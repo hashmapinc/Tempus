@@ -625,3 +625,11 @@ section.tb-footer-buttons {
 .ace_editor {
   font-size: 16px !important;
 }
+
+.hm-side-toolbar {
+  background: linear-gradient(to bottom, #0c3483 0%, transparent 200%), url("/static/images/LoginPage_Background_Image.png");
+}
+.hm-homecard-gradient {
+  background: linear-gradient(to bottom, #0c3483 0%, transparent 300%);
+  color: rgba(255,255,255,0.87);
+}
