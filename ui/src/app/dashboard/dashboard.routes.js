@@ -41,7 +41,7 @@ export default function DashboardRoutes($stateProvider) {
                 pageTitle: 'dashboard.dashboards'
             },
             ncyBreadcrumb: {
-                label: '{"icon": "dashboard", "label": "dashboard.dashboards"}'
+                label: '{"icon": "dashboard", "label": "dashboard.dashboards", "link": "/static/svg/dashboardlightgray.svg"}'
             }
         })
         .state('home.customers.dashboards', {
@@ -62,7 +62,7 @@ export default function DashboardRoutes($stateProvider) {
                 pageTitle: 'customer.dashboards'
             },
             ncyBreadcrumb: {
-                label: '{"icon": "dashboard", "label": "{{ vm.customerDashboardsTitle }}", "translate": "false"}'
+                label: '{"icon": "dashboard", "label": "{{ vm.customerDashboardsTitle }}", "translate": "false", "link": "/static/svg/dashboardlightgray.svg"}'
             }
         })
         .state('home.dashboards.dashboard', {
@@ -83,7 +83,7 @@ export default function DashboardRoutes($stateProvider) {
                 pageTitle: 'dashboard.dashboard'
             },
             ncyBreadcrumb: {
-                label: '{"icon": "dashboard", "label": "{{ vm.dashboard.title }}", "translate": "false"}'
+                label: '{"icon": "dashboard", "label": "{{ vm.dashboard.title }}", "translate": "false", "link": "/static/svg/dashboardlightgray.svg"}'
             }
         })
         .state('home.customers.dashboards.dashboard', {
@@ -103,7 +103,7 @@ export default function DashboardRoutes($stateProvider) {
                 pageTitle: 'customer.dashboard'
             },
             ncyBreadcrumb: {
-                label: '{"icon": "dashboard", "label": "customer.dashboard"}'
+                label: '{"icon": "dashboard", "label": "customer.dashboard", "link": "/static/svg/dashboardlightgray.svg"}'
             }
         })
 }

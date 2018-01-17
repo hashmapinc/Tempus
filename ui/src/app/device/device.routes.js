@@ -42,7 +42,7 @@ export default function DeviceRoutes($stateProvider, types) {
                 pageTitle: 'device.devices'
             },
             ncyBreadcrumb: {
-                label: '{"icon": "devices_other", "label": "device.devices"}'
+                label: '{"icon": "devices_other", "label": "device.devices", "link": "/static/svg/deviceslightgray.svg"}'
             }
         })
         .state('home.customers.devices', {
@@ -65,7 +65,7 @@ export default function DeviceRoutes($stateProvider, types) {
                 pageTitle: 'customer.devices'
             },
             ncyBreadcrumb: {
-                label: '{"icon": "devices_other", "label": "{{ vm.customerDevicesTitle }}", "translate": "false"}'
+                label: '{"icon": "devices_other", "label": "{{ vm.customerDevicesTitle }}", "translate": "false", "link": "/static/svg/deviceslightgray.svg"}'
             }
         });
 

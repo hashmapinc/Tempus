@@ -40,7 +40,7 @@ export default function CustomerRoutes($stateProvider) {
                 pageTitle: 'customer.customers'
             },
             ncyBreadcrumb: {
-                label: '{"icon": "supervisor_account", "label": "customer.customers"}'
+                label: '{"icon": "supervisor_account", "label": "customer.customers", "link": "/static/svg/businessunitslightgray.svg"}'
             }
         });
 
