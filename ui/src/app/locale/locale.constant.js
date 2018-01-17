@@ -635,6 +635,9 @@ export default angular.module('thingsboard.locale', [])
                     "name": "Application Name",
                     "name-required": "Application name is required"
                 },
+                "tempusboard": {
+                    "tempusboards": "Tempusboard"
+                },
                 "datakey": {
                     "settings": "Settings",
                     "advanced": "Advanced",
@@ -1404,7 +1407,7 @@ export default angular.module('thingsboard.locale', [])
                     }
                 },
                 "computation": {
-                    "computations": "Upload Computations"
+                    "computations": "Computations"
                 }
             }
         }
