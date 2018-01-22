@@ -43,7 +43,8 @@ module.exports = {
         }),
         new CopyWebpackPlugin([
             {from: './src/thingsboard.svg', to: 'thingsboard.svg'},
-            {from: './src/svg', to: 'svg'}
+            {from: './src/svg', to: 'svg'},
+            {from: './src/images', to: 'images'}
         ]),
         new HtmlWebpackPlugin({
             template: './src/index.html',
