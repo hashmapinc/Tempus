@@ -324,6 +324,17 @@ function Menu(userService, $state, $rootScope) {
                                         link: '/static/svg/dashboardlightgray.svg'
                                     }
                                 ]
+                            },
+                            {
+                                name: 'tempusboard.view-tempusboard',
+                                places: [
+                                    {
+                                        name: 'Tempusboard',
+                                        icon: 'dashboard',
+                                        state: 'home.tempusboard',
+                                        link: '/static/svg/tempusboardlightgray.svg'
+                                    }
+                                ]
                             }];
 
                 } else if (authority === 'CUSTOMER_USER') {
@@ -335,18 +346,11 @@ function Menu(userService, $state, $rootScope) {
                             icon: 'home'
                         },
                         {
-                            name: 'alert.alert',
+                            name: 'Tempusboard',
                             type: 'link',
-                            state: 'alert.links',
-                            icon: 'dashboards',
-                            ink: '/static/svg/dashboardlightgray.svg'
-                        },
-                        {
-                            name: 'asset.assets',
-                            type: 'link',
-                            state: 'home.assets',
-                            icon: 'domain',                                        
-                            link: '/static/svg/assetslightgray.svg'
+                            icon: 'dashboard',
+                            state: 'home.tempusboard',
+                            link: '/static/svg/tempusboardlightgray.svg'
                         },
                         {
                             name: 'device.devices',
@@ -396,7 +400,19 @@ function Menu(userService, $state, $rootScope) {
                                         link: '/static/svg/dashboardlightgray.svg'
                                     }
                                 ]
-                            }];
+                            },
+                            {
+                                name: 'tempusboard.view-tempusboard',
+                                places: [
+                                    {
+                                        name: 'Tempusboard',
+                                        icon: 'dashboard',
+                                        state: 'home.tempusboard',
+                                        link: '/static/svg/tempusboardlightgray.svg'
+                                    }
+                                ]
+                            }
+                            ];
                 }
             }
         }
