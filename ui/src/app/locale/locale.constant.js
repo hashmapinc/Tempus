@@ -636,7 +636,8 @@ export default angular.module('thingsboard.locale', [])
                     "name-required": "Application name is required"
                 },
                 "tempusboard": {
-                    "tempusboards": "Tempusboard"
+                    "tempusboards": "Tempusboard",
+                    "view-tempusboard": "View Tempusboard",
                 },
                 "datakey": {
                     "settings": "Settings",
