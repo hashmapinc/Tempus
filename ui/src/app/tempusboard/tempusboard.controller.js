@@ -126,6 +126,9 @@ export function TempusboardController($scope, $log, $state, $stateParams, userSe
         vm.devicesScope = 'customer_user';
         customerId = user.customerId;
     }
+    else if (user.authority === 'TENANT_ADMIN') {
+        vm.devicesScope = 'tenant';
+    }
 
     if (vm.devicesScope === 'tenant') {
        
@@ -135,7 +138,7 @@ export function TempusboardController($scope, $log, $state, $stateParams, userSe
     else if (vm.devicesScope === 'customer' || vm.devicesScope === 'customer_user') {
         devices = deviceService.getCustomerDevices(customerId, pageLink, true, null);
     }
-    
+
 	devices.then(function (data) {
 		$log.log(data);
 		vm.devices = data.data;
