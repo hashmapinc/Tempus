@@ -154,7 +154,16 @@ public class VelocityUtils {
     
     private static void pushAttributes(VelocityContext context, Collection<AttributeKvEntry> deviceAttributes, String prefix) {
         Map<String, String> values = new HashMap<>();
-        deviceAttributes.forEach(v -> values.put(v.getKey(), v.getValueAsString()));
-        context.put(prefix, values);
+        Set<String> clientAttrib = new HashSet<>();
+        if(prefix.contentEquals(NashornJsEvaluator.CLIENT_SIDE)){
+            deviceAttributes.forEach(v -> {values.put(v.getKey(), v.getValueAsString());
+                clientAttrib.add(v.getKey());});
+            context.put(prefix, values);
+            context.put("cs",values);
+        }
+        else {
+            deviceAttributes.forEach(v -> values.put(v.getKey(), v.getValueAsString()));
+            context.put(prefix, values);
+        }
     }
 }
