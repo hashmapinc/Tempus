@@ -17,8 +17,8 @@ package org.thingsboard.server.common.data;
 
 import org.thingsboard.server.common.data.id.*;
 
-import java.util.Arrays;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 public class Application extends SearchTextBased<ApplicationId> implements HasName {
 
@@ -28,10 +28,10 @@ public class Application extends SearchTextBased<ApplicationId> implements HasNa
     private CustomerId customerId;
     private DashboardId dashboardId;
     private DashboardId miniDashboardId;
-    private List<RuleId> rules = Arrays.asList();
+    private Set<RuleId> rules = new HashSet<>();
     private String name;
     private String description;
-    private List<String> deviceTypes = Arrays.asList();
+    private Set<String> deviceTypes = new HashSet<>();
     private Boolean isValid = Boolean.TRUE;
 
     public Application() {
@@ -85,12 +85,20 @@ public class Application extends SearchTextBased<ApplicationId> implements HasNa
         this.miniDashboardId = miniDashboardId;
     }
 
-    public List<RuleId> getRules() {
+    public Set<RuleId> getRules() {
         return rules;
     }
 
-    public void setRules(List<RuleId> rules) {
+    public void setRules(Set<RuleId> rules) {
         this.rules = rules;
+    }
+
+    public void addRules(Set<RuleId> rules) {
+        this.rules.addAll(rules);
+    }
+
+    public void addDeviceTypes(Set<String> deviceTypes) {
+        this.deviceTypes.addAll(deviceTypes);
     }
 
     public String getDescription() {
@@ -101,11 +109,11 @@ public class Application extends SearchTextBased<ApplicationId> implements HasNa
         this.description = description;
     }
 
-    public List<String> getDeviceTypes() {
+    public Set<String> getDeviceTypes() {
         return deviceTypes;
     }
 
-    public void setDeviceTypes(List<String> deviceTypes) {
+    public void setDeviceTypes(Set<String> deviceTypes) {
         this.deviceTypes = deviceTypes;
     }
 
