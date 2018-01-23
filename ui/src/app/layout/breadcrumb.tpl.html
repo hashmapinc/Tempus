@@ -19,7 +19,10 @@
 	<h1 flex hide-gt-sm>{{ steps[steps.length-1].ncyBreadcrumbLabel | breadcrumbLabel }}</h1>
 	<span hide-xs hide-sm ng-repeat="step in steps" ng-switch="$last || !!step.abstract">
 	    <a ng-switch-when="false" href="{{step.ncyBreadcrumbLink}}">
-	    <md-icon ng-show="step.ncyBreadcrumbLabel | breadcrumbIcon" 
+	    <md-icon ng-if="step.ncyBreadcrumbLink" md-svg-src="{{step.ncyBreadcrumbLink}}"
+	    class="material-icons">
+	    </md-icon>
+	    <md-icon ng-if="!step.ncyBreadcrumbLink" ng-show="step.ncyBreadcrumbLabel | breadcrumbIcon" 
 	    class="material-icons"
 	    aria-label="{{step.ncyBreadcrumbLabel | breadcrumbIcon}}">
 	    	{{step.ncyBreadcrumbLabel | breadcrumbIcon}}
@@ -27,7 +30,10 @@
 	    {{step.ncyBreadcrumbLabel | breadcrumbLabel}}
 	    </a>
 	    <span ng-switch-when="true">
-	    	<md-icon ng-show="step.ncyBreadcrumbLabel | breadcrumbIcon" 
+	    	<md-icon ng-if="step.ncyBreadcrumbLabel | breadcrumbLink" md-svg-src="{{step.ncyBreadcrumbLabel | breadcrumbLink}}"
+	    	class="material-icons">
+	    	</md-icon>
+	    	<md-icon ng-if="!(step.ncyBreadcrumbLabel | breadcrumbLink)" ng-show="step.ncyBreadcrumbLabel | breadcrumbIcon" 
 	    	class="material-icons"
 	    	aria-label="{{step.ncyBreadcrumbLabel | breadcrumbIcon}}">
 	    	{{step.ncyBreadcrumbLabel | breadcrumbIcon}}

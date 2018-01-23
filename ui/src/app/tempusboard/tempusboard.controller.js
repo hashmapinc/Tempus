@@ -18,8 +18,10 @@
 //import AliasController from '../api/alias-controller';
 
 /*@ngInject*/
-export function TempusboardController($scope, $log, $state, $stateParams, deviceService, types, attributeService, $q, dashboardService, applicationService) {
+export function TempusboardController($scope, $log, $state, $stateParams, userService, deviceService, types, attributeService, $q, dashboardService, applicationService) {
 	var vm = this;
+    var customerId = $stateParams.customerId;
+
 	vm.types = types;
     vm.deviceSelected = false;
     vm.dashboardCtx = {
@@ -119,7 +121,24 @@ export function TempusboardController($scope, $log, $state, $stateParams, device
         $log.log(subscriptionIdMap);
     }
 
-    var devices = deviceService.getTenantDevices(pageLink, true, null);
+    var user = userService.getCurrentUser();
+    if (user.authority === 'CUSTOMER_USER') {
+        vm.devicesScope = 'customer_user';
+        customerId = user.customerId;
+    }
+    else if (user.authority === 'TENANT_ADMIN') {
+        vm.devicesScope = 'tenant';
+    }
+
+    if (vm.devicesScope === 'tenant') {
+       
+        var devices = deviceService.getTenantDevices(pageLink, true, null);
+        
+    }
+    else if (vm.devicesScope === 'customer' || vm.devicesScope === 'customer_user') {
+        devices = deviceService.getCustomerDevices(customerId, pageLink, true, null);
+    }
+
 	devices.then(function (data) {
 		$log.log(data);
 		vm.devices = data.data;

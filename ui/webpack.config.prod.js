@@ -42,12 +42,14 @@ module.exports = {
             moment: "moment"
         }),
         new CopyWebpackPlugin([
-            {from: './src/thingsboard.ico', to: 'thingsboard.ico'}
+            {from: './src/thingsboard.svg', to: 'thingsboard.svg'},
+            {from: './src/svg', to: 'svg'},
+            {from: './src/images', to: 'images'}
         ]),
         new HtmlWebpackPlugin({
             template: './src/index.html',
             filename: '../index.html',
-            title: 'ThingsBoard',
+            title: 'Tempus',
             inject: 'body',
         }),
         new webpack.optimize.OccurrenceOrderPlugin(),

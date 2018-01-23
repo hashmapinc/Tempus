@@ -55,6 +55,7 @@ import HomeRoutes from './home.routes';
 import HomeController from './home.controller';
 import BreadcrumbLabel from './breadcrumb-label.filter';
 import BreadcrumbIcon from './breadcrumb-icon.filter';
+import BreadcrumbLink from './breadcrumb-link.filter';
 
 export default angular.module('thingsboard.home', [
     uiRouter,
@@ -92,4 +93,5 @@ export default angular.module('thingsboard.home', [
     .controller('HomeController', HomeController)
     .filter('breadcrumbLabel', BreadcrumbLabel)
     .filter('breadcrumbIcon', BreadcrumbIcon)
+    .filter('breadcrumbLink', BreadcrumbLink)
     .name;

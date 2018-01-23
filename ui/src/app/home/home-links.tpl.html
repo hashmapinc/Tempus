@@ -20,14 +20,15 @@
 		<md-card style='width: 100%;'>
 			<md-card-title>
 				<md-card-title-text>
-					<span translate class="md-headline">{{ section.name }}</span>
+					<span translate class="md-subtitle" style="text-transform: uppercase; text-align: center;">{{ section.name }}</span>
 				</md-card-title-text>
 			</md-card-title>
 			<md-card-content>
 				<md-grid-list md-row-height="170px" md-cols="{{section.places.length}}" md-cols-gt-md="{{section.places.length}}">
 					 <md-grid-tile class="card-tile" ng-repeat="place in section.places">
-			        	<md-button class="tb-card-button md-raised md-primary" layout="column" ui-sref="{{place.state}}">
-			        		<md-icon class="material-icons tb-md-96" aria-label="{{place.icon}}">{{place.icon}}</md-icon>
+			        	<md-button class="tb-card-button md-raised hm-homecard-gradient" style="color:#fafafa;" layout="column" ui-sref="{{place.state}}">
+			        		<md-icon ng-if="place.link" class="material-icons tb-md-96" md-svg-src="{{place.link}}"></md-icon>
+			        		<md-icon ng-if="!place.link" class="material-icons tb-md-96" aria-label="{{place.icon}}" style="color:#fafafa;">{{place.icon}}</md-icon>
 			   				<span translate>{{place.name}}</span>
 			        	</md-button>
 					 </md-grid-tile>

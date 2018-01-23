@@ -70,13 +70,15 @@ function Menu(userService, $state, $rootScope) {
                             name: 'plugin.plugins',
                             type: 'link',
                             state: 'home.plugins',
-                            icon: 'extension'
+                            icon: 'extension',
+                            link: '/static/svg/pluginslightgray.svg'
                         },
                         {
                             name: 'rule.rules',
                             type: 'link',
                             state: 'home.rules',
-                            icon: 'settings_ethernet'
+                            icon: 'settings_ethernet',
+                            link: '/static/svg/businessruleslightgray.svg'
                         },
                         {
                             name: 'tenant.tenants',
@@ -88,7 +90,8 @@ function Menu(userService, $state, $rootScope) {
                             name: 'widget.widget-library',
                             type: 'link',
                             state: 'home.widgets-bundles',
-                            icon: 'now_widgets'
+                            icon: 'now_widgets',
+                            link: '/static/svg/widgetslightgray.svg'
                         },
                         {
                             name: 'admin.system-settings',
@@ -101,14 +104,12 @@ function Menu(userService, $state, $rootScope) {
                                     name: 'admin.general',
                                     type: 'link',
                                     state: 'home.settings.general',
-                                    icon: 'settings_applications'
-                                },
+                                    icon: 'settings_applications'                                },
                                 {
                                     name: 'admin.outgoing-mail',
                                     type: 'link',
                                     state: 'home.settings.outgoing-mail',
-                                    icon: 'mail'
-                                }
+                                    icon: 'mail'                                }
                             ]
                         }];
                     homeSections =
@@ -118,12 +119,14 @@ function Menu(userService, $state, $rootScope) {
                                 {
                                     name: 'plugin.plugins',
                                     icon: 'extension',
-                                    state: 'home.plugins'
+                                    state: 'home.plugins',
+                                    link: 'static/svg/pluginslightgray.svg'
                                 },
                                 {
                                     name: 'rule.rules',
                                     icon: 'settings_ethernet',
-                                    state: 'home.rules'
+                                    state: 'home.rules',
+                                    link: '/static/svg/businessruleslightgray.svg'
                                 }
                             ]
                         },
@@ -143,7 +146,8 @@ function Menu(userService, $state, $rootScope) {
                                     {
                                         name: 'widget.widget-library',
                                         icon: 'now_widgets',
-                                        state: 'home.widgets-bundles'
+                                        state: 'home.widgets-bundles',
+                                        link: '/static/svg/widgetslightgray.svg'
                                     }
                                 ]
                             },
@@ -158,7 +162,7 @@ function Menu(userService, $state, $rootScope) {
                                     {
                                         name: 'admin.outgoing-mail',
                                         icon: 'mail',
-                                        state: 'home.settings.outgoing-mail'
+                                        state: 'home.settings.outgoing-mail',
                                     }
                                 ]
                             }];
@@ -174,61 +178,71 @@ function Menu(userService, $state, $rootScope) {
                             name: 'Applications',
                             type: 'link',
                             state: 'home.applications',
-                            icon: 'dashboards'
+                            icon: 'dashboards',
+                            link: '/static/svg/applicationslightgray.svg'
                         }, 
                         {
                             name: 'Tempusboard',
                             type: 'link',
                             state: 'home.tempusboard',
-                            icon: 'dashboards'
+                            icon: 'dashboards',
+                            link: '/static/svg/tempusboardlightgray.svg'
                         },
                         {
                             name: 'plugin.plugins',
                             type: 'link',
                             state: 'home.plugins',
-                            icon: 'extension'
+                            icon: 'extension',
+                            link: '/static/svg/pluginslightgray.svg'
                         },
                         {
                             name: 'rule.rules',
                             type: 'link',
                             state: 'home.rules',
-                            icon: 'settings_ethernet'
+                            icon: 'settings_ethernet',
+                            link: '/static/svg/businessruleslightgray.svg'
                         },
                         {
                             name: 'customer.customers',
                             type: 'link',
                             state: 'home.customers',
-                            icon: 'supervisor_account'
+                            icon: 'supervisor_account',
+                            link: '/static/svg/businessunitslightgray.svg'
                         },
                         {
                             name: 'asset.assets',
                             type: 'link',
                             state: 'home.assets',
-                            icon: 'domain'
+                            icon: 'domain',
+                            link: '/static/svg/assetslightgray.svg'
                         },
                         {
                             name: 'device.devices',
                             type: 'link',
                             state: 'home.devices',
-                            icon: 'devices_other'
+                            icon: 'devices_other',
+                            link: '/static/svg/deviceslightgray.svg'
                         },
                         {
                             name: 'widget.widget-library',
                             type: 'link',
                             state: 'home.widgets-bundles',
-                            icon: 'now_widgets'
+                            icon: 'now_widgets',
+                            link: '/static/svg/widgetslightgray.svg'
                         },
                         {
                             name: 'dashboard.dashboards',
                             type: 'link',
                             state: 'home.dashboards',
-                            icon: 'dashboards'
+                            icon: 'dashboards',
+                            link: '/static/svg/dashboardlightgray.svg'
                         },
                         {
                             name: 'computation.computations',
                             type: 'link',
                             state: 'home.computations',
-                            icon: 'dashboards'
+                            icon: 'dashboards',
+                            link: '/static/svg/computationslightgray.svg'
                         }];
 
                     homeSections =
@@ -238,12 +252,15 @@ function Menu(userService, $state, $rootScope) {
                                 {
                                     name: 'plugin.plugins',
                                     icon: 'extension',
-                                    state: 'home.plugins'
+                                    state: 'home.plugins',
+                                    link: '/static/svg/pluginslightgray.svg'
+
                                 },
                                 {
                                     name: 'rule.rules',
                                     icon: 'settings_ethernet',
-                                    state: 'home.rules'
+                                    state: 'home.rules',
+                                    link: '/static/svg/businessruleslightgray.svg'
                                 }
                             ]
                         },
@@ -253,7 +270,8 @@ function Menu(userService, $state, $rootScope) {
                                 {
                                     name: 'customer.customers',
                                     icon: 'supervisor_account',
-                                    state: 'home.customers'
+                                    state: 'home.customers',
+                                    link: '/static/svg/businessunitslightgray.svg'
                                 }
                             ]
                         },
@@ -263,7 +281,8 @@ function Menu(userService, $state, $rootScope) {
                                     {
                                         name: 'asset.assets',
                                         icon: 'domain',
-                                        state: 'home.assets'
+                                        state: 'home.assets',
+                                        link: '/static/svg/assetslightgray.svg'
                                     }
                                 ]
                             },
@@ -273,7 +292,8 @@ function Menu(userService, $state, $rootScope) {
                                     {
                                         name: 'Tempusboard',
                                         icon: 'dashboard',
-                                        state: 'home.tempusboard'
+                                        state: 'home.tempusboard',
+                                        link: '/static/svg/tempusboardlightgray.svg'
                                     }
                                 ]
                             },
@@ -283,7 +303,8 @@ function Menu(userService, $state, $rootScope) {
                                     {
                                         name: 'device.devices',
                                         icon: 'devices_other',
-                                        state: 'home.devices'
+                                        state: 'home.devices',
+                                        link: '/static/svg/deviceslightgray.svg'
                                     }
                                 ]
                             },
@@ -293,12 +314,25 @@ function Menu(userService, $state, $rootScope) {
                                     {
                                         name: 'widget.widget-library',
                                         icon: 'now_widgets',
-                                        state: 'home.widgets-bundles'
+                                        state: 'home.widgets-bundles',
+                                        link: '/static/svg/widgetslightgray.svg'
                                     },
                                     {
                                         name: 'dashboard.dashboards',
                                         icon: 'dashboard',
-                                        state: 'home.dashboards'
+                                        state: 'home.dashboards',
+                                        link: '/static/svg/dashboardlightgray.svg'
+                                    }
+                                ]
+                            },
+                            {
+                                name: 'tempusboard.view-tempusboard',
+                                places: [
+                                    {
+                                        name: 'Tempusboard',
+                                        icon: 'dashboard',
+                                        state: 'home.tempusboard',
+                                        link: '/static/svg/tempusboardlightgray.svg'
                                     }
                                 ]
                             }];
@@ -312,28 +346,25 @@ function Menu(userService, $state, $rootScope) {
                             icon: 'home'
                         },
                         {
-                            name: 'alert.alert',
+                            name: 'Tempusboard',
                             type: 'link',
-                            state: 'alert.links',
-                            icon: 'dashboards'
-                        },
-                        {
-                            name: 'asset.assets',
-                            type: 'link',
-                            state: 'home.assets',
-                            icon: 'domain'
+                            icon: 'dashboard',
+                            state: 'home.tempusboard',
+                            link: '/static/svg/tempusboardlightgray.svg'
                         },
                         {
                             name: 'device.devices',
                             type: 'link',
                             state: 'home.devices',
-                            icon: 'devices_other'
+                            icon: 'devices_other',
+                            link: '/static/svg/deviceslightgray.svg'
                         },
                         {
                             name: 'dashboard.dashboards',
                             type: 'link',
                             state: 'home.dashboards',
-                            icon: 'dashboard'
+                            icon: 'dashboard',                            
+                            link: '/static/svg/dashboardlightgray.svg'
                         }];
 
                     homeSections =
@@ -343,7 +374,8 @@ function Menu(userService, $state, $rootScope) {
                                 {
                                     name: 'asset.assets',
                                     icon: 'domain',
-                                    state: 'home.assets'
+                                    state: 'home.assets',
+                                    link: '/static/svg/assetslightgray.svg'
                                 }
                             ]
                         },
@@ -353,7 +385,8 @@ function Menu(userService, $state, $rootScope) {
                                 {
                                     name: 'device.devices',
                                     icon: 'devices_other',
-                                    state: 'home.devices'
+                                    state: 'home.devices',                                        
+                                    link: '/static/svg/deviceslightgray.svg'
                                 }
                             ]
                         },
@@ -363,10 +396,23 @@ function Menu(userService, $state, $rootScope) {
                                     {
                                         name: 'dashboard.dashboards',
                                         icon: 'dashboard',
-                                        state: 'home.dashboards'
+                                        state: 'home.dashboards',                            
+                                        link: '/static/svg/dashboardlightgray.svg'
                                     }
                                 ]
-                            }];
+                            },
+                            {
+                                name: 'tempusboard.view-tempusboard',
+                                places: [
+                                    {
+                                        name: 'Tempusboard',
+                                        icon: 'dashboard',
+                                        state: 'home.tempusboard',
+                                        link: '/static/svg/tempusboardlightgray.svg'
+                                    }
+                                ]
+                            }
+                            ];
                 }
             }
         }

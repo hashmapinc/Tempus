@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright © 2016-2017 The Thingsboard Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,29 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-div.tb-user-info {
-  line-height: 3;
-  span {
-    text-transform: none;
-    text-align: left;
-  }
-  span.tb-user-display-name {
-    font-size: 0.800rem;
-    font-weight: 300;
-    letter-spacing: 0.008em;
-  }
-  span.tb-user-authority {
-    font-size: 0.800rem;
-    font-weight: 300;
-    letter-spacing: 0.005em;
-    opacity: 0.8;
-  }
-}
-
-md-icon.tb-mini-avatar {
-  margin: auto 8px;
-  font-size: 36px;
-  height: 36px;
-  width: 36px;
+export default function BreadcrumbLink() {
+    return function (bLink) {
+        var linkObj = angular.fromJson(bLink);
+        if (angular.isDefined(linkObj.link)) {
+            return linkObj.link;
+        }
+        return null;
+    };
 }

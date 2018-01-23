@@ -37,7 +37,7 @@ export default function ComputationRoutes($stateProvider) {
                 pageTitle: 'computation.computations'
             },
             ncyBreadcrumb: {
-                label: '{"icon": "dashboards", "label": "computation.computations"}'
+                label: '{"icon": "dashboards", "label": "computation.computations", "link": "/static/svg/computationslightgray.svg"}'
             }
         });
 
