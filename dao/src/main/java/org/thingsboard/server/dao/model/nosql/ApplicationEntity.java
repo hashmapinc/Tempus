@@ -26,6 +26,7 @@ import com.datastax.driver.mapping.annotations.Transient;
 
 
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -65,10 +66,10 @@ public final class ApplicationEntity implements SearchTextEntity<Application> {
     private String searchText;
 
     @Column(name = APPLICATION_RULES_COLUMN)
-    private List<UUID> rules;
+    private Set<UUID> rules;
 
     @Column(name = APPLICATION_DEVICE_TYPES_COLUMN)
-    private List<String> deviceTypes;
+    private Set<String> deviceTypes;
 
 
     public ApplicationEntity() {
@@ -95,7 +96,7 @@ public final class ApplicationEntity implements SearchTextEntity<Application> {
         }
 
         if(application.getRules() !=null && application.getRules().size() !=0) {
-            this.rules = application.getRules().stream().map(r -> (r.getId())).collect(Collectors.toList());
+            this.rules = application.getRules().stream().map(r -> (r.getId())).collect(Collectors.toSet());
         }
 
         this.name = application.getName();
@@ -174,19 +175,19 @@ public final class ApplicationEntity implements SearchTextEntity<Application> {
         return searchText;
     }
 
-    public List<UUID> getRules() {
+    public Set<UUID> getRules() {
         return rules;
     }
 
-    public void setRules(List<UUID> rules) {
+    public void setRules(Set<UUID> rules) {
         this.rules = rules;
     }
 
-    public List<String> getDeviceTypes() {
+    public Set<String> getDeviceTypes() {
         return deviceTypes;
     }
 
-    public void setDeviceTypes(List<String> deviceTypes) {
+    public void setDeviceTypes(Set<String> deviceTypes) {
         this.deviceTypes = deviceTypes;
     }
 
@@ -210,7 +211,7 @@ public final class ApplicationEntity implements SearchTextEntity<Application> {
         }
 
         if(rules !=null && rules.size() !=0) {
-            application.setRules(rules.stream().map(RuleId::new).collect(Collectors.toList()));
+            application.setRules(rules.stream().map(RuleId::new).collect(Collectors.toSet()));
         }
         application.setName(name);
         application.setDescription(description);

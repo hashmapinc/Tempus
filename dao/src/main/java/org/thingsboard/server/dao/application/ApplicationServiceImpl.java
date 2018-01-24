@@ -15,6 +15,8 @@
  */
 package org.thingsboard.server.dao.application;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.google.common.collect.Iterables;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,8 +38,8 @@ import org.thingsboard.server.dao.rule.RuleDao;
 import org.thingsboard.server.dao.service.DataValidator;
 import org.thingsboard.server.dao.tenant.TenantDao;
 
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import static org.thingsboard.server.dao.model.ModelConstants.NULL_DEVICE_TYPE;
 import static org.thingsboard.server.dao.model.ModelConstants.NULL_UUID;
@@ -160,21 +162,44 @@ public class ApplicationServiceImpl extends AbstractEntityService implements App
         return saveApplication(application);
     }
 
+
     @Override
-    public Application assignRulesToApplication(ApplicationId applicationId, List<RuleId> ruleIdList) {
+    public Application unassignRulesToApplication(ApplicationId applicationId, Set<RuleId> ruleIdSet) {
         Application application = findApplicationById(applicationId);
-        application.setRules(ruleIdList);
+        application.getRules().removeAll(ruleIdSet);
+        for(RuleId ruleId: application.getRules()) {
+            RuleMetaData ruleMetaData = ruleDao.findById(ruleId);
+            application.setDeviceTypes(getDeviceTypesfromFiltersJson(ruleMetaData.getFilters()));
+        }
         return saveApplication(application);
     }
 
     @Override
-    public Application assignDeviceTypesToApplication(ApplicationId applicationId, List<String> deviceTypes) {
+    public Application assignRulesToApplication(ApplicationId applicationId, Set<RuleId> ruleIdSet) {
         Application application = findApplicationById(applicationId);
-        if(deviceTypes != null && !deviceTypes.isEmpty()){
-            application.setDeviceTypes(deviceTypes);
-            return saveApplication(application);
+        for(RuleId ruleId: ruleIdSet) {
+            RuleMetaData ruleMetaData = ruleDao.findById(ruleId);
+            application.addDeviceTypes(getDeviceTypesfromFiltersJson(ruleMetaData.getFilters()));
         }
-        return application;
+        if(application.getRules().contains(new RuleId(NULL_UUID))) {
+            application.getRules().remove(new RuleId(NULL_UUID));
+            application.getDeviceTypes().remove(NULL_DEVICE_TYPE);
+        }
+        application.addRules(ruleIdSet);
+        return saveApplication(application);
+    }
+
+    private Set<String> getDeviceTypesfromFiltersJson(JsonNode filters){
+        Set<String> deviceTypes = new HashSet<>();
+        Iterator<JsonNode> configurations = filters.elements();
+        while (configurations.hasNext()) {
+            JsonNode configuration = configurations.next();
+            for(JsonNode jsonNode: configuration.findValues("deviceTypes")) {
+                java.util.List<String> name = jsonNode.findValues("name").stream().map(JsonNode::asText).collect(Collectors.toList());
+                deviceTypes.addAll(name);
+            }
+        }
+        return deviceTypes;
     }
 
 
@@ -236,18 +261,18 @@ public class ApplicationServiceImpl extends AbstractEntityService implements App
                     }
 
                     if(application.getRules() == null || application.getRules().isEmpty()) {
-                        application.setRules(Arrays.asList(new RuleId(NULL_UUID)));
-                    } else if(!application.getRules().get(0).getId().equals(NULL_UUID)) {
+                        application.setRules(new HashSet<>(Arrays.asList(new RuleId(NULL_UUID))));
+                    } else if(application.getRules().size() > 1 || !Iterables.getOnlyElement(application.getRules()).getId().equals(NULL_UUID)) {
                         for(RuleId ruleId: application.getRules()) {
                             RuleMetaData ruleMetaData = ruleDao.findById(ruleId);
                             if(ruleMetaData == null) {
-                              throw new DataValidationException("Can't assign application to non-existent rule!");
+                                isValid = false;
                             }
                         }
                     }
 
                     if(application.getDeviceTypes() == null || application.getDeviceTypes().isEmpty()) {
-                        application.setDeviceTypes(Arrays.asList(NULL_DEVICE_TYPE));
+                        application.setDeviceTypes(new HashSet<>(Arrays.asList(NULL_DEVICE_TYPE)));
                     }
 
                     if(application.getMiniDashboardId() == null) {
@@ -258,6 +283,7 @@ public class ApplicationServiceImpl extends AbstractEntityService implements App
                             throw new DataValidationException("Can't assign application to non-existent mini dashboard!");
                         }
                     }
+                    application.setIsValid(isValid);
                 }
             };
 }

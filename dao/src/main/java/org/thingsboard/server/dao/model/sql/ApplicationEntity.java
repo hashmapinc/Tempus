@@ -30,6 +30,7 @@ import org.thingsboard.server.dao.util.mapping.JsonStringType;
 
 import javax.persistence.*;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Data
@@ -57,7 +58,7 @@ public final class ApplicationEntity extends BaseSqlEntity<Application> implemen
     @ElementCollection
     @CollectionTable(name = ModelConstants.APPLICATION_RULES_ASSOCIATION_TABLE, joinColumns = @JoinColumn(name = ModelConstants.APPLICATION_ID_COLUMN))
     @Column(name = ModelConstants.APPLICATION_RULE_ID_COLUMN)
-    private List<String> rules;
+    private Set<String> rules;
 
     @Column(name = ModelConstants.APPLICATION_NAME)
     private String name;
@@ -71,7 +72,7 @@ public final class ApplicationEntity extends BaseSqlEntity<Application> implemen
     @ElementCollection
     @CollectionTable(name = ModelConstants.APPLICATION_DEVICE_TYPES_TABLE, joinColumns = @JoinColumn(name = ModelConstants.APPLICATION_ID_COLUMN))
     @Column(name = ModelConstants.APPLICATION_DEVICE_TYPES)
-    private List<String> deviceTypes;
+    private Set<String> deviceTypes;
 
 
     public ApplicationEntity() {
@@ -98,7 +99,7 @@ public final class ApplicationEntity extends BaseSqlEntity<Application> implemen
         }
 
         if(application.getRules() !=null && application.getRules().size() !=0) {
-            this.rules = application.getRules().stream().map(r -> toString(r.getId())).collect(Collectors.toList());
+            this.rules = application.getRules().stream().map(r -> toString(r.getId())).collect(Collectors.toSet());
         }
 
         this.name = application.getName();
@@ -136,7 +137,7 @@ public final class ApplicationEntity extends BaseSqlEntity<Application> implemen
         }
 
         if(rules !=null && rules.size() !=0) {
-            application.setRules(rules.stream().map(r -> new RuleId(toUUID(r))).collect(Collectors.toList()));
+            application.setRules(rules.stream().map(r -> new RuleId(toUUID(r))).collect(Collectors.toSet()));
         }
         application.setName(name);
         application.setDescription(description);

@@ -19,11 +19,10 @@ import com.datastax.driver.core.utils.UUIDs;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang.RandomStringUtils;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.json.JSONObject;
+import org.junit.*;
 import org.thingsboard.server.common.data.*;
+import org.thingsboard.server.common.data.id.RuleId;
 import org.thingsboard.server.common.data.page.TextPageData;
 import org.thingsboard.server.common.data.page.TextPageLink;
 import org.thingsboard.server.common.data.plugin.PluginMetaData;
@@ -33,12 +32,10 @@ import org.thingsboard.server.dao.model.ModelConstants;
 import org.thingsboard.server.extensions.core.plugin.telemetry.TelemetryStoragePlugin;
 import scala.App;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 import static org.hamcrest.CoreMatchers.containsString;
+import static org.thingsboard.server.dao.model.ModelConstants.NULL_DEVICE_TYPE;
 import static org.thingsboard.server.dao.model.ModelConstants.NULL_UUID;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -263,17 +260,17 @@ public class BaseApplicationControllerTest extends AbstractControllerTest {
     public void testGetDeviceTypeApplications() throws Exception {
         Application application1 = new Application();
         application1.setName("application1");
-        application1.setDeviceTypes(Arrays.asList("DT1", "DT2"));
+        application1.setDeviceTypes(new HashSet<>(Arrays.asList("DT1", "DT2")));
         doPost("/api/application", application1, Application.class);
 
         Application application2 = new Application();
         application2.setName("application2");
-        application2.setDeviceTypes(Arrays.asList("DT2", "DT3"));
+        application2.setDeviceTypes(new HashSet<>(Arrays.asList("DT2", "DT3")));
         doPost("/api/application", application2, Application.class);
 
         Application application3 = new Application();
         application3.setName("application3");
-        application3.setDeviceTypes(Arrays.asList("DT3", "DT4"));
+        application3.setDeviceTypes(new HashSet<>(Arrays.asList("DT3", "DT4")));
         doPost("/api/application", application3, Application.class);
 
         Application application4 = new Application();
@@ -429,12 +426,14 @@ public class BaseApplicationControllerTest extends AbstractControllerTest {
         application.setName("My application");
         Application savedApplication = doPost("/api/application", application, Application.class);
 
+        Assert.assertEquals(new HashSet<>(Arrays.asList(new RuleId(NULL_UUID))), savedApplication.getRules());
+        Assert.assertEquals(1,savedApplication.getDeviceTypes().size());
+        Assert.assertTrue(savedApplication.getDeviceTypes().contains(NULL_DEVICE_TYPE));
+
         RuleMetaData rule1 = new RuleMetaData();
         rule1.setName("My Rule1");
         rule1.setPluginToken(tenantPlugin.getApiToken());
-        rule1.setFilters(mapper.readTree("[{\"clazz\":\"org.thingsboard.server.extensions.core.filter.MsgTypeFilter\", " +
-                "\"name\":\"TelemetryFilter\", " +
-                "\"configuration\": {\"messageTypes\":[\"POST_TELEMETRY\",\"POST_ATTRIBUTES\",\"GET_ATTRIBUTES\"]}}]"));
+        rule1.setFilters(mapper.readTree("[{\"configuration\":{\"deviceTypes\":[{\"name\":\"Motor\"},{\"name\":\"Pump\"}]},\"clazz\":\"org.thingsboard.server.extensions.core.filter.DeviceTypeFilter\",\"name\":\"jetinder\"},{\"configuration\":{\"deviceTypes\":[{\"name\":\"Well\"},{}]},\"clazz\":\"org.thingsboard.server.extensions.core.filter.DeviceTypeFilter\",\"name\":\"F2\"},{\"configuration\":{\"methodNames\":[{\"name\":\"sdsdsdsdsdsdsd\"}]},\"clazz\":\"org.thingsboard.server.extensions.core.filter.MethodNameFilter\",\"name\":\"sdsdsdsdsdsdsdsdsd\"}]"));
         rule1.setAction(mapper.readTree("{\"clazz\":\"org.thingsboard.server.extensions.core.action.telemetry.TelemetryPluginAction\", \"name\":\"TelemetryMsgConverterAction\", \"configuration\":{\"timeUnit\":\"DAYS\", \"ttlValue\":1}}"));
         RuleMetaData savedRule1 = doPost("/api/rule", rule1, RuleMetaData.class);
 
@@ -449,32 +448,61 @@ public class BaseApplicationControllerTest extends AbstractControllerTest {
 
         ApplicationRulesWrapper applicationRulesWrapper = new ApplicationRulesWrapper();
         applicationRulesWrapper.setApplicationId(savedApplication.getId().getId().toString());
-        applicationRulesWrapper.setRules(Arrays.asList(savedRule1.getId().getId().toString(), savedRule2.getId().getId().toString()));
+        applicationRulesWrapper.setRules(new HashSet<>(Arrays.asList(savedRule1.getId().getId().toString(), savedRule2.getId().getId().toString())));
 
         Application assignedApplication = doPostWithDifferentResponse("/api/app/assignRules", applicationRulesWrapper, Application.class);
-        Assert.assertEquals(Arrays.asList(savedRule1.getId(), savedRule2.getId()), assignedApplication.getRules());
+        Assert.assertEquals(new HashSet<>(Arrays.asList(savedRule1.getId(), savedRule2.getId())), assignedApplication.getRules());
 
         Application foundApplication = doGet("/api/application/" + savedApplication.getId().getId().toString(), Application.class);
-        Assert.assertEquals(Arrays.asList(savedRule1.getId(), savedRule2.getId()), foundApplication.getRules());
-
-
-        ApplicationRulesWrapper newApplicationRulesWrapper = new ApplicationRulesWrapper();
-        newApplicationRulesWrapper.setApplicationId(savedApplication.getId().getId().toString());
-        newApplicationRulesWrapper.setRules(Arrays.asList(savedRule2.getId().getId().toString()));
-        Application unAssignedOneRuleApplication = doPostWithDifferentResponse("/api/app/assignRules", newApplicationRulesWrapper, Application.class);
-        Assert.assertEquals(Arrays.asList(savedRule2.getId()), unAssignedOneRuleApplication.getRules());
+        Assert.assertEquals(new HashSet<>(Arrays.asList(savedRule1.getId(), savedRule2.getId())), foundApplication.getRules());
+        Assert.assertEquals(3,foundApplication.getDeviceTypes().size());
+        Assert.assertTrue(foundApplication.getDeviceTypes().containsAll(new HashSet<>(Arrays.asList("Motor", "Pump", "Well"))));
     }
 
     @Test
-    public void testAssignDeviceTypesToApplication() throws Exception{
+    public void testUnassignRulesToApplication() throws Exception{
         Application application = new Application();
         application.setName("My application");
         Application savedApplication = doPost("/api/application", application, Application.class);
 
-        List<String> deviceTypes = new ArrayList<String>(Arrays.asList("WeatherStation", "Pump"));
-        Application assignedApplication = doPostWithDifferentResponse("/api/app/" + savedApplication.getId().getId().toString() + "/deviceTypes",
-                deviceTypes, Application.class);
-        Assert.assertEquals(deviceTypes, assignedApplication.getDeviceTypes());
+        RuleMetaData rule1 = new RuleMetaData();
+        rule1.setName("My Rule1");
+        rule1.setPluginToken(tenantPlugin.getApiToken());
+        rule1.setFilters(mapper.readTree("[{\"configuration\": {\"deviceTypes\": [{\"name\": \"Motor\"}, {\"name\": \"Pump\"}]},\"clazz\": \"org.thingsboard.server.extensions.core.filter.DeviceTypeFilter\",\"name\": \"jetinder\"\n" +
+                "}, {\"configuration\": {\"methodNames\": [{\"name\": \"sdsdsdsdsdsdsd\"}]},\"clazz\": \"org.thingsboard.server.extensions.core.filter.MethodNameFilter\",\"name\": \"sdsdsdsdsdsdsdsdsd\"}]"));
+        rule1.setAction(mapper.readTree("{\"clazz\":\"org.thingsboard.server.extensions.core.action.telemetry.TelemetryPluginAction\", \"name\":\"TelemetryMsgConverterAction\", \"configuration\":{\"timeUnit\":\"DAYS\", \"ttlValue\":1}}"));
+        RuleMetaData savedRule1 = doPost("/api/rule", rule1, RuleMetaData.class);
+
+        RuleMetaData rule2 = new RuleMetaData();
+        rule2.setName("My Rule2");
+        rule2.setPluginToken(tenantPlugin.getApiToken());
+        rule2.setFilters(mapper.readTree("[{\"configuration\": {\"deviceTypes\": [{\"name\": \"Well\"}]},\"clazz\":\"org.thingsboard.server.extensions.core.filter.DeviceTypeFilter\",\"name\": \"jetinder\"}, {\"configuration\": {\"methodNames\": [{\"name\": \"sdsdsdsdsdsdsd\"}]},\"clazz\":\"org.thingsboard.server.extensions.core.filter.MethodNameFilter\",\"name\":\"sdsdsdsdsdsdsdsdsd\"}]"));
+        rule2.setAction(mapper.readTree("{\"clazz\":\"org.thingsboard.server.extensions.core.action.telemetry.TelemetryPluginAction\", \"name\":\"TelemetryMsgConverterAction\", \"configuration\":{\"timeUnit\":\"DAYS\", \"ttlValue\":1}}"));
+        rule2.setAction(mapper.readTree("{\"clazz\":\"org.thingsboard.server.extensions.core.action.telemetry.TelemetryPluginAction\", \"name\":\"TelemetryMsgConverterAction\", \"configuration\":{\"timeUnit\":\"DAYS\", \"ttlValue\":1}}"));
+        RuleMetaData savedRule2 = doPost("/api/rule", rule2, RuleMetaData.class);
+
+        ApplicationRulesWrapper applicationRulesWrapper = new ApplicationRulesWrapper();
+        applicationRulesWrapper.setApplicationId(savedApplication.getId().getId().toString());
+        applicationRulesWrapper.setRules(new HashSet<>(Arrays.asList(savedRule1.getId().getId().toString(), savedRule2.getId().getId().toString())));
+
+        Application assignedApplication = doPostWithDifferentResponse("/api/app/assignRules", applicationRulesWrapper, Application.class);
+        Assert.assertEquals(new HashSet<>(Arrays.asList(savedRule1.getId(), savedRule2.getId())), assignedApplication.getRules());
+
+        Application foundApplication = doGet("/api/application/" + savedApplication.getId().getId().toString(), Application.class);
+        Assert.assertEquals(new HashSet<>(Arrays.asList(savedRule1.getId(), savedRule2.getId())), foundApplication.getRules());
+        Assert.assertEquals(3,foundApplication.getDeviceTypes().size());
+        Assert.assertTrue(foundApplication.getDeviceTypes().containsAll(new HashSet<>(Arrays.asList("Motor", "Pump", "Well"))));
+
+        ApplicationRulesWrapper newApplicationRulesWrapper = new ApplicationRulesWrapper();
+        newApplicationRulesWrapper.setApplicationId(savedApplication.getId().getId().toString());
+        newApplicationRulesWrapper.setRules(new HashSet<>(Arrays.asList(savedRule2.getId().getId().toString())));
+        doPostWithDifferentResponse("/api/app/unassignRules", newApplicationRulesWrapper, Application.class);
+
+        Application foundUnassignedApplication = doGet("/api/application/" + savedApplication.getId().getId().toString(), Application.class);
+        Assert.assertEquals(new HashSet<>(Arrays.asList(savedRule1.getId())), foundUnassignedApplication.getRules());
+        Assert.assertEquals(2,foundUnassignedApplication.getDeviceTypes().size());
+        Assert.assertTrue(foundApplication.getDeviceTypes().containsAll(new HashSet<>(Arrays.asList("Motor", "Pump"))));
+
     }
 
     @Test
@@ -547,6 +575,7 @@ public class BaseApplicationControllerTest extends AbstractControllerTest {
                 "\"configuration\": {\"messageTypes\":[\"POST_TELEMETRY\",\"POST_ATTRIBUTES\",\"GET_ATTRIBUTES\"]}}]"));
         rule2.setAction(mapper.readTree("{\"clazz\":\"org.thingsboard.server.extensions.core.action.telemetry.TelemetryPluginAction\", \"name\":\"TelemetryMsgConverterAction\", \"configuration\":{\"timeUnit\":\"DAYS\", \"ttlValue\":1}}"));
         RuleMetaData savedRule2 = doPost("/api/rule", rule2, RuleMetaData.class);
+        JSONObject obj = new JSONObject(rule2.getFilters());
 
         RuleMetaData rule3 = new RuleMetaData();
         rule2.setName("My Rule3");
@@ -559,12 +588,12 @@ public class BaseApplicationControllerTest extends AbstractControllerTest {
 
         ApplicationRulesWrapper applicationRulesWrapper = new ApplicationRulesWrapper();
         applicationRulesWrapper.setApplicationId(savedApplication.getId().getId().toString());
-        applicationRulesWrapper.setRules(Arrays.asList(savedRule1.getId().getId().toString(), savedRule2.getId().getId().toString()));
+        applicationRulesWrapper.setRules(new HashSet<>(Arrays.asList(savedRule1.getId().getId().toString(), savedRule2.getId().getId().toString())));
         doPostWithDifferentResponse("/api/app/assignRules", applicationRulesWrapper, Application.class);
 
         ApplicationRulesWrapper applicationRulesWrapper1 = new ApplicationRulesWrapper();
         applicationRulesWrapper1.setApplicationId(savedApplication1.getId().getId().toString());
-        applicationRulesWrapper1.setRules(Arrays.asList(savedRule1.getId().getId().toString()));
+        applicationRulesWrapper1.setRules(new HashSet<>(Arrays.asList(savedRule1.getId().getId().toString())));
         doPostWithDifferentResponse("/api/app/assignRules", applicationRulesWrapper1, Application.class);
 
         List<String> foundApplications1 = doGetTyped("/api/applications/rule/"+savedRule1.getId().getId().toString() , new TypeReference<List<String>>(){});
