@@ -129,7 +129,7 @@ export default function AppRun($rootScope, $window, $injector, $location, $log, 
             }
         })
 
-        $rootScope.pageTitle = 'ThingsBoard';
+        $rootScope.pageTitle = 'Tempus';
 
         $rootScope.stateChangeSuccessHandle = $rootScope.$on('$stateChangeSuccess', function (evt, to, params) {
             if (userService.isPublic() && to.name === 'home.dashboards.dashboard') {

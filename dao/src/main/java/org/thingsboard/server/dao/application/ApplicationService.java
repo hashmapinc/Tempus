@@ -51,8 +51,4 @@ public interface ApplicationService {
 
     Application unassignRulesToApplication(ApplicationId applicationId, Set<RuleId> ruleIdList);
 
-    void updateApplicationOnRuleDelete(RuleId ruleId, TenantId tenantId);
-
-    void updateApplicationOnDashboardDelete(DashboardId dashboardIdId, TenantId tenantId);
-
 }

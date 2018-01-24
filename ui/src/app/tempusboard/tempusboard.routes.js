@@ -42,7 +42,7 @@ export default function TempusboardRoutes($stateProvider, types) {
                 pageTitle: 'tempusboard.tempusboards'
             },
             ncyBreadcrumb: {
-                label: '{"icon": "domain", "label": "tempusboard.tempusboards"}'
+                label: '{"icon": "domain", "label": "tempusboard.tempusboards", "link": "/static/svg/tempusboardlightgray.svg"}'
             }
         });
 

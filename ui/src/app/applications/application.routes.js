@@ -43,7 +43,7 @@ export default function ApplicationRoutes($stateProvider, types) {
                 dashboardsType: 'tenant',         
             },
             ncyBreadcrumb: {
-                label: '{"icon": "devices_other", "label": "application.applications"}'
+                label: '{"icon": "devices_other", "label": "application.applications", "link": "/static/svg/applicationslightgray.svg"}'
             }
         })
 }
