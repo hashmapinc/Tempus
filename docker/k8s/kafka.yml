@@ -4,14 +4,13 @@ metadata:
   name: kafka
   labels:
     app: kafka
-    name: kafka
 spec:
   ports:
-  - port: 9092
-    name: server
+  - name: server
+    port: 9092
+    targetPort: 9092
   selector:
     app: kafka
-    name: kafka
 ---
 apiVersion: policy/v1beta1
 kind: PodDisruptionBudget
@@ -51,8 +50,11 @@ spec:
           value: "kafka"
         - name: KAFKA_ZOOKEEPER_CONNECT
           value: zk-cs:2181
+        - name: KAFKA_ZOOKEEPER_CONNECTION_TIMEOUT_MS
+          value: "16000"
         name: kafka
         image: hashmapinc/kafka:1.0
+        imagePullPolicy: Always
         ports:
         - containerPort: 9092
         volumeMounts:

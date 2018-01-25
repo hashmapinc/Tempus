@@ -5,9 +5,10 @@ metadata:
     app: postgres
   name: postgres
 spec:
-  clusterIP: None
   ports:
-    - port: 5432
+    - name: psql
+      port: 5432
+      targetPort: 5432
   selector:
     app: postgres
 ---
@@ -32,7 +33,7 @@ spec:
           value: "thingsboard"
         ports:
         - containerPort: 5432
-          name: postgresql
+          name: psql
 #        command: [ "postgres" ]
 #        command: [ "psql -U postgres -W postgres" ]
 #        command: [ "/bin/bash", "-c", "--" ]

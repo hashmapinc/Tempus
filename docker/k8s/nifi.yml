@@ -4,12 +4,10 @@ metadata:
   name: nifi
   labels:
     app: nifi
-    name: nifi
 spec:
   type: LoadBalancer
   selector:
     app: nifi
-    name: nifi
   ports:
     - protocol: TCP
       port: 9090

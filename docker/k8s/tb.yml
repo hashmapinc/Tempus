@@ -4,20 +4,18 @@ metadata:
   name: tb
   labels:
     app: tb
-    name: tb
 spec:
   type: LoadBalancer
   selector:
     app: tb
-    name: tb
   ports:
     - protocol: TCP
       port: 8080
-#      targetPort: 8080
+      targetPort: 8080
       name: ui
     - protocol: TCP
       port: 1883
-#      targetPort: 1883
+      targetPort: 1883
       name: mqtt
 #    - protocol: UDP
 #      port: 5683
@@ -25,7 +23,7 @@ spec:
 #      name: coap
     - protocol: TCP
       port: 9999
-#      targetPort: 9999
+      targetPort: 9999
       name: tb-port
 ---
 apiVersion: policy/v1beta1
@@ -53,6 +51,11 @@ data:
   postgres.port: "5432"
   schema.data: "true"
   demo.data: "true"
+  mqtt.address: "0.0.0.0"
+  mqtt.port: "1883"
+  coap.address: "0.0.0.0"
+  coap.port: "5683"
+  spark.path: "/home"
 ---
 apiVersion: "apps/v1beta1"
 kind: StatefulSet
@@ -81,12 +84,38 @@ spec:
         - containerPort: 1883
           name: mqtt
         - containerPort: 5683
+          protocol: UDP
           name: coap
         - containerPort: 9001
           name: rpc
         - containerPort: 9999
           name: tb-port
         env:
+        - name: SPARK_COMPUTATIONS_PATH
+          valueFrom:
+            configMapKeyRef:
+              name: tb-config
+              key: spark.path
+        - name: MQTT_BIND_ADDRESS
+          valueFrom:
+            configMapKeyRef:
+              name: tb-config
+              key: mqtt.address
+        - name: MQTT_BIND_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: tb-config
+              key: mqtt.port
+        - name: COAP_BIND_ADDRESS
+          valueFrom:
+            configMapKeyRef:
+              name: tb-config
+              key: coap.address
+        - name: COAP_BIND_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: tb-config
+              key: coap.port
         - name: DATABASE_TYPE
           valueFrom:
             configMapKeyRef:

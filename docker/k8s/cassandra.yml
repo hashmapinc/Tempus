@@ -5,9 +5,14 @@ metadata:
     app: cassandra
   name: cassandra
 spec:
-  clusterIP: None
+#  clusterIP: None
   ports:
-    - port: 9042
+    - name: cql
+      port: 9042
+      targetPort: 9043
+    - name: thrift
+      port: 9160
+      targetPort: 9160
   selector:
     app: cassandra
 ---

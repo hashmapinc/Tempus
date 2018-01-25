@@ -24,6 +24,7 @@ spec:
   ports:
   - port: 2181
     name: client
+    targetPort: 2181
   selector:
     app: zk
 ---
@@ -56,7 +57,7 @@ spec:
         app: zk
     spec:
       containers:
-      - name: kubernetes-zookeeper
+      - name: zk
         imagePullPolicy: Always
         image: "hashmapinc/zk:1.0"
         ports:
