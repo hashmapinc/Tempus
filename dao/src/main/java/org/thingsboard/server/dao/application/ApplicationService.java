@@ -21,7 +21,6 @@ import org.thingsboard.server.common.data.page.TextPageData;
 import org.thingsboard.server.common.data.page.TextPageLink;
 
 import java.util.List;
-import java.util.Set;
 
 public interface ApplicationService {
 
@@ -47,8 +46,8 @@ public interface ApplicationService {
 
     Application unassignDashboardFromApplication(ApplicationId applicationId, String dashboardType);
 
-    Application assignRulesToApplication(ApplicationId applicationId, Set<RuleId> ruleIdList);
+    Application assignRulesToApplication(ApplicationId applicationId, List<RuleId> ruleIdList);
 
-    Application unassignRulesToApplication(ApplicationId applicationId, Set<RuleId> ruleIdList);
+    Application assignDeviceTypesToApplication(ApplicationId applicationId, List<String> deviceTypes);
 
 }

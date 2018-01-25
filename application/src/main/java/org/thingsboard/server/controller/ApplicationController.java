@@ -31,7 +31,6 @@ import org.thingsboard.server.exception.ThingsboardException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 @RestController
@@ -225,9 +224,9 @@ public class ApplicationController extends BaseController {
         try {
             ApplicationId applicationId = new ApplicationId(toUUID(applicationRulesWrapper.getApplicationId()));
             checkApplicationId(applicationId);
-            Set<RuleId> ruleIds = Collections.emptySet();
+            List<RuleId> ruleIds = Collections.emptyList();
             if (applicationRulesWrapper != null) {
-                ruleIds = applicationRulesWrapper.getRules().stream().map(r -> new RuleId(toUUID(r))).collect(Collectors.toSet());
+                ruleIds = applicationRulesWrapper.getRules().stream().map(r -> new RuleId(toUUID(r))).collect(Collectors.toList());
             }
             return checkNotNull(applicationService.assignRulesToApplication(applicationId, ruleIds));
         } catch (Exception e) {
@@ -235,19 +234,16 @@ public class ApplicationController extends BaseController {
         }
     }
 
-
     @PreAuthorize("hasAuthority('TENANT_ADMIN')")
-    @RequestMapping(value = "/app/unassignRules", method = RequestMethod.POST,consumes = "application/json")
-    public Application unassignRulesToApplication(@RequestBody ApplicationRulesWrapper applicationRulesWrapper) throws ThingsboardException {
-        checkParameter("applicationId", applicationRulesWrapper.getApplicationId());
+    @RequestMapping(value = "/app/{applicationId}/deviceTypes", method = RequestMethod.POST,consumes = "application/json")
+    public Application assignDeviceTypesToApplication(@PathVariable("applicationId") String strApplicationId,
+                                                      @RequestBody List<String> deviceTypes) throws ThingsboardException {
+        checkParameter("applicationId", strApplicationId);
         try {
-            ApplicationId applicationId = new ApplicationId(toUUID(applicationRulesWrapper.getApplicationId()));
+            log.error("Got application [{}] with deviceTypes [{}]", strApplicationId, deviceTypes);
+            ApplicationId applicationId = new ApplicationId(toUUID(strApplicationId));
             checkApplicationId(applicationId);
-            Set<RuleId> ruleIds = Collections.emptySet();
-            if (applicationRulesWrapper != null) {
-                ruleIds = applicationRulesWrapper.getRules().stream().map(r -> new RuleId(toUUID(r))).collect(Collectors.toSet());
-            }
-            return checkNotNull(applicationService.unassignRulesToApplication(applicationId, ruleIds));
+            return checkNotNull(applicationService.assignDeviceTypesToApplication(applicationId, deviceTypes));
         } catch (Exception e) {
             throw handleException(e);
         }

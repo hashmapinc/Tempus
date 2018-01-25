@@ -18,8 +18,9 @@ package org.thingsboard.server.common.data;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.thingsboard.server.common.data.id.*;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.lang.reflect.Array;
+import java.util.Arrays;
+import java.util.List;
 
 public class Application extends SearchTextBased<ApplicationId> implements HasName {
 
@@ -29,11 +30,10 @@ public class Application extends SearchTextBased<ApplicationId> implements HasNa
     private CustomerId customerId;
     private DashboardId dashboardId;
     private DashboardId miniDashboardId;
-    private Set<RuleId> rules = new HashSet<>();
+    private List<RuleId> rules = Arrays.asList();
     private String name;
     private String description;
-    private Set<String> deviceTypes = new HashSet<>();
-    private Boolean isValid = Boolean.TRUE;
+    private List<String> deviceTypes = Arrays.asList();
 
     public Application() {
         super();
@@ -85,20 +85,12 @@ public class Application extends SearchTextBased<ApplicationId> implements HasNa
         this.miniDashboardId = miniDashboardId;
     }
 
-    public Set<RuleId> getRules() {
+    public List<RuleId> getRules() {
         return rules;
     }
 
-    public void setRules(Set<RuleId> rules) {
+    public void setRules(List<RuleId> rules) {
         this.rules = rules;
-    }
-
-    public void addRules(Set<RuleId> rules) {
-        this.rules.addAll(rules);
-    }
-
-    public void addDeviceTypes(Set<String> deviceTypes) {
-        this.deviceTypes.addAll(deviceTypes);
     }
 
     public String getDescription() {
@@ -109,11 +101,11 @@ public class Application extends SearchTextBased<ApplicationId> implements HasNa
         this.description = description;
     }
 
-    public Set<String> getDeviceTypes() {
+    public List<String> getDeviceTypes() {
         return deviceTypes;
     }
 
-    public void setDeviceTypes(Set<String> deviceTypes) {
+    public void setDeviceTypes(List<String> deviceTypes) {
         this.deviceTypes = deviceTypes;
     }
 

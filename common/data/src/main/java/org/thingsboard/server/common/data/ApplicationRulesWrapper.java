@@ -16,18 +16,19 @@
 
 package org.thingsboard.server.common.data;
 
-import java.util.Set;
+
+import java.util.List;
 
 public class ApplicationRulesWrapper {
 
     private String applicationId;
-    private Set<String> rules;
+    private List<String> rules;
 
-    public Set<String> getRules() {
+    public List<String> getRules() {
         return rules;
     }
 
-    public void setRules(Set<String> rules) {
+    public void setRules(List<String> rules) {
         this.rules = rules;
     }
 
