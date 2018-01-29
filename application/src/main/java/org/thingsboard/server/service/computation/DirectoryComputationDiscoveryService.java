@@ -83,7 +83,7 @@ public class DirectoryComputationDiscoveryService implements ComputationDiscover
 
     private RuntimeJavaCompiler compiler;
     private FileAlterationMonitor monitor;
-    private Map<String, Set<String>> processedJarsSources = new HashMap<>();
+    //private Map<String, Set<String>> processedJarsSources = new HashMap<>();
 
     @PostConstruct
     public void init() {
@@ -136,7 +136,6 @@ public class DirectoryComputationDiscoveryService implements ComputationDiscover
                             computations.setId(persistedComputations.getId());
                             computationsService.save(computations);
                         }
-                        putCompiledActions(j, c);
                     }
                 }
             }
@@ -155,11 +154,6 @@ public class DirectoryComputationDiscoveryService implements ComputationDiscover
             delimiter = ",";
         }
         return stringBuilder.toString();
-    }
-
-    private void putCompiledActions(Path j, List<ComputationActionCompiled> c) {
-        processedJarsSources.put(j.toFile().getName(),
-                c.stream().map(ComputationActionCompiled::getActionClazz).collect(Collectors.toSet()));
     }
 
     private void startPolling(){
@@ -198,10 +192,10 @@ public class DirectoryComputationDiscoveryService implements ComputationDiscover
             public void onFileDelete(File file){
                 log.error("\n ***** File {} is deleted HMDC *****\n", file.getAbsolutePath());
                 Path path = file.toPath();
-                computationsService.deleteByName(file.getName());
-                Set<String> actionsToRemove = processedJarsSources.get(file.getName());
+                Set<String> actionsToRemove = actionsForJar(file.getName());
                 if(actionsToRemove != null && !actionsToRemove.isEmpty()){
                     log.debug("Actions to remove are {}", actionsToRemove);
+                    computationsService.deleteByName(file.getName());
                     ComputationMsgListener listener = context.getBean(ComputationMsgListener.class);
                     Optional<ComponentDescriptor> plugin = componentDiscoveryService.getComponent(PLUGIN_CLAZZ);
                     if(plugin.isPresent() && listener != null) {
@@ -216,6 +210,15 @@ public class DirectoryComputationDiscoveryService implements ComputationDiscover
                 }
             }
 
+            private Set<String> actionsForJar(String jarName){
+                Computations computations = computationsService.findByName(jarName);
+                Set<String> actions = new HashSet<>();
+                if(computations != null) {
+                    actions.addAll(Arrays.stream(computations.getActions().split(",")).map(a -> a.split(":")[0]).collect(Collectors.toSet()));
+                }
+                return actions;
+            }
+
             private void processComponent(File file) {
                 Path j = file.toPath();
                 try{
@@ -223,7 +226,6 @@ public class DirectoryComputationDiscoveryService implements ComputationDiscover
                         AnnotationsProcessor processor = new AnnotationsProcessor(j, compiler);
                         List<ComputationActionCompiled> actions = processor.processAnnotations();
                         if(actions != null && !actions.isEmpty()) {
-                            putCompiledActions(j, actions);
                             Computations computations = new Computations();
                             computations.setName(j.getFileName().toString());
                             computations.setJarPath(j.toString());
