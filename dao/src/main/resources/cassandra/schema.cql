@@ -205,9 +205,10 @@ CREATE TABLE IF NOT EXISTS thingsboard.application (
     dashboard_id timeuuid,
     search_text text,
     name text,
+    is_valid boolean,
     description text,
-    application_rules list<timeuuid>,
-    application_device_types list<text>,
+    application_rules set<timeuuid>,
+    application_device_types set<text>,
     PRIMARY KEY (id, tenant_id, customer_id)
 );
 
