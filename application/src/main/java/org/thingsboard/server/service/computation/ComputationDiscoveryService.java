@@ -15,6 +15,13 @@
  */
 package org.thingsboard.server.service.computation;
 
+import org.thingsboard.server.common.data.Computations;
+
+import java.util.List;
+
 public interface ComputationDiscoveryService {
     void discoverDynamicComponents();
+    void deleteJarFile(String path);
+    List<Computations>  findAll();
+    void onJarUpload(String path);
 }

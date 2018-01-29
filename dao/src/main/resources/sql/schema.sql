@@ -285,3 +285,11 @@ CREATE TABLE IF NOT EXISTS application_associated_rules(
     application_id varchar(31),
     application_rule_id varchar(31)
 );
+
+CREATE TABLE IF NOT EXISTS computations (
+    id varchar(31) NOT NULL CONSTRAINT computations_pkey PRIMARY KEY,
+    name varchar,
+    jarpath varchar,
+    search_text varchar,
+    actions varchar
+);

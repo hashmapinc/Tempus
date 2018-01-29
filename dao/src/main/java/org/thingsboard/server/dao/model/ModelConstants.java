@@ -152,10 +152,19 @@ public class ModelConstants {
     public static final String APPLICATION_CUSTOMER_ID_PROPERTY = CUSTOMER_ID_PROPERTY;
     public static final String APPLICATION_RULES_COLUMN = "application_rules";
     public static final String APPLICATION_DEVICE_TYPES_COLUMN = "application_device_types";
-    public static final String APPLICATION_BY_TENANT_AND_SEARCH_TEXT_COLUMN_FAMILY_NAME = "application_by_tenant_and_search_text";
     public static final String APPLICATION_BY_TENANT_AND_DASHBOARD_COLUMN_FAMILY= "application_by_dashboard";
     public static final String APPLICATION_BY_TENANT_AND_MINI_DASHBOARD_COLUMN_FAMILY= "application_by_mini_dashboard";
+    public static final String APPLICATION_BY_TENANT_AND_SEARCH_TEXT_COLUMN_FAMILY_NAME = "application_by_tenant_and_search_text";
     public static final String APPLICATION_BY_TENANT_AND_NAME_VIEW_NAME = "application_by_tenant_and_name";
+
+    /**
+     * Computations Constants
+     */
+    public static final String COMPUTATIONS_TABLE_NAME = "computations";
+    public static final String COMPUTATIONS_NAME = "name";
+    //public static final String COMPUTATIONS_ID = "id";
+    public static final String COMPUTATIONS_JAR_PATH = "jarpath";
+    public static final String COMPUTATIONS_ACTIONS = "actions";
 
     /**
      * Cassandra asset constants.

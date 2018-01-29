@@ -17,12 +17,16 @@ package org.thingsboard.server.controller;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.thingsboard.server.exception.ThingsboardException;
+import org.thingsboard.server.service.computation.ComputationDiscoveryService;
 
 import java.io.File;
 
@@ -33,6 +37,10 @@ public class ComputationsController extends BaseController {
     @Value("${spark.jar_path}")
     private String uploadPath;
 
+    @Autowired
+    @Qualifier("uploadComputationDiscoveryService")
+    private ComputationDiscoveryService computationDiscoveryService;
+
     @PreAuthorize("hasAuthority('TENANT_ADMIN')")
     @RequestMapping(value = "/upload", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
@@ -41,10 +49,28 @@ public class ComputationsController extends BaseController {
             String path = uploadPath + File.separator + file.getOriginalFilename();
             File destinationFile = new File(path);
             file.transferTo(destinationFile);
+
+            // Creating service call
+            computationDiscoveryService.onJarUpload(path);
             return new FileInfo(file.getOriginalFilename(), path);
         } catch (Exception e) {
             throw handleException(e);
         }
+    }
+
+    @PreAuthorize("hasAuthority('TENANT_ADMIN')")
+    @RequestMapping(value = "/delete", method = RequestMethod.POST)
+    @ResponseBody
+    public void delete(@RequestParam("fileName") String fileName) throws ThingsboardException {
+        String path = uploadPath + File.separator + fileName;
+        computationDiscoveryService.deleteJarFile(path);
+    }
+
+    @PreAuthorize("hasAuthority('TENANT_ADMIN')")
+    @RequestMapping(value = "/find/all", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public void findAll() throws ThingsboardException {
+        computationDiscoveryService.findAll();
     }
 
     @Data

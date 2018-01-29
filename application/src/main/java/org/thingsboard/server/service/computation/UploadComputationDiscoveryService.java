@@ -26,7 +26,6 @@ import org.apache.commons.io.monitor.FileAlterationObserver;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import org.thingsboard.server.common.data.Computations;
@@ -56,9 +55,9 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
-@Service("computationDiscoveryService")
+@Service("uploadComputationDiscoveryService")
 @Slf4j
-public class DirectoryComputationDiscoveryService implements ComputationDiscoveryService{
+public class UploadComputationDiscoveryService implements ComputationDiscoveryService{
 
     private static final Executor executor = Executors.newSingleThreadExecutor();
     private final String PLUGIN_CLAZZ = "org.thingsboard.server.extensions.spark.computation.plugin.SparkComputationPlugin";
@@ -92,22 +91,6 @@ public class DirectoryComputationDiscoveryService implements ComputationDiscover
         Assert.notNull(pollingInterval, MiscUtils.missingProperty("spark.polling_interval"));
         this.compiler = new RuntimeJavaCompiler();
         discoverDynamicComponents();
-        startPolling();
-    }
-
-    @Override
-    public void deleteJarFile(String fileName) {
-
-    }
-
-    @Override
-    public void onJarUpload(String path) {
-
-    }
-
-    @Override
-    public List<Computations> findAll() {
-        return null;
     }
 
     public void discoverDynamicComponents(){
@@ -146,7 +129,7 @@ public class DirectoryComputationDiscoveryService implements ComputationDiscover
         }
     }
 
-    public String getActionString(List<ComputationActionCompiled> computationActionCompiledList){
+    private String getActionString(List<ComputationActionCompiled> computationActionCompiledList){
         StringBuilder stringBuilder = new StringBuilder();
         String delimiter = "";
         for (ComputationActionCompiled computationActionCompiled: computationActionCompiledList) {
@@ -162,91 +145,65 @@ public class DirectoryComputationDiscoveryService implements ComputationDiscover
                 c.stream().map(ComputationActionCompiled::getActionClazz).collect(Collectors.toSet()));
     }
 
-    private void startPolling(){
-        try {
-            final FileSystem fs = FileSystems.getDefault();
-            FileAlterationObserver observer = new FileAlterationObserver(fs.getPath(libraryPath).toFile());
-            monitor = new FileAlterationMonitor(pollingInterval * 1000);
-            observer.addListener(newListener());
-            monitor.addObserver(observer);
-            monitor.start();
-        } catch (Exception e) {
-            log.error("Error while starting poller to scan dynamic components", e);
-        }
-    }
-
     private boolean isJar(Path jarPath) throws IOException {
         File file = jarPath.toFile();
         return file.getCanonicalPath().endsWith(".jar") && file.canRead();
     }
 
-    private FileAlterationListener newListener(){
-        return new FileAlterationListenerAdaptor(){
-            @Override
-            public void onFileCreate(File file) {
-                log.debug("File {} is created", file.getAbsolutePath());
-                processComponent(file);
-            }
+    public void onFileCreate(File file) {
+        log.debug("File {} is created", file.getAbsolutePath());
+        processComponent(file);
+    }
 
-            @Override
-            public void onFileChange(File file) {
-                log.debug("File {} is modified", file.getAbsolutePath());
-                processComponent(file);
-            }
-
-            @Override
-            public void onFileDelete(File file){
-                log.error("\n ***** File {} is deleted HMDC *****\n", file.getAbsolutePath());
-                Path path = file.toPath();
-                computationsService.deleteByName(file.getName());
-                Set<String> actionsToRemove = processedJarsSources.get(file.getName());
-                if(actionsToRemove != null && !actionsToRemove.isEmpty()){
-                    log.debug("Actions to remove are {}", actionsToRemove);
-                    ComputationMsgListener listener = context.getBean(ComputationMsgListener.class);
-                    Optional<ComponentDescriptor> plugin = componentDiscoveryService.getComponent(PLUGIN_CLAZZ);
-                    if(plugin.isPresent() && listener != null) {
-                        PluginMetaData pluginMetadata = pluginService.findPluginByClass(PLUGIN_CLAZZ);
-                        if(pluginMetadata != null) {
-                            log.debug("Plugin Metadata found {}", pluginMetadata);
-                            final ComputationActionDeleted msg = new ComputationActionDeleted(actionsToRemove, pluginMetadata.getApiToken());
-                            Future<Object> fut = listener.onMsg(msg);
-                            addDeleteCallback(msg, path, fut);
-                        }
+    private void processComponent(File file) {
+        Path j = file.toPath();
+        try{
+            if(isJar(j)){
+                AnnotationsProcessor processor = new AnnotationsProcessor(j, compiler);
+                List<ComputationActionCompiled> actions = processor.processAnnotations();
+                if(actions != null && !actions.isEmpty()) {
+                    putCompiledActions(j, actions);
+                    Computations computations = new Computations();
+                    computations.setName(j.getFileName().toString());
+                    computations.setJarPath(j.toString());
+                    String dbActionString = getActionString(actions);
+                    computations.setActions(dbActionString);
+                    Computations persistedComputations = computationsService.findByName(computations.getName());
+                    if(persistedComputations == null){
+                        ComputationsId computationsId = new ComputationsId(UUIDs.timeBased());
+                        computations.setId(computationsId);
+                        computationsService.save(computations);
                     }
+                    else {
+                        computations.setId(persistedComputations.getId());
+                        computationsService.save(computations);
+                    }
+                    componentDiscoveryService.updateActionsForPlugin(actions, PLUGIN_CLAZZ);
                 }
             }
+        } catch (IOException e) {
+            log.error("Error while accessing jar to scan dynamic components", e);
+        }
+    }
 
-            private void processComponent(File file) {
-                Path j = file.toPath();
-                try{
-                    if(isJar(j)){
-                        AnnotationsProcessor processor = new AnnotationsProcessor(j, compiler);
-                        List<ComputationActionCompiled> actions = processor.processAnnotations();
-                        if(actions != null && !actions.isEmpty()) {
-                            putCompiledActions(j, actions);
-                            Computations computations = new Computations();
-                            computations.setName(j.getFileName().toString());
-                            computations.setJarPath(j.toString());
-                            String dbActionString = getActionString(actions);
-                            computations.setActions(dbActionString);
-                            Computations persistedComputations = computationsService.findByName(computations.getName());
-                            if(persistedComputations == null) {
-                                ComputationsId computationsId = new ComputationsId(UUIDs.timeBased());
-                                computations.setId(computationsId);
-                                computationsService.save(computations);
-                            }
-                            else {
-                                computations.setId(persistedComputations.getId());
-                                computationsService.save(computations);
-                            }
-                            componentDiscoveryService.updateActionsForPlugin(actions, PLUGIN_CLAZZ);
-                        }
-                    }
-                } catch (IOException e) {
-                    log.error("Error while accessing jar to scan dynamic components", e);
+    public void onFileDelete(File file){
+        log.debug("File {} is deleted", file.getAbsolutePath());
+        Path path = file.toPath();
+        Set<String> actionsToRemove = processedJarsSources.get(file.getName());
+        if(actionsToRemove != null && !actionsToRemove.isEmpty()){
+            log.debug("Actions to remove are {}", actionsToRemove);
+            ComputationMsgListener listener = context.getBean(ComputationMsgListener.class);
+            Optional<ComponentDescriptor> plugin = componentDiscoveryService.getComponent(PLUGIN_CLAZZ);
+            if(plugin.isPresent() && listener != null) {
+                PluginMetaData pluginMetadata = pluginService.findPluginByClass(PLUGIN_CLAZZ);
+                if(pluginMetadata != null) {
+                    log.debug("Plugin Metadata found {}", pluginMetadata);
+                    final ComputationActionDeleted msg = new ComputationActionDeleted(actionsToRemove, pluginMetadata.getApiToken());
+                    Future<Object> fut = listener.onMsg(msg);
+                    addDeleteCallback(msg, path, fut);
                 }
             }
-        };
+        }
     }
 
     private void addDeleteCallback(ComputationActionDeleted msg, Path path, Future<Object> fut) {
@@ -260,6 +217,24 @@ public class DirectoryComputationDiscoveryService implements ComputationDiscover
                 }
             }
         }, ExecutionContexts.fromExecutor(executor));
+    }
+
+    @Override
+    public List<Computations> findAll() {
+        return computationsService.findAll();
+    }
+
+    @Override
+    public void deleteJarFile(String path){
+        File file = new File(path);
+        if(file.delete()){
+            this.onFileDelete(file);
+        }
+    }
+
+    @Override
+    public void onJarUpload(String path) {
+        onFileCreate(new File(path));
     }
 
     @PreDestroy
