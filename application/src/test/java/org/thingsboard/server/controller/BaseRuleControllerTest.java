@@ -21,6 +21,8 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.thingsboard.server.common.data.Application;
+import org.thingsboard.server.common.data.ApplicationRulesWrapper;
 import org.thingsboard.server.common.data.Tenant;
 import org.thingsboard.server.common.data.User;
 import org.thingsboard.server.common.data.page.TextPageData;
@@ -31,9 +33,7 @@ import org.thingsboard.server.common.data.security.Authority;
 import org.thingsboard.server.extensions.core.plugin.telemetry.TelemetryStoragePlugin;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -110,6 +110,49 @@ public abstract class BaseRuleControllerTest extends AbstractControllerTest {
         Assert.assertNotNull(savedRule.getId());
         Assert.assertTrue(savedRule.getCreatedTime() > 0);
         Assert.assertEquals(savedTenant.getId(), savedRule.getTenantId());
+    }
+
+    @Test
+    public void testDeleteRuleAndUpdateApplication() throws Exception {
+        RuleMetaData rule = createRuleMetaData(tenantPlugin);
+        RuleMetaData savedRule = doPost("/api/rule", rule, RuleMetaData.class);
+        RuleMetaData foundRule = doGet("/api/rule/" + savedRule.getId().getId().toString(), RuleMetaData.class);
+        Assert.assertNotNull(foundRule);
+
+        Application application = new Application();
+        application.setName("My Application");
+        application.setDescription("Application Description");
+
+        Application savedApplication = doPost("/api/application", application, Application.class);
+
+
+        ApplicationRulesWrapper applicationRulesWrapper = new ApplicationRulesWrapper();
+        applicationRulesWrapper.setApplicationId(savedApplication.getId().getId().toString());
+        applicationRulesWrapper.setRules(new HashSet<>(Arrays.asList(savedRule.getId().getId().toString())));
+
+        Application assignedApplication = doPostWithDifferentResponse("/api/app/assignRules", applicationRulesWrapper, Application.class);
+        Assert.assertEquals(new HashSet<>(Arrays.asList(savedRule.getId())), assignedApplication.getRules());
+        Assert.assertTrue(assignedApplication.getIsValid());
+
+        doDelete("/api/rule/"+savedRule.getId().getId().toString()).andExpect(status().isOk());
+        doGet("/api/rule/"+savedRule.getId().getId().toString()).andExpect(status().isNotFound());
+
+        Thread.sleep(10000);
+
+        Application foundApplication = doGet("/api/application/" + savedApplication.getId().getId().toString(), Application.class);
+        Assert.assertFalse(foundApplication.getIsValid());
+    }
+
+
+    @Test
+    public void testDeleteRule() throws Exception {
+        RuleMetaData rule = createRuleMetaData(tenantPlugin);
+        RuleMetaData savedRule = doPost("/api/rule", rule, RuleMetaData.class);
+        RuleMetaData foundRule = doGet("/api/rule/" + savedRule.getId().getId().toString(), RuleMetaData.class);
+        Assert.assertNotNull(foundRule);
+        doDelete("/api/rule/"+savedRule.getId().getId().toString()).andExpect(status().isOk());
+        doGet("/api/rule/"+savedRule.getId().getId().toString()).andExpect(status().isNotFound());
+
     }
 
     @Test

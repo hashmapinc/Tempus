@@ -102,7 +102,38 @@ public abstract class BaseDashboardControllerTest extends AbstractControllerTest
         Assert.assertNotNull(foundDashboard);
         Assert.assertEquals(savedDashboard, foundDashboard);
     }
-    
+
+    @Test
+    public void testDeleteDashboardAndUpdateApplication() throws Exception {
+        Dashboard dashboard = new Dashboard();
+        dashboard.setTitle("My dashboard");
+        Dashboard savedDashboard = doPost("/api/dashboard", dashboard, Dashboard.class);
+
+        Application application = new Application();
+        application.setName("My Application");
+        application.setDescription("Application Description");
+
+        Application savedApplication = doPost("/api/application", application, Application.class);
+
+
+        String dashboardType = "main";
+        Application assignedApplication = doPost("/api/dashboard/"+dashboardType+"/"+savedDashboard.getId().getId().toString()
+                +"/application/"+savedApplication.getId().getId().toString(), Application.class);
+        Assert.assertEquals(savedDashboard.getId(), assignedApplication.getDashboardId());
+        Assert.assertTrue(assignedApplication.getIsValid());
+
+        doDelete("/api/dashboard/"+savedDashboard.getId().getId().toString())
+                .andExpect(status().isOk());
+
+        doGet("/api/dashboard/"+savedDashboard.getId().getId().toString())
+                .andExpect(status().isNotFound());
+
+        Thread.sleep(10000);
+
+        Application foundApplication = doGet("/api/application/" + savedApplication.getId().getId().toString(), Application.class);
+        Assert.assertFalse(foundApplication.getIsValid());
+    }
+
     @Test
     public void testDeleteDashboard() throws Exception {
         Dashboard dashboard = new Dashboard();

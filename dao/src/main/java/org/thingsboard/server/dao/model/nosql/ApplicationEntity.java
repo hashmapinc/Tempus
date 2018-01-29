@@ -26,6 +26,7 @@ import com.datastax.driver.mapping.annotations.Transient;
 
 
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -58,6 +59,9 @@ public final class ApplicationEntity implements SearchTextEntity<Application> {
     @Column(name = APPLICATION_NAME)
     private String name;
 
+    @Column(name = APPLICATION_IS_VALID)
+    private Boolean isValid;
+
     @Column(name = APPLICATION_DESCRIPTION)
     private String description;
 
@@ -65,10 +69,10 @@ public final class ApplicationEntity implements SearchTextEntity<Application> {
     private String searchText;
 
     @Column(name = APPLICATION_RULES_COLUMN)
-    private List<UUID> rules;
+    private Set<UUID> rules;
 
     @Column(name = APPLICATION_DEVICE_TYPES_COLUMN)
-    private List<String> deviceTypes;
+    private Set<String> deviceTypes;
 
 
     public ApplicationEntity() {
@@ -95,10 +99,11 @@ public final class ApplicationEntity implements SearchTextEntity<Application> {
         }
 
         if(application.getRules() !=null && application.getRules().size() !=0) {
-            this.rules = application.getRules().stream().map(r -> (r.getId())).collect(Collectors.toList());
+            this.rules = application.getRules().stream().map(r -> (r.getId())).collect(Collectors.toSet());
         }
 
         this.name = application.getName();
+        this.isValid = application.getIsValid();
         this.description = application.getDescription();
         this.deviceTypes = application.getDeviceTypes();
     }
@@ -162,6 +167,14 @@ public final class ApplicationEntity implements SearchTextEntity<Application> {
         this.name = name;
     }
 
+    public Boolean getIsValid() {
+        return isValid;
+    }
+
+    public void setIsValid(Boolean valid) {
+        isValid = valid;
+    }
+
     public String getDescription() {
         return description;
     }
@@ -174,19 +187,19 @@ public final class ApplicationEntity implements SearchTextEntity<Application> {
         return searchText;
     }
 
-    public List<UUID> getRules() {
+    public Set<UUID> getRules() {
         return rules;
     }
 
-    public void setRules(List<UUID> rules) {
+    public void setRules(Set<UUID> rules) {
         this.rules = rules;
     }
 
-    public List<String> getDeviceTypes() {
+    public Set<String> getDeviceTypes() {
         return deviceTypes;
     }
 
-    public void setDeviceTypes(List<String> deviceTypes) {
+    public void setDeviceTypes(Set<String> deviceTypes) {
         this.deviceTypes = deviceTypes;
     }
 
@@ -210,9 +223,10 @@ public final class ApplicationEntity implements SearchTextEntity<Application> {
         }
 
         if(rules !=null && rules.size() !=0) {
-            application.setRules(rules.stream().map(RuleId::new).collect(Collectors.toList()));
+            application.setRules(rules.stream().map(RuleId::new).collect(Collectors.toSet()));
         }
         application.setName(name);
+        application.setIsValid(isValid);
         application.setDescription(description);
         if(deviceTypes !=null) {
             application.setDeviceTypes(deviceTypes);
@@ -234,6 +248,7 @@ public final class ApplicationEntity implements SearchTextEntity<Application> {
             return false;
         if (dashboardId != null ? !dashboardId.equals(that.dashboardId) : that.dashboardId != null) return false;
         if (name != null ? !name.equals(that.name) : that.name != null) return false;
+        if (isValid != null ? !isValid.equals(that.isValid) : that.isValid != null) return false;
         if (description != null ? !description.equals(that.description) : that.description != null) return false;
         if (searchText != null ? !searchText.equals(that.searchText) : that.searchText != null) return false;
         if (rules != null ? !rules.equals(that.rules) : that.rules != null) return false;
@@ -248,6 +263,7 @@ public final class ApplicationEntity implements SearchTextEntity<Application> {
         result = 31 * result + (miniDashboardId != null ? miniDashboardId.hashCode() : 0);
         result = 31 * result + (dashboardId != null ? dashboardId.hashCode() : 0);
         result = 31 * result + (name != null ? name.hashCode() : 0);
+        result = 31 * result + (isValid != null ? isValid.hashCode() : 0);
         result = 31 * result + (description != null ? description.hashCode() : 0);
         result = 31 * result + (searchText != null ? searchText.hashCode() : 0);
         result = 31 * result + (rules != null ? rules.hashCode() : 0);

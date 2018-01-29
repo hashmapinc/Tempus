@@ -15,12 +15,10 @@
  */
 package org.thingsboard.server.common.data;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import org.thingsboard.server.common.data.id.*;
 
-import java.lang.reflect.Array;
-import java.util.Arrays;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 public class Application extends SearchTextBased<ApplicationId> implements HasName {
 
@@ -30,10 +28,11 @@ public class Application extends SearchTextBased<ApplicationId> implements HasNa
     private CustomerId customerId;
     private DashboardId dashboardId;
     private DashboardId miniDashboardId;
-    private List<RuleId> rules = Arrays.asList();
+    private Set<RuleId> rules = new HashSet<>();
     private String name;
     private String description;
-    private List<String> deviceTypes = Arrays.asList();
+    private Set<String> deviceTypes = new HashSet<>();
+    private Boolean isValid = Boolean.TRUE;
 
     public Application() {
         super();
@@ -53,6 +52,7 @@ public class Application extends SearchTextBased<ApplicationId> implements HasNa
         this.name = application.name;
         this.description = application.description;
         this.deviceTypes = application.deviceTypes;
+        this.isValid = application.isValid;
     }
 
     @Override
@@ -85,12 +85,20 @@ public class Application extends SearchTextBased<ApplicationId> implements HasNa
         this.miniDashboardId = miniDashboardId;
     }
 
-    public List<RuleId> getRules() {
+    public Set<RuleId> getRules() {
         return rules;
     }
 
-    public void setRules(List<RuleId> rules) {
+    public void setRules(Set<RuleId> rules) {
         this.rules = rules;
+    }
+
+    public void addRules(Set<RuleId> rules) {
+        this.rules.addAll(rules);
+    }
+
+    public void addDeviceTypes(Set<String> deviceTypes) {
+        this.deviceTypes.addAll(deviceTypes);
     }
 
     public String getDescription() {
@@ -101,11 +109,11 @@ public class Application extends SearchTextBased<ApplicationId> implements HasNa
         this.description = description;
     }
 
-    public List<String> getDeviceTypes() {
+    public Set<String> getDeviceTypes() {
         return deviceTypes;
     }
 
-    public void setDeviceTypes(List<String> deviceTypes) {
+    public void setDeviceTypes(Set<String> deviceTypes) {
         this.deviceTypes = deviceTypes;
     }
 
@@ -125,6 +133,14 @@ public class Application extends SearchTextBased<ApplicationId> implements HasNa
         this.customerId = customerId;
     }
 
+    public Boolean getIsValid() {
+        return isValid;
+    }
+
+    public void setIsValid(Boolean valid) {
+        isValid = valid;
+    }
+
     @Override
     public String toString() {
         return "Application{" +
@@ -132,6 +148,7 @@ public class Application extends SearchTextBased<ApplicationId> implements HasNa
                 ", customerId=" + customerId +
                 ", miniDashboardId=" + miniDashboardId +
                 ", dashboardId=" + dashboardId +
+                ", isValid=" + isValid +
                 ", rules=" + rules +
                 ", name='" + name + '\'' +
                 ", description='" + description + '\'' +
@@ -155,7 +172,8 @@ public class Application extends SearchTextBased<ApplicationId> implements HasNa
         if (rules != null ? !rules.equals(that.rules) : that.rules != null) return false;
         if (name != null ? !name.equals(that.name) : that.name != null) return false;
         if (description != null ? !description.equals(that.description) : that.description != null) return false;
-        return deviceTypes != null ? deviceTypes.equals(that.deviceTypes) : that.deviceTypes == null;
+        if (deviceTypes != null ? !deviceTypes.equals(that.deviceTypes) : that.deviceTypes != null) return false;
+        return isValid != null ? isValid.equals(that.isValid) : that.isValid == null;
     }
 
     @Override
@@ -169,6 +187,7 @@ public class Application extends SearchTextBased<ApplicationId> implements HasNa
         result = 31 * result + (name != null ? name.hashCode() : 0);
         result = 31 * result + (description != null ? description.hashCode() : 0);
         result = 31 * result + (deviceTypes != null ? deviceTypes.hashCode() : 0);
+        result = 31 * result + (isValid != null ? isValid.hashCode() : 0);
         return result;
     }
 }
