@@ -297,3 +297,12 @@ CREATE TABLE IF NOT EXISTS computations (
     json_descriptor varchar,
     tenant_id varchar(31)
 );
+
+CREATE TABLE IF NOT EXISTS computation_job (
+    id varchar(31) NOT NULL CONSTRAINT computation_job_pkey PRIMARY KEY,
+    job_name varchar,
+    search_text varchar,
+    computation_id varchar,
+    arg_parameters varchar,
+    tenant_id varchar(31)
+);

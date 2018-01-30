@@ -162,13 +162,18 @@ public class ModelConstants {
      */
     public static final String COMPUTATIONS_TABLE_NAME = "computations";
     public static final String COMPUTATIONS_JAR = "jar_name";
-    //public static final String COMPUTATIONS_ID = "id";
     public static final String COMPUTATIONS_JAR_PATH = "jar_path";
     public static final String COMPUTATIONS_NAME = "computation_name";
     public static final String COMPUTATIONS_MAIN_CLASS = "main_class";
     public static final String COMPUTATIONS_DESCRIPTOR = "json_descriptor";
-    public static final String COMPUTATIONS_TENANT_ID = "tenant_id";
+    public static final String COMPUTATIONS_TENANT_ID = TENANT_ID_PROPERTY;
     public static final String COMPUTATIONS_ARGS_FORMAT = "args_format";
+
+    public static final String COMPUTATION_JOB_TABLE_NAME = "computation_job";
+    public static final String COMPUTATION_JOB_NAME = "job_name";
+    public static final String COMPUTATION_JOB_COMPUTAION_ID = "computation_id";
+    public static final String COMPUTATION_JOB_ARG_PRS = "arg_parameters";
+    public static final String COMPUTATION_JOB_TENANT_ID = TENANT_ID_PROPERTY;
 
     /**
      * Cassandra asset constants.
