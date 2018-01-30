@@ -105,7 +105,7 @@ public class UploadComputationDiscoveryService implements ComputationDiscoverySe
                         computations.setName(j.getFileName().toString());
                         computations.setJarPath(j.toString());
                         String dbActionString = this.getActionString(c);
-                        computations.setActions(dbActionString);
+                        computations.setComputationName(dbActionString);
                         Computations persistedComputations = computationsService.findByName(computations.getName());
                         if(persistedComputations == null) {
                             ComputationId computationId = new ComputationId(UUIDs.timeBased());
@@ -164,7 +164,7 @@ public class UploadComputationDiscoveryService implements ComputationDiscoverySe
                     computations.setName(j.getFileName().toString());
                     computations.setJarPath(j.toString());
                     String dbActionString = getActionString(actions);
-                    computations.setActions(dbActionString);
+                    computations.setComputationName(dbActionString);
                     Computations persistedComputations = computationsService.findByName(computations.getName());
                     if(persistedComputations == null){
                         ComputationId computationId = new ComputationId(UUIDs.timeBased());

@@ -161,10 +161,14 @@ public class ModelConstants {
      * Computations Constants
      */
     public static final String COMPUTATIONS_TABLE_NAME = "computations";
-    public static final String COMPUTATIONS_NAME = "name";
+    public static final String COMPUTATIONS_JAR = "jar_name";
     //public static final String COMPUTATIONS_ID = "id";
-    public static final String COMPUTATIONS_JAR_PATH = "jarpath";
-    public static final String COMPUTATIONS_ACTIONS = "actions";
+    public static final String COMPUTATIONS_JAR_PATH = "jar_path";
+    public static final String COMPUTATIONS_NAME = "computation_name";
+    public static final String COMPUTATIONS_MAIN_CLASS = "main_class";
+    public static final String COMPUTATIONS_DESCRIPTOR = "json_descriptor";
+    public static final String COMPUTATIONS_TENANT_ID = "tenant_id";
+    public static final String COMPUTATIONS_ARGS_FORMAT = "args_format";
 
     /**
      * Cassandra asset constants.

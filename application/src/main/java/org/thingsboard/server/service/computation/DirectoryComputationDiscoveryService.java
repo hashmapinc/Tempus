@@ -124,7 +124,7 @@ public class DirectoryComputationDiscoveryService implements ComputationDiscover
                         computations.setName(j.getFileName().toString());
                         computations.setJarPath(j.toString());
                         String dbActionString = this.getActionString(c);
-                        computations.setActions(dbActionString);
+                        computations.setComputationName(dbActionString);
                         Computations persistedComputations = computationsService.findByName(computations.getName());
                         if(persistedComputations == null) {
                             ComputationId computationId = new ComputationId(UUIDs.timeBased());
@@ -213,7 +213,7 @@ public class DirectoryComputationDiscoveryService implements ComputationDiscover
                 Computations computations = computationsService.findByName(jarName);
                 Set<String> actions = new HashSet<>();
                 if(computations != null) {
-                    actions.addAll(Arrays.stream(computations.getActions().split(",")).map(a -> a.split(":")[0]).collect(Collectors.toSet()));
+                    actions.addAll(Arrays.stream(computations.getComputationName().split(",")).map(a -> a.split(":")[0]).collect(Collectors.toSet()));
                 }
                 return actions;
             }
@@ -229,7 +229,7 @@ public class DirectoryComputationDiscoveryService implements ComputationDiscover
                             computations.setName(j.getFileName().toString());
                             computations.setJarPath(j.toString());
                             String dbActionString = getActionString(actions);
-                            computations.setActions(dbActionString);
+                            computations.setComputationName(dbActionString);
                             Computations persistedComputations = computationsService.findByName(computations.getName());
                             if(persistedComputations == null) {
                                 ComputationId computationId = new ComputationId(UUIDs.timeBased());

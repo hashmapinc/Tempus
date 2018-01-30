@@ -288,8 +288,12 @@ CREATE TABLE IF NOT EXISTS application_associated_rules(
 
 CREATE TABLE IF NOT EXISTS computations (
     id varchar(31) NOT NULL CONSTRAINT computations_pkey PRIMARY KEY,
-    name varchar,
-    jarpath varchar,
+    jar_name varchar,
+    jar_path varchar,
     search_text varchar,
-    actions varchar
+    computation_name varchar,
+    main_class varchar,
+    args_format varchar,
+    json_descriptor varchar,
+    tenant_id varchar(31)
 );

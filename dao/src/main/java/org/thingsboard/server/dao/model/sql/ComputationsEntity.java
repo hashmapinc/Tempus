@@ -1,11 +1,14 @@
 package org.thingsboard.server.dao.model.sql;
 
 import com.datastax.driver.core.utils.UUIDs;
+import com.fasterxml.jackson.databind.JsonNode;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
 import org.thingsboard.server.common.data.computation.Computations;
 import org.thingsboard.server.common.data.id.ComputationId;
+import org.thingsboard.server.common.data.id.TenantId;
 import org.thingsboard.server.dao.model.BaseSqlEntity;
 import org.thingsboard.server.dao.model.ModelConstants;
 import org.thingsboard.server.dao.model.SearchTextEntity;
@@ -16,6 +19,9 @@ import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
+import static org.thingsboard.server.common.data.UUIDConverter.fromString;
+import static org.thingsboard.server.common.data.UUIDConverter.fromTimeUUID;
+
 @Data
 @EqualsAndHashCode(callSuper = true)
 @Entity
@@ -25,17 +31,30 @@ public class ComputationsEntity extends BaseSqlEntity<Computations> implements S
     @Transient
     private static final long serialVersionUID = -4873737406462009031L;
 
-    @Column(name = ModelConstants.COMPUTATIONS_NAME)
+    @Column(name = ModelConstants.COMPUTATIONS_JAR)
     private String name;
 
     @Column(name = ModelConstants.COMPUTATIONS_JAR_PATH)
     private String jarPath;
 
-    @Column(name = ModelConstants.COMPUTATIONS_ACTIONS)
-    private String actions;
+    @Column(name = ModelConstants.COMPUTATIONS_NAME)
+    private String computationName;
 
     @Column(name = ModelConstants.SEARCH_TEXT_PROPERTY)
     private String searchText;
+
+    @Column(name = ModelConstants.COMPUTATIONS_MAIN_CLASS)
+    private String mainClass;
+
+    @Column(name = ModelConstants.COMPUTATIONS_ARGS_FORMAT)
+    private String argsFormat;
+
+    @Type(type = "json")
+    @Column(name = ModelConstants.COMPUTATIONS_DESCRIPTOR)
+    private JsonNode jsonDescriptor;
+
+    @Column(name = ModelConstants.COMPUTATIONS_TENANT_ID)
+    private String tenantId;
 
     @Override
     public String getSearchTextSource() {
@@ -57,7 +76,19 @@ public class ComputationsEntity extends BaseSqlEntity<Computations> implements S
             this.jarPath = computations.getJarPath();
         }
         if(computations.getJarPath() != null) {
-            this.actions = computations.getActions();
+            this.computationName = computations.getComputationName();
+        }
+        if(computations.getArgsformat() != null) {
+            this.argsFormat = computations.getArgsformat();
+        }
+        if(computations.getJsonDescriptor() != null) {
+            this.jsonDescriptor = computations.getJsonDescriptor();
+        }
+        if(computations.getMainClass() != null) {
+            this.mainClass = computations.getMainClass();
+        }
+        if(computations.getTenantId() != null) {
+            this.tenantId = fromTimeUUID(computations.getTenantId().getId());
         }
     }
 
@@ -76,7 +107,13 @@ public class ComputationsEntity extends BaseSqlEntity<Computations> implements S
         if (name != null ? !name.equals(that.name) : that.name != null) return false;
         if (searchText != null ? !searchText.equals(that.searchText) : that.searchText != null) return false;
         if (jarPath != null ? !jarPath.equals(that.jarPath) : that.jarPath != null) return false;
-        if (actions != null ? !actions.equals(that.actions) : that.actions != null) return false;
+        if (computationName != null ? !computationName.equals(that.computationName) : that.computationName != null) return false;
+
+        if (mainClass != null ? !mainClass.equals(that.mainClass) : that.mainClass != null) return false;
+        if (jsonDescriptor != null ? !jsonDescriptor.equals(that.jsonDescriptor) : that.jsonDescriptor != null) return false;
+        if (tenantId != null ? !tenantId.equals(that.tenantId) : that.tenantId != null) return false;
+        if (argsFormat != null ? !argsFormat.equals(that.argsFormat) : that.argsFormat != null) return false;
+
 
         return true;
     }
@@ -87,7 +124,11 @@ public class ComputationsEntity extends BaseSqlEntity<Computations> implements S
         result = 31 * result + (name != null ? name.hashCode() : 0);
         result = 31 * result + (searchText != null ? searchText.hashCode() : 0);
         result = 31 * result + (jarPath != null ? jarPath.hashCode() : 0);
-        result = 31 * result + (actions != null ? actions.hashCode() : 0);
+        result = 31 * result + (computationName != null ? computationName.hashCode() : 0);
+        result = 31 * result + (mainClass != null ? mainClass.hashCode() : 0);
+        result = 31 * result + (jsonDescriptor != null ? jsonDescriptor.hashCode() : 0);
+        result = 31 * result + (tenantId != null ? tenantId.hashCode() : 0);
+        result = 31 * result + (argsFormat != null ? argsFormat.hashCode() : 0);
         return result;
     }
 
@@ -97,7 +138,13 @@ public class ComputationsEntity extends BaseSqlEntity<Computations> implements S
         computations.setCreatedTime(UUIDs.unixTimestamp(getId()));
         computations.setName(name);
         computations.setJarPath(jarPath);
-        computations.setActions(actions);
+        computations.setComputationName(computationName);
+        computations.setArgsformat(argsFormat);
+        if (tenantId != null) {
+            computations.setTenantId(new TenantId(fromString(tenantId)));
+        }
+        computations.setMainClass(mainClass);
+        computations.setJsonDescriptor(jsonDescriptor);
         return computations;
     }
 
