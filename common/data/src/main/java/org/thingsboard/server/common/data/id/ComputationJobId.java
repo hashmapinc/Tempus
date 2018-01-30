@@ -4,26 +4,24 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.thingsboard.server.common.data.EntityType;
-
 import java.util.UUID;
 
-public class ComputationId extends UUIDBased implements EntityId{
-
+public final class ComputationJobId extends UUIDBased implements EntityId{
     private static final long serialVersionUID = 1L;
 
     @JsonCreator
-    public ComputationId(@JsonProperty("id") UUID id) {
+    public ComputationJobId(@JsonProperty("id") UUID id) {
         super(id);
     }
 
-    public static ComputationId fromString(String computationsId) {
-        return new ComputationId(UUID.fromString(computationsId));
+    public static ComputationJobId fromString(String computationJobId) {
+        return new ComputationJobId(UUID.fromString(computationJobId));
     }
 
 
     @JsonIgnore
     @Override
     public EntityType getEntityType() {
-        return EntityType.COMPUTATION;
+        return EntityType.COMPUTATION_JOB;
     }
 }
