@@ -18,9 +18,7 @@ package org.thingsboard.server.common.msg.plugin;
 import lombok.Data;
 import lombok.Getter;
 import lombok.ToString;
-import org.thingsboard.server.common.data.id.PluginId;
-import org.thingsboard.server.common.data.id.RuleId;
-import org.thingsboard.server.common.data.id.TenantId;
+import org.thingsboard.server.common.data.id.*;
 import org.thingsboard.server.common.data.plugin.ComponentLifecycleEvent;
 import org.thingsboard.server.common.data.plugin.ComponentLifecycleState;
 import org.thingsboard.server.common.msg.aware.TenantAwareMsg;
@@ -37,21 +35,35 @@ public class ComponentLifecycleMsg implements TenantAwareMsg, ToAllNodesMsg {
     private final TenantId tenantId;
     private final PluginId pluginId;
     private final RuleId ruleId;
+    private final ComputationId computationId;
+    private final ComputationJobId computationJobId;
     @Getter
     private final ComponentLifecycleEvent event;
 
     public static ComponentLifecycleMsg forPlugin(TenantId tenantId, PluginId pluginId, ComponentLifecycleEvent event) {
-        return new ComponentLifecycleMsg(tenantId, pluginId, null, event);
+        return new ComponentLifecycleMsg(tenantId, pluginId, null, null, null, event);
     }
 
     public static ComponentLifecycleMsg forRule(TenantId tenantId, RuleId ruleId, ComponentLifecycleEvent event) {
-        return new ComponentLifecycleMsg(tenantId, null, ruleId, event);
+        return new ComponentLifecycleMsg(tenantId, null, ruleId, null, null, event);
     }
 
-    private ComponentLifecycleMsg(TenantId tenantId, PluginId pluginId, RuleId ruleId, ComponentLifecycleEvent event) {
+    public static ComponentLifecycleMsg forComputation(TenantId tenantId, ComputationId computationId, ComponentLifecycleEvent event) {
+        return new ComponentLifecycleMsg(tenantId, null, null, computationId, null, event);
+    }
+
+    public static ComponentLifecycleMsg forComputationJob(TenantId tenantId, ComputationId computationId, ComputationJobId computationJobId, ComponentLifecycleEvent event) {
+        return new ComponentLifecycleMsg(tenantId, null, null, computationId, computationJobId, event);
+    }
+
+    private ComponentLifecycleMsg(TenantId tenantId, PluginId pluginId,
+                                  RuleId ruleId, ComputationId computationId,
+                                  ComputationJobId computationJobId, ComponentLifecycleEvent event) {
         this.tenantId = tenantId;
         this.pluginId = pluginId;
         this.ruleId = ruleId;
+        this.computationId = computationId;
+        this.computationJobId = computationJobId;
         this.event = event;
     }
 
@@ -61,5 +73,13 @@ public class ComponentLifecycleMsg implements TenantAwareMsg, ToAllNodesMsg {
 
     public Optional<RuleId> getRuleId() {
         return Optional.ofNullable(ruleId);
+    }
+
+    public Optional<ComputationId> getComputationId() {
+        return Optional.ofNullable(computationId);
+    }
+
+    public Optional<ComputationJobId> getComputationJobId() {
+        return Optional.ofNullable(computationJobId);
     }
 }

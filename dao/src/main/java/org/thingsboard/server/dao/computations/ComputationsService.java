@@ -1,5 +1,8 @@
 package org.thingsboard.server.dao.computations;
-import org.thingsboard.server.common.data.Computations;
+import org.thingsboard.server.common.data.computation.Computations;
+import org.thingsboard.server.common.data.id.TenantId;
+import org.thingsboard.server.common.data.page.TextPageData;
+import org.thingsboard.server.common.data.page.TextPageLink;
 
 import java.util.List;
 
@@ -12,4 +15,6 @@ public interface ComputationsService {
     void save(Computations computations);
 
     void deleteByName(String name);
+
+    TextPageData<Computations> findTenantComputations(TenantId tenantId, TextPageLink pageLink);
 }

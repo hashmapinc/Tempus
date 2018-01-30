@@ -15,7 +15,6 @@
  */
 package org.thingsboard.server.service.component;
 
-import org.thingsboard.server.common.data.Computations;
 import org.thingsboard.server.common.data.plugin.ComponentDescriptor;
 import org.thingsboard.server.common.data.plugin.ComponentType;
 import org.thingsboard.server.common.msg.computation.ComputationActionCompiled;

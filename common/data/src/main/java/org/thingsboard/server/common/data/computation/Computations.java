@@ -1,5 +1,7 @@
-package org.thingsboard.server.common.data;
+package org.thingsboard.server.common.data.computation;
 
+import org.thingsboard.server.common.data.HasName;
+import org.thingsboard.server.common.data.SearchTextBased;
 import org.thingsboard.server.common.data.id.ComputationId;
 
 public class Computations extends SearchTextBased<ComputationId> implements HasName {

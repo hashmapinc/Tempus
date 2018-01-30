@@ -15,7 +15,7 @@
  */
 package org.thingsboard.server.service.computation;
 
-import org.thingsboard.server.common.data.Computations;
+import org.thingsboard.server.common.data.computation.Computations;
 
 import java.util.List;
 

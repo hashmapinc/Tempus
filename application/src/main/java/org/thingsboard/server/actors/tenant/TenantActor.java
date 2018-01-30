@@ -27,6 +27,7 @@ import org.thingsboard.server.actors.rule.RuleActorChain;
 import org.thingsboard.server.actors.service.ContextAwareActor;
 import org.thingsboard.server.actors.service.ContextBasedCreator;
 import org.thingsboard.server.actors.service.DefaultActorService;
+import org.thingsboard.server.actors.shared.computation.TenantComputationManager;
 import org.thingsboard.server.actors.shared.plugin.PluginManager;
 import org.thingsboard.server.actors.shared.plugin.TenantPluginManager;
 import org.thingsboard.server.actors.shared.rule.RuleManager;
@@ -52,6 +53,7 @@ public class TenantActor extends ContextAwareActor {
     private final TenantId tenantId;
     private final RuleManager ruleManager;
     private final PluginManager pluginManager;
+    private final TenantComputationManager computationManager;
     private final Map<DeviceId, ActorRef> deviceActors;
 
     private TenantActor(ActorSystemContext systemContext, TenantId tenantId) {
@@ -59,6 +61,7 @@ public class TenantActor extends ContextAwareActor {
         this.tenantId = tenantId;
         this.ruleManager = new TenantRuleManager(systemContext, tenantId);
         this.pluginManager = new TenantPluginManager(systemContext, tenantId);
+        this.computationManager = new TenantComputationManager(systemContext, tenantId);
         this.deviceActors = new HashMap<>();
     }
 
@@ -68,6 +71,7 @@ public class TenantActor extends ContextAwareActor {
         try {
             ruleManager.init(this.context());
             pluginManager.init(this.context());
+            computationManager.init(this.context());
             logger.info("[{}] Tenant actor started.", tenantId);
         } catch (Exception e) {
             logger.error(e, "[{}] Unknown failure", tenantId);
@@ -147,7 +151,9 @@ public class TenantActor extends ContextAwareActor {
                 return;
             }
             target.tell(msg, ActorRef.noSender());
-        } else {
+        } else if(msg.getComputationId().isPresent()){
+            //TODO: computationsManaer to update computation and Jobs if required
+        }else {
             logger.debug("[{}] Invalid component lifecycle msg.", tenantId);
         }
     }
