@@ -19,17 +19,14 @@ import akka.dispatch.ExecutionContexts;
 import akka.dispatch.OnComplete;
 import com.datastax.driver.core.utils.UUIDs;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.io.monitor.FileAlterationListener;
-import org.apache.commons.io.monitor.FileAlterationListenerAdaptor;
 import org.apache.commons.io.monitor.FileAlterationMonitor;
-import org.apache.commons.io.monitor.FileAlterationObserver;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import org.thingsboard.server.common.data.Computations;
-import org.thingsboard.server.common.data.id.ComputationsId;
+import org.thingsboard.server.common.data.id.ComputationId;
 import org.thingsboard.server.common.data.plugin.ComponentDescriptor;
 import org.thingsboard.server.common.data.plugin.PluginMetaData;
 import org.thingsboard.server.common.msg.computation.ComputationActionCompiled;
@@ -111,8 +108,8 @@ public class UploadComputationDiscoveryService implements ComputationDiscoverySe
                         computations.setActions(dbActionString);
                         Computations persistedComputations = computationsService.findByName(computations.getName());
                         if(persistedComputations == null) {
-                            ComputationsId computationsId = new ComputationsId(UUIDs.timeBased());
-                            computations.setId(computationsId);
+                            ComputationId computationId = new ComputationId(UUIDs.timeBased());
+                            computations.setId(computationId);
                             computationsService.save(computations);
                         }
                         else {
@@ -170,8 +167,8 @@ public class UploadComputationDiscoveryService implements ComputationDiscoverySe
                     computations.setActions(dbActionString);
                     Computations persistedComputations = computationsService.findByName(computations.getName());
                     if(persistedComputations == null){
-                        ComputationsId computationsId = new ComputationsId(UUIDs.timeBased());
-                        computations.setId(computationsId);
+                        ComputationId computationId = new ComputationId(UUIDs.timeBased());
+                        computations.setId(computationId);
                         computationsService.save(computations);
                     }
                     else {

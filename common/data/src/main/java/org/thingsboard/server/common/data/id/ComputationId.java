@@ -7,17 +7,17 @@ import org.thingsboard.server.common.data.EntityType;
 
 import java.util.UUID;
 
-public class ComputationsId extends UUIDBased implements EntityId{
+public class ComputationId extends UUIDBased implements EntityId{
 
     private static final long serialVersionUID = 1L;
 
     @JsonCreator
-    public ComputationsId(@JsonProperty("id") UUID id) {
+    public ComputationId(@JsonProperty("id") UUID id) {
         super(id);
     }
 
-    public static ComputationsId fromString(String computationsId) {
-        return new ComputationsId(UUID.fromString(computationsId));
+    public static ComputationId fromString(String computationsId) {
+        return new ComputationId(UUID.fromString(computationsId));
     }
 
 

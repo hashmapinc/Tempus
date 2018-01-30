@@ -5,7 +5,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.hibernate.annotations.TypeDef;
 import org.thingsboard.server.common.data.Computations;
-import org.thingsboard.server.common.data.id.ComputationsId;
+import org.thingsboard.server.common.data.id.ComputationId;
 import org.thingsboard.server.dao.model.BaseSqlEntity;
 import org.thingsboard.server.dao.model.ModelConstants;
 import org.thingsboard.server.dao.model.SearchTextEntity;
@@ -93,7 +93,7 @@ public class ComputationsEntity extends BaseSqlEntity<Computations> implements S
 
     @Override
     public Computations toData() {
-        Computations computations = new Computations(new ComputationsId(getId()));
+        Computations computations = new Computations(new ComputationId(getId()));
         computations.setCreatedTime(UUIDs.unixTimestamp(getId()));
         computations.setName(name);
         computations.setJarPath(jarPath);

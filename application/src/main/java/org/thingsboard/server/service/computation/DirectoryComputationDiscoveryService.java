@@ -26,11 +26,10 @@ import org.apache.commons.io.monitor.FileAlterationObserver;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import org.thingsboard.server.common.data.Computations;
-import org.thingsboard.server.common.data.id.ComputationsId;
+import org.thingsboard.server.common.data.id.ComputationId;
 import org.thingsboard.server.common.data.plugin.ComponentDescriptor;
 import org.thingsboard.server.common.data.plugin.PluginMetaData;
 import org.thingsboard.server.common.msg.computation.ComputationActionCompiled;
@@ -128,8 +127,8 @@ public class DirectoryComputationDiscoveryService implements ComputationDiscover
                         computations.setActions(dbActionString);
                         Computations persistedComputations = computationsService.findByName(computations.getName());
                         if(persistedComputations == null) {
-                            ComputationsId computationsId = new ComputationsId(UUIDs.timeBased());
-                            computations.setId(computationsId);
+                            ComputationId computationId = new ComputationId(UUIDs.timeBased());
+                            computations.setId(computationId);
                             computationsService.save(computations);
                         }
                         else {
@@ -233,8 +232,8 @@ public class DirectoryComputationDiscoveryService implements ComputationDiscover
                             computations.setActions(dbActionString);
                             Computations persistedComputations = computationsService.findByName(computations.getName());
                             if(persistedComputations == null) {
-                                ComputationsId computationsId = new ComputationsId(UUIDs.timeBased());
-                                computations.setId(computationsId);
+                                ComputationId computationId = new ComputationId(UUIDs.timeBased());
+                                computations.setId(computationId);
                                 computationsService.save(computations);
                             }
                             else {

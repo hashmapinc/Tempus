@@ -1,8 +1,8 @@
 package org.thingsboard.server.common.data;
 
-import org.thingsboard.server.common.data.id.ComputationsId;
+import org.thingsboard.server.common.data.id.ComputationId;
 
-public class Computations extends SearchTextBased<ComputationsId> implements HasName {
+public class Computations extends SearchTextBased<ComputationId> implements HasName {
 
     private String name;
     private String jarPath;
@@ -13,7 +13,7 @@ public class Computations extends SearchTextBased<ComputationsId> implements Has
         super();
     }
 
-    public Computations(ComputationsId id) {
+    public Computations(ComputationId id) {
         super(id);
     }
 
