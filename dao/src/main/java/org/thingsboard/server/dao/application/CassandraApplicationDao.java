@@ -67,6 +67,16 @@ public class CassandraApplicationDao extends CassandraAbstractSearchTextDao<Appl
     }
 
     @Override
+    public List<Application> findApplicationByComputationJobId(UUID tenantId, UUID computationJobId) {
+        log.debug("Trying to find applications by computation job id for tenantId [{}] and computation job id [{}]", tenantId, computationJobId);
+        Select select = select().from(APPLICATION_BY_TENANT_AND_SEARCH_TEXT_COLUMN_FAMILY_NAME).allowFiltering();
+        Select.Where query = select.where();
+        query.and(eq(APPLICATION_TENANT_ID_PROPERTY, tenantId));
+        query.and(contains(APPLICATION_COMPUTATION_JOBS_COLUMN, computationJobId));
+        return DaoUtil.convertDataList(findListByStatement(query));
+    }
+
+    @Override
     public List<Application> findApplicationsByDashboardId(UUID tenantId, UUID dashboardId) {
         log.debug("Trying to find applications by dashboard id for tenantId [{}] and dashboard id [{}]", tenantId, dashboardId);
 

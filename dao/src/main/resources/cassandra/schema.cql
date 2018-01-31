@@ -207,6 +207,7 @@ CREATE TABLE IF NOT EXISTS thingsboard.application (
     name text,
     is_valid boolean,
     description text,
+    application_computation_jobs set<timeuuid>,
     application_rules set<timeuuid>,
     application_device_types set<text>,
     PRIMARY KEY (id, tenant_id, customer_id)

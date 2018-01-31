@@ -71,6 +71,9 @@ public final class ApplicationEntity implements SearchTextEntity<Application> {
     @Column(name = APPLICATION_RULES_COLUMN)
     private Set<UUID> rules;
 
+    @Column(name = APPLICATION_COMPUTATION_JOBS_COLUMN)
+    private Set<UUID> computationJobs;
+
     @Column(name = APPLICATION_DEVICE_TYPES_COLUMN)
     private Set<String> deviceTypes;
 
@@ -100,6 +103,10 @@ public final class ApplicationEntity implements SearchTextEntity<Application> {
 
         if(application.getRules() !=null && application.getRules().size() !=0) {
             this.rules = application.getRules().stream().map(r -> (r.getId())).collect(Collectors.toSet());
+        }
+
+        if(application.getComputationJobIdSet() !=null && application.getComputationJobIdSet().size() !=0) {
+            this.computationJobs = application.getComputationJobIdSet().stream().map(c -> (c.getId())).collect(Collectors.toSet());
         }
 
         this.name = application.getName();
@@ -195,6 +202,14 @@ public final class ApplicationEntity implements SearchTextEntity<Application> {
         this.rules = rules;
     }
 
+    public Set<UUID> getComputationJobs() {
+        return computationJobs;
+    }
+
+    public void setComputationJobs(Set<UUID> computationJobs) {
+        this.computationJobs = computationJobs;
+    }
+
     public Set<String> getDeviceTypes() {
         return deviceTypes;
     }
@@ -225,6 +240,10 @@ public final class ApplicationEntity implements SearchTextEntity<Application> {
         if(rules !=null && rules.size() !=0) {
             application.setRules(rules.stream().map(RuleId::new).collect(Collectors.toSet()));
         }
+
+        if(computationJobs !=null && computationJobs.size() !=0) {
+            application.setComputationJobIdSet(computationJobs.stream().map(ComputationJobId::new).collect(Collectors.toSet()));
+        }
         application.setName(name);
         application.setIsValid(isValid);
         application.setDescription(description);
@@ -252,6 +271,7 @@ public final class ApplicationEntity implements SearchTextEntity<Application> {
         if (description != null ? !description.equals(that.description) : that.description != null) return false;
         if (searchText != null ? !searchText.equals(that.searchText) : that.searchText != null) return false;
         if (rules != null ? !rules.equals(that.rules) : that.rules != null) return false;
+        if (computationJobs != null ? !computationJobs.equals(that.computationJobs) : that.computationJobs != null) return false;
         return deviceTypes != null ? deviceTypes.equals(that.deviceTypes) : that.deviceTypes == null;
     }
 
@@ -267,6 +287,7 @@ public final class ApplicationEntity implements SearchTextEntity<Application> {
         result = 31 * result + (description != null ? description.hashCode() : 0);
         result = 31 * result + (searchText != null ? searchText.hashCode() : 0);
         result = 31 * result + (rules != null ? rules.hashCode() : 0);
+        result = 31 * result + (computationJobs != null ? computationJobs.hashCode() : 0);
         result = 31 * result + (deviceTypes != null ? deviceTypes.hashCode() : 0);
         return result;
     }

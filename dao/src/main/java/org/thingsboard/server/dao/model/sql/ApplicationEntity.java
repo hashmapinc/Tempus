@@ -61,6 +61,12 @@ public final class ApplicationEntity extends BaseSqlEntity<Application> implemen
     @Column(name = ModelConstants.APPLICATION_RULE_ID_COLUMN)
     private Set<String> rules;
 
+    @ElementCollection(fetch = FetchType.EAGER)
+    @Fetch(value = FetchMode.SUBSELECT)
+    @CollectionTable(name = ModelConstants.APPLICATION_COMPUTATION_JOBS_ASSOCIATION_TABLE, joinColumns = @JoinColumn(name = ModelConstants.APPLICATION_ID_COLUMN))
+    @Column(name = ModelConstants.APPLICATION_COMPUTATION_JOB_ID_COLUMN)
+    private Set<String> computationJobs;
+
     @Column(name = ModelConstants.APPLICATION_NAME)
     private String name;
 
@@ -107,6 +113,10 @@ public final class ApplicationEntity extends BaseSqlEntity<Application> implemen
             this.rules = application.getRules().stream().map(r -> toString(r.getId())).collect(Collectors.toSet());
         }
 
+        if(application.getComputationJobIdSet() !=null && application.getComputationJobIdSet().size() !=0) {
+            this.computationJobs = application.getComputationJobIdSet().stream().map(c -> toString(c.getId())).collect(Collectors.toSet());
+        }
+
         this.name = application.getName();
         this.isValid = application.getIsValid();
         this.description = application.getDescription();
@@ -145,6 +155,10 @@ public final class ApplicationEntity extends BaseSqlEntity<Application> implemen
         if(rules !=null && rules.size() !=0) {
             application.setRules(rules.stream().map(r -> new RuleId(toUUID(r))).collect(Collectors.toSet()));
         }
+
+        if(computationJobs !=null && computationJobs.size() !=0) {
+            application.setComputationJobIdSet(computationJobs.stream().map(c -> new ComputationJobId(toUUID(c))).collect(Collectors.toSet()));
+        }
         application.setName(name);
         application.setIsValid(isValid);
         application.setDescription(description);
@@ -168,6 +182,7 @@ public final class ApplicationEntity extends BaseSqlEntity<Application> implemen
             return false;
         if (dashboardId != null ? !dashboardId.equals(that.dashboardId) : that.dashboardId != null) return false;
         if (rules != null ? !rules.equals(that.rules) : that.rules != null) return false;
+        if (computationJobs != null ? !computationJobs.equals(that.computationJobs) : that.computationJobs != null) return false;
         if (name != null ? !name.equals(that.name) : that.name != null) return false;
         if (isValid != null ? !isValid.equals(that.isValid) : that.isValid != null) return false;
         if (description != null ? !description.equals(that.description) : that.description != null) return false;
@@ -183,6 +198,7 @@ public final class ApplicationEntity extends BaseSqlEntity<Application> implemen
         result = 31 * result + (miniDashboardId != null ? miniDashboardId.hashCode() : 0);
         result = 31 * result + (dashboardId != null ? dashboardId.hashCode() : 0);
         result = 31 * result + (rules != null ? rules.hashCode() : 0);
+        result = 31 * result + (computationJobs != null ? computationJobs.hashCode() : 0);
         result = 31 * result + (name != null ? name.hashCode() : 0);
         result = 31 * result + (isValid != null ? isValid.hashCode() : 0);
         result = 31 * result + (description != null ? description.hashCode() : 0);

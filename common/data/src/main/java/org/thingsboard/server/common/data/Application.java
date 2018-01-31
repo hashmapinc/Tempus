@@ -28,6 +28,7 @@ public class Application extends SearchTextBased<ApplicationId> implements HasNa
     private CustomerId customerId;
     private DashboardId dashboardId;
     private DashboardId miniDashboardId;
+    private Set<ComputationJobId> computationJobIdSet = new HashSet<>();
     private Set<RuleId> rules = new HashSet<>();
     private String name;
     private String description;
@@ -48,6 +49,7 @@ public class Application extends SearchTextBased<ApplicationId> implements HasNa
         this.customerId = application.customerId;
         this.dashboardId = application.dashboardId;
         this.miniDashboardId = application.miniDashboardId;
+        this.computationJobIdSet = application.computationJobIdSet;
         this.rules = application.rules;
         this.name = application.name;
         this.description = application.description;
@@ -97,6 +99,17 @@ public class Application extends SearchTextBased<ApplicationId> implements HasNa
         this.rules.addAll(rules);
     }
 
+    public void addComputationJobs(Set<ComputationJobId> computationJobIds) {
+        this.computationJobIdSet.addAll(computationJobIds);
+    }
+
+    public Set<ComputationJobId> getComputationJobIdSet() {
+        return computationJobIdSet;
+    }
+
+    public void setComputationJobIdSet(Set<ComputationJobId> computationJobIdSet) {
+        this.computationJobIdSet = computationJobIdSet;
+    }
     public void addDeviceTypes(Set<String> deviceTypes) {
         this.deviceTypes.addAll(deviceTypes);
     }
@@ -148,6 +161,7 @@ public class Application extends SearchTextBased<ApplicationId> implements HasNa
                 ", customerId=" + customerId +
                 ", miniDashboardId=" + miniDashboardId +
                 ", dashboardId=" + dashboardId +
+                ", computationJobIdSet=" + computationJobIdSet +
                 ", isValid=" + isValid +
                 ", rules=" + rules +
                 ", name='" + name + '\'' +
@@ -170,6 +184,7 @@ public class Application extends SearchTextBased<ApplicationId> implements HasNa
         if (miniDashboardId != null ? !miniDashboardId.equals(that.miniDashboardId) : that.miniDashboardId != null)
             return false;
         if (rules != null ? !rules.equals(that.rules) : that.rules != null) return false;
+        if (computationJobIdSet != null ? !computationJobIdSet.equals(that.computationJobIdSet) : that.computationJobIdSet != null) return false;
         if (name != null ? !name.equals(that.name) : that.name != null) return false;
         if (description != null ? !description.equals(that.description) : that.description != null) return false;
         if (deviceTypes != null ? !deviceTypes.equals(that.deviceTypes) : that.deviceTypes != null) return false;
@@ -184,6 +199,7 @@ public class Application extends SearchTextBased<ApplicationId> implements HasNa
         result = 31 * result + (dashboardId != null ? dashboardId.hashCode() : 0);
         result = 31 * result + (miniDashboardId != null ? miniDashboardId.hashCode() : 0);
         result = 31 * result + (rules != null ? rules.hashCode() : 0);
+        result = 31 * result + (computationJobIdSet != null ? computationJobIdSet.hashCode() : 0);
         result = 31 * result + (name != null ? name.hashCode() : 0);
         result = 31 * result + (description != null ? description.hashCode() : 0);
         result = 31 * result + (deviceTypes != null ? deviceTypes.hashCode() : 0);
