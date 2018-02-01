@@ -26,9 +26,12 @@ import org.apache.velocity.runtime.RuntimeSingleton;
 import org.apache.velocity.runtime.parser.ParseException;
 import org.apache.velocity.runtime.parser.node.SimpleNode;
 import org.apache.velocity.tools.generic.DateTool;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.thingsboard.server.common.data.kv.AttributeKvEntry;
 import org.thingsboard.server.common.data.kv.BasicTsKvEntry;
 import org.thingsboard.server.common.data.kv.BasicDsKvEntry;
+import org.thingsboard.server.common.data.kv.StringDataEntry;
 import org.thingsboard.server.common.msg.core.TelemetryUploadRequest;
 import org.thingsboard.server.common.msg.core.DepthTelemetryUploadRequest;
 import org.thingsboard.server.common.msg.core.BasicDepthTelemetryUploadRequest;
@@ -53,6 +56,8 @@ import java.util.HashSet;
  */
 @Slf4j
 public class VelocityUtils {
+
+    private static Logger logger = LoggerFactory.getLogger(VelocityUtils.class);
 
     public static Template create(String source, String templateName) throws ParseException {
         RuntimeServices runtimeServices = RuntimeSingleton.getRuntimeServices();
@@ -151,19 +156,21 @@ public class VelocityUtils {
         });
         context.put("tags", allKeys);
     }
-    
+
     private static void pushAttributes(VelocityContext context, Collection<AttributeKvEntry> deviceAttributes, String prefix) {
         Map<String, String> values = new HashMap<>();
-        Set<String> clientAttrib = new HashSet<>();
+        Set<StringDataEntry> clientAttrib = new HashSet<>();
         if(prefix.contentEquals(NashornJsEvaluator.CLIENT_SIDE)){
             deviceAttributes.forEach(v -> {values.put(v.getKey(), v.getValueAsString());
-                clientAttrib.add(v.getKey());});
+                clientAttrib.add(new StringDataEntry(v.getKey(), v.getValueAsString()));});
             context.put(prefix, values);
             context.put("cs",values);
+            context.put("attrtags", clientAttrib);
         }
         else {
             deviceAttributes.forEach(v -> values.put(v.getKey(), v.getValueAsString()));
             context.put(prefix, values);
         }
     }
+
 }
