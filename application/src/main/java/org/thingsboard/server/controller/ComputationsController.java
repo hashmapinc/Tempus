@@ -25,6 +25,11 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.thingsboard.server.common.data.computation.Computations;
+import org.thingsboard.server.common.data.id.TenantId;
+import org.thingsboard.server.common.data.page.TextPageData;
+import org.thingsboard.server.common.data.page.TextPageLink;
+import org.thingsboard.server.common.data.plugin.PluginMetaData;
 import org.thingsboard.server.exception.ThingsboardException;
 import org.thingsboard.server.service.computation.ComputationDiscoveryService;
 
@@ -72,6 +77,23 @@ public class ComputationsController extends BaseController {
     public void findAll() throws ThingsboardException {
         computationDiscoveryService.findAll();
     }
+
+    /*@PreAuthorize("hasAuthority('TENANT_ADMIN')")
+    @RequestMapping(value = "/computations", params = {"limit"}, method = RequestMethod.GET)
+    @ResponseBody
+    public TextPageData<Computations> getTenantComputations(
+            @RequestParam int limit,
+            @RequestParam(required = false) String textSearch,
+            @RequestParam(required = false) String idOffset,
+            @RequestParam(required = false) String textOffset) throws ThingsboardException {
+        try {
+            TenantId tenantId = getCurrentUser().getTenantId();
+            TextPageLink pageLink = createPageLink(limit, textSearch, idOffset, textOffset);
+            return checkNotNull(computationDiscoveryService.findTenantComputations(tenantId, pageLink));
+        } catch (Exception e) {
+            throw handleException(e);
+        }
+    }*/
 
     @Data
     @AllArgsConstructor

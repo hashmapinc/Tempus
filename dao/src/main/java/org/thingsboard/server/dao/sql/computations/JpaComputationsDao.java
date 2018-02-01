@@ -50,7 +50,11 @@ public class JpaComputationsDao extends JpaAbstractDaoListeningExecutorService i
 
     @Override
     public Computations findByName(String name) {
-        ComputationsEntity computationsEntity = computationsRepository.findByName(name);
+        ComputationsEntity computationsEntity = null;
+        List<ComputationsEntity> computationsEntityList = computationsRepository.findByName(name);
+        if( computationsEntityList != null && !computationsEntityList.isEmpty()) {
+            computationsEntity = computationsEntityList.get(0);
+        }
         return DaoUtil.getData(computationsEntity);
     }
 
@@ -60,8 +64,8 @@ public class JpaComputationsDao extends JpaAbstractDaoListeningExecutorService i
     }
 
     @Override
-    public void deleteByName(String name) {
-        computationsRepository.deleteByName(name);
+    public void deleteByJarName(String name) {
+        computationsRepository.deleteByJarName(name);
     }
 
     @Override

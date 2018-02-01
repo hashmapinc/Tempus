@@ -29,7 +29,8 @@ public class BaseComputationsService extends AbstractEntityService implements Co
 
     @Override
     public Computations findByName(String name) {
-        return computationsDao.findByName(name);
+        Computations computations = computationsDao.findByName(name);
+        return computations;
     }
 
     @Override
@@ -39,9 +40,8 @@ public class BaseComputationsService extends AbstractEntityService implements Co
     }
 
     @Override
-    public void deleteByName(String name) {
-        log.error("\nHMDC deleting jar \n");
-        computationsDao.deleteByName(name);
+    public void deleteByJarName(String name) {
+        computationsDao.deleteByJarName(name);
     }
 
     @Override

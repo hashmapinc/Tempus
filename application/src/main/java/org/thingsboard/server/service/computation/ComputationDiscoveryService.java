@@ -16,6 +16,9 @@
 package org.thingsboard.server.service.computation;
 
 import org.thingsboard.server.common.data.computation.Computations;
+import org.thingsboard.server.common.data.id.TenantId;
+import org.thingsboard.server.common.data.page.TextPageData;
+import org.thingsboard.server.common.data.page.TextPageLink;
 
 import java.util.List;
 
@@ -24,4 +27,5 @@ public interface ComputationDiscoveryService {
     void deleteJarFile(String path);
     List<Computations>  findAll();
     void onJarUpload(String path);
+    //TextPageData<Computations> findTenantComputations(TenantId tenantId, TextPageLink pageLink);
 }

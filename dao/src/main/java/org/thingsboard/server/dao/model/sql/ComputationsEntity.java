@@ -31,14 +31,14 @@ public class ComputationsEntity extends BaseSqlEntity<Computations> implements S
     @Transient
     private static final long serialVersionUID = -4873737406462009031L;
 
-    @Column(name = ModelConstants.COMPUTATIONS_JAR)
+    @Column(name = ModelConstants.COMPUTATIONS_NAME)
     private String name;
 
     @Column(name = ModelConstants.COMPUTATIONS_JAR_PATH)
     private String jarPath;
 
-    @Column(name = ModelConstants.COMPUTATIONS_NAME)
-    private String computationName;
+    @Column(name = ModelConstants.COMPUTATIONS_JAR)
+    private String jarName;
 
     @Column(name = ModelConstants.SEARCH_TEXT_PROPERTY)
     private String searchText;
@@ -76,7 +76,7 @@ public class ComputationsEntity extends BaseSqlEntity<Computations> implements S
             this.jarPath = computations.getJarPath();
         }
         if(computations.getJarPath() != null) {
-            this.computationName = computations.getComputationName();
+            this.jarName = computations.getJarName();
         }
         if(computations.getArgsformat() != null) {
             this.argsFormat = computations.getArgsformat();
@@ -107,7 +107,7 @@ public class ComputationsEntity extends BaseSqlEntity<Computations> implements S
         if (name != null ? !name.equals(that.name) : that.name != null) return false;
         if (searchText != null ? !searchText.equals(that.searchText) : that.searchText != null) return false;
         if (jarPath != null ? !jarPath.equals(that.jarPath) : that.jarPath != null) return false;
-        if (computationName != null ? !computationName.equals(that.computationName) : that.computationName != null) return false;
+        if (jarName != null ? !jarName.equals(that.jarName) : that.jarName != null) return false;
 
         if (mainClass != null ? !mainClass.equals(that.mainClass) : that.mainClass != null) return false;
         if (jsonDescriptor != null ? !jsonDescriptor.equals(that.jsonDescriptor) : that.jsonDescriptor != null) return false;
@@ -124,7 +124,7 @@ public class ComputationsEntity extends BaseSqlEntity<Computations> implements S
         result = 31 * result + (name != null ? name.hashCode() : 0);
         result = 31 * result + (searchText != null ? searchText.hashCode() : 0);
         result = 31 * result + (jarPath != null ? jarPath.hashCode() : 0);
-        result = 31 * result + (computationName != null ? computationName.hashCode() : 0);
+        result = 31 * result + (jarName != null ? jarName.hashCode() : 0);
         result = 31 * result + (mainClass != null ? mainClass.hashCode() : 0);
         result = 31 * result + (jsonDescriptor != null ? jsonDescriptor.hashCode() : 0);
         result = 31 * result + (tenantId != null ? tenantId.hashCode() : 0);
@@ -138,7 +138,7 @@ public class ComputationsEntity extends BaseSqlEntity<Computations> implements S
         computations.setCreatedTime(UUIDs.unixTimestamp(getId()));
         computations.setName(name);
         computations.setJarPath(jarPath);
-        computations.setComputationName(computationName);
+        computations.setJarName(jarName);
         computations.setArgsformat(argsFormat);
         if (tenantId != null) {
             computations.setTenantId(new TenantId(fromString(tenantId)));

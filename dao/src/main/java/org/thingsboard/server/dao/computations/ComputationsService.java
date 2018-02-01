@@ -5,6 +5,7 @@ import org.thingsboard.server.common.data.page.TextPageData;
 import org.thingsboard.server.common.data.page.TextPageLink;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface ComputationsService {
 
@@ -14,7 +15,7 @@ public interface ComputationsService {
 
     void save(Computations computations);
 
-    void deleteByName(String name);
+    void deleteByJarName(String name);
 
     TextPageData<Computations> findTenantComputations(TenantId tenantId, TextPageLink pageLink);
 }

@@ -11,7 +11,7 @@ public class Computations extends SearchTextBased<ComputationId> implements HasN
     private String name;
     private String jarPath;
     private TenantId tenantId;
-    private String computationName;
+    private String jarName;
     private String mainClass;
     private JsonNode jsonDescriptor;
     private String argsformat;
@@ -28,7 +28,7 @@ public class Computations extends SearchTextBased<ComputationId> implements HasN
         super(computations);
         this.name = computations.name;
         this.jarPath = computations.jarPath;
-        this.computationName = computations.computationName;
+        this.jarName = computations.jarName;
         this.tenantId = computations.tenantId;
         this.argsformat = computations.argsformat;
         this.jsonDescriptor = computations.jsonDescriptor;
@@ -44,7 +44,7 @@ public class Computations extends SearchTextBased<ComputationId> implements HasN
         Computations that = (Computations) o;
         if (name != null ? !name.equals(that.name) : that.name != null) return false;
         if (jarPath != null ? !jarPath.equals(that.jarPath) : that.jarPath != null) return false;
-        if (computationName != null ? !computationName.equals(that.computationName) : that.computationName != null) return false;
+        if (jarName != null ? !jarName.equals(that.jarName) : that.jarName != null) return false;
         if (tenantId != null ? !tenantId.equals(that.tenantId) : that.tenantId != null) return false;
         if (argsformat != null ? !argsformat.equals(that.argsformat) : that.argsformat != null) return false;
         if (jsonDescriptor != null ? !jsonDescriptor.equals(that.jsonDescriptor) : that.jsonDescriptor != null) return false;
@@ -59,7 +59,7 @@ public class Computations extends SearchTextBased<ComputationId> implements HasN
         int result = super.hashCode();
         result = 31 * result + (name != null ? name.hashCode() : 0);
         result = 31 * result + (jarPath != null ? jarPath.hashCode() : 0);
-        result = 31 * result + (computationName != null ? computationName.hashCode() : 0);
+        result = 31 * result + (jarName != null ? jarName.hashCode() : 0);
         result = 31 * result + (tenantId != null ? tenantId.hashCode() : 0);
         result = 31 * result + (argsformat != null ? argsformat.hashCode() : 0);
         result = 31 * result + (jsonDescriptor != null ? jsonDescriptor.hashCode() : 0);
@@ -79,12 +79,12 @@ public class Computations extends SearchTextBased<ComputationId> implements HasN
         this.jarPath = jarPath;
     }
 
-    public String getComputationName() {
-        return computationName;
+    public String getJarName() {
+        return jarName;
     }
 
-    public void setComputationName(String computationName) {
-        this.computationName = computationName;
+    public void setJarName(String jarName) {
+        this.jarName = jarName;
     }
 
     public TenantId getTenantId() {

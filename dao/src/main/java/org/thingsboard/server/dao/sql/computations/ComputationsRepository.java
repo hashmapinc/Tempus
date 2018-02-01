@@ -13,11 +13,11 @@ import java.util.List;
 
 @SqlDao
 public interface ComputationsRepository extends CrudRepository<ComputationsEntity, String> {
-    ComputationsEntity findByName(String name);
+    List <ComputationsEntity> findByName(String name);
     @Modifying
     @Transactional
-    @Query("delete from ComputationsEntity c where c.name = ?1")
-    void deleteByName(String name);
+    @Query("delete from ComputationsEntity c where c.jarName = :jarName")
+    void deleteByJarName(@Param("jarName") String name);
 
     @Query("SELECT ce FROM ComputationsEntity ce WHERE ce.tenantId = :tenantId " +
             "AND LOWER(ce.searchText) LIKE LOWER(CONCAT(:textSearch, '%')) " +

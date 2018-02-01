@@ -21,6 +21,7 @@ import org.thingsboard.server.common.data.page.TextPageLink;
 import org.thingsboard.server.dao.model.sql.ComputationsEntity;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface ComputationsDao {
     List<Computations> findAll();
@@ -29,7 +30,7 @@ public interface ComputationsDao {
 
     void save(ComputationsEntity computationsEntity);
 
-    void deleteByName(String name);
+    void deleteByJarName(String name);
 
     List<Computations> findByTenantIdAndPageLink(TenantId tenantId, TextPageLink pageLink);
 }
