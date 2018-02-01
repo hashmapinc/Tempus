@@ -15,18 +15,28 @@
  */
 package org.thingsboard.server.extensions.core.utils;
 
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
+import org.apache.velocity.tools.generic.ContextTool;
+import org.apache.velocity.tools.view.ViewContextTool;
 import org.apache.velocity.runtime.RuntimeServices;
 import org.apache.velocity.runtime.RuntimeSingleton;
 import org.apache.velocity.runtime.parser.ParseException;
 import org.apache.velocity.runtime.parser.node.SimpleNode;
 import org.apache.velocity.tools.generic.DateTool;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.thingsboard.server.common.data.kv.AttributeKvEntry;
 import org.thingsboard.server.common.data.kv.BasicDsKvEntry;
 import org.thingsboard.server.common.data.kv.BasicTsKvEntry;
 import org.thingsboard.server.common.msg.core.DepthTelemetryUploadRequest;
+import org.thingsboard.server.common.data.kv.BasicDsKvEntry;
+import org.thingsboard.server.common.data.kv.StringDataEntry;
 import org.thingsboard.server.common.msg.core.TelemetryUploadRequest;
+import org.thingsboard.server.common.msg.core.DepthTelemetryUploadRequest;
+import org.thingsboard.server.common.msg.core.BasicDepthTelemetryUploadRequest;
 import org.thingsboard.server.common.msg.session.FromDeviceMsg;
 import org.thingsboard.server.extensions.api.device.DeviceAttributes;
 import org.thingsboard.server.extensions.api.device.DeviceMetaData;
@@ -38,11 +48,18 @@ import java.io.StringWriter;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.Set;
+import java.util.HashSet;
 
 /**
  * @author Andrew Shvayka
  */
+@Slf4j
 public class VelocityUtils {
+
+    private static Logger logger = LoggerFactory.getLogger(VelocityUtils.class);
 
     public static Template create(String source, String templateName) throws ParseException {
         RuntimeServices runtimeServices = RuntimeSingleton.getRuntimeServices();
@@ -76,8 +93,11 @@ public class VelocityUtils {
         pushAttributes(context, deviceAttributes.getServerSideAttributes(), NashornJsEvaluator.SERVER_SIDE);
         pushAttributes(context, deviceAttributes.getServerSidePublicAttributes(), NashornJsEvaluator.SHARED);
 
-        switch (payload.getMsgType()) {
-            case POST_TELEMETRY_REQUEST:
+		switch (payload.getMsgType()) {
+        case POST_TELEMETRY_REQUEST_DEPTH:
+	            pushDsEntries(context, (DepthTelemetryUploadRequest) payload);
+	            break;
+        case POST_TELEMETRY_REQUEST:
                 pushTsEntries(context, (TelemetryUploadRequest) payload);
                 break;
             case POST_TELEMETRY_REQUEST_DEPTH:
@@ -92,12 +112,54 @@ public class VelocityUtils {
         return context;
     }
 
-    private static void pushTsEntries(VelocityContext context, TelemetryUploadRequest payload) {
+    private static ViewContextTool getContext(VelocityContext context) {
+    	java.util.Map<String, Object> map=new java.util.HashMap<String, Object>();
+    	String[] keys = (String[])context.internalGetKeys();
+    	if (keys!=null) {
+    		for (int i=0; i<keys.length; i++) {
+    			map.put(keys[i], context.internalGet(keys[i]));
+    		}
+    	}
+        org.apache.velocity.tools.generic.ValueParser vp=new org.apache.velocity.tools.generic.ValueParser(map);
+        ViewContextTool vct = new ViewContextTool();
+        vct.configure(vp);
+        return vct;
+    }
+
+    private static ViewContextTool getContext(TelemetryUploadRequest payload) {
+    	java.util.Map<String, Object> map=new java.util.HashMap<String, Object>();
         payload.getData().forEach((k, vList) -> {
             vList.forEach(v -> {
-                context.put(v.getKey(), new BasicTsKvEntry(k, v));
+                //map.put(v.getKey(), new BasicTsKvEntry(k, v));
+                map.put(v.getKey(), v);
             });
         });
+        org.apache.velocity.tools.generic.ValueParser vp=new org.apache.velocity.tools.generic.ValueParser(map);
+        ViewContextTool vct = new ViewContextTool();
+        vct.configure(vp);
+        return vct;
+    }
+
+    private static void pushDsEntries(VelocityContext context, DepthTelemetryUploadRequest payload) {
+    	Set<BasicDsKvEntry> allKeys = new HashSet<>();
+        payload.getData().forEach((k, vList) -> {
+            allKeys.addAll(vList.stream().map(v -> {
+                context.put(v.getKey(), new BasicDsKvEntry(k, v));
+                return new BasicDsKvEntry(k, v);
+            }).collect(Collectors.toSet()));
+        });
+        context.put("tags", allKeys);
+    }
+    
+    private static void pushTsEntries(VelocityContext context, TelemetryUploadRequest payload) {
+        Set<BasicTsKvEntry> allKeys = new HashSet<>();
+        payload.getData().forEach((k, vList) -> {
+            allKeys.addAll(vList.stream().map(v -> {
+                context.put(v.getKey(), new BasicTsKvEntry(k, v));
+                return new BasicTsKvEntry(k, v);
+            }).collect(Collectors.toSet()));
+        });
+        context.put("tags", allKeys);
     }
 
     private static void pushDsEntries(VelocityContext context, DepthTelemetryUploadRequest payload) {
@@ -110,7 +172,18 @@ public class VelocityUtils {
 
     private static void pushAttributes(VelocityContext context, Collection<AttributeKvEntry> deviceAttributes, String prefix) {
         Map<String, String> values = new HashMap<>();
-        deviceAttributes.forEach(v -> values.put(v.getKey(), v.getValueAsString()));
-        context.put(prefix, values);
+        Set<StringDataEntry> clientAttrib = new HashSet<>();
+        if(prefix.contentEquals(NashornJsEvaluator.CLIENT_SIDE)){
+            deviceAttributes.forEach(v -> {values.put(v.getKey(), v.getValueAsString());
+                clientAttrib.add(new StringDataEntry(v.getKey(), v.getValueAsString()));});
+            context.put(prefix, values);
+            context.put("cs",values);
+            context.put("attrtags", clientAttrib);
+        }
+        else {
+            deviceAttributes.forEach(v -> values.put(v.getKey(), v.getValueAsString()));
+            context.put(prefix, values);
+        }
     }
+
 }
