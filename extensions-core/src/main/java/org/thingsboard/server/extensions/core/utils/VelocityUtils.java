@@ -29,7 +29,9 @@ import org.apache.velocity.tools.generic.DateTool;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.thingsboard.server.common.data.kv.AttributeKvEntry;
+import org.thingsboard.server.common.data.kv.BasicDsKvEntry;
 import org.thingsboard.server.common.data.kv.BasicTsKvEntry;
+import org.thingsboard.server.common.msg.core.DepthTelemetryUploadRequest;
 import org.thingsboard.server.common.data.kv.BasicDsKvEntry;
 import org.thingsboard.server.common.data.kv.StringDataEntry;
 import org.thingsboard.server.common.msg.core.TelemetryUploadRequest;
@@ -98,6 +100,9 @@ public class VelocityUtils {
         case POST_TELEMETRY_REQUEST:
                 pushTsEntries(context, (TelemetryUploadRequest) payload);
                 break;
+            case POST_TELEMETRY_REQUEST_DEPTH:
+                pushDsEntries(context, (DepthTelemetryUploadRequest) payload);
+                break;
         }
 
         context.put("deviceId", deviceMetaData.getDeviceId().getId().toString());
@@ -155,6 +160,14 @@ public class VelocityUtils {
             }).collect(Collectors.toSet()));
         });
         context.put("tags", allKeys);
+    }
+
+    private static void pushDsEntries(VelocityContext context, DepthTelemetryUploadRequest payload) {
+        payload.getData().forEach((k, vList) -> {
+            vList.forEach(v -> {
+                context.put(v.getKey(), new BasicDsKvEntry(k, v));
+            });
+        });
     }
 
     private static void pushAttributes(VelocityContext context, Collection<AttributeKvEntry> deviceAttributes, String prefix) {
