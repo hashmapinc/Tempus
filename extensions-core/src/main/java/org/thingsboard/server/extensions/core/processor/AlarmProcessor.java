@@ -28,6 +28,7 @@ import org.thingsboard.server.common.data.alarm.Alarm;
 import org.thingsboard.server.common.data.alarm.AlarmSeverity;
 import org.thingsboard.server.common.data.alarm.AlarmStatus;
 import org.thingsboard.server.common.data.kv.KvEntry;
+import org.thingsboard.server.common.msg.core.DepthTelemetryUploadRequest;
 import org.thingsboard.server.common.msg.core.TelemetryUploadRequest;
 import org.thingsboard.server.common.msg.core.UpdateAttributesRequest;
 import org.thingsboard.server.common.msg.device.ToDeviceActorMsg;
@@ -204,6 +205,13 @@ public class AlarmProcessor implements RuleProcessor<AlarmProcessorConfiguration
                     for (List<KvEntry> entries : telemetryMsg.getData().values()) {
                         bindings = NashornJsEvaluator.toBindings(bindings, entries);
                     }
+                    break;
+                case POST_TELEMETRY_REQUEST_DEPTH:
+                    DepthTelemetryUploadRequest depthTelemetryMsg = (DepthTelemetryUploadRequest) msg;
+                    for (List<KvEntry> entries : depthTelemetryMsg.getData().values()) {
+                        bindings = NashornJsEvaluator.toBindings(bindings, entries);
+                    }
+                    break;
             }
         }
         return bindings;
