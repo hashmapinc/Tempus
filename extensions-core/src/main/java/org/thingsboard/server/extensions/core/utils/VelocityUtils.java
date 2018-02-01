@@ -97,12 +97,12 @@ public class VelocityUtils {
         case POST_TELEMETRY_REQUEST_DEPTH:
 	            pushDsEntries(context, (DepthTelemetryUploadRequest) payload);
 	            break;
+
         case POST_TELEMETRY_REQUEST:
                 pushTsEntries(context, (TelemetryUploadRequest) payload);
                 break;
-            case POST_TELEMETRY_REQUEST_DEPTH:
-                pushDsEntries(context, (DepthTelemetryUploadRequest) payload);
-                break;
+
+
         }
 
         context.put("deviceId", deviceMetaData.getDeviceId().getId().toString());
@@ -162,13 +162,7 @@ public class VelocityUtils {
         context.put("tags", allKeys);
     }
 
-    private static void pushDsEntries(VelocityContext context, DepthTelemetryUploadRequest payload) {
-        payload.getData().forEach((k, vList) -> {
-            vList.forEach(v -> {
-                context.put(v.getKey(), new BasicDsKvEntry(k, v));
-            });
-        });
-    }
+
 
     private static void pushAttributes(VelocityContext context, Collection<AttributeKvEntry> deviceAttributes, String prefix) {
         Map<String, String> values = new HashMap<>();
