@@ -56,7 +56,8 @@ public class ComputationsController extends BaseController {
             file.transferTo(destinationFile);
 
             // Creating service call
-            computationDiscoveryService.onJarUpload(path);
+            TenantId tenantId = getCurrentUser().getTenantId();
+            computationDiscoveryService.onJarUpload(path, tenantId);
             return new FileInfo(file.getOriginalFilename(), path);
         } catch (Exception e) {
             throw handleException(e);

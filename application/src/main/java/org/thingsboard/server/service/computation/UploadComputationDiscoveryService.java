@@ -23,8 +23,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
+import org.thingsboard.server.common.data.Tenant;
 import org.thingsboard.server.common.data.computation.Computations;
 import org.thingsboard.server.common.data.id.ComputationId;
+import org.thingsboard.server.common.data.id.TenantId;
 import org.thingsboard.server.common.msg.computation.ComputationRequestCompiled;
 import org.thingsboard.server.dao.computations.ComputationsService;
 import org.thingsboard.server.dao.plugin.PluginService;
@@ -126,12 +128,12 @@ public class UploadComputationDiscoveryService implements ComputationDiscoverySe
         return file.getCanonicalPath().endsWith(".jar") && file.canRead();
     }
 
-    public void onFileCreate(File file) {
+    public void onFileCreate(File file, TenantId tenantId) {
         log.debug("File {} is created", file.getAbsolutePath());
-        processComponent(file);
+        processComponent(file, tenantId);
     }
 
-    private void processComponent(File file) {
+    private void processComponent(File file, TenantId tenantId) {
         Path j = file.toPath();
         try{
             if(isJar(j)){
@@ -140,6 +142,7 @@ public class UploadComputationDiscoveryService implements ComputationDiscoverySe
                 if(c != null && !c.isEmpty()) {
                     for (ComputationRequestCompiled computationRequestCompiled : c) {
                         Computations computations = new Computations();
+                        computations.setTenantId(tenantId);
                         computations.setJarPath(j.toString());
                         computations.setMainClass(computationRequestCompiled.getMainClazz());
                         computations.setJsonDescriptor(computationRequestCompiled.getConfigurationDescriptor());
@@ -182,8 +185,8 @@ public class UploadComputationDiscoveryService implements ComputationDiscoverySe
     }
 
     @Override
-    public void onJarUpload(String path) {
-        onFileCreate(new File(path));
+    public void onJarUpload(String path, TenantId tenantId) {
+        onFileCreate(new File(path), tenantId);
     }
 
     @PreDestroy

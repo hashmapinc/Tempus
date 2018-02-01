@@ -161,7 +161,7 @@ public class AnnotationsProcessor {
                 Template at = ve.getTemplate("templates/action.vm");
                 generateSource(at, vc, model.getPackageName() + "." + model.getClassName());
                 JsonNode descriptor = descriptorNode(model.getDescriptor());
-                return new ComputationActionCompiled(model.getPackageName() + "." + model.getClassName(), model.getDescriptor(), model.getName(), descriptor, model.getRequest().getMainClass());
+                return new ComputationActionCompiled(model.getPackageName() + "." + model.getClassName(), model.getDescriptor(), model.getName(), descriptor);
             }
         } catch (IOException e) {
             log.error("Exception occurred while generating java source", e);

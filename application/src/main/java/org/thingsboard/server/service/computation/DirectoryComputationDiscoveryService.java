@@ -28,6 +28,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import org.thingsboard.server.common.data.computation.Computations;
 import org.thingsboard.server.common.data.id.ComputationId;
+import org.thingsboard.server.common.data.id.TenantId;
 import org.thingsboard.server.common.msg.computation.ComputationRequestCompiled;
 import org.thingsboard.server.dao.computations.ComputationsService;
 import org.thingsboard.server.dao.plugin.PluginService;
@@ -84,8 +85,8 @@ public class DirectoryComputationDiscoveryService implements ComputationDiscover
         Assert.hasLength(libraryPath, MiscUtils.missingProperty("spark.jar_path"));
         Assert.notNull(pollingInterval, MiscUtils.missingProperty("spark.polling_interval"));
         this.compiler = new RuntimeJavaCompiler();
-        discoverDynamicComponents();
-        startPolling();
+        //discoverDynamicComponents();
+        //startPolling();
     }
 
     @Override
@@ -94,7 +95,7 @@ public class DirectoryComputationDiscoveryService implements ComputationDiscover
     }
 
     @Override
-    public void onJarUpload(String path) {
+    public void onJarUpload(String path, TenantId tenantId) {
 
     }
 
@@ -164,13 +165,13 @@ public class DirectoryComputationDiscoveryService implements ComputationDiscover
             @Override
             public void onFileCreate(File file) {
                 log.debug("File {} is created", file.getAbsolutePath());
-                processComponent(file);
+                //processComponent(file);
             }
 
             @Override
             public void onFileChange(File file) {
                 log.debug("File {} is modified", file.getAbsolutePath());
-                processComponent(file);
+                //processComponent(file);
             }
 
             @Override
