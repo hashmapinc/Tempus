@@ -11,15 +11,13 @@ import org.thingsboard.server.common.data.computation.ComputationJob;
 import org.thingsboard.server.common.data.id.ComputationId;
 import org.thingsboard.server.common.data.id.ComputationJobId;
 import org.thingsboard.server.common.data.id.TenantId;
+import org.thingsboard.server.common.data.plugin.ComponentLifecycleState;
 import org.thingsboard.server.dao.model.BaseSqlEntity;
 import org.thingsboard.server.dao.model.ModelConstants;
 import org.thingsboard.server.dao.model.SearchTextEntity;
 import org.thingsboard.server.dao.util.mapping.JsonStringType;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Table;
-import javax.persistence.Transient;
+import javax.persistence.*;
 
 import java.util.UUID;
 
@@ -51,6 +49,10 @@ public class ComputationJobEntity extends BaseSqlEntity<ComputationJob> implemen
     @Column(name = ModelConstants.SEARCH_TEXT_PROPERTY)
     private String searchText;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = ModelConstants.COMPUTATION_JOB_STATE)
+    private ComponentLifecycleState state;
+
     @Override
     public String getSearchTextSource() {
         return jobName;
@@ -76,6 +78,8 @@ public class ComputationJobEntity extends BaseSqlEntity<ComputationJob> implemen
         if(computationJob.getTenantId() != null) {
             this.tenantId = fromTimeUUID(computationJob.getTenantId().getId());
         }
+        this.state = computationJob.getState();
+
     }
 
     @Override
@@ -116,6 +120,7 @@ public class ComputationJobEntity extends BaseSqlEntity<ComputationJob> implemen
         computationJob.setCreatedTime(UUIDs.unixTimestamp(getId()));
         computationJob.setName(jobName);
         computationJob.setArgParameters(argParameters);
+        computationJob.setState(state);
         if(computaionId != null) {
             computationJob.setComputationId(new ComputationId(fromString(computaionId)));
         }

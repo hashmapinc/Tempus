@@ -173,6 +173,7 @@ public class ModelConstants {
     public static final String COMPUTATION_JOB_NAME = "job_name";
     public static final String COMPUTATION_JOB_COMPUTAION_ID = "computation_id";
     public static final String COMPUTATION_JOB_ARG_PRS = "arg_parameters";
+    public static final String COMPUTATION_JOB_STATE = "state";
     public static final String COMPUTATION_JOB_TENANT_ID = TENANT_ID_PROPERTY;
 
     /**

@@ -6,6 +6,7 @@ import org.thingsboard.server.common.data.SearchTextBased;
 import org.thingsboard.server.common.data.id.ComputationId;
 import org.thingsboard.server.common.data.id.ComputationJobId;
 import org.thingsboard.server.common.data.id.TenantId;
+import org.thingsboard.server.common.data.plugin.ComponentLifecycleState;
 
 import java.util.UUID;
 
@@ -15,6 +16,7 @@ public class ComputationJob extends SearchTextBased<ComputationJobId> implements
     private ComputationId computationId;
     private JsonNode argParameters;
     private String name;
+    private ComponentLifecycleState state;
 
     public ComputationJob() {
         super();
@@ -30,6 +32,7 @@ public class ComputationJob extends SearchTextBased<ComputationJobId> implements
         this.computationId = computationJob.computationId;
         this.tenantId = computationJob.tenantId;
         this.name = computationJob.name;
+        this.state = computationJob.state;
     }
 
     @Override
@@ -69,6 +72,14 @@ public class ComputationJob extends SearchTextBased<ComputationJobId> implements
         this.tenantId = tenantId;
     }
 
+    public ComponentLifecycleState getState() {
+        return state;
+    }
+
+    public void setState(ComponentLifecycleState state) {
+        this.state = state;
+    }
+
     public ComputationId getComputationId() {
         return computationId;
     }
@@ -84,6 +95,8 @@ public class ComputationJob extends SearchTextBased<ComputationJobId> implements
     public void setArgParameters(JsonNode argParameters) {
         this.argParameters = argParameters;
     }
+
+
 
     @Override
     public String getName() {

@@ -304,5 +304,6 @@ CREATE TABLE IF NOT EXISTS computation_job (
     search_text varchar,
     computation_id varchar,
     arg_parameters varchar,
+    state varchar(255),
     tenant_id varchar(31)
 );
