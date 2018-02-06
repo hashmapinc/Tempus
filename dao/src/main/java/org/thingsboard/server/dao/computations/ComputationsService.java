@@ -16,10 +16,12 @@ public interface ComputationsService {
 
     Computations findById(ComputationId id);
 
-    void save(Computations computations);
+    Computations save(Computations computations);
 
     void deleteByJarName(String name);
 
     TextPageData<Computations> findTenantComputations(TenantId tenantId, TextPageLink pageLink);
+
+    List<Computations> findAllTenantComputationsByTenantId(TenantId tenantId);
 
 }

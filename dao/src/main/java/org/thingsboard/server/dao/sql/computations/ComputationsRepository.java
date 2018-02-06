@@ -26,4 +26,6 @@ public interface ComputationsRepository extends CrudRepository<ComputationsEntit
                                                        @Param("textSearch") String textSearch,
                                                        @Param("idOffset") String idOffset,
                                                        Pageable pageable);
+    @Query("SELECT ce FROM ComputationsEntity ce WHERE ce.tenantId = :tenantId")
+    List<ComputationsEntity> findTenantById(@Param("tenantId") String tenantId);
 }

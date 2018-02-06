@@ -37,4 +37,6 @@ public interface ComputationsDao {
     List<Computations> findByTenantIdAndPageLink(TenantId tenantId, TextPageLink pageLink);
 
     Computations findById(UUID id);
+
+    List<Computations> findByTenantId(TenantId tenantId);
 }

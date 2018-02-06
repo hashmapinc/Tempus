@@ -40,7 +40,8 @@ export default function ImportExport($log, $translate, $q, $mdDialog, $document,
         exportWidgetType: exportWidgetType,
         importWidgetType: importWidgetType,
         exportWidgetsBundle: exportWidgetsBundle,
-        importWidgetsBundle: importWidgetsBundle
+        importWidgetsBundle: importWidgetsBundle,
+        importComputation: importComputation
     }
 
     return service;
@@ -311,6 +312,29 @@ export default function ImportExport($log, $translate, $q, $mdDialog, $document,
                         }
                     );
                 }
+            },
+            function fail() {
+                deferred.reject();
+            }
+        );
+        return deferred.promise;
+    }
+
+    function importComputation($event) {
+        var deferred = $q.defer();
+        openImportDialog($event, 'computation.import', 'computation.computation-file').then(
+            function success(computation) {
+                    computation.state = 'CREATED';
+                    /*computationService.saveComputation(computation).then(
+                        function success() {
+                            deferred.resolve();
+                        },
+                        function fail() {
+                            deferred.reject();
+                        }
+                    );*/
+                    deferred.resolve();
+                
             },
             function fail() {
                 deferred.reject();

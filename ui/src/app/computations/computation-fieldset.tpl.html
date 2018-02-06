@@ -1,0 +1,87 @@
+<!--
+
+    Copyright © 2016-2017 The Thingsboard Authors
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+        http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<md-button ng-click="onActivateComputation({event: $event})"
+           ng-show="!isEdit && !isReadOnly && computation.state === 'SUSPENDED'"
+           class="md-raised md-primary">{{ 'computation.activate' | translate }}</md-button>
+<md-button ng-click="onSuspendComputation({event: $event})"
+           ng-show="!isEdit && !isReadOnly && computation.state === 'ACTIVE'"
+           class="md-raised md-primary">{{ 'computation.suspend' | translate }}</md-button>
+<md-button ng-click="onDeleteComputation({event: $event})"
+           ng-show="!isEdit && !isReadOnly"
+           class="md-raised md-primary">{{ 'computation.delete' | translate }}</md-button>
+
+<div layout="row">
+    <md-button ngclipboard data-clipboard-action="copy"
+               ngclipboard-success="onComputationIdCopied(e)"
+               data-clipboard-text="{{computation.id.id}}" ng-show="!isEdit"
+               class="md-raised">
+        <md-icon md-svg-icon="mdi:clipboard-arrow-left"></md-icon>
+        <span translate>computation.copyId</span>
+    </md-button>
+</div>
+
+<md-content class="md-padding" layout="column" style="overflow-x: hidden">
+    <fieldset ng-disabled="loading || !isEdit || isReadOnly">
+        <md-input-container class="md-block">
+            <label translate>computation.name</label>
+            <input required name="name" ng-model="computation.name">
+            <div ng-messages="theForm.name.$error">
+                <div translate ng-message="required">computation.name-required</div>
+            </div>
+        </md-input-container>
+        <md-input-container class="md-block">
+            <label translate>computation.description</label>
+            <textarea ng-model="computation.additionalInfo.description" rows="2"></textarea>
+        </md-input-container>
+        <section flex layout="row">
+            <md-input-container flex class="md-block">
+                <label translate>computation.api-token</label>
+                <input required name="apiToken" ng-model="computation.apiToken">
+                <div ng-messages="theForm.apiToken.$error">
+                    <div translate ng-message="required">computation.api-token-required</div>
+                </div>
+            </md-input-container>
+            <md-input-container flex class="md-block">
+                <label translate>computation.type</label>
+                <md-select required name="computationType" ng-model="computation.clazz" ng-disabled="loading || !isEdit">
+                    <md-option ng-repeat="component in computationComponents" ng-value="component.clazz">
+                        {{component.name}}
+                    </md-option>
+                </md-select>
+                <div ng-messages="theForm.computationType.$error">
+                    <div translate ng-message="required">computation.type-required</div>
+                </div>
+            </md-input-container>
+        </section>
+        <md-card flex class="computation-config" ng-if="showComputationConfig">
+            <md-card-title>
+                <md-card-title-text>
+                    <span translate class="md-headline" ng-class="{'tb-readonly-label' : (loading || !isEdit || isReadOnly)}">computation.configuration</span>
+                </md-card-title-text>
+            </md-card-title>
+            <md-card-content>
+                <tb-json-form schema="computationComponent.configurationDescriptor.schema"
+                              form="computationComponent.configurationDescriptor.form"
+                              model="computationConfiguration.data"
+                              readonly="loading || !isEdit || isReadOnly"
+                              form-control="theForm">
+                </tb-json-form>
+            </md-card-content>
+        </md-card>
+    </fieldset>
+</md-content>

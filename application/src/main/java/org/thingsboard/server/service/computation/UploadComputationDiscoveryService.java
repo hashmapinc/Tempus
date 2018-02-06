@@ -27,6 +27,8 @@ import org.thingsboard.server.common.data.Tenant;
 import org.thingsboard.server.common.data.computation.Computations;
 import org.thingsboard.server.common.data.id.ComputationId;
 import org.thingsboard.server.common.data.id.TenantId;
+import org.thingsboard.server.common.data.page.TextPageData;
+import org.thingsboard.server.common.data.page.TextPageLink;
 import org.thingsboard.server.common.msg.computation.ComputationRequestCompiled;
 import org.thingsboard.server.dao.computations.ComputationsService;
 import org.thingsboard.server.dao.plugin.PluginService;
@@ -128,12 +130,13 @@ public class UploadComputationDiscoveryService implements ComputationDiscoverySe
         return file.getCanonicalPath().endsWith(".jar") && file.canRead();
     }
 
-    public void onFileCreate(File file, TenantId tenantId) {
+    public Computations onFileCreate(File file, TenantId tenantId) {
         log.debug("File {} is created", file.getAbsolutePath());
-        processComponent(file, tenantId);
+        return processComponent(file, tenantId);
     }
 
-    private void processComponent(File file, TenantId tenantId) {
+    private Computations processComponent(File file, TenantId tenantId) {
+        Computations savedComputations = null;
         Path j = file.toPath();
         try{
             if(isJar(j)){
@@ -154,17 +157,19 @@ public class UploadComputationDiscoveryService implements ComputationDiscoverySe
                         if (persistedComputations == null) {
                             ComputationId computationId = new ComputationId(UUIDs.timeBased());
                             computations.setId(computationId);
-                            computationsService.save(computations);
+                            savedComputations = computationsService.save(computations);
                         } else {
                             computations.setId(persistedComputations.getId());
-                            computationsService.save(computations);
+                            savedComputations = computationsService.save(computations);
                         }
                     }
                 }
             }
+
         } catch (IOException e) {
             log.error("Error while accessing jar to scan dynamic components", e);
         }
+        return savedComputations;
     }
 
     public void onFileDelete(File file){
@@ -185,8 +190,13 @@ public class UploadComputationDiscoveryService implements ComputationDiscoverySe
     }
 
     @Override
-    public void onJarUpload(String path, TenantId tenantId) {
-        onFileCreate(new File(path), tenantId);
+    public TextPageData<Computations> findTenantComputations(TenantId tenantId, TextPageLink pageLink) {
+        return computationsService.findTenantComputations(tenantId, pageLink);
+    }
+
+    @Override
+    public Computations onJarUpload(String path, TenantId tenantId) {
+        return onFileCreate(new File(path), tenantId);
     }
 
     @PreDestroy

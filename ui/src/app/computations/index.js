@@ -17,8 +17,10 @@
 /* eslint-disable import/no-unresolved, import/default */
 import uiRouter from 'angular-ui-router';
 import thingsboardApiComputation from '../api/computation.service';
-import ComputationsController from './computations.controller';
-import ComputationUploadDirective from './computation-upload.directive';
+import ComputationController from './computation.controller';
+import ComputationTestController from './computationsTest.controller';
+//import ComputationUploadDirective from './computation-upload.directive';
+import ComputationDirective from './computation.directive';
 import ComputationRoutes from './computation.routes';
 /* eslint-enable import/no-unresolved, import/default */
 
@@ -27,6 +29,9 @@ export default angular.module('thingsboard.computation', [
     thingsboardApiComputation
 ])
     .config(ComputationRoutes)
-    .controller('ComputationsController', ComputationsController)
-    .directive('fileModel', ComputationUploadDirective)
+    .controller('ComputationController', ComputationController)
+    .controller('ComputationTestController', ComputationTestController)
+    //.directive('fileModel', ComputationUploadDirective)
+    .directive('tbComputation',ComputationDirective)
+    .directive('tbComputationTest',ComputationDirective)
     .name;

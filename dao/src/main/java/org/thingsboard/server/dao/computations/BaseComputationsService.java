@@ -40,9 +40,10 @@ public class BaseComputationsService extends AbstractEntityService implements Co
     }
 
     @Override
-    public void save(Computations computations) {
+    public Computations save(Computations computations) {
         ComputationsEntity computationsEntity = new ComputationsEntity(computations);
         computationsDao.save(computationsEntity);
+        return computations;
     }
 
     @Override
@@ -56,5 +57,10 @@ public class BaseComputationsService extends AbstractEntityService implements Co
         validatePageLink(pageLink, "Incorrect PageLink object for search computation request.");
         List<Computations> computations = computationsDao.findByTenantIdAndPageLink(tenantId, pageLink);
         return new TextPageData<>(computations, pageLink);
+    }
+
+    @Override
+    public List<Computations> findAllTenantComputationsByTenantId(TenantId tenantId) {
+        return computationsDao.findByTenantId(tenantId);
     }
 }

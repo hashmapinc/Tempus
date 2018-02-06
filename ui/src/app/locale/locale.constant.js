@@ -1003,6 +1003,49 @@ export default angular.module('thingsboard.locale', [])
                     "idCopiedMessage": "Plugin Id has been copied to clipboard"
 
                 },
+                "computation": {
+                    "computations": "Computations",
+                    "delete": "Delete Computation",
+                    "activate": "Activate Computation",
+                    "suspend": "Suspend Computation",
+                    "active": "Active",
+                    "created": "Created",
+                    "suspended": "Suspended",
+                    "name": "Name",
+                    "name-required": "Name is required.",
+                    "description": "Description",
+                    "add": "Add Computation",
+                    "delete-computation-title": "Are you sure you want to delete the computation '{{computationName}}'?",
+                    "delete-computation-text": "Be careful, after the confirmation the plugin and all related data will become unrecoverable.",
+                    "delete-computations-title": "Are you sure you want to delete { count, select, 1 {1 computation} other {# computations} }?",
+                    "delete-computations-action-title": "Delete { count, select, 1 {1 computation} other {# computations} }",
+                    "delete-computations-text": "Be careful, after the confirmation all selected computations will be removed and all related data will become unrecoverable.",
+                    "add-computation-text": "Add new computation",
+                    "no-computations-text": "No computations found",
+                    "computation-details": "computation details",
+                    "api-token": "API token",
+                    "api-token-required": "API token is required.",
+                    "type": "Plugin type",
+                    "type-required": "Computation type is required.",
+                    "configuration": "Computation configuration",
+                    "system": "System",
+                    "select-computation": "Select computation",
+                    "computation": "Computation",
+                    "no-computations-matching": "No plugins matching '{{entity}}' were found.",
+                    "Computation-required": "Computation is required.",
+                    "Computation-require-match": "Please select an existing computation.",
+                    "events": "Events",
+                    "details": "Details",
+                    "import": "Import computation",
+                    "export": "Export computation",
+                    "export-failed-error": "Unable to export computation: {{error}}",
+                    "create-new-computation": "Create new computation",
+                    "computation-file": "Computation file",
+                    "invalid-computation-file-error": "Unable to import computation: Invalid computation data structure.",
+                    "copyId": "Copy computation Id",
+                    "idCopiedMessage": "Computation Id has been copied to clipboard"
+
+                },
                 "position": {
                     "top": "Top",
                     "bottom": "Bottom",
@@ -1406,9 +1449,6 @@ export default angular.module('thingsboard.locale', [])
                         "marker-click": "On marker click",
                         "tooltip-tag-action": "Tooltip tag action"
                     }
-                },
-                "computation": {
-                    "computations": "Computations"
                 }
             }
         }

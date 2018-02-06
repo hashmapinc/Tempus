@@ -15,7 +15,8 @@
  */
 /* eslint-disable import/no-unresolved, import/default */
 
-import computationsTemplate from './computation.tpl.html';
+import computationsTemplate from './computations.tpl.html';
+import computationsTemplateTest from './computationsTest.tpl.html';
 
 /* eslint-enable import/no-unresolved, import/default */
 
@@ -28,8 +29,26 @@ export default function ComputationRoutes($stateProvider) {
             auth: ['TENANT_ADMIN'],
             views: {
                 "content@home": {
+                    templateUrl: computationsTemplateTest,
+                    controller: 'ComputationTestController',
+                    controllerAs: 'vm'
+                }
+            },
+            data: {
+                pageTitle: 'computation.computations'
+            },
+            ncyBreadcrumb: {
+                label: '{"icon": "dashboards", "label": "computation.computations", "link": "/static/svg/computationslightgray.svg"}'
+            }
+        })
+        .state('home.computationJob', {
+            url: '/computation',
+            module: 'private',
+            auth: ['TENANT_ADMIN'],
+            views: {
+                "content@home": {
                     templateUrl: computationsTemplate,
-                    controller: 'ComputationsController',
+                    controller: 'ComputationController',
                     controllerAs: 'vm'
                 }
             },

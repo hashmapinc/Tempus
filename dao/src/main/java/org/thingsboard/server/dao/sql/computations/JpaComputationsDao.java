@@ -94,4 +94,12 @@ public class JpaComputationsDao extends JpaAbstractDaoListeningExecutorService i
         return DaoUtil.getData(entity);
     }
 
+    @Override
+    public List<Computations> findByTenantId(TenantId tenantId) {
+        Iterable <ComputationsEntity> computationsEntities = computationsRepository.findTenantById(UUIDConverter.fromTimeUUID(tenantId.getId()));
+        List<ComputationsEntity> computationsEntityList = DaoUtil.toList(computationsEntities);
+        List<Computations> computationsList = DaoUtil.convertDataList(computationsEntityList);
+        return computationsList;
+    }
+
 }

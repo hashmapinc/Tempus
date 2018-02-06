@@ -29,6 +29,8 @@ import org.springframework.util.Assert;
 import org.thingsboard.server.common.data.computation.Computations;
 import org.thingsboard.server.common.data.id.ComputationId;
 import org.thingsboard.server.common.data.id.TenantId;
+import org.thingsboard.server.common.data.page.TextPageData;
+import org.thingsboard.server.common.data.page.TextPageLink;
 import org.thingsboard.server.common.msg.computation.ComputationRequestCompiled;
 import org.thingsboard.server.dao.computations.ComputationsService;
 import org.thingsboard.server.dao.plugin.PluginService;
@@ -95,8 +97,8 @@ public class DirectoryComputationDiscoveryService implements ComputationDiscover
     }
 
     @Override
-    public void onJarUpload(String path, TenantId tenantId) {
-
+    public Computations onJarUpload(String path, TenantId tenantId) {
+        return null;
     }
 
 
@@ -212,6 +214,11 @@ public class DirectoryComputationDiscoveryService implements ComputationDiscover
                 }
             }
         };
+    }
+
+    @Override
+    public TextPageData<Computations> findTenantComputations(TenantId tenantId, TextPageLink pageLink) {
+        return computationsService.findTenantComputations(tenantId, pageLink);
     }
 
     @PreDestroy

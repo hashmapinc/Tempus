@@ -17,6 +17,7 @@ package org.thingsboard.server.controller;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -24,12 +25,20 @@ import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.thingsboard.server.common.data.computation.Computations;
 import org.thingsboard.server.common.data.id.TenantId;
+import org.thingsboard.server.common.data.page.TextPageData;
+import org.thingsboard.server.common.data.page.TextPageLink;
+import org.thingsboard.server.common.data.security.Authority;
+import org.thingsboard.server.dao.computations.ComputationsService;
+import org.thingsboard.server.dao.model.ModelConstants;
 import org.thingsboard.server.exception.ThingsboardException;
 import org.thingsboard.server.service.computation.ComputationDiscoveryService;
 
 import java.io.File;
+import java.util.List;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/computations")
 public class ComputationsController extends BaseController {
@@ -41,19 +50,23 @@ public class ComputationsController extends BaseController {
     @Qualifier("uploadComputationDiscoveryService")
     private ComputationDiscoveryService computationDiscoveryService;
 
+    @Autowired
+    ComputationsService computationsService;
+
     @PreAuthorize("hasAuthority('TENANT_ADMIN')")
     @RequestMapping(value = "/upload", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
-    public FileInfo upload(@RequestParam("file") MultipartFile file) throws ThingsboardException {
+    public Computations upload(@RequestParam("file") MultipartFile file) throws ThingsboardException {
         try {
             String path = uploadPath + File.separator + file.getOriginalFilename();
             File destinationFile = new File(path);
             file.transferTo(destinationFile);
 
             // Creating service call
+            log.error("HMDC uplaoding computations !!");
             TenantId tenantId = getCurrentUser().getTenantId();
-            computationDiscoveryService.onJarUpload(path, tenantId);
-            return new FileInfo(file.getOriginalFilename(), path);
+            return computationDiscoveryService.onJarUpload(path, tenantId);
+            //return new FileInfo(file.getOriginalFilename(), path);
         } catch (Exception e) {
             throw handleException(e);
         }
@@ -67,6 +80,7 @@ public class ComputationsController extends BaseController {
         computationDiscoveryService.deleteJarFile(path);
     }
 
+    //Added here for testing purpose
     @PreAuthorize("hasAuthority('TENANT_ADMIN')")
     @RequestMapping(value = "/find/all", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
@@ -74,7 +88,7 @@ public class ComputationsController extends BaseController {
         computationDiscoveryService.findAll();
     }
 
-    /*@PreAuthorize("hasAuthority('TENANT_ADMIN')")
+    @PreAuthorize("hasAuthority('TENANT_ADMIN')")
     @RequestMapping(value = "/computations", params = {"limit"}, method = RequestMethod.GET)
     @ResponseBody
     public TextPageData<Computations> getTenantComputations(
@@ -89,7 +103,24 @@ public class ComputationsController extends BaseController {
         } catch (Exception e) {
             throw handleException(e);
         }
-    }*/
+    }
+
+    @PreAuthorize("hasAnyAuthority('SYS_ADMIN', 'TENANT_ADMIN')")
+    @RequestMapping(value = "/all", method = RequestMethod.GET)
+    @ResponseBody
+    public List<Computations> getComputations() throws ThingsboardException {
+        try {
+                log.error("HMDC Fetching computations.");
+                TenantId tenantId = getCurrentUser().getTenantId();
+                List<Computations> computations = checkNotNull(computationsService.findAllTenantComputationsByTenantId(tenantId));
+                computations.stream()
+                        .filter(computation -> computation.getTenantId().getId().equals(ModelConstants.NULL_UUID));
+                log.error("HMDC returning Computations {} ", computations);
+                return computations;
+        } catch (Exception e) {
+            throw handleException(e);
+        }
+    }
 
     @Data
     @AllArgsConstructor
