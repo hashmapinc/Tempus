@@ -15,12 +15,15 @@
  */
 package org.thingsboard.server.common.transport.adaptor;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.*;
 import lombok.extern.slf4j.Slf4j;
 import org.thingsboard.server.common.msg.core.*;
@@ -38,6 +41,8 @@ public class JsonConverter {
     }
 
     public static TelemetryUploadRequest convertToTelemetry(JsonElement jsonObject, int requestId) throws JsonSyntaxException {
+        log.info("####PATERN#### : convertToTelemetry : {}", jsonObject.toString());
+        log.info("####PATERN#### : convertToTelemetry : isJsonObject : {}", jsonObject.isJsonObject());
         BasicTelemetryUploadRequest request = new BasicTelemetryUploadRequest(requestId);
         long systemTs = System.currentTimeMillis();
         if (jsonObject.isJsonObject()) {
@@ -85,10 +90,12 @@ public class JsonConverter {
     }
 
     private static void parseObject(BasicTelemetryUploadRequest request, long systemTs, JsonElement jsonObject) {
+        log.info("####PATERN#### : parseObject : {}", jsonObject.toString());
         JsonObject jo = jsonObject.getAsJsonObject();
         if (jo.has("ts") && jo.has("values")) {
             parseWithTs(request, jo);
         } else {
+            log.info("####PATERN##### : ParseWithoutTs");
             parseWithoutTs(request, systemTs, jo);
         }
     }
@@ -104,7 +111,12 @@ public class JsonConverter {
     }
 
     private static void parseWithoutTs(BasicTelemetryUploadRequest request, long systemTs, JsonObject jo) {
+        log.info("####PATERN#### : parseWithoutTs : json : {}", jo.isJsonArray());
+        log.info("####PATERN#### : parseWithoutTs : json : {}", jo.isJsonObject());
+        log.info("####PATERN#### : parseWithoutTs : json : {}", jo.toString());
         for (KvEntry entry : parseValues(jo)) {
+            log.info("####PATERN#### : parseWithTs : entry : {}", entry.getValueAsString());
+            log.info("####PATERN#### : parseWithTs : entry : {}", entry.getDataType().toString());
             request.add(systemTs, entry);
         }
     }
@@ -127,8 +139,10 @@ public class JsonConverter {
     }
 
     public static List<KvEntry> parseValues(JsonObject valuesObject) {
+        log.info("####PATERN#### : parseValues : JsonObject : {}", valuesObject.toString());
         List<KvEntry> result = new ArrayList<>();
         for (Entry<String, JsonElement> valueEntry : valuesObject.entrySet()) {
+            log.info("####PATERN#### : valueEntry : Key {} : Value {}", valueEntry.getKey(), valueEntry.getValue());
             JsonElement element = valueEntry.getValue();
             if (element.isJsonPrimitive()) {
                 JsonPrimitive value = element.getAsJsonPrimitive();
@@ -145,10 +159,23 @@ public class JsonConverter {
                 } else {
                     throw new JsonSyntaxException("Can't parse value: " + value);
                 }
+            } else if (element.isJsonObject() || element.isJsonArray()) {
+                log.info("####PATERN#### :  element : isObject {}", element.isJsonObject());
+                log.info("####PATERN#### :  element : isArray {}", element.isJsonArray());
+                ObjectMapper mapper = new ObjectMapper();
+                JsonNode value = null;
+                try {
+                    value = mapper.readTree(element.toString());
+                } catch (IOException ex) {
+                    log.trace("exception in parsing Json Data");
+                }
+                log.info("####PATERN#### : JSON DATA : {}", value.toString());
+                result.add(new JsonDataEntry(valueEntry.getKey(), value));
             } else {
                 throw new JsonSyntaxException("Can't parse value: " + element);
             }
         }
+        log.info("####PATERN#### : Result : {}", result.toString());
         return result;
     }
 
@@ -240,4 +267,22 @@ public class JsonConverter {
         error.addProperty("error", errorMsg);
         return error;
     }
+
+    /*public static void main(String[] args) {
+        String str = "{\"tsID\":{\"value1\": \"1123\"}, \"tag2\" : {\"value2\": \"1123\"}}";
+        Gson gson = new Gson();
+
+        JsonParser parser = new JsonParser();
+        JsonObject jsonObject = parser.parse(str).getAsJsonObject();
+        ObjectMapper mapper = new ObjectMapper();
+        JsonNode value = null;
+        try {
+            value = mapper.readTree(jsonObject.toString());
+        } catch (IOException ex) {
+            ex.printStackTrace();
+            log.trace("exception in parsing Json Data");
+        }
+        System.out.println("Value : " + value);
+        jsonObject.toString();
+    }*/
 }

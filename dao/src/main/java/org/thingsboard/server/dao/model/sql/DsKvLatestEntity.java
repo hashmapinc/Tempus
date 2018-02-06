@@ -15,10 +15,15 @@
  */
 package org.thingsboard.server.dao.model.sql;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.google.gson.JsonObject;
 import lombok.Data;
+import org.hibernate.annotations.Type;
+import org.hibernate.annotations.TypeDef;
 import org.thingsboard.server.common.data.EntityType;
 import org.thingsboard.server.common.data.kv.*;
 import org.thingsboard.server.dao.model.ToData;
+import org.thingsboard.server.dao.util.mapping.JsonStringType;
 
 import javax.persistence.*;
 
@@ -26,6 +31,7 @@ import static org.thingsboard.server.dao.model.ModelConstants.*;
 
 @Data
 @Entity
+@TypeDef(name = "json", typeClass = JsonStringType.class)
 @Table(name = "ds_kv_latest")
 @IdClass(TsKvLatestCompositeKey.class)
 public final class DsKvLatestEntity implements ToData<DsKvEntry> {
@@ -58,6 +64,10 @@ public final class DsKvLatestEntity implements ToData<DsKvEntry> {
     @Column(name = DOUBLE_VALUE_COLUMN)
     private Double doubleValue;
 
+    @Type(type = "json")
+    @Column(name = JSON_VALUE_COLUMN)
+    private JsonNode jsonValue;
+
     @Override
     public DsKvEntry toData() {
         KvEntry kvEntry = null;
@@ -69,6 +79,8 @@ public final class DsKvLatestEntity implements ToData<DsKvEntry> {
             kvEntry = new DoubleDataEntry(key, doubleValue);
         } else if (booleanValue != null) {
             kvEntry = new BooleanDataEntry(key, booleanValue);
+        } else if (jsonValue != null) {
+            kvEntry = new JsonDataEntry(key, jsonValue);
         }
         return new BasicDsKvEntry(ds, kvEntry);
     }

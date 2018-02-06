@@ -18,11 +18,13 @@ package org.thingsboard.server.dao.depthSeries;
 import com.datastax.driver.core.*;
 import com.datastax.driver.core.querybuilder.QueryBuilder;
 import com.datastax.driver.core.querybuilder.Select;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.base.Function;
 import com.google.common.util.concurrent.AsyncFunction;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
+import com.google.gson.JsonObject;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
@@ -39,6 +41,7 @@ import org.thingsboard.server.dao.util.NoSqlDao;
 import javax.annotation.Nullable;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
+import java.nio.ByteBuffer;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
@@ -48,6 +51,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static com.datastax.driver.core.querybuilder.QueryBuilder.eq;
+import static com.datastax.driver.core.querybuilder.QueryBuilder.remove;
 
 @Component
 @Slf4j
@@ -353,7 +357,12 @@ public class CassandraBaseDepthSeriesDao extends CassandraAbstractAsyncDao imple
                     if (boolV != null) {
                         kvEntry = new BooleanDataEntry(key, boolV);
                     } else {
-                        log.warn("All values in key-value row are nullable ");
+                        JsonNode jsonV = row.get(ModelConstants.JSON_VALUE_COLUMN, JsonNode.class);
+                        if (jsonV != null) {
+                            kvEntry = new JsonDataEntry(key, jsonV);
+                        } else {
+                            log.warn("All values in key-value row are nullable ");
+                        }
                     }
                 }
             }
@@ -484,7 +493,8 @@ public class CassandraBaseDepthSeriesDao extends CassandraAbstractAsyncDao imple
                     ModelConstants.STRING_VALUE_COLUMN + "," +
                     ModelConstants.BOOLEAN_VALUE_COLUMN + "," +
                     ModelConstants.LONG_VALUE_COLUMN + "," +
-                    ModelConstants.DOUBLE_VALUE_COLUMN + " " +
+                    ModelConstants.DOUBLE_VALUE_COLUMN + "," +
+                    ModelConstants.JSON_VALUE_COLUMN + " " +
                     "FROM " + ModelConstants.DS_KV_LATEST_CF + " " +
                     "WHERE " + ModelConstants.ENTITY_TYPE_COLUMN + " = ? " +
                     "AND " + ModelConstants.ENTITY_ID_COLUMN + " = ? " +
@@ -501,7 +511,8 @@ public class CassandraBaseDepthSeriesDao extends CassandraAbstractAsyncDao imple
                     ModelConstants.STRING_VALUE_COLUMN + "," +
                     ModelConstants.BOOLEAN_VALUE_COLUMN + "," +
                     ModelConstants.LONG_VALUE_COLUMN + "," +
-                    ModelConstants.DOUBLE_VALUE_COLUMN + " " +
+                    ModelConstants.DOUBLE_VALUE_COLUMN + "," +
+                    ModelConstants.JSON_VALUE_COLUMN + " " +
                     "FROM " + ModelConstants.DS_KV_LATEST_CF + " " +
                     "WHERE " + ModelConstants.ENTITY_TYPE_COLUMN + " = ? " +
                     "AND " + ModelConstants.ENTITY_ID_COLUMN + " = ? ");
@@ -519,6 +530,8 @@ public class CassandraBaseDepthSeriesDao extends CassandraAbstractAsyncDao imple
                 return ModelConstants.LONG_VALUE_COLUMN;
             case DOUBLE:
                 return ModelConstants.DOUBLE_VALUE_COLUMN;
+            case JSON:
+                return ModelConstants.JSON_VALUE_COLUMN;
             default:
                 throw new RuntimeException("Not implemented!");
         }
@@ -537,6 +550,9 @@ public class CassandraBaseDepthSeriesDao extends CassandraAbstractAsyncDao imple
                 break;
             case DOUBLE:
                 stmt.setDouble(column, kvEntry.getDoubleValue().get().doubleValue());
+                break;
+            case JSON:
+                stmt.setString(column, kvEntry.getJsonValue().get().toString());
                 break;
         }
     }
