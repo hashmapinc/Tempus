@@ -152,7 +152,8 @@ public class TenantActor extends ContextAwareActor {
             }
             target.tell(msg, ActorRef.noSender());
         } else if(msg.getComputationId().isPresent()){
-            //TODO: computationsManaer to update computation and Jobs if required
+            ActorRef computationActor = computationManager.getOrCreateComputationActor(this.context(), msg.getComputationId().get());
+            computationActor.tell(msg, ActorRef.noSender());
         }else {
             logger.debug("[{}] Invalid component lifecycle msg.", tenantId);
         }

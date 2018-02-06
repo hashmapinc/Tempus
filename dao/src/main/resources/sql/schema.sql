@@ -301,6 +301,7 @@ CREATE TABLE IF NOT EXISTS computations (
 CREATE TABLE IF NOT EXISTS computation_job (
     id varchar(31) NOT NULL CONSTRAINT computation_job_pkey PRIMARY KEY,
     job_name varchar,
+    job_id varchar,
     search_text varchar,
     computation_id varchar,
     arg_parameters varchar,

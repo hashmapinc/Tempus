@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.thingsboard.server.common.data.computation.Computations;
+import org.thingsboard.server.common.data.id.ComputationId;
 import org.thingsboard.server.common.data.id.TenantId;
 import org.thingsboard.server.common.data.page.TextPageData;
 import org.thingsboard.server.common.data.page.TextPageLink;
@@ -31,6 +32,11 @@ public class BaseComputationsService extends AbstractEntityService implements Co
     public Computations findByName(String name) {
         Computations computations = computationsDao.findByName(name);
         return computations;
+    }
+
+    @Override
+    public Computations findById(ComputationId id) {
+        return computationsDao.findById(id.getId());
     }
 
     @Override

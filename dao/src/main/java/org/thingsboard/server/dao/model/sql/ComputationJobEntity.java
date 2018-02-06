@@ -49,6 +49,9 @@ public class ComputationJobEntity extends BaseSqlEntity<ComputationJob> implemen
     @Column(name = ModelConstants.SEARCH_TEXT_PROPERTY)
     private String searchText;
 
+    @Column(name = ModelConstants.COMPUTATION_JOB_ID)
+    private String jobId;
+
     @Enumerated(EnumType.STRING)
     @Column(name = ModelConstants.COMPUTATION_JOB_STATE)
     private ComponentLifecycleState state;
@@ -78,6 +81,9 @@ public class ComputationJobEntity extends BaseSqlEntity<ComputationJob> implemen
         if(computationJob.getTenantId() != null) {
             this.tenantId = fromTimeUUID(computationJob.getTenantId().getId());
         }
+        if(computationJob.getJobId() != null){
+            this.jobId = computationJob.getJobId();
+        }
         this.state = computationJob.getState();
 
     }
@@ -99,7 +105,8 @@ public class ComputationJobEntity extends BaseSqlEntity<ComputationJob> implemen
         if (argParameters != null ? !argParameters.equals(that.argParameters) : that.argParameters != null) return false;
         if (computaionId != null ? !computaionId.equals(that.computaionId) : that.computaionId != null) return false;
         if (tenantId != null ? !tenantId.equals(that.tenantId) : that.tenantId != null) return false;
-        
+        if (jobId != null ? !jobId.equals(that.jobId) : that.jobId != null) return false;
+
         return true;
     }
 
@@ -111,6 +118,7 @@ public class ComputationJobEntity extends BaseSqlEntity<ComputationJob> implemen
         result = 31 * result + (argParameters != null ? argParameters.hashCode() : 0);
         result = 31 * result + (computaionId != null ? computaionId.hashCode() : 0);
         result = 31 * result + (tenantId != null ? tenantId.hashCode() : 0);
+        result = 31 * result + (jobId != null ? jobId.hashCode() : 0);
         return result;
     }
 
@@ -127,6 +135,7 @@ public class ComputationJobEntity extends BaseSqlEntity<ComputationJob> implemen
         if (tenantId != null) {
             computationJob.setTenantId(new TenantId(fromString(tenantId)));
         }
+        computationJob.setJobId(jobId);
         return computationJob;
     }
 

@@ -15,30 +15,43 @@
  */
 package org.thingsboard.server.actors.computation;
 
+import akka.event.Logging;
+import akka.event.LoggingAdapter;
 import org.thingsboard.server.actors.ActorSystemContext;
-import org.thingsboard.server.actors.service.ContextAwareActor;
+import org.thingsboard.server.actors.service.ComponentActor;
 import org.thingsboard.server.actors.service.ContextBasedCreator;
+import org.thingsboard.server.common.data.computation.Computations;
 import org.thingsboard.server.common.data.id.ComputationId;
 import org.thingsboard.server.common.data.id.ComputationJobId;
 import org.thingsboard.server.common.data.id.TenantId;
+import org.thingsboard.server.common.msg.plugin.ComponentLifecycleMsg;
 
-public class ComputationJobActor extends ContextAwareActor{
+public class ComputationJobActor extends ComponentActor<ComputationJobId, ComputationJobActorMessageProcessor> {
 
-    private final TenantId tenantId;
-    private final ComputationId computationId;
-    private final ComputationJobId computationJobId;
+    private final LoggingAdapter logger = Logging.getLogger(getContext().system(), this);
 
     public ComputationJobActor(ActorSystemContext systemContext, TenantId tenantId,
-                               ComputationId computationId, ComputationJobId computationJobId) {
-        super(systemContext);
-        this.tenantId = tenantId;
-        this.computationId = computationId;
-        this.computationJobId = computationJobId;
+                               Computations computation, ComputationJobId computationJobId) {
+        super(systemContext, tenantId, computationJobId);
+        setProcessor(new ComputationJobActorMessageProcessor(tenantId, computationJobId, systemContext,
+                logger, context().parent(), context().self(), computation));
     }
 
     @Override
-    public void onReceive(Object message) throws Exception {
+    public void onReceive(Object msg) throws Exception {
+        logger.debug("[{}] Received message: {}", tenantId, msg);
+        if(msg instanceof ComponentLifecycleMsg){
+            onComponentLifecycleMsg((ComponentLifecycleMsg)msg);
+        }else if(msg instanceof ComputationJobTerminationMsg) {
+            context().stop(self());
+        }else {
+            logger.warning("[{}] Unknown message: {}!", tenantId, msg);
+        }
+    }
 
+    @Override
+    protected long getErrorPersistFrequency() {
+        return systemContext.getComputationErrorPersistFrequency();
     }
 
 
@@ -46,19 +59,19 @@ public class ComputationJobActor extends ContextAwareActor{
         private static final long serialVersionUID = 1L;
 
         private final TenantId tenantId;
-        private final ComputationId computationId;
+        private final Computations computation;
         private final ComputationJobId computationJobId;
 
-        public ActorCreator(ActorSystemContext context, TenantId tenantId, ComputationId computationId, ComputationJobId computationJobId) {
+        public ActorCreator(ActorSystemContext context, TenantId tenantId, Computations computation, ComputationJobId computationJobId) {
             super(context);
             this.tenantId = tenantId;
-            this.computationId = computationId;
+            this.computation = computation;
             this.computationJobId = computationJobId;
         }
 
         @Override
         public ComputationJobActor create() throws Exception {
-            return new ComputationJobActor(context, tenantId, computationId, computationJobId);
+            return new ComputationJobActor(context, tenantId, computation, computationJobId);
         }
     }
 }

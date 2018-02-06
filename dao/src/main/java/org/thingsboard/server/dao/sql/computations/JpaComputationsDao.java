@@ -21,6 +21,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.thingsboard.server.common.data.computation.Computations;
 import org.thingsboard.server.common.data.UUIDConverter;
+import org.thingsboard.server.common.data.id.ComputationId;
 import org.thingsboard.server.common.data.id.TenantId;
 import org.thingsboard.server.common.data.page.TextPageLink;
 import org.thingsboard.server.dao.DaoUtil;
@@ -30,6 +31,7 @@ import org.thingsboard.server.dao.sql.JpaAbstractDaoListeningExecutorService;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+import java.util.UUID;
 
 import static org.thingsboard.server.dao.model.ModelConstants.NULL_UUID_STR;
 
@@ -84,6 +86,12 @@ public class JpaComputationsDao extends JpaAbstractDaoListeningExecutorService i
             log.debug("Search result: [{}]", entities.size());
         }
         return DaoUtil.convertDataList(entities);
+    }
+
+    @Override
+    public Computations findById(UUID id) {
+        ComputationsEntity entity = computationsRepository.findOne(UUIDConverter.fromTimeUUID(id));
+        return DaoUtil.getData(entity);
     }
 
 }

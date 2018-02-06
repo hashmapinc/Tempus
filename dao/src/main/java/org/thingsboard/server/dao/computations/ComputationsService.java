@@ -1,5 +1,6 @@
 package org.thingsboard.server.dao.computations;
 import org.thingsboard.server.common.data.computation.Computations;
+import org.thingsboard.server.common.data.id.ComputationId;
 import org.thingsboard.server.common.data.id.TenantId;
 import org.thingsboard.server.common.data.page.TextPageData;
 import org.thingsboard.server.common.data.page.TextPageLink;
@@ -12,6 +13,8 @@ public interface ComputationsService {
     List<Computations> findAll();
 
     Computations findByName(String name);
+
+    Computations findById(ComputationId id);
 
     void save(Computations computations);
 

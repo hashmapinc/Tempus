@@ -16,5 +16,5 @@
 package org.thingsboard.server.extensions.spark.computation.model;
 
 public enum SparkComputationStatus {
-    NOT_FOUND, RUNNING, STARTING, UNKNOWN
+    NOT_FOUND, RUNNING, STARTING, UNKNOWN, DEAD
 }

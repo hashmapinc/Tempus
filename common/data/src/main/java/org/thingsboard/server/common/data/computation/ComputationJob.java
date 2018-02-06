@@ -17,6 +17,7 @@ public class ComputationJob extends SearchTextBased<ComputationJobId> implements
     private JsonNode argParameters;
     private String name;
     private ComponentLifecycleState state;
+    private String jobId;
 
     public ComputationJob() {
         super();
@@ -33,6 +34,7 @@ public class ComputationJob extends SearchTextBased<ComputationJobId> implements
         this.tenantId = computationJob.tenantId;
         this.name = computationJob.name;
         this.state = computationJob.state;
+        this.jobId = computationJob.jobId;
     }
 
     @Override
@@ -46,6 +48,7 @@ public class ComputationJob extends SearchTextBased<ComputationJobId> implements
         if (computationId != null ? !computationId.equals(that.computationId) : that.computationId != null) return false;
         if (tenantId != null ? !tenantId.equals(that.tenantId) : that.tenantId != null) return false;
         if (name != null ? !name.equals(that.name) : that.name != null) return false;
+        if (jobId != null ? !jobId.equals(that.jobId) : that.jobId != null) return false;
         return true;
     }
 
@@ -57,6 +60,7 @@ public class ComputationJob extends SearchTextBased<ComputationJobId> implements
         result = 31 * result + (argParameters != null ? argParameters.hashCode() : 0);
         result = 31 * result + (computationId != null ? computationId.hashCode() : 0);
         result = 31 * result + (name != null ? name.hashCode() : 0);
+        result = 31 * result + (jobId != null ? jobId.hashCode() : 0);
         return result;
     }
 
@@ -96,7 +100,13 @@ public class ComputationJob extends SearchTextBased<ComputationJobId> implements
         this.argParameters = argParameters;
     }
 
+    public String getJobId() {
+        return jobId;
+    }
 
+    public void setJobId(String jobId) {
+        this.jobId = jobId;
+    }
 
     @Override
     public String getName() {

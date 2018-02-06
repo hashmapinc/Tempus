@@ -16,12 +16,14 @@
 package org.thingsboard.server.dao.computations;
 
 import org.thingsboard.server.common.data.computation.Computations;
+import org.thingsboard.server.common.data.id.ComputationId;
 import org.thingsboard.server.common.data.id.TenantId;
 import org.thingsboard.server.common.data.page.TextPageLink;
 import org.thingsboard.server.dao.model.sql.ComputationsEntity;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 public interface ComputationsDao {
     List<Computations> findAll();
@@ -33,4 +35,6 @@ public interface ComputationsDao {
     void deleteByJarName(String name);
 
     List<Computations> findByTenantIdAndPageLink(TenantId tenantId, TextPageLink pageLink);
+
+    Computations findById(UUID id);
 }
