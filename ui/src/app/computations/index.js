@@ -17,21 +17,26 @@
 /* eslint-disable import/no-unresolved, import/default */
 import uiRouter from 'angular-ui-router';
 import thingsboardApiComputation from '../api/computation.service';
+import thingsboardApiComputationJob from '../api/computation-job.service';
 import ComputationController from './computation.controller';
 import ComputationTestController from './computationsTest.controller';
+import ComputationJobController from './computation-job.controller';
 //import ComputationUploadDirective from './computation-upload.directive';
 import ComputationDirective from './computation.directive';
+import ComputationJobDirective from './computation-job.directive';
 import ComputationRoutes from './computation.routes';
 /* eslint-enable import/no-unresolved, import/default */
 
 export default angular.module('thingsboard.computation', [
     uiRouter,
-    thingsboardApiComputation
+    thingsboardApiComputation,
+    thingsboardApiComputationJob
 ])
     .config(ComputationRoutes)
     .controller('ComputationController', ComputationController)
     .controller('ComputationTestController', ComputationTestController)
+    .controller('ComputationJobController', ComputationJobController)
     //.directive('fileModel', ComputationUploadDirective)
     .directive('tbComputation',ComputationDirective)
-    .directive('tbComputationTest',ComputationDirective)
+    .directive('tbComputationJob',ComputationJobDirective)
     .name;

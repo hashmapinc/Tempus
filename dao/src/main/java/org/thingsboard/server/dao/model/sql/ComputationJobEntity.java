@@ -7,7 +7,6 @@ import lombok.EqualsAndHashCode;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
 import org.thingsboard.server.common.data.computation.ComputationJob;
-import org.thingsboard.server.common.data.computation.ComputationJob;
 import org.thingsboard.server.common.data.id.ComputationId;
 import org.thingsboard.server.common.data.id.ComputationJobId;
 import org.thingsboard.server.common.data.id.TenantId;
@@ -18,8 +17,6 @@ import org.thingsboard.server.dao.model.SearchTextEntity;
 import org.thingsboard.server.dao.util.mapping.JsonStringType;
 
 import javax.persistence.*;
-
-import java.util.UUID;
 
 import static org.thingsboard.server.common.data.UUIDConverter.fromString;
 import static org.thingsboard.server.common.data.UUIDConverter.fromTimeUUID;
@@ -37,7 +34,7 @@ public class ComputationJobEntity extends BaseSqlEntity<ComputationJob> implemen
     private String jobName;
 
     @Column(name = ModelConstants.COMPUTATION_JOB_COMPUTAION_ID)
-    private String computaionId;
+    private String computationId;
 
     @Type(type = "json")
     @Column(name = ModelConstants.COMPUTATION_JOB_ARG_PRS)
@@ -76,7 +73,7 @@ public class ComputationJobEntity extends BaseSqlEntity<ComputationJob> implemen
             this.argParameters = computationJob.getArgParameters();
         }
         if(computationJob.getComputationId() != null) {
-            this.computaionId = computationJob.getComputationId().toString();
+            this.computationId = computationJob.getComputationId().toString();
         }
         if(computationJob.getTenantId() != null) {
             this.tenantId = fromTimeUUID(computationJob.getTenantId().getId());
@@ -103,7 +100,7 @@ public class ComputationJobEntity extends BaseSqlEntity<ComputationJob> implemen
         if (jobName != null ? !jobName.equals(that.jobName) : that.jobName != null) return false;
         if (searchText != null ? !searchText.equals(that.searchText) : that.searchText != null) return false;
         if (argParameters != null ? !argParameters.equals(that.argParameters) : that.argParameters != null) return false;
-        if (computaionId != null ? !computaionId.equals(that.computaionId) : that.computaionId != null) return false;
+        if (computationId != null ? !computationId.equals(that.computationId) : that.computationId != null) return false;
         if (tenantId != null ? !tenantId.equals(that.tenantId) : that.tenantId != null) return false;
         if (jobId != null ? !jobId.equals(that.jobId) : that.jobId != null) return false;
 
@@ -116,7 +113,7 @@ public class ComputationJobEntity extends BaseSqlEntity<ComputationJob> implemen
         result = 31 * result + (jobName != null ? jobName.hashCode() : 0);
         result = 31 * result + (searchText != null ? searchText.hashCode() : 0);
         result = 31 * result + (argParameters != null ? argParameters.hashCode() : 0);
-        result = 31 * result + (computaionId != null ? computaionId.hashCode() : 0);
+        result = 31 * result + (computationId != null ? computationId.hashCode() : 0);
         result = 31 * result + (tenantId != null ? tenantId.hashCode() : 0);
         result = 31 * result + (jobId != null ? jobId.hashCode() : 0);
         return result;
@@ -129,8 +126,8 @@ public class ComputationJobEntity extends BaseSqlEntity<ComputationJob> implemen
         computationJob.setName(jobName);
         computationJob.setArgParameters(argParameters);
         computationJob.setState(state);
-        if(computaionId != null) {
-            computationJob.setComputationId(new ComputationId(fromString(computaionId)));
+        if(computationId != null) {
+            computationJob.setComputationId(new ComputationId(fromString(computationId)));
         }
         if (tenantId != null) {
             computationJob.setTenantId(new TenantId(fromString(tenantId)));

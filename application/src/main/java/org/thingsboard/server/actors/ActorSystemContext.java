@@ -164,7 +164,7 @@ public class ActorSystemContext {
     @Getter private long computationStatusCheckFrequency;
 
     @Value("${actors.computation.location}")
-    @Getter private long computationLocation;
+    @Getter private String computationLocation;
 
     @Getter @Setter private ActorSystem actorSystem;
 

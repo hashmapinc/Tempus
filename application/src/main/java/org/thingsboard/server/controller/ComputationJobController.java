@@ -22,7 +22,7 @@ public class ComputationJobController extends BaseController{
     @Autowired
     ComputationJobService computationJobService;
 
-    @PreAuthorize("hasAnyAuthority('TENANT_ADMIN')")
+    @PreAuthorize("hasAuthority('TENANT_ADMIN')")
     @RequestMapping(value = "/computationJob", method = RequestMethod.POST)
     @ResponseBody
     public ComputationJob saveComputationJob(@RequestBody ComputationJob source) throws ThingsboardException {

@@ -164,13 +164,13 @@ export default function ComputationTestController(computationService, $log, user
         importExport.exportComputation(computation.id.id);
     }*/
     
-    function openComputation($event) {
+    function openComputation($event, computation) {
         if ($event) {
             $event.stopPropagation();
         }
         
         //$state.go('home.dashboards.dashboard', {dashboardId: dashboard.id.id});
-        $state.go('home.computationJob');
+        $state.go('home.computationJob',{computationId: computation.id.id});
     }
 
 }
