@@ -295,7 +295,7 @@ public class TelemetryRpcMsgHandler implements RpcMsgHandler {
                 try {
                     entry = new JsonDataEntry(proto.getKey(), mapper.readTree(proto.getStrValue()));
                 } catch (IOException ex) {
-                    log.trace("Exception in Json Data : {}", ex);
+                    log.error(ex.getMessage());
                 }
         }
         return entry;

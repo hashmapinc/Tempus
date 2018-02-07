@@ -195,7 +195,6 @@ public class MqttTransportHandler extends ChannelInboundHandlerAdapter implement
         } catch (AdaptorException e) {
             log.warn("[{}] Failed to process publish msg [{}][{}]", sessionId, topicName, msgId, e);
         }
-        log.info("####PATERN##### : MqttTransportHandler : MSG : {}", msg.getMsg().toString());
         if (msg != null) {
             processor.process(new BasicToDeviceActorSessionMsg(deviceSessionCtx.getDevice(), msg));
         } else {
