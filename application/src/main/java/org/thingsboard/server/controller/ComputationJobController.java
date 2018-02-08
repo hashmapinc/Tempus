@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.thingsboard.server.common.data.computation.ComputationJob;
+import org.thingsboard.server.common.data.id.ComputationId;
 import org.thingsboard.server.common.data.id.ComputationJobId;
 import org.thingsboard.server.common.data.id.TenantId;
 import org.thingsboard.server.common.data.plugin.ComponentLifecycleEvent;
@@ -18,19 +19,22 @@ import java.util.UUID;
 
 @Slf4j
 @RestController
-@RequestMapping("/api/")
+@RequestMapping("/api")
 public class ComputationJobController extends BaseController{
 
     @Autowired
     ComputationJobService computationJobService;
 
     @PreAuthorize("hasAuthority('TENANT_ADMIN')")
-    @RequestMapping(value = "computationJob", method = RequestMethod.POST)
+    @RequestMapping(value = "/computations/{computationId}/jobs", method = RequestMethod.POST)
     @ResponseBody
-    public ComputationJob saveComputationJob(@RequestBody ComputationJob source) throws ThingsboardException {
+    public ComputationJob saveComputationJob(@RequestBody ComputationJob source,
+                                             @PathVariable("computationId") String strComputationId) throws ThingsboardException {
+        checkParameter("computationId", strComputationId);
         try {
             boolean created = source.getId() == null;
             source.setTenantId(getCurrentUser().getTenantId());
+            source.setComputationId(ComputationId.fromString(strComputationId));
             ComputationJob computationJob = checkNotNull(computationJobService.saveComputationJob(source));
             actorService.onComputationJobStateChange(computationJob.getTenantId(), computationJob.getComputationId(),
                     computationJob.getId(), created ? ComponentLifecycleEvent.CREATED : ComponentLifecycleEvent.UPDATED);
@@ -43,7 +47,7 @@ public class ComputationJobController extends BaseController{
     @PreAuthorize("hasAnyAuthority('SYS_ADMIN', 'TENANT_ADMIN')")
     @RequestMapping(value = "/computationJob/{computationJobId}", method = RequestMethod.DELETE)
     @ResponseStatus(value = HttpStatus.OK)
-    public void deletePlugin(@PathVariable("computationJobId") String strComputationJobId) throws ThingsboardException {
+    public void deleteComputationJob(@PathVariable("computationJobId") String strComputationJobId) throws ThingsboardException {
         checkParameter("computationJobId", strComputationJobId);
         try {
             ComputationJobId computationJobId = new ComputationJobId(toUUID(strComputationJobId));
@@ -55,4 +59,19 @@ public class ComputationJobController extends BaseController{
         }
     }
 
+    @PreAuthorize("hasAnyAuthority('SYS_ADMIN', 'TENANT_ADMIN')")
+    @RequestMapping(value = "/computations/{computationId}/jobs/{computaionJodId}", method = RequestMethod.GET)
+    @ResponseStatus(value = HttpStatus.OK)
+    public void getComputationJob(@PathVariable("computationJobId") String strComputationJobId,
+                                  @PathVariable("computationId") String strComputationId) throws ThingsboardException {
+        checkParameter("computationJobId", strComputationJobId);
+        try {
+            ComputationJobId computationJobId = new ComputationJobId(toUUID(strComputationJobId));
+            ComputationJob computationJob = checkComputationJob(computationJobService.findComputationJobById(computationJobId));
+            computationJobService.deleteComputationJobById(computationJobId);
+            actorService.onComputationJobStateChange(computationJob.getTenantId(), computationJob.getComputationId(), computationJob.getId(), ComponentLifecycleEvent.DELETED);
+        } catch (Exception e) {
+            throw handleException(e);
+        }
+    }
 }

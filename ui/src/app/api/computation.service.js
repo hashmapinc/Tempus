@@ -72,7 +72,7 @@ function ComputationService($http, $q, $rootScope, $filter, componentDescriptorS
     function loadComputationsCache() {
         var deferred = $q.defer();
         if (!allComputations) {
-            var url = '/api/computations/all';
+            var url = '/api/computations';
             $http.get(url, null).then(function success(response) {
                 //componentDescriptorService.getComponentDescriptorsByType(types.componentType.computation).then(
                     //function success(computationComponents) {
@@ -178,7 +178,7 @@ function ComputationService($http, $q, $rootScope, $filter, componentDescriptorS
 
     function getComputation(computationId) {
         var deferred = $q.defer();
-        var url = '/api/computation/' + computationId;
+        var url = '/api/computations/' + computationId;
         $http.get(url, null).then(function success(response) {
             deferred.resolve(response.data);
         }, function fail(response) {

@@ -170,6 +170,7 @@ export default function ComputationController(computationService, $log, userServ
         }
         
         //$state.go('home.dashboards.dashboard', {dashboardId: dashboard.id.id});
+        //$state.go('home.computationJob',{computationId: computation.id.id});
         $state.go('home.computationJob',{computationId: computation.id.id});
     }
 

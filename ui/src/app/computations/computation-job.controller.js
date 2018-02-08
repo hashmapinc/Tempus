@@ -21,7 +21,7 @@ import computationJobCard from './computation-job-card.tpl.html';
 /* eslint-enable import/no-unresolved, import/default */
 
 /*@ngInject*/
-export default function ComputationJobController(computationJobService, userService, importExport, $state, $stateParams, $filter, $translate, types, helpLinks) {
+export default function ComputationJobController(computationJobService, computationService, $log, userService, importExport, $state, $stateParams, $filter, $translate, types, helpLinks) {
 
     var computationJobActionsList = [
         {
@@ -57,6 +57,8 @@ export default function ComputationJobController(computationJobService, userServ
         }
     ];
 
+    $log.log("HMDC computationObject ", $stateParams.computationId);
+
     var computationJobAddItemActionsList = [
         {
             onAction: function ($event) {
@@ -68,12 +70,16 @@ export default function ComputationJobController(computationJobService, userServ
         }
     ];
 
-
     var vm = this;
+
+    vm.computation = computationService.getComputation($stateParams.computationId);
+
+    $log.log("Computation : " + angular.toJson(vm.computation));
 
     vm.types = types;
 
     vm.helpLinkIdForComputationJob = helpLinkIdForComputationJob;
+
 
     vm.computationJobGridConfig = {
 

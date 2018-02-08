@@ -34,7 +34,6 @@ export default function ComputationJobDirective($compile, $templateCache, $log){
         scope.$watch('computationJob.name', function(newValue, oldValue) {
             $log.log("newValue, oldValue" + newValue + ":" + oldValue);
         });
-        
 
         $log.log("scope : " + scope);
 
@@ -94,7 +93,7 @@ export default function ComputationJobDirective($compile, $templateCache, $log){
         restrict: "E",
         link: linker,
         scope: {
-            computationJob: '=?',
+            computationJob: '=',
             isEdit: '=',
             isReadOnly: '=',
             theForm: '=',

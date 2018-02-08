@@ -22,7 +22,7 @@ import org.thingsboard.server.common.data.EntityType;
 
 import java.util.UUID;
 
-public class ComputationId extends UUIDBased implements EntityId{
+public final class ComputationId extends UUIDBased implements EntityId{
 
     private static final long serialVersionUID = 1L;
 

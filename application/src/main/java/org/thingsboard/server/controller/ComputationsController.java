@@ -26,6 +26,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.thingsboard.server.common.data.computation.Computations;
+import org.thingsboard.server.common.data.id.ComputationId;
 import org.thingsboard.server.common.data.id.TenantId;
 import org.thingsboard.server.common.data.page.TextPageData;
 import org.thingsboard.server.common.data.page.TextPageLink;
@@ -40,7 +41,7 @@ import java.util.List;
 
 @Slf4j
 @RestController
-@RequestMapping("/api/computations")
+@RequestMapping("/api")
 public class ComputationsController extends BaseController {
 
     @Value("${spark.jar_path}")
@@ -54,7 +55,7 @@ public class ComputationsController extends BaseController {
     ComputationsService computationsService;
 
     @PreAuthorize("hasAuthority('TENANT_ADMIN')")
-    @RequestMapping(value = "/upload", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(value = "/computations/upload", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     public Computations upload(@RequestParam("file") MultipartFile file) throws ThingsboardException {
         try {
@@ -73,7 +74,7 @@ public class ComputationsController extends BaseController {
     }
 
     @PreAuthorize("hasAuthority('TENANT_ADMIN')")
-    @RequestMapping(value = "/delete", method = RequestMethod.POST)
+    @RequestMapping(value = "/computations/delete", method = RequestMethod.POST)
     @ResponseBody
     public void delete(@RequestParam("fileName") String fileName) throws ThingsboardException {
         String path = uploadPath + File.separator + fileName;
@@ -82,7 +83,7 @@ public class ComputationsController extends BaseController {
 
     //Added here for testing purpose
     @PreAuthorize("hasAuthority('TENANT_ADMIN')")
-    @RequestMapping(value = "/find/all", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(value = "/computations/find/all", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     public void findAll() throws ThingsboardException {
         computationDiscoveryService.findAll();
@@ -106,7 +107,7 @@ public class ComputationsController extends BaseController {
     }
 
     @PreAuthorize("hasAnyAuthority('SYS_ADMIN', 'TENANT_ADMIN')")
-    @RequestMapping(value = "/all", method = RequestMethod.GET)
+    @RequestMapping(value = "/computations", method = RequestMethod.GET)
     @ResponseBody
     public List<Computations> getComputations() throws ThingsboardException {
         try {
@@ -117,6 +118,23 @@ public class ComputationsController extends BaseController {
                         .filter(computation -> computation.getTenantId().getId().equals(ModelConstants.NULL_UUID));
                 log.error("HMDC returning Computations {} ", computations);
                 return computations;
+        } catch (Exception e) {
+            throw handleException(e);
+        }
+    }
+
+    @PreAuthorize("hasAnyAuthority('SYS_ADMIN', 'TENANT_ADMIN')")
+    @RequestMapping(value = "/computations/{computationId}", method = RequestMethod.GET)
+    @ResponseBody
+    public Computations getComputation(@PathVariable("computationId") String strComputationId) throws ThingsboardException {
+
+        try {
+            log.error("HMDC Fetching computations by id.");
+            ComputationId computationId = new ComputationId(toUUID(strComputationId));
+            //TenantId tenantId = getCurrentUser().getTenantId();
+            Computations computations = checkNotNull(computationsService.findById(computationId));
+            log.error("HMDC returning Computations by id{} ", computations);
+            return computations;
         } catch (Exception e) {
             throw handleException(e);
         }
