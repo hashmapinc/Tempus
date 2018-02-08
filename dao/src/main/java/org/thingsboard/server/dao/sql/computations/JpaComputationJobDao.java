@@ -74,4 +74,9 @@ public class JpaComputationJobDao extends JpaAbstractSearchTextDao<ComputationJo
         }
         return DaoUtil.convertDataList(entities);
     }
+
+    @Override
+    public List<ComputationJob> findByComputationId(ComputationId computationId) {
+        return DaoUtil.convertDataList(computationJobRepository.findByComputationId(UUIDConverter.fromTimeUUID(computationId.getId())));
+    }
 }

@@ -21,4 +21,7 @@ public interface ComputationJobRepository extends CrudRepository<ComputationJobE
                                                                          @Param("textSearch") String textSearch,
                                                                          @Param("idOffset") String idOffset,
                                                                          Pageable pageable);
+
+    @Query("SELECT cje FROM ComputationJobEntity cje WHERE cje.computationId = :computationId ")
+    List<ComputationJobEntity> findByComputationId(@Param("computationId") String computationId);
 }

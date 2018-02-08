@@ -54,9 +54,11 @@ function ComputationJobService($http, $q, $rootScope, $filter, componentDescript
 
     function loadComputationJobsCache() {
         var deferred = $q.defer();
-        if (!allComputationJobs) {
-            var url = '/api/computationJobs/all';
+        //if (!allComputationJobs) {
+            var url = '/api/computations/bb999570-0cc7-11e8-8600-6bb60de8cb52/jobs';
+            $log.log("URL is ", url);
             $http.get(url, null).then(function success(response) {
+                $log.log("success response is ", response.data);
                 //componentDescriptorService.getComponentDescriptorsByType(types.componentType.computationJob).then(
                     //function success(computationJobComponents) {
                         allComputationJobs = response.data;
@@ -88,11 +90,12 @@ function ComputationJobService($http, $q, $rootScope, $filter, componentDescript
                     }*/
                 //);
             }, function fail() {
+                $log.log("failed to get response");
                 deferred.reject();
             });
-        } else {
+        /*} else {
             deferred.resolve();
-        }
+        }*/
         return deferred.promise;
     }
 

@@ -17,5 +17,7 @@ public interface ComputationJobDao extends Dao<ComputationJob> {
 
     void deleteByComputaionJobId(ComputationJobId computationJobId);
 
+    List<ComputationJob> findByComputationId(ComputationId computationId);
+
     List<ComputationJob> findByTenantIdAndComputationIdAndPageLink(TenantId tenantId, ComputationId computationId, TextPageLink pageLink);
 }

@@ -15,6 +15,7 @@ import org.thingsboard.server.common.data.plugin.PluginMetaData;
 import org.thingsboard.server.dao.computations.ComputationJobService;
 import org.thingsboard.server.exception.ThingsboardException;
 
+import java.util.List;
 import java.util.UUID;
 
 @Slf4j
@@ -62,15 +63,28 @@ public class ComputationJobController extends BaseController{
     @PreAuthorize("hasAnyAuthority('SYS_ADMIN', 'TENANT_ADMIN')")
     @RequestMapping(value = "/computations/{computationId}/jobs/{computaionJodId}", method = RequestMethod.GET)
     @ResponseStatus(value = HttpStatus.OK)
-    public void getComputationJob(@PathVariable("computationJobId") String strComputationJobId,
+    public ComputationJob getComputationJob(@PathVariable("computationJobId") String strComputationJobId,
                                   @PathVariable("computationId") String strComputationId) throws ThingsboardException {
         checkParameter("computationJobId", strComputationJobId);
         try {
             ComputationJobId computationJobId = new ComputationJobId(toUUID(strComputationJobId));
             ComputationJob computationJob = checkComputationJob(computationJobService.findComputationJobById(computationJobId));
-            computationJobService.deleteComputationJobById(computationJobId);
-            actorService.onComputationJobStateChange(computationJob.getTenantId(), computationJob.getComputationId(), computationJob.getId(), ComponentLifecycleEvent.DELETED);
+            return computationJob;
         } catch (Exception e) {
+            throw handleException(e);
+        }
+    }
+
+    @PreAuthorize("hasAnyAuthority('SYS_ADMIN', 'TENANT_ADMIN')")
+    @RequestMapping(value = "/computations/{computationId}/jobs", method = RequestMethod.GET)
+    @ResponseStatus(value = HttpStatus.OK)
+    public List<ComputationJob> getComputationJobs(@PathVariable("computationId") String strComputationId) throws ThingsboardException {
+        checkParameter("computationId", strComputationId);
+        try {
+            ComputationId computationId = new ComputationId(toUUID(strComputationId));
+            List<ComputationJob> computationJobs = computationJobService.findByComputationId(computationId);
+            return computationJobs;
+            } catch (Exception e) {
             throw handleException(e);
         }
     }

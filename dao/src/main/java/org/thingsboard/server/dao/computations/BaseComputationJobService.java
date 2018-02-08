@@ -61,4 +61,9 @@ public class BaseComputationJobService extends AbstractEntityService implements 
         List<ComputationJob> computationJobs = computationJobDao.findByTenantIdAndComputationIdAndPageLink(tenantId, computationId, pageLink);
         return new TextPageData<>(computationJobs, pageLink);
     }
+
+    @Override
+    public List<ComputationJob> findByComputationId(ComputationId computationId) {
+        return computationJobDao.findByComputationId(computationId);
+    }
 }

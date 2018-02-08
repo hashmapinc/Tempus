@@ -29,13 +29,18 @@ export default function ComputationJobDirective($compile, $templateCache, $log){
 
         //$log.error("HMDC scope.computationJob " + scope.computationJob.id.id);
 
-        scope.computationJob = null;
+        //scope.computationJob = null;
         
         scope.$watch('computationJob.name', function(newValue, oldValue) {
             $log.log("newValue, oldValue" + newValue + ":" + oldValue);
         });
 
-        $log.log("scope : " + scope);
+        scope.$watch('computationJob', function(newValue, oldValue) {
+            $log.log("newValue, oldValue" + newValue + ":" + oldValue);
+            scope.computationJob = newValue;
+        });
+
+        $log.log("scope computation : " + scope.computation);
 
         scope.showComputationJobConfig = false;
 
@@ -47,6 +52,8 @@ export default function ComputationJobDirective($compile, $templateCache, $log){
         if (scope.computationJob && !scope.computationJob.configuration) {
             scope.computationJob.configuration = {};
         }
+
+
 
         /*scope.$watch("computationJob.clazz", function (newValue, prevValue) {
             if (newValue != prevValue) {
@@ -93,7 +100,7 @@ export default function ComputationJobDirective($compile, $templateCache, $log){
         restrict: "E",
         link: linker,
         scope: {
-            computationJob: '=',
+            computationJob: '=?',
             isEdit: '=',
             isReadOnly: '=',
             theForm: '=',
@@ -101,6 +108,11 @@ export default function ComputationJobDirective($compile, $templateCache, $log){
             onSuspendComputationJob: '&',
             onExportComputationJob: '&',
             onDeleteComputationJob: '&'
-        }
+        },
+        bindToController: {
+            computation: '=?'
+        },
+        controller: 'ComputationJobController',
+        controllerAs: 'vm'
     };
 }
