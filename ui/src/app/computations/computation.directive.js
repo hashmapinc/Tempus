@@ -39,7 +39,7 @@ export default function ComputationDirective($compile, $templateCache, $translat
             scope.computation.configuration = {};
         }
 
-        scope.$watch("computation.clazz", function (newValue, prevValue) {
+        scope.$watch("computation", function (newValue, prevValue) {
             if (newValue != prevValue) {
                 scope.computationConfiguration.data = null;
                 if (scope.computation) {
@@ -59,12 +59,6 @@ export default function ComputationDirective($compile, $templateCache, $translat
                 }
             }
         });
-
-        scope.$watch("computationConfiguration.data", function (newValue, prevValue) {
-            if (newValue && !angular.equals(newValue, prevValue)) {
-                scope.computation.configuration = angular.copy(scope.computationConfiguration.data);
-            }
-        }, true);
 
         scope.onComputationIdCopied = function() {
             toast.showSuccess($translate.instant('computation.idCopiedMessage'), 750, angular.element(element).parent().parent(), 'bottom left');
@@ -88,9 +82,6 @@ export default function ComputationDirective($compile, $templateCache, $translat
             isEdit: '=',
             isReadOnly: '=',
             theForm: '=',
-            onActivateComputation: '&',
-            onSuspendComputation: '&',
-            onExportComputation: '&',
             onDeleteComputation: '&'
         }
     };

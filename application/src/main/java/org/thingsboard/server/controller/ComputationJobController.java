@@ -17,13 +17,15 @@ import org.thingsboard.server.exception.ThingsboardException;
 import java.util.UUID;
 
 @Slf4j
+@RestController
+@RequestMapping("/api/")
 public class ComputationJobController extends BaseController{
 
     @Autowired
     ComputationJobService computationJobService;
 
     @PreAuthorize("hasAuthority('TENANT_ADMIN')")
-    @RequestMapping(value = "/computationJob", method = RequestMethod.POST)
+    @RequestMapping(value = "computationJob", method = RequestMethod.POST)
     @ResponseBody
     public ComputationJob saveComputationJob(@RequestBody ComputationJob source) throws ThingsboardException {
         try {

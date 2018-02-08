@@ -21,31 +21,9 @@ import computationCard from './computation-card.tpl.html';
 /* eslint-enable import/no-unresolved, import/default */
 
 /*@ngInject*/
-export default function ComputationController(computationService, userService, importExport, $state, $stateParams, $filter, $translate, types, helpLinks) {
+export default function ComputationController(computationService, $log, userService, importExport, $state, $stateParams, $filter, $translate, types, helpLinks) {
 
     var computationActionsList = [
-        {
-            onAction: function ($event, item) {
-                activateComputation($event, item);
-            },
-            name: function() { return $translate.instant('action.activate') },
-            details: function() { return $translate.instant('computation.activate') },
-            icon: "play_arrow",
-            isEnabled: function(computation) {
-                return isComputationEditable(computation) && computation && computation.state === 'SUSPENDED';
-            }
-        },
-        {
-            onAction: function ($event, item) {
-                suspendComputation($event, item);
-            },
-            name: function() { return $translate.instant('action.suspend') },
-            details: function() { return $translate.instant('computation.suspend') },
-            icon: "pause",
-            isEnabled: function(computation) {
-                return isComputationEditable(computation) && computation && computation.state === 'ACTIVE';
-            }
-        },
         {
             onAction: function ($event, item) {
                 vm.grid.deleteItem($event, item);
@@ -93,6 +71,8 @@ export default function ComputationController(computationService, userService, i
         saveItemFunc: saveComputation,
         deleteItemFunc: deleteComputation,
 
+        clickItemFunc: openComputation,
+
         getItemTitleFunc: getComputationTitle,
         itemCardTemplateUrl: computationCard,
         parentCtl: vm,
@@ -124,8 +104,6 @@ export default function ComputationController(computationService, userService, i
 
     vm.isComputationEditable = isComputationEditable;
 
-    vm.activateComputation = activateComputation;
-    vm.suspendComputation = suspendComputation;
     //vm.exportComputation = exportComputation;
 
     function helpLinkIdForComputation() {
@@ -157,6 +135,7 @@ export default function ComputationController(computationService, userService, i
     }
 
     function fetchComputations(pageLink) {
+        $log.error("HMDC fetching computations")
         return computationService.getAllComputations(pageLink);
     }
 
@@ -184,19 +163,14 @@ export default function ComputationController(computationService, userService, i
         $event.stopPropagation();
         importExport.exportComputation(computation.id.id);
     }*/
-
-    function activateComputation(event, computation) {
-        computationService.activateComputation(computation.id.id).then(function () {
-            vm.grid.refreshList();
-        }, function () {
-        });
-    }
-
-    function suspendComputation(event, computation) {
-        computationService.suspendComputation(computation.id.id).then(function () {
-            vm.grid.refreshList();
-        }, function () {
-        });
+    
+    function openComputation($event, computation) {
+        if ($event) {
+            $event.stopPropagation();
+        }
+        
+        //$state.go('home.dashboards.dashboard', {dashboardId: dashboard.id.id});
+        $state.go('home.computationJob',{computationId: computation.id.id});
     }
 
 }

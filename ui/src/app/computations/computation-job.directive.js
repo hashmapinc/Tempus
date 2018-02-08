@@ -22,12 +22,21 @@ import computationJobFieldsetTemplate from './computation-job-fieldset.tpl.html'
 /* eslint-enable import/no-unresolved, import/default */
 
 /*@ngInject*/
-export default function ComputationJobDirective($compile, $templateCache, $translate, types, toast, utils, userService, componentDescriptorService, $log) {
+export default function ComputationJobDirective($compile, $templateCache, $log){//, $translate, types, toast, utils, userService) {
     var linker = function (scope, element) {
         var template = $templateCache.get(computationJobFieldsetTemplate);
         element.html(template);
 
         //$log.error("HMDC scope.computationJob " + scope.computationJob.id.id);
+
+        scope.computationJob = null;
+        
+        scope.$watch('computationJob.name', function(newValue, oldValue) {
+            $log.log("newValue, oldValue" + newValue + ":" + oldValue);
+        });
+        
+
+        $log.log("scope : " + scope);
 
         scope.showComputationJobConfig = false;
 
@@ -35,11 +44,12 @@ export default function ComputationJobDirective($compile, $templateCache, $trans
             data: null
         };
 
+
         if (scope.computationJob && !scope.computationJob.configuration) {
             scope.computationJob.configuration = {};
         }
 
-        scope.$watch("computationJob.clazz", function (newValue, prevValue) {
+        /*scope.$watch("computationJob.clazz", function (newValue, prevValue) {
             if (newValue != prevValue) {
                 scope.computationJobConfiguration.data = null;
                 if (scope.computationJob) {

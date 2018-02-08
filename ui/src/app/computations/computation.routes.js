@@ -15,8 +15,8 @@
  */
 /* eslint-disable import/no-unresolved, import/default */
 
-//import computationsTemplate from './computations.tpl.html';
-import computationsTemplateTest from './computationsTest.tpl.html';
+import computationsTemplate from './computations.tpl.html';
+//import computationsTemplate from './computationsTest.tpl.html';
 import computationJobTemplate from './computation-job.tpl.html';
 
 /* eslint-enable import/no-unresolved, import/default */
@@ -30,8 +30,8 @@ export default function ComputationRoutes($stateProvider) {
             auth: ['TENANT_ADMIN'],
             views: {
                 "content@home": {
-                    templateUrl: computationsTemplateTest,
-                    controller: 'ComputationTestController',
+                    templateUrl: computationsTemplate,
+                    controller: 'ComputationController',
                     controllerAs: 'vm'
                 }
             },

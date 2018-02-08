@@ -172,7 +172,7 @@ function ComputationJobService($http, $q, $rootScope, $filter, componentDescript
 
     function saveComputationJob(computationJob) {
         var deferred = $q.defer();
-        var url = '/computationJob';
+        var url = '/api/computationJob';
         $http.post(url, computationJob).then(function success(response) {
             invalidateComputationJobsCache();
             deferred.resolve(response.data);

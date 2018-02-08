@@ -16,23 +16,8 @@
 
 -->
 <tb-grid grid-configuration="vm.computationGridConfig">
-    <md-tabs ng-class="{'tb-headless': (vm.grid.detailsConfig.isDetailsEditMode || !vm.isComputationEditable(vm.grid.operatingItem()))}"
-             id="tabs" md-border-bottom flex class="tb-absolute-fill">
-        <md-tab label="{{ 'computation.details' | translate }}">
-            <tb-computation computation="vm.grid.operatingItem()"
-                 is-edit="vm.grid.detailsConfig.isDetailsEditMode"
-                 is-read-only="vm.grid.isDetailsReadOnly(vm.grid.operatingItem())"
-                 the-form="vm.grid.detailsForm"
-                 on-activate-computation="vm.activateComputation(event, vm.grid.detailsConfig.currentItem)"
-                 on-suspend-computation="vm.suspendComputation(event, vm.grid.detailsConfig.currentItem)"
-                 on-delete-computation="vm.grid.deleteItem(event, vm.grid.detailsConfig.currentItem)"></tb-computation>
-        </md-tab>
-        <md-tab ng-if="!vm.grid.detailsConfig.isDetailsEditMode && vm.isComputationEditable(vm.grid.operatingItem())" md-on-select="vm.grid.triggerResize()" label="{{ 'computation.events' | translate }}">
-            <tb-event-table flex entity-type="vm.types.entityType.computation"
-                            entity-id="vm.grid.operatingItem().id.id"
-                            tenant-id="vm.grid.operatingItem().tenantId.id"
-                            default-event-type="{{vm.types.eventType.lcEvent.value}}">
-            </tb-event-table>
-        </md-tab>
-    </md-tabs>
+    <tb-computation computation="vm.grid.operatingItem()"
+        is-edit="vm.grid.detailsConfig.isDetailsEditMode"
+        the-form="vm.grid.detailsForm"
+        on-delete-computation="vm.grid.deleteItem(event, vm.grid.detailsConfig.currentItem)"></tb-computation>
 </tb-grid>
