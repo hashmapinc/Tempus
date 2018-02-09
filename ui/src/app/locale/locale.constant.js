@@ -272,6 +272,7 @@ export default angular.module('thingsboard.locale', [])
                     "add": "Add attribute",
                     "key": "Key",
                     "last-update-time": "Last update time",
+                    "last-update-depth": "Last update depth",
                     "key-required": "Attribute key is required.",
                     "value": "Value",
                     "value-required": "Attribute value is required.",

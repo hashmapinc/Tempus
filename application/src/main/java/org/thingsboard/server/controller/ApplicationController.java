@@ -20,6 +20,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.thingsboard.server.common.data.Application;
+import org.thingsboard.server.common.data.ApplicationComputationJosWrapper;
 import org.thingsboard.server.common.data.ApplicationRulesWrapper;
 import org.thingsboard.server.common.data.id.*;
 import org.thingsboard.server.common.data.page.TextPageData;
@@ -31,6 +32,7 @@ import org.thingsboard.server.exception.ThingsboardException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @RestController
@@ -224,9 +226,9 @@ public class ApplicationController extends BaseController {
         try {
             ApplicationId applicationId = new ApplicationId(toUUID(applicationRulesWrapper.getApplicationId()));
             checkApplicationId(applicationId);
-            List<RuleId> ruleIds = Collections.emptyList();
+            Set<RuleId> ruleIds = Collections.emptySet();
             if (applicationRulesWrapper != null) {
-                ruleIds = applicationRulesWrapper.getRules().stream().map(r -> new RuleId(toUUID(r))).collect(Collectors.toList());
+                ruleIds = applicationRulesWrapper.getRules().stream().map(r -> new RuleId(toUUID(r))).collect(Collectors.toSet());
             }
             return checkNotNull(applicationService.assignRulesToApplication(applicationId, ruleIds));
         } catch (Exception e) {
@@ -234,16 +236,48 @@ public class ApplicationController extends BaseController {
         }
     }
 
+
     @PreAuthorize("hasAuthority('TENANT_ADMIN')")
-    @RequestMapping(value = "/app/{applicationId}/deviceTypes", method = RequestMethod.POST,consumes = "application/json")
-    public Application assignDeviceTypesToApplication(@PathVariable("applicationId") String strApplicationId,
-                                                      @RequestBody List<String> deviceTypes) throws ThingsboardException {
-        checkParameter("applicationId", strApplicationId);
+    @RequestMapping(value = "/app/unassignRules", method = RequestMethod.POST,consumes = "application/json")
+    public Application unassignRulesToApplication(@RequestBody ApplicationRulesWrapper applicationRulesWrapper) throws ThingsboardException {
+        checkParameter("applicationId", applicationRulesWrapper.getApplicationId());
         try {
-            log.error("Got application [{}] with deviceTypes [{}]", strApplicationId, deviceTypes);
-            ApplicationId applicationId = new ApplicationId(toUUID(strApplicationId));
+            ApplicationId applicationId = new ApplicationId(toUUID(applicationRulesWrapper.getApplicationId()));
             checkApplicationId(applicationId);
-            return checkNotNull(applicationService.assignDeviceTypesToApplication(applicationId, deviceTypes));
+            Set<RuleId> ruleIds = Collections.emptySet();
+            if (applicationRulesWrapper != null) {
+                ruleIds = applicationRulesWrapper.getRules().stream().map(r -> new RuleId(toUUID(r))).collect(Collectors.toSet());
+            }
+            return checkNotNull(applicationService.unassignRulesToApplication(applicationId, ruleIds));
+        } catch (Exception e) {
+            throw handleException(e);
+        }
+    }
+
+
+    @PreAuthorize("hasAuthority('TENANT_ADMIN')")
+    @RequestMapping(value = "/app/assignComputationJobs", method = RequestMethod.POST,consumes = "application/json")
+    public Application assignComputationsJobToApplication(@RequestBody ApplicationComputationJosWrapper applicationComputationJosWrapper) throws ThingsboardException {
+        checkParameter("applicationId", applicationComputationJosWrapper.getApplicationId());
+        try {
+            ApplicationId applicationId = new ApplicationId(toUUID(applicationComputationJosWrapper.getApplicationId()));
+            checkApplicationId(applicationId);
+            Set<ComputationJobId> computationJobIds = applicationComputationJosWrapper.getComputationJobs().stream().map(r -> new ComputationJobId(toUUID(r))).collect(Collectors.toSet());
+            return checkNotNull(applicationService.assignComputationJobsToApplication(applicationId, computationJobIds));
+        } catch (Exception e) {
+            throw handleException(e);
+        }
+    }
+
+    @PreAuthorize("hasAuthority('TENANT_ADMIN')")
+    @RequestMapping(value = "/app/unassignComputationJobs", method = RequestMethod.POST,consumes = "application/json")
+    public Application unassignComputationsJobToApplication(@RequestBody ApplicationComputationJosWrapper applicationComputationJosWrapper) throws ThingsboardException {
+        checkParameter("applicationId", applicationComputationJosWrapper.getApplicationId());
+        try {
+            ApplicationId applicationId = new ApplicationId(toUUID(applicationComputationJosWrapper.getApplicationId()));
+            checkApplicationId(applicationId);
+            Set<ComputationJobId> computationJobIds  = applicationComputationJosWrapper.getComputationJobs().stream().map(c -> new ComputationJobId(toUUID(c))).collect(Collectors.toSet());
+            return checkNotNull(applicationService.unassignComputationJobsToApplication(applicationId, computationJobIds));
         } catch (Exception e) {
             throw handleException(e);
         }

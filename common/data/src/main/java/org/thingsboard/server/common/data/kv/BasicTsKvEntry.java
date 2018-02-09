@@ -15,6 +15,7 @@
  */
 package org.thingsboard.server.common.data.kv;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -56,6 +57,11 @@ public class BasicTsKvEntry implements TsKvEntry {
     @Override
     public Optional<Double> getDoubleValue() {
         return kv.getDoubleValue();
+    }
+
+    @Override
+    public Optional<JsonNode> getJsonValue() {
+        return kv.getJsonValue();
     }
 
     @Override

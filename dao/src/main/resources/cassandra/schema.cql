@@ -205,9 +205,11 @@ CREATE TABLE IF NOT EXISTS thingsboard.application (
     dashboard_id timeuuid,
     search_text text,
     name text,
+    is_valid boolean,
     description text,
-    application_rules list<timeuuid>,
-    application_device_types list<text>,
+    application_computation_jobs set<timeuuid>,
+    application_rules set<timeuuid>,
+    application_device_types set<text>,
     PRIMARY KEY (id, tenant_id, customer_id)
 );
 
@@ -437,6 +439,7 @@ CREATE TABLE IF NOT EXISTS thingsboard.ts_kv_cf (
     str_v text,
     long_v bigint,
     dbl_v double,
+    json_v text,
     PRIMARY KEY (( entity_type, entity_id, key, partition ), ts)
 );
 
@@ -458,6 +461,7 @@ CREATE TABLE IF NOT EXISTS thingsboard.ts_kv_latest_cf (
     str_v text,
     long_v bigint,
     dbl_v double,
+    json_v text,
     PRIMARY KEY (( entity_type, entity_id ), key)
 ) WITH compaction = { 'class' :  'LeveledCompactionStrategy'  };
 
@@ -471,6 +475,7 @@ CREATE TABLE IF NOT EXISTS thingsboard.ds_kv_cf (
     str_v text,
     long_v bigint,
     dbl_v double,
+    json_v text,
     PRIMARY KEY (( entity_type, entity_id, key, partition ), ds)
 );
 
@@ -492,6 +497,7 @@ CREATE TABLE IF NOT EXISTS thingsboard.ds_kv_latest_cf (
     str_v text,
     long_v bigint,
     dbl_v double,
+    json_v text,
     PRIMARY KEY (( entity_type, entity_id ), key)
 ) WITH compaction = { 'class' :  'LeveledCompactionStrategy'  };
 
@@ -504,6 +510,7 @@ CREATE TABLE IF NOT EXISTS thingsboard.attributes_kv_cf (
     str_v text,
     long_v bigint,
     dbl_v double,
+    json_v text,
     last_update_ts bigint,
     PRIMARY KEY ((entity_type, entity_id, attribute_type), attribute_key)
 ) WITH compaction = { 'class' :  'LeveledCompactionStrategy'  };

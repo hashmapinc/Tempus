@@ -18,6 +18,7 @@ package org.thingsboard.server.transport.mqtt.session;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;
 import io.netty.buffer.UnpooledByteBufAllocator;
@@ -153,6 +154,11 @@ public class GatewayDeviceSessionCtx extends DeviceAwareSessionContext {
                 break;
             case LONG:
                 json.addProperty(name, entry.getLongValue().get());
+                break;
+            case JSON:
+                JsonParser parser = new JsonParser();
+                JsonObject jsonObject = parser.parse(entry.getJsonValue().toString()).getAsJsonObject();
+                json.add(name, jsonObject);
                 break;
         }
     }

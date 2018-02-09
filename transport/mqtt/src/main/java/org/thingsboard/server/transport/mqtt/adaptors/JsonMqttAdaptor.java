@@ -61,7 +61,6 @@ public class JsonMqttAdaptor implements MqttTransportAdaptor {
                 break;
             case POST_TELEMETRY_REQUEST_DEPTH:
                 msg = convertToTelemetryUploadRequestDepth(ctx, (MqttPublishMessage) inbound);
-                log.debug("\n\n########### msg " + msg + "\n\n");
                 break;
             case POST_ATTRIBUTES_REQUEST:
                 msg = convertToUpdateAttributesRequest(ctx, (MqttPublishMessage) inbound);
@@ -106,7 +105,8 @@ public class JsonMqttAdaptor implements MqttTransportAdaptor {
                     MsgType requestMsgType = responseMsg.getRequestMsgType();
                     Integer requestId = responseMsg.getRequestId();
                     if (requestId >= 0) {
-                        if (requestMsgType == MsgType.POST_ATTRIBUTES_REQUEST || requestMsgType == MsgType.POST_TELEMETRY_REQUEST) {
+                        if (requestMsgType == MsgType.POST_ATTRIBUTES_REQUEST || requestMsgType == MsgType.POST_TELEMETRY_REQUEST
+                                || requestMsgType == MsgType.POST_TELEMETRY_REQUEST_DEPTH) {
                             result = MqttTransportHandler.createMqttPubAckMsg(requestId);
                         } else if (requestMsgType == MsgType.GET_ATTRIBUTES_REQUEST) {
                             GetAttributesResponse response = (GetAttributesResponse) msg;

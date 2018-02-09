@@ -18,6 +18,7 @@ package org.thingsboard.server.dao.timeseries;
 import com.datastax.driver.core.*;
 import com.datastax.driver.core.querybuilder.QueryBuilder;
 import com.datastax.driver.core.querybuilder.Select;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.base.Function;
 import com.google.common.util.concurrent.AsyncFunction;
 import com.google.common.util.concurrent.FutureCallback;
@@ -354,7 +355,12 @@ public class CassandraBaseTimeseriesDao extends CassandraAbstractAsyncDao implem
                     if (boolV != null) {
                         kvEntry = new BooleanDataEntry(key, boolV);
                     } else {
-                        log.warn("All values in key-value row are nullable ");
+                        JsonNode jsonV = row.get(ModelConstants.JSON_VALUE_COLUMN, JsonNode.class);
+                        if (jsonV != null) {
+                            kvEntry = new JsonDataEntry(key, jsonV);
+                        } else {
+                            log.warn("All values in key-value row are nullable ");
+                        }
                     }
                 }
             }
@@ -482,7 +488,8 @@ public class CassandraBaseTimeseriesDao extends CassandraAbstractAsyncDao implem
                     ModelConstants.STRING_VALUE_COLUMN + "," +
                     ModelConstants.BOOLEAN_VALUE_COLUMN + "," +
                     ModelConstants.LONG_VALUE_COLUMN + "," +
-                    ModelConstants.DOUBLE_VALUE_COLUMN + " " +
+                    ModelConstants.DOUBLE_VALUE_COLUMN + "," +
+                    ModelConstants.JSON_VALUE_COLUMN + " " +
                     "FROM " + ModelConstants.TS_KV_LATEST_CF + " " +
                     "WHERE " + ModelConstants.ENTITY_TYPE_COLUMN + " = ? " +
                     "AND " + ModelConstants.ENTITY_ID_COLUMN + " = ? " +
@@ -499,7 +506,8 @@ public class CassandraBaseTimeseriesDao extends CassandraAbstractAsyncDao implem
                     ModelConstants.STRING_VALUE_COLUMN + "," +
                     ModelConstants.BOOLEAN_VALUE_COLUMN + "," +
                     ModelConstants.LONG_VALUE_COLUMN + "," +
-                    ModelConstants.DOUBLE_VALUE_COLUMN + " " +
+                    ModelConstants.DOUBLE_VALUE_COLUMN + "," +
+                    ModelConstants.JSON_VALUE_COLUMN + " " +
                     "FROM " + ModelConstants.TS_KV_LATEST_CF + " " +
                     "WHERE " + ModelConstants.ENTITY_TYPE_COLUMN + " = ? " +
                     "AND " + ModelConstants.ENTITY_ID_COLUMN + " = ? ");
@@ -517,6 +525,8 @@ public class CassandraBaseTimeseriesDao extends CassandraAbstractAsyncDao implem
                 return ModelConstants.LONG_VALUE_COLUMN;
             case DOUBLE:
                 return ModelConstants.DOUBLE_VALUE_COLUMN;
+            case JSON:
+                return ModelConstants.JSON_VALUE_COLUMN;
             default:
                 throw new RuntimeException("Not implemented!");
         }
@@ -535,6 +545,9 @@ public class CassandraBaseTimeseriesDao extends CassandraAbstractAsyncDao implem
                 break;
             case DOUBLE:
                 stmt.setDouble(column, kvEntry.getDoubleValue().get().doubleValue());
+                break;
+            case JSON:
+                stmt.setString(column, kvEntry.getJsonValue().get().toString());
                 break;
         }
     }

@@ -17,10 +17,13 @@ package org.thingsboard.server.dao.timeseries;
 
 import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Row;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.thingsboard.server.common.data.kv.*;
 
 import javax.annotation.Nullable;
+import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
@@ -34,10 +37,12 @@ public class AggregatePartitionsFunction implements com.google.common.base.Funct
     private static final int DOUBLE_CNT_POS = 1;
     private static final int BOOL_CNT_POS = 2;
     private static final int STR_CNT_POS = 3;
-    private static final int LONG_POS = 4;
-    private static final int DOUBLE_POS = 5;
-    private static final int BOOL_POS = 6;
-    private static final int STR_POS = 7;
+    private static final int JSON_CNT_POS = 4;
+    private static final int LONG_POS = 5;
+    private static final int DOUBLE_POS = 6;
+    private static final int BOOL_POS = 7;
+    private static final int STR_POS = 8;
+    private static final int JSON_POS = 9;
 
     private final Aggregation aggregation;
     private final String key;
@@ -64,6 +69,7 @@ public class AggregatePartitionsFunction implements com.google.common.base.Funct
             String sValue = null;
             Double dValue = null;
             Long lValue = null;
+            JsonNode jValue = null;
 
             for (ResultSet rs : rsList) {
                 for (Row row : rs.all()) {
@@ -73,11 +79,13 @@ public class AggregatePartitionsFunction implements com.google.common.base.Funct
                     Double curDValue = null;
                     Boolean curBValue = null;
                     String curSValue = null;
+                    JsonNode curJValue = null;
 
                     long longCount = row.getLong(LONG_CNT_POS);
                     long doubleCount = row.getLong(DOUBLE_CNT_POS);
                     long boolCount = row.getLong(BOOL_CNT_POS);
                     long strCount = row.getLong(STR_CNT_POS);
+                    long jsonCount = row.getLong(JSON_CNT_POS);
 
                     if (longCount > 0) {
                         dataType = DataType.LONG;
@@ -95,6 +103,10 @@ public class AggregatePartitionsFunction implements com.google.common.base.Funct
                         dataType = DataType.STRING;
                         curCount = strCount;
                         curSValue = getStringValue(row);
+                    } else if (jsonCount > 0) {
+                        dataType = DataType.JSON;
+                        curCount = jsonCount;
+                        curJValue = getJsonValue(row);
                     } else {
                         continue;
                     }
@@ -119,6 +131,10 @@ public class AggregatePartitionsFunction implements com.google.common.base.Funct
                             if (sValue == null || curSValue.compareTo(sValue) < 0) {
                                 sValue = curSValue;
                             }
+                        } else if (curJValue != null) {
+                            if (jValue == null || curJValue.toString().compareTo(jValue.toString()) < 0) {
+                                jValue = curJValue;
+                            }
                         }
                     } else if (aggregation == Aggregation.MAX) {
                         if (curDValue != null) {
@@ -130,6 +146,10 @@ public class AggregatePartitionsFunction implements com.google.common.base.Funct
                         } else if (curSValue != null) {
                             if (sValue == null || curSValue.compareTo(sValue) > 0) {
                                 sValue = curSValue;
+                            }
+                        } else if (curJValue != null) {
+                            if (jValue == null || curJValue.toString().compareTo(jValue.toString()) > 0) {
+                                jValue = curJValue;
                             }
                         }
                     }
@@ -154,8 +174,10 @@ public class AggregatePartitionsFunction implements com.google.common.base.Funct
                     return Optional.of(new BasicTsKvEntry(ts, new LongDataEntry(key, lValue)));
                 } else if (dataType == DataType.STRING) {
                     return Optional.of(new BasicTsKvEntry(ts, new StringDataEntry(key, sValue)));
-                } else {
+                } else if (dataType == DataType.BOOLEAN) {
                     return Optional.of(new BasicTsKvEntry(ts, new BooleanDataEntry(key, bValue)));
+                } else if (dataType == DataType.JSON) {
+                    return Optional.of(new BasicTsKvEntry(ts, new JsonDataEntry(key, jValue)));
                 }
             }
             log.trace("[{}][{}][{}] Aggregated data is empty.", key, ts, aggregation);
@@ -169,6 +191,20 @@ public class AggregatePartitionsFunction implements com.google.common.base.Funct
     private Boolean getBooleanValue(Row row) {
         if (aggregation == Aggregation.MIN || aggregation == Aggregation.MAX) {
             return row.getBool(BOOL_POS);
+        } else {
+            return null;
+        }
+    }
+
+    private JsonNode getJsonValue(Row row) {
+        if (aggregation == Aggregation.MIN || aggregation == Aggregation.MAX) {
+            ObjectMapper mapper = new ObjectMapper();
+            try {
+                return mapper.readTree(row.getString(JSON_POS));
+            } catch (IOException ex) {
+                ex.printStackTrace();
+                return null;
+            }
         } else {
             return null;
         }
