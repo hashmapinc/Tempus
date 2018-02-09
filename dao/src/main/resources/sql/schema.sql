@@ -291,3 +291,8 @@ CREATE TABLE IF NOT EXISTS application_associated_rules(
     application_id varchar(31),
     application_rule_id varchar(31)
 );
+
+CREATE TABLE IF NOT EXISTS application_associated_computation_jobs(
+    application_id varchar(31),
+    application_computation_job_id varchar(31)
+);

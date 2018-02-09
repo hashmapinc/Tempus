@@ -53,7 +53,6 @@ public class ThingsboardSchemaCreationService {
     public void performInstall() {
         try {
         log.info("Starting ThingsBoard Installation...");
-            System.out.println("Jetinder starting schema creation");
 
         if (this.dataDir == null) {
             throw new RuntimeException("'install.data_dir' property should specified!");

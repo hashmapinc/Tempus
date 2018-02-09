@@ -189,6 +189,43 @@ public class ApplicationServiceImpl extends AbstractEntityService implements App
         return saveApplication(application);
     }
 
+    @Override
+    public Application assignComputationJobsToApplication(ApplicationId applicationId, Set<ComputationJobId> computationJobIds) {
+        Application application = findApplicationById(applicationId);
+        if(application.getComputationJobIdSet().contains(new ComputationJobId(NULL_UUID))) {
+            application.getComputationJobIdSet().remove(new ComputationJobId(NULL_UUID));
+        }
+        application.addComputationJobs(computationJobIds);
+        return saveApplication(application);
+    }
+
+    @Override
+    public Application unassignComputationJobsToApplication(ApplicationId applicationId, Set<ComputationJobId> computationJobIds) {
+        Application application = findApplicationById(applicationId);
+        application.getComputationJobIdSet().removeAll(computationJobIds);
+        return saveApplication(application);
+    }
+
+    @Override
+    public List<String> findApplicationByComputationJobId(TenantId tenantId, ComputationJobId computationJobId) {
+        log.trace("Executing findApplicationByComputationJobId,  tenantId [{}], computationJobId [{}]", tenantId, computationJobId);
+        validateId(tenantId, "Incorrect tenantId " + tenantId);
+        validateId(computationJobId, "Incorrect computationJobId " + computationJobId);
+        return applicationDao.findApplicationByComputationJobId(tenantId.getId(), computationJobId.getId()).stream().map(Application::getName).collect(Collectors.toList());
+    }
+
+    @Override
+    public void updateApplicationOnComputationJobDelete(ComputationJobId computationJobId, TenantId tenantId) {
+        log.trace("Executing updateApplicationOnComputationJobDelete,  tenantId [{}], computationJobId [{}]", tenantId, computationJobId);
+        List<Application> applications = applicationDao.findApplicationByComputationJobId(tenantId.getId(), computationJobId.getId());
+        if(!applications.isEmpty()) {
+            for(Application a: applications) {
+                a.setIsValid(Boolean.FALSE);
+                saveApplication(a);
+            }
+        }
+    }
+
     private Set<String> getDeviceTypesfromFiltersJson(JsonNode filters){
         Set<String> deviceTypes = new HashSet<>();
         Iterator<JsonNode> configurations = filters.elements();
@@ -293,6 +330,17 @@ public class ApplicationServiceImpl extends AbstractEntityService implements App
                             if(ruleMetaData == null) {
                                 isValid = false;
                             }
+                        }
+                    }
+
+                    if(application.getComputationJobIdSet() == null || application.getComputationJobIdSet().isEmpty()) {
+                        application.setComputationJobIdSet(new HashSet<>(Arrays.asList(new ComputationJobId(NULL_UUID))));
+                    } else if(application.getComputationJobIdSet().size() > 1 || !Iterables.getOnlyElement(application.getComputationJobIdSet()).getId().equals(NULL_UUID)) {
+                        for(ComputationJobId computationJobId: application.getComputationJobIdSet()) {
+                            //TODO: call the computation dao to see if the computation exists
+                            /*if(computationJob == null) {
+                                isValid = false;
+                            }*/
                         }
                     }
 
