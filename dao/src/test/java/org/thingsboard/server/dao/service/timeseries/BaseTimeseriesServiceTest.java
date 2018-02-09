@@ -16,6 +16,7 @@
 package org.thingsboard.server.dao.service.timeseries;
 
 import com.datastax.driver.core.utils.UUIDs;
+import com.google.gson.JsonParser;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Assert;
 import org.junit.Test;
@@ -43,13 +44,16 @@ public abstract class BaseTimeseriesServiceTest extends AbstractServiceTest {
     private static final String LONG_KEY = "longKey";
     private static final String DOUBLE_KEY = "doubleKey";
     private static final String BOOLEAN_KEY = "booleanKey";
+    private static final String JSON_KEY = "jsonKey";
 
     private static final long TS = 42L;
 
+    JsonParser parser = new JsonParser();
     KvEntry stringKvEntry = new StringDataEntry(STRING_KEY, "value");
     KvEntry longKvEntry = new LongDataEntry(LONG_KEY, Long.MAX_VALUE);
     KvEntry doubleKvEntry = new DoubleDataEntry(DOUBLE_KEY, Double.MAX_VALUE);
     KvEntry booleanKvEntry = new BooleanDataEntry(BOOLEAN_KEY, Boolean.TRUE);
+    KvEntry jsonKvEntry = new JsonDataEntry(JSON_KEY, parser.parse("{\"tag\": \"value\"}").getAsJsonObject());
 
     @Test
     public void testFindAllLatest() throws Exception {
@@ -62,7 +66,7 @@ public abstract class BaseTimeseriesServiceTest extends AbstractServiceTest {
         List<TsKvEntry> tsList = tsService.findAllLatest(deviceId).get();
 
         assertNotNull(tsList);
-        assertEquals(4, tsList.size());
+        assertEquals(5, tsList.size());
         for (int i = 0; i < tsList.size(); i++) {
             assertEquals(TS, tsList.get(i).getTs());
         }
@@ -73,7 +77,8 @@ public abstract class BaseTimeseriesServiceTest extends AbstractServiceTest {
                 toTsEntry(TS, stringKvEntry),
                 toTsEntry(TS, longKvEntry),
                 toTsEntry(TS, doubleKvEntry),
-                toTsEntry(TS, booleanKvEntry));
+                toTsEntry(TS, booleanKvEntry),
+                toTsEntry(TS, jsonKvEntry));
         Collections.sort(expected, (o1, o2) -> o1.getKey().compareTo(o2.getKey()));
 
         assertEquals(expected, tsList);
@@ -194,6 +199,7 @@ public abstract class BaseTimeseriesServiceTest extends AbstractServiceTest {
         tsService.save(deviceId, toTsEntry(ts, longKvEntry)).get();
         tsService.save(deviceId, toTsEntry(ts, doubleKvEntry)).get();
         tsService.save(deviceId, toTsEntry(ts, booleanKvEntry)).get();
+        tsService.save(deviceId, toTsEntry(ts, jsonKvEntry)).get();
     }
 
     private static TsKvEntry toTsEntry(long ts, KvEntry entry) {

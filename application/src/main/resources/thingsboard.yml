@@ -241,7 +241,7 @@ spring.mvc.cors:
 # UI Related Configuration
 configurations:
   ui:
-    depthSeries: "false"
+    depthSeries: "true"
 
 # HSQLDB DAO Configuration
 spring:

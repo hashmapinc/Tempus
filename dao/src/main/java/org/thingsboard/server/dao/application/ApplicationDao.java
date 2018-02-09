@@ -65,6 +65,15 @@ public interface ApplicationDao extends Dao<Application>{
      */
     List<Application> findApplicationByRuleId(UUID tenantId, UUID ruleId);
 
+    /**
+     * Find application by tenantId and computationJobId.
+     *
+     * @param tenantId the tenantId
+     * @param computationJobId the computationJobId
+     * @return the list of applications
+     */
+    List<Application> findApplicationByComputationJobId(UUID tenantId, UUID computationJobId);
+
 
     /**
      * Find application by tenantId and dashboardId.

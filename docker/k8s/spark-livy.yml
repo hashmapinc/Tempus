@@ -1,0 +1,94 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: spark-master
+  labels:
+    app: spark-master
+spec:
+  selector:
+    app: spark-master
+  ports:
+    - protocol: TCP
+      port: 4040
+      targetPort: 4040
+    - protocol: TCP
+      port: 6066
+      targetPort: 6066
+    - protocol: TCP
+      port: 7077
+      targetPort: 7077
+    - protocol: TCP
+      port: 8181
+      targetPort: 8080
+    - protocol: TCP
+      port: 8998
+      targetPort: 8998
+---
+apiVersion: "apps/v1beta1"
+kind: StatefulSet
+metadata:
+  name: spark-master
+spec:
+  selector:
+    matchLabels:
+      app: spark-master
+  serviceName: spark-master
+  replicas: 1
+  updateStrategy:
+    type: RollingUpdate
+  podManagementPolicy: Parallel
+  template:
+    metadata:
+      labels:
+        app: spark-livy
+    spec:
+      containers:
+      - name: spark-master
+        image: hashmapinc/spark-livy:1.0
+        ports:
+        - containerPort: 4040
+        - containerPort: 6066
+        - containerPort: 7077
+        - containerPort: 8080
+        - containerPort: 8998
+        env:
+        - name: MASTER
+          value: spark://spark-master:7077
+        - name: SPARK_CONF_DIR
+          value: /conf
+        - name: SPARK_PUBLIC_DNS
+          value: 127.0.0.1
+        - name: SPARK_WORKER_WEBUI_PORT
+          value: "8181"
+        volumeMounts:
+        - mountPath: /conf
+          name: spark-confdir
+        - mountPath: /tmp/data
+          name: spark-datadir
+        - mountPath: /usr/livy-server/upload
+          name: spark-jardir
+  volumeClaimTemplates:
+  - metadata:
+      name: spark-confdir
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: 1Gi
+      storageClassName: ebs-gp2
+  - metadata:
+      name: spark-datadir
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: 1Gi
+      storageClassName: ebs-gp2
+  - metadata:
+      name: spark-jardir
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: 1Gi
+      storageClassName: ebs-gp2

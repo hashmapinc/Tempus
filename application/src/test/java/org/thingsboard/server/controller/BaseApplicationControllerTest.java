@@ -22,6 +22,7 @@ import org.apache.commons.lang.RandomStringUtils;
 import org.json.JSONObject;
 import org.junit.*;
 import org.thingsboard.server.common.data.*;
+import org.thingsboard.server.common.data.id.ComputationJobId;
 import org.thingsboard.server.common.data.id.RuleId;
 import org.thingsboard.server.common.data.page.TextPageData;
 import org.thingsboard.server.common.data.page.TextPageLink;
@@ -606,6 +607,37 @@ public class BaseApplicationControllerTest extends AbstractControllerTest {
 
         List<String> foundApplications3 = doGetTyped("/api/applications/rule/"+savedRule3.getId().getId().toString() , new TypeReference<List<String>>(){});
         Assert.assertEquals(0, foundApplications3.size());
+    }
+
+    @Test
+    public void testUnAssignUnAssignComputationJobsToApplication() throws Exception{
+        Application application = new Application();
+        application.setName("My application");
+        Application savedApplication = doPost("/api/application", application, Application.class);
+
+        Assert.assertEquals(new HashSet<>(Arrays.asList(new ComputationJobId(NULL_UUID))), savedApplication.getComputationJobIdSet());
+
+
+        ComputationJobId computationJobId1 = new ComputationJobId(UUIDConverter.fromString("1e80658f63c8450841b7f44ce019219"));
+        ComputationJobId computationJobId2 = new ComputationJobId(UUIDConverter.fromString("1e80658f7e24510841b7f44ce019219"));
+
+        ApplicationComputationJosWrapper applicationComputationJosWrapper = new ApplicationComputationJosWrapper();
+        applicationComputationJosWrapper.setApplicationId(savedApplication.getId().getId().toString());
+        applicationComputationJosWrapper.setComputationJobs(new HashSet<>(Arrays.asList(computationJobId1.getId().toString(), computationJobId2.getId().toString())));
+
+        Application assignedApplication = doPostWithDifferentResponse("/api/app/assignComputationJobs", applicationComputationJosWrapper, Application.class);
+
+        Application foundAssignedApplication = doGet("/api/application/" + savedApplication.getId().getId().toString(), Application.class);
+        Assert.assertEquals(new HashSet<>(Arrays.asList(computationJobId1, computationJobId2)), foundAssignedApplication.getComputationJobIdSet());
+
+
+        ApplicationComputationJosWrapper applicationComputationJosWrapper1 = new ApplicationComputationJosWrapper();
+        applicationComputationJosWrapper1.setApplicationId(savedApplication.getId().getId().toString());
+        applicationComputationJosWrapper1.setComputationJobs(new HashSet<>(Arrays.asList(computationJobId2.getId().toString())));
+        Application unAssignedApplication = doPostWithDifferentResponse("/api/app/unassignComputationJobs", applicationComputationJosWrapper1, Application.class);
+
+        Application foundUnApplication = doGet("/api/application/" + savedApplication.getId().getId().toString(), Application.class);
+        Assert.assertEquals(new HashSet<>(Arrays.asList(computationJobId1)), foundUnApplication.getComputationJobIdSet());
     }
 
 

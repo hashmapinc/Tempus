@@ -1,0 +1,168 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: openldap
+  labels:
+    app: openldap
+spec:
+  selector:
+    app: openldap
+  ports:
+    - protocol: TCP
+      port: 389
+      targetPort: 389
+    - protocol: TCP
+      port: 636
+      targetPort: 636
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: phpldapadmin
+  labels:
+    app: phpldapadmin
+spec:
+  selector:
+    app: phpldapadmin
+  ports:
+    - protocol: TCP
+      port: 9080
+      targetPort: 80
+---
+apiVersion: "apps/v1beta1"
+kind: StatefulSet
+metadata:
+  name: openldap
+spec:
+  selector:
+    matchLabels:
+      app: openldap
+  serviceName: openldap
+  replicas: 1
+  updateStrategy:
+    type: RollingUpdate
+  podManagementPolicy: Parallel
+  template:
+    metadata:
+      labels:
+        app: openldap
+    spec:
+      containers:
+      - name: openldap
+        image: osixia/openldap:1.1.9
+        ports:
+        - containerPort: 389
+        - containerPort: 636
+        stdin: true
+        tty: true
+        env:
+        - name: KEEP_EXISTING_CONFIG
+          value: "false"
+        - name: LDAP_ADMIN_PASSWORD
+          value: admin
+        - name: LDAP_BACKEND
+          value: hdb
+        - name: LDAP_BASE_DN
+          value: ""
+        - name: LDAP_CONFIG_PASSWORD
+          value: config
+        - name: LDAP_DOMAIN
+          value: example.org
+        - name: LDAP_LOG_LEVEL
+          value: "256"
+        - name: LDAP_ORGANISATION
+          value: Example Inc.
+        - name: LDAP_READONLY_USER
+          value: "false"
+        - name: LDAP_REMOVE_CONFIG_AFTER_SETUP
+          value: "true"
+        - name: LDAP_REPLICATION
+          value: "false"
+        - name: LDAP_RFC2307BIS_SCHEMA
+          value: "false"
+        - name: LDAP_SSL_HELPER_PREFIX
+          value: ldap
+        - name: LDAP_TLS
+          value: "true"
+        - name: LDAP_TLS_CA_CRT_FILENAME
+          value: ca.crt
+        - name: LDAP_TLS_CIPHER_SUITE
+          value: SECURE256:-VERS-SSL3.0
+        - name: LDAP_TLS_CRT_FILENAME
+          value: ldap.crt
+        - name: LDAP_TLS_ENFORCE
+          value: "false"
+        - name: LDAP_TLS_KEY_FILENAME
+          value: ldap.key
+        - name: LDAP_TLS_PROTOCOL_MIN
+          value: "3.1"
+        - name: LDAP_TLS_VERIFY_CLIENT
+          value: demand
+#        - name: LDAP_READONLY_USER_USERNAME
+#          value: "readonly"
+#        - name: LDAP_READONLY_USER_PASSWORD
+#          value: "readonly"
+#        - name: LDAP_REPLICATION_CONFIG_SYNCPROV
+#          value: "binddn="cn=admin,cn=config" bindmethod=simple credentials=$LDAP_CONFIG_PASSWORD searchbase="cn=config" type=refreshAndPersist retry="60 +" timeout=1 starttls=critical"
+#        - name: LDAP_REPLICATION_DB_SYNCPROV
+#          value: "binddn="cn=admin,$LDAP_BASE_DN" bindmethod=simple credentials=$LDAP_ADMIN_PASSWORD searchbase="$LDAP_BASE_DN" type=refreshAndPersist interval=00:00:00:10 retry="60 +" timeout=1 starttls=critical"
+#        - name: LDAP_REPLICATION_HOSTS
+#          value: "#PYTHON2BASH:['ldap://ldap.example.org','ldap://ldap2.example.org']"
+        volumeMounts:
+        - mountPath: /var/lib/ldap
+          name: ldap-dir
+        - mountPath: /etc/ldap/slapd.d
+          name: sldap-dir
+        - mountPath: /container/service/slapd/assets/certs
+          name: ldap-cert-dir
+  volumeClaimTemplates:
+  - metadata:
+      name: ldap-dir
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: 1Gi
+      storageClassName: ebs-gp2
+  - metadata:
+      name: sldap-dir
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: 1Gi
+      storageClassName: ebs-gp2
+  - metadata:
+      name: ldap-cert-dir
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: 1Gi
+      storageClassName: ebs-gp2
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: phpldapadmin
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: phpldapadmin
+  template:
+    metadata:
+      labels:
+        app: phpldapadmin
+        name: phpldapadmin
+    spec:
+      containers:
+      - env:
+        - name: PHPLDAPADMIN_HTTPS
+          value: "false"
+        - name: PHPLDAPADMIN_LDAP_HOSTS
+          value: openldap
+        image: osixia/phpldapadmin:latest
+        name: phpldapadmin
+        ports:
+        - containerPort: 80

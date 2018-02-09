@@ -43,6 +43,7 @@ import org.thingsboard.server.dao.asset.AssetService;
 import org.thingsboard.server.dao.component.ComponentDescriptorService;
 import org.thingsboard.server.dao.customer.CustomerService;
 import org.thingsboard.server.dao.dashboard.DashboardService;
+import org.thingsboard.server.dao.depthSeries.DepthSeriesService;
 import org.thingsboard.server.dao.device.DeviceCredentialsService;
 import org.thingsboard.server.dao.device.DeviceService;
 import org.thingsboard.server.dao.event.EventService;
@@ -103,6 +104,9 @@ public abstract class AbstractServiceTest {
 
     @Autowired
     protected TimeseriesService tsService;
+
+    @Autowired
+    protected DepthSeriesService dsService;
 
     @Autowired
     protected PluginService pluginService;

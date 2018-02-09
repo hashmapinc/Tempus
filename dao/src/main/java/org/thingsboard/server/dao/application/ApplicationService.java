@@ -51,6 +51,14 @@ public interface ApplicationService {
 
     Application unassignRulesToApplication(ApplicationId applicationId, Set<RuleId> ruleIdList);
 
+    Application assignComputationJobsToApplication(ApplicationId applicationId, Set<ComputationJobId> computationJobIds);
+
+    Application unassignComputationJobsToApplication(ApplicationId applicationId, Set<ComputationJobId> computationJobIds);
+
+    List<String> findApplicationByComputationJobId(TenantId tenantId, ComputationJobId computationJobId);
+
+    void updateApplicationOnComputationJobDelete(ComputationJobId computationJobId, TenantId tenantId);
+
     void updateApplicationOnRuleDelete(RuleId ruleId, TenantId tenantId);
 
     void updateApplicationOnDashboardDelete(DashboardId dashboardIdId, TenantId tenantId);
