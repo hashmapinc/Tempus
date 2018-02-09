@@ -27,31 +27,28 @@ export default function ComputationJobDirective($compile, $templateCache, $log, 
         var template = $templateCache.get(computationJobFieldsetTemplate);
         element.html(template);
 
-        //$log.error("HMDC scope.computationJob " + scope.computationJob.id.id);
-
-        //scope.computationJob = null;
-        
-        scope.$watch('computationJob.name', function(newValue, oldValue) {
-            $log.log("newValue, oldValue" + newValue + ":" + oldValue);
-        });
-
-        scope.$watch('computationJob', function(newValue, oldValue) {
-            $log.log("newValue, oldValue" + newValue + ":" + oldValue);
-            scope.computationJob = newValue;
-        });
-
-        $log.log("scope computation : " + scope.computation);
-
         scope.showComputationJobConfig = false;
 
         scope.computationJobConfiguration = {
             data: null
         };
 
-        if(scope.computation){
+        if (scope.computation) {
             scope.showComputationJobConfig = true;
             scope.computationDescriptor = scope.computation.jsonDescriptor;
         } 
+ 
+        scope.$watch('computationJob.name', function(newValue, oldValue) {
+            $log.log("newValue, oldValue" + newValue + ":" + oldValue);
+        });
+
+        scope.$watch('computationJob', function(newValue, oldValue) {
+            if (newValue && !angular.equals(newValue, oldValue)) {
+                scope.pluginConfiguration.data = null;
+                scope.computationJob = newValue;
+                scope.computationJobConfiguration.data = newValue.argParameters;
+            }
+        });
 
         scope.$watch('computation', function(newValue, oldValue) {
             if(newValue && !angular.equals(newValue, oldValue)){
@@ -61,13 +58,13 @@ export default function ComputationJobDirective($compile, $templateCache, $log, 
         }, true);
 
 
-        if (scope.computationJob && !scope.computationJob.configuration) {
+        if (scope.computationJob && !scope.computationJob.argParameters) {
             scope.computationJob.configuration = {};
         }
 
         scope.$watch("computationJobConfiguration.data", function (newValue, prevValue) {
             if (newValue && !angular.equals(newValue, prevValue)) {
-                scope.computationJob.configuration = angular.copy(scope.computationJobConfiguration.data);
+                scope.computationJob.argParameters = angular.copy(scope.computationJobConfiguration.data);
             }
         }, true);
 
