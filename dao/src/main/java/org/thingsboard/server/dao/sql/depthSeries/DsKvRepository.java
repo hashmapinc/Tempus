@@ -64,7 +64,7 @@ public interface DsKvRepository extends CrudRepository<DsKvEntity, DsKvComposite
                                           @Param("endDs") Double endDs);
 
     @Async
-    @Query("SELECT new DsKvEntity(COUNT(dskv.booleanValue), COUNT(dskv.strValue), COUNT(dskv.longValue), COUNT(dskv.doubleValue)) FROM DsKvEntity dskv " +
+    @Query("SELECT new DsKvEntity(COUNT(dskv.booleanValue), COUNT(dskv.strValue), COUNT(dskv.longValue), COUNT(dskv.doubleValue), COUNT(dskv.jsonValue)) FROM DsKvEntity dskv " +
             "WHERE dskv.entityId = :entityId AND dskv.entityType = :entityType " +
             "AND dskv.key = :entityKey AND dskv.ds > :startDs AND dskv.ds < :endDs")
     CompletableFuture<DsKvEntity> findCount(@Param("entityId") String entityId,

@@ -56,6 +56,7 @@ CREATE TABLE IF NOT EXISTS attribute_kv (
   str_v varchar(10000000),
   long_v bigint,
   dbl_v double precision,
+  json_v varchar,
   last_update_ts bigint,
   CONSTRAINT attribute_kv_unq_key UNIQUE (entity_type, entity_id, attribute_type, attribute_key)
 );
@@ -200,6 +201,7 @@ CREATE TABLE IF NOT EXISTS ts_kv (
     str_v varchar(10000000),
     long_v bigint,
     dbl_v double precision,
+    json_v varchar,
     CONSTRAINT ts_kv_unq_key UNIQUE (entity_type, entity_id, key, ts)
 );
 
@@ -212,6 +214,7 @@ CREATE TABLE IF NOT EXISTS ts_kv_latest (
     str_v varchar,
     long_v bigint,
     dbl_v double precision,
+    json_v varchar,
     CONSTRAINT ts_kv_latest_unq_key UNIQUE (entity_type, entity_id, key)
 );
 
@@ -224,6 +227,7 @@ CREATE TABLE IF NOT EXISTS ds_kv (
     str_v varchar(10000000),
     long_v bigint,
     dbl_v double precision,
+    json_v varchar,
     CONSTRAINT ds_kv_unq_key UNIQUE (entity_type, entity_id, key, ds)
 );
 
@@ -236,6 +240,7 @@ CREATE TABLE IF NOT EXISTS ds_kv_latest (
     str_v varchar,
     long_v bigint,
     dbl_v double precision,
+    json_v varchar,
     CONSTRAINT ds_kv_latest_unq_key UNIQUE (entity_type, entity_id, key)
 );
 

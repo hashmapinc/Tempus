@@ -15,6 +15,9 @@
  */
 package org.thingsboard.server.extensions.core.plugin.telemetry.handlers;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.google.protobuf.InvalidProtocolBufferException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -29,6 +32,7 @@ import org.thingsboard.server.extensions.core.plugin.telemetry.SubscriptionManag
 import org.thingsboard.server.extensions.core.plugin.telemetry.gen.TelemetryPluginProtos.*;
 import org.thingsboard.server.extensions.core.plugin.telemetry.sub.*;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -255,6 +259,9 @@ public class TelemetryRpcMsgHandler implements RpcMsgHandler {
             case STRING:
                 dataBuilder.setStrValue(attr.getStrValue().get());
                 break;
+            case JSON:
+                dataBuilder.setStrValue(attr.getJsonValue().get().toString());
+                break;
         }
         return dataBuilder;
     }
@@ -283,6 +290,13 @@ public class TelemetryRpcMsgHandler implements RpcMsgHandler {
             case STRING:
                 entry = new StringDataEntry(proto.getKey(), proto.getStrValue());
                 break;
+            case JSON:
+                ObjectMapper mapper = new ObjectMapper();
+                try {
+                    entry = new JsonDataEntry(proto.getKey(), mapper.readTree(proto.getStrValue()));
+                } catch (IOException ex) {
+                    log.error(ex.getMessage());
+                }
         }
         return entry;
     }

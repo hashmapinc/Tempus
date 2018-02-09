@@ -124,6 +124,11 @@ public class CassandraBaseAttributesDao extends CassandraAbstractAsyncDao implem
         } else {
             stmt.setToNull(8);
         }
+        if (attribute.getJsonValue().isPresent()) {
+            stmt.setString(9, attribute.getJsonValue().get().toString());
+        } else {
+            stmt.setToNull(9);
+        }
         log.trace("Generated save stmt [{}] for entityId {} and attributeType {} and attribute", stmt, entityId, attributeType, attribute);
         return getFuture(executeAsyncWrite(stmt), rs -> null);
     }
@@ -159,8 +164,9 @@ public class CassandraBaseAttributesDao extends CassandraAbstractAsyncDao implem
                     "," + ModelConstants.BOOLEAN_VALUE_COLUMN +
                     "," + ModelConstants.LONG_VALUE_COLUMN +
                     "," + ModelConstants.DOUBLE_VALUE_COLUMN +
+                    "," + ModelConstants.JSON_VALUE_COLUMN +
                     ")" +
-                    " VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)");
+                    " VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
         }
         return saveStmt;
     }

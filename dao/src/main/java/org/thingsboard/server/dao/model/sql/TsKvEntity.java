@@ -15,10 +15,14 @@
  */
 package org.thingsboard.server.dao.model.sql;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import lombok.Data;
+import org.hibernate.annotations.Type;
+import org.hibernate.annotations.TypeDef;
 import org.thingsboard.server.common.data.EntityType;
 import org.thingsboard.server.common.data.kv.*;
 import org.thingsboard.server.dao.model.ToData;
+import org.thingsboard.server.dao.util.mapping.JsonStringType;
 
 import javax.persistence.*;
 
@@ -26,6 +30,7 @@ import static org.thingsboard.server.dao.model.ModelConstants.*;
 
 @Data
 @Entity
+@TypeDef(name = "json", typeClass = JsonStringType.class)
 @Table(name = "ts_kv")
 @IdClass(TsKvCompositeKey.class)
 public final class TsKvEntity implements ToData<TsKvEntry> {
@@ -51,7 +56,7 @@ public final class TsKvEntity implements ToData<TsKvEntry> {
         this.doubleValue = doubleValue;
     }
 
-    public TsKvEntity(Long booleanValueCount, Long strValueCount, Long longValueCount, Long doubleValueCount) {
+    public TsKvEntity(Long booleanValueCount, Long strValueCount, Long longValueCount, Long doubleValueCount, Long jsonValueCount) {
         if (booleanValueCount != 0) {
             this.longValue = booleanValueCount;
         } else if (strValueCount != 0) {
@@ -60,6 +65,8 @@ public final class TsKvEntity implements ToData<TsKvEntry> {
             this.longValue = longValueCount;
         } else if (doubleValueCount != 0) {
             this.longValue = doubleValueCount;
+        } else if (jsonValueCount != 0) {
+            this.longValue = jsonValueCount;
         }
     }
 
@@ -92,6 +99,10 @@ public final class TsKvEntity implements ToData<TsKvEntry> {
     @Column(name = DOUBLE_VALUE_COLUMN)
     private Double doubleValue;
 
+    @Type(type = "json")
+    @Column(name = JSON_VALUE_COLUMN)
+    private JsonNode jsonValue;
+
     @Override
     public TsKvEntry toData() {
         KvEntry kvEntry = null;
@@ -103,11 +114,13 @@ public final class TsKvEntity implements ToData<TsKvEntry> {
             kvEntry = new DoubleDataEntry(key, doubleValue);
         } else if (booleanValue != null) {
             kvEntry = new BooleanDataEntry(key, booleanValue);
+        } else if (jsonValue != null) {
+            kvEntry = new JsonDataEntry(key, jsonValue);
         }
         return new BasicTsKvEntry(ts, kvEntry);
     }
 
     public boolean isNotEmpty() {
-        return strValue != null || longValue != null || doubleValue != null || booleanValue != null;
+        return strValue != null || longValue != null || doubleValue != null || booleanValue != null | jsonValue != null;
     }
 }

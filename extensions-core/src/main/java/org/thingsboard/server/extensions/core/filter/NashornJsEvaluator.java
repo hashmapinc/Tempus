@@ -92,6 +92,8 @@ public class NashornJsEvaluator {
                 return attr.getDoubleValue().get();
             case BOOLEAN:
                 return attr.getBooleanValue().get();
+            case JSON:
+                return attr.getJsonValue().get();
         }
         return null;
     }
