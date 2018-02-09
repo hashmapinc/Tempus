@@ -36,7 +36,7 @@ public class ComputationJobController extends BaseController{
         try {
             boolean created = source.getId() == null;
             source.setTenantId(getCurrentUser().getTenantId());
-            source.setComputationId(new ComputationId(toUUID(strComputationId.trim())));
+            source.setComputationId(new ComputationId(toUUID(strComputationId)));
             ComputationJob computationJob = checkNotNull(computationJobService.saveComputationJob(source));
             actorService.onComputationJobStateChange(computationJob.getTenantId(), computationJob.getComputationId(),
                     computationJob.getId(), created ? ComponentLifecycleEvent.CREATED : ComponentLifecycleEvent.UPDATED);

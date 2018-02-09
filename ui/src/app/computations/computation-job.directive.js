@@ -38,15 +38,15 @@ export default function ComputationJobDirective($compile, $templateCache, $log, 
             scope.computationDescriptor = scope.computation.jsonDescriptor;
         } 
  
-        scope.$watch('computationJob.name', function(newValue, oldValue) {
+        scope.$watch('computationjob.name', function(newValue, oldValue) {
             $log.log("newValue, oldValue" + newValue + ":" + oldValue);
         });
 
-        scope.$watch('computationJob', function(newValue, oldValue) {
+        scope.$watch('computationjob', function(newValue, oldValue) {
             if (newValue && !angular.equals(newValue, oldValue)) {
-                scope.pluginConfiguration.data = null;
-                scope.computationJob = newValue;
-                scope.computationJobConfiguration.data = newValue.argParameters;
+                scope.computationJobConfiguration.data = null;
+                scope.computationjob = newValue;
+                scope.computationJobConfiguration.data = angular.copy(newValue.argParameters);
             }
         });
 
@@ -58,13 +58,13 @@ export default function ComputationJobDirective($compile, $templateCache, $log, 
         }, true);
 
 
-        if (scope.computationJob && !scope.computationJob.argParameters) {
-            scope.computationJob.configuration = {};
+        if (scope.computationjob && !scope.computationjob.argParameters) {
+            scope.computationjob.argParameters = {};
         }
 
         scope.$watch("computationJobConfiguration.data", function (newValue, prevValue) {
             if (newValue && !angular.equals(newValue, prevValue)) {
-                scope.computationJob.argParameters = angular.copy(scope.computationJobConfiguration.data);
+                scope.computationjob.argParameters = angular.copy(scope.computationJobConfiguration.data);
             }
         }, true);
 

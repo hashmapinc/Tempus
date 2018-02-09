@@ -163,8 +163,8 @@ export function ComputationJobController(computationJobService, $log, userServic
         return computationJobService.getAllComputationJobs(pageLink);
     }
 
-    function saveComputationJob(computationJob) {
-        return computationJobService.saveComputationJob(computationJob);
+    function saveComputationJob(computationJob, computationId) {
+        return computationJobService.saveComputationJob(computationJob, computationId);
     }
 
     function deleteComputationJob(computationJobId) {
@@ -242,7 +242,7 @@ export function AddComputationJobController(computationService, $stateParams, $l
     }
 
     function add() {
-        saveItemFunction(vm.item).then(function success(item) {
+        saveItemFunction(vm.item, vm.computation.id.id).then(function success(item) {
             vm.item = item;
             $scope.theForm.$setPristine();
             $mdDialog.hide();
