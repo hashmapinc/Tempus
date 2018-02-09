@@ -39,33 +39,33 @@
     <fieldset ng-disabled="loading || !isEdit || isReadOnly">
         <md-input-container class="md-block">
             <label translate>computationJob.name</label>
-            <input required name="name" ng-model="computationJob.name">
+            <input required name="name" ng-model="computationjob.name">
             <div ng-messages="theForm.name.$error">
                 <div translate ng-message="required">computationJob.name-required</div>
             </div>
         </md-input-container>
         <md-input-container class="md-block">
             <label translate>computationJob.description</label>
-            <textarea ng-model="computationJob.additionalInfo.description" rows="2"></textarea>
+            <textarea ng-model="computationjob.additionalInfo.description" rows="2"></textarea>
         </md-input-container>
         <section flex layout="row">
             <md-input-container flex class="md-block">
                 <label translate>computationJob.api-token</label>
-                <input required name="apiToken" ng-model="computationJob.apiToken">
+                <input required name="apiToken" ng-model="computationjob.apiToken">
                 <div ng-messages="theForm.apiToken.$error">
                     <div translate ng-message="required">computationJob.api-token-required</div>
                 </div>
             </md-input-container>
         </section>
-        <md-card flex class="computationJob-config" ng-if="showComputationJobConfig">
+        <md-card flex class="plugin-config" ng-if="showComputationJobConfig">
             <md-card-title>
                 <md-card-title-text>
                     <span translate class="md-headline" ng-class="{'tb-readonly-label' : (loading || !isEdit || isReadOnly)}">computationJob.configuration</span>
                 </md-card-title-text>
             </md-card-title>
             <md-card-content>
-                <tb-json-form schema="computationJobComponent.configurationDescriptor.schema"
-                              form="computationJobComponent.configurationDescriptor.form"
+                <tb-json-form schema="computationDescriptor.schema"
+                              form="computationDescriptor.form"
                               model="computationJobConfiguration.data"
                               readonly="loading || !isEdit || isReadOnly"
                               form-control="theForm">

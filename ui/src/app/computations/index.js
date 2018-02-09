@@ -20,7 +20,7 @@ import thingsboardApiComputation from '../api/computation.service';
 import thingsboardApiComputationJob from '../api/computation-job.service';
 import ComputationController from './computation.controller';
 //import ComputationTestController from './computationsTest.controller';
-import ComputationJobController from './computation-job.controller';
+import {ComputationJobController, AddComputationJobController} from './computation-job.controller';
 //import ComputationUploadDirective from './computation-upload.directive';
 import ComputationDirective from './computation.directive';
 import ComputationJobDirective from './computation-job.directive';
@@ -36,6 +36,7 @@ export default angular.module('thingsboard.computation', [
     .controller('ComputationController', ComputationController)
     //.controller('ComputationTestController', ComputationTestController)
     .controller('ComputationJobController', ComputationJobController)
+    .controller('AddComputationJobController', AddComputationJobController)
     //.directive('fileModel', ComputationUploadDirective)
     .directive('tbComputation',ComputationDirective)
     .directive('tbComputationJob',ComputationJobDirective)

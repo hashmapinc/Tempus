@@ -16,10 +16,13 @@
 
 -->
 <tb-grid grid-configuration="vm.computationJobGridConfig">
+    <details-buttons tb-help="vm.helpLinkIdForPlugin()" help-container-id="help-container">
+        <div id="help-container"></div>
+    </details-buttons>
     <md-tabs ng-class="{'tb-headless': (vm.grid.detailsConfig.isDetailsEditMode || !vm.isComputationJobEditable(vm.grid.operatingItem()))}"
              id="tabs" md-border-bottom flex class="tb-absolute-fill">
         <md-tab label="{{ 'computationJob.details' | translate }}">
-            <tb-computation-job computationJob="vm.grid.operatingItem()"
+            <tb-computation-job computationjob="vm.grid.operatingItem()"
                  is-edit="vm.grid.detailsConfig.isDetailsEditMode"
                  is-read-only="vm.grid.isDetailsReadOnly(vm.grid.operatingItem())"
                  the-form="vm.grid.detailsForm"
@@ -27,12 +30,12 @@
                  on-suspend-computationJob="vm.suspendComputationJob(event, vm.grid.detailsConfig.currentItem)"
                  on-delete-computationJob="vm.grid.deleteItem(event, vm.grid.detailsConfig.currentItem)"></tb-computation-job>
         </md-tab>
-        <md-tab ng-if="!vm.grid.detailsConfig.isDetailsEditMode && vm.isComputationJobEditable(vm.grid.operatingItem())" md-on-select="vm.grid.triggerResize()" label="{{ 'computationJob.events' | translate }}">
-            <tb-event-table flex entity-type="vm.types.entityType.computationJob"
+        <!--<md-tab ng-if="!vm.grid.detailsConfig.isDetailsEditMode && vm.isComputationJobEditable(vm.grid.operatingItem())" md-on-select="vm.grid.triggerResize()" label="{{ 'computationJob.events' | translate }}">
+            <tb-event-table flex entity-type="vm.types.entityType.plugin"
                             entity-id="vm.grid.operatingItem().id.id"
                             tenant-id="vm.grid.operatingItem().tenantId.id"
                             default-event-type="{{vm.types.eventType.lcEvent.value}}">
             </tb-event-table>
-        </md-tab>
+        </md-tab>-->
     </md-tabs>
 </tb-grid>

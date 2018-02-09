@@ -32,10 +32,11 @@ public class ComputationJobController extends BaseController{
     public ComputationJob saveComputationJob(@RequestBody ComputationJob source,
                                              @PathVariable("computationId") String strComputationId) throws ThingsboardException {
         checkParameter("computationId", strComputationId);
+        log.error("HMDC strComputationId " + strComputationId);
         try {
             boolean created = source.getId() == null;
             source.setTenantId(getCurrentUser().getTenantId());
-            source.setComputationId(ComputationId.fromString(strComputationId));
+            source.setComputationId(new ComputationId(toUUID(strComputationId.trim())));
             ComputationJob computationJob = checkNotNull(computationJobService.saveComputationJob(source));
             actorService.onComputationJobStateChange(computationJob.getTenantId(), computationJob.getComputationId(),
                     computationJob.getId(), created ? ComponentLifecycleEvent.CREATED : ComponentLifecycleEvent.UPDATED);

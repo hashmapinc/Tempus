@@ -22,7 +22,7 @@ import computationJobFieldsetTemplate from './computation-job-fieldset.tpl.html'
 /* eslint-enable import/no-unresolved, import/default */
 
 /*@ngInject*/
-export default function ComputationJobDirective($compile, $templateCache, $log){//, $translate, types, toast, utils, userService) {
+export default function ComputationJobDirective($compile, $templateCache, $log, $translate, types, toast) {
     var linker = function (scope, element) {
         var template = $templateCache.get(computationJobFieldsetTemplate);
         element.html(template);
@@ -48,33 +48,22 @@ export default function ComputationJobDirective($compile, $templateCache, $log){
             data: null
         };
 
+        if(scope.computation){
+            scope.showComputationJobConfig = true;
+            scope.computationDescriptor = scope.computation.jsonDescriptor;
+        } 
+
+        scope.$watch('computation', function(newValue, oldValue) {
+            if(newValue && !angular.equals(newValue, oldValue)){
+                scope.showComputationJobConfig = true;
+                scope.computationDescriptor = newValue.jsonDescriptor;
+            } 
+        }, true);
+
 
         if (scope.computationJob && !scope.computationJob.configuration) {
             scope.computationJob.configuration = {};
         }
-
-
-
-        /*scope.$watch("computationJob.clazz", function (newValue, prevValue) {
-            if (newValue != prevValue) {
-                scope.computationJobConfiguration.data = null;
-                if (scope.computationJob) {
-                    $log.error("HMDC scope.computationJob " + angular.toJson(scope.computationJob));
-                    componentDescriptorService.getComponentDescriptorByClazz(scope.computationJob.clazz).then(
-                        function success(component) {
-                            scope.computationJobComponent = component;
-                            scope.showComputationJobConfig = !(userService.getAuthority() === 'TENANT_ADMIN'
-                                                        && scope.computationJob.tenantId
-                                                        && scope.computationJob.tenantId.id === types.id.nullUid)
-                                                      && utils.isDescriptorSchemaNotEmpty(scope.computationJobComponent.configurationDescriptor);
-                            scope.computationJobConfiguration.data = angular.copy(scope.computationJob.configuration);
-                        },
-                        function fail() {
-                        }
-                    );
-                }
-            }
-        });
 
         scope.$watch("computationJobConfiguration.data", function (newValue, prevValue) {
             if (newValue && !angular.equals(newValue, prevValue)) {
@@ -86,33 +75,21 @@ export default function ComputationJobDirective($compile, $templateCache, $log){
             toast.showSuccess($translate.instant('computationJob.idCopiedMessage'), 750, angular.element(element).parent().parent(), 'bottom left');
         };
 
-        /*componentDescriptorService.getComponentDescriptorsByType(types.componentType.computationJob).then(
-            function success(components) {
-                scope.computationJobComponents = components;
-            },
-            function fail() {
-            }
-        );*/
-
         $compile(element.contents())(scope);
     }
     return {
         restrict: "E",
         link: linker,
         scope: {
-            computationJob: '=?',
+            computationjob: '=',
             isEdit: '=',
             isReadOnly: '=',
             theForm: '=',
             onActivateComputationJob: '&',
             onSuspendComputationJob: '&',
             onExportComputationJob: '&',
+            computation: '=',
             onDeleteComputationJob: '&'
-        },
-        bindToController: {
-            computation: '=?'
-        },
-        controller: 'ComputationJobController',
-        controllerAs: 'vm'
+        }
     };
 }

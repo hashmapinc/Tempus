@@ -169,9 +169,9 @@ export default function ComputationController(computationService, $log, userServ
         if ($event) {
             $event.stopPropagation();
         }
-        
+        $log.log("Computaion json " + computation.id.id);
         //$state.go('home.dashboards.dashboard', {dashboardId: dashboard.id.id});
-        //$state.go('home.computationJob',{computationId: computation.id.id});
+        //$state.go('home.computationJob', {jsonDescriptor: angular.toJson(computation.jsonDescriptor)});
         $state.go('home.computationJob',{computationId: computation.id.id});
     }
 

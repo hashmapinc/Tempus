@@ -21,7 +21,7 @@ import computationJobCard from './computation-job-card.tpl.html';
 /* eslint-enable import/no-unresolved, import/default */
 
 /*@ngInject*/
-export default function ComputationJobController(computationJobService, computationService, $log, userService, importExport, $state, $stateParams, $filter, $translate, types, helpLinks, $scope) {
+export function ComputationJobController(computationJobService, $log, userService, importExport, $state, $stateParams, $filter, $translate, types, helpLinks) {
 
     var computationJobActionsList = [
         {
@@ -57,7 +57,7 @@ export default function ComputationJobController(computationJobService, computat
         }
     ];
 
-    $log.log("HMDC computationObject ", $stateParams.computationId);
+    $log.log("HMDC computation Descriptor ", $stateParams.computationId);
 
     var computationJobAddItemActionsList = [
         {
@@ -72,18 +72,10 @@ export default function ComputationJobController(computationJobService, computat
 
     var vm = this;
 
-    computationService.getComputation($stateParams.computationId).then(
-       function success(computation) {
-           vm.computation = computation;  
-           //$log.log("Computation : " + angular.toJson(vm.computation));
-       },
-       function fail() {
-       }
-    );
 
-    $scope.computation = vm.computation;
-    $log.log("Computation : " + angular.toJson(vm.computation));
-
+    //vm.computationDescriptor = $stateParams.jsonDescriptor;
+    //$scope.computation = vm.computation;
+    //$scope;
     vm.types = types;
 
     vm.helpLinkIdForComputationJob = helpLinkIdForComputationJob;
@@ -99,6 +91,7 @@ export default function ComputationJobController(computationJobService, computat
         deleteItemsActionTitleFunc: deleteComputationJobsActionTitle,
         deleteItemsContentFunc: deleteComputationJobsText,
 
+        addItemController: 'AddComputationJobController',
         fetchItemsFunc: fetchComputationJobs,
         saveItemFunc: saveComputationJob,
         deleteItemFunc: deleteComputationJob,
@@ -209,4 +202,50 @@ export default function ComputationJobController(computationJobService, computat
         });
     }
 
+}
+
+
+/*@ngInject*/
+export function AddComputationJobController(computationService, $stateParams, $log, $scope, $mdDialog, saveItemFunction, helpLinks) {
+
+    var vm = this;
+
+    vm.helpLinks = helpLinks;
+    vm.item = {};
+
+    vm.add = add;
+    vm.cancel = cancel;
+
+    vm.computation = {};
+    computationService.getComputation($stateParams.computationId).then(
+       function success(computation) {
+           vm.computation = computation;
+           /*scope.computationJobComponent = computation;
+                            scope.showComputationJobConfig = !(userService.getAuthority() === 'TENANT_ADMIN'
+                                                        && scope.computationjob.tenantId
+                                                        && scope.computationjob.tenantId.id === types.id.nullUid)
+                                                      && utils.isDescriptorSchemaNotEmpty(scope.computationJobComponent.jsonDescriptor);
+                            scope.computationJobConfiguration.data = angular.copy(scope.computationJob.configuration);
+                        */
+           //$scope.computation = vm.computation;  
+           $log.log("Computation success: " + angular.toJson(vm.computation));
+       },
+       function fail() {
+       }
+    );
+
+    $log.log("Computation : " + vm.computation);
+
+
+    function cancel() {
+        $mdDialog.cancel();
+    }
+
+    function add() {
+        saveItemFunction(vm.item).then(function success(item) {
+            vm.item = item;
+            $scope.theForm.$setPristine();
+            $mdDialog.hide();
+        });
+    }
 }
