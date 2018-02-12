@@ -14,6 +14,8 @@ public interface ComputationJobService {
     ComputationJob saveComputationJob(ComputationJob computationJob);
     ComputationJob findComputationJobById(ComputationJobId computationJobId);
     void deleteComputationJobById(ComputationJobId computationJobId);
+    void activateComputationJobById(ComputationJobId computationJobId);
+    void suspendComputationJobById(ComputationJobId computationJobId);
     List<ComputationJob> findByComputationId(ComputationId computationId);
     TextPageData<ComputationJob> findTenantComputationJobs(TenantId tenantId, ComputationId computationId, TextPageLink link);
 }

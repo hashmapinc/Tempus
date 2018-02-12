@@ -11,7 +11,9 @@ import org.thingsboard.server.common.data.page.TextPageData;
 import org.thingsboard.server.common.data.page.TextPageLink;
 import org.thingsboard.server.common.data.plugin.ComponentLifecycleState;
 import org.thingsboard.server.dao.entity.AbstractEntityService;
+import org.thingsboard.server.dao.exception.DatabaseException;
 import org.thingsboard.server.dao.exception.IncorrectParameterException;
+import org.thingsboard.server.dao.service.Validator;
 
 import java.util.List;
 
@@ -65,5 +67,29 @@ public class BaseComputationJobService extends AbstractEntityService implements 
     @Override
     public List<ComputationJob> findByComputationId(ComputationId computationId) {
         return computationJobDao.findByComputationId(computationId);
+    }
+
+    @Override
+    public void activateComputationJobById(ComputationJobId computationJobId) {
+        Validator.validateId(computationJobId, "Incorrect computation Job id for state change request.");
+        ComputationJob computationJob = computationJobDao.findById(computationJobId);
+        if (computationJob != null) {
+            computationJob.setState(ComponentLifecycleState.ACTIVE);
+            computationJobDao.save(computationJob);
+        } else {
+            throw new DatabaseException("Plugin not found!");
+        }
+    }
+
+    @Override
+    public void suspendComputationJobById(ComputationJobId computationJobId) {
+        Validator.validateId(computationJobId, "Incorrect computation Job id for state change request.");
+        ComputationJob computationJob = computationJobDao.findById(computationJobId);
+        if (computationJob != null) {
+            computationJob.setState(ComponentLifecycleState.SUSPENDED);
+            computationJobDao.save(computationJob);
+        } else {
+            throw new DatabaseException("Plugin not found!");
+        }
     }
 }

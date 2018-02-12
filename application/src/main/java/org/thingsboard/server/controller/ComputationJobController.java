@@ -101,14 +101,14 @@ public class ComputationJobController extends BaseController{
     @PreAuthorize("hasAnyAuthority('SYS_ADMIN', 'TENANT_ADMIN')")
     @RequestMapping(value = "/computations/{computationId}/jobs/{computaionJodId}/activate", method = RequestMethod.POST)
     @ResponseStatus(value = HttpStatus.OK)
-    public void activatePluginById(@PathVariable("computaionJodId") String strComputationJobId,
+    public void activateCompuationJobById(@PathVariable("computaionJodId") String strComputationJobId,
                                    @PathVariable("computaionId") String strComputationId) throws ThingsboardException {
         checkParameter("strComputationJobId", strComputationJobId);
         try {
             ComputationJobId computationJobId = new ComputationJobId(toUUID(strComputationJobId));
             ComputationId computationId = new ComputationId(toUUID(strComputationId));
             ComputationJob computationJob = checkComputationJob(computationJobService.findComputationJobById(computationJobId));
-            computationJobService.activateCompuationJobById(computationJobId);
+            computationJobService.activateComputationJobById(computationJobId);
             actorService.onComputationJobStateChange(computationJob.getTenantId(), computationId, computationJob.getId(), ComponentLifecycleEvent.ACTIVATED);
         } catch (Exception e) {
             throw handleException(e);
@@ -118,15 +118,15 @@ public class ComputationJobController extends BaseController{
     @PreAuthorize("hasAnyAuthority('SYS_ADMIN', 'TENANT_ADMIN')")
     @RequestMapping(value = "/computations/{computationId}/jobs/{computaionJodId}/suspend", method = RequestMethod.POST)
     @ResponseStatus(value = HttpStatus.OK)
-    public void suspendPluginById(@PathVariable("computaionJodId") String strComputationJobId,
+    public void suspendComputationJobById(@PathVariable("computaionJodId") String strComputationJobId,
                                   @PathVariable("computaionId") String strComputationId) throws ThingsboardException {
         checkParameter("strComputationJobId", strComputationJobId);
         try {
             ComputationJobId computationJobId = new ComputationJobId(toUUID(strComputationJobId));
             ComputationId computationId = new ComputationId(toUUID(strComputationId));
             ComputationJob computationJob = checkComputationJob(computationJobService.findComputationJobById(computationJobId));
-            pluginService.suspendPluginById(pluginId);
-            actorService.onPluginStateChange(plugin.getTenantId(), plugin.getId(), ComponentLifecycleEvent.SUSPENDED);
+            computationJobService.suspendComputationJobById(computationJobId);
+            actorService.onComputationJobStateChange(computationJob.getTenantId(), computationId, computationJob.getId(), ComponentLifecycleEvent.SUSPENDED);
         } catch (Exception e) {
             throw handleException(e);
         }
