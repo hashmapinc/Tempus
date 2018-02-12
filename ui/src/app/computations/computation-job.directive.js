@@ -28,6 +28,7 @@ export default function ComputationJobDirective($compile, $templateCache, $log, 
         element.html(template);
 
         scope.showComputationJobConfig = false;
+        //scope.showComputationJobConfig = true;
 
         scope.computationJobConfiguration = {
             data: null
@@ -36,16 +37,30 @@ export default function ComputationJobDirective($compile, $templateCache, $log, 
         if (scope.computation) {
             scope.showComputationJobConfig = true;
             scope.computationDescriptor = scope.computation.jsonDescriptor;
+            //scope.computationjob.computationId = scope.computation.id;
         } 
+
+        /*computationService.getComputation(scope.computation.id.id).then(
+            function success(computation) {
+                scope.computation = computation;
+                scope.showComputationJobConfig = true;
+                scope.computationDescriptor = computation.jsonDescriptor;
+                $log.log("Computation success: " + angular.toJson(computation));
+            },
+            function fail() {
+            }
+        );*/
  
         scope.$watch('computationjob.name', function(newValue, oldValue) {
             $log.log("newValue, oldValue" + newValue + ":" + oldValue);
         });
 
+
         scope.$watch('computationjob', function(newValue, oldValue) {
             if (newValue && !angular.equals(newValue, oldValue)) {
                 scope.computationJobConfiguration.data = null;
                 scope.computationjob = newValue;
+                //scope.computationjob.computationId = scope.computation.id;
                 scope.computationJobConfiguration.data = angular.copy(newValue.argParameters);
             }
         });
@@ -54,6 +69,7 @@ export default function ComputationJobDirective($compile, $templateCache, $log, 
             if(newValue && !angular.equals(newValue, oldValue)){
                 scope.showComputationJobConfig = true;
                 scope.computationDescriptor = newValue.jsonDescriptor;
+                //scope.computationjob.computationId = scope.computation.id;
             } 
         }, true);
 
@@ -82,10 +98,10 @@ export default function ComputationJobDirective($compile, $templateCache, $log, 
             isEdit: '=',
             isReadOnly: '=',
             theForm: '=',
+            computation: '=',
             onActivateComputationJob: '&',
             onSuspendComputationJob: '&',
             onExportComputationJob: '&',
-            computation: '=',
             onDeleteComputationJob: '&'
         }
     };

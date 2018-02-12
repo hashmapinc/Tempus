@@ -73,7 +73,7 @@ public class ComputationJobEntity extends BaseSqlEntity<ComputationJob> implemen
             this.argParameters = computationJob.getArgParameters();
         }
         if(computationJob.getComputationId() != null) {
-            this.computationId = computationJob.getComputationId().toString();
+            this.computationId = fromTimeUUID(computationJob.getComputationId().getId());
         }
         if(computationJob.getTenantId() != null) {
             this.tenantId = fromTimeUUID(computationJob.getTenantId().getId());

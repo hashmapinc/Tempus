@@ -52,10 +52,11 @@ function ComputationJobService($http, $q, $rootScope, $filter, componentDescript
         tenantComputationJobs = undefined;
     }
 
-    function loadComputationJobsCache() {
+    function loadComputationJobsCache(computationId) {
         var deferred = $q.defer();
+        computationId;
         //if (!allComputationJobs) {
-            var url = '/api/computations/bb999570-0cc7-11e8-8600-6bb60de8cb52/jobs';
+            var url = '/api/computations/423dc500-0d96-11e8-b4c8-cd50aeb03796/jobs';
             $log.log("URL is ", url);
             $http.get(url, null).then(function success(response) {
                 $log.log("success response is ", response.data);
@@ -138,9 +139,9 @@ function ComputationJobService($http, $q, $rootScope, $filter, componentDescript
         return deferred.promise;
     }
 
-    function getAllComputationJobs(pageLink) {
+    function getAllComputationJobs(pageLink, computationId) {
         var deferred = $q.defer();
-        loadComputationJobsCache().then(
+        loadComputationJobsCache(computationId).then(
             function success() {
                 utils.filterSearchTextEntities(allComputationJobs, 'name', pageLink, deferred);
             },
@@ -176,7 +177,8 @@ function ComputationJobService($http, $q, $rootScope, $filter, componentDescript
     function saveComputationJob(computationJob, computationId) {
         $log.log("computationJob to be posted " + computationJob.name);
         var deferred = $q.defer();
-        var url = '/api/computations/' + computationId + '/jobs';
+        computationId;
+        var url = '/api/computations/'+computationId+'/jobs';
         $http.post(url, computationJob).then(function success(response) {
             invalidateComputationJobsCache();
             deferred.resolve(response.data);

@@ -159,8 +159,8 @@ export function ComputationJobController(computationJobService, $log, userServic
         vm.grid = grid;
     }
 
-    function fetchComputationJobs(pageLink) {
-        return computationJobService.getAllComputationJobs(pageLink);
+    function fetchComputationJobs(pageLink, computationId) {
+        return computationJobService.getAllComputationJobs(pageLink, computationId);
     }
 
     function saveComputationJob(computationJob, computationId) {
@@ -217,17 +217,11 @@ export function AddComputationJobController(computationService, $stateParams, $l
     vm.cancel = cancel;
 
     vm.computation = {};
+    vm.computationId = $stateParams.computationId;
+    
     computationService.getComputation($stateParams.computationId).then(
        function success(computation) {
            vm.computation = computation;
-           /*scope.computationJobComponent = computation;
-                            scope.showComputationJobConfig = !(userService.getAuthority() === 'TENANT_ADMIN'
-                                                        && scope.computationjob.tenantId
-                                                        && scope.computationjob.tenantId.id === types.id.nullUid)
-                                                      && utils.isDescriptorSchemaNotEmpty(scope.computationJobComponent.jsonDescriptor);
-                            scope.computationJobConfiguration.data = angular.copy(scope.computationJob.configuration);
-                        */
-           //$scope.computation = vm.computation;  
            $log.log("Computation success: " + angular.toJson(vm.computation));
        },
        function fail() {

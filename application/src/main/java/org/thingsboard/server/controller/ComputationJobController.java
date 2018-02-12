@@ -27,16 +27,38 @@ public class ComputationJobController extends BaseController{
     ComputationJobService computationJobService;
 
     @PreAuthorize("hasAuthority('TENANT_ADMIN')")
-    @RequestMapping(value = "/computations/{computationId}/jobs", method = RequestMethod.POST)
+    @RequestMapping(value = "/computations/{computationid}/jobs", method = RequestMethod.POST)
     @ResponseBody
-    public ComputationJob saveComputationJob(@RequestBody ComputationJob source,
-                                             @PathVariable("computationId") String strComputationId) throws ThingsboardException {
-        checkParameter("computationId", strComputationId);
+    public ComputationJob saveComputationJob(@PathVariable("computationid") UUID strComputationId,
+                                             @RequestBody ComputationJob source) throws ThingsboardException {
+        //checkParameter("computationId", strComputationId);
         log.error("HMDC strComputationId " + strComputationId);
         try {
             boolean created = source.getId() == null;
             source.setTenantId(getCurrentUser().getTenantId());
-            source.setComputationId(new ComputationId(toUUID(strComputationId)));
+            //UUID id = UUID.fromString(strComputationId.trim());
+            source.setComputationId(new ComputationId(strComputationId));
+            log.error("HMDC Computation ID added " + source.getComputationId());
+            ComputationJob computationJob = checkNotNull(computationJobService.saveComputationJob(source));
+            actorService.onComputationJobStateChange(computationJob.getTenantId(), computationJob.getComputationId(),
+                    computationJob.getId(), created ? ComponentLifecycleEvent.CREATED : ComponentLifecycleEvent.UPDATED);
+            return computationJob;
+        } catch (Exception e) {
+            throw handleException(e);
+        }
+    }
+
+    @PreAuthorize("hasAuthority('TENANT_ADMIN')")
+    @RequestMapping(value = "/computations/jobs", method = RequestMethod.POST)
+    @ResponseBody
+    public ComputationJob saveComputationJob(@RequestBody ComputationJob source) throws ThingsboardException {
+        //checkParameter("computationId", strComputationId);
+        //log.error("HMDC strComputationId " + strComputationId);
+        try {
+            boolean created = source.getId() == null;
+            source.setTenantId(getCurrentUser().getTenantId());
+            //UUID id = UUID.fromString(strComputationId.trim());
+            //source.setComputationId(new ComputationId(strComputationId));
             ComputationJob computationJob = checkNotNull(computationJobService.saveComputationJob(source));
             actorService.onComputationJobStateChange(computationJob.getTenantId(), computationJob.getComputationId(),
                     computationJob.getId(), created ? ComponentLifecycleEvent.CREATED : ComponentLifecycleEvent.UPDATED);
