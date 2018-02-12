@@ -28,7 +28,6 @@ export default function ComputationJobDirective($compile, $templateCache, $log, 
         element.html(template);
 
         scope.showComputationJobConfig = false;
-        //scope.showComputationJobConfig = true;
 
         scope.computationJobConfiguration = {
             data: null
@@ -37,7 +36,6 @@ export default function ComputationJobDirective($compile, $templateCache, $log, 
         if (scope.computation) {
             scope.showComputationJobConfig = true;
             scope.computationDescriptor = scope.computation.jsonDescriptor;
-            //scope.computationjob.computationId = scope.computation.id;
         } 
         else{
             computationService.getComputation($stateParams.computationId).then(
@@ -45,7 +43,6 @@ export default function ComputationJobDirective($compile, $templateCache, $log, 
                     scope.computation = computation;
                     scope.showComputationJobConfig = true;
                     scope.computationDescriptor = computation.jsonDescriptor;
-                    $log.log("Computation success: " + angular.toJson(computation));
                 },
                 function fail() {
                 }
@@ -70,7 +67,6 @@ export default function ComputationJobDirective($compile, $templateCache, $log, 
             if(newValue && !angular.equals(newValue, oldValue)){
                 scope.showComputationJobConfig = true;
                 scope.computationDescriptor = newValue.jsonDescriptor;
-                //scope.computationjob.computationId = scope.computation.id;
             } 
         }, true);
 
@@ -99,7 +95,6 @@ export default function ComputationJobDirective($compile, $templateCache, $log, 
             isEdit: '=',
             isReadOnly: '=',
             theForm: '=',
-            computation: '=',
             onActivateComputationJob: '&',
             onSuspendComputationJob: '&',
             onExportComputationJob: '&',

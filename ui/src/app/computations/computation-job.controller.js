@@ -21,7 +21,7 @@ import computationJobCard from './computation-job-card.tpl.html';
 /* eslint-enable import/no-unresolved, import/default */
 
 /*@ngInject*/
-export function ComputationJobController(computationJobService, $log, userService, importExport, $state, $stateParams, $filter, $translate, types, helpLinks) {
+export default function ComputationJobController(computationJobService, $log, userService, importExport, $state, $stateParams, $filter, $translate, types, helpLinks) {
 
     var computationJobActionsList = [
         {
@@ -91,7 +91,6 @@ export function ComputationJobController(computationJobService, $log, userServic
         deleteItemsActionTitleFunc: deleteComputationJobsActionTitle,
         deleteItemsContentFunc: deleteComputationJobsText,
 
-        addItemController: 'AddComputationJobController',
         fetchItemsFunc: fetchComputationJobs,
         saveItemFunc: saveComputationJob,
         deleteItemFunc: deleteComputationJob,
@@ -202,44 +201,4 @@ export function ComputationJobController(computationJobService, $log, userServic
         });
     }
 
-}
-
-
-/*@ngInject*/
-export function AddComputationJobController(computationService, $stateParams, $log, $scope, $mdDialog, saveItemFunction, helpLinks) {
-
-    var vm = this;
-
-    vm.helpLinks = helpLinks;
-    vm.item = {};
-
-    vm.add = add;
-    vm.cancel = cancel;
-
-    vm.computation = {};
-    vm.computationId = $stateParams.computationId;
-
-    computationService.getComputation($stateParams.computationId).then(
-       function success(computation) {
-           vm.computation = computation;
-           $log.log("Computation success: " + angular.toJson(vm.computation));
-       },
-       function fail() {
-       }
-    );
-
-    $log.log("Computation : " + vm.computation);
-
-
-    function cancel() {
-        $mdDialog.cancel();
-    }
-
-    function add() {
-        saveItemFunction(vm.item).then(function success(item) {
-            vm.item = item;
-            $scope.theForm.$setPristine();
-            $mdDialog.hide();
-        });
-    }
 }
