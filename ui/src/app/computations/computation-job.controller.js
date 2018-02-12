@@ -159,12 +159,12 @@ export function ComputationJobController(computationJobService, $log, userServic
         vm.grid = grid;
     }
 
-    function fetchComputationJobs(pageLink, computationId) {
-        return computationJobService.getAllComputationJobs(pageLink, computationId);
+    function fetchComputationJobs(pageLink) {
+        return computationJobService.getAllComputationJobs(pageLink, $stateParams.computationId);
     }
 
-    function saveComputationJob(computationJob, computationId) {
-        return computationJobService.saveComputationJob(computationJob, computationId);
+    function saveComputationJob(computationJob) {
+        return computationJobService.saveComputationJob(computationJob, $stateParams.computationId);
     }
 
     function deleteComputationJob(computationJobId) {
@@ -218,7 +218,7 @@ export function AddComputationJobController(computationService, $stateParams, $l
 
     vm.computation = {};
     vm.computationId = $stateParams.computationId;
-    
+
     computationService.getComputation($stateParams.computationId).then(
        function success(computation) {
            vm.computation = computation;
@@ -236,7 +236,7 @@ export function AddComputationJobController(computationService, $stateParams, $l
     }
 
     function add() {
-        saveItemFunction(vm.item, vm.computation.id.id).then(function success(item) {
+        saveItemFunction(vm.item).then(function success(item) {
             vm.item = item;
             $scope.theForm.$setPristine();
             $mdDialog.hide();

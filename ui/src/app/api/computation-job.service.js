@@ -56,7 +56,7 @@ function ComputationJobService($http, $q, $rootScope, $filter, componentDescript
         var deferred = $q.defer();
         computationId;
         //if (!allComputationJobs) {
-            var url = '/api/computations/423dc500-0d96-11e8-b4c8-cd50aeb03796/jobs';
+            var url = '/api/computations/'+ computationId +'/jobs';
             $log.log("URL is ", url);
             $http.get(url, null).then(function success(response) {
                 $log.log("success response is ", response.data);

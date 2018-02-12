@@ -22,7 +22,7 @@ import computationJobFieldsetTemplate from './computation-job-fieldset.tpl.html'
 /* eslint-enable import/no-unresolved, import/default */
 
 /*@ngInject*/
-export default function ComputationJobDirective($compile, $templateCache, $log, $translate, types, toast) {
+export default function ComputationJobDirective($compile, $templateCache, $log, $translate, types, toast, $stateParams, computationService) {
     var linker = function (scope, element) {
         var template = $templateCache.get(computationJobFieldsetTemplate);
         element.html(template);
@@ -39,17 +39,18 @@ export default function ComputationJobDirective($compile, $templateCache, $log, 
             scope.computationDescriptor = scope.computation.jsonDescriptor;
             //scope.computationjob.computationId = scope.computation.id;
         } 
-
-        /*computationService.getComputation(scope.computation.id.id).then(
-            function success(computation) {
-                scope.computation = computation;
-                scope.showComputationJobConfig = true;
-                scope.computationDescriptor = computation.jsonDescriptor;
-                $log.log("Computation success: " + angular.toJson(computation));
-            },
-            function fail() {
-            }
-        );*/
+        else{
+            computationService.getComputation($stateParams.computationId).then(
+                function success(computation) {
+                    scope.computation = computation;
+                    scope.showComputationJobConfig = true;
+                    scope.computationDescriptor = computation.jsonDescriptor;
+                    $log.log("Computation success: " + angular.toJson(computation));
+                },
+                function fail() {
+                }
+            );
+        }
  
         scope.$watch('computationjob.name', function(newValue, oldValue) {
             $log.log("newValue, oldValue" + newValue + ":" + oldValue);
