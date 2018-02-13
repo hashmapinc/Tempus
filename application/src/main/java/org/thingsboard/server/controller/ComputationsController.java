@@ -86,7 +86,7 @@ public class ComputationsController extends BaseController {
     @PreAuthorize("hasAuthority('TENANT_ADMIN')")
     @RequestMapping(value = "/computations/{computationId}", method = RequestMethod.DELETE)
     @ResponseBody
-    public void delete(@RequestParam("computationId") String strComputationId) throws ThingsboardException {
+    public void delete(@PathVariable("computationId") String strComputationId) throws ThingsboardException {
         ComputationId computationId = new ComputationId(toUUID(strComputationId));
         Computations computation = checkComputation(computationsService.findById(computationId));
         List<ComputationJob> computationJobs = checkNotNull(computationJobService.findByComputationId(computationId));

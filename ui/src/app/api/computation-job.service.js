@@ -21,22 +21,8 @@
 
 /*@ngInject*/
 function ComputationJobService($http, $q, $rootScope, $filter, componentDescriptorService, types, utils, $log) {
-
-    var allComputationJobs = undefined;
-    var allActionComputationJobs = undefined;
-    var systemComputationJobs = undefined;
-    var tenantComputationJobs = undefined;
-
-    $rootScope.computationJobServiceStateChangeStartHandle = $rootScope.$on('$stateChangeStart', function () {
-        invalidateComputationJobsCache();
-    });
     var service = {
-        getSystemComputationJobs: getSystemComputationJobs,
-        getTenantComputationJobs: getTenantComputationJobs,
         getAllComputationJobs: getAllComputationJobs,
-        getAllActionComputationJobs: getAllActionComputationJobs,
-        getComputationJobByToken: getComputationJobByToken,
-        getComputationJob: getComputationJob,
         deleteComputationJob: deleteComputationJob,
         saveComputationJob: saveComputationJob,
         activateComputationJob: activateComputationJob,
@@ -44,77 +30,6 @@ function ComputationJobService($http, $q, $rootScope, $filter, componentDescript
     }
 
     return service;
-
-    function invalidateComputationJobsCache() {
-        allComputationJobs = undefined;
-        allActionComputationJobs = undefined;
-        systemComputationJobs = undefined;
-        tenantComputationJobs = undefined;
-    }
-
-    function loadComputationJobsCache(computationId) {
-        var deferred = $q.defer();
-        computationId;
-            var url = '/api/computations/'+ computationId +'/jobs';
-            $log.log("URL is ", url);
-            $http.get(url, null).then(function success(response) {
-                $log.log("success response is ", response.data);
-                        allComputationJobs = response.data;
-                        //allActionComputationJobs = [];
-                        systemComputationJobs = [];
-                        tenantComputationJobs = [];
-                        allComputationJobs = $filter('orderBy')(allComputationJobs, ['+name', '-createdTime']);
-                        for (var i = 0; i < allComputationJobs.length; i++) {
-                            var computationJob = allComputationJobs[i];
-                                tenantComputationJobs.push(computationJob);
-                        }
-
-                        deferred.resolve();
-            }, function fail() {
-                $log.log("failed to get response");
-                deferred.reject();
-            });
-        return deferred.promise;
-    }
-
-    function getSystemComputationJobs(pageLink) {
-        var deferred = $q.defer();
-        loadComputationJobsCache().then(
-            function success() {
-                utils.filterSearchTextEntities(systemComputationJobs, 'name', pageLink, deferred);
-            },
-            function fail() {
-                deferred.reject();
-            }
-        );
-        return deferred.promise;
-    }
-
-    function getTenantComputationJobs(pageLink) {
-        var deferred = $q.defer();
-        loadComputationJobsCache().then(
-            function success() {
-                utils.filterSearchTextEntities(tenantComputationJobs, 'name', pageLink, deferred);
-            },
-            function fail() {
-                deferred.reject();
-            }
-        );
-        return deferred.promise;
-    }
-
-    function getAllActionComputationJobs(pageLink) {
-        var deferred = $q.defer();
-        loadComputationJobsCache().then(
-            function success() {
-                utils.filterSearchTextEntities(allActionComputationJobs, 'name', pageLink, deferred);
-            },
-            function fail() {
-                deferred.reject();
-            }
-        );
-        return deferred.promise;
-    }
 
     function getAllComputationJobs(pageLink, computationId) {
         var deferred = $q.defer();
@@ -133,35 +48,12 @@ function ComputationJobService($http, $q, $rootScope, $filter, componentDescript
         return deferred.promise;
     }
 
-    function getComputationJobByToken(computationJobToken) {
-        var deferred = $q.defer();
-        var url = '/api/computationJob/token/' + computationJobToken;
-        $http.get(url, null).then(function success(response) {
-            deferred.resolve(response.data);
-        }, function fail() {
-            deferred.reject();
-        });
-        return deferred.promise;
-    }
-
-    function getComputationJob(computationJobId) {
-        var deferred = $q.defer();
-        var url = '/api/computationJob/' + computationJobId;
-        $http.get(url, null).then(function success(response) {
-            deferred.resolve(response.data);
-        }, function fail(response) {
-            deferred.reject(response.data);
-        });
-        return deferred.promise;
-    }
-
     function saveComputationJob(computationJob, computationId) {
         $log.log("computationJob to be posted " + computationJob.name);
         var deferred = $q.defer();
         computationId;
         var url = '/api/computations/'+computationId+'/jobs';
         $http.post(url, computationJob).then(function success(response) {
-            invalidateComputationJobsCache();
             deferred.resolve(response.data);
         }, function fail(response) {
             deferred.reject(response.data);
@@ -173,7 +65,6 @@ function ComputationJobService($http, $q, $rootScope, $filter, componentDescript
         var deferred = $q.defer();
         var url = '/api/computationJob/' + computationJobId;
         $http.delete(url).then(function success() {
-            invalidateComputationJobsCache();
             deferred.resolve();
         }, function fail(response) {
             deferred.reject(response.data);

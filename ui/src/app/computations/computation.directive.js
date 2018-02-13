@@ -22,45 +22,10 @@ import computationFieldsetTemplate from './computation-fieldset.tpl.html';
 /* eslint-enable import/no-unresolved, import/default */
 
 /*@ngInject*/
-export default function ComputationDirective($compile, $templateCache, $translate, types, toast, utils, userService, componentDescriptorService) {
+export default function ComputationDirective($compile, $templateCache) {
     var linker = function (scope, element) {
         var template = $templateCache.get(computationFieldsetTemplate);
         element.html(template);
-
-        scope.showComputationConfig = false;
-
-        scope.computationConfiguration = {
-            data: null
-        };
-
-        if (scope.computation && !scope.computation.configuration) {
-            scope.computation.configuration = {};
-        }
-
-        scope.$watch("computation", function (newValue, prevValue) {
-            if (newValue != prevValue) {
-                scope.computationConfiguration.data = null;
-                if (scope.computation) {
-                    componentDescriptorService.getComponentDescriptorByClazz(scope.computation.clazz).then(
-                        function success(component) {
-                            scope.computationComponent = component;
-                            scope.showComputationConfig = !(userService.getAuthority() === 'TENANT_ADMIN'
-                                                        && scope.computation.tenantId
-                                                        && scope.computation.tenantId.id === types.id.nullUid)
-                                                      && utils.isDescriptorSchemaNotEmpty(scope.computationComponent.configurationDescriptor);
-                            scope.computationConfiguration.data = angular.copy(scope.computation.configuration);
-                        },
-                        function fail() {
-                        }
-                    );
-                }
-            }
-        });
-
-        scope.onComputationIdCopied = function() {
-            toast.showSuccess($translate.instant('computation.idCopiedMessage'), 750, angular.element(element).parent().parent(), 'bottom left');
-        };
-
         $compile(element.contents())(scope);
     }
     return {

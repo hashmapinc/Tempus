@@ -74,10 +74,8 @@ export default function ImportDialogController($scope, $log, $mdDialog, toast, i
 
     function importFromJsonOrJar() {
         $scope.theForm.$setPristine();
-        $log.error("Before importing");
-        if ((vm.fileName.indexOf('jar') !== -1) ){ //&& (vm.importData.getExtension() === 'jar')){
+        if ((vm.fileName.indexOf('.jar') !== -1) ){
             computationService.upload(vm.importData.file);
-            $log.error("Inside import from json ");
         }
         $mdDialog.hide(vm.importData);
     }

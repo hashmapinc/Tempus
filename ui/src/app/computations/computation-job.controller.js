@@ -21,7 +21,7 @@ import computationJobCard from './computation-job-card.tpl.html';
 /* eslint-enable import/no-unresolved, import/default */
 
 /*@ngInject*/
-export default function ComputationJobController(computationJobService, $log, userService, importExport, $state, $stateParams, $filter, $translate, types, helpLinks) {
+export default function ComputationJobController(computationJobService, $log, userService, importExport, $state, $stateParams, $filter, $translate, types) {
 
     var computationJobActionsList = [
         {
@@ -72,7 +72,7 @@ export default function ComputationJobController(computationJobService, $log, us
 
     vm.types = types;
 
-    vm.helpLinkIdForComputationJob = helpLinkIdForComputationJob;
+    //vm.helpLinkIdForComputationJob = helpLinkIdForComputationJob;
 
 
     vm.computationJobGridConfig = {
@@ -82,7 +82,7 @@ export default function ComputationJobController(computationJobService, $log, us
         deleteItemTitleFunc: deleteComputationJobTitle,
         deleteItemContentFunc: deleteComputationJobText,
         deleteItemsTitleFunc: deleteComputationJobsTitle,
-        deleteItemsActionTitleFunc: deleteComputationJobsActionTitle,
+        //deleteItemsActionTitleFunc: deleteComputationJobsActionTitle,
         deleteItemsContentFunc: deleteComputationJobsText,
 
         fetchItemsFunc: fetchComputationJobs,
@@ -122,11 +122,10 @@ export default function ComputationJobController(computationJobService, $log, us
 
     vm.activateComputationJob = activateComputationJob;
     vm.suspendComputationJob = suspendComputationJob;
-    //vm.exportComputationJob = exportComputationJob;
 
-    function helpLinkIdForComputationJob() {
+    /*function helpLinkIdForComputationJob() {
         return helpLinks.getComputationJobLink(vm.grid.operatingItem());
-    }
+    }*/
 
     function deleteComputationJobTitle(computationJob) {
         return $translate.instant('computationJob.delete-computationJob-title', {computationJobName: computationJob.name});
@@ -140,9 +139,9 @@ export default function ComputationJobController(computationJobService, $log, us
         return $translate.instant('computationJob.delete-computationJobs-title', {count: selectedCount}, 'messageformat');
     }
 
-    function deleteComputationJobsActionTitle(selectedCount) {
+    /*function deleteComputationJobsActionTitle(selectedCount) {
         return $translate.instant('computationJob.delete-computationJobs-action-title', {count: selectedCount}, 'messageformat');
-    }
+    }*/
 
     function deleteComputationJobsText() {
         return $translate.instant('computationJob.delete-computationJobs-text');
