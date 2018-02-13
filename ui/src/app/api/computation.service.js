@@ -96,7 +96,7 @@ function ComputationService($http, $q, $rootScope, $filter, componentDescriptorS
                             //}
                         }
 
-                        $log.error("HMDC tenantComputations : " + angular.toJson(tenantComputations));
+                        $log.log("tenantComputations : " + angular.toJson(tenantComputations));
 
                         deferred.resolve();
                     //},

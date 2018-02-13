@@ -60,7 +60,14 @@ public class BaseComputationsService extends AbstractEntityService implements Co
     }
 
     @Override
+    public void deleteById(ComputationId computationId) {
+        computationsDao.deleteById(computationId);
+    }
+
+    @Override
     public List<Computations> findAllTenantComputationsByTenantId(TenantId tenantId) {
         return computationsDao.findByTenantId(tenantId);
     }
+
+
 }

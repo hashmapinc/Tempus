@@ -40,6 +40,7 @@ import scala.concurrent.duration.Duration;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -145,6 +146,7 @@ public class ComputationJobActorMessageProcessor extends ComponentMsgProcessor<C
 
     private void processHeaders(){
         JsonNode jsonHeaders = job.getArgParameters().get("headers");
+        logger.info("Processing headers " + jsonHeaders.asText());
         if(jsonHeaders != null && jsonHeaders.isArray()){
             for(JsonNode e : jsonHeaders){
                 this.headers.add(e.get("key").asText(), e.get("value").asText());
@@ -154,6 +156,7 @@ public class ComputationJobActorMessageProcessor extends ComponentMsgProcessor<C
 
     private void buildBaseUrl(){
         JsonNode configuration = job.getArgParameters();
+        logger.info("Configuration is : " + configuration.asText());
         this.baseUrl = String.format(
                 BASE_URL_TEMPLATE,
                 configuration.get("host").asText("localhost"),
@@ -166,49 +169,74 @@ public class ComputationJobActorMessageProcessor extends ComponentMsgProcessor<C
     }
 
     private void postJob() throws IOException {
+        logger.info("Status is " + status);
         if(status != SparkComputationStatus.RUNNING){
             JsonNode conf = job.getArgParameters();
+            logger.info("Payload is " + buildSparkComputationRequest());
             ResponseEntity<Batch> response = new RestTemplate().exchange(
-                    baseUrl + conf.get("actionPath"),
+                    baseUrl + conf.get("actionPath").asText("batches"),
                     HttpMethod.POST,
                     new HttpEntity<>(buildSparkComputationRequest(), headers),
                     Batch.class);
             if (response.getStatusCode() == HttpStatus.CREATED) {
                 Batch res =  response.getBody();
-                logger.debug("[{}] Computation Job is created with id [{}]", entityId, res.getId());
+                logger.info("[{}] Computation Job is created with id [{}]", entityId, res.getId());
                 job.setJobId(String.valueOf(res.getId()));
                 job.setState(ComponentLifecycleState.ACTIVE);
                 systemContext.getComputationJobService().saveComputationJob(job);
                 this.status = SparkComputationStatus.RUNNING;
                 schedulePeriodicStatusCheckWithDelay();
             }else{
+                logger.info("status in post job " + response.getStatusCode());
                 suspendJob();
             }
         }else{
+            logger.info("Job already running");
             schedulePeriodicStatusCheckWithDelay();
         }
     }
 
     private String buildSparkComputationRequest() throws IOException {
+        logger.info("Jar name is {}, main class is {}, arg parameters are {}, location is {}", computation.getJarName(), computation.getMainClass(), computation.getArgsformat(), systemContext.getComputationLocation());
         SparkComputationRequest.SparkComputationRequestBuilder builder = SparkComputationRequest.builder();
         builder.file(systemContext.getComputationLocation() + computation.getJarName());
         builder.className(computation.getMainClass());
+        //logger.info("Arguments are " + args());
         builder.args(args());
         SparkComputationRequest sparkComputationRequest = builder.build();
+        logger.info("spark request {} " + sparkComputationRequest.toString());
         return mapper.writeValueAsString(sparkComputationRequest);
     }
 
     private String[] args() throws IOException {
         JsonNode conf = job.getArgParameters();
-        JsonNode node = mapper.readTree(computation.getArgsformat());
+        logger.info("Parsing args format");
+        //JsonNode node = mapper.readTree(computation.getArgsformat());
+        String argsFormat = computation.getArgsformat();
+        String argsTmp = argsFormat.substring(1, argsFormat.length() - 1);
+        logger.info("Parsed array parameters arg are {} ", argsTmp);
         List<String> args = new ArrayList<>();
-        if(node != null && node.isArray()){
-            for(JsonNode ar : node){
-                args.add("--" + ar.asText());
-                args.add(conf.get(ar.asText()).asText());
+        List<String> argsList =  new ArrayList<String>(Arrays.asList(argsTmp.split(",")));
+        logger.info("Args List : " + argsList );
+        if(!argsList.isEmpty()){
+            for (String arg: argsList) {
+                logger.info("Argument key " + arg.trim());
+                logger.info("Argument value " + conf.get(arg.trim()).asText());
+                //args.add("--" + arg.trim() + " " + conf.get(arg.trim()).asText());
+                args.add(conf.get(arg.trim()).asText());
             }
         }
-        return (String[])args.toArray();
+        /*if(node != null && node.isArray()){
+            logger.info("Args format is an array");
+            for(JsonNode ar : node){
+                args.add("--" + ar.asText());
+                logger.info("Argument key is {}", ar.asText());
+                args.add(conf.get(ar.asText()).asText());
+                logger.info("Argument value for key {} is {}", ar.asText(), conf.get(ar.asText()).asText());
+            }
+        }*/
+        logger.info("Argument array list to spark job " + args);
+        return args.toArray(new String[args.size()]);
     }
 
     private void stopJobOnServer(){
@@ -224,7 +252,7 @@ public class ComputationJobActorMessageProcessor extends ComponentMsgProcessor<C
                     logger.info("[{}] Computation job with id [{}] deletion returned invalid response [{}]", entityId, response.getStatusCodeValue());
                 }
             } catch (RestClientException e){
-                logger.warning("[{}] Computation job deletion returned error", entityId);
+                logger.info("[{}] Computation job deletion returned error", entityId);
                 suspendJob();
             }
         }
@@ -261,17 +289,17 @@ public class ComputationJobActorMessageProcessor extends ComponentMsgProcessor<C
                                           break;
                     }
                 }else {
-                    logger.warning("[{}] Computation job status response received is [{}]", entityId, response.getStatusCodeValue());
+                    logger.info("[{}] Computation job status response received is [{}]", entityId, response.getStatusCodeValue());
                     this.status = SparkComputationStatus.NOT_FOUND;
                 }
             }catch (RestClientException e){
-                logger.warning("[{}] Computation job status response received with error.", entityId);
+                logger.info("[{}] Computation job status response received with error.", entityId);
                 this.status = SparkComputationStatus.NOT_FOUND;
             }
         }else{
             this.status = SparkComputationStatus.NOT_FOUND;
         }
-        logger.debug("[{}] Computation Job status is [{}]", entityId, status);
+        logger.info("[{}] Computation Job status is [{}]", entityId, status);
     }
 
     private class StatusChecker implements Runnable{

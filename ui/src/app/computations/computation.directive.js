@@ -22,12 +22,10 @@ import computationFieldsetTemplate from './computation-fieldset.tpl.html';
 /* eslint-enable import/no-unresolved, import/default */
 
 /*@ngInject*/
-export default function ComputationDirective($compile, $templateCache, $translate, types, toast, utils, userService, componentDescriptorService, $log) {
+export default function ComputationDirective($compile, $templateCache, $translate, types, toast, utils, userService, componentDescriptorService) {
     var linker = function (scope, element) {
         var template = $templateCache.get(computationFieldsetTemplate);
         element.html(template);
-
-        //$log.error("HMDC scope.computation " + scope.computation.id.id);
 
         scope.showComputationConfig = false;
 
@@ -43,7 +41,6 @@ export default function ComputationDirective($compile, $templateCache, $translat
             if (newValue != prevValue) {
                 scope.computationConfiguration.data = null;
                 if (scope.computation) {
-                    $log.error("HMDC scope.computation " + angular.toJson(scope.computation));
                     componentDescriptorService.getComponentDescriptorByClazz(scope.computation.clazz).then(
                         function success(component) {
                             scope.computationComponent = component;
@@ -63,14 +60,6 @@ export default function ComputationDirective($compile, $templateCache, $translat
         scope.onComputationIdCopied = function() {
             toast.showSuccess($translate.instant('computation.idCopiedMessage'), 750, angular.element(element).parent().parent(), 'bottom left');
         };
-
-        /*componentDescriptorService.getComponentDescriptorsByType(types.componentType.computation).then(
-            function success(components) {
-                scope.computationComponents = components;
-            },
-            function fail() {
-            }
-        );*/
 
         $compile(element.contents())(scope);
     }

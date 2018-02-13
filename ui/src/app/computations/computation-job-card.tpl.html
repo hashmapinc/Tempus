@@ -16,4 +16,4 @@
 
 -->
 <div class="tb-uppercase" ng-if="item && parentCtl.types.id.nullUid === item.tenantId.id" translate>computatioJob.system</div>
-<div class="tb-uppercase" translate>{{item && item.state === 'CREATED' ? 'computationJob.created' : 'computationJob.suspended'}}</div>
+<div class="tb-uppercase" translate>{{item && item.state === 'ACTIVE' ? 'computationJob.active' : 'computationJob.suspended'}}</div>

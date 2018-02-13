@@ -19,6 +19,9 @@ public interface ComputationsRepository extends CrudRepository<ComputationsEntit
     @Query("delete from ComputationsEntity c where c.jarName = :jarName")
     void deleteByJarName(@Param("jarName") String name);
 
+    @Query("delete from ComputationsEntity c where c.id = :computationId")
+    void deleteById(@Param("computationId") String computationId);
+
     @Query("SELECT ce FROM ComputationsEntity ce WHERE ce.tenantId = :tenantId " +
             "AND LOWER(ce.searchText) LIKE LOWER(CONCAT(:textSearch, '%')) " +
             "AND ce.id > :idOffset ORDER BY ce.id")

@@ -18,6 +18,8 @@ public interface ComputationsService {
 
     Computations save(Computations computations);
 
+    void deleteById(ComputationId computationId);
+
     void deleteByJarName(String name);
 
     TextPageData<Computations> findTenantComputations(TenantId tenantId, TextPageLink pageLink);

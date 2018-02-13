@@ -136,7 +136,6 @@ export default function ComputationController(computationService, $log, userServ
     }
 
     function fetchComputations(pageLink) {
-        $log.error("HMDC fetching computations")
         return computationService.getAllComputations(pageLink);
     }
 

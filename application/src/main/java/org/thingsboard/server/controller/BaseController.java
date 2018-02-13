@@ -185,7 +185,6 @@ public abstract class BaseController {
     }
 
     UUID toUUID(String id) {
-        log.error("HMDC id passed id : " + id);
         return UUID.fromString(id);
     }
 

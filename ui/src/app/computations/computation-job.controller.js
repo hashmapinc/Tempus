@@ -57,8 +57,6 @@ export default function ComputationJobController(computationJobService, $log, us
         }
     ];
 
-    $log.log("HMDC computation Descriptor ", $stateParams.computationId);
-
     var computationJobAddItemActionsList = [
         {
             onAction: function ($event) {
@@ -72,10 +70,6 @@ export default function ComputationJobController(computationJobService, $log, us
 
     var vm = this;
 
-
-    //vm.computationDescriptor = $stateParams.jsonDescriptor;
-    //$scope.computation = vm.computation;
-    //$scope;
     vm.types = types;
 
     vm.helpLinkIdForComputationJob = helpLinkIdForComputationJob;
@@ -182,20 +176,15 @@ export default function ComputationJobController(computationJobService, $log, us
         }
     }
 
-    /*function exportComputationJob($event, computationJob) {
-        $event.stopPropagation();
-        importExport.exportComputationJob(computationJob.id.id);
-    }*/
-
-    function activateComputationJob(event, computationJob) {
-        computationJobService.activateComputationJob(computationJob.id.id).then(function () {
+    function activateComputationJob(event,computationJob) {
+        computationJobService.activateComputationJob($stateParams.computationId, computationJob.id.id).then(function () {
             vm.grid.refreshList();
         }, function () {
         });
     }
 
     function suspendComputationJob(event, computationJob) {
-        computationJobService.suspendComputationJob(computationJob.id.id).then(function () {
+        computationJobService.suspendComputationJob($stateParams.computationId, computationJob.id.id).then(function () {
             vm.grid.refreshList();
         }, function () {
         });

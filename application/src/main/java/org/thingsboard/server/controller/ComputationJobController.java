@@ -32,13 +32,12 @@ public class ComputationJobController extends BaseController{
     public ComputationJob saveComputationJob(@PathVariable("computationid") UUID strComputationId,
                                              @RequestBody ComputationJob source) throws ThingsboardException {
         //checkParameter("computationId", strComputationId);
-        log.error("HMDC strComputationId " + strComputationId);
         try {
             boolean created = source.getId() == null;
             source.setTenantId(getCurrentUser().getTenantId());
             //UUID id = UUID.fromString(strComputationId.trim());
             source.setComputationId(new ComputationId(strComputationId));
-            log.error("HMDC Computation ID added " + source.getComputationId());
+            log.debug(" Computation ID added " + source.getComputationId());
             ComputationJob computationJob = checkNotNull(computationJobService.saveComputationJob(source));
             actorService.onComputationJobStateChange(computationJob.getTenantId(), computationJob.getComputationId(),
                     computationJob.getId(), created ? ComponentLifecycleEvent.CREATED : ComponentLifecycleEvent.UPDATED);
@@ -52,13 +51,9 @@ public class ComputationJobController extends BaseController{
     @RequestMapping(value = "/computations/jobs", method = RequestMethod.POST)
     @ResponseBody
     public ComputationJob saveComputationJob(@RequestBody ComputationJob source) throws ThingsboardException {
-        //checkParameter("computationId", strComputationId);
-        //log.error("HMDC strComputationId " + strComputationId);
         try {
             boolean created = source.getId() == null;
             source.setTenantId(getCurrentUser().getTenantId());
-            //UUID id = UUID.fromString(strComputationId.trim());
-            //source.setComputationId(new ComputationId(strComputationId));
             ComputationJob computationJob = checkNotNull(computationJobService.saveComputationJob(source));
             actorService.onComputationJobStateChange(computationJob.getTenantId(), computationJob.getComputationId(),
                     computationJob.getId(), created ? ComponentLifecycleEvent.CREATED : ComponentLifecycleEvent.UPDATED);
@@ -99,11 +94,12 @@ public class ComputationJobController extends BaseController{
     }
 
     @PreAuthorize("hasAnyAuthority('SYS_ADMIN', 'TENANT_ADMIN')")
-    @RequestMapping(value = "/computations/{computationId}/jobs/{computaionJodId}/activate", method = RequestMethod.POST)
+    @RequestMapping(value = "/computations/{computationId}/jobs/{computationJodId}/activate", method = RequestMethod.POST)
     @ResponseStatus(value = HttpStatus.OK)
-    public void activateCompuationJobById(@PathVariable("computaionJodId") String strComputationJobId,
-                                   @PathVariable("computaionId") String strComputationId) throws ThingsboardException {
+    public void activateCompuationJobById(@PathVariable("computationJodId") String strComputationJobId,
+                                   @PathVariable("computationId") String strComputationId) throws ThingsboardException {
         checkParameter("strComputationJobId", strComputationJobId);
+        checkParameter("strComputationId", strComputationId);
         try {
             ComputationJobId computationJobId = new ComputationJobId(toUUID(strComputationJobId));
             ComputationId computationId = new ComputationId(toUUID(strComputationId));
@@ -116,11 +112,12 @@ public class ComputationJobController extends BaseController{
     }
 
     @PreAuthorize("hasAnyAuthority('SYS_ADMIN', 'TENANT_ADMIN')")
-    @RequestMapping(value = "/computations/{computationId}/jobs/{computaionJodId}/suspend", method = RequestMethod.POST)
+    @RequestMapping(value = "/computations/{computationId}/jobs/{computationJodId}/suspend", method = RequestMethod.POST)
     @ResponseStatus(value = HttpStatus.OK)
-    public void suspendComputationJobById(@PathVariable("computaionJodId") String strComputationJobId,
-                                  @PathVariable("computaionId") String strComputationId) throws ThingsboardException {
+    public void suspendComputationJobById(@PathVariable("computationJodId") String strComputationJobId,
+                                  @PathVariable("computationId") String strComputationId) throws ThingsboardException {
         checkParameter("strComputationJobId", strComputationJobId);
+        checkParameter("strComputationId", strComputationId);
         try {
             ComputationJobId computationJobId = new ComputationJobId(toUUID(strComputationJobId));
             ComputationId computationId = new ComputationId(toUUID(strComputationId));

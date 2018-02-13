@@ -25,19 +25,26 @@ import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.thingsboard.server.common.data.computation.ComputationJob;
 import org.thingsboard.server.common.data.computation.Computations;
 import org.thingsboard.server.common.data.id.ComputationId;
 import org.thingsboard.server.common.data.id.TenantId;
 import org.thingsboard.server.common.data.page.TextPageData;
 import org.thingsboard.server.common.data.page.TextPageLink;
+import org.thingsboard.server.common.data.plugin.ComponentLifecycleEvent;
 import org.thingsboard.server.common.data.security.Authority;
+import org.thingsboard.server.dao.computations.ComputationJobService;
 import org.thingsboard.server.dao.computations.ComputationsService;
 import org.thingsboard.server.dao.model.ModelConstants;
+import org.thingsboard.server.exception.ThingsboardErrorCode;
 import org.thingsboard.server.exception.ThingsboardException;
 import org.thingsboard.server.service.computation.ComputationDiscoveryService;
+import org.thingsboard.server.service.security.model.SecurityUser;
 
 import java.io.File;
 import java.util.List;
+
+import static org.thingsboard.server.dao.service.Validator.validateId;
 
 @Slf4j
 @RestController
@@ -54,6 +61,9 @@ public class ComputationsController extends BaseController {
     @Autowired
     ComputationsService computationsService;
 
+    @Autowired
+    ComputationJobService computationJobService;
+
     @PreAuthorize("hasAuthority('TENANT_ADMIN')")
     @RequestMapping(value = "/computations/upload", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
@@ -64,7 +74,7 @@ public class ComputationsController extends BaseController {
             file.transferTo(destinationFile);
 
             // Creating service call
-            log.error("HMDC uplaoding computations !!");
+            log.info(" uplaoding computations !!");
             TenantId tenantId = getCurrentUser().getTenantId();
             return computationDiscoveryService.onJarUpload(path, tenantId);
             //return new FileInfo(file.getOriginalFilename(), path);
@@ -74,19 +84,17 @@ public class ComputationsController extends BaseController {
     }
 
     @PreAuthorize("hasAuthority('TENANT_ADMIN')")
-    @RequestMapping(value = "/computations/delete", method = RequestMethod.POST)
+    @RequestMapping(value = "/computations/{computationId}", method = RequestMethod.DELETE)
     @ResponseBody
-    public void delete(@RequestParam("fileName") String fileName) throws ThingsboardException {
-        String path = uploadPath + File.separator + fileName;
-        computationDiscoveryService.deleteJarFile(path);
-    }
-
-    //Added here for testing purpose
-    @PreAuthorize("hasAuthority('TENANT_ADMIN')")
-    @RequestMapping(value = "/computations/find/all", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseBody
-    public void findAll() throws ThingsboardException {
-        computationDiscoveryService.findAll();
+    public void delete(@RequestParam("computationId") String strComputationId) throws ThingsboardException {
+        ComputationId computationId = new ComputationId(toUUID(strComputationId));
+        Computations computation = checkComputation(computationsService.findById(computationId));
+        List<ComputationJob> computationJobs = checkNotNull(computationJobService.findByComputationId(computationId));
+        for (ComputationJob computationJob: computationJobs) {
+            //computationJobService.deleteComputationJobById(computationJob.getId());
+            actorService.onComputationJobStateChange(computationJob.getTenantId(), computationJob.getComputationId(), computationJob.getId(), ComponentLifecycleEvent.DELETED);
+        }
+        computationsService.deleteById(computationId);
     }
 
     @PreAuthorize("hasAuthority('TENANT_ADMIN')")
@@ -111,12 +119,12 @@ public class ComputationsController extends BaseController {
     @ResponseBody
     public List<Computations> getComputations() throws ThingsboardException {
         try {
-                log.error("HMDC Fetching computations.");
+                log.info(" Fetching computations.");
                 TenantId tenantId = getCurrentUser().getTenantId();
                 List<Computations> computations = checkNotNull(computationsService.findAllTenantComputationsByTenantId(tenantId));
                 computations.stream()
                         .filter(computation -> computation.getTenantId().getId().equals(ModelConstants.NULL_UUID));
-                log.error("HMDC returning Computations {} ", computations);
+                log.info(" returning Computations {} ", computations);
                 return computations;
         } catch (Exception e) {
             throw handleException(e);
@@ -129,11 +137,11 @@ public class ComputationsController extends BaseController {
     public Computations getComputation(@PathVariable("computationId") String strComputationId) throws ThingsboardException {
 
         try {
-            log.error("HMDC Fetching computations by id.");
+            log.info(" Fetching computations by id.");
             ComputationId computationId = new ComputationId(toUUID(strComputationId));
             //TenantId tenantId = getCurrentUser().getTenantId();
             Computations computations = checkNotNull(computationsService.findById(computationId));
-            log.error("HMDC returning Computations by id{} ", computations);
+            log.info(" returning Computations by id{} ", computations);
             return computations;
         } catch (Exception e) {
             throw handleException(e);
@@ -145,5 +153,23 @@ public class ComputationsController extends BaseController {
     private static class FileInfo{
         private final String name;
         private final String path;
+    }
+
+    protected Computations checkComputation(Computations computation) throws ThingsboardException {
+        checkNotNull(computation);
+        SecurityUser authUser = getCurrentUser();
+        TenantId tenantId = computation.getTenantId();
+        validateId(tenantId, "Incorrect tenantId " + tenantId);
+        if (authUser.getAuthority() != Authority.SYS_ADMIN) {
+            if (authUser.getTenantId() == null ||
+                    !tenantId.getId().equals(ModelConstants.NULL_UUID) && !authUser.getTenantId().equals(tenantId)) {
+                throw new ThingsboardException("You don't have permission to perform this operation!",
+                        ThingsboardErrorCode.PERMISSION_DENIED);
+
+            } else if (tenantId.getId().equals(ModelConstants.NULL_UUID)) {
+                computation.setJsonDescriptor(null);
+            }
+        }
+        return computation;
     }
 }

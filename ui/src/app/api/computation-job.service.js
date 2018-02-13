@@ -55,48 +55,25 @@ function ComputationJobService($http, $q, $rootScope, $filter, componentDescript
     function loadComputationJobsCache(computationId) {
         var deferred = $q.defer();
         computationId;
-        //if (!allComputationJobs) {
             var url = '/api/computations/'+ computationId +'/jobs';
             $log.log("URL is ", url);
             $http.get(url, null).then(function success(response) {
                 $log.log("success response is ", response.data);
-                //componentDescriptorService.getComponentDescriptorsByType(types.componentType.computationJob).then(
-                    //function success(computationJobComponents) {
                         allComputationJobs = response.data;
                         //allActionComputationJobs = [];
                         systemComputationJobs = [];
                         tenantComputationJobs = [];
                         allComputationJobs = $filter('orderBy')(allComputationJobs, ['+name', '-createdTime']);
-                        /*var computationJobHasActionsByClazz = {};
-                        for (var index in computationJobComponents) {
-                            computationJobHasActionsByClazz[computationJobComponents[index].clazz] =
-                                (computationJobComponents[index].actions != null && computationJobComponents[index].actions.length > 0);
-                        }*/
                         for (var i = 0; i < allComputationJobs.length; i++) {
                             var computationJob = allComputationJobs[i];
-                
-                            /*if (computationJob.tenantId.id === types.id.nullUid) {
-                                systemComputationJobs.push(computationJob);
-                            } else {*/
                                 tenantComputationJobs.push(computationJob);
-                            //}
                         }
 
-                        $log.error("HMDC tenantComputationJobs : " + angular.toJson(tenantComputationJobs));
-
                         deferred.resolve();
-                    //},
-                    /*function fail() {
-                        deferred.reject();
-                    }*/
-                //);
             }, function fail() {
                 $log.log("failed to get response");
                 deferred.reject();
             });
-        /*} else {
-            deferred.resolve();
-        }*/
         return deferred.promise;
     }
 
@@ -141,9 +118,13 @@ function ComputationJobService($http, $q, $rootScope, $filter, componentDescript
 
     function getAllComputationJobs(pageLink, computationId) {
         var deferred = $q.defer();
-        loadComputationJobsCache(computationId).then(
-            function success() {
-                utils.filterSearchTextEntities(allComputationJobs, 'name', pageLink, deferred);
+
+        var url = '/api/computations/'+ computationId +'/jobs';
+        $log.log("URL is ", url);
+        $http.get(url, null).then(
+            function success(response) {
+                $log.log("success response is ", response.data);
+                deferred.resolve(response);
             },
             function fail() {
                 deferred.reject();
@@ -200,9 +181,9 @@ function ComputationJobService($http, $q, $rootScope, $filter, componentDescript
         return deferred.promise;
     }
 
-    function activateComputationJob(computationJobId) {
+    function activateComputationJob(computationId, computationJobId) {
         var deferred = $q.defer();
-        var url = '/api/computationJob/' + computationJobId + '/activate';
+        var url = '/api/computations/' + computationId + '/jobs/' + computationJobId + '/activate';
         $http.post(url, null).then(function success(response) {
             deferred.resolve(response.data);
         }, function fail(response) {
@@ -211,9 +192,9 @@ function ComputationJobService($http, $q, $rootScope, $filter, componentDescript
         return deferred.promise;
     }
 
-    function suspendComputationJob(computationJobId) {
+    function suspendComputationJob(computationId, computationJobId) {
         var deferred = $q.defer();
-        var url = '/api/computationJob/' + computationJobId + '/suspend';
+        var url = '/api/computations/' + computationId + '/jobs/' + computationJobId + '/suspend';
         $http.post(url, null).then(function success(response) {
             deferred.resolve(response.data);
         }, function fail(response) {

@@ -59,11 +59,8 @@ export default function ImportDialogController($scope, $log, $mdDialog, toast, i
         else if ($file.getExtension() === 'jar') {
             $scope.$apply(function() {
                 $scope.theForm.$setDirty();
-                //$log.error("HMDC inside jar ");
-                //if($file.length > 0){
                     vm.importData = $file;
                     vm.fileName = $file.name;
-                //}
             })
         }
 
