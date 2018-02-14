@@ -141,6 +141,7 @@ public class AnnotationsProcessor {
             actionRequest.setArgs(request.args());
             actionRequest.setDescriptor(request.descriptor());
             actionRequest.setName(request.name());
+            actionRequest.setArgType(request.argType());
         }
         return actionRequest;
     }
@@ -173,11 +174,11 @@ public class AnnotationsProcessor {
 
     private ComputationRequestCompiled processModelRequest(SparkActionRequestType model){
         try {
-            Properties props = new Properties();
+            /*Properties props = new Properties();
             URL url = this.getClass().getClassLoader().getResource("velocity.properties");
-            props.load(url.openStream());
+            props.load(url.openStream());*/
             JsonNode descriptor = descriptorNode(model.getDescriptor());
-            return new ComputationRequestCompiled(model.getArgs(),model.getName(),descriptor,model.getMainClass());
+            return new ComputationRequestCompiled(model.getArgs(), model.getArgType(), model.getName(), descriptor, model.getMainClass());
         } catch (IOException e) {
             log.error("Exception occurred while generating java source", e);
         }

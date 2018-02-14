@@ -15,6 +15,7 @@ public class Computations extends SearchTextBased<ComputationId> implements HasN
     private String mainClass;
     private JsonNode jsonDescriptor;
     private String argsformat;
+    private String argsType;
 
     public Computations() {
         super();
@@ -33,6 +34,7 @@ public class Computations extends SearchTextBased<ComputationId> implements HasN
         this.argsformat = computations.argsformat;
         this.jsonDescriptor = computations.jsonDescriptor;
         this.mainClass = computations.mainClass;
+        this.argsType = computations.argsType;
     }
 
     @Override
@@ -49,7 +51,7 @@ public class Computations extends SearchTextBased<ComputationId> implements HasN
         if (argsformat != null ? !argsformat.equals(that.argsformat) : that.argsformat != null) return false;
         if (jsonDescriptor != null ? !jsonDescriptor.equals(that.jsonDescriptor) : that.jsonDescriptor != null) return false;
         if (mainClass != null ? !mainClass.equals(that.mainClass) : that.mainClass != null) return false;
-
+        if (argsType != null ? !argsType.equals(that.argsType) : that.argsType != null) return false;
         return true;
     }
 
@@ -64,6 +66,7 @@ public class Computations extends SearchTextBased<ComputationId> implements HasN
         result = 31 * result + (argsformat != null ? argsformat.hashCode() : 0);
         result = 31 * result + (jsonDescriptor != null ? jsonDescriptor.hashCode() : 0);
         result = 31 * result + (mainClass != null ? mainClass.hashCode() : 0);
+        result = 31 * result + (argsType != null ? argsType.hashCode() : 0);
         return result;
     }
 
@@ -117,6 +120,14 @@ public class Computations extends SearchTextBased<ComputationId> implements HasN
 
     public void setArgsformat(String argsformat) {
         this.argsformat = argsformat;
+    }
+
+    public String getArgsType() {
+        return argsType;
+    }
+
+    public void setArgsType(String argsType) {
+        this.argsType = argsType;
     }
 
     @Override

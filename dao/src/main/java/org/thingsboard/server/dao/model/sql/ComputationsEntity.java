@@ -56,6 +56,9 @@ public class ComputationsEntity extends BaseSqlEntity<Computations> implements S
     @Column(name = ModelConstants.COMPUTATIONS_TENANT_ID)
     private String tenantId;
 
+    @Column(name = ModelConstants.COMPUTATIONS_ARGS_TYPE)
+    private String argsType;
+
     @Override
     public String getSearchTextSource() {
         return name;
@@ -90,6 +93,9 @@ public class ComputationsEntity extends BaseSqlEntity<Computations> implements S
         if(computations.getTenantId() != null) {
             this.tenantId = fromTimeUUID(computations.getTenantId().getId());
         }
+        if(computations.getArgsType() != null) {
+            this.argsType = computations.getArgsType();
+        }
     }
 
     @Override
@@ -113,7 +119,7 @@ public class ComputationsEntity extends BaseSqlEntity<Computations> implements S
         if (jsonDescriptor != null ? !jsonDescriptor.equals(that.jsonDescriptor) : that.jsonDescriptor != null) return false;
         if (tenantId != null ? !tenantId.equals(that.tenantId) : that.tenantId != null) return false;
         if (argsFormat != null ? !argsFormat.equals(that.argsFormat) : that.argsFormat != null) return false;
-
+        if (argsType != null ? !argsType.equals(that.argsType) : that.argsType != null) return false;
 
         return true;
     }
@@ -129,6 +135,7 @@ public class ComputationsEntity extends BaseSqlEntity<Computations> implements S
         result = 31 * result + (jsonDescriptor != null ? jsonDescriptor.hashCode() : 0);
         result = 31 * result + (tenantId != null ? tenantId.hashCode() : 0);
         result = 31 * result + (argsFormat != null ? argsFormat.hashCode() : 0);
+        result = 31 * result + (argsType != null ? argsType.hashCode() : 0);
         return result;
     }
 
@@ -140,6 +147,7 @@ public class ComputationsEntity extends BaseSqlEntity<Computations> implements S
         computations.setJarPath(jarPath);
         computations.setJarName(jarName);
         computations.setArgsformat(argsFormat);
+        computations.setArgsType(argsType);
         if (tenantId != null) {
             computations.setTenantId(new TenantId(fromString(tenantId)));
         }

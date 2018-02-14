@@ -22,6 +22,7 @@ import akka.event.LoggingAdapter;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.hashmap.tempus.models.ArgType;
 import org.springframework.http.*;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
@@ -201,7 +202,6 @@ public class ComputationJobActorMessageProcessor extends ComponentMsgProcessor<C
         SparkComputationRequest.SparkComputationRequestBuilder builder = SparkComputationRequest.builder();
         builder.file(systemContext.getComputationLocation() + computation.getJarName());
         builder.className(computation.getMainClass());
-        //logger.info("Arguments are " + args());
         builder.args(args());
         SparkComputationRequest sparkComputationRequest = builder.build();
         logger.info("spark request {} " + sparkComputationRequest.toString());
@@ -210,31 +210,19 @@ public class ComputationJobActorMessageProcessor extends ComponentMsgProcessor<C
 
     private String[] args() throws IOException {
         JsonNode conf = job.getArgParameters();
-        logger.info("Parsing args format");
-        //JsonNode node = mapper.readTree(computation.getArgsformat());
         String argsFormat = computation.getArgsformat();
         String argsTmp = argsFormat.substring(1, argsFormat.length() - 1);
-        logger.info("Parsed array parameters arg are {} ", argsTmp);
         List<String> args = new ArrayList<>();
-        List<String> argsList =  new ArrayList<String>(Arrays.asList(argsTmp.split(",")));
-        logger.info("Args List : " + argsList );
+        List<String> argsList =  new ArrayList<>(Arrays.asList(argsTmp.split(",")));
+        logger.info("Parsed array parameters arg are {} ", argsList);
         if(!argsList.isEmpty()){
             for (String arg: argsList) {
-                logger.info("Argument key " + arg.trim());
-                logger.info("Argument value " + conf.get(arg.trim()).asText());
-                //args.add("--" + arg.trim() + " " + conf.get(arg.trim()).asText());
+                if(computation.getArgsType().equals(ArgType.NAMED)) {
+                    args.add("--" + arg.trim());
+                }
                 args.add(conf.get(arg.trim()).asText());
             }
         }
-        /*if(node != null && node.isArray()){
-            logger.info("Args format is an array");
-            for(JsonNode ar : node){
-                args.add("--" + ar.asText());
-                logger.info("Argument key is {}", ar.asText());
-                args.add(conf.get(ar.asText()).asText());
-                logger.info("Argument value for key {} is {}", ar.asText(), conf.get(ar.asText()).asText());
-            }
-        }*/
         logger.info("Argument array list to spark job " + args);
         return args.toArray(new String[args.size()]);
     }

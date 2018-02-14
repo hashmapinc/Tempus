@@ -168,6 +168,7 @@ public class ModelConstants {
     public static final String COMPUTATIONS_DESCRIPTOR = "json_descriptor";
     public static final String COMPUTATIONS_TENANT_ID = TENANT_ID_PROPERTY;
     public static final String COMPUTATIONS_ARGS_FORMAT = "args_format";
+    public static final String COMPUTATIONS_ARGS_TYPE = "args_type";
 
     public static final String COMPUTATION_JOB_TABLE_NAME = "computation_job";
     public static final String COMPUTATION_JOB_NAME = "job_name";

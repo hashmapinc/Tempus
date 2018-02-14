@@ -294,6 +294,7 @@ CREATE TABLE IF NOT EXISTS computations (
     computation_name varchar,
     main_class varchar,
     args_format varchar,
+    args_type varchar,
     json_descriptor varchar,
     tenant_id varchar(31)
 );

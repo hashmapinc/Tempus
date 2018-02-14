@@ -26,12 +26,15 @@ public class ComputationRequestCompiled implements ComputationMsg{
     private final String name;
     private final JsonNode configurationDescriptor;
     private final String mainClazz;
+    private final String argsType;
 
     public ComputationRequestCompiled(String[] args,
+                                     String argsType,
                                      String name,
                                      JsonNode configurationDescriptor,
                                      String mainClazz) {
         this.args = args;
+        this.argsType = argsType;
         this.name = name;
         this.configurationDescriptor = configurationDescriptor;
         this.mainClazz = mainClazz;
@@ -51,5 +54,9 @@ public class ComputationRequestCompiled implements ComputationMsg{
 
     public String getMainClazz() {
         return mainClazz;
+    }
+
+    public String getArgsType() {
+        return argsType;
     }
 }
