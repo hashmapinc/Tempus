@@ -138,9 +138,9 @@ export default function AppRun($rootScope, $window, $injector, $location, $log, 
             }
             if (angular.isDefined(to.data.pageTitle)) {
                 $translate(to.data.pageTitle).then(function (translation) {
-                    $rootScope.pageTitle = 'ThingsBoard | ' + translation;
+                    $rootScope.pageTitle = 'Tempus | ' + translation;
                 }, function (translationId) {
-                    $rootScope.pageTitle = 'ThingsBoard | ' + translationId;
+                    $rootScope.pageTitle = 'Tempus | ' + translationId;
                 });
             }
         })
