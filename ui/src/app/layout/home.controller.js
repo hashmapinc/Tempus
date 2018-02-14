@@ -18,7 +18,7 @@ import $ from 'jquery';
 
 /* eslint-disable import/no-unresolved, import/default */
 
-import logoSvg from '../../svg/Tempus_Logo_E_TagLineExtended_vectorized.svg';
+import logoSvg from '../../svg/concho-logo.svg';
 
 /* eslint-enable import/no-unresolved, import/default */
 
