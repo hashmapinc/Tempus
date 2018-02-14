@@ -324,17 +324,6 @@ function Menu(userService, $state, $rootScope) {
                                         link: '/static/svg/dashboardlightgray.svg'
                                     }
                                 ]
-                            },
-                            {
-                                name: 'tempusboard.view-tempusboard',
-                                places: [
-                                    {
-                                        name: 'Tempusboard',
-                                        icon: 'dashboard',
-                                        state: 'home.tempusboard',
-                                        link: '/static/svg/tempusboardlightgray.svg'
-                                    }
-                                ]
                             }];
 
                 } else if (authority === 'CUSTOMER_USER') {
