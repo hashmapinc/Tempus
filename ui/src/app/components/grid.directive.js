@@ -217,6 +217,18 @@ function GridController($scope, $state, $mdDialog, $document, $q, $timeout, $tra
                                 vm.items.pending = false;
                                 reload();
                             } else {
+                                if (($window.localStorage.getItem("currentApp") !== "null" && $window.localStorage.getItem("currentApp") !== null) && items.data[0].id.entityType == 'APPLICATION') {
+                                    var oldStoredApp = angular.fromJson($window.localStorage.getItem('currentApp'));
+                                    vm.config.parentCtl.tabSelectedIndex = $window.localStorage.getItem('currentTab');
+                                    items.data.forEach(function(application){
+                                        if(oldStoredApp.id.id == application.id.id){
+                                            vm.newApp = application;
+                                        }
+                                    })
+                                    //$window.localStorage.setItem('currentApp', angular.toJson(vm.currentApplication));
+                                    $window.localStorage.removeItem('currentApp');
+                                    $window.localStorage.removeItem('currentTab');
+                                }
                                 if(items.data[0].id.entityType == 'DASHBOARD' && angular.isDefined(vm.config.parentCtl.currentApplication) && (angular.isDefined(vm.config.parentCtl.currentApplication.miniDashboardId) || angular.isDefined(vm.config.parentCtl.currentApplication.dashboardId))){
                                     if(vm.config.parentCtl.showAppMini){
                                         items.data.forEach(function(miniDashboard){
@@ -271,6 +283,10 @@ function GridController($scope, $state, $mdDialog, $document, $q, $timeout, $tra
                                     vm.items.nextPageLink.limit = pageSize;
                                 }
                                 vm.items.pending = false;
+                                if (vm.newApp) {
+                                    vm.openItem(null, vm.newApp);
+                                    $window.localStorage.removeItem('currentApp');
+                                }
                             }
                         },
                         function fail() {
@@ -522,7 +538,9 @@ function GridController($scope, $state, $mdDialog, $document, $q, $timeout, $tra
     }
 
     function openItem($event, item) {
-        $event.stopPropagation();
+        if($event){
+            $event.stopPropagation();
+        }
         if (vm.detailsConfig.currentItem != null && vm.detailsConfig.currentItem.id.id === item.id.id) {
             if (vm.detailsConfig.isDetailsOpen) {
                 vm.detailsConfig.isDetailsOpen = false;
@@ -562,6 +580,7 @@ function GridController($scope, $state, $mdDialog, $document, $q, $timeout, $tra
 
     function onCloseDetails() {
         vm.detailsConfig.currentItem = null;
+        $window.localStorage.removeItem('currentApp')
     }
 
     function operatingItem() {
