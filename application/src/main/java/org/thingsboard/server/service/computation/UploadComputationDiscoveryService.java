@@ -84,45 +84,12 @@ public class UploadComputationDiscoveryService implements ComputationDiscoverySe
         log.warn("Initializing bean Directory Computation discovery.");
         Assert.hasLength(libraryPath, MiscUtils.missingProperty("spark.jar_path"));
         Assert.notNull(pollingInterval, MiscUtils.missingProperty("spark.polling_interval"));
-        this.compiler = new RuntimeJavaCompiler();
-        discoverDynamicComponents();
+        //this.compiler = new RuntimeJavaCompiler();
+        //discoverDynamicComponents();
     }
 
     public void discoverDynamicComponents(){
-        final FileSystem fs = FileSystems.getDefault();
-        try {
-            List<Path> jars = Files.walk(fs.getPath(libraryPath)).collect(Collectors.toList());
-            for(Path j: jars){
-                if(isJar(j)) {
-                    AnnotationsProcessor processor = new AnnotationsProcessor(j, compiler);
-                    List<ComputationRequestCompiled> c = processor.processAnnotations();
-                    if(c != null && !c.isEmpty()) {
-                        for (ComputationRequestCompiled computationRequestCompiled : c) {
-                            Computations computations = new Computations();
-                            computations.setJarPath(j.toString());
-                            computations.setMainClass(computationRequestCompiled.getMainClazz());
-                            computations.setJsonDescriptor(computationRequestCompiled.getConfigurationDescriptor());
-                            String args = Arrays.toString(computationRequestCompiled.getArgs());
-                            computations.setArgsformat(args);
-                            computations.setJarName(j.getFileName().toString());
-                            computations.setName(computationRequestCompiled.getName());
-                            Computations persistedComputations = computationsService.findByName(computations.getName());
-                            if (persistedComputations == null) {
-                                ComputationId computationId = new ComputationId(UUIDs.timeBased());
-                                computations.setId(computationId);
-                                computationsService.save(computations);
-                            } else {
-                                computations.setId(persistedComputations.getId());
-                                computationsService.save(computations);
-                            }
-                        }
-                    }
-                }
-            }
-            //componentDiscoveryService.updateActionsForPlugin(compiledActions, PLUGIN_CLAZZ);
-        } catch (IOException e) {
-            log.error("Error while reading jars from directory.", e);
-        }
+
     }
 
     private boolean isJar(Path jarPath) throws IOException {
