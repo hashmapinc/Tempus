@@ -147,8 +147,9 @@ public class ComputationJobActorMessageProcessor extends ComponentMsgProcessor<C
 
     private void processHeaders(){
         JsonNode jsonHeaders = job.getArgParameters().get("headers");
-        logger.info("Processing headers " + jsonHeaders.asText());
+        headers.add("Content-Type", "application/json");
         if(jsonHeaders != null && jsonHeaders.isArray()){
+            logger.info("Processing headers " + jsonHeaders.asText());
             for(JsonNode e : jsonHeaders){
                 this.headers.add(e.get("key").asText(), e.get("value").asText());
             }

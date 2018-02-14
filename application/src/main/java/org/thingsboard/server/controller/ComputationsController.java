@@ -42,6 +42,10 @@ import org.thingsboard.server.service.computation.ComputationDiscoveryService;
 import org.thingsboard.server.service.security.model.SecurityUser;
 
 import java.io.File;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.List;
 
 import static org.thingsboard.server.dao.service.Validator.validateId;
@@ -71,9 +75,9 @@ public class ComputationsController extends BaseController {
         try {
             String path = uploadPath + File.separator + file.getOriginalFilename();
             File destinationFile = new File(path);
-            file.transferTo(destinationFile);
-
-            // Creating service call
+            try (InputStream input = file.getInputStream()) {
+                Files.copy(input, Paths.get(destinationFile.toURI()), StandardCopyOption.REPLACE_EXISTING);
+            }
             log.info(" uplaoding computations !!");
             TenantId tenantId = getCurrentUser().getTenantId();
             return computationDiscoveryService.onJarUpload(path, tenantId);

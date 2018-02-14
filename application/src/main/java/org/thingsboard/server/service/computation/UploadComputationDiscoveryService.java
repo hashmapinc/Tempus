@@ -104,7 +104,6 @@ public class UploadComputationDiscoveryService implements ComputationDiscoverySe
                             computations.setJsonDescriptor(computationRequestCompiled.getConfigurationDescriptor());
                             String args = Arrays.toString(computationRequestCompiled.getArgs());
                             computations.setArgsformat(args);
-                            computations.setArgsType(computationRequestCompiled.getArgsType());
                             computations.setJarName(j.getFileName().toString());
                             computations.setName(computationRequestCompiled.getName());
                             Computations persistedComputations = computationsService.findByName(computations.getName());
@@ -152,6 +151,7 @@ public class UploadComputationDiscoveryService implements ComputationDiscoverySe
                         computations.setJsonDescriptor(computationRequestCompiled.getConfigurationDescriptor());
                         String args = Arrays.toString(computationRequestCompiled.getArgs());
                         computations.setArgsformat(args);
+                        computations.setArgsType(computationRequestCompiled.getArgsType());
                         computations.setJarName(j.getFileName().toString());
                         computations.setName(computationRequestCompiled.getName());
                         Computations persistedComputations = computationsService.findByName(computations.getName());
