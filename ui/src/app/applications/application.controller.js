@@ -35,7 +35,7 @@ export function ApplicationCardController(types) {
 }
 
 /*@ngInject*/
-export function ApplicationController($log, $rootScope, userService, applicationService, customerService, $state, $stateParams, $document, $mdDialog, $q, types, ruleService, importExport, $filter, dashboardService, $translate, $window) {
+export function ApplicationController($timeout, $log, $rootScope, userService, applicationService, customerService, $state, $stateParams, $document, $mdDialog, $q, types, ruleService, importExport, $filter, dashboardService, $translate, $window) {
 
     var customerId = $stateParams.customerId;
 
@@ -46,6 +46,7 @@ export function ApplicationController($log, $rootScope, userService, application
     var vm = this;
 
     vm.types = types;
+    vm.isShowSidenav = true;
 
     vm.applicationGridConfig = {
         deleteItemTitleFunc: deleteApplicationTitle,
@@ -94,37 +95,73 @@ export function ApplicationController($log, $rootScope, userService, application
     vm.manageCredentials = manageCredentials;
     vm.currentApp = currentApp;
     vm.appClicked = false;
+    vm.appSliderOpen = true;
 
     vm.showAppMini = false;
     vm.showAppMain = false;
     vm.showAppRules = false;
+    vm.showAppDetails = true;
+
+    vm.tabSelectedIndex = 0;
 
     vm.tabselected = function (selectedTab){
         if(selectedTab == 'Mini'){
             vm.showAppMini = true;
             vm.showAppMain = false;
             vm.showAppRules = false;
+            vm.showAppDetails = false;
+            vm.tabSelectedIndex = 1;
         }
         else if(selectedTab == 'Rules'){
             vm.showAppMini = false;
             vm.showAppMain = false;
             vm.showAppRules = true;
+            vm.showAppDetails = false;
+            vm.tabSelectedIndex = 2;
 
         }
         else if(selectedTab == 'Main'){
             vm.showAppMini = false;
             vm.showAppMain = true;
             vm.showAppRules = false;
+            vm.showAppDetails = false;
+            vm.tabSelectedIndex = 3;
 
         }
+        else if(selectedTab == 'Details'){
+            vm.currentAppforDirective = vm.currentApplication;
+            vm.showAppMini = false;
+            vm.showAppMain = false;
+            vm.showAppRules = false;
+            vm.showAppDetails = true; 
+            vm.tabSelectedIndex = 0;
+        }
 
+    }
+
+    vm.detailesClicked = function() {
+        vm.appSliderOpen = false;
+        $timeout( function(){
+                   vm.showAppMini = false;
+            vm.showAppMain = false;
+            vm.showAppRules = false;
+            vm.showAppDetails = true; 
+                       vm.grid.detailsConfig.isDetailsOpen = false;
+            vm.appSliderOpen = true;
+            $timeout( function(){
+                vm.grid.openItem(null, vm.currentApplication);
+            }, 100 ); 
+        }, 100 ); 
     }
 
     function currentApp(item) {
        vm.currentApplication = item; 
     }    
 
-
+    $window.onbeforeunload = function() {
+      $window.localStorage.removeItem('currentApp');
+      $window.localStorage.removeItem('currentTab');
+    };
 
     initController();
 
@@ -161,68 +198,68 @@ export function ApplicationController($log, $rootScope, userService, application
                 return {"topIndex": vm.topIndex};
             };
 
-            applicationActionsList.push({
-                onAction: function ($event, item) {
-                    makePublic($event, item);
-                },
-                name: function() { return $translate.instant('action.share') },
-                details: function() { return $translate.instant('application.make-public') },
-                icon: "share",
-                isEnabled: function(application) {
-                    return application && (!application.customerId || application.customerId.id === types.id.nullUid);
-                }
-            });
+            // applicationActionsList.push({
+            //     onAction: function ($event, item) {
+            //         makePublic($event, item);
+            //     },
+            //     name: function() { return $translate.instant('action.share') },
+            //     details: function() { return $translate.instant('application.make-public') },
+            //     icon: "share",
+            //     isEnabled: function(application) {
+            //         return application && (!application.customerId || application.customerId.id === types.id.nullUid);
+            //     }
+            // });
 
-            applicationActionsList.push(
-                {
-                    onAction: function ($event, item) {
-                        assignToCustomer($event, [ item.id.id ]);
-                    },
-                    name: function() { return $translate.instant('action.assign') },
-                    details: function() { return $translate.instant('application.assign-to-customer') },
-                    icon: "assignment_ind",
-                    isEnabled: function(application) {
-                        return application && (!application.customerId || application.customerId.id === types.id.nullUid);
-                    }
-                }
-            );
+            // applicationActionsList.push(
+            //     {
+            //         onAction: function ($event, item) {
+            //             assignToCustomer($event, [ item.id.id ]);
+            //         },
+            //         name: function() { return $translate.instant('action.assign') },
+            //         details: function() { return $translate.instant('application.assign-to-customer') },
+            //         icon: "assignment_ind",
+            //         isEnabled: function(application) {
+            //             return application && (!application.customerId || application.customerId.id === types.id.nullUid);
+            //         }
+            //     }
+            // );
 
-            applicationActionsList.push(
-                {
-                    onAction: function ($event, item) {
-                        unassignFromCustomer($event, item, false);
-                    },
-                    name: function() { return $translate.instant('action.unassign') },
-                    details: function() { return $translate.instant('application.unassign-from-customer') },
-                    icon: "assignment_return",
-                    isEnabled: function(application) {
-                        return application && application.customerId && application.customerId.id !== types.id.nullUid && !application.assignedCustomer.isPublic;
-                    }
-                }
-            );
+            // applicationActionsList.push(
+            //     {
+            //         onAction: function ($event, item) {
+            //             unassignFromCustomer($event, item, false);
+            //         },
+            //         name: function() { return $translate.instant('action.unassign') },
+            //         details: function() { return $translate.instant('application.unassign-from-customer') },
+            //         icon: "assignment_return",
+            //         isEnabled: function(application) {
+            //             return application && application.customerId && application.customerId.id !== types.id.nullUid && !application.assignedCustomer.isPublic;
+            //         }
+            //     }
+            // );
 
-            applicationActionsList.push({
-                onAction: function ($event, item) {
-                    unassignFromCustomer($event, item, true);
-                },
-                name: function() { return $translate.instant('action.make-private') },
-                details: function() { return $translate.instant('application.make-private') },
-                icon: "reply",
-                isEnabled: function(application) {
-                    return application && application.customerId && application.customerId.id !== types.id.nullUid && application.assignedCustomer.isPublic;
-                }
-            });
+            // applicationActionsList.push({
+            //     onAction: function ($event, item) {
+            //         unassignFromCustomer($event, item, true);
+            //     },
+            //     name: function() { return $translate.instant('action.make-private') },
+            //     details: function() { return $translate.instant('application.make-private') },
+            //     icon: "reply",
+            //     isEnabled: function(application) {
+            //         return application && application.customerId && application.customerId.id !== types.id.nullUid && application.assignedCustomer.isPublic;
+            //     }
+            // });
 
-            applicationActionsList.push(
-                {
-                    onAction: function ($event, item) {
-                        manageCredentials($event, item);
-                    },
-                    name: function() { return $translate.instant('application.credentials') },
-                    details: function() { return $translate.instant('application.manage-credentials') },
-                    icon: "security"
-                }
-            );
+            // applicationActionsList.push(
+            //     {
+            //         onAction: function ($event, item) {
+            //             manageCredentials($event, item);
+            //         },
+            //         name: function() { return $translate.instant('application.credentials') },
+            //         details: function() { return $translate.instant('application.manage-credentials') },
+            //         icon: "security"
+            //     }
+            // );
 
             applicationActionsList.push(
                 {
@@ -353,11 +390,10 @@ export function ApplicationController($log, $rootScope, userService, application
         vm.applicationGridConfig.refreshParamsFunc = refreshApplicationsParamsFunction;
         vm.applicationGridConfig.fetchItemsFunc = fetchApplicationsFunction;
         vm.applicationGridConfig.deleteItemFunc = deleteApplicationFunction;
-
     }
 
     function deleteApplicationTitle(application) {
-        return $translate.instant('application.delete-application-title', {applicationName: application.name});
+        return $translate.instant('application.delete-application-title', {applicationTitle: application.name});
     }
 
     function deleteApplicationText() {
@@ -717,31 +753,23 @@ export function ApplicationController($log, $rootScope, userService, application
     }
 
     function saveRule(rule) {
-        var deferred = $q.defer();
-        ruleService.saveRule(rule).then(
-            function success(savedRule) {
-                $log.log(savedRule);
-                var rules = {"applicationId": vm.currentApplication.id.id, "rules":[savedRule.id.id]};
-                var deviceTypes =[];
-                 savedRule.filters.forEach(function(filter){
-                    filter.configuration.deviceTypes.forEach(function(deviceType){
-                        deviceTypes.push(deviceType.name.toLowerCase());
-                    })
-                 });
-
-                
+        return ruleService.saveRule(rule).then(
+            function(savedRule) {
+                var rules = {"applicationId": vm.currentApplication.id.id, "rules":[savedRule.id.id]}; 
                 applicationService.assignRulesToApplication(rules);
-                applicationService.assignDeviceTypesToApplication(vm.currentApplication.id.id, deviceTypes);
-            },
-            function fail() {
-                deferred.reject();
-            }
+                $window.localStorage.setItem('currentApp', angular.toJson(vm.currentApplication));
+                $window.localStorage.setItem('currentTab', angular.toJson(vm.tabSelectedIndex));
+           }
         );
-        return deferred.promise;
     }
 
     function deleteRule(ruleId) {
-        return ruleService.deleteRule(ruleId);
+        return ruleService.deleteRule(ruleId).then(
+            function() {
+                var rules = {"applicationId": vm.currentApplication.id.id, "rules":[ruleId]};
+                applicationService.unAssignRulesFromApplication(rules);
+            }
+        );
     }
 
     function getRuleTitle(rule) {
@@ -1104,8 +1132,9 @@ export function ApplicationController($log, $rootScope, userService, application
         var deferred = $q.defer();
         dashboardService.saveDashboard(dashboard).then(
             function success(savedDashboard) {
-                $log.log(vm.currentApplication);
                 var dashboards = [ savedDashboard ];
+                $window.localStorage.setItem('currentApp', angular.toJson(vm.currentApplication));
+                $window.localStorage.setItem('currentTab', angular.toJson(vm.tabSelectedIndex));
                 if(vm.showAppMini){
                     applicationService.assignMiniDashboardToApplication(vm.currentApplication.id.id, savedDashboard.id.id);
                 }
