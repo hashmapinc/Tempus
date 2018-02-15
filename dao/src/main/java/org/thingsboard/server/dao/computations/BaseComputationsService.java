@@ -41,9 +41,8 @@ public class BaseComputationsService extends AbstractEntityService implements Co
 
     @Override
     public Computations save(Computations computations) {
-        ComputationsEntity computationsEntity = new ComputationsEntity(computations);
-        computationsDao.save(computationsEntity);
-        return computations;
+        //ComputationsEntity computationsEntity = new ComputationsEntity(computations);
+        return computationsDao.save(computations);
     }
 
     @Override

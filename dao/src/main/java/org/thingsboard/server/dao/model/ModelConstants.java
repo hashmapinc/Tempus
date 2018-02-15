@@ -142,15 +142,19 @@ public class ModelConstants {
     public static final String APPLICATION_DASHBOARD_ID_PROPERTY = "dashboard_id";
     public static final String APPLICATION_MINI_DASHBOARD_ID_PROPERTY = "mini_dashboard_id";
     public static final String APPLICATION_NAME = "name";
+    public static final String APPLICATION_IS_VALID = "is_valid";
     public static final String APPLICATION_DESCRIPTION = "description";
     public static final String APPLICATION_DEVICE_TYPES_TABLE = "application_device_types";
     public static final String APPLICATION_RULES_ASSOCIATION_TABLE = "application_associated_rules";
+    public static final String APPLICATION_COMPUTATION_JOBS_ASSOCIATION_TABLE = "application_associated_computation_jobs";
     public static final String APPLICATION_RULE_ID_COLUMN= "application_rule_id";
+    public static final String APPLICATION_COMPUTATION_JOB_ID_COLUMN= "application_computation_job_id";
     public static final String APPLICATION_ID_COLUMN = "application_id";
     public static final String APPLICATION_DEVICE_TYPES = "device_type";
     public static final String APPLICATION_TENANT_ID_PROPERTY = TENANT_ID_PROPERTY;
     public static final String APPLICATION_CUSTOMER_ID_PROPERTY = CUSTOMER_ID_PROPERTY;
     public static final String APPLICATION_RULES_COLUMN = "application_rules";
+    public static final String APPLICATION_COMPUTATION_JOBS_COLUMN = "application_computation_jobs";
     public static final String APPLICATION_DEVICE_TYPES_COLUMN = "application_device_types";
     public static final String APPLICATION_BY_TENANT_AND_DASHBOARD_COLUMN_FAMILY= "application_by_dashboard";
     public static final String APPLICATION_BY_TENANT_AND_MINI_DASHBOARD_COLUMN_FAMILY= "application_by_mini_dashboard";
@@ -303,6 +307,30 @@ public class ModelConstants {
     public static final String PLUGIN_BY_CLASS_COLUMN_FAMILY_NAME = "plugin_by_clazz";
 
     /**
+     * Cassandra Computations Constants
+     */
+    public static final String COMPUTATIONS_COLUMN_FAMILY_NAME = "computations";
+    public static final String COMPUTATIONS_JAR_PROPERTY = "jar_name";
+    public static final String COMPUTATIONS_JAR_PATH_PROPERTY = "jar_path";
+    public static final String COMPUTATIONS_NAME_PROPERTY = "computation_name";
+    public static final String COMPUTATIONS_MAIN_CLASS_PROPERTY = "main_class";
+    public static final String COMPUTATIONS_DESCRIPTOR_PROPERTY = "json_descriptor";
+    public static final String COMPUTATIONS_TENANT_ID_PROPERTY = TENANT_ID_PROPERTY;
+    public static final String COMPUTATIONS_ARGS_FORMAT_PROPERTY = "args_format";
+    public static final String COMPUTATIONS_ARGS_TYPE_PROPERTY = "args_type";
+    public static final String COMPUTATIONS_BY_TENANT = "computations_by_tenant_and_search_text";
+
+    public static final String COMPUTATION_JOB_COLUMN_FAMILY_NAME = "computation_job";
+    public static final String COMPUTATION_JOB_NAME_PROPERTY = "job_name";
+    public static final String COMPUTATION_JOB_COMPUTAION_ID_PROPERTY = "computation_id";
+    public static final String COMPUTATION_JOB_ARG_PRS_PROPERTY = "arg_parameters";
+    public static final String COMPUTATION_JOB_STATE_PROPERTY = "state";
+    public static final String COMPUTATION_JOB_ID_PROPERTY = "job_id";
+    public static final String COMPUTATION_JOB_BY_COMPUTATION = "computation_jobs_by_computation_and_search_text";
+    public static final String COMPUTATION_JOB_TENANT_ID_PROPERTY = TENANT_ID_PROPERTY;
+
+
+    /**
      * Cassandra plugin component metadata constants.
      */
     public static final String COMPONENT_DESCRIPTOR_COLUMN_FAMILY_NAME = "component_descriptor";
@@ -377,16 +405,17 @@ public class ModelConstants {
     public static final String STRING_VALUE_COLUMN = "str_v";
     public static final String LONG_VALUE_COLUMN = "long_v";
     public static final String DOUBLE_VALUE_COLUMN = "dbl_v";
+    public static final String JSON_VALUE_COLUMN = "json_v";
 
-    public static final String[] NONE_AGGREGATION_COLUMNS = new String[]{LONG_VALUE_COLUMN, DOUBLE_VALUE_COLUMN, BOOLEAN_VALUE_COLUMN, STRING_VALUE_COLUMN, KEY_COLUMN, TS_COLUMN};
-    public static final String[] NONE_DS_AGGREGATION_COLUMNS = new String[]{LONG_VALUE_COLUMN, DOUBLE_VALUE_COLUMN, BOOLEAN_VALUE_COLUMN, STRING_VALUE_COLUMN, KEY_COLUMN, DS_COLUMN};
+    public static final String[] NONE_AGGREGATION_COLUMNS = new String[]{LONG_VALUE_COLUMN, DOUBLE_VALUE_COLUMN, BOOLEAN_VALUE_COLUMN, STRING_VALUE_COLUMN, JSON_VALUE_COLUMN, KEY_COLUMN, TS_COLUMN};
+    public static final String[] NONE_DS_AGGREGATION_COLUMNS = new String[]{LONG_VALUE_COLUMN, DOUBLE_VALUE_COLUMN, BOOLEAN_VALUE_COLUMN, STRING_VALUE_COLUMN, JSON_VALUE_COLUMN, KEY_COLUMN, DS_COLUMN};
 
-    public static final String[] COUNT_AGGREGATION_COLUMNS = new String[]{count(LONG_VALUE_COLUMN), count(DOUBLE_VALUE_COLUMN), count(BOOLEAN_VALUE_COLUMN), count(STRING_VALUE_COLUMN)};
+    public static final String[] COUNT_AGGREGATION_COLUMNS = new String[]{count(LONG_VALUE_COLUMN), count(DOUBLE_VALUE_COLUMN), count(BOOLEAN_VALUE_COLUMN), count(STRING_VALUE_COLUMN), count(JSON_VALUE_COLUMN)};
 
     public static final String[] MIN_AGGREGATION_COLUMNS = ArrayUtils.addAll(COUNT_AGGREGATION_COLUMNS,
-            new String[]{min(LONG_VALUE_COLUMN), min(DOUBLE_VALUE_COLUMN), min(BOOLEAN_VALUE_COLUMN), min(STRING_VALUE_COLUMN)});
+            new String[]{min(LONG_VALUE_COLUMN), min(DOUBLE_VALUE_COLUMN), min(BOOLEAN_VALUE_COLUMN), min(STRING_VALUE_COLUMN), min(JSON_VALUE_COLUMN)});
     public static final String[] MAX_AGGREGATION_COLUMNS = ArrayUtils.addAll(COUNT_AGGREGATION_COLUMNS,
-            new String[]{max(LONG_VALUE_COLUMN), max(DOUBLE_VALUE_COLUMN), max(BOOLEAN_VALUE_COLUMN), max(STRING_VALUE_COLUMN)});
+            new String[]{max(LONG_VALUE_COLUMN), max(DOUBLE_VALUE_COLUMN), max(BOOLEAN_VALUE_COLUMN), max(STRING_VALUE_COLUMN), min(JSON_VALUE_COLUMN)});
     public static final String[] SUM_AGGREGATION_COLUMNS = ArrayUtils.addAll(COUNT_AGGREGATION_COLUMNS,
             new String[]{sum(LONG_VALUE_COLUMN), sum(DOUBLE_VALUE_COLUMN)});
     public static final String[] AVG_AGGREGATION_COLUMNS = SUM_AGGREGATION_COLUMNS;

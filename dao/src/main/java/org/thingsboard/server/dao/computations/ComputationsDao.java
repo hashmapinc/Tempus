@@ -19,10 +19,8 @@ import org.thingsboard.server.common.data.computation.Computations;
 import org.thingsboard.server.common.data.id.ComputationId;
 import org.thingsboard.server.common.data.id.TenantId;
 import org.thingsboard.server.common.data.page.TextPageLink;
-import org.thingsboard.server.dao.model.sql.ComputationsEntity;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 public interface ComputationsDao {
@@ -30,7 +28,7 @@ public interface ComputationsDao {
 
     Computations findByName(String name);
 
-    void save(ComputationsEntity computationsEntity);
+    Computations save(Computations computations);
 
     void deleteByJarName(String name);
 

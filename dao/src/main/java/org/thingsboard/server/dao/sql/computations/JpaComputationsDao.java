@@ -61,8 +61,10 @@ public class JpaComputationsDao extends JpaAbstractDaoListeningExecutorService i
     }
 
     @Override
-    public void save(ComputationsEntity computationsEntity) {
+    public Computations save(Computations computations) {
+        ComputationsEntity computationsEntity = new ComputationsEntity(computations);
         computationsRepository.save(computationsEntity);
+        return computations;
     }
 
     @Override
