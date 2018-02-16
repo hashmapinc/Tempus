@@ -25,7 +25,7 @@ import entityAliasesTemplate from '../entity/alias/entity-aliases.tpl.html';
 
 /*@ngInject*/
 export default function ImportExport($log, $translate, $q, $mdDialog, $document, itembuffer, utils, types, dashboardUtils,
-                                     entityService, dashboardService, pluginService, ruleService, widgetService, toast) {
+                                     entityService, dashboardService, pluginService, ruleService, widgetService, computationService, toast) {
 
 
     var service = {
@@ -323,18 +323,15 @@ export default function ImportExport($log, $translate, $q, $mdDialog, $document,
     function importComputation($event) {
         var deferred = $q.defer();
         openImportDialog($event, 'computation.import', 'computation.computation-file').then(
-            function success(computation) {
-                    computation.state = 'CREATED';
-                    /*computationService.saveComputation(computation).then(
+            function success(importData) {
+                    computationService.upload(importData.file).then(
                         function success() {
                             deferred.resolve();
                         },
                         function fail() {
                             deferred.reject();
                         }
-                    );*/
-                    deferred.resolve();
-                
+                    );
             },
             function fail() {
                 deferred.reject();

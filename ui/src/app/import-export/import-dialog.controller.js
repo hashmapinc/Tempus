@@ -16,7 +16,7 @@
 import './import-dialog.scss';
 
 /*@ngInject*/
-export default function ImportDialogController($scope, $log, $mdDialog, toast, importTitle, importFileLabel, computationService) {
+export default function ImportDialogController($scope, $log, $mdDialog, toast, importTitle, importFileLabel) {
 
     var vm = this;
 
@@ -74,9 +74,6 @@ export default function ImportDialogController($scope, $log, $mdDialog, toast, i
 
     function importFromJsonOrJar() {
         $scope.theForm.$setPristine();
-        if ((vm.fileName.indexOf('.jar') !== -1) ){
-            computationService.upload(vm.importData.file);
-        }
         $mdDialog.hide(vm.importData);
     }
 }
