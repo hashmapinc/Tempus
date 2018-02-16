@@ -171,12 +171,6 @@ Spark application jar should contain a class with below annotations to be added 
 
 ***In case jars are deleted when thingsbord server is stopped, nothing mentioned above will be triggered. You have to be careful while deleting existing spark computations***
 
-## Support
-
- - [Community chat](https://gitter.im/thingsboard/chat)
- - [Q&A forum](https://groups.google.com/forum/#!forum/thingsboard)
- - [Stackoverflow](http://stackoverflow.com/questions/tagged/thingsboard)
-
 ## Licenses
 
 This project is released under [Apache 2.0 License](./LICENSE).
