@@ -672,8 +672,6 @@ CREATE MATERIALIZED VIEW IF NOT EXISTS thingsboard.computations_by_tenant_and_se
     PRIMARY KEY ( tenant_id, search_text, id )
     WITH CLUSTERING ORDER BY ( search_text ASC, id DESC );
 
-DROP TABLE IF EXISTS thingsboard.computation_job;
-
 CREATE TABLE IF NOT EXISTS thingsboard.computation_job (
     id uuid,
     job_name text,
@@ -691,4 +689,12 @@ CREATE MATERIALIZED VIEW IF NOT EXISTS thingsboard.computation_jobs_by_computati
     from thingsboard.computation_job
     WHERE computation_id IS NOT NULL AND search_text IS NOT NULL AND id IS NOT NULL
     PRIMARY KEY ( computation_id, search_text, id )
+    WITH CLUSTERING ORDER BY ( search_text ASC, id DESC );
+
+
+CREATE MATERIALIZED VIEW IF NOT EXISTS thingsboard.computation_jobs_by_tenant_and_computation_search_text AS
+    SELECT *
+    from thingsboard.computation_job
+    WHERE tenant_id IS NOT NULL AND search_text IS NOT NULL AND computation_id IS NOT NULL AND id IS NOT NULL
+    PRIMARY KEY ( tenant_id, search_text, computation_id )
     WITH CLUSTERING ORDER BY ( search_text ASC, id DESC );

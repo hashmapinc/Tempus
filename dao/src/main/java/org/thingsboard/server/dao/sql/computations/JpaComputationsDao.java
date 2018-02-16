@@ -28,6 +28,8 @@ import org.thingsboard.server.dao.DaoUtil;
 import org.thingsboard.server.dao.computations.ComputationsDao;
 import org.thingsboard.server.dao.model.sql.ComputationsEntity;
 import org.thingsboard.server.dao.sql.JpaAbstractDaoListeningExecutorService;
+import org.thingsboard.server.dao.util.SqlDao;
+
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
@@ -36,6 +38,7 @@ import java.util.UUID;
 import static org.thingsboard.server.dao.model.ModelConstants.NULL_UUID_STR;
 
 @Service
+@SqlDao
 @Slf4j
 public class JpaComputationsDao extends JpaAbstractDaoListeningExecutorService implements ComputationsDao {
 

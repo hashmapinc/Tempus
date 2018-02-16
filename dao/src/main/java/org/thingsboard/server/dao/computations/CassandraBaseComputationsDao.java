@@ -15,6 +15,9 @@
  */
 package org.thingsboard.server.dao.computations;
 
+import com.datastax.driver.core.querybuilder.Clause;
+import com.datastax.driver.core.querybuilder.QueryBuilder;
+import com.datastax.driver.core.querybuilder.Select;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.thingsboard.server.common.data.computation.Computations;
@@ -73,7 +76,16 @@ public class CassandraBaseComputationsDao extends CassandraAbstractSearchTextDao
 
     @Override
     public List<Computations> findByTenantIdAndPageLink(TenantId tenantId, TextPageLink pageLink) {
-        return null;
+        log.info("Try to find all tenant computationJobs by tenantId [{}] and pageLink [{}]", tenantId, pageLink);
+        List<ComputationsEntity> computationsEntities = findPageWithTextSearch(ModelConstants.COMPUTATIONS_BY_TENANT,
+                Arrays.asList(in(ModelConstants.COMPUTATIONS_TENANT_ID, Arrays.asList(NULL_UUID, tenantId))),
+                pageLink);
+        if (log.isTraceEnabled()) {
+            log.trace("Search result: [{}]", Arrays.toString(computationsEntities.toArray()));
+        } else {
+            log.info("Search result: [{}]", computationsEntities.size());
+        }
+        return DaoUtil.convertDataList(computationsEntities);
     }
 
     @Override
@@ -93,16 +105,12 @@ public class CassandraBaseComputationsDao extends CassandraAbstractSearchTextDao
 
     @Override
     public List<Computations> findByTenantId(TenantId tenantId) {
-        TextPageLink pageLink = new TextPageLink(300);
-        log.info("Try to find all tenant computations by tenantId [{}] and pageLink [{}]", tenantId, pageLink);
-        List<ComputationsEntity> computationsEntities = findPageWithTextSearch(ModelConstants.COMPUTATIONS_BY_TENANT,
-                Arrays.asList(in(ModelConstants.COMPUTATIONS_TENANT_ID, Arrays.asList(NULL_UUID, tenantId))),
-                pageLink);
-        if (log.isTraceEnabled()) {
-            log.trace("Search result: [{}]", Arrays.toString(computationsEntities.toArray()));
-        } else {
-            log.info("Search result: [{}]", computationsEntities.size());
-        }
+        log.info("Going to fetch computations by tenant Id : " + tenantId );
+        Select select = select().from(ModelConstants.COMPUTATIONS_COLUMN_FAMILY_NAME).allowFiltering();
+        Select.Where query = select.where();
+        query.and(eq(ModelConstants.COMPUTATIONS_TENANT_ID, tenantId.getId()));
+        List<ComputationsEntity> computationsEntities = findListByStatement(query);
+        log.info("computationsEntities returned " + computationsEntities);
         return DaoUtil.convertDataList(computationsEntities);
     }
 

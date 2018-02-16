@@ -105,6 +105,74 @@ public class ComputationsEntity implements SearchTextEntity<Computations> {
         this.id = id;
     }
 
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getJarPath() {
+        return jarPath;
+    }
+
+    public void setJarPath(String jarPath) {
+        this.jarPath = jarPath;
+    }
+
+    public String getJarName() {
+        return jarName;
+    }
+
+    public void setJarName(String jarName) {
+        this.jarName = jarName;
+    }
+
+    public String getSearchText() {
+        return searchText;
+    }
+
+    public String getMainClass() {
+        return mainClass;
+    }
+
+    public void setMainClass(String mainClass) {
+        this.mainClass = mainClass;
+    }
+
+    public String getArgsFormat() {
+        return argsFormat;
+    }
+
+    public void setArgsFormat(String argsFormat) {
+        this.argsFormat = argsFormat;
+    }
+
+    public JsonNode getJsonDescriptor() {
+        return jsonDescriptor;
+    }
+
+    public void setJsonDescriptor(JsonNode jsonDescriptor) {
+        this.jsonDescriptor = jsonDescriptor;
+    }
+
+    public UUID getTenantId() {
+        return tenantId;
+    }
+
+    public void setTenantId(UUID tenantId) {
+        this.tenantId = tenantId;
+    }
+
+    public String getArgsType() {
+        return argsType;
+    }
+
+    public void setArgsType(String argsType) {
+        this.argsType = argsType;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

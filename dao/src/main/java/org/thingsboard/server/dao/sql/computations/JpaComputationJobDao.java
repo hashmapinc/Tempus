@@ -15,6 +15,7 @@ import org.thingsboard.server.dao.DaoUtil;
 import org.thingsboard.server.dao.computations.ComputationJobDao;
 import org.thingsboard.server.dao.model.sql.ComputationJobEntity;
 import org.thingsboard.server.dao.sql.JpaAbstractSearchTextDao;
+import org.thingsboard.server.dao.util.SqlDao;
 
 import java.util.Arrays;
 import java.util.List;
@@ -24,6 +25,7 @@ import static org.thingsboard.server.dao.model.ModelConstants.NULL_UUID_STR;
 
 @Slf4j
 @Component
+@SqlDao
 public class JpaComputationJobDao extends JpaAbstractSearchTextDao<ComputationJobEntity, ComputationJob> implements ComputationJobDao {
 
     @Autowired

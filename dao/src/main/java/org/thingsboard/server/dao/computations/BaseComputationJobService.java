@@ -14,6 +14,7 @@ import org.thingsboard.server.dao.entity.AbstractEntityService;
 import org.thingsboard.server.dao.exception.DatabaseException;
 import org.thingsboard.server.dao.exception.IncorrectParameterException;
 import org.thingsboard.server.dao.service.Validator;
+import org.thingsboard.server.dao.util.SqlDao;
 
 import java.util.List;
 

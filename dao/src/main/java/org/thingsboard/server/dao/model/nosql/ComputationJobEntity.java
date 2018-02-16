@@ -124,6 +124,59 @@ public class ComputationJobEntity implements SearchTextEntity<ComputationJob> {
         this.id = id;
     }
 
+
+    public String getJobName() {
+        return jobName;
+    }
+
+    public void setJobName(String jobName) {
+        this.jobName = jobName;
+    }
+
+    public UUID getComputationId() {
+        return computationId;
+    }
+
+    public void setComputationId(UUID computationId) {
+        this.computationId = computationId;
+    }
+
+    public JsonNode getArgParameters() {
+        return argParameters;
+    }
+
+    public void setArgParameters(JsonNode argParameters) {
+        this.argParameters = argParameters;
+    }
+
+    public UUID getTenantId() {
+        return tenantId;
+    }
+
+    public void setTenantId(UUID tenantId) {
+        this.tenantId = tenantId;
+    }
+
+    public String getSearchText() {
+        return searchText;
+    }
+
+    public String getJobId() {
+        return jobId;
+    }
+
+    public void setJobId(String jobId) {
+        this.jobId = jobId;
+    }
+
+    public ComponentLifecycleState getState() {
+        return state;
+    }
+
+    public void setState(ComponentLifecycleState state) {
+        this.state = state;
+    }
+
     @Override
     public ComputationJob toData() {
         ComputationJob computationJob = new ComputationJob(new ComputationJobId(getId()));

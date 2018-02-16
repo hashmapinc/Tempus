@@ -15,8 +15,10 @@
  */
 package org.thingsboard.server.dao.computations;
 
+import com.datastax.driver.core.querybuilder.Select;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import org.thingsboard.server.common.data.computation.ComputationJob;
 import org.thingsboard.server.common.data.id.ComputationId;
 import org.thingsboard.server.common.data.id.ComputationJobId;
@@ -34,7 +36,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
-@Component
+@Service
 @Slf4j
 @NoSqlDao
 public class CassandraBaseComputationJobDao extends CassandraAbstractSearchTextDao<ComputationJobEntity, ComputationJob> implements ComputationJobDao {
@@ -67,21 +69,27 @@ public class CassandraBaseComputationJobDao extends CassandraAbstractSearchTextD
 
     @Override
     public List<ComputationJob> findByComputationId(ComputationId computationId) {
-        TextPageLink pageLink = new TextPageLink(300);
-        log.info("Try to find all tenant computationJobs by tenantId [{}] and pageLink [{}]", computationId, pageLink);
-        List<ComputationJobEntity> computationJobEntities = findPageWithTextSearch(ModelConstants.COMPUTATION_JOB_BY_COMPUTATION,
-                Arrays.asList(in(ModelConstants.COMPUTATION_JOB_COMPUTAION_ID, Arrays.asList(NULL_UUID, computationId))),
-                pageLink);
-        if (log.isTraceEnabled()) {
-            log.trace("Search result: [{}]", Arrays.toString(computationJobEntities.toArray()));
-        } else {
-            log.info("Search result: [{}]", computationJobEntities.size());
-        }
+
+        log.info("Going to fetch computationJobs by ComputationId Id : " + computationId );
+        Select select = select().from(ModelConstants.COMPUTATION_JOB_COLUMN_FAMILY_NAME).allowFiltering();
+        Select.Where query = select.where();
+        query.and(eq(ModelConstants.COMPUTATION_JOB_COMPUTAION_ID, computationId.getId()));
+        List<ComputationJobEntity> computationJobEntities = findListByStatement(query);
+        log.info("computationsEntities returned " + computationJobEntities);
         return DaoUtil.convertDataList(computationJobEntities);
     }
 
     @Override
     public List<ComputationJob> findByTenantIdAndComputationIdAndPageLink(TenantId tenantId, ComputationId computationId, TextPageLink pageLink) {
-        return null;
+
+        log.debug("Try to find assets by tenantId [{}], computationId[{}] and pageLink [{}]", tenantId, computationId, pageLink);
+        List<ComputationJobEntity> computationJobEntities = findPageWithTextSearch(ModelConstants.COMPUTATION_JOB_BY_TENANT_AND_COMPUTATION,
+                Arrays.asList(eq(ModelConstants.COMPUTATION_JOB_TENANT_ID, tenantId),
+                        eq(ModelConstants.COMPUTATION_JOB_COMPUTAION_ID, computationId)),
+                pageLink);
+
+        log.trace("Found assets [{}] by tenantId [{}], customerId [{}] and pageLink [{}]", computationJobEntities, tenantId, computationId, pageLink);
+        return DaoUtil.convertDataList(computationJobEntities);
+
     }
 }
