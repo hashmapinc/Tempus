@@ -27,7 +27,7 @@
     <artifactId>http</artifactId>
     <packaging>jar</packaging>
 
-    <name>Thingsboard HTTP Transport</name>
+    <name>Tempus HTTP Transport</name>
     <url>http://thingsboard.org</url>
 
     <properties>

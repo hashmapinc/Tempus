@@ -27,7 +27,7 @@
     <artifactId>mqtt</artifactId>
     <packaging>jar</packaging>
 
-    <name>Thingsboard MQTT Transport</name>
+    <name>Tempus MQTT Transport</name>
     <url>http://thingsboard.org</url>
 
     <properties>

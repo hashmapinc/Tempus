@@ -27,7 +27,7 @@
     <artifactId>extensions-core</artifactId>
     <packaging>jar</packaging>
 
-    <name>Thingsboard Server Core Extensions</name>
+    <name>Tempus Server Core Extensions</name>
     <url>http://thingsboard.org</url>
 
     <properties>

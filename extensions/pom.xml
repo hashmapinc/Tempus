@@ -27,7 +27,7 @@
     <artifactId>extensions</artifactId>
     <packaging>pom</packaging>
 
-    <name>Thingsboard Extensions</name>
+    <name>Tempus Extensions</name>
     <url>http://thingsboard.org</url>
 
     <properties>

@@ -27,7 +27,7 @@
     <artifactId>transport</artifactId>
     <packaging>pom</packaging>
 
-    <name>Thingsboard Server Transport Modules</name>
+    <name>Tempus Server Transport Modules</name>
     <url>http://thingsboard.org</url>
 
     <properties>

@@ -27,7 +27,7 @@
     <artifactId>extension-rabbitmq</artifactId>
     <packaging>jar</packaging>
 
-    <name>Thingsboard Server RabbitMQ Extension</name>
+    <name>Tempus Server RabbitMQ Extension</name>
     <url>http://thingsboard.org</url>
 
     <properties>
