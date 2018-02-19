@@ -16,12 +16,12 @@
 import './import-dialog.scss';
 
 /*@ngInject*/
-export default function ImportDialogController($scope, $mdDialog, toast, importTitle, importFileLabel) {
+export default function ImportDialogController($scope, $log, $mdDialog, toast, importTitle, importFileLabel) {
 
     var vm = this;
 
     vm.cancel = cancel;
-    vm.importFromJson = importFromJson;
+    vm.importFromJsonOrJar = importFromJsonOrJar;
     vm.fileAdded = fileAdded;
     vm.clearFile = clearFile;
 
@@ -55,6 +55,15 @@ export default function ImportDialogController($scope, $mdDialog, toast, importT
             };
             reader.readAsText($file.file);
         }
+
+        else if ($file.getExtension() === 'jar') {
+            $scope.$apply(function() {
+                $scope.theForm.$setDirty();
+                    vm.importData = $file;
+                    vm.fileName = $file.name;
+            })
+        }
+
     }
 
     function clearFile() {
@@ -63,7 +72,7 @@ export default function ImportDialogController($scope, $mdDialog, toast, importT
         vm.importData = null;
     }
 
-    function importFromJson() {
+    function importFromJsonOrJar() {
         $scope.theForm.$setPristine();
         $mdDialog.hide(vm.importData);
     }

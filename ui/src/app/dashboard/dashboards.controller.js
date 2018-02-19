@@ -591,6 +591,7 @@ export function DashboardsController(userService, dashboardService, customerServ
             });
         } else {
             $state.go('home.dashboards.dashboard', {dashboardId: dashboard.id.id});
+            //$state.go('home.computationJob');
         }
     }
 }

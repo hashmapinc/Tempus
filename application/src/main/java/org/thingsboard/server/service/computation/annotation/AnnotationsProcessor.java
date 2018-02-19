@@ -33,6 +33,7 @@ import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.VelocityEngine;
 import org.thingsboard.server.common.msg.computation.ComputationActionCompiled;
+import org.thingsboard.server.common.msg.computation.ComputationRequestCompiled;
 import org.thingsboard.server.service.computation.classloader.RuntimeJavaCompiler;
 import javax.lang.model.type.MirroredTypeException;
 import javax.lang.model.type.TypeMirror;
@@ -63,22 +64,22 @@ public class AnnotationsProcessor {
         this.compiler = compiler;
     }
 
-    public List<ComputationActionCompiled> processAnnotations() throws IOException {
-        final List<ComputationActionCompiled> actions = new ArrayList<>();
-        AnnotationDetector detector = new AnnotationDetector(newReporter(actions));
+    public List<ComputationRequestCompiled> processAnnotations() throws IOException {
+        final List<ComputationRequestCompiled> requests = new ArrayList<>();
+        AnnotationDetector detector = new AnnotationDetector(newReporter(requests));
         detector.detect(jar.toFile());
-        return actions;
+        return requests;
     }
 
-    private AnnotationDetector.TypeReporter newReporter(List<ComputationActionCompiled> actions){
+    private AnnotationDetector.TypeReporter newReporter(List<ComputationRequestCompiled> requests){
         return new AnnotationDetector.TypeReporter() {
             @Override
             public void reportTypeAnnotation(Class<? extends Annotation> aClass, String s) {
-                if(aClass.isAssignableFrom(SparkAction.class)){
+                if(aClass.isAssignableFrom(SparkRequest.class)){
                     try {
-                        ComputationActionCompiled action = processModel(buildModelFromAnnotations(s));
-                        if(action != null) {
-                            actions.add(action);
+                        ComputationRequestCompiled request = processModelRequest(buildModelFromAnnotations(s));
+                        if(request != null) {
+                            requests.add(request);
                         }
                         log.debug("Java Source creation and loading completed for {} ", s);
                     } catch (ClassNotFoundException e) {
@@ -86,20 +87,17 @@ public class AnnotationsProcessor {
                     }
                 }
             }
-
             @SuppressWarnings("unchecked")
             @Override
             public Class<? extends Annotation>[] annotations() {
-                return new Class[]{SparkAction.class};
+                return new Class[]{SparkRequest.class};
             }
         };
     }
 
-    private SparkActionType buildModelFromAnnotations(String clazzString) throws ClassNotFoundException {
+    private SparkActionRequestType buildModelFromAnnotations(String clazzString) throws ClassNotFoundException {
         Class<?> clazz = classLoader.loadClass(clazzString);
-        SparkActionType model = action(clazz);
-        model.setConfiguration(configurations(clazz));
-        model.setRequest(request(clazz));
+        SparkActionRequestType model = request(clazz);
         return model;
     }
 
@@ -141,6 +139,9 @@ public class AnnotationsProcessor {
             actionRequest.setMainClass(request.main());
             actionRequest.setJar(request.jar());
             actionRequest.setArgs(request.args());
+            actionRequest.setDescriptor(request.descriptor());
+            actionRequest.setName(request.name());
+            actionRequest.setArgType(request.argType());
         }
         return actionRequest;
     }
@@ -170,6 +171,20 @@ public class AnnotationsProcessor {
         }
         return null;
     }
+
+    private ComputationRequestCompiled processModelRequest(SparkActionRequestType model){
+        try {
+            Properties props = new Properties();
+            URL url = this.getClass().getClassLoader().getResource("velocity.properties");
+            props.load(url.openStream());
+            JsonNode descriptor = descriptorNode(model.getDescriptor());
+            return new ComputationRequestCompiled(model.getArgs(), model.getArgType(), model.getName(), descriptor, model.getMainClass());
+        } catch (IOException e) {
+            log.error("Exception occurred while generating java source", e);
+        }
+        return null;
+    }
+
 
     private Class<?> generateSource(Template vt, VelocityContext vc, String sourceName) throws IOException, ClassNotFoundException {
         log.debug("Generating source for {}", sourceName);

@@ -15,8 +15,7 @@
  */
 package org.thingsboard.server.service.computation;
 
-import akka.dispatch.ExecutionContexts;
-import akka.dispatch.OnComplete;
+import com.datastax.driver.core.utils.UUIDs;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.monitor.FileAlterationListener;
 import org.apache.commons.io.monitor.FileAlterationListenerAdaptor;
@@ -27,16 +26,18 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
-import org.thingsboard.server.common.data.plugin.ComponentDescriptor;
-import org.thingsboard.server.common.data.plugin.PluginMetaData;
-import org.thingsboard.server.common.msg.computation.ComputationActionCompiled;
-import org.thingsboard.server.common.msg.computation.ComputationActionDeleted;
+import org.thingsboard.server.common.data.computation.Computations;
+import org.thingsboard.server.common.data.id.ComputationId;
+import org.thingsboard.server.common.data.id.TenantId;
+import org.thingsboard.server.common.data.page.TextPageData;
+import org.thingsboard.server.common.data.page.TextPageLink;
+import org.thingsboard.server.common.msg.computation.ComputationRequestCompiled;
+import org.thingsboard.server.dao.computations.ComputationsService;
 import org.thingsboard.server.dao.plugin.PluginService;
 import org.thingsboard.server.service.component.ComponentDiscoveryService;
 import org.thingsboard.server.service.computation.annotation.AnnotationsProcessor;
 import org.thingsboard.server.service.computation.classloader.RuntimeJavaCompiler;
 import org.thingsboard.server.utils.MiscUtils;
-import scala.concurrent.Future;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -73,9 +74,12 @@ public class DirectoryComputationDiscoveryService implements ComputationDiscover
     @Autowired
     private ApplicationContext context;
 
+    @Autowired
+    private ComputationsService computationsService;
+
     private RuntimeJavaCompiler compiler;
     private FileAlterationMonitor monitor;
-    private Map<String, Set<String>> processedJarsSources = new HashMap<>();
+    //private Map<String, Set<String>> processedJarsSources = new HashMap<>();
 
     @PostConstruct
     public void init() {
@@ -83,34 +87,61 @@ public class DirectoryComputationDiscoveryService implements ComputationDiscover
         Assert.hasLength(libraryPath, MiscUtils.missingProperty("spark.jar_path"));
         Assert.notNull(pollingInterval, MiscUtils.missingProperty("spark.polling_interval"));
         this.compiler = new RuntimeJavaCompiler();
-        discoverDynamicComponents();
-        startPolling();
+        //discoverDynamicComponents();
+        //startPolling();
+    }
+
+    @Override
+    public void deleteJarFile(String fileName) {
+
+    }
+
+    @Override
+    public Computations onJarUpload(String path, TenantId tenantId) {
+        return null;
+    }
+
+
+    @Override
+    public List<Computations> findAll() {
+        return null;
     }
 
     public void discoverDynamicComponents(){
         final FileSystem fs = FileSystems.getDefault();
-        final List<ComputationActionCompiled> compiledActions = new ArrayList<>();
         try {
             List<Path> jars = Files.walk(fs.getPath(libraryPath)).collect(Collectors.toList());
             for(Path j: jars){
                 if(isJar(j)) {
                     AnnotationsProcessor processor = new AnnotationsProcessor(j, compiler);
-                    List<ComputationActionCompiled> c = processor.processAnnotations();
+                    List<ComputationRequestCompiled> c = processor.processAnnotations();
                     if(c != null && !c.isEmpty()) {
-                        compiledActions.addAll(c);
-                        putCompiledActions(j, c);
+                        for (ComputationRequestCompiled computationRequestCompiled : c) {
+                            Computations computations = new Computations();
+                            computations.setJarPath(j.toString());
+                            computations.setMainClass(computationRequestCompiled.getMainClazz());
+                            computations.setJsonDescriptor(computationRequestCompiled.getConfigurationDescriptor());
+                            String args = Arrays.toString(computationRequestCompiled.getArgs());
+                            computations.setArgsformat(args);
+                            computations.setJarName(j.getFileName().toString());
+                            computations.setName(computationRequestCompiled.getName());
+                            Computations persistedComputations = computationsService.findByName(computations.getName());
+                            if (persistedComputations == null) {
+                                ComputationId computationId = new ComputationId(UUIDs.timeBased());
+                                computations.setId(computationId);
+                                computationsService.save(computations);
+                            } else {
+                                computations.setId(persistedComputations.getId());
+                                computationsService.save(computations);
+                            }
+                        }
                     }
                 }
             }
-            componentDiscoveryService.updateActionsForPlugin(compiledActions, PLUGIN_CLAZZ);
+            //componentDiscoveryService.updateActionsForPlugin(compiledActions, PLUGIN_CLAZZ);
         } catch (IOException e) {
             log.error("Error while reading jars from directory.", e);
         }
-    }
-
-    private void putCompiledActions(Path j, List<ComputationActionCompiled> c) {
-        processedJarsSources.put(j.toFile().getName(),
-                c.stream().map(ComputationActionCompiled::getActionClazz).collect(Collectors.toSet()));
     }
 
     private void startPolling(){
@@ -136,34 +167,18 @@ public class DirectoryComputationDiscoveryService implements ComputationDiscover
             @Override
             public void onFileCreate(File file) {
                 log.debug("File {} is created", file.getAbsolutePath());
-                processComponent(file);
+                //processComponent(file);
             }
 
             @Override
             public void onFileChange(File file) {
                 log.debug("File {} is modified", file.getAbsolutePath());
-                processComponent(file);
+                //processComponent(file);
             }
 
             @Override
             public void onFileDelete(File file){
-                log.debug("File {} is deleted", file.getAbsolutePath());
-                Set<String> actionsToRemove = processedJarsSources.get(file.getName());
-                if(actionsToRemove != null && !actionsToRemove.isEmpty()){
-                    log.debug("Actions to remove are {}", actionsToRemove);
-                    ComputationMsgListener listener = context.getBean(ComputationMsgListener.class);
-                    Optional<ComponentDescriptor> plugin = componentDiscoveryService.getComponent(PLUGIN_CLAZZ);
-                    if(plugin.isPresent() && listener != null) {
-                        PluginMetaData pluginMetadata = pluginService.findPluginByClass(PLUGIN_CLAZZ);
-                        if(pluginMetadata != null) {
-                            log.debug("Plugin Metadata found {}", pluginMetadata);
-                            final ComputationActionDeleted msg = new ComputationActionDeleted(actionsToRemove, pluginMetadata.getApiToken());
-                            Future<Object> fut = listener.onMsg(msg);
-
-                            addDeleteCallback(msg, fut);
-                        }
-                    }
-                }
+                computationsService.deleteByJarName(file.getName());
             }
 
             private void processComponent(File file) {
@@ -171,10 +186,27 @@ public class DirectoryComputationDiscoveryService implements ComputationDiscover
                 try{
                     if(isJar(j)){
                         AnnotationsProcessor processor = new AnnotationsProcessor(j, compiler);
-                        List<ComputationActionCompiled> actions = processor.processAnnotations();
-                        if(actions != null && !actions.isEmpty()) {
-                            putCompiledActions(j, actions);
-                            componentDiscoveryService.updateActionsForPlugin(actions, PLUGIN_CLAZZ);
+                        List<ComputationRequestCompiled> c = processor.processAnnotations();
+                        if(c != null && !c.isEmpty()) {
+                            for (ComputationRequestCompiled computationRequestCompiled : c) {
+                                Computations computations = new Computations();
+                                computations.setJarPath(j.toString());
+                                computations.setMainClass(computationRequestCompiled.getMainClazz());
+                                computations.setJsonDescriptor(computationRequestCompiled.getConfigurationDescriptor());
+                                String args = Arrays.toString(computationRequestCompiled.getArgs());
+                                computations.setArgsformat(args);
+                                computations.setJarName(j.getFileName().toString());
+                                computations.setName(computationRequestCompiled.getName());
+                                Computations persistedComputations = computationsService.findByName(computations.getName());
+                                if (persistedComputations == null) {
+                                    ComputationId computationId = new ComputationId(UUIDs.timeBased());
+                                    computations.setId(computationId);
+                                    computationsService.save(computations);
+                                } else {
+                                    computations.setId(persistedComputations.getId());
+                                    computationsService.save(computations);
+                                }
+                            }
                         }
                     }
                 } catch (IOException e) {
@@ -184,17 +216,9 @@ public class DirectoryComputationDiscoveryService implements ComputationDiscover
         };
     }
 
-    private void addDeleteCallback(ComputationActionDeleted msg, Future<Object> fut) {
-        fut.onComplete(new OnComplete<Object>(){
-            public void onComplete(Throwable t, Object result){
-                if(t != null){
-                    log.error("Error occurred while trying to delete rules", t);
-                }else {
-                    log.info("Deleting action descriptors from plugin");
-                    componentDiscoveryService.deleteActionsFromPlugin(msg, PLUGIN_CLAZZ);
-                }
-            }
-        }, ExecutionContexts.fromExecutor(executor));
+    @Override
+    public TextPageData<Computations> findTenantComputations(TenantId tenantId, TextPageLink pageLink) {
+        return computationsService.findTenantComputations(tenantId, pageLink);
     }
 
     @PreDestroy

@@ -296,3 +296,27 @@ CREATE TABLE IF NOT EXISTS application_associated_computation_jobs(
     application_id varchar(31),
     application_computation_job_id varchar(31)
 );
+
+CREATE TABLE IF NOT EXISTS computations (
+    id varchar(31) NOT NULL CONSTRAINT computations_pkey PRIMARY KEY,
+    jar_name varchar,
+    jar_path varchar,
+    search_text varchar,
+    computation_name varchar,
+    main_class varchar,
+    args_format varchar,
+    args_type varchar,
+    json_descriptor varchar,
+    tenant_id varchar(31)
+);
+
+CREATE TABLE IF NOT EXISTS computation_job (
+    id varchar(31) NOT NULL CONSTRAINT computation_job_pkey PRIMARY KEY,
+    job_name varchar,
+    job_id varchar,
+    search_text varchar,
+    computation_id varchar,
+    arg_parameters varchar,
+    state varchar(255),
+    tenant_id varchar(31)
+);

@@ -28,6 +28,10 @@ public interface ActorService extends SessionMsgProcessor, WebSocketMsgProcessor
 
     void onRuleStateChange(TenantId tenantId, RuleId ruleId, ComponentLifecycleEvent state);
 
+    void onComputationStateChange(TenantId tenantId, ComputationId computationId, ComponentLifecycleEvent state);
+
+    void onComputationJobStateChange(TenantId tenantId, ComputationId computationId, ComputationJobId computationJobId,ComponentLifecycleEvent state);
+
     void onCredentialsUpdate(TenantId tenantId, DeviceId deviceId);
 
     void onDeviceNameOrTypeUpdate(TenantId tenantId, DeviceId deviceId, String deviceName, String deviceType);
