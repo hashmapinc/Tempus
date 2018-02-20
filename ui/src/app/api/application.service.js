@@ -36,7 +36,9 @@ function ApplicationService($http, $q, customerService) {
         assignRulesToApplication: assignRulesToApplication,
         assignDeviceTypesToApplication: assignDeviceTypesToApplication,
         getApplicationsByDeviceType: getApplicationsByDeviceType,
-        assignDashboardToApplication: assignDashboardToApplication
+        assignDashboardToApplication: assignDashboardToApplication,
+        unAssignRulesFromApplication: unAssignRulesFromApplication,
+        getApplicationsByRuleId : getApplicationsByRuleId
     }
 
     return service;
@@ -230,6 +232,29 @@ function ApplicationService($http, $q, customerService) {
         return deferred.promise;
     }
 
+     function unAssignRulesFromApplication(rules) {
+        var deferred = $q.defer();
+        var url = '/api/app/unassignRules';
+        $http.post(url, rules).then(function success(response) {
+            deferred.resolve(response.data);
+        }, function fail() {
+            deferred.reject();
+        });
+        return deferred.promise;
+    }
+
+    function getApplicationsByRuleId(ruleId) {
+        var deferred = $q.defer();
+        var url = '/api/applications/rule/' + ruleId;
+        $http.get(url, ruleId).then(function success(response) {
+            deferred.resolve(response.data);
+        }, function fail() {
+            deferred.reject();
+        });
+        return deferred.promise;
+    }
+    
+
     function assignDeviceTypesToApplication(applicationId, deviceTypes){
         var deferred = $q.defer();
         var url = '/api/app/' + applicationId + '/deviceTypes';
@@ -241,7 +266,7 @@ function ApplicationService($http, $q, customerService) {
         return deferred.promise;
     }
 
-        function getApplicationsByDeviceType(deviceType) {
+    function getApplicationsByDeviceType(deviceType) {
         var deferred = $q.defer();
         var url = '/api/applications/' + deviceType;
         $http.get(url, deviceType).then(function success(response) {
@@ -251,7 +276,7 @@ function ApplicationService($http, $q, customerService) {
         });
         return deferred.promise;
     }
-        function assignDashboardToApplication(applicationId, dashboardId) {
+    function assignDashboardToApplication(applicationId, dashboardId) {
         var deferred = $q.defer();
         var url = '/api/dashboard/main/' + dashboardId + '/application/' + applicationId;
         $http.post(url, null).then(function success(response) {
