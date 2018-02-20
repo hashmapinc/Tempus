@@ -16,7 +16,7 @@
 #
 
 
-dpkg -i /thingsboard.deb
+dpkg -i /tempus.deb
 
 if [ "$DATABASE_TYPE" == "cassandra" ]; then
     until nmap $CASSANDRA_HOST -p $CASSANDRA_PORT | grep "$CASSANDRA_PORT/tcp open"
@@ -40,21 +40,21 @@ if [ "$ADD_SCHEMA_AND_SYSTEM_DATA" == "true" ]; then
     echo "Creating 'Thingsboard' schema and system data..."
     if [ "$ADD_DEMO_DATA" == "true" ]; then
         echo "plus demo data..."
-        /usr/share/thingsboard/bin/install/install.sh --loadDemo
+        /usr/share/tempus/bin/install/install.sh --loadDemo
     elif [ "$ADD_DEMO_DATA" == "false" ]; then
-        /usr/share/thingsboard/bin/install/install.sh
+        /usr/share/tempus/bin/install/install.sh
     fi
 fi
 
 
 # Copying env variables into conf files
-printenv | awk -F "=" '{print "export " $1 "='\''" $2 "'\''"}' >> /usr/share/thingsboard/conf/thingsboard.conf
+printenv | awk -F "=" '{print "export " $1 "='\''" $2 "'\''"}' >> /usr/share/tempus/conf/tempus.conf
 
-cat /usr/share/thingsboard/conf/thingsboard.conf
+cat /usr/share/tempus/conf/tempus.conf
 
 echo "Starting 'Thingsboard' service..."
-service thingsboard start
+service tempus start
 
 # Wait until log file is created
 sleep 10
-tail -f /var/log/thingsboard/thingsboard.log
+tail -f /var/log/tempus/tempus.log

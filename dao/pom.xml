@@ -27,7 +27,7 @@
     <artifactId>dao</artifactId>
     <packaging>jar</packaging>
 
-    <name>Thingsboard Server DAO Layer</name>
+    <name>Tempus Server DAO Layer</name>
     <url>http://thingsboard.org</url>
 
     <properties>

@@ -27,7 +27,7 @@
     <artifactId>coap</artifactId>
     <packaging>jar</packaging>
 
-    <name>Thingsboard COAP Transport</name>
+    <name>Tempus COAP Transport</name>
     <url>http://thingsboard.org</url>
 
     <properties>

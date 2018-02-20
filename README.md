@@ -28,9 +28,9 @@ Thingsboard can now support depthseries data also. Earlier thingsboard supported
 
 1. Create a new rule similar to system telemetry rule with message type filter, just set the message types as "POST_TELEMETRY_DEPTH" for filter. Save and start the rule.
 
-## Publish Depthseries Data to thingsboard
+## Publish Depthseries Data to tempus
 
-1. Presently depthseries data can be published to thingsboard via MQTT only. The MQTT topic for publishing depthseries data is:
+1. Presently depthseries data can be published to tempus via MQTT only. The MQTT topic for publishing depthseries data is:
    **v1/devices/me/depth/telemetry**
 
 2. The JSON format to publish depthseries data to above topic
@@ -45,7 +45,7 @@ Thingsboard can now support depthseries data also. Earlier thingsboard supported
 ```
    **Note:** the json has ds for depth instead of ts which is for timestamp.
 
-3. Now depthseries data can be published to thingsboard similar to timeseries telemetry data using mqtt publish.
+3. Now depthseries data can be published to tempus similar to timeseries telemetry data using mqtt publish.
 
 ## Visualize depthseries data
 
@@ -71,7 +71,7 @@ Thingsboard can now support depthseries data also. Earlier thingsboard supported
 
 ## Enabling LDAP Security
 
-The default installation doesn't use LDAP security.  However, It can be changed to use LDAP server for authentication and thingsboard to authorize the user based on the authentication.
+The default installation doesn't use LDAP security.  However, It can be changed to use LDAP server for authentication and tempus to authorize the user based on the authentication.
 
 To enable LDAP authentication change the value of flag 'authentication-enabled' under 'ldap' in thingsboard.yml to 'true'. Other settings under ldap also needs to be changed accordingly to point to the right ldap server, dn etc.
 
@@ -145,7 +145,7 @@ Spark application jar should contain a class with below annotations to be added 
 
 #### Motivation
 
-*As a user if i want to add new Spark computation capability in thingsboard, i don't want to create a new Action for Spark computation plugin and i want a mechanism so that i should be able to register spark computation application without taking thingsboard down*
+*As a user if i want to add new Spark computation capability in tempus, i don't want to create a new Action for Spark computation plugin and i want a mechanism so that i should be able to register spark computation application without taking tempus down*
 
 #### Implementation
 

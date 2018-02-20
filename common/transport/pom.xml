@@ -27,7 +27,7 @@
     <artifactId>transport</artifactId>
     <packaging>jar</packaging>
 
-    <name>Thingsboard Server Common Transport components</name>
+    <name>Tempus Server Common Transport components</name>
     <url>http://thingsboard.org</url>
 
     <properties>

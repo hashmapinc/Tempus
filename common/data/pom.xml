@@ -27,7 +27,7 @@
     <artifactId>data</artifactId>
     <packaging>jar</packaging>
 
-    <name>Thingsboard Server Common Data</name>
+    <name>Tempus Server Common Data</name>
     <url>http://thingsboard.org</url>
 
     <properties>

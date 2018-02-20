@@ -29,7 +29,7 @@
     <artifactId>extension-mqtt</artifactId>
     <packaging>jar</packaging>
 
-    <name>Thingsboard Server MQTT Extension</name>
+    <name>Tempus Server MQTT Extension</name>
     <url>http://thingsboard.org</url>
 
     <properties>
