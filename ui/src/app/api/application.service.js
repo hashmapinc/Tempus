@@ -37,7 +37,8 @@ function ApplicationService($http, $q, customerService) {
         assignDeviceTypesToApplication: assignDeviceTypesToApplication,
         getApplicationsByDeviceType: getApplicationsByDeviceType,
         assignDashboardToApplication: assignDashboardToApplication,
-        unAssignRulesFromApplication: unAssignRulesFromApplication
+        unAssignRulesFromApplication: unAssignRulesFromApplication,
+        getApplicationsByRuleId : getApplicationsByRuleId
     }
 
     return service;
@@ -242,16 +243,16 @@ function ApplicationService($http, $q, customerService) {
         return deferred.promise;
     }
 
-    // function getApplicationsByRuleId(ruleId) {
-    //     var deferred = $q.defer();
-    //     var url = '/applications/rule/' + ruleId;
-    //     $http.get(url, ruleId).then(function success(response) {
-    //         deferred.resolve(response.data);
-    //     }, function fail() {
-    //         deferred.reject();
-    //     });
-    //     return deferred.promise;
-    // }
+    function getApplicationsByRuleId(ruleId) {
+        var deferred = $q.defer();
+        var url = '/api/applications/rule/' + ruleId;
+        $http.get(url, ruleId).then(function success(response) {
+            deferred.resolve(response.data);
+        }, function fail() {
+            deferred.reject();
+        });
+        return deferred.promise;
+    }
     
 
     function assignDeviceTypesToApplication(applicationId, deviceTypes){

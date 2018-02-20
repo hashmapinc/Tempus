@@ -125,7 +125,7 @@ function Grid() {
 }
 
 /*@ngInject*/
-function GridController($scope, $state, $mdDialog, $document, $q, $timeout, $translate, $mdMedia, $templateCache, $window) {
+function GridController(applicationService, $scope, $state, $mdDialog, $document, $q, $timeout, $translate, $mdMedia, $templateCache, $window) {
 
     var vm = this;
 
@@ -616,42 +616,102 @@ function GridController($scope, $state, $mdDialog, $document, $q, $timeout, $tra
         if ($event) {
             $event.stopPropagation();
         }
-        var confirm = $mdDialog.confirm()
-            .targetEvent($event)
-            .title(vm.deleteItemTitleFunc(item))
-            .htmlContent(vm.deleteItemContentFunc(item))
-            .ariaLabel($translate.instant('grid.delete-item'))
-            .cancel($translate.instant('action.no'))
-            .ok($translate.instant('action.yes'));
-        $mdDialog.show(confirm).then(function () {
+        if(item.id.entityType === "RULE"){
+            applicationService.getApplicationsByRuleId(item.id.id).then(
+                function success(application){
+                    if(application){
+                        item.rulesAppname = application[0];
+                    }
+                    var confirm = $mdDialog.confirm()
+                        .targetEvent($event)
+                        .title(vm.deleteItemTitleFunc(item))
+                        .htmlContent(vm.deleteItemContentFunc(item))
+                        .ariaLabel($translate.instant('grid.delete-item'))
+                        .cancel($translate.instant('action.no'))
+                        .ok($translate.instant('action.yes'));
+                    $mdDialog.show(confirm).then(function () {
+                        vm.deleteItemFunc(item.id.id).then(function success() {
+                            refreshList();
+                        });
+                    },
+                    function () {
+                    });
+                }
+            );
+        }
+        else {
+            var confirm = $mdDialog.confirm()
+                .targetEvent($event)
+                .title(vm.deleteItemTitleFunc(item))
+                .htmlContent(vm.deleteItemContentFunc(item))
+                .ariaLabel($translate.instant('grid.delete-item'))
+                .cancel($translate.instant('action.no'))
+                .ok($translate.instant('action.yes'));
+            $mdDialog.show(confirm).then(function () {
                 vm.deleteItemFunc(item.id.id).then(function success() {
                     refreshList();
                 });
             },
             function () {
             });
-
+        }
     }
 
     function deleteItems($event) {
-        var confirm = $mdDialog.confirm()
-            .targetEvent($event)
-            .title(vm.deleteItemsTitleFunc(vm.items.selectedCount))
-            .htmlContent(vm.deleteItemsContentFunc())
-            .ariaLabel($translate.instant('grid.delete-items'))
-            .cancel($translate.instant('action.no'))
-            .ok($translate.instant('action.yes'));
-        $mdDialog.show(confirm).then(function () {
-                var tasks = [];
-                for (var id in vm.items.selections) {
-                    tasks.push(vm.deleteItemFunc(id));
-                }
-                $q.all(tasks).then(function () {
-                    refreshList();
+        // var appNames = [];
+        // if(vm.items.data[0].id.entityType === "RULE"){
+        //     var arr = Object.keys(vm.items.selections);
+        //     applicationService.getApplicationsByRuleId(arr[0]).then(
+        //         function success(application){
+        //             if(application.length > 0){
+        //                 appNames.push(application[0]);
+        //             }
+        //             else {
+        //                 appNames = vm.items.selectedCount;
+        //             }
+        //             var confirm = $mdDialog.confirm()
+        //                 .targetEvent($event)
+        //                 .title(vm.deleteItemsTitleFunc(appNames))
+        //                 .htmlContent(vm.deleteItemsContentFunc())
+        //                 .ariaLabel($translate.instant('grid.delete-items'))
+        //                 .cancel($translate.instant('action.no'))
+        //                 .ok($translate.instant('action.yes'));
+        //             $mdDialog.show(confirm).then(function () {
+        //                     var tasks = [];
+        //                     for (var id in vm.items.selections) {
+        //                         tasks.push(vm.deleteItemFunc(id));
+        //                     }
+        //                     $q.all(tasks).then(function () {
+        //                         refreshList();
+        //                     });
+        //                 },
+        //                 function () {
+        //                 });
+        //         }
+        //     );
+            
+        // }
+        // else {
+            var confirm = $mdDialog.confirm()
+                .targetEvent($event)
+                .title(vm.deleteItemsTitleFunc(vm.items.selectedCount))
+                .htmlContent(vm.deleteItemsContentFunc())
+                .ariaLabel($translate.instant('grid.delete-items'))
+                .cancel($translate.instant('action.no'))
+                .ok($translate.instant('action.yes'));
+            $mdDialog.show(confirm).then(function () {
+                    var tasks = [];
+                    for (var id in vm.items.selections) {
+                        tasks.push(vm.deleteItemFunc(id));
+                    }
+                    $q.all(tasks).then(function () {
+                        refreshList();
+                    });
+                },
+                function () {
                 });
-            },
-            function () {
-            });
+      //  }
+
     }
 
 
