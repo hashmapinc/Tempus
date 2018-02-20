@@ -15,14 +15,25 @@
     limitations under the License.
 
 -->
+<div ng-if="vm.appSliderOpen">
 <tb-grid grid-configuration="vm.applicationGridConfig">
     <details-buttons tb-help="'applications'" help-container-id="help-container">
         <div id="help-container"></div>
     </details-buttons>
-    <md-tabs ng-class="{'tb-headless': vm.grid.detailsConfig.isDetailsEditMode}"
+    <md-tabs md-selected="vm.tabSelectedIndex" ng-class="{'tb-headless': vm.grid.detailsConfig.isDetailsEditMode}"
              id="tabs" md-border-bottom flex class="tb-absolute-fill" ng-if="vm.appClicked">
-        <md-tab label="{{ 'application.details' | translate }}">
-           <tb-application></tb-application>
+        <md-tab label="{{ 'application.details' | translate }}" ng-click="vm.detailesClicked()">
+          <div ng-if="vm.showAppDetails">
+             <tb-application application="vm.currentApplication"
+             is-edit="vm.grid.detailsConfig.isDetailsEditMode"
+             application-scope="vm.applicationScope"
+             the-form="vm.grid.detailsForm"
+             on-assign-to-customer="vm.assignToCustomer(event, [ vm.grid.detailsConfig.currentItem.id.id ])"
+             on-make-public="vm.makePublic(event, vm.grid.detailsConfig.currentItem)"
+             on-unassign-from-customer="vm.unassignFromCustomer(event, vm.grid.detailsConfig.currentItem, isPublic)"
+             on-manage-credentials="vm.manageCredentials(event, vm.grid.detailsConfig.currentItem)"
+             on-delete-application="vm.grid.deleteItem(event, vm.grid.detailsConfig.currentItem)"></tb-application>
+         </div>
         </md-tab>
         <md-tab label="Mini Dashboard" md-on-select="vm.tabselected('Mini')">
           <div ng-if="vm.showAppMini">
@@ -99,8 +110,7 @@
             <tb-grid grid-configuration=""> </tb-grid>
 
         </md-tab>
-     
-
-        
+     </md-tabs>
 
 </tb-grid>
+</div>
