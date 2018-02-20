@@ -1070,6 +1070,8 @@ export default angular.module('thingsboard.locale', [])
                     "description": "Description",
                     "add": "Add Rule",
                     "delete-rule-title": "Are you sure you want to delete the rule '{{ruleName}}'?",
+                    "delete-rule-app-warning": "Application '{{ruleAppWarning}}' is associated with this Rule. Are you sure you want to delete?",
+                    "delete-rules-app-warning": "Application '{{count}}' and other applications are associated with these Rules. Are you sure you want to delete?",
                     "delete-rule-text": "Be careful, after the confirmation the rule and all related data will become unrecoverable.",
                     "delete-rules-title": "Are you sure you want to delete { count, select, 1 {1 rule} other {# rules} }?",
                     "delete-rules-action-title": "Delete { count, select, 1 {1 rule} other {# rules} }",

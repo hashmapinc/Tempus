@@ -125,7 +125,7 @@ function Grid() {
 }
 
 /*@ngInject*/
-function GridController($scope, $state, $mdDialog, $document, $q, $timeout, $translate, $mdMedia, $templateCache, $window) {
+function GridController(applicationService, $scope, $state, $mdDialog, $document, $q, $timeout, $translate, $mdMedia, $templateCache, $window) {
 
     var vm = this;
 
@@ -217,6 +217,18 @@ function GridController($scope, $state, $mdDialog, $document, $q, $timeout, $tra
                                 vm.items.pending = false;
                                 reload();
                             } else {
+                                if (($window.localStorage.getItem("currentApp") !== "null" && $window.localStorage.getItem("currentApp") !== null) && items.data[0].id.entityType == 'APPLICATION') {
+                                    var oldStoredApp = angular.fromJson($window.localStorage.getItem('currentApp'));
+                                    vm.config.parentCtl.tabSelectedIndex = $window.localStorage.getItem('currentTab');
+                                    items.data.forEach(function(application){
+                                        if(oldStoredApp.id.id == application.id.id){
+                                            vm.newApp = application;
+                                        }
+                                    })
+                                    //$window.localStorage.setItem('currentApp', angular.toJson(vm.currentApplication));
+                                    $window.localStorage.removeItem('currentApp');
+                                    $window.localStorage.removeItem('currentTab');
+                                }
                                 if(items.data[0].id.entityType == 'DASHBOARD' && angular.isDefined(vm.config.parentCtl.currentApplication) && (angular.isDefined(vm.config.parentCtl.currentApplication.miniDashboardId) || angular.isDefined(vm.config.parentCtl.currentApplication.dashboardId))){
                                     if(vm.config.parentCtl.showAppMini){
                                         items.data.forEach(function(miniDashboard){
@@ -271,6 +283,10 @@ function GridController($scope, $state, $mdDialog, $document, $q, $timeout, $tra
                                     vm.items.nextPageLink.limit = pageSize;
                                 }
                                 vm.items.pending = false;
+                                if (vm.newApp) {
+                                    vm.openItem(null, vm.newApp);
+                                    $window.localStorage.removeItem('currentApp');
+                                }
                             }
                         },
                         function fail() {
@@ -522,7 +538,9 @@ function GridController($scope, $state, $mdDialog, $document, $q, $timeout, $tra
     }
 
     function openItem($event, item) {
-        $event.stopPropagation();
+        if($event){
+            $event.stopPropagation();
+        }
         if (vm.detailsConfig.currentItem != null && vm.detailsConfig.currentItem.id.id === item.id.id) {
             if (vm.detailsConfig.isDetailsOpen) {
                 vm.detailsConfig.isDetailsOpen = false;
@@ -562,6 +580,7 @@ function GridController($scope, $state, $mdDialog, $document, $q, $timeout, $tra
 
     function onCloseDetails() {
         vm.detailsConfig.currentItem = null;
+        $window.localStorage.removeItem('currentApp')
     }
 
     function operatingItem() {
@@ -597,42 +616,102 @@ function GridController($scope, $state, $mdDialog, $document, $q, $timeout, $tra
         if ($event) {
             $event.stopPropagation();
         }
-        var confirm = $mdDialog.confirm()
-            .targetEvent($event)
-            .title(vm.deleteItemTitleFunc(item))
-            .htmlContent(vm.deleteItemContentFunc(item))
-            .ariaLabel($translate.instant('grid.delete-item'))
-            .cancel($translate.instant('action.no'))
-            .ok($translate.instant('action.yes'));
-        $mdDialog.show(confirm).then(function () {
+        if(item.id.entityType === "RULE"){
+            applicationService.getApplicationsByRuleId(item.id.id).then(
+                function success(application){
+                    if(application){
+                        item.rulesAppname = application[0];
+                    }
+                    var confirm = $mdDialog.confirm()
+                        .targetEvent($event)
+                        .title(vm.deleteItemTitleFunc(item))
+                        .htmlContent(vm.deleteItemContentFunc(item))
+                        .ariaLabel($translate.instant('grid.delete-item'))
+                        .cancel($translate.instant('action.no'))
+                        .ok($translate.instant('action.yes'));
+                    $mdDialog.show(confirm).then(function () {
+                        vm.deleteItemFunc(item.id.id).then(function success() {
+                            refreshList();
+                        });
+                    },
+                    function () {
+                    });
+                }
+            );
+        }
+        else {
+            var confirm = $mdDialog.confirm()
+                .targetEvent($event)
+                .title(vm.deleteItemTitleFunc(item))
+                .htmlContent(vm.deleteItemContentFunc(item))
+                .ariaLabel($translate.instant('grid.delete-item'))
+                .cancel($translate.instant('action.no'))
+                .ok($translate.instant('action.yes'));
+            $mdDialog.show(confirm).then(function () {
                 vm.deleteItemFunc(item.id.id).then(function success() {
                     refreshList();
                 });
             },
             function () {
             });
-
+        }
     }
 
     function deleteItems($event) {
-        var confirm = $mdDialog.confirm()
-            .targetEvent($event)
-            .title(vm.deleteItemsTitleFunc(vm.items.selectedCount))
-            .htmlContent(vm.deleteItemsContentFunc())
-            .ariaLabel($translate.instant('grid.delete-items'))
-            .cancel($translate.instant('action.no'))
-            .ok($translate.instant('action.yes'));
-        $mdDialog.show(confirm).then(function () {
-                var tasks = [];
-                for (var id in vm.items.selections) {
-                    tasks.push(vm.deleteItemFunc(id));
-                }
-                $q.all(tasks).then(function () {
-                    refreshList();
+        // var appNames = [];
+        // if(vm.items.data[0].id.entityType === "RULE"){
+        //     var arr = Object.keys(vm.items.selections);
+        //     applicationService.getApplicationsByRuleId(arr[0]).then(
+        //         function success(application){
+        //             if(application.length > 0){
+        //                 appNames.push(application[0]);
+        //             }
+        //             else {
+        //                 appNames = vm.items.selectedCount;
+        //             }
+        //             var confirm = $mdDialog.confirm()
+        //                 .targetEvent($event)
+        //                 .title(vm.deleteItemsTitleFunc(appNames))
+        //                 .htmlContent(vm.deleteItemsContentFunc())
+        //                 .ariaLabel($translate.instant('grid.delete-items'))
+        //                 .cancel($translate.instant('action.no'))
+        //                 .ok($translate.instant('action.yes'));
+        //             $mdDialog.show(confirm).then(function () {
+        //                     var tasks = [];
+        //                     for (var id in vm.items.selections) {
+        //                         tasks.push(vm.deleteItemFunc(id));
+        //                     }
+        //                     $q.all(tasks).then(function () {
+        //                         refreshList();
+        //                     });
+        //                 },
+        //                 function () {
+        //                 });
+        //         }
+        //     );
+            
+        // }
+        // else {
+            var confirm = $mdDialog.confirm()
+                .targetEvent($event)
+                .title(vm.deleteItemsTitleFunc(vm.items.selectedCount))
+                .htmlContent(vm.deleteItemsContentFunc())
+                .ariaLabel($translate.instant('grid.delete-items'))
+                .cancel($translate.instant('action.no'))
+                .ok($translate.instant('action.yes'));
+            $mdDialog.show(confirm).then(function () {
+                    var tasks = [];
+                    for (var id in vm.items.selections) {
+                        tasks.push(vm.deleteItemFunc(id));
+                    }
+                    $q.all(tasks).then(function () {
+                        refreshList();
+                    });
+                },
+                function () {
                 });
-            },
-            function () {
-            });
+      //  }
+
     }
 
 

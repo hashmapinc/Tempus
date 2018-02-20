@@ -27,7 +27,7 @@
     <artifactId>extensions-api</artifactId>
     <packaging>jar</packaging>
 
-    <name>Thingsboard Server Extensions API</name>
+    <name>Tempus Server Extensions API</name>
     <url>http://thingsboard.org</url>
 
     <properties>

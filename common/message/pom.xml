@@ -27,7 +27,7 @@
     <artifactId>message</artifactId>
     <packaging>jar</packaging>
 
-    <name>Thingsboard Server Common Messages</name>
+    <name>Tempus Server Common Messages</name>
     <url>http://thingsboard.org</url>
 
     <properties>
