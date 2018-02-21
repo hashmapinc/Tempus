@@ -103,6 +103,8 @@ public class ComputationJobActorMessageProcessor extends ComponentMsgProcessor<C
         job = systemContext.getComputationJobService().findComputationJobById(entityId);
         logger.info("[{}] Computation configuration was updated from {} to {}.", entityId, oldJob, job);
         if(!oldJob.getArgParameters().equals(job.getArgParameters())){
+            onStop();
+            systemContext.getComputationJobService().activateComputationJobById(job.getId());
             start();
         }
     }
