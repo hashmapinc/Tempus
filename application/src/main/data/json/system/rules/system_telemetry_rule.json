@@ -22,7 +22,7 @@
     "name": "TelemetryMsgConverterAction",
     "configuration": {
       "timeUnit": "DAYS",
-      "ttlValue": 365
+      "ttlValue": 14
     }
   },
   "additionalInfo": null
