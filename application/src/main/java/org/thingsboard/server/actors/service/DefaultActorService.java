@@ -61,7 +61,7 @@ import java.util.Optional;
 
 @Service
 @Slf4j
-@DependsOn("computationDiscoveryService")
+@DependsOn({"computationDiscoveryService","uploadComputationDiscoveryService"})
 public class DefaultActorService implements ActorService {
 
     private static final String ACTOR_SYSTEM_NAME = "Akka";
@@ -234,6 +234,18 @@ public class DefaultActorService implements ActorService {
     public void onDashboardStateChange(TenantId tenantId, DashboardId dashboardId, ComponentLifecycleEvent event) {
         log.trace("[{}] Processing onDashboardStateChange event: {}", dashboardId, event);
         appActor.tell(ComponentLifecycleMsg.forDashboard(tenantId, dashboardId, event) , ActorRef.noSender());
+    }
+
+    @Override
+    public void onComputationStateChange(TenantId tenantId, ComputationId computationId, ComponentLifecycleEvent state) {
+        log.trace("[{}] Processing onComputationStateChange event: {}", computationId, state);
+        broadcast(ComponentLifecycleMsg.forComputation(tenantId, computationId, state));
+    }
+
+    @Override
+    public void onComputationJobStateChange(TenantId tenantId, ComputationId computationId, ComputationJobId computationJobId, ComponentLifecycleEvent state) {
+        log.trace("[{}] Processing onComputationStateChange event: {}", computationJobId, state);
+        broadcast(ComponentLifecycleMsg.forComputationJob(tenantId, computationId, computationJobId, state));
     }
 
     @Override

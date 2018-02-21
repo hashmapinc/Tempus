@@ -72,8 +72,9 @@ import thingsboardApiAsset from './api/asset.service';
 import thingsboardApiAttribute from './api/attribute.service';
 import thingsboardApiEntity from './api/entity.service';
 import thingsboardApiAlarm from './api/alarm.service';
-import thingsboardApiUiConfiguration from './api/ui-configuration.service'
+import thingsboardApiUiConfiguration from './api/ui-configuration.service';
 import thingsboardApiComputation from './api/computation.service';
+import thingsboardApiComputationJob from './api/computation-job.service';
 import thingsboardTempusboard from './tempusboard';
 import thingsboardApplications from './applications';
 
@@ -137,6 +138,7 @@ angular.module('thingsboard', [
     thingsboardApiAlarm,
     thingsboardApiUiConfiguration,
     thingsboardApiComputation,
+    thingsboardApiComputationJob,
     thingsboardTempusboard,
     thingsboardApplications,
     uiRouter])

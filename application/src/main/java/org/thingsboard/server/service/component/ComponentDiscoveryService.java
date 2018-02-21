@@ -20,6 +20,7 @@ import org.thingsboard.server.common.data.plugin.ComponentType;
 import org.thingsboard.server.common.msg.computation.ComputationActionCompiled;
 import org.thingsboard.server.common.msg.computation.ComputationActionDeleted;
 
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
 
@@ -38,6 +39,6 @@ public interface ComponentDiscoveryService {
 
     void updateActionsForPlugin(List<ComputationActionCompiled> action, String pluginClazz);
 
-    void deleteActionsFromPlugin(ComputationActionDeleted deleted, String pluginClazz);
+    void deleteActionsFromPlugin(ComputationActionDeleted deleted, Path path, String pluginClazz);
 
 }

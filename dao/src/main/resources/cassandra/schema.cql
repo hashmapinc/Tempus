@@ -635,3 +635,51 @@ CREATE MATERIALIZED VIEW IF NOT EXISTS thingsboard.event_by_id AS
     AND event_type IS NOT NULL AND event_uid IS NOT NULL
     PRIMARY KEY ((tenant_id, entity_type, entity_id), id, event_type, event_uid)
     WITH CLUSTERING ORDER BY (id ASC, event_type ASC, event_uid ASC);
+
+
+CREATE TABLE IF NOT EXISTS thingsboard.computations (
+    id uuid,
+    jar_name text,
+    jar_path text,
+    search_text text,
+    computation_name text,
+    main_class text,
+    args_format text,
+    args_type text,
+    json_descriptor text,
+    tenant_id uuid,
+    PRIMARY KEY (id, tenant_id)
+);
+
+CREATE MATERIALIZED VIEW IF NOT EXISTS thingsboard.computations_by_tenant_and_search_text AS
+    SELECT *
+    from thingsboard.computations
+    WHERE tenant_id IS NOT NULL AND search_text IS NOT NULL AND id IS NOT NULL
+    PRIMARY KEY ( tenant_id, search_text, id )
+    WITH CLUSTERING ORDER BY ( search_text ASC, id DESC );
+
+CREATE MATERIALIZED VIEW IF NOT EXISTS thingsboard.computations_by_tenant_and_computation_name AS
+    SELECT *
+    from thingsboard.computations
+    WHERE tenant_id IS NOT NULL AND computation_name IS NOT NULL AND id IS NOT NULL
+    PRIMARY KEY ( tenant_id, computation_name, id )
+    WITH CLUSTERING ORDER BY ( computation_name ASC, id DESC );
+
+CREATE TABLE IF NOT EXISTS thingsboard.computation_job (
+    id uuid,
+    job_name text,
+    job_id text,
+    search_text text,
+    computation_id uuid,
+    arg_parameters text,
+    state text,
+    tenant_id uuid,
+    PRIMARY KEY (id, tenant_id, computation_id)
+);
+
+CREATE MATERIALIZED VIEW IF NOT EXISTS thingsboard.cmp_jobs_by_tenant_and_cmp_search_text AS
+    SELECT *
+    from thingsboard.computation_job
+    WHERE tenant_id IS NOT NULL AND computation_id IS NOT NULL AND search_text IS NOT NULL AND id IS NOT NULL
+    PRIMARY KEY (tenant_id, computation_id, search_text, id)
+    WITH CLUSTERING ORDER BY ( search_text ASC, id DESC );
