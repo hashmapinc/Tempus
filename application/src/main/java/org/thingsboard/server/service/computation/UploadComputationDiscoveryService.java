@@ -121,13 +121,13 @@ public class UploadComputationDiscoveryService implements ComputationDiscoverySe
                         computations.setArgsType(computationRequestCompiled.getArgsType());
                         computations.setJarName(j.getFileName().toString());
                         computations.setName(computationRequestCompiled.getName());
-                        Computations persistedComputations = computationsService.findByName(computations.getName());
-                        if (persistedComputations == null) {
+                        Optional<Computations> persisted = computationsService.findByTenantIdAndName(tenantId, computations.getName());
+                        if (!persisted.isPresent()) {
                             ComputationId computationId = new ComputationId(UUIDs.timeBased());
                             computations.setId(computationId);
                             savedComputations = computationsService.save(computations);
                         } else {
-                            computations.setId(persistedComputations.getId());
+                            computations.setId(persisted.get().getId());
                             savedComputations = computationsService.save(computations);
                         }
                     }
@@ -142,11 +142,6 @@ public class UploadComputationDiscoveryService implements ComputationDiscoverySe
 
     public void onFileDelete(File file){
         computationsService.deleteByJarName(file.getName());
-    }
-
-    @Override
-    public List<Computations> findAll() {
-        return computationsService.findAll();
     }
 
     @Override

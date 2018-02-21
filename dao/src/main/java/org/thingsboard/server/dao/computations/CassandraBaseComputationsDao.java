@@ -32,10 +32,11 @@ import org.thingsboard.server.dao.util.NoSqlDao;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import static com.datastax.driver.core.querybuilder.QueryBuilder.*;
-import static org.thingsboard.server.dao.model.ModelConstants.NULL_UUID;
+import static org.thingsboard.server.dao.model.ModelConstants.*;
 
 @Component
 @Slf4j
@@ -52,17 +53,6 @@ public class CassandraBaseComputationsDao extends CassandraAbstractSearchTextDao
         return ModelConstants.COMPUTATIONS_COLUMN_FAMILY_NAME;
     }
 
-    /*@Override
-    public Computations findById(ComputationId computationId) {
-        Computations computations = super.findById(computationId.getId());
-        if (log.isTraceEnabled()) {
-            log.trace("Search result: [{}] for plugin entity [{}]", computations != null, computations);
-        } else {
-            log.info("Search result: [{}]", computations != null);
-        }
-        return computations;
-    }*/
-
     public void deleteById(UUID id) {
         log.info("Delete computations entity by id [{}]", id);
         boolean result = removeById(id);
@@ -78,8 +68,7 @@ public class CassandraBaseComputationsDao extends CassandraAbstractSearchTextDao
     public List<Computations> findByTenantIdAndPageLink(TenantId tenantId, TextPageLink pageLink) {
         log.info("Try to find all tenant computationJobs by tenantId [{}] and pageLink [{}]", tenantId, pageLink);
         List<ComputationsEntity> computationsEntities = findPageWithTextSearch(ModelConstants.COMPUTATIONS_BY_TENANT,
-                Arrays.asList(in(ModelConstants.COMPUTATIONS_TENANT_ID, Arrays.asList(NULL_UUID, tenantId))),
-                pageLink);
+                Arrays.asList(in(ModelConstants.COMPUTATIONS_TENANT_ID_PROPERTY, tenantId.getId())), pageLink);
         if (log.isTraceEnabled()) {
             log.trace("Search result: [{}]", Arrays.toString(computationsEntities.toArray()));
         } else {
@@ -89,13 +78,17 @@ public class CassandraBaseComputationsDao extends CassandraAbstractSearchTextDao
     }
 
     @Override
-    public List<Computations> findAll() {
-        return null;
+    public Computations findByName(String name) {
+        throw new UnsupportedOperationException("To support multi-tenancy this is not supported without tenantId");
     }
 
     @Override
-    public Computations findByName(String name) {
-        return null;
+    public Optional<Computations> findByTenantIdAndName(TenantId tenantId, String name) {
+        Select select = select().from(COMPUTATIONS_BY_TENANT_AND_NAME_COLUMN_FAMILY);
+        Select.Where query = select.where();
+        query.and(eq(COMPUTATIONS_TENANT_ID_PROPERTY, tenantId.getId()));
+        query.and(eq(COMPUTATIONS_NAME_PROPERTY, name));
+        return Optional.ofNullable(DaoUtil.getData(findOneByStatement(query)));
     }
 
     @Override

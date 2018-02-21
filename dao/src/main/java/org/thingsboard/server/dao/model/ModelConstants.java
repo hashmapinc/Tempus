@@ -319,15 +319,15 @@ public class ModelConstants {
     public static final String COMPUTATIONS_ARGS_FORMAT_PROPERTY = "args_format";
     public static final String COMPUTATIONS_ARGS_TYPE_PROPERTY = "args_type";
     public static final String COMPUTATIONS_BY_TENANT = "computations_by_tenant_and_search_text";
+    public static final String COMPUTATIONS_BY_TENANT_AND_NAME_COLUMN_FAMILY = "computations_by_tenant_and_computation_name";
 
     public static final String COMPUTATION_JOB_COLUMN_FAMILY_NAME = "computation_job";
     public static final String COMPUTATION_JOB_NAME_PROPERTY = "job_name";
-    public static final String COMPUTATION_JOB_COMPUTAION_ID_PROPERTY = "computation_id";
+    public static final String COMPUTATION_JOB_COMPUTATION_ID_PROPERTY = "computation_id";
     public static final String COMPUTATION_JOB_ARG_PRS_PROPERTY = "arg_parameters";
     public static final String COMPUTATION_JOB_STATE_PROPERTY = "state";
     public static final String COMPUTATION_JOB_ID_PROPERTY = "job_id";
-    public static final String COMPUTATION_JOB_BY_COMPUTATION = "computation_jobs_by_computation_and_search_text";
-    public static final String COMPUTATION_JOB_BY_TENANT_AND_COMPUTATION = "computation_jobs_by_tenant_and_computation_search_text";
+    public static final String COMPUTATION_JOB_BY_TENANT_AND_COMPUTATION = "cmp_jobs_by_tenant_and_cmp_search_text";
     public static final String COMPUTATION_JOB_TENANT_ID_PROPERTY = TENANT_ID_PROPERTY;
 
 

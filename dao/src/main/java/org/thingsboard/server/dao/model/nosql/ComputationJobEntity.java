@@ -25,26 +25,26 @@ public class ComputationJobEntity implements SearchTextEntity<ComputationJob> {
     @Column(name = ID_PROPERTY)
     private UUID id;
 
-    @Column(name = ModelConstants.COMPUTATION_JOB_NAME)
+    @Column(name = ModelConstants.COMPUTATION_JOB_NAME_PROPERTY)
     private String jobName;
 
-    @Column(name = ModelConstants.COMPUTATION_JOB_COMPUTAION_ID)
+    @Column(name = ModelConstants.COMPUTATION_JOB_COMPUTATION_ID_PROPERTY)
     private UUID computationId;
 
-    @Column(name = ModelConstants.COMPUTATION_JOB_ARG_PRS, codec = JsonCodec.class)
+    @Column(name = ModelConstants.COMPUTATION_JOB_ARG_PRS_PROPERTY, codec = JsonCodec.class)
     private JsonNode argParameters;
 
     @ClusteringColumn
-    @Column(name = ModelConstants.COMPUTATION_JOB_TENANT_ID)
+    @Column(name = ModelConstants.COMPUTATION_JOB_TENANT_ID_PROPERTY)
     private UUID tenantId;
 
     @Column(name = ModelConstants.SEARCH_TEXT_PROPERTY)
     private String searchText;
 
-    @Column(name = ModelConstants.COMPUTATION_JOB_ID)
+    @Column(name = ModelConstants.COMPUTATION_JOB_ID_PROPERTY)
     private String jobId;
 
-    @Column(name = ModelConstants.COMPUTATION_JOB_STATE, codec = ComponentLifecycleStateCodec.class)
+    @Column(name = ModelConstants.COMPUTATION_JOB_STATE_PROPERTY, codec = ComponentLifecycleStateCodec.class)
     private ComponentLifecycleState state;
 
     @Override

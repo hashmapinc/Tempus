@@ -23,32 +23,32 @@ public class ComputationsEntity implements SearchTextEntity<Computations> {
     @Column(name = ID_PROPERTY)
     private UUID id;
 
-    @Column(name = ModelConstants.COMPUTATIONS_NAME)
+    @Column(name = ModelConstants.COMPUTATIONS_NAME_PROPERTY)
     private String name;
 
-    @Column(name = ModelConstants.COMPUTATIONS_JAR_PATH)
+    @Column(name = ModelConstants.COMPUTATIONS_JAR_PATH_PROPERTY)
     private String jarPath;
 
-    @Column(name = ModelConstants.COMPUTATIONS_JAR)
+    @Column(name = ModelConstants.COMPUTATIONS_JAR_PROPERTY)
     private String jarName;
 
     @Column(name = ModelConstants.SEARCH_TEXT_PROPERTY)
     private String searchText;
 
-    @Column(name = ModelConstants.COMPUTATIONS_MAIN_CLASS)
+    @Column(name = ModelConstants.COMPUTATIONS_MAIN_CLASS_PROPERTY)
     private String mainClass;
 
-    @Column(name = ModelConstants.COMPUTATIONS_ARGS_FORMAT)
+    @Column(name = ModelConstants.COMPUTATIONS_ARGS_FORMAT_PROPERTY)
     private String argsFormat;
 
-    @Column(name = ModelConstants.COMPUTATIONS_DESCRIPTOR, codec = JsonCodec.class)
+    @Column(name = ModelConstants.COMPUTATIONS_DESCRIPTOR_PROPERTY, codec = JsonCodec.class)
     private JsonNode jsonDescriptor;
 
     @ClusteringColumn
-    @Column(name = ModelConstants.COMPUTATIONS_TENANT_ID)
+    @Column(name = ModelConstants.COMPUTATIONS_TENANT_ID_PROPERTY)
     private UUID tenantId;
 
-    @Column(name = ModelConstants.COMPUTATIONS_ARGS_TYPE)
+    @Column(name = ModelConstants.COMPUTATIONS_ARGS_TYPE_PROPERTY)
     private String argsType;
 
     @Override

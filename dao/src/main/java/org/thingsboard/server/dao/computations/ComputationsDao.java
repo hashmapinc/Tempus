@@ -21,12 +21,13 @@ import org.thingsboard.server.common.data.id.TenantId;
 import org.thingsboard.server.common.data.page.TextPageLink;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 public interface ComputationsDao {
-    List<Computations> findAll();
-
     Computations findByName(String name);
+
+    Optional<Computations> findByTenantIdAndName(TenantId tenantId, String name);
 
     Computations save(Computations computations);
 

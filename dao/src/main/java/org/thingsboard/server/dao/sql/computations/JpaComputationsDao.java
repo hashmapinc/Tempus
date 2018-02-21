@@ -30,10 +30,7 @@ import org.thingsboard.server.dao.model.sql.ComputationsEntity;
 import org.thingsboard.server.dao.sql.JpaAbstractDaoListeningExecutorService;
 import org.thingsboard.server.dao.util.SqlDao;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 
 import static org.thingsboard.server.dao.model.ModelConstants.NULL_UUID_STR;
 
@@ -44,14 +41,6 @@ public class JpaComputationsDao extends JpaAbstractDaoListeningExecutorService i
 
     @Autowired
     ComputationsRepository computationsRepository;
-
-    @Override
-    public List<Computations> findAll() {
-        Iterable <ComputationsEntity> computationsEntities = computationsRepository.findAll();
-        List<ComputationsEntity> computationsEntityList = DaoUtil.toList(computationsEntities);
-        List<Computations> computationsList = DaoUtil.convertDataList(computationsEntityList);
-        return computationsList;
-    }
 
     @Override
     public Computations findByName(String name) {
@@ -107,10 +96,16 @@ public class JpaComputationsDao extends JpaAbstractDaoListeningExecutorService i
 
     @Override
     public List<Computations> findByTenantId(TenantId tenantId) {
-        Iterable <ComputationsEntity> computationsEntities = computationsRepository.findTenantById(UUIDConverter.fromTimeUUID(tenantId.getId()));
+        Iterable <ComputationsEntity> computationsEntities = computationsRepository.findByTenantId(UUIDConverter.fromTimeUUID(tenantId.getId()));
         List<ComputationsEntity> computationsEntityList = DaoUtil.toList(computationsEntities);
         List<Computations> computationsList = DaoUtil.convertDataList(computationsEntityList);
         return computationsList;
+    }
+
+    @Override
+    public Optional<Computations> findByTenantIdAndName(TenantId tenantId, String name) {
+        ComputationsEntity computationsEntity = computationsRepository.findByTenantIdAndName(UUIDConverter.fromTimeUUID(tenantId.getId()), name);
+        return Optional.ofNullable(DaoUtil.getData(computationsEntity));
     }
 
 }

@@ -10,9 +10,9 @@ import java.util.Optional;
 
 public interface ComputationsService {
 
-    List<Computations> findAll();
-
     Computations findByName(String name);
+
+    Optional<Computations> findByTenantIdAndName(TenantId tenantId, String name);
 
     Computations findById(ComputationId id);
 

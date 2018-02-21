@@ -14,6 +14,9 @@ import java.util.List;
 @SqlDao
 public interface ComputationsRepository extends CrudRepository<ComputationsEntity, String> {
     List <ComputationsEntity> findByName(String name);
+
+    ComputationsEntity findByTenantIdAndName(String tenantId, String name);
+
     @Modifying
     @Transactional
     @Query("delete from ComputationsEntity c where c.jarName = :jarName")
@@ -26,6 +29,6 @@ public interface ComputationsRepository extends CrudRepository<ComputationsEntit
                                                        @Param("textSearch") String textSearch,
                                                        @Param("idOffset") String idOffset,
                                                        Pageable pageable);
-    @Query("SELECT ce FROM ComputationsEntity ce WHERE ce.tenantId = :tenantId")
-    List<ComputationsEntity> findTenantById(@Param("tenantId") String tenantId);
+
+    List<ComputationsEntity> findByTenantId(@Param("tenantId") String tenantId);
 }

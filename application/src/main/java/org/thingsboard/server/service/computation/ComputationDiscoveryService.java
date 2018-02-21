@@ -25,7 +25,6 @@ import java.util.List;
 public interface ComputationDiscoveryService {
     void discoverDynamicComponents();
     void deleteJarFile(String path);
-    List<Computations>  findAll();
     Computations onJarUpload(String path, TenantId tenantId);
     TextPageData<Computations> findTenantComputations(TenantId tenantId, TextPageLink pageLink);
 }

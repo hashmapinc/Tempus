@@ -102,11 +102,6 @@ public class DirectoryComputationDiscoveryService implements ComputationDiscover
     }
 
 
-    @Override
-    public List<Computations> findAll() {
-        return null;
-    }
-
     public void discoverDynamicComponents(){
         final FileSystem fs = FileSystems.getDefault();
         try {

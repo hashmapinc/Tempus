@@ -637,20 +637,6 @@ CREATE MATERIALIZED VIEW IF NOT EXISTS thingsboard.event_by_id AS
     WITH CLUSTERING ORDER BY (id ASC, event_type ASC, event_uid ASC);
 
 
-CREATE TABLE IF NOT EXISTS  thingsboard.plugin (
-    id uuid,
-    tenant_id uuid,
-    name text,
-    state text,
-    search_text text,
-    api_token text,
-    plugin_class text,
-    public_access boolean,
-    configuration text,
-    additional_info text,
-    PRIMARY KEY (id, tenant_id)
-);
-
 CREATE TABLE IF NOT EXISTS thingsboard.computations (
     id uuid,
     jar_name text,
@@ -672,6 +658,13 @@ CREATE MATERIALIZED VIEW IF NOT EXISTS thingsboard.computations_by_tenant_and_se
     PRIMARY KEY ( tenant_id, search_text, id )
     WITH CLUSTERING ORDER BY ( search_text ASC, id DESC );
 
+CREATE MATERIALIZED VIEW IF NOT EXISTS thingsboard.computations_by_tenant_and_computation_name AS
+    SELECT *
+    from thingsboard.computations
+    WHERE tenant_id IS NOT NULL AND computation_name IS NOT NULL AND id IS NOT NULL
+    PRIMARY KEY ( tenant_id, computation_name, id )
+    WITH CLUSTERING ORDER BY ( computation_name ASC, id DESC );
+
 CREATE TABLE IF NOT EXISTS thingsboard.computation_job (
     id uuid,
     job_name text,
@@ -681,20 +674,12 @@ CREATE TABLE IF NOT EXISTS thingsboard.computation_job (
     arg_parameters text,
     state text,
     tenant_id uuid,
-    PRIMARY KEY (id, computation_id)
+    PRIMARY KEY (id, computation_id, tenant_id)
 );
 
-CREATE MATERIALIZED VIEW IF NOT EXISTS thingsboard.computation_jobs_by_computation_and_search_text AS
-    SELECT *
-    from thingsboard.computation_job
-    WHERE computation_id IS NOT NULL AND search_text IS NOT NULL AND id IS NOT NULL
-    PRIMARY KEY ( computation_id, search_text, id )
-    WITH CLUSTERING ORDER BY ( search_text ASC, id DESC );
-
-
-CREATE MATERIALIZED VIEW IF NOT EXISTS thingsboard.computation_jobs_by_tenant_and_computation_search_text AS
+CREATE MATERIALIZED VIEW IF NOT EXISTS thingsboard.cmp_jobs_by_tenant_and_cmp_search_text AS
     SELECT *
     from thingsboard.computation_job
     WHERE tenant_id IS NOT NULL AND search_text IS NOT NULL AND computation_id IS NOT NULL AND id IS NOT NULL
-    PRIMARY KEY ( tenant_id, search_text, computation_id )
+    PRIMARY KEY ( computation_id, search_text, tenant_id, id)
     WITH CLUSTERING ORDER BY ( search_text ASC, id DESC );

@@ -17,7 +17,6 @@ package org.thingsboard.server.dao.computations;
 
 import com.datastax.driver.core.querybuilder.Select;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.thingsboard.server.common.data.computation.ComputationJob;
 import org.thingsboard.server.common.data.id.ComputationId;
@@ -30,7 +29,6 @@ import org.thingsboard.server.dao.model.nosql.ComputationJobEntity;
 import org.thingsboard.server.dao.nosql.CassandraAbstractSearchTextDao;
 import org.thingsboard.server.dao.util.NoSqlDao;
 import static com.datastax.driver.core.querybuilder.QueryBuilder.*;
-import static org.thingsboard.server.dao.model.ModelConstants.NULL_UUID;
 
 import java.util.Arrays;
 import java.util.List;
@@ -73,7 +71,7 @@ public class CassandraBaseComputationJobDao extends CassandraAbstractSearchTextD
         log.info("Going to fetch computationJobs by ComputationId Id : " + computationId );
         Select select = select().from(ModelConstants.COMPUTATION_JOB_COLUMN_FAMILY_NAME).allowFiltering();
         Select.Where query = select.where();
-        query.and(eq(ModelConstants.COMPUTATION_JOB_COMPUTAION_ID, computationId.getId()));
+        query.and(eq(ModelConstants.COMPUTATION_JOB_COMPUTATION_ID_PROPERTY, computationId.getId()));
         List<ComputationJobEntity> computationJobEntities = findListByStatement(query);
         log.info("computationsEntities returned " + computationJobEntities);
         return DaoUtil.convertDataList(computationJobEntities);
@@ -84,8 +82,8 @@ public class CassandraBaseComputationJobDao extends CassandraAbstractSearchTextD
 
         log.debug("Try to find assets by tenantId [{}], computationId[{}] and pageLink [{}]", tenantId, computationId, pageLink);
         List<ComputationJobEntity> computationJobEntities = findPageWithTextSearch(ModelConstants.COMPUTATION_JOB_BY_TENANT_AND_COMPUTATION,
-                Arrays.asList(eq(ModelConstants.COMPUTATION_JOB_TENANT_ID, tenantId),
-                        eq(ModelConstants.COMPUTATION_JOB_COMPUTAION_ID, computationId)),
+                Arrays.asList(eq(ModelConstants.COMPUTATION_JOB_TENANT_ID_PROPERTY, tenantId.getId()),
+                        eq(ModelConstants.COMPUTATION_JOB_COMPUTATION_ID_PROPERTY, computationId)),
                 pageLink);
 
         log.trace("Found assets [{}] by tenantId [{}], customerId [{}] and pageLink [{}]", computationJobEntities, tenantId, computationId, pageLink);

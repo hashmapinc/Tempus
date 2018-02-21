@@ -12,6 +12,7 @@ import org.thingsboard.server.dao.entity.AbstractEntityService;
 import org.thingsboard.server.dao.model.sql.ComputationsEntity;
 
 import java.util.List;
+import java.util.Optional;
 
 import static org.thingsboard.server.dao.service.Validator.validateId;
 import static org.thingsboard.server.dao.service.Validator.validatePageLink;
@@ -24,14 +25,14 @@ public class BaseComputationsService extends AbstractEntityService implements Co
     ComputationsDao computationsDao;
 
     @Override
-    public List<Computations> findAll() {
-        return computationsDao.findAll();
-    }
-
-    @Override
     public Computations findByName(String name) {
         Computations computations = computationsDao.findByName(name);
         return computations;
+    }
+
+    @Override
+    public Optional<Computations> findByTenantIdAndName(TenantId tenantId, String name) {
+        return computationsDao.findByTenantIdAndName(tenantId, name);
     }
 
     @Override
@@ -41,7 +42,6 @@ public class BaseComputationsService extends AbstractEntityService implements Co
 
     @Override
     public Computations save(Computations computations) {
-        //ComputationsEntity computationsEntity = new ComputationsEntity(computations);
         return computationsDao.save(computations);
     }
 
