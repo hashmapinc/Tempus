@@ -83,7 +83,7 @@ public class CassandraBaseComputationJobDao extends CassandraAbstractSearchTextD
         log.debug("Try to find assets by tenantId [{}], computationId[{}] and pageLink [{}]", tenantId, computationId, pageLink);
         List<ComputationJobEntity> computationJobEntities = findPageWithTextSearch(ModelConstants.COMPUTATION_JOB_BY_TENANT_AND_COMPUTATION,
                 Arrays.asList(eq(ModelConstants.COMPUTATION_JOB_TENANT_ID_PROPERTY, tenantId.getId()),
-                        eq(ModelConstants.COMPUTATION_JOB_COMPUTATION_ID_PROPERTY, computationId)),
+                        eq(ModelConstants.COMPUTATION_JOB_COMPUTATION_ID_PROPERTY, computationId.getId())),
                 pageLink);
 
         log.trace("Found assets [{}] by tenantId [{}], customerId [{}] and pageLink [{}]", computationJobEntities, tenantId, computationId, pageLink);

@@ -674,12 +674,12 @@ CREATE TABLE IF NOT EXISTS thingsboard.computation_job (
     arg_parameters text,
     state text,
     tenant_id uuid,
-    PRIMARY KEY (id, computation_id, tenant_id)
+    PRIMARY KEY (id, tenant_id, computation_id)
 );
 
 CREATE MATERIALIZED VIEW IF NOT EXISTS thingsboard.cmp_jobs_by_tenant_and_cmp_search_text AS
     SELECT *
     from thingsboard.computation_job
-    WHERE tenant_id IS NOT NULL AND search_text IS NOT NULL AND computation_id IS NOT NULL AND id IS NOT NULL
-    PRIMARY KEY ( computation_id, search_text, tenant_id, id)
+    WHERE tenant_id IS NOT NULL AND computation_id IS NOT NULL AND search_text IS NOT NULL AND id IS NOT NULL
+    PRIMARY KEY (tenant_id, computation_id, search_text, id)
     WITH CLUSTERING ORDER BY ( search_text ASC, id DESC );

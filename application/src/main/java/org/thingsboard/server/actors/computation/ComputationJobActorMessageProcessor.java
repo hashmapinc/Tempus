@@ -23,6 +23,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hashmap.tempus.models.ArgType;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.http.*;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
@@ -139,8 +140,10 @@ public class ComputationJobActorMessageProcessor extends ComponentMsgProcessor<C
             checkJobStatus();
             postJob();
         } catch (IOException e) {
+            suspendJob();
             throw new ComputationInitializationException("Error while creating computation job request.", e);
         }catch (Exception e){
+            suspendJob();
             throw new ComputationInitializationException("Error while initializing computation job.", e);
         }
     }
@@ -205,23 +208,22 @@ public class ComputationJobActorMessageProcessor extends ComponentMsgProcessor<C
         builder.className(computation.getMainClass());
         builder.args(args());
         SparkComputationRequest sparkComputationRequest = builder.build();
-        logger.info("spark request {} " + sparkComputationRequest.toString());
         return mapper.writeValueAsString(sparkComputationRequest);
     }
 
     private String[] args() throws IOException {
         JsonNode conf = job.getArgParameters();
         String argsFormat = computation.getArgsformat();
-        String argsTmp = argsFormat.substring(1, argsFormat.length() - 1);
         List<String> args = new ArrayList<>();
-        List<String> argsList =  new ArrayList<>(Arrays.asList(argsTmp.split(",")));
-        logger.info("Parsed array parameters arg are {} ", argsList);
-        if(!argsList.isEmpty()){
-            for (String arg: argsList) {
-                if(computation.getArgsType().equals(ArgType.NAMED)) {
-                    args.add("--" + arg.trim());
+        if(StringUtils.isNotEmpty(argsFormat)){
+            String[] argsList = argsFormat.substring(1, argsFormat.length() - 1).split(",");
+            for(String arg : argsList){
+                if(conf.get(arg.trim()) != null) {
+                    if (computation.getArgsType().equals(ArgType.NAMED)) {
+                        args.add("--" + arg.trim());
+                    }
+                    args.add(conf.get(arg.trim()).asText());
                 }
-                args.add(conf.get(arg.trim()).asText());
             }
         }
         logger.info("Argument array list to spark job " + args);
@@ -248,9 +250,7 @@ public class ComputationJobActorMessageProcessor extends ComponentMsgProcessor<C
     }
 
     private void suspendJob(){
-        job.setState(ComponentLifecycleState.SUSPENDED);
-        job.setJobId(null);
-        systemContext.getComputationJobService().saveComputationJob(job);
+        systemContext.getComputationJobService().suspendComputationJobById(job.getId());
         if(schedule != null && !schedule.isCancelled()) schedule.cancel();
     }
 

@@ -88,6 +88,7 @@ public class BaseComputationJobService extends AbstractEntityService implements 
         ComputationJob computationJob = computationJobDao.findById(computationJobId);
         if (computationJob != null) {
             computationJob.setState(ComponentLifecycleState.SUSPENDED);
+            computationJob.setJobId(null);
             computationJobDao.save(computationJob);
         } else {
             throw new DatabaseException("Plugin not found!");

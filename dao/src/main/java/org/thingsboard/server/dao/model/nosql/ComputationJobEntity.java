@@ -21,20 +21,21 @@ public class ComputationJobEntity implements SearchTextEntity<ComputationJob> {
     @Transient
     private static final long serialVersionUID = -4673737406462009037L;
 
-    @PartitionKey
+    @PartitionKey()
     @Column(name = ID_PROPERTY)
     private UUID id;
 
     @Column(name = ModelConstants.COMPUTATION_JOB_NAME_PROPERTY)
     private String jobName;
 
+    @PartitionKey(value = 1)
     @Column(name = ModelConstants.COMPUTATION_JOB_COMPUTATION_ID_PROPERTY)
     private UUID computationId;
 
     @Column(name = ModelConstants.COMPUTATION_JOB_ARG_PRS_PROPERTY, codec = JsonCodec.class)
     private JsonNode argParameters;
 
-    @ClusteringColumn
+    @PartitionKey(value = 2)
     @Column(name = ModelConstants.COMPUTATION_JOB_TENANT_ID_PROPERTY)
     private UUID tenantId;
 
