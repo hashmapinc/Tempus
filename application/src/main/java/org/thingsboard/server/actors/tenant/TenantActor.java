@@ -31,6 +31,7 @@ import org.thingsboard.server.actors.service.ContextBasedCreator;
 import org.thingsboard.server.actors.service.DefaultActorService;
 import org.thingsboard.server.actors.shared.application.ApplicationManager;
 import org.thingsboard.server.actors.shared.application.TenantApplicationManager;
+import org.thingsboard.server.actors.shared.computation.TenantComputationManager;
 import org.thingsboard.server.actors.shared.plugin.PluginManager;
 import org.thingsboard.server.actors.shared.plugin.TenantPluginManager;
 import org.thingsboard.server.actors.shared.rule.RuleManager;
@@ -58,6 +59,7 @@ public class TenantActor extends ContextAwareActor {
     private final RuleManager ruleManager;
     private final PluginManager pluginManager;
     private final ApplicationManager applicationManager;
+    private final TenantComputationManager computationManager;
     private final Map<DeviceId, ActorRef> deviceActors;
 
     private TenantActor(ActorSystemContext systemContext, TenantId tenantId) {
@@ -66,6 +68,7 @@ public class TenantActor extends ContextAwareActor {
         this.ruleManager = new TenantRuleManager(systemContext, tenantId);
         this.pluginManager = new TenantPluginManager(systemContext, tenantId);
         this.applicationManager = new TenantApplicationManager(systemContext, tenantId);
+        this.computationManager = new TenantComputationManager(systemContext, tenantId);
         this.deviceActors = new HashMap<>();
     }
 
@@ -75,6 +78,7 @@ public class TenantActor extends ContextAwareActor {
         try {
             ruleManager.init(this.context());
             pluginManager.init(this.context());
+            computationManager.init(this.context());
             logger.info("[{}] Tenant actor started.", tenantId);
         } catch (Exception e) {
             logger.error(e, "[{}] Unknown failure", tenantId);
@@ -165,7 +169,10 @@ public class TenantActor extends ContextAwareActor {
                 DashboardDeleteMessage dashboardDeleteMessage = new DashboardDeleteMessage(msg.getDashboardId().get());
                 applicationActor.tell(dashboardDeleteMessage, ActorRef.noSender());
             }
-        } else {
+        } else if(msg.getComputationId().isPresent()){
+            ActorRef computationActor = computationManager.getOrCreateComputationActor(this.context(), msg.getComputationId().get());
+            computationActor.tell(msg, ActorRef.noSender());
+        }else {
             logger.debug("[{}] Invalid component lifecycle msg.", tenantId);
         }
     }

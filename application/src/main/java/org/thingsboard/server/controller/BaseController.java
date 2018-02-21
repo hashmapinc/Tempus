@@ -27,6 +27,7 @@ import org.thingsboard.server.common.data.alarm.Alarm;
 import org.thingsboard.server.common.data.alarm.AlarmId;
 import org.thingsboard.server.common.data.alarm.AlarmInfo;
 import org.thingsboard.server.common.data.asset.Asset;
+import org.thingsboard.server.common.data.computation.ComputationJob;
 import org.thingsboard.server.common.data.id.*;
 import org.thingsboard.server.common.data.page.TextPageLink;
 import org.thingsboard.server.common.data.page.TimePageLink;
@@ -509,6 +510,24 @@ public abstract class BaseController {
             }
         }
         return plugin;
+    }
+
+    protected ComputationJob checkComputationJob(ComputationJob computationJob) throws ThingsboardException {
+        checkNotNull(computationJob);
+        SecurityUser authUser = getCurrentUser();
+        TenantId tenantId = computationJob.getTenantId();
+        validateId(tenantId, "Incorrect tenantId " + tenantId);
+        if (authUser.getAuthority() != Authority.SYS_ADMIN) {
+            if (authUser.getTenantId() == null ||
+                    !tenantId.getId().equals(ModelConstants.NULL_UUID) && !authUser.getTenantId().equals(tenantId)) {
+                throw new ThingsboardException("You don't have permission to perform this operation!",
+                        ThingsboardErrorCode.PERMISSION_DENIED);
+
+            } else if (tenantId.getId().equals(ModelConstants.NULL_UUID)) {
+                computationJob.setArgParameters(null);
+            }
+        }
+        return computationJob;
     }
 
     protected PluginMetaData checkPlugin(PluginId pluginId) throws ThingsboardException {

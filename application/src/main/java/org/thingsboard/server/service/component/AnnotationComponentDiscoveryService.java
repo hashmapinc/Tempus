@@ -39,6 +39,7 @@ import org.thingsboard.server.extensions.api.component.Plugin;
 import org.thingsboard.server.extensions.api.component.Processor;
 import javax.annotation.PostConstruct;
 import java.lang.annotation.Annotation;
+import java.nio.file.Path;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -143,13 +144,13 @@ public class AnnotationComponentDiscoveryService implements ComponentDiscoverySe
             }
             ComponentDescriptor persistedComponent = componentDescriptorService.findByClazz(clazzName);
             if (persistedComponent == null) {
-                log.info("Persisting new component: {}", scannedComponent);
+                log.error("Persisting new component: {}", scannedComponent);
                 scannedComponent = componentDescriptorService.saveComponent(scannedComponent);
             } else if (scannedComponent.equals(persistedComponent)) {
-                log.info("Component is already persisted: {}", persistedComponent);
+                log.error("Component is already persisted: {}", persistedComponent);
                 scannedComponent = persistedComponent;
             } else {
-                log.info("Component {} will be updated to {}", persistedComponent, scannedComponent);
+                log.error("Component {} will be updated to {}", persistedComponent, scannedComponent);
                 componentDescriptorService.deleteByClazz(persistedComponent.getClazz());
                 scannedComponent.setId(persistedComponent.getId());
                 scannedComponent = componentDescriptorService.saveComponent(scannedComponent);
@@ -236,7 +237,7 @@ public class AnnotationComponentDiscoveryService implements ComponentDiscoverySe
     }
 
     @Override
-    public void deleteActionsFromPlugin(ComputationActionDeleted deleted, String pluginClazz) {
+    public void deleteActionsFromPlugin(ComputationActionDeleted deleted, Path path, String pluginClazz) {
         Set<String> deletedActions = deleted.getActionClasses();
         Optional<ComponentDescriptor> plugin = getComponent(pluginClazz);
         if(plugin.isPresent()){

@@ -187,6 +187,14 @@ actors:
     termination.delay: "${ACTORS_RULE_TERMINATION_DELAY:30000}"
     # Errors for particular actor are persisted once per specified amount of milliseconds
     error_persist_frequency: "${ACTORS_RULE_ERROR_FREQUENCY:3000}"
+  computation:
+    # Default timeout for termination of the computation actor after it is stopped
+    termination.delay: "${ACTORS_COMPUTATION_TERMINATION_DELAY:30000}"
+    # Errors for particular actor are persisted once per specified amount of milliseconds
+    error_persist_frequency: "${ACTORS_COMPUTATION_ERROR_FREQUENCY:3000}"
+    status_check.delay: "${ACTORS_COMPUTATION_STATUS_CHECK_DELAY:10}"
+    status_check.frequency: "${ACTORS_COMPUTATION_STATUS_CHECK_FREQUENCY:6000}"
+    location: "${ACTORS_COMPUTATION_LOCATION:/usr/livy-server-0.3.0/upload/}"
   statistics:
     # Enable/disable actor statistics
     enabled: "${ACTORS_STATISTICS_ENABLED:true}"
@@ -279,5 +287,5 @@ spring:
 #max file and request size
 spring.http:
   multipart:
-    max-file-size: 10MB
-    max-request-size: 11MB
+    max-file-size: -1
+    max-request-size: -1

@@ -30,6 +30,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.context.support.AnnotationConfigContextLoader;
 import org.thingsboard.server.common.data.BaseData;
 import org.thingsboard.server.common.data.Event;
+import org.thingsboard.server.common.data.computation.Computations;
 import org.thingsboard.server.common.data.id.EntityId;
 import org.thingsboard.server.common.data.id.TenantId;
 import org.thingsboard.server.common.data.id.UUIDBased;
@@ -41,6 +42,7 @@ import org.thingsboard.server.common.data.rule.RuleMetaData;
 import org.thingsboard.server.dao.alarm.AlarmService;
 import org.thingsboard.server.dao.asset.AssetService;
 import org.thingsboard.server.dao.component.ComponentDescriptorService;
+import org.thingsboard.server.dao.computations.ComputationsService;
 import org.thingsboard.server.dao.customer.CustomerService;
 import org.thingsboard.server.dao.dashboard.DashboardService;
 import org.thingsboard.server.dao.depthSeries.DepthSeriesService;
@@ -124,6 +126,9 @@ public abstract class AbstractServiceTest {
     protected AlarmService alarmService;
 
     @Autowired
+    protected ComputationsService computationsService;
+
+    @Autowired
     private ComponentDescriptorService componentDescriptorService;
 
     class IdComparator<D extends BaseData<? extends UUIDBased>> implements Comparator<D> {
@@ -171,6 +176,32 @@ public abstract class AbstractServiceTest {
             throw new RuntimeException(e);
         }
         return pluginMetaData;
+    }
+
+    protected Computations generateComputation(TenantId tenantId) throws IOException {
+        String jsonString = "{\"title\":\"computationsTest\",\"property\":\"window\"}";
+        ObjectMapper mapper = new ObjectMapper();
+        JsonNode jsonDescriptor = mapper.readTree(jsonString);
+        return generateComputation(tenantId, "Test computation", "org.thingsboard.ComputationsTest",
+                "test/jar/path", "test_jar", jsonDescriptor, "[mqttUrl, kafkaUrl]", "positional");
+    }
+
+    protected Computations generateComputation(TenantId tenantId, String name, String mainClazz,
+                                               String jarPath, String jarName,
+                                               JsonNode jsonDescriptor, String argsformat, String argsType) throws IOException {
+        if (tenantId == null) {
+            tenantId = new TenantId(UUIDs.timeBased());
+        }
+        Computations computationsTest = new Computations();
+        computationsTest.setName(name);
+        computationsTest.setTenantId(tenantId);
+        computationsTest.setMainClass(mainClazz);
+        computationsTest.setJsonDescriptor(jsonDescriptor);
+        computationsTest.setJarName(jarName);
+        computationsTest.setJarPath(jarPath);
+        computationsTest.setArgsformat(argsformat);
+        computationsTest.setArgsType(argsType);
+        return computationsTest;
     }
 
     private ComponentDescriptor getOrCreateDescriptor(ComponentScope scope, ComponentType type, String clazz, String configurationDescriptorResource) throws IOException {
