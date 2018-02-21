@@ -16,7 +16,7 @@
 #
 
 
-dpkg -i /thingsboard.deb
+dpkg -i /tempus.deb
 
 until nmap $CASSANDRA_HOST -p $CASSANDRA_PORT | grep "$CASSANDRA_PORT/tcp open"
 do
@@ -27,7 +27,7 @@ done
 echo "Creating 'Thingsboard' schema and system data..."
 if [ "$ADD_DEMO_DATA" == "true" ]; then
     echo "plus demo data..."
-    /usr/share/thingsboard/bin/install/install.sh --loadDemo
+    /usr/share/tempus/bin/install/install.sh --loadDemo
 elif [ "$ADD_DEMO_DATA" == "false" ]; then
-    /usr/share/thingsboard/bin/install/install.sh
+    /usr/share/tempus/bin/install/install.sh
 fi

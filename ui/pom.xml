@@ -27,7 +27,7 @@
     <artifactId>ui</artifactId>
     <packaging>jar</packaging>
 
-    <name>Thingsboard Server UI</name>
+    <name>Tempus Server UI</name>
     <url>http://thingsboard.org</url>
 
     <properties>

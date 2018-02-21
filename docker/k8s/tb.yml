@@ -177,7 +177,7 @@ spec:
 #          initialDelaySeconds: 120
 #          timeoutSeconds: 10
         volumeMounts:
-          - mountPath: /usr/share/thingsboard/data/sql
+          - mountPath: /usr/share/tempus/data/sql
             name: hsql-dir
   volumeClaimTemplates:
   - metadata:

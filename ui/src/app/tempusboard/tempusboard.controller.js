@@ -36,7 +36,8 @@ export function TempusboardController($scope, $log, $state, $stateParams, userSe
         applicationService.getApplicationsByDeviceType(device.type.toLowerCase())
             .then(function success(applications) {
                 applications.forEach(function(application){
-                     dashboardService.getDashboard(application.miniDashboardId.id)
+                    if(application.isValid){
+                         dashboardService.getDashboard(application.miniDashboardId.id)
                         .then(function success(dashboard) {
                             vm.deviceSelected = true;
                           //  vm.dashboard = dashboardUtils.validateAndUpdateDashboard(dashboard);
@@ -51,6 +52,7 @@ export function TempusboardController($scope, $log, $state, $stateParams, userSe
                         }, function fail() {
                             vm.configurationError = true;
                         });
+                    }
                 })                
                
             }, function fail() {

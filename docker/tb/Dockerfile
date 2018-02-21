@@ -17,7 +17,7 @@
 FROM openjdk:8-jre
 
 ADD run-application.sh /run-application.sh
-ADD thingsboard.deb /thingsboard.deb
+ADD tempus.deb /tempus.deb
 
 RUN apt-get update \
         && apt-get install -y nmap \
