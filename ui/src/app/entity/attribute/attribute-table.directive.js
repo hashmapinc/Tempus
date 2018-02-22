@@ -197,6 +197,7 @@ export default function AttributeTableDirective($compile, $templateCache, $rootS
                 $mdEditDialog.show({
                     controller: EditAttributeValueController,
                     templateUrl: editAttributeValueTemplate,
+					windowClass: 'center-modal',
                     locals: {attributeValue: attribute.value,
                              save: function (model) {
                                 var updatedAttribute = angular.copy(attribute);
