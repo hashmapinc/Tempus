@@ -25,10 +25,12 @@ import org.thingsboard.server.common.data.Application;
 import org.thingsboard.server.common.data.Customer;
 import org.thingsboard.server.common.data.Dashboard;
 import org.thingsboard.server.common.data.Tenant;
+import org.thingsboard.server.common.data.computation.ComputationJob;
 import org.thingsboard.server.common.data.id.*;
 import org.thingsboard.server.common.data.page.TextPageData;
 import org.thingsboard.server.common.data.page.TextPageLink;
 import org.thingsboard.server.common.data.rule.RuleMetaData;
+import org.thingsboard.server.dao.computations.ComputationJobDao;
 import org.thingsboard.server.dao.customer.CustomerDao;
 import org.thingsboard.server.dao.dashboard.DashboardDao;
 import org.thingsboard.server.dao.entity.AbstractEntityService;
@@ -64,6 +66,9 @@ public class ApplicationServiceImpl extends AbstractEntityService implements App
 
     @Autowired
     private RuleDao ruleDao;
+
+    @Autowired
+    private ComputationJobDao computationJobDao;
 
     @Override
     public Application saveApplication(Application application) {
@@ -226,6 +231,17 @@ public class ApplicationServiceImpl extends AbstractEntityService implements App
         }
     }
 
+    @Override
+    public void updateApplicationOnComputationDelete(ComputationId computationId, TenantId tenantId) {
+        log.trace("Executing updateApplicationOnComputationDelete,  tenantId [{}], computationId [{}]", tenantId, computationId);
+        List<ComputationJob> computationJobs = computationJobDao.findByComputationId(computationId);
+        if(computationJobs !=null && !computationJobs.isEmpty()) {
+            for (ComputationJob computationJob: computationJobs) {
+                updateApplicationOnComputationJobDelete(computationJob.getId(), tenantId);
+            }
+        }
+    }
+
     private Set<String> getDeviceTypesfromFiltersJson(JsonNode filters){
         Set<String> deviceTypes = new HashSet<>();
         Iterator<JsonNode> configurations = filters.elements();
@@ -337,10 +353,10 @@ public class ApplicationServiceImpl extends AbstractEntityService implements App
                         application.setComputationJobIdSet(new HashSet<>(Arrays.asList(new ComputationJobId(NULL_UUID))));
                     } else if(application.getComputationJobIdSet().size() > 1 || !Iterables.getOnlyElement(application.getComputationJobIdSet()).getId().equals(NULL_UUID)) {
                         for(ComputationJobId computationJobId: application.getComputationJobIdSet()) {
-                            //TODO: call the computation dao to see if the computation exists
-                            /*if(computationJob == null) {
+                            ComputationJob computationJob = computationJobDao.findById(computationJobId);
+                            if(computationJob == null) {
                                 isValid = false;
-                            }*/
+                            }
                         }
                     }
 

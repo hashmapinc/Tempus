@@ -59,6 +59,8 @@ public interface ApplicationService {
 
     void updateApplicationOnComputationJobDelete(ComputationJobId computationJobId, TenantId tenantId);
 
+    void updateApplicationOnComputationDelete(ComputationId computationId, TenantId tenantId);
+
     void updateApplicationOnRuleDelete(RuleId ruleId, TenantId tenantId);
 
     void updateApplicationOnDashboardDelete(DashboardId dashboardIdId, TenantId tenantId);
