@@ -252,7 +252,9 @@ public class ComputationJobActorMessageProcessor extends ComponentMsgProcessor<C
     }
 
     private void suspendJob(){
-        systemContext.getComputationJobService().suspendComputationJobById(job.getId());
+        ComputationJob savedJob = systemContext.getComputationJobService().findComputationJobById(job.getId());
+        if(savedJob != null)
+            systemContext.getComputationJobService().suspendComputationJobById(job.getId());
         if(schedule != null && !schedule.isCancelled()) schedule.cancel();
     }
 
