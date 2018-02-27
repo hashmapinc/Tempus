@@ -17,11 +17,6 @@ public interface ComputationsRepository extends CrudRepository<ComputationsEntit
 
     ComputationsEntity findByTenantIdAndName(String tenantId, String name);
 
-    @Modifying
-    @Transactional
-    @Query("delete from ComputationsEntity c where c.jarName = :jarName")
-    void deleteByJarName(@Param("jarName") String name);
-
     @Query("SELECT ce FROM ComputationsEntity ce WHERE ce.tenantId = :tenantId " +
             "AND LOWER(ce.searchText) LIKE LOWER(CONCAT(:textSearch, '%')) " +
             "AND ce.id > :idOffset ORDER BY ce.id")

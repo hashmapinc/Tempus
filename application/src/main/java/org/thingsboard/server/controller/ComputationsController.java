@@ -59,7 +59,7 @@ public class ComputationsController extends BaseController {
     private String uploadPath;
 
     @Autowired
-    @Qualifier("uploadComputationDiscoveryService")
+    //@Qualifier("uploadComputationDiscoveryService")
     private ComputationDiscoveryService computationDiscoveryService;
 
     @Autowired

@@ -61,7 +61,7 @@ import java.util.Optional;
 
 @Service
 @Slf4j
-@DependsOn({"computationDiscoveryService","uploadComputationDiscoveryService"})
+@DependsOn({"uploadComputationDiscoveryService"})
 public class DefaultActorService implements ActorService {
 
     private static final String ACTOR_SYSTEM_NAME = "Akka";

@@ -17,13 +17,9 @@ package org.thingsboard.server.service.computation;
 
 import com.datastax.driver.core.utils.UUIDs;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.io.monitor.FileAlterationMonitor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
-import org.springframework.util.Assert;
-import org.thingsboard.server.common.data.Tenant;
 import org.thingsboard.server.common.data.computation.Computations;
 import org.thingsboard.server.common.data.id.ComputationId;
 import org.thingsboard.server.common.data.id.TenantId;
@@ -35,33 +31,20 @@ import org.thingsboard.server.dao.plugin.PluginService;
 import org.thingsboard.server.service.component.ComponentDiscoveryService;
 import org.thingsboard.server.service.computation.annotation.AnnotationsProcessor;
 import org.thingsboard.server.service.computation.classloader.RuntimeJavaCompiler;
-import org.thingsboard.server.utils.MiscUtils;
 
-import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.FileSystem;
-import java.nio.file.FileSystems;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
-import java.util.stream.Collectors;
 
 @Service("uploadComputationDiscoveryService")
 @Slf4j
 public class UploadComputationDiscoveryService implements ComputationDiscoveryService{
 
     private static final Executor executor = Executors.newSingleThreadExecutor();
-    private final String PLUGIN_CLAZZ = "org.thingsboard.server.extensions.spark.computation.plugin.SparkComputationPlugin";
-
-    @Value("${spark.jar_path}")
-    private String libraryPath;
-
-    @Value("${spark.polling_interval}")
-    private Long pollingInterval;
 
     @Autowired
     private ComponentDiscoveryService componentDiscoveryService;
@@ -76,21 +59,6 @@ public class UploadComputationDiscoveryService implements ComputationDiscoverySe
     private ComputationsService computationsService;
 
     private RuntimeJavaCompiler compiler;
-    private FileAlterationMonitor monitor;
-    private Map<String, Set<String>> processedJarsSources = new HashMap<>();
-
-    @PostConstruct
-    public void init() {
-        log.warn("Initializing bean Directory Computation discovery.");
-        Assert.hasLength(libraryPath, MiscUtils.missingProperty("spark.jar_path"));
-        Assert.notNull(pollingInterval, MiscUtils.missingProperty("spark.polling_interval"));
-        //this.compiler = new RuntimeJavaCompiler();
-        //discoverDynamicComponents();
-    }
-
-    public void discoverDynamicComponents(){
-
-    }
 
     private boolean isJar(Path jarPath) throws IOException {
         File file = jarPath.toFile();
@@ -140,18 +108,6 @@ public class UploadComputationDiscoveryService implements ComputationDiscoverySe
         return savedComputations;
     }
 
-    public void onFileDelete(File file){
-        computationsService.deleteByJarName(file.getName());
-    }
-
-    @Override
-    public void deleteJarFile(String path){
-        File file = new File(path);
-        if(file.delete()){
-            this.onFileDelete(file);
-        }
-    }
-
     @Override
     public TextPageData<Computations> findTenantComputations(TenantId tenantId, TextPageLink pageLink) {
         return computationsService.findTenantComputations(tenantId, pageLink);
@@ -166,9 +122,6 @@ public class UploadComputationDiscoveryService implements ComputationDiscoverySe
     public void destroy(){
         log.debug("Cleaning up resources from Computation discovery service");
         try {
-            if (monitor != null) {
-                monitor.stop();
-            }
             if(compiler != null){
                 compiler.destroy();
             }

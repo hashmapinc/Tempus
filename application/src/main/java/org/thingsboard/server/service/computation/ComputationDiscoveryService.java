@@ -23,8 +23,6 @@ import org.thingsboard.server.common.data.page.TextPageLink;
 import java.util.List;
 
 public interface ComputationDiscoveryService {
-    void discoverDynamicComponents();
-    void deleteJarFile(String path);
     Computations onJarUpload(String path, TenantId tenantId);
     TextPageData<Computations> findTenantComputations(TenantId tenantId, TextPageLink pageLink);
 }
