@@ -46,11 +46,6 @@ public class BaseComputationsService extends AbstractEntityService implements Co
     }
 
     @Override
-    public void deleteByJarName(String name) {
-        computationsDao.deleteByJarName(name);
-    }
-
-    @Override
     public TextPageData<Computations> findTenantComputations(TenantId tenantId, TextPageLink pageLink) {
         validateId(tenantId, "Incorrect tenant id for search computation request.");
         validatePageLink(pageLink, "Incorrect PageLink object for search computation request.");

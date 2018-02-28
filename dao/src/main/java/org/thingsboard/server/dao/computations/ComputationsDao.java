@@ -31,8 +31,6 @@ public interface ComputationsDao {
 
     Computations save(Computations computations);
 
-    void deleteByJarName(String name);
-
     void deleteById(ComputationId computationId);
 
     List<Computations> findByTenantIdAndPageLink(TenantId tenantId, TextPageLink pageLink);

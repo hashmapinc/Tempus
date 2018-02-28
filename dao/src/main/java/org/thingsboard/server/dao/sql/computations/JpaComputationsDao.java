@@ -65,12 +65,6 @@ public class JpaComputationsDao extends JpaAbstractDaoListeningExecutorService i
     }
 
     @Override
-    public void deleteByJarName(String name) {
-        computationsRepository.deleteByJarName(name);
-    }
-
-
-    @Override
     public List<Computations> findByTenantIdAndPageLink(TenantId tenantId, TextPageLink pageLink) {
         log.debug("Try to find rules by tenantId [{}] and pageLink [{}]", tenantId, pageLink);
         List<ComputationsEntity> entities =

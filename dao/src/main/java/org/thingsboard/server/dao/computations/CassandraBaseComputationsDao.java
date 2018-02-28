@@ -15,8 +15,6 @@
  */
 package org.thingsboard.server.dao.computations;
 
-import com.datastax.driver.core.querybuilder.Clause;
-import com.datastax.driver.core.querybuilder.QueryBuilder;
 import com.datastax.driver.core.querybuilder.Select;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -89,11 +87,6 @@ public class CassandraBaseComputationsDao extends CassandraAbstractSearchTextDao
         query.and(eq(COMPUTATIONS_TENANT_ID_PROPERTY, tenantId.getId()));
         query.and(eq(COMPUTATIONS_NAME_PROPERTY, name));
         return Optional.ofNullable(DaoUtil.getData(findOneByStatement(query)));
-    }
-
-    @Override
-    public void deleteByJarName(String name) {
-
     }
 
     @Override

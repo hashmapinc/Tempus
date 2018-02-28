@@ -20,8 +20,6 @@ public interface ComputationsService {
 
     void deleteById(ComputationId computationId);
 
-    void deleteByJarName(String name);
-
     TextPageData<Computations> findTenantComputations(TenantId tenantId, TextPageLink pageLink);
 
     List<Computations> findAllTenantComputationsByTenantId(TenantId tenantId);
