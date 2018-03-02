@@ -15,21 +15,24 @@
  */
 package org.thingsboard.server.controller;
 
+import com.datastax.driver.core.utils.UUIDs;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.thingsboard.server.common.data.Application;
-import org.thingsboard.server.common.data.ApplicationRulesWrapper;
-import org.thingsboard.server.common.data.Tenant;
-import org.thingsboard.server.common.data.User;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.thingsboard.server.common.data.*;
+import org.thingsboard.server.common.data.computation.ComputationJob;
+import org.thingsboard.server.common.data.computation.Computations;
+import org.thingsboard.server.common.data.id.ComputationId;
 import org.thingsboard.server.common.data.page.TextPageData;
 import org.thingsboard.server.common.data.page.TextPageLink;
 import org.thingsboard.server.common.data.plugin.PluginMetaData;
 import org.thingsboard.server.common.data.rule.RuleMetaData;
 import org.thingsboard.server.common.data.security.Authority;
+import org.thingsboard.server.dao.computations.ComputationsService;
 import org.thingsboard.server.extensions.core.plugin.telemetry.TelemetryStoragePlugin;
 
 import java.io.IOException;
@@ -47,6 +50,9 @@ public abstract class BaseRuleControllerTest extends AbstractControllerTest {
     private User tenantAdmin;
     private PluginMetaData sysPlugin;
     private PluginMetaData tenantPlugin;
+
+    @Autowired
+    ComputationsService computationsService;
 
     @Before
     public void beforeTest() throws Exception {
@@ -125,6 +131,24 @@ public abstract class BaseRuleControllerTest extends AbstractControllerTest {
 
         Application savedApplication = doPost("/api/application", application, Application.class);
 
+
+        Dashboard dashboard = new Dashboard();
+        dashboard.setTitle("My Dashboard");
+        Dashboard savedDashboard = doPost("/api/dashboard", dashboard, Dashboard.class);
+        String dashboardType = "mini";
+        doPost("/api/dashboard/"+dashboardType+"/"+savedDashboard.getId().getId().toString()
+                +"/application/"+savedApplication.getId().getId().toString(), Application.class);
+
+
+        Computations savedComputations = saveComputation();
+        ComputationJob computationJob1 = new ComputationJob();
+        computationJob1.setName("Computation Job 1");
+        computationJob1.setJobId("0123");
+        ComputationJob savedComputationJob1 = doPost("/api/computations/"+savedComputations.getId().getId().toString()+"/jobs", computationJob1, ComputationJob.class);
+        ApplicationComputationJosWrapper applicationComputationJosWrapper = new ApplicationComputationJosWrapper();
+        applicationComputationJosWrapper.setApplicationId(savedApplication.getId().getId().toString());
+        applicationComputationJosWrapper.setComputationJobs(new HashSet<>(Arrays.asList(savedComputationJob1.getId().toString())));
+        doPostWithDifferentResponse("/api/app/assignComputationJobs", applicationComputationJosWrapper, Application.class);
 
         ApplicationRulesWrapper applicationRulesWrapper = new ApplicationRulesWrapper();
         applicationRulesWrapper.setApplicationId(savedApplication.getId().getId().toString());
@@ -286,5 +310,18 @@ public abstract class BaseRuleControllerTest extends AbstractControllerTest {
         rule.setAction(mapper.readTree("{\"clazz\":\"org.thingsboard.server.extensions.core.action.telemetry.TelemetryPluginAction\", \"name\":\"TelemetryMsgConverterAction\", " +
                 "\"configuration\":{\"timeUnit\":\"DAYS\", \"ttlValue\":1}}"));
         return rule;
+    }
+    private Computations saveComputation() {
+        Computations computations = new Computations();
+        computations.setName("Computation");
+        computations.setId(new ComputationId(UUIDs.timeBased()));
+        computations.setJarPath("/Some/Jar/path");
+        computations.setTenantId(savedTenant.getId());
+        computations.setJarName("SomeJar");
+        computations.setMainClass("MainClass");
+        //computations.setJsonDescriptor();
+        computations.setArgsformat("argsFormat");
+        computations.setArgsType("ArgsType");
+        return computationsService.save(computations);
     }
 }

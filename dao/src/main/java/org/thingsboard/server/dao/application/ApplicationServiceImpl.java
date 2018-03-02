@@ -225,7 +225,7 @@ public class ApplicationServiceImpl extends AbstractEntityService implements App
         List<Application> applications = applicationDao.findApplicationByComputationJobId(tenantId.getId(), computationJobId.getId());
         if(!applications.isEmpty()) {
             for(Application a: applications) {
-                a.setIsValid(Boolean.FALSE);
+                a.getComputationJobIdSet().remove(computationJobId);
                 saveApplication(a);
             }
         }
@@ -261,7 +261,7 @@ public class ApplicationServiceImpl extends AbstractEntityService implements App
         List<Application> applications = applicationDao.findApplicationByRuleId(tenantId.getId(), ruleId.getId());
         if(!applications.isEmpty()) {
             for(Application a: applications) {
-                a.setIsValid(Boolean.FALSE);
+                a.getRules().remove(ruleId);
                 saveApplication(a);
             }
         }
@@ -273,7 +273,11 @@ public class ApplicationServiceImpl extends AbstractEntityService implements App
         List<Application> applications = applicationDao.findApplicationsByDashboardId(tenantId.getId(), dashboardId.getId());
         if(!applications.isEmpty()) {
             for(Application a: applications) {
-                a.setIsValid(Boolean.FALSE);
+                if(a.getMiniDashboardId().equals(dashboardId)) {
+                    a.setMiniDashboardId(null);
+                } else {
+                    a.setDashboardId(null);
+                }
                 saveApplication(a);
             }
         }
@@ -340,24 +344,30 @@ public class ApplicationServiceImpl extends AbstractEntityService implements App
 
                     if(application.getRules() == null || application.getRules().isEmpty()) {
                         application.setRules(new HashSet<>(Arrays.asList(new RuleId(NULL_UUID))));
+                        isValid = false;
                     } else if(application.getRules().size() > 1 || !Iterables.getOnlyElement(application.getRules()).getId().equals(NULL_UUID)) {
                         for(RuleId ruleId: application.getRules()) {
                             RuleMetaData ruleMetaData = ruleDao.findById(ruleId);
                             if(ruleMetaData == null) {
-                                isValid = false;
+                                throw new DataValidationException("Application is referencing to non-existent rule!");
                             }
                         }
+                    } else {
+                        isValid = false;
                     }
 
                     if(application.getComputationJobIdSet() == null || application.getComputationJobIdSet().isEmpty()) {
                         application.setComputationJobIdSet(new HashSet<>(Arrays.asList(new ComputationJobId(NULL_UUID))));
+                        isValid = false;
                     } else if(application.getComputationJobIdSet().size() > 1 || !Iterables.getOnlyElement(application.getComputationJobIdSet()).getId().equals(NULL_UUID)) {
                         for(ComputationJobId computationJobId: application.getComputationJobIdSet()) {
                             ComputationJob computationJob = computationJobDao.findById(computationJobId);
                             if(computationJob == null) {
-                                isValid = false;
+                                throw new DataValidationException("Application is referencing to non-existent computation!");
                             }
                         }
+                    } else {
+                        isValid = false;
                     }
 
                     if(application.getDeviceTypes() == null || application.getDeviceTypes().isEmpty()) {
@@ -365,12 +375,15 @@ public class ApplicationServiceImpl extends AbstractEntityService implements App
                     }
 
                     if(application.getMiniDashboardId() == null) {
+                        isValid = false;
                         application.setMiniDashboardId(new DashboardId(NULL_UUID));
                     } else if(!application.getMiniDashboardId().getId().equals(NULL_UUID)) {
                         Dashboard miniDashboard = dashboardDao.findById(application.getMiniDashboardId().getId());
                         if(miniDashboard == null) {
-                            isValid = false;
+                            throw new DataValidationException("Application is referencing to non-existent dashboard!");
                         }
+                    } else {
+                        isValid = false;
                     }
                     application.setIsValid(isValid);
                 }

@@ -21,7 +21,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang.RandomStringUtils;
 import org.json.JSONObject;
 import org.junit.*;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.thingsboard.server.common.data.*;
+import org.thingsboard.server.common.data.computation.ComputationJob;
+import org.thingsboard.server.common.data.computation.Computations;
+import org.thingsboard.server.common.data.id.ComputationId;
 import org.thingsboard.server.common.data.id.ComputationJobId;
 import org.thingsboard.server.common.data.id.RuleId;
 import org.thingsboard.server.common.data.page.TextPageData;
@@ -29,6 +33,7 @@ import org.thingsboard.server.common.data.page.TextPageLink;
 import org.thingsboard.server.common.data.plugin.PluginMetaData;
 import org.thingsboard.server.common.data.rule.RuleMetaData;
 import org.thingsboard.server.common.data.security.Authority;
+import org.thingsboard.server.dao.computations.ComputationsService;
 import org.thingsboard.server.dao.model.ModelConstants;
 import org.thingsboard.server.extensions.core.plugin.telemetry.TelemetryStoragePlugin;
 import scala.App;
@@ -50,6 +55,9 @@ public class BaseApplicationControllerTest extends AbstractControllerTest {
     private PluginMetaData sysPlugin;
     private PluginMetaData tenantPlugin;
     private static final ObjectMapper mapper = new ObjectMapper();
+
+    @Autowired
+    ComputationsService computationsService;
 
     @Before
     public void beforeTest() throws Exception {
@@ -611,33 +619,63 @@ public class BaseApplicationControllerTest extends AbstractControllerTest {
 
     @Test
     public void testUnAssignUnAssignComputationJobsToApplication() throws Exception{
+        System.out.println("Saving 1");
         Application application = new Application();
         application.setName("My application");
         Application savedApplication = doPost("/api/application", application, Application.class);
+        System.out.println("Saving 2");
 
         Assert.assertEquals(new HashSet<>(Arrays.asList(new ComputationJobId(NULL_UUID))), savedApplication.getComputationJobIdSet());
 
 
-        ComputationJobId computationJobId1 = new ComputationJobId(UUIDConverter.fromString("1e80658f63c8450841b7f44ce019219"));
-        ComputationJobId computationJobId2 = new ComputationJobId(UUIDConverter.fromString("1e80658f7e24510841b7f44ce019219"));
+        Computations savedComputations = saveComputation();
+
+        ComputationJob computationJob1 = new ComputationJob();
+        computationJob1.setName("Computation Job 1");
+        computationJob1.setJobId("0123");
+        ComputationJob savedComputationJob1 = doPost("/api/computations/"+savedComputations.getId().getId().toString()+"/jobs", computationJob1, ComputationJob.class);
+
+
+        ComputationJob computationJob2 = new ComputationJob();
+        computationJob2.setName("Computation Job 2");
+        computationJob2.setJobId("0124");
+        ComputationJob savedComputationJob2 = doPost("/api/computations/"+savedComputations.getId().getId().toString()+"/jobs", computationJob2, ComputationJob.class);
+
+
+        /*ComputationJobId computationJobId1 = new ComputationJobId(UUIDConverter.fromString("1e80658f63c8450841b7f44ce019219"));
+        ComputationJobId computationJobId2 = new ComputationJobId(UUIDConverter.fromString("1e80658f7e24510841b7f44ce019219"));*/
 
         ApplicationComputationJosWrapper applicationComputationJosWrapper = new ApplicationComputationJosWrapper();
         applicationComputationJosWrapper.setApplicationId(savedApplication.getId().getId().toString());
-        applicationComputationJosWrapper.setComputationJobs(new HashSet<>(Arrays.asList(computationJobId1.getId().toString(), computationJobId2.getId().toString())));
+        applicationComputationJosWrapper.setComputationJobs(new HashSet<>(Arrays.asList(savedComputationJob1.getId().toString(), savedComputationJob2.getId().toString())));
 
         Application assignedApplication = doPostWithDifferentResponse("/api/app/assignComputationJobs", applicationComputationJosWrapper, Application.class);
 
         Application foundAssignedApplication = doGet("/api/application/" + savedApplication.getId().getId().toString(), Application.class);
-        Assert.assertEquals(new HashSet<>(Arrays.asList(computationJobId1, computationJobId2)), foundAssignedApplication.getComputationJobIdSet());
+        Assert.assertEquals(new HashSet<>(Arrays.asList(savedComputationJob1.getId(), savedComputationJob2.getId())), foundAssignedApplication.getComputationJobIdSet());
 
 
         ApplicationComputationJosWrapper applicationComputationJosWrapper1 = new ApplicationComputationJosWrapper();
         applicationComputationJosWrapper1.setApplicationId(savedApplication.getId().getId().toString());
-        applicationComputationJosWrapper1.setComputationJobs(new HashSet<>(Arrays.asList(computationJobId2.getId().toString())));
+        applicationComputationJosWrapper1.setComputationJobs(new HashSet<>(Arrays.asList(savedComputationJob2.getId().toString())));
         Application unAssignedApplication = doPostWithDifferentResponse("/api/app/unassignComputationJobs", applicationComputationJosWrapper1, Application.class);
 
         Application foundUnApplication = doGet("/api/application/" + savedApplication.getId().getId().toString(), Application.class);
-        Assert.assertEquals(new HashSet<>(Arrays.asList(computationJobId1)), foundUnApplication.getComputationJobIdSet());
+        Assert.assertEquals(new HashSet<>(Arrays.asList(savedComputationJob1.getId())), foundUnApplication.getComputationJobIdSet());
+    }
+
+    private Computations saveComputation() {
+        Computations computations = new Computations();
+        computations.setName("Computation");
+        computations.setId(new ComputationId(UUIDs.timeBased()));
+        computations.setJarPath("/Some/Jar/path");
+        computations.setTenantId(savedTenant.getId());
+        computations.setJarName("SomeJar");
+        computations.setMainClass("MainClass");
+        //computations.setJsonDescriptor();
+        computations.setArgsformat("argsFormat");
+        computations.setArgsType("ArgsType");
+        return computationsService.save(computations);
     }
 
 
