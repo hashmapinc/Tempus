@@ -20,14 +20,8 @@
 
 
 /*@ngInject*/
-function ComputationService($http, $q, $rootScope, $filter, componentDescriptorService, types, utils, $log) {
+function ComputationService($http, $q, $filter, utils) {
 
-    var allComputations = undefined;
-    var tenantComputations = undefined;
-
-    $rootScope.computationServiceStateChangeStartHandle = $rootScope.$on('$stateChangeStart', function () {
-        invalidateComputationsCache();
-    });
     var service = {
         upload: upload,
         getAllComputations: getAllComputations,
@@ -36,11 +30,6 @@ function ComputationService($http, $q, $rootScope, $filter, componentDescriptorS
     }
 
     return service;
-
-    function invalidateComputationsCache() {
-        allComputations = undefined;
-        tenantComputations = undefined;
-    }
 
     function upload(file) {
         var deferred = $q.defer();
@@ -58,41 +47,19 @@ function ComputationService($http, $q, $rootScope, $filter, componentDescriptorS
         return deferred.promise;
     }
 
-    function loadComputationsCache() {
-        var deferred = $q.defer();
-        if (!allComputations) {
-            var url = '/api/computations';
-            $http.get(url, null).then(function success(response) {
-                        allComputations = response.data;
-                        tenantComputations = [];
-                        allComputations = $filter('orderBy')(allComputations, ['+name', '-createdTime']);
-                        for (var i = 0; i < allComputations.length; i++) {
-                            var computation = allComputations[i];
-                            tenantComputations.push(computation);
-                        }
-
-                        $log.log("tenantComputations : " + angular.toJson(tenantComputations));
-
-                        deferred.resolve();
-            }, function fail() {
-                deferred.reject();
-            });
-        } else {
-            deferred.resolve();
-        }
-        return deferred.promise;
-    }
-
     function getAllComputations(pageLink) {
         var deferred = $q.defer();
-        loadComputationsCache().then(
-            function success() {
-                utils.filterSearchTextEntities(allComputations, 'name', pageLink, deferred);
-            },
-            function fail() {
-                deferred.reject();
-            }
-        );
+        var url = '/api/computations';
+        $http.get(url, null).then(
+                    function success(response) {
+                        var allComputations = response.data;
+                        allComputations = $filter('orderBy')(allComputations, ['+name', '-createdTime']);
+                        utils.filterSearchTextEntities(allComputations, 'name', pageLink, deferred);
+                    },
+                    function fail() {
+                        deferred.reject();
+                    }
+                );
         return deferred.promise;
     }
 
@@ -111,7 +78,6 @@ function ComputationService($http, $q, $rootScope, $filter, componentDescriptorS
         var deferred = $q.defer();
         var url = '/api/computations/' + computationId;
         $http.delete(url).then(function success() {
-            invalidateComputationsCache();
             deferred.resolve();
         }, function fail(response) {
             deferred.reject(response.data);

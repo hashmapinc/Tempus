@@ -43,10 +43,10 @@ public class JpaComputationJobDao extends JpaAbstractSearchTextDao<ComputationJo
 
     @Override
     public ComputationJob findById(ComputationJobId computationJobId) {
-        log.debug("Search plugin meta-data entity by id [{}]", computationJobId);
+        log.debug("Search computationJob entity by id [{}]", computationJobId);
         ComputationJob computationJob = super.findById(computationJobId.getId());
         if (log.isTraceEnabled()) {
-            log.trace("Search result: [{}] for plugin entity [{}]", computationJob != null, computationJob);
+            log.trace("Search result: [{}] for computationJob entity [{}]", computationJob != null, computationJob);
         } else {
             log.debug("Search result: [{}]", computationJob != null);
         }
@@ -60,7 +60,7 @@ public class JpaComputationJobDao extends JpaAbstractSearchTextDao<ComputationJo
 
     @Override
     public List<ComputationJob> findByTenantIdAndComputationIdAndPageLink(TenantId tenantId, ComputationId computationId, TextPageLink pageLink) {
-        log.debug("Try to find rules by tenantId [{}] and pageLink [{}]", tenantId, pageLink);
+        log.debug("Try to find computationJobs by tenantId [{}] and pageLink [{}]", tenantId, pageLink);
         List<ComputationJobEntity> entities =
                 computationJobRepository
                         .findByTenantIdAndComputationIdAndPageLink(

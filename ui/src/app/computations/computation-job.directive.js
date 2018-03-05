@@ -22,7 +22,7 @@ import computationJobFieldsetTemplate from './computation-job-fieldset.tpl.html'
 /* eslint-enable import/no-unresolved, import/default */
 
 /*@ngInject*/
-export default function ComputationJobDirective($compile, $templateCache, $log, $translate, types, toast, $stateParams, computationService) {
+export default function ComputationJobDirective($compile, $templateCache, $translate, types, toast, $stateParams, computationService) {
     var linker = function (scope, element) {
         var template = $templateCache.get(computationJobFieldsetTemplate);
         element.html(template);
@@ -48,17 +48,11 @@ export default function ComputationJobDirective($compile, $templateCache, $log, 
                 }
             );
         }
- 
-        scope.$watch('computationjob.name', function(newValue, oldValue) {
-            $log.log("newValue, oldValue" + newValue + ":" + oldValue);
-        });
-
 
         scope.$watch('computationjob', function(newValue, oldValue) {
             if (newValue && !angular.equals(newValue, oldValue)) {
                 scope.computationJobConfiguration.data = null;
                 scope.computationjob = newValue;
-                //scope.computationjob.computationId = scope.computation.id;
                 scope.computationJobConfiguration.data = angular.copy(newValue.argParameters);
             }
         });

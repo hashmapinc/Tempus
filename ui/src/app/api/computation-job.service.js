@@ -20,7 +20,7 @@
 
 
 /*@ngInject*/
-function ComputationJobService($http, $q, $rootScope, $filter, componentDescriptorService, types, utils, $log) {
+function ComputationJobService($http, $q, $filter, utils) {
     var service = {
         getAllComputationJobs: getAllComputationJobs,
         deleteComputationJob: deleteComputationJob,
@@ -35,11 +35,11 @@ function ComputationJobService($http, $q, $rootScope, $filter, componentDescript
         var deferred = $q.defer();
 
         var url = '/api/computations/'+ computationId +'/jobs';
-        $log.log("URL is ", url);
         $http.get(url, null).then(
             function success(response) {
-                $log.log("success response is ", response.data);
-                deferred.resolve(response);
+                var allComputationJobs = response.data;
+                allComputationJobs = $filter('orderBy')(allComputationJobs, ['+name', '-createdTime']);
+                utils.filterSearchTextEntities(allComputationJobs, 'name', pageLink, deferred);
             },
             function fail() {
                 deferred.reject();
@@ -49,7 +49,6 @@ function ComputationJobService($http, $q, $rootScope, $filter, componentDescript
     }
 
     function saveComputationJob(computationJob, computationId) {
-        $log.log("computationJob to be posted " + computationJob.name);
         var deferred = $q.defer();
         computationId;
         var url = '/api/computations/'+computationId+'/jobs';
