@@ -338,7 +338,7 @@ public class ApplicationServiceImpl extends AbstractEntityService implements App
                     } else if(!application.getDashboardId().getId().equals(NULL_UUID)) {
                         Dashboard dashboard = dashboardDao.findById(application.getDashboardId().getId());
                         if(dashboard == null) {
-                            isValid =false;
+                            throw new DataValidationException("Application is referencing to non existent dashboard!");
                         }
                     }
 
