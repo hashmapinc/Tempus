@@ -3,13 +3,13 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to the $project Documentation
+Welcome to the Tempus Cloud Documentation
 ================================================
 
 About
 -----
 
-$project is an open IIoT/IoT framework (Field/Edge to Cloud/DC) and rapid analytics application creator that provides a spectrum of outcome-based experiences on an unmodified data stream and does not force customers into a proprietary approach but focuses on a use-case driven approach for top-line/bottom-line benefits. 
+Tempus Cloud  is an open IIoT/IoT framework (Field/Edge to Cloud/DC) and rapid analytics application creator that provides a spectrum of outcome-based experiences on an unmodified data stream and does not force customers into a proprietary approach but focuses on a use-case driven approach for top-line/bottom-line benefits. 
 
 Features
 --------
@@ -43,6 +43,9 @@ Rapid Computation Deployment:
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
+   
+   installation
+   feature
 
 Indices and tables
 ==================
@@ -50,3 +53,5 @@ Indices and tables
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`
+
+
