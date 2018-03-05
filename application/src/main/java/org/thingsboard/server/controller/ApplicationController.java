@@ -22,12 +22,15 @@ import org.springframework.web.bind.annotation.*;
 import org.thingsboard.server.common.data.Application;
 import org.thingsboard.server.common.data.ApplicationComputationJosWrapper;
 import org.thingsboard.server.common.data.ApplicationRulesWrapper;
+import org.thingsboard.server.common.data.computation.ComputationJob;
 import org.thingsboard.server.common.data.id.*;
 import org.thingsboard.server.common.data.page.TextPageData;
 import org.thingsboard.server.common.data.page.TextPageLink;
+import org.thingsboard.server.common.data.plugin.ComponentLifecycleEvent;
 import org.thingsboard.server.dao.exception.IncorrectParameterException;
 import org.thingsboard.server.dao.model.ModelConstants;
 import org.thingsboard.server.exception.ThingsboardException;
+import scala.App;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -73,10 +76,36 @@ public class ApplicationController extends BaseController {
         checkParameter("applicationId", strApplicationId);
         try {
             ApplicationId applicationId = new ApplicationId(toUUID(strApplicationId));
-            checkApplicationId(applicationId);
+            Application application = checkApplicationId(applicationId);
             applicationService.deleteApplication(applicationId);
+            cleanupApplicationRelatedEntities(application);
         } catch (Exception e) {
             throw handleException(e);
+        }
+    }
+
+    private void cleanupApplicationRelatedEntities(Application application) throws ThingsboardException {
+        for(RuleId ruleId: application.getRules()) {
+            if(!ruleId.isNullUid()) {
+                ruleService.deleteRuleById(ruleId);
+                actorService.onRuleStateChange(application.getTenantId(), ruleId, ComponentLifecycleEvent.DELETED);
+            }
+        }
+
+        if(!application.getDashboardId().isNullUid()) {
+            dashboardService.deleteDashboard(application.getDashboardId());
+        }
+
+        if(!application.getMiniDashboardId().isNullUid()) {
+            dashboardService.deleteDashboard(application.getMiniDashboardId());
+        }
+
+        for(ComputationJobId computationJobId: application.getComputationJobIdSet()) {
+            if(!computationJobId.isNullUid()) {
+                ComputationJob computationJob = checkComputationJob(computationJobService.findComputationJobById(computationJobId));
+                computationJobService.deleteComputationJobById(computationJobId);
+                actorService.onComputationJobStateChange(computationJob.getTenantId(), computationJob.getComputationId(), computationJob.getId(), ComponentLifecycleEvent.DELETED);
+            }
         }
     }
 

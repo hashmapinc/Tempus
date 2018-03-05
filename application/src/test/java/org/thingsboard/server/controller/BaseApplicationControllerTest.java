@@ -157,6 +157,45 @@ public class BaseApplicationControllerTest extends AbstractControllerTest {
     }
 
     @Test
+    public void testDeleteApplicationAndRelatedEntities() throws Exception {
+        Application application = new Application();
+        application.setName("My application");
+        Application savedApplication = doPost("/api/application", application, Application.class);
+
+        RuleMetaData rule1 = new RuleMetaData();
+        rule1.setName("My Rule1");
+        rule1.setPluginToken(tenantPlugin.getApiToken());
+        rule1.setFilters(mapper.readTree("[{\"configuration\":{\"deviceTypes\":[{\"name\":\"Motor\"},{\"name\":\"Pump\"}]},\"clazz\":\"org.thingsboard.server.extensions.core.filter.DeviceTypeFilter\",\"name\":\"jetinder\"},{\"configuration\":{\"deviceTypes\":[{\"name\":\"Well\"},{}]},\"clazz\":\"org.thingsboard.server.extensions.core.filter.DeviceTypeFilter\",\"name\":\"F2\"},{\"configuration\":{\"methodNames\":[{\"name\":\"sdsdsdsdsdsdsd\"}]},\"clazz\":\"org.thingsboard.server.extensions.core.filter.MethodNameFilter\",\"name\":\"sdsdsdsdsdsdsdsdsd\"}]"));
+        rule1.setAction(mapper.readTree("{\"clazz\":\"org.thingsboard.server.extensions.core.action.telemetry.TelemetryPluginAction\", \"name\":\"TelemetryMsgConverterAction\", \"configuration\":{\"timeUnit\":\"DAYS\", \"ttlValue\":1}}"));
+        RuleMetaData savedRule1 = doPost("/api/rule", rule1, RuleMetaData.class);
+
+        doGet("/api/rule/"+savedRule1.getId().getId().toString()).andExpect(status().isOk());
+
+        ApplicationRulesWrapper applicationRulesWrapper = new ApplicationRulesWrapper();
+        applicationRulesWrapper.setApplicationId(savedApplication.getId().getId().toString());
+        applicationRulesWrapper.setRules(new HashSet<>(Arrays.asList(savedRule1.getId().getId().toString())));
+        doPostWithDifferentResponse("/api/app/assignRules", applicationRulesWrapper, Application.class);
+
+
+        Dashboard dashboard = new Dashboard();
+        dashboard.setTitle("My Dashboard");
+        Dashboard savedDashboard = doPost("/api/dashboard", dashboard, Dashboard.class);
+        doPost("/api/dashboard/main/"+savedDashboard.getId().getId().toString()
+                +"/application/"+savedApplication.getId().getId().toString(), Application.class);
+        doGet("/api/dashboard//"+savedDashboard.getId().getId().toString()).andExpect(status().isOk());
+
+
+        doDelete("/api/application/"+savedApplication.getId().getId().toString())
+                .andExpect(status().isOk());
+
+        doGet("/api/application/"+savedApplication.getId().getId().toString())
+                .andExpect(status().isNotFound());
+
+        doGet("/api/rule/"+savedRule1.getId().getId().toString()).andExpect(status().isNotFound());
+        doGet("/api/dashboard//"+savedDashboard.getId().getId().toString()).andExpect(status().isNotFound());
+    }
+
+    @Test
     public void testAssignUnassignApplicationToCustomer() throws Exception {
         Application application = new Application();
         application.setName("My application");

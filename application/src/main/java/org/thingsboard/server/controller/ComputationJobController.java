@@ -23,9 +23,6 @@ import java.util.UUID;
 @RequestMapping("/api")
 public class ComputationJobController extends BaseController{
 
-    @Autowired
-    ComputationJobService computationJobService;
-
     @PreAuthorize("hasAuthority('TENANT_ADMIN')")
     @RequestMapping(value = "/computations/{computationid}/jobs", method = RequestMethod.POST)
     @ResponseBody
