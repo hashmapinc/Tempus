@@ -140,13 +140,13 @@ public class ApplicationController extends BaseController {
     }
 
     @PreAuthorize("hasAuthority('TENANT_ADMIN')")
-    @RequestMapping(value = "/applications/rule/{ruleId}", method = RequestMethod.GET)
+    @RequestMapping(value = "/applications/rules/{strRuleIds}", method = RequestMethod.GET)
     @ResponseBody
-    public List<String> findApplicationsByruleId(@PathVariable("ruleId") String strRuleId) throws ThingsboardException {
-        checkParameter("ruleId", strRuleId);
-        RuleId ruleId = new RuleId(toUUID(strRuleId));
+    public Set<String> findApplicationsByruleIds(@PathVariable String[] strRuleIds) throws ThingsboardException {
+        checkArrayParameter("ruleIds", strRuleIds);
+        Set<RuleId> ruleIds = Arrays.stream(strRuleIds).map(r -> new RuleId(toUUID(r))).collect(Collectors.toSet());
         TenantId tenantId = getCurrentUser().getTenantId();
-        return applicationService.findApplicationByRuleId(tenantId, ruleId);
+        return applicationService.findApplicationByRuleIds(tenantId, ruleIds);
     }
 
     @PreAuthorize("hasAuthority('TENANT_ADMIN')")

@@ -626,13 +626,13 @@ public class BaseApplicationControllerTest extends AbstractControllerTest {
         JSONObject obj = new JSONObject(rule2.getFilters());
 
         RuleMetaData rule3 = new RuleMetaData();
-        rule2.setName("My Rule3");
-        rule2.setPluginToken(tenantPlugin.getApiToken());
-        rule2.setFilters(mapper.readTree("[{\"clazz\":\"org.thingsboard.server.extensions.core.filter.MsgTypeFilter\", " +
+        rule3.setName("My Rule3");
+        rule3.setPluginToken(tenantPlugin.getApiToken());
+        rule3.setFilters(mapper.readTree("[{\"clazz\":\"org.thingsboard.server.extensions.core.filter.MsgTypeFilter\", " +
                 "\"name\":\"TelemetryFilter\", " +
                 "\"configuration\": {\"messageTypes\":[\"POST_TELEMETRY\",\"POST_ATTRIBUTES\",\"GET_ATTRIBUTES\"]}}]"));
-        rule2.setAction(mapper.readTree("{\"clazz\":\"org.thingsboard.server.extensions.core.action.telemetry.TelemetryPluginAction\", \"name\":\"TelemetryMsgConverterAction\", \"configuration\":{\"timeUnit\":\"DAYS\", \"ttlValue\":1}}"));
-        RuleMetaData savedRule3 = doPost("/api/rule", rule2, RuleMetaData.class);
+        rule3.setAction(mapper.readTree("{\"clazz\":\"org.thingsboard.server.extensions.core.action.telemetry.TelemetryPluginAction\", \"name\":\"TelemetryMsgConverterAction\", \"configuration\":{\"timeUnit\":\"DAYS\", \"ttlValue\":1}}"));
+        RuleMetaData savedRule3 = doPost("/api/rule", rule3, RuleMetaData.class);
 
         ApplicationRulesWrapper applicationRulesWrapper = new ApplicationRulesWrapper();
         applicationRulesWrapper.setApplicationId(savedApplication.getId().getId().toString());
@@ -641,22 +641,23 @@ public class BaseApplicationControllerTest extends AbstractControllerTest {
 
         ApplicationRulesWrapper applicationRulesWrapper1 = new ApplicationRulesWrapper();
         applicationRulesWrapper1.setApplicationId(savedApplication1.getId().getId().toString());
-        applicationRulesWrapper1.setRules(new HashSet<>(Arrays.asList(savedRule1.getId().getId().toString())));
+        applicationRulesWrapper1.setRules(new HashSet<>(Arrays.asList(savedRule1.getId().getId().toString(), savedRule3.getId().getId().toString())));
         doPostWithDifferentResponse("/api/app/assignRules", applicationRulesWrapper1, Application.class);
 
-        List<String> foundApplications1 = doGetTyped("/api/applications/rule/"+savedRule1.getId().getId().toString() , new TypeReference<List<String>>(){});
+
+        ApplicationRulesWrapper applicationRulesWrapper2 = new ApplicationRulesWrapper();
+        applicationRulesWrapper2.setApplicationId(savedApplication2.getId().getId().toString());
+        applicationRulesWrapper2.setRules(new HashSet<>(Arrays.asList(savedRule2.getId().getId().toString(), savedRule3.getId().getId().toString())));
+        doPostWithDifferentResponse("/api/app/assignRules", applicationRulesWrapper2, Application.class);
+
+        Set<String> foundApplications1 = doGetTyped("/api/applications/rules/"+savedRule1.getId().getId().toString() , new TypeReference<Set<String>>(){});
         Assert.assertEquals(2, foundApplications1.size());
-        Assert.assertTrue(foundApplications1.containsAll(Arrays.asList("My application", "My application 1")));
 
-        List<String> foundApplications2 = doGetTyped("/api/applications/rule/"+savedRule2.getId().getId().toString() , new TypeReference<List<String>>(){});
-        Assert.assertEquals(1, foundApplications2.size());
-        Assert.assertTrue(foundApplications2.containsAll(Arrays.asList("My application")));
-
-        List<String> foundApplications3 = doGetTyped("/api/applications/rule/"+savedRule3.getId().getId().toString() , new TypeReference<List<String>>(){});
-        Assert.assertEquals(0, foundApplications3.size());
+        Set<String> foundApplications2 = doGetTyped("/api/applications/rules/"+savedRule1.getId().getId().toString()+","+savedRule3.getId().getId().toString() , new TypeReference<Set<String>>(){});
+        Assert.assertEquals(3, foundApplications2.size());
     }
 
-    @Test
+   @Test
     public void testUnAssignUnAssignComputationJobsToApplication() throws Exception{
         System.out.println("Saving 1");
         Application application = new Application();

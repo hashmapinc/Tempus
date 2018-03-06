@@ -35,7 +35,7 @@ public interface ApplicationService {
 
     List<Application> findApplicationsByDeviceType(TenantId tenantId, String deviceType);
 
-    List<String> findApplicationByRuleId(TenantId tenantId, RuleId ruleId);
+    Set<String> findApplicationByRuleIds(TenantId tenantId, Set<RuleId> ruleIds);
 
     List<String> findApplicationByDashboardId(TenantId tenantId, DashboardId dashboardId);
 

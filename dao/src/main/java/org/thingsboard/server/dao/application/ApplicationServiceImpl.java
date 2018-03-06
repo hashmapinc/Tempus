@@ -46,6 +46,7 @@ import java.util.stream.Collectors;
 import static org.thingsboard.server.dao.model.ModelConstants.NULL_DEVICE_TYPE;
 import static org.thingsboard.server.dao.model.ModelConstants.NULL_UUID;
 import static org.thingsboard.server.dao.service.Validator.validateId;
+import static org.thingsboard.server.dao.service.Validator.validateIds;
 import static org.thingsboard.server.dao.service.Validator.validatePageLink;
 
 @Service
@@ -110,11 +111,15 @@ public class ApplicationServiceImpl extends AbstractEntityService implements App
     }
 
     @Override
-    public List<String> findApplicationByRuleId(TenantId tenantId, RuleId ruleId) {
-        log.trace("Executing findApplicationByRuleId,  tenantId [{}], ruleId [{}]", tenantId, ruleId);
+    public Set<String> findApplicationByRuleIds(TenantId tenantId, Set<RuleId> ruleIds) {
+        log.trace("Executing findApplicationByRuleIds,  tenantId [{}], ruleIds [{}]", tenantId, ruleIds);
         validateId(tenantId, "Incorrect tenantId " + tenantId);
-        validateId(ruleId, "Incorrect ruleId " + ruleId);
-        return applicationDao.findApplicationByRuleId(tenantId.getId(), ruleId.getId()).stream().map(Application::getName).collect(Collectors.toList());
+        validateIds(ruleIds, "Incorrect ruleIds " + ruleIds);
+        Set<String> applications = new HashSet<>();
+        for(RuleId ruleId: ruleIds) {
+            applications.addAll(applicationDao.findApplicationByRuleId(tenantId.getId(), ruleId.getId()).stream().map(Application::getName).collect(Collectors.toList()));
+        }
+        return applications;
     }
 
     @Override
