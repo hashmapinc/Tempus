@@ -112,9 +112,9 @@ public class BaseComputationsControllerTest extends AbstractControllerTest {
         Application savedApplication = doPost("/api/application", application, Application.class);
 
 
-        ApplicationComputationJosWrapper applicationComputationJosWrapper = new ApplicationComputationJosWrapper();
+        ApplicationFieldsWrapper applicationComputationJosWrapper = new ApplicationFieldsWrapper();
         applicationComputationJosWrapper.setApplicationId(savedApplication.getId().getId().toString());
-        applicationComputationJosWrapper.setComputationJobs(new HashSet<>(Arrays.asList(savedComputationJob.getId().getId().toString())));
+        applicationComputationJosWrapper.setFields(new HashSet<>(Arrays.asList(savedComputationJob.getId().getId().toString())));
 
         Application assignedApplication = doPostWithDifferentResponse("/api/app/assignComputationJobs", applicationComputationJosWrapper, Application.class);
 

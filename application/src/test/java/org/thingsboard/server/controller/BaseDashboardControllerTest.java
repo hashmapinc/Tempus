@@ -140,9 +140,9 @@ public abstract class BaseDashboardControllerTest extends AbstractControllerTest
         computationJob1.setName("Computation Job 1");
         computationJob1.setJobId("0123");
         ComputationJob savedComputationJob1 = doPost("/api/computations/"+savedComputations.getId().getId().toString()+"/jobs", computationJob1, ComputationJob.class);
-        ApplicationComputationJosWrapper applicationComputationJosWrapper = new ApplicationComputationJosWrapper();
+        ApplicationFieldsWrapper applicationComputationJosWrapper = new ApplicationFieldsWrapper();
         applicationComputationJosWrapper.setApplicationId(savedApplication.getId().getId().toString());
-        applicationComputationJosWrapper.setComputationJobs(new HashSet<>(Arrays.asList(savedComputationJob1.getId().toString())));
+        applicationComputationJosWrapper.setFields(new HashSet<>(Arrays.asList(savedComputationJob1.getId().toString())));
         doPostWithDifferentResponse("/api/app/assignComputationJobs", applicationComputationJosWrapper, Application.class);
 
 
@@ -150,9 +150,9 @@ public abstract class BaseDashboardControllerTest extends AbstractControllerTest
         RuleMetaData savedRule = doPost("/api/rule", rule, RuleMetaData.class);
         RuleMetaData foundRule = doGet("/api/rule/" + savedRule.getId().getId().toString(), RuleMetaData.class);
         Assert.assertNotNull(foundRule);
-        ApplicationRulesWrapper applicationRulesWrapper = new ApplicationRulesWrapper();
+        ApplicationFieldsWrapper applicationRulesWrapper = new ApplicationFieldsWrapper();
         applicationRulesWrapper.setApplicationId(savedApplication.getId().getId().toString());
-        applicationRulesWrapper.setRules(new HashSet<>(Arrays.asList(savedRule.getId().getId().toString())));
+        applicationRulesWrapper.setFields(new HashSet<>(Arrays.asList(savedRule.getId().getId().toString())));
         doPostWithDifferentResponse("/api/app/assignRules", applicationRulesWrapper, Application.class);
 
         String dashboardType = "mini";

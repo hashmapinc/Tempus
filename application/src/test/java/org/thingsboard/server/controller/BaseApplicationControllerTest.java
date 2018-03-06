@@ -171,9 +171,9 @@ public class BaseApplicationControllerTest extends AbstractControllerTest {
 
         doGet("/api/rule/"+savedRule1.getId().getId().toString()).andExpect(status().isOk());
 
-        ApplicationRulesWrapper applicationRulesWrapper = new ApplicationRulesWrapper();
+        ApplicationFieldsWrapper applicationRulesWrapper = new ApplicationFieldsWrapper();
         applicationRulesWrapper.setApplicationId(savedApplication.getId().getId().toString());
-        applicationRulesWrapper.setRules(new HashSet<>(Arrays.asList(savedRule1.getId().getId().toString())));
+        applicationRulesWrapper.setFields(new HashSet<>(Arrays.asList(savedRule1.getId().getId().toString())));
         doPostWithDifferentResponse("/api/app/assignRules", applicationRulesWrapper, Application.class);
 
 
@@ -494,9 +494,9 @@ public class BaseApplicationControllerTest extends AbstractControllerTest {
         rule2.setAction(mapper.readTree("{\"clazz\":\"org.thingsboard.server.extensions.core.action.telemetry.TelemetryPluginAction\", \"name\":\"TelemetryMsgConverterAction\", \"configuration\":{\"timeUnit\":\"DAYS\", \"ttlValue\":1}}"));
         RuleMetaData savedRule2 = doPost("/api/rule", rule2, RuleMetaData.class);
 
-        ApplicationRulesWrapper applicationRulesWrapper = new ApplicationRulesWrapper();
+        ApplicationFieldsWrapper applicationRulesWrapper = new ApplicationFieldsWrapper();
         applicationRulesWrapper.setApplicationId(savedApplication.getId().getId().toString());
-        applicationRulesWrapper.setRules(new HashSet<>(Arrays.asList(savedRule1.getId().getId().toString(), savedRule2.getId().getId().toString())));
+        applicationRulesWrapper.setFields(new HashSet<>(Arrays.asList(savedRule1.getId().getId().toString(), savedRule2.getId().getId().toString())));
 
         Application assignedApplication = doPostWithDifferentResponse("/api/app/assignRules", applicationRulesWrapper, Application.class);
         Assert.assertEquals(new HashSet<>(Arrays.asList(savedRule1.getId(), savedRule2.getId())), assignedApplication.getRules());
@@ -529,9 +529,9 @@ public class BaseApplicationControllerTest extends AbstractControllerTest {
         rule2.setAction(mapper.readTree("{\"clazz\":\"org.thingsboard.server.extensions.core.action.telemetry.TelemetryPluginAction\", \"name\":\"TelemetryMsgConverterAction\", \"configuration\":{\"timeUnit\":\"DAYS\", \"ttlValue\":1}}"));
         RuleMetaData savedRule2 = doPost("/api/rule", rule2, RuleMetaData.class);
 
-        ApplicationRulesWrapper applicationRulesWrapper = new ApplicationRulesWrapper();
+        ApplicationFieldsWrapper applicationRulesWrapper = new ApplicationFieldsWrapper();
         applicationRulesWrapper.setApplicationId(savedApplication.getId().getId().toString());
-        applicationRulesWrapper.setRules(new HashSet<>(Arrays.asList(savedRule1.getId().getId().toString(), savedRule2.getId().getId().toString())));
+        applicationRulesWrapper.setFields(new HashSet<>(Arrays.asList(savedRule1.getId().getId().toString(), savedRule2.getId().getId().toString())));
 
         Application assignedApplication = doPostWithDifferentResponse("/api/app/assignRules", applicationRulesWrapper, Application.class);
         Assert.assertEquals(new HashSet<>(Arrays.asList(savedRule1.getId(), savedRule2.getId())), assignedApplication.getRules());
@@ -541,9 +541,9 @@ public class BaseApplicationControllerTest extends AbstractControllerTest {
         Assert.assertEquals(3,foundApplication.getDeviceTypes().size());
         Assert.assertTrue(foundApplication.getDeviceTypes().containsAll(new HashSet<>(Arrays.asList("Motor", "Pump", "Well"))));
 
-        ApplicationRulesWrapper newApplicationRulesWrapper = new ApplicationRulesWrapper();
+        ApplicationFieldsWrapper newApplicationRulesWrapper = new ApplicationFieldsWrapper();
         newApplicationRulesWrapper.setApplicationId(savedApplication.getId().getId().toString());
-        newApplicationRulesWrapper.setRules(new HashSet<>(Arrays.asList(savedRule2.getId().getId().toString())));
+        newApplicationRulesWrapper.setFields(new HashSet<>(Arrays.asList(savedRule2.getId().getId().toString())));
         doPostWithDifferentResponse("/api/app/unassignRules", newApplicationRulesWrapper, Application.class);
 
         Application foundUnassignedApplication = doGet("/api/application/" + savedApplication.getId().getId().toString(), Application.class);
@@ -634,20 +634,20 @@ public class BaseApplicationControllerTest extends AbstractControllerTest {
         rule3.setAction(mapper.readTree("{\"clazz\":\"org.thingsboard.server.extensions.core.action.telemetry.TelemetryPluginAction\", \"name\":\"TelemetryMsgConverterAction\", \"configuration\":{\"timeUnit\":\"DAYS\", \"ttlValue\":1}}"));
         RuleMetaData savedRule3 = doPost("/api/rule", rule3, RuleMetaData.class);
 
-        ApplicationRulesWrapper applicationRulesWrapper = new ApplicationRulesWrapper();
+        ApplicationFieldsWrapper applicationRulesWrapper = new ApplicationFieldsWrapper();
         applicationRulesWrapper.setApplicationId(savedApplication.getId().getId().toString());
-        applicationRulesWrapper.setRules(new HashSet<>(Arrays.asList(savedRule1.getId().getId().toString(), savedRule2.getId().getId().toString())));
+        applicationRulesWrapper.setFields(new HashSet<>(Arrays.asList(savedRule1.getId().getId().toString(), savedRule2.getId().getId().toString())));
         doPostWithDifferentResponse("/api/app/assignRules", applicationRulesWrapper, Application.class);
 
-        ApplicationRulesWrapper applicationRulesWrapper1 = new ApplicationRulesWrapper();
+        ApplicationFieldsWrapper applicationRulesWrapper1 = new ApplicationFieldsWrapper();
         applicationRulesWrapper1.setApplicationId(savedApplication1.getId().getId().toString());
-        applicationRulesWrapper1.setRules(new HashSet<>(Arrays.asList(savedRule1.getId().getId().toString(), savedRule3.getId().getId().toString())));
+        applicationRulesWrapper1.setFields(new HashSet<>(Arrays.asList(savedRule1.getId().getId().toString(), savedRule3.getId().getId().toString())));
         doPostWithDifferentResponse("/api/app/assignRules", applicationRulesWrapper1, Application.class);
 
 
-        ApplicationRulesWrapper applicationRulesWrapper2 = new ApplicationRulesWrapper();
+        ApplicationFieldsWrapper applicationRulesWrapper2 = new ApplicationFieldsWrapper();
         applicationRulesWrapper2.setApplicationId(savedApplication2.getId().getId().toString());
-        applicationRulesWrapper2.setRules(new HashSet<>(Arrays.asList(savedRule2.getId().getId().toString(), savedRule3.getId().getId().toString())));
+        applicationRulesWrapper2.setFields(new HashSet<>(Arrays.asList(savedRule2.getId().getId().toString(), savedRule3.getId().getId().toString())));
         doPostWithDifferentResponse("/api/app/assignRules", applicationRulesWrapper2, Application.class);
 
         Set<String> foundApplications1 = doGetTyped("/api/applications/rules/"+savedRule1.getId().getId().toString() , new TypeReference<Set<String>>(){});
@@ -685,9 +685,9 @@ public class BaseApplicationControllerTest extends AbstractControllerTest {
         /*ComputationJobId computationJobId1 = new ComputationJobId(UUIDConverter.fromString("1e80658f63c8450841b7f44ce019219"));
         ComputationJobId computationJobId2 = new ComputationJobId(UUIDConverter.fromString("1e80658f7e24510841b7f44ce019219"));*/
 
-        ApplicationComputationJosWrapper applicationComputationJosWrapper = new ApplicationComputationJosWrapper();
+       ApplicationFieldsWrapper applicationComputationJosWrapper = new ApplicationFieldsWrapper();
         applicationComputationJosWrapper.setApplicationId(savedApplication.getId().getId().toString());
-        applicationComputationJosWrapper.setComputationJobs(new HashSet<>(Arrays.asList(savedComputationJob1.getId().toString(), savedComputationJob2.getId().toString())));
+        applicationComputationJosWrapper.setFields(new HashSet<>(Arrays.asList(savedComputationJob1.getId().toString(), savedComputationJob2.getId().toString())));
 
         Application assignedApplication = doPostWithDifferentResponse("/api/app/assignComputationJobs", applicationComputationJosWrapper, Application.class);
 
@@ -695,9 +695,9 @@ public class BaseApplicationControllerTest extends AbstractControllerTest {
         Assert.assertEquals(new HashSet<>(Arrays.asList(savedComputationJob1.getId(), savedComputationJob2.getId())), foundAssignedApplication.getComputationJobIdSet());
 
 
-        ApplicationComputationJosWrapper applicationComputationJosWrapper1 = new ApplicationComputationJosWrapper();
+       ApplicationFieldsWrapper applicationComputationJosWrapper1 = new ApplicationFieldsWrapper();
         applicationComputationJosWrapper1.setApplicationId(savedApplication.getId().getId().toString());
-        applicationComputationJosWrapper1.setComputationJobs(new HashSet<>(Arrays.asList(savedComputationJob2.getId().toString())));
+        applicationComputationJosWrapper1.setFields(new HashSet<>(Arrays.asList(savedComputationJob2.getId().toString())));
         Application unAssignedApplication = doPostWithDifferentResponse("/api/app/unassignComputationJobs", applicationComputationJosWrapper1, Application.class);
 
         Application foundUnApplication = doGet("/api/application/" + savedApplication.getId().getId().toString(), Application.class);

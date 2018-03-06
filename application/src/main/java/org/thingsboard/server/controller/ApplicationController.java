@@ -20,8 +20,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.thingsboard.server.common.data.Application;
-import org.thingsboard.server.common.data.ApplicationComputationJosWrapper;
-import org.thingsboard.server.common.data.ApplicationRulesWrapper;
+import org.thingsboard.server.common.data.ApplicationFieldsWrapper;
 import org.thingsboard.server.common.data.computation.ComputationJob;
 import org.thingsboard.server.common.data.id.*;
 import org.thingsboard.server.common.data.page.TextPageData;
@@ -250,14 +249,14 @@ public class ApplicationController extends BaseController {
 
     @PreAuthorize("hasAuthority('TENANT_ADMIN')")
     @RequestMapping(value = "/app/assignRules", method = RequestMethod.POST,consumes = "application/json")
-    public Application assignRulesToApplication(@RequestBody ApplicationRulesWrapper applicationRulesWrapper) throws ThingsboardException {
-        checkParameter("applicationId", applicationRulesWrapper.getApplicationId());
+    public Application assignRulesToApplication(@RequestBody ApplicationFieldsWrapper applicationFieldsWrapper) throws ThingsboardException {
+        checkParameter("applicationId", applicationFieldsWrapper.getApplicationId());
         try {
-            ApplicationId applicationId = new ApplicationId(toUUID(applicationRulesWrapper.getApplicationId()));
+            ApplicationId applicationId = new ApplicationId(toUUID(applicationFieldsWrapper.getApplicationId()));
             checkApplicationId(applicationId);
             Set<RuleId> ruleIds = Collections.emptySet();
-            if (applicationRulesWrapper != null) {
-                ruleIds = applicationRulesWrapper.getRules().stream().map(r -> new RuleId(toUUID(r))).collect(Collectors.toSet());
+            if (applicationFieldsWrapper != null) {
+                ruleIds = applicationFieldsWrapper.getFields().stream().map(r -> new RuleId(toUUID(r))).collect(Collectors.toSet());
             }
             return checkNotNull(applicationService.assignRulesToApplication(applicationId, ruleIds));
         } catch (Exception e) {
@@ -268,14 +267,14 @@ public class ApplicationController extends BaseController {
 
     @PreAuthorize("hasAuthority('TENANT_ADMIN')")
     @RequestMapping(value = "/app/unassignRules", method = RequestMethod.POST,consumes = "application/json")
-    public Application unassignRulesToApplication(@RequestBody ApplicationRulesWrapper applicationRulesWrapper) throws ThingsboardException {
-        checkParameter("applicationId", applicationRulesWrapper.getApplicationId());
+    public Application unassignRulesToApplication(@RequestBody ApplicationFieldsWrapper applicationFieldsWrapper) throws ThingsboardException {
+        checkParameter("applicationId", applicationFieldsWrapper.getApplicationId());
         try {
-            ApplicationId applicationId = new ApplicationId(toUUID(applicationRulesWrapper.getApplicationId()));
+            ApplicationId applicationId = new ApplicationId(toUUID(applicationFieldsWrapper.getApplicationId()));
             checkApplicationId(applicationId);
             Set<RuleId> ruleIds = Collections.emptySet();
-            if (applicationRulesWrapper != null) {
-                ruleIds = applicationRulesWrapper.getRules().stream().map(r -> new RuleId(toUUID(r))).collect(Collectors.toSet());
+            if (applicationFieldsWrapper != null) {
+                ruleIds = applicationFieldsWrapper.getFields().stream().map(r -> new RuleId(toUUID(r))).collect(Collectors.toSet());
             }
             return checkNotNull(applicationService.unassignRulesToApplication(applicationId, ruleIds));
         } catch (Exception e) {
@@ -286,12 +285,12 @@ public class ApplicationController extends BaseController {
 
     @PreAuthorize("hasAuthority('TENANT_ADMIN')")
     @RequestMapping(value = "/app/assignComputationJobs", method = RequestMethod.POST,consumes = "application/json")
-    public Application assignComputationsJobToApplication(@RequestBody ApplicationComputationJosWrapper applicationComputationJosWrapper) throws ThingsboardException {
-        checkParameter("applicationId", applicationComputationJosWrapper.getApplicationId());
+    public Application assignComputationsJobToApplication(@RequestBody ApplicationFieldsWrapper applicationFieldsWrapper) throws ThingsboardException {
+        checkParameter("applicationId", applicationFieldsWrapper.getApplicationId());
         try {
-            ApplicationId applicationId = new ApplicationId(toUUID(applicationComputationJosWrapper.getApplicationId()));
+            ApplicationId applicationId = new ApplicationId(toUUID(applicationFieldsWrapper.getApplicationId()));
             checkApplicationId(applicationId);
-            Set<ComputationJobId> computationJobIds = applicationComputationJosWrapper.getComputationJobs().stream().map(r -> new ComputationJobId(toUUID(r))).collect(Collectors.toSet());
+            Set<ComputationJobId> computationJobIds = applicationFieldsWrapper.getFields().stream().map(r -> new ComputationJobId(toUUID(r))).collect(Collectors.toSet());
             return checkNotNull(applicationService.assignComputationJobsToApplication(applicationId, computationJobIds));
         } catch (Exception e) {
             throw handleException(e);
@@ -300,12 +299,12 @@ public class ApplicationController extends BaseController {
 
     @PreAuthorize("hasAuthority('TENANT_ADMIN')")
     @RequestMapping(value = "/app/unassignComputationJobs", method = RequestMethod.POST,consumes = "application/json")
-    public Application unassignComputationsJobToApplication(@RequestBody ApplicationComputationJosWrapper applicationComputationJosWrapper) throws ThingsboardException {
-        checkParameter("applicationId", applicationComputationJosWrapper.getApplicationId());
+    public Application unassignComputationsJobToApplication(@RequestBody ApplicationFieldsWrapper applicationFieldsWrapper) throws ThingsboardException {
+        checkParameter("applicationId", applicationFieldsWrapper.getApplicationId());
         try {
-            ApplicationId applicationId = new ApplicationId(toUUID(applicationComputationJosWrapper.getApplicationId()));
+            ApplicationId applicationId = new ApplicationId(toUUID(applicationFieldsWrapper.getApplicationId()));
             checkApplicationId(applicationId);
-            Set<ComputationJobId> computationJobIds  = applicationComputationJosWrapper.getComputationJobs().stream().map(c -> new ComputationJobId(toUUID(c))).collect(Collectors.toSet());
+            Set<ComputationJobId> computationJobIds  = applicationFieldsWrapper.getFields().stream().map(c -> new ComputationJobId(toUUID(c))).collect(Collectors.toSet());
             return checkNotNull(applicationService.unassignComputationJobsToApplication(applicationId, computationJobIds));
         } catch (Exception e) {
             throw handleException(e);

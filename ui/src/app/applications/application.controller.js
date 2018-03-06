@@ -755,7 +755,7 @@ export function ApplicationController($timeout, $log, $rootScope, userService, a
     function saveRule(rule) {
         return ruleService.saveRule(rule).then(
             function(savedRule) {
-                var rules = {"applicationId": vm.currentApplication.id.id, "rules":[savedRule.id.id]}; 
+                var rules = {"applicationId": vm.currentApplication.id.id, "fields":[savedRule.id.id]};
                 applicationService.assignRulesToApplication(rules);
                 $window.localStorage.setItem('currentApp', angular.toJson(vm.currentApplication));
                 $window.localStorage.setItem('currentTab', angular.toJson(vm.tabSelectedIndex));
@@ -766,7 +766,7 @@ export function ApplicationController($timeout, $log, $rootScope, userService, a
     function deleteRule(ruleId) {
         return ruleService.deleteRule(ruleId).then(
             function() {
-                var rules = {"applicationId": vm.currentApplication.id.id, "rules":[ruleId]};
+                var rules = {"applicationId": vm.currentApplication.id.id, "fields":[ruleId]};
                 applicationService.unAssignRulesFromApplication(rules);
             }
         );
