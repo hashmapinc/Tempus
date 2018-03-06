@@ -59,10 +59,10 @@ public class ComputationsController extends BaseController {
     private ComputationDiscoveryService computationDiscoveryService;
 
     @Autowired
-    ComputationsService computationsService;
+    private ComputationsService computationsService;
 
     @Autowired
-    ComputationJobService computationJobService;
+    private ComputationJobService computationJobService;
 
     @PreAuthorize("hasAuthority('TENANT_ADMIN')")
     @RequestMapping(value = "/computations/upload", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)

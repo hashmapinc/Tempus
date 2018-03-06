@@ -18,7 +18,6 @@ package org.thingsboard.server.service.computation;
 import com.datastax.driver.core.utils.UUIDs;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 import org.thingsboard.server.common.data.computation.Computations;
 import org.thingsboard.server.common.data.id.ComputationId;
@@ -27,8 +26,6 @@ import org.thingsboard.server.common.data.page.TextPageData;
 import org.thingsboard.server.common.data.page.TextPageLink;
 import org.thingsboard.server.common.msg.computation.ComputationRequestCompiled;
 import org.thingsboard.server.dao.computations.ComputationsService;
-import org.thingsboard.server.dao.plugin.PluginService;
-import org.thingsboard.server.service.component.ComponentDiscoveryService;
 import org.thingsboard.server.service.computation.annotation.AnnotationsProcessor;
 import org.thingsboard.server.service.computation.classloader.RuntimeJavaCompiler;
 
@@ -37,23 +34,10 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.*;
-import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
 
 @Service("uploadComputationDiscoveryService")
 @Slf4j
 public class UploadComputationDiscoveryService implements ComputationDiscoveryService{
-
-    private static final Executor executor = Executors.newSingleThreadExecutor();
-
-    @Autowired
-    private ComponentDiscoveryService componentDiscoveryService;
-
-    @Autowired
-    private PluginService pluginService;
-
-    @Autowired
-    private ApplicationContext context;
 
     @Autowired
     private ComputationsService computationsService;
