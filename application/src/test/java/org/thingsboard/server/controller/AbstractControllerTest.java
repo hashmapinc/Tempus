@@ -398,6 +398,10 @@ public abstract class AbstractControllerTest {
         return readResponse(doPost(urlTemplate, content, params).andExpect(status().isOk()), responseClass);
     }
 
+    protected <T, R> R doPutWithDifferentResponse(String urlTemplate, T content, Class<R> responseClass, String... params) throws Exception {
+        return readResponse(doPut(urlTemplate, content, params).andExpect(status().isOk()), responseClass);
+    }
+
     protected <T> T doPostAsync(String urlTemplate, T content, Class<T> responseClass, ResultMatcher resultMatcher, String... params) throws Exception {
         return readResponse(doPostAsync(urlTemplate, content, params).andExpect(resultMatcher), responseClass);
     }
@@ -415,6 +419,14 @@ public abstract class AbstractControllerTest {
 
     protected <T> ResultActions doPost(String urlTemplate, T content, String... params) throws Exception {
         MockHttpServletRequestBuilder postRequest = post(urlTemplate);
+        setJwtToken(postRequest);
+        String json = json(content);
+        postRequest.contentType(contentType).content(json);
+        return mockMvc.perform(postRequest);
+    }
+
+    protected <T> ResultActions doPut(String urlTemplate, T content, String... params) throws Exception {
+        MockHttpServletRequestBuilder postRequest = put(urlTemplate);
         setJwtToken(postRequest);
         String json = json(content);
         postRequest.contentType(contentType).content(json);

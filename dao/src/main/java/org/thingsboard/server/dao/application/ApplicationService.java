@@ -49,6 +49,10 @@ public interface ApplicationService {
 
     Application assignRulesToApplication(ApplicationId applicationId, Set<RuleId> ruleIdList);
 
+    Application assignDevicesToApplication(ApplicationId applicationId, Set<String> deviceTypes);
+
+    Application unassignDevicesToApplication(ApplicationId applicationId, String[] deviceTypes);
+
     Application unassignRulesToApplication(ApplicationId applicationId, Set<RuleId> ruleIdList);
 
     Application assignComputationJobsToApplication(ApplicationId applicationId, Set<ComputationJobId> computationJobIds);

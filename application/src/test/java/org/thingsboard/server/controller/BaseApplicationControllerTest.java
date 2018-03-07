@@ -18,6 +18,7 @@ package org.thingsboard.server.controller;
 import com.datastax.driver.core.utils.UUIDs;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.Sets;
 import org.apache.commons.lang.RandomStringUtils;
 import org.json.JSONObject;
 import org.junit.*;
@@ -503,8 +504,8 @@ public class BaseApplicationControllerTest extends AbstractControllerTest {
 
         Application foundApplication = doGet("/api/application/" + savedApplication.getId().getId().toString(), Application.class);
         Assert.assertEquals(new HashSet<>(Arrays.asList(savedRule1.getId(), savedRule2.getId())), foundApplication.getRules());
-        Assert.assertEquals(3,foundApplication.getDeviceTypes().size());
-        Assert.assertTrue(foundApplication.getDeviceTypes().containsAll(new HashSet<>(Arrays.asList("Motor", "Pump", "Well"))));
+//        Assert.assertEquals(3,foundApplication.getDeviceTypes().size());
+  //      Assert.assertTrue(foundApplication.getDeviceTypes().containsAll(new HashSet<>(Arrays.asList("Motor", "Pump", "Well"))));
     }
 
     @Test
@@ -538,8 +539,6 @@ public class BaseApplicationControllerTest extends AbstractControllerTest {
 
         Application foundApplication = doGet("/api/application/" + savedApplication.getId().getId().toString(), Application.class);
         Assert.assertEquals(new HashSet<>(Arrays.asList(savedRule1.getId(), savedRule2.getId())), foundApplication.getRules());
-        Assert.assertEquals(3,foundApplication.getDeviceTypes().size());
-        Assert.assertTrue(foundApplication.getDeviceTypes().containsAll(new HashSet<>(Arrays.asList("Motor", "Pump", "Well"))));
 
         ApplicationFieldsWrapper newApplicationRulesWrapper = new ApplicationFieldsWrapper();
         newApplicationRulesWrapper.setApplicationId(savedApplication.getId().getId().toString());
@@ -548,9 +547,40 @@ public class BaseApplicationControllerTest extends AbstractControllerTest {
 
         Application foundUnassignedApplication = doGet("/api/application/" + savedApplication.getId().getId().toString(), Application.class);
         Assert.assertEquals(new HashSet<>(Arrays.asList(savedRule1.getId())), foundUnassignedApplication.getRules());
-        Assert.assertEquals(2,foundUnassignedApplication.getDeviceTypes().size());
-        Assert.assertTrue(foundApplication.getDeviceTypes().containsAll(new HashSet<>(Arrays.asList("Motor", "Pump"))));
+    }
 
+    @Test
+    public void testAssignDeviceTypesToApplication() throws Exception {
+        Application application = new Application();
+        application.setName("My application");
+        Application savedApplication = doPost("/api/application", application, Application.class);
+
+        Assert.assertEquals(Sets.newHashSet("!NULL__DEVICE__TYPE!"), savedApplication.getDeviceTypes());
+
+        ApplicationFieldsWrapper applicationFieldsWrapper = new ApplicationFieldsWrapper();
+        applicationFieldsWrapper.setApplicationId(savedApplication.getId().getId().toString());
+        applicationFieldsWrapper.setFields(Sets.newHashSet("DT1", "DT2", "DT3"));
+        Application assignedApplication = doPutWithDifferentResponse("/api/app/devices", applicationFieldsWrapper, Application.class);
+        Assert.assertEquals(Sets.newHashSet("DT1", "DT2", "DT3"), assignedApplication.getDeviceTypes());
+
+    }
+
+    @Test
+    public void testUnassignDeviceTypesToApplication() throws Exception {
+        Application application = new Application();
+        application.setName("My application");
+        Application savedApplication = doPost("/api/application", application, Application.class);
+
+        ApplicationFieldsWrapper applicationFieldsWrapper = new ApplicationFieldsWrapper();
+        applicationFieldsWrapper.setApplicationId(savedApplication.getId().getId().toString());
+        applicationFieldsWrapper.setFields(Sets.newHashSet("DT1", "DT2", "DT3"));
+
+        Application assignedApplication = doPutWithDifferentResponse("/api/app/devices", applicationFieldsWrapper, Application.class);
+        Assert.assertEquals(Sets.newHashSet("DT1", "DT2", "DT3"), assignedApplication.getDeviceTypes());
+
+        String url = "/api/app/"+savedApplication.getId().getId().toString()+"/devices/"+ "DT1, DT2";
+        Application unassignedApplication = doDelete(url, Application.class);
+        Assert.assertEquals(Sets.newHashSet("DT3"), unassignedApplication.getDeviceTypes());
     }
 
     @Test
@@ -681,9 +711,6 @@ public class BaseApplicationControllerTest extends AbstractControllerTest {
         computationJob2.setJobId("0124");
         ComputationJob savedComputationJob2 = doPost("/api/computations/"+savedComputations.getId().getId().toString()+"/jobs", computationJob2, ComputationJob.class);
 
-
-        /*ComputationJobId computationJobId1 = new ComputationJobId(UUIDConverter.fromString("1e80658f63c8450841b7f44ce019219"));
-        ComputationJobId computationJobId2 = new ComputationJobId(UUIDConverter.fromString("1e80658f7e24510841b7f44ce019219"));*/
 
        ApplicationFieldsWrapper applicationComputationJosWrapper = new ApplicationFieldsWrapper();
         applicationComputationJosWrapper.setApplicationId(savedApplication.getId().getId().toString());

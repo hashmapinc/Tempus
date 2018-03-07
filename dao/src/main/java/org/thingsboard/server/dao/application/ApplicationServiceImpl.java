@@ -177,25 +177,33 @@ public class ApplicationServiceImpl extends AbstractEntityService implements App
     public Application unassignRulesToApplication(ApplicationId applicationId, Set<RuleId> ruleIdSet) {
         Application application = findApplicationById(applicationId);
         application.getRules().removeAll(ruleIdSet);
-        for(RuleId ruleId: application.getRules()) {
-            RuleMetaData ruleMetaData = ruleDao.findById(ruleId);
-            application.setDeviceTypes(getDeviceTypesfromFiltersJson(ruleMetaData.getFilters()));
-        }
         return saveApplication(application);
     }
 
     @Override
     public Application assignRulesToApplication(ApplicationId applicationId, Set<RuleId> ruleIdSet) {
         Application application = findApplicationById(applicationId);
-        for(RuleId ruleId: ruleIdSet) {
-            RuleMetaData ruleMetaData = ruleDao.findById(ruleId);
-            application.addDeviceTypes(getDeviceTypesfromFiltersJson(ruleMetaData.getFilters()));
-        }
         if(application.getRules().contains(new RuleId(NULL_UUID))) {
             application.getRules().remove(new RuleId(NULL_UUID));
-            application.getDeviceTypes().remove(NULL_DEVICE_TYPE);
         }
         application.addRules(ruleIdSet);
+        return saveApplication(application);
+    }
+
+    @Override
+    public Application assignDevicesToApplication(ApplicationId applicationId, Set<String> deviceTypes) {
+        Application application = findApplicationById(applicationId);
+        if(application.getDeviceTypes().contains(NULL_DEVICE_TYPE)) {
+            application.getDeviceTypes().remove(NULL_DEVICE_TYPE);
+        }
+        application.addDeviceTypes(deviceTypes);
+        return saveApplication(application);
+    }
+
+    @Override
+    public Application unassignDevicesToApplication(ApplicationId applicationId, String[] deviceTypes) {
+        Application application = findApplicationById(applicationId);
+        application.getDeviceTypes().removeAll(Arrays.asList(deviceTypes));
         return saveApplication(application);
     }
 
@@ -245,19 +253,6 @@ public class ApplicationServiceImpl extends AbstractEntityService implements App
                 updateApplicationOnComputationJobDelete(computationJob.getId(), tenantId);
             }
         }
-    }
-
-    private Set<String> getDeviceTypesfromFiltersJson(JsonNode filters){
-        Set<String> deviceTypes = new HashSet<>();
-        Iterator<JsonNode> configurations = filters.elements();
-        while (configurations.hasNext()) {
-            JsonNode configuration = configurations.next();
-            for(JsonNode jsonNode: configuration.findValues("deviceTypes")) {
-                java.util.List<String> name = jsonNode.findValues("name").stream().map(JsonNode::asText).collect(Collectors.toList());
-                deviceTypes.addAll(name);
-            }
-        }
-        return deviceTypes;
     }
 
     @Override
