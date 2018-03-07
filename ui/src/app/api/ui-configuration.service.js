@@ -47,10 +47,13 @@ function UiConfiguration($http, $q, $log) {
     }
 
     function isDepthSeriesEnabled() {
-        if (configs.depthSeries === 'false') {
-            return false;
-        } else {
-            return true;
+        if(angular.isDefined(configs)){
+            if (configs.depthSeries === 'false') {
+                return false;
+            } else {
+                return true;
+            }
         }
+
     }
 }

@@ -84,7 +84,9 @@
     "tinycolor2": "^1.4.1",
     "tooltipster": "^4.2.4",
     "typeface-roboto": "0.0.22",
-    "v-accordion": "^1.6.0"
+    "v-accordion": "^1.6.0",
+    "arcgis": "*",
+    "angular-esri-map": "*"
   },
   "devDependencies": {
     "babel-cli": "^6.18.0",
