@@ -18,12 +18,13 @@ import tinycolor from 'tinycolor2';
 
 import TbGoogleMap from './google-map';
 import TbOpenStreetMap from './openstreet-map';
+import TbArcgisMap from './arcgis-map';
 import TbImageMap from './image-map';
 
 import {processPattern, arraysEqual, toLabelValueMap, fillPattern, fillPatternWithActions} from './widget-utils';
 
 export default class TbMapWidgetV2 {
-    constructor(mapProvider, drawRoutes, ctx, useDynamicLocations, $element) {
+    constructor(mapProvider, drawRoutes, ctx, useDynamicLocations, $element, mapObj) {
         var tbMap = this;
         this.ctx = ctx;
         this.mapProvider = mapProvider;
@@ -61,7 +62,7 @@ export default class TbMapWidgetV2 {
         var minZoomLevel = this.drawRoutes ? 18 : 15;
 
         var initCallback = function() {
-            tbMap.update();
+          //  tbMap.update();
             tbMap.resize();
         };
 
@@ -78,6 +79,8 @@ export default class TbMapWidgetV2 {
             this.map = new TbGoogleMap($element, initCallback, this.defaultZoomLevel, this.dontFitMapBounds, minZoomLevel, settings.gmApiKey, settings.gmDefaultMapType);
         } else if (mapProvider === 'openstreet-map') {
             this.map = new TbOpenStreetMap($element, initCallback, this.defaultZoomLevel, this.dontFitMapBounds, minZoomLevel);
+        } else if (mapProvider === 'arcgis-map') {
+            this.map = new TbArcgisMap(mapObj, $element, initCallback, this.defaultZoomLevel, this.dontFitMapBounds, minZoomLevel);
         } else if (mapProvider === 'image-map') {
             this.map = new TbImageMap(this.ctx, $element, initCallback,
                 settings.mapImageUrl,
@@ -451,6 +454,8 @@ export default class TbMapWidgetV2 {
             schema = angular.copy(googleMapSettingsSchema);
         } else if (mapProvider === 'openstreet-map') {
             schema = angular.copy(openstreetMapSettingsSchema);
+        }else if (mapProvider === 'arcgis-map') {
+            schema = angular.copy(arcgisMapSettingsSchema);
         } else if (mapProvider === 'image-map') {
             return imageMapSettingsSchema;
         }
@@ -536,6 +541,20 @@ const openstreetMapSettingsSchema =
     {
         "schema":{
             "title":"Openstreet Map Configuration",
+            "type":"object",
+            "properties":{
+            },
+            "required":[
+            ]
+        },
+        "form":[
+        ]
+    };
+
+const arcgisMapSettingsSchema =
+    {
+        "schema":{
+            "title":"ArcGISy Map Configuration",
             "type":"object",
             "properties":{
             },
