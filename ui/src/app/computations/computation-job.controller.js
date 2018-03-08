@@ -21,7 +21,7 @@ import computationJobCard from './computation-job-card.tpl.html';
 /* eslint-enable import/no-unresolved, import/default */
 
 /*@ngInject*/
-export default function ComputationJobController(computationJobService, $log, userService, importExport, $state, $stateParams, $filter, $translate, types) {
+export default function ComputationJobController(computationJobService, computationService, $log, userService, importExport, $state, $stateParams, $filter, $translate, types) {
 
     var computationJobActionsList = [
         {
@@ -69,6 +69,14 @@ export default function ComputationJobController(computationJobService, $log, us
     ];
 
     var vm = this;
+    vm.computation = null;
+    computationService.getComputation($stateParams.computationId).then(
+                    function success(computation) {
+                        vm.computation = computation;
+                    },
+                    function fail() {
+                    }
+                );
 
     vm.types = types;
 

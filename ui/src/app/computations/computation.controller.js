@@ -107,7 +107,7 @@ export default function ComputationController(computationService, $log, userServ
             $event.stopPropagation();
         }
         $log.log("Computaion json " + computation.id.id);
-        $state.go('home.computationJob',{computationId: computation.id.id});
+        $state.go('home.computations.computationJob',{computationId: computation.id.id});
     }
 
 }

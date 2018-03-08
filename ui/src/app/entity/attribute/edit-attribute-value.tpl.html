@@ -15,12 +15,27 @@
     limitations under the License.
 
 -->
-<md-edit-dialog>
-    <form name="editDialog" ng-submit="submit()">
-        <div layout="column" class="md-content" style="width: 400px;">
-            <fieldset>
-                <section layout="row">
-                    <md-input-container flex="40" class="md-block">
+<md-edit-dialog class="center-modal">
+<div>
+		<div style="width:85%;float:left;padding:10px">
+		    <b>Edit Attribute</b>
+		</div>
+		<div style="width:10%;float:right">
+		<div ng-if="valueType===valueTypes.string">
+			<ng-md-icon ng-if="!max" icon="fullscreen" class="ng-scope" ng-click="toggleMaximize()"></ng-md-icon>
+			<ng-md-icon ng-if="max" icon="fullscreen_exit" class="ng-scope" ng-click="toggleMaximize()"></ng-md-icon>
+		</div>
+		</div>
+		</div>
+<md-dialog-content style="height:80%">
+    <form name="editDialog" ng-class="{'min': !max, 'max': max}" ng-submit="submit()" >
+	
+        <div layout="column" class="md-content" style="width: 100%;height:80%">
+		
+		
+            <fieldset style="height:80%">
+                <section layout="row" style="height:100%">
+                    <md-input-container flex="40" class="md-block" >
                         <label translate>value.type</label>
                         <md-select ng-model="valueType">
                             <md-option ng-repeat="type in valueTypes" ng-value="type">
@@ -29,29 +44,29 @@
                             </md-option>
                         </md-select>
                     </md-input-container>
-                    <md-input-container ng-if="valueType===valueTypes.string" flex="60" class="md-block">
+                    <md-input-container ng-if="valueType===valueTypes.string" flex="60" class="md-block" style="height:100%">
                         <label translate>value.string-value</label>
-                        <input required name="value" ng-model="model.value">
+                        <textarea   required name="value" ng-model="model.value" ng-class="{'min-text': !max, 'max-text': max}" style="overflow:auto;"></textarea>
                         <div ng-messages="editDialog.value.$error">
                             <div translate ng-message="required">attribute.value-required</div>
                         </div>
                     </md-input-container>
-                    <md-input-container ng-if="valueType===valueTypes.integer" flex="60" class="md-block">
+                    <md-input-container ng-if="valueType===valueTypes.integer" flex="60" class="md-block" >
                         <label translate>value.integer-value</label>
-                        <input required name="value" type="number" step="1" ng-pattern="/^-?[0-9]+$/" ng-model="model.value">
+                        <input required name="value" type="number" step="1" ng-pattern="/^-?[0-9]+$/" ng-model="model.value" >
                         <div ng-messages="editDialog.value.$error">
                             <div translate ng-message="required">attribute.value-required</div>
                             <div translate ng-message="pattern">value.invalid-integer-value</div>
                         </div>
                     </md-input-container>
-                    <md-input-container ng-if="valueType===valueTypes.double" flex="60" class="md-block">
+                    <md-input-container ng-if="valueType===valueTypes.double" flex="60" class="md-block" >
                         <label translate>value.double-value</label>
                         <input required name="value" type="number" step="any" ng-model="model.value">
                         <div ng-messages="editDialog.value.$error">
                             <div translate ng-message="required">attribute.value-required</div>
                         </div>
                     </md-input-container>
-                    <div layout="column" layout-align="center" flex="60" ng-if="valueType===valueTypes.boolean">
+                    <div layout="column" layout-align="center" flex="60" ng-if="valueType===valueTypes.boolean" >
                         <md-checkbox ng-model="model.value" style="margin-bottom: 0px;">
                             {{ (model.value ? 'value.true' : 'value.false') | translate }}
                         </md-checkbox>
@@ -69,4 +84,5 @@
             </md-button>
         </div>
     </form>
+	</md-dialog-content>
 </md-edit-dialog>
