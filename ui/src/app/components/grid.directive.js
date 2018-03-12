@@ -548,13 +548,15 @@ function GridController(applicationService, $scope, $state, $mdDialog, $document
             }
         }
         vm.loadItemDetailsFunc(item).then(function success(detailsItem) {
-            if((angular.isFunction(vm.config.parentCtl.currentApp) || angular.isObject(vm.config.parentCtl.currentApp)) && detailsItem.id.entityType == 'APPLICATION')
-            {
-                vm.config.parentCtl.currentApp(detailsItem);  
-                vm.config.parentCtl.appClicked = false;
-                $timeout( function(){
-                    vm.config.parentCtl.appClicked = true;
-                }, 100 );   
+            if(angular.isDefined(vm.config.parentCtl)){
+                if((angular.isFunction(vm.config.parentCtl.currentApp) || angular.isObject(vm.config.parentCtl.currentApp)) && detailsItem.id.entityType == 'APPLICATION')
+                {
+                    vm.config.parentCtl.currentApp(detailsItem);  
+                    vm.config.parentCtl.appClicked = false;
+                    $timeout( function(){
+                        vm.config.parentCtl.appClicked = true;
+                    }, 100 );   
+                }
             }
             detailsItem.index = item.index;
             vm.detailsConfig.currentItem = detailsItem;
