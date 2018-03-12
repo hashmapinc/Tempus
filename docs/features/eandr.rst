@@ -41,7 +41,7 @@ Provision entities and relations
 
 We are going to setup following hierarchy of assets and devices:
 
-.. image:: _images/eandr_heirarchy.png
+.. image:: ../_images/eandr_heirarchy.png
     :align: center
     :alt: A sample asset hierarchy
 
