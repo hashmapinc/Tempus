@@ -49,7 +49,7 @@ Please review the following screen cast to learn how to provision land lease, fi
 
 Please review the following screen cast to learn how to provision devices and their relations with assets using Tempus Web UI
 
-You can automate this actions using Tempus REST API. You can provision new asset using POST request to the following URL
+You can automate this actions using Tempus REST API. You can provision new assets by using POST requests to the following URL
 
 .. code-block:: bash
 

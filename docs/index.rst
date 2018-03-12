@@ -38,14 +38,18 @@ Rules Engine:
         Modification of the data flow from the edge
 
 Rapid Computation Deployment:
-    Tempus Cloud also has the capability to orchestration and manage Spark computataions on the data. This allows for a deeper analysis of the streaming data, in which the results can be visualized in real time, or even sent back to the edge.
+    Tempus Cloud also has the capability to orchestrate and manage Spark computataions on the data. This allows for a deeper analysis of the streaming data, in which the results can be visualized in real time, or even sent back to the edge.
+
+********
+Contents
+********
 
 .. toctree::
    :maxdepth: 2
-   :caption: Contents:
    
-   installation
-   feature
+   api/index
+   features/index
+   install/index
 
 Indices and tables
 ==================
