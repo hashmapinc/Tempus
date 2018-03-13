@@ -10,7 +10,7 @@ MQTT basics
 ===========
 
 MQTT is a lightweight publish-subscribe messaging protocol which probably makes it the most suitable for various IoT devices. You can find more information about MQTT here.
-ThingsBoard server nodes act as an MQTT Broker that supports QoS levels 0 (at most once) and 1 (at least once) and a set of predefined topics.
+Tempus Cloud server nodes act as an MQTT Broker that supports QoS levels 0 (at most once) and 1 (at least once) and a set of predefined topics.
 
 Client libraries setup
 ======================
@@ -22,7 +22,7 @@ MQTT Connect
 
 We will use access token device credentials in this article and they will be referred to later as $ACCESS_TOKEN. The application needs to send MQTT CONNECT message with username that contains $ACCESS_TOKEN. Possible return codes and their reasons during connect sequence:
 
-* 0x00 Connected - Successfully connected to ThingsBoard MQTT server.
+* 0x00 Connected - Successfully connected to Tempus Cloud MQTT server.
 * 0x04 Connection Refused, bad user name or password - Username is empty.
 * 0x05 Connection Refused, not authorized - Username contains invalid $ACCESS_TOKEN.
 
@@ -30,7 +30,7 @@ We will use access token device credentials in this article and they will be ref
 Key-Value Format
 ****************
 
-By default, ThingsBoard supports key-value content in JSON. Key is always a string, while value can be either string, boolean, double or long. Using custom binary format or some serialization framework is also possible. See protocol customization for more details. For example:
+By default, Tempus Cloud supports key-value content in JSON. Key is always a string, while value can be either string, boolean, double or long. Using custom binary format or some serialization framework is also possible. See protocol customization for more details. For example:
 
 .. code-block:: json
 
@@ -108,11 +108,38 @@ In the example above, we assume that “1451649600512” is a unix timestamp wit
 
             {"ts":1451649600512, "values":{"key1":"value1", "key2":"value2"}}
 
+********************
+Telemetry upload API
+********************
+
+In order to support depth data, the administrator must first configure Tempus to handle depth data. This is done by chaning the configuration in thingsboard.yml and uner the heading **UI Related configuration** set depthSeries to true: 
+
+.. code-block:: yaml
+
+    #UI Related Configuration
+    configurations:
+        ui:
+        depthSeries: "true"
+
+The depth topic is as follows:
+
+.. code-block:: bash
+
+    v1/devices/me/depth/telemetry
+
+The supported data format is:
+
+.. code-block:: json
+
+     {"ds":5844.23,"values":{"viscosity":0.1, "humidity":22.0}}
+
+Notice the use of DS. DS stands for depth stamp. This can either be in meters or feet, but must be consistant throughout the publication of data to the device. Mixing of units will cause data integrity issues.
+
 **************
 Attributes API
 **************
 
-ThingsBoard attributes API allows devices to
+Tempus Cloud attributes API allows devices to
 
 * Upload client-side device attributes to the server.
 * Request client-side and shared device attributes from the server.
@@ -121,7 +148,7 @@ ThingsBoard attributes API allows devices to
 Publish attribute update to the server
 ======================================
 
-In order to publish client-side device attributes to ThingsBoard server node, send PUBLISH message to the following topic:
+In order to publish client-side device attributes to Tempus Cloud server node, send PUBLISH message to the following topic:
 
 .. code-block:: bash
 
@@ -152,7 +179,7 @@ In order to publish client-side device attributes to ThingsBoard server node, se
 Request attribute values from the server
 ========================================
 
-In order to request client-side or shared device attributes to ThingsBoard server node, send PUBLISH message to the following topic:
+In order to request client-side or shared device attributes to Tempus Cloud server node, send PUBLISH message to the following topic:
 
 .. code-block:: bash
 

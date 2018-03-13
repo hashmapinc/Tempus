@@ -14,4 +14,13 @@ Data Acqusition
     mqtt
     coap
     http
+
+=========
+API Usage
+=========
+
+.. toctree::
+    :maxdepth: 1
+
+    swagger
   

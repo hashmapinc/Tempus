@@ -32,7 +32,7 @@ We will use access token device credentials in this article and they will be ref
 Key-value format
 ****************
 
-By default, ThingsBoard supports key-value content in JSON. Key is always a string, while value can be either string, boolean, double or long. Using custom binary format or some serialization framework is also possible. See protocol customization for more details. For example:
+By default, Tempus Cloud supports key-value content in JSON. Key is always a string, while value can be either string, boolean, double or long. Using custom binary format or some serialization framework is also possible. See protocol customization for more details. For example:
 
 .. code-block:: json
 
@@ -43,7 +43,7 @@ By default, ThingsBoard supports key-value content in JSON. Key is always a stri
 Telemetry upload API
 ********************
 
-In order to publish telemetry data to ThingsBoard server node, send POST request to the following URL:
+In order to publish telemetry data to Tempus Cloud server node, send POST request to the following URL:
 
 .. code-block:: bash
 
@@ -109,7 +109,7 @@ Example
 Attributes API
 **************
 
-ThingsBoard attributes API allows devices to
+Tempus Cloud attributes API allows devices to
 
 * Upload client-side device attributes to the server.
 * Request client-side and shared device attributes from the server.
@@ -119,7 +119,7 @@ ThingsBoard attributes API allows devices to
 Publish attribute update to the server
 ======================================
 
-In order to publish client-side device attributes to ThingsBoard server node, send POST request to the following URL:
+In order to publish client-side device attributes to Tempus Cloud server node, send POST request to the following URL:
 
 .. code-block:: bash
 
@@ -144,7 +144,7 @@ In order to publish client-side device attributes to ThingsBoard server node, se
 Request attribute values from the server
 ========================================
 
-In order to request client-side or shared device attributes to ThingsBoard server node, send GET request to the following URL:
+In order to request client-side or shared device attributes to Tempus Cloud server node, send GET request to the following URL:
 
 .. code-block:: bash
 
@@ -244,7 +244,7 @@ where **$id** is an integer request identifier.
 
     .. tab:: Example Reply
 
-        .. code-block:: json  
+        .. code-block:: bash  
 
             # Publish response to RPC request
             cat rpc-response.json | coap post coap://localhost/api/v1/$ACCESS_TOKEN/rpc/1

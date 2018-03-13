@@ -8,7 +8,7 @@ Attribute types
 
 Attributes are separated into three main groups:
 
-* **server-side** - attributes are reported and managed by the server-side application. Not visible to the device application. Some secret data that may be used by thingsboard rules but should not be available to the device. Any ThingsBoard entity supports server-side attributes: Device, Asset, Customer, Tenant, Rules, etc.
+* **server-side** - attributes are reported and managed by the server-side application. Not visible to the device application. Some secret data that may be used by tempus cloud rules, but should not be available to the device. Any Tempus Cloud entity supports server-side attributes: Device, Asset, Customer, Tenant, Rules, etc.
 
 image
 
@@ -35,7 +35,7 @@ image
 Device attributes API
 *********************
 
-ThingsBoard provides following API to device applications:
+Tempus Cloud provides following API to device applications:
 
 * upload client-side attributes to the server
 * request client-side and shared attributes from the server.
@@ -54,14 +54,14 @@ Attributes API is specific for each supported network protocol. You can review A
 Telemetry plugin
 ****************
 
-ThingsBoard consists of core services and pluggable modules called plugins. Telemetry plugin is responsible for persisting attributes data to internal data storage; provides server-side API to query and subscribe for attribute updates. Since Telemetry plugin functionality is critical for data visualization purposes in dashboards, it is configured on the system level by a system administrator. Advanced users or platform developers can customize telemetry plugin functionality.
+Tempus Cloud consists of core services and pluggable modules called plugins. Telemetry plugin is responsible for persisting attributes data to internal data storage; provides server-side API to query and subscribe for attribute updates. Since Telemetry plugin functionality is critical for data visualization purposes in dashboards, it is configured on the system level by a system administrator. Advanced users or platform developers can customize telemetry plugin functionality.
 
 Internal data storage
 =====================
 
-ThingsBoard uses either Cassandra NoSQL database or SQL database to store all data.
+Tempus Cloud uses either Cassandra NoSQL database or SQL database to store all data.
 
-Although you can query the database directly, ThingsBoard provides a set of RESTful and Websocket API that simplify this process and apply certain security policies:
+Although you can query the database directly, Tempus Cloud provides a set of RESTful and Websocket API that simplify this process and apply certain security policies:
 
 Tenant Administrator user is able to manage attributes for all entities that belong to the corresponding tenant.
 Customer user is able to manage attributes only for entities that are assigned to the corresponding customer.
