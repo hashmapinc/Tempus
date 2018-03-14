@@ -281,6 +281,7 @@ export default angular.module('thingsboard.locale', [])
                     "delete-attributes": "Delete attributes",
                     "enter-attribute-value": "Enter attribute value",
                     "show-on-widget": "Show on widget",
+                    "send-to-shared": "Send to Shared",
                     "widget-mode": "Widget mode",
                     "next-widget": "Next widget",
                     "prev-widget": "Previous widget",
