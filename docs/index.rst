@@ -50,6 +50,8 @@ Contents
    api/index
    features/index
    install/index
+   security/index
+   admin/index
 
 Indices and tables
 ==================
