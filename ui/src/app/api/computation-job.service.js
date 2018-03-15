@@ -63,7 +63,7 @@ function ComputationJobService($http, $q, $rootScope, $filter, componentDescript
 
     function deleteComputationJob(computationJobId) {
         var deferred = $q.defer();
-        var url = '/api/computationJob/' + computationJobId;
+        var url = '/api/computations/jobs/' + computationJobId;
         $http.delete(url).then(function success() {
             deferred.resolve();
         }, function fail(response) {
