@@ -834,24 +834,20 @@
         "id": "501d0411-f35a-92dc-8cfe-9b2725368437",
         "alias": "Tank123",
         "filter": {
-          "type": "singleEntity",
+          "type": "entityName",
           "resolveMultiple": false,
-          "singleEntity": {
-            "entityType": "DEVICE",
-            "id": "16573d30-26f1-11e8-a0c4-51156b65bef8"
-          }
+          "entityType": "DEVICE",
+          "entityNameFilter": "Tank 123"
         }
       },
       "c214f77b-3535-5c7b-7943-185c667a41e6": {
         "id": "c214f77b-3535-5c7b-7943-185c667a41e6",
         "alias": "Tank456",
         "filter": {
-          "type": "singleEntity",
+          "type": "entityName",
           "resolveMultiple": false,
-          "singleEntity": {
-            "entityType": "DEVICE",
-            "id": "1b308aa0-26f1-11e8-a0c4-51156b65bef8"
-          }
+          "entityType": "DEVICE",
+          "entityNameFilter": "Tank 456"
         }
       },
       "10a91f26-2968-b336-e501-f5fd776a0a43": {

@@ -31,6 +31,7 @@ import org.springframework.stereotype.Service;
 import org.thingsboard.server.common.data.*;
 import org.thingsboard.server.common.data.id.CustomerId;
 import org.thingsboard.server.common.data.id.TenantId;
+import org.thingsboard.server.common.data.kv.*;
 import org.thingsboard.server.common.data.plugin.ComponentLifecycleState;
 import org.thingsboard.server.common.data.plugin.PluginMetaData;
 import org.thingsboard.server.common.data.rule.RuleMetaData;
@@ -58,6 +59,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 @Profile("install")
@@ -208,9 +211,17 @@ public class DefaultSystemDataLoaderService implements SystemDataLoaderService {
 
         createUser(Authority.CUSTOMER_USER, demoTenant.getId(), customerA.getId(), "bob.jones@hashmapinc.com", "driller");
 
-        createDevice(demoTenant.getId(), customerA.getId(), "WaterTank", "Tank 123", "Test_Token_Tank123", null);
-        createDevice(demoTenant.getId(), customerA.getId(), "WaterTank", "Tank 456", "Test_Token_Tank456", null);
-        createDevice(demoTenant.getId(), customerA.getId(), "Gateway", "Spark Analytics Gateway", "GATEWAY_ACCESS_TOKEN", null, true);
+        List<AttributeKvEntry> attributesTank123 = new ArrayList<>();
+        attributesTank123.add(new BaseAttributeKvEntry(new StringDataEntry("latitude", "52.330732"), DateTime.now().getMillis()));
+        attributesTank123.add(new BaseAttributeKvEntry(new StringDataEntry("longitude", "-114.051973"), DateTime.now().getMillis()));
+
+        List<AttributeKvEntry> attributesTank456 = new ArrayList<>();
+        attributesTank456.add(new BaseAttributeKvEntry(new StringDataEntry("latitude", "52.317932"), DateTime.now().getMillis()));
+        attributesTank456.add(new BaseAttributeKvEntry(new StringDataEntry("longitude", "-113.993608"), DateTime.now().getMillis()));
+
+        createDevice(demoTenant.getId(), customerA.getId(), "WaterTank", "Tank 123", "Test_Token_Tank123", null, false, attributesTank123);
+        createDevice(demoTenant.getId(), customerA.getId(), "WaterTank", "Tank 456", "Test_Token_Tank456", null, false, attributesTank456);
+        createDevice(demoTenant.getId(), customerA.getId(), "Gateway", "Spark Analytics Gateway", "GATEWAY_ACCESS_TOKEN", null, true, null);
 
         loadPlugins(Paths.get(dataDir, JSON_DIR, DEMO_DIR, PLUGINS_DIR), demoTenant.getId());
         loadRules(Paths.get(dataDir, JSON_DIR, DEMO_DIR, RULES_DIR), demoTenant.getId());
@@ -250,7 +261,8 @@ public class DefaultSystemDataLoaderService implements SystemDataLoaderService {
                                 String name,
                                 String accessToken,
                                 String description,
-                                Boolean isGateway) {
+                                Boolean isGateway,
+                                List<AttributeKvEntry> attributes) {
         Device device = new Device();
         device.setTenantId(tenantId);
         device.setCustomerId(customerId);
@@ -267,6 +279,11 @@ public class DefaultSystemDataLoaderService implements SystemDataLoaderService {
             device.setAdditionalInfo(additionalInfo);
         }
         device = deviceService.saveDevice(device);
+
+        if (attributes != null){
+            attributeService.save(device.getId(), DataConstants.SERVER_SCOPE, attributes);
+        }
+
         DeviceCredentials deviceCredentials = deviceCredentialsService.findDeviceCredentialsByDeviceId(device.getId());
         deviceCredentials.setCredentialsId(accessToken);
         deviceCredentialsService.updateDeviceCredentials(deviceCredentials);
@@ -279,7 +296,7 @@ public class DefaultSystemDataLoaderService implements SystemDataLoaderService {
                                 String name,
                                 String accessToken,
                                 String description) {
-        return createDevice(tenantId, customerId, type, name, accessToken, description, false);
+        return createDevice(tenantId, customerId, type, name, accessToken, description, false, null);
     }
 
     private void loadPlugins(Path pluginsDir, TenantId tenantId) throws Exception{
