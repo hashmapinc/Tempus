@@ -31,6 +31,7 @@ import org.thingsboard.server.common.data.id.ComputationJobId;
 import org.thingsboard.server.common.data.id.RuleId;
 import org.thingsboard.server.common.data.page.TextPageData;
 import org.thingsboard.server.common.data.page.TextPageLink;
+import org.thingsboard.server.common.data.plugin.ComponentLifecycleState;
 import org.thingsboard.server.common.data.plugin.PluginMetaData;
 import org.thingsboard.server.common.data.rule.RuleMetaData;
 import org.thingsboard.server.common.data.security.Authority;
@@ -108,7 +109,7 @@ public class BaseApplicationControllerTest extends AbstractControllerTest {
     }
 
 
-    @Test
+   @Test
     public void testSaveApplication() throws Exception {
         Application application = new Application();
         application.setName("My Application");
@@ -183,7 +184,7 @@ public class BaseApplicationControllerTest extends AbstractControllerTest {
         Dashboard savedDashboard = doPost("/api/dashboard", dashboard, Dashboard.class);
         doPost("/api/dashboard/main/"+savedDashboard.getId().getId().toString()
                 +"/application/"+savedApplication.getId().getId().toString(), Application.class);
-        doGet("/api/dashboard//"+savedDashboard.getId().getId().toString()).andExpect(status().isOk());
+        doGet("/api/dashboard/"+savedDashboard.getId().getId().toString()).andExpect(status().isOk());
 
 
         doDelete("/api/application/"+savedApplication.getId().getId().toString())
@@ -193,7 +194,7 @@ public class BaseApplicationControllerTest extends AbstractControllerTest {
                 .andExpect(status().isNotFound());
 
         doGet("/api/rule/"+savedRule1.getId().getId().toString()).andExpect(status().isNotFound());
-        doGet("/api/dashboard//"+savedDashboard.getId().getId().toString()).andExpect(status().isNotFound());
+        doGet("/api/dashboard/"+savedDashboard.getId().getId().toString()).andExpect(status().isNotFound());
     }
 
     @Test
@@ -689,11 +690,9 @@ public class BaseApplicationControllerTest extends AbstractControllerTest {
 
    @Test
     public void testUnAssignUnAssignComputationJobsToApplication() throws Exception{
-        System.out.println("Saving 1");
         Application application = new Application();
         application.setName("My application");
         Application savedApplication = doPost("/api/application", application, Application.class);
-        System.out.println("Saving 2");
 
         Assert.assertEquals(new HashSet<>(Arrays.asList(new ComputationJobId(NULL_UUID))), savedApplication.getComputationJobIdSet());
 
@@ -702,13 +701,11 @@ public class BaseApplicationControllerTest extends AbstractControllerTest {
 
         ComputationJob computationJob1 = new ComputationJob();
         computationJob1.setName("Computation Job 1");
-        computationJob1.setJobId("0123");
         ComputationJob savedComputationJob1 = doPost("/api/computations/"+savedComputations.getId().getId().toString()+"/jobs", computationJob1, ComputationJob.class);
 
 
         ComputationJob computationJob2 = new ComputationJob();
         computationJob2.setName("Computation Job 2");
-        computationJob2.setJobId("0124");
         ComputationJob savedComputationJob2 = doPost("/api/computations/"+savedComputations.getId().getId().toString()+"/jobs", computationJob2, ComputationJob.class);
 
 
@@ -730,6 +727,110 @@ public class BaseApplicationControllerTest extends AbstractControllerTest {
         Application foundUnApplication = doGet("/api/application/" + savedApplication.getId().getId().toString(), Application.class);
         Assert.assertEquals(new HashSet<>(Arrays.asList(savedComputationJob1.getId())), foundUnApplication.getComputationJobIdSet());
     }
+
+    @Test
+    public void testActivateApplicationFailure() throws Exception {
+        Application application = new Application();
+        application.setName("My application");
+        Application savedApplication = doPost("/api/application", application, Application.class);
+
+        Computations savedComputations = saveComputation();
+        ComputationJob computationJob1 = new ComputationJob();
+        computationJob1.setName("Computation Job 1");
+        ComputationJob savedComputationJob1 = doPost("/api/computations/"+savedComputations.getId().getId().toString()+"/jobs", computationJob1, ComputationJob.class);
+
+        ApplicationFieldsWrapper applicationComputationJosWrapper = new ApplicationFieldsWrapper();
+        applicationComputationJosWrapper.setApplicationId(savedApplication.getId().getId().toString());
+        applicationComputationJosWrapper.setFields(new HashSet<>(Arrays.asList(savedComputationJob1.getId().toString())));
+
+        doPostWithDifferentResponse("/api/app/assignComputationJobs", applicationComputationJosWrapper, Application.class);
+
+
+        RuleMetaData rule1 = new RuleMetaData();
+        rule1.setName("My Rule1");
+        rule1.setPluginToken(tenantPlugin.getApiToken());
+        rule1.setFilters(mapper.readTree("[{\"clazz\":\"org.thingsboard.server.extensions.core.filter.MsgTypeFilter\", " +
+                "\"name\":\"TelemetryFilter\", " +
+                "\"configuration\": {\"messageTypes\":[\"POST_TELEMETRY\",\"POST_ATTRIBUTES\",\"GET_ATTRIBUTES\"]}}]"));
+        rule1.setAction(mapper.readTree("{\"clazz\":\"org.thingsboard.server.extensions.core.action.telemetry.TelemetryPluginAction\", \"name\":\"TelemetryMsgConverterAction\", \"configuration\":{\"timeUnit\":\"DAYS\", \"ttlValue\":1}}"));
+        RuleMetaData savedRule1 = doPost("/api/rule", rule1, RuleMetaData.class);
+
+
+        ApplicationFieldsWrapper applicationRulesWrapper = new ApplicationFieldsWrapper();
+        applicationRulesWrapper.setApplicationId(savedApplication.getId().getId().toString());
+        applicationRulesWrapper.setFields(new HashSet<>(Arrays.asList(savedRule1.getId().getId().toString())));
+        doPostWithDifferentResponse("/api/app/assignRules", applicationRulesWrapper, Application.class);
+
+
+        Assert.assertEquals(ComponentLifecycleState.SUSPENDED, savedApplication.getComponentLifecycleState());
+        Assert.assertEquals(ComponentLifecycleState.SUSPENDED, savedRule1.getState());
+        Assert.assertEquals(ComponentLifecycleState.SUSPENDED, savedComputationJob1.getState());
+
+        doPost("/api/application/"+savedApplication.getId().getId().toString() +"/activate").andExpect(status().isBadRequest());
+
+        Application foundApplication = doGet("/api/application/" + savedApplication.getId().getId().toString(), Application.class);
+        Assert.assertEquals(ComponentLifecycleState.SUSPENDED, foundApplication.getComponentLifecycleState());
+
+        RuleMetaData foundRuleMetaData = doGet("/api/rule/"+savedRule1.getId().getId().toString(), RuleMetaData.class);
+        Assert.assertEquals(ComponentLifecycleState.SUSPENDED ,foundRuleMetaData.getState());
+
+        ComputationJob foundComputationJob = doGet("/api/computations/"+savedComputations.getId().getId().toString()+"/jobs/"+ savedComputationJob1.getId(), ComputationJob.class);
+        Assert.assertEquals(ComponentLifecycleState.SUSPENDED, foundComputationJob.getState());
+    }
+
+
+    @Test
+    public void testActivateApplicationSuccess() throws Exception {
+        Application application = new Application();
+        application.setName("My application");
+        Application savedApplication = doPost("/api/application", application, Application.class);
+
+        Computations savedComputations = saveComputation();
+        ComputationJob computationJob1 = new ComputationJob();
+        computationJob1.setName("Computation Job 1");
+        computationJob1.setArgParameters(mapper.readTree("{\"host\": \"localhost\", \"port\": 8080}"));
+        ComputationJob savedComputationJob1 = doPost("/api/computations/"+savedComputations.getId().getId().toString()+"/jobs", computationJob1, ComputationJob.class);
+
+        ApplicationFieldsWrapper applicationComputationJosWrapper = new ApplicationFieldsWrapper();
+        applicationComputationJosWrapper.setApplicationId(savedApplication.getId().getId().toString());
+        applicationComputationJosWrapper.setFields(new HashSet<>(Arrays.asList(savedComputationJob1.getId().toString())));
+
+        doPostWithDifferentResponse("/api/app/assignComputationJobs", applicationComputationJosWrapper, Application.class);
+
+
+        RuleMetaData rule1 = new RuleMetaData();
+        rule1.setName("My Rule1");
+        rule1.setPluginToken(tenantPlugin.getApiToken());
+        rule1.setFilters(mapper.readTree("[{\"clazz\":\"org.thingsboard.server.extensions.core.filter.MsgTypeFilter\", " +
+                "\"name\":\"TelemetryFilter\", " +
+                "\"configuration\": {\"messageTypes\":[\"POST_TELEMETRY\",\"POST_ATTRIBUTES\",\"GET_ATTRIBUTES\"]}}]"));
+        rule1.setAction(mapper.readTree("{\"clazz\":\"org.thingsboard.server.extensions.core.action.telemetry.TelemetryPluginAction\", \"name\":\"TelemetryMsgConverterAction\", \"configuration\":{\"timeUnit\":\"DAYS\", \"ttlValue\":1}}"));
+        RuleMetaData savedRule1 = doPost("/api/rule", rule1, RuleMetaData.class);
+
+
+        ApplicationFieldsWrapper applicationRulesWrapper = new ApplicationFieldsWrapper();
+        applicationRulesWrapper.setApplicationId(savedApplication.getId().getId().toString());
+        applicationRulesWrapper.setFields(new HashSet<>(Arrays.asList(savedRule1.getId().getId().toString())));
+        doPostWithDifferentResponse("/api/app/assignRules", applicationRulesWrapper, Application.class);
+
+
+        Assert.assertEquals(ComponentLifecycleState.SUSPENDED, savedApplication.getComponentLifecycleState());
+        Assert.assertEquals(ComponentLifecycleState.SUSPENDED, savedRule1.getState());
+        Assert.assertEquals(ComponentLifecycleState.SUSPENDED, savedComputationJob1.getState());
+
+        doPost("/api/plugin/" + tenantPlugin.getId().getId().toString() + "/activate").andExpect(status().isOk());
+        doPost("/api/application/"+savedApplication.getId().getId().toString() +"/activate").andExpect(status().isOk());
+
+        Application foundApplication = doGet("/api/application/" + savedApplication.getId().getId().toString(), Application.class);
+        Assert.assertEquals(ComponentLifecycleState.ACTIVE, foundApplication.getComponentLifecycleState());
+
+        RuleMetaData foundRuleMetaData = doGet("/api/rule/"+savedRule1.getId().getId().toString(), RuleMetaData.class);
+        Assert.assertEquals(ComponentLifecycleState.ACTIVE ,foundRuleMetaData.getState());
+
+        ComputationJob foundComputationJob = doGet("/api/computations/"+savedComputations.getId().getId().toString()+"/jobs/"+ savedComputationJob1.getId(), ComputationJob.class);
+        Assert.assertEquals(ComponentLifecycleState.ACTIVE, foundComputationJob.getState());
+    }
+
 
     private Computations saveComputation() {
         Computations computations = new Computations();

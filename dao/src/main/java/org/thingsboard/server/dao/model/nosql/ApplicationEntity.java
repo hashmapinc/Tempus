@@ -18,14 +18,17 @@ package org.thingsboard.server.dao.model.nosql;
 import com.datastax.driver.core.utils.UUIDs;
 import org.thingsboard.server.common.data.Application;
 import org.thingsboard.server.common.data.id.*;
+import org.thingsboard.server.common.data.plugin.ComponentLifecycleState;
 import org.thingsboard.server.dao.model.SearchTextEntity;
 import com.datastax.driver.mapping.annotations.Column;
 import com.datastax.driver.mapping.annotations.PartitionKey;
 import com.datastax.driver.mapping.annotations.Table;
 import com.datastax.driver.mapping.annotations.Transient;
+import org.thingsboard.server.dao.model.type.ComponentLifecycleStateCodec;
 
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -77,6 +80,9 @@ public final class ApplicationEntity implements SearchTextEntity<Application> {
     @Column(name = APPLICATION_DEVICE_TYPES_COLUMN)
     private Set<String> deviceTypes;
 
+    @Column(name = APPLICATION_STATE_PROPERTY, codec = ComponentLifecycleStateCodec.class)
+    private ComponentLifecycleState state;
+
 
     public ApplicationEntity() {
         super();
@@ -113,6 +119,7 @@ public final class ApplicationEntity implements SearchTextEntity<Application> {
         this.isValid = application.getIsValid();
         this.description = application.getDescription();
         this.deviceTypes = application.getDeviceTypes();
+        this.state = application.getComponentLifecycleState();
     }
 
 
@@ -218,6 +225,14 @@ public final class ApplicationEntity implements SearchTextEntity<Application> {
         this.deviceTypes = deviceTypes;
     }
 
+    public ComponentLifecycleState getState() {
+        return state;
+    }
+
+    public void setState(ComponentLifecycleState state) {
+        this.state = state;
+    }
+
     @Override
     public Application toData() {
         Application application = new Application(new ApplicationId(getId()));
@@ -247,6 +262,13 @@ public final class ApplicationEntity implements SearchTextEntity<Application> {
         application.setName(name);
         application.setIsValid(isValid);
         application.setDescription(description);
+
+        if(state != null) {
+            application.setComponentLifecycleState(state);
+        } else {
+            application.setComponentLifecycleState(ComponentLifecycleState.SUSPENDED);
+        }
+
         if(deviceTypes !=null) {
             application.setDeviceTypes(deviceTypes);
         }
@@ -259,36 +281,23 @@ public final class ApplicationEntity implements SearchTextEntity<Application> {
         if (o == null || getClass() != o.getClass()) return false;
 
         ApplicationEntity that = (ApplicationEntity) o;
-
-        if (id != null ? !id.equals(that.id) : that.id != null) return false;
-        if (tenantId != null ? !tenantId.equals(that.tenantId) : that.tenantId != null) return false;
-        if (customerId != null ? !customerId.equals(that.customerId) : that.customerId != null) return false;
-        if (miniDashboardId != null ? !miniDashboardId.equals(that.miniDashboardId) : that.miniDashboardId != null)
-            return false;
-        if (dashboardId != null ? !dashboardId.equals(that.dashboardId) : that.dashboardId != null) return false;
-        if (name != null ? !name.equals(that.name) : that.name != null) return false;
-        if (isValid != null ? !isValid.equals(that.isValid) : that.isValid != null) return false;
-        if (description != null ? !description.equals(that.description) : that.description != null) return false;
-        if (searchText != null ? !searchText.equals(that.searchText) : that.searchText != null) return false;
-        if (rules != null ? !rules.equals(that.rules) : that.rules != null) return false;
-        if (computationJobs != null ? !computationJobs.equals(that.computationJobs) : that.computationJobs != null) return false;
-        return deviceTypes != null ? deviceTypes.equals(that.deviceTypes) : that.deviceTypes == null;
+        return Objects.equals(id, that.id) &&
+                Objects.equals(tenantId, that.tenantId) &&
+                Objects.equals(customerId, that.customerId) &&
+                Objects.equals(miniDashboardId, that.miniDashboardId) &&
+                Objects.equals(dashboardId, that.dashboardId) &&
+                Objects.equals(name, that.name) &&
+                Objects.equals(isValid, that.isValid) &&
+                Objects.equals(description, that.description) &&
+                Objects.equals(searchText, that.searchText) &&
+                Objects.equals(rules, that.rules) &&
+                Objects.equals(computationJobs, that.computationJobs) &&
+                Objects.equals(deviceTypes, that.deviceTypes) &&
+                state == that.state;
     }
 
     @Override
     public int hashCode() {
-        int result = id != null ? id.hashCode() : 0;
-        result = 31 * result + (tenantId != null ? tenantId.hashCode() : 0);
-        result = 31 * result + (customerId != null ? customerId.hashCode() : 0);
-        result = 31 * result + (miniDashboardId != null ? miniDashboardId.hashCode() : 0);
-        result = 31 * result + (dashboardId != null ? dashboardId.hashCode() : 0);
-        result = 31 * result + (name != null ? name.hashCode() : 0);
-        result = 31 * result + (isValid != null ? isValid.hashCode() : 0);
-        result = 31 * result + (description != null ? description.hashCode() : 0);
-        result = 31 * result + (searchText != null ? searchText.hashCode() : 0);
-        result = 31 * result + (rules != null ? rules.hashCode() : 0);
-        result = 31 * result + (computationJobs != null ? computationJobs.hashCode() : 0);
-        result = 31 * result + (deviceTypes != null ? deviceTypes.hashCode() : 0);
-        return result;
+        return Objects.hash(id, tenantId, customerId, miniDashboardId, dashboardId, name, isValid, description, searchText, rules, computationJobs, deviceTypes, state);
     }
 }

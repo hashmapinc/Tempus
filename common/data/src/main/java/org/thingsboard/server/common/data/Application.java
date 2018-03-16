@@ -16,8 +16,10 @@
 package org.thingsboard.server.common.data;
 
 import org.thingsboard.server.common.data.id.*;
+import org.thingsboard.server.common.data.plugin.ComponentLifecycleState;
 
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 public class Application extends SearchTextBased<ApplicationId> implements HasName {
@@ -34,6 +36,7 @@ public class Application extends SearchTextBased<ApplicationId> implements HasNa
     private String description;
     private Set<String> deviceTypes = new HashSet<>();
     private Boolean isValid = Boolean.TRUE;
+    private ComponentLifecycleState componentLifecycleState;
 
     public Application() {
         super();
@@ -55,6 +58,7 @@ public class Application extends SearchTextBased<ApplicationId> implements HasNa
         this.description = application.description;
         this.deviceTypes = application.deviceTypes;
         this.isValid = application.isValid;
+        this.componentLifecycleState = application.componentLifecycleState;
     }
 
     @Override
@@ -64,6 +68,15 @@ public class Application extends SearchTextBased<ApplicationId> implements HasNa
 
     public void setName(String name) {
         this.name = name;
+    }
+
+
+    public ComponentLifecycleState getComponentLifecycleState() {
+        return componentLifecycleState;
+    }
+
+    public void setComponentLifecycleState(ComponentLifecycleState componentLifecycleState) {
+        this.componentLifecycleState = componentLifecycleState;
     }
 
     @Override
@@ -159,14 +172,15 @@ public class Application extends SearchTextBased<ApplicationId> implements HasNa
         return "Application{" +
                 "tenantId=" + tenantId +
                 ", customerId=" + customerId +
-                ", miniDashboardId=" + miniDashboardId +
                 ", dashboardId=" + dashboardId +
+                ", miniDashboardId=" + miniDashboardId +
                 ", computationJobIdSet=" + computationJobIdSet +
-                ", isValid=" + isValid +
                 ", rules=" + rules +
                 ", name='" + name + '\'' +
                 ", description='" + description + '\'' +
                 ", deviceTypes=" + deviceTypes +
+                ", isValid=" + isValid +
+                ", componentLifecycleState=" + componentLifecycleState +
                 '}';
     }
 
@@ -175,35 +189,22 @@ public class Application extends SearchTextBased<ApplicationId> implements HasNa
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         if (!super.equals(o)) return false;
-
         Application that = (Application) o;
-
-        if (tenantId != null ? !tenantId.equals(that.tenantId) : that.tenantId != null) return false;
-        if (customerId != null ? !customerId.equals(that.customerId) : that.customerId != null) return false;
-        if (dashboardId != null ? !dashboardId.equals(that.dashboardId) : that.dashboardId != null) return false;
-        if (miniDashboardId != null ? !miniDashboardId.equals(that.miniDashboardId) : that.miniDashboardId != null)
-            return false;
-        if (rules != null ? !rules.equals(that.rules) : that.rules != null) return false;
-        if (computationJobIdSet != null ? !computationJobIdSet.equals(that.computationJobIdSet) : that.computationJobIdSet != null) return false;
-        if (name != null ? !name.equals(that.name) : that.name != null) return false;
-        if (description != null ? !description.equals(that.description) : that.description != null) return false;
-        if (deviceTypes != null ? !deviceTypes.equals(that.deviceTypes) : that.deviceTypes != null) return false;
-        return isValid != null ? isValid.equals(that.isValid) : that.isValid == null;
+        return Objects.equals(tenantId, that.tenantId) &&
+                Objects.equals(customerId, that.customerId) &&
+                Objects.equals(dashboardId, that.dashboardId) &&
+                Objects.equals(miniDashboardId, that.miniDashboardId) &&
+                Objects.equals(computationJobIdSet, that.computationJobIdSet) &&
+                Objects.equals(rules, that.rules) &&
+                Objects.equals(name, that.name) &&
+                Objects.equals(description, that.description) &&
+                Objects.equals(deviceTypes, that.deviceTypes) &&
+                Objects.equals(isValid, that.isValid) &&
+                componentLifecycleState == that.componentLifecycleState;
     }
 
     @Override
     public int hashCode() {
-        int result = super.hashCode();
-        result = 31 * result + (tenantId != null ? tenantId.hashCode() : 0);
-        result = 31 * result + (customerId != null ? customerId.hashCode() : 0);
-        result = 31 * result + (dashboardId != null ? dashboardId.hashCode() : 0);
-        result = 31 * result + (miniDashboardId != null ? miniDashboardId.hashCode() : 0);
-        result = 31 * result + (rules != null ? rules.hashCode() : 0);
-        result = 31 * result + (computationJobIdSet != null ? computationJobIdSet.hashCode() : 0);
-        result = 31 * result + (name != null ? name.hashCode() : 0);
-        result = 31 * result + (description != null ? description.hashCode() : 0);
-        result = 31 * result + (deviceTypes != null ? deviceTypes.hashCode() : 0);
-        result = 31 * result + (isValid != null ? isValid.hashCode() : 0);
-        return result;
+        return Objects.hash(super.hashCode(), tenantId, customerId, dashboardId, miniDashboardId, computationJobIdSet, rules, name, description, deviceTypes, isValid, componentLifecycleState);
     }
 }

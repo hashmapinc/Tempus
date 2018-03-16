@@ -69,4 +69,8 @@ public interface ApplicationService {
 
     void updateApplicationOnDashboardDelete(DashboardId dashboardIdId, TenantId tenantId);
 
+    void activateApplicationById(ApplicationId applicationId);
+
+    void suspendApplicationById(ApplicationId applicationId);
+
 }

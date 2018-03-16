@@ -23,6 +23,7 @@ import org.hibernate.annotations.FetchMode;
 import org.hibernate.annotations.TypeDef;
 import org.thingsboard.server.common.data.Application;
 import org.thingsboard.server.common.data.id.*;
+import org.thingsboard.server.common.data.plugin.ComponentLifecycleState;
 import org.thingsboard.server.dao.model.BaseSqlEntity;
 import org.thingsboard.server.dao.model.ModelConstants;
 import org.thingsboard.server.dao.model.SearchTextEntity;
@@ -30,6 +31,7 @@ import org.thingsboard.server.dao.util.mapping.JsonStringType;
 
 import javax.persistence.*;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -85,6 +87,9 @@ public final class ApplicationEntity extends BaseSqlEntity<Application> implemen
     @Column(name = ModelConstants.APPLICATION_DEVICE_TYPES)
     private Set<String> deviceTypes;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = ModelConstants.APPLICATION_STATE_PROPERTY)
+    private ComponentLifecycleState state;
 
     public ApplicationEntity() {
         super();
@@ -121,6 +126,7 @@ public final class ApplicationEntity extends BaseSqlEntity<Application> implemen
         this.isValid = application.getIsValid();
         this.description = application.getDescription();
         this.deviceTypes = application.getDeviceTypes();
+        this.state = application.getComponentLifecycleState();
     }
 
     @Override
@@ -163,47 +169,33 @@ public final class ApplicationEntity extends BaseSqlEntity<Application> implemen
         application.setIsValid(isValid);
         application.setDescription(description);
         application.setDeviceTypes(deviceTypes);
+        application.setComponentLifecycleState(state);
         return application;
 
     }
-
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         if (!super.equals(o)) return false;
-
         ApplicationEntity that = (ApplicationEntity) o;
-
-        if (tenantId != null ? !tenantId.equals(that.tenantId) : that.tenantId != null) return false;
-        if (customerId != null ? !customerId.equals(that.customerId) : that.customerId != null) return false;
-        if (miniDashboardId != null ? !miniDashboardId.equals(that.miniDashboardId) : that.miniDashboardId != null)
-            return false;
-        if (dashboardId != null ? !dashboardId.equals(that.dashboardId) : that.dashboardId != null) return false;
-        if (rules != null ? !rules.equals(that.rules) : that.rules != null) return false;
-        if (computationJobs != null ? !computationJobs.equals(that.computationJobs) : that.computationJobs != null) return false;
-        if (name != null ? !name.equals(that.name) : that.name != null) return false;
-        if (isValid != null ? !isValid.equals(that.isValid) : that.isValid != null) return false;
-        if (description != null ? !description.equals(that.description) : that.description != null) return false;
-        if (searchText != null ? !searchText.equals(that.searchText) : that.searchText != null) return false;
-        return deviceTypes != null ? deviceTypes.equals(that.deviceTypes) : that.deviceTypes == null;
+        return  Objects.equals(tenantId, that.tenantId) &&
+                Objects.equals(customerId, that.customerId) &&
+                Objects.equals(miniDashboardId, that.miniDashboardId) &&
+                Objects.equals(dashboardId, that.dashboardId) &&
+                Objects.equals(rules, that.rules) &&
+                Objects.equals(computationJobs, that.computationJobs) &&
+                Objects.equals(name, that.name) &&
+                Objects.equals(isValid, that.isValid) &&
+                Objects.equals(description, that.description) &&
+                Objects.equals(searchText, that.searchText) &&
+                Objects.equals(deviceTypes, that.deviceTypes) &&
+                state == that.state;
     }
 
     @Override
     public int hashCode() {
-        int result = super.hashCode();
-        result = 31 * result + (tenantId != null ? tenantId.hashCode() : 0);
-        result = 31 * result + (customerId != null ? customerId.hashCode() : 0);
-        result = 31 * result + (miniDashboardId != null ? miniDashboardId.hashCode() : 0);
-        result = 31 * result + (dashboardId != null ? dashboardId.hashCode() : 0);
-        result = 31 * result + (rules != null ? rules.hashCode() : 0);
-        result = 31 * result + (computationJobs != null ? computationJobs.hashCode() : 0);
-        result = 31 * result + (name != null ? name.hashCode() : 0);
-        result = 31 * result + (isValid != null ? isValid.hashCode() : 0);
-        result = 31 * result + (description != null ? description.hashCode() : 0);
-        result = 31 * result + (searchText != null ? searchText.hashCode() : 0);
-        result = 31 * result + (deviceTypes != null ? deviceTypes.hashCode() : 0);
-        return result;
+        return Objects.hash(super.hashCode(), tenantId, customerId, miniDashboardId, dashboardId, rules, computationJobs, name, isValid, description, searchText, deviceTypes, state);
     }
 }

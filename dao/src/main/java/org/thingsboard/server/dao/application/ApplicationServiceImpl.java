@@ -29,15 +29,18 @@ import org.thingsboard.server.common.data.computation.ComputationJob;
 import org.thingsboard.server.common.data.id.*;
 import org.thingsboard.server.common.data.page.TextPageData;
 import org.thingsboard.server.common.data.page.TextPageLink;
+import org.thingsboard.server.common.data.plugin.ComponentLifecycleState;
 import org.thingsboard.server.common.data.rule.RuleMetaData;
 import org.thingsboard.server.dao.computations.ComputationJobDao;
 import org.thingsboard.server.dao.customer.CustomerDao;
 import org.thingsboard.server.dao.dashboard.DashboardDao;
 import org.thingsboard.server.dao.entity.AbstractEntityService;
 import org.thingsboard.server.dao.exception.DataValidationException;
+import org.thingsboard.server.dao.exception.DatabaseException;
 import org.thingsboard.server.dao.exception.IncorrectParameterException;
 import org.thingsboard.server.dao.rule.RuleDao;
 import org.thingsboard.server.dao.service.DataValidator;
+import org.thingsboard.server.dao.service.Validator;
 import org.thingsboard.server.dao.tenant.TenantDao;
 
 import java.util.*;
@@ -75,6 +78,21 @@ public class ApplicationServiceImpl extends AbstractEntityService implements App
     public Application saveApplication(Application application) {
         log.trace("Executing saveApplication [{}]", application);
         applicationValidator.validate(application);
+        if (application.getId() != null) {
+            Application oldVersion = applicationDao.findById(application.getId().getId());
+            if (application.getComponentLifecycleState() == null) {
+                application.setComponentLifecycleState(oldVersion.getComponentLifecycleState());
+            } else if (application.getComponentLifecycleState() != oldVersion.getComponentLifecycleState()) {
+                throw new IncorrectParameterException("Use Activate/Suspend method to control state of the application!");
+            }
+        } else {
+            if (application.getComponentLifecycleState() == null) {
+                application.setComponentLifecycleState(ComponentLifecycleState.SUSPENDED);
+            } else if (application.getComponentLifecycleState() != ComponentLifecycleState.SUSPENDED) {
+                throw new IncorrectParameterException("Use Activate/Suspend method to control state of the application!");
+            }
+        }
+
         return applicationDao.save(application);
     }
 
@@ -281,6 +299,28 @@ public class ApplicationServiceImpl extends AbstractEntityService implements App
                 saveApplication(a);
             }
         }
+    }
+
+    @Override
+    public void activateApplicationById(ApplicationId applicationId) {
+        updateLifeCycleState(applicationId, ComponentLifecycleState.ACTIVE);
+    }
+
+    @Override
+    public void suspendApplicationById(ApplicationId applicationId) {
+        updateLifeCycleState(applicationId, ComponentLifecycleState.SUSPENDED);
+    }
+
+    private void updateLifeCycleState(ApplicationId applicationId, ComponentLifecycleState state) {
+        Validator.validateId(applicationId, "Incorrect application id for state change request.");
+        Application application = applicationDao.findById(applicationId.getId());
+        if (application != null) {
+            application.setComponentLifecycleState(state);
+            applicationDao.save(application);
+        } else {
+            throw new DatabaseException("Application not found!");
+        }
+
     }
 
 
