@@ -45,8 +45,8 @@ Create a Tenant
 5. Fill in the required information, and then click Add
 
 .. image:: ../_images/TenantInfo.png
-:align: center
-:alt: Tenant Information
+    :align: center
+    :alt: Tenant Information
 
 Create a Tenant Administrator
 =============================
@@ -54,16 +54,16 @@ Create a Tenant Administrator
 1. After performing the steps to create a tenant, navigate to the Tenants page and click on the user button of the tenant card that you want to create the administrator for.
 
 .. image:: ../_images/tenantadmincreate.png
-:align: center
-:alt: Tenant Admin Creation
+    :align: center
+    :alt: Tenant Admin Creation
 
 2. Click on the "+" symbol at the bottom right to create an administrator
 
 3. Enter in the Tenant admin info as required
 
 .. image:: ../_images/Tenantadmininfo.png
-:align: center
-:alt: Tenant Admin Information
+    :align: center
+    :alt: Tenant Admin Information
 
 The user can be activated in one of 2 ways:
 
@@ -75,14 +75,10 @@ We will choose the Display Activation Link option.
 4. Follow the activation link and create a password, and then click Create Password
 
 .. image:: ../_images/TenantPassword.png
-:align: center
-:alt: Tenant Admin Password Creation
+    :align: center
+    :alt: Tenant Admin Password Creation
 
 5. You have now created the Tenant admin and should be logged in as the Tenant Administrator after activation
-
-**********************
-Proivision Your Device
-**********************
 
 
 
