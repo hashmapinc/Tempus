@@ -89,7 +89,8 @@
                         {{ 'action.delete' | translate }}
                     </md-tooltip>
                 </md-button>
-                <md-button ng-show="attributeScope.clientSide" class="md-accent md-hue-2 md-raised" ng-click="sendAttributesToShared()">
+                <md-button ng-show="attributeScope.clientSide && attributeScope.value === types.attributesScope.client.value"
+                           class="md-accent md-hue-2 md-raised" ng-click="sendAttributesToShared()">
                     <md-tooltip md-direction="top">
                         {{ 'attribute.send-to-shared' | translate }}
                     </md-tooltip>

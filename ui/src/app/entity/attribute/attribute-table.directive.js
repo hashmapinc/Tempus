@@ -206,13 +206,13 @@ export default function AttributeTableDirective($compile, $templateCache, $rootS
 
                 attributeService.saveEntityAttributes(scope.entityType, scope.entityId, types.attributesScope.shared.value, sharedAttributes).then(
                     function success() {
-                        scope.getEntityAttributes();
                         $mdToast.show(
                             $mdToast.simple()
-                                .textContent('Attribute Send to Shared!')
+                                .textContent('Attribute Sent to Shared!')
                                 .position('bottom left')
                                 .hideDelay(2000)
                         );
+                        scope.attributeScope = types.attributesScope.shared;
                     }
                 );
             }
