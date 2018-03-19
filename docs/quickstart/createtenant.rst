@@ -80,5 +80,10 @@ We will choose the Display Activation Link option.
 
 5. You have now created the Tenant admin and should be logged in as the Tenant Administrator after activation
 
+**********************
+Proivision Your Device
+**********************
+
+
 
 
