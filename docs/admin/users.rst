@@ -24,6 +24,16 @@ Tenant administrator is display or resend a user thier activation link
     :align: center
     :alt: User activation links
 
+***********************
+Display activation link
+***********************
+
+Activation link is provided for a user to activate an account and create a password.
+
+.. image:: ../_images/admin/users_activate_link.png
+    :align: center
+    :alt: User activation links
+
 ********************
 Create user password
 ********************

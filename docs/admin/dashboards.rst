@@ -2,27 +2,27 @@
 Dashboards
 ##########
 
-***************************************
-Default IoT dashboard for customer user
-***************************************
+****************************************
+Default dashboard for business unit user
+****************************************
 
-Tempus allow you to define default IoT dashboard for your customer users in 2 simple steps:
+Tempus allow you to define default IoT dashboard for your business unit users in 2 simple steps:
 
-========================================
-Step 1. Assign IoT dashboard to customer
-========================================
+=========================================
+Step 1. Assign dashboard to business unit
+=========================================
 
 See embedded video tutorial above on tips how to do this.
 
-==================================
-Step 2. Open customer user details
-==================================
+=======================================
+Step 2. Open business unit user details
+=======================================
 
-Navigate to “**Customers** -> Your customer -> **Customer Users**” and toggle edit mode using ‘pencil’ button in the top-right corner of the screen.
+Navigate to “**Business Unit** -> Your business unit -> **Buinsess Unit Users**” and toggle edit mode using ‘pencil’ button in the top-right corner of the screen.
 
-============================
-Step 3. Select IoT dashboard
-============================
+========================
+Step 3. Select dashboard
+========================
 
 Select the IoT dashboard from the list and apply changes. Please note that you can also check the “Always Fullscreen” mode to prevent a user from navigating to different dashboards/screens.
 

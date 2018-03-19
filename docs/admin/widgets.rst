@@ -115,7 +115,7 @@ Below is an example of a Static widget - “HTML card” displaying specified ht
 Widgets Library (Bundles)
 *************************
 
-Widget definitions are grouped into widget bundles according to their purpose. There are System level and Tenant level **Widgets Bundles**. Initial ThingsBoard installation is shipped with the basic set of system level **Widgets Bundles**. There are more than thirty widgets in seven widget bundles available out-of-the-box. System level bundles can be managed by a **System administrator** and are available for use by any tenant in the system. Tenant level bundles can be managed by a **Tenant administrator** and are available for use only by this tenant and its customers. You can always implement and add your widgets by following this guide.
+Widget definitions are grouped into widget bundles according to their purpose. There are System level and Tenant level **Widgets Bundles**. Initial ThingsBoard installation is shipped with the basic set of system level **Widgets Bundles**. There are more than thirty widgets in seven widget bundles available out-of-the-box. System level bundles can be managed by a **System administrator** and are available for use by any tenant in the system. Tenant level bundles can be managed by a **Tenant administrator** and are available for use only by this tenant and its business units. You can always implement and add your widgets by following this guide.
 
 .. image:: ../_images/admin/widgets_bundles.png
     :align: center
