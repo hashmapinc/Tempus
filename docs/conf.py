@@ -128,7 +128,7 @@ latex_elements = {
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
     (master_doc, 'TempusDocumentation.tex', u'Tempus Documentation Documentation',
-     u'Hashmap, Inc', 'manual'),
+     u'Hashmap, Inc', 'howto'),
 ]
 
 

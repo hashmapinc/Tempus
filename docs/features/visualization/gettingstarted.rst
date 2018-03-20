@@ -189,7 +189,7 @@ Attributes
 
 The easiest way to create new dashboard is to select device attributes and show them on widget.
 
-.. image:: ../../images/attribDashboard.png
+.. image:: ../../_images/attribDashboard.png
     :align: center
     :alt: Attributes Selected
 
@@ -201,7 +201,7 @@ Once you click on “Show on widget” button, you will see a “widget preview�
 
 Select the Widget Bundle **Cards** and click the **>** until you get to the **Attributes Card** as shown below
 
-.. image:: ../../images/attributesCard.png
+.. image:: ../../_images/attributesCard.png
     :align: center
     :alt: Attributes card
 
@@ -209,7 +209,7 @@ Click **Add to Dashboard**
 
 Select **Create New Dashboard**
 
-.. image:: ../../images/newDashboard.png
+.. image:: ../../_images/newDashboard.png
     :align: center
     :alt: New Dashboard
 
@@ -221,13 +221,13 @@ Click on the **Latest Telemetry** tab
 
 Select the Telemetry values that you would like to monitor on the dashboard and click **Show on Widget**
 
-.. image:: ../../images/selectedLatestTele.png
+.. image:: ../../_images/selectedLatestTele.png
     :align: center
     :alt: Latest Telemetry Selected
 
 Under Cards choose **Time Series Table**
 
-.. image:: ../../images/timeSeriesTable.png
+.. image:: ../../_images/timeSeriesTable.png
     :align: center
     :alt: Time Series Table
 
@@ -237,7 +237,7 @@ This time select **Select Existing Dashboard**
 
 Click in the box that says **Select Dashboard** and choose the **Demo Dashboard** that we created above.
 
-.. image:: ../../images/selectExistingDashboard.png
+.. image:: ../../_images/selectExistingDashboard.png
     :align: center
     :alt: Existing Dashboard
 
@@ -247,6 +247,6 @@ Click **ADD**
 
 The 2 Widgets that were created in the steps above should now be shown.
 
-.. image:: ../../images/gettingStartedDashboard.png
+.. image:: ../../_images/gettingStartedDashboard.png
     :align: center
     :alt: New Dashboard
