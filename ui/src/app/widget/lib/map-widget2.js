@@ -27,6 +27,7 @@ export default class TbMapWidgetV2 {
     constructor(mapProvider, drawRoutes, ctx, useDynamicLocations, $element, mapObj) {
         var tbMap = this;
         this.ctx = ctx;
+        this.mapObj = mapObj;
         this.mapProvider = mapProvider;
         if (!$element) {
             $element = ctx.$container;
@@ -310,7 +311,12 @@ export default class TbMapWidgetV2 {
                         // Create or update marker
                         lat = latData[latData.length - 1][1];
                         lng = lngData[lngData.length - 1][1];
-                        latLng = tbMap.map.createLatLng(lat, lng);
+                        if(tbMap.mapProvider === 'arcgis-map'){
+                            latLng = tbMap.map.createLatLng(lat, lng, location.settings.labelText);
+                        }
+                        else{
+                            latLng = tbMap.map.createLatLng(lat, lng);
+                        }
                         if (!location.marker) {
                             location.marker = tbMap.map.createMarker(latLng, location.settings,
                                 function (event) {
@@ -334,7 +340,12 @@ export default class TbMapWidgetV2 {
         }
 
         function loadLocations(data, datasources) {
-            var bounds = tbMap.map.createBounds();
+            if(tbMap.mapProvider === 'arcgis-map'){
+                var bounds = tbMap.map.createBounds(tbMap.mapObj);
+            }
+            else {
+                bounds = tbMap.map.createBounds();
+            }
             tbMap.locations = [];
             var dataMap = toLabelValueMap(data, datasources);
             var currentDatasource = null;
@@ -396,7 +407,12 @@ export default class TbMapWidgetV2 {
 
         function updateLocations(data, datasources) {
             var locationsChanged = false;
-            var bounds = tbMap.map.createBounds();
+            if (tbMap.mapProvider === 'arcgis-map') {
+               var bounds = tbMap.map.createBounds(tbMap.mapObj);
+            }
+            else{
+                 bounds = tbMap.map.createBounds();
+            }
             var dataMap = toLabelValueMap(data, datasources);
             for (var p = 0; p < tbMap.locations.length; p++) {
                 var location = tbMap.locations[p];
@@ -434,7 +450,12 @@ export default class TbMapWidgetV2 {
         if (this.map && this.map.inited()) {
             this.map.invalidateSize();
             if (this.locations && this.locations.length > 0) {
-                var bounds = this.map.createBounds();
+                if(this.mapProvider === 'arcgis-map'){
+                    var bounds = this.map.createBounds(this.mapObj);
+                }
+                else {
+                    bounds = this.map.createBounds();
+                }
                 for (var m = 0; m < this.markers.length; m++) {
                     this.map.extendBoundsWithMarker(bounds, this.markers[m]);
                 }
