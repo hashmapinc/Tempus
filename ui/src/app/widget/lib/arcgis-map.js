@@ -65,6 +65,9 @@ export default class TbArcgisMap {
 
        var marker = this.mapObj.point(location.latitude, location.longitude, settings.labelText);
        this.map.map.add(marker);
+        if(settings.featureLayerURL !=="" && angular.isDefined(settings.featureLayerURL)){
+            this.map.map.add(this.mapObj.addFeatureLayer(settings.featureLayerURL));
+       }
 
         if (settings.showLabel) {
             // marker.tooltipOffset = [0, -height + 10];
@@ -159,7 +162,7 @@ export default class TbArcgisMap {
 
     fitBounds() {
         if (this.dontFitMapBounds && this.defaultZoomLevel) {
-                this.map.setZoom(this.defaultZoomLevel, {animate: false});
+                this.zoom = this.defaultZoomLevel;
         }
         else {
             this.zoom = 10;
@@ -181,9 +184,12 @@ export default class TbArcgisMap {
         // }
     }
 
-      createLatLng(lat, lng, labelText) {
+      createLatLng(lat, lng, labelText, featureLayerURL) {
         var point = this.mapObj.point(lat, lng, labelText);
         this.map.map.add(point);
+        if(featureLayerURL !=="" && angular.isDefined(featureLayerURL)){
+            this.map.map.add(this.mapObj.addFeatureLayer(featureLayerURL));
+        }
         return point.graphics.items[0].geometry;
       }
 
