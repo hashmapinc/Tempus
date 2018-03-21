@@ -73,7 +73,7 @@ public class SqlDatabaseSchemaService implements DatabaseSchemaService {
             List<String> executedUpgrades = new ArrayList<>();
             ResultSet rs = conn.createStatement().executeQuery("select "+ ModelConstants.INSTALLED_SCRIPTS_COLUMN + " from "+ ModelConstants.INSTALLED_SCHEMA_VERSIONS);
             while (rs.next()) {
-                executedUpgrades.add(rs.getString(ModelConstants.INSTALLED_SCHEMA_VERSIONS));
+                executedUpgrades.add(rs.getString(ModelConstants.INSTALLED_SCRIPTS_COLUMN));
             }
 
             List<Integer> sortedScriptsIndexes = Files.list(upgradeScriptsDirectory).map(a -> stripExtensionFromName(a.getFileName().toString())).sorted().collect(Collectors.toList());
