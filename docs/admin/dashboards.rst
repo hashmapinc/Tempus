@@ -38,7 +38,7 @@ IoT Dashboard import/export
 Dashboard export
 ================
 
-You are able to export your dashboard to JSON format and import it to the same or another ThingsBoard instance.
+You are able to export your dashboard to JSON format and import it to the same or another Tempus instance.
 In order to export dashboard, you should navigate to the Dashboards page and click on the export button located on the particular dashboard card.
 
 .. image:: ../_images/admin/dashboards_export.png

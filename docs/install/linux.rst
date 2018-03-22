@@ -74,7 +74,7 @@ When it’s done, connect to the database and create Tempus Cloud DB:
 .. code-block:: bash
 
     psql -U postgres -d postgres -h 127.0.0.1 -W
-    CREATE DATABASE thingsboard;
+    CREATE DATABASE Tempus;
     \q
 
 NoSQL Database: Cassandra
@@ -144,7 +144,7 @@ Edit Tempus Cloud configuration file
 
 .. code-block:: bash
 
-    sudo nano /etc/thingsboard/conf/thingsboard.yml
+    sudo nano /etc/Tempus/conf/Tempus.yml
 
 Comment ‘# HSQLDB DAO Configuration’ block.
 
@@ -162,7 +162,7 @@ Comment ‘# HSQLDB DAO Configuration’ block.
     #    database-platform: "org.hibernate.dialect.HSQLDialect"
     #  datasource:
     #    driverClassName: "${SPRING_DRIVER_CLASS_NAME:org.hsqldb.jdbc.JDBCDriver}"
-    #    url: "${SPRING_DATASOURCE_URL:jdbc:hsqldb:file:${SQL_DATA_FOLDER:/tmp}/thingsboardDb;sql.enforce_size=false}"
+    #    url: "${SPRING_DATASOURCE_URL:jdbc:hsqldb:file:${SQL_DATA_FOLDER:/tmp}/TempusDb;sql.enforce_size=false}"
     #    username: "${SPRING_DATASOURCE_USERNAME:sa}"
     #    password: "${SPRING_DATASOURCE_PASSWORD:}"
 
@@ -184,7 +184,7 @@ Uncomment ‘# PostgreSQL DAO Configuration’ block. Be sure to update the post
         database-platform: "org.hibernate.dialect.PostgreSQLDialect"
     datasource:
         driverClassName: "${SPRING_DRIVER_CLASS_NAME:org.postgresql.Driver}"
-        url: "${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/thingsboard}"
+        url: "${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/Tempus}"
         username: "${SPRING_DATASOURCE_USERNAME:postgres}"
         password: "${SPRING_DATASOURCE_PASSWORD:postgres}"
 
@@ -206,7 +206,7 @@ For Tempus Cloud service:
 
 .. code-block:: bash
 
-    # Update ThingsBoard memory usage and restrict it to 256MB in /etc/thingsboard/conf/thingsboard.conf
+    # Update Tempus memory usage and restrict it to 256MB in /etc/Tempus/conf/Tempus.conf
     export JAVA_OPTS="$JAVA_OPTS -Xms256M -Xmx256M"
 
 ***********************
@@ -218,7 +218,7 @@ Once Tempus Cloud service is installed, you can execute the following script:
 .. code-block:: bash
 
     # --loadDemo option will load demo data: users, devices, assets, rules, widgets.
-    sudo /usr/share/thingsboard/bin/install/install.sh --loadDemo
+    sudo /usr/share/Tempus/bin/install/install.sh --loadDemo
 
 **************************
 Start Tempus Cloud service

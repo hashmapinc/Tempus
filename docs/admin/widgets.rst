@@ -115,7 +115,7 @@ Below is an example of a Static widget - “HTML card” displaying specified ht
 Widgets Library (Bundles)
 *************************
 
-Widget definitions are grouped into widget bundles according to their purpose. There are System level and Tenant level **Widgets Bundles**. Initial ThingsBoard installation is shipped with the basic set of system level **Widgets Bundles**. There are more than thirty widgets in seven widget bundles available out-of-the-box. System level bundles can be managed by a **System administrator** and are available for use by any tenant in the system. Tenant level bundles can be managed by a **Tenant administrator** and are available for use only by this tenant and its business units. You can always implement and add your widgets by following this guide.
+Widget definitions are grouped into widget bundles according to their purpose. There are System level and Tenant level **Widgets Bundles**. Initial Tempus installation is shipped with the basic set of system level **Widgets Bundles**. There are more than thirty widgets in seven widget bundles available out-of-the-box. System level bundles can be managed by a **System administrator** and are available for use by any tenant in the system. Tenant level bundles can be managed by a **Tenant administrator** and are available for use only by this tenant and its business units. You can always implement and add your widgets by following this guide.
 
 .. image:: ../_images/admin/widgets_bundles.png
     :align: center
@@ -207,7 +207,7 @@ Widgets Bundles import/export
 Widgets Bundle export
 =====================
 
-You are able to export widgets bundle to JSON format and import it to the same or another ThingsBoard instance.
+You are able to export widgets bundle to JSON format and import it to the same or another Tempus instance.
 In order to export widgets bundle, you should navigate to the Widgets Library page and click on the export button located on the particular widgets bundle card.
 
 .. image:: ../_images/admin/widgets_export_bundle.png
@@ -237,7 +237,7 @@ Widgets Types import/export
 Widget Type export
 ==================
 
-You are able to export particular widget type from widgets bundle to JSON format and import it to the same or another ThingsBoard instance.
+You are able to export particular widget type from widgets bundle to JSON format and import it to the same or another Tempus instance.
 In order to export widget type, you should navigate to the Widgets Library page, then open desired widgets bundle and finally click on the export button located on the particular widget type card.
 
 .. image:: ../_images/admin/widgets_type_export.png

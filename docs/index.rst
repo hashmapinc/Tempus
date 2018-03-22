@@ -56,6 +56,7 @@ Contents
    api/index
    security/index
    admin/index
+   reference/index
 
 Indices and tables
 ==================

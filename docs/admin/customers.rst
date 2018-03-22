@@ -44,9 +44,9 @@ Tenant administrator is able to manage business unit assets.
     :align: center
     :alt: Manage business unit assets
 
-==========================
+==============================
 Assign assets to business unit
-==========================
+==============================
 
 Tenant administrator is able assign assets to a business unit. 
 
