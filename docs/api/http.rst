@@ -53,6 +53,7 @@ The simplest supported data formats are:
 .. code-block:: json
 
     {"key1":"value1", "key2":"value2"}
+    
 or
 
 .. code-block:: json

@@ -12,6 +12,4 @@ Platforms
     :maxdepth: 1
 
     linux
-    rpi
-    aws
   

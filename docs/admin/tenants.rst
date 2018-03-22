@@ -2,7 +2,7 @@
 Tenants
 #######
 
-Tempus support `Multitenancy <https://en.wikipedia.org/wiki/Multitenancy/>`_ out-of-the-box. You can treat ThingsBoard tenant as a separate business-entity: individual or organization who owns or produce devices.
+Tempus support `Multitenancy <https://en.wikipedia.org/wiki/Multitenancy/>`_ out-of-the-box. You can treat Tempus tenant as a separate business-entity: individual or organization who owns or produce devices.
 
 **System administrator** is able to create tenant entities.
 
