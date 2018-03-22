@@ -91,12 +91,10 @@ public class CassandraBaseComputationsDao extends CassandraAbstractSearchTextDao
 
     @Override
     public List<Computations> findByTenantId(TenantId tenantId) {
-        log.info("Going to fetch computations by tenant Id : " + tenantId );
         Select select = select().from(ModelConstants.COMPUTATIONS_COLUMN_FAMILY_NAME).allowFiltering();
         Select.Where query = select.where();
         query.and(eq(ModelConstants.COMPUTATIONS_TENANT_ID, tenantId.getId()));
         List<ComputationsEntity> computationsEntities = findListByStatement(query);
-        log.info("computationsEntities returned " + computationsEntities);
         return DaoUtil.convertDataList(computationsEntities);
     }
 

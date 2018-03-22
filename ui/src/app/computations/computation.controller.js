@@ -21,7 +21,7 @@ import computationCard from './computation-card.tpl.html';
 /* eslint-enable import/no-unresolved, import/default */
 
 /*@ngInject*/
-export default function ComputationController(computationService, $log, userService, importExport, $state, $stateParams, $translate, types) {
+export default function ComputationController(computationService, userService, importExport, $state, $stateParams, $translate, types) {
 
     var computationActionsList = [
         {
@@ -106,7 +106,6 @@ export default function ComputationController(computationService, $log, userServ
         if ($event) {
             $event.stopPropagation();
         }
-        $log.log("Computaion json " + computation.id.id);
         $state.go('home.computations.computationJob',{computationId: computation.id.id});
     }
 
