@@ -729,11 +729,12 @@ export default class Subscription {
         this.callbacks.dataLoading(this);
     }
 
-    updateTimewindow() {
+    updateTimewindow(maxTime) {
         this.timeWindow.interval = this.subscriptionTimewindow.aggregation.interval || 1000;
         if (this.subscriptionTimewindow.realtimeWindowMs) {
-            this.timeWindow.maxTime = (new Date).getTime() + this.timeWindow.stDiff;
-            this.timeWindow.minTime = this.timeWindow.maxTime - this.subscriptionTimewindow.realtimeWindowMs;
+            var windowProportion = 0.8;
+            this.timeWindow.maxTime = maxTime + this.subscriptionTimewindow.realtimeWindowMs * (1 - windowProportion);//(new Date).getTime() + this.timeWindow.stDiff;
+            this.timeWindow.minTime = maxTime - this.subscriptionTimewindow.realtimeWindowMs * windowProportion;//this.timeWindow.maxTime - this.subscriptionTimewindow.realtimeWindowMs;
         } else if (this.subscriptionTimewindow.fixedWindow) {
             this.timeWindow.maxTime = this.subscriptionTimewindow.fixedWindow.endTimeMs;
             this.timeWindow.minTime = this.subscriptionTimewindow.fixedWindow.startTimeMs;
@@ -774,7 +775,7 @@ export default class Subscription {
                     this.depthWindowConfig,
                     this.depthWindow.stDiff, this.stateData);
         }
-        this.updateDepthwindow();
+        this.updateDepthwindow(this.depthWindow.maxDepth);
         return this.subscriptionDepthwindow;
     }
 
@@ -799,17 +800,45 @@ export default class Subscription {
             }
         }
         if (update) {
-            if (this.subscriptionTimewindow && this.subscriptionTimewindow.realtimeWindowMs) {
-                this.updateTimewindow();
+
+            var sourceDataTmp = {
+                data: []
             }
 
-            if (this.subscriptionDepthwindow && this.subscriptionDepthwindow.realtimeWindowFt) {
-                if(currentData.data.length > 1)
-                    this.updateDepthwindow(currentData.data[currentData.data.length - 1][0]);
+            if (this.subscriptionTimewindow && this.subscriptionTimewindow.realtimeWindowMs) {
+                currentData.data = sourceData.data;
+                if(currentData.data.length > 1) {
+                    var tmpMax = currentData.data[currentData.data.length - 1][0];
+                    this.updateTimewindow(tmpMax);
+                    for (var i = 0; i < currentData.data.length; i++) {
+                        if (sourceData.data[i][0] >= (tmpMax - this.subscriptionTimewindow.realtimeWindowMs * (0.8))) {
+                            sourceDataTmp.data.push(sourceData.data[i]);
+                        }
+                    }
+                }
             }
+
+            else if (this.subscriptionDepthwindow && this.subscriptionDepthwindow.realtimeWindowFt) {
+                currentData.data = sourceData.data;
+                if(currentData.data.length > 1) {
+                    tmpMax = currentData.data[currentData.data.length - 1][0];
+                    this.updateDepthwindow(tmpMax);
+                    for(i = 0; i < currentData.data.length; i++)
+                    {
+                        if(sourceData.data[i][0] >= (tmpMax - this.subscriptionDepthwindow.realtimeWindowFt * (0.8))){
+                            sourceDataTmp.data.push(sourceData.data[i]);
+                        }
+                    }
+                }
+            }
+
+            else {
+                sourceDataTmp.data = sourceData.data;
+            }
+
             currentData.data = sourceData.data;
             if (this.caulculateLegendData) {
-                this.updateLegend(datasourceIndex + dataKeyIndex, sourceData.data, apply);
+                this.updateLegend(datasourceIndex + dataKeyIndex, sourceDataTmp.data, apply);
             }
             this.onDataUpdated(apply);
         }
@@ -837,6 +866,7 @@ export default class Subscription {
         }
         if (this.legendConfig.showAvg) {
             legendKeyData.avg = this.ctx.widgetUtils.formatValue(calculateAvg(data), decimals, units);
+            legendKeyData
         }
         if (this.legendConfig.showTotal) {
             legendKeyData.total = this.ctx.widgetUtils.formatValue(calculateTotal(data), decimals, units);

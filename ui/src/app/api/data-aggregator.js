@@ -107,6 +107,7 @@ export default class DataAggregator {
             }
             this.onInterval(history, apply);
         } else {
+            updateAggregationMap(this.aggregationMap, this.data, this.startTs, this.timeWindow);
             updateAggregatedData(this.aggregationMap, this.aggregationType === this.types.aggregation.count.value,
                 this.noAggregation, this.aggFunction, data.data, this.interval, this.startTs);
             if (history) {
@@ -154,18 +155,17 @@ export default class DataAggregator {
         for (var key in this.aggregationMap) {
             var aggKeyData = this.aggregationMap[key];
             var keyData = this.dataBuffer[key];
-            for (var aggTimestamp in aggKeyData) {
+            var aggTimestamp;
+            for (aggTimestamp in aggKeyData) {
                 if (aggTimestamp <= this.startTs) {
                     if (this.stateData &&
                         (!this.lastPrevKvPairData[key] || this.lastPrevKvPairData[key][0] < aggTimestamp)) {
                         this.lastPrevKvPairData[key] = [Number(aggTimestamp), aggKeyData[aggTimestamp].aggValue];
                     }
-                    delete aggKeyData[aggTimestamp];
-                } else if (aggTimestamp <= this.endTs) {
-                    var aggData = aggKeyData[aggTimestamp];
-                    var kvPair = [Number(aggTimestamp), aggData.aggValue];
-                    keyData.push(kvPair);
                 }
+                var aggData = aggKeyData[aggTimestamp];
+                var kvPair = [Number(aggTimestamp), aggData.aggValue];
+                keyData.push(kvPair);
             }
             keyData = this.$filter('orderBy')(keyData, '+this[0]');
             if (this.stateData) {
@@ -273,6 +273,17 @@ function updateAggregatedData(aggregationMap, isCount, noAggregation, aggFunctio
             } else {
                 aggFunction(aggData, value);
             }
+        }
+    }
+}
+
+function updateAggregationMap(aggregationMap, data, startTs, timeWindow) {
+    for (var key in data) {
+        var aggKeyData = aggregationMap[key];
+        // added to delete stale data points.
+        for (var aggrTimestamp in aggKeyData) {
+            if (aggrTimestamp <= (startTs - timeWindow))
+                delete aggKeyData[aggrTimestamp];
         }
     }
 }

@@ -1246,6 +1246,8 @@ export default angular.module('thingsboard.locale', [])
                 },
                 "depthinterval": {
                     "feet-interval": "{ feet, select, 1 {1 feet} other {# feet} }",
+                    "feet": "Feet",
+                    "advanced": "Advanced"
                 },
                 "timewindow": {
                     "days": "{ days, select, 1 { day } other {# days } }",

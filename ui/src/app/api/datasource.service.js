@@ -277,7 +277,6 @@ function DatasourceSubscription(datasourceSubscription, telemetryWebsocketServic
             if (tsKeys.length > 0) {
 
                 var subscriber;
-
                 if (history) {
 
                     var historyCommand = {
@@ -527,7 +526,7 @@ function DatasourceSubscription(datasourceSubscription, telemetryWebsocketServic
                                 if (this.subsDw.aggregation.stateData && !this.stateDataReceived) {
                                     if (this.firstStateData) {
                                         onStateDepthHistoryData(this.firstStateData, data, this.subsDw.aggregation.limit,
-                                            this.subsDw.startDs, this.subsDw.startDs + this.subsTw.aggregation.depthWindow,
+                                            this.subsDw.startDs, this.subsDw.startDs + this.subsDw.aggregation.depthWindow,
                                             (data) => {
                                                 dataAggregator.onData(data, false, false, true);
                                             });
