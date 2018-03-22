@@ -126,6 +126,11 @@ export default class TbMapWidgetV2 {
             this.locationSettings.lngKeyName = this.ctx.settings.yPosKeyName || 'yPos';
             this.locationSettings.markerOffsetX = angular.isDefined(this.ctx.settings.markerOffsetX) ? this.ctx.settings.markerOffsetX : 0.5;
             this.locationSettings.markerOffsetY = angular.isDefined(this.ctx.settings.markerOffsetY) ? this.ctx.settings.markerOffsetY : 1;
+        } 
+        if(this.mapProvider  == 'arcgis-map') {
+            this.locationSettings.latKeyName = this.ctx.settings.latKeyName || 'latitude';
+            this.locationSettings.lngKeyName = this.ctx.settings.lngKeyName || 'longitude';
+            this.locationSettings.featureLayerURL = this.ctx.settings.featureLayerURL;
         } else {
             this.locationSettings.latKeyName = this.ctx.settings.latKeyName || 'latitude';
             this.locationSettings.lngKeyName = this.ctx.settings.lngKeyName || 'longitude';
@@ -278,7 +283,12 @@ export default class TbMapWidgetV2 {
                         for (var i = 0; i < latData.length; i++) {
                             lat = latData[i][1];
                             lng = lngData[i][1];
-                            latLng = tbMap.map.createLatLng(lat, lng);
+                            if(tbMap.mapProvider === 'arcgis-map'){
+                                 latLng = tbMap.map.createLatLng(lat, lng, location.settings.labelText, location.settings.featureLayerURL);
+                            }
+                            else{
+                                latLng = tbMap.map.createLatLng(lat, lng);
+                            }
                             if (i == 0 || !latLngs[latLngs.length - 1].equals(latLng)) {
                                 latLngs.push(latLng);
                             }
@@ -312,7 +322,7 @@ export default class TbMapWidgetV2 {
                         lat = latData[latData.length - 1][1];
                         lng = lngData[lngData.length - 1][1];
                         if(tbMap.mapProvider === 'arcgis-map'){
-                            latLng = tbMap.map.createLatLng(lat, lng, location.settings.labelText);
+                            latLng = tbMap.map.createLatLng(lat, lng, location.settings.labelText, location.settings.featureLayerURL);
                         }
                         else{
                             latLng = tbMap.map.createLatLng(lat, lng);
@@ -578,11 +588,16 @@ const arcgisMapSettingsSchema =
             "title":"ArcGISy Map Configuration",
             "type":"object",
             "properties":{
+                "featureLayerURL":{
+                    "title":"Feature Layer URL",
+                    "type":"string"
+                }
             },
             "required":[
             ]
         },
         "form":[
+            "featureLayerURL"
         ]
     };
 

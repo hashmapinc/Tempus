@@ -212,7 +212,7 @@ public class JsonConverter {
 
     private static Consumer<AttributeKvEntry> addToObject(JsonObject result) {
         return de -> {
-            JsonPrimitive value;
+            JsonElement value;
             switch (de.getDataType()) {
                 case BOOLEAN:
                     value = new JsonPrimitive(de.getBooleanValue().get());
@@ -225,6 +225,11 @@ public class JsonConverter {
                     break;
                 case STRING:
                     value = new JsonPrimitive(de.getStrValue().get());
+                    break;
+                case JSON:
+                    String jsonString = de.getJsonValue().get().toString();
+                    JsonParser parser = new JsonParser();
+                    value = parser.parse(jsonString);
                     break;
                 default:
                     throw new IllegalArgumentException("Unsupported data type: " + de.getDataType());

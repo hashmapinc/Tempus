@@ -112,7 +112,7 @@ In the example above, we assume that “1451649600512” is a unix timestamp wit
 Telemetry upload API
 ********************
 
-In order to support depth data, the administrator must first configure Tempus to handle depth data. This is done by chaning the configuration in thingsboard.yml and uner the heading **UI Related configuration** set depthSeries to true: 
+In order to support depth data, the administrator must first configure Tempus to handle depth data. This is done by chaning the configuration in Tempus.yml and uner the heading **UI Related configuration** set depthSeries to true: 
 
 .. code-block:: yaml
 

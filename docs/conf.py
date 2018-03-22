@@ -26,7 +26,7 @@ author = u'Hashmap, Inc'
 # The short X.Y version
 version = u''
 # The full version, including alpha/beta/rc tags
-release = u'1.0'
+release = u'1.3'
 
 
 # -- General configuration ---------------------------------------------------
@@ -127,8 +127,8 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-    (master_doc, 'TempusDocumentation.tex', u'Tempus Documentation Documentation',
-     u'Hashmap, Inc', 'manual'),
+    (master_doc, 'TempusDocumentation.tex', u'Tempus Documentation',
+     u'Hashmap, Inc', 'howto'),
 ]
 
 
@@ -137,7 +137,7 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    (master_doc, 'tempusdocumentation', u'Tempus Documentation Documentation',
+    (master_doc, 'tempusdocumentation', u'Tempus Documentation',
      [author], 1)
 ]
 
@@ -148,7 +148,7 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-    (master_doc, 'TempusDocumentation', u'Tempus Documentation Documentation',
+    (master_doc, 'TempusDocumentation', u'Tempus Documentation',
      author, 'TempusDocumentation', 'One line description of project.',
      'Miscellaneous'),
 ]
