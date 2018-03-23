@@ -1309,6 +1309,7 @@ export default angular.module('thingsboard.locale', [])
                     "activation-method": "Activation method",
                     "display-activation-link": "Display activation link",
                     "send-activation-mail": "Send activation mail",
+                    "external-no-activation": "External - No Activation",
                     "activation-link": "User activation link",
                     "activation-link-text": "In order to activate user use the following <a href='{{activationLink}}' target='_blank'>activation link</a> :",
                     "copy-activation-link": "Copy activation link",

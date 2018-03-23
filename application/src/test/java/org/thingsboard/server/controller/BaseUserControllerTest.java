@@ -29,6 +29,7 @@ import org.thingsboard.server.common.data.id.TenantId;
 import org.thingsboard.server.common.data.page.TextPageData;
 import org.thingsboard.server.common.data.page.TextPageLink;
 import org.thingsboard.server.common.data.security.Authority;
+import org.thingsboard.server.common.data.security.UserCredentials;
 import org.thingsboard.server.service.mail.TestMailService;
 
 import java.util.ArrayList;
@@ -42,6 +43,38 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public abstract class BaseUserControllerTest extends AbstractControllerTest {
     
     private IdComparator<User> idComparator = new IdComparator<>();
+
+    @Test
+    public void testSaveExternalUser() throws Exception {
+        loginSysAdmin();
+
+        Tenant tenant = new Tenant();
+        tenant.setTitle("My tenant");
+        Tenant savedTenant = doPost("/api/tenant", tenant, Tenant.class);
+        Assert.assertNotNull(savedTenant);
+
+        String email = "tenant2@thingsboard.org";
+        User user = new User();
+        user.setAuthority(Authority.TENANT_ADMIN);
+        user.setTenantId(savedTenant.getId());
+        user.setEmail(email);
+        user.setFirstName("Joe");
+        user.setLastName("Downs");
+        User savedUser = doPost("/api/user?activationType=external", user, User.class);
+        Assert.assertNotNull(savedUser);
+        Assert.assertNotNull(savedUser.getId());
+        Assert.assertTrue(savedUser.getCreatedTime() > 0);
+        Assert.assertEquals(user.getEmail(), savedUser.getEmail());
+        if(ldapEnabled) {
+            createLDAPEntry(email, "tenant2");
+            login(email, "tenant2");
+
+            doGet("/api/auth/user")
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.authority",is(Authority.TENANT_ADMIN.name())))
+                    .andExpect(jsonPath("$.email",is(email)));
+        }
+    }
 
     @Test
     public void testSaveUser() throws Exception {
@@ -59,7 +92,7 @@ public abstract class BaseUserControllerTest extends AbstractControllerTest {
         user.setEmail(email);
         user.setFirstName("Joe");
         user.setLastName("Downs");
-        User savedUser = doPost("/api/user", user, User.class);
+        User savedUser = doPost("/api/user?activationType=mail", user, User.class);
         Assert.assertNotNull(savedUser);
         Assert.assertNotNull(savedUser.getId());
         Assert.assertTrue(savedUser.getCreatedTime() > 0);
@@ -164,7 +197,7 @@ public abstract class BaseUserControllerTest extends AbstractControllerTest {
         user.setFirstName("Joe");
         user.setLastName("Downs");
         
-        User savedUser = doPost("/api/user", user, User.class);
+        User savedUser = doPost("/api/user?activationType=mail", user, User.class);
         User foundUser = doGet("/api/user/"+savedUser.getId().getId().toString(), User.class); 
         Assert.assertNotNull(foundUser);
         Assert.assertEquals(savedUser, foundUser);
@@ -190,7 +223,7 @@ public abstract class BaseUserControllerTest extends AbstractControllerTest {
         user.setFirstName("Joe");
         user.setLastName("Downs");
         
-        doPost("/api/user", user)
+        doPost("/api/user?activationType=mail", user)
         .andExpect(status().isBadRequest())
         .andExpect(statusReason(containsString("User with email '" + email + "'  already present in database")));
         
@@ -215,7 +248,7 @@ public abstract class BaseUserControllerTest extends AbstractControllerTest {
         user.setFirstName("Joe");
         user.setLastName("Downs");
         
-        doPost("/api/user", user)
+        doPost("/api/user?activationType=mail", user)
         .andExpect(status().isBadRequest())
         .andExpect(statusReason(containsString("Invalid email address format '" + email + "'")));
         
@@ -238,7 +271,7 @@ public abstract class BaseUserControllerTest extends AbstractControllerTest {
         user.setFirstName("Joe");
         user.setLastName("Downs");
         
-        doPost("/api/user", user)
+        doPost("/api/user?activationType=mail", user)
         .andExpect(status().isBadRequest())
         .andExpect(statusReason(containsString("User email should be specified")));
         
@@ -256,7 +289,7 @@ public abstract class BaseUserControllerTest extends AbstractControllerTest {
         user.setFirstName("Joe");
         user.setLastName("Downs");
         
-        doPost("/api/user", user)
+        doPost("/api/user?activationType=mail", user)
         .andExpect(status().isBadRequest())
         .andExpect(statusReason(containsString("Tenant administrator should be assigned to tenant")));
     }
@@ -278,7 +311,7 @@ public abstract class BaseUserControllerTest extends AbstractControllerTest {
         user.setFirstName("Joe");
         user.setLastName("Downs");
         
-        User savedUser = doPost("/api/user", user, User.class);
+        User savedUser = doPost("/api/user?activationType=mail", user, User.class);
         User foundUser = doGet("/api/user/"+savedUser.getId().getId().toString(), User.class); 
         Assert.assertNotNull(foundUser);
         
@@ -309,7 +342,7 @@ public abstract class BaseUserControllerTest extends AbstractControllerTest {
             user.setAuthority(Authority.TENANT_ADMIN);
             user.setTenantId(tenantId);
             user.setEmail("testTenant" + i + "@thingsboard.org");
-            tenantAdmins.add(doPost("/api/user", user, User.class));
+            tenantAdmins.add(doPost("/api/user?activationType=mail", user, User.class));
         }
         
         List<User> loadedTenantAdmins = new ArrayList<>();
@@ -362,7 +395,7 @@ public abstract class BaseUserControllerTest extends AbstractControllerTest {
             String email = email1+suffix+ "@thingsboard.org";
             email = i % 2 == 0 ? email.toLowerCase() : email.toUpperCase();
             user.setEmail(email);
-            tenantAdminsEmail1.add(doPost("/api/user", user, User.class));
+            tenantAdminsEmail1.add(doPost("/api/user?activationType=mail", user, User.class));
         }
         
         String email2 = "testEmail2";        
@@ -376,7 +409,7 @@ public abstract class BaseUserControllerTest extends AbstractControllerTest {
             String email = email2+suffix+ "@thingsboard.org";
             email = i % 2 == 0 ? email.toLowerCase() : email.toUpperCase();
             user.setEmail(email);
-            tenantAdminsEmail2.add(doPost("/api/user", user, User.class));
+            tenantAdminsEmail2.add(doPost("/api/user?activationType=mail", user, User.class));
         }
         
         List<User> loadedTenantAdminsEmail1 = new ArrayList<>();
@@ -469,7 +502,7 @@ public abstract class BaseUserControllerTest extends AbstractControllerTest {
             user.setAuthority(Authority.CUSTOMER_USER);
             user.setCustomerId(customerId);
             user.setEmail("testCustomer" + i + "@thingsboard.org");
-            customerUsers.add(doPost("/api/user", user, User.class));
+            customerUsers.add(doPost("/api/user?activationType=mail", user, User.class));
         }
         
         List<User> loadedCustomerUsers = new ArrayList<>();
@@ -534,7 +567,7 @@ public abstract class BaseUserControllerTest extends AbstractControllerTest {
             String email = email1+suffix+ "@thingsboard.org";
             email = i % 2 == 0 ? email.toLowerCase() : email.toUpperCase();
             user.setEmail(email);
-            customerUsersEmail1.add(doPost("/api/user", user, User.class));
+            customerUsersEmail1.add(doPost("/api/user?activationType=mail", user, User.class));
         }
         
         String email2 = "testEmail2";        
@@ -548,7 +581,7 @@ public abstract class BaseUserControllerTest extends AbstractControllerTest {
             String email = email2+suffix+ "@thingsboard.org";
             email = i % 2 == 0 ? email.toLowerCase() : email.toUpperCase();
             user.setEmail(email);
-            customerUsersEmail2.add(doPost("/api/user", user, User.class));
+            customerUsersEmail2.add(doPost("/api/user?activationType=mail", user, User.class));
         }
         
         List<User> loadedCustomerUsersEmail1 = new ArrayList<>();
