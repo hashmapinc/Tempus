@@ -114,9 +114,19 @@ public class DefaultSystemDataLoaderService implements SystemDataLoaderService {
         return new BCryptPasswordEncoder();
     }
 
+    @Value("${ldap.admin-email}")
+    private String adminEmail;
+
+    @Value("${ldap.authentication-enabled}")
+    private boolean isLdapEnabled;
+
     @Override
     public void createSysAdmin() {
-        createUser(Authority.SYS_ADMIN, null, null, "sysadmin@thingsboard.org", "sysadmin");
+        if(isLdapEnabled) {
+            createUser(Authority.SYS_ADMIN, null, null, adminEmail, null, true);
+        } else {
+            createUser(Authority.SYS_ADMIN, null, null, "sysadmin@hashmapinc.com", "sysadmin", false);
+        }
     }
 
     @Override
@@ -192,7 +202,7 @@ public class DefaultSystemDataLoaderService implements SystemDataLoaderService {
         demoTenant.setRegion("Global");
         demoTenant.setTitle("Tenant");
         demoTenant = tenantService.saveTenant(demoTenant);
-        createUser(Authority.TENANT_ADMIN, demoTenant.getId(), null, "tenant@thingsboard.org", "tenant");
+        createUser(Authority.TENANT_ADMIN, demoTenant.getId(), null, "tenant@hashmapinc.com", "tenant", false);
 
         Customer customerA = new Customer();
         customerA.setTenantId(demoTenant.getId());
@@ -206,10 +216,10 @@ public class DefaultSystemDataLoaderService implements SystemDataLoaderService {
         customerC.setTenantId(demoTenant.getId());
         customerC.setTitle("Customer C");
         customerC = customerService.saveCustomer(customerC);
-        createUser(Authority.CUSTOMER_USER, demoTenant.getId(), customerA.getId(), "customer@thingsboard.org", "customer");
-        createUser(Authority.CUSTOMER_USER, demoTenant.getId(), customerA.getId(), "customerA@thingsboard.org", "customer");
-        createUser(Authority.CUSTOMER_USER, demoTenant.getId(), customerB.getId(), "customerB@thingsboard.org", "customer");
-        createUser(Authority.CUSTOMER_USER, demoTenant.getId(), customerC.getId(), "customerC@thingsboard.org", "customer");
+        createUser(Authority.CUSTOMER_USER, demoTenant.getId(), customerA.getId(), "customer@thingsboard.org", "customer", false);
+        createUser(Authority.CUSTOMER_USER, demoTenant.getId(), customerA.getId(), "customerA@thingsboard.org", "customer", false);
+        createUser(Authority.CUSTOMER_USER, demoTenant.getId(), customerB.getId(), "customerB@thingsboard.org", "customer", false);
+        createUser(Authority.CUSTOMER_USER, demoTenant.getId(), customerC.getId(), "customerC@thingsboard.org", "customer", false);
 
         createDevice(demoTenant.getId(), customerA.getId(), "default", "Test Device A1", "A1_TEST_TOKEN", null);
         createDevice(demoTenant.getId(), customerA.getId(), "default", "Test Device A2", "A2_TEST_TOKEN", null);
@@ -240,18 +250,23 @@ public class DefaultSystemDataLoaderService implements SystemDataLoaderService {
                             TenantId tenantId,
                             CustomerId customerId,
                             String email,
-                            String password) {
+                            String password,
+                            boolean isExternalUser) {
         User user = new User();
         user.setAuthority(authority);
         user.setEmail(email);
         user.setTenantId(tenantId);
         user.setCustomerId(customerId);
-        user = userService.saveUser(user);
-        UserCredentials userCredentials = userService.findUserCredentialsByUserId(user.getId());
-        userCredentials.setPassword(passwordEncoder.encode(password));
-        userCredentials.setEnabled(true);
-        userCredentials.setActivateToken(null);
-        userService.saveUserCredentials(userCredentials);
+        if(isExternalUser) {
+            user = userService.saveExternalUser(user);
+        } else {
+            user = userService.saveUser(user);
+            UserCredentials userCredentials = userService.findUserCredentialsByUserId(user.getId());
+            userCredentials.setPassword(passwordEncoder.encode(password));
+            userCredentials.setEnabled(true);
+            userCredentials.setActivateToken(null);
+            userService.saveUserCredentials(userCredentials);
+        }
         return user;
     }
 

@@ -15,6 +15,7 @@
  */
 package org.thingsboard.server.controller;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -36,6 +37,7 @@ import javax.servlet.http.HttpServletRequest;
 
 @RestController
 @RequestMapping("/api")
+@Slf4j
 public class UserController extends BaseController {
 
     @Autowired
@@ -61,22 +63,26 @@ public class UserController extends BaseController {
 
     @PreAuthorize("hasAnyAuthority('SYS_ADMIN', 'TENANT_ADMIN', 'CUSTOMER_USER')")
     @RequestMapping(value = "/user", method = RequestMethod.POST)
-    @ResponseBody 
+    @ResponseBody
     public User saveUser(@RequestBody User user,
-                         @RequestParam(required = false, defaultValue = "true") boolean sendActivationMail,
-            HttpServletRequest request) throws ThingsboardException {
+                         @RequestParam String activationType,
+                         HttpServletRequest request) throws ThingsboardException {
+
         try {
+            // activationType = "mail", "link", "external"
             SecurityUser authUser = getCurrentUser();
             if (authUser.getAuthority() == Authority.CUSTOMER_USER && !authUser.getId().equals(user.getId())) {
                 throw new ThingsboardException("You don't have permission to perform this operation!",
                         ThingsboardErrorCode.PERMISSION_DENIED);
             }
-            boolean sendEmail = user.getId() == null && sendActivationMail;
+            boolean sendEmail = user.getId() == null && activationType.equals("mail");
+            boolean isNewExternal = user.getId() == null && activationType.equals("external");
             if (getCurrentUser().getAuthority() == Authority.TENANT_ADMIN) {
                 user.setTenantId(getCurrentUser().getTenantId());
             }
-            User savedUser = checkNotNull(userService.saveUser(user));
+            User savedUser;
             if (sendEmail) {
+                savedUser = checkNotNull(userService.saveUser(user));
                 UserCredentials userCredentials = userService.findUserCredentialsByUserId(savedUser.getId());
                 String baseUrl = constructBaseUrl(request);
                 String activateUrl = String.format("%s/api/noauth/activate?activateToken=%s", baseUrl,
@@ -88,6 +94,10 @@ public class UserController extends BaseController {
                     userService.deleteUser(savedUser.getId());
                     throw e;
                 }
+            } else if(isNewExternal) {
+                savedUser = userService.saveExternalUser(user);
+            } else {
+                savedUser = checkNotNull(userService.saveUser(user));
             }
             return savedUser;
         } catch (Exception e) {
