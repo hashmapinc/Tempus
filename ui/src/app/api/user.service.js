@@ -401,8 +401,8 @@ function UserService($http, $q, $rootScope, adminService, dashboardService, logi
     function saveUser(user, activationType) {
         var deferred = $q.defer();
         var url = '/api/user';
-        if (angular.isDefined(sendActivationMail)) {
-            url += '?activationType=' + sendActivationMail;
+        if (angular.isDefined(activationType)) {
+            url += '?activationType=' + activationType;
         }
         $http.post(url, user).then(function success(response) {
             deferred.resolve(response.data);
