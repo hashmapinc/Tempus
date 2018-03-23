@@ -41,6 +41,10 @@ export default function AddUserController($scope, $mdDialog, $state, $stateParam
         {
             value: 'sendActivationMail',
             name: 'user.send-activation-mail'
+        },
+        {
+            value: 'external',
+            name: 'user.external-no-activation'
         }
     ];
 
@@ -54,10 +58,6 @@ export default function AddUserController($scope, $mdDialog, $state, $stateParam
     }
 
     function add($event) {
-        var sendActivationMail = false;
-        if (vm.userActivationMethod == 'sendActivationMail') {
-            sendActivationMail = true;
-        }
         if (usersType === 'tenant') {
             vm.item.authority = "TENANT_ADMIN";
             vm.item.tenantId = {
@@ -71,7 +71,7 @@ export default function AddUserController($scope, $mdDialog, $state, $stateParam
                 id: customerId
             };
         }
-        userService.saveUser(vm.item, sendActivationMail).then(function success(item) {
+        userService.saveUser(vm.item, vm.userActivationMethod).then(function success(item) {
             vm.item = item;
             $scope.theForm.$setPristine();
             if (vm.userActivationMethod == 'displayActivationLink') {
