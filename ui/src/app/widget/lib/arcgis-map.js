@@ -42,54 +42,32 @@ export default class TbArcgisMap {
             { className: 'tb-marker-label', permanent: true, direction: 'top', offset: marker.tooltipOffset });
     }
 
-    // updateMarkerColor(marker, color) {
-    //     var pinColor = color.substr(1);
-    //     var icon = L.icon({
-    //         iconUrl: 'https://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=%E2%80%A2|' + pinColor,
-    //         iconSize: [21, 34],
-    //         iconAnchor: [10, 34],
-    //         popupAnchor: [0, -34],
-    //         shadowUrl: 'https://chart.apis.google.com/chart?chst=d_map_pin_shadow',
-    //         shadowSize: [40, 37],
-    //         shadowAnchor: [12, 35]
-    //     });
-    //     marker.setIcon(icon);
-    // }
+    updateMarkerColor(marker, color) {
+        marker.color = color;
+    }
 
-    // updateMarkerImage(marker, settings, image, maxSize) {
-    //     var testImage = new Image(); // eslint-disable-line no-undef
-    //     testImage.onload = function() {
-    //         var width;
-    //         var height;
-    //         var aspect = testImage.width / testImage.height;
-    //         if (aspect > 1) {
-    //             width = maxSize;
-    //             height = maxSize / aspect;
-    //         } else {
-    //             width = maxSize * aspect;
-    //             height = maxSize;
-    //         }
-    //         var icon = L.icon({
-    //             iconUrl: image,
-    //             iconSize: [width, height],
-    //             iconAnchor: [width/2, height],
-    //             popupAnchor: [0, -height]
-    //         });
-    //         marker.setIcon(icon);
-    //         if (settings.showLabel) {
-    //             marker.unbindTooltip();
-    //             marker.tooltipOffset = [0, -height + 10];
-    //             marker.bindTooltip('<div style="color: '+ settings.labelColor +';"><b>'+settings.labelText+'</b></div>',
-    //                 { className: 'tb-marker-label', permanent: true, direction: 'top', offset: marker.tooltipOffset });
-    //         }
-    //     }
-    //     testImage.src = image;
-    // }
+    updateMarkerImage(marker, settings, image, maxSize) {
+        //TODO
+        if(marker){
+            if(settings){
+                if(image){
+                    if(maxSize){
+                        return marker;
+                    }
+                }
+            }
+        }
+
+    }
 
     createMarker(location, settings, onClickListener, markerArgs) {
-       
+       var tbMap = this;
 
-       var marker = this.map.graphics.add(this.mapObj.point(1, 1));
+       var marker = this.mapObj.point(location.latitude, location.longitude, settings.labelText);
+       this.map.map.add(marker);
+        if(settings.featureLayerURL !=="" && angular.isDefined(settings.featureLayerURL)){
+            this.map.map.add(this.mapObj.addFeatureLayer(settings.featureLayerURL));
+       }
 
         if (settings.showLabel) {
             // marker.tooltipOffset = [0, -height + 10];
@@ -104,15 +82,42 @@ export default class TbArcgisMap {
         // if (settings.displayTooltip) {
         //     this.createTooltip(marker, settings.tooltipPattern, settings.tooltipReplaceInfo, markerArgs);
         // }
+        function eventHandler(event) {
+            // the hitTest() checks to see if any graphics in the view
+            // intersect the given screen x, y coordinates
+            var evt = null;
+            tbMap.mapObj.view.hitTest(event)
+            .then(function(resp){
+                evt = getGraphics(resp);
+            });
+            if(evt !== null && angular.isDefined(evt)){
+              onClickListener(event);
+            }
+        }
+
+        function getGraphics(response) {
+            // the topmost graphic from the hurricanesLayer
+            // and display select attribute values from the
+            // graphic to the user
+            if (response.results.length) {
+                var graphic  = response.results.filter(function(result) {
+                return result.graphic === marker.graphics.items[0];
+              })[0].graphic;
+            }
+            return graphic;
+        }
 
         if (onClickListener) {
-         //   marker.on('click', onClickListener);
+            this.mapObj.view.on('pointer-up', eventHandler);
+
+              
         }
+        
         if(markerArgs){
             markerArgs.test = 1;
         }
 
-        return marker;
+        return marker.graphics.items[0].geometry;
     }
 
     removeMarker(marker) {
@@ -155,37 +160,52 @@ export default class TbArcgisMap {
         this.map.removeLayer(polyline);
     }
 
-    fitBounds(bounds) {
-        if (bounds.isValid()) {
-            if (this.dontFitMapBounds && this.defaultZoomLevel) {
-                this.map.setZoom(this.defaultZoomLevel, {animate: false});
-                this.map.panTo(bounds.getCenter(), {animate: false});
-            } else {
-                var tbMap = this;
-                this.map.once('zoomend', function() {
-                    if (!tbMap.defaultZoomLevel && tbMap.map.getZoom() > tbMap.minZoomLevel) {
-                        tbMap.map.setZoom(tbMap.minZoomLevel, {animate: false});
-                    }
-                });
-                this.map.fitBounds(bounds, {padding: [50, 50], animate: false});
-            }
+    fitBounds() {
+        if (this.dontFitMapBounds && this.defaultZoomLevel) {
+                this.zoom = this.defaultZoomLevel;
         }
+        else {
+            this.zoom = 10;
+        }
+
+        // if (bounds.isValid()) {
+        //     if (this.dontFitMapBounds && this.defaultZoomLevel) {
+        //         this.map.setZoom(this.defaultZoomLevel, {animate: false});
+        //         this.map.panTo(bounds.getCenter(), {animate: false});
+        //     } else {
+        //         var tbMap = this;
+        //         this.map.once('zoomend', function() {
+        //             if (!tbMap.defaultZoomLevel && tbMap.map.getZoom() > tbMap.minZoomLevel) {
+        //                 tbMap.map.setZoom(tbMap.minZoomLevel, {animate: false});
+        //             }
+        //         });
+        //         this.map.fitBounds(bounds, {padding: [50, 50], animate: false});
+        //     }
+        // }
     }
 
-      createLatLng(lat, lng) {
-        return this.map.graphics.add(this.mapObj.point(lat, lng));
+      createLatLng(lat, lng, labelText, featureLayerURL) {
+        var point = this.mapObj.point(lat, lng, labelText);
+        this.map.map.add(point);
+        if(featureLayerURL !=="" && angular.isDefined(featureLayerURL)){
+            this.map.map.add(this.mapObj.addFeatureLayer(featureLayerURL));
+        }
+        return point.graphics.items[0].geometry;
       }
 
     extendBoundsWithMarker(bounds, marker) {
-        bounds.extend(marker.getLatLng());
+        if(marker){
+            return bounds;
+        }  
     }
 
     getMarkerPosition(marker) {
-        return marker.getLatLng();
+        return marker;
     }
 
     setMarkerPosition(marker, latLng) {
-        marker.setLatLng(latLng);
+        marker.latitude = latLng.latitude;
+        marker.longitude = latLng.longitude;
     }
 
     getPolylineLatLngs(polyline) {
@@ -196,8 +216,8 @@ export default class TbArcgisMap {
         polyline.setLatLngs(latLngs);
     }
 
-    createBounds() {
-      //  return L.latLngBounds();
+    createBounds(mapObj) {
+        return mapObj.view.extend;
     }
 
     extendBounds(bounds, polyline) {

@@ -43,7 +43,7 @@ Plugin import/export
 Plugin export
 =============
 
-You are able to export your plugin to JSON format and import it to the same or another ThingsBoard instance.
+You are able to export your plugin to JSON format and import it to the same or another Tempus instance.
 In order to export plugin, you should navigate to the Plugins page and click on the export button located on the particular plugin card.
 
 .. image:: ../_images/admin/plugins_export.png

@@ -27,6 +27,7 @@ export default class TbMapWidgetV2 {
     constructor(mapProvider, drawRoutes, ctx, useDynamicLocations, $element, mapObj) {
         var tbMap = this;
         this.ctx = ctx;
+        this.mapObj = mapObj;
         this.mapProvider = mapProvider;
         if (!$element) {
             $element = ctx.$container;
@@ -125,6 +126,11 @@ export default class TbMapWidgetV2 {
             this.locationSettings.lngKeyName = this.ctx.settings.yPosKeyName || 'yPos';
             this.locationSettings.markerOffsetX = angular.isDefined(this.ctx.settings.markerOffsetX) ? this.ctx.settings.markerOffsetX : 0.5;
             this.locationSettings.markerOffsetY = angular.isDefined(this.ctx.settings.markerOffsetY) ? this.ctx.settings.markerOffsetY : 1;
+        } 
+        if(this.mapProvider  == 'arcgis-map') {
+            this.locationSettings.latKeyName = this.ctx.settings.latKeyName || 'latitude';
+            this.locationSettings.lngKeyName = this.ctx.settings.lngKeyName || 'longitude';
+            this.locationSettings.featureLayerURL = this.ctx.settings.featureLayerURL;
         } else {
             this.locationSettings.latKeyName = this.ctx.settings.latKeyName || 'latitude';
             this.locationSettings.lngKeyName = this.ctx.settings.lngKeyName || 'longitude';
@@ -277,7 +283,12 @@ export default class TbMapWidgetV2 {
                         for (var i = 0; i < latData.length; i++) {
                             lat = latData[i][1];
                             lng = lngData[i][1];
-                            latLng = tbMap.map.createLatLng(lat, lng);
+                            if(tbMap.mapProvider === 'arcgis-map'){
+                                 latLng = tbMap.map.createLatLng(lat, lng, location.settings.labelText, location.settings.featureLayerURL);
+                            }
+                            else{
+                                latLng = tbMap.map.createLatLng(lat, lng);
+                            }
                             if (i == 0 || !latLngs[latLngs.length - 1].equals(latLng)) {
                                 latLngs.push(latLng);
                             }
@@ -310,7 +321,12 @@ export default class TbMapWidgetV2 {
                         // Create or update marker
                         lat = latData[latData.length - 1][1];
                         lng = lngData[lngData.length - 1][1];
-                        latLng = tbMap.map.createLatLng(lat, lng);
+                        if(tbMap.mapProvider === 'arcgis-map'){
+                            latLng = tbMap.map.createLatLng(lat, lng, location.settings.labelText, location.settings.featureLayerURL);
+                        }
+                        else{
+                            latLng = tbMap.map.createLatLng(lat, lng);
+                        }
                         if (!location.marker) {
                             location.marker = tbMap.map.createMarker(latLng, location.settings,
                                 function (event) {
@@ -334,7 +350,12 @@ export default class TbMapWidgetV2 {
         }
 
         function loadLocations(data, datasources) {
-            var bounds = tbMap.map.createBounds();
+            if(tbMap.mapProvider === 'arcgis-map'){
+                var bounds = tbMap.map.createBounds(tbMap.mapObj);
+            }
+            else {
+                bounds = tbMap.map.createBounds();
+            }
             tbMap.locations = [];
             var dataMap = toLabelValueMap(data, datasources);
             var currentDatasource = null;
@@ -396,7 +417,12 @@ export default class TbMapWidgetV2 {
 
         function updateLocations(data, datasources) {
             var locationsChanged = false;
-            var bounds = tbMap.map.createBounds();
+            if (tbMap.mapProvider === 'arcgis-map') {
+               var bounds = tbMap.map.createBounds(tbMap.mapObj);
+            }
+            else{
+                 bounds = tbMap.map.createBounds();
+            }
             var dataMap = toLabelValueMap(data, datasources);
             for (var p = 0; p < tbMap.locations.length; p++) {
                 var location = tbMap.locations[p];
@@ -434,7 +460,12 @@ export default class TbMapWidgetV2 {
         if (this.map && this.map.inited()) {
             this.map.invalidateSize();
             if (this.locations && this.locations.length > 0) {
-                var bounds = this.map.createBounds();
+                if(this.mapProvider === 'arcgis-map'){
+                    var bounds = this.map.createBounds(this.mapObj);
+                }
+                else {
+                    bounds = this.map.createBounds();
+                }
                 for (var m = 0; m < this.markers.length; m++) {
                     this.map.extendBoundsWithMarker(bounds, this.markers[m]);
                 }
@@ -557,11 +588,16 @@ const arcgisMapSettingsSchema =
             "title":"ArcGISy Map Configuration",
             "type":"object",
             "properties":{
+                "featureLayerURL":{
+                    "title":"Feature Layer URL",
+                    "type":"string"
+                }
             },
             "required":[
             ]
         },
         "form":[
+            "featureLayerURL"
         ]
     };
 

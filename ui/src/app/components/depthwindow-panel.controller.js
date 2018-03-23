@@ -23,7 +23,7 @@ export default function DepthwindowPanelController(mdPanelRef, $scope, depthServ
     vm.historyOnly = historyOnly;
     vm.aggregation = aggregation;
     vm.onDepthwindowUpdate = onDepthwindowUpdate;
-    vm.aggregationTypes = types.aggregation;
+    vm.aggregationTypes = types.depthAggregation;
     vm.showLimit = showLimit;
     vm.showRealtimeDepthAggInterval = showRealtimeAggInterval;
     vm.showHistoryDepthAggInterval = showHistoryAggInterval;

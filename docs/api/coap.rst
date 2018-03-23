@@ -192,6 +192,7 @@ Once shared attribute will be changed by one of the server-side components (REST
         .. code-block:: json  
 
             {"key1":"value1"}
+            
 *******
 RPC API
 *******

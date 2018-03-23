@@ -117,6 +117,7 @@ You can fetch list of latest values for particular entity type and entity id usi
             --header "X-Authorization: $JWT_TOKEN"
           
     .. tab:: get-attributes-values-result.json
+    
         .. code-block:: json
 
             [
