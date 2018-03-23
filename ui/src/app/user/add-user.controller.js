@@ -73,9 +73,9 @@ export default function AddUserController($scope, $mdDialog, $state, $stateParam
         }
 
         var activationMethod = 'external';
-        if (vm.userActivationMethod.value === 'displayActivationLink'){
+        if (vm.userActivationMethod === 'displayActivationLink'){
             activationMethod = 'link';
-        } else if (vm.userActivationMethod.value === 'sendActivationMail'){
+        } else if (vm.userActivationMethod === 'sendActivationMail'){
             activationMethod = 'mail';
         }
 
