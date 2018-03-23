@@ -71,7 +71,15 @@ export default function AddUserController($scope, $mdDialog, $state, $stateParam
                 id: customerId
             };
         }
-        userService.saveUser(vm.item, vm.userActivationMethod).then(function success(item) {
+
+        var activationMethod = 'external';
+        if (vm.userActivationMethod.value === 'displayActivationLink'){
+            activationMethod = 'link';
+        } else if (vm.userActivationMethod.value === 'sendActivationMail'){
+            activationMethod = 'mail';
+        }
+
+        userService.saveUser(vm.item, activationMethod).then(function success(item) {
             vm.item = item;
             $scope.theForm.$setPristine();
             if (vm.userActivationMethod == 'displayActivationLink') {
