@@ -104,7 +104,7 @@ public abstract class AbstractControllerTest {
 
     protected static final String TEST_TENANT_NAME = "TEST TENANT";
 
-    protected static final String SYS_ADMIN_EMAIL = "sysadmin@thingsboard.org";
+    protected static final String SYS_ADMIN_EMAIL = "sysadmin@hashmapinc.com";
     private static final String SYS_ADMIN_PASSWORD = "sysadmin";
 
     protected static final String TENANT_ADMIN_EMAIL = "testtenant@thingsboard.org";
@@ -233,7 +233,7 @@ public abstract class AbstractControllerTest {
     }
 
     protected User createUserAndLogin(User user, String password) throws Exception {
-        User savedUser = doPost("/api/user", user, User.class);
+        User savedUser = doPost("/api/user?activationType=mail", user, User.class);
         logout();
         doGet("/api/noauth/activate?activateToken={activateToken}", TestMailService.currentActivateToken)
                 .andExpect(status().isSeeOther())
