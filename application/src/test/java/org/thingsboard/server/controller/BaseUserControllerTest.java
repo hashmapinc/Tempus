@@ -29,6 +29,7 @@ import org.thingsboard.server.common.data.id.TenantId;
 import org.thingsboard.server.common.data.page.TextPageData;
 import org.thingsboard.server.common.data.page.TextPageLink;
 import org.thingsboard.server.common.data.security.Authority;
+import org.thingsboard.server.common.data.security.UserCredentials;
 import org.thingsboard.server.service.mail.TestMailService;
 
 import java.util.ArrayList;
@@ -42,6 +43,38 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public abstract class BaseUserControllerTest extends AbstractControllerTest {
     
     private IdComparator<User> idComparator = new IdComparator<>();
+
+    @Test
+    public void testSaveExternalUser() throws Exception {
+        loginSysAdmin();
+
+        Tenant tenant = new Tenant();
+        tenant.setTitle("My tenant");
+        Tenant savedTenant = doPost("/api/tenant", tenant, Tenant.class);
+        Assert.assertNotNull(savedTenant);
+
+        String email = "tenant2@thingsboard.org";
+        User user = new User();
+        user.setAuthority(Authority.TENANT_ADMIN);
+        user.setTenantId(savedTenant.getId());
+        user.setEmail(email);
+        user.setFirstName("Joe");
+        user.setLastName("Downs");
+        User savedUser = doPost("/api/user?activationType=external", user, User.class);
+        Assert.assertNotNull(savedUser);
+        Assert.assertNotNull(savedUser.getId());
+        Assert.assertTrue(savedUser.getCreatedTime() > 0);
+        Assert.assertEquals(user.getEmail(), savedUser.getEmail());
+        if(ldapEnabled) {
+            createLDAPEntry(email, "tenant2");
+            login(email, "tenant2");
+
+            doGet("/api/auth/user")
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.authority",is(Authority.TENANT_ADMIN.name())))
+                    .andExpect(jsonPath("$.email",is(email)));
+        }
+    }
 
     @Test
     public void testSaveUser() throws Exception {
