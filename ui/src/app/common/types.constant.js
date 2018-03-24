@@ -59,12 +59,6 @@ export default angular.module('thingsboard.types', [])
                     name: "aggregation.none"
                 }
             },
-            depthAggregation:{
-                none: {
-                    value: "NONE",
-                    name: "aggregation.none"
-                }
-            },
             alarmFields: {
                 createdTime: {
                     keyName: 'createdTime',

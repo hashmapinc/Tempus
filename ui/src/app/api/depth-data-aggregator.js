@@ -41,10 +41,23 @@ export default class DepthDataAggregator {
         }
 
         // as of now only none is supported for depthseries data so all will point to none
-        // set interval to 0
-        this.interval = 0;
         this.aggregationTimeout = Math.max(this.interval, 1000);
         switch (aggregationType) {
+            case types.aggregation.min.value:
+                this.aggFunction = min;
+                break;
+            case types.aggregation.max.value:
+                this.aggFunction = max;
+                break;
+            case types.aggregation.avg.value:
+                this.aggFunction = avg;
+                break;
+            case types.aggregation.sum.value:
+                this.aggFunction = sum;
+                break;
+            case types.aggregation.count.value:
+                this.aggFunction = count;
+                break;
             case types.aggregation.none.value:
                 this.aggFunction = none;
                 break;
@@ -137,7 +150,7 @@ export default class DepthDataAggregator {
                 var kvPair = [Number(aggDepthdatum), aggData.aggValue];
                 keyData.push(kvPair);
             }
-            this.startDs = aggDepthdatum;
+            this.startDs = Number(aggDepthdatum);
             keyData = this.$filter('orderBy')(keyData, '+this[0]');
             if (this.stateData) {
                 this.updateStateBounds(keyData, angular.copy(this.lastPrevKvPairData[key]));
@@ -271,7 +284,7 @@ function isNumeric(value) {
     return (value - parseFloat( value ) + 1) >= 0;
 }
 
-/*function avg(aggData, value) {
+function avg(aggData, value) {
     aggData.count++;
     aggData.sum += value;
     aggData.aggValue = aggData.sum / aggData.count;
@@ -293,7 +306,7 @@ function count(aggData) {
     aggData.count++;
     aggData.aggValue = aggData.count;
 }
-*/
+
 function none(aggData, value) {
     aggData.aggValue = value;
 }
