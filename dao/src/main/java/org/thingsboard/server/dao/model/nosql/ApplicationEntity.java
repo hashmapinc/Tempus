@@ -27,7 +27,6 @@ import com.datastax.driver.mapping.annotations.Transient;
 import org.thingsboard.server.dao.model.type.ComponentLifecycleStateCodec;
 
 
-import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
@@ -119,7 +118,7 @@ public final class ApplicationEntity implements SearchTextEntity<Application> {
         this.isValid = application.getIsValid();
         this.description = application.getDescription();
         this.deviceTypes = application.getDeviceTypes();
-        this.state = application.getComponentLifecycleState();
+        this.state = application.getState();
     }
 
 
@@ -264,9 +263,9 @@ public final class ApplicationEntity implements SearchTextEntity<Application> {
         application.setDescription(description);
 
         if(state != null) {
-            application.setComponentLifecycleState(state);
+            application.setState(state);
         } else {
-            application.setComponentLifecycleState(ComponentLifecycleState.SUSPENDED);
+            application.setState(ComponentLifecycleState.SUSPENDED);
         }
 
         if(deviceTypes !=null) {

@@ -38,7 +38,6 @@ import org.thingsboard.server.common.data.security.Authority;
 import org.thingsboard.server.dao.computations.ComputationsService;
 import org.thingsboard.server.dao.model.ModelConstants;
 import org.thingsboard.server.extensions.core.plugin.telemetry.TelemetryStoragePlugin;
-import scala.App;
 
 import java.util.*;
 
@@ -762,14 +761,14 @@ public class BaseApplicationControllerTest extends AbstractControllerTest {
         doPostWithDifferentResponse("/api/app/assignRules", applicationRulesWrapper, Application.class);
 
 
-        Assert.assertEquals(ComponentLifecycleState.SUSPENDED, savedApplication.getComponentLifecycleState());
+        Assert.assertEquals(ComponentLifecycleState.SUSPENDED, savedApplication.getState());
         Assert.assertEquals(ComponentLifecycleState.SUSPENDED, savedRule1.getState());
         Assert.assertEquals(ComponentLifecycleState.SUSPENDED, savedComputationJob1.getState());
 
         doPost("/api/application/"+savedApplication.getId().getId().toString() +"/activate").andExpect(status().isBadRequest());
 
         Application foundApplication = doGet("/api/application/" + savedApplication.getId().getId().toString(), Application.class);
-        Assert.assertEquals(ComponentLifecycleState.SUSPENDED, foundApplication.getComponentLifecycleState());
+        Assert.assertEquals(ComponentLifecycleState.SUSPENDED, foundApplication.getState());
 
         RuleMetaData foundRuleMetaData = doGet("/api/rule/"+savedRule1.getId().getId().toString(), RuleMetaData.class);
         Assert.assertEquals(ComponentLifecycleState.SUSPENDED ,foundRuleMetaData.getState());
@@ -814,7 +813,7 @@ public class BaseApplicationControllerTest extends AbstractControllerTest {
         doPostWithDifferentResponse("/api/app/assignRules", applicationRulesWrapper, Application.class);
 
 
-        Assert.assertEquals(ComponentLifecycleState.SUSPENDED, savedApplication.getComponentLifecycleState());
+        Assert.assertEquals(ComponentLifecycleState.SUSPENDED, savedApplication.getState());
         Assert.assertEquals(ComponentLifecycleState.SUSPENDED, savedRule1.getState());
         Assert.assertEquals(ComponentLifecycleState.SUSPENDED, savedComputationJob1.getState());
 
@@ -822,7 +821,7 @@ public class BaseApplicationControllerTest extends AbstractControllerTest {
         doPost("/api/application/"+savedApplication.getId().getId().toString() +"/activate").andExpect(status().isOk());
 
         Application foundApplication = doGet("/api/application/" + savedApplication.getId().getId().toString(), Application.class);
-        Assert.assertEquals(ComponentLifecycleState.ACTIVE, foundApplication.getComponentLifecycleState());
+        Assert.assertEquals(ComponentLifecycleState.ACTIVE, foundApplication.getState());
 
         RuleMetaData foundRuleMetaData = doGet("/api/rule/"+savedRule1.getId().getId().toString(), RuleMetaData.class);
         Assert.assertEquals(ComponentLifecycleState.ACTIVE ,foundRuleMetaData.getState());

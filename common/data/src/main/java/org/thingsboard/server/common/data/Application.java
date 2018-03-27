@@ -36,7 +36,7 @@ public class Application extends SearchTextBased<ApplicationId> implements HasNa
     private String description;
     private Set<String> deviceTypes = new HashSet<>();
     private Boolean isValid = Boolean.TRUE;
-    private ComponentLifecycleState componentLifecycleState;
+    private ComponentLifecycleState state;
 
     public Application() {
         super();
@@ -58,7 +58,7 @@ public class Application extends SearchTextBased<ApplicationId> implements HasNa
         this.description = application.description;
         this.deviceTypes = application.deviceTypes;
         this.isValid = application.isValid;
-        this.componentLifecycleState = application.componentLifecycleState;
+        this.state = application.state;
     }
 
     @Override
@@ -71,12 +71,12 @@ public class Application extends SearchTextBased<ApplicationId> implements HasNa
     }
 
 
-    public ComponentLifecycleState getComponentLifecycleState() {
-        return componentLifecycleState;
+    public ComponentLifecycleState getState() {
+        return state;
     }
 
-    public void setComponentLifecycleState(ComponentLifecycleState componentLifecycleState) {
-        this.componentLifecycleState = componentLifecycleState;
+    public void setState(ComponentLifecycleState state) {
+        this.state = state;
     }
 
     @Override
@@ -180,7 +180,7 @@ public class Application extends SearchTextBased<ApplicationId> implements HasNa
                 ", description='" + description + '\'' +
                 ", deviceTypes=" + deviceTypes +
                 ", isValid=" + isValid +
-                ", componentLifecycleState=" + componentLifecycleState +
+                ", state=" + state +
                 '}';
     }
 
@@ -200,11 +200,11 @@ public class Application extends SearchTextBased<ApplicationId> implements HasNa
                 Objects.equals(description, that.description) &&
                 Objects.equals(deviceTypes, that.deviceTypes) &&
                 Objects.equals(isValid, that.isValid) &&
-                componentLifecycleState == that.componentLifecycleState;
+                state == that.state;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), tenantId, customerId, dashboardId, miniDashboardId, computationJobIdSet, rules, name, description, deviceTypes, isValid, componentLifecycleState);
+        return Objects.hash(super.hashCode(), tenantId, customerId, dashboardId, miniDashboardId, computationJobIdSet, rules, name, description, deviceTypes, isValid, state);
     }
 }

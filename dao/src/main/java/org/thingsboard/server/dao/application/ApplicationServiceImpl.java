@@ -15,7 +15,6 @@
  */
 package org.thingsboard.server.dao.application;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.collect.Iterables;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -80,15 +79,15 @@ public class ApplicationServiceImpl extends AbstractEntityService implements App
         applicationValidator.validate(application);
         if (application.getId() != null) {
             Application oldVersion = applicationDao.findById(application.getId().getId());
-            if (application.getComponentLifecycleState() == null) {
-                application.setComponentLifecycleState(oldVersion.getComponentLifecycleState());
-            } else if (application.getComponentLifecycleState() != oldVersion.getComponentLifecycleState()) {
+            if (application.getState() == null) {
+                application.setState(oldVersion.getState());
+            } else if (application.getState() != oldVersion.getState()) {
                 throw new IncorrectParameterException("Use Activate/Suspend method to control state of the application!");
             }
         } else {
-            if (application.getComponentLifecycleState() == null) {
-                application.setComponentLifecycleState(ComponentLifecycleState.SUSPENDED);
-            } else if (application.getComponentLifecycleState() != ComponentLifecycleState.SUSPENDED) {
+            if (application.getState() == null) {
+                application.setState(ComponentLifecycleState.SUSPENDED);
+            } else if (application.getState() != ComponentLifecycleState.SUSPENDED) {
                 throw new IncorrectParameterException("Use Activate/Suspend method to control state of the application!");
             }
         }
@@ -315,7 +314,7 @@ public class ApplicationServiceImpl extends AbstractEntityService implements App
         Validator.validateId(applicationId, "Incorrect application id for state change request.");
         Application application = applicationDao.findById(applicationId.getId());
         if (application != null) {
-            application.setComponentLifecycleState(state);
+            application.setState(state);
             applicationDao.save(application);
         } else {
             throw new DatabaseException("Application not found!");

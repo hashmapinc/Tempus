@@ -30,7 +30,6 @@ import org.thingsboard.server.dao.model.SearchTextEntity;
 import org.thingsboard.server.dao.util.mapping.JsonStringType;
 
 import javax.persistence.*;
-import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -126,7 +125,7 @@ public final class ApplicationEntity extends BaseSqlEntity<Application> implemen
         this.isValid = application.getIsValid();
         this.description = application.getDescription();
         this.deviceTypes = application.getDeviceTypes();
-        this.state = application.getComponentLifecycleState();
+        this.state = application.getState();
     }
 
     @Override
@@ -169,7 +168,7 @@ public final class ApplicationEntity extends BaseSqlEntity<Application> implemen
         application.setIsValid(isValid);
         application.setDescription(description);
         application.setDeviceTypes(deviceTypes);
-        application.setComponentLifecycleState(state);
+        application.setState(state);
         return application;
 
     }

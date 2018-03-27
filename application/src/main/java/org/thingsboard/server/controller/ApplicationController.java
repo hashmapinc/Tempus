@@ -21,7 +21,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.thingsboard.server.common.data.Application;
 import org.thingsboard.server.common.data.ApplicationFieldsWrapper;
-import org.thingsboard.server.common.data.Tenant;
 import org.thingsboard.server.common.data.computation.ComputationJob;
 import org.thingsboard.server.common.data.id.*;
 import org.thingsboard.server.common.data.page.TextPageData;
@@ -32,7 +31,6 @@ import org.thingsboard.server.common.data.rule.RuleMetaData;
 import org.thingsboard.server.dao.exception.IncorrectParameterException;
 import org.thingsboard.server.dao.model.ModelConstants;
 import org.thingsboard.server.exception.ThingsboardException;
-import scala.App;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -257,7 +255,7 @@ public class ApplicationController extends BaseController {
             checkApplicationId(applicationId);
             Set<RuleId> ruleIds = applicationFieldsWrapper.getFields().stream().map(r -> new RuleId(toUUID(r))).collect(Collectors.toSet());
             Application application  = checkNotNull(applicationService.assignRulesToApplication(applicationId, ruleIds));
-            if(application.getComponentLifecycleState().equals(ACTIVE)) {
+            if(application.getState().equals(ACTIVE)) {
                 for(RuleId ruleId: ruleIds){
                     RuleMetaData rule = checkRule(ruleService.findRuleById(ruleId));
                     ruleService.activateRuleById(ruleId);
@@ -321,7 +319,7 @@ public class ApplicationController extends BaseController {
             checkApplicationId(applicationId);
             Set<ComputationJobId> computationJobIds = applicationFieldsWrapper.getFields().stream().map(r -> new ComputationJobId(toUUID(r))).collect(Collectors.toSet());
             Application application =  checkNotNull(applicationService.assignComputationJobsToApplication(applicationId, computationJobIds));
-            if(application.getComponentLifecycleState().equals(ACTIVE)) {
+            if(application.getState().equals(ACTIVE)) {
                 for(ComputationJobId computationJobId: computationJobIds) {
                     ComputationJob computationJob = checkComputationJob(computationJobService.findComputationJobById(computationJobId));
                     computationJobService.activateComputationJobById(computationJobId);
