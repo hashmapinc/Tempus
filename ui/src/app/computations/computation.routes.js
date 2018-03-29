@@ -39,10 +39,10 @@ export default function ComputationRoutes($stateProvider) {
                 pageTitle: 'computation.computations'
             },
             ncyBreadcrumb: {
-                label: '{"icon": "dashboards", "label": "computation.computations", "link": "/static/svg/computationslightgray.svg"}'
+                label: '{"icon": "computations", "label": "computation.computations", "link": "/static/svg/computationslightgray.svg"}'
             }
         })
-        .state('home.computationJob', {
+        .state('home.computations.computationJob', {
             url: '/computationJob/:computationId',
             module: 'private',
             auth: ['TENANT_ADMIN'],
@@ -57,7 +57,7 @@ export default function ComputationRoutes($stateProvider) {
                 pageTitle: 'computationJob.computationJobs'
             },
             ncyBreadcrumb: {
-                label: '{"icon": "dashboards", "label": "computationJob.computationJobs", "link": "/static/svg/computationslightgray.svg"}'
+                label: '{"icon": "computationJobs", "label": "{{ vm.computation.name }}", "link": "/static/svg/computationslightgray.svg"}'
             }
         });
 

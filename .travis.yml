@@ -1,9 +1,16 @@
 before_install:
-  - sudo rm -f /etc/mavenrc
-  - export M2_HOME=/usr/local/maven
-  - export MAVEN_OPTS="-Dmaven.repo.local=$HOME/.m2/repository -Xms1024m -Xmx3072m"
+- sudo rm -f /etc/mavenrc
+- export M2_HOME=/usr/local/maven
+- export MAVEN_OPTS="-Dmaven.repo.local=$HOME/.m2/repository -Xms1024m -Xmx3072m"
 jdk:
- - oraclejdk8
+- oraclejdk8
 language: java
 sudo: required
 script: mvn clean install -DskipTests
+after success:
+  addons:
+    artifacts:
+      s3_region: "us-west-2"
+      paths:
+        - $HOME/application/target/tempus.deb
+        - $HOME/application/target/tempus.rpm

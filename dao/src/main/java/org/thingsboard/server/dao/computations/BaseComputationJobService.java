@@ -78,7 +78,7 @@ public class BaseComputationJobService extends AbstractEntityService implements 
             computationJob.setState(ComponentLifecycleState.ACTIVE);
             computationJobDao.save(computationJob);
         } else {
-            throw new DatabaseException("Plugin not found!");
+            throw new DatabaseException("ComputaionJob not found!");
         }
     }
 
@@ -91,7 +91,7 @@ public class BaseComputationJobService extends AbstractEntityService implements 
             computationJob.setJobId(null);
             computationJobDao.save(computationJob);
         } else {
-            throw new DatabaseException("Plugin not found!");
+            throw new DatabaseException("ComputaionJob not found!");
         }
     }
 }

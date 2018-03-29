@@ -195,7 +195,7 @@ public class TelemetryWebsocketMsgHandler extends DefaultWebsocketMsgHandler {
                     long startTs;
                     if (cmd.getTimeWindow() > 0) {
                         List<String> keys = new ArrayList<>(getKeys(cmd).orElse(Collections.emptySet()));
-                        log.debug("[{}] fetching timeseries data for last {} ms for keys: ({}) for device : {}", sessionId, cmd.getTimeWindow(), cmd.getKeys(), entityId);
+                        log.info("[{}] fetching timeseries data for last {} ms for keys: ({}) for device : {}", sessionId, cmd.getTimeWindow(), cmd.getKeys(), entityId);
                         startTs = cmd.getStartTs();
                         long endTs = cmd.getStartTs() + cmd.getTimeWindow();
                         List<TsKvQuery> queries = keys.stream().map(key -> new BaseTsKvQuery(key, startTs, endTs, cmd.getInterval(), getLimit(cmd.getLimit()), getAggregation(cmd.getAgg()))).collect(Collectors.toList());
@@ -203,7 +203,7 @@ public class TelemetryWebsocketMsgHandler extends DefaultWebsocketMsgHandler {
                     } else {
                         List<String> keys = new ArrayList<>(getKeys(cmd).orElse(Collections.emptySet()));
                         startTs = System.currentTimeMillis();
-                        log.debug("[{}] fetching latest timeseries data for keys: ({}) for device : {}", sessionId, cmd.getKeys(), entityId);
+                        log.info("[{}] fetching latest timeseries data for keys: ({}) for device : {}", sessionId, cmd.getKeys(), entityId);
                         ctx.loadLatestTimeseries(entityId, keys, getSubscriptionCallback(sessionRef, cmd, sessionId, entityId, startTs, keys));
                     }
                 } else {
@@ -262,7 +262,6 @@ public class TelemetryWebsocketMsgHandler extends DefaultWebsocketMsgHandler {
                         ctx.loadLatestDepthSeries(entityId, keys, getSubscriptionCallback(sessionRef, cmd, sessionId, entityId, startDs, keys));
                     }
                 } else {
-                    log.debug("inside load latest Depth Series ");
                     ctx.loadLatestDepthSeries(entityId, new PluginCallback<List<DsKvEntry>>() {
                         @Override
                         public void onSuccess(PluginContext ctx, List<DsKvEntry> data) {
@@ -278,7 +277,7 @@ public class TelemetryWebsocketMsgHandler extends DefaultWebsocketMsgHandler {
                         @Override
                         public void onFailure(PluginContext ctx, Exception e) {
                             DepthSubscriptionUpdate update;
-                            log.debug("HMDC load latest failure ");
+                            log.debug("load latest failure ");
                             if (UnauthorizedException.class.isInstance(e)) {
                                 update = new DepthSubscriptionUpdate(cmd.getCmdId(), SubscriptionErrorCode.UNAUTHORIZED,
                                         SubscriptionErrorCode.UNAUTHORIZED.getDefaultMsg());
@@ -298,8 +297,34 @@ public class TelemetryWebsocketMsgHandler extends DefaultWebsocketMsgHandler {
         return new PluginCallback<List<TsKvEntry>>() {
             @Override
             public void onSuccess(PluginContext ctx, List<TsKvEntry> data) {
-                log.debug("on ts subscription success : data " + data);
-                sendWsMsg(ctx, sessionRef, new SubscriptionUpdate(cmd.getCmdId(), data));
+                if(data.isEmpty()){
+                    ctx.loadLatestTimeseries(entityId, keys, new PluginCallback<List<TsKvEntry>>() {
+                        @Override
+                        public void onSuccess(PluginContext ctx, List<TsKvEntry> data) {
+                            log.info("Latest TsKvEntry [{}]", data);
+                            long endTs = data.get(0).getTs();
+                            long startTs = endTs - cmd.getTimeWindow();
+                            List<TsKvQuery> queries = keys.stream().map(key -> new BaseTsKvQuery(key, startTs, endTs, cmd.getInterval(), getLimit(cmd.getLimit()), getAggregation(cmd.getAgg()))).collect(Collectors.toList());
+                            ctx.loadTimeseries(entityId, queries, new PluginCallback<List<TsKvEntry>>() {
+                                @Override
+                                public void onSuccess(PluginContext ctx, List<TsKvEntry> data) {
+                                    log.debug("TsKvEntry List [{}]", data);
+                                    sendWsMsg(ctx, sessionRef, new SubscriptionUpdate(cmd.getCmdId(), data));
+                                }
+                                @Override
+                                public void onFailure(PluginContext ctx, Exception e) {
+                                    log.info("Failed to fetch TsKvEntry List.");
+                                }
+                            });
+                        }
+                        @Override
+                        public void onFailure(PluginContext ctx, Exception e){
+                            log.info("Failed to fetch latest TsKvEntry.");
+                        }
+                    });
+                }
+                else
+                    sendWsMsg(ctx, sessionRef, new SubscriptionUpdate(cmd.getCmdId(), data));
 
                 Map<String, Long> subState = new HashMap<>(keys.size());
                 keys.forEach(key -> subState.put(key, startTs));
@@ -323,11 +348,39 @@ public class TelemetryWebsocketMsgHandler extends DefaultWebsocketMsgHandler {
             @Override
             public void onSuccess(PluginContext ctx, List<DsKvEntry> data) {
                 log.debug("on success getSubscriptionCallback " + data );
-                sendWsMsg(ctx, sessionRef, new DepthSubscriptionUpdate(cmd.getCmdId(), data));
+                if(data.isEmpty()){
+                    ctx.loadLatestDepthSeries(entityId, keys, new PluginCallback<List<DsKvEntry>>() {
+                        @Override
+                        public void onSuccess(PluginContext ctx, List<DsKvEntry> data) {
+                            log.info("Latest DsKvEntry [{}]", data);
+                            Double endDs = data.get(0).getDs();
+                            log.info("endDs = " + endDs);
+                            Double startDs = endDs - cmd.getDepthWindow();
+                            List<DsKvQuery> queries = keys.stream().map(key -> new BaseDsKvQuery(key, startDs, endDs, cmd.getInterval(), getLimit(cmd.getLimit()), getDepthAggregation(cmd.getAgg()))).collect(Collectors.toList());
+                            ctx.loadDepthSeries(entityId, queries, new PluginCallback<List<DsKvEntry>>() {
+                                @Override
+                                public void onSuccess(PluginContext ctx, List<DsKvEntry> data) {
+                                    log.debug("DsKvEntry List [{}]", data);
+                                    sendWsMsg(ctx, sessionRef, new DepthSubscriptionUpdate(cmd.getCmdId(), data));
+                                }
+                                @Override
+                                public void onFailure(PluginContext ctx, Exception e) {
+                                    log.info("Failed to fetch DsKvEntry List.");
+                                }
+                            });
+                        }
+                        @Override
+                        public void onFailure(PluginContext ctx, Exception e){
+                            log.info("Failed to fetch latest DsKvEntry.");
+                        }
+                    });
+                }
+                else
+                    sendWsMsg(ctx, sessionRef, new DepthSubscriptionUpdate(cmd.getCmdId(), data));
 
                 Map<String, Double> subState = new HashMap<>(keys.size());
                 keys.forEach(key -> subState.put(key, startDs));
-                data.forEach(v -> subState.put(v.getKey(), v.getDs()));
+                data.forEach(v -> subState.put( v.getKey(), v.getDs()));
                 SubscriptionState<Double> sub = new SubscriptionState(sessionId, cmd.getCmdId(), entityId, SubscriptionType.DEPTHSERIES, false, subState);
                 subscriptionManager.addLocalWsDepthSubscription(ctx, sessionId, entityId, sub);
             }
@@ -418,7 +471,6 @@ public class TelemetryWebsocketMsgHandler extends DefaultWebsocketMsgHandler {
         ctx.loadDepthSeries(entityId, queries, new PluginCallback<List<DsKvEntry>>() {
             @Override
             public void onSuccess(PluginContext ctx, List<DsKvEntry> data) {
-                log.debug("HMDC depthHistory success." + data);
                 sendWsMsg(ctx, sessionRef, new DepthSubscriptionUpdate(cmd.getCmdId(), data));
             }
 

@@ -15,11 +15,8 @@
  */
 package org.thingsboard.server.controller;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -59,9 +56,13 @@ public class ComputationsController extends BaseController {
     private String uploadPath;
 
     @Autowired
-    @Qualifier("uploadComputationDiscoveryService")
     private ComputationDiscoveryService computationDiscoveryService;
 
+    @Autowired
+    private ComputationsService computationsService;
+
+    @Autowired
+    private ComputationJobService computationJobService;
 
     @PreAuthorize("hasAuthority('TENANT_ADMIN')")
     @RequestMapping(value = "/computations/upload", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -73,10 +74,8 @@ public class ComputationsController extends BaseController {
             try (InputStream input = file.getInputStream()) {
                 Files.copy(input, Paths.get(destinationFile.toURI()), StandardCopyOption.REPLACE_EXISTING);
             }
-            log.info(" uplaoding computations !!");
             TenantId tenantId = getCurrentUser().getTenantId();
             return computationDiscoveryService.onJarUpload(path, tenantId);
-            //return new FileInfo(file.getOriginalFilename(), path);
         } catch (Exception e) {
             throw handleException(e);
         }
@@ -88,7 +87,7 @@ public class ComputationsController extends BaseController {
     public void delete(@PathVariable("computationId") String strComputationId) throws ThingsboardException {
         ComputationId computationId = new ComputationId(toUUID(strComputationId));
         Computations computation = checkComputation(computationsService.findById(computationId));
-        List<ComputationJob> computationJobs = checkNotNull(computationJobService.findByComputationId(computationId));
+        List<ComputationJob> computationJobs = checkNotNull(computationJobService.findByComputationId(computation.getId()));
         for (ComputationJob computationJob: computationJobs) {
             computationJobService.deleteComputationJobById(computationJob.getId());
             actorService.onComputationJobStateChange(computationJob.getTenantId(), computationJob.getComputationId(), computationJob.getId(), ComponentLifecycleEvent.DELETED);
@@ -118,12 +117,11 @@ public class ComputationsController extends BaseController {
     @ResponseBody
     public List<Computations> getComputations() throws ThingsboardException {
         try {
-                log.info(" Fetching computations.");
                 TenantId tenantId = getCurrentUser().getTenantId();
                 List<Computations> computations = checkNotNull(computationsService.findAllTenantComputationsByTenantId(tenantId));
                 computations.stream()
                         .filter(computation -> computation.getTenantId().getId().equals(ModelConstants.NULL_UUID));
-                log.info(" returning Computations {} ", computations);
+                log.trace(" returning Computations {} ", computations);
                 return computations;
         } catch (Exception e) {
             throw handleException(e);
@@ -136,22 +134,13 @@ public class ComputationsController extends BaseController {
     public Computations getComputation(@PathVariable("computationId") String strComputationId) throws ThingsboardException {
 
         try {
-            log.info(" Fetching computations by id.");
             ComputationId computationId = new ComputationId(toUUID(strComputationId));
-            //TenantId tenantId = getCurrentUser().getTenantId();
-            Computations computations = checkNotNull(computationsService.findById(computationId));
-            log.info(" returning Computations by id{} ", computations);
-            return computations;
+            Computations computation = checkNotNull(computationsService.findById(computationId));
+            log.trace(" returning Computations by id {} ", computation);
+            return computation;
         } catch (Exception e) {
             throw handleException(e);
         }
-    }
-
-    @Data
-    @AllArgsConstructor
-    private static class FileInfo{
-        private final String name;
-        private final String path;
     }
 
     protected Computations checkComputation(Computations computation) throws ThingsboardException {

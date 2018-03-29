@@ -31,7 +31,7 @@ import AliasController from '../../api/alias-controller';
 /*@ngInject*/
 export default function AttributeTableDirective($compile, $templateCache, $rootScope, $q, $mdEditDialog, $mdDialog,
                                                 $mdUtil, $document, $translate, $filter, utils, types, dashboardUtils,
-                                                dashboardService, entityService, attributeService, widgetService) {
+                                                dashboardService, entityService, attributeService, widgetService, $log, $mdToast) {
 
     var linker = function (scope, element, attrs) {
 
@@ -191,12 +191,40 @@ export default function AttributeTableDirective($compile, $templateCache, $rootS
             }
         });
 
+        scope.sendAttributesToShared = function() {
+            if (scope.attributeScope.clientSide) {
+                var channelId = scope.entityName;
+                var sharedAttributes = new Array();
+
+                for (var attr =0; attr < scope.selectedAttributes.length; attr++) {
+                    var updateAttribute = {};
+                    updateAttribute = angular.extend(updateAttribute, scope.selectedAttributes[attr]);
+                    updateAttribute.key = channelId + "." + updateAttribute.key;
+                    updateAttribute.value = true;
+                    sharedAttributes.push(updateAttribute);
+                }
+
+                attributeService.saveEntityAttributes(scope.entityType, scope.entityId, types.attributesScope.shared.value, sharedAttributes).then(
+                    function success() {
+                        $mdToast.show(
+                            $mdToast.simple()
+                                .textContent('Attribute Sent to Shared!')
+                                .position('bottom left')
+                                .hideDelay(2000)
+                        );
+                        scope.attributeScope = types.attributesScope.shared;
+                    }
+                );
+            }
+        }
+
         scope.editAttribute = function($event, attribute) {
             if (!scope.attributeScope.clientSide) {
                 $event.stopPropagation();
                 $mdEditDialog.show({
                     controller: EditAttributeValueController,
                     templateUrl: editAttributeValueTemplate,
+					windowClass: 'center-modal',
                     locals: {attributeValue: attribute.value,
                              save: function (model) {
                                 var updatedAttribute = angular.copy(attribute);

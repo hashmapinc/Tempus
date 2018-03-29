@@ -50,7 +50,7 @@ public class CassandraBaseComputationJobDao extends CassandraAbstractSearchTextD
     }
 
     public void deleteById(UUID id) {
-        log.info("Delete computations entity by id [{}]", id);
+        log.info("Delete computationJob entity by id [{}]", id);
         boolean result = removeById(id);
         log.info("Delete result: [{}]", result);
     }
@@ -67,26 +67,24 @@ public class CassandraBaseComputationJobDao extends CassandraAbstractSearchTextD
 
     @Override
     public List<ComputationJob> findByComputationId(ComputationId computationId) {
-
-        log.info("Going to fetch computationJobs by ComputationId Id : " + computationId );
         Select select = select().from(ModelConstants.COMPUTATION_JOB_COLUMN_FAMILY_NAME).allowFiltering();
         Select.Where query = select.where();
         query.and(eq(ModelConstants.COMPUTATION_JOB_COMPUTATION_ID_PROPERTY, computationId.getId()));
         List<ComputationJobEntity> computationJobEntities = findListByStatement(query);
-        log.info("computationsEntities returned " + computationJobEntities);
+        log.trace("computationJobEntities returned [{}] ", computationJobEntities);
         return DaoUtil.convertDataList(computationJobEntities);
     }
 
     @Override
     public List<ComputationJob> findByTenantIdAndComputationIdAndPageLink(TenantId tenantId, ComputationId computationId, TextPageLink pageLink) {
 
-        log.debug("Try to find assets by tenantId [{}], computationId[{}] and pageLink [{}]", tenantId, computationId, pageLink);
+        log.debug("Try to find computationJobs by tenantId [{}], computationId[{}] and pageLink [{}]", tenantId, computationId, pageLink);
         List<ComputationJobEntity> computationJobEntities = findPageWithTextSearch(ModelConstants.COMPUTATION_JOB_BY_TENANT_AND_COMPUTATION,
                 Arrays.asList(eq(ModelConstants.COMPUTATION_JOB_TENANT_ID_PROPERTY, tenantId.getId()),
                         eq(ModelConstants.COMPUTATION_JOB_COMPUTATION_ID_PROPERTY, computationId.getId())),
                 pageLink);
 
-        log.trace("Found assets [{}] by tenantId [{}], customerId [{}] and pageLink [{}]", computationJobEntities, tenantId, computationId, pageLink);
+        log.trace("Found computationJobs [{}] by tenantId [{}], customerId [{}] and pageLink [{}]", computationJobEntities, tenantId, computationId, pageLink);
         return DaoUtil.convertDataList(computationJobEntities);
 
     }

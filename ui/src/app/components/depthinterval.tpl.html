@@ -16,6 +16,15 @@
 
 -->
 <section layout="row">
+    <section layout="column" flex ng-show="advanced">
+        <label class="tb-small" translate>{{ predefinedName }}</label>
+        <section layout="row" layout-align="start start" flex>
+            <md-input-container>
+                <label translate>depthinterval.feet</label>
+                <input type="text" ng-model="feetValue" step="1" aria-label="{{ 'depthinterval.feet' | translate }}">
+            </md-input-container>
+        </section>
+    </section>
     <section layout="row" flex ng-show="!advanced">
         <md-input-container flex>
             <label translate>{{ predefinedName }}</label>
@@ -25,5 +34,10 @@
                 </md-option>
             </md-select>
         </md-input-container>
+    </section>
+    <section layout="column" layout-align="center center">
+        <label class="tb-small advanced-label" translate>timeinterval.advanced</label>
+        <md-switch class="advanced-switch" ng-model="advanced" aria-label="predefined-switcher">
+        </md-switch>
     </section>
 </section>

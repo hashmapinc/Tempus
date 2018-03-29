@@ -8,49 +8,38 @@ import org.springframework.web.bind.annotation.*;
 import org.thingsboard.server.common.data.computation.ComputationJob;
 import org.thingsboard.server.common.data.id.ComputationId;
 import org.thingsboard.server.common.data.id.ComputationJobId;
-import org.thingsboard.server.common.data.id.TenantId;
 import org.thingsboard.server.common.data.plugin.ComponentLifecycleEvent;
-import org.thingsboard.server.common.data.plugin.ComponentLifecycleState;
-import org.thingsboard.server.common.data.plugin.PluginMetaData;
 import org.thingsboard.server.dao.computations.ComputationJobService;
+import org.thingsboard.server.dao.computations.ComputationsService;
 import org.thingsboard.server.exception.ThingsboardException;
 
 import java.util.List;
-import java.util.UUID;
+
+import static org.thingsboard.server.exception.ThingsboardErrorCode.ITEM_NOT_FOUND;
 
 @Slf4j
 @RestController
 @RequestMapping("/api")
 public class ComputationJobController extends BaseController{
 
+    @Autowired
+    ComputationJobService computationJobService;
+
+    @Autowired
+    ComputationsService computationsService;
+
     @PreAuthorize("hasAuthority('TENANT_ADMIN')")
     @RequestMapping(value = "/computations/{computationid}/jobs", method = RequestMethod.POST)
     @ResponseBody
-    public ComputationJob saveComputationJob(@PathVariable("computationid") UUID strComputationId,
+    public ComputationJob saveComputationJob(@PathVariable("computationid") String strComputationId,
                                              @RequestBody ComputationJob source) throws ThingsboardException {
-        //checkParameter("computationId", strComputationId);
-        try {
-            boolean created = source.getId() == null;
-            source.setTenantId(getCurrentUser().getTenantId());
-            //UUID id = UUID.fromString(strComputationId.trim());
-            source.setComputationId(new ComputationId(strComputationId));
-            log.debug(" Computation ID added " + source.getComputationId());
-            ComputationJob computationJob = checkNotNull(computationJobService.saveComputationJob(source));
-            actorService.onComputationJobStateChange(computationJob.getTenantId(), computationJob.getComputationId(),
-                    computationJob.getId(), created ? ComponentLifecycleEvent.CREATED : ComponentLifecycleEvent.UPDATED);
-            return computationJob;
-        } catch (Exception e) {
-            throw handleException(e);
+        if(!validateComputationId(strComputationId)){
+            throw new ThingsboardException("ComputationId " + strComputationId + " wasn't found! ",ITEM_NOT_FOUND);
         }
-    }
-
-    @PreAuthorize("hasAuthority('TENANT_ADMIN')")
-    @RequestMapping(value = "/computations/jobs", method = RequestMethod.POST)
-    @ResponseBody
-    public ComputationJob saveComputationJob(@RequestBody ComputationJob source) throws ThingsboardException {
         try {
             boolean created = source.getId() == null;
             source.setTenantId(getCurrentUser().getTenantId());
+            source.setComputationId(new ComputationId(toUUID(strComputationId)));
             ComputationJob computationJob = checkNotNull(computationJobService.saveComputationJob(source));
             actorService.onComputationJobStateChange(computationJob.getTenantId(), computationJob.getComputationId(),
                     computationJob.getId(), created ? ComponentLifecycleEvent.CREATED : ComponentLifecycleEvent.UPDATED);
@@ -61,7 +50,7 @@ public class ComputationJobController extends BaseController{
     }
 
     @PreAuthorize("hasAnyAuthority('SYS_ADMIN', 'TENANT_ADMIN')")
-    @RequestMapping(value = "/computationJob/{computationJobId}", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/computations/jobs/{computationJobId}", method = RequestMethod.DELETE)
     @ResponseStatus(value = HttpStatus.OK)
     public void deleteComputationJob(@PathVariable("computationJobId") String strComputationJobId) throws ThingsboardException {
         checkParameter("computationJobId", strComputationJobId);
@@ -81,6 +70,9 @@ public class ComputationJobController extends BaseController{
     public ComputationJob getComputationJob(@PathVariable("computationJobId") String strComputationJobId,
                                   @PathVariable("computationId") String strComputationId) throws ThingsboardException {
         checkParameter("computationJobId", strComputationJobId);
+        if(!validateComputationId(strComputationId)){
+            throw new ThingsboardException("ComputationId " + strComputationId + " wasn't found!",ITEM_NOT_FOUND);
+        }
         try {
             ComputationJobId computationJobId = new ComputationJobId(toUUID(strComputationJobId));
             return checkComputationJob(computationJobService.findComputationJobById(computationJobId));
@@ -96,6 +88,9 @@ public class ComputationJobController extends BaseController{
                                    @PathVariable("computationId") String strComputationId) throws ThingsboardException {
         checkParameter("strComputationJobId", strComputationJobId);
         checkParameter("strComputationId", strComputationId);
+        if(!validateComputationId(strComputationId)){
+            throw new ThingsboardException("ComputationId " + strComputationId + " wasn't found!",ITEM_NOT_FOUND);
+        }
         try {
             ComputationJobId computationJobId = new ComputationJobId(toUUID(strComputationJobId));
             ComputationId computationId = new ComputationId(toUUID(strComputationId));
@@ -114,6 +109,9 @@ public class ComputationJobController extends BaseController{
                                   @PathVariable("computationId") String strComputationId) throws ThingsboardException {
         checkParameter("strComputationJobId", strComputationJobId);
         checkParameter("strComputationId", strComputationId);
+        if(!validateComputationId(strComputationId)){
+            throw new ThingsboardException("ComputationId " + strComputationId + " wasn't found!",ITEM_NOT_FOUND);
+        }
         try {
             ComputationJobId computationJobId = new ComputationJobId(toUUID(strComputationJobId));
             ComputationId computationId = new ComputationId(toUUID(strComputationId));
@@ -130,6 +128,9 @@ public class ComputationJobController extends BaseController{
     @ResponseStatus(value = HttpStatus.OK)
     public List<ComputationJob> getComputationJobs(@PathVariable("computationId") String strComputationId) throws ThingsboardException {
         checkParameter("computationId", strComputationId);
+        if(!validateComputationId(strComputationId)){
+            throw new ThingsboardException("ComputationId " + strComputationId + " wasn't found!",ITEM_NOT_FOUND);
+        }
         try {
             ComputationId computationId = new ComputationId(toUUID(strComputationId));
             List<ComputationJob> computationJobs = computationJobService.findByComputationId(computationId);
@@ -137,5 +138,12 @@ public class ComputationJobController extends BaseController{
             } catch (Exception e) {
             throw handleException(e);
         }
+    }
+
+    private boolean validateComputationId(String computationId){
+        if(computationsService.findById(new ComputationId(toUUID(computationId))) == null){
+            return false;
+        }
+        return true;
     }
 }
