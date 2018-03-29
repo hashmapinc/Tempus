@@ -1,0 +1,1 @@
+ALTER TABLE thingsboard.application ADD state text;

@@ -46,6 +46,14 @@ public class ModelConstants {
     public static final String ADDITIONAL_INFO_PROPERTY = "additional_info";
 
     /**
+     * Installation Constants
+     */
+
+    public static final String INSTALLED_SCHEMA_VERSIONS = "installed_schema_versions";
+    public static final String INSTALLED_SCRIPTS_COLUMN = "executed_scripts";
+    public static final String THINGSBOARD_KEYSPACE = "thingsboard";
+
+    /**
      * Cassandra user constants.
      */
     public static final String USER_COLUMN_FAMILY_NAME = "user";
@@ -143,6 +151,7 @@ public class ModelConstants {
     public static final String APPLICATION_MINI_DASHBOARD_ID_PROPERTY = "mini_dashboard_id";
     public static final String APPLICATION_NAME = "name";
     public static final String APPLICATION_IS_VALID = "is_valid";
+    public static final String APPLICATION_STATE_PROPERTY = "state";
     public static final String APPLICATION_DESCRIPTION = "description";
     public static final String APPLICATION_DEVICE_TYPES_TABLE = "application_device_types";
     public static final String APPLICATION_RULES_ASSOCIATION_TABLE = "application_associated_rules";

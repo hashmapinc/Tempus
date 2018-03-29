@@ -65,7 +65,7 @@ public class ComputationJobController extends BaseController{
     }
 
     @PreAuthorize("hasAnyAuthority('SYS_ADMIN', 'TENANT_ADMIN')")
-    @RequestMapping(value = "/computations/{computationId}/jobs/{computaionJodId}", method = RequestMethod.GET)
+    @RequestMapping(value = "/computations/{computationId}/jobs/{computationJobId}", method = RequestMethod.GET)
     @ResponseStatus(value = HttpStatus.OK)
     public ComputationJob getComputationJob(@PathVariable("computationJobId") String strComputationJobId,
                                   @PathVariable("computationId") String strComputationId) throws ThingsboardException {
@@ -75,8 +75,7 @@ public class ComputationJobController extends BaseController{
         }
         try {
             ComputationJobId computationJobId = new ComputationJobId(toUUID(strComputationJobId));
-            ComputationJob computationJob = checkComputationJob(computationJobService.findComputationJobById(computationJobId));
-            return computationJob;
+            return checkComputationJob(computationJobService.findComputationJobById(computationJobId));
         } catch (Exception e) {
             throw handleException(e);
         }

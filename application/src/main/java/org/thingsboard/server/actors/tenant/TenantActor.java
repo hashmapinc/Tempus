@@ -20,6 +20,8 @@ import java.util.Map;
 import java.util.Optional;
 
 import org.thingsboard.server.actors.ActorSystemContext;
+import org.thingsboard.server.actors.application.ComputationDeleteMessage;
+import org.thingsboard.server.actors.application.ComputationJobDeleteMessage;
 import org.thingsboard.server.actors.application.DashboardDeleteMessage;
 import org.thingsboard.server.actors.application.RuleDeleteMessage;
 import org.thingsboard.server.actors.device.DeviceActor;
@@ -170,6 +172,18 @@ public class TenantActor extends ContextAwareActor {
                 applicationActor.tell(dashboardDeleteMessage, ActorRef.noSender());
             }
         } else if(msg.getComputationId().isPresent()){
+            if(msg.getEvent().equals(ComponentLifecycleEvent.DELETED)) {
+                ActorRef applicationActor = applicationManager.getOrCreateApplicationActor(this.context());
+                if(msg.getComputationJobId().isPresent()) {
+                    ComputationJobDeleteMessage computationJobDeleteMessage = new ComputationJobDeleteMessage(msg.getComputationJobId().get());
+                    applicationActor.tell(computationJobDeleteMessage, ActorRef.noSender());
+                } /*else if(msg.getComputationId().isPresent()){
+                    ComputationDeleteMessage computationDeleteMessage = new ComputationDeleteMessage(msg.getComputationId().get());
+                    applicationActor.tell(computationDeleteMessage, ActorRef.noSender());
+                }*/ else {
+                    logger.debug("Invalid message: Computation delete message without computationId or ComputationJobId");
+                }
+            }
             ActorRef computationActor = computationManager.getOrCreateComputationActor(this.context(), msg.getComputationId().get());
             computationActor.tell(msg, ActorRef.noSender());
         }else {
