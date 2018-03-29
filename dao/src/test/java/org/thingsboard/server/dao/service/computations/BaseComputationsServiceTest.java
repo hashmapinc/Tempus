@@ -20,6 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.junit.Assert;
 import org.junit.Test;
 import org.thingsboard.server.common.data.computation.Computations;
+import org.thingsboard.server.common.data.id.ComputationId;
 import org.thingsboard.server.common.data.id.TenantId;
 import org.thingsboard.server.dao.service.AbstractServiceTest;
 
@@ -41,7 +42,7 @@ public abstract class BaseComputationsServiceTest extends AbstractServiceTest {
         Computations expected = computationsService.save(generateComputation(null));
         Assert.assertNotNull(expected.getId());
         Computations found = computationsService.findById(expected.getId());
-        Assert.assertEquals(expected, found);
+        Assert.assertEquals(expected.getName(), found.getName());
     }
 
     @Test
@@ -49,7 +50,7 @@ public abstract class BaseComputationsServiceTest extends AbstractServiceTest {
         Computations expected = computationsService.save(generateComputation(null));
         Assert.assertNotNull(expected.getName());
         Computations found = computationsService.findByName(expected.getName());
-        Assert.assertEquals(expected, found);
+        Assert.assertEquals(expected.getName(), found.getName());
     }
 
     @Test

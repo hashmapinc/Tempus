@@ -76,7 +76,7 @@ public class TelemetryRestMsgHandler extends DefaultRestMsgHandler {
 
         if (method.equals("keys")) {
             if (feature == TelemetryFeature.TIMESERIES) {
-                log.error("HMDC inside telemetry keys ");
+                log.debug("HMDC inside telemetry keys ");
                 ctx.loadLatestTimeseries(entityId, new PluginCallback<List<TsKvEntry>>() {
                     @Override
                     public void onSuccess(PluginContext ctx, List<TsKvEntry> value) {
@@ -104,7 +104,7 @@ public class TelemetryRestMsgHandler extends DefaultRestMsgHandler {
                 });
             }
             else if (feature == TelemetryFeature.ATTRIBUTES) {
-                log.error("HMDC inside Attributes keys ");
+                log.debug("HMDC inside Attributes keys ");
                 PluginCallback<List<AttributeKvEntry>> callback = getAttributeKeysPluginCallback(msg);
                 if (!StringUtils.isEmpty(scope)) {
                     ctx.loadAttributes(entityId, scope, callback);
@@ -114,7 +114,7 @@ public class TelemetryRestMsgHandler extends DefaultRestMsgHandler {
             }
         } else if (method.equals("values")) {
             if (feature == TelemetryFeature.TIMESERIES) {
-                log.error("HMDC inside telemetry values ");
+                log.debug("HMDC inside telemetry values ");
                 String keysStr = request.getParameter("keys");
                 List<String> keys = Arrays.asList(keysStr.split(","));
 
@@ -134,7 +134,7 @@ public class TelemetryRestMsgHandler extends DefaultRestMsgHandler {
                             .collect(Collectors.toList());
                     ctx.loadTimeseries(entityId, queries, getTsKvListCallback(msg));
                 } else {
-                    log.error("HMDC inside telemetry values ");
+                    log.debug("HMDC inside telemetry values ");
                     ctx.loadLatestTimeseries(entityId, keys, getTsKvListCallback(msg));
                 }
             } else if(feature == TelemetryFeature.DEPTHSERIES){
@@ -163,7 +163,7 @@ public class TelemetryRestMsgHandler extends DefaultRestMsgHandler {
             }
             else if (feature == TelemetryFeature.ATTRIBUTES) {
                 String keys = request.getParameter("keys", "");
-                log.error("HMDC inside attriibute values ");
+                log.debug("HMDC inside attriibute values ");
 
                 PluginCallback<List<AttributeKvEntry>> callback = getAttributeValuesPluginCallback(msg);
                 if (!StringUtils.isEmpty(scope)) {
