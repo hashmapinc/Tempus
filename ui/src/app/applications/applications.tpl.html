@@ -28,6 +28,8 @@
              is-edit="vm.grid.detailsConfig.isDetailsEditMode"
              application-scope="vm.applicationScope"
              the-form="vm.grid.detailsForm"
+             on-activate-application="vm.activateApplication(event, vm.grid.detailsConfig.currentItem)"
+             on-suspend-application="vm.suspendApplication(event, vm.grid.detailsConfig.currentItem)"
              on-assign-to-customer="vm.assignToCustomer(event, [ vm.grid.detailsConfig.currentItem.id.id ])"
              on-make-public="vm.makePublic(event, vm.grid.detailsConfig.currentItem)"
              on-unassign-from-customer="vm.unassignFromCustomer(event, vm.grid.detailsConfig.currentItem, isPublic)"

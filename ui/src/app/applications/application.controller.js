@@ -163,6 +163,13 @@ export function ApplicationController($timeout, $log, $rootScope, userService, a
       $window.localStorage.removeItem('currentTab');
     };
 
+    function activateApplication(event, application) {
+        applicationService.activateApplication(application.id.id).then(function () {
+            vm.grid.refreshList();
+        }, function () {
+        });
+    }
+
     initController();
 
     function initController() {
@@ -260,6 +267,18 @@ export function ApplicationController($timeout, $log, $rootScope, userService, a
             //         icon: "security"
             //     }
             // );
+            applicationActionsList.push(
+                {
+                    onAction: function ($event, item) {
+                        activateApplication($event, item);
+                    },
+                    name: function() { return $translate.instant('action.activate') },
+                    details: function() { return $translate.instant('application.activate') },
+                    icon: "play_arrow",
+                    isEnabled: function(application) {
+                        return isRuleEditable(application) && application && application.state === 'SUSPENDED';
+                    }
+                });
 
             applicationActionsList.push(
                 {
