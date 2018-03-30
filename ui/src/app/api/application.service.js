@@ -39,7 +39,8 @@ function ApplicationService($http, $q, customerService) {
         assignDashboardToApplication: assignDashboardToApplication,
         unAssignRulesFromApplication: unAssignRulesFromApplication,
         getApplicationsByRuleId : getApplicationsByRuleId,
-        activateApplication: activateApplication
+        activateApplication: activateApplication,
+        suspendApplication: suspendApplication
     }
 
     return service;
@@ -277,6 +278,7 @@ function ApplicationService($http, $q, customerService) {
         });
         return deferred.promise;
     }
+
     function assignDashboardToApplication(applicationId, dashboardId) {
         var deferred = $q.defer();
         var url = '/api/dashboard/main/' + dashboardId + '/application/' + applicationId;
@@ -287,9 +289,21 @@ function ApplicationService($http, $q, customerService) {
         });
         return deferred.promise;
     }
+
     function activateApplication(applicationId) {
         var deferred = $q.defer();
         var url = '/api/application/' + applicationId + '/activate';
+        $http.post(url, null).then(function success(response) {
+            deferred.resolve(response.data);
+        }, function fail(response) {
+            deferred.reject(response.data);
+        });
+        return deferred.promise;
+    }
+
+    function suspendApplication(applicationId) {
+        var deferred = $q.defer();
+        var url = '/api/application/' + applicationId + '/suspend';
         $http.post(url, null).then(function success(response) {
             deferred.resolve(response.data);
         }, function fail(response) {

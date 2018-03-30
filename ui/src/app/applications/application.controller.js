@@ -170,6 +170,13 @@ export function ApplicationController($timeout, $log, $rootScope, userService, a
         });
     }
 
+    function suspendApplication(event, application) {
+        applicationService.suspendApplication(application.id.id).then(function () {
+            vm.grid.refreshList();
+        }, function () {
+        });
+    }
+
     initController();
 
     function initController() {
@@ -276,9 +283,21 @@ export function ApplicationController($timeout, $log, $rootScope, userService, a
                     details: function() { return $translate.instant('application.activate') },
                     icon: "play_arrow",
                     isEnabled: function(application) {
-                        return isRuleEditable(application) && application && application.state === 'SUSPENDED';
+                        return isApplicationEditable(application) && application && application.state === 'SUSPENDED';
                     }
                 });
+            applicationActionsList.push(
+                {
+                    onAction: function ($event, item) {
+                        suspendApplication($event, item);
+                    },
+                    name: function() { return $translate.instant('action.suspend') },
+                    details: function() { return $translate.instant('application.suspend') },
+                    icon: "pause",
+                    isEnabled: function(application) {
+                        return isApplicationEditable(application) && application.state === 'ACTIVE';
+                    }
+            }),
 
             applicationActionsList.push(
                 {
@@ -433,6 +452,13 @@ export function ApplicationController($timeout, $log, $rootScope, userService, a
 
     function getApplicationTitle(application) {
         return application ? application.name : '';
+    }
+    function isApplicationEditable(application) {
+        if (userService.getAuthority() === 'TENANT_ADMIN') {
+            return application && application.tenantId.id != types.id.nullUid;
+        } else {
+            return userService.getAuthority() === 'SYS_ADMIN';
+        }
     }
 
     function saveApplication(application) {
@@ -821,11 +847,6 @@ export function ApplicationController($timeout, $log, $rootScope, userService, a
         }, function () {
         });
     }
-  // var application = {name: "1st App"}
- //  applicationService.saveApplication(application);
-  // var  pageLink = {limit: 30};
-  // applicationService.getTenantApplications(pageLink, false, null, null);
-
 
     var dashboardActionsList = [
         {
