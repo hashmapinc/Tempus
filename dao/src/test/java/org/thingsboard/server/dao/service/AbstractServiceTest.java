@@ -31,6 +31,7 @@ import org.springframework.test.context.support.AnnotationConfigContextLoader;
 import org.thingsboard.server.common.data.BaseData;
 import org.thingsboard.server.common.data.Event;
 import org.thingsboard.server.common.data.computation.Computations;
+import org.thingsboard.server.common.data.id.ComputationId;
 import org.thingsboard.server.common.data.id.EntityId;
 import org.thingsboard.server.common.data.id.TenantId;
 import org.thingsboard.server.common.data.id.UUIDBased;
@@ -201,6 +202,7 @@ public abstract class AbstractServiceTest {
         computationsTest.setJarPath(jarPath);
         computationsTest.setArgsformat(argsformat);
         computationsTest.setArgsType(argsType);
+        computationsTest.setId(new ComputationId(UUIDs.timeBased()));
         return computationsTest;
     }
 

@@ -32,3 +32,5 @@ pom.xml.versionsBackup
 **/Californium.properties
 **/.env
 .instance_id
+.vscode/
+docs/_build

@@ -37,6 +37,7 @@ ldap:
   authentication-server: "${LDAP_AUTH_SERVER:ldap://openldap:389}"
   basedn: "${LDAP_BASE_DN:dc=example,dc=org}"
   id-attribute: "${LDAP_ID_ATTRIBUTE:uid}"
+  admin-email: "${LDAP_ADMIN_EMAIL:sysadmin@hashmapinc.com}"
 
 # Zookeeper connection parameters. Used for service discovery.
 zk:

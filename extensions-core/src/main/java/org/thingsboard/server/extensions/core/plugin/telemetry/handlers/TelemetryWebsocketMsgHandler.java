@@ -301,9 +301,9 @@ public class TelemetryWebsocketMsgHandler extends DefaultWebsocketMsgHandler {
                     ctx.loadLatestTimeseries(entityId, keys, new PluginCallback<List<TsKvEntry>>() {
                         @Override
                         public void onSuccess(PluginContext ctx, List<TsKvEntry> data) {
-                            log.debug("Latest TsKvEntry [{}]", data);
+                            log.info("Latest TsKvEntry [{}]", data);
                             long endTs = data.get(0).getTs();
-                            long startTs = endTs - 61000;
+                            long startTs = endTs - cmd.getTimeWindow();
                             List<TsKvQuery> queries = keys.stream().map(key -> new BaseTsKvQuery(key, startTs, endTs, cmd.getInterval(), getLimit(cmd.getLimit()), getAggregation(cmd.getAgg()))).collect(Collectors.toList());
                             ctx.loadTimeseries(entityId, queries, new PluginCallback<List<TsKvEntry>>() {
                                 @Override
@@ -355,7 +355,7 @@ public class TelemetryWebsocketMsgHandler extends DefaultWebsocketMsgHandler {
                             log.info("Latest DsKvEntry [{}]", data);
                             Double endDs = data.get(0).getDs();
                             log.info("endDs = " + endDs);
-                            Double startDs = endDs - 3000.0;
+                            Double startDs = endDs - cmd.getDepthWindow();
                             List<DsKvQuery> queries = keys.stream().map(key -> new BaseDsKvQuery(key, startDs, endDs, cmd.getInterval(), getLimit(cmd.getLimit()), getDepthAggregation(cmd.getAgg()))).collect(Collectors.toList());
                             ctx.loadDepthSeries(entityId, queries, new PluginCallback<List<DsKvEntry>>() {
                                 @Override

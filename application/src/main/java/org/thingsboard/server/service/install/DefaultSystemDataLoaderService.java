@@ -124,9 +124,19 @@ public class DefaultSystemDataLoaderService implements SystemDataLoaderService {
         return new BCryptPasswordEncoder();
     }
 
+    @Value("${ldap.admin-email}")
+    private String adminEmail;
+
+    @Value("${ldap.authentication-enabled}")
+    private boolean isLdapEnabled;
+
     @Override
     public void createSysAdmin() {
-        createUser(Authority.SYS_ADMIN, null, null, "sysadmin@thingsboard.org", "sysadmin");
+        if(isLdapEnabled) {
+            createUser(Authority.SYS_ADMIN, null, null, adminEmail, null, true);
+        } else {
+            createUser(Authority.SYS_ADMIN, null, null, "sysadmin@hashmapinc.com", "sysadmin", false);
+        }
     }
 
     @Override
@@ -202,14 +212,14 @@ public class DefaultSystemDataLoaderService implements SystemDataLoaderService {
         demoTenant.setRegion("Global");
         demoTenant.setTitle("DemoTenant");
         demoTenant = tenantService.saveTenant(demoTenant);
-        createUser(Authority.TENANT_ADMIN, demoTenant.getId(), null, "demo@hashmapinc.com", "tenant");
+        createUser(Authority.TENANT_ADMIN, demoTenant.getId(), null, "demo@hashmapinc.com", "tenant", false);
 
         Customer customerA = new Customer();
         customerA.setTenantId(demoTenant.getId());
         customerA.setTitle("Drilling Team");
         customerA = customerService.saveCustomer(customerA);
 
-        createUser(Authority.CUSTOMER_USER, demoTenant.getId(), customerA.getId(), "bob.jones@hashmapinc.com", "driller");
+        createUser(Authority.CUSTOMER_USER, demoTenant.getId(), customerA.getId(), "bob.jones@hashmapinc.com", "driller", false);
 
         List<AttributeKvEntry> attributesTank123 = new ArrayList<>();
         attributesTank123.add(new BaseAttributeKvEntry(new StringDataEntry("latitude", "52.330732"), DateTime.now().getMillis()));
@@ -240,18 +250,23 @@ public class DefaultSystemDataLoaderService implements SystemDataLoaderService {
                             TenantId tenantId,
                             CustomerId customerId,
                             String email,
-                            String password) {
+                            String password,
+                            boolean isExternalUser) {
         User user = new User();
         user.setAuthority(authority);
         user.setEmail(email);
         user.setTenantId(tenantId);
         user.setCustomerId(customerId);
-        user = userService.saveUser(user);
-        UserCredentials userCredentials = userService.findUserCredentialsByUserId(user.getId());
-        userCredentials.setPassword(passwordEncoder.encode(password));
-        userCredentials.setEnabled(true);
-        userCredentials.setActivateToken(null);
-        userService.saveUserCredentials(userCredentials);
+        if(isExternalUser) {
+            user = userService.saveExternalUser(user);
+        } else {
+            user = userService.saveUser(user);
+            UserCredentials userCredentials = userService.findUserCredentialsByUserId(user.getId());
+            userCredentials.setPassword(passwordEncoder.encode(password));
+            userCredentials.setEnabled(true);
+            userCredentials.setActivateToken(null);
+            userService.saveUserCredentials(userCredentials);
+        }
         return user;
     }
 

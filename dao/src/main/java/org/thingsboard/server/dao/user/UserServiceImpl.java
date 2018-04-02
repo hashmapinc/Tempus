@@ -97,6 +97,21 @@ public class UserServiceImpl extends AbstractEntityService implements UserServic
         }        
         return savedUser;
     }
+
+    @Override
+    public User saveExternalUser(User user){
+	    log.trace("Executing save external user [{}]", user);
+	    userValidator.validate(user);
+        User savedUser = userDao.save(user);
+        if(user.getId() == null) {
+            UserCredentials userCredentials = new UserCredentials();
+            userCredentials.setEnabled(true);
+            userCredentials.setActivateToken(null);
+            userCredentials.setUserId(new UserId(savedUser.getUuidId()));
+            userCredentialsDao.save(userCredentials);
+        }
+        return savedUser;
+    }
     
     @Override
     public UserCredentials findUserCredentialsByUserId(UserId userId) {
@@ -291,9 +306,10 @@ public class UserServiceImpl extends AbstractEntityService implements UserServic
                         throw new DataValidationException("User credentials should be assigned to user!");
                     }
                     if (userCredentials.isEnabled()) {
-                        if (StringUtils.isEmpty(userCredentials.getPassword())) {
+                        //activated ldap users can have no password
+                        /*if (StringUtils.isEmpty(userCredentials.getPassword())) {
                             throw new DataValidationException("Enabled user credentials should have password!");
-                        }
+                        }*/
                         if (StringUtils.isNotEmpty(userCredentials.getActivateToken())) {
                             throw new DataValidationException("Enabled user credentials can't have activate token!");
                         }

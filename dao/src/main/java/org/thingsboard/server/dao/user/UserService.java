@@ -34,6 +34,8 @@ public interface UserService {
 
 	User saveUser(User user);
 
+	User saveExternalUser(User user);
+
 	UserCredentials findUserCredentialsByUserId(UserId userId);
 	
 	UserCredentials findUserCredentialsByActivateToken(String activateToken);
