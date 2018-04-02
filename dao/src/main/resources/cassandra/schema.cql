@@ -683,3 +683,8 @@ CREATE MATERIALIZED VIEW IF NOT EXISTS thingsboard.cmp_jobs_by_tenant_and_cmp_se
     WHERE tenant_id IS NOT NULL AND computation_id IS NOT NULL AND search_text IS NOT NULL AND id IS NOT NULL
     PRIMARY KEY (tenant_id, computation_id, search_text, id)
     WITH CLUSTERING ORDER BY ( search_text ASC, id DESC );
+
+CREATE TABLE IF NOT EXISTS thingsboard.installed_schema_versions (
+    executed_scripts text,
+    PRIMARY KEY(executed_scripts)
+);

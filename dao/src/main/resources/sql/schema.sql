@@ -320,3 +320,6 @@ CREATE TABLE IF NOT EXISTS computation_job (
     state varchar(255),
     tenant_id varchar(31)
 );
+
+
+CREATE TABLE IF NOT EXISTS installed_schema_versions(executed_scripts varchar(255) UNIQUE);

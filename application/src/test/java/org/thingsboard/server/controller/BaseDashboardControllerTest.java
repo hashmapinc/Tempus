@@ -19,17 +19,24 @@ import static org.hamcrest.Matchers.containsString;
 import static org.thingsboard.server.dao.model.ModelConstants.NULL_UUID;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.io.IOException;
+import java.util.*;
 
 import com.datastax.driver.core.utils.UUIDs;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.thingsboard.server.common.data.*;
+import org.thingsboard.server.common.data.computation.ComputationJob;
+import org.thingsboard.server.common.data.computation.Computations;
+import org.thingsboard.server.common.data.id.ComputationId;
 import org.thingsboard.server.common.data.id.CustomerId;
 import org.thingsboard.server.common.data.page.TextPageData;
 import org.thingsboard.server.common.data.page.TextPageLink;
+import org.thingsboard.server.common.data.plugin.PluginMetaData;
+import org.thingsboard.server.common.data.rule.RuleMetaData;
 import org.thingsboard.server.common.data.security.Authority;
+import org.thingsboard.server.dao.computations.ComputationsService;
 import org.thingsboard.server.dao.model.ModelConstants;
 import org.junit.After;
 import org.junit.Assert;
@@ -37,13 +44,18 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import org.thingsboard.server.extensions.core.plugin.telemetry.TelemetryStoragePlugin;
 
 public abstract class BaseDashboardControllerTest extends AbstractControllerTest {
     
     private IdComparator<DashboardInfo> idComparator = new IdComparator<>();
-    
+    private static final ObjectMapper mapper = new ObjectMapper();
     private Tenant savedTenant;
     private User tenantAdmin;
+    private PluginMetaData tenantPlugin;
+
+    @Autowired
+    ComputationsService computationsService;
     
     @Before
     public void beforeTest() throws Exception {
@@ -62,6 +74,13 @@ public abstract class BaseDashboardControllerTest extends AbstractControllerTest
         tenantAdmin.setLastName("Downs");
         
         tenantAdmin = createUserAndLogin(tenantAdmin, "testPassword1");
+
+        tenantPlugin = new PluginMetaData();
+        tenantPlugin.setName("My plugin");
+        tenantPlugin.setApiToken("myplugin");
+        tenantPlugin.setConfiguration(mapper.readTree("{}"));
+        tenantPlugin.setClazz(TelemetryStoragePlugin.class.getName());
+        tenantPlugin = doPost("/api/plugin", tenantPlugin, PluginMetaData.class);
     }
     
     @After
@@ -116,10 +135,30 @@ public abstract class BaseDashboardControllerTest extends AbstractControllerTest
         Application savedApplication = doPost("/api/application", application, Application.class);
 
 
-        String dashboardType = "main";
+        Computations savedComputations = saveComputation();
+        ComputationJob computationJob1 = new ComputationJob();
+        computationJob1.setName("Computation Job 1");
+        computationJob1.setJobId("0123");
+        ComputationJob savedComputationJob1 = doPost("/api/computations/"+savedComputations.getId().getId().toString()+"/jobs", computationJob1, ComputationJob.class);
+        ApplicationFieldsWrapper applicationComputationJosWrapper = new ApplicationFieldsWrapper();
+        applicationComputationJosWrapper.setApplicationId(savedApplication.getId().getId().toString());
+        applicationComputationJosWrapper.setFields(new HashSet<>(Arrays.asList(savedComputationJob1.getId().toString())));
+        doPostWithDifferentResponse("/api/app/assignComputationJobs", applicationComputationJosWrapper, Application.class);
+
+
+        RuleMetaData rule = createRuleMetaData(tenantPlugin);
+        RuleMetaData savedRule = doPost("/api/rule", rule, RuleMetaData.class);
+        RuleMetaData foundRule = doGet("/api/rule/" + savedRule.getId().getId().toString(), RuleMetaData.class);
+        Assert.assertNotNull(foundRule);
+        ApplicationFieldsWrapper applicationRulesWrapper = new ApplicationFieldsWrapper();
+        applicationRulesWrapper.setApplicationId(savedApplication.getId().getId().toString());
+        applicationRulesWrapper.setFields(new HashSet<>(Arrays.asList(savedRule.getId().getId().toString())));
+        doPostWithDifferentResponse("/api/app/assignRules", applicationRulesWrapper, Application.class);
+
+        String dashboardType = "mini";
         Application assignedApplication = doPost("/api/dashboard/"+dashboardType+"/"+savedDashboard.getId().getId().toString()
                 +"/application/"+savedApplication.getId().getId().toString(), Application.class);
-        Assert.assertEquals(savedDashboard.getId(), assignedApplication.getDashboardId());
+        Assert.assertEquals(savedDashboard.getId(), assignedApplication.getMiniDashboardId());
         Assert.assertTrue(assignedApplication.getIsValid());
 
         doDelete("/api/dashboard/"+savedDashboard.getId().getId().toString())
@@ -454,6 +493,32 @@ public abstract class BaseDashboardControllerTest extends AbstractControllerTest
                 new TypeReference<TextPageData<DashboardInfo>>(){}, pageLink);
         Assert.assertFalse(pageData.hasNext());
         Assert.assertEquals(0, pageData.getData().size());
+    }
+
+    private Computations saveComputation() {
+        Computations computations = new Computations();
+        computations.setName("Computation");
+        computations.setId(new ComputationId(UUIDs.timeBased()));
+        computations.setJarPath("/Some/Jar/path");
+        computations.setTenantId(savedTenant.getId());
+        computations.setJarName("SomeJar");
+        computations.setMainClass("MainClass");
+        //computations.setJsonDescriptor();
+        computations.setArgsformat("argsFormat");
+        computations.setArgsType("ArgsType");
+        return computationsService.save(computations);
+    }
+
+    public static RuleMetaData createRuleMetaData(PluginMetaData plugin) throws IOException {
+        RuleMetaData rule = new RuleMetaData();
+        rule.setName("My Rule");
+        rule.setPluginToken(plugin.getApiToken());
+        rule.setFilters(mapper.readTree("[{\"clazz\":\"org.thingsboard.server.extensions.core.filter.MsgTypeFilter\", " +
+                "\"name\":\"TelemetryFilter\", " +
+                "\"configuration\": {\"messageTypes\":[\"POST_TELEMETRY\",\"POST_ATTRIBUTES\",\"GET_ATTRIBUTES\"]}}]"));
+        rule.setAction(mapper.readTree("{\"clazz\":\"org.thingsboard.server.extensions.core.action.telemetry.TelemetryPluginAction\", \"name\":\"TelemetryMsgConverterAction\", " +
+                "\"configuration\":{\"timeUnit\":\"DAYS\", \"ttlValue\":1}}"));
+        return rule;
     }
 
 }

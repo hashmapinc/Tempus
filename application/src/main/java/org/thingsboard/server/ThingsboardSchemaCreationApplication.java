@@ -35,7 +35,7 @@ import java.util.Arrays;
         "org.thingsboard.server.dao.cassandra.AbstractCassandraCluster"})
 public class ThingsboardSchemaCreationApplication {
     private static final String SPRING_CONFIG_NAME_KEY = "--spring.config.name";
-    private static final String DEFAULT_SPRING_CONFIG_PARAM = SPRING_CONFIG_NAME_KEY + "=" + "thingsboard";
+    private static final String DEFAULT_SPRING_CONFIG_PARAM = SPRING_CONFIG_NAME_KEY + "=" + "tempus";
 
     public static void main(String[] args) {
         SpringApplication application = new SpringApplication(ThingsboardInstallApplication.class);

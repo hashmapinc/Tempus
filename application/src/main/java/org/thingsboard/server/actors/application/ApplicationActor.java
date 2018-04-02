@@ -25,7 +25,14 @@ public class ApplicationActor extends ContextAwareActor {
         } else if(message instanceof DashboardDeleteMessage){
             logger.debug("msg type DashboardDeleteMessage -->");
             systemContext.getApplicationService().updateApplicationOnDashboardDelete(((DashboardDeleteMessage) message).getDashboardId(), tenantId);
-        } else {
+        } else if(message instanceof ComputationJobDeleteMessage) {
+            logger.debug("msg type ComputationJobDeleteMessage -->");
+            systemContext.getApplicationService().updateApplicationOnComputationJobDelete(((ComputationJobDeleteMessage) message).getComputationJobId(), tenantId);
+        } /*else if (message instanceof ComputationDeleteMessage) {
+            logger.debug("msg type ComputationJobDeleteMessage -->");
+            systemContext.getApplicationService().updateApplicationOnComputationDelete(((ComputationDeleteMessage) message).getComputationId(), tenantId);
+        }*/
+        else {
             logger.debug("[{}][{}] Unknown msg type.", tenantId, message.getClass().getName());
         }
     }

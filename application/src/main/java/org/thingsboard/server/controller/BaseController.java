@@ -41,6 +41,8 @@ import org.thingsboard.server.common.data.widget.WidgetsBundle;
 import org.thingsboard.server.dao.alarm.AlarmService;
 import org.thingsboard.server.dao.application.ApplicationService;
 import org.thingsboard.server.dao.asset.AssetService;
+import org.thingsboard.server.dao.computations.ComputationJobService;
+import org.thingsboard.server.dao.computations.ComputationsService;
 import org.thingsboard.server.dao.customer.CustomerService;
 import org.thingsboard.server.dao.dashboard.DashboardService;
 import org.thingsboard.server.dao.device.DeviceCredentialsService;
@@ -120,6 +122,13 @@ public abstract class BaseController {
 
     @Autowired
     protected ApplicationService applicationService;
+
+    @Autowired
+    protected ComputationJobService computationJobService;
+
+    @Autowired
+    protected ComputationsService computationsService;
+
 
 
     @ExceptionHandler(ThingsboardException.class)

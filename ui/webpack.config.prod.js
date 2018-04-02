@@ -42,7 +42,7 @@ module.exports = {
             moment: "moment"
         }),
         new CopyWebpackPlugin([
-            {from: './src/thingsboard.svg', to: 'thingsboard.svg'},
+            {from: './src/tempus.ico', to: 'tempus.ico'},
             {from: './src/svg', to: 'svg'},
             {from: './src/images', to: 'images'}
         ]),
