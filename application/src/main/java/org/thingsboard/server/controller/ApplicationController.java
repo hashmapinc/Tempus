@@ -15,6 +15,7 @@
  */
 package org.thingsboard.server.controller;
 
+import com.google.common.collect.Iterables;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -36,6 +37,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static org.thingsboard.server.common.data.plugin.ComponentLifecycleState.ACTIVE;
+import static org.thingsboard.server.dao.model.ModelConstants.NULL_UUID;
 
 @RestController
 @RequestMapping("/api")
@@ -364,23 +366,28 @@ public class ApplicationController extends BaseController {
         Map<RuleId, RuleMetaData> activatedRules = new HashMap<>();
         Map<ComputationJobId, ComputationJob> activatedComputations = new HashMap<>();
         try {
-            for(RuleId ruleId: application.getRules()) {
-                RuleMetaData rule = checkRule(ruleService.findRuleById(ruleId));
-                if(!rule.getState().equals(ComponentLifecycleState.ACTIVE)) {
-                    ruleService.activateRuleById(ruleId);
-                    actorService.onRuleStateChange(rule.getTenantId(), rule.getId(), ComponentLifecycleEvent.ACTIVATED);
-                    activatedRules.put(ruleId, rule);
+            if(application.getRules().size() > 1 || !Iterables.getOnlyElement(application.getRules()).getId().equals(NULL_UUID)) {
+                for(RuleId ruleId: application.getRules()) {
+                    RuleMetaData rule = checkRule(ruleService.findRuleById(ruleId));
+                    if(!rule.getState().equals(ComponentLifecycleState.ACTIVE)) {
+                        ruleService.activateRuleById(ruleId);
+                        actorService.onRuleStateChange(rule.getTenantId(), rule.getId(), ComponentLifecycleEvent.ACTIVATED);
+                        activatedRules.put(ruleId, rule);
+                    }
                 }
             }
 
-            for(ComputationJobId computationJobId: application.getComputationJobIdSet()) {
-                ComputationJob computationJob = checkComputationJob(computationJobService.findComputationJobById(computationJobId));
-                if(!computationJob.getState().equals(ComponentLifecycleState.ACTIVE)) {
-                    computationJobService.activateComputationJobById(computationJobId);
-                    actorService.onComputationJobStateChange(computationJob.getTenantId(), computationJob.getComputationId(), computationJob.getId(), ComponentLifecycleEvent.ACTIVATED);
-                    activatedComputations.put(computationJob.getId(), computationJob);
+            if(application.getComputationJobIdSet().size() >1 || !Iterables.getOnlyElement(application.getComputationJobIdSet()).getId().equals(NULL_UUID)) {
+                for(ComputationJobId computationJobId: application.getComputationJobIdSet()) {
+                    ComputationJob computationJob = checkComputationJob(computationJobService.findComputationJobById(computationJobId));
+                    if(!computationJob.getState().equals(ComponentLifecycleState.ACTIVE)) {
+                        computationJobService.activateComputationJobById(computationJobId);
+                        actorService.onComputationJobStateChange(computationJob.getTenantId(), computationJob.getComputationId(), computationJob.getId(), ComponentLifecycleEvent.ACTIVATED);
+                        activatedComputations.put(computationJob.getId(), computationJob);
+                    }
                 }
             }
+
             applicationService.activateApplicationById(application.getId());
         } catch (Exception e) {
             if(!activatedRules.isEmpty()) {
@@ -417,18 +424,22 @@ public class ApplicationController extends BaseController {
     }
 
     private void suspendComputations(Set<ComputationJobId> computationJobIds) throws ThingsboardException {
-        for(ComputationJobId computationJobId: computationJobIds) {
-            ComputationJob computationJob = checkComputationJob(computationJobService.findComputationJobById(computationJobId));
-            computationJobService.suspendComputationJobById(computationJobId);
-            actorService.onComputationJobStateChange(computationJob.getTenantId(), computationJob.getComputationId(), computationJob.getId(), ComponentLifecycleEvent.SUSPENDED);
+        if(computationJobIds.size() > 1 || !Iterables.getOnlyElement(computationJobIds).getId().equals(NULL_UUID)) {
+            for(ComputationJobId computationJobId: computationJobIds) {
+                ComputationJob computationJob = checkComputationJob(computationJobService.findComputationJobById(computationJobId));
+                computationJobService.suspendComputationJobById(computationJobId);
+                actorService.onComputationJobStateChange(computationJob.getTenantId(), computationJob.getComputationId(), computationJob.getId(), ComponentLifecycleEvent.SUSPENDED);
+            }
         }
     }
 
     private void suspendRules(Set<RuleId> ruleIds) throws ThingsboardException {
-        for(RuleId ruleId: ruleIds) {
-            RuleMetaData rule = checkRule(ruleService.findRuleById(ruleId));
-            ruleService.suspendRuleById(ruleId);
-            actorService.onRuleStateChange(rule.getTenantId(), rule.getId(), ComponentLifecycleEvent.SUSPENDED);
+        if(ruleIds.size() > 1 || !Iterables.getOnlyElement(ruleIds).getId().equals(NULL_UUID)) {
+            for(RuleId ruleId: ruleIds) {
+                RuleMetaData rule = checkRule(ruleService.findRuleById(ruleId));
+                ruleService.suspendRuleById(ruleId);
+                actorService.onRuleStateChange(rule.getTenantId(), rule.getId(), ComponentLifecycleEvent.SUSPENDED);
+            }
         }
     }
 

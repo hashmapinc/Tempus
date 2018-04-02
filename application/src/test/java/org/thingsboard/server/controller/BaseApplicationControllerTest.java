@@ -26,9 +26,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.thingsboard.server.common.data.*;
 import org.thingsboard.server.common.data.computation.ComputationJob;
 import org.thingsboard.server.common.data.computation.Computations;
-import org.thingsboard.server.common.data.id.ComputationId;
-import org.thingsboard.server.common.data.id.ComputationJobId;
-import org.thingsboard.server.common.data.id.RuleId;
+import org.thingsboard.server.common.data.id.*;
 import org.thingsboard.server.common.data.page.TextPageData;
 import org.thingsboard.server.common.data.page.TextPageLink;
 import org.thingsboard.server.common.data.plugin.ComponentLifecycleState;
@@ -687,7 +685,7 @@ public class BaseApplicationControllerTest extends AbstractControllerTest {
         Assert.assertEquals(3, foundApplications2.size());
     }
 
-   @Test
+    @Test
     public void testUnAssignUnAssignComputationJobsToApplication() throws Exception{
         Application application = new Application();
         application.setName("My application");
@@ -708,7 +706,7 @@ public class BaseApplicationControllerTest extends AbstractControllerTest {
         ComputationJob savedComputationJob2 = doPost("/api/computations/"+savedComputations.getId().getId().toString()+"/jobs", computationJob2, ComputationJob.class);
 
 
-       ApplicationFieldsWrapper applicationComputationJosWrapper = new ApplicationFieldsWrapper();
+        ApplicationFieldsWrapper applicationComputationJosWrapper = new ApplicationFieldsWrapper();
         applicationComputationJosWrapper.setApplicationId(savedApplication.getId().getId().toString());
         applicationComputationJosWrapper.setFields(new HashSet<>(Arrays.asList(savedComputationJob1.getId().toString(), savedComputationJob2.getId().toString())));
 
@@ -718,7 +716,7 @@ public class BaseApplicationControllerTest extends AbstractControllerTest {
         Assert.assertEquals(new HashSet<>(Arrays.asList(savedComputationJob1.getId(), savedComputationJob2.getId())), foundAssignedApplication.getComputationJobIdSet());
 
 
-       ApplicationFieldsWrapper applicationComputationJosWrapper1 = new ApplicationFieldsWrapper();
+        ApplicationFieldsWrapper applicationComputationJosWrapper1 = new ApplicationFieldsWrapper();
         applicationComputationJosWrapper1.setApplicationId(savedApplication.getId().getId().toString());
         applicationComputationJosWrapper1.setFields(new HashSet<>(Arrays.asList(savedComputationJob2.getId().toString())));
         Application unAssignedApplication = doPostWithDifferentResponse("/api/app/unassignComputationJobs", applicationComputationJosWrapper1, Application.class);
@@ -828,7 +826,28 @@ public class BaseApplicationControllerTest extends AbstractControllerTest {
 
         ComputationJob foundComputationJob = doGet("/api/computations/"+savedComputations.getId().getId().toString()+"/jobs/"+ savedComputationJob1.getId(), ComputationJob.class);
         Assert.assertEquals(ComponentLifecycleState.ACTIVE, foundComputationJob.getState());
+
+        doPost("/api/application/"+savedApplication.getId().getId().toString() +"/suspend").andExpect(status().isOk());
+        Assert.assertEquals(ComponentLifecycleState.SUSPENDED, doGet("/api/application/" + savedApplication.getId().getId().toString(), Application.class).getState());
+        Assert.assertEquals(ComponentLifecycleState.SUSPENDED ,doGet("/api/rule/"+savedRule1.getId().getId().toString(), RuleMetaData.class).getState());
+        Assert.assertEquals(ComponentLifecycleState.SUSPENDED, doGet("/api/computations/"+savedComputations.getId().getId().toString()+"/jobs/"+ savedComputationJob1.getId(), ComputationJob.class));
     }
+
+    @Test
+    public void testActivateSuspendApplicationWithoutRulesAndComputationSuccess() throws Exception {
+        Application application = new Application();
+        application.setName("My application");
+        Application savedApplication = doPost("/api/application", application, Application.class);
+        Assert.assertEquals(ComponentLifecycleState.SUSPENDED, savedApplication.getState());
+        doPost("/api/application/"+savedApplication.getId().getId().toString() +"/activate").andExpect(status().isOk());
+
+        Application foundApplication = doGet("/api/application/" + savedApplication.getId().getId().toString(), Application.class);
+        Assert.assertEquals(ComponentLifecycleState.ACTIVE, foundApplication.getState());
+
+        doPost("/api/application/"+savedApplication.getId().getId().toString() +"/suspend").andExpect(status().isOk());
+        Assert.assertEquals(ComponentLifecycleState.SUSPENDED,  doGet("/api/application/" + savedApplication.getId().getId().toString(), Application.class).getState());
+    }
+
 
 
     private Computations saveComputation() {
