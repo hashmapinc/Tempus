@@ -35,7 +35,7 @@ public interface ApplicationService {
 
     List<Application> findApplicationsByDeviceType(TenantId tenantId, String deviceType);
 
-    List<String> findApplicationByRuleId(TenantId tenantId, RuleId ruleId);
+    Set<String> findApplicationByRuleIds(TenantId tenantId, Set<RuleId> ruleIds);
 
     List<String> findApplicationByDashboardId(TenantId tenantId, DashboardId dashboardId);
 
@@ -49,6 +49,10 @@ public interface ApplicationService {
 
     Application assignRulesToApplication(ApplicationId applicationId, Set<RuleId> ruleIdList);
 
+    Application assignDevicesToApplication(ApplicationId applicationId, Set<String> deviceTypes);
+
+    Application unassignDevicesToApplication(ApplicationId applicationId, String[] deviceTypes);
+
     Application unassignRulesToApplication(ApplicationId applicationId, Set<RuleId> ruleIdList);
 
     Application assignComputationJobsToApplication(ApplicationId applicationId, Set<ComputationJobId> computationJobIds);
@@ -59,8 +63,14 @@ public interface ApplicationService {
 
     void updateApplicationOnComputationJobDelete(ComputationJobId computationJobId, TenantId tenantId);
 
+    void updateApplicationOnComputationDelete(ComputationId computationId, TenantId tenantId);
+
     void updateApplicationOnRuleDelete(RuleId ruleId, TenantId tenantId);
 
     void updateApplicationOnDashboardDelete(DashboardId dashboardIdId, TenantId tenantId);
+
+    void activateApplicationById(ApplicationId applicationId);
+
+    void suspendApplicationById(ApplicationId applicationId);
 
 }

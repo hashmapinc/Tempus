@@ -83,7 +83,7 @@ public class CassandraBaseDepthSeriesDao extends CassandraAbstractAsyncDao imple
         super.startExecutor();
         if (!isInstall()) {
             getFetchStmt(DepthAggregation.NONE);
-            log.error("HMDC inside init. ");
+            log.debug("HMDC inside init. ");
             /*Optional<TsPartitionDate> partition = TsPartitionDate.parse(partitioning);
             if (partition.isPresent()) {
                 tsFormat = partition.get();
@@ -271,7 +271,7 @@ public class CassandraBaseDepthSeriesDao extends CassandraAbstractAsyncDao imple
     @Override
     public ListenableFuture<Void> save(EntityId entityId, DsKvEntry dsKvEntry, long ttl) {
         Double partition = dsKvEntry.getDs();
-        log.error("HMDC Partition value " + partition);
+        log.debug("HMDC Partition value " + partition);
         DataType type = dsKvEntry.getDataType();
         BoundStatement stmt = (ttl == 0 ? getSaveStmt(type) : getSaveTtlStmt(type)).bind();
         stmt.setString(0, entityId.getEntityType().name())
@@ -415,7 +415,7 @@ public class CassandraBaseDepthSeriesDao extends CassandraAbstractAsyncDao imple
 
     private PreparedStatement getFetchStmt(DepthAggregation aggType) {
         if (fetchStmts == null) {
-            log.error("HMDC Here I am fetch null");
+            log.debug("HMDC Here I am fetch null");
             fetchStmts = new PreparedStatement[DepthAggregation.values().length];
             for (DepthAggregation type : DepthAggregation.values()) {
                 if (type == DepthAggregation.SUM && fetchStmts[DepthAggregation.AVG.ordinal()] != null) {
@@ -423,7 +423,7 @@ public class CassandraBaseDepthSeriesDao extends CassandraAbstractAsyncDao imple
                 } else if (type == DepthAggregation.AVG && fetchStmts[DepthAggregation.SUM.ordinal()] != null) {
                     fetchStmts[type.ordinal()] = fetchStmts[DepthAggregation.SUM.ordinal()];
                 } else {
-                    log.error("HMDC here Iam else ");
+                    log.debug("HMDC here Iam else ");
                     fetchStmts[type.ordinal()] = getSession().prepare("SELECT " +
                             String.join(", ", ModelConstants.getFetchColumnNames(type)) + " FROM " + ModelConstants.DS_KV_CF
                             + " WHERE " + ModelConstants.ENTITY_TYPE_COLUMN + " = ? "
@@ -436,7 +436,7 @@ public class CassandraBaseDepthSeriesDao extends CassandraAbstractAsyncDao imple
                 }
             }
         }
-        log.error("HMDC Out of fetch null ");
+        log.debug("HMDC Out of fetch null ");
         return fetchStmts[aggType.ordinal()];
     }
 

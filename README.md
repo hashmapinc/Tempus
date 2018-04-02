@@ -77,6 +77,15 @@ To enable LDAP authentication change the value of flag 'authentication-enabled' 
 
 The corresponding code can be found in class ThingsboardSecurityConfiguration.java and RestAuthenticationProvider.java. Please refer the official oracle documentation on how LDAP security has been implemented - [LDAP authentication in Java](https://docs.oracle.com/javase/jndi/tutorial/ldap/security/ldap.html)
 
+## SCHEMA MODIFICATION
+
+To upgrade the schema(modify the existing tables), Put the upgrade scripts in upgrade folder under resources in "dao" module. there are different folders "sql" and "cassandra" for corresponding database. Note that the naming format of the upgrade script needs to be - [Name].[Extension] Where name can only be number[anything else other then number in name will cause an ERROR] and upgrades will be applied in the order of names sorted numerically by name and extension can be either sql or cql
+
+example - 1.sql, 5.sql, 4.sql, 3.sql, 2.sql (or extension cql for cassandra)
+
+in the example above the order in which scripts will be applied is - 1.sql, 2.sql, 3.sql, 4.sql, 5.sql
+
+
 # Spark Annotations
 
 ## Introduction

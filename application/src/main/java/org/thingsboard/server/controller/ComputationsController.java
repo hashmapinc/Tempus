@@ -89,6 +89,7 @@ public class ComputationsController extends BaseController {
         Computations computation = checkComputation(computationsService.findById(computationId));
         List<ComputationJob> computationJobs = checkNotNull(computationJobService.findByComputationId(computation.getId()));
         for (ComputationJob computationJob: computationJobs) {
+            computationJobService.deleteComputationJobById(computationJob.getId());
             actorService.onComputationJobStateChange(computationJob.getTenantId(), computationJob.getComputationId(), computationJob.getId(), ComponentLifecycleEvent.DELETED);
         }
         computationsService.deleteById(computationId);
