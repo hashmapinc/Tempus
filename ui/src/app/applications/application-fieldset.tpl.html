@@ -48,6 +48,14 @@
 	    	</div>				
 		</md-input-container>
     <md-input-container class="md-block">
+     <tb-json-form schema="application.configurationDescriptor.schema"
+                                          form="application.configurationDescriptor.form"
+                                          model="application.configuration"
+                                          readonly="loading || !isEdit"
+                                          form-control="theForm">
+      </tb-json-form>      
+    </md-input-container>
+    <md-input-container class="md-block">
         <label translate>application.description</label>
         <textarea ng-model="application.additionalInfo.description" rows="2"></textarea>
     </md-input-container>
