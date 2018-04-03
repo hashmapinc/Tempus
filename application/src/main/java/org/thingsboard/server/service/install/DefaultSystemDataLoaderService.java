@@ -232,6 +232,7 @@ public class DefaultSystemDataLoaderService implements SystemDataLoaderService {
         createDevice(demoTenant.getId(), customerA.getId(), "WaterTank", "Tank 123", "Test_Token_Tank123", null, false, attributesTank123);
         createDevice(demoTenant.getId(), customerA.getId(), "WaterTank", "Tank 456", "Test_Token_Tank456", null, false, attributesTank456);
         createDevice(demoTenant.getId(), customerA.getId(), "Gateway", "Spark Analytics Gateway", "GATEWAY_ACCESS_TOKEN", null, true, null);
+        createDevice(demoTenant.getId(), customerA.getId(), "Gateway", "Device Gateway", "DEVICE_GATEWAY_TOKEN", null, true, null);
 
         loadPlugins(Paths.get(dataDir, JSON_DIR, DEMO_DIR, PLUGINS_DIR), demoTenant.getId());
         loadRules(Paths.get(dataDir, JSON_DIR, DEMO_DIR, RULES_DIR), demoTenant.getId());
