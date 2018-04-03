@@ -32,14 +32,51 @@ export default function ApplicationDirective($compile, $templateCache, toast, $t
 
         scope.applicationCredentials = null;
 
+        scope.application.configurationDescriptor = {
+  "schema": {
+    "title": "Device Type Filter Configuration",
+    "type": "object",
+    "properties": {
+      "deviceTypes": {
+        "title": "Device types",
+        "type": "array",
+        "minItems" : 1,
+        "items": {
+          "type": "object",
+          "title": "Device Type",
+          "properties": {
+            "name": {
+              "title": "Device Type",
+              "type": "string"
+            }
+          }
+        },
+        "uniqueItems": true
+      }
+    },
+    "required": ["deviceTypes"]
+  },
+  "form": [
+    "deviceTypes"
+  ]
+}
+
         scope.$watch('application', function(newVal) {
             if (newVal) {
-                if (scope.application.id) {
-                    applicationService.getApplicationCredentials(scope.application.id.id).then(
-                        function success(credentials) {
-                            scope.applicationCredentials = credentials;
-                        }
-                    );
+                // if (scope.application.id) {
+                //     applicationService.getApplicationCredentials(scope.application.id.id).then(
+                //         function success(credentials) {
+                //             scope.applicationCredentials = credentials;
+                //         }
+                //     );
+                // }
+                if(angular.isDefined(scope.application.deviceTypes)){
+                    scope.application.configuration = {};
+                    scope.application.configuration.deviceTypes = [];
+                    scope.application.deviceTypes.forEach(function(deviceType){
+
+                        scope.application.configuration.deviceTypes.push({"name": deviceType});
+                    })
                 }
                 if (scope.application.customerId && scope.application.customerId.id !== types.id.nullUid) {
                     scope.isAssignedToCustomer = true;
