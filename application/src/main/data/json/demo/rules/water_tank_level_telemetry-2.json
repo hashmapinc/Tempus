@@ -1,0 +1,46 @@
+{
+  "name": "Water Tank Level Telemetry",
+  "state": "ACTIVE",
+  "weight": 0,
+  "pluginToken": "kafka_plugin_token",
+  "filters": [
+    {
+      "configuration": {
+        "messageTypes": [
+          "POST_TELEMETRY"
+        ]
+      },
+      "clazz": "org.thingsboard.server.extensions.core.filter.MsgTypeFilter",
+      "name": "Telemetry Type Filter"
+    },
+    {
+      "configuration": {
+        "deviceTypes": [
+          {
+            "name": "WaterTank"
+          }
+        ]
+      },
+      "name": "Water Tank Filter",
+      "clazz": "org.thingsboard.server.extensions.core.filter.DeviceTypeFilter"
+    },
+    {
+      "configuration": {
+        "filter": "typeof waterTankLevel !== 'undefined'"
+      },
+      "name": "waterTankLevel Filter",
+      "clazz": "org.thingsboard.server.extensions.core.filter.DeviceTelemetryFilter"
+    }
+  ],
+  "processor": null,
+  "action": {
+    "configuration": {
+      "sync": false,
+      "template": "{\"tankId\":\"$cs.get('tankId')\", \"ts\":\"$waterTankLevel.getTs()\", \"waterTankLevel\":$waterTankLevel.valueAsString}",
+      "topic": "water-tank-level-data"
+    },
+    "clazz": "org.thingsboard.server.extensions.kafka.action.KafkaPluginAction",
+    "name": "Water Tank Level Data Publisher"
+  },
+  "additionalInfo": null
+}

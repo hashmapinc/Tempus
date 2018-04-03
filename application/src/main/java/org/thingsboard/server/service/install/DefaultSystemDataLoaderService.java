@@ -20,8 +20,10 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import lombok.extern.slf4j.Slf4j;
+import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.AutoConfigureOrder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Profile;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -29,6 +31,7 @@ import org.springframework.stereotype.Service;
 import org.thingsboard.server.common.data.*;
 import org.thingsboard.server.common.data.id.CustomerId;
 import org.thingsboard.server.common.data.id.TenantId;
+import org.thingsboard.server.common.data.kv.*;
 import org.thingsboard.server.common.data.plugin.ComponentLifecycleState;
 import org.thingsboard.server.common.data.plugin.PluginMetaData;
 import org.thingsboard.server.common.data.rule.RuleMetaData;
@@ -37,6 +40,7 @@ import org.thingsboard.server.common.data.security.DeviceCredentials;
 import org.thingsboard.server.common.data.security.UserCredentials;
 import org.thingsboard.server.common.data.widget.WidgetType;
 import org.thingsboard.server.common.data.widget.WidgetsBundle;
+import org.thingsboard.server.dao.attributes.AttributesService;
 import org.thingsboard.server.dao.customer.CustomerService;
 import org.thingsboard.server.dao.dashboard.DashboardService;
 import org.thingsboard.server.dao.device.DeviceCredentialsService;
@@ -49,11 +53,14 @@ import org.thingsboard.server.dao.tenant.TenantService;
 import org.thingsboard.server.dao.user.UserService;
 import org.thingsboard.server.dao.widget.WidgetTypeService;
 import org.thingsboard.server.dao.widget.WidgetsBundleService;
+import org.thingsboard.server.extensions.core.plugin.telemetry.AttributeData;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 @Profile("install")
@@ -102,6 +109,9 @@ public class DefaultSystemDataLoaderService implements SystemDataLoaderService {
 
     @Autowired
     private DeviceService deviceService;
+
+    @Autowired
+    private AttributesService attributeService;
 
     @Autowired
     private DeviceCredentialsService deviceCredentialsService;
@@ -200,38 +210,29 @@ public class DefaultSystemDataLoaderService implements SystemDataLoaderService {
     public void loadDemoData() throws Exception {
         Tenant demoTenant = new Tenant();
         demoTenant.setRegion("Global");
-        demoTenant.setTitle("Tenant");
+        demoTenant.setTitle("DemoTenant");
         demoTenant = tenantService.saveTenant(demoTenant);
-        createUser(Authority.TENANT_ADMIN, demoTenant.getId(), null, "tenant@hashmapinc.com", "tenant", false);
+        createUser(Authority.TENANT_ADMIN, demoTenant.getId(), null, "demo@hashmapinc.com", "tenant", false);
 
         Customer customerA = new Customer();
         customerA.setTenantId(demoTenant.getId());
-        customerA.setTitle("Customer A");
+        customerA.setTitle("Drilling Team");
         customerA = customerService.saveCustomer(customerA);
-        Customer customerB = new Customer();
-        customerB.setTenantId(demoTenant.getId());
-        customerB.setTitle("Customer B");
-        customerB = customerService.saveCustomer(customerB);
-        Customer customerC = new Customer();
-        customerC.setTenantId(demoTenant.getId());
-        customerC.setTitle("Customer C");
-        customerC = customerService.saveCustomer(customerC);
-        createUser(Authority.CUSTOMER_USER, demoTenant.getId(), customerA.getId(), "customer@thingsboard.org", "customer", false);
-        createUser(Authority.CUSTOMER_USER, demoTenant.getId(), customerA.getId(), "customerA@thingsboard.org", "customer", false);
-        createUser(Authority.CUSTOMER_USER, demoTenant.getId(), customerB.getId(), "customerB@thingsboard.org", "customer", false);
-        createUser(Authority.CUSTOMER_USER, demoTenant.getId(), customerC.getId(), "customerC@thingsboard.org", "customer", false);
 
-        createDevice(demoTenant.getId(), customerA.getId(), "default", "Test Device A1", "A1_TEST_TOKEN", null);
-        createDevice(demoTenant.getId(), customerA.getId(), "default", "Test Device A2", "A2_TEST_TOKEN", null);
-        createDevice(demoTenant.getId(), customerA.getId(), "default", "Test Device A3", "A3_TEST_TOKEN", null);
-        createDevice(demoTenant.getId(), customerB.getId(), "default", "Test Device B1", "B1_TEST_TOKEN", null);
-        createDevice(demoTenant.getId(), customerC.getId(), "default", "Test Device C1", "C1_TEST_TOKEN", null);
+        createUser(Authority.CUSTOMER_USER, demoTenant.getId(), customerA.getId(), "bob.jones@hashmapinc.com", "driller", false);
 
-        createDevice(demoTenant.getId(), null, "default", "DHT11 Demo Device", "DHT11_DEMO_TOKEN", "Demo device that is used in sample " +
-                "applications that upload data from DHT11 temperature and humidity sensor");
+        List<AttributeKvEntry> attributesTank123 = new ArrayList<>();
+        attributesTank123.add(new BaseAttributeKvEntry(new StringDataEntry("latitude", "52.330732"), DateTime.now().getMillis()));
+        attributesTank123.add(new BaseAttributeKvEntry(new StringDataEntry("longitude", "-114.051973"), DateTime.now().getMillis()));
 
-        createDevice(demoTenant.getId(), null, "default", "Raspberry Pi Demo Device", "RASPBERRY_PI_DEMO_TOKEN", "Demo device that is used in " +
-                "Raspberry Pi GPIO control sample application");
+        List<AttributeKvEntry> attributesTank456 = new ArrayList<>();
+        attributesTank456.add(new BaseAttributeKvEntry(new StringDataEntry("latitude", "52.317932"), DateTime.now().getMillis()));
+        attributesTank456.add(new BaseAttributeKvEntry(new StringDataEntry("longitude", "-113.993608"), DateTime.now().getMillis()));
+
+        createDevice(demoTenant.getId(), customerA.getId(), "WaterTank", "Tank 123", "Test_Token_Tank123", null, false, attributesTank123);
+        createDevice(demoTenant.getId(), customerA.getId(), "WaterTank", "Tank 456", "Test_Token_Tank456", null, false, attributesTank456);
+        createDevice(demoTenant.getId(), customerA.getId(), "Gateway", "Spark Analytics Gateway", "GATEWAY_ACCESS_TOKEN", null, true, null);
+        createDevice(demoTenant.getId(), customerA.getId(), "Gateway", "Device Gateway", "DEVICE_GATEWAY_TOKEN", null, true, null);
 
         loadPlugins(Paths.get(dataDir, JSON_DIR, DEMO_DIR, PLUGINS_DIR), demoTenant.getId());
         loadRules(Paths.get(dataDir, JSON_DIR, DEMO_DIR, RULES_DIR), demoTenant.getId());
@@ -275,22 +276,43 @@ public class DefaultSystemDataLoaderService implements SystemDataLoaderService {
                                 String type,
                                 String name,
                                 String accessToken,
-                                String description) {
+                                String description,
+                                Boolean isGateway,
+                                List<AttributeKvEntry> attributes) {
         Device device = new Device();
         device.setTenantId(tenantId);
         device.setCustomerId(customerId);
         device.setType(type);
         device.setName(name);
-        if (description != null) {
+        if (isGateway || description != null){
             ObjectNode additionalInfo = objectMapper.createObjectNode();
-            additionalInfo.put("description", description);
+            if (isGateway) {
+                additionalInfo.put("gateway", true);
+            }
+            if (description != null){
+                additionalInfo.put("description", description);
+            }
             device.setAdditionalInfo(additionalInfo);
         }
         device = deviceService.saveDevice(device);
+
+        if (attributes != null){
+            attributeService.save(device.getId(), DataConstants.SERVER_SCOPE, attributes);
+        }
+
         DeviceCredentials deviceCredentials = deviceCredentialsService.findDeviceCredentialsByDeviceId(device.getId());
         deviceCredentials.setCredentialsId(accessToken);
         deviceCredentialsService.updateDeviceCredentials(deviceCredentials);
         return device;
+    }
+
+    private Device createDevice(TenantId tenantId,
+                                CustomerId customerId,
+                                String type,
+                                String name,
+                                String accessToken,
+                                String description) {
+        return createDevice(tenantId, customerId, type, name, accessToken, description, false, null);
     }
 
     private void loadPlugins(Path pluginsDir, TenantId tenantId) throws Exception{
