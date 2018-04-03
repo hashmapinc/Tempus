@@ -1,5 +1,5 @@
 /**
- * Copyright © 2016-2017 The Thingsboard Authors
+ * Copyright © 2016-2018 The Thingsboard Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -101,27 +101,12 @@ public class JsonMqttAdaptor implements MqttTransportAdaptor {
             case STATUS_CODE_RESPONSE:
             case GET_ATTRIBUTES_RESPONSE:
                 ResponseMsg<?> responseMsg = (ResponseMsg) msg;
+                Optional<Exception> responseError = responseMsg.getError();
                 if (responseMsg.isSuccess()) {
-                    MsgType requestMsgType = responseMsg.getRequestMsgType();
-                    Integer requestId = responseMsg.getRequestId();
-                    if (requestId >= 0) {
-                        if (requestMsgType == MsgType.POST_ATTRIBUTES_REQUEST || requestMsgType == MsgType.POST_TELEMETRY_REQUEST
-                                || requestMsgType == MsgType.POST_TELEMETRY_REQUEST_DEPTH) {
-                            result = MqttTransportHandler.createMqttPubAckMsg(requestId);
-                        } else if (requestMsgType == MsgType.GET_ATTRIBUTES_REQUEST) {
-                            GetAttributesResponse response = (GetAttributesResponse) msg;
-                            if (response.isSuccess()) {
-                                result = createMqttPublishMsg(ctx,
-                                        MqttTopics.DEVICE_ATTRIBUTES_RESPONSE_TOPIC_PREFIX + requestId,
-                                        response.getData().get(), true);
-                            } else {
-                                throw new AdaptorException(response.getError().get());
-                            }
-                        }
-                    }
+                    result = convertResponseMsg(ctx, msg, responseMsg, responseError);
                 } else {
-                    if (responseMsg.getError().isPresent()) {
-                        throw new AdaptorException(responseMsg.getError().get());
+                    if (responseError.isPresent()) {
+                        throw new AdaptorException(responseError.get());
                     }
                 }
                 break;
@@ -143,8 +128,38 @@ public class JsonMqttAdaptor implements MqttTransportAdaptor {
                 RuleEngineErrorMsg errorMsg = (RuleEngineErrorMsg) msg;
                 result = createMqttPublishMsg(ctx, "errors", JsonConverter.toErrorJson(errorMsg.getErrorMsg()));
                 break;
+            default:
+                break;
         }
         return Optional.ofNullable(result);
+    }
+
+    private MqttMessage convertResponseMsg(DeviceSessionCtx ctx, ToDeviceMsg msg,
+                                           ResponseMsg<?> responseMsg, Optional<Exception> responseError) throws AdaptorException {
+        MqttMessage result = null;
+
+
+        MsgType requestMsgType = responseMsg.getRequestMsgType();
+        Integer requestId = responseMsg.getRequestId();
+            if (requestId >= 0) {
+                if (requestMsgType == MsgType.POST_ATTRIBUTES_REQUEST || requestMsgType == MsgType.POST_TELEMETRY_REQUEST
+                        || requestMsgType == MsgType.POST_TELEMETRY_REQUEST_DEPTH) {
+                    result = MqttTransportHandler.createMqttPubAckMsg(requestId);
+                } else if (requestMsgType == MsgType.GET_ATTRIBUTES_REQUEST) {
+                    GetAttributesResponse response = (GetAttributesResponse) msg;
+                    Optional<AttributesKVMsg> responseData = response.getData();
+                    if (response.isSuccess() && responseData.isPresent()) {
+                        result = createMqttPublishMsg(ctx,
+                                MqttTopics.DEVICE_ATTRIBUTES_RESPONSE_TOPIC_PREFIX + requestId,
+                                response.getData().get(), true);
+                    } else {
+                        if (responseError.isPresent()) {
+                            throw new AdaptorException(responseError.get());
+                        }
+                    }
+                }
+            }
+        return result;
     }
 
     private MqttPublishMessage createMqttPublishMsg(DeviceSessionCtx ctx, String topic, AttributesKVMsg msg, boolean asMap) {

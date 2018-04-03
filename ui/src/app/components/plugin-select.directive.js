@@ -1,5 +1,5 @@
 /*
- * Copyright © 2016-2017 The Thingsboard Authors
+ * Copyright © 2016-2018 The Thingsboard Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -56,7 +56,7 @@ function PluginSelect($compile, $templateCache, $q, pluginService, types) {
 
             var deferred = $q.defer();
 
-            scope.pluginFetchFunction(pageLink).then(function success(result) {
+            scope.pluginFetchFunction(pageLink, {ignoreLoading: true}).then(function success(result) {
                 deferred.resolve(result.data);
             }, function fail() {
                 deferred.reject();
@@ -89,7 +89,7 @@ function PluginSelect($compile, $templateCache, $q, pluginService, types) {
 
         if (scope.selectFirstPlugin) {
             var pageLink = {limit: 1, textSearch: ''};
-            scope.pluginFetchFunction(pageLink).then(function success(result) {
+            scope.pluginFetchFunction(pageLink, {ignoreLoading: true}).then(function success(result) {
                 var plugins = result.data;
                 if (plugins.length > 0) {
                     scope.plugin = plugins[0];

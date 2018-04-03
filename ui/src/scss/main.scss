@@ -1,5 +1,5 @@
 /**
- * Copyright © 2016-2017 The Thingsboard Authors
+ * Copyright © 2016-2018 The Thingsboard Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -203,6 +203,19 @@ md-sidenav {
  * THINGSBOARD SPECIFIC
  ***********************/
 
+label {
+  &.tb-title {
+    pointer-events: none;
+    color: #666;
+    font-size: 13px;
+    font-weight: 400;
+    padding-bottom: 15px;
+    &.no-padding {
+      padding-bottom: 0px;
+    }
+  }
+}
+
 .tb-noselect {
   -webkit-touch-callout: none; /* iOS Safari */
   -webkit-user-select: none; /* Safari */
@@ -273,6 +286,14 @@ pre.tb-highlight {
 .tb-data-table {
   md-toolbar {
     z-index: 0;
+  }
+  md-toolbar.md-table-toolbar.md-default-theme:not(.md-menu-toolbar).md-default .md-button[disabled],
+  md-toolbar.md-table-toolbar:not(.md-menu-toolbar).md-default .md-button[disabled] {
+    color: rgba(0,0,0,0.38);
+  }
+  md-toolbar.md-default-theme:not(.md-menu-toolbar) .md-button[disabled] md-icon,
+  md-toolbar:not(.md-menu-toolbar) .md-button[disabled] md-icon {
+    color: rgba(0,0,0,.28);
   }
   span.no-data-found {
     position: relative;
@@ -395,11 +416,13 @@ $previewSize: 100px;
   position: relative;
   border: dashed 2px;
   height: $previewSize;
-  display: flex;
-  align-items: center;
   overflow: hidden;
   label {
     width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
     font-size: 16px;
     text-align: center;
     @media (min-width: $layout-breakpoint-sm) {
@@ -484,11 +507,15 @@ md-tabs.tb-headless {
   height: 100%;
   max-width: 240px;
   span {
-    padding: 10px 10px 20px 10px;
+    padding: 0 0 20px 0;
     font-size: 18px;
     font-weight: 400;
     white-space: normal;
     line-height: 18px;
+    max-height: 18px;
+    min-height: 18px;
+    height: 18px;
+    margin: auto;
   }
 }
 
@@ -549,7 +576,7 @@ section.tb-footer-buttons {
   position: fixed;
   right: 20px;
   bottom: 20px;
-  z-index: 2;
+  z-index: 13;
   pointer-events: none;
 }
 

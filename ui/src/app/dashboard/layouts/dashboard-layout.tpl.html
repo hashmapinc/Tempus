@@ -1,6 +1,6 @@
 <!--
 
-    Copyright © 2016-2017 The Thingsboard Authors
+    Copyright © 2016-2018 The Thingsboard Authors
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@
                     'background-attachment': 'scroll',
                     'background-size': vm.layoutCtx.gridSettings.backgroundSizeMode || '100%',
                     'background-position': '0% 0%'}">
-    <section ng-show="!loading && vm.noData()" layout-align="center center"
+    <section ng-show="!$root.loading && vm.noData()" layout-align="center center"
              ng-style="{'color': vm.layoutCtx.gridSettings.color}"
              style="text-transform: uppercase; display: flex; z-index: 1; pointer-events: none;"
              class="md-headline tb-absolute-fill">
@@ -65,7 +65,6 @@
             prepare-dashboard-context-menu="vm.prepareDashboardContextMenu()"
             prepare-widget-context-menu="vm.prepareWidgetContextMenu(widget)"
             on-remove-widget="vm.removeWidget(event, widget)"
-            get-st-diff="vm.getStDiff()"
             on-init="vm.dashboardInited(dashboard)"
             on-init-failed="vm.dashboardInitFailed(e)"
             ignore-loading="vm.layoutCtx.ignoreLoading">

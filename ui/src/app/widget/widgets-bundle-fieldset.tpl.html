@@ -1,6 +1,6 @@
 <!--
 
-    Copyright © 2016-2017 The Thingsboard Authors
+    Copyright © 2016-2018 The Thingsboard Authors
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -23,7 +23,7 @@
            class="md-raised md-primary">{{ 'widgets-bundle.delete' | translate }}</md-button>
 
 <md-content class="md-padding" layout="column">
-    <fieldset ng-disabled="loading || !isEdit">
+    <fieldset ng-disabled="$root.loading || !isEdit">
         <md-input-container class="md-block">
             <label translate>widgets-bundle.title</label>
             <input required name="title" ng-model="widgetsBundle.title">

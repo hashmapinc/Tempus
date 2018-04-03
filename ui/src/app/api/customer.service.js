@@ -1,5 +1,5 @@
 /*
- * Copyright © 2016-2017 The Thingsboard Authors
+ * Copyright © 2016-2018 The Thingsboard Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,7 +32,7 @@ function CustomerService($http, $q, types) {
 
     return service;
 
-    function getCustomers(pageLink) {
+    function getCustomers(pageLink, config) {
         var deferred = $q.defer();
         var url = '/api/customers?limit=' + pageLink.limit;
         if (angular.isDefined(pageLink.textSearch)) {
@@ -44,7 +44,7 @@ function CustomerService($http, $q, types) {
         if (angular.isDefined(pageLink.textOffset)) {
             url += '&textOffset=' + pageLink.textOffset;
         }
-        $http.get(url, null).then(function success(response) {
+        $http.get(url, config).then(function success(response) {
             deferred.resolve(response.data);
         }, function fail() {
             deferred.reject();
@@ -52,10 +52,10 @@ function CustomerService($http, $q, types) {
         return deferred.promise;
     }
 
-    function getCustomer(customerId) {
+    function getCustomer(customerId, config) {
         var deferred = $q.defer();
         var url = '/api/customer/' + customerId;
-        $http.get(url, null).then(function success(response) {
+        $http.get(url, config).then(function success(response) {
             deferred.resolve(response.data);
         }, function fail(response) {
             deferred.reject(response.data);

@@ -1,5 +1,5 @@
 /*
- * Copyright © 2016-2017 The Thingsboard Authors
+ * Copyright © 2016-2018 The Thingsboard Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 import $ from 'jquery';
 import tinycolor from 'tinycolor2';
 import canvasGauges from 'canvas-gauges';
@@ -197,14 +196,19 @@ export default class TbCanvasDigitalGauge {
             if (cellData.data.length > 0) {
                 var tvPair = cellData.data[cellData.data.length -
                 1];
+                var timestamp;
                 if (this.localSettings.showTimestamp) {
-                    var timestamp = tvPair[0];
+                    timestamp = tvPair[0];
                     var filter= this.ctx.$scope.$injector.get('$filter');
                     var timestampDisplayValue = filter('date')(timestamp, this.localSettings.timestampFormat);
                     this.gauge.options.label = timestampDisplayValue;
                 }
                 var value = tvPair[1];
-                this.gauge.value = value;
+                if(value !== this.gauge.value) {
+                    this.gauge.value = value;
+                } else if (this.localSettings.showTimestamp && this.gauge.timestamp != timestamp) {
+                    this.gauge.timestamp = timestamp;
+                }
             }
         }
     }

@@ -1,5 +1,5 @@
 /**
- * Copyright © 2016-2017 The Thingsboard Authors
+ * Copyright © 2016-2018 The Thingsboard Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,10 +33,7 @@ import org.thingsboard.server.extensions.core.plugin.telemetry.gen.TelemetryPlug
 import org.thingsboard.server.extensions.core.plugin.telemetry.sub.*;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -120,8 +117,8 @@ public class TelemetryRpcMsgHandler implements RpcMsgHandler {
             throw new RuntimeException(e);
         }
         Map<String, Long> statesMap = proto.getKeyStatesList().stream().collect(Collectors.toMap(SubscriptionKetStateProto::getKey, SubscriptionKetStateProto::getTs));
-        Subscription<Long> subscription = new Subscription(
-                new SubscriptionState(proto.getSessionId(), proto.getSubscriptionId(), EntityIdFactory.getByTypeAndId(proto.getEntityType(), proto.getEntityId()), SubscriptionType.valueOf(proto.getType()), proto.getAllKeys(), statesMap),
+        Subscription subscription = new Subscription(
+                new SubscriptionState(proto.getSessionId(), proto.getSubscriptionId(), EntityIdFactory.getByTypeAndId(proto.getEntityType(), proto.getEntityId()), SubscriptionType.valueOf(proto.getType()), proto.getAllKeys(), statesMap, proto.getScope()),
                 false, msg.getServerAddress());
         subscriptionManager.addRemoteWsSubscription(ctx, msg.getServerAddress(), proto.getSessionId(), subscription);
     }
@@ -134,6 +131,7 @@ public class TelemetryRpcMsgHandler implements RpcMsgHandler {
         builder.setEntityId(cmd.getEntityId().getId().toString());
         builder.setType(cmd.getType().name());
         builder.setAllKeys(cmd.isAllKeys());
+        builder.setScope(cmd.getScope());
         cmd.getKeyStates().entrySet().forEach(e -> builder.addKeyStates(SubscriptionKetStateProto.newBuilder().setKey(e.getKey()).setTs(e.getValue()).build()));
         ctx.sendPluginRpcMsg(new RpcMsg(address, SUBSCRIPTION_CLAZZ, builder.build().toByteArray()));
     }
@@ -248,16 +246,28 @@ public class TelemetryRpcMsgHandler implements RpcMsgHandler {
         dataBuilder.setValueType(attr.getDataType().ordinal());
         switch (attr.getDataType()) {
             case BOOLEAN:
-                dataBuilder.setBoolValue(attr.getBooleanValue().get());
+                Optional<Boolean> booleanValue = attr.getBooleanValue();
+                if (booleanValue.isPresent()) {
+                    dataBuilder.setBoolValue(booleanValue.get());
+                }
                 break;
             case LONG:
-                dataBuilder.setLongValue(attr.getLongValue().get());
+                Optional<Long> longValue = attr.getLongValue();
+                if (longValue.isPresent()) {
+                    dataBuilder.setLongValue(longValue.get());
+                }
                 break;
             case DOUBLE:
-                dataBuilder.setDoubleValue(attr.getDoubleValue().get());
+                Optional<Double> doubleValue = attr.getDoubleValue();
+                if (doubleValue.isPresent()) {
+                    dataBuilder.setDoubleValue(doubleValue.get());
+                }
                 break;
             case STRING:
-                dataBuilder.setStrValue(attr.getStrValue().get());
+                Optional<String> stringValue = attr.getStrValue();
+                if (stringValue.isPresent()) {
+                    dataBuilder.setStrValue(stringValue.get());
+                }
                 break;
             case JSON:
                 dataBuilder.setStrValue(attr.getJsonValue().get().toString());

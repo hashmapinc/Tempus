@@ -1,5 +1,5 @@
 /**
- * Copyright © 2016-2017 The Thingsboard Authors
+ * Copyright © 2016-2018 The Thingsboard Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -172,7 +172,7 @@ class RuleActorMessageProcessor extends ComponentMsgProcessor<RuleId> {
             Optional<RuleToPluginMsg<?>> ruleToPluginMsgOptional = action.convert(ruleCtx, inMsg, inMsgMd);
             if (ruleToPluginMsgOptional.isPresent()) {
                 RuleToPluginMsg<?> ruleToPluginMsg = ruleToPluginMsgOptional.get();
-                logger.debug("[{}] Device msg is converter to: {}", entityId, ruleToPluginMsg);
+                logger.debug("[{}] Device msg is converted to: {}", entityId, ruleToPluginMsg);
                 context.parent().tell(new RuleToPluginMsgWrapper(pluginTenantId, pluginId, tenantId, entityId, ruleToPluginMsg), context.self());
                 if (action.isOneWayAction()) {
                     pushToNextRule(context, msg.getCtx(), RuleEngineError.NO_TWO_WAY_ACTIONS);
@@ -324,7 +324,7 @@ class RuleActorMessageProcessor extends ComponentMsgProcessor<RuleId> {
 
     @Override
     public void onClusterEventMsg(ClusterEventMsg msg) throws Exception {
-
+        //Do nothing
     }
 
     private void stopAction() {

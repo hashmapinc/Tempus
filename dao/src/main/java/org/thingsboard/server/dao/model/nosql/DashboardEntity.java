@@ -1,5 +1,5 @@
 /**
- * Copyright © 2016-2017 The Thingsboard Authors
+ * Copyright © 2016-2018 The Thingsboard Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,24 +19,36 @@ import com.datastax.driver.core.utils.UUIDs;
 import com.datastax.driver.mapping.annotations.Column;
 import com.datastax.driver.mapping.annotations.PartitionKey;
 import com.datastax.driver.mapping.annotations.Table;
-import com.datastax.driver.mapping.annotations.Transient;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.util.StringUtils;
 import org.thingsboard.server.common.data.Dashboard;
-import org.thingsboard.server.common.data.id.CustomerId;
+import org.thingsboard.server.common.data.ShortCustomerInfo;
 import org.thingsboard.server.common.data.id.DashboardId;
 import org.thingsboard.server.common.data.id.TenantId;
 import org.thingsboard.server.dao.model.SearchTextEntity;
 import org.thingsboard.server.dao.model.type.JsonCodec;
 
+import java.io.IOException;
+import java.util.HashSet;
 import java.util.UUID;
 
 import static org.thingsboard.server.dao.model.ModelConstants.*;
 
 @Table(name = DASHBOARD_COLUMN_FAMILY_NAME)
+@EqualsAndHashCode
+@ToString
+@Slf4j
 public final class DashboardEntity implements SearchTextEntity<Dashboard> {
-    
-    @Transient
-    private static final long serialVersionUID = 2998395951247446191L;
+
+    private static final ObjectMapper objectMapper = new ObjectMapper();
+    private static final JavaType assignedCustomersType =
+            objectMapper.getTypeFactory().constructCollectionType(HashSet.class, ShortCustomerInfo.class);
 
     @PartitionKey(value = 0)
     @Column(name = ID_PROPERTY)
@@ -46,16 +58,15 @@ public final class DashboardEntity implements SearchTextEntity<Dashboard> {
     @Column(name = DASHBOARD_TENANT_ID_PROPERTY)
     private UUID tenantId;
 
-    @PartitionKey(value = 2)
-    @Column(name = DASHBOARD_CUSTOMER_ID_PROPERTY)
-    private UUID customerId;
-
     @Column(name = DASHBOARD_TITLE_PROPERTY)
     private String title;
     
     @Column(name = SEARCH_TEXT_PROPERTY)
     private String searchText;
-    
+
+    @Column(name = DASHBOARD_ASSIGNED_CUSTOMERS_PROPERTY)
+    private String assignedCustomers;
+
     @Column(name = DASHBOARD_CONFIGURATION_PROPERTY, codec = JsonCodec.class)
     private JsonNode configuration;
 
@@ -70,10 +81,14 @@ public final class DashboardEntity implements SearchTextEntity<Dashboard> {
         if (dashboard.getTenantId() != null) {
             this.tenantId = dashboard.getTenantId().getId();
         }
-        if (dashboard.getCustomerId() != null) {
-            this.customerId = dashboard.getCustomerId().getId();
-        }
         this.title = dashboard.getTitle();
+        if (dashboard.getAssignedCustomers() != null) {
+            try {
+                this.assignedCustomers = objectMapper.writeValueAsString(dashboard.getAssignedCustomers());
+            } catch (JsonProcessingException e) {
+                log.error("Unable to serialize assigned customers to string!", e);
+            }
+        }
         this.configuration = dashboard.getConfiguration();
     }
     
@@ -93,20 +108,20 @@ public final class DashboardEntity implements SearchTextEntity<Dashboard> {
         this.tenantId = tenantId;
     }
 
-    public UUID getCustomerId() {
-        return customerId;
-    }
-
-    public void setCustomerId(UUID customerId) {
-        this.customerId = customerId;
-    }
-    
     public String getTitle() {
         return title;
     }
 
     public void setTitle(String title) {
         this.title = title;
+    }
+
+    public String getAssignedCustomers() {
+        return assignedCustomers;
+    }
+
+    public void setAssignedCustomers(String assignedCustomers) {
+        this.assignedCustomers = assignedCustomers;
     }
 
     public JsonNode getConfiguration() {
@@ -119,7 +134,7 @@ public final class DashboardEntity implements SearchTextEntity<Dashboard> {
     
     @Override
     public String getSearchTextSource() {
-        return title;
+        return getTitle();
     }
 
     @Override
@@ -132,90 +147,20 @@ public final class DashboardEntity implements SearchTextEntity<Dashboard> {
     }
 
     @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + ((configuration == null) ? 0 : configuration.hashCode());
-        result = prime * result + ((customerId == null) ? 0 : customerId.hashCode());
-        result = prime * result + ((id == null) ? 0 : id.hashCode());
-        result = prime * result + ((searchText == null) ? 0 : searchText.hashCode());
-        result = prime * result + ((tenantId == null) ? 0 : tenantId.hashCode());
-        result = prime * result + ((title == null) ? 0 : title.hashCode());
-        return result;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj)
-            return true;
-        if (obj == null)
-            return false;
-        if (getClass() != obj.getClass())
-            return false;
-        DashboardEntity other = (DashboardEntity) obj;
-        if (configuration == null) {
-            if (other.configuration != null)
-                return false;
-        } else if (!configuration.equals(other.configuration))
-            return false;
-        if (customerId == null) {
-            if (other.customerId != null)
-                return false;
-        } else if (!customerId.equals(other.customerId))
-            return false;
-        if (id == null) {
-            if (other.id != null)
-                return false;
-        } else if (!id.equals(other.id))
-            return false;
-        if (searchText == null) {
-            if (other.searchText != null)
-                return false;
-        } else if (!searchText.equals(other.searchText))
-            return false;
-        if (tenantId == null) {
-            if (other.tenantId != null)
-                return false;
-        } else if (!tenantId.equals(other.tenantId))
-            return false;
-        if (title == null) {
-            if (other.title != null)
-                return false;
-        } else if (!title.equals(other.title))
-            return false;
-        return true;
-    }
-    
-    @Override
-    public String toString() {
-        StringBuilder builder = new StringBuilder();
-        builder.append("DashboardEntity [id=");
-        builder.append(id);
-        builder.append(", tenantId=");
-        builder.append(tenantId);
-        builder.append(", customerId=");
-        builder.append(customerId);
-        builder.append(", title=");
-        builder.append(title);
-        builder.append(", searchText=");
-        builder.append(searchText);
-        builder.append(", configuration=");
-        builder.append(configuration);
-        builder.append("]");
-        return builder.toString();
-    }
-
-    @Override
     public Dashboard toData() {
         Dashboard dashboard = new Dashboard(new DashboardId(id));
         dashboard.setCreatedTime(UUIDs.unixTimestamp(id));
         if (tenantId != null) {
             dashboard.setTenantId(new TenantId(tenantId));
         }
-        if (customerId != null) {
-            dashboard.setCustomerId(new CustomerId(customerId));
-        }
         dashboard.setTitle(title);
+        if (!StringUtils.isEmpty(assignedCustomers)) {
+            try {
+                dashboard.setAssignedCustomers(objectMapper.readValue(assignedCustomers, assignedCustomersType));
+            } catch (IOException e) {
+                log.warn("Unable to parse assigned customers!", e);
+            }
+        }
         dashboard.setConfiguration(configuration);
         return dashboard;
     }

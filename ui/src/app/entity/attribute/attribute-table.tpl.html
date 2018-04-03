@@ -1,6 +1,6 @@
 <!--
 
-    Copyright © 2016-2017 The Thingsboard Authors
+    Copyright © 2016-2018 The Thingsboard Authors
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -16,17 +16,17 @@
 
 -->
 <md-content flex class="md-padding tb-absolute-fill" layout="column">
-    <section layout="row" ng-show="!disableAttributeScopeSelection">
+    <section ng-show="!disableAttributeScopeSelection">
         <md-input-container class="md-block" style="width: 200px;">
             <label translate>attribute.attributes-scope</label>
-            <md-select ng-model="attributeScope" ng-disabled="loading() || attributeScopeSelectionReadonly">
+            <md-select ng-model="attributeScope" ng-disabled="$root.loading || attributeScopeSelectionReadonly">
                 <md-option ng-repeat="scope in attributeScopes" ng-value="scope">
                     {{scope.name | translate}}
                 </md-option>
             </md-select>
         </md-input-container>
     </section>
-    <div layout="column" class="md-whiteframe-z1" ng-class="{flex: mode==='widget'}">
+    <div class="md-whiteframe-z1" ng-class="{flex: mode==='widget'}">
         <md-toolbar class="md-table-toolbar md-default" ng-show="mode==='default'
                                                                  && !selectedAttributes.length
                                                                  && query.search === null">
@@ -168,7 +168,6 @@
                 <tb-dashboard
                         alias-controller="aliasController"
                         widgets="widgets"
-                        get-st-diff="getServerTimeDiff()"
                         columns="20"
                         is-edit="false"
                         is-mobile-disabled="true"

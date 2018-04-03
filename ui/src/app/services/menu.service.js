@@ -1,5 +1,5 @@
 /*
- * Copyright © 2016-2017 The Thingsboard Authors
+ * Copyright © 2016-2018 The Thingsboard Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -243,6 +243,12 @@ function Menu(userService, $state, $rootScope) {
                             state: 'home.computations',
                             icon: 'dashboards',
                             link: '/static/svg/computationslightgray.svg'
+                        },
+                        {
+                            name: 'audit-log.audit-logs',
+                            type: 'link',
+                            state: 'home.auditLogs',
+                            icon: 'track_changes'
                         }];
 
                     homeSections =
@@ -322,6 +328,16 @@ function Menu(userService, $state, $rootScope) {
                                         icon: 'dashboard',
                                         state: 'home.dashboards',
                                         link: '/static/svg/dashboardlightgray.svg'
+                                    }
+                                ]
+                            },
+                            {
+                                name: 'audit-log.audit',
+                                places: [
+                                    {
+                                        name: 'audit-log.audit-logs',
+                                        icon: 'track_changes',
+                                        state: 'home.auditLogs'
                                     }
                                 ]
                             }];

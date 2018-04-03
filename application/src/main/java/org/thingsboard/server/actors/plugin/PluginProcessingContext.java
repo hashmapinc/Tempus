@@ -1,5 +1,5 @@
 /**
- * Copyright © 2016-2017 The Thingsboard Authors
+ * Copyright © 2016-2018 The Thingsboard Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,19 +26,20 @@ import org.thingsboard.server.common.data.Device;
 import org.thingsboard.server.common.data.EntityType;
 import org.thingsboard.server.common.data.Tenant;
 import org.thingsboard.server.common.data.asset.Asset;
+import org.thingsboard.server.common.data.audit.ActionType;
 import org.thingsboard.server.common.data.id.*;
 import org.thingsboard.server.common.data.kv.*;
 import org.thingsboard.server.common.data.page.TextPageLink;
 import org.thingsboard.server.common.data.plugin.PluginMetaData;
+import org.thingsboard.server.common.data.relation.EntityRelation;
+import org.thingsboard.server.common.data.relation.RelationTypeGroup;
 import org.thingsboard.server.common.data.rule.RuleMetaData;
 import org.thingsboard.server.common.msg.cluster.ServerAddress;
 import org.thingsboard.server.extensions.api.device.DeviceAttributesEventNotificationMsg;
 import org.thingsboard.server.extensions.api.plugins.PluginApiCallSecurityContext;
 import org.thingsboard.server.extensions.api.plugins.PluginCallback;
 import org.thingsboard.server.extensions.api.plugins.PluginContext;
-import org.thingsboard.server.extensions.api.plugins.msg.PluginToRuleMsg;
-import org.thingsboard.server.extensions.api.plugins.msg.TimeoutMsg;
-import org.thingsboard.server.extensions.api.plugins.msg.ToDeviceRpcRequest;
+import org.thingsboard.server.extensions.api.plugins.msg.*;
 import org.thingsboard.server.extensions.api.plugins.rpc.PluginRpcMsg;
 import org.thingsboard.server.extensions.api.plugins.rpc.RpcMsg;
 import org.thingsboard.server.extensions.api.plugins.ws.PluginWebsocketSessionRef;
@@ -55,6 +56,9 @@ import java.util.stream.Collectors;
 public final class PluginProcessingContext implements PluginContext {
 
     private static final Executor executor = Executors.newSingleThreadExecutor();
+    public static final String CUSTOMER_USER_IS_NOT_ALLOWED_TO_PERFORM_THIS_OPERATION = "Customer user is not allowed to perform this operation!";
+    public static final String SYSTEM_ADMINISTRATOR_IS_NOT_ALLOWED_TO_PERFORM_THIS_OPERATION = "System administrator is not allowed to perform this operation!";
+    public static final String DEVICE_WITH_REQUESTED_ID_NOT_FOUND = "Device with requested id wasn't found!";
 
     private final SharedPluginProcessingContext pluginCtx;
     private final Optional<PluginApiCallSecurityContext> securityCtx;
@@ -214,6 +218,52 @@ public final class PluginProcessingContext implements PluginContext {
     }
 
     @Override
+    public void logAttributesUpdated(PluginApiCallSecurityContext ctx, EntityId entityId, String attributeType,
+                                                                     List<AttributeKvEntry> attributes, Exception e) {
+        pluginCtx.auditLogService.logEntityAction(
+                ctx.getTenantId(),
+                ctx.getCustomerId(),
+                ctx.getUserId(),
+                ctx.getUserName(),
+                (UUIDBased & EntityId)entityId,
+                null,
+                ActionType.ATTRIBUTES_UPDATED,
+                e,
+                attributeType,
+                attributes);
+    }
+
+    @Override
+    public void logAttributesDeleted(PluginApiCallSecurityContext ctx, EntityId entityId, String attributeType, List<String> keys, Exception e) {
+        pluginCtx.auditLogService.logEntityAction(
+                ctx.getTenantId(),
+                ctx.getCustomerId(),
+                ctx.getUserId(),
+                ctx.getUserName(),
+                (UUIDBased & EntityId)entityId,
+                null,
+                ActionType.ATTRIBUTES_DELETED,
+                e,
+                attributeType,
+                keys);
+    }
+
+    @Override
+    public void logAttributesRead(PluginApiCallSecurityContext ctx, EntityId entityId, String attributeType, List<String> keys, Exception e) {
+        pluginCtx.auditLogService.logEntityAction(
+                ctx.getTenantId(),
+                ctx.getCustomerId(),
+                ctx.getUserId(),
+                ctx.getUserName(),
+                (UUIDBased & EntityId)entityId,
+                null,
+                ActionType.ATTRIBUTES_READ,
+                e,
+                attributeType,
+                keys);
+    }
+
+    @Override
     public void loadLatestTimeseries(final EntityId entityId, final Collection<String> keys, final PluginCallback<List<TsKvEntry>> callback) {
         validate(entityId, new ValidationCallback(callback, ctx -> {
             ListenableFuture<List<TsKvEntry>> rsListFuture = pluginCtx.tsService.findLatest(entityId, keys);
@@ -309,128 +359,166 @@ public final class PluginProcessingContext implements PluginContext {
     private void validate(EntityId entityId, ValidationCallback callback) {
         if (securityCtx.isPresent()) {
             final PluginApiCallSecurityContext ctx = securityCtx.get();
-            if (ctx.isTenantAdmin() || ctx.isCustomerUser() || ctx.isSystemAdmin()) {
-                switch (entityId.getEntityType()) {
-                    case DEVICE:
-                        if (ctx.isSystemAdmin()) {
-                            callback.onSuccess(this, Boolean.FALSE);
-                        } else {
-                            ListenableFuture<Device> deviceFuture = pluginCtx.deviceService.findDeviceByIdAsync(new DeviceId(entityId.getId()));
-                            Futures.addCallback(deviceFuture, getCallback(callback, device -> {
-                                if (device == null) {
-                                    return Boolean.FALSE;
-                                } else {
-                                    if (!device.getTenantId().equals(ctx.getTenantId())) {
-                                        return Boolean.FALSE;
-                                    } else if (ctx.isCustomerUser() && !device.getCustomerId().equals(ctx.getCustomerId())) {
-                                        return Boolean.FALSE;
-                                    } else {
-                                        return Boolean.TRUE;
-                                    }
-                                }
-                            }));
-                        }
-                        return;
-                    case ASSET:
-                        if (ctx.isSystemAdmin()) {
-                            callback.onSuccess(this, Boolean.FALSE);
-                        } else {
-                            ListenableFuture<Asset> assetFuture = pluginCtx.assetService.findAssetByIdAsync(new AssetId(entityId.getId()));
-                            Futures.addCallback(assetFuture, getCallback(callback, asset -> {
-                                if (asset == null) {
-                                    return Boolean.FALSE;
-                                } else {
-                                    if (!asset.getTenantId().equals(ctx.getTenantId())) {
-                                        return Boolean.FALSE;
-                                    } else if (ctx.isCustomerUser() && !asset.getCustomerId().equals(ctx.getCustomerId())) {
-                                        return Boolean.FALSE;
-                                    } else {
-                                        return Boolean.TRUE;
-                                    }
-                                }
-                            }));
-                        }
-                        return;
-                    case RULE:
-                        if (ctx.isCustomerUser()) {
-                            callback.onSuccess(this, Boolean.FALSE);
-                        } else {
-                            ListenableFuture<RuleMetaData> ruleFuture = pluginCtx.ruleService.findRuleByIdAsync(new RuleId(entityId.getId()));
-                            Futures.addCallback(ruleFuture, getCallback(callback, rule -> {
-                                if (rule == null) {
-                                    return Boolean.FALSE;
-                                } else {
-                                    if (ctx.isTenantAdmin() && !rule.getTenantId().equals(ctx.getTenantId())) {
-                                        return Boolean.FALSE;
-                                    } else if (ctx.isSystemAdmin() && !rule.getTenantId().isNullUid()) {
-                                        return Boolean.FALSE;
-                                    } else {
-                                        return Boolean.TRUE;
-                                    }
-                                }
-                            }));
-                        }
-                        return;
-                    case PLUGIN:
-                        if (ctx.isCustomerUser()) {
-                            callback.onSuccess(this, Boolean.FALSE);
-                        } else {
-                            ListenableFuture<PluginMetaData> pluginFuture = pluginCtx.pluginService.findPluginByIdAsync(new PluginId(entityId.getId()));
-                            Futures.addCallback(pluginFuture, getCallback(callback, plugin -> {
-                                if (plugin == null) {
-                                    return Boolean.FALSE;
-                                } else {
-                                    if (ctx.isTenantAdmin() && !plugin.getTenantId().equals(ctx.getTenantId())) {
-                                        return Boolean.FALSE;
-                                    } else if (ctx.isSystemAdmin() && !plugin.getTenantId().isNullUid()) {
-                                        return Boolean.FALSE;
-                                    } else {
-                                        return Boolean.TRUE;
-                                    }
-                                }
-                            }));
-                        }
-                        return;
-                    case CUSTOMER:
-                        if (ctx.isSystemAdmin()) {
-                            callback.onSuccess(this, Boolean.FALSE);
-                        } else {
-                            ListenableFuture<Customer> customerFuture = pluginCtx.customerService.findCustomerByIdAsync(new CustomerId(entityId.getId()));
-                            Futures.addCallback(customerFuture, getCallback(callback, customer -> {
-                                if (customer == null) {
-                                    return Boolean.FALSE;
-                                } else {
-                                    if (!customer.getTenantId().equals(ctx.getTenantId())) {
-                                        return Boolean.FALSE;
-                                    } else if (ctx.isCustomerUser() && !customer.getId().equals(ctx.getCustomerId())) {
-                                        return Boolean.FALSE;
-                                    } else {
-                                        return Boolean.TRUE;
-                                    }
-                                }
-                            }));
-                        }
-                        return;
-                    case TENANT:
-                        if (ctx.isCustomerUser()) {
-                            callback.onSuccess(this, Boolean.FALSE);
-                        } else if (ctx.isSystemAdmin()) {
-                            callback.onSuccess(this, Boolean.TRUE);
-                        } else {
-                            ListenableFuture<Tenant> tenantFuture = pluginCtx.tenantService.findTenantByIdAsync(new TenantId(entityId.getId()));
-                            Futures.addCallback(tenantFuture, getCallback(callback, tenant -> tenant != null && tenant.getId().equals(ctx.getTenantId())));
-                        }
-                        return;
-                    default:
-                        //TODO: add support of other entities
-                        throw new IllegalStateException("Not Implemented!");
-                }
-            } else {
-                callback.onSuccess(this, Boolean.FALSE);
+            switch (entityId.getEntityType()) {
+                case DEVICE:
+                    validateDevice(ctx, entityId, callback);
+                    return;
+                case ASSET:
+                    validateAsset(ctx, entityId, callback);
+                    return;
+                case RULE:
+                    validateRule(ctx, entityId, callback);
+                    return;
+                case PLUGIN:
+                    validatePlugin(ctx, entityId, callback);
+                    return;
+                case CUSTOMER:
+                    validateCustomer(ctx, entityId, callback);
+                    return;
+                case TENANT:
+                    validateTenant(ctx, entityId, callback);
+                    return;
+                default:
+                    //TODO: add support of other entities
+                    throw new IllegalStateException("Not Implemented!");
             }
         } else {
-            callback.onSuccess(this, Boolean.TRUE);
+            callback.onSuccess(this, ValidationResult.ok());
         }
+    }
+
+    private void validateDevice(final PluginApiCallSecurityContext ctx, EntityId entityId, ValidationCallback callback) {
+        if (ctx.isSystemAdmin()) {
+            callback.onSuccess(this, ValidationResult.accessDenied(SYSTEM_ADMINISTRATOR_IS_NOT_ALLOWED_TO_PERFORM_THIS_OPERATION));
+        } else {
+            ListenableFuture<Device> deviceFuture = pluginCtx.deviceService.findDeviceByIdAsync(new DeviceId(entityId.getId()));
+            Futures.addCallback(deviceFuture, getCallback(callback, device -> {
+                if (device == null) {
+                    return ValidationResult.entityNotFound(DEVICE_WITH_REQUESTED_ID_NOT_FOUND);
+                } else {
+                    if (!device.getTenantId().equals(ctx.getTenantId())) {
+                        return ValidationResult.accessDenied("Device doesn't belong to the current Tenant!");
+                    } else if (ctx.isCustomerUser() && !device.getCustomerId().equals(ctx.getCustomerId())) {
+                        return ValidationResult.accessDenied("Device doesn't belong to the current Customer!");
+                    } else {
+                        return ValidationResult.ok();
+                    }
+                }
+            }));
+        }
+    }
+
+    private void validateAsset(final PluginApiCallSecurityContext ctx, EntityId entityId, ValidationCallback callback) {
+        if (ctx.isSystemAdmin()) {
+            callback.onSuccess(this, ValidationResult.accessDenied(SYSTEM_ADMINISTRATOR_IS_NOT_ALLOWED_TO_PERFORM_THIS_OPERATION));
+        } else {
+            ListenableFuture<Asset> assetFuture = pluginCtx.assetService.findAssetByIdAsync(new AssetId(entityId.getId()));
+            Futures.addCallback(assetFuture, getCallback(callback, asset -> {
+                if (asset == null) {
+                    return ValidationResult.entityNotFound("Asset with requested id wasn't found!");
+                } else {
+                    if (!asset.getTenantId().equals(ctx.getTenantId())) {
+                        return ValidationResult.accessDenied("Asset doesn't belong to the current Tenant!");
+                    } else if (ctx.isCustomerUser() && !asset.getCustomerId().equals(ctx.getCustomerId())) {
+                        return ValidationResult.accessDenied("Asset doesn't belong to the current Customer!");
+                    } else {
+                        return ValidationResult.ok();
+                    }
+                }
+            }));
+        }
+    }
+
+    private void validateRule(final PluginApiCallSecurityContext ctx, EntityId entityId, ValidationCallback callback) {
+        if (ctx.isCustomerUser()) {
+            callback.onSuccess(this, ValidationResult.accessDenied(CUSTOMER_USER_IS_NOT_ALLOWED_TO_PERFORM_THIS_OPERATION));
+        } else {
+            ListenableFuture<RuleMetaData> ruleFuture = pluginCtx.ruleService.findRuleByIdAsync(new RuleId(entityId.getId()));
+            Futures.addCallback(ruleFuture, getCallback(callback, rule -> {
+                if (rule == null) {
+                    return ValidationResult.entityNotFound("Rule with requested id wasn't found!");
+                } else {
+                    if (ctx.isTenantAdmin() && !rule.getTenantId().equals(ctx.getTenantId())) {
+                        return ValidationResult.accessDenied("Rule doesn't belong to the current Tenant!");
+                    } else if (ctx.isSystemAdmin() && !rule.getTenantId().isNullUid()) {
+                        return ValidationResult.accessDenied("Rule is not in system scope!");
+                    } else {
+                        return ValidationResult.ok();
+                    }
+                }
+            }));
+        }
+    }
+
+    private void validatePlugin(final PluginApiCallSecurityContext ctx, EntityId entityId, ValidationCallback callback) {
+        if (ctx.isCustomerUser()) {
+            callback.onSuccess(this, ValidationResult.accessDenied(CUSTOMER_USER_IS_NOT_ALLOWED_TO_PERFORM_THIS_OPERATION));
+        } else {
+            ListenableFuture<PluginMetaData> pluginFuture = pluginCtx.pluginService.findPluginByIdAsync(new PluginId(entityId.getId()));
+            Futures.addCallback(pluginFuture, getCallback(callback, plugin -> {
+                if (plugin == null) {
+                    return ValidationResult.entityNotFound("Plugin with requested id wasn't found!");
+                } else {
+                    if (ctx.isTenantAdmin() && !plugin.getTenantId().equals(ctx.getTenantId())) {
+                        return ValidationResult.accessDenied("Plugin doesn't belong to the current Tenant!");
+                    } else if (ctx.isSystemAdmin() && !plugin.getTenantId().isNullUid()) {
+                        return ValidationResult.accessDenied("Plugin is not in system scope!");
+                    } else {
+                        return ValidationResult.ok();
+                    }
+                }
+            }));
+        }
+    }
+
+    private void validateCustomer(final PluginApiCallSecurityContext ctx, EntityId entityId, ValidationCallback callback) {
+        if (ctx.isSystemAdmin()) {
+            callback.onSuccess(this, ValidationResult.accessDenied(SYSTEM_ADMINISTRATOR_IS_NOT_ALLOWED_TO_PERFORM_THIS_OPERATION));
+        } else {
+            ListenableFuture<Customer> customerFuture = pluginCtx.customerService.findCustomerByIdAsync(new CustomerId(entityId.getId()));
+            Futures.addCallback(customerFuture, getCallback(callback, customer -> {
+                if (customer == null) {
+                    return ValidationResult.entityNotFound("Customer with requested id wasn't found!");
+                } else {
+                    if (!customer.getTenantId().equals(ctx.getTenantId())) {
+                        return ValidationResult.accessDenied("Customer doesn't belong to the current Tenant!");
+                    } else if (ctx.isCustomerUser() && !customer.getId().equals(ctx.getCustomerId())) {
+                        return ValidationResult.accessDenied("Customer doesn't relate to the currently authorized customer user!");
+                    } else {
+                        return ValidationResult.ok();
+                    }
+                }
+            }));
+        }
+    }
+
+    private void validateTenant(final PluginApiCallSecurityContext ctx, EntityId entityId, ValidationCallback callback) {
+        if (ctx.isCustomerUser()) {
+            callback.onSuccess(this, ValidationResult.accessDenied(CUSTOMER_USER_IS_NOT_ALLOWED_TO_PERFORM_THIS_OPERATION));
+        } else if (ctx.isSystemAdmin()) {
+            callback.onSuccess(this, ValidationResult.ok());
+        } else {
+            ListenableFuture<Tenant> tenantFuture = pluginCtx.tenantService.findTenantByIdAsync(new TenantId(entityId.getId()));
+            Futures.addCallback(tenantFuture, getCallback(callback, tenant -> {
+                if (tenant == null) {
+                    return ValidationResult.entityNotFound("Tenant with requested id wasn't found!");
+                } else if (!tenant.getId().equals(ctx.getTenantId())) {
+                    return ValidationResult.accessDenied("Tenant doesn't relate to the currently authorized user!");
+                } else {
+                    return ValidationResult.ok();
+                }
+            }));
+        }
+    }
+
+    @Override
+    public ListenableFuture<List<EntityRelation>> findByFromAndType(EntityId from, String relationType) {
+        return this.pluginCtx.relationService.findByFromAndTypeAsync(from, relationType, RelationTypeGroup.COMMON);
+    }
+
+    @Override
+    public ListenableFuture<List<EntityRelation>> findByToAndType(EntityId from, String relationType) {
+        return this.pluginCtx.relationService.findByToAndTypeAsync(from, relationType, RelationTypeGroup.COMMON);
     }
 
     @Override
@@ -454,6 +542,29 @@ public final class PluginProcessingContext implements PluginContext {
     @Override
     public void sendRpcRequest(ToDeviceRpcRequest msg) {
         pluginCtx.sendRpcRequest(msg);
+    }
+
+    @Override
+    public void logRpcRequest(PluginApiCallSecurityContext ctx, DeviceId deviceId, ToDeviceRpcRequestBody body, boolean oneWay, Optional<RpcError> rpcError, Exception e) {
+        String rpcErrorStr = "";
+        if (rpcError.isPresent()) {
+            rpcErrorStr = "RPC Error: " + rpcError.get().name();
+        }
+        String method = body.getMethod();
+        String params = body.getParams();
+        pluginCtx.auditLogService.logEntityAction(
+                ctx.getTenantId(),
+                ctx.getCustomerId(),
+                ctx.getUserId(),
+                ctx.getUserName(),
+                deviceId,
+                null,
+                ActionType.RPC_CALL,
+                e,
+                rpcErrorStr,
+                new Boolean(oneWay),
+                method,
+                params);
     }
 
     @Override

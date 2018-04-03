@@ -1,5 +1,5 @@
 /**
- * Copyright © 2016-2017 The Thingsboard Authors
+ * Copyright © 2016-2018 The Thingsboard Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,15 +19,19 @@ import lombok.extern.slf4j.Slf4j;
 import org.thingsboard.server.extensions.api.component.Plugin;
 import org.thingsboard.server.extensions.api.plugins.AbstractPlugin;
 import org.thingsboard.server.extensions.api.plugins.PluginContext;
+import org.thingsboard.server.extensions.api.plugins.handlers.DefaultRuleMsgHandler;
 import org.thingsboard.server.extensions.api.plugins.handlers.RestMsgHandler;
+import org.thingsboard.server.extensions.api.plugins.handlers.RuleMsgHandler;
 import org.thingsboard.server.extensions.api.plugins.msg.FromDeviceRpcResponse;
 import org.thingsboard.server.extensions.api.plugins.msg.TimeoutMsg;
+import org.thingsboard.server.extensions.core.action.rpc.ServerSideRpcCallAction;
 import org.thingsboard.server.extensions.core.plugin.rpc.handlers.RpcRestMsgHandler;
+import org.thingsboard.server.extensions.core.plugin.rpc.handlers.RpcRuleMsgHandler;
 
 /**
  * @author Andrew Shvayka
  */
-@Plugin(name = "RPC Plugin", actions = {}, descriptor = "RpcPluginDescriptor.json", configuration = RpcPluginConfiguration.class)
+@Plugin(name = "RPC Plugin", actions = {ServerSideRpcCallAction.class}, descriptor = "RpcPluginDescriptor.json", configuration = RpcPluginConfiguration.class)
 @Slf4j
 public class RpcPlugin extends AbstractPlugin<RpcPluginConfiguration> {
 
@@ -61,17 +65,22 @@ public class RpcPlugin extends AbstractPlugin<RpcPluginConfiguration> {
     }
 
     @Override
-    public void resume(PluginContext ctx) {
+    protected RuleMsgHandler getRuleMsgHandler() {
+        return new RpcRuleMsgHandler();
+    }
 
+    @Override
+    public void resume(PluginContext ctx) {
+        //Do nothing
     }
 
     @Override
     public void suspend(PluginContext ctx) {
-
+        //Do nothing
     }
 
     @Override
     public void stop(PluginContext ctx) {
-
+        //Do nothing
     }
 }

@@ -1,5 +1,5 @@
 /**
- * Copyright © 2016-2017 The Thingsboard Authors
+ * Copyright © 2016-2018 The Thingsboard Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@ import io.jsonwebtoken.Claims;
 public final class AccessJwtToken implements JwtToken {
     private final String rawToken;
     @JsonIgnore
-    private Claims claims;
+    private transient Claims claims;
 
     protected AccessJwtToken(final String token, Claims claims) {
         this.rawToken = token;

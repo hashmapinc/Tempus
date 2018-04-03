@@ -1,5 +1,5 @@
 /**
- * Copyright © 2016-2017 The Thingsboard Authors
+ * Copyright © 2016-2018 The Thingsboard Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.thingsboard.server.service.update;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -27,6 +26,7 @@ import org.thingsboard.server.service.update.model.UpdateMessage;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -71,23 +71,32 @@ public class DefaultUpdateService implements UpdateService {
                 if (version == null) {
                     version = "unknown";
                 }
-                Path instanceIdPath = Paths.get(INSTANCE_ID_FILE);
-                if (Files.exists(instanceIdPath)) {
-                    byte[] data = Files.readAllBytes(instanceIdPath);
-                    if (data != null && data.length > 0) {
-                        try {
-                            instanceId = UUID.fromString(new String(data));
-                        } catch (IllegalArgumentException e) {
-                        }
-                    }
-                }
-                if (instanceId == null) {
-                    instanceId = UUID.randomUUID();
-                    Files.write(instanceIdPath, instanceId.toString().getBytes());
-                }
+                instanceId = parseInstanceId();
                 checkUpdatesFuture = scheduler.scheduleAtFixedRate(checkUpdatesRunnable, 0, 1, TimeUnit.HOURS);
-            } catch (Exception e) {}
+            } catch (Exception e) {
+                //Do nothing
+            }
         }
+    }
+
+    private UUID parseInstanceId() throws IOException {
+        UUID result = null;
+        Path instanceIdPath = Paths.get(INSTANCE_ID_FILE);
+        if (instanceIdPath.toFile().exists()) {
+            byte[] data = Files.readAllBytes(instanceIdPath);
+            if (data != null && data.length > 0) {
+                try {
+                    result = UUID.fromString(new String(data));
+                } catch (IllegalArgumentException e) {
+                    //Do nothing
+                }
+            }
+        }
+        if (result == null) {
+            result = UUID.randomUUID();
+            Files.write(instanceIdPath, result.toString().getBytes());
+        }
+        return result;
     }
 
     @PreDestroy
@@ -97,26 +106,25 @@ public class DefaultUpdateService implements UpdateService {
                 checkUpdatesFuture.cancel(true);
             }
             scheduler.shutdownNow();
-        } catch (Exception e) {}
+        } catch (Exception e) {
+            //Do nothing
+        }
     }
 
-    Runnable checkUpdatesRunnable = new Runnable() {
-        @Override
-        public void run() {
-            try {
-                log.trace("Executing check update method for instanceId [{}], platform [{}] and version [{}]", instanceId, platform, version);
-                ObjectNode request = new ObjectMapper().createObjectNode();
-                request.put(PLATFORM_PARAM, platform);
-                request.put(VERSION_PARAM, version);
-                request.put(INSTANCE_ID_PARAM, instanceId.toString());
-                JsonNode response = restClient.postForObject(UPDATE_SERVER_BASE_URL+"/api/thingsboard/updates", request, JsonNode.class);
-                updateMessage = new UpdateMessage(
-                        response.get("message").asText(),
-                        response.get("updateAvailable").asBoolean()
-                );
-            } catch (Exception e) {
-                log.trace(e.getMessage());
-            }
+    Runnable checkUpdatesRunnable = () -> {
+        try {
+            log.trace("Executing check update method for instanceId [{}], platform [{}] and version [{}]", instanceId, platform, version);
+            ObjectNode request = new ObjectMapper().createObjectNode();
+            request.put(PLATFORM_PARAM, platform);
+            request.put(VERSION_PARAM, version);
+            request.put(INSTANCE_ID_PARAM, instanceId.toString());
+            JsonNode response = restClient.postForObject(UPDATE_SERVER_BASE_URL+"/api/thingsboard/updates", request, JsonNode.class);
+            updateMessage = new UpdateMessage(
+                    response.get("message").asText(),
+                    response.get("updateAvailable").asBoolean()
+            );
+        } catch (Exception e) {
+            log.trace(e.getMessage());
         }
     };
 

@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Copyright © 2016-2017 The Thingsboard Authors
+# Copyright © 2016-2018 The Thingsboard Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -74,13 +74,13 @@ echo "Generating SSL Key Pair..."
 
 keytool -genkeypair -v \
   -alias $CLIENT_KEY_ALIAS \
-  -dname "CN=$DOMAIN_SUFFIX, OU=$ORGANIZATIONAL_UNIT, O=$ORGANIZATION, L=$CITY, ST=$STATE_OR_PROVINCE, C=$TWO_LETTER_COUNTRY_CODE" \ 
   -keystore $CLIENT_FILE_PREFIX.jks \
   -keypass $CLIENT_KEY_PASSWORD \
   -storepass $CLIENT_KEYSTORE_PASSWORD \
   -keyalg RSA \
   -keysize 2048 \
-  -validity 9999
+  -validity 9999 \
+  -dname "CN=$DOMAIN_SUFFIX, OU=$ORGANIZATIONAL_UNIT, O=$ORGANIZATION, L=$CITY, ST=$STATE_OR_PROVINCE, C=$TWO_LETTER_COUNTRY_CODE"
 
 echo "Converting keystore to pkcs12"
 keytool -importkeystore  \

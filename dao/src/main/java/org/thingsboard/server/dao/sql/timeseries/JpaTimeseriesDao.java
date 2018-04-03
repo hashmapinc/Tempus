@@ -1,5 +1,5 @@
 /**
- * Copyright © 2016-2017 The Thingsboard Authors
+ * Copyright © 2016-2018 The Thingsboard Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,11 +17,10 @@ package org.thingsboard.server.dao.sql.timeseries;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
-import com.google.common.util.concurrent.Futures;
-import com.google.common.util.concurrent.ListenableFuture;
-import com.google.common.util.concurrent.SettableFuture;
+import com.google.common.util.concurrent.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Component;
 import org.thingsboard.server.common.data.UUIDConverter;
@@ -33,13 +32,18 @@ import org.thingsboard.server.dao.model.sql.TsKvLatestCompositeKey;
 import org.thingsboard.server.dao.model.sql.TsKvLatestEntity;
 import org.thingsboard.server.dao.sql.JpaAbstractDaoListeningExecutorService;
 import org.thingsboard.server.dao.timeseries.TimeseriesDao;
+import org.thingsboard.server.dao.timeseries.TsInsertExecutorType;
 import org.thingsboard.server.dao.util.SqlDao;
 
 import javax.annotation.Nullable;
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
 import static org.thingsboard.server.common.data.UUIDConverter.fromTimeUUID;
@@ -50,11 +54,45 @@ import static org.thingsboard.server.common.data.UUIDConverter.fromTimeUUID;
 @SqlDao
 public class JpaTimeseriesDao extends JpaAbstractDaoListeningExecutorService implements TimeseriesDao {
 
+    @Value("${sql.ts_inserts_executor_type}")
+    private String insertExecutorType;
+
+    @Value("${sql.ts_inserts_fixed_thread_pool_size}")
+    private int insertFixedThreadPoolSize;
+
+    private ListeningExecutorService insertService;
+
     @Autowired
     private TsKvRepository tsKvRepository;
 
     @Autowired
     private TsKvLatestRepository tsKvLatestRepository;
+
+    @PostConstruct
+    public void init() {
+        Optional<TsInsertExecutorType> executorTypeOptional = TsInsertExecutorType.parse(insertExecutorType);
+        TsInsertExecutorType executorType;
+        if (executorTypeOptional.isPresent()) {
+            executorType = executorTypeOptional.get();
+        } else {
+            executorType = TsInsertExecutorType.FIXED;
+        }
+        switch (executorType) {
+            case SINGLE:
+                insertService = MoreExecutors.listeningDecorator(Executors.newSingleThreadExecutor());
+                break;
+            case FIXED:
+                int poolSize = insertFixedThreadPoolSize;
+                if (poolSize <= 0) {
+                    poolSize = 10;
+                }
+                insertService = MoreExecutors.listeningDecorator(Executors.newFixedThreadPool(poolSize));
+                break;
+            case CACHED:
+                insertService = MoreExecutors.listeningDecorator(Executors.newCachedThreadPool());
+                break;
+        }
+    }
 
     @Override
     public ListenableFuture<List<TsKvEntry>> findAllAsync(EntityId entityId, List<TsKvQuery> queries) {
@@ -168,7 +206,6 @@ public class JpaTimeseriesDao extends JpaAbstractDaoListeningExecutorService imp
             }
         });
         return Futures.transform(listenableFuture, new Function<TsKvEntity, Optional<TsKvEntry>>() {
-            @Nullable
             @Override
             public Optional<TsKvEntry> apply(@Nullable TsKvEntity entity) {
                 if (entity != null && entity.isNotEmpty()) {
@@ -234,7 +271,8 @@ public class JpaTimeseriesDao extends JpaAbstractDaoListeningExecutorService imp
         entity.setLongValue(tsKvEntry.getLongValue().orElse(null));
         entity.setBooleanValue(tsKvEntry.getBooleanValue().orElse(null));
         entity.setJsonValue(tsKvEntry.getJsonValue().orElse(null));
-        return service.submit(() -> {
+        log.trace("Saving entity: {}", entity);
+        return insertService.submit(() -> {
             tsKvRepository.save(entity);
             return null;
         });
@@ -242,7 +280,7 @@ public class JpaTimeseriesDao extends JpaAbstractDaoListeningExecutorService imp
 
     @Override
     public ListenableFuture<Void> savePartition(EntityId entityId, long tsKvEntryTs, String key, long ttl) {
-        return service.submit(() -> null);
+        return insertService.submit(() -> null);
     }
 
     @Override
@@ -257,10 +295,17 @@ public class JpaTimeseriesDao extends JpaAbstractDaoListeningExecutorService imp
         latestEntity.setLongValue(tsKvEntry.getLongValue().orElse(null));
         latestEntity.setBooleanValue(tsKvEntry.getBooleanValue().orElse(null));
         latestEntity.setJsonValue(tsKvEntry.getJsonValue().orElse(null));
-        return service.submit(() -> {
+        return insertService.submit(() -> {
             tsKvLatestRepository.save(latestEntity);
             return null;
         });
+    }
+
+    @PreDestroy
+    void onDestroy() {
+        if (insertService != null) {
+            insertService.shutdown();
+        }
     }
 
 }

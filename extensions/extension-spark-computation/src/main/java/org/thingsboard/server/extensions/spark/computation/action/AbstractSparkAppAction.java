@@ -37,7 +37,7 @@ public abstract class AbstractSparkAppAction<T extends SparkComputationPluginAct
     }
 
     @Override
-    public Optional<RuleToPluginMsg<?>> convert(RuleContext ctx, ToDeviceActorMsg msg, RuleProcessingMetaData deviceMsgMd) {
+    public Optional<RuleToPluginMsg> convert(RuleContext ctx, ToDeviceActorMsg msg, RuleProcessingMetaData deviceMsgMd) {
         String application = configuration.getApplication();
         SparkComputationActionPayload.SparkComputationActionPayloadBuilder builder = SparkComputationActionPayload.builder();
         builder.sparkApplication(application);

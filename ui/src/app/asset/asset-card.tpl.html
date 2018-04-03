@@ -1,6 +1,6 @@
 <!--
 
-    Copyright © 2016-2017 The Thingsboard Authors
+    Copyright © 2016-2018 The Thingsboard Authors
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
 
 -->
 <div flex layout="column" style="margin-top: -10px;">
-    <div flex style="text-transform: uppercase; padding-bottom: 10px;">{{vm.item.type}}</div>
+    <div style="text-transform: uppercase; padding-bottom: 10px;">{{vm.item.type}}</div>
     <div class="tb-small" ng-show="vm.isAssignedToCustomer()">{{'asset.assignedToCustomer' | translate}} '{{vm.item.assignedCustomer.title}}'</div>
     <div class="tb-small" ng-show="vm.isPublic()">{{'asset.public' | translate}}</div>
 </div>

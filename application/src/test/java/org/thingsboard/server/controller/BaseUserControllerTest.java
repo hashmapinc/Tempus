@@ -1,5 +1,5 @@
 /**
- * Copyright © 2016-2017 The Thingsboard Authors
+ * Copyright © 2016-2018 The Thingsboard Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@ package org.thingsboard.server.controller;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.Assert;
 import org.junit.Test;
@@ -106,7 +107,11 @@ public abstract class BaseUserControllerTest extends AbstractControllerTest {
         .andExpect(status().isSeeOther())
         .andExpect(header().string(HttpHeaders.LOCATION, "/login/createPassword?activateToken=" + TestMailService.currentActivateToken));
 
-        JsonNode tokenInfo = readResponse(doPost("/api/noauth/activate", "activateToken", TestMailService.currentActivateToken, "password", "testPassword").andExpect(status().isOk()), JsonNode.class);
+        JsonNode activateRequest = new ObjectMapper().createObjectNode()
+                .put("activateToken", TestMailService.currentActivateToken)
+                .put("password", "testPassword");
+
+        JsonNode tokenInfo = readResponse(doPost("/api/noauth/activate", activateRequest).andExpect(status().isOk()), JsonNode.class);
         validateAndSetJwtToken(tokenInfo, email);
 
         doGet("/api/auth/user")
@@ -150,13 +155,21 @@ public abstract class BaseUserControllerTest extends AbstractControllerTest {
         
         User savedUser = createUserAndLogin(user, "testPassword1");
         logout();
-        doPost("/api/noauth/resetPasswordByEmail", "email", email)
+
+        JsonNode resetPasswordByEmailRequest = new ObjectMapper().createObjectNode()
+                .put("email", email);
+
+        doPost("/api/noauth/resetPasswordByEmail", resetPasswordByEmailRequest)
         .andExpect(status().isOk());
         doGet("/api/noauth/resetPassword?resetToken={resetToken}", TestMailService.currentResetPasswordToken)
         .andExpect(status().isSeeOther())
         .andExpect(header().string(HttpHeaders.LOCATION, "/login/resetPassword?resetToken=" + TestMailService.currentResetPasswordToken));
-        
-        JsonNode tokenInfo = readResponse(doPost("/api/noauth/resetPassword", "resetToken", TestMailService.currentResetPasswordToken, "password", "testPassword2").andExpect(status().isOk()), JsonNode.class);
+
+        JsonNode resetPasswordRequest = new ObjectMapper().createObjectNode()
+                .put("resetToken", TestMailService.currentResetPasswordToken)
+                .put("password", "testPassword2");
+
+        JsonNode tokenInfo = readResponse(doPost("/api/noauth/resetPassword", resetPasswordRequest).andExpect(status().isOk()), JsonNode.class);
         validateAndSetJwtToken(tokenInfo, email);
 
         doGet("/api/auth/user")
