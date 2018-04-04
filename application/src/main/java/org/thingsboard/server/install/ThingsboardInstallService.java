@@ -64,21 +64,21 @@ public class ThingsboardInstallService {
     public void performInstall() {
         try {
             if (isUpgrade) {
-                log.info("Starting ThingsBoard Upgrade from version {} ...", upgradeFromVersion);
+                log.info("Starting Tempus Upgrade from version {} ...", upgradeFromVersion);
 
                 switch (upgradeFromVersion) {
                     case "1.2.3": //NOSONAR, Need to execute gradual upgrade starting from upgradeFromVersion
-                        log.info("Upgrading ThingsBoard from version 1.2.3 to 1.3.0 ...");
+                        log.info("Upgrading Tempus from version 1.2.3 to 1.3.0 ...");
 
                         databaseUpgradeService.upgradeDatabase("1.2.3");
 
                     case "1.3.0":  //NOSONAR, Need to execute gradual upgrade starting from upgradeFromVersion
-                        log.info("Upgrading ThingsBoard from version 1.3.0 to 1.3.1 ...");
+                        log.info("Upgrading Tempus from version 1.3.0 to 1.3.1 ...");
 
                         databaseUpgradeService.upgradeDatabase("1.3.0");
 
                     case "1.3.1":
-                        log.info("Upgrading ThingsBoard from version 1.3.1 to 1.4.0 ...");
+                        log.info("Upgrading Tempus from version 1.3.1 to 1.4.0 ...");
 
                         databaseUpgradeService.upgradeDatabase("1.3.1");
 
@@ -99,14 +99,14 @@ public class ThingsboardInstallService {
 
                         break;
                     default:
-                        throw new RuntimeException("Unable to upgrade ThingsBoard, unsupported fromVersion: " + upgradeFromVersion);
+                        throw new RuntimeException("Unable to upgrade Tempus, unsupported fromVersion: " + upgradeFromVersion);
 
                 }
                 log.info("Upgrade finished successfully!");
 
             } else {
 
-                log.info("Starting ThingsBoard Installation...");
+                log.info("Starting Tempus Installation...");
 
                 if (this.dataDir == null) {
                     throw new RuntimeException("'install.data_dir' property should specified!");
@@ -138,8 +138,8 @@ public class ThingsboardInstallService {
 
 
         } catch (Exception e) {
-            log.error("Unexpected error during ThingsBoard installation!", e);
-            throw new ThingsboardInstallException("Unexpected error during ThingsBoard installation!", e);
+            log.error("Unexpected error during Tempus installation!", e);
+            throw new ThingsboardInstallException("Unexpected error during Tempus installation!", e);
         } finally {
             SpringApplication.exit(context);
         }

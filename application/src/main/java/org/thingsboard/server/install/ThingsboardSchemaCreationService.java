@@ -52,7 +52,7 @@ public class ThingsboardSchemaCreationService {
 
     public void performInstall() {
         try {
-        log.info("Starting ThingsBoard Installation...");
+        log.info("Starting Tempus Installation...");
 
         if (this.dataDir == null) {
             throw new RuntimeException("'install.data_dir' property should specified!");
@@ -65,8 +65,8 @@ public class ThingsboardSchemaCreationService {
 
             databaseSchemaService.createDatabaseSchema();
         } catch (Exception e) {
-            log.error("Unexpected error during ThingsBoard installation!", e);
-            throw new ThingsboardInstallException("Unexpected error during ThingsBoard installation!", e);
+            log.error("Unexpected error during Tempus installation!", e);
+            throw new ThingsboardInstallException("Unexpected error during Tempus installation!", e);
         } finally {
             SpringApplication.exit(context);
         }

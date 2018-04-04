@@ -56,9 +56,9 @@ su -s /bin/sh -c "java -cp ${jarfile} $JAVA_OPTS -Dloader.main=org.thingsboard.s
                     org.springframework.boot.loader.PropertiesLauncher" "$run_user"
 
 if [ $? -ne 0 ]; then
-    echo "ThingsBoard schema setup failed!"
+    echo "Tempus schema setup failed!"
 else
-    echo "ThingsBoard schema setup successfully!"
+    echo "Tempus schema setup successfully!"
 fi
 
 
@@ -72,9 +72,9 @@ su -s /bin/sh -c "java -cp ${jarfile} $JAVA_OPTS -Dloader.main=org.thingsboard.s
                     org.springframework.boot.loader.PropertiesLauncher" "$run_user"
 
 if [ $? -ne 0 ]; then
-    echo "ThingsBoard installation failed!"
+    echo "Tempus installation failed!"
 else
-    echo "ThingsBoard installed successfully!"
+    echo "Tempus installed successfully!"
 fi
 
 exit $?
