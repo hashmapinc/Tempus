@@ -33,5 +33,6 @@ public class MqttSqlTestSuite {
     public static CustomSqlUnit sqlUnit = new CustomSqlUnit(
             Arrays.asList("sql/schema.sql", "sql/system-data.sql"),
             "sql/drop-all-tables.sql",
-            "sql-test.properties");
+            "sql-test.properties",
+             "sql/upgrade");
 }

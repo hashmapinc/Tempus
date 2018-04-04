@@ -32,7 +32,8 @@ public class SqlDaoServiceTestSuite {
     public static CustomSqlUnit sqlUnit = new CustomSqlUnit(
             Arrays.asList("sql/schema.sql", "sql/system-data.sql", "sql/system-test.sql"),
             "sql/drop-all-tables.sql",
-            "sql-test.properties"
+            "sql-test.properties",
+            "sql/upgrade"
     );
 
 }
