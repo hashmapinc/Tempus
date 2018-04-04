@@ -174,7 +174,11 @@ public abstract class AbstractControllerTest {
             createLDAPEntry(TENANT_ADMIN_EMAIL, TENANT_ADMIN_PASSWORD);
             createLDAPEntry(CUSTOMER_USER_EMAIL, CUSTOMER_USER_PASSWORD);
         }
+
+
+        log.info("Logging in as admin");
         loginSysAdmin();
+        log.info("Logged in as sysadmin");
 
         Tenant tenant = new Tenant();
         tenant.setTitle(TEST_TENANT_NAME);
@@ -234,12 +238,16 @@ public abstract class AbstractControllerTest {
 
     protected User createUserAndLogin(User user, String password) throws Exception {
         User savedUser = doPost("/api/user?activationType=mail", user, User.class);
+        log.info("CHDC User Created = " + user + " + " + password);
         logout();
+        log.info("Logged Out Admin");
         doGet("/api/noauth/activate?activateToken={activateToken}", TestMailService.currentActivateToken)
                 .andExpect(status().isSeeOther())
                 .andExpect(header().string(HttpHeaders.LOCATION, "/login/createPassword?activateToken=" + TestMailService.currentActivateToken));
+        log.info("Received token request response");
         JsonNode tokenInfo = readResponse(doPost("/api/noauth/activate", "activateToken", TestMailService.currentActivateToken, "password", password).andExpect(status().isOk()), JsonNode.class);
         validateAndSetJwtToken(tokenInfo, user.getEmail());
+        log.info("JWT token validated");
         return savedUser;
     }
 

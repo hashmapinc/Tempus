@@ -19,15 +19,23 @@ import com.google.common.base.Charsets;
 import com.google.common.io.Resources;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.rules.ExternalResource;
+import org.thingsboard.server.dao.model.ModelConstants;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
+import java.util.stream.Collectors;
 
 
 /**
@@ -41,10 +49,12 @@ public class CustomSqlUnit extends ExternalResource {
     private final String dbUrl;
     private final String dbUserName;
     private final String dbPassword;
+    private final String upgradePath;
 
-    public CustomSqlUnit(List<String> sqlFiles, String dropAllTablesSqlFile, String configurationFileName) {
+    public CustomSqlUnit(List<String> sqlFiles, String dropAllTablesSqlFile, String configurationFileName, String upgradePath) {
         this.sqlFiles = sqlFiles;
         this.dropAllTablesSqlFile = dropAllTablesSqlFile;
+        this.upgradePath = upgradePath;
         final Properties properties = new Properties();
         try (final InputStream stream = this.getClass().getClassLoader().getResourceAsStream(configurationFileName)) {
             properties.load(stream);
@@ -63,11 +73,34 @@ public class CustomSqlUnit extends ExternalResource {
         Connection conn = null;
         try {
             conn = DriverManager.getConnection(dbUrl, dbUserName, dbPassword);
+            Path upgradeScriptsDirectory = Paths.get(upgradePath);
+
             for (String sqlFile : sqlFiles) {
                 URL sqlFileUrl = Resources.getResource(sqlFile);
                 String sql = Resources.toString(sqlFileUrl, Charsets.UTF_8);
                 conn.createStatement().execute(sql);
             }
+
+            log.info("Installing pending upgrades ...");
+
+            List<String> executedUpgrades = new ArrayList<>();
+            ResultSet rs = conn.createStatement().executeQuery("select "+ ModelConstants.INSTALLED_SCRIPTS_COLUMN + " from "+ ModelConstants.INSTALLED_SCHEMA_VERSIONS);
+            while (rs.next()) {
+                executedUpgrades.add(rs.getString(ModelConstants.INSTALLED_SCRIPTS_COLUMN));
+            }
+
+            List<Integer> sortedScriptsIndexes = Files.list(upgradeScriptsDirectory).map(a -> stripExtensionFromName(a.getFileName().toString())).sorted().collect(Collectors.toList());
+
+            for(Integer i: sortedScriptsIndexes) {
+                String scriptFileName = i.toString()+".sql";
+                if(!executedUpgrades.contains(scriptFileName)) {
+                    String upgradeQueries = new String(Files.readAllBytes(upgradeScriptsDirectory.resolve(scriptFileName)), Charset.forName("UTF-8"));
+                    conn.createStatement().execute(upgradeQueries);
+                    conn.createStatement().execute("insert into " + ModelConstants.INSTALLED_SCHEMA_VERSIONS+ " values('"+scriptFileName+"'"+")");
+                }
+            }
+
+
         } catch (IOException | SQLException e) {
             throw new RuntimeException("Unable to start embedded hsqldb. Reason: " + e.getMessage(), e);
         } finally {
@@ -104,5 +137,9 @@ public class CustomSqlUnit extends ExternalResource {
                 }
             }
         }
+    }
+
+    private Integer stripExtensionFromName(String fileName) {
+        return Integer.parseInt(fileName.substring(0, fileName.indexOf(".sql")));
     }
 }

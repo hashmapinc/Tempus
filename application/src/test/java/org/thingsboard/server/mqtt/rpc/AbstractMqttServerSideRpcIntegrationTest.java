@@ -97,6 +97,7 @@ public abstract class AbstractMqttServerSideRpcIntegrationTest extends AbstractC
 
         String setGpioRequest = "{\"method\":\"setGpio\",\"params\":{\"pin\": \"23\",\"value\": 1}}";
         String deviceId = savedDevice.getId().getId().toString();
+        log.info("Received Device Id: " + deviceId);
         String result = doPostAsync("/api/plugins/rpc/oneway/" + deviceId, setGpioRequest, String.class, status().isOk());
         Assert.assertTrue(StringUtils.isEmpty(result));
     }
@@ -146,10 +147,12 @@ public abstract class AbstractMqttServerSideRpcIntegrationTest extends AbstractC
         device.setName("Test Two-Way Server-Side RPC");
         device.setType("default");
         Device savedDevice = getSavedDevice(device);
+        log.info("Created Device");
         DeviceCredentials deviceCredentials = getDeviceCredentials(savedDevice);
         assertEquals(savedDevice.getId(), deviceCredentials.getDeviceId());
         String accessToken = deviceCredentials.getCredentialsId();
         assertNotNull(accessToken);
+        log.info("Received Access Token");
 
         String clientId = MqttAsyncClient.generateClientId();
         MqttAsyncClient client = new MqttAsyncClient(MQTT_URL, clientId);
