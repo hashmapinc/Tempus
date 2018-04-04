@@ -45,6 +45,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 /**
  * Created by ashvayka on 19.01.17.
  */
+
 public class GatewayDeviceSessionCtx extends DeviceAwareSessionContext {
 
     private static final Gson GSON = new Gson();
@@ -87,9 +88,9 @@ public class GatewayDeviceSessionCtx extends DeviceAwareSessionContext {
                 if (responseMsg.isSuccess()) {
                     MsgType requestMsgType = responseMsg.getRequestMsgType();
                     Integer requestId = responseMsg.getRequestId();
-                    if (requestId >= 0 && requestMsgType == MsgType.POST_ATTRIBUTES_REQUEST || requestMsgType == MsgType.POST_TELEMETRY_REQUEST
-                            || requestMsgType == MsgType.POST_TELEMETRY_REQUEST_DEPTH) {
-                        return Optional.of(MqttTransportHandler.createMqttPubAckMsg(requestId));
+                    if (requestId >= 0 && (requestMsgType == MsgType.POST_ATTRIBUTES_REQUEST || requestMsgType == MsgType.POST_TELEMETRY_REQUEST
+                            || requestMsgType == MsgType.POST_TELEMETRY_REQUEST_DEPTH)) {
+                       return Optional.of(MqttTransportHandler.createMqttPubAckMsg(requestId));
                     }
                 }
                 break;
