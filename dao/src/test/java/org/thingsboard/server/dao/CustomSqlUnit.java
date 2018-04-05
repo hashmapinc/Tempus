@@ -49,12 +49,13 @@ public class CustomSqlUnit extends ExternalResource {
     private final String dbUrl;
     private final String dbUserName;
     private final String dbPassword;
-    private final String upgradePath;
+    //private final String upgradePath;
 
-    public CustomSqlUnit(List<String> sqlFiles, String dropAllTablesSqlFile, String configurationFileName, String upgradePath) {
+    public CustomSqlUnit(List<String> sqlFiles, String dropAllTablesSqlFile, String configurationFileName//, String upgradePath
+    ) {
         this.sqlFiles = sqlFiles;
         this.dropAllTablesSqlFile = dropAllTablesSqlFile;
-        this.upgradePath = upgradePath;
+        //this.upgradePath = upgradePath;
         final Properties properties = new Properties();
         try (final InputStream stream = this.getClass().getClassLoader().getResourceAsStream(configurationFileName)) {
             properties.load(stream);
@@ -73,7 +74,7 @@ public class CustomSqlUnit extends ExternalResource {
         Connection conn = null;
         try {
             conn = DriverManager.getConnection(dbUrl, dbUserName, dbPassword);
-            Path upgradeScriptsDirectory = Paths.get(upgradePath);
+            //Path upgradeScriptsDirectory = Paths.get(upgradePath);
 
             for (String sqlFile : sqlFiles) {
                 URL sqlFileUrl = Resources.getResource(sqlFile);
@@ -89,16 +90,16 @@ public class CustomSqlUnit extends ExternalResource {
                 executedUpgrades.add(rs.getString(ModelConstants.INSTALLED_SCRIPTS_COLUMN));
             }
 
-            List<Integer> sortedScriptsIndexes = Files.list(upgradeScriptsDirectory).map(a -> stripExtensionFromName(a.getFileName().toString())).sorted().collect(Collectors.toList());
+           // List<Integer> sortedScriptsIndexes = Files.list(upgradeScriptsDirectory).map(a -> stripExtensionFromName(a.getFileName().toString())).sorted().collect(Collectors.toList());
 
-            for(Integer i: sortedScriptsIndexes) {
+           /* for(Integer i: sortedScriptsIndexes) {
                 String scriptFileName = i.toString()+".sql";
                 if(!executedUpgrades.contains(scriptFileName)) {
                     String upgradeQueries = new String(Files.readAllBytes(upgradeScriptsDirectory.resolve(scriptFileName)), Charset.forName("UTF-8"));
                     conn.createStatement().execute(upgradeQueries);
                     conn.createStatement().execute("insert into " + ModelConstants.INSTALLED_SCHEMA_VERSIONS+ " values('"+scriptFileName+"'"+")");
                 }
-            }
+            }*/
 
 
         } catch (IOException | SQLException e) {

@@ -32,8 +32,8 @@ public class JpaDaoTestSuite {
     public static CustomSqlUnit sqlUnit = new CustomSqlUnit(
             Arrays.asList("sql/schema.sql", "sql/system-data.sql"),
             "sql/drop-all-tables.sql",
-            "sql-test.properties",
-            "sql/upgrade"
+            "sql-test.properties"
+           // ,"sql/upgrade/1.sql"
     );
 
 }
