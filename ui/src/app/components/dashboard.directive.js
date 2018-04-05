@@ -257,7 +257,7 @@ function DashboardController($scope, $rootScope, $element, $timeout, $mdMedia, $
         }
     };
 
-    addResizeListener(gridsterParent[0], onGirdsterParentResize); // eslint-disable-line no-undef
+    addResizeListener(gridsterParent[0], onGridsterParentResize); // eslint-disable-line no-undef
 
     $scope.$on("$destroy", function () {
         removeResizeListener(gridsterParent[0], onGridsterParentResize); // eslint-disable-line no-undef
