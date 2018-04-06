@@ -16,6 +16,7 @@
 package org.thingsboard.server.dao.depthSeries;
 
 import com.google.common.util.concurrent.ListenableFuture;
+import org.thingsboard.server.common.data.DeviceDataSet;
 import org.thingsboard.server.common.data.id.EntityId;
 import org.thingsboard.server.common.data.kv.DsKvEntry;
 import org.thingsboard.server.common.data.kv.DsKvQuery;
@@ -39,4 +40,6 @@ public interface DepthSeriesService {
     ListenableFuture<List<Void>> save(EntityId entityId, DsKvEntry tsKvEntry);
 
     ListenableFuture<List<Void>> save(EntityId entityId, List<DsKvEntry> dsKvEntry, long ttl);
+
+    DeviceDataSet findAllBetweenDepths(EntityId entityId, Double startDs, Double endDs);
 }

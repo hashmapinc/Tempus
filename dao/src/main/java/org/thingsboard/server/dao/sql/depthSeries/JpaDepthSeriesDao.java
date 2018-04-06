@@ -24,24 +24,24 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Component;
+import org.thingsboard.server.common.data.DeviceDataSet;
 import org.thingsboard.server.common.data.UUIDConverter;
 import org.thingsboard.server.common.data.id.EntityId;
 import org.thingsboard.server.common.data.kv.*;
 import org.thingsboard.server.dao.DaoUtil;
+import org.thingsboard.server.dao.model.ModelConstants;
 import org.thingsboard.server.dao.model.sql.*;
 import org.thingsboard.server.dao.sql.JpaAbstractDaoListeningExecutorService;
 import org.thingsboard.server.dao.depthSeries.DepthSeriesDao;
 import org.thingsboard.server.dao.util.SqlDao;
 
 import javax.annotation.Nullable;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 import static org.thingsboard.server.common.data.UUIDConverter.fromTimeUUID;
+import static org.thingsboard.server.dao.model.ModelConstants.DS_COLUMN;
 
 
 @Component
@@ -259,4 +259,39 @@ public class JpaDepthSeriesDao extends JpaAbstractDaoListeningExecutorService im
         });
     }
 
+    @Override
+    public DeviceDataSet findAllBetweenDepths(EntityId entityId, Double startDs, Double endDs) {
+        List<Object[]> results = dsKvRepository.findSelected(fromTimeUUID(entityId.getId()), entityId.getEntityType(), startDs, endDs);
+        List<String> headerColumns = new ArrayList<>();
+        headerColumns.add(DS_COLUMN);
+        Map<String, Map<String, String>> tableRowsGroupedByDS= new HashMap<>();
+        for(int i = 0; i < results.size(); i++) {
+            if(i > 0) {
+                Object[] row = results.get(i);
+                String ds = row[0].toString();
+                String key = row[1].toString();
+                String value = getFirstNonEmptyValue(row, 2, row.length - 1);
+                if(!headerColumns.contains(key)) {
+                    headerColumns.add(key);
+                }
+                if(tableRowsGroupedByDS.containsKey(ds)) {
+                    Map<String, String> attributeVsValue = tableRowsGroupedByDS.get(ds);
+                    attributeVsValue.put(key, value);
+                    tableRowsGroupedByDS.put(ds, attributeVsValue);
+                } else {
+                    Map<String, String> attributeVsValue = new HashMap<>();
+                    attributeVsValue.put(key, value);
+                    tableRowsGroupedByDS.put(ds, attributeVsValue);
+                }
+            }
+        }
+        return new DeviceDataSet(tableRowsGroupedByDS, headerColumns, DS_COLUMN);
+    }
+
+    private String getFirstNonEmptyValue(Object[] array, int s, int e) {
+        for(int i = s; i <= e; i ++) {
+            if(array[i] !=null && array[i] != "") return  array[i].toString();
+        }
+        return "";
+    }
 }

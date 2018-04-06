@@ -16,6 +16,7 @@
 package org.thingsboard.server.dao.attributes;
 
 import com.google.common.util.concurrent.ListenableFuture;
+import org.thingsboard.server.common.data.DeviceDataSet;
 import org.thingsboard.server.common.data.id.EntityId;
 import org.thingsboard.server.common.data.kv.AttributeKvEntry;
 
@@ -37,4 +38,6 @@ public interface AttributesService {
     ListenableFuture<List<Void>> save(EntityId entityId, String scope, List<AttributeKvEntry> attributes);
 
     ListenableFuture<List<Void>> removeAll(EntityId entityId, String scope, List<String> attributeKeys);
+
+    DeviceDataSet findAll(EntityId entityId);
 }
