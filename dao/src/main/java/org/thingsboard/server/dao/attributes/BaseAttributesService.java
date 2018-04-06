@@ -20,6 +20,7 @@ import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.thingsboard.server.common.data.DeviceDataSet;
 import org.thingsboard.server.common.data.id.EntityId;
 import org.thingsboard.server.common.data.kv.AttributeKvEntry;
 import org.thingsboard.server.dao.exception.IncorrectParameterException;
@@ -75,6 +76,12 @@ public class BaseAttributesService implements AttributesService {
         return attributesDao.removeAll(entityId, scope, keys);
     }
 
+    @Override
+    public DeviceDataSet findAll(EntityId entityId) {
+        validate(entityId);
+        return attributesDao.findAll(entityId);
+    }
+
     private static void validate(EntityId id, String scope) {
         Validator.validateId(id.getId(), "Incorrect id " + id);
         Validator.validateString(scope, "Incorrect scope " + scope);
@@ -89,6 +96,10 @@ public class BaseAttributesService implements AttributesService {
             Validator.validateString(kvEntry.getKey(), "Incorrect kvEntry. Key can't be empty");
             Validator.validatePositiveNumber(kvEntry.getLastUpdateTs(), "Incorrect last update ts. Ts should be positive");
         }
+    }
+
+    private static void validate(EntityId entityId) {
+        Validator.validateEntityId(entityId, "Incorrect entityId " + entityId);
     }
 
 }

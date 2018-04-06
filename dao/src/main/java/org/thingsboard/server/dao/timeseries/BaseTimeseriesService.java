@@ -21,12 +21,14 @@ import com.google.common.util.concurrent.ListenableFuture;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.thingsboard.server.common.data.DeviceDataSet;
 import org.thingsboard.server.common.data.id.EntityId;
 import org.thingsboard.server.common.data.kv.TsKvEntry;
 import org.thingsboard.server.common.data.kv.TsKvQuery;
 import org.thingsboard.server.dao.exception.IncorrectParameterException;
 import org.thingsboard.server.dao.service.Validator;
 
+import javax.persistence.EntityManager;
 import java.util.Collection;
 import java.util.List;
 
@@ -87,6 +89,13 @@ public class BaseTimeseriesService implements TimeseriesService {
             saveAndRegisterFutures(futures, entityId, tsKvEntry, ttl);
         }
         return Futures.allAsList(futures);
+    }
+
+
+    @Override
+    public DeviceDataSet findAllBetweenTimeStamp(EntityId entityId, Long startTs, Long endTs) {
+        validate(entityId);
+        return timeseriesDao.findAllBetweenTimeStamp(entityId, startTs, endTs);
     }
 
     private void saveAndRegisterFutures(List<ListenableFuture<Void>> futures, EntityId entityId, TsKvEntry tsKvEntry, long ttl) {

@@ -16,18 +16,13 @@
 package org.thingsboard.server.controller;
 
 import com.google.common.util.concurrent.ListenableFuture;
+import com.opencsv.CSVWriter;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import org.thingsboard.server.common.data.Application;
-import org.thingsboard.server.common.data.Customer;
-import org.thingsboard.server.common.data.Device;
-import org.thingsboard.server.common.data.EntitySubtype;
-import org.thingsboard.server.common.data.EntityType;
-import org.thingsboard.server.common.data.audit.ActionStatus;
-import org.thingsboard.server.common.data.audit.ActionType;
-import org.thingsboard.server.common.data.device.DeviceSearchQuery;
+import org.thingsboard.server.common.data.*;
 import org.thingsboard.server.common.data.id.CustomerId;
 import org.thingsboard.server.common.data.id.DeviceId;
 import org.thingsboard.server.common.data.id.TenantId;
@@ -35,15 +30,20 @@ import org.thingsboard.server.common.data.page.TextPageData;
 import org.thingsboard.server.common.data.page.TextPageLink;
 import org.thingsboard.server.common.data.security.Authority;
 import org.thingsboard.server.common.data.security.DeviceCredentials;
+import org.thingsboard.server.common.data.device.DeviceSearchQuery;
+import org.thingsboard.server.dao.attributes.AttributesService;
+import org.thingsboard.server.dao.depthSeries.DepthSeriesService;
 import org.thingsboard.server.dao.exception.IncorrectParameterException;
 import org.thingsboard.server.dao.model.ModelConstants;
+import org.thingsboard.server.dao.timeseries.TimeseriesService;
 import org.thingsboard.server.exception.ThingsboardErrorCode;
 import org.thingsboard.server.exception.ThingsboardException;
 import org.thingsboard.server.service.security.model.SecurityUser;
-
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @RestController
@@ -51,7 +51,14 @@ import java.util.stream.Collectors;
 @Slf4j
 public class DeviceController extends BaseController {
 
-    public static final String DEVICE_ID = "deviceId";
+    @Autowired
+    protected TimeseriesService timeseriesService;
+
+    @Autowired
+    protected DepthSeriesService depthSeriesService;
+
+    @Autowired
+    protected AttributesService attributesService;
 
     @PreAuthorize("hasAnyAuthority('TENANT_ADMIN', 'CUSTOMER_USER')")
     @RequestMapping(value = "/device/{deviceId}", method = RequestMethod.GET)
@@ -334,6 +341,44 @@ public class DeviceController extends BaseController {
             throw handleException(e);
         }
     }
+
+    @PreAuthorize("hasAnyAuthority('TENANT_ADMIN', 'CUSTOMER_USER')")
+    @RequestMapping(value = "/download/deviceData", method = RequestMethod.GET)
+    @ResponseBody
+    public void downloadCsv(HttpServletResponse response,
+                            @RequestParam("deviceId") String strDeviceId,
+                            @RequestParam("type") String dataSetType,
+                            @RequestParam(value = "startValue", required = false) String startValue,
+                            @RequestParam(value = "endValue", required = false) String endValue) throws ThingsboardException, IOException {
+        String csvFileName = "device_data.csv";
+        response.setContentType("text/csv");
+        String headerKey = "Content-Disposition";
+        String headerValue = String.format("attachment; filename=\"%s\"", csvFileName);
+        response.setHeader(headerKey, headerValue);
+
+        DeviceId deviceId = new DeviceId(toUUID(strDeviceId));
+
+        CSVWriter csvWriter = new CSVWriter(response.getWriter(),
+                CSVWriter.DEFAULT_SEPARATOR,
+                CSVWriter.NO_QUOTE_CHARACTER,
+                CSVWriter.DEFAULT_ESCAPE_CHARACTER,
+                CSVWriter.DEFAULT_LINE_END);
+
+        DeviceDataSet deviceDataSet = null;
+        if(dataSetType.equals("ts")) {
+            deviceDataSet = timeseriesService.findAllBetweenTimeStamp(deviceId, Long.parseLong(startValue), Long.parseLong(endValue));
+        } else if(dataSetType.equals("ds")) {
+            deviceDataSet = depthSeriesService.findAllBetweenDepths(deviceId, Double.parseDouble(startValue), Double.parseDouble(endValue));
+        } else if(dataSetType.equals("as")){
+            deviceDataSet = attributesService.findAll(deviceId);
+        } else {
+            throw new ThingsboardException("Unsupported Data Set Type Supplied", ThingsboardErrorCode.BAD_REQUEST_PARAMS);
+        }
+        csvWriter.writeNext(deviceDataSet.getHeaderRow());
+        csvWriter.writeAll(deviceDataSet.getDataRows());
+        csvWriter.close();
+    }
+
 
     @PreAuthorize("hasAnyAuthority('TENANT_ADMIN', 'CUSTOMER_USER')")
     @RequestMapping(value = "/devices", method = RequestMethod.POST)

@@ -15,7 +15,9 @@
  */
 package org.thingsboard.server.dao.sql.attributes;
 
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.repository.query.Param;
 import org.thingsboard.server.common.data.EntityType;
 import org.thingsboard.server.dao.model.sql.AttributeKvCompositeKey;
 import org.thingsboard.server.dao.model.sql.AttributeKvEntity;
@@ -29,5 +31,9 @@ public interface AttributeKvRepository extends CrudRepository<AttributeKvEntity,
     List<AttributeKvEntity> findAllByEntityTypeAndEntityIdAndAttributeType(EntityType entityType,
                                                                            String entityId,
                                                                            String attributeType);
+
+    @Query("SELECT akv.lastUpdateTs, akv.attributeKey, akv.booleanValue, akv.strValue, akv.longValue, akv.doubleValue, akv.jsonValue FROM AttributeKvEntity akv WHERE akv.entityId = :entityId " +
+            "AND akv.entityType = :entityType ORDER BY akv.lastUpdateTs DESC")
+    List<Object[]> findAllByEntityTypeAndEntityId(@Param("entityId") String entityId, @Param("entityType") EntityType entityType);
 }
 

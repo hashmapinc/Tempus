@@ -16,6 +16,7 @@
 package org.thingsboard.server.dao.timeseries;
 
 import com.google.common.util.concurrent.ListenableFuture;
+import org.thingsboard.server.common.data.DeviceDataSet;
 import org.thingsboard.server.common.data.id.EntityId;
 import org.thingsboard.server.common.data.kv.TsKvEntry;
 import org.thingsboard.server.common.data.kv.TsKvQuery;
@@ -37,4 +38,6 @@ public interface TimeseriesService {
     ListenableFuture<List<Void>> save(EntityId entityId, TsKvEntry tsKvEntry);
 
     ListenableFuture<List<Void>> save(EntityId entityId, List<TsKvEntry> tsKvEntry, long ttl);
+
+    DeviceDataSet findAllBetweenTimeStamp(EntityId entityId, Long startDS, Long endDS);
 }

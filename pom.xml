@@ -749,6 +749,11 @@
                 <version>${paho.client.version}</version>
             </dependency>
             <dependency>
+                <groupId>com.opencsv</groupId>
+                <artifactId>opencsv</artifactId>
+                <version>4.0</version>
+            </dependency>
+            <dependency>
                 <groupId>com.hazelcast</groupId>
                 <artifactId>hazelcast-spring</artifactId>
                 <version>${hazelcast.version}</version>

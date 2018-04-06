@@ -23,10 +23,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Component;
+import org.thingsboard.server.common.data.DeviceDataSet;
 import org.thingsboard.server.common.data.UUIDConverter;
 import org.thingsboard.server.common.data.id.EntityId;
 import org.thingsboard.server.common.data.kv.*;
 import org.thingsboard.server.dao.DaoUtil;
+import org.thingsboard.server.dao.model.ModelConstants;
 import org.thingsboard.server.dao.model.sql.TsKvEntity;
 import org.thingsboard.server.dao.model.sql.TsKvLatestCompositeKey;
 import org.thingsboard.server.dao.model.sql.TsKvLatestEntity;
@@ -36,17 +38,15 @@ import org.thingsboard.server.dao.timeseries.TsInsertExecutorType;
 import org.thingsboard.server.dao.util.SqlDao;
 
 import javax.annotation.Nullable;
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import javax.persistence.EntityManager;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
 import static org.thingsboard.server.common.data.UUIDConverter.fromTimeUUID;
+import static org.thingsboard.server.dao.model.ModelConstants.TS_COLUMN;
 
 
 @Component
@@ -308,4 +308,39 @@ public class JpaTimeseriesDao extends JpaAbstractDaoListeningExecutorService imp
         }
     }
 
+    @Override
+    public DeviceDataSet findAllBetweenTimeStamp(EntityId entityId, Long startTs, Long endTs) {
+        List<Object[]> results = tsKvRepository.findSelected(fromTimeUUID(entityId.getId()), entityId.getEntityType(), startTs, endTs);
+        List<String> headerColumns = new ArrayList<>();
+        headerColumns.add(TS_COLUMN);
+        Map<String, Map<String, String>> tableRowsGroupedByTS= new HashMap<>();
+        for(int i = 0; i < results.size(); i++) {
+            if(i > 0) {
+                Object[] row = results.get(i);
+                String ts = row[0].toString();
+                String key = row[1].toString();
+                String value = getFirstNonEmptyValue(row, 2, row.length - 1);
+                if(!headerColumns.contains(key)) {
+                    headerColumns.add(key);
+                }
+                if(tableRowsGroupedByTS.containsKey(ts)) {
+                    Map<String, String> attributeVsValue = tableRowsGroupedByTS.get(ts);
+                    attributeVsValue.put(key, value);
+                    tableRowsGroupedByTS.put(ts, attributeVsValue);
+                } else {
+                    Map<String, String> attributeVsValue = new HashMap<>();
+                    attributeVsValue.put(key, value);
+                    tableRowsGroupedByTS.put(ts, attributeVsValue);
+                }
+            }
+        }
+        return new DeviceDataSet(tableRowsGroupedByTS, headerColumns, TS_COLUMN);
+    }
+
+    private String getFirstNonEmptyValue(Object[] array, int s, int e) {
+        for(int i = s; i <= e; i ++) {
+            if(array[i] !=null && array[i] != "") return  array[i].toString();
+        }
+        return "";
+    }
 }

@@ -89,6 +89,11 @@
             <scope>test</scope>
         </dependency>
         <dependency>
+            <groupId>com.opencsv</groupId>
+            <artifactId>opencsv</artifactId>
+            <version>4.0</version>
+        </dependency>
+        <dependency>
             <groupId>io.takari.junit</groupId>
             <artifactId>takari-cpsuite</artifactId>
             <scope>test</scope>

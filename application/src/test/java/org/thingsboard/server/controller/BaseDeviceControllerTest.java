@@ -20,27 +20,36 @@ import static org.thingsboard.server.dao.model.ModelConstants.NULL_UUID;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.google.gson.JsonParser;
 import com.datastax.driver.core.utils.UUIDs;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.web.servlet.ResultActions;
 import org.thingsboard.server.common.data.*;
 import org.thingsboard.server.common.data.id.CustomerId;
 import org.thingsboard.server.common.data.id.DeviceCredentialsId;
 import org.thingsboard.server.common.data.id.DeviceId;
+import org.thingsboard.server.common.data.kv.*;
 import org.thingsboard.server.common.data.page.TextPageData;
 import org.thingsboard.server.common.data.page.TextPageLink;
 import org.thingsboard.server.common.data.security.Authority;
 import org.thingsboard.server.common.data.security.DeviceCredentials;
 import org.thingsboard.server.common.data.security.DeviceCredentialsType;
+import org.thingsboard.server.dao.attributes.AttributesService;
+import org.thingsboard.server.dao.depthSeries.DepthSeriesService;
 import org.thingsboard.server.dao.model.ModelConstants;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.fasterxml.jackson.core.type.TypeReference;
+import org.thingsboard.server.dao.timeseries.TimeseriesService;
 
 public abstract class BaseDeviceControllerTest extends AbstractControllerTest {
     
@@ -48,7 +57,31 @@ public abstract class BaseDeviceControllerTest extends AbstractControllerTest {
     
     private Tenant savedTenant;
     private User tenantAdmin;
-    
+
+
+    private String STRING_KEY_FOR_TS_DS_OR_AS = "stringKey";
+    private String LONG_KEY_FOR_TS_DS_OR_AS = "longKey";
+    private String DOUBLE_KEY_FOR_TS_DS_OR_AS = "doubleKey";
+    private String BOOLEAN_KEY_FOR_TS_DS_OR_AS = "booleanKey";
+    private String JSON_KEY_FOR_TS_DS_OR_AS = "jsonKey";
+
+    private JsonParser parser = new JsonParser();
+    private KvEntry stringKvEntry = new StringDataEntry(STRING_KEY_FOR_TS_DS_OR_AS, "value");
+    private KvEntry longKvEntry = new LongDataEntry(LONG_KEY_FOR_TS_DS_OR_AS, Long.MAX_VALUE);
+    private KvEntry doubleKvEntry = new DoubleDataEntry(DOUBLE_KEY_FOR_TS_DS_OR_AS, Double.MAX_VALUE);
+    private KvEntry booleanKvEntry = new BooleanDataEntry(BOOLEAN_KEY_FOR_TS_DS_OR_AS, Boolean.TRUE);
+    private KvEntry jsonKvEntry = new JsonDataEntry(JSON_KEY_FOR_TS_DS_OR_AS, parser.parse("{\"tag\": \"value\"}").getAsJsonObject());
+
+
+    @Autowired
+    private TimeseriesService timeseriesService;
+
+    @Autowired
+    private DepthSeriesService depthSeriesService;
+
+    @Autowired
+    private AttributesService attributesService;
+
     @Before
     public void beforeTest() throws Exception {
         loginSysAdmin();
@@ -764,4 +797,99 @@ public abstract class BaseDeviceControllerTest extends AbstractControllerTest {
         Assert.assertEquals(0, pageData.getData().size());
     }
 
+    @Test
+    public void testDownloadCsvTSData() throws Exception {
+        Device device = new Device();
+        device.setName("D1");
+        device.setType("default");
+        Device savedDevice = doPost("/api/device", device, Device.class);
+        createTimeSeriesData(savedDevice.getId());
+
+        ResultActions result = doGet("/api/download/deviceData?type=ts&deviceId="+savedDevice.getId().getId().toString()+"&startValue=40&endValue=42");
+        String s = result.andReturn().getResponse().getContentAsString();
+        String[] rows = s.split("\n");
+        Assert.assertEquals( 4, rows.length);
+        Assert.assertEquals("ts,booleanKey,doubleKey,jsonKey,longKey,stringKey", rows[0]);
+        Assert.assertEquals("40,true,1.7976931348623157E308,{\"\"tag\"\":\"\"value\"\"},9223372036854775807,value", rows[1]);
+        Assert.assertEquals("41,true,1.7976931348623157E308,{\"\"tag\"\":\"\"value\"\"},9223372036854775807,value", rows[2]);
+        Assert.assertEquals("42,true,1.7976931348623157E308,{\"\"tag\"\":\"\"value\"\"},9223372036854775807,value", rows[3]);
+    }
+
+    @Test
+    public void testDownloadCsvDSData() throws Exception {
+        Device device = new Device();
+        device.setName("D1");
+        device.setType("default");
+        Device savedDevice = doPost("/api/device", device, Device.class);
+        createDepthSeriesData(savedDevice.getId());
+
+        ResultActions result = doGet("/api/download/deviceData?type=ds&deviceId="+savedDevice.getId().getId().toString()+"&startValue=4000&endValue=4200");
+        String s = result.andReturn().getResponse().getContentAsString();
+        String[] rows = s.split("\n");
+        Assert.assertEquals( 4, rows.length);
+        Assert.assertEquals("ds,booleanKey,doubleKey,jsonKey,longKey,stringKey", rows[0]);
+        Assert.assertEquals("4200.0,true,1.7976931348623157E308,{\"\"tag\"\":\"\"value\"\"},9223372036854775807,value", rows[1]);
+        Assert.assertEquals("4000.0,true,1.7976931348623157E308,{\"\"tag\"\":\"\"value\"\"},9223372036854775807,value", rows[2]);
+        Assert.assertEquals("4100.0,true,1.7976931348623157E308,{\"\"tag\"\":\"\"value\"\"},9223372036854775807,value", rows[3]);
+    }
+
+    @Test
+    public void testDownloadCsvASData() throws Exception {
+        Device device = new Device();
+        device.setName("D1");
+        device.setType("default");
+        Device savedDevice = doPost("/api/deviceData", device, Device.class);
+        createDepthSeriesData(savedDevice.getId());
+
+        AttributeKvEntry attr1 = new BaseAttributeKvEntry(new StringDataEntry("attribute1", "value1"), 42L);
+        AttributeKvEntry attr2 = new BaseAttributeKvEntry(new StringDataEntry("attribute2", "value2"), 73L);
+        attributesService.save(savedDevice.getId(), DataConstants.CLIENT_SCOPE, Arrays.asList(attr1, attr2)).get();
+
+        ResultActions result = doGet("/api/download/devices?type=as&deviceId="+savedDevice.getId().getId().toString());
+        String s = result.andReturn().getResponse().getContentAsString();
+        String[] rows = s.split("\n");
+        Assert.assertEquals( 3, rows.length);
+        Assert.assertEquals("last_update_ts,attribute1,attribute2", rows[0]);
+        Assert.assertEquals("73,,value2", rows[1]);
+        Assert.assertEquals("42,value1,", rows[2]);
+
+    }
+
+    private void createTimeSeriesData(DeviceId deviceId) throws ExecutionException, InterruptedException {
+        long TS = 42L;
+        saveTsEntries(deviceId, TS - 2);
+        saveTsEntries(deviceId, TS - 1);
+        saveTsEntries(deviceId, TS);
+    }
+
+    private void createDepthSeriesData(DeviceId deviceId) throws ExecutionException, InterruptedException {
+        Double DS = 4200D;
+        saveDsEntries(deviceId, DS - 200D);
+        saveDsEntries(deviceId, DS - 100D);
+        saveDsEntries(deviceId, DS);
+    }
+
+    private void saveTsEntries(DeviceId deviceId, long ts) throws ExecutionException, InterruptedException {
+        timeseriesService.save(deviceId, toTsEntry(ts, stringKvEntry)).get();
+        timeseriesService.save(deviceId, toTsEntry(ts, longKvEntry)).get();
+        timeseriesService.save(deviceId, toTsEntry(ts, doubleKvEntry)).get();
+        timeseriesService.save(deviceId, toTsEntry(ts, booleanKvEntry)).get();
+        timeseriesService.save(deviceId, toTsEntry(ts, jsonKvEntry)).get();
+    }
+
+    private static TsKvEntry toTsEntry(long ts, KvEntry entry) {
+        return new BasicTsKvEntry(ts, entry);
+    }
+
+    private void saveDsEntries(DeviceId deviceId, Double ds) throws ExecutionException, InterruptedException {
+        depthSeriesService.save(deviceId, toDsEntry(ds, stringKvEntry)).get();
+        depthSeriesService.save(deviceId, toDsEntry(ds, longKvEntry)).get();
+        depthSeriesService.save(deviceId, toDsEntry(ds, doubleKvEntry)).get();
+        depthSeriesService.save(deviceId, toDsEntry(ds, booleanKvEntry)).get();
+        depthSeriesService.save(deviceId, toDsEntry(ds, jsonKvEntry)).get();
+    }
+
+    private static DsKvEntry toDsEntry(Double ds, KvEntry entry) {
+        return new BasicDsKvEntry(ds, entry);
+    }
 }

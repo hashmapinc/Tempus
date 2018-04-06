@@ -18,11 +18,14 @@ package org.thingsboard.server.dao.attributes;
 import com.datastax.driver.core.*;
 import com.datastax.driver.core.querybuilder.QueryBuilder;
 import com.datastax.driver.core.querybuilder.Select;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.base.Function;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import org.thingsboard.server.common.data.DataConstants;
+import org.thingsboard.server.common.data.DeviceDataSet;
 import org.thingsboard.server.common.data.id.EntityId;
 import org.thingsboard.server.common.data.kv.AttributeKvEntry;
 import org.thingsboard.server.common.data.kv.BaseAttributeKvEntry;
@@ -33,10 +36,7 @@ import org.thingsboard.server.dao.util.NoSqlDao;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.datastax.driver.core.querybuilder.QueryBuilder.eq;
@@ -143,6 +143,54 @@ public class CassandraBaseAttributesDao extends CassandraAbstractAsyncDao implem
                 .map(key -> delete(entityId, attributeType, key))
                 .collect(Collectors.toList());
         return Futures.allAsList(futures);
+    }
+
+    @Override
+    public DeviceDataSet findAll(EntityId entityId) {
+        Select.Where select = QueryBuilder.select(LAST_UPDATE_TS_COLUMN, ATTRIBUTE_KEY_COLUMN, BOOLEAN_VALUE_COLUMN, DOUBLE_VALUE_COLUMN, JSON_VALUE_COLUMN, LONG_VALUE_COLUMN, STRING_VALUE_COLUMN)
+                .from(ATTRIBUTES_KV_CF)
+                .where(eq(ENTITY_TYPE_COLUMN, entityId.getEntityType().name())).and(eq(ModelConstants.ENTITY_ID_COLUMN, entityId.getId()));
+        select.and(QueryBuilder.in(ATTRIBUTE_TYPE_COLUMN, DataConstants.ALL_SCOPES));
+        List<Row> rows = executeRead(select).all();
+        List<String> headerColumns = new ArrayList<>();
+        headerColumns.add(LAST_UPDATE_TS_COLUMN);
+        Map<String, Map<String, String>> tableRowsGroupedByTS = new HashMap<>();
+        for (int i = 0; i < rows.size(); i++) {
+            Row row = rows.get(i);
+            String ts = row.get(LAST_UPDATE_TS_COLUMN, Long.class).toString();
+            String key = row.getString(ATTRIBUTE_KEY_COLUMN);
+
+            String value = getNonNullValueForTsKey(row);
+            if (!headerColumns.contains(key)) {
+                headerColumns.add(key);
+            }
+            if (tableRowsGroupedByTS.containsKey(ts)) {
+                Map<String, String> attributeVsValue = tableRowsGroupedByTS.get(ts);
+                attributeVsValue.put(key, value);
+                tableRowsGroupedByTS.put(ts, attributeVsValue);
+            } else {
+                Map<String, String> attributeVsValue = new HashMap<>();
+                attributeVsValue.put(key, value);
+                tableRowsGroupedByTS.put(ts, attributeVsValue);
+            }
+        }
+        return new DeviceDataSet(tableRowsGroupedByTS, headerColumns, LAST_UPDATE_TS_COLUMN);
+    }
+
+    private String getNonNullValueForTsKey(Row row) {
+        if(row.get(BOOLEAN_VALUE_COLUMN, Boolean.class) != null) {
+            return row.get(BOOLEAN_VALUE_COLUMN, Boolean.class).toString();
+        } else if(row.get(DOUBLE_VALUE_COLUMN, Double.class) != null) {
+            return row.get(DOUBLE_VALUE_COLUMN, Double.class).toString();
+        } else if(row.get(JSON_VALUE_COLUMN, JsonNode.class) != null) {
+            return row.get(JSON_VALUE_COLUMN, JsonNode.class).toString();
+        } else if(row.get(LONG_VALUE_COLUMN, Long.class) !=null) {
+            return row.get(LONG_VALUE_COLUMN, Long.class).toString();
+        } else if(row.get(STRING_VALUE_COLUMN, String.class) != null) {
+            return row.get(STRING_VALUE_COLUMN, String.class);
+        } else {
+            return "";
+        }
     }
 
     private ListenableFuture<Void> delete(EntityId entityId, String attributeType, String key) {
