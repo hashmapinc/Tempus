@@ -838,21 +838,29 @@ public abstract class BaseDeviceControllerTest extends AbstractControllerTest {
         Device device = new Device();
         device.setName("D1");
         device.setType("default");
-        Device savedDevice = doPost("/api/deviceData", device, Device.class);
+        Device savedDevice = doPost("/api/device", device, Device.class);
         createDepthSeriesData(savedDevice.getId());
 
         AttributeKvEntry attr1 = new BaseAttributeKvEntry(new StringDataEntry("attribute1", "value1"), 42L);
         AttributeKvEntry attr2 = new BaseAttributeKvEntry(new StringDataEntry("attribute2", "value2"), 73L);
+        AttributeKvEntry attr3 = new BaseAttributeKvEntry(new StringDataEntry("attribute3", "value3"), 74L);
+        AttributeKvEntry attr4 = new BaseAttributeKvEntry(new StringDataEntry("attribute4", "value4"), 75L);
+        AttributeKvEntry attr5 = new BaseAttributeKvEntry(new StringDataEntry("attribute5", "value5"), 76L);
         attributesService.save(savedDevice.getId(), DataConstants.CLIENT_SCOPE, Arrays.asList(attr1, attr2)).get();
+        attributesService.save(savedDevice.getId(), DataConstants.SERVER_SCOPE, Arrays.asList(attr3, attr4)).get();
+        attributesService.save(savedDevice.getId(), DataConstants.SHARED_SCOPE, Arrays.asList(attr5)).get();
 
-        ResultActions result = doGet("/api/download/devices?type=as&deviceId="+savedDevice.getId().getId().toString());
+        ResultActions result = doGet("/api/download/deviceData?type=as&deviceId="+savedDevice.getId().getId().toString());
         String s = result.andReturn().getResponse().getContentAsString();
         String[] rows = s.split("\n");
-        Assert.assertEquals( 3, rows.length);
-        Assert.assertEquals("last_update_ts,attribute1,attribute2", rows[0]);
-        Assert.assertEquals("73,,value2", rows[1]);
-        Assert.assertEquals("42,value1,", rows[2]);
+        Assert.assertEquals( 6, rows.length);
 
+        Assert.assertEquals("last_update_ts,attribute1,attribute2,attribute3,attribute4,attribute5", rows[0]);
+        Assert.assertEquals("73,,value2,,,", rows[1]);
+        Assert.assertEquals("74,,,value3,,", rows[2]);
+        Assert.assertEquals("42,value1,,,,", rows[3]);
+        Assert.assertEquals("75,,,,value4,", rows[4]);
+        Assert.assertEquals("76,,,,,value5", rows[5]);
     }
 
     private void createTimeSeriesData(DeviceId deviceId) throws ExecutionException, InterruptedException {
