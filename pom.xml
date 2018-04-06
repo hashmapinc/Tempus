@@ -90,6 +90,7 @@
         <module>ui</module>
         <module>tools</module>
         <module>application</module>
+        <module>wal</module>
     </modules>
 
     <profiles>
@@ -602,6 +603,11 @@
             <dependency>
                 <groupId>com.typesafe.akka</groupId>
                 <artifactId>akka-slf4j_${scala.version}</artifactId>
+                <version>${akka.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.typesafe.akka</groupId>
+                <artifactId>akka-persistence_${scala.version}</artifactId>
                 <version>${akka.version}</version>
             </dependency>
             <dependency>
