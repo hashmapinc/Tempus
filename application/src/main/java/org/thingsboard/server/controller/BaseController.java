@@ -258,6 +258,23 @@ public abstract class BaseController {
         }
     }
 
+    Long checkLong(String value, String paramName) {
+        try {
+           return Long.parseLong(value);
+        } catch (Exception e) {
+            throw new IllegalArgumentException("Incorrect "+paramName + " value supplied");
+        }
+    }
+
+    Double checkDouble(String value, String paramName) {
+        try {
+            return Double.parseDouble(value);
+        } catch (Exception e) {
+            throw new IllegalArgumentException("Incorrect "+paramName + " value supplied");
+        }
+    }
+
+
     private void checkCustomer(Customer customer) throws ThingsboardException {
         checkNotNull(customer);
         checkTenantId(customer.getTenantId());

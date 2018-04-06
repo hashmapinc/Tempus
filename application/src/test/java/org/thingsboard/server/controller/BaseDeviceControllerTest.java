@@ -31,6 +31,7 @@ import com.datastax.driver.core.utils.UUIDs;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.web.util.NestedServletException;
 import org.thingsboard.server.common.data.*;
 import org.thingsboard.server.common.data.id.CustomerId;
 import org.thingsboard.server.common.data.id.DeviceCredentialsId;
@@ -805,7 +806,7 @@ public abstract class BaseDeviceControllerTest extends AbstractControllerTest {
         Device savedDevice = doPost("/api/device", device, Device.class);
         createTimeSeriesData(savedDevice.getId());
 
-        ResultActions result = doGet("/api/download/deviceData?type=ts&deviceId="+savedDevice.getId().getId().toString()+"&startValue=40&endValue=42");
+        ResultActions result = doGet("/api/download/deviceSeriesData?type=ts&deviceId="+savedDevice.getId().getId().toString()+"&startValue=40&endValue=42");
         String s = result.andReturn().getResponse().getContentAsString();
         String[] rows = s.split("\n");
         Assert.assertEquals( 4, rows.length);
@@ -823,7 +824,7 @@ public abstract class BaseDeviceControllerTest extends AbstractControllerTest {
         Device savedDevice = doPost("/api/device", device, Device.class);
         createDepthSeriesData(savedDevice.getId());
 
-        ResultActions result = doGet("/api/download/deviceData?type=ds&deviceId="+savedDevice.getId().getId().toString()+"&startValue=4000&endValue=4200");
+        ResultActions result = doGet("/api/download/deviceSeriesData?type=ds&deviceId="+savedDevice.getId().getId().toString()+"&startValue=4000&endValue=4200");
         String s = result.andReturn().getResponse().getContentAsString();
         String[] rows = s.split("\n");
         Assert.assertEquals( 4, rows.length);
@@ -832,6 +833,21 @@ public abstract class BaseDeviceControllerTest extends AbstractControllerTest {
         Assert.assertEquals("4000.0,true,1.7976931348623157E308,{\"\"tag\"\":\"\"value\"\"},9223372036854775807,value", rows[2]);
         Assert.assertEquals("4100.0,true,1.7976931348623157E308,{\"\"tag\"\":\"\"value\"\"},9223372036854775807,value", rows[3]);
     }
+
+    @Test(expected = Exception.class)
+    public void testDownloadCsvDSData_incorrectFormatStartValue() throws Exception {
+        DeviceId deviceId = new DeviceId(UUIDs.timeBased());
+
+        ResultActions result = doGet("/api/download/deviceSeriesData?type=ds&deviceId="+deviceId.getId().toString()+"&startValue=40J00&endValue=4200");
+    }
+
+    @Test(expected = Exception.class)
+    public void testDownloadCsvTSData_incorrectFormatStartValue() throws Exception {
+        DeviceId deviceId = new DeviceId(UUIDs.timeBased());
+
+        ResultActions result = doGet("/api/download/deviceSeriesData?type=ts&deviceId="+deviceId.getId().toString()+"&startValue=40J00&endValue=4200");
+    }
+
 
     @Test
     public void testDownloadCsvASData() throws Exception {
@@ -850,7 +866,7 @@ public abstract class BaseDeviceControllerTest extends AbstractControllerTest {
         attributesService.save(savedDevice.getId(), DataConstants.SERVER_SCOPE, Arrays.asList(attr3, attr4)).get();
         attributesService.save(savedDevice.getId(), DataConstants.SHARED_SCOPE, Arrays.asList(attr5)).get();
 
-        ResultActions result = doGet("/api/download/deviceData?type=as&deviceId="+savedDevice.getId().getId().toString());
+        ResultActions result = doGet("/api/download/deviceAttributesData?deviceId="+savedDevice.getId().getId().toString());
         String s = result.andReturn().getResponse().getContentAsString();
         String[] rows = s.split("\n");
         Assert.assertEquals( 6, rows.length);
