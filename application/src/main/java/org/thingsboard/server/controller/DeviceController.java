@@ -343,13 +343,38 @@ public class DeviceController extends BaseController {
     }
 
     @PreAuthorize("hasAnyAuthority('TENANT_ADMIN', 'CUSTOMER_USER')")
-    @RequestMapping(value = "/download/deviceData", method = RequestMethod.GET)
+    @RequestMapping(value = "/download/deviceAttributesData", method = RequestMethod.GET)
     @ResponseBody
-    public void downloadCsv(HttpServletResponse response,
+    public void downloadAttributesDataAsCsv(HttpServletResponse response, @RequestParam("deviceId") String strDeviceId) throws IOException {
+        String csvFileName = "device_attributes_data.csv";
+        response.setContentType("text/csv");
+        String headerKey = "Content-Disposition";
+        String headerValue = String.format("attachment; filename=\"%s\"", csvFileName);
+        response.setHeader(headerKey, headerValue);
+
+        DeviceId deviceId = new DeviceId(toUUID(strDeviceId));
+
+        CSVWriter csvWriter = new CSVWriter(response.getWriter(),
+                CSVWriter.DEFAULT_SEPARATOR,
+                CSVWriter.NO_QUOTE_CHARACTER,
+                CSVWriter.DEFAULT_ESCAPE_CHARACTER,
+                CSVWriter.DEFAULT_LINE_END);
+
+        DeviceDataSet deviceDataSet = attributesService.findAll(deviceId);
+
+        csvWriter.writeNext(deviceDataSet.getHeaderRow());
+        csvWriter.writeAll(deviceDataSet.getDataRows());
+        csvWriter.close();
+    }
+
+    @PreAuthorize("hasAnyAuthority('TENANT_ADMIN', 'CUSTOMER_USER')")
+    @RequestMapping(value = "/download/deviceSeriesData", method = RequestMethod.GET)
+    @ResponseBody
+    public void downloadTimeSeriesOrDepthSeriesDataAsCSV(HttpServletResponse response,
                             @RequestParam("deviceId") String strDeviceId,
                             @RequestParam("type") String dataSetType,
-                            @RequestParam(value = "startValue", required = false) String startValue,
-                            @RequestParam(value = "endValue", required = false) String endValue) throws ThingsboardException, IOException {
+                            @RequestParam("startValue") String startValue,
+                            @RequestParam("endValue") String endValue) throws ThingsboardException, IOException {
         String csvFileName = "device_data.csv";
         response.setContentType("text/csv");
         String headerKey = "Content-Disposition";
@@ -364,13 +389,11 @@ public class DeviceController extends BaseController {
                 CSVWriter.DEFAULT_ESCAPE_CHARACTER,
                 CSVWriter.DEFAULT_LINE_END);
 
-        DeviceDataSet deviceDataSet = null;
+        DeviceDataSet deviceDataSet;
         if(dataSetType.equals("ts")) {
-            deviceDataSet = timeseriesService.findAllBetweenTimeStamp(deviceId, Long.parseLong(startValue), Long.parseLong(endValue));
+            deviceDataSet = timeseriesService.findAllBetweenTimeStamp(deviceId, checkLong(startValue, "startValue"), checkLong(endValue, "endValue"));
         } else if(dataSetType.equals("ds")) {
-            deviceDataSet = depthSeriesService.findAllBetweenDepths(deviceId, Double.parseDouble(startValue), Double.parseDouble(endValue));
-        } else if(dataSetType.equals("as")){
-            deviceDataSet = attributesService.findAll(deviceId);
+            deviceDataSet = depthSeriesService.findAllBetweenDepths(deviceId, checkDouble(startValue, "startValue"), checkDouble(endValue, "endValue"));
         } else {
             throw new ThingsboardException("Unsupported Data Set Type Supplied", ThingsboardErrorCode.BAD_REQUEST_PARAMS);
         }
