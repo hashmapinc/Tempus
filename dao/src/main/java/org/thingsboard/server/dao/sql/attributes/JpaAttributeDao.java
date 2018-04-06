@@ -122,7 +122,6 @@ public class JpaAttributeDao extends JpaAbstractDaoListeningExecutorService impl
         headerColumns.add(LAST_UPDATE_TS_COLUMN);
         Map<String, Map<String, String>> tableRowsGroupedByTS= new HashMap<>();
         for(int i = 0; i < results.size(); i++) {
-            if(i > 0) {
                 Object[] row = results.get(i);
                 String ts = row[0].toString();
                 String key = row[1].toString();
@@ -139,7 +138,6 @@ public class JpaAttributeDao extends JpaAbstractDaoListeningExecutorService impl
                     attributeVsValue.put(key, value);
                     tableRowsGroupedByTS.put(ts, attributeVsValue);
                 }
-            }
         }
         return new DeviceDataSet(tableRowsGroupedByTS, headerColumns, LAST_UPDATE_TS_COLUMN);
     }
