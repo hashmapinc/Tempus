@@ -90,7 +90,7 @@ public class GatewayDeviceSessionCtx extends DeviceAwareSessionContext {
                     Integer requestId = responseMsg.getRequestId();
                     if (requestId >= 0 && (requestMsgType == MsgType.POST_ATTRIBUTES_REQUEST || requestMsgType == MsgType.POST_TELEMETRY_REQUEST
                             || requestMsgType == MsgType.POST_TELEMETRY_REQUEST_DEPTH)) {
-                       return Optional.of(MqttTransportHandler.createMqttPubAckMsg(requestId));
+                        return Optional.of(MqttTransportHandler.createMqttPubAckMsg(requestId));
                     }
                 }
                 break;
