@@ -287,3 +287,38 @@ Protocol customization
 **********************
 
 HTTP transport can be fully customized for specific use-case by changing the corresponding module.
+
+******************************
+Device Telemetry Data Download
+******************************
+
+Time Series Data
+================
+
+Device Time Series data can be downloaded in CSV format between two timestamp values. The API can be invoked as below except that values in brackets needs to be replaced with actual values(device id, start timestamp, end timestamp).Authorization header values also need to be provided in headers.
+
+.. code-block:: bash
+
+    http://host:port/api/download/deviceSeriesData?deviceId=<Device_Id>&type=ts&startValue<Start_Timestamp_Long_Value>&endValue<End_Timestamp_Long_Value>
+
+
+Depth Series Data
+=================
+
+Device Depth Series data can be downloaded in CSV format between two depth values. The API can be invoked as below except that values in brackets needs to be replaced with actual values(device id, start depth, end depth).Authorization header values also need to be provided in headers.
+
+.. code-block:: bash
+
+   http://host:port/api/download/deviceSeriesData?deviceId=<Device_Id>&type=ds&startValue<Start_Depth_Double_Value>&endValue<End_Depth_Double_Value>
+
+
+Attributes Data
+===============
+
+Device Attributes data can be downloaded in CSV format. The API can be invoked as below except that value in bracket needs to be replaced with actual value(device id).Authorization header values also need to be provided in headers.
+
+.. code-block:: bash
+
+   http://host:port/api/download/deviceAttributesData?deviceId=<Device_Id>
+
+
