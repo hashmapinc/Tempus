@@ -20,6 +20,13 @@ The HTML output also makes use of [sphinx-tabs](https://github.com/djungelorm/sp
 pip install sphinx_tabs
 ```
 
+We are also using sphinx_rtd_theme hence to install that execute: 
+
+
+```bash
+pip install sphinx_rtd_theme
+```
+
 In order to make the HTML version, from the root of the /docs folder, execute: 
 
 ```bash
