@@ -41,10 +41,12 @@ import org.thingsboard.server.common.data.widget.WidgetsBundle;
 import org.thingsboard.server.dao.alarm.AlarmService;
 import org.thingsboard.server.dao.application.ApplicationService;
 import org.thingsboard.server.dao.asset.AssetService;
+import org.thingsboard.server.dao.attributes.AttributesService;
 import org.thingsboard.server.dao.computations.ComputationJobService;
 import org.thingsboard.server.dao.computations.ComputationsService;
 import org.thingsboard.server.dao.customer.CustomerService;
 import org.thingsboard.server.dao.dashboard.DashboardService;
+import org.thingsboard.server.dao.depthSeries.DepthSeriesService;
 import org.thingsboard.server.dao.device.DeviceCredentialsService;
 import org.thingsboard.server.dao.device.DeviceService;
 import org.thingsboard.server.dao.exception.DataValidationException;
@@ -53,6 +55,7 @@ import org.thingsboard.server.dao.model.ModelConstants;
 import org.thingsboard.server.dao.plugin.PluginService;
 import org.thingsboard.server.dao.relation.RelationService;
 import org.thingsboard.server.dao.rule.RuleService;
+import org.thingsboard.server.dao.timeseries.TimeseriesService;
 import org.thingsboard.server.dao.user.UserService;
 import org.thingsboard.server.dao.widget.WidgetTypeService;
 import org.thingsboard.server.dao.widget.WidgetsBundleService;
@@ -254,6 +257,23 @@ public abstract class BaseController {
             throw handleException(e, false);
         }
     }
+
+    Long checkLong(String value, String paramName) {
+        try {
+           return Long.parseLong(value);
+        } catch (Exception e) {
+            throw new IllegalArgumentException("Incorrect "+paramName + " value supplied");
+        }
+    }
+
+    Double checkDouble(String value, String paramName) {
+        try {
+            return Double.parseDouble(value);
+        } catch (Exception e) {
+            throw new IllegalArgumentException("Incorrect "+paramName + " value supplied");
+        }
+    }
+
 
     private void checkCustomer(Customer customer) throws ThingsboardException {
         checkNotNull(customer);

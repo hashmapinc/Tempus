@@ -28,6 +28,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
+import org.thingsboard.server.common.data.DeviceDataSet;
 import org.thingsboard.server.common.data.id.EntityId;
 import org.thingsboard.server.common.data.kv.*;
 import org.thingsboard.server.common.data.kv.DataType;
@@ -43,12 +44,11 @@ import javax.annotation.PreDestroy;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.datastax.driver.core.querybuilder.QueryBuilder.eq;
+import static org.thingsboard.server.dao.model.ModelConstants.*;
 
 @Component
 @Slf4j
@@ -313,6 +313,81 @@ public class CassandraBaseDepthSeriesDao extends CassandraAbstractAsyncDao imple
         return getFuture(executeAsyncWrite(stmt), rs -> null);
     }
 
+    @Override
+    public DeviceDataSet findAllBetweenDepths(EntityId entityId, Double startDs, Double endDs) {
+        Set<String> keys = findAllKeysForEntity(entityId);
+        Double minPartition = startDs;
+        Double maxPartition = endDs;
+
+        Set<Double> partitions = fetchPartitionsSet(entityId, keys, minPartition, maxPartition);
+
+        Select.Where select = QueryBuilder.select(DS_COLUMN, KEY_COLUMN, BOOLEAN_VALUE_COLUMN, DOUBLE_VALUE_COLUMN, JSON_VALUE_COLUMN, LONG_VALUE_COLUMN, STRING_VALUE_COLUMN)
+                .from(DS_KV_CF)
+                .where(eq(ENTITY_TYPE_COLUMN, entityId.getEntityType().name())).and(eq(ModelConstants.ENTITY_ID_COLUMN, entityId.getId()));
+        select.and(QueryBuilder.in(KEY_COLUMN, keys.toArray(new String[keys.size()])));
+        select.and(QueryBuilder.in(PARTITION_COLUMN, partitions.toArray(new Double[partitions.size()])));
+        select.and(QueryBuilder.gte(DS_COLUMN, startDs));
+        select.and(QueryBuilder.lte(DS_COLUMN, endDs));
+        List<Row> rows = executeRead(select).all();
+
+        List<String> headerColumns = new ArrayList<>();
+        headerColumns.add(DS_COLUMN);
+        Map<String, Map<String, String>> tableRowsGroupedByDS = new HashMap<>();
+        for (int i = 0; i < rows.size(); i++) {
+            Row row = rows.get(i);
+            String ds = row.get(DS_COLUMN, Double.class).toString();
+            String key = row.getString(KEY_COLUMN);
+
+            String value = getNonNullValueForDsKey(row);
+            if (!headerColumns.contains(key)) {
+                headerColumns.add(key);
+            }
+            if (tableRowsGroupedByDS.containsKey(ds)) {
+                Map<String, String> attributeVsValue = tableRowsGroupedByDS.get(ds);
+                attributeVsValue.put(key, value);
+                tableRowsGroupedByDS.put(ds, attributeVsValue);
+            } else {
+                Map<String, String> attributeVsValue = new HashMap<>();
+                attributeVsValue.put(key, value);
+                tableRowsGroupedByDS.put(ds, attributeVsValue);
+            }
+
+        }
+        return new DeviceDataSet(tableRowsGroupedByDS, headerColumns, DS_COLUMN);
+    }
+
+    private String getNonNullValueForDsKey(Row row) {
+        if(row.get(BOOLEAN_VALUE_COLUMN, Boolean.class) != null) {
+            return row.get(BOOLEAN_VALUE_COLUMN, Boolean.class).toString();
+        } else if(row.get(DOUBLE_VALUE_COLUMN, Double.class) != null) {
+            return row.get(DOUBLE_VALUE_COLUMN, Double.class).toString();
+        } else if(row.get(JSON_VALUE_COLUMN, JsonNode.class) != null) {
+            return row.get(JSON_VALUE_COLUMN, JsonNode.class).toString();
+        } else if(row.get(LONG_VALUE_COLUMN, Long.class) !=null) {
+            return row.get(LONG_VALUE_COLUMN, Long.class).toString();
+        } else if(row.get(STRING_VALUE_COLUMN, String.class) != null) {
+            return row.get(STRING_VALUE_COLUMN, String.class);
+        } else {
+            return "";
+        }
+    }
+
+    private Set<Double> fetchPartitionsSet(EntityId entityId, Set<String> keys, Double minPartition, Double maxPartition) {
+        Select.Where select = QueryBuilder.select(ModelConstants.PARTITION_COLUMN).from(ModelConstants.DS_KV_PARTITIONS_CF).where(eq(ENTITY_TYPE_COLUMN, entityId.getEntityType().name()))
+                .and(eq(ModelConstants.ENTITY_ID_COLUMN, entityId.getId())).and(QueryBuilder.in(KEY_COLUMN, keys.toArray(new String[keys.size()])));
+        select.and(QueryBuilder.gte(ModelConstants.PARTITION_COLUMN, minPartition));
+        select.and(QueryBuilder.lte(ModelConstants.PARTITION_COLUMN, maxPartition));
+        return executeRead(select).all().stream().map(row -> row.getDouble(PARTITION_COLUMN)).collect(Collectors.toSet());
+    }
+
+
+    private Set<String> findAllKeysForEntity(EntityId entityId) {
+        Select.Where select = QueryBuilder.select(KEY_COLUMN)
+                .from(DS_KV_LATEST_CF)
+                .where(eq(ENTITY_TYPE_COLUMN, entityId.getEntityType().name())).and(eq(ModelConstants.ENTITY_ID_COLUMN, entityId.getId()));
+        return executeRead(select).all().stream().map(row -> row.getString(KEY_COLUMN)).collect(Collectors.toSet());
+    }
+
     private List<DsKvEntry> convertResultToDsKvEntryList(List<Row> rows) {
         List<DsKvEntry> entries = new ArrayList<>(rows.size());
         if (!rows.isEmpty()) {
@@ -372,7 +447,7 @@ public class CassandraBaseDepthSeriesDao extends CassandraAbstractAsyncDao imple
      * <code>{@link ModelConstants#DS_KV_PARTITIONS_CF}</code> for the given entity
      */
     private ResultSetFuture fetchPartitions(EntityId entityId, String key, Double minPartition, Double maxPartition) {
-        Select.Where select = QueryBuilder.select(ModelConstants.PARTITION_COLUMN).from(ModelConstants.DS_KV_PARTITIONS_CF).where(eq(ModelConstants.ENTITY_TYPE_COLUMN, entityId.getEntityType().name()))
+        Select.Where select = QueryBuilder.select(ModelConstants.PARTITION_COLUMN).from(ModelConstants.DS_KV_PARTITIONS_CF).where(eq(ENTITY_TYPE_COLUMN, entityId.getEntityType().name()))
                 .and(eq(ModelConstants.ENTITY_ID_COLUMN, entityId.getId())).and(eq(ModelConstants.KEY_COLUMN, key));
         select.and(QueryBuilder.gte(ModelConstants.PARTITION_COLUMN, minPartition));
         select.and(QueryBuilder.lte(ModelConstants.PARTITION_COLUMN, maxPartition));
@@ -384,7 +459,7 @@ public class CassandraBaseDepthSeriesDao extends CassandraAbstractAsyncDao imple
             saveStmts = new PreparedStatement[DataType.values().length];
             for (DataType type : DataType.values()) {
                 saveStmts[type.ordinal()] = getSession().prepare("INSERT INTO " + ModelConstants.DS_KV_CF +
-                        "(" + ModelConstants.ENTITY_TYPE_COLUMN +
+                        "(" + ENTITY_TYPE_COLUMN +
                         "," + ModelConstants.ENTITY_ID_COLUMN +
                         "," + ModelConstants.KEY_COLUMN +
                         "," + ModelConstants.PARTITION_COLUMN +
@@ -401,7 +476,7 @@ public class CassandraBaseDepthSeriesDao extends CassandraAbstractAsyncDao imple
             saveTtlStmts = new PreparedStatement[DataType.values().length];
             for (DataType type : DataType.values()) {
                 saveTtlStmts[type.ordinal()] = getSession().prepare("INSERT INTO " + ModelConstants.DS_KV_CF +
-                        "(" + ModelConstants.ENTITY_TYPE_COLUMN +
+                        "(" + ENTITY_TYPE_COLUMN +
                         "," + ModelConstants.ENTITY_ID_COLUMN +
                         "," + ModelConstants.KEY_COLUMN +
                         "," + ModelConstants.PARTITION_COLUMN +
@@ -426,7 +501,7 @@ public class CassandraBaseDepthSeriesDao extends CassandraAbstractAsyncDao imple
                     log.debug("HMDC here Iam else ");
                     fetchStmts[type.ordinal()] = getSession().prepare("SELECT " +
                             String.join(", ", ModelConstants.getFetchColumnNames(type)) + " FROM " + ModelConstants.DS_KV_CF
-                            + " WHERE " + ModelConstants.ENTITY_TYPE_COLUMN + " = ? "
+                            + " WHERE " + ENTITY_TYPE_COLUMN + " = ? "
                             + "AND " + ModelConstants.ENTITY_ID_COLUMN + " = ? "
                             + "AND " + ModelConstants.KEY_COLUMN + " = ? "
                             + "AND " + ModelConstants.PARTITION_COLUMN + " = ? "
@@ -445,7 +520,7 @@ public class CassandraBaseDepthSeriesDao extends CassandraAbstractAsyncDao imple
             latestInsertStmts = new PreparedStatement[DataType.values().length];
             for (DataType type : DataType.values()) {
                 latestInsertStmts[type.ordinal()] = getSession().prepare("INSERT INTO " + ModelConstants.DS_KV_LATEST_CF +
-                        "(" + ModelConstants.ENTITY_TYPE_COLUMN +
+                        "(" + ENTITY_TYPE_COLUMN +
                         "," + ModelConstants.ENTITY_ID_COLUMN +
                         "," + ModelConstants.KEY_COLUMN +
                         "," + ModelConstants.DS_COLUMN +
@@ -460,7 +535,7 @@ public class CassandraBaseDepthSeriesDao extends CassandraAbstractAsyncDao imple
     private PreparedStatement getPartitionInsertStmt() {
         if (partitionInsertStmt == null) {
             partitionInsertStmt = getSession().prepare("INSERT INTO " + ModelConstants.DS_KV_PARTITIONS_CF +
-                    "(" + ModelConstants.ENTITY_TYPE_COLUMN +
+                    "(" + ENTITY_TYPE_COLUMN +
                     "," + ModelConstants.ENTITY_ID_COLUMN +
                     "," + ModelConstants.PARTITION_COLUMN +
                     "," + ModelConstants.KEY_COLUMN + ")" +
@@ -472,7 +547,7 @@ public class CassandraBaseDepthSeriesDao extends CassandraAbstractAsyncDao imple
     private PreparedStatement getPartitionInsertTtlStmt() {
         if (partitionInsertTtlStmt == null) {
             partitionInsertTtlStmt = getSession().prepare("INSERT INTO " + ModelConstants.DS_KV_PARTITIONS_CF +
-                    "(" + ModelConstants.ENTITY_TYPE_COLUMN +
+                    "(" + ENTITY_TYPE_COLUMN +
                     "," + ModelConstants.ENTITY_ID_COLUMN +
                     "," + ModelConstants.PARTITION_COLUMN +
                     "," + ModelConstants.KEY_COLUMN + ")" +
@@ -493,7 +568,7 @@ public class CassandraBaseDepthSeriesDao extends CassandraAbstractAsyncDao imple
                     ModelConstants.DOUBLE_VALUE_COLUMN + "," +
                     ModelConstants.JSON_VALUE_COLUMN + " " +
                     "FROM " + ModelConstants.DS_KV_LATEST_CF + " " +
-                    "WHERE " + ModelConstants.ENTITY_TYPE_COLUMN + " = ? " +
+                    "WHERE " + ENTITY_TYPE_COLUMN + " = ? " +
                     "AND " + ModelConstants.ENTITY_ID_COLUMN + " = ? " +
                     "AND " + ModelConstants.KEY_COLUMN + " = ? ");
         }
@@ -511,7 +586,7 @@ public class CassandraBaseDepthSeriesDao extends CassandraAbstractAsyncDao imple
                     ModelConstants.DOUBLE_VALUE_COLUMN + "," +
                     ModelConstants.JSON_VALUE_COLUMN + " " +
                     "FROM " + ModelConstants.DS_KV_LATEST_CF + " " +
-                    "WHERE " + ModelConstants.ENTITY_TYPE_COLUMN + " = ? " +
+                    "WHERE " + ENTITY_TYPE_COLUMN + " = ? " +
                     "AND " + ModelConstants.ENTITY_ID_COLUMN + " = ? ");
         }
         return findAllLatestStmt;

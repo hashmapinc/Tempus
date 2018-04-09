@@ -21,6 +21,7 @@ import com.google.common.util.concurrent.ListenableFuture;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.thingsboard.server.common.data.DeviceDataSet;
 import org.thingsboard.server.common.data.id.EntityId;
 import org.thingsboard.server.common.data.kv.DsKvEntry;
 import org.thingsboard.server.common.data.kv.DsKvQuery;
@@ -87,6 +88,12 @@ public class BaseDepthSeriesService implements DepthSeriesService {
             saveAndRegisterFutures(futures, entityId, dsKvEntry, ttl);
         }
         return Futures.allAsList(futures);
+    }
+
+    @Override
+    public DeviceDataSet findAllBetweenDepths(EntityId entityId, Double startDs, Double endDs) {
+        validate(entityId);
+        return depthSeriesDao.findAllBetweenDepths(entityId, startDs, endDs);
     }
 
     private void saveAndRegisterFutures(List<ListenableFuture<Void>> futures, EntityId entityId, DsKvEntry dsKvEntry, long ttl) {
