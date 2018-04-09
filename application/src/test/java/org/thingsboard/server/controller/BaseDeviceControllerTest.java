@@ -809,11 +809,26 @@ public abstract class BaseDeviceControllerTest extends AbstractControllerTest {
         ResultActions result = doGet("/api/download/deviceSeriesData?type=ts&deviceId="+savedDevice.getId().getId().toString()+"&startValue=40&endValue=42");
         String s = result.andReturn().getResponse().getContentAsString();
         String[] rows = s.split("\n");
+
         Assert.assertEquals( 4, rows.length);
-        Assert.assertEquals("ts,booleanKey,doubleKey,jsonKey,longKey,stringKey", rows[0]);
-        Assert.assertEquals("40,true,1.7976931348623157E308,{\"\"tag\"\":\"\"value\"\"},9223372036854775807,value", rows[1]);
-        Assert.assertEquals("41,true,1.7976931348623157E308,{\"\"tag\"\":\"\"value\"\"},9223372036854775807,value", rows[2]);
-        Assert.assertEquals("42,true,1.7976931348623157E308,{\"\"tag\"\":\"\"value\"\"},9223372036854775807,value", rows[3]);
+
+        List<String> headers = new ArrayList<String>(Arrays.asList(rows[0].split(",")));
+        Assert.assertTrue(headers.containsAll(Arrays.asList("ts", "booleanKey", "doubleKey", "jsonKey", "longKey", "stringKey")));
+
+        List<List<String>> valuesRows = Arrays.asList(
+                new ArrayList<String>(Arrays.asList(rows[1].split(","))),
+                new ArrayList<String>(Arrays.asList(rows[2].split(","))),
+                new ArrayList<String>(Arrays.asList(rows[3].split(",")))
+        );
+
+        List<String> rowWithTs42 = geRowWithSpecifiedKeyValue("42", valuesRows);
+        List<String> rowWithTs40 = geRowWithSpecifiedKeyValue("40", valuesRows);
+        List<String> rowWithTs41 = geRowWithSpecifiedKeyValue("41", valuesRows);
+
+
+        Assert.assertTrue(rowWithTs40.containsAll(Arrays.asList("40","true","1.7976931348623157E308","{\"\"tag\"\":\"\"value\"\"}","9223372036854775807","value")));
+        Assert.assertTrue(rowWithTs41.containsAll(Arrays.asList("41","true","1.7976931348623157E308","{\"\"tag\"\":\"\"value\"\"}","9223372036854775807","value")));
+        Assert.assertTrue(rowWithTs42.containsAll(Arrays.asList("42","true","1.7976931348623157E308","{\"\"tag\"\":\"\"value\"\"}","9223372036854775807","value")));
     }
 
     @Test
@@ -828,10 +843,24 @@ public abstract class BaseDeviceControllerTest extends AbstractControllerTest {
         String s = result.andReturn().getResponse().getContentAsString();
         String[] rows = s.split("\n");
         Assert.assertEquals( 4, rows.length);
-        Assert.assertEquals("ds,booleanKey,doubleKey,jsonKey,longKey,stringKey", rows[0]);
-        Assert.assertEquals("4200.0,true,1.7976931348623157E308,{\"\"tag\"\":\"\"value\"\"},9223372036854775807,value", rows[1]);
-        Assert.assertEquals("4000.0,true,1.7976931348623157E308,{\"\"tag\"\":\"\"value\"\"},9223372036854775807,value", rows[2]);
-        Assert.assertEquals("4100.0,true,1.7976931348623157E308,{\"\"tag\"\":\"\"value\"\"},9223372036854775807,value", rows[3]);
+
+        List<String> headers = new ArrayList<String>(Arrays.asList(rows[0].split(",")));
+        Assert.assertTrue(headers.containsAll(Arrays.asList("ds", "booleanKey", "doubleKey", "jsonKey", "longKey", "stringKey")));
+
+        List<List<String>> valuesRows = Arrays.asList(
+                new ArrayList<String>(Arrays.asList(rows[1].split(","))),
+                new ArrayList<String>(Arrays.asList(rows[2].split(","))),
+                new ArrayList<String>(Arrays.asList(rows[3].split(",")))
+        );
+
+        List<String> rowWithDs4200 = geRowWithSpecifiedKeyValue("4200.0", valuesRows);
+        List<String> rowWithDs4000 = geRowWithSpecifiedKeyValue("4000.0", valuesRows);
+        List<String> rowWithDs4100 = geRowWithSpecifiedKeyValue("4100.0", valuesRows);
+
+
+        Assert.assertTrue(rowWithDs4200.containsAll(Arrays.asList("4200.0","true","1.7976931348623157E308","{\"\"tag\"\":\"\"value\"\"}","9223372036854775807","value")));
+        Assert.assertTrue(rowWithDs4000.containsAll(Arrays.asList("4000.0","true","1.7976931348623157E308","{\"\"tag\"\":\"\"value\"\"}","9223372036854775807","value")));
+        Assert.assertTrue(rowWithDs4100.containsAll(Arrays.asList("4100.0","true","1.7976931348623157E308","{\"\"tag\"\":\"\"value\"\"}","9223372036854775807","value")));
     }
 
     @Test(expected = Exception.class)
@@ -871,12 +900,35 @@ public abstract class BaseDeviceControllerTest extends AbstractControllerTest {
         String[] rows = s.split("\n");
         Assert.assertEquals( 6, rows.length);
 
-        Assert.assertEquals("last_update_ts,attribute1,attribute2,attribute3,attribute4,attribute5", rows[0]);
-        Assert.assertEquals("73,,value2,,,", rows[1]);
-        Assert.assertEquals("74,,,value3,,", rows[2]);
-        Assert.assertEquals("42,value1,,,,", rows[3]);
-        Assert.assertEquals("75,,,,value4,", rows[4]);
-        Assert.assertEquals("76,,,,,value5", rows[5]);
+        List<String> headers = new ArrayList<String>(Arrays.asList(rows[0].split(",")));
+        List<List<String>> valuesRows = Arrays.asList(
+                new ArrayList<String>(Arrays.asList(rows[1].split(","))),
+                new ArrayList<String>(Arrays.asList(rows[2].split(","))),
+                new ArrayList<String>(Arrays.asList(rows[3].split(","))),
+                new ArrayList<String>(Arrays.asList(rows[4].split(","))),
+                new ArrayList<String>(Arrays.asList(rows[5].split(",")))
+        );
+
+        List<String> rowWithTs42 = geRowWithSpecifiedKeyValue("42", valuesRows);
+        List<String> rowWithTs73 = geRowWithSpecifiedKeyValue("73", valuesRows);
+        List<String> rowWithTs74 = geRowWithSpecifiedKeyValue("74", valuesRows);
+        List<String> rowWithTs75 = geRowWithSpecifiedKeyValue("75", valuesRows);
+        List<String> rowWithTs76 = geRowWithSpecifiedKeyValue("76", valuesRows);
+
+        Assert.assertTrue(headers.containsAll(Arrays.asList("last_update_ts", "attribute1", "attribute2", "attribute3", "attribute4", "attribute5")));
+        Assert.assertTrue(rowWithTs42.containsAll(Arrays.asList("42", "value1")));
+        Assert.assertTrue(rowWithTs73.containsAll(Arrays.asList("73", "value2")));
+        Assert.assertTrue(rowWithTs74.containsAll(Arrays.asList("74", "value3")));
+        Assert.assertTrue(rowWithTs75.containsAll(Arrays.asList("75", "value4")));
+        Assert.assertTrue(rowWithTs76.containsAll(Arrays.asList("76", "value5")));
+
+    }
+
+    private List<String> geRowWithSpecifiedKeyValue(String key, List<List<String>> rows){
+        for(List<String> row: rows) {
+            if(row.contains(key)) return row;
+        }
+        return null;
     }
 
     private void createTimeSeriesData(DeviceId deviceId) throws ExecutionException, InterruptedException {
