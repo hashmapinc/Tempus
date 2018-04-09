@@ -315,26 +315,26 @@ public class JpaTimeseriesDao extends JpaAbstractDaoListeningExecutorService imp
         List<Object[]> results = tsKvRepository.findSelected(fromTimeUUID(entityId.getId()), entityId.getEntityType(), startTs, endTs);
         List<String> headerColumns = new ArrayList<>();
         headerColumns.add(TS_COLUMN);
-        Map<String, Map<String, String>> tableRowsGroupedByTS= new HashMap<>();
-        for(int i = 0; i < results.size(); i++) {
-            if(i > 0) {
-                Object[] row = results.get(i);
-                String ts = row[0].toString();
-                String key = row[1].toString();
-                String value = getFirstNonEmptyValue(row, 2, row.length - 1);
-                if(!headerColumns.contains(key)) {
-                    headerColumns.add(key);
-                }
-                if(tableRowsGroupedByTS.containsKey(ts)) {
-                    Map<String, String> attributeVsValue = tableRowsGroupedByTS.get(ts);
-                    attributeVsValue.put(key, value);
-                    tableRowsGroupedByTS.put(ts, attributeVsValue);
-                } else {
-                    Map<String, String> attributeVsValue = new HashMap<>();
-                    attributeVsValue.put(key, value);
-                    tableRowsGroupedByTS.put(ts, attributeVsValue);
-                }
+        Map<String, Map<String, String>> tableRowsGroupedByTS = new HashMap<>();
+        for (int i = 0; i < results.size(); i++) {
+
+            Object[] row = results.get(i);
+            String ts = row[0].toString();
+            String key = row[1].toString();
+            String value = getFirstNonEmptyValue(row, 2, row.length - 1);
+            if (!headerColumns.contains(key)) {
+                headerColumns.add(key);
             }
+            if (tableRowsGroupedByTS.containsKey(ts)) {
+                Map<String, String> attributeVsValue = tableRowsGroupedByTS.get(ts);
+                attributeVsValue.put(key, value);
+                tableRowsGroupedByTS.put(ts, attributeVsValue);
+            } else {
+                Map<String, String> attributeVsValue = new HashMap<>();
+                attributeVsValue.put(key, value);
+                tableRowsGroupedByTS.put(ts, attributeVsValue);
+            }
+
         }
         return new DeviceDataSet(tableRowsGroupedByTS, headerColumns, TS_COLUMN);
     }
