@@ -17,7 +17,7 @@ pip install sphinx sphinx-autobuild
 The HTML output also makes use of [sphinx-tabs](https://github.com/djungelorm/sphinx-tabs). To install this execute:
 
 ```bash
-pip install pip install sphinx_tabs
+pip install sphinx_tabs
 ```
 
 In order to make the HTML version, from the root of the /docs folder, execute: 
