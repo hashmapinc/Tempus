@@ -17,6 +17,7 @@ package org.thingsboard.server.dao.model.nosql;
 
 import com.datastax.driver.core.utils.UUIDs;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.thingsboard.server.common.data.Application;
 import org.thingsboard.server.common.data.Configuration;
@@ -30,6 +31,7 @@ import com.datastax.driver.mapping.annotations.PartitionKey;
 import com.datastax.driver.mapping.annotations.Table;
 import com.datastax.driver.mapping.annotations.Transient;
 import org.thingsboard.server.dao.model.type.ComponentLifecycleStateCodec;
+import org.thingsboard.server.dao.model.type.JsonCodec;
 
 
 import java.util.*;
@@ -67,8 +69,8 @@ public final class ApplicationEntity implements SearchTextEntity<Application> {
     @Column(name = APPLICATION_IS_VALID)
     private Boolean isValid;
 
-    @Column(name = APPLICATION_DESCRIPTION)
-    private String description;
+    @Column(name = APPLICATION_DESCRIPTION, codec = JsonCodec.class)
+    private JsonNode additionalInfo;
 
     @Column(name = SEARCH_TEXT_PROPERTY)
     private String searchText;
@@ -121,7 +123,7 @@ public final class ApplicationEntity implements SearchTextEntity<Application> {
 
         this.name = application.getName();
         this.isValid = application.getIsValid();
-        this.description = application.getDescription();
+        this.additionalInfo = application.getAdditionalInfo();
         this.deviceTypes = mapper.treeToValue(application.getDeviceTypes(), DeviceTypeConfigurations.class).getConfiguration().getDeviceTypes().stream().map(DeviceType::getName).collect(Collectors.toSet());
         this.state = application.getState();
     }
@@ -193,12 +195,12 @@ public final class ApplicationEntity implements SearchTextEntity<Application> {
         isValid = valid;
     }
 
-    public String getDescription() {
-        return description;
+    public JsonNode getAdditionalInfo() {
+        return additionalInfo;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
+    public void setAdditionalInfo(JsonNode additionalInfo) {
+        this.additionalInfo = additionalInfo;
     }
 
     public String getSearchText() {
@@ -265,7 +267,7 @@ public final class ApplicationEntity implements SearchTextEntity<Application> {
         }
         application.setName(name);
         application.setIsValid(isValid);
-        application.setDescription(description);
+        application.setAdditionalInfo(additionalInfo);
 
         if(state != null) {
             application.setState(state);
@@ -303,7 +305,7 @@ public final class ApplicationEntity implements SearchTextEntity<Application> {
                 Objects.equals(dashboardId, that.dashboardId) &&
                 Objects.equals(name, that.name) &&
                 Objects.equals(isValid, that.isValid) &&
-                Objects.equals(description, that.description) &&
+                Objects.equals(additionalInfo, that.additionalInfo) &&
                 Objects.equals(searchText, that.searchText) &&
                 Objects.equals(rules, that.rules) &&
                 Objects.equals(computationJobs, that.computationJobs) &&
@@ -313,6 +315,7 @@ public final class ApplicationEntity implements SearchTextEntity<Application> {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, tenantId, customerId, miniDashboardId, dashboardId, name, isValid, description, searchText, rules, computationJobs, deviceTypes, state);
+
+        return Objects.hash(id, tenantId, customerId, miniDashboardId, dashboardId, name, isValid, additionalInfo, searchText, rules, computationJobs, deviceTypes, state);
     }
 }
