@@ -107,7 +107,11 @@ public class BaseComputationsControllerTest extends AbstractControllerTest {
 
         Application application = new Application();
         application.setName("My Application");
-        application.setDescription("Application Description");
+        application.setAdditionalInfo(mapper.readTree("{\n" +
+                "\" additionalInfo\": {\n" +
+                "\"description\": \"string\"\n" +
+                "}\n" +
+                "}"));
 
         Application savedApplication = doPost("/api/application", application, Application.class);
 
