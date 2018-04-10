@@ -271,33 +271,6 @@ public class ApplicationController extends BaseController {
     }
 
     @PreAuthorize("hasAuthority('TENANT_ADMIN')")
-    @RequestMapping(value = "/app/devices", method = RequestMethod.PUT, consumes = "application/json")
-    public Application assignDevicesToApplication(@RequestBody ApplicationFieldsWrapper applicationFieldsWrapper) throws ThingsboardException {
-        checkParameter("applicationId", applicationFieldsWrapper.getApplicationId());
-        try {
-            ApplicationId applicationId = new ApplicationId(toUUID(applicationFieldsWrapper.getApplicationId()));
-            checkApplicationId(applicationId);
-            return checkNotNull(applicationService.assignDevicesToApplication(applicationId, applicationFieldsWrapper.getFields()));
-        } catch (Exception e) {
-            throw handleException(e);
-        }
-    }
-
-    @PreAuthorize("hasAuthority('TENANT_ADMIN')")
-    @RequestMapping(value = "/app/{applicationId}/devices/{strDevices}", method = RequestMethod.DELETE)
-    public Application unassignDevicesToApplication(@PathVariable("applicationId") String strApplicationId, @PathVariable String[] strDevices) throws ThingsboardException {
-        checkParameter("applicationId", strApplicationId);
-        try {
-            ApplicationId applicationId = new ApplicationId(toUUID(strApplicationId));
-            checkApplicationId(applicationId);
-            return checkNotNull(applicationService.unassignDevicesToApplication(applicationId, strDevices));
-        } catch (Exception e) {
-            throw handleException(e);
-        }
-    }
-
-
-    @PreAuthorize("hasAuthority('TENANT_ADMIN')")
     @RequestMapping(value = "/app/unassignRules", method = RequestMethod.POST,consumes = "application/json")
     public Application unassignRulesToApplication(@RequestBody ApplicationFieldsWrapper applicationFieldsWrapper) throws ThingsboardException {
         checkParameter("applicationId", applicationFieldsWrapper.getApplicationId());
