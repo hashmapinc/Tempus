@@ -16,12 +16,17 @@
 package org.thingsboard.server.dao.model.sql;
 
 import com.datastax.driver.core.utils.UUIDs;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
 import org.hibernate.annotations.TypeDef;
 import org.thingsboard.server.common.data.Application;
+import org.thingsboard.server.common.data.Configuration;
+import org.thingsboard.server.common.data.DeviceType;
+import org.thingsboard.server.common.data.DeviceTypeConfigurations;
 import org.thingsboard.server.common.data.id.*;
 import org.thingsboard.server.common.data.plugin.ComponentLifecycleState;
 import org.thingsboard.server.dao.model.BaseSqlEntity;
@@ -30,6 +35,8 @@ import org.thingsboard.server.dao.model.SearchTextEntity;
 import org.thingsboard.server.dao.util.mapping.JsonStringType;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -90,11 +97,13 @@ public final class ApplicationEntity extends BaseSqlEntity<Application> implemen
     @Column(name = ModelConstants.APPLICATION_STATE_PROPERTY)
     private ComponentLifecycleState state;
 
+    private static ObjectMapper mapper = new ObjectMapper();
+
     public ApplicationEntity() {
         super();
     }
 
-    public ApplicationEntity(Application application){
+    public ApplicationEntity(Application application) throws JsonProcessingException {
         if (application.getId() != null) {
             this.setId(application.getId().getId());
         }
@@ -124,7 +133,7 @@ public final class ApplicationEntity extends BaseSqlEntity<Application> implemen
         this.name = application.getName();
         this.isValid = application.getIsValid();
         this.description = application.getDescription();
-        this.deviceTypes = application.getDeviceTypes();
+        this.deviceTypes = mapper.treeToValue(application.getDeviceTypes(), DeviceTypeConfigurations.class).getConfiguration().getDeviceTypes().stream().map(DeviceType::getName).collect(Collectors.toSet());
         this.state = application.getState();
     }
 
@@ -167,7 +176,21 @@ public final class ApplicationEntity extends BaseSqlEntity<Application> implemen
         application.setName(name);
         application.setIsValid(isValid);
         application.setDescription(description);
-        application.setDeviceTypes(deviceTypes);
+        if(deviceTypes !=null) {
+            DeviceTypeConfigurations deviceTypeConfigurations = new DeviceTypeConfigurations();
+            Configuration configuration = new Configuration();
+            List<DeviceType> deviceTypesModelList = new ArrayList<>();
+            for(String dt: deviceTypes) {
+                DeviceType deviceType = new DeviceType();
+                deviceType.setName(dt);
+                deviceTypesModelList.add(deviceType);
+            }
+
+            configuration.setDeviceTypes(deviceTypesModelList);
+            deviceTypeConfigurations.setConfiguration(configuration);
+
+            application.setDeviceTypes(mapper.valueToTree(deviceTypeConfigurations));
+        }
         application.setState(state);
         return application;
 
