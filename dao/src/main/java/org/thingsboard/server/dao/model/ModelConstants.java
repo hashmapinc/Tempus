@@ -30,7 +30,6 @@ public class ModelConstants {
 
     public static UUID NULL_UUID = UUIDs.startOf(0);
     public static String NULL_UUID_STR = UUIDConverter.fromTimeUUID(NULL_UUID);
-    public static String NULL_DEVICE_TYPE = "!NULL__DEVICE__TYPE!";
 
     /**
      * Generic constants.

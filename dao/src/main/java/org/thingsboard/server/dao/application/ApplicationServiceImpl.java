@@ -15,6 +15,7 @@
  */
 package org.thingsboard.server.dao.application;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Iterables;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -45,7 +46,6 @@ import org.thingsboard.server.dao.tenant.TenantDao;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static org.thingsboard.server.dao.model.ModelConstants.NULL_DEVICE_TYPE;
 import static org.thingsboard.server.dao.model.ModelConstants.NULL_UUID;
 import static org.thingsboard.server.dao.service.Validator.validateId;
 import static org.thingsboard.server.dao.service.Validator.validateIds;
@@ -204,23 +204,6 @@ public class ApplicationServiceImpl extends AbstractEntityService implements App
             application.getRules().remove(new RuleId(NULL_UUID));
         }
         application.addRules(ruleIdSet);
-        return saveApplication(application);
-    }
-
-    @Override
-    public Application assignDevicesToApplication(ApplicationId applicationId, Set<String> deviceTypes) {
-        Application application = findApplicationById(applicationId);
-        if(application.getDeviceTypes().contains(NULL_DEVICE_TYPE)) {
-            application.getDeviceTypes().remove(NULL_DEVICE_TYPE);
-        }
-        application.addDeviceTypes(deviceTypes);
-        return saveApplication(application);
-    }
-
-    @Override
-    public Application unassignDevicesToApplication(ApplicationId applicationId, String[] deviceTypes) {
-        Application application = findApplicationById(applicationId);
-        application.getDeviceTypes().removeAll(Arrays.asList(deviceTypes));
         return saveApplication(application);
     }
 
@@ -407,10 +390,6 @@ public class ApplicationServiceImpl extends AbstractEntityService implements App
                         }
                     } else {
                         isValid = false;
-                    }
-
-                    if(application.getDeviceTypes() == null || application.getDeviceTypes().isEmpty()) {
-                        application.setDeviceTypes(new HashSet<>(Arrays.asList(NULL_DEVICE_TYPE)));
                     }
 
                     if(application.getMiniDashboardId() == null) {

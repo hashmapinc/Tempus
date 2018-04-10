@@ -16,7 +16,12 @@
 package org.thingsboard.server.dao.model.nosql;
 
 import com.datastax.driver.core.utils.UUIDs;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.thingsboard.server.common.data.Application;
+import org.thingsboard.server.common.data.Configuration;
+import org.thingsboard.server.common.data.DeviceType;
+import org.thingsboard.server.common.data.DeviceTypeConfigurations;
 import org.thingsboard.server.common.data.id.*;
 import org.thingsboard.server.common.data.plugin.ComponentLifecycleState;
 import org.thingsboard.server.dao.model.SearchTextEntity;
@@ -27,9 +32,7 @@ import com.datastax.driver.mapping.annotations.Transient;
 import org.thingsboard.server.dao.model.type.ComponentLifecycleStateCodec;
 
 
-import java.util.Objects;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static org.thingsboard.server.dao.model.ModelConstants.*;
@@ -83,11 +86,13 @@ public final class ApplicationEntity implements SearchTextEntity<Application> {
     private ComponentLifecycleState state;
 
 
+    private static ObjectMapper mapper = new ObjectMapper();
+
     public ApplicationEntity() {
         super();
     }
 
-    public ApplicationEntity(Application application){
+    public ApplicationEntity(Application application) throws JsonProcessingException {
         if (application.getId() != null) {
             this.setId(application.getId().getId());
         }
@@ -117,7 +122,7 @@ public final class ApplicationEntity implements SearchTextEntity<Application> {
         this.name = application.getName();
         this.isValid = application.getIsValid();
         this.description = application.getDescription();
-        this.deviceTypes = application.getDeviceTypes();
+        this.deviceTypes = mapper.treeToValue(application.getDeviceTypes(), DeviceTypeConfigurations.class).getConfiguration().getDeviceTypes().stream().map(DeviceType::getName).collect(Collectors.toSet());
         this.state = application.getState();
     }
 
@@ -269,7 +274,19 @@ public final class ApplicationEntity implements SearchTextEntity<Application> {
         }
 
         if(deviceTypes !=null) {
-            application.setDeviceTypes(deviceTypes);
+            DeviceTypeConfigurations deviceTypeConfigurations = new DeviceTypeConfigurations();
+            Configuration configuration = new Configuration();
+            List<DeviceType> deviceTypesModelList = new ArrayList<>();
+            for(String dt: deviceTypes) {
+                DeviceType deviceType = new DeviceType();
+                deviceType.setName(dt);
+                deviceTypesModelList.add(deviceType);
+            }
+
+            configuration.setDeviceTypes(deviceTypesModelList);
+            deviceTypeConfigurations.setConfiguration(configuration);
+
+            application.setDeviceTypes(mapper.valueToTree(deviceTypeConfigurations));
         }
         return application;
     }
@@ -278,7 +295,6 @@ public final class ApplicationEntity implements SearchTextEntity<Application> {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-
         ApplicationEntity that = (ApplicationEntity) o;
         return Objects.equals(id, that.id) &&
                 Objects.equals(tenantId, that.tenantId) &&

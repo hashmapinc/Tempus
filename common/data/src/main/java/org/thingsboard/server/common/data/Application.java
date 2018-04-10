@@ -15,6 +15,7 @@
  */
 package org.thingsboard.server.common.data;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import org.thingsboard.server.common.data.id.*;
 import org.thingsboard.server.common.data.plugin.ComponentLifecycleState;
 
@@ -34,7 +35,7 @@ public class Application extends SearchTextBased<ApplicationId> implements HasNa
     private Set<RuleId> rules = new HashSet<>();
     private String name;
     private String description;
-    private Set<String> deviceTypes = new HashSet<>();
+    private JsonNode deviceTypes;
     private Boolean isValid = Boolean.TRUE;
     private ComponentLifecycleState state;
 
@@ -123,9 +124,6 @@ public class Application extends SearchTextBased<ApplicationId> implements HasNa
     public void setComputationJobIdSet(Set<ComputationJobId> computationJobIdSet) {
         this.computationJobIdSet = computationJobIdSet;
     }
-    public void addDeviceTypes(Set<String> deviceTypes) {
-        this.deviceTypes.addAll(deviceTypes);
-    }
 
     public String getDescription() {
         return description;
@@ -135,11 +133,11 @@ public class Application extends SearchTextBased<ApplicationId> implements HasNa
         this.description = description;
     }
 
-    public Set<String> getDeviceTypes() {
+    public JsonNode getDeviceTypes() {
         return deviceTypes;
     }
 
-    public void setDeviceTypes(Set<String> deviceTypes) {
+    public void setDeviceTypes(JsonNode deviceTypes) {
         this.deviceTypes = deviceTypes;
     }
 
@@ -168,23 +166,6 @@ public class Application extends SearchTextBased<ApplicationId> implements HasNa
     }
 
     @Override
-    public String toString() {
-        return "Application{" +
-                "tenantId=" + tenantId +
-                ", customerId=" + customerId +
-                ", dashboardId=" + dashboardId +
-                ", miniDashboardId=" + miniDashboardId +
-                ", computationJobIdSet=" + computationJobIdSet +
-                ", rules=" + rules +
-                ", name='" + name + '\'' +
-                ", description='" + description + '\'' +
-                ", deviceTypes=" + deviceTypes +
-                ", isValid=" + isValid +
-                ", state=" + state +
-                '}';
-    }
-
-    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
@@ -205,6 +186,24 @@ public class Application extends SearchTextBased<ApplicationId> implements HasNa
 
     @Override
     public int hashCode() {
+
         return Objects.hash(super.hashCode(), tenantId, customerId, dashboardId, miniDashboardId, computationJobIdSet, rules, name, description, deviceTypes, isValid, state);
+    }
+
+    @Override
+    public String toString() {
+        return "Application{" +
+                "tenantId=" + tenantId +
+                ", customerId=" + customerId +
+                ", dashboardId=" + dashboardId +
+                ", miniDashboardId=" + miniDashboardId +
+                ", computationJobIdSet=" + computationJobIdSet +
+                ", rules=" + rules +
+                ", name='" + name + '\'' +
+                ", description='" + description + '\'' +
+                ", deviceTypes=" + deviceTypes +
+                ", isValid=" + isValid +
+                ", state=" + state +
+                '}';
     }
 }
