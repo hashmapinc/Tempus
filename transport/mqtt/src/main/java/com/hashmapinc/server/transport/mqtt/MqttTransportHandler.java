@@ -76,7 +76,7 @@ public class MqttTransportHandler extends ChannelInboundHandlerAdapter implement
     private volatile boolean connected;
     private volatile InetSocketAddress address;
     private volatile GatewaySessionCtx gatewaySessionCtx;
-    private SparkPlugSpecificationService sparkPlugSpecificationService; //= new SparkPlugSpecificationService();
+    private SparkPlugSpecificationService sparkPlugSpecificationService;
 
 
     public MqttTransportHandler(SessionMsgProcessor processor, DeviceService deviceService, DeviceAuthService authService, RelationService relationService,

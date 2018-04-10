@@ -93,7 +93,7 @@ public class SparkPlugSpecificationService {
 
     }
 
-    public void updateMapState(){
+    public void updateDeviceMapState(){
         deviceMap.forEach((k, v) -> {
             deviceMap.put(k, false);
         });
