@@ -38,10 +38,10 @@ import io.netty.handler.codec.mqtt.MqttMessage;
 import io.netty.handler.codec.mqtt.MqttPublishMessage;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.StringUtils;
-import com.hashmapinc.server.common.msg.core.*;
 import com.hashmapinc.server.common.transport.SessionMsgProcessor;
 import com.hashmapinc.server.transport.mqtt.MqttTransportHandler;
-
+import org.hashmapinc.server.transport.mqtt.sparkplugB.SparkPlugMsgTypes;
+import com.hashmapinc.server.common.data.kv.KvEntry;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -140,6 +140,47 @@ public class GatewaySessionCtx {
             }
         } else {
             throw new JsonSyntaxException(CAN_T_PARSE_VALUE + json);
+        }
+    }
+
+    public void onSparkPlugDecodedMsg(Long ts, MqttPublishMessage mqttMsg, List<KvEntry> kvEntryList) throws AdaptorException {
+        int requestId = mqttMsg.variableHeader().messageId();
+        String deviceName = createDeviceName(mqttMsg.variableHeader().topicName());
+        deviceName = checkDeviceConnected(deviceName);
+        BasicTelemetryUploadRequest request = new BasicTelemetryUploadRequest(requestId);
+        for (KvEntry entry : kvEntryList) {
+            request.add(ts, entry);
+        }
+        GatewayDeviceSessionCtx deviceSessionCtx = devices.get(deviceName);
+        processor.process(new BasicToDeviceActorSessionMsg(deviceSessionCtx.getDevice(),
+                new BasicAdaptorToSessionActorMsg(deviceSessionCtx, request)));
+    }
+
+    private String createDeviceName(String topicName){
+        String[] splitTopic = topicName.split("/");
+        StringBuilder deviceName = new StringBuilder();
+        String delimeter = "";
+        for (String str: splitTopic) {
+            if(!sparkPlugMsgTypes(str)) {
+                deviceName.append(delimeter);
+                deviceName.append(str);
+                delimeter = "/";
+            }
+        }
+        return deviceName.toString();
+    }
+
+    private boolean sparkPlugMsgTypes(String type){
+        switch (type){
+            case SparkPlugMsgTypes.DBIRTH : return true;
+            case SparkPlugMsgTypes.DDEATH : return true;
+            case SparkPlugMsgTypes.DDATA : return true;
+            case SparkPlugMsgTypes.NBIRTH : return true;
+            case SparkPlugMsgTypes.NDATA : return true;
+            case SparkPlugMsgTypes.NDEATH : return true;
+            case SparkPlugMsgTypes.NCMD : return true;
+            case SparkPlugMsgTypes.DCMD : return true;
+            default: return false;
         }
     }
 

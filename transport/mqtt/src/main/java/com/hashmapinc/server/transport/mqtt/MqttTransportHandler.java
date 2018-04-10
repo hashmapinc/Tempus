@@ -44,7 +44,7 @@ import io.netty.util.concurrent.Future;
 import io.netty.util.concurrent.GenericFutureListener;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.StringUtils;
-
+import org.hashmapinc.server.transport.mqtt.sparkplugB.SparkPlugSpecificationService;
 import javax.net.ssl.SSLPeerUnverifiedException;
 import javax.security.cert.X509Certificate;
 import java.net.InetSocketAddress;
@@ -72,9 +72,12 @@ public class MqttTransportHandler extends ChannelInboundHandlerAdapter implement
     private final RelationService relationService;
     private final QuotaService quotaService;
     private final SslHandler sslHandler;
+    private final String sparkPlugNameSpace = "spBv1.0";
     private volatile boolean connected;
     private volatile InetSocketAddress address;
     private volatile GatewaySessionCtx gatewaySessionCtx;
+    private SparkPlugSpecificationService sparkPlugSpecificationService; //= new SparkPlugSpecificationService();
+
 
     public MqttTransportHandler(SessionMsgProcessor processor, DeviceService deviceService, DeviceAuthService authService, RelationService relationService,
                                 MqttTransportAdaptor adaptor, SslHandler sslHandler, QuotaService quotaService) {
@@ -110,33 +113,32 @@ public class MqttTransportHandler extends ChannelInboundHandlerAdapter implement
             processDisconnect(ctx);
             return;
         }
-
-        deviceSessionCtx.setChannel(ctx);
-        switch (msg.fixedHeader().messageType()) {
-            case CONNECT:
-                processConnect(ctx, (MqttConnectMessage) msg);
-                break;
-            case PUBLISH:
-                processPublish(ctx, (MqttPublishMessage) msg);
-                break;
-            case SUBSCRIBE:
-                processSubscribe(ctx, (MqttSubscribeMessage) msg);
-                break;
-            case UNSUBSCRIBE:
-                processUnsubscribe(ctx, (MqttUnsubscribeMessage) msg);
-                break;
-            case PINGREQ:
-                if (checkConnected(ctx)) {
-                    ctx.writeAndFlush(new MqttMessage(new MqttFixedHeader(PINGRESP, false, AT_MOST_ONCE, false, 0)));
-                }
-                break;
-            case DISCONNECT:
-                if (checkConnected(ctx)) {
-                    processDisconnect(ctx);
-                }
-                break;
-            default:
-                break;
+        else {
+            deviceSessionCtx.setChannel(ctx);
+            switch (msg.fixedHeader().messageType()) {
+                case CONNECT:
+                    processConnect(ctx, (MqttConnectMessage) msg);
+                    break;
+                case PUBLISH:
+                    processPublish(ctx, (MqttPublishMessage) msg);
+                    break;
+                case SUBSCRIBE:
+                    processSubscribe(ctx, (MqttSubscribeMessage) msg);
+                    break;
+                case UNSUBSCRIBE:
+                    processUnsubscribe(ctx, (MqttUnsubscribeMessage) msg);
+                    break;
+                case PINGREQ:
+                    if (checkConnected(ctx)) {
+                        ctx.writeAndFlush(new MqttMessage(new MqttFixedHeader(PINGRESP, false, AT_MOST_ONCE, false, 0)));
+                    }
+                    break;
+                case DISCONNECT:
+                    if (checkConnected(ctx)) {
+                        processDisconnect(ctx);
+                    }
+                    break;
+            }
         }
 
     }
@@ -154,7 +156,13 @@ public class MqttTransportHandler extends ChannelInboundHandlerAdapter implement
                 gatewaySessionCtx.setChannel(ctx);
                 handleMqttPublishMsg(topicName, msgId, mqttMsg);
             }
-        } else {
+        }else if(topicName.startsWith(sparkPlugNameSpace)){
+            if (gatewaySessionCtx != null) {
+                gatewaySessionCtx.setChannel(ctx);
+                sparkPlugSpecificationService.processSparkPlugbPostTelemetry(gatewaySessionCtx, mqttMsg);
+            }
+        }
+        else {
             processDevicePublish(ctx, mqttMsg, topicName, msgId);
         }
     }
@@ -290,7 +298,7 @@ public class MqttTransportHandler extends ChannelInboundHandlerAdapter implement
         log.info("[{}] Processing connect msg for client: {}!", sessionId, msg.payload().clientIdentifier());
         X509Certificate cert;
         if (sslHandler != null && (cert = getX509Certificate()) != null) {
-            processX509CertConnect(ctx, cert);
+            processX509CertConnect(ctx, cert, msg);
         } else {
             processAuthTokenConnect(ctx, msg);
         }
@@ -307,18 +315,18 @@ public class MqttTransportHandler extends ChannelInboundHandlerAdapter implement
         } else {
             ctx.writeAndFlush(createMqttConnAckMsg(CONNECTION_ACCEPTED));
             connected = true;
-            checkGatewaySession();
+            checkGatewaySession(msg);
         }
     }
 
-    private void processX509CertConnect(ChannelHandlerContext ctx, X509Certificate cert) {
+    private void processX509CertConnect(ChannelHandlerContext ctx, X509Certificate cert, MqttConnectMessage msg) {
         try {
             String strCert = SslUtil.getX509CertificateString(cert);
             String sha3Hash = EncryptionUtil.getSha3Hash(strCert);
             if (deviceSessionCtx.login(new DeviceX509Credentials(sha3Hash))) {
                 ctx.writeAndFlush(createMqttConnAckMsg(CONNECTION_ACCEPTED));
                 connected = true;
-                checkGatewaySession();
+                checkGatewaySession(msg);
             } else {
                 ctx.writeAndFlush(createMqttConnAckMsg(CONNECTION_REFUSED_NOT_AUTHORIZED));
                 ctx.close();
@@ -348,6 +356,7 @@ public class MqttTransportHandler extends ChannelInboundHandlerAdapter implement
             processor.process(SessionCloseMsg.onDisconnect(deviceSessionCtx.getSessionId()));
             if (gatewaySessionCtx != null) {
                 gatewaySessionCtx.onGatewayDisconnect();
+                sparkPlugSpecificationService.updateMapState();
             }
         }
     }
@@ -401,13 +410,16 @@ public class MqttTransportHandler extends ChannelInboundHandlerAdapter implement
         }
     }
 
-    private void checkGatewaySession() {
+    private void checkGatewaySession(MqttConnectMessage msg) {
         Device device = deviceSessionCtx.getDevice();
         JsonNode infoNode = device.getAdditionalInfo();
         if (infoNode != null) {
             JsonNode gatewayNode = infoNode.get("gateway");
             if (gatewayNode != null && gatewayNode.asBoolean()) {
                 gatewaySessionCtx = new GatewaySessionCtx(processor, deviceService, authService, relationService, deviceSessionCtx);
+                if((msg.payload().willTopic() != null) && msg.payload().willTopic().startsWith(sparkPlugNameSpace)){
+                    sparkPlugSpecificationService = new SparkPlugSpecificationService();
+                }
             }
         }
     }
