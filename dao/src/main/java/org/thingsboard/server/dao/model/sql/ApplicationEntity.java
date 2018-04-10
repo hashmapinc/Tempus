@@ -17,11 +17,13 @@ package org.thingsboard.server.dao.model.sql;
 
 import com.datastax.driver.core.utils.UUIDs;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
+import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
 import org.thingsboard.server.common.data.Application;
 import org.thingsboard.server.common.data.Configuration;
@@ -81,8 +83,9 @@ public final class ApplicationEntity extends BaseSqlEntity<Application> implemen
     @Column(name = ModelConstants.APPLICATION_IS_VALID)
     private Boolean isValid;
 
+    @Type(type = "json")
     @Column(name = ModelConstants.APPLICATION_DESCRIPTION)
-    private String description;
+    private JsonNode additionalInfo;
 
     @Column(name = ModelConstants.SEARCH_TEXT_PROPERTY)
     private String searchText;
@@ -132,7 +135,7 @@ public final class ApplicationEntity extends BaseSqlEntity<Application> implemen
 
         this.name = application.getName();
         this.isValid = application.getIsValid();
-        this.description = application.getDescription();
+        this.additionalInfo = application.getAdditionalInfo();
         this.deviceTypes = mapper.treeToValue(application.getDeviceTypes(), DeviceTypeConfigurations.class).getConfiguration().getDeviceTypes().stream().map(DeviceType::getName).collect(Collectors.toSet());
         this.state = application.getState();
     }
@@ -175,7 +178,7 @@ public final class ApplicationEntity extends BaseSqlEntity<Application> implemen
         }
         application.setName(name);
         application.setIsValid(isValid);
-        application.setDescription(description);
+        application.setAdditionalInfo(additionalInfo);
         if(deviceTypes !=null) {
             DeviceTypeConfigurations deviceTypeConfigurations = new DeviceTypeConfigurations();
             Configuration configuration = new Configuration();
@@ -202,7 +205,7 @@ public final class ApplicationEntity extends BaseSqlEntity<Application> implemen
         if (o == null || getClass() != o.getClass()) return false;
         if (!super.equals(o)) return false;
         ApplicationEntity that = (ApplicationEntity) o;
-        return  Objects.equals(tenantId, that.tenantId) &&
+        return Objects.equals(tenantId, that.tenantId) &&
                 Objects.equals(customerId, that.customerId) &&
                 Objects.equals(miniDashboardId, that.miniDashboardId) &&
                 Objects.equals(dashboardId, that.dashboardId) &&
@@ -210,7 +213,7 @@ public final class ApplicationEntity extends BaseSqlEntity<Application> implemen
                 Objects.equals(computationJobs, that.computationJobs) &&
                 Objects.equals(name, that.name) &&
                 Objects.equals(isValid, that.isValid) &&
-                Objects.equals(description, that.description) &&
+                Objects.equals(additionalInfo, that.additionalInfo) &&
                 Objects.equals(searchText, that.searchText) &&
                 Objects.equals(deviceTypes, that.deviceTypes) &&
                 state == that.state;
@@ -218,6 +221,6 @@ public final class ApplicationEntity extends BaseSqlEntity<Application> implemen
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), tenantId, customerId, miniDashboardId, dashboardId, rules, computationJobs, name, isValid, description, searchText, deviceTypes, state);
+        return Objects.hash(super.hashCode(), tenantId, customerId, miniDashboardId, dashboardId, rules, computationJobs, name, isValid, additionalInfo, searchText, deviceTypes, state);
     }
 }

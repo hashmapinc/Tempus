@@ -112,7 +112,11 @@ public class BaseApplicationControllerTest extends AbstractControllerTest {
         JsonNode deviceTypes1 = mapper.readTree("{\"configuration\":{\"deviceTypes\":[{\"name\":\"DT1\"}]}}");
         application.setDeviceTypes(deviceTypes1);
         application.setName("My Application");
-        application.setDescription("Application Description");
+        application.setAdditionalInfo(mapper.readTree("{\n" +
+                "\" additionalInfo\": {\n" +
+                "\"description\": \"string\"\n" +
+                "}\n" +
+                "}"));
 
         Application savedApplication = doPost("/api/application", application, Application.class);
 

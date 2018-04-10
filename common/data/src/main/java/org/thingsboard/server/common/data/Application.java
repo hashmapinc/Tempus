@@ -34,7 +34,7 @@ public class Application extends SearchTextBased<ApplicationId> implements HasNa
     private Set<ComputationJobId> computationJobIdSet = new HashSet<>();
     private Set<RuleId> rules = new HashSet<>();
     private String name;
-    private String description;
+    private JsonNode additionalInfo;
     private JsonNode deviceTypes;
     private Boolean isValid = Boolean.TRUE;
     private ComponentLifecycleState state;
@@ -56,7 +56,7 @@ public class Application extends SearchTextBased<ApplicationId> implements HasNa
         this.computationJobIdSet = application.computationJobIdSet;
         this.rules = application.rules;
         this.name = application.name;
-        this.description = application.description;
+        this.additionalInfo = application.getAdditionalInfo();
         this.deviceTypes = application.deviceTypes;
         this.isValid = application.isValid;
         this.state = application.state;
@@ -125,12 +125,12 @@ public class Application extends SearchTextBased<ApplicationId> implements HasNa
         this.computationJobIdSet = computationJobIdSet;
     }
 
-    public String getDescription() {
-        return description;
+    public JsonNode getAdditionalInfo() {
+        return additionalInfo;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
+    public void setAdditionalInfo(JsonNode additionalInfo) {
+        this.additionalInfo = additionalInfo;
     }
 
     public JsonNode getDeviceTypes() {
@@ -178,7 +178,7 @@ public class Application extends SearchTextBased<ApplicationId> implements HasNa
                 Objects.equals(computationJobIdSet, that.computationJobIdSet) &&
                 Objects.equals(rules, that.rules) &&
                 Objects.equals(name, that.name) &&
-                Objects.equals(description, that.description) &&
+                Objects.equals(additionalInfo, that.additionalInfo) &&
                 Objects.equals(deviceTypes, that.deviceTypes) &&
                 Objects.equals(isValid, that.isValid) &&
                 state == that.state;
@@ -187,7 +187,7 @@ public class Application extends SearchTextBased<ApplicationId> implements HasNa
     @Override
     public int hashCode() {
 
-        return Objects.hash(super.hashCode(), tenantId, customerId, dashboardId, miniDashboardId, computationJobIdSet, rules, name, description, deviceTypes, isValid, state);
+        return Objects.hash(super.hashCode(), tenantId, customerId, dashboardId, miniDashboardId, computationJobIdSet, rules, name, additionalInfo, deviceTypes, isValid, state);
     }
 
     @Override
@@ -200,7 +200,7 @@ public class Application extends SearchTextBased<ApplicationId> implements HasNa
                 ", computationJobIdSet=" + computationJobIdSet +
                 ", rules=" + rules +
                 ", name='" + name + '\'' +
-                ", description='" + description + '\'' +
+                ", additionalInfo=" + additionalInfo +
                 ", deviceTypes=" + deviceTypes +
                 ", isValid=" + isValid +
                 ", state=" + state +
