@@ -1,0 +1,14 @@
+kind: PersistentVolume
+apiVersion: v1
+metadata:
+  name: tb-0 
+  labels:
+    type: local
+spec:
+  storageClassName: gold
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path : "/mnt/data"

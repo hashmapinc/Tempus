@@ -1,0 +1,75 @@
+kind: PersistentVolume
+apiVersion: v1
+metadata:
+  name: nifi-0 
+  labels:
+    type: local
+spec:
+  storageClassName: gold
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path : "/mnt/data"
+---
+kind: PersistentVolume
+apiVersion: v1
+metadata:
+  name: nifi-1
+  labels:
+    type: local
+spec:
+  storageClassName: gold
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path : "/mnt/data"
+---
+kind: PersistentVolume
+apiVersion: v1
+metadata:
+  name: nifi-2
+  labels:
+    type: local
+spec:
+  storageClassName: gold
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path : "/mnt/data"
+---
+kind: PersistentVolume
+apiVersion: v1
+metadata:
+  name: nifi-3
+  labels:
+    type: local
+spec:
+  storageClassName: gold
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path : "/mnt/data"
+---
+kind: PersistentVolume
+apiVersion: v1
+metadata:
+  name: nifi-4
+  labels:
+    type: local
+spec:
+  storageClassName: gold
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path : "/mnt/data"
+
