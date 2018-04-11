@@ -39,11 +39,14 @@ import org.thingsboard.server.service.computation.ComputationDiscoveryService;
 import org.thingsboard.server.service.security.model.SecurityUser;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.thingsboard.server.dao.service.Validator.validateId;
 
@@ -69,6 +72,10 @@ public class ComputationsController extends BaseController {
     @ResponseBody
     public Computations upload(@RequestParam("file") MultipartFile file) throws ThingsboardException {
         try {
+            List<String> filesAtDestination = Files.list(Paths.get(this.uploadPath)).map(f -> f.getFileName().toString()).collect(Collectors.toList());
+            if(filesAtDestination.contains(file.getOriginalFilename())) {
+                throw new ThingsboardException("Cant upload the same computation artifact again. Delete the existing computation first to upload it again" , ThingsboardErrorCode.GENERAL);
+            }
             String path = uploadPath + File.separator + file.getOriginalFilename();
             File destinationFile = new File(path);
             try (InputStream input = file.getInputStream()) {
@@ -84,7 +91,7 @@ public class ComputationsController extends BaseController {
     @PreAuthorize("hasAuthority('TENANT_ADMIN')")
     @RequestMapping(value = "/computations/{computationId}", method = RequestMethod.DELETE)
     @ResponseBody
-    public void delete(@PathVariable("computationId") String strComputationId) throws ThingsboardException {
+    public void delete(@PathVariable("computationId") String strComputationId) throws ThingsboardException, IOException {
         ComputationId computationId = new ComputationId(toUUID(strComputationId));
         Computations computation = checkComputation(computationsService.findById(computationId));
         List<ComputationJob> computationJobs = checkNotNull(computationJobService.findByComputationId(computation.getId()));
@@ -93,6 +100,7 @@ public class ComputationsController extends BaseController {
             actorService.onComputationJobStateChange(computationJob.getTenantId(), computationJob.getComputationId(), computationJob.getId(), ComponentLifecycleEvent.DELETED);
         }
         computationsService.deleteById(computationId);
+        Files.deleteIfExists(Paths.get(computation.getJarPath()));
     }
 
     @PreAuthorize("hasAuthority('TENANT_ADMIN')")
