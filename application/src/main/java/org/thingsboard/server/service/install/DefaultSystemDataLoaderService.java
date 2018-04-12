@@ -238,7 +238,7 @@ public class DefaultSystemDataLoaderService implements SystemDataLoaderService {
         createDevice(demoTenant.getId(), customerA.getId(), "WaterTank", "Tank 456", "Test_Token_Tank456", null, false, attributesTank456);
         createDevice(demoTenant.getId(), customerA.getId(), "Gateway", "Spark Analytics Gateway", "GATEWAY_ACCESS_TOKEN", null, true, null);
         createDevice(demoTenant.getId(), customerA.getId(), "Gateway", "Device Gateway", "DEVICE_GATEWAY_TOKEN", null, true, null);
-        createDevice(demoTenant.getId(), customerA.getId(), "Gateway", "MQTT Gateway Device", "gatewaytoken", "Demo device that is used in sample " +
+        createDevice(demoTenant.getId(), null, "Gateway", "MQTT Gateway Device", "gatewaytoken", "Demo device that is used in sample " +
                 "tempus gateway application");
 
 
