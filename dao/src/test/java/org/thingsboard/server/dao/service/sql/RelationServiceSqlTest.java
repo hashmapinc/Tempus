@@ -15,9 +15,11 @@
  */
 package org.thingsboard.server.dao.service.sql;
 
+import org.junit.Ignore;
 import org.thingsboard.server.dao.service.DaoSqlTest;
 import org.thingsboard.server.dao.service.BaseRelationServiceTest;
 
 @DaoSqlTest
+@Ignore
 public class RelationServiceSqlTest extends BaseRelationServiceTest {
 }

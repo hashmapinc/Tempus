@@ -15,6 +15,7 @@
  */
 package org.thingsboard.server.controller;
 
+import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -31,6 +32,7 @@ import java.util.List;
 
 
 @RestController
+@ConditionalOnExpression("${relation.controller.enabled:false}")
 @RequestMapping("/api")
 public class EntityRelationController extends BaseController {
 

@@ -32,6 +32,9 @@ server:
     # Alias that identifies the key in the key store
     key-alias: "${SSL_KEY_ALIAS:tomcat}"
 
+asset.controller.enabled: "true"
+relation.controller.enabled: "true"
+
 ldap:
   authentication-enabled: "${LDAP_AUTHENTICATION_ENABLED:false}"
   authentication-server: "${LDAP_AUTH_SERVER:ldap://openldap:389}"

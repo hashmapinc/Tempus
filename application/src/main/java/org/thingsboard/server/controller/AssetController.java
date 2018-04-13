@@ -16,6 +16,7 @@
 package org.thingsboard.server.controller;
 
 import com.google.common.util.concurrent.ListenableFuture;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -42,6 +43,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
+@ConditionalOnExpression("${asset.controller.enabled:false}")
 @RequestMapping("/api")
 public class AssetController extends BaseController {
 

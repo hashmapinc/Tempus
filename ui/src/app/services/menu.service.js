@@ -209,13 +209,13 @@ function Menu(userService, $state, $rootScope) {
                             icon: 'supervisor_account',
                             link: '/static/svg/businessunitslightgray.svg'
                         },
-                        {
-                            name: 'asset.assets',
-                            type: 'link',
-                            state: 'home.assets',
-                            icon: 'domain',
-                            link: '/static/svg/assetslightgray.svg'
-                        },
+//                        {
+//                            name: 'asset.assets',
+//                            type: 'link',
+//                            state: 'home.assets',
+//                            icon: 'domain',
+//                            link: '/static/svg/assetslightgray.svg'
+//                        },
                         {
                             name: 'device.devices',
                             type: 'link',
@@ -281,17 +281,17 @@ function Menu(userService, $state, $rootScope) {
                                 }
                             ]
                         },
-                            {
-                                name: 'asset.management',
-                                places: [
-                                    {
-                                        name: 'asset.assets',
-                                        icon: 'domain',
-                                        state: 'home.assets',
-                                        link: '/static/svg/assetslightgray.svg'
-                                    }
-                                ]
-                            },
+//                            {
+//                                name: 'asset.management',
+//                                places: [
+//                                    {
+//                                        name: 'asset.assets',
+//                                        icon: 'domain',
+//                                        state: 'home.assets',
+//                                        link: '/static/svg/assetslightgray.svg'
+//                                    }
+//                                ]
+//                            },
                             {
                                 name: 'Tempusboard',
                                 places: [
@@ -373,17 +373,18 @@ function Menu(userService, $state, $rootScope) {
                         }];
 
                     homeSections =
-                        [{
-                            name: 'asset.view-assets',
-                            places: [
-                                {
-                                    name: 'asset.assets',
-                                    icon: 'domain',
-                                    state: 'home.assets',
-                                    link: '/static/svg/assetslightgray.svg'
-                                }
-                            ]
-                        },
+                        [
+//                        {
+//                            name: 'asset.view-assets',
+//                            places: [
+//                                {
+//                                    name: 'asset.assets',
+//                                    icon: 'domain',
+//                                    state: 'home.assets',
+//                                    link: '/static/svg/assetslightgray.svg'
+//                                }
+//                            ]
+//                        },
                         {
                             name: 'device.view-devices',
                             places: [

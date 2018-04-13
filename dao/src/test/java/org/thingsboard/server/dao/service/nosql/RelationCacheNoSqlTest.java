@@ -15,9 +15,11 @@
  */
 package org.thingsboard.server.dao.service.nosql;
 
+import org.junit.Ignore;
 import org.thingsboard.server.dao.service.BaseRelationCacheTest;
 import org.thingsboard.server.dao.service.DaoNoSqlTest;
 
 @DaoNoSqlTest
+@Ignore
 public class RelationCacheNoSqlTest extends BaseRelationCacheTest {
 }
