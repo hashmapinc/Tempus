@@ -34,13 +34,16 @@ function ApplicationService($http, $q, customerService) {
         makeApplicationPublic: makeApplicationPublic,
         assignMiniDashboardToApplication: assignMiniDashboardToApplication,
         assignRulesToApplication: assignRulesToApplication,
-        assignDeviceTypesToApplication: assignDeviceTypesToApplication,
         getApplicationsByDeviceType: getApplicationsByDeviceType,
         assignDashboardToApplication: assignDashboardToApplication,
         unAssignRulesFromApplication: unAssignRulesFromApplication,
         getApplicationsByRuleId : getApplicationsByRuleId,
         activateApplication: activateApplication,
-        suspendApplication: suspendApplication
+        suspendApplication: suspendApplication,
+        assignComputationJobToApplication: assignComputationJobToApplication,
+        unAssignComputationJobToApplication: unAssignComputationJobToApplication,
+        getApplicationsByDashboardId: getApplicationsByDashboardId,
+        getApplicationsByComputationId:getApplicationsByComputationId
     }
 
     return service;
@@ -247,7 +250,7 @@ function ApplicationService($http, $q, customerService) {
 
     function getApplicationsByRuleId(ruleId) {
         var deferred = $q.defer();
-        var url = '/api/applications/rule/' + ruleId;
+        var url = '/api/applications/rules/' + ruleId;
         $http.get(url, ruleId).then(function success(response) {
             deferred.resolve(response.data);
         }, function fail() {
@@ -255,12 +258,22 @@ function ApplicationService($http, $q, customerService) {
         });
         return deferred.promise;
     }
-    
 
-    function assignDeviceTypesToApplication(applicationId, deviceTypes){
+    function getApplicationsByDashboardId(dashboardId) {
         var deferred = $q.defer();
-        var url = '/api/app/' + applicationId + '/deviceTypes';
-        $http.post(url, deviceTypes).then(function success(response) {
+        var url = '/api/applications/dashboard/' + dashboardId;
+        $http.get(url, dashboardId).then(function success(response) {
+            deferred.resolve(response.data);
+        }, function fail() {
+            deferred.reject();
+        });
+        return deferred.promise;
+    }
+
+    function getApplicationsByComputationId(computationId) {
+        var deferred = $q.defer();
+        var url = '/api/applications/computation/' + computationId;
+        $http.get(url, computationId).then(function success(response) {
             deferred.resolve(response.data);
         }, function fail() {
             deferred.reject();
@@ -308,6 +321,28 @@ function ApplicationService($http, $q, customerService) {
             deferred.resolve(response.data);
         }, function fail(response) {
             deferred.reject(response.data);
+        });
+        return deferred.promise;
+    }
+
+    function assignComputationJobToApplication(computation) {
+        var deferred = $q.defer();
+        var url = '/api/app/assignComputationJobs';
+        $http.post(url, computation).then(function success(response) {
+            deferred.resolve(response.data);
+        }, function fail() {
+            deferred.reject();
+        });
+        return deferred.promise;
+    }
+
+    function unAssignComputationJobToApplication(computation) {
+        var deferred = $q.defer();
+        var url = '/api/app/unassignComputationJobs';
+        $http.post(url, computation).then(function success(response) {
+            deferred.resolve(response.data);
+        }, function fail() {
+            deferred.reject();
         });
         return deferred.promise;
     }
