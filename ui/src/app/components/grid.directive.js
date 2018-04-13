@@ -260,6 +260,19 @@ function GridController(applicationService, $scope, $state, $mdDialog, $document
                                     startIndex = vm.items.data.length - indexCounter;
                                     endIndex = vm.items.data.length;
                                 }
+                                else if(items.data[0].id.entityType == 'COMPUTATION_JOB' && angular.isDefined(vm.config.parentCtl.currentApplication) && angular.isDefined(vm.config.parentCtl.currentApplication.computationJobIdSet)){
+                                    indexCounter = 0;
+                                    items.data.forEach(function(computation){
+                                        vm.config.parentCtl.currentApplication.computationJobIdSet.forEach(function(currentComputation){
+                                            if(computation.id.id === currentComputation.id){
+                                            vm.items.data.push(computation);
+                                            indexCounter +=1;
+                                        }
+                                        })
+                                    });
+                                    startIndex = vm.items.data.length - indexCounter;
+                                    endIndex = vm.items.data.length;
+                                }
                                 else {
                                      vm.items.data = vm.items.data.concat(items.data);
                                      var startIndex = vm.items.data.length - items.data.length;
@@ -614,6 +627,22 @@ function GridController(applicationService, $scope, $state, $mdDialog, $document
         });
     }
 
+    function deleteDialogue($event, item){
+        var confirm = $mdDialog.confirm()
+            .targetEvent($event)
+            .title(vm.deleteItemTitleFunc(item))
+            .htmlContent(vm.deleteItemContentFunc(item))
+            .ariaLabel($translate.instant('grid.delete-item'))
+            .cancel($translate.instant('action.no'))
+            .ok($translate.instant('action.yes'));
+        $mdDialog.show(confirm).then(function () {
+            vm.deleteItemFunc(item.id.id).then(function success() {
+                refreshList();
+            });
+        },
+        function () {
+        });
+    } 
     function deleteItem($event, item) {
         if ($event) {
             $event.stopPropagation();
@@ -624,20 +653,17 @@ function GridController(applicationService, $scope, $state, $mdDialog, $document
                     if(application){
                         item.rulesAppname = application[0];
                     }
-                    var confirm = $mdDialog.confirm()
-                        .targetEvent($event)
-                        .title(vm.deleteItemTitleFunc(item))
-                        .htmlContent(vm.deleteItemContentFunc(item))
-                        .ariaLabel($translate.instant('grid.delete-item'))
-                        .cancel($translate.instant('action.no'))
-                        .ok($translate.instant('action.yes'));
-                    $mdDialog.show(confirm).then(function () {
-                        vm.deleteItemFunc(item.id.id).then(function success() {
-                            refreshList();
-                        });
-                    },
-                    function () {
-                    });
+                    deleteDialogue($event, item);
+                }
+            );
+        }
+        if(item.id.entityType === "DASHBOARD"){
+            applicationService.getApplicationsByDashboardId(item.id.id).then(
+                function success(application){
+                    if(application){
+                        item.dashboardsAppname = application[0];
+                    }
+                    deleteDialogue($event, item);
                 }
             );
         }
