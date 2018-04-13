@@ -52,6 +52,11 @@ import thingsboardApiComponentDescriptor from '../api/component-descriptor.servi
 import DashboardController from '../dashboard/dashboard.controller';
 import DashboardSettingsController from '../dashboard/dashboard-settings.controller';
 import AddWidgetController from '../dashboard/add-widget.controller';
+
+import thingsboardApiComputation from '../api/computation.service';
+import thingsboardApiComputationJob from '../api/computation-job.service';
+//import ComputationJobController from '../computations/computation-job.controller';
+
 //import DashboardDirective from '../dashboard/dashboard.directive';
 //import EditWidgetDirective from '../dashboard/edit-widget.directive';
 //import DashboardToolbar from '../dashboard/dashboard-toolbar.directive';
@@ -72,6 +77,8 @@ export default angular.module('thingsboard.application', [
     thingsboardApiRule,
     thingsboardApiPlugin,
     thingsboardApiComponentDescriptor,
+    thingsboardApiComputation,
+    thingsboardApiComputationJob,
     thingsboardTypes,
     thingsboardItemBuffer,
     thingsboardImportExport,
@@ -93,6 +100,7 @@ export default angular.module('thingsboard.application', [
     .controller('DashboardController', DashboardController)
     .controller('DashboardSettingsController', DashboardSettingsController)
     .controller('AddWidgetController', AddWidgetController)
+    //.controller('ComputationJobController', ComputationJobController)
     .directive('tbApplication', ApplicationDirective)
   //  .directive('tbRule', RuleDirective)
   //  .directive('tbDashboardDetails', DashboardDirective)
