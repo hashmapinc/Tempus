@@ -1420,6 +1420,7 @@ export function ApplicationController($timeout, $log, $rootScope, userService, a
     var computationAddItemActionsList = [
         {
             onAction: function ($event) {
+                $window.localStorage.setItem('currentApp', angular.toJson(vm.currentApplication));
                 importExport.importComputation($event).then(
                     function() {
                         vm.grid.refreshList();
