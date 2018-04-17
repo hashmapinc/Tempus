@@ -47,6 +47,7 @@ import org.thingsboard.server.transport.mqtt.util.SslUtil;
 import javax.net.ssl.SSLPeerUnverifiedException;
 import javax.security.cert.X509Certificate;
 import java.net.InetSocketAddress;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -298,11 +299,16 @@ public class MqttTransportHandler extends ChannelInboundHandlerAdapter implement
     }
 
     private void processAuthTokenConnect(ChannelHandlerContext ctx, MqttConnectMessage msg) {
-        String userName = msg.payload().userName();
-        if (StringUtils.isEmpty(userName)) {
-            ctx.writeAndFlush(createMqttConnAckMsg(CONNECTION_REFUSED_BAD_USER_NAME_OR_PASSWORD));
+        if (msg.payload().passwordInBytes() == null){
+            ctx.writeAndFlush(createMqttConnAckMsg(CONNECTION_REFUSED_NOT_AUTHORIZED));
             ctx.close();
-        } else if (!deviceSessionCtx.login(new DeviceTokenCredentials(msg.payload().userName()))) {
+            return;
+        }
+        String password = new String(msg.payload().passwordInBytes(), StandardCharsets.UTF_8);
+        if (StringUtils.isEmpty(password)) {
+            ctx.writeAndFlush(createMqttConnAckMsg(CONNECTION_REFUSED_NOT_AUTHORIZED));
+            ctx.close();
+        } else if (!deviceSessionCtx.login(new DeviceTokenCredentials(password))) {
             ctx.writeAndFlush(createMqttConnAckMsg(CONNECTION_REFUSED_NOT_AUTHORIZED));
             ctx.close();
         } else {
