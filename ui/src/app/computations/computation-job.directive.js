@@ -71,7 +71,9 @@ export default function ComputationJobDirective($compile, $templateCache, $trans
 
         scope.$watch("computationJobConfiguration.data", function (newValue, prevValue) {
             if (newValue && !angular.equals(newValue, prevValue)) {
-                scope.computationjob.argParameters = angular.copy(scope.computationJobConfiguration.data);
+                if(scope.computationjob !=null && angular.isDefined(scope.computationjob)){
+                     scope.computationjob.argParameters = angular.copy(scope.computationJobConfiguration.data);
+                }
             }
         }, true);
 
@@ -86,6 +88,7 @@ export default function ComputationJobDirective($compile, $templateCache, $trans
         link: linker,
         scope: {
             computationjob: '=',
+            computation: '=?',
             isEdit: '=',
             isReadOnly: '=',
             theForm: '=',
