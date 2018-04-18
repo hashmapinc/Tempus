@@ -40,7 +40,6 @@ class ASyncMsgProcessor extends AbstractSessionActorMsgProcessor {
     private boolean subscribedToAttributeUpdates;
     private boolean subscribedToTelemetryUpdates;
     private boolean subscribedToRpcCommands;
-    //private boolean subscribedToSparkPlugDeviceTelemetryUpdates;
 
     public ASyncMsgProcessor(ActorSystemContext ctx, LoggingAdapter logger, SessionId sessionId) {
         super(ctx, logger, sessionId);

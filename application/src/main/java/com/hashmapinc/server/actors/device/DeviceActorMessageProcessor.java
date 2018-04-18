@@ -96,7 +96,6 @@ public class DeviceActorMessageProcessor extends AbstractContextAwareMsgProcesso
         this.deviceType = device.getType();
         this.deviceAttributes = new DeviceAttributes(fetchAttributes(DataConstants.CLIENT_SCOPE),
                 fetchAttributes(DataConstants.SERVER_SCOPE), fetchAttributes(DataConstants.SHARED_SCOPE));
-        //this.deviceTelemetry = new DeviceTelemetry(fetchLatestTelemetry());
     }
 
     private void initTelemetry(){
@@ -214,7 +213,6 @@ public class DeviceActorMessageProcessor extends AbstractContextAwareMsgProcesso
 
     void processAttributesUpdate(ActorContext context, DeviceAttributesEventNotificationMsg msg) {
         refreshAttributes(msg);
-        logger.info("Inside processAttributesUpdate device attributes [{}]", deviceAttributes);
         if (attributeSubscriptions.size() > 0) {
             ToDeviceMsg notification = null;
             if (msg.isDeleted()) {
@@ -401,7 +399,6 @@ public class DeviceActorMessageProcessor extends AbstractContextAwareMsgProcesso
         if (sessionAddress.isPresent()) {
             ServerAddress address = sessionAddress.get();
             logger.debug("{} Forwarding msg: {}", address, response);
-            logger.info("{} Forwarding msg: {}", address, response);
             systemContext.getRpcService().tell(sessionAddress.get(), response);
         } else {
             systemContext.getSessionManagerActor().tell(response, ActorRef.noSender());
