@@ -109,7 +109,7 @@ public class BaseApplicationControllerTest extends AbstractControllerTest {
    @Test
     public void testSaveApplication() throws Exception {
         Application application = new Application();
-        JsonNode deviceTypes1 = mapper.readTree("{\"configuration\":{\"deviceTypes\":[{\"name\":\"DT1\"}]}}");
+        JsonNode deviceTypes1 = mapper.readTree("{\"deviceTypes\":[{\"name\":\"DT1\"}]}");
         application.setDeviceTypes(deviceTypes1);
         application.setName("My Application");
         application.setAdditionalInfo(mapper.readTree("{\n" +
@@ -142,7 +142,7 @@ public class BaseApplicationControllerTest extends AbstractControllerTest {
     @Test
     public void testFindApplicationById() throws Exception {
         Application application = new Application();
-        JsonNode deviceTypes1 = mapper.readTree("{\"configuration\":{\"deviceTypes\":[{\"name\":\"DT1\"}]}}");
+        JsonNode deviceTypes1 = mapper.readTree("{\"deviceTypes\":[{\"name\":\"DT1\"}]}");
         application.setDeviceTypes(deviceTypes1);
         application.setName("My App");
 
@@ -156,7 +156,7 @@ public class BaseApplicationControllerTest extends AbstractControllerTest {
     public void testDeleteApplication() throws Exception {
         Application application = new Application();
         application.setName("My application");
-        JsonNode deviceTypes1 = mapper.readTree("{\"configuration\":{\"deviceTypes\":[{\"name\":\"DT1\"}]}}");
+        JsonNode deviceTypes1 = mapper.readTree("{\"deviceTypes\":[{\"name\":\"DT1\"}]}");
         application.setDeviceTypes(deviceTypes1);
         Application savedApplicaiton = doPost("/api/application", application, Application.class);
 
@@ -171,7 +171,7 @@ public class BaseApplicationControllerTest extends AbstractControllerTest {
     public void testDeleteApplicationAndRelatedEntities() throws Exception {
         Application application = new Application();
         application.setName("My application");
-        JsonNode deviceTypes1 = mapper.readTree("{\"configuration\":{\"deviceTypes\":[{\"name\":\"DT1\"}]}}");
+        JsonNode deviceTypes1 = mapper.readTree("{\"deviceTypes\":[{\"name\":\"DT1\"}]}");
         application.setDeviceTypes(deviceTypes1);
         Application savedApplication = doPost("/api/application", application, Application.class);
 
@@ -212,7 +212,7 @@ public class BaseApplicationControllerTest extends AbstractControllerTest {
     public void testAssignUnassignApplicationToCustomer() throws Exception {
         Application application = new Application();
         application.setName("My application");
-        application.setDeviceTypes(mapper.readTree("{\"configuration\":{\"deviceTypes\":[{\"name\":\"DT1\"}]}}"));
+        application.setDeviceTypes(mapper.readTree("{\"deviceTypes\":[{\"name\":\"DT1\"}]}"));
         Application savedApplication = doPost("/api/application", application, Application.class);
 
         Customer customer = new Customer();
@@ -238,7 +238,7 @@ public class BaseApplicationControllerTest extends AbstractControllerTest {
     public void testAssignApplicationToNonExistentCustomer() throws Exception {
         Application application = new Application();
         application.setName("My application");
-        JsonNode deviceTypes1 = mapper.readTree("{\"configuration\":{\"deviceTypes\":[{\"name\":\"DT1\"}]}}");
+        JsonNode deviceTypes1 = mapper.readTree("{\"deviceTypes\":[{\"name\":\"DT1\"}]}");
         application.setDeviceTypes(deviceTypes1);
 
         Application savedApplication = doPost("/api/application", application, Application.class);
@@ -277,7 +277,7 @@ public class BaseApplicationControllerTest extends AbstractControllerTest {
 
         Application application = new Application();
         application.setName("My application");
-        JsonNode deviceTypes1 = mapper.readTree("{\"configuration\":{\"deviceTypes\":[{\"name\":\"DT1\"}]}}");
+        JsonNode deviceTypes1 = mapper.readTree("{\"deviceTypes\":[{\"name\":\"DT1\"}]}");
         application.setDeviceTypes(deviceTypes1);
 
         Application savedApplication = doPost("/api/application", application, Application.class);
@@ -300,7 +300,7 @@ public class BaseApplicationControllerTest extends AbstractControllerTest {
         List<Application> applications = new ArrayList<>();
         for (int i=0;i<178;i++) {
             Application application = new Application();
-            JsonNode deviceTypes1 = mapper.readTree("{\"configuration\":{\"deviceTypes\":[{\"name\":\"DT1\"}]}}");
+            JsonNode deviceTypes1 = mapper.readTree("{\"deviceTypes\":[{\"name\":\"DT1\"}]}");
             application.setDeviceTypes(deviceTypes1);
             application.setName("Application"+i);
 
@@ -328,24 +328,24 @@ public class BaseApplicationControllerTest extends AbstractControllerTest {
     public void testGetDeviceTypeApplications() throws Exception {
         Application application1 = new Application();
         application1.setName("application1");
-        JsonNode deviceTypes1 = mapper.readTree("{\"configuration\":{\"deviceTypes\":[{\"name\":\"DT1\"},{\"name\":\"DT2\"}]}}");
+        JsonNode deviceTypes1 = mapper.readTree("{\"deviceTypes\":[{\"name\":\"DT1\"},{\"name\":\"DT2\"}]}");
         application1.setDeviceTypes(deviceTypes1);
         doPost("/api/application", application1, Application.class);
 
         Application application2 = new Application();
         application2.setName("application2");
-        JsonNode deviceTypes2 = mapper.readTree("{\"configuration\":{\"deviceTypes\":[{\"name\":\"DT2\"},{\"name\":\"DT3\"}]}}");
+        JsonNode deviceTypes2 = mapper.readTree("{\"deviceTypes\":[{\"name\":\"DT2\"},{\"name\":\"DT3\"}]}");
         application2.setDeviceTypes(deviceTypes2);
         doPost("/api/application", application2, Application.class);
 
         Application application3 = new Application();
         application3.setName("application3");
-        JsonNode deviceTypes3 = mapper.readTree("{\"configuration\":{\"deviceTypes\":[{\"name\":\"DT3\"},{\"name\":\"DT4\"}]}}");
+        JsonNode deviceTypes3 = mapper.readTree("{\"deviceTypes\":[{\"name\":\"DT3\"},{\"name\":\"DT4\"}]}");
         application3.setDeviceTypes(deviceTypes3);
         doPost("/api/application", application3, Application.class);
 
         Application application4 = new Application();
-        application4.setDeviceTypes(mapper.readTree("{\"configuration\":{\"deviceTypes\":[{\"name\":\"DT1\"}]}}"));
+        application4.setDeviceTypes(mapper.readTree("{\"deviceTypes\":[{\"name\":\"DT1\"}]}"));
         application4.setName("application4");
         doPost("/api/application", application4, Application.class);
 
@@ -363,7 +363,7 @@ public class BaseApplicationControllerTest extends AbstractControllerTest {
         List<Application> applicationsTitle1 = new ArrayList<>();
         for (int i=0;i<143;i++) {
             Application application = new Application();
-            JsonNode deviceTypes1 = mapper.readTree("{\"configuration\":{\"deviceTypes\":[{\"name\":\"DT1\"}]}}");
+            JsonNode deviceTypes1 = mapper.readTree("{\"deviceTypes\":[{\"name\":\"DT1\"}]}");
             application.setDeviceTypes(deviceTypes1);
             String suffix = RandomStringUtils.randomAlphanumeric(15);
             String name = title1+suffix;
@@ -375,7 +375,7 @@ public class BaseApplicationControllerTest extends AbstractControllerTest {
         List<Application> applicationsTitle2 = new ArrayList<>();
         for (int i=0;i<75;i++) {
             Application application = new Application();
-            JsonNode deviceTypes1 = mapper.readTree("{\"configuration\":{\"deviceTypes\":[{\"name\":\"DT1\"}]}}");
+            JsonNode deviceTypes1 = mapper.readTree("{\"deviceTypes\":[{\"name\":\"DT1\"}]}");
             application.setDeviceTypes(deviceTypes1);
             String suffix = RandomStringUtils.randomAlphanumeric(15);
             String name = title2+suffix;
@@ -443,7 +443,7 @@ public class BaseApplicationControllerTest extends AbstractControllerTest {
     @Test
     public void testAssignUnAssignDashboardToApplication() throws Exception {
         Application application = new Application();
-        JsonNode deviceTypes1 = mapper.readTree("{\"configuration\":{\"deviceTypes\":[{\"name\":\"DT1\"}]}}");
+        JsonNode deviceTypes1 = mapper.readTree("{\"deviceTypes\":[{\"name\":\"DT1\"}]}");
         application.setDeviceTypes(deviceTypes1);
         application.setName("My application");
         Application savedApplication = doPost("/api/application", application, Application.class);
@@ -474,7 +474,7 @@ public class BaseApplicationControllerTest extends AbstractControllerTest {
     public void testAssignUnAssignMiniDashboardToApplication() throws Exception {
         Application application = new Application();
         application.setName("My application");
-        JsonNode deviceTypes1 = mapper.readTree("{\"configuration\":{\"deviceTypes\":[{\"name\":\"DT1\"}]}}");
+        JsonNode deviceTypes1 = mapper.readTree("{\"deviceTypes\":[{\"name\":\"DT1\"}]}");
         application.setDeviceTypes(deviceTypes1);
         Application savedApplication = doPost("/api/application", application, Application.class);
 
@@ -503,7 +503,7 @@ public class BaseApplicationControllerTest extends AbstractControllerTest {
     @Test
     public void testAssignRulesToApplication() throws Exception{
         Application application = new Application();
-        JsonNode deviceTypes1 = mapper.readTree("{\"configuration\":{\"deviceTypes\":[{\"name\":\"DT1\"}]}}");
+        JsonNode deviceTypes1 = mapper.readTree("{\"deviceTypes\":[{\"name\":\"DT1\"}]}");
         application.setDeviceTypes(deviceTypes1);
         application.setName("My application");
         Application savedApplication = doPost("/api/application", application, Application.class);
@@ -543,7 +543,7 @@ public class BaseApplicationControllerTest extends AbstractControllerTest {
     @Test
     public void testUnassignRulesToApplication() throws Exception{
         Application application = new Application();
-        JsonNode deviceTypes1 = mapper.readTree("{\"configuration\":{\"deviceTypes\":[{\"name\":\"DT1\"}]}}");
+        JsonNode deviceTypes1 = mapper.readTree("{\"deviceTypes\":[{\"name\":\"DT1\"}]}");
         application.setDeviceTypes(deviceTypes1);
         application.setName("My application");
         Application savedApplication = doPost("/api/application", application, Application.class);
@@ -587,12 +587,12 @@ public class BaseApplicationControllerTest extends AbstractControllerTest {
     public void findApplicationsByDashboardId() throws Exception {
         Application application = new Application();
         application.setName("My application");
-        JsonNode deviceTypes = mapper.readTree("{\"configuration\":{\"deviceTypes\":[{\"name\":\"DT1\"}]}}");
+        JsonNode deviceTypes = mapper.readTree("{\"deviceTypes\":[{\"name\":\"DT1\"}]}");
         application.setDeviceTypes(deviceTypes);
         Application savedApplication = doPost("/api/application", application, Application.class);
 
         Application application1 = new Application();
-        JsonNode deviceTypes1 = mapper.readTree("{\"configuration\":{\"deviceTypes\":[{\"name\":\"DT1\"}]}}");
+        JsonNode deviceTypes1 = mapper.readTree("{\"deviceTypes\":[{\"name\":\"DT1\"}]}");
         application1.setDeviceTypes(deviceTypes1);
         application1.setName("My application 1");
         Application savedApplication1 = doPost("/api/application", application1, Application.class);
@@ -628,19 +628,19 @@ public class BaseApplicationControllerTest extends AbstractControllerTest {
     @Test
     public void findApplicationsByruleId() throws Exception {
         Application application = new Application();
-        JsonNode deviceTypes = mapper.readTree("{\"configuration\":{\"deviceTypes\":[{\"name\":\"DT1\"}]}}");
+        JsonNode deviceTypes = mapper.readTree("{\"deviceTypes\":[{\"name\":\"DT1\"}]}");
         application.setDeviceTypes(deviceTypes);
         application.setName("My application");
         Application savedApplication = doPost("/api/application", application, Application.class);
 
         Application application1 = new Application();
-        JsonNode deviceTypes1 = mapper.readTree("{\"configuration\":{\"deviceTypes\":[{\"name\":\"DT1\"}]}}");
+        JsonNode deviceTypes1 = mapper.readTree("{\"deviceTypes\":[{\"name\":\"DT1\"}]}");
         application1.setDeviceTypes(deviceTypes1);
         application1.setName("My application 1");
         Application savedApplication1 = doPost("/api/application", application1, Application.class);
 
         Application application2 = new Application();
-        JsonNode deviceTypes2 = mapper.readTree("{\"configuration\":{\"deviceTypes\":[{\"name\":\"DT1\"}]}}");
+        JsonNode deviceTypes2 = mapper.readTree("{\"deviceTypes\":[{\"name\":\"DT1\"}]}");
         application2.setDeviceTypes(deviceTypes2);
         application2.setName("My application 2");
         Application savedApplication2 = doPost("/api/application", application2, Application.class);
@@ -700,7 +700,7 @@ public class BaseApplicationControllerTest extends AbstractControllerTest {
     @Test
     public void testUnAssignUnAssignComputationJobsToApplication() throws Exception{
         Application application = new Application();
-        application.setDeviceTypes(mapper.readTree("{\"configuration\":{\"deviceTypes\":[{\"name\":\"DT1\"}]}}"));
+        application.setDeviceTypes(mapper.readTree("{\"deviceTypes\":[{\"name\":\"DT1\"}]}"));
         application.setName("My application");
         Application savedApplication = doPost("/api/application", application, Application.class);
 
@@ -741,7 +741,7 @@ public class BaseApplicationControllerTest extends AbstractControllerTest {
     @Test
     public void testActivateApplicationFailure() throws Exception {
         Application application = new Application();
-        application.setDeviceTypes(mapper.readTree("{\"configuration\":{\"deviceTypes\":[{\"name\":\"DT1\"}]}}"));
+        application.setDeviceTypes(mapper.readTree("{\"deviceTypes\":[{\"name\":\"DT1\"}]}"));
         application.setName("My application");
         Application savedApplication = doPost("/api/application", application, Application.class);
 
@@ -793,7 +793,7 @@ public class BaseApplicationControllerTest extends AbstractControllerTest {
     @Test
     public void testActivateApplicationSuccess() throws Exception {
         Application application = new Application();
-        application.setDeviceTypes(mapper.readTree("{\"configuration\":{\"deviceTypes\":[{\"name\":\"DT1\"}]}}"));
+        application.setDeviceTypes(mapper.readTree("{\"deviceTypes\":[{\"name\":\"DT1\"}]}"));
         application.setName("My application");
         Application savedApplication = doPost("/api/application", application, Application.class);
 
@@ -851,7 +851,7 @@ public class BaseApplicationControllerTest extends AbstractControllerTest {
     @Test
     public void testActivateSuspendApplicationWithoutRulesAndComputationSuccess() throws Exception {
         Application application = new Application();
-        application.setDeviceTypes(mapper.readTree("{\"configuration\":{\"deviceTypes\":[{\"name\":\"DT1\"}]}}"));
+        application.setDeviceTypes(mapper.readTree("{\"deviceTypes\":[{\"name\":\"DT1\"}]}"));
         application.setName("My application");
         Application savedApplication = doPost("/api/application", application, Application.class);
         Assert.assertEquals(ComponentLifecycleState.SUSPENDED, savedApplication.getState());

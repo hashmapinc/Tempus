@@ -1,16 +1,16 @@
 package org.thingsboard.server.common.data;
 
 import java.io.Serializable;
+import java.util.List;
 
 public class DeviceTypeConfigurations implements Serializable {
-    private Configuration configuration;
+    private List<DeviceType> deviceTypes;
 
-    public Configuration getConfiguration() {
-        return configuration;
+    public List<DeviceType> getDeviceTypes() {
+        return deviceTypes;
     }
 
-    public void setConfiguration(Configuration configuration) {
-        this.configuration = configuration;
+    public void setDeviceTypes(List<DeviceType> deviceTypes) {
+        this.deviceTypes = deviceTypes;
     }
-
 }
