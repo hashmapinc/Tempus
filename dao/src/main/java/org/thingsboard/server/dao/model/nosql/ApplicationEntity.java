@@ -20,7 +20,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.thingsboard.server.common.data.Application;
-import org.thingsboard.server.common.data.Configuration;
 import org.thingsboard.server.common.data.DeviceType;
 import org.thingsboard.server.common.data.DeviceTypeConfigurations;
 import org.thingsboard.server.common.data.id.*;
@@ -124,7 +123,7 @@ public final class ApplicationEntity implements SearchTextEntity<Application> {
         this.name = application.getName();
         this.isValid = application.getIsValid();
         this.additionalInfo = application.getAdditionalInfo();
-        this.deviceTypes = mapper.treeToValue(application.getDeviceTypes(), DeviceTypeConfigurations.class).getConfiguration().getDeviceTypes().stream().map(DeviceType::getName).collect(Collectors.toSet());
+        this.deviceTypes = mapper.treeToValue(application.getDeviceTypes(), DeviceTypeConfigurations.class).getDeviceTypes().stream().map(DeviceType::getName).collect(Collectors.toSet());
         this.state = application.getState();
     }
 
@@ -277,7 +276,6 @@ public final class ApplicationEntity implements SearchTextEntity<Application> {
 
         if(deviceTypes !=null) {
             DeviceTypeConfigurations deviceTypeConfigurations = new DeviceTypeConfigurations();
-            Configuration configuration = new Configuration();
             List<DeviceType> deviceTypesModelList = new ArrayList<>();
             for(String dt: deviceTypes) {
                 DeviceType deviceType = new DeviceType();
@@ -285,9 +283,7 @@ public final class ApplicationEntity implements SearchTextEntity<Application> {
                 deviceTypesModelList.add(deviceType);
             }
 
-            configuration.setDeviceTypes(deviceTypesModelList);
-            deviceTypeConfigurations.setConfiguration(configuration);
-
+            deviceTypeConfigurations.setDeviceTypes(deviceTypesModelList);
             application.setDeviceTypes(mapper.valueToTree(deviceTypeConfigurations));
         }
         return application;
