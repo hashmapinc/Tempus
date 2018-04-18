@@ -33,6 +33,8 @@ import com.hashmapinc.server.dao.relation.RelationService;
 import com.hashmapinc.server.transport.mqtt.adaptors.MqttTransportAdaptor;
 import com.hashmapinc.server.transport.mqtt.session.DeviceSessionCtx;
 import com.hashmapinc.server.transport.mqtt.session.GatewaySessionCtx;
+import com.hashmapinc.server.transport.mqtt.sparkplugB.SparkPlugMetaData;
+import com.hashmapinc.server.transport.mqtt.sparkplugB.SparkPlugSpecificationService;
 import com.hashmapinc.server.transport.mqtt.util.SslUtil;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
@@ -44,13 +46,15 @@ import io.netty.util.concurrent.Future;
 import io.netty.util.concurrent.GenericFutureListener;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.StringUtils;
-import org.hashmapinc.server.transport.mqtt.sparkplugB.SparkPlugSpecificationService;
 import javax.net.ssl.SSLPeerUnverifiedException;
 import javax.security.cert.X509Certificate;
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.hashmapinc.server.common.msg.session.MsgType.SUBSCRIBE_RPC_COMMANDS_REQUEST;
+import static com.hashmapinc.server.common.msg.session.MsgType.SUBSCRIBE_SPARKPLUG_TELEMETRY_REQUEST;
+import static com.hashmapinc.server.transport.mqtt.MqttTopics.DEVICE_RPC_REQUESTS_SUB_TOPIC;
 import static io.netty.handler.codec.mqtt.MqttConnectReturnCode.*;
 import static io.netty.handler.codec.mqtt.MqttMessageType.*;
 import static io.netty.handler.codec.mqtt.MqttQoS.*;
@@ -241,8 +245,14 @@ public class MqttTransportHandler extends ChannelInboundHandlerAdapter implement
                     AdaptorToSessionActorMsg msg = adaptor.convertToActorMsg(deviceSessionCtx, MsgType.SUBSCRIBE_ATTRIBUTES_REQUEST, mqttMsg);
                     processor.process(new BasicToDeviceActorSessionMsg(deviceSessionCtx.getDevice(), msg));
                     grantedQoSList.add(getMinSupportedQos(reqQoS));
-                } else if (topicName.equals(MqttTopics.DEVICE_RPC_REQUESTS_SUB_TOPIC)) {
-                    AdaptorToSessionActorMsg msg = adaptor.convertToActorMsg(deviceSessionCtx, MsgType.SUBSCRIBE_RPC_COMMANDS_REQUEST, mqttMsg);
+                } else if (topicName.startsWith(sparkPlugNameSpace)) {
+                    AdaptorToSessionActorMsg msg = adaptor.convertToActorMsg(deviceSessionCtx, SUBSCRIBE_SPARKPLUG_TELEMETRY_REQUEST, mqttMsg);
+                    SparkPlugMetaData sparkPlugMetaData = new SparkPlugMetaData(topicName,0);
+                    deviceSessionCtx.setSparkPlugMetaData(sparkPlugMetaData);
+                    processor.process(new BasicToDeviceActorSessionMsg(deviceSessionCtx.getDevice(), msg));
+                    grantedQoSList.add(getMinSupportedQos(reqQoS));
+                } else if (topicName.equals(DEVICE_RPC_REQUESTS_SUB_TOPIC)) {
+                    AdaptorToSessionActorMsg msg = adaptor.convertToActorMsg(deviceSessionCtx, SUBSCRIBE_RPC_COMMANDS_REQUEST, mqttMsg);
                     processor.process(new BasicToDeviceActorSessionMsg(deviceSessionCtx.getDevice(), msg));
                     grantedQoSList.add(getMinSupportedQos(reqQoS));
                 } else if (topicName.equals(MqttTopics.DEVICE_RPC_RESPONSE_SUB_TOPIC)) {
@@ -274,7 +284,7 @@ public class MqttTransportHandler extends ChannelInboundHandlerAdapter implement
                 if (topicName.equals(MqttTopics.DEVICE_ATTRIBUTES_TOPIC)) {
                     AdaptorToSessionActorMsg msg = adaptor.convertToActorMsg(deviceSessionCtx, MsgType.UNSUBSCRIBE_ATTRIBUTES_REQUEST, mqttMsg);
                     processor.process(new BasicToDeviceActorSessionMsg(deviceSessionCtx.getDevice(), msg));
-                } else if (topicName.equals(MqttTopics.DEVICE_RPC_REQUESTS_SUB_TOPIC)) {
+                } else if (topicName.equals(DEVICE_RPC_REQUESTS_SUB_TOPIC)) {
                     AdaptorToSessionActorMsg msg = adaptor.convertToActorMsg(deviceSessionCtx, MsgType.UNSUBSCRIBE_RPC_COMMANDS_REQUEST, mqttMsg);
                     processor.process(new BasicToDeviceActorSessionMsg(deviceSessionCtx.getDevice(), msg));
                 } else if (topicName.equals(MqttTopics.DEVICE_ATTRIBUTES_RESPONSES_TOPIC)) {

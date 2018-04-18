@@ -1,4 +1,4 @@
-package org.hashmapinc.server.transport.mqtt.sparkplugB;
+package com.hashmapinc.server.transport.mqtt.sparkplugB;
 
 public class SparkPlugMsgTypes {
     public static final String DBIRTH = "DBIRTH";

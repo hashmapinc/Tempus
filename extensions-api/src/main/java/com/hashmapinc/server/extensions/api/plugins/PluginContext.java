@@ -80,11 +80,11 @@ public interface PluginContext {
      */
 
 
-    void saveTsData(EntityId entityId, TsKvEntry entry, PluginCallback<Void> callback);
+    void saveTsData(final TenantId tenantId, EntityId entityId, TsKvEntry entry, PluginCallback<Void> callback);
 
-    void saveTsData(EntityId entityId, List<TsKvEntry> entries, PluginCallback<Void> callback);
+    void saveTsData(final TenantId tenantId, EntityId entityId, List<TsKvEntry> entries, PluginCallback<Void> callback);
 
-    void saveTsData(EntityId deviceId, List<TsKvEntry> entries, long ttl, PluginCallback<Void> pluginCallback);
+    void saveTsData(final TenantId tenantId, EntityId deviceId, List<TsKvEntry> entries, long ttl, PluginCallback<Void> pluginCallback);
 
     void saveDsData(EntityId deviceId, List<DsKvEntry> entries, long ttl, PluginCallback<Void> pluginCallback);
 

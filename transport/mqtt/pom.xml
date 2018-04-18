@@ -46,7 +46,7 @@
             <artifactId>sparkplug-java</artifactId>
             <version>1.1.11</version>
             <packaging>jar</packaging>
-            <file>src/main/java/org/hashmapinc/server/transport/mqtt/sparkplugB/lib/sparkplug-java-1.1.11.jar</file>
+            <file>src/main/java/com/hashmapinc/server/transport/mqtt/sparkplugB/lib/sparkplug-java-1.1.11.jar</file>
             <generatePom>true</generatePom>
         </configuration>
         <executions>
@@ -60,6 +60,7 @@
         </executions>
         </plugin>
         </plugins>
+
     </build>
 
     <dependencies>

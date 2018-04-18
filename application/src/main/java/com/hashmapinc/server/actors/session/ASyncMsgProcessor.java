@@ -22,16 +22,12 @@ import com.hashmapinc.server.actors.shared.SessionTimeoutMsg;
 import com.hashmapinc.server.common.data.id.SessionId;
 import com.hashmapinc.server.common.msg.cluster.ClusterEventMsg;
 import com.hashmapinc.server.common.msg.cluster.ServerAddress;
-import com.hashmapinc.server.common.msg.core.*;
 import com.hashmapinc.server.common.msg.device.ToDeviceActorMsg;
-import com.hashmapinc.server.common.msg.session.*;
 
 import akka.actor.ActorContext;
 import akka.event.LoggingAdapter;
-import com.hashmapinc.server.common.msg.session.ctrl.*;
 import com.hashmapinc.server.common.msg.session.ctrl.SessionCloseMsg;
 import com.hashmapinc.server.common.msg.session.ex.SessionException;
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -42,7 +38,9 @@ class ASyncMsgProcessor extends AbstractSessionActorMsgProcessor {
     private Map<Integer, ToDeviceActorMsg> pendingMap = new HashMap<>();
     private Optional<ServerAddress> currentTargetServer;
     private boolean subscribedToAttributeUpdates;
+    private boolean subscribedToTelemetryUpdates;
     private boolean subscribedToRpcCommands;
+    //private boolean subscribedToSparkPlugDeviceTelemetryUpdates;
 
     public ASyncMsgProcessor(ActorSystemContext ctx, LoggingAdapter logger, SessionId sessionId) {
         super(ctx, logger, sessionId);
@@ -71,8 +69,14 @@ class ASyncMsgProcessor extends AbstractSessionActorMsgProcessor {
             case SUBSCRIBE_ATTRIBUTES_REQUEST:
                 subscribedToAttributeUpdates = true;
                 break;
+            case SUBSCRIBE_SPARKPLUG_TELEMETRY_REQUEST:
+                subscribedToTelemetryUpdates = true;
+                break;
             case UNSUBSCRIBE_ATTRIBUTES_REQUEST:
                 subscribedToAttributeUpdates = false;
+                break;
+            case UNSUBSCRIBE_SPARKPLUG_TELEMETRY_REQUEST:
+                subscribedToTelemetryUpdates = false;
                 break;
             case SUBSCRIBE_RPC_COMMANDS_REQUEST:
                 subscribedToRpcCommands = true;
@@ -123,7 +127,9 @@ class ASyncMsgProcessor extends AbstractSessionActorMsgProcessor {
 
     @Override
     public void processClusterEvent(ActorContext context, ClusterEventMsg msg) {
-        if (pendingMap.size() > 0 || subscribedToAttributeUpdates || subscribedToRpcCommands) {
+        logger.info("Inside processClusterEvent ");
+        if (pendingMap.size() > 0 || subscribedToAttributeUpdates || subscribedToRpcCommands
+                || subscribedToTelemetryUpdates) {
             Optional<ServerAddress> newTargetServer = systemContext.getRoutingService().resolveById(getDeviceId());
             if (!newTargetServer.equals(currentTargetServer)) {
                 firstMsg = true;
@@ -143,6 +149,10 @@ class ASyncMsgProcessor extends AbstractSessionActorMsgProcessor {
                 if (subscribedToRpcCommands) {
                     toDeviceMsg(new RpcSubscribeMsg()).ifPresent(m -> forwardToAppActor(context, m, currentTargetServer));
                     logger.debug("[{}] Forwarded rpc commands subscription.", sessionId);
+                }
+                if (subscribedToTelemetryUpdates) {
+                    toDeviceMsg(new TelemetrySubscribeMsg()).ifPresent(m -> forwardToAppActor(context, m, currentTargetServer));
+                    logger.debug("[{}] Forwarded telemetry subscription.", sessionId);
                 }
             }
         }

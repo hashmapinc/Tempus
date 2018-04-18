@@ -40,7 +40,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.StringUtils;
 import com.hashmapinc.server.common.transport.SessionMsgProcessor;
 import com.hashmapinc.server.transport.mqtt.MqttTransportHandler;
-import org.hashmapinc.server.transport.mqtt.sparkplugB.SparkPlugMsgTypes;
+import com.hashmapinc.server.transport.mqtt.sparkplugB.SparkPlugMsgTypes;
 import com.hashmapinc.server.common.data.kv.KvEntry;
 import java.util.*;
 import java.util.stream.Collectors;

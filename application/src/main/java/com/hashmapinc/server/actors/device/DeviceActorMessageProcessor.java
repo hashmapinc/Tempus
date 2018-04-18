@@ -24,15 +24,12 @@ import com.hashmapinc.server.actors.rule.RuleProcessingMsg;
 import com.hashmapinc.server.actors.rule.RulesProcessedMsg;
 import com.hashmapinc.server.actors.shared.AbstractContextAwareMsgProcessor;
 import com.hashmapinc.server.common.data.id.SessionId;
+import com.hashmapinc.server.common.data.kv.TsKvEntry;
 import com.hashmapinc.server.common.msg.core.*;
 import com.hashmapinc.server.common.msg.session.MsgType;
-import com.hashmapinc.server.extensions.api.device.DeviceAttributes;
-import com.hashmapinc.server.extensions.api.device.DeviceAttributesEventNotificationMsg;
-import com.hashmapinc.server.extensions.api.device.DeviceMetaData;
-import com.hashmapinc.server.extensions.api.device.DeviceNameOrTypeUpdateMsg;
+import com.hashmapinc.server.extensions.api.device.*;
 import com.hashmapinc.server.extensions.api.plugins.msg.TimeoutMsg;
 import com.hashmapinc.server.actors.ActorSystemContext;
-import com.hashmapinc.server.actors.rule.*;
 import com.hashmapinc.server.actors.tenant.RuleChainDeviceMsg;
 import com.hashmapinc.server.common.data.DataConstants;
 import com.hashmapinc.server.common.data.Device;
@@ -41,13 +38,11 @@ import com.hashmapinc.server.common.data.kv.AttributeKey;
 import com.hashmapinc.server.common.data.kv.AttributeKvEntry;
 import com.hashmapinc.server.common.msg.cluster.ClusterEventMsg;
 import com.hashmapinc.server.common.msg.cluster.ServerAddress;
-import com.hashmapinc.server.common.msg.core.*;
 import com.hashmapinc.server.common.msg.device.ToDeviceActorMsg;
 import com.hashmapinc.server.common.msg.kv.BasicAttributeKVMsg;
 import com.hashmapinc.server.common.msg.session.FromDeviceMsg;
 import com.hashmapinc.server.common.msg.session.SessionType;
 import com.hashmapinc.server.common.msg.session.ToDeviceMsg;
-import com.hashmapinc.server.extensions.api.device.*;
 import com.hashmapinc.server.extensions.api.plugins.msg.FromDeviceRpcResponse;
 import com.hashmapinc.server.extensions.api.plugins.msg.RpcError;
 import com.hashmapinc.server.extensions.api.plugins.msg.TimeoutIntMsg;
@@ -55,7 +50,7 @@ import com.hashmapinc.server.extensions.api.plugins.msg.ToDeviceRpcRequest;
 import com.hashmapinc.server.extensions.api.plugins.msg.ToDeviceRpcRequestBody;
 import com.hashmapinc.server.extensions.api.plugins.msg.ToDeviceRpcRequestPluginMsg;
 import com.hashmapinc.server.extensions.api.plugins.msg.ToPluginRpcResponseDeviceMsg;
-
+import com.hashmapinc.server.common.msg.kv.BasicTelemetryKVMsg;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
@@ -71,6 +66,7 @@ public class DeviceActorMessageProcessor extends AbstractContextAwareMsgProcesso
     private final DeviceId deviceId;
     private final Map<SessionId, SessionInfo> sessions;
     private final Map<SessionId, SessionInfo> attributeSubscriptions;
+    private final Map<SessionId, SessionInfo> telemetrySubscriptions;
     private final Map<SessionId, SessionInfo> rpcSubscriptions;
 
     private final Map<Integer, ToDeviceRpcRequestMetadata> rpcPendingMap;
@@ -79,15 +75,18 @@ public class DeviceActorMessageProcessor extends AbstractContextAwareMsgProcesso
     private String deviceName;
     private String deviceType;
     private DeviceAttributes deviceAttributes;
+    private DeviceTelemetry deviceTelemetry;
 
     public DeviceActorMessageProcessor(ActorSystemContext systemContext, LoggingAdapter logger, DeviceId deviceId) {
         super(systemContext, logger);
         this.deviceId = deviceId;
         this.sessions = new HashMap<>();
         this.attributeSubscriptions = new HashMap<>();
+        this.telemetrySubscriptions = new HashMap<>();
         this.rpcSubscriptions = new HashMap<>();
         this.rpcPendingMap = new HashMap<>();
         initAttributes();
+        initTelemetry();
     }
 
     private void initAttributes() {
@@ -97,6 +96,11 @@ public class DeviceActorMessageProcessor extends AbstractContextAwareMsgProcesso
         this.deviceType = device.getType();
         this.deviceAttributes = new DeviceAttributes(fetchAttributes(DataConstants.CLIENT_SCOPE),
                 fetchAttributes(DataConstants.SERVER_SCOPE), fetchAttributes(DataConstants.SHARED_SCOPE));
+        //this.deviceTelemetry = new DeviceTelemetry(fetchLatestTelemetry());
+    }
+
+    private void initTelemetry(){
+        this.deviceTelemetry = new DeviceTelemetry(fetchLatestTelemetry());
     }
 
     private void refreshAttributes(DeviceAttributesEventNotificationMsg msg) {
@@ -210,6 +214,7 @@ public class DeviceActorMessageProcessor extends AbstractContextAwareMsgProcesso
 
     void processAttributesUpdate(ActorContext context, DeviceAttributesEventNotificationMsg msg) {
         refreshAttributes(msg);
+        logger.info("Inside processAttributesUpdate device attributes [{}]", deviceAttributes);
         if (attributeSubscriptions.size() > 0) {
             ToDeviceMsg notification = null;
             if (msg.isDeleted()) {
@@ -237,6 +242,34 @@ public class DeviceActorMessageProcessor extends AbstractContextAwareMsgProcesso
         } else {
             logger.debug("[{}] No registered attributes subscriptions to process!", deviceId);
         }
+    }
+
+    void processTelemetryUpdate(ActorContext context, DeviceTelemetryEventNotificationMsg msg) {
+        refreshTelemetry(msg);
+        if (telemetrySubscriptions.size() > 0) {
+            ToDeviceMsg notification = null;
+            List<TsKvEntry> tsKvEntries = new ArrayList<>(msg.getValues());
+
+            if (tsKvEntries.size() > 0) {
+                notification = new TelemetryUpdateNotification(BasicTelemetryKVMsg.createTelemetyKVMsg(tsKvEntries));
+            } else {
+                logger.debug("[{}] No telemetry changed!", deviceId);
+            }
+
+            if (notification != null) {
+                ToDeviceMsg finalNotification = notification;
+                telemetrySubscriptions.entrySet().forEach(sub -> {
+                    ToDeviceSessionActorMsg response = new BasicToDeviceSessionActorMsg(finalNotification, sub.getKey());
+                    sendMsgToSessionActor(response, sub.getValue().getServer());
+                });
+            }
+        } else {
+            logger.debug("[{}] No registered telemetry subscriptions to process!", deviceId);
+        }
+    }
+
+    private void refreshTelemetry(DeviceTelemetryEventNotificationMsg msg) {
+        deviceTelemetry.update(msg.getValues());
     }
 
     void process(ActorContext context, RuleChainDeviceMsg srcMsg) {
@@ -331,9 +364,15 @@ public class DeviceActorMessageProcessor extends AbstractContextAwareMsgProcesso
         if (inMsg.getMsgType() == MsgType.SUBSCRIBE_ATTRIBUTES_REQUEST) {
             logger.debug("[{}] Registering attributes subscription for session [{}]", deviceId, sessionId);
             attributeSubscriptions.put(sessionId, new SessionInfo(sessionType, msg.getServerAddress()));
-        } else if (inMsg.getMsgType() == MsgType.UNSUBSCRIBE_ATTRIBUTES_REQUEST) {
+        }  else if (inMsg.getMsgType() == MsgType.UNSUBSCRIBE_ATTRIBUTES_REQUEST) {
             logger.debug("[{}] Canceling attributes subscription for session [{}]", deviceId, sessionId);
             attributeSubscriptions.remove(sessionId);
+        } else if (inMsg.getMsgType() == MsgType.SUBSCRIBE_SPARKPLUG_TELEMETRY_REQUEST) {
+            logger.debug("[{}] Registering telemetry subscription for session [{}]", deviceId, sessionId);
+            telemetrySubscriptions.put(sessionId, new SessionInfo(sessionType, msg.getServerAddress()));
+        } else if (inMsg.getMsgType() == MsgType.UNSUBSCRIBE_SPARKPLUG_TELEMETRY_REQUEST) {
+            logger.debug("[{}] Canceling telemetry subscription for session [{}]", deviceId, sessionId);
+            telemetrySubscriptions.remove(sessionId);
         } else if (inMsg.getMsgType() == MsgType.SUBSCRIBE_RPC_COMMANDS_REQUEST) {
             logger.debug("[{}] Registering rpc subscription for session [{}][{}]", deviceId, sessionId, sessionType);
             rpcSubscriptions.put(sessionId, new SessionInfo(sessionType, msg.getServerAddress()));
@@ -362,6 +401,7 @@ public class DeviceActorMessageProcessor extends AbstractContextAwareMsgProcesso
         if (sessionAddress.isPresent()) {
             ServerAddress address = sessionAddress.get();
             logger.debug("{} Forwarding msg: {}", address, response);
+            logger.info("{} Forwarding msg: {}", address, response);
             systemContext.getRpcService().tell(sessionAddress.get(), response);
         } else {
             systemContext.getSessionManagerActor().tell(response, ActorRef.noSender());
@@ -374,6 +414,15 @@ public class DeviceActorMessageProcessor extends AbstractContextAwareMsgProcesso
             return systemContext.getAttributesService().findAll(this.deviceId, scope).get();
         } catch (InterruptedException | ExecutionException e) {
             logger.warning("[{}] Failed to fetch attributes for scope: {}", deviceId, scope);
+            throw new RuntimeException(e);
+        }
+    }
+
+    private List<TsKvEntry> fetchLatestTelemetry() {
+        try {
+             return systemContext.getTsService().findAllLatest(this.deviceId).get();
+        } catch (InterruptedException | ExecutionException e) {
+            logger.warning("[{}] Failed to fetch latestTelemetry", deviceId);
             throw new RuntimeException(e);
         }
     }
