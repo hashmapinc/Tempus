@@ -30,6 +30,8 @@ import org.thingsboard.server.common.data.page.TextPageData;
 import org.thingsboard.server.common.data.page.TextPageLink;
 import org.thingsboard.server.common.data.security.Authority;
 import org.thingsboard.server.common.data.security.DeviceCredentials;
+import org.thingsboard.server.common.data.audit.ActionStatus;
+import org.thingsboard.server.common.data.audit.ActionType;
 import org.thingsboard.server.common.data.device.DeviceSearchQuery;
 import org.thingsboard.server.dao.attributes.AttributesService;
 import org.thingsboard.server.dao.depthSeries.DepthSeriesService;
@@ -51,6 +53,7 @@ import java.util.stream.Collectors;
 @Slf4j
 public class DeviceController extends BaseController {
 
+    public static final String DEVICE_ID = "deviceId";
     @Autowired
     protected TimeseriesService timeseriesService;
 

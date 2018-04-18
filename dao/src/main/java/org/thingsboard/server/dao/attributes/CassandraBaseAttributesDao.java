@@ -52,6 +52,7 @@ import static org.thingsboard.server.dao.model.ModelConstants.*;
 public class CassandraBaseAttributesDao extends CassandraAbstractAsyncDao implements AttributesDao {
 
     private PreparedStatement saveStmt;
+    private String ts;
 
     @PostConstruct
     public void init() {
@@ -150,7 +151,7 @@ public class CassandraBaseAttributesDao extends CassandraAbstractAsyncDao implem
         Select.Where select = QueryBuilder.select(LAST_UPDATE_TS_COLUMN, ATTRIBUTE_KEY_COLUMN, BOOLEAN_VALUE_COLUMN, DOUBLE_VALUE_COLUMN, JSON_VALUE_COLUMN, LONG_VALUE_COLUMN, STRING_VALUE_COLUMN)
                 .from(ATTRIBUTES_KV_CF)
                 .where(eq(ENTITY_TYPE_COLUMN, entityId.getEntityType().name())).and(eq(ModelConstants.ENTITY_ID_COLUMN, entityId.getId()));
-        select.and(QueryBuilder.in(ATTRIBUTE_TYPE_COLUMN, DataConstants.ALL_SCOPES));
+        select.and(QueryBuilder.in(ATTRIBUTE_TYPE_COLUMN, DataConstants.allScopes()));
         List<Row> rows = executeRead(select).all();
         List<String> headerColumns = new ArrayList<>();
         headerColumns.add(LAST_UPDATE_TS_COLUMN);

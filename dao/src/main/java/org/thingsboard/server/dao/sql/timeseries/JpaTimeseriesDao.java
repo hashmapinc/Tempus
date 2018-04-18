@@ -38,6 +38,8 @@ import org.thingsboard.server.dao.timeseries.TsInsertExecutorType;
 import org.thingsboard.server.dao.util.SqlDao;
 
 import javax.annotation.Nullable;
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import javax.persistence.EntityManager;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
