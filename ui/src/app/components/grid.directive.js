@@ -600,7 +600,22 @@ function GridController(applicationService, $scope, $state, $mdDialog, $document
     }
 
     function saveItem(theForm) {
-        vm.saveItemFunc(vm.detailsConfig.editingItem).then(function success(item) {
+        if(vm.detailsConfig.currentItem.id.entityType === 'APPLICATION'){
+            vm.saveItemFunc(vm.detailsConfig.currentItem).then(function success(item) {
+                theForm.$setPristine();
+                vm.detailsConfig.isDetailsEditMode = false;
+                var index = vm.detailsConfig.currentItem.index;
+                item.index = index;
+                vm.detailsConfig.currentItem = item;
+                vm.items.data[index] = item;
+                var row = Math.floor(index / vm.columns);
+                var itemRow = vm.items.rowData[row];
+                var column = index % vm.columns;
+                itemRow[column] = item;
+            });
+        }
+        else{
+            vm.saveItemFunc(vm.detailsConfig.editingItem).then(function success(item) {
             theForm.$setPristine();
             vm.detailsConfig.isDetailsEditMode = false;
             var index = vm.detailsConfig.currentItem.index;
@@ -612,6 +627,8 @@ function GridController(applicationService, $scope, $state, $mdDialog, $document
             var column = index % vm.columns;
             itemRow[column] = item;
         });
+        }
+
     }
 
     function deleteItem($event, item) {
