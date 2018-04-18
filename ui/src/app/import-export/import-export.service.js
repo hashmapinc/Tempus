@@ -28,7 +28,6 @@ export default function ImportExport($log, $translate, $q, $mdDialog, $document,
                                      dashboardUtils, entityService, dashboardService, pluginService, ruleService,
                                      widgetService, toast, attributeService,computationService, $window) {
 
-
     var service = {
         exportDashboard: exportDashboard,
         importDashboard: importDashboard,
