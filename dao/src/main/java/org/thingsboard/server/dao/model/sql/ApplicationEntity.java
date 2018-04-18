@@ -135,7 +135,7 @@ public final class ApplicationEntity extends BaseSqlEntity<Application> implemen
         this.name = application.getName();
         this.isValid = application.getIsValid();
         this.additionalInfo = application.getAdditionalInfo();
-        this.deviceTypes = mapper.treeToValue(application.getDeviceTypes(), DeviceTypeConfigurations.class).getConfiguration().getDeviceTypes().stream().map(DeviceType::getName).collect(Collectors.toSet());
+        this.deviceTypes = mapper.treeToValue(application.getDeviceTypes(), DeviceTypeConfigurations.class).getDeviceTypes().stream().map(DeviceType::getName).collect(Collectors.toSet());
         this.state = application.getState();
     }
 
