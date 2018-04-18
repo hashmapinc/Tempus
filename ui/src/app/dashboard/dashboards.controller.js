@@ -383,7 +383,12 @@ export function DashboardsController(userService, dashboardService, customerServ
     }
 
     function deleteDashboardTitle (dashboard) {
-        return $translate.instant('dashboard.delete-dashboard-title', {dashboardTitle: dashboard.title});
+        if(angular.isDefined(dashboard.dashboardsAppname)){
+            return  $translate.instant('dashboard.delete-dashboard-app-warning', {dashboardAppWarning: dashboard.dashboardsAppname});
+        }
+        else {
+            return $translate.instant('dashboard.delete-dashboard-title', {dashboardTitle: dashboard.title});
+        }
     }
 
     function deleteDashboardText () {
@@ -391,7 +396,12 @@ export function DashboardsController(userService, dashboardService, customerServ
     }
 
     function deleteDashboardsTitle (selectedCount) {
-        return $translate.instant('dashboard.delete-dashboards-title', {count: selectedCount}, 'messageformat');
+        if(angular.isDefined(selectedCount)){
+            return $translate.instant('dashboard.delete-dashboards-app-warning', {count: selectedCount});
+        }
+        else {
+            return $translate.instant('dashboard.delete-dashboards-title', {count: selectedCount}, 'messageformat');
+        }
     }
 
     function deleteDashboardsActionTitle(selectedCount) {

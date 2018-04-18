@@ -40,7 +40,8 @@ export default function ComputationRoutes($stateProvider) {
             },
             ncyBreadcrumb: {
                 label: '{"icon": "computations", "label": "computation.computations", "link": "/static/svg/computationslightgray.svg"}'
-            }
+            },
+            params: {computationId: null}
         })
         .state('home.computations.computationJob', {
             url: '/computationJob/:computationId',

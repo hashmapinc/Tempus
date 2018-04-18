@@ -26,7 +26,7 @@ import entityAliasesTemplate from '../entity/alias/entity-aliases.tpl.html';
 /*@ngInject*/
 export default function ImportExport($log, $translate, $q, $mdDialog, $document, $http, itembuffer, utils, types,
                                      dashboardUtils, entityService, dashboardService, pluginService, ruleService,
-                                     widgetService, toast, attributeService,computationService) {
+                                     widgetService, toast, attributeService,computationService, $window) {
 
 
     var service = {
@@ -331,6 +331,7 @@ export default function ImportExport($log, $translate, $q, $mdDialog, $document,
                     computationService.upload(importData.file).then(
                         function success() {
                             deferred.resolve();
+                            $window.localStorage.setItem('currentTab', 4);
                         },
                         function fail() {
                             deferred.reject();

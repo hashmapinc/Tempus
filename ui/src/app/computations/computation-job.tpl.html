@@ -23,6 +23,7 @@
              id="tabs" md-border-bottom flex class="tb-absolute-fill">
         <md-tab label="{{ 'computationJob.details' | translate }}">
             <tb-computation-job computationjob="vm.grid.operatingItem()"
+                 computation="vm.computation"
                  is-edit="vm.grid.detailsConfig.isDetailsEditMode"
                  is-read-only="vm.grid.isDetailsReadOnly(vm.grid.operatingItem())"
                  the-form="vm.grid.detailsForm"
