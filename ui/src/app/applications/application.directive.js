@@ -90,33 +90,33 @@ export default function ApplicationDirective($compile, $templateCache, toast, $t
 }
 
         scope.application.configurationDescriptor = {
-  "schema": {
-    "title": "Device Type Filter Configuration",
-    "type": "object",
-    "properties": {
-      "deviceTypes": {
-        "title": "Device types",
-        "type": "array",
-        "minItems" : 1,
-        "items": {
-          "type": "object",
-          "title": "Device Type",
-          "properties": {
-            "name": {
-              "title": "Device Type",
-              "type": "string"
-            }
-          }
-        },
-        "uniqueItems": true
-      }
-    },
-    "required": ["deviceTypes"]
-  },
-  "form": [
-    "deviceTypes"
-  ]
-}
+          "schema": {
+            "title": "Device Type Filter Configuration",
+            "type": "object",
+            "properties": {
+              "deviceTypes": {
+                "title": "Device types",
+                "type": "array",
+                "minItems" : 1,
+                "items": {
+                  "type": "object",
+                  "title": "Device Type",
+                  "properties": {
+                    "name": {
+                      "title": "Device Type",
+                      "type": "string"
+                    }
+                  }
+                },
+                "uniqueItems": true
+              }
+            },
+            "required": ["deviceTypes"]
+          },
+          "form": [
+            "deviceTypes"
+          ]
+        }
 
         scope.$watch('application', function(newVal) {
             if (newVal) {
@@ -127,14 +127,6 @@ export default function ApplicationDirective($compile, $templateCache, toast, $t
                 //         }
                 //     );
                 // }
-                if(angular.isDefined(scope.application.deviceTypes)){
-                    scope.application.configuration = {};
-                    scope.application.configuration.deviceTypes = [];
-                    scope.application.deviceTypes.forEach(function(deviceType){
-
-                        scope.application.configuration.deviceTypes.push({"name": deviceType});
-                    })
-                }
                 if (scope.application.customerId && scope.application.customerId.id !== types.id.nullUid) {
                     scope.isAssignedToCustomer = true;
                     customerService.getShortCustomerInfo(scope.application.customerId.id).then(
