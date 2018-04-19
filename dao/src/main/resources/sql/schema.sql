@@ -293,7 +293,6 @@ CREATE TABLE IF NOT EXISTS application (
     search_text varchar(255),
     dashboard_id varchar(31),
     is_valid boolean,
-    state VARCHAR(255) DEFAULT 'SUSPENDED',
     name varchar(255),
     description varchar(255)
 );
