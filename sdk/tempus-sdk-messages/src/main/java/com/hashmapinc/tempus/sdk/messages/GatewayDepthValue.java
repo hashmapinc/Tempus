@@ -6,7 +6,6 @@ import java.util.List;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
-
 /**
  * A Gateway is a special type of device in Tempus that is able to act as a bridge between external devices
  * connected to different systems and Tempus. Gateway API provides the ability to exchange data between multiple
@@ -37,6 +36,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
  *
  * Where Device A id the device names, WOB and ROP are parameters keys and values and ds the depth value.
  */
+
 public class GatewayDepthValue {
 
     private String deviceName;
