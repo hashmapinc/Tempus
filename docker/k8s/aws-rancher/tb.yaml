@@ -46,16 +46,16 @@ data:
   cassandra.url: "cassandra:9042"
   cassandra.host: "cassandra"
   cassandra.port: "9042"
-  database.type: "cassandra"
-#  postgres.host: "postgres"
-#  postgres.port: "5432"
+  database.type: "sql"
+  postgres.host: "postgres"
+  postgres.port: "5432"
   schema.data: "true"
   demo.data: "true"
   mqtt.address: "0.0.0.0"
   mqtt.port: "1883"
-#  coap.address: "0.0.0.0"
-#  coap.port: "5683"
-#  spark.path: "/home"
+  coap.address: "0.0.0.0"
+  coap.port: "5683"
+  spark.path: "/home"
 ---
 apiVersion: "apps/v1beta1"
 kind: StatefulSet
@@ -176,15 +176,3 @@ spec:
 #            port: ui-port
 #          initialDelaySeconds: 120
 #          timeoutSeconds: 10
-#        volumeMounts:
-#          - mountPath: /usr/share/tempus/data/sql
-#            name: hsql-dir
-#  volumeClaimTemplates:
-#  - metadata:
-#      name: hsql-dir
-#    spec:
-#      accessModes: [ "ReadWriteOnce" ]
-#      resources:
-#        requests:
-#          storage: 5Gi
-#      storageClassName: tempus
