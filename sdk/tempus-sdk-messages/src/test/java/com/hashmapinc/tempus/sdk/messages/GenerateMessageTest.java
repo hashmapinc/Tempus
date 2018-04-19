@@ -5,10 +5,16 @@ import com.fasterxml.jackson.databind.module.SimpleModule;
 import org.junit.Assert;
 import org.junit.Test;
 
-import javax.xml.crypto.Data;
-
+/**
+ * The type Generate message test.
+ */
 public class GenerateMessageTest {
 
+    /**
+     * Test gateway connect device message.
+     *
+     * @throws Exception the exception
+     */
     @Test
     public void testGatewayConnectDeviceMessage() throws Exception {
         String msg = "{\"device\":\"Device A\"}";
@@ -20,6 +26,11 @@ public class GenerateMessageTest {
         Assert.assertEquals(out,msg);
     }
 
+    /**
+     * Test gateway connect device with type message.
+     *
+     * @throws Exception the exception
+     */
     @Test
     public void testGatewayConnectDeviceWithTypeMessage() throws Exception {
         String msg = "{\"device\":\"Device A\",\"type\":\"Device Type\"}";
@@ -31,6 +42,11 @@ public class GenerateMessageTest {
         Assert.assertEquals(out,msg);
     }
 
+    /**
+     * Test gateway disconnect device message.
+     *
+     * @throws Exception the exception
+     */
     @Test
     public void testGatewayDisconnectDeviceMessage() throws Exception {
         String msg = "{\"device\":\"Device A\"}";
@@ -42,12 +58,17 @@ public class GenerateMessageTest {
         Assert.assertEquals(out,msg);
     }
 
+    /**
+     * Test device telemetry message.
+     *
+     * @throws Exception the exception
+     */
     @Test
     public void testDeviceTelemetryMessage() throws Exception {
         String msg = "[{\"values\":{\"temp\":42.0,\"humidity\":82.0},\"ts\":\"1524242990171\"}]";
-        DeviceValue device = new DeviceValue();
+        DeviceTelemetryValue device = new DeviceTelemetryValue();
 
-        DataValue values = new DataValue();
+        TelemetryDataValue values = new TelemetryDataValue();
         values.addValue("temp",42.0);
         values.addValue("humidity",82.0);
         device.addDataValue(values);
@@ -55,25 +76,30 @@ public class GenerateMessageTest {
 
         ObjectMapper objectMapper = new ObjectMapper();
         SimpleModule module = new SimpleModule();
-        module.addSerializer(DeviceValue.class, new DeviceValueSerializer());
+        module.addSerializer(DeviceTelemetryValue.class, new DeviceTelemetryValueSerializer());
         objectMapper.registerModule(module);
         String out = objectMapper.writeValueAsString(device);
         Assert.assertNotNull(out);
         Assert.assertEquals(out,msg);
     }
 
+    /**
+     * Test device telemetry array message.
+     *
+     * @throws Exception the exception
+     */
     @Test
     public void testDeviceTelemetryArrayMessage() throws Exception {
         String msg = "[{\"values\":{\"temp\":42.0,\"humidity\":82.0},\"ts\":\"1524242990171\"},{\"values\":{\"temp\":42.0,\"humidity\":82.0},\"ts\":\"1624242990171\"}]";
-        DeviceValue device = new DeviceValue();
+        DeviceTelemetryValue device = new DeviceTelemetryValue();
 
-        DataValue ts1 = new DataValue();
+        TelemetryDataValue ts1 = new TelemetryDataValue();
         ts1.addValue("temp",42.0);
         ts1.addValue("humidity",82.0);
         device.addDataValue(ts1);
         ts1.setTimeStamp("1524242990171");
 
-        DataValue ts2 = new DataValue();
+        TelemetryDataValue ts2 = new TelemetryDataValue();
         ts2.addValue("temp",42.0);
         ts2.addValue("humidity",82.0);
         device.addDataValue(ts2);
@@ -81,13 +107,18 @@ public class GenerateMessageTest {
 
         ObjectMapper objectMapper = new ObjectMapper();
         SimpleModule module = new SimpleModule();
-        module.addSerializer(DeviceValue.class, new DeviceValueSerializer());
+        module.addSerializer(DeviceTelemetryValue.class, new DeviceTelemetryValueSerializer());
         objectMapper.registerModule(module);
         String out = objectMapper.writeValueAsString(device);
         Assert.assertNotNull(out);
         Assert.assertEquals(out,msg);
     }
 
+    /**
+     * Test device depth message.
+     *
+     * @throws Exception the exception
+     */
     @Test
     public void testDeviceDepthMessage() throws Exception {
         String msg = "[{\"values\":{\"key1\":42.0,\"key2\":82.0},\"ds\":305.1}]";
@@ -108,6 +139,11 @@ public class GenerateMessageTest {
         Assert.assertEquals(out,msg);
     }
 
+    /**
+     * Test device depth message array.
+     *
+     * @throws Exception the exception
+     */
     @Test
     public void testDeviceDepthMessageArray() throws Exception {
         String msg = "[{\"values\":{\"key1\":42.0,\"key2\":82.0},\"ds\":305.1},{\"values\":{\"key1\":42.0,\"key2\":82.0},\"ds\":315.1}]";
@@ -134,12 +170,17 @@ public class GenerateMessageTest {
         Assert.assertEquals(out,msg);
     }
 
+    /**
+     * Test gateway telemetry message.
+     *
+     * @throws Exception the exception
+     */
     @Test
     public void testGatewayTelemetryMessage() throws Exception {
         String msg = "{\"Device A\":[{\"values\":{\"temp\":42.0,\"humidity\":82.0},\"ts\":\"1524242990171\"}]}";
-        GatewayValue gateway = new GatewayValue();
+        GatewayTelemetryValue gateway = new GatewayTelemetryValue();
         gateway.setDeviceName("Device A");
-        DataValue values = new DataValue();
+        TelemetryDataValue values = new TelemetryDataValue();
         values.addValue("temp",42.0);
         values.addValue("humidity",82.0);
         gateway.addDataValue(values);
@@ -147,7 +188,7 @@ public class GenerateMessageTest {
 
         ObjectMapper objectMapper = new ObjectMapper();
         SimpleModule module = new SimpleModule();
-        module.addSerializer(GatewayValue.class, new GatewayValueSerializer());
+        module.addSerializer(GatewayTelemetryValue.class, new GatewayTelemetryValueSerializer());
         objectMapper.registerModule(module);
         String out = objectMapper.writeValueAsString(gateway);
         Assert.assertNotNull(out);
@@ -155,19 +196,24 @@ public class GenerateMessageTest {
     }
 
 
+    /**
+     * Test gateway telemetry message array.
+     *
+     * @throws Exception the exception
+     */
     @Test
     public void testGatewayTelemetryMessageArray() throws Exception {
         String msg = "{\"Device A\":[{\"values\":{\"temp\":42.0,\"humidity\":82.0},\"ts\":\"1524242990171\"},{\"values\":{\"temp\":42.0,\"humidity\":82.0},\"ts\":\"1624242990171\"}]}";
-        GatewayValue gateway = new GatewayValue();
+        GatewayTelemetryValue gateway = new GatewayTelemetryValue();
         gateway.setDeviceName("Device A");
 
-        DataValue ts1 = new DataValue();
+        TelemetryDataValue ts1 = new TelemetryDataValue();
         ts1.addValue("temp",42.0);
         ts1.addValue("humidity",82.0);
         ts1.setTimeStamp("1524242990171");
         gateway.addDataValue(ts1);
 
-        DataValue ts2 = new DataValue();
+        TelemetryDataValue ts2 = new TelemetryDataValue();
         ts2.addValue("temp",42.0);
         ts2.addValue("humidity",82.0);
         ts2.setTimeStamp("1624242990171");
@@ -175,13 +221,18 @@ public class GenerateMessageTest {
 
         ObjectMapper objectMapper = new ObjectMapper();
         SimpleModule module = new SimpleModule();
-        module.addSerializer(GatewayValue.class, new GatewayValueSerializer());
+        module.addSerializer(GatewayTelemetryValue.class, new GatewayTelemetryValueSerializer());
         objectMapper.registerModule(module);
         String out = objectMapper.writeValueAsString(gateway);
         Assert.assertNotNull(out);
         Assert.assertEquals(out,msg);
     }
 
+    /**
+     * Test gateway depth message.
+     *
+     * @throws Exception the exception
+     */
     @Test
     public void testGatewayDepthMessage() throws Exception {
         String msg = "{\"Device A\":[{\"values\":{\"key1\":42.0,\"key2\":82.0},\"ds\":305.1}]}";
@@ -202,6 +253,11 @@ public class GenerateMessageTest {
         Assert.assertEquals(out,msg);
     }
 
+    /**
+     * Test gateway depth message array.
+     *
+     * @throws Exception the exception
+     */
     @Test
     public void testGatewayDepthMessageArray() throws Exception {
         String msg = "{\"Device A\":[{\"values\":{\"key1\":42.0,\"key2\":82.0},\"ds\":305.1},{\"values\":{\"key1\":42.0,\"key2\":82.0},\"ds\":315.1}]}";
