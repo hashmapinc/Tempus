@@ -16,9 +16,17 @@
 package org.thingsboard.server.controller.nosql;
 
 
+import org.cassandraunit.dataset.cql.ClassPathCQLDataSet;
+import org.junit.ClassRule;
+import org.junit.extensions.cpsuite.ClasspathSuite;
+import org.junit.runner.RunWith;
 import org.thingsboard.server.controller.BaseApplicationControllerTest;
+import org.thingsboard.server.dao.CustomCassandraCQLUnit;
 import org.thingsboard.server.dao.service.DaoNoSqlTest;
+
+import java.util.Arrays;
 
 @DaoNoSqlTest
 public class ApplicationControllerNoSqlTest extends BaseApplicationControllerTest {
+
 }

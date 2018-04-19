@@ -15,6 +15,7 @@
  */
 package org.thingsboard.server.dao;
 
+import org.cassandraunit.dataset.CQLDataSet;
 import org.cassandraunit.dataset.cql.ClassPathCQLDataSet;
 import org.junit.ClassRule;
 import org.junit.Ignore;
@@ -22,7 +23,15 @@ import org.junit.extensions.cpsuite.ClasspathSuite;
 import org.junit.extensions.cpsuite.ClasspathSuite.ClassnameFilters;
 import org.junit.runner.RunWith;
 
+import java.io.IOException;
+import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @RunWith(ClasspathSuite.class)
 @ClassnameFilters({
@@ -33,9 +42,33 @@ public class NoSqlDaoServiceTestSuite {
     @ClassRule
     public static CustomCassandraCQLUnit cassandraUnit =
             new CustomCassandraCQLUnit(
-                    Arrays.asList(new ClassPathCQLDataSet("cassandra/schema.cql", false, false),
-                            new ClassPathCQLDataSet("cassandra/system-data.cql", false, false),
-                            new ClassPathCQLDataSet("cassandra/system-test.cql", false, false)),
+                    getDataSetLists(),
                     "cassandra-test.yaml", 30000L);
+    private static List<CQLDataSet> getDataSetLists(){
+        List<CQLDataSet> dataSets = new ArrayList<>();
+        dataSets.add(new ClassPathCQLDataSet("cassandra/schema.cql", false, false));
+        dataSets.add(new ClassPathCQLDataSet("cassandra/system-data.cql", false, false));
+        dataSets.add(new ClassPathCQLDataSet("cassandra/system-test.cql", false, false));
+        String upgradePath = "cassandra/upgrade/";
+        ClassLoader loader = Thread.currentThread().getContextClassLoader();
+        URL url = loader.getResource(upgradePath);
+        String path = url.getPath();
+        Path upgradeScriptsDirectory = Paths.get(path);
+        List<Integer> sortedScriptsIndexes = null;
+        try {
+            sortedScriptsIndexes = Files.list(upgradeScriptsDirectory).map(a -> stripExtensionFromName(a.getFileName().toString())).sorted().collect(Collectors.toList());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        for(Integer i: sortedScriptsIndexes) {
+            String scriptFileName = upgradePath + i.toString()+".cql";
+            dataSets.add(new ClassPathCQLDataSet(scriptFileName, false, false));
+        }
+        return dataSets;
+    }
+
+    private static Integer stripExtensionFromName(String fileName) {
+        return Integer.parseInt(fileName.substring(0, fileName.indexOf(".cql")));
+    }
 
 }
