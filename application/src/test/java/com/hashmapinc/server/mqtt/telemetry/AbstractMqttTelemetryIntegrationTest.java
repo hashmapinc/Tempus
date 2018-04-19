@@ -15,6 +15,13 @@
  */
 package com.hashmapinc.server.mqtt.telemetry;
 
+import com.cirruslink.sparkplug.message.SparkplugBPayloadEncoder;
+import com.cirruslink.sparkplug.message.model.Metric;
+import com.cirruslink.sparkplug.message.model.SparkplugBPayload;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.hashmapinc.server.common.data.id.TenantId;
+import com.hashmapinc.server.dao.device.DeviceService;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.paho.client.mqttv3.MqttAsyncClient;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
@@ -24,9 +31,10 @@ import org.junit.Test;
 import com.hashmapinc.server.common.data.Device;
 import com.hashmapinc.server.common.data.security.DeviceCredentials;
 import com.hashmapinc.server.controller.AbstractControllerTest;
-
+import org.springframework.beans.factory.annotation.Autowired;
 import java.util.*;
 
+import static com.cirruslink.sparkplug.message.model.MetricDataType.String;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
@@ -40,6 +48,11 @@ public abstract class AbstractMqttTelemetryIntegrationTest extends AbstractContr
 
     private Device savedDevice;
     private String accessToken;
+    private Device savedGatewayDevice;
+    private String gatewayAccessToken;
+    private TenantId tenantId;
+    @Autowired
+    private DeviceService deviceService;
 
     @Before
     public void beforeTest() throws Exception {
@@ -56,6 +69,22 @@ public abstract class AbstractMqttTelemetryIntegrationTest extends AbstractContr
         assertEquals(savedDevice.getId(), deviceCredentials.getDeviceId());
         accessToken = deviceCredentials.getCredentialsId();
         assertNotNull(accessToken);
+
+        Device gatewayDevice = new Device();
+        gatewayDevice.setName("Spark Plug gateway");
+        gatewayDevice.setType("gateway");
+        ObjectMapper mapper = new ObjectMapper();
+        JsonNode additionalInfo = mapper.readTree("{\"gateway\":true}");
+        gatewayDevice.setAdditionalInfo(additionalInfo);
+        savedGatewayDevice = doPost("/api/device", gatewayDevice, Device.class);
+        tenantId = savedGatewayDevice.getTenantId();
+
+        DeviceCredentials gatewayDeviceCredentials =
+                doGet("/api/device/" + savedGatewayDevice.getId().getId().toString() + "/credentials", DeviceCredentials.class);
+
+        assertEquals(savedGatewayDevice.getId(), gatewayDeviceCredentials.getDeviceId());
+        gatewayAccessToken = gatewayDeviceCredentials.getCredentialsId();
+        assertNotNull(gatewayAccessToken);
     }
 
     @Test
@@ -82,12 +111,68 @@ public abstract class AbstractMqttTelemetryIntegrationTest extends AbstractContr
 
         assertEquals(expectedKeySet, actualKeySet);
 
-        String getTelemetryValuesUrl = "/api/plugins/telemetry/DEVICE/" + deviceId +  "/values/timeseries?keys=" + String.join(",", actualKeySet);
+        String getTelemetryValuesUrl = "/api/plugins/telemetry/DEVICE/" + deviceId +  "/values/timeseries?keys=" + java.lang.String.join(",", actualKeySet);
         Map<String, List<Map<String, String>>> values = doGetAsync(getTelemetryValuesUrl, Map.class);
 
         assertEquals("value1", values.get("key1").get(0).get("value"));
         assertEquals("true", values.get("key2").get(0).get("value"));
         assertEquals("3.0", values.get("key3").get(0).get("value"));
         assertEquals("4", values.get("key4").get(0).get("value"));
+    }
+
+    @Test
+    public void testPushMqttSparkPlugData() throws Exception {
+        String clientId = MqttAsyncClient.generateClientId();
+        MqttAsyncClient client = new MqttAsyncClient(MQTT_URL, clientId);
+
+        SparkplugBPayload.SparkplugBPayloadBuilder deathPayload = new SparkplugBPayload.SparkplugBPayloadBuilder().setTimestamp(new Date());
+        deathPayload.setSeq(0);
+        byte [] deathBytes = new SparkplugBPayloadEncoder().getBytes(deathPayload.createPayload());
+
+        MqttConnectOptions options = new MqttConnectOptions();
+        options.setUserName(gatewayAccessToken);
+        options.setWill("spBv1.0/hashmap/DDEATH/tempus device", deathBytes, 0, false);
+        client.connect(options);
+        Thread.sleep(3000);
+        byte[] sparkPlugMsgByeArray = createSparkPlugMsg();
+
+        client.publish("spBv1.0/hashmap/DBIRTH/tempus device/SparkplugBdevice", sparkPlugMsgByeArray, 0, false);
+
+        Thread.sleep(10000);
+        Device device = deviceService.findDeviceByTenantIdAndName(tenantId,"spBv1.0/hashmap/tempus device/SparkplugBdevice");
+        String deviceId = device.getId().getId().toString();
+        Thread.sleep(1000);
+        List<String> actualKeys = doGetAsync("/api/plugins/telemetry/DEVICE/" + deviceId +  "/keys/timeseries", List.class);
+        Set<String> actualKeySet = new HashSet<>(actualKeys);
+
+        List<String> expectedKeys = Arrays.asList("key1", "key2");
+        Set<String> expectedKeySet = new HashSet<>(expectedKeys);
+
+        assertEquals(expectedKeySet, actualKeySet);
+
+        String getTelemetryValuesUrl = "/api/plugins/telemetry/DEVICE/" + deviceId +  "/values/timeseries?keys=" + java.lang.String.join(",", actualKeySet);
+        Map<String, List<Map<String, String>>> values = doGetAsync(getTelemetryValuesUrl, Map.class);
+
+        assertEquals("value1", values.get("key1").get(0).get("value"));
+        assertEquals("value2", values.get("key2").get(0).get("value"));
+    }
+
+    private byte[] createSparkPlugMsg(){
+        byte[] sparkplugByteArray = null;
+        try {
+            List<Metric> metrics = new ArrayList<Metric>();
+            metrics.add(new Metric.MetricBuilder("key1", String, "value1").createMetric());
+            metrics.add(new Metric.MetricBuilder("key2", String, "value2").createMetric());
+            SparkplugBPayload payload = new SparkplugBPayload(
+                    new Date(),
+                    metrics,
+                    1,
+                    java.util.UUID.randomUUID().toString(),
+                    null);
+            sparkplugByteArray = new SparkplugBPayloadEncoder().getBytes(payload);
+        }catch (Exception e){
+
+        }
+        return sparkplugByteArray;
     }
 }
