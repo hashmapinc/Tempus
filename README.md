@@ -1,32 +1,8 @@
-# ThingsBoard 
-[![Join the chat at https://gitter.im/thingsboard/chat](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/thingsboard/chat?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
-[![Build Status](https://travis-ci.org/thingsboard/thingsboard.svg?branch=master)](https://travis-ci.org/thingsboard/thingsboard)
+<img src="https://github.com/hashmapinc/hashmap.github.io/blob/master/images/tempus/TempusLogoBlack2.png" width="910" height="245" alt="Hashmap, Inc Tempus"/>
 
-ThingsBoard is an open-source IoT platform for data collection, processing, visualization, and device management.
+[![License](http://img.shields.io/:license-Apache%202-blue.svg)](http://www.apache.org/licenses/LICENSE-2.0.txt)
 
-<img src="./img/logo.png?raw=true" width="100" height="100">
-
-## Documentation
-
-ThingsBoard documentation is hosted on [thingsboard.io](https://thingsboard.io/docs).
-
-## IoT use cases
-
-[**Smart metering**](https://thingsboard.io/smart-metering/)
-[![Smart metering](https://user-images.githubusercontent.com/8308069/29627611-4125eebc-883b-11e7-8862-f29419902079.gif "Smart metering")](https://thingsboard.io/smart-metering/)
-
-[**Smart energy**](https://thingsboard.io/smart-energy/)
-[![Smart energy](https://cloud.githubusercontent.com/assets/8308069/24495682/aebd45d0-153e-11e7-8de4-7360ed5b41ae.gif "Smart energy")](https://thingsboard.io/smart-energy/)
-
-[**Smart farming**](https://thingsboard.io/smart-farming/)
-[![Smart farming](https://cloud.githubusercontent.com/assets/8308069/24496824/10dc1144-1542-11e7-8aa1-5d3a281d5a1a.gif "Smart farming")](https://thingsboard.io/smart-farming/)
-
-[**Fleet tracking**](https://thingsboard.io/fleet-tracking/)
-[![Fleet tracking](https://cloud.githubusercontent.com/assets/8308069/24497169/3a1a61e0-1543-11e7-8d55-3c8a13f35634.gif "Fleet tracking")](https://thingsboard.io/fleet-tracking/)
-
-## Getting Started
-
-Collect and Visualize your IoT data in minutes by following this [guide](https://thingsboard.io/docs/getting-started-guides/helloworld/).
+Tempus is an Apache 2.0 licensed IIoT framework for industrial data ingestion and analysis.
 
 
 # Depth Data Support 
@@ -52,9 +28,9 @@ Thingsboard can now support depthseries data also. Earlier thingsboard supported
 
 1. Create a new rule similar to system telemetry rule with message type filter, just set the message types as "POST_TELEMETRY_DEPTH" for filter. Save and start the rule.
 
-## Publish Depthseries Data to thingsboard
+## Publish Depthseries Data to tempus
 
-1. Presently depthseries data can be published to thingsboard via MQTT only. The MQTT topic for publishing depthseries data is:
+1. Presently depthseries data can be published to tempus via MQTT only. The MQTT topic for publishing depthseries data is:
    **v1/devices/me/depth/telemetry**
 
 2. The JSON format to publish depthseries data to above topic
@@ -69,7 +45,7 @@ Thingsboard can now support depthseries data also. Earlier thingsboard supported
 ```
    **Note:** the json has ds for depth instead of ts which is for timestamp.
 
-3. Now depthseries data can be published to thingsboard similar to timeseries telemetry data using mqtt publish.
+3. Now depthseries data can be published to tempus similar to timeseries telemetry data using mqtt publish.
 
 ## Visualize depthseries data
 
@@ -95,11 +71,20 @@ Thingsboard can now support depthseries data also. Earlier thingsboard supported
 
 ## Enabling LDAP Security
 
-The default installation doesn't use LDAP security.  However, It can be changed to use LDAP server for authentication and thingsboard to authorize the user based on the authentication.
+The default installation doesn't use LDAP security.  However, It can be changed to use LDAP server for authentication and tempus to authorize the user based on the authentication.
 
 To enable LDAP authentication change the value of flag 'authentication-enabled' under 'ldap' in thingsboard.yml to 'true'. Other settings under ldap also needs to be changed accordingly to point to the right ldap server, dn etc.
 
 The corresponding code can be found in class ThingsboardSecurityConfiguration.java and RestAuthenticationProvider.java. Please refer the official oracle documentation on how LDAP security has been implemented - [LDAP authentication in Java](https://docs.oracle.com/javase/jndi/tutorial/ldap/security/ldap.html)
+
+## SCHEMA MODIFICATION
+
+To upgrade the schema(modify the existing tables), Put the upgrade scripts in upgrade folder under resources in "dao" module. there are different folders "sql" and "cassandra" for corresponding database. Note that the naming format of the upgrade script needs to be - [Name].[Extension] Where name can only be number[anything else other then number in name will cause an ERROR] and upgrades will be applied in the order of names sorted numerically by name and extension can be either sql or cql
+
+example - 1.sql, 5.sql, 4.sql, 3.sql, 2.sql (or extension cql for cassandra)
+
+in the example above the order in which scripts will be applied is - 1.sql, 2.sql, 3.sql, 4.sql, 5.sql
+
 
 # Spark Annotations
 
@@ -169,7 +154,7 @@ Spark application jar should contain a class with below annotations to be added 
 
 #### Motivation
 
-*As a user if i want to add new Spark computation capability in thingsboard, i don't want to create a new Action for Spark computation plugin and i want a mechanism so that i should be able to register spark computation application without taking thingsboard down*
+*As a user if i want to add new Spark computation capability in tempus, i don't want to create a new Action for Spark computation plugin and i want a mechanism so that i should be able to register spark computation application without taking tempus down*
 
 #### Implementation
 
@@ -194,12 +179,6 @@ Spark application jar should contain a class with below annotations to be added 
 * *Delete Component Descriptors* : ComponentDescriptors associated with those actions are deleted. Remember generated action and configuration classes are not deleted, so that in case of error in any of the earlier stage that rule will still be available.
 
 ***In case jars are deleted when thingsbord server is stopped, nothing mentioned above will be triggered. You have to be careful while deleting existing spark computations***
-
-## Support
-
- - [Community chat](https://gitter.im/thingsboard/chat)
- - [Q&A forum](https://groups.google.com/forum/#!forum/thingsboard)
- - [Stackoverflow](http://stackoverflow.com/questions/tagged/thingsboard)
 
 ## Licenses
 

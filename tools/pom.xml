@@ -27,7 +27,7 @@
     <artifactId>tools</artifactId>
     <packaging>jar</packaging>
 
-    <name>Thingsboard Server Tools</name>
+    <name>Tempus Server Tools</name>
     <url>http://thingsboard.org</url>
 
     <properties>

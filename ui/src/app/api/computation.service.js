@@ -20,10 +20,13 @@
 
 
 /*@ngInject*/
-function ComputationService($http, $q) {
+function ComputationService($http, $q, $filter, utils) {
 
     var service = {
-        upload: upload
+        upload: upload,
+        getAllComputations: getAllComputations,
+        getComputation: getComputation,
+        deleteComputation: deleteComputation
     }
 
     return service;
@@ -43,4 +46,43 @@ function ComputationService($http, $q) {
                   });
         return deferred.promise;
     }
+
+    function getAllComputations(pageLink) {
+        var deferred = $q.defer();
+        var url = '/api/computations';
+        $http.get(url, null).then(
+                    function success(response) {
+                        var allComputations = response.data;
+                        allComputations = $filter('orderBy')(allComputations, ['+name', '-createdTime']);
+                        utils.filterSearchTextEntities(allComputations, 'name', pageLink, deferred);
+                    },
+                    function fail() {
+                        deferred.reject();
+                    }
+                );
+        return deferred.promise;
+    }
+
+    function getComputation(computationId) {
+        var deferred = $q.defer();
+        var url = '/api/computations/' + computationId;
+        $http.get(url, null).then(function success(response) {
+            deferred.resolve(response.data);
+        }, function fail(response) {
+            deferred.reject(response.data);
+        });
+        return deferred.promise;
+    }
+
+    function deleteComputation(computationId) {
+        var deferred = $q.defer();
+        var url = '/api/computations/' + computationId;
+        $http.delete(url).then(function success() {
+            deferred.resolve();
+        }, function fail(response) {
+            deferred.reject(response.data);
+        });
+        return deferred.promise;
+    }
+
 }

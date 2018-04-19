@@ -15,12 +15,15 @@
  */
 package org.thingsboard.server.common.transport.adaptor;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.*;
 import lombok.extern.slf4j.Slf4j;
 import org.thingsboard.server.common.msg.core.*;
@@ -145,6 +148,15 @@ public class JsonConverter {
                 } else {
                     throw new JsonSyntaxException("Can't parse value: " + value);
                 }
+            } else if (element.isJsonObject() || element.isJsonArray()) {
+                ObjectMapper mapper = new ObjectMapper();
+                JsonNode value = null;
+                try {
+                    value = mapper.readTree(element.toString());
+                } catch (IOException ex) {
+                    log.error(ex.getMessage());
+                }
+                result.add(new JsonDataEntry(valueEntry.getKey(), value));
             } else {
                 throw new JsonSyntaxException("Can't parse value: " + element);
             }
@@ -200,7 +212,7 @@ public class JsonConverter {
 
     private static Consumer<AttributeKvEntry> addToObject(JsonObject result) {
         return de -> {
-            JsonPrimitive value;
+            JsonElement value;
             switch (de.getDataType()) {
                 case BOOLEAN:
                     value = new JsonPrimitive(de.getBooleanValue().get());
@@ -213,6 +225,11 @@ public class JsonConverter {
                     break;
                 case STRING:
                     value = new JsonPrimitive(de.getStrValue().get());
+                    break;
+                case JSON:
+                    String jsonString = de.getJsonValue().get().toString();
+                    JsonParser parser = new JsonParser();
+                    value = parser.parse(jsonString);
                     break;
                 default:
                     throw new IllegalArgumentException("Unsupported data type: " + de.getDataType());

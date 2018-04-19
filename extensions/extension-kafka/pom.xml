@@ -29,7 +29,7 @@
     <artifactId>extension-kafka</artifactId>
     <packaging>jar</packaging>
 
-    <name>Thingsboard Server Kafka Extension</name>
+    <name>Tempus Server Kafka Extension</name>
     <url>http://thingsboard.org</url>
 
     <properties>

@@ -38,8 +38,11 @@ import org.thingsboard.server.common.msg.cluster.ServerAddress;
 import org.thingsboard.server.common.transport.auth.DeviceAuthService;
 import org.thingsboard.server.controller.plugin.PluginWebSocketMsgEndpoint;
 import org.thingsboard.server.dao.alarm.AlarmService;
+import org.thingsboard.server.dao.application.ApplicationService;
 import org.thingsboard.server.dao.asset.AssetService;
 import org.thingsboard.server.dao.attributes.AttributesService;
+import org.thingsboard.server.dao.computations.ComputationJobService;
+import org.thingsboard.server.dao.computations.ComputationsService;
 import org.thingsboard.server.dao.customer.CustomerService;
 import org.thingsboard.server.dao.device.DeviceService;
 import org.thingsboard.server.dao.event.EventService;
@@ -114,6 +117,15 @@ public class ActorSystemContext {
     @Getter private AlarmService alarmService;
 
     @Autowired
+    @Getter private ApplicationService applicationService;
+
+    @Autowired
+    @Getter private ComputationsService computationsService;
+
+    @Autowired
+    @Getter private ComputationJobService computationJobService;
+
+    @Autowired
     @Getter @Setter private PluginWebSocketMsgEndpoint wsMsgEndpoint;
 
     @Value("${actors.session.sync.timeout}")
@@ -142,6 +154,21 @@ public class ActorSystemContext {
 
     @Value("${actors.tenant.create_components_on_init}")
     @Getter private boolean tenantComponentsInitEnabled;
+
+    @Value("${actors.computation.termination.delay}")
+    @Getter private long computationActorTerminationDelay;
+
+    @Value("${actors.computation.error_persist_frequency}")
+    @Getter private long computationErrorPersistFrequency;
+
+    @Value("${actors.computation.status_check.delay}")
+    @Getter private long computationStatusCheckDelay;
+
+    @Value("${actors.computation.status_check.frequency}")
+    @Getter private long computationStatusCheckFrequency;
+
+    @Value("${actors.computation.location}")
+    @Getter private String computationLocation;
 
     @Getter @Setter private ActorSystem actorSystem;
 

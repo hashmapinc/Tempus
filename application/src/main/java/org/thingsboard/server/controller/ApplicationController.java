@@ -15,23 +15,29 @@
  */
 package org.thingsboard.server.controller;
 
+import com.google.common.collect.Iterables;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.thingsboard.server.common.data.Application;
-import org.thingsboard.server.common.data.ApplicationRulesWrapper;
+import org.thingsboard.server.common.data.ApplicationFieldsWrapper;
+import org.thingsboard.server.common.data.computation.ComputationJob;
 import org.thingsboard.server.common.data.id.*;
 import org.thingsboard.server.common.data.page.TextPageData;
 import org.thingsboard.server.common.data.page.TextPageLink;
+import org.thingsboard.server.common.data.plugin.ComponentLifecycleEvent;
+import org.thingsboard.server.common.data.plugin.ComponentLifecycleState;
+import org.thingsboard.server.common.data.rule.RuleMetaData;
 import org.thingsboard.server.dao.exception.IncorrectParameterException;
 import org.thingsboard.server.dao.model.ModelConstants;
 import org.thingsboard.server.exception.ThingsboardException;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
+
+import static org.thingsboard.server.common.data.plugin.ComponentLifecycleState.ACTIVE;
+import static org.thingsboard.server.dao.model.ModelConstants.NULL_UUID;
 
 @RestController
 @RequestMapping("/api")
@@ -44,8 +50,7 @@ public class ApplicationController extends BaseController {
     public Application saveApplication(@RequestBody Application application) throws ThingsboardException {
         try{
             application.setTenantId(getCurrentUser().getTenantId());
-            Application savedApplication = checkNotNull(applicationService.saveApplication(application));
-            return savedApplication;
+            return checkNotNull(applicationService.saveApplication(application));
         } catch (Exception e) {
             throw handleException(e);
         }
@@ -71,10 +76,36 @@ public class ApplicationController extends BaseController {
         checkParameter("applicationId", strApplicationId);
         try {
             ApplicationId applicationId = new ApplicationId(toUUID(strApplicationId));
-            checkApplicationId(applicationId);
+            Application application = checkApplicationId(applicationId);
             applicationService.deleteApplication(applicationId);
+            cleanupApplicationRelatedEntities(application);
         } catch (Exception e) {
             throw handleException(e);
+        }
+    }
+
+    private void cleanupApplicationRelatedEntities(Application application) throws ThingsboardException {
+        for(RuleId ruleId: application.getRules()) {
+            if(!ruleId.isNullUid()) {
+                ruleService.deleteRuleById(ruleId);
+                actorService.onRuleStateChange(application.getTenantId(), ruleId, ComponentLifecycleEvent.DELETED);
+            }
+        }
+
+        if(!application.getDashboardId().isNullUid()) {
+            dashboardService.deleteDashboard(application.getDashboardId());
+        }
+
+        if(!application.getMiniDashboardId().isNullUid()) {
+            dashboardService.deleteDashboard(application.getMiniDashboardId());
+        }
+
+        for(ComputationJobId computationJobId: application.getComputationJobIdSet()) {
+            if(!computationJobId.isNullUid()) {
+                ComputationJob computationJob = checkComputationJob(computationJobService.findComputationJobById(computationJobId));
+                computationJobService.deleteComputationJobById(computationJobId);
+                actorService.onComputationJobStateChange(computationJob.getTenantId(), computationJob.getComputationId(), computationJob.getId(), ComponentLifecycleEvent.DELETED);
+            }
         }
     }
 
@@ -109,13 +140,13 @@ public class ApplicationController extends BaseController {
     }
 
     @PreAuthorize("hasAuthority('TENANT_ADMIN')")
-    @RequestMapping(value = "/applications/rule/{ruleId}", method = RequestMethod.GET)
+    @RequestMapping(value = "/applications/rules/{strRuleIds}", method = RequestMethod.GET)
     @ResponseBody
-    public List<String> findApplicationsByruleId(@PathVariable("ruleId") String strRuleId) throws ThingsboardException {
-        checkParameter("ruleId", strRuleId);
-        RuleId ruleId = new RuleId(toUUID(strRuleId));
+    public Set<String> findApplicationsByruleIds(@PathVariable String[] strRuleIds) throws ThingsboardException {
+        checkArrayParameter("ruleIds", strRuleIds);
+        Set<RuleId> ruleIds = Arrays.stream(strRuleIds).map(r -> new RuleId(toUUID(r))).collect(Collectors.toSet());
         TenantId tenantId = getCurrentUser().getTenantId();
-        return applicationService.findApplicationByRuleId(tenantId, ruleId);
+        return applicationService.findApplicationByRuleIds(tenantId, ruleIds);
     }
 
     @PreAuthorize("hasAuthority('TENANT_ADMIN')")
@@ -219,33 +250,169 @@ public class ApplicationController extends BaseController {
 
     @PreAuthorize("hasAuthority('TENANT_ADMIN')")
     @RequestMapping(value = "/app/assignRules", method = RequestMethod.POST,consumes = "application/json")
-    public Application assignRulesToApplication(@RequestBody ApplicationRulesWrapper applicationRulesWrapper) throws ThingsboardException {
-        checkParameter("applicationId", applicationRulesWrapper.getApplicationId());
+    public Application assignRulesToApplication(@RequestBody ApplicationFieldsWrapper applicationFieldsWrapper) throws ThingsboardException {
+        checkParameter("applicationId", applicationFieldsWrapper.getApplicationId());
         try {
-            ApplicationId applicationId = new ApplicationId(toUUID(applicationRulesWrapper.getApplicationId()));
+            ApplicationId applicationId = new ApplicationId(toUUID(applicationFieldsWrapper.getApplicationId()));
             checkApplicationId(applicationId);
-            List<RuleId> ruleIds = Collections.emptyList();
-            if (applicationRulesWrapper != null) {
-                ruleIds = applicationRulesWrapper.getRules().stream().map(r -> new RuleId(toUUID(r))).collect(Collectors.toList());
+            Set<RuleId> ruleIds = applicationFieldsWrapper.getFields().stream().map(r -> new RuleId(toUUID(r))).collect(Collectors.toSet());
+            Application application  = checkNotNull(applicationService.assignRulesToApplication(applicationId, ruleIds));
+            if(application.getState().equals(ACTIVE)) {
+                for(RuleId ruleId: ruleIds){
+                    RuleMetaData rule = checkRule(ruleService.findRuleById(ruleId));
+                    ruleService.activateRuleById(ruleId);
+                    actorService.onRuleStateChange(rule.getTenantId(), rule.getId(), ComponentLifecycleEvent.ACTIVATED);
+                }
             }
-            return checkNotNull(applicationService.assignRulesToApplication(applicationId, ruleIds));
+            return application;
         } catch (Exception e) {
             throw handleException(e);
         }
     }
 
     @PreAuthorize("hasAuthority('TENANT_ADMIN')")
-    @RequestMapping(value = "/app/{applicationId}/deviceTypes", method = RequestMethod.POST,consumes = "application/json")
-    public Application assignDeviceTypesToApplication(@PathVariable("applicationId") String strApplicationId,
-                                                      @RequestBody List<String> deviceTypes) throws ThingsboardException {
-        checkParameter("applicationId", strApplicationId);
+    @RequestMapping(value = "/app/unassignRules", method = RequestMethod.POST,consumes = "application/json")
+    public Application unassignRulesToApplication(@RequestBody ApplicationFieldsWrapper applicationFieldsWrapper) throws ThingsboardException {
+        checkParameter("applicationId", applicationFieldsWrapper.getApplicationId());
         try {
-            log.error("Got application [{}] with deviceTypes [{}]", strApplicationId, deviceTypes);
-            ApplicationId applicationId = new ApplicationId(toUUID(strApplicationId));
+            ApplicationId applicationId = new ApplicationId(toUUID(applicationFieldsWrapper.getApplicationId()));
             checkApplicationId(applicationId);
-            return checkNotNull(applicationService.assignDeviceTypesToApplication(applicationId, deviceTypes));
+            Set<RuleId> ruleIds = applicationFieldsWrapper.getFields().stream().map(r -> new RuleId(toUUID(r))).collect(Collectors.toSet());
+            return checkNotNull(applicationService.unassignRulesToApplication(applicationId, ruleIds));
         } catch (Exception e) {
             throw handleException(e);
+        }
+    }
+
+
+    @PreAuthorize("hasAuthority('TENANT_ADMIN')")
+    @RequestMapping(value = "/app/assignComputationJobs", method = RequestMethod.POST,consumes = "application/json")
+    public Application assignComputationsJobToApplication(@RequestBody ApplicationFieldsWrapper applicationFieldsWrapper) throws ThingsboardException {
+        checkParameter("applicationId", applicationFieldsWrapper.getApplicationId());
+        try {
+            ApplicationId applicationId = new ApplicationId(toUUID(applicationFieldsWrapper.getApplicationId()));
+            checkApplicationId(applicationId);
+            Set<ComputationJobId> computationJobIds = applicationFieldsWrapper.getFields().stream().map(r -> new ComputationJobId(toUUID(r))).collect(Collectors.toSet());
+            Application application =  checkNotNull(applicationService.assignComputationJobsToApplication(applicationId, computationJobIds));
+            if(application.getState().equals(ACTIVE)) {
+                for(ComputationJobId computationJobId: computationJobIds) {
+                    ComputationJob computationJob = checkComputationJob(computationJobService.findComputationJobById(computationJobId));
+                    computationJobService.activateComputationJobById(computationJobId);
+                    actorService.onComputationJobStateChange(computationJob.getTenantId(), computationJob.getComputationId(), computationJob.getId(), ComponentLifecycleEvent.ACTIVATED);
+                }
+            }
+            return application;
+        } catch (Exception e) {
+            throw handleException(e);
+        }
+    }
+
+    @PreAuthorize("hasAuthority('TENANT_ADMIN')")
+    @RequestMapping(value = "/app/unassignComputationJobs", method = RequestMethod.POST,consumes = "application/json")
+    public Application unassignComputationsJobToApplication(@RequestBody ApplicationFieldsWrapper applicationFieldsWrapper) throws ThingsboardException {
+        checkParameter("applicationId", applicationFieldsWrapper.getApplicationId());
+        try {
+            ApplicationId applicationId = new ApplicationId(toUUID(applicationFieldsWrapper.getApplicationId()));
+            checkApplicationId(applicationId);
+            Set<ComputationJobId> computationJobIds  = applicationFieldsWrapper.getFields().stream().map(c -> new ComputationJobId(toUUID(c))).collect(Collectors.toSet());
+            return checkNotNull(applicationService.unassignComputationJobsToApplication(applicationId, computationJobIds));
+        } catch (Exception e) {
+            throw handleException(e);
+        }
+    }
+
+    @PreAuthorize("hasAuthority('TENANT_ADMIN')")
+    @RequestMapping(value = "/application/{applicationId}/activate", method = RequestMethod.POST)
+    @ResponseStatus(value = HttpStatus.OK)
+    public void activateApplicationById(@PathVariable("applicationId") String strApplicationId) throws ThingsboardException {
+        checkParameter("applicationId", strApplicationId);
+        try {
+            ApplicationId applicationId = new ApplicationId(toUUID(strApplicationId));
+            Application application =  checkApplicationId(applicationId);
+            activateApplication(application);
+        } catch (Exception e) {
+            throw handleException(e);
+        }
+    }
+
+    private void activateApplication(Application application) throws ThingsboardException {
+        Map<RuleId, RuleMetaData> activatedRules = new HashMap<>();
+        Map<ComputationJobId, ComputationJob> activatedComputations = new HashMap<>();
+        try {
+            if(application.getRules().size() > 1 || !Iterables.getOnlyElement(application.getRules()).getId().equals(NULL_UUID)) {
+                for(RuleId ruleId: application.getRules()) {
+                    RuleMetaData rule = checkRule(ruleService.findRuleById(ruleId));
+                    if(!rule.getState().equals(ComponentLifecycleState.ACTIVE)) {
+                        ruleService.activateRuleById(ruleId);
+                        actorService.onRuleStateChange(rule.getTenantId(), rule.getId(), ComponentLifecycleEvent.ACTIVATED);
+                        activatedRules.put(ruleId, rule);
+                    }
+                }
+            }
+
+            if(application.getComputationJobIdSet().size() >1 || !Iterables.getOnlyElement(application.getComputationJobIdSet()).getId().equals(NULL_UUID)) {
+                for(ComputationJobId computationJobId: application.getComputationJobIdSet()) {
+                    ComputationJob computationJob = checkComputationJob(computationJobService.findComputationJobById(computationJobId));
+                    if(!computationJob.getState().equals(ComponentLifecycleState.ACTIVE)) {
+                        computationJobService.activateComputationJobById(computationJobId);
+                        actorService.onComputationJobStateChange(computationJob.getTenantId(), computationJob.getComputationId(), computationJob.getId(), ComponentLifecycleEvent.ACTIVATED);
+                        activatedComputations.put(computationJob.getId(), computationJob);
+                    }
+                }
+            }
+
+            applicationService.activateApplicationById(application.getId());
+        } catch (Exception e) {
+            if(!activatedRules.isEmpty()) {
+                for(Map.Entry<RuleId, RuleMetaData> entry: activatedRules.entrySet()){
+                    ruleService.suspendRuleById(entry.getKey());
+                    actorService.onRuleStateChange(entry.getValue().getTenantId(), entry.getKey(), ComponentLifecycleEvent.SUSPENDED);
+                }
+            }
+
+            if(!activatedComputations.isEmpty()) {
+                for(Map.Entry<ComputationJobId, ComputationJob> entry: activatedComputations.entrySet()){
+                    computationJobService.suspendComputationJobById(entry.getKey());
+                    actorService.onComputationJobStateChange(entry.getValue().getTenantId(), entry.getValue().getComputationId(), entry.getValue().getId(), ComponentLifecycleEvent.SUSPENDED);
+                }
+            }
+            throw e;
+        }
+    }
+
+    @PreAuthorize("hasAnyAuthority('SYS_ADMIN', 'TENANT_ADMIN')")
+    @RequestMapping(value = "/application/{applicationId}/suspend", method = RequestMethod.POST)
+    @ResponseStatus(value = HttpStatus.OK)
+    public void suspendApplicationById(@PathVariable("applicationId") String strApplicationId) throws ThingsboardException {
+        checkParameter("applicationId", strApplicationId);
+        try {
+            ApplicationId applicationId = new ApplicationId(toUUID(strApplicationId));
+            Application application =  checkApplicationId(applicationId);
+            suspendRules(application.getRules());
+            suspendComputations(application.getComputationJobIdSet());
+            applicationService.suspendApplicationById(applicationId);
+        } catch (Exception e) {
+            throw handleException(e);
+        }
+    }
+
+    private void suspendComputations(Set<ComputationJobId> computationJobIds) throws ThingsboardException {
+        if(computationJobIds.size() > 1 || !Iterables.getOnlyElement(computationJobIds).getId().equals(NULL_UUID)) {
+            for(ComputationJobId computationJobId: computationJobIds) {
+                ComputationJob computationJob = checkComputationJob(computationJobService.findComputationJobById(computationJobId));
+                computationJobService.suspendComputationJobById(computationJobId);
+                actorService.onComputationJobStateChange(computationJob.getTenantId(), computationJob.getComputationId(), computationJob.getId(), ComponentLifecycleEvent.SUSPENDED);
+            }
+        }
+    }
+
+    private void suspendRules(Set<RuleId> ruleIds) throws ThingsboardException {
+        if(ruleIds.size() > 1 || !Iterables.getOnlyElement(ruleIds).getId().equals(NULL_UUID)) {
+            for(RuleId ruleId: ruleIds) {
+                RuleMetaData rule = checkRule(ruleService.findRuleById(ruleId));
+                ruleService.suspendRuleById(ruleId);
+                actorService.onRuleStateChange(rule.getTenantId(), rule.getId(), ComponentLifecycleEvent.SUSPENDED);
+            }
         }
     }
 

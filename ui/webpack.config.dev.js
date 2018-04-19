@@ -45,13 +45,13 @@ module.exports = {
             moment: "moment"
         }),
         new CopyWebpackPlugin([
-            { from: './src/thingsboard.ico', to: 'thingsboard.ico' }
+            { from: './src/tempus.ico', to: 'tempus.ico' }
         ]),
         new webpack.HotModuleReplacementPlugin(),
         new HtmlWebpackPlugin({
             template: './src/index.html',
             filename: 'index.html',
-            title: 'ThingsBoard',
+            title: 'Tempus',
             inject: 'body',
         }),
         new webpack.optimize.OccurrenceOrderPlugin(),

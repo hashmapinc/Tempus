@@ -1,5 +1,6 @@
 package org.thingsboard.server.common.data.kv;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import lombok.ToString;
 
 import java.util.Objects;
@@ -43,6 +44,11 @@ public class BasicDsKvEntry implements DsKvEntry{
     @Override
     public Optional<Double> getDoubleValue() {
         return kv.getDoubleValue();
+    }
+
+    @Override
+    public Optional<JsonNode> getJsonValue() {
+        return kv.getJsonValue();
     }
 
     @Override

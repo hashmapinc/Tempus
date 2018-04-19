@@ -22,6 +22,11 @@ import ruleCard from '../rule/rule-card.tpl.html';
 
 import addDashboardTemplate from '../dashboard/add-dashboard.tpl.html';
 
+import addComputationTemplate from '../computations/add-computation.tpl.html';
+import computationCard from '../computations/computation-card.tpl.html';
+import addComputationJobTemplate from '../computations/add-computation-job.tpl.html';
+import computationJobCard from '../computations/computation-job-card.tpl.html';
+
 
 /* eslint-enable import/no-unresolved, import/default */
 
@@ -35,7 +40,7 @@ export function ApplicationCardController(types) {
 }
 
 /*@ngInject*/
-export function ApplicationController($log, $rootScope, userService, applicationService, customerService, $state, $stateParams, $document, $mdDialog, $q, types, ruleService, importExport, $filter, dashboardService, $translate, $window) {
+export function ApplicationController($timeout, $log, $rootScope, userService, applicationService, customerService, $state, $stateParams, $document, $mdDialog, $q, types, ruleService, importExport, $filter, dashboardService, $translate, $window, computationService, computationJobService) {
 
     var customerId = $stateParams.customerId;
 
@@ -46,6 +51,7 @@ export function ApplicationController($log, $rootScope, userService, application
     var vm = this;
 
     vm.types = types;
+    vm.isShowSidenav = true;
 
     vm.applicationGridConfig = {
         deleteItemTitleFunc: deleteApplicationTitle,
@@ -94,37 +100,109 @@ export function ApplicationController($log, $rootScope, userService, application
     vm.manageCredentials = manageCredentials;
     vm.currentApp = currentApp;
     vm.appClicked = false;
+    vm.appSliderOpen = true;
 
     vm.showAppMini = false;
     vm.showAppMain = false;
     vm.showAppRules = false;
+    vm.showComputations = false;
+    vm.showAppDetails = true;
+    vm.showComputationJobs = false;
+
+    vm.tabSelectedIndex = 0;
 
     vm.tabselected = function (selectedTab){
         if(selectedTab == 'Mini'){
             vm.showAppMini = true;
             vm.showAppMain = false;
             vm.showAppRules = false;
+            vm.showAppDetails = false;
+            vm.showComputations = false;
+            vm.showComputationJobs = false;
+            vm.tabSelectedIndex = 1;
         }
         else if(selectedTab == 'Rules'){
             vm.showAppMini = false;
             vm.showAppMain = false;
             vm.showAppRules = true;
+            vm.showAppDetails = false;
+            vm.showComputations = false;
+            vm.showComputationJobs = false;
+            vm.tabSelectedIndex = 2;
 
         }
         else if(selectedTab == 'Main'){
             vm.showAppMini = false;
             vm.showAppMain = true;
             vm.showAppRules = false;
+            vm.showAppDetails = false;
+            vm.showComputations = false;
+            vm.showComputationJobs = false;
+            vm.tabSelectedIndex = 3;
+
+        }
+        else if(selectedTab == 'Details'){
+            vm.currentAppforDirective = vm.currentApplication;
+            vm.showAppMini = false;
+            vm.showAppMain = false;
+            vm.showAppRules = false;
+            vm.showComputations = false;
+            vm.showComputationJobs = false;
+            vm.showAppDetails = true; 
+            vm.tabSelectedIndex = 0;
+        }  
+        else if(selectedTab == 'Computation'){
+            vm.showAppMini = false;
+            vm.showAppMain = false;
+            vm.showAppRules = false;
+            vm.showAppDetails = false;
+            vm.tabSelectedIndex = 4;
+            vm.showComputations = true;
+            vm.showComputationJobs = false;
 
         }
 
+    }
+
+    vm.detailesClicked = function() {
+        vm.appSliderOpen = false;
+        $timeout( function(){
+            vm.showAppMini = false;
+            vm.showAppMain = false;
+            vm.showAppRules = false;
+            vm.showComputations = false;
+            vm.showComputationJobs = false;
+            vm.showAppDetails = true; 
+            vm.grid.detailsConfig.isDetailsOpen = false;
+            vm.appSliderOpen = true;
+            $timeout( function(){
+                vm.grid.openItem(null, vm.currentApplication);
+            }, 100 ); 
+        }, 100 ); 
     }
 
     function currentApp(item) {
        vm.currentApplication = item; 
     }    
 
+    $window.onbeforeunload = function() {
+      $window.localStorage.removeItem('currentApp');
+      $window.localStorage.removeItem('currentTab');
+    };
 
+    function activateApplication(event, application) {
+        applicationService.activateApplication(application.id.id).then(function () {
+            vm.grid.refreshList();
+        }, function () {
+        });
+    }
+
+    function suspendApplication(event, application) {
+        applicationService.suspendApplication(application.id.id).then(function () {
+            vm.grid.refreshList();
+        }, function () {
+        });
+    }
 
     initController();
 
@@ -161,68 +239,92 @@ export function ApplicationController($log, $rootScope, userService, application
                 return {"topIndex": vm.topIndex};
             };
 
-            applicationActionsList.push({
-                onAction: function ($event, item) {
-                    makePublic($event, item);
-                },
-                name: function() { return $translate.instant('action.share') },
-                details: function() { return $translate.instant('application.make-public') },
-                icon: "share",
-                isEnabled: function(application) {
-                    return application && (!application.customerId || application.customerId.id === types.id.nullUid);
-                }
-            });
+            // applicationActionsList.push({
+            //     onAction: function ($event, item) {
+            //         makePublic($event, item);
+            //     },
+            //     name: function() { return $translate.instant('action.share') },
+            //     details: function() { return $translate.instant('application.make-public') },
+            //     icon: "share",
+            //     isEnabled: function(application) {
+            //         return application && (!application.customerId || application.customerId.id === types.id.nullUid);
+            //     }
+            // });
 
+            // applicationActionsList.push(
+            //     {
+            //         onAction: function ($event, item) {
+            //             assignToCustomer($event, [ item.id.id ]);
+            //         },
+            //         name: function() { return $translate.instant('action.assign') },
+            //         details: function() { return $translate.instant('application.assign-to-customer') },
+            //         icon: "assignment_ind",
+            //         isEnabled: function(application) {
+            //             return application && (!application.customerId || application.customerId.id === types.id.nullUid);
+            //         }
+            //     }
+            // );
+
+            // applicationActionsList.push(
+            //     {
+            //         onAction: function ($event, item) {
+            //             unassignFromCustomer($event, item, false);
+            //         },
+            //         name: function() { return $translate.instant('action.unassign') },
+            //         details: function() { return $translate.instant('application.unassign-from-customer') },
+            //         icon: "assignment_return",
+            //         isEnabled: function(application) {
+            //             return application && application.customerId && application.customerId.id !== types.id.nullUid && !application.assignedCustomer.isPublic;
+            //         }
+            //     }
+            // );
+
+            // applicationActionsList.push({
+            //     onAction: function ($event, item) {
+            //         unassignFromCustomer($event, item, true);
+            //     },
+            //     name: function() { return $translate.instant('action.make-private') },
+            //     details: function() { return $translate.instant('application.make-private') },
+            //     icon: "reply",
+            //     isEnabled: function(application) {
+            //         return application && application.customerId && application.customerId.id !== types.id.nullUid && application.assignedCustomer.isPublic;
+            //     }
+            // });
+
+            // applicationActionsList.push(
+            //     {
+            //         onAction: function ($event, item) {
+            //             manageCredentials($event, item);
+            //         },
+            //         name: function() { return $translate.instant('application.credentials') },
+            //         details: function() { return $translate.instant('application.manage-credentials') },
+            //         icon: "security"
+            //     }
+            // );
             applicationActionsList.push(
                 {
                     onAction: function ($event, item) {
-                        assignToCustomer($event, [ item.id.id ]);
+                        activateApplication($event, item);
                     },
-                    name: function() { return $translate.instant('action.assign') },
-                    details: function() { return $translate.instant('application.assign-to-customer') },
-                    icon: "assignment_ind",
+                    name: function() { return $translate.instant('action.activate') },
+                    details: function() { return $translate.instant('application.activate') },
+                    icon: "play_arrow",
                     isEnabled: function(application) {
-                        return application && (!application.customerId || application.customerId.id === types.id.nullUid);
+                        return isApplicationEditable(application) && application && application.state === 'SUSPENDED';
                     }
-                }
-            );
-
+                });
             applicationActionsList.push(
                 {
                     onAction: function ($event, item) {
-                        unassignFromCustomer($event, item, false);
+                        suspendApplication($event, item);
                     },
-                    name: function() { return $translate.instant('action.unassign') },
-                    details: function() { return $translate.instant('application.unassign-from-customer') },
-                    icon: "assignment_return",
+                    name: function() { return $translate.instant('action.suspend') },
+                    details: function() { return $translate.instant('application.suspend') },
+                    icon: "pause",
                     isEnabled: function(application) {
-                        return application && application.customerId && application.customerId.id !== types.id.nullUid && !application.assignedCustomer.isPublic;
+                        return isApplicationEditable(application) && application.state === 'ACTIVE';
                     }
-                }
-            );
-
-            applicationActionsList.push({
-                onAction: function ($event, item) {
-                    unassignFromCustomer($event, item, true);
-                },
-                name: function() { return $translate.instant('action.make-private') },
-                details: function() { return $translate.instant('application.make-private') },
-                icon: "reply",
-                isEnabled: function(application) {
-                    return application && application.customerId && application.customerId.id !== types.id.nullUid && application.assignedCustomer.isPublic;
-                }
-            });
-
-            applicationActionsList.push(
-                {
-                    onAction: function ($event, item) {
-                        manageCredentials($event, item);
-                    },
-                    name: function() { return $translate.instant('application.credentials') },
-                    details: function() { return $translate.instant('application.manage-credentials') },
-                    icon: "security"
-                }
-            );
+            }),
 
             applicationActionsList.push(
                 {
@@ -353,11 +455,10 @@ export function ApplicationController($log, $rootScope, userService, application
         vm.applicationGridConfig.refreshParamsFunc = refreshApplicationsParamsFunction;
         vm.applicationGridConfig.fetchItemsFunc = fetchApplicationsFunction;
         vm.applicationGridConfig.deleteItemFunc = deleteApplicationFunction;
-
     }
 
     function deleteApplicationTitle(application) {
-        return $translate.instant('application.delete-application-title', {applicationName: application.name});
+        return $translate.instant('application.delete-application-title', {applicationTitle: application.name});
     }
 
     function deleteApplicationText() {
@@ -378,6 +479,13 @@ export function ApplicationController($log, $rootScope, userService, application
 
     function getApplicationTitle(application) {
         return application ? application.name : '';
+    }
+    function isApplicationEditable(application) {
+        if (userService.getAuthority() === 'TENANT_ADMIN') {
+            return application && application.tenantId.id != types.id.nullUid;
+        } else {
+            return userService.getAuthority() === 'SYS_ADMIN';
+        }
     }
 
     function saveApplication(application) {
@@ -717,31 +825,25 @@ export function ApplicationController($log, $rootScope, userService, application
     }
 
     function saveRule(rule) {
-        var deferred = $q.defer();
-        ruleService.saveRule(rule).then(
-            function success(savedRule) {
-                $log.log(savedRule);
-                var rules = {"applicationId": vm.currentApplication.id.id, "rules":[savedRule.id.id]};
-                var deviceTypes =[];
-                 savedRule.filters.forEach(function(filter){
-                    filter.configuration.deviceTypes.forEach(function(deviceType){
-                        deviceTypes.push(deviceType.name.toLowerCase());
-                    })
-                 });
-
-                
+        return ruleService.saveRule(rule).then(
+            function(savedRule) {
+                var rules = {"applicationId": vm.currentApplication.id.id, "fields":[savedRule.id.id]};
                 applicationService.assignRulesToApplication(rules);
-                applicationService.assignDeviceTypesToApplication(vm.currentApplication.id.id, deviceTypes);
-            },
-            function fail() {
-                deferred.reject();
-            }
+                $window.localStorage.setItem('currentApp', angular.toJson(vm.currentApplication));
+                $window.localStorage.setItem('currentTab', angular.toJson(vm.tabSelectedIndex));
+           }
         );
-        return deferred.promise;
     }
 
     function deleteRule(ruleId) {
-        return ruleService.deleteRule(ruleId);
+        return ruleService.deleteRule(ruleId).then(
+            function() {
+                var rules = {"applicationId": vm.currentApplication.id.id, "fields":[ruleId]};
+                applicationService.unAssignRulesFromApplication(rules);
+                $window.localStorage.setItem('currentApp', angular.toJson(vm.currentApplication));
+                $window.localStorage.setItem('currentTab', angular.toJson(vm.tabSelectedIndex));
+            }
+        );
     }
 
     function getRuleTitle(rule) {
@@ -774,11 +876,8 @@ export function ApplicationController($log, $rootScope, userService, application
         }, function () {
         });
     }
-  // var application = {name: "1st App"}
- //  applicationService.saveApplication(application);
-  // var  pageLink = {limit: 30};
-  // applicationService.getTenantApplications(pageLink, false, null, null);
 
+    //--------End of Rules
 
     var dashboardActionsList = [
         {
@@ -867,7 +966,12 @@ export function ApplicationController($log, $rootScope, userService, application
                 return dashboardService.getTenantDashboards(pageLink);
             };
             deleteDashboardFunction = function (dashboardId) {
-                return dashboardService.deleteDashboard(dashboardId);
+                return dashboardService.deleteDashboard(dashboardId).then(
+            function() {
+                $window.localStorage.setItem('currentApp', angular.toJson(vm.currentApplication));
+                $window.localStorage.setItem('currentTab', angular.toJson(vm.tabSelectedIndex));
+           }
+        );
             };
             refreshDashboardsParamsFunction = function () {
                 return {"topIndex": vm.topIndex};
@@ -1104,8 +1208,9 @@ export function ApplicationController($log, $rootScope, userService, application
         var deferred = $q.defer();
         dashboardService.saveDashboard(dashboard).then(
             function success(savedDashboard) {
-                $log.log(vm.currentApplication);
                 var dashboards = [ savedDashboard ];
+                $window.localStorage.setItem('currentApp', angular.toJson(vm.currentApplication));
+                $window.localStorage.setItem('currentTab', angular.toJson(vm.tabSelectedIndex));
                 if(vm.showAppMini){
                     applicationService.assignMiniDashboardToApplication(vm.currentApplication.id.id, savedDashboard.id.id);
                 }
@@ -1299,56 +1404,320 @@ export function ApplicationController($log, $rootScope, userService, application
             $window.open(url,'_blank');
         }
     }
+// End of Dashboard
+    
+    var computationActionsList = [
+        {
+            onAction: function ($event, item) {
+                vm.grid.deleteItem($event, item);
+            },
+            name: function() { return $translate.instant('action.delete') },
+            details: function() { return $translate.instant('computation.delete') },
+            icon: "delete",
+        }
+    ];
+
+    var computationAddItemActionsList = [
+        {
+            onAction: function ($event) {
+                $window.localStorage.setItem('currentApp', angular.toJson(vm.currentApplication));
+                importExport.importComputation($event).then(
+                    function() {
+                        vm.grid.refreshList();
+                    }
+                );
+            },
+            name: function() { return $translate.instant('action.import') },
+            details: function() { return $translate.instant('computation.import') },
+            icon: "file_upload"
+        }
+    ];
+
+    vm.showComputations = true;
+    vm.showComputationJobs = false;
+
+    vm.computationGridConfig = {
+
+        refreshParamsFunc: null,
+
+        fetchItemsFunc: fetchComputations,
+        deleteItemFunc: deleteComputation,
+
+        clickItemFunc: openComputation,
+
+        getItemTitleFunc: getComputationTitle,
+        itemCardTemplateUrl: computationCard,
+        parentCtl: vm,
+
+        actionsList: computationActionsList,
+        addItemActions: computationAddItemActionsList,
+
+        onGridInited: gridInited,
+
+        addItemTemplateUrl: addComputationTemplate,
+
+        addItemText: function() { return $translate.instant('computation.add-computation-text') },
+        noItemsText: function() { return $translate.instant('computation.no-computations-text') },
+
+    };
+
+    if (angular.isDefined($stateParams.items) && $stateParams.items !== null) {
+        vm.computationGridConfig.items = $stateParams.items;
+    }
+
+    if (angular.isDefined($stateParams.topIndex) && $stateParams.topIndex > 0) {
+        vm.computationGridConfig.topIndex = $stateParams.topIndex;
+    }
+
+    // function gridInited(grid) {
+    //     vm.grid = grid;
+    // }
+
+    function fetchComputations(pageLink) {
+
+        return computationService.getAllComputations(pageLink);
+    }
+
+    function deleteComputation(computationId) {
+        return computationService.deleteComputation(computationId).then(
+            function() {
+                vm.showComputations = false;
+                vm.showComputationJobs = true;
+                $window.localStorage.setItem('currentApp', angular.toJson(vm.currentApplication));
+                $window.localStorage.setItem('currentTab', angular.toJson(vm.tabSelectedIndex));
+           }
+        );
+    }
+
+    function getComputationTitle(computation) {
+        return computation ? computation.name : '';
+    }
+    
+    function openComputation($event, computation) {
+        if ($event) {
+            $event.stopPropagation();
+        }
+
+        $state.transitionTo ('.', {computationId: computation.id.id}, { location: false, relative: $state.$current, reload: false, notify: false }) 
+
+                vm.computation = computation;
+                vm.showComputations = false;
+                vm.showComputationJobs = true;
+    }
+
+    vm.backtoComputation = function (){
+        vm.showComputations = true;
+        vm.showComputationJobs = false;
+    }
+
+    if($stateParams.computationId != null){
+        computationService.getComputation($stateParams.computationId).then(
+            function success(computation) {
+                vm.computation = computation;
+                vm.showComputations = false;
+                vm.showComputationJobs = true;
+                openComputation(null, vm.computation);
+            },
+            function fail() {
+            }
+        );
+       
+    }
+
+// Computation Job starts
+
+    var computationJobActionsList = [
+        {
+            onAction: function ($event, item) {
+                activateComputationJob($event, item);
+            },
+            name: function() { return $translate.instant('action.activate') },
+            details: function() { return $translate.instant('computationJob.activate') },
+            icon: "play_arrow",
+            isEnabled: function(computationJob) {
+                return isComputationJobEditable(computationJob) && computationJob && computationJob.state === 'SUSPENDED';
+            }
+        },
+        {
+            onAction: function ($event, item) {
+                suspendComputationJob($event, item);
+            },
+            name: function() { return $translate.instant('action.suspend') },
+            details: function() { return $translate.instant('computationJob.suspend') },
+            icon: "pause",
+            isEnabled: function(computationJob) {
+                return isComputationJobEditable(computationJob) && computationJob && computationJob.state === 'ACTIVE';
+            }
+        },
+        {
+            onAction: function ($event, item) {
+                vm.grid.deleteItem($event, item);
+            },
+            name: function() { return $translate.instant('action.delete') },
+            details: function() { return $translate.instant('computationJob.delete') },
+            icon: "delete",
+            isEnabled: isComputationJobEditable
+        }
+    ];
+
+    var computationJobAddItemActionsList = [
+        {
+            onAction: function ($event) {
+                vm.grid.addItem($event);
+            },
+            name: function() { return $translate.instant('action.create') },
+            details: function() { return $translate.instant('computationJob.create-new-computationJob') },
+            icon: "insert_drive_file"
+        }
+    ];
+
+    //var vm = this;
+    
+
+    //vm.types = types;
+
+    //vm.helpLinkIdForComputationJob = helpLinkIdForComputationJob;
+
+
+    vm.computationJobGridConfig = {
+
+        refreshParamsFunc: null,
+
+        deleteItemTitleFunc: deleteComputationJobTitle,
+        deleteItemContentFunc: deleteComputationJobText,
+        deleteItemsTitleFunc: deleteComputationJobsTitle,
+        //deleteItemsActionTitleFunc: deleteComputationJobsActionTitle,
+        deleteItemsContentFunc: deleteComputationJobsText,
+
+        fetchItemsFunc: fetchComputationJobs,
+        saveItemFunc: saveComputationJob,
+        deleteItemFunc: deleteComputationJob,
+
+        getItemTitleFunc: getComputationJobTitle,
+        itemCardTemplateUrl: computationJobCard,
+        parentCtl: vm,
+
+        actionsList: computationJobActionsList,
+        addItemActions: computationJobAddItemActionsList,
+
+        onGridInited: gridInited,
+
+        addItemTemplateUrl: addComputationJobTemplate,
+
+        addItemText: function() { return $translate.instant('computationJob.add-computationJob-text') },
+        noItemsText: function() { return $translate.instant('computationJob.no-computationJobs-text') },
+        itemDetailsText: function() { return $translate.instant('computationJob.computationJob-details') },
+        isSelectionEnabled: isComputationJobEditable,
+        isDetailsReadOnly: function(computationJob) {
+            return !isComputationJobEditable(computationJob);
+        }
+
+    };
+
+    if (angular.isDefined($stateParams.items) && $stateParams.items !== null) {
+        vm.computationJobGridConfig.items = $stateParams.items;
+    }
+
+    if (angular.isDefined($stateParams.topIndex) && $stateParams.topIndex > 0) {
+        vm.computationJobGridConfig.topIndex = $stateParams.topIndex;
+    }
+
+    vm.isComputationJobEditable = isComputationJobEditable;
+
+    vm.activateComputationJob = activateComputationJob;
+    vm.suspendComputationJob = suspendComputationJob;
+
+    /*function helpLinkIdForComputationJob() {
+        return helpLinks.getComputationJobLink(vm.grid.operatingItem());
+    }*/
+
+    function deleteComputationJobTitle(computationJob) {
+        return $translate.instant('computationJob.delete-computationJob-title', {computationJobName: computationJob.name});
+    }
+
+    function deleteComputationJobText() {
+        return $translate.instant('computationJob.delete-computationJob-text');
+    }
+
+    function deleteComputationJobsTitle(selectedCount) {
+        return $translate.instant('computationJob.delete-computationJobs-title', {count: selectedCount}, 'messageformat');
+    }
+
+    /*function deleteComputationJobsActionTitle(selectedCount) {
+        return $translate.instant('computationJob.delete-computationJobs-action-title', {count: selectedCount}, 'messageformat');
+    }*/
+
+    function deleteComputationJobsText() {
+        return $translate.instant('computationJob.delete-computationJobs-text');
+    }
+
+    // function gridInited(grid) {
+    //     vm.grid = grid;
+    // }
+
+    function fetchComputationJobs(pageLink) {
+        if(vm.computation != null){
+                    return computationJobService.getAllComputationJobs(pageLink, vm.computation.id.id);
+        }
+        else {
+                computationService.getComputation($stateParams.computationId).then(
+                function success(computation) {
+                    //vm.computation = computation;
+                    return computationJobService.getAllComputationJobs(pageLink, computation.id.id)
+                },
+                function fail() {
+                }
+            );
+        }
+    }
+
+    function saveComputationJob(computationJob) {
+        return computationJobService.saveComputationJob(computationJob, vm.computation.id.id).then(
+            function(savedComputationJob) {
+                var computationJob = {"applicationId": vm.currentApplication.id.id, "fields":[savedComputationJob.id.id]};
+                applicationService.assignComputationJobToApplication(computationJob);
+                $window.localStorage.setItem('currentApp', angular.toJson(vm.currentApplication));
+                $window.localStorage.setItem('currentTab', angular.toJson(vm.tabSelectedIndex));
+           }
+        );
+    }
+
+    function deleteComputationJob(computationJobId) {
+        return computationJobService.deleteComputationJob(computationJobId).then(
+            function() {
+                vm.showComputations = false;
+                vm.showComputationJobs = true;
+                $window.localStorage.setItem('currentApp', angular.toJson(vm.currentApplication));
+                $window.localStorage.setItem('currentTab', angular.toJson(vm.tabSelectedIndex));
+           }
+        );
+    }
+
+    function getComputationJobTitle(computationJob) {
+        return computationJob ? computationJob.name : '';
+    }
+
+    function isComputationJobEditable(computationJob) {
+        if (userService.getAuthority() === 'TENANT_ADMIN') {
+            return computationJob && computationJob.tenantId.id != types.id.nullUid;
+        } else {
+            return userService.getAuthority() === 'SYS_ADMIN';
+        }
+    }
+
+    function activateComputationJob(event,computationJob) {
+        computationJobService.activateComputationJob(vm.computation.id.id, computationJob.id.id).then(function () {
+            vm.grid.refreshList();
+        }, function () {
+        });
+    }
+
+    function suspendComputationJob(event, computationJob) {
+        computationJobService.suspendComputationJob(vm.computation.id.id, computationJob.id.id).then(function () {
+            vm.grid.refreshList();
+        }, function () {
+        });
+    }
+
 }
-
-// import dashboardCard from './dashboard-card.tpl.html';
-// import assignToCustomerTemplate from './assign-to-customer.tpl.html';
-// import addDashboardsToCustomerTemplate from './add-dashboards-to-customer.tpl.html';
-// import makeDashboardPublicDialogTemplate from './make-dashboard-public-dialog.tpl.html';
-
-/* eslint-enable import/no-unresolved, import/default */
-
-/*@ngInject*/
-// export function MakeDashboardPublicDialogController($mdDialog, $translate, toast, dashboardService, dashboard) {
-
-//     var vm = this;
-
-//     vm.dashboard = dashboard;
-//     vm.publicLink = dashboardService.getPublicDashboardLink(dashboard);
-
-//     vm.onPublicLinkCopied = onPublicLinkCopied;
-//     vm.close = close;
-
-//     function onPublicLinkCopied(){
-//         toast.showSuccess($translate.instant('dashboard.public-link-copied-message'), 750, angular.element('#make-dialog-public-content'), 'bottom left');
-//     }
-
-//     function close() {
-//         $mdDialog.hide();
-//     }
-
-// }
-
-// /*@ngInject*/
-// export function DashboardCardController(types) {
-
-//     var vm = this;
-
-//     vm.types = types;
-
-//     vm.isAssignedToCustomer = function() {
-//         if (vm.item && vm.item.customerId && vm.parentCtl.dashboardsScope === 'tenant' &&
-//             vm.item.customerId.id != vm.types.id.nullUid && !vm.item.assignedCustomer.isPublic) {
-//             return true;
-//         }
-//         return false;
-//     }
-
-//     vm.isPublic = function() {
-//         if (vm.item && vm.item.assignedCustomer && vm.parentCtl.dashboardsScope === 'tenant' && vm.item.assignedCustomer.isPublic) {
-//             return true;
-//         }
-//         return false;
-//     }
-// }
 

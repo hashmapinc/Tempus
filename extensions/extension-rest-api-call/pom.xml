@@ -29,7 +29,7 @@
     <artifactId>extension-rest-api-call</artifactId>
     <packaging>jar</packaging>
 
-    <name>Thingsboard Server REST API Call Extension</name>
+    <name>Tempus Server REST API Call Extension</name>
     <url>http://thingsboard.org</url>
 
     <properties>

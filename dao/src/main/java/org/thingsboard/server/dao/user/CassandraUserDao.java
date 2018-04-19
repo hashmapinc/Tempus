@@ -52,6 +52,8 @@ public class CassandraUserDao extends CassandraAbstractSearchTextDao<UserEntity,
     @Override
     public User findByEmail(String email) {
         log.debug("Try to find user by email [{}] ", email);
+        if(email!=null)
+            email = email.toLowerCase();
         Where query = select().from(ModelConstants.USER_BY_EMAIL_COLUMN_FAMILY_NAME).where(eq(ModelConstants.USER_EMAIL_PROPERTY, email));
         log.trace("Execute query {}", query);
         UserEntity userEntity = findOneByStatement(query);

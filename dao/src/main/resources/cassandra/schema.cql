@@ -205,9 +205,11 @@ CREATE TABLE IF NOT EXISTS thingsboard.application (
     dashboard_id timeuuid,
     search_text text,
     name text,
+    is_valid boolean,
     description text,
-    application_rules list<timeuuid>,
-    application_device_types list<text>,
+    application_computation_jobs set<timeuuid>,
+    application_rules set<timeuuid>,
+    application_device_types set<text>,
     PRIMARY KEY (id, tenant_id, customer_id)
 );
 
@@ -437,6 +439,7 @@ CREATE TABLE IF NOT EXISTS thingsboard.ts_kv_cf (
     str_v text,
     long_v bigint,
     dbl_v double,
+    json_v text,
     PRIMARY KEY (( entity_type, entity_id, key, partition ), ts)
 );
 
@@ -458,6 +461,7 @@ CREATE TABLE IF NOT EXISTS thingsboard.ts_kv_latest_cf (
     str_v text,
     long_v bigint,
     dbl_v double,
+    json_v text,
     PRIMARY KEY (( entity_type, entity_id ), key)
 ) WITH compaction = { 'class' :  'LeveledCompactionStrategy'  };
 
@@ -471,6 +475,7 @@ CREATE TABLE IF NOT EXISTS thingsboard.ds_kv_cf (
     str_v text,
     long_v bigint,
     dbl_v double,
+    json_v text,
     PRIMARY KEY (( entity_type, entity_id, key, partition ), ds)
 );
 
@@ -492,6 +497,7 @@ CREATE TABLE IF NOT EXISTS thingsboard.ds_kv_latest_cf (
     str_v text,
     long_v bigint,
     dbl_v double,
+    json_v text,
     PRIMARY KEY (( entity_type, entity_id ), key)
 ) WITH compaction = { 'class' :  'LeveledCompactionStrategy'  };
 
@@ -504,6 +510,7 @@ CREATE TABLE IF NOT EXISTS thingsboard.attributes_kv_cf (
     str_v text,
     long_v bigint,
     dbl_v double,
+    json_v text,
     last_update_ts bigint,
     PRIMARY KEY ((entity_type, entity_id, attribute_type), attribute_key)
 ) WITH compaction = { 'class' :  'LeveledCompactionStrategy'  };
@@ -628,3 +635,56 @@ CREATE MATERIALIZED VIEW IF NOT EXISTS thingsboard.event_by_id AS
     AND event_type IS NOT NULL AND event_uid IS NOT NULL
     PRIMARY KEY ((tenant_id, entity_type, entity_id), id, event_type, event_uid)
     WITH CLUSTERING ORDER BY (id ASC, event_type ASC, event_uid ASC);
+
+
+CREATE TABLE IF NOT EXISTS thingsboard.computations (
+    id uuid,
+    jar_name text,
+    jar_path text,
+    search_text text,
+    computation_name text,
+    main_class text,
+    args_format text,
+    args_type text,
+    json_descriptor text,
+    tenant_id uuid,
+    PRIMARY KEY (id, tenant_id)
+);
+
+CREATE MATERIALIZED VIEW IF NOT EXISTS thingsboard.computations_by_tenant_and_search_text AS
+    SELECT *
+    from thingsboard.computations
+    WHERE tenant_id IS NOT NULL AND search_text IS NOT NULL AND id IS NOT NULL
+    PRIMARY KEY ( tenant_id, search_text, id )
+    WITH CLUSTERING ORDER BY ( search_text ASC, id DESC );
+
+CREATE MATERIALIZED VIEW IF NOT EXISTS thingsboard.computations_by_tenant_and_computation_name AS
+    SELECT *
+    from thingsboard.computations
+    WHERE tenant_id IS NOT NULL AND computation_name IS NOT NULL AND id IS NOT NULL
+    PRIMARY KEY ( tenant_id, computation_name, id )
+    WITH CLUSTERING ORDER BY ( computation_name ASC, id DESC );
+
+CREATE TABLE IF NOT EXISTS thingsboard.computation_job (
+    id uuid,
+    job_name text,
+    job_id text,
+    search_text text,
+    computation_id uuid,
+    arg_parameters text,
+    state text,
+    tenant_id uuid,
+    PRIMARY KEY (id, tenant_id, computation_id)
+);
+
+CREATE MATERIALIZED VIEW IF NOT EXISTS thingsboard.cmp_jobs_by_tenant_and_cmp_search_text AS
+    SELECT *
+    from thingsboard.computation_job
+    WHERE tenant_id IS NOT NULL AND computation_id IS NOT NULL AND search_text IS NOT NULL AND id IS NOT NULL
+    PRIMARY KEY (tenant_id, computation_id, search_text, id)
+    WITH CLUSTERING ORDER BY ( search_text ASC, id DESC );
+
+CREATE TABLE IF NOT EXISTS thingsboard.installed_schema_versions (
+    executed_scripts text,
+    PRIMARY KEY(executed_scripts)
+);

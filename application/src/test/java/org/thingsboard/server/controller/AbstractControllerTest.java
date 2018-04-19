@@ -104,7 +104,7 @@ public abstract class AbstractControllerTest {
 
     protected static final String TEST_TENANT_NAME = "TEST TENANT";
 
-    protected static final String SYS_ADMIN_EMAIL = "sysadmin@thingsboard.org";
+    protected static final String SYS_ADMIN_EMAIL = "sysadmin@hashmapinc.com";
     private static final String SYS_ADMIN_PASSWORD = "sysadmin";
 
     protected static final String TENANT_ADMIN_EMAIL = "testtenant@thingsboard.org";
@@ -233,7 +233,7 @@ public abstract class AbstractControllerTest {
     }
 
     protected User createUserAndLogin(User user, String password) throws Exception {
-        User savedUser = doPost("/api/user", user, User.class);
+        User savedUser = doPost("/api/user?activationType=mail", user, User.class);
         logout();
         doGet("/api/noauth/activate?activateToken={activateToken}", TestMailService.currentActivateToken)
                 .andExpect(status().isSeeOther())
@@ -398,6 +398,10 @@ public abstract class AbstractControllerTest {
         return readResponse(doPost(urlTemplate, content, params).andExpect(status().isOk()), responseClass);
     }
 
+    protected <T, R> R doPutWithDifferentResponse(String urlTemplate, T content, Class<R> responseClass, String... params) throws Exception {
+        return readResponse(doPut(urlTemplate, content, params).andExpect(status().isOk()), responseClass);
+    }
+
     protected <T> T doPostAsync(String urlTemplate, T content, Class<T> responseClass, ResultMatcher resultMatcher, String... params) throws Exception {
         return readResponse(doPostAsync(urlTemplate, content, params).andExpect(resultMatcher), responseClass);
     }
@@ -415,6 +419,14 @@ public abstract class AbstractControllerTest {
 
     protected <T> ResultActions doPost(String urlTemplate, T content, String... params) throws Exception {
         MockHttpServletRequestBuilder postRequest = post(urlTemplate);
+        setJwtToken(postRequest);
+        String json = json(content);
+        postRequest.contentType(contentType).content(json);
+        return mockMvc.perform(postRequest);
+    }
+
+    protected <T> ResultActions doPut(String urlTemplate, T content, String... params) throws Exception {
+        MockHttpServletRequestBuilder postRequest = put(urlTemplate);
         setJwtToken(postRequest);
         String json = json(content);
         postRequest.contentType(contentType).content(json);

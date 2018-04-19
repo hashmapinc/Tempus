@@ -1,0 +1,452 @@
+{
+  "title": "Tank Information",
+  "configuration": {
+    "widgets": {
+      "83d52e54-98f4-5200-22a3-836248493ffe": {
+        "isSystemType": true,
+        "bundleAlias": "charts",
+        "typeAlias": "basic_timeseries",
+        "type": "timeseries",
+        "title": "New widget",
+        "sizeX": 12,
+        "sizeY": 5,
+        "config": {
+          "datasources": [
+            {
+              "type": "entity",
+              "dataKeys": [
+                {
+                  "name": "waterTankLevel",
+                  "type": "timeseries",
+                  "label": "waterTankLevel",
+                  "color": "#2196f3",
+                  "settings": {
+                    "showLines": true,
+                    "fillLines": false,
+                    "showPoints": false,
+                    "tooltipValueFormatter": "",
+                    "showSeparateAxis": false,
+                    "axisTitle": "",
+                    "axisTickDecimals": 0,
+                    "axisPosition": "left",
+                    "axisTicksFormatter": ""
+                  },
+                  "_hash": 0.23396968507398297
+                }
+              ],
+              "entityAliasId": "c4df79ab-2117-4bab-22b2-c86840876ba0"
+            }
+          ],
+          "timewindow": {
+            "realtime": {
+              "interval": 300000,
+              "timewindowMs": 86400000
+            },
+            "aggregation": {
+              "type": "AVG",
+              "limit": 200
+            }
+          },
+          "showTitle": true,
+          "backgroundColor": "#fff",
+          "color": "rgba(0, 0, 0, 0.87)",
+          "padding": "8px",
+          "settings": {
+            "shadowSize": 4,
+            "fontColor": "#545454",
+            "fontSize": 10,
+            "xaxis": {
+              "showLabels": true,
+              "color": "#545454"
+            },
+            "yaxis": {
+              "showLabels": true,
+              "color": "#545454"
+            },
+            "grid": {
+              "color": "#545454",
+              "tickColor": "#DDDDDD",
+              "verticalLines": true,
+              "horizontalLines": true,
+              "outlineWidth": 1
+            },
+            "stack": false,
+            "tooltipIndividual": false
+          },
+          "title": "Historical Data",
+          "dropShadow": true,
+          "enableFullscreen": true,
+          "titleStyle": {
+            "fontSize": "16px",
+            "fontWeight": 400
+          },
+          "mobileHeight": null,
+          "widgetStyle": {},
+          "useDashboardTimewindow": false,
+          "showLegend": true,
+          "actions": {}
+        },
+        "id": "83d52e54-98f4-5200-22a3-836248493ffe"
+      },
+      "f51ed55a-354d-337e-d477-2025009680fe": {
+        "isSystemType": true,
+        "bundleAlias": "cards",
+        "typeAlias": "entities_table",
+        "type": "latest",
+        "title": "New widget",
+        "sizeX": 16,
+        "sizeY": 6,
+        "config": {
+          "timewindow": {
+            "realtime": {
+              "interval": 1000,
+              "timewindowMs": 86400000
+            },
+            "aggregation": {
+              "type": "NONE",
+              "limit": 200
+            }
+          },
+          "showTitle": true,
+          "backgroundColor": "rgb(255, 255, 255)",
+          "color": "rgba(0, 0, 0, 0.87)",
+          "padding": "4px",
+          "settings": {
+            "enableSearch": true,
+            "displayPagination": true,
+            "defaultPageSize": 10,
+            "defaultSortOrder": "entityName",
+            "displayEntityName": true,
+            "displayEntityType": true
+          },
+          "title": "Latest Data",
+          "dropShadow": true,
+          "enableFullscreen": true,
+          "titleStyle": {
+            "fontSize": "18px",
+            "fontWeight": 400,
+            "padding": "5px 10px 5px 10px"
+          },
+          "useDashboardTimewindow": false,
+          "showLegend": false,
+          "datasources": [
+            {
+              "type": "entity",
+              "dataKeys": [
+                {
+                  "name": "waterTankLevel",
+                  "type": "timeseries",
+                  "label": "waterTankLevel",
+                  "color": "#2196f3",
+                  "settings": {
+                    "columnWidth": "0px",
+                    "useCellStyleFunction": false,
+                    "useCellContentFunction": false
+                  },
+                  "_hash": 0.008893809855028523,
+                  "units": "galUS",
+                  "decimals": 2
+                },
+                {
+                  "name": "timeToFill",
+                  "type": "timeseries",
+                  "label": "timeToFill",
+                  "color": "#4caf50",
+                  "settings": {
+                    "columnWidth": "0px",
+                    "useCellStyleFunction": false,
+                    "useCellContentFunction": false
+                  },
+                  "_hash": 0.16210183433087788,
+                  "postFuncBody": "return ((value/60)/60);",
+                  "units": "hrs",
+                  "decimals": 2
+                }
+              ],
+              "entityAliasId": "c4df79ab-2117-4bab-22b2-c86840876ba0"
+            }
+          ],
+          "widgetStyle": {},
+          "actions": {}
+        },
+        "id": "f51ed55a-354d-337e-d477-2025009680fe"
+      },
+      "58802f07-3339-179c-a192-0d92f90e3e72": {
+        "isSystemType": true,
+        "bundleAlias": "digital_gauges",
+        "typeAlias": "vertical_bar_justgage",
+        "type": "latest",
+        "title": "New widget",
+        "sizeX": 4,
+        "sizeY": 5,
+        "config": {
+          "datasources": [
+            {
+              "type": "entity",
+              "dataKeys": [
+                {
+                  "name": "timeToFill",
+                  "type": "timeseries",
+                  "label": "timeToFill",
+                  "color": "#2196f3",
+                  "settings": {},
+                  "_hash": 0.8797010973865315,
+                  "postFuncBody": "return (value/60)/60;"
+                }
+              ],
+              "entityAliasId": "c4df79ab-2117-4bab-22b2-c86840876ba0"
+            }
+          ],
+          "timewindow": {
+            "realtime": {
+              "timewindowMs": 60000
+            }
+          },
+          "showTitle": true,
+          "backgroundColor": "#ffffff",
+          "color": "rgba(0, 0, 0, 0.87)",
+          "padding": "0px",
+          "settings": {
+            "maxValue": 100,
+            "minValue": 0,
+            "donutStartAngle": 90,
+            "showValue": true,
+            "showMinMax": true,
+            "gaugeWidthScale": 0.75,
+            "levelColors": [],
+            "titleFont": {
+              "family": "Roboto",
+              "size": 12,
+              "style": "normal",
+              "weight": "500",
+              "color": "#999999"
+            },
+            "labelFont": {
+              "family": "Roboto",
+              "size": 8,
+              "style": "normal",
+              "weight": "500"
+            },
+            "valueFont": {
+              "family": "Roboto",
+              "style": "normal",
+              "weight": "500",
+              "size": 12,
+              "color": "#666666"
+            },
+            "minMaxFont": {
+              "family": "Roboto",
+              "size": 8,
+              "style": "normal",
+              "weight": "500",
+              "color": "#666666"
+            },
+            "neonGlowBrightness": 0,
+            "dashThickness": 1.5,
+            "gaugeColor": "#eeeeee",
+            "showTitle": false,
+            "gaugeType": "verticalBar",
+            "timestampFormat": "yyyy-MM-dd HH:mm:ss",
+            "animation": true,
+            "animationDuration": 500,
+            "animationRule": "linear"
+          },
+          "title": "Time To Fill",
+          "dropShadow": true,
+          "enableFullscreen": true,
+          "titleStyle": {
+            "fontSize": "16px",
+            "fontWeight": 400
+          },
+          "widgetStyle": {},
+          "units": "hrs",
+          "useDashboardTimewindow": true,
+          "showLegend": false,
+          "actions": {}
+        },
+        "id": "58802f07-3339-179c-a192-0d92f90e3e72"
+      },
+      "409a872d-c69a-4ed5-5928-d3bc0f495c1d": {
+        "isSystemType": true,
+        "bundleAlias": "cards",
+        "typeAlias": "html_card",
+        "type": "static",
+        "title": "New widget",
+        "sizeX": 6,
+        "sizeY": 11,
+        "config": {
+          "datasources": [],
+          "timewindow": {
+            "realtime": {
+              "timewindowMs": 60000
+            }
+          },
+          "showTitle": true,
+          "backgroundColor": "rgb(255, 255, 255)",
+          "color": "rgba(0, 0, 0, 0.87)",
+          "padding": "8px",
+          "settings": {
+            "cardCss": ".card {\n    font-weight: bold;\n    font-size: 32px;\n    color: #999;\n    width: 100%;\n    height: 100%;\n    display: flex;\n    align-items: center;\n    justify-content: center;\n}",
+            "cardHtml": "<style type=\"text/css\">\n.tg  {border-collapse:collapse;border-spacing:0;border-color:#999;}\n.tg td{font-family:Arial, sans-serif;font-size:14px;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#999;color:#444;background-color:#F7FDFA;}\n.tg th{font-family:Arial, sans-serif;font-size:14px;font-weight:normal;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#999;color:#fff;background-color:#26ADE4;}\n.tg .tg-5cez{background-color:#d2e4fc;vertical-align:top}\n.tg .tg-kkd1{background-color:#304598;vertical-align:top}\n.tg .tg-yw4l{vertical-align:top}\n.tg .tg-6k2t{background-color:#D2E4FC;vertical-align:top}\n</style>\n<table class=\"tg\">\n  <tr>\n    <th class=\"tg-kkd1\">Property</th>\n    <th class=\"tg-kkd1\">Value</th>\n  </tr>\n  <tr>\n    <td class=\"tg-5cez\">Number of Times Emptied</td>\n    <td class=\"tg-5cez\">232</td>\n  </tr>\n  <tr>\n    <td class=\"tg-yw4l\">Average lead time</td>\n    <td class=\"tg-yw4l\">2 days</td>\n  </tr>\n  <tr>\n    <td class=\"tg-6k2t\">Max lead time</td>\n    <td class=\"tg-6k2t\">4 days</td>\n  </tr>\n  <tr>\n    <td class=\"tg-yw4l\">Tank Max Capacity</td>\n    <td class=\"tg-yw4l\">55 galUS</td>\n  </tr>\n  <tr>\n    <td class=\"tg-6k2t\">Vac Truck Provider</td>\n    <td class=\"tg-6k2t\">ARCO</td>\n  </tr>\n  <tr>\n    <td class=\"tg-yw4l\">GeoZone</td>\n    <td class=\"tg-yw4l\">A</td>\n  </tr>\n</table>"
+          },
+          "title": "Device Information",
+          "dropShadow": true,
+          "enableFullscreen": true,
+          "widgetStyle": {},
+          "titleStyle": {
+            "fontSize": "16px",
+            "fontWeight": 400
+          },
+          "useDashboardTimewindow": true,
+          "showLegend": false,
+          "actions": {
+            "headerButton": [
+              {
+                "id": "0d6a2744-ce24-0ec4-0709-fd55314c75f7",
+                "name": "Back",
+                "icon": "arrow_back",
+                "type": "openDashboard",
+                "targetDashboardId": "8378a990-1683-11e8-9f5b-9fd828cd400e",
+                "targetDashboardStateId": "default",
+                "setEntityId": false
+              }
+            ]
+          },
+          "useDashboardDepthwindow": true
+        },
+        "id": "409a872d-c69a-4ed5-5928-d3bc0f495c1d"
+      }
+    },
+    "states": {
+      "default": {
+        "name": "Water Tank Alarm",
+        "root": true,
+        "layouts": {
+          "main": {
+            "widgets": {
+              "83d52e54-98f4-5200-22a3-836248493ffe": {
+                "sizeX": 12,
+                "sizeY": 5,
+                "mobileHeight": null,
+                "row": 0,
+                "col": 0
+              },
+              "f51ed55a-354d-337e-d477-2025009680fe": {
+                "sizeX": 16,
+                "sizeY": 6,
+                "row": 5,
+                "col": 0
+              },
+              "58802f07-3339-179c-a192-0d92f90e3e72": {
+                "sizeX": 4,
+                "sizeY": 5,
+                "row": 0,
+                "col": 12
+              },
+              "409a872d-c69a-4ed5-5928-d3bc0f495c1d": {
+                "sizeX": 6,
+                "sizeY": 11,
+                "row": 0,
+                "col": 16
+              }
+            },
+            "gridSettings": {
+              "backgroundColor": "#eeeeee",
+              "color": "rgba(0,0,0,0.870588)",
+              "columns": 24,
+              "margins": [
+                10,
+                10
+              ],
+              "backgroundSizeMode": "100%"
+            }
+          }
+        }
+      },
+      "watertank1": {
+        "name": "WaterTank1",
+        "root": false,
+        "layouts": {
+          "main": {
+            "widgets": {},
+            "gridSettings": {
+              "backgroundColor": "#eeeeee",
+              "color": "rgba(0,0,0,0.870588)",
+              "columns": 24,
+              "margins": [
+                10,
+                10
+              ],
+              "backgroundSizeMode": "100%"
+            }
+          }
+        }
+      }
+    },
+    "entityAliases": {
+      "c4df79ab-2117-4bab-22b2-c86840876ba0": {
+        "id": "c4df79ab-2117-4bab-22b2-c86840876ba0",
+        "alias": "Tank",
+        "filter": {
+          "type": "stateEntity",
+          "resolveMultiple": false,
+          "stateEntityParamName": "TankName",
+          "defaultStateEntity": null
+        }
+      }
+    },
+    "timewindow": {
+      "displayValue": "",
+      "selectedTab": 0,
+      "realtime": {
+        "interval": 1000,
+        "timewindowMs": 60000
+      },
+      "history": {
+        "historyType": 0,
+        "interval": 1000,
+        "timewindowMs": 60000,
+        "fixedTimewindow": {
+          "startTimeMs": 1515424144102,
+          "endTimeMs": 1515510544102
+        }
+      },
+      "aggregation": {
+        "type": "AVG",
+        "limit": 200
+      }
+    },
+    "settings": {
+      "stateControllerId": "entity",
+      "showTitle": false,
+      "showDashboardsSelect": false,
+      "showEntitiesSelect": false,
+      "showDashboardTimewindow": false,
+      "showDashboardExport": false,
+      "toolbarAlwaysOpen": true,
+      "titleColor": "rgba(0,0,0,0.870588)"
+    },
+    "depthwindow": {
+      "displayValue": "",
+      "selectedTab": 0,
+      "realtime": {
+        "interval": 10,
+        "depthwindowFt": 10
+      },
+      "history": {
+        "historyType": 0,
+        "interval": 10,
+        "depthwindowFt": 100,
+        "fixedDepthwindow": {
+          "startDepthFt": 0,
+          "endDepthFt": 100
+        }
+      },
+      "aggregation": {
+        "type": "NONE",
+        "limit": 200
+      }
+    }
+  },
+  "name": "Tank Information"
+}

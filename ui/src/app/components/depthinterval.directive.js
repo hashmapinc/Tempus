@@ -15,6 +15,7 @@
  */
 
 /* eslint-disable import/no-unresolved, import/default */
+import './timeinterval.scss';
 
 import depthintervalTemplate from './depthinterval.tpl.html';
 
@@ -33,6 +34,7 @@ function Depthinterval($compile, $templateCache, depthService) {
         element.html(template);
 
         scope.rendered = false;
+        scope.advanced = false;
 
         scope.boundInterval = function() {
             scope.intervals = depthService.getIntervals();
@@ -52,6 +54,13 @@ function Depthinterval($compile, $templateCache, depthService) {
         ngModelCtrl.$render = function () {
             if (ngModelCtrl.$viewValue) {
                 var intervalFt = ngModelCtrl.$viewValue;
+
+                if (!scope.rendered) {
+                    scope.advanced = depthService.matchesExistingInterval(intervalFt);
+                    if(scope.advanced)
+                        scope.feetValue = intervalFt;
+
+                }
                 scope.setIntervalFt(intervalFt);
             }
             scope.rendered = true;
@@ -81,6 +90,20 @@ function Depthinterval($compile, $templateCache, depthService) {
 
         scope.$watch('intervalFt', function (newIntervalFt, prevIntervalFt) {
             if (angular.isDefined(newIntervalFt) && newIntervalFt !== prevIntervalFt) {
+                scope.updateView();
+            }
+        });
+
+        scope.$watch('feetValue', function (newFeetValue, prevFeetValue) {
+            if (angular.isDefined(newFeetValue) && newFeetValue !== prevFeetValue) {
+                scope.intervalFt = newFeetValue;
+                scope.updateView();
+            }
+        });
+
+        scope.$watch('advanced', function (newAdvanced, prevAdvanced) {
+            if (angular.isDefined(newAdvanced) && newAdvanced !== prevAdvanced) {
+                scope.intervalFt = scope.intervalFt;
                 scope.updateView();
             }
         });

@@ -39,6 +39,8 @@ export default class DepthDataAggregator {
         if (this.stateData) {
             this.lastPrevKvPairData = {};
         }
+
+        // as of now only none is supported for depthseries data so all will point to none
         this.aggregationTimeout = Math.max(this.interval, 1000);
         switch (aggregationType) {
             case types.aggregation.min.value:
@@ -60,7 +62,7 @@ export default class DepthDataAggregator {
                 this.aggFunction = none;
                 break;
             default:
-                this.aggFunction = avg;
+                this.aggFunction = none;
         }
     }
 
@@ -107,6 +109,7 @@ export default class DepthDataAggregator {
             }
             this.onInterval(history, apply);
         } else {
+            updateAggregationMap(this.aggregationMap, this.data, this.startDs, this.depthWindow);
             updateAggregatedData(this.aggregationMap, this.aggregationType === this.types.aggregation.count.value,
                 this.noAggregation, this.aggFunction, data.data, this.interval, this.startDs);
             if (history) {
@@ -117,22 +120,11 @@ export default class DepthDataAggregator {
     }
 
     onInterval(history, apply) {
-        var now = currentTime();
-        this.elapsed += now - this.intervalScheduledTime;
-        this.intervalScheduledTime = now;
         if (this.intervalTimeoutHandle) {
             this.$timeout.cancel(this.intervalTimeoutHandle);
             this.intervalTimeoutHandle = null;
         }
-        if (!history) {
-            var delta = Math.floor(this.elapsed / this.interval);
-            delta;
-            if(delta || !this.data){
-                this.data = this.updateData();
-            }
-        } else {
-            this.data = this.updateData();
-        }
+        this.data = this.updateData();
         if (this.onDataCb) {
             this.onDataCb(this.data, apply);
         }
@@ -152,15 +144,17 @@ export default class DepthDataAggregator {
         for (var key in this.aggregationMap) {
             var aggKeyData = this.aggregationMap[key];
             var keyData = this.dataBuffer[key];
-            for (var aggDepthdatum in aggKeyData) {
+            var aggDepthdatum;
+            for (aggDepthdatum in aggKeyData) {
                 var aggData = aggKeyData[aggDepthdatum];
                 var kvPair = [Number(aggDepthdatum), aggData.aggValue];
                 keyData.push(kvPair);
             }
+            this.startDs = Number(aggDepthdatum);
             keyData = this.$filter('orderBy')(keyData, '+this[0]');
-            /*if (this.stateData) {
+            if (this.stateData) {
                 this.updateStateBounds(keyData, angular.copy(this.lastPrevKvPairData[key]));
-            }*/
+            }
             if (keyData.length > this.limit) {
                 keyData = keyData.slice(keyData.length - this.limit);
             }
@@ -263,6 +257,17 @@ function updateAggregatedData(aggregationMap, isCount, noAggregation, aggFunctio
             } else {
                 aggFunction(aggData, value);
             }
+        }
+    }
+}
+
+function updateAggregationMap(aggregationMap, data, startDs, depthWindow) {
+    for (var key in data) {
+        var aggKeyData = aggregationMap[key];
+        // added to delete stale data points.
+        for (var aggrDepth in aggKeyData) {
+            if (aggrDepth <= (startDs - depthWindow))
+                delete aggKeyData[aggrDepth];
         }
     }
 }

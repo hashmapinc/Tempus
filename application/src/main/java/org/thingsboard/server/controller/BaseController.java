@@ -27,6 +27,7 @@ import org.thingsboard.server.common.data.alarm.Alarm;
 import org.thingsboard.server.common.data.alarm.AlarmId;
 import org.thingsboard.server.common.data.alarm.AlarmInfo;
 import org.thingsboard.server.common.data.asset.Asset;
+import org.thingsboard.server.common.data.computation.ComputationJob;
 import org.thingsboard.server.common.data.id.*;
 import org.thingsboard.server.common.data.page.TextPageLink;
 import org.thingsboard.server.common.data.page.TimePageLink;
@@ -40,8 +41,12 @@ import org.thingsboard.server.common.data.widget.WidgetsBundle;
 import org.thingsboard.server.dao.alarm.AlarmService;
 import org.thingsboard.server.dao.application.ApplicationService;
 import org.thingsboard.server.dao.asset.AssetService;
+import org.thingsboard.server.dao.attributes.AttributesService;
+import org.thingsboard.server.dao.computations.ComputationJobService;
+import org.thingsboard.server.dao.computations.ComputationsService;
 import org.thingsboard.server.dao.customer.CustomerService;
 import org.thingsboard.server.dao.dashboard.DashboardService;
+import org.thingsboard.server.dao.depthSeries.DepthSeriesService;
 import org.thingsboard.server.dao.device.DeviceCredentialsService;
 import org.thingsboard.server.dao.device.DeviceService;
 import org.thingsboard.server.dao.exception.DataValidationException;
@@ -50,6 +55,7 @@ import org.thingsboard.server.dao.model.ModelConstants;
 import org.thingsboard.server.dao.plugin.PluginService;
 import org.thingsboard.server.dao.relation.RelationService;
 import org.thingsboard.server.dao.rule.RuleService;
+import org.thingsboard.server.dao.timeseries.TimeseriesService;
 import org.thingsboard.server.dao.user.UserService;
 import org.thingsboard.server.dao.widget.WidgetTypeService;
 import org.thingsboard.server.dao.widget.WidgetsBundleService;
@@ -119,6 +125,13 @@ public abstract class BaseController {
 
     @Autowired
     protected ApplicationService applicationService;
+
+    @Autowired
+    protected ComputationJobService computationJobService;
+
+    @Autowired
+    protected ComputationsService computationsService;
+
 
 
     @ExceptionHandler(ThingsboardException.class)
@@ -244,6 +257,23 @@ public abstract class BaseController {
             throw handleException(e, false);
         }
     }
+
+    Long checkLong(String value, String paramName) {
+        try {
+           return Long.parseLong(value);
+        } catch (Exception e) {
+            throw new IllegalArgumentException("Incorrect "+paramName + " value supplied");
+        }
+    }
+
+    Double checkDouble(String value, String paramName) {
+        try {
+            return Double.parseDouble(value);
+        } catch (Exception e) {
+            throw new IllegalArgumentException("Incorrect "+paramName + " value supplied");
+        }
+    }
+
 
     private void checkCustomer(Customer customer) throws ThingsboardException {
         checkNotNull(customer);
@@ -509,6 +539,24 @@ public abstract class BaseController {
             }
         }
         return plugin;
+    }
+
+    protected ComputationJob checkComputationJob(ComputationJob computationJob) throws ThingsboardException {
+        checkNotNull(computationJob);
+        SecurityUser authUser = getCurrentUser();
+        TenantId tenantId = computationJob.getTenantId();
+        validateId(tenantId, "Incorrect tenantId " + tenantId);
+        if (authUser.getAuthority() != Authority.SYS_ADMIN) {
+            if (authUser.getTenantId() == null ||
+                    !tenantId.getId().equals(ModelConstants.NULL_UUID) && !authUser.getTenantId().equals(tenantId)) {
+                throw new ThingsboardException("You don't have permission to perform this operation!",
+                        ThingsboardErrorCode.PERMISSION_DENIED);
+
+            } else if (tenantId.getId().equals(ModelConstants.NULL_UUID)) {
+                computationJob.setArgParameters(null);
+            }
+        }
+        return computationJob;
     }
 
     protected PluginMetaData checkPlugin(PluginId pluginId) throws ThingsboardException {

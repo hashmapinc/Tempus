@@ -17,26 +17,33 @@ export default angular.module('thingsboard.api.depth', [])
     .factory('depthService', DepthService)
     .name;
 
-const DECI_FT = 10;
+const DECI_FT = 0;
 const AVG_LIMIT = 200;
 const MAX_LIMIT = 500;
 const MIN_LIMIT = 10;
 const MIN_INTEVAL = 10;
 const MAX_INTEVAL = 30;
+const START_DS = -10000;
 var startDpt = DECI_FT;
+
 
 /*@ngInject*/
 function DepthService($translate, types) {
 
     var predefIntervals = [
         {
-            name: $translate.instant('depthinterval.feet-interval', {feet: 10}, 'messageformat'),
-            value: 10
+            name: $translate.instant('depthinterval.feet-interval', {feet: 1000}, 'messageformat'),
+            value: 1000
         },
         {
-            name: $translate.instant('depthinterval.feet-interval', {feet: 20}, 'messageformat'),
-            value: 20
-        }]
+            name: $translate.instant('depthinterval.feet-interval', {feet: 2000}, 'messageformat'),
+            value: 2000
+        },
+        {
+            name: $translate.instant('depthinterval.feet-interval', {feet: 3000}, 'messageformat'),
+            value: 3000
+        }
+    ]
 
     var service = {
         minIntervalLimit: minIntervalLimit,
@@ -44,6 +51,7 @@ function DepthService($translate, types) {
         getIntervals: getIntervals,
         defaultDepthwindow: defaultDepthwindow,
         toHistoryDepthwindow: toHistoryDepthwindow,
+        matchesExistingInterval: matchesExistingInterval,
         createSubscriptionDepthwindow: createSubscriptionDepthwindow,
         avgAggregationLimit: function () {
             return AVG_LIMIT;
@@ -58,7 +66,7 @@ function DepthService($translate, types) {
             selectedTab: 0,
             realtime: {
                 interval: DECI_FT,
-                depthwindowFt: DECI_FT // 10 Feet by default by default
+                depthwindowFt: 1000 // 10 Feet by default by default
             },
             history: {
                 historyType: 0,
@@ -66,7 +74,7 @@ function DepthService($translate, types) {
                 depthwindowFt: 100,
                 fixedDepthwindow: {
                     startDepthFt: 0,
-                    endDepthFt: 100
+                    endDepthFt: 3000
                 }
             },
             aggregation: {
@@ -88,9 +96,9 @@ function DepthService($translate, types) {
 
         var aggType;
         if (depthwindow.aggregation) {
-            aggType = depthwindow.aggregation.type || types.aggregation.avg.value;
+            aggType = depthwindow.aggregation.type || types.aggregation.none.value;
         } else {
-            aggType = types.aggregation.avg.value;
+            aggType = types.aggregation.none.value;
         }
 
         var historyDepthwindow = {
@@ -117,7 +125,7 @@ function DepthService($translate, types) {
             aggregation: {
                 interval: DECI_FT,
                 limit: AVG_LIMIT,
-                type: types.aggregation.avg.value
+                type: types.aggregation.none.value
             }
         };
         var aggDepthwindow = 0;
@@ -132,13 +140,13 @@ function DepthService($translate, types) {
             subscriptionDepthwindow.aggregation = {
                 interval: DECI_FT,
                 limit: AVG_LIMIT,
-                type: types.aggregation.avg.value
+                type: types.aggregation.none.value
             };
         }
 
         if (angular.isDefined(depthwindow.aggregation) && !stateData) {
             subscriptionDepthwindow.aggregation = {
-                type: depthwindow.aggregation.type || types.aggregation.avg.value,
+                type: depthwindow.aggregation.type || types.aggregation.none.value,
                 limit: depthwindow.aggregation.limit || AVG_LIMIT
             };
         }
@@ -147,8 +155,8 @@ function DepthService($translate, types) {
             subscriptionDepthwindow.aggregation.interval =
                 boundIntervalToDepthwindow(subscriptionDepthwindow.realtimeWindowFt, depthwindow.realtime.interval,
                     subscriptionDepthwindow.aggregation.type);
-            subscriptionDepthwindow.startDs = startDpt + stDiff - subscriptionDepthwindow.realtimeWindowFt;
-            startDpt = startDpt + subscriptionDepthwindow.realtimeWindowFt;
+
+            subscriptionDepthwindow.startDs = START_DS;
 
             var startDiff = subscriptionDepthwindow.startDs % subscriptionDepthwindow.aggregation.interval;
             aggDepthwindow = subscriptionDepthwindow.realtimeWindowFt;
@@ -158,7 +166,6 @@ function DepthService($translate, types) {
             }
         } else if (angular.isDefined(depthwindow.history)) {
             if (angular.isDefined(depthwindow.history.depthwindowFt)) {
-                //var currentTime = (new Date).getTime();
                 subscriptionDepthwindow.fixedWindow = {
                     startDepthFt: startDpt - depthwindow.history.depthwindowFt,
                     endDepthFt: startDpt
@@ -185,6 +192,14 @@ function DepthService($translate, types) {
         return subscriptionDepthwindow;
     }
 
+    function matchesExistingInterval(intervalFt) {
+        for (var interval in predefIntervals){
+            if(intervalFt === predefIntervals[interval].value)
+                return false;
+        }
+        return true;
+    }
+
     function getIntervals() {
         var intervals = [];
         for (var i in predefIntervals) {
@@ -209,6 +224,7 @@ function DepthService($translate, types) {
         if (aggType === types.aggregation.none.value) {
             return DECI_FT;
         }
+        return Number(intervalFt);
     }
 
 

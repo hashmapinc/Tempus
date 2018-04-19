@@ -410,7 +410,7 @@ $previewSize: 100px;
 
 .tb-container {
   position: relative;
-  margin-top: 32px;
+  margin-top: 5px;
   padding: 10px 0;
 }
 
@@ -624,4 +624,29 @@ section.tb-footer-buttons {
 
 .ace_editor {
   font-size: 16px !important;
+}
+
+.hm-side-toolbar {
+  background: linear-gradient(to bottom, #0c3483 0%, transparent 200%), url("/static/images/LoginPage_Background_Image.png");
+}
+.hm-homecard-gradient {
+  background: linear-gradient(to bottom, #0c3483 0%, transparent 300%);
+  color: rgba(255,255,255,0.87);
+}
+
+md-card-title {
+  max-width: 100%;
+}
+
+md-card-title-text {
+  overflow-y: auto;
+  word-wrap: break-word;
+}
+
+.tb-card-item md-card-title-text {
+    max-height: 100%;
+}
+
+.md-headline {
+    font-size: 20px;
 }

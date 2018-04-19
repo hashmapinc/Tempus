@@ -27,7 +27,7 @@
     <artifactId>application</artifactId>
     <packaging>jar</packaging>
 
-    <name>ThingsBoard Server Application</name>
+    <name>Tempus Server Application</name>
     <url>https://thingsboard.io</url>
     <description>Open-source IoT Platform - Device management, data collection, processing and visualization
     </description>
@@ -35,7 +35,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <main.dir>${basedir}/..</main.dir>
-        <pkg.name>thingsboard</pkg.name>
+        <pkg.name>tempus</pkg.name>
         <pkg.unixLogFolder>/var/log/${pkg.name}</pkg.unixLogFolder>
         <pkg.installFolder>/usr/share/${pkg.name}</pkg.installFolder>
         <pkg.win.dist>${project.build.directory}/windows</pkg.win.dist>
@@ -87,6 +87,11 @@
             <artifactId>dao</artifactId>
             <type>test-jar</type>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.opencsv</groupId>
+            <artifactId>opencsv</artifactId>
+            <version>4.0</version>
         </dependency>
         <dependency>
             <groupId>io.takari.junit</groupId>
@@ -301,7 +306,7 @@
                 <version>${surfire.version}</version>
                 <configuration>
                     <systemPropertyVariables>
-                        <spring.config.name>thingsboard</spring.config.name>
+                        <spring.config.name>tempus</spring.config.name>
                     </systemPropertyVariables>
                     <includes>
                         <include>**/*TestSuite.java</include>
@@ -558,7 +563,7 @@
                     </excludes>
                     <archive>
                         <manifestEntries>
-                            <Implementation-Title>ThingsBoard</Implementation-Title>
+                            <Implementation-Title>Tempus</Implementation-Title>
                             <Implementation-Version>${project.version}</Implementation-Version>
                         </manifestEntries>
                     </archive>

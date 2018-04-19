@@ -16,17 +16,24 @@
 package org.thingsboard.server.dao.model.nosql;
 
 import com.datastax.driver.core.utils.UUIDs;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.thingsboard.server.common.data.Application;
+import org.thingsboard.server.common.data.DeviceType;
+import org.thingsboard.server.common.data.DeviceTypeConfigurations;
 import org.thingsboard.server.common.data.id.*;
+import org.thingsboard.server.common.data.plugin.ComponentLifecycleState;
 import org.thingsboard.server.dao.model.SearchTextEntity;
 import com.datastax.driver.mapping.annotations.Column;
 import com.datastax.driver.mapping.annotations.PartitionKey;
 import com.datastax.driver.mapping.annotations.Table;
 import com.datastax.driver.mapping.annotations.Transient;
+import org.thingsboard.server.dao.model.type.ComponentLifecycleStateCodec;
+import org.thingsboard.server.dao.model.type.JsonCodec;
 
 
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static org.thingsboard.server.dao.model.ModelConstants.*;
@@ -58,24 +65,35 @@ public final class ApplicationEntity implements SearchTextEntity<Application> {
     @Column(name = APPLICATION_NAME)
     private String name;
 
-    @Column(name = APPLICATION_DESCRIPTION)
-    private String description;
+    @Column(name = APPLICATION_IS_VALID)
+    private Boolean isValid;
+
+    @Column(name = APPLICATION_DESCRIPTION, codec = JsonCodec.class)
+    private JsonNode additionalInfo;
 
     @Column(name = SEARCH_TEXT_PROPERTY)
     private String searchText;
 
     @Column(name = APPLICATION_RULES_COLUMN)
-    private List<UUID> rules;
+    private Set<UUID> rules;
+
+    @Column(name = APPLICATION_COMPUTATION_JOBS_COLUMN)
+    private Set<UUID> computationJobs;
 
     @Column(name = APPLICATION_DEVICE_TYPES_COLUMN)
-    private List<String> deviceTypes;
+    private Set<String> deviceTypes;
 
+    @Column(name = APPLICATION_STATE_PROPERTY, codec = ComponentLifecycleStateCodec.class)
+    private ComponentLifecycleState state;
+
+
+    private static ObjectMapper mapper = new ObjectMapper();
 
     public ApplicationEntity() {
         super();
     }
 
-    public ApplicationEntity(Application application){
+    public ApplicationEntity(Application application) throws JsonProcessingException {
         if (application.getId() != null) {
             this.setId(application.getId().getId());
         }
@@ -95,12 +113,18 @@ public final class ApplicationEntity implements SearchTextEntity<Application> {
         }
 
         if(application.getRules() !=null && application.getRules().size() !=0) {
-            this.rules = application.getRules().stream().map(r -> (r.getId())).collect(Collectors.toList());
+            this.rules = application.getRules().stream().map(r -> (r.getId())).collect(Collectors.toSet());
+        }
+
+        if(application.getComputationJobIdSet() !=null && application.getComputationJobIdSet().size() !=0) {
+            this.computationJobs = application.getComputationJobIdSet().stream().map(c -> (c.getId())).collect(Collectors.toSet());
         }
 
         this.name = application.getName();
-        this.description = application.getDescription();
-        this.deviceTypes = application.getDeviceTypes();
+        this.isValid = application.getIsValid();
+        this.additionalInfo = application.getAdditionalInfo();
+        this.deviceTypes = mapper.treeToValue(application.getDeviceTypes(), DeviceTypeConfigurations.class).getDeviceTypes().stream().map(DeviceType::getName).collect(Collectors.toSet());
+        this.state = application.getState();
     }
 
 
@@ -162,32 +186,56 @@ public final class ApplicationEntity implements SearchTextEntity<Application> {
         this.name = name;
     }
 
-    public String getDescription() {
-        return description;
+    public Boolean getIsValid() {
+        return isValid;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
+    public void setIsValid(Boolean valid) {
+        isValid = valid;
+    }
+
+    public JsonNode getAdditionalInfo() {
+        return additionalInfo;
+    }
+
+    public void setAdditionalInfo(JsonNode additionalInfo) {
+        this.additionalInfo = additionalInfo;
     }
 
     public String getSearchText() {
         return searchText;
     }
 
-    public List<UUID> getRules() {
+    public Set<UUID> getRules() {
         return rules;
     }
 
-    public void setRules(List<UUID> rules) {
+    public void setRules(Set<UUID> rules) {
         this.rules = rules;
     }
 
-    public List<String> getDeviceTypes() {
+    public Set<UUID> getComputationJobs() {
+        return computationJobs;
+    }
+
+    public void setComputationJobs(Set<UUID> computationJobs) {
+        this.computationJobs = computationJobs;
+    }
+
+    public Set<String> getDeviceTypes() {
         return deviceTypes;
     }
 
-    public void setDeviceTypes(List<String> deviceTypes) {
+    public void setDeviceTypes(Set<String> deviceTypes) {
         this.deviceTypes = deviceTypes;
+    }
+
+    public ComponentLifecycleState getState() {
+        return state;
+    }
+
+    public void setState(ComponentLifecycleState state) {
+        this.state = state;
     }
 
     @Override
@@ -210,12 +258,33 @@ public final class ApplicationEntity implements SearchTextEntity<Application> {
         }
 
         if(rules !=null && rules.size() !=0) {
-            application.setRules(rules.stream().map(RuleId::new).collect(Collectors.toList()));
+            application.setRules(rules.stream().map(RuleId::new).collect(Collectors.toSet()));
+        }
+
+        if(computationJobs !=null && computationJobs.size() !=0) {
+            application.setComputationJobIdSet(computationJobs.stream().map(ComputationJobId::new).collect(Collectors.toSet()));
         }
         application.setName(name);
-        application.setDescription(description);
+        application.setIsValid(isValid);
+        application.setAdditionalInfo(additionalInfo);
+
+        if(state != null) {
+            application.setState(state);
+        } else {
+            application.setState(ComponentLifecycleState.SUSPENDED);
+        }
+
         if(deviceTypes !=null) {
-            application.setDeviceTypes(deviceTypes);
+            DeviceTypeConfigurations deviceTypeConfigurations = new DeviceTypeConfigurations();
+            List<DeviceType> deviceTypesModelList = new ArrayList<>();
+            for(String dt: deviceTypes) {
+                DeviceType deviceType = new DeviceType();
+                deviceType.setName(dt);
+                deviceTypesModelList.add(deviceType);
+            }
+
+            deviceTypeConfigurations.setDeviceTypes(deviceTypesModelList);
+            application.setDeviceTypes(mapper.valueToTree(deviceTypeConfigurations));
         }
         return application;
     }
@@ -224,34 +293,25 @@ public final class ApplicationEntity implements SearchTextEntity<Application> {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-
         ApplicationEntity that = (ApplicationEntity) o;
-
-        if (id != null ? !id.equals(that.id) : that.id != null) return false;
-        if (tenantId != null ? !tenantId.equals(that.tenantId) : that.tenantId != null) return false;
-        if (customerId != null ? !customerId.equals(that.customerId) : that.customerId != null) return false;
-        if (miniDashboardId != null ? !miniDashboardId.equals(that.miniDashboardId) : that.miniDashboardId != null)
-            return false;
-        if (dashboardId != null ? !dashboardId.equals(that.dashboardId) : that.dashboardId != null) return false;
-        if (name != null ? !name.equals(that.name) : that.name != null) return false;
-        if (description != null ? !description.equals(that.description) : that.description != null) return false;
-        if (searchText != null ? !searchText.equals(that.searchText) : that.searchText != null) return false;
-        if (rules != null ? !rules.equals(that.rules) : that.rules != null) return false;
-        return deviceTypes != null ? deviceTypes.equals(that.deviceTypes) : that.deviceTypes == null;
+        return Objects.equals(id, that.id) &&
+                Objects.equals(tenantId, that.tenantId) &&
+                Objects.equals(customerId, that.customerId) &&
+                Objects.equals(miniDashboardId, that.miniDashboardId) &&
+                Objects.equals(dashboardId, that.dashboardId) &&
+                Objects.equals(name, that.name) &&
+                Objects.equals(isValid, that.isValid) &&
+                Objects.equals(additionalInfo, that.additionalInfo) &&
+                Objects.equals(searchText, that.searchText) &&
+                Objects.equals(rules, that.rules) &&
+                Objects.equals(computationJobs, that.computationJobs) &&
+                Objects.equals(deviceTypes, that.deviceTypes) &&
+                state == that.state;
     }
 
     @Override
     public int hashCode() {
-        int result = id != null ? id.hashCode() : 0;
-        result = 31 * result + (tenantId != null ? tenantId.hashCode() : 0);
-        result = 31 * result + (customerId != null ? customerId.hashCode() : 0);
-        result = 31 * result + (miniDashboardId != null ? miniDashboardId.hashCode() : 0);
-        result = 31 * result + (dashboardId != null ? dashboardId.hashCode() : 0);
-        result = 31 * result + (name != null ? name.hashCode() : 0);
-        result = 31 * result + (description != null ? description.hashCode() : 0);
-        result = 31 * result + (searchText != null ? searchText.hashCode() : 0);
-        result = 31 * result + (rules != null ? rules.hashCode() : 0);
-        result = 31 * result + (deviceTypes != null ? deviceTypes.hashCode() : 0);
-        return result;
+
+        return Objects.hash(id, tenantId, customerId, miniDashboardId, dashboardId, name, isValid, additionalInfo, searchText, rules, computationJobs, deviceTypes, state);
     }
 }

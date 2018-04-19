@@ -1,5 +1,5 @@
 VERSION=1.3.0
-PROJECT=thingsboard
+PROJECT=tempus
 APP=cassandra
 
 build:

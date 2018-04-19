@@ -24,7 +24,7 @@ export default function ApplicationRoutes($stateProvider, types) {
     $stateProvider
         .state('home.applications', {
             url: '/applications',
-            params: {'topIndex': 0},
+            params: {'topIndex': 0, computationId: null, reload: false},
             module: 'private',
             auth: ['TENANT_ADMIN', 'CUSTOMER_USER'],
             views: {
@@ -43,7 +43,7 @@ export default function ApplicationRoutes($stateProvider, types) {
                 dashboardsType: 'tenant',         
             },
             ncyBreadcrumb: {
-                label: '{"icon": "devices_other", "label": "application.applications"}'
+                label: '{"icon": "devices_other", "label": "application.applications", "link": "/static/svg/applicationslightgray.svg"}'
             }
         })
 }

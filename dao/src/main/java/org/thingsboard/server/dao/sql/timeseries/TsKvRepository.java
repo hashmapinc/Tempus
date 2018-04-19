@@ -41,6 +41,15 @@ public interface TsKvRepository extends CrudRepository<TsKvEntity, TsKvComposite
                                       @Param("endTs") long endTs,
                                       Pageable pageable);
 
+    @Query("SELECT tskv.ts, tskv.key, tskv.booleanValue, tskv.strValue, tskv.longValue, tskv.doubleValue, tskv.jsonValue FROM TsKvEntity tskv WHERE tskv.entityId = :entityId " +
+            "AND tskv.entityType = :entityType " +
+            "AND tskv.ts >= :startTs AND tskv.ts <= :endTs ORDER BY tskv.ts DESC")
+    List<Object[]> findSelected(@Param("entityId") String entityId,
+                                @Param("entityType") EntityType entityType,
+                                @Param("startTs") long startTs,
+                                @Param("endTs") long endTs);
+
+
     @Async
     @Query("SELECT new TsKvEntity(MAX(tskv.strValue), MAX(tskv.longValue), MAX(tskv.doubleValue)) FROM TsKvEntity tskv " +
             "WHERE tskv.entityId = :entityId AND tskv.entityType = :entityType " +
@@ -62,7 +71,7 @@ public interface TsKvRepository extends CrudRepository<TsKvEntity, TsKvComposite
                        @Param("endTs") long endTs);
 
     @Async
-    @Query("SELECT new TsKvEntity(COUNT(tskv.booleanValue), COUNT(tskv.strValue), COUNT(tskv.longValue), COUNT(tskv.doubleValue)) FROM TsKvEntity tskv " +
+    @Query("SELECT new TsKvEntity(COUNT(tskv.booleanValue), COUNT(tskv.strValue), COUNT(tskv.longValue), COUNT(tskv.doubleValue), COUNT(tskv.jsonValue)) FROM TsKvEntity tskv " +
             "WHERE tskv.entityId = :entityId AND tskv.entityType = :entityType " +
             "AND tskv.key = :entityKey AND tskv.ts > :startTs AND tskv.ts < :endTs")
     CompletableFuture<TsKvEntity> findCount(@Param("entityId") String entityId,

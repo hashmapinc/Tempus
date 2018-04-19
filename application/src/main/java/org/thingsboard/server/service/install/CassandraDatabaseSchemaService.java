@@ -16,18 +16,28 @@
 
 package org.thingsboard.server.service.install;
 
+import com.datastax.driver.core.ResultSet;
+import com.datastax.driver.core.Row;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 import org.thingsboard.server.dao.cassandra.CassandraInstallCluster;
+import org.thingsboard.server.dao.model.ModelConstants;
 import org.thingsboard.server.dao.util.NoSqlDao;
 import org.thingsboard.server.service.install.cql.CQLStatementsParser;
 
+import java.nio.charset.Charset;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.stream.Collectors;
+
+import static org.thingsboard.server.dao.model.ModelConstants.THINGSBOARD_KEYSPACE;
 
 @Service
 @NoSqlDao
@@ -37,6 +47,7 @@ public class CassandraDatabaseSchemaService implements DatabaseSchemaService {
 
     private static final String CASSANDRA_DIR = "cassandra";
     private static final String SCHEMA_CQL = "schema.cql";
+    private static final String UPGRADE_DIR = "upgrade";
 
     @Value("${install.data_dir}")
     private String dataDir;
@@ -51,10 +62,34 @@ public class CassandraDatabaseSchemaService implements DatabaseSchemaService {
         Path schemaFile = Paths.get(this.dataDir, CASSANDRA_DIR, SCHEMA_CQL);
         loadCql(schemaFile);
 
+        log.info("Installing pending upgrades ...");
+
+        Path upgradeScriptsDirectory = Paths.get(this.dataDir, CASSANDRA_DIR, UPGRADE_DIR);
+        List<String> executedUpgrades = new ArrayList<>();
+        ResultSet resultSet = cluster.getSession().execute("select "+ModelConstants.INSTALLED_SCRIPTS_COLUMN+" from " +THINGSBOARD_KEYSPACE +"." + ModelConstants.INSTALLED_SCHEMA_VERSIONS+";");
+        Iterator<Row> rowIterator = resultSet.iterator();
+
+        while(rowIterator.hasNext()) {
+            Row row = rowIterator.next();
+            executedUpgrades.add(row.getString(ModelConstants.INSTALLED_SCRIPTS_COLUMN));
+        }
+        List<Integer> sortedScriptsIndexes = Files.list(upgradeScriptsDirectory).map(a -> stripExtensionFromName(a.getFileName().toString())).sorted().collect(Collectors.toList());
+
+        for(Integer i: sortedScriptsIndexes) {
+            String scriptFileName = i.toString()+".cql";
+            if(!executedUpgrades.contains(scriptFileName)) {
+                loadCql(upgradeScriptsDirectory.resolve(scriptFileName));
+                cluster.getSession().execute("insert into " +THINGSBOARD_KEYSPACE +"."+ ModelConstants.INSTALLED_SCHEMA_VERSIONS+ "("+ModelConstants.INSTALLED_SCRIPTS_COLUMN+")" +" values('"+scriptFileName+"'"+")");
+            }
+        }
     }
 
     private void loadCql(Path cql) throws Exception {
         List<String> statements = new CQLStatementsParser(cql).getStatements();
         statements.forEach(statement -> cluster.getSession().execute(statement));
+    }
+
+    private Integer stripExtensionFromName(String fileName) {
+        return Integer.parseInt(fileName.substring(0, fileName.indexOf(".cql")));
     }
 }

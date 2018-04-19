@@ -1,0 +1,67 @@
+<!--
+
+    Copyright © 2016-2017 The Thingsboard Authors
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+        http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<md-button ng-click="onActivateComputationJob({event: $event})"
+           ng-show="!isEdit && !isReadOnly && computationJob.state === 'SUSPENDED'"
+           class="md-raised md-primary">{{ 'computationJob.activate' | translate }}</md-button>
+<md-button ng-click="onSuspendComputationJob({event: $event})"
+           ng-show="!isEdit && !isReadOnly && computationJob.state === 'ACTIVE'"
+           class="md-raised md-primary">{{ 'computationJob.suspend' | translate }}</md-button>
+<md-button ng-click="onDeleteComputationJob({event: $event})"
+           ng-show="!isEdit && !isReadOnly"
+           class="md-raised md-primary">{{ 'computationJob.delete' | translate }}</md-button>
+
+<div layout="row">
+    <md-button ngclipboard data-clipboard-action="copy"
+               ngclipboard-success="onComputationJobIdCopied(e)"
+               data-clipboard-text="{{computationJob.id.id}}" ng-show="!isEdit"
+               class="md-raised">
+        <md-icon md-svg-icon="mdi:clipboard-arrow-left"></md-icon>
+        <span translate>computationJob.copyId</span>
+    </md-button>
+</div>
+
+<md-content class="md-padding" layout="column" style="overflow-x: hidden">
+    <fieldset ng-disabled="loading || !isEdit || isReadOnly">
+        <md-input-container class="md-block">
+            <label translate>computationJob.name</label>
+            <input required name="name" ng-model="computationjob.name">
+            <div ng-messages="theForm.name.$error">
+                <div translate ng-message="required">computationJob.name-required</div>
+            </div>
+        </md-input-container>
+        <md-input-container class="md-block">
+            <label translate>computationJob.description</label>
+            <textarea ng-model="computationjob.additionalInfo.description" rows="2"></textarea>
+        </md-input-container>
+        <md-card flex class="plugin-config" ng-if="showComputationJobConfig">
+            <md-card-title>
+                <md-card-title-text>
+                    <span translate class="md-headline" ng-class="{'tb-readonly-label' : (loading || !isEdit || isReadOnly)}">computationJob.configuration</span>
+                </md-card-title-text>
+            </md-card-title>
+            <md-card-content>
+                <tb-json-form schema="computationDescriptor.schema"
+                              form="computationDescriptor.form"
+                              model="computationJobConfiguration.data"
+                              readonly="loading || !isEdit || isReadOnly"
+                              form-control="theForm">
+                </tb-json-form>
+            </md-card-content>
+        </md-card>
+    </fieldset>
+</md-content>

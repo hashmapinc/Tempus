@@ -1,0 +1,16 @@
+{
+  "apiToken": "kafka_plugin_token",
+  "name": "Tempus Kafka Plugin",
+  "clazz": "org.thingsboard.server.extensions.kafka.plugin.KafkaPlugin",
+  "publicAccess": false,
+  "state": "ACTIVE",
+  "configuration": {
+    "bootstrapServers": "kafka:9092",
+    "batchSize": 16384,
+    "bufferMemory": 33554432,
+    "acks": -1,
+    "keySerializer": "org.apache.kafka.common.serialization.StringSerializer",
+    "valueSerializer": "org.apache.kafka.common.serialization.StringSerializer"
+  },
+  "additionalInfo": null
+}

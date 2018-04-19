@@ -71,11 +71,11 @@ public class User extends SearchTextBased<UserId> implements HasName {
     }
 
     public String getEmail() {
-        return email;
+        return (email!= null?email.toLowerCase():email);
     }
 
     public void setEmail(String email) {
-        this.email = email;
+        this.email = (email!= null?email.toLowerCase():email);
     }
 
     @Override

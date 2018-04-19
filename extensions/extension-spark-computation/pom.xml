@@ -30,7 +30,7 @@
     <artifactId>extension-spark-computation</artifactId>
     <packaging>jar</packaging>
 
-    <name>Thingsboard Server Livy Extension</name>
+    <name>Tempus Server Livy Extension</name>
     <url>http://thingsboard.org</url>
 
     <properties>

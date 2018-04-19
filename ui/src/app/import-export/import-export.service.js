@@ -25,7 +25,7 @@ import entityAliasesTemplate from '../entity/alias/entity-aliases.tpl.html';
 
 /*@ngInject*/
 export default function ImportExport($log, $translate, $q, $mdDialog, $document, itembuffer, utils, types, dashboardUtils,
-                                     entityService, dashboardService, pluginService, ruleService, widgetService, toast) {
+                                     entityService, dashboardService, pluginService, ruleService, widgetService, computationService, toast, $window) {
 
 
     var service = {
@@ -40,7 +40,8 @@ export default function ImportExport($log, $translate, $q, $mdDialog, $document,
         exportWidgetType: exportWidgetType,
         importWidgetType: importWidgetType,
         exportWidgetsBundle: exportWidgetsBundle,
-        importWidgetsBundle: importWidgetsBundle
+        importWidgetsBundle: importWidgetsBundle,
+        importComputation: importComputation
     }
 
     return service;
@@ -311,6 +312,27 @@ export default function ImportExport($log, $translate, $q, $mdDialog, $document,
                         }
                     );
                 }
+            },
+            function fail() {
+                deferred.reject();
+            }
+        );
+        return deferred.promise;
+    }
+
+    function importComputation($event) {
+        var deferred = $q.defer();
+        openImportDialog($event, 'computation.import', 'computation.computation-file').then(
+            function success(importData) {
+                    computationService.upload(importData.file).then(
+                        function success() {
+                            deferred.resolve();
+                            $window.localStorage.setItem('currentTab', 4);
+                        },
+                        function fail() {
+                            deferred.reject();
+                        }
+                    );
             },
             function fail() {
                 deferred.reject();

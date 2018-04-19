@@ -57,6 +57,7 @@ class ASyncMsgProcessor extends AbstractSessionActorMsgProcessor {
         FromDeviceMsg fromDeviceMsg = pendingMsg.getPayload();
         switch (fromDeviceMsg.getMsgType()) {
             case POST_TELEMETRY_REQUEST:
+            case POST_TELEMETRY_REQUEST_DEPTH:
             case POST_ATTRIBUTES_REQUEST:
                 FromDeviceRequestMsg requestMsg = (FromDeviceRequestMsg) fromDeviceMsg;
                 if (requestMsg.getRequestId() >= 0) {

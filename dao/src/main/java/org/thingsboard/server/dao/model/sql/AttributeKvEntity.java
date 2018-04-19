@@ -15,10 +15,14 @@
  */
 package org.thingsboard.server.dao.model.sql;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import lombok.Data;
+import org.hibernate.annotations.Type;
+import org.hibernate.annotations.TypeDef;
 import org.thingsboard.server.common.data.EntityType;
 import org.thingsboard.server.common.data.kv.*;
 import org.thingsboard.server.dao.model.ToData;
+import org.thingsboard.server.dao.util.mapping.JsonStringType;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -27,6 +31,7 @@ import static org.thingsboard.server.dao.model.ModelConstants.*;
 
 @Data
 @Entity
+@TypeDef(name = "json", typeClass = JsonStringType.class)
 @Table(name = "attribute_kv")
 @IdClass(AttributeKvCompositeKey.class)
 public class AttributeKvEntity implements ToData<AttributeKvEntry>, Serializable {
@@ -60,6 +65,10 @@ public class AttributeKvEntity implements ToData<AttributeKvEntry>, Serializable
     @Column(name = DOUBLE_VALUE_COLUMN)
     private Double doubleValue;
 
+    @Type(type = "json")
+    @Column(name = JSON_VALUE_COLUMN)
+    private JsonNode jsonValue;
+
     @Column(name = LAST_UPDATE_TS_COLUMN)
     private Long lastUpdateTs;
 
@@ -74,6 +83,8 @@ public class AttributeKvEntity implements ToData<AttributeKvEntry>, Serializable
             kvEntry = new DoubleDataEntry(attributeKey, doubleValue);
         } else if (longValue != null) {
             kvEntry = new LongDataEntry(attributeKey, longValue);
+        } else if (jsonValue != null) {
+            kvEntry = new JsonDataEntry(attributeKey, jsonValue);
         }
         return new BaseAttributeKvEntry(kvEntry, lastUpdateTs);
     }

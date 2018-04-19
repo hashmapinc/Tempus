@@ -18,7 +18,7 @@ import { /*blueGrey500, blueGrey700, blueGrey100, orange500,*/
 import {fade} from 'material-ui/utils/colorManipulator';
 import spacing from 'material-ui/styles/spacing';
 
-const PRIMARY_BACKGROUND_COLOR = "#305680";//"#3f51b5";
+const PRIMARY_BACKGROUND_COLOR = "#0c3483";//"#305680";//"#3f51b5";
 
 /*var blueGrayPalette = {
     primary1Color: blueGrey500,

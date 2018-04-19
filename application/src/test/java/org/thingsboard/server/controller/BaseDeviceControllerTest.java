@@ -20,27 +20,37 @@ import static org.thingsboard.server.dao.model.ModelConstants.NULL_UUID;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.google.gson.JsonParser;
 import com.datastax.driver.core.utils.UUIDs;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.web.util.NestedServletException;
 import org.thingsboard.server.common.data.*;
 import org.thingsboard.server.common.data.id.CustomerId;
 import org.thingsboard.server.common.data.id.DeviceCredentialsId;
 import org.thingsboard.server.common.data.id.DeviceId;
+import org.thingsboard.server.common.data.kv.*;
 import org.thingsboard.server.common.data.page.TextPageData;
 import org.thingsboard.server.common.data.page.TextPageLink;
 import org.thingsboard.server.common.data.security.Authority;
 import org.thingsboard.server.common.data.security.DeviceCredentials;
 import org.thingsboard.server.common.data.security.DeviceCredentialsType;
+import org.thingsboard.server.dao.attributes.AttributesService;
+import org.thingsboard.server.dao.depthSeries.DepthSeriesService;
 import org.thingsboard.server.dao.model.ModelConstants;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.fasterxml.jackson.core.type.TypeReference;
+import org.thingsboard.server.dao.timeseries.TimeseriesService;
 
 public abstract class BaseDeviceControllerTest extends AbstractControllerTest {
     
@@ -48,7 +58,31 @@ public abstract class BaseDeviceControllerTest extends AbstractControllerTest {
     
     private Tenant savedTenant;
     private User tenantAdmin;
-    
+
+
+    private String STRING_KEY_FOR_TS_DS_OR_AS = "stringKey";
+    private String LONG_KEY_FOR_TS_DS_OR_AS = "longKey";
+    private String DOUBLE_KEY_FOR_TS_DS_OR_AS = "doubleKey";
+    private String BOOLEAN_KEY_FOR_TS_DS_OR_AS = "booleanKey";
+    private String JSON_KEY_FOR_TS_DS_OR_AS = "jsonKey";
+
+    private JsonParser parser = new JsonParser();
+    private KvEntry stringKvEntry = new StringDataEntry(STRING_KEY_FOR_TS_DS_OR_AS, "value");
+    private KvEntry longKvEntry = new LongDataEntry(LONG_KEY_FOR_TS_DS_OR_AS, Long.MAX_VALUE);
+    private KvEntry doubleKvEntry = new DoubleDataEntry(DOUBLE_KEY_FOR_TS_DS_OR_AS, Double.MAX_VALUE);
+    private KvEntry booleanKvEntry = new BooleanDataEntry(BOOLEAN_KEY_FOR_TS_DS_OR_AS, Boolean.TRUE);
+    private KvEntry jsonKvEntry = new JsonDataEntry(JSON_KEY_FOR_TS_DS_OR_AS, parser.parse("{\"tag\": \"value\"}").getAsJsonObject());
+
+
+    @Autowired
+    private TimeseriesService timeseriesService;
+
+    @Autowired
+    private DepthSeriesService depthSeriesService;
+
+    @Autowired
+    private AttributesService attributesService;
+
     @Before
     public void beforeTest() throws Exception {
         loginSysAdmin();
@@ -764,4 +798,174 @@ public abstract class BaseDeviceControllerTest extends AbstractControllerTest {
         Assert.assertEquals(0, pageData.getData().size());
     }
 
+    @Test
+    public void testDownloadCsvTSData() throws Exception {
+        Device device = new Device();
+        device.setName("D1");
+        device.setType("default");
+        Device savedDevice = doPost("/api/device", device, Device.class);
+        createTimeSeriesData(savedDevice.getId());
+
+        ResultActions result = doGet("/api/download/deviceSeriesData?type=ts&deviceId="+savedDevice.getId().getId().toString()+"&startValue=40&endValue=42");
+        String s = result.andReturn().getResponse().getContentAsString();
+        String[] rows = s.split("\n");
+
+        Assert.assertEquals( 4, rows.length);
+
+        List<String> headers = new ArrayList<String>(Arrays.asList(rows[0].split(",")));
+        Assert.assertTrue(headers.containsAll(Arrays.asList("ts", "booleanKey", "doubleKey", "jsonKey", "longKey", "stringKey")));
+
+        List<List<String>> valuesRows = Arrays.asList(
+                new ArrayList<String>(Arrays.asList(rows[1].split(","))),
+                new ArrayList<String>(Arrays.asList(rows[2].split(","))),
+                new ArrayList<String>(Arrays.asList(rows[3].split(",")))
+        );
+
+        List<String> rowWithTs42 = geRowWithSpecifiedKeyValue("42", valuesRows);
+        List<String> rowWithTs40 = geRowWithSpecifiedKeyValue("40", valuesRows);
+        List<String> rowWithTs41 = geRowWithSpecifiedKeyValue("41", valuesRows);
+
+
+        Assert.assertTrue(rowWithTs40.containsAll(Arrays.asList("40","true","1.7976931348623157E308","{\"\"tag\"\":\"\"value\"\"}","9223372036854775807","value")));
+        Assert.assertTrue(rowWithTs41.containsAll(Arrays.asList("41","true","1.7976931348623157E308","{\"\"tag\"\":\"\"value\"\"}","9223372036854775807","value")));
+        Assert.assertTrue(rowWithTs42.containsAll(Arrays.asList("42","true","1.7976931348623157E308","{\"\"tag\"\":\"\"value\"\"}","9223372036854775807","value")));
+    }
+
+    @Test
+    public void testDownloadCsvDSData() throws Exception {
+        Device device = new Device();
+        device.setName("D1");
+        device.setType("default");
+        Device savedDevice = doPost("/api/device", device, Device.class);
+        createDepthSeriesData(savedDevice.getId());
+
+        ResultActions result = doGet("/api/download/deviceSeriesData?type=ds&deviceId="+savedDevice.getId().getId().toString()+"&startValue=4000&endValue=4200");
+        String s = result.andReturn().getResponse().getContentAsString();
+        String[] rows = s.split("\n");
+        Assert.assertEquals( 4, rows.length);
+
+        List<String> headers = new ArrayList<String>(Arrays.asList(rows[0].split(",")));
+        Assert.assertTrue(headers.containsAll(Arrays.asList("ds", "booleanKey", "doubleKey", "jsonKey", "longKey", "stringKey")));
+
+        List<List<String>> valuesRows = Arrays.asList(
+                new ArrayList<String>(Arrays.asList(rows[1].split(","))),
+                new ArrayList<String>(Arrays.asList(rows[2].split(","))),
+                new ArrayList<String>(Arrays.asList(rows[3].split(",")))
+        );
+
+        List<String> rowWithDs4200 = geRowWithSpecifiedKeyValue("4200.0", valuesRows);
+        List<String> rowWithDs4000 = geRowWithSpecifiedKeyValue("4000.0", valuesRows);
+        List<String> rowWithDs4100 = geRowWithSpecifiedKeyValue("4100.0", valuesRows);
+
+
+        Assert.assertTrue(rowWithDs4200.containsAll(Arrays.asList("4200.0","true","1.7976931348623157E308","{\"\"tag\"\":\"\"value\"\"}","9223372036854775807","value")));
+        Assert.assertTrue(rowWithDs4000.containsAll(Arrays.asList("4000.0","true","1.7976931348623157E308","{\"\"tag\"\":\"\"value\"\"}","9223372036854775807","value")));
+        Assert.assertTrue(rowWithDs4100.containsAll(Arrays.asList("4100.0","true","1.7976931348623157E308","{\"\"tag\"\":\"\"value\"\"}","9223372036854775807","value")));
+    }
+
+    @Test(expected = Exception.class)
+    public void testDownloadCsvDSData_incorrectFormatStartValue() throws Exception {
+        DeviceId deviceId = new DeviceId(UUIDs.timeBased());
+
+        ResultActions result = doGet("/api/download/deviceSeriesData?type=ds&deviceId="+deviceId.getId().toString()+"&startValue=40J00&endValue=4200");
+    }
+
+    @Test(expected = Exception.class)
+    public void testDownloadCsvTSData_incorrectFormatStartValue() throws Exception {
+        DeviceId deviceId = new DeviceId(UUIDs.timeBased());
+
+        ResultActions result = doGet("/api/download/deviceSeriesData?type=ts&deviceId="+deviceId.getId().toString()+"&startValue=40J00&endValue=4200");
+    }
+
+
+    @Test
+    public void testDownloadCsvASData() throws Exception {
+        Device device = new Device();
+        device.setName("D1");
+        device.setType("default");
+        Device savedDevice = doPost("/api/device", device, Device.class);
+        createDepthSeriesData(savedDevice.getId());
+
+        AttributeKvEntry attr1 = new BaseAttributeKvEntry(new StringDataEntry("attribute1", "value1"), 42L);
+        AttributeKvEntry attr2 = new BaseAttributeKvEntry(new StringDataEntry("attribute2", "value2"), 73L);
+        AttributeKvEntry attr3 = new BaseAttributeKvEntry(new StringDataEntry("attribute3", "value3"), 74L);
+        AttributeKvEntry attr4 = new BaseAttributeKvEntry(new StringDataEntry("attribute4", "value4"), 75L);
+        AttributeKvEntry attr5 = new BaseAttributeKvEntry(new StringDataEntry("attribute5", "value5"), 76L);
+        attributesService.save(savedDevice.getId(), DataConstants.CLIENT_SCOPE, Arrays.asList(attr1, attr2)).get();
+        attributesService.save(savedDevice.getId(), DataConstants.SERVER_SCOPE, Arrays.asList(attr3, attr4)).get();
+        attributesService.save(savedDevice.getId(), DataConstants.SHARED_SCOPE, Arrays.asList(attr5)).get();
+
+        ResultActions result = doGet("/api/download/deviceAttributesData?deviceId="+savedDevice.getId().getId().toString());
+        String s = result.andReturn().getResponse().getContentAsString();
+        String[] rows = s.split("\n");
+        Assert.assertEquals( 6, rows.length);
+
+        List<String> headers = new ArrayList<String>(Arrays.asList(rows[0].split(",")));
+        List<List<String>> valuesRows = Arrays.asList(
+                new ArrayList<String>(Arrays.asList(rows[1].split(","))),
+                new ArrayList<String>(Arrays.asList(rows[2].split(","))),
+                new ArrayList<String>(Arrays.asList(rows[3].split(","))),
+                new ArrayList<String>(Arrays.asList(rows[4].split(","))),
+                new ArrayList<String>(Arrays.asList(rows[5].split(",")))
+        );
+
+        List<String> rowWithTs42 = geRowWithSpecifiedKeyValue("42", valuesRows);
+        List<String> rowWithTs73 = geRowWithSpecifiedKeyValue("73", valuesRows);
+        List<String> rowWithTs74 = geRowWithSpecifiedKeyValue("74", valuesRows);
+        List<String> rowWithTs75 = geRowWithSpecifiedKeyValue("75", valuesRows);
+        List<String> rowWithTs76 = geRowWithSpecifiedKeyValue("76", valuesRows);
+
+        Assert.assertTrue(headers.containsAll(Arrays.asList("last_update_ts", "attribute1", "attribute2", "attribute3", "attribute4", "attribute5")));
+        Assert.assertTrue(rowWithTs42.containsAll(Arrays.asList("42", "value1")));
+        Assert.assertTrue(rowWithTs73.containsAll(Arrays.asList("73", "value2")));
+        Assert.assertTrue(rowWithTs74.containsAll(Arrays.asList("74", "value3")));
+        Assert.assertTrue(rowWithTs75.containsAll(Arrays.asList("75", "value4")));
+        Assert.assertTrue(rowWithTs76.containsAll(Arrays.asList("76", "value5")));
+
+    }
+
+    private List<String> geRowWithSpecifiedKeyValue(String key, List<List<String>> rows){
+        for(List<String> row: rows) {
+            if(row.contains(key)) return row;
+        }
+        return null;
+    }
+
+    private void createTimeSeriesData(DeviceId deviceId) throws ExecutionException, InterruptedException {
+        long TS = 42L;
+        saveTsEntries(deviceId, TS - 2);
+        saveTsEntries(deviceId, TS - 1);
+        saveTsEntries(deviceId, TS);
+    }
+
+    private void createDepthSeriesData(DeviceId deviceId) throws ExecutionException, InterruptedException {
+        Double DS = 4200D;
+        saveDsEntries(deviceId, DS - 200D);
+        saveDsEntries(deviceId, DS - 100D);
+        saveDsEntries(deviceId, DS);
+    }
+
+    private void saveTsEntries(DeviceId deviceId, long ts) throws ExecutionException, InterruptedException {
+        timeseriesService.save(deviceId, toTsEntry(ts, stringKvEntry)).get();
+        timeseriesService.save(deviceId, toTsEntry(ts, longKvEntry)).get();
+        timeseriesService.save(deviceId, toTsEntry(ts, doubleKvEntry)).get();
+        timeseriesService.save(deviceId, toTsEntry(ts, booleanKvEntry)).get();
+        timeseriesService.save(deviceId, toTsEntry(ts, jsonKvEntry)).get();
+    }
+
+    private static TsKvEntry toTsEntry(long ts, KvEntry entry) {
+        return new BasicTsKvEntry(ts, entry);
+    }
+
+    private void saveDsEntries(DeviceId deviceId, Double ds) throws ExecutionException, InterruptedException {
+        depthSeriesService.save(deviceId, toDsEntry(ds, stringKvEntry)).get();
+        depthSeriesService.save(deviceId, toDsEntry(ds, longKvEntry)).get();
+        depthSeriesService.save(deviceId, toDsEntry(ds, doubleKvEntry)).get();
+        depthSeriesService.save(deviceId, toDsEntry(ds, booleanKvEntry)).get();
+        depthSeriesService.save(deviceId, toDsEntry(ds, jsonKvEntry)).get();
+    }
+
+    private static DsKvEntry toDsEntry(Double ds, KvEntry entry) {
+        return new BasicDsKvEntry(ds, entry);
+    }
 }

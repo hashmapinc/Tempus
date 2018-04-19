@@ -27,7 +27,7 @@
     <artifactId>common</artifactId>
     <packaging>pom</packaging>
 
-    <name>Thingsboard Server Commons</name>
+    <name>Tempus Server Commons</name>
     <url>http://thingsboard.org</url>
 
     <properties>

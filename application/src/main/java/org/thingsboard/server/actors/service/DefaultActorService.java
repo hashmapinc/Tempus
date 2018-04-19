@@ -32,10 +32,7 @@ import org.thingsboard.server.actors.rpc.RpcSessionCreateRequestMsg;
 import org.thingsboard.server.actors.rpc.RpcSessionTellMsg;
 import org.thingsboard.server.actors.session.SessionManagerActor;
 import org.thingsboard.server.actors.stats.StatsActor;
-import org.thingsboard.server.common.data.id.DeviceId;
-import org.thingsboard.server.common.data.id.PluginId;
-import org.thingsboard.server.common.data.id.RuleId;
-import org.thingsboard.server.common.data.id.TenantId;
+import org.thingsboard.server.common.data.id.*;
 import org.thingsboard.server.common.data.plugin.ComponentLifecycleEvent;
 import org.thingsboard.server.common.msg.aware.SessionAwareMsg;
 import org.thingsboard.server.common.msg.cluster.ClusterEventMsg;
@@ -64,7 +61,6 @@ import java.util.Optional;
 
 @Service
 @Slf4j
-@DependsOn("computationDiscoveryService")
 public class DefaultActorService implements ActorService {
 
     private static final String ACTOR_SYSTEM_NAME = "Akka";
@@ -231,6 +227,18 @@ public class DefaultActorService implements ActorService {
     public void onRuleStateChange(TenantId tenantId, RuleId ruleId, ComponentLifecycleEvent state) {
         log.trace("[{}] Processing onRuleStateChange event: {}", ruleId, state);
         broadcast(ComponentLifecycleMsg.forRule(tenantId, ruleId, state));
+    }
+
+    @Override
+    public void onDashboardStateChange(TenantId tenantId, DashboardId dashboardId, ComponentLifecycleEvent event) {
+        log.trace("[{}] Processing onDashboardStateChange event: {}", dashboardId, event);
+        appActor.tell(ComponentLifecycleMsg.forDashboard(tenantId, dashboardId, event) , ActorRef.noSender());
+    }
+
+    @Override
+    public void onComputationJobStateChange(TenantId tenantId, ComputationId computationId, ComputationJobId computationJobId, ComponentLifecycleEvent state) {
+        log.trace("[{}] Processing onComputationJobStateChange event: {}", computationJobId, state);
+        broadcast(ComponentLifecycleMsg.forComputationJob(tenantId, computationId, computationJobId, state));
     }
 
     @Override

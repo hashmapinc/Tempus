@@ -15,6 +15,8 @@
  */
 package org.thingsboard.server.dao.application;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.Iterables;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,25 +25,30 @@ import org.thingsboard.server.common.data.Application;
 import org.thingsboard.server.common.data.Customer;
 import org.thingsboard.server.common.data.Dashboard;
 import org.thingsboard.server.common.data.Tenant;
+import org.thingsboard.server.common.data.computation.ComputationJob;
 import org.thingsboard.server.common.data.id.*;
 import org.thingsboard.server.common.data.page.TextPageData;
 import org.thingsboard.server.common.data.page.TextPageLink;
+import org.thingsboard.server.common.data.plugin.ComponentLifecycleState;
 import org.thingsboard.server.common.data.rule.RuleMetaData;
+import org.thingsboard.server.dao.computations.ComputationJobDao;
 import org.thingsboard.server.dao.customer.CustomerDao;
 import org.thingsboard.server.dao.dashboard.DashboardDao;
 import org.thingsboard.server.dao.entity.AbstractEntityService;
 import org.thingsboard.server.dao.exception.DataValidationException;
+import org.thingsboard.server.dao.exception.DatabaseException;
 import org.thingsboard.server.dao.exception.IncorrectParameterException;
 import org.thingsboard.server.dao.rule.RuleDao;
 import org.thingsboard.server.dao.service.DataValidator;
+import org.thingsboard.server.dao.service.Validator;
 import org.thingsboard.server.dao.tenant.TenantDao;
 
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
-import static org.thingsboard.server.dao.model.ModelConstants.NULL_DEVICE_TYPE;
 import static org.thingsboard.server.dao.model.ModelConstants.NULL_UUID;
 import static org.thingsboard.server.dao.service.Validator.validateId;
+import static org.thingsboard.server.dao.service.Validator.validateIds;
 import static org.thingsboard.server.dao.service.Validator.validatePageLink;
 
 @Service
@@ -63,10 +70,28 @@ public class ApplicationServiceImpl extends AbstractEntityService implements App
     @Autowired
     private RuleDao ruleDao;
 
+    @Autowired
+    private ComputationJobDao computationJobDao;
+
     @Override
     public Application saveApplication(Application application) {
         log.trace("Executing saveApplication [{}]", application);
         applicationValidator.validate(application);
+        if (application.getId() != null) {
+            Application oldVersion = applicationDao.findById(application.getId().getId());
+            if (application.getState() == null) {
+                application.setState(oldVersion.getState());
+            } else if (application.getState() != oldVersion.getState()) {
+                throw new IncorrectParameterException("Use Activate/Suspend method to control state of the application!");
+            }
+        } else {
+            if (application.getState() == null) {
+                application.setState(ComponentLifecycleState.SUSPENDED);
+            } else if (application.getState() != ComponentLifecycleState.SUSPENDED) {
+                throw new IncorrectParameterException("Use Activate/Suspend method to control state of the application!");
+            }
+        }
+
         return applicationDao.save(application);
     }
 
@@ -103,11 +128,15 @@ public class ApplicationServiceImpl extends AbstractEntityService implements App
     }
 
     @Override
-    public List<String> findApplicationByRuleId(TenantId tenantId, RuleId ruleId) {
-        log.trace("Executing findApplicationByRuleId,  tenantId [{}], ruleId [{}]", tenantId, ruleId);
+    public Set<String> findApplicationByRuleIds(TenantId tenantId, Set<RuleId> ruleIds) {
+        log.trace("Executing findApplicationByRuleIds,  tenantId [{}], ruleIds [{}]", tenantId, ruleIds);
         validateId(tenantId, "Incorrect tenantId " + tenantId);
-        validateId(ruleId, "Incorrect ruleId " + ruleId);
-        return applicationDao.findApplicationByRuleId(tenantId.getId(), ruleId.getId());
+        validateIds(ruleIds, "Incorrect ruleIds " + ruleIds);
+        Set<String> applications = new HashSet<>();
+        for(RuleId ruleId: ruleIds) {
+            applications.addAll(applicationDao.findApplicationByRuleId(tenantId.getId(), ruleId.getId()).stream().map(Application::getName).collect(Collectors.toList()));
+        }
+        return applications;
     }
 
     @Override
@@ -115,7 +144,7 @@ public class ApplicationServiceImpl extends AbstractEntityService implements App
         log.trace("Executing findApplicationByDashboardId,  tenantId [{}], dashboardId [{}]", tenantId, dashboardId);
         validateId(tenantId, "Incorrect tenantId " + tenantId);
         validateId(dashboardId, "Incorrect dashboardId " + dashboardId);
-        return applicationDao.findApplicationsByDashboardId(tenantId.getId(), dashboardId.getId());
+        return applicationDao.findApplicationsByDashboardId(tenantId.getId(), dashboardId.getId()).stream().map(Application::getName).collect(Collectors.toList());
     }
 
     @Override
@@ -160,21 +189,120 @@ public class ApplicationServiceImpl extends AbstractEntityService implements App
         return saveApplication(application);
     }
 
+
     @Override
-    public Application assignRulesToApplication(ApplicationId applicationId, List<RuleId> ruleIdList) {
+    public Application unassignRulesToApplication(ApplicationId applicationId, Set<RuleId> ruleIdSet) {
         Application application = findApplicationById(applicationId);
-        application.setRules(ruleIdList);
+        application.getRules().removeAll(ruleIdSet);
         return saveApplication(application);
     }
 
     @Override
-    public Application assignDeviceTypesToApplication(ApplicationId applicationId, List<String> deviceTypes) {
+    public Application assignRulesToApplication(ApplicationId applicationId, Set<RuleId> ruleIdSet) {
         Application application = findApplicationById(applicationId);
-        if(deviceTypes != null && !deviceTypes.isEmpty()){
-            application.setDeviceTypes(deviceTypes);
-            return saveApplication(application);
+        if(application.getRules().contains(new RuleId(NULL_UUID))) {
+            application.getRules().remove(new RuleId(NULL_UUID));
         }
-        return application;
+        application.addRules(ruleIdSet);
+        return saveApplication(application);
+    }
+
+    @Override
+    public Application assignComputationJobsToApplication(ApplicationId applicationId, Set<ComputationJobId> computationJobIds) {
+        Application application = findApplicationById(applicationId);
+        if(application.getComputationJobIdSet().contains(new ComputationJobId(NULL_UUID))) {
+            application.getComputationJobIdSet().remove(new ComputationJobId(NULL_UUID));
+        }
+        application.addComputationJobs(computationJobIds);
+        return saveApplication(application);
+    }
+
+    @Override
+    public Application unassignComputationJobsToApplication(ApplicationId applicationId, Set<ComputationJobId> computationJobIds) {
+        Application application = findApplicationById(applicationId);
+        application.getComputationJobIdSet().removeAll(computationJobIds);
+        return saveApplication(application);
+    }
+
+    @Override
+    public List<String> findApplicationByComputationJobId(TenantId tenantId, ComputationJobId computationJobId) {
+        log.trace("Executing findApplicationByComputationJobId,  tenantId [{}], computationJobId [{}]", tenantId, computationJobId);
+        validateId(tenantId, "Incorrect tenantId " + tenantId);
+        validateId(computationJobId, "Incorrect computationJobId " + computationJobId);
+        return applicationDao.findApplicationByComputationJobId(tenantId.getId(), computationJobId.getId()).stream().map(Application::getName).collect(Collectors.toList());
+    }
+
+    @Override
+    public void updateApplicationOnComputationJobDelete(ComputationJobId computationJobId, TenantId tenantId) {
+        log.trace("Executing updateApplicationOnComputationJobDelete,  tenantId [{}], computationJobId [{}]", tenantId, computationJobId);
+        List<Application> applications = applicationDao.findApplicationByComputationJobId(tenantId.getId(), computationJobId.getId());
+        if(!applications.isEmpty()) {
+            for(Application a: applications) {
+                a.getComputationJobIdSet().remove(computationJobId);
+                saveApplication(a);
+            }
+        }
+    }
+
+    @Override
+    public void updateApplicationOnComputationDelete(ComputationId computationId, TenantId tenantId) {
+        log.trace("Executing updateApplicationOnComputationDelete,  tenantId [{}], computationId [{}]", tenantId, computationId);
+        List<ComputationJob> computationJobs = computationJobDao.findByComputationId(computationId);
+        if(computationJobs !=null && !computationJobs.isEmpty()) {
+            for (ComputationJob computationJob: computationJobs) {
+                updateApplicationOnComputationJobDelete(computationJob.getId(), tenantId);
+            }
+        }
+    }
+
+    @Override
+    public void updateApplicationOnRuleDelete(RuleId ruleId, TenantId tenantId) {
+        log.trace("Executing updateApplicationOnRuleDelete,  tenantId [{}], ruleId [{}]", tenantId, ruleId);
+        List<Application> applications = applicationDao.findApplicationByRuleId(tenantId.getId(), ruleId.getId());
+        if(!applications.isEmpty()) {
+            for(Application a: applications) {
+                a.getRules().remove(ruleId);
+                saveApplication(a);
+            }
+        }
+    }
+
+    @Override
+    public void updateApplicationOnDashboardDelete(DashboardId dashboardId, TenantId tenantId) {
+        log.trace("Executing updateApplicationOnDashboardDelete,  tenantId [{}], dashboardId [{}]", tenantId, dashboardId);
+        List<Application> applications = applicationDao.findApplicationsByDashboardId(tenantId.getId(), dashboardId.getId());
+        if(!applications.isEmpty()) {
+            for(Application a: applications) {
+                if(a.getMiniDashboardId().equals(dashboardId)) {
+                    a.setMiniDashboardId(null);
+                } else {
+                    a.setDashboardId(null);
+                }
+                saveApplication(a);
+            }
+        }
+    }
+
+    @Override
+    public void activateApplicationById(ApplicationId applicationId) {
+        updateLifeCycleState(applicationId, ComponentLifecycleState.ACTIVE);
+    }
+
+    @Override
+    public void suspendApplicationById(ApplicationId applicationId) {
+        updateLifeCycleState(applicationId, ComponentLifecycleState.SUSPENDED);
+    }
+
+    private void updateLifeCycleState(ApplicationId applicationId, ComponentLifecycleState state) {
+        Validator.validateId(applicationId, "Incorrect application id for state change request.");
+        Application application = applicationDao.findById(applicationId.getId());
+        if (application != null) {
+            application.setState(state);
+            applicationDao.save(application);
+        } else {
+            throw new DatabaseException("Application not found!");
+        }
+
     }
 
 
@@ -203,6 +331,7 @@ public class ApplicationServiceImpl extends AbstractEntityService implements App
 
                 @Override
                 protected void validateDataImpl(Application application) {
+                    Boolean isValid = true;
                     if (StringUtils.isEmpty(application.getName())) {
                         throw new DataValidationException("Application name should be specified!");
                     }
@@ -231,33 +360,50 @@ public class ApplicationServiceImpl extends AbstractEntityService implements App
                     } else if(!application.getDashboardId().getId().equals(NULL_UUID)) {
                         Dashboard dashboard = dashboardDao.findById(application.getDashboardId().getId());
                         if(dashboard == null) {
-                            throw new DataValidationException("Can't assign application to non-existent dashboard!");
+                            throw new DataValidationException("Application is referencing to non existent dashboard!");
                         }
                     }
 
                     if(application.getRules() == null || application.getRules().isEmpty()) {
-                        application.setRules(Arrays.asList(new RuleId(NULL_UUID)));
-                    } else if(!application.getRules().get(0).getId().equals(NULL_UUID)) {
+                        application.setRules(new HashSet<>(Arrays.asList(new RuleId(NULL_UUID))));
+                        isValid = false;
+                    } else if(application.getRules().size() > 1 || !Iterables.getOnlyElement(application.getRules()).getId().equals(NULL_UUID)) {
                         for(RuleId ruleId: application.getRules()) {
                             RuleMetaData ruleMetaData = ruleDao.findById(ruleId);
                             if(ruleMetaData == null) {
-                              throw new DataValidationException("Can't assign application to non-existent rule!");
+                                throw new DataValidationException("Application is referencing to non-existent rule!");
                             }
                         }
+                    } else {
+                        isValid = false;
                     }
 
-                    if(application.getDeviceTypes() == null || application.getDeviceTypes().isEmpty()) {
-                        application.setDeviceTypes(Arrays.asList(NULL_DEVICE_TYPE));
+                    if(application.getComputationJobIdSet() == null || application.getComputationJobIdSet().isEmpty()) {
+                        application.setComputationJobIdSet(new HashSet<>(Arrays.asList(new ComputationJobId(NULL_UUID))));
+                        isValid = false;
+                    } else if(application.getComputationJobIdSet().size() > 1 || !Iterables.getOnlyElement(application.getComputationJobIdSet()).getId().equals(NULL_UUID)) {
+                        for(ComputationJobId computationJobId: application.getComputationJobIdSet()) {
+                            ComputationJob computationJob = computationJobDao.findById(computationJobId);
+                            if(computationJob == null) {
+                                throw new DataValidationException("Application is referencing to non-existent computation!");
+                            }
+                        }
+                    } else {
+                        isValid = false;
                     }
 
                     if(application.getMiniDashboardId() == null) {
+                        isValid = false;
                         application.setMiniDashboardId(new DashboardId(NULL_UUID));
                     } else if(!application.getMiniDashboardId().getId().equals(NULL_UUID)) {
                         Dashboard miniDashboard = dashboardDao.findById(application.getMiniDashboardId().getId());
                         if(miniDashboard == null) {
-                            throw new DataValidationException("Can't assign application to non-existent mini dashboard!");
+                            throw new DataValidationException("Application is referencing to non-existent dashboard!");
                         }
+                    } else {
+                        isValid = false;
                     }
+                    application.setIsValid(isValid);
                 }
             };
 }

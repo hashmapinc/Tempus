@@ -56,6 +56,7 @@ CREATE TABLE IF NOT EXISTS attribute_kv (
   str_v varchar(10000000),
   long_v bigint,
   dbl_v double precision,
+  json_v varchar,
   last_update_ts bigint,
   CONSTRAINT attribute_kv_unq_key UNIQUE (entity_type, entity_id, attribute_type, attribute_key)
 );
@@ -200,6 +201,7 @@ CREATE TABLE IF NOT EXISTS ts_kv (
     str_v varchar(10000000),
     long_v bigint,
     dbl_v double precision,
+    json_v varchar,
     CONSTRAINT ts_kv_unq_key UNIQUE (entity_type, entity_id, key, ts)
 );
 
@@ -212,6 +214,7 @@ CREATE TABLE IF NOT EXISTS ts_kv_latest (
     str_v varchar,
     long_v bigint,
     dbl_v double precision,
+    json_v varchar,
     CONSTRAINT ts_kv_latest_unq_key UNIQUE (entity_type, entity_id, key)
 );
 
@@ -224,6 +227,7 @@ CREATE TABLE IF NOT EXISTS ds_kv (
     str_v varchar(10000000),
     long_v bigint,
     dbl_v double precision,
+    json_v varchar,
     CONSTRAINT ds_kv_unq_key UNIQUE (entity_type, entity_id, key, ds)
 );
 
@@ -236,6 +240,7 @@ CREATE TABLE IF NOT EXISTS ds_kv_latest (
     str_v varchar,
     long_v bigint,
     dbl_v double precision,
+    json_v varchar,
     CONSTRAINT ds_kv_latest_unq_key UNIQUE (entity_type, entity_id, key)
 );
 
@@ -272,6 +277,7 @@ CREATE TABLE IF NOT EXISTS application (
     mini_dashboard_id varchar(31),
     search_text varchar(255),
     dashboard_id varchar(31),
+    is_valid boolean,
     name varchar(255),
     description varchar(255)
 );
@@ -285,3 +291,35 @@ CREATE TABLE IF NOT EXISTS application_associated_rules(
     application_id varchar(31),
     application_rule_id varchar(31)
 );
+
+CREATE TABLE IF NOT EXISTS application_associated_computation_jobs(
+    application_id varchar(31),
+    application_computation_job_id varchar(31)
+);
+
+CREATE TABLE IF NOT EXISTS computations (
+    id varchar(31) NOT NULL CONSTRAINT computations_pkey PRIMARY KEY,
+    jar_name varchar,
+    jar_path varchar,
+    search_text varchar,
+    computation_name varchar,
+    main_class varchar,
+    args_format varchar,
+    args_type varchar,
+    json_descriptor varchar,
+    tenant_id varchar(31)
+);
+
+CREATE TABLE IF NOT EXISTS computation_job (
+    id varchar(31) NOT NULL CONSTRAINT computation_job_pkey PRIMARY KEY,
+    job_name varchar,
+    job_id varchar,
+    search_text varchar,
+    computation_id varchar,
+    arg_parameters varchar,
+    state varchar(255),
+    tenant_id varchar(31)
+);
+
+
+CREATE TABLE IF NOT EXISTS installed_schema_versions(executed_scripts varchar(255) UNIQUE);

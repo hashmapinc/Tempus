@@ -18,6 +18,7 @@ package org.thingsboard.server.transport.mqtt.session;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;
 import io.netty.buffer.UnpooledByteBufAllocator;
@@ -82,7 +83,8 @@ public class GatewayDeviceSessionCtx extends DeviceAwareSessionContext {
                 if (responseMsg.isSuccess()) {
                     MsgType requestMsgType = responseMsg.getRequestMsgType();
                     Integer requestId = responseMsg.getRequestId();
-                    if (requestMsgType == MsgType.POST_ATTRIBUTES_REQUEST || requestMsgType == MsgType.POST_TELEMETRY_REQUEST) {
+                    if (requestId >= 0 && (requestMsgType == MsgType.POST_ATTRIBUTES_REQUEST || requestMsgType == MsgType.POST_TELEMETRY_REQUEST
+                            || requestMsgType == MsgType.POST_TELEMETRY_REQUEST_DEPTH)) {
                         return Optional.of(MqttTransportHandler.createMqttPubAckMsg(requestId));
                     }
                 }
@@ -153,6 +155,11 @@ public class GatewayDeviceSessionCtx extends DeviceAwareSessionContext {
                 break;
             case LONG:
                 json.addProperty(name, entry.getLongValue().get());
+                break;
+            case JSON:
+                JsonParser parser = new JsonParser();
+                JsonObject jsonObject = parser.parse(entry.getJsonValue().toString()).getAsJsonObject();
+                json.add(name, jsonObject);
                 break;
         }
     }
