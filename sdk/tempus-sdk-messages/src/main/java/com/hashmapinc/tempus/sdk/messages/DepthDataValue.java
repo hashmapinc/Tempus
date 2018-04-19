@@ -20,8 +20,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.HashMap;
 import java.util.Map;
 
-//TODO: javadoc format for each file //*  */ with min of 50%
-
 public class DepthDataValue {
 
     @JsonProperty(value = "ds", index = 1)
@@ -31,6 +29,7 @@ public class DepthDataValue {
     private Map<String, Object> values;
 
     public double getDepth(){
+
         return depth;
     }
 
@@ -50,7 +49,4 @@ public class DepthDataValue {
         //TODO: add type check on supported values (boolean, string, double, long) throw un supported type exception
         values.put(key, value);
     }
-
-    //TODO:  add 4 helper methods
-
 }
