@@ -6,11 +6,4 @@ jdk:
 - oraclejdk8
 language: java
 sudo: required
-script: mvn clean install -DskipTests
-after success:
-  addons:
-    artifacts:
-      s3_region: "us-west-2"
-      paths:
-        - $HOME/application/target/tempus.deb
-        - $HOME/application/target/tempus.rpm
+script: mvn clean verify -DskipTests
