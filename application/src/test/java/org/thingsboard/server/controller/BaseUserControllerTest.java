@@ -75,6 +75,11 @@ public abstract class BaseUserControllerTest extends AbstractControllerTest {
                     .andExpect(jsonPath("$.authority",is(Authority.TENANT_ADMIN.name())))
                     .andExpect(jsonPath("$.email",is(email)));
         }
+        doDelete("/api/user/"+savedUser.getId().getId().toString())
+                .andExpect(status().isOk());
+
+        doDelete("/api/tenant/"+savedTenant.getId().getId().toString())
+                .andExpect(status().isOk());
     }
 
     @Test
