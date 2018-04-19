@@ -21,7 +21,6 @@ import java.util.List;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
-//TODO: Rename to GatewayTelemetyValue for each class for Time series
 public class GatewayValue {
 
     private String deviceName;

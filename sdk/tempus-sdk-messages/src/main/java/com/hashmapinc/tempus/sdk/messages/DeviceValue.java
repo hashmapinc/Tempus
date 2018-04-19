@@ -17,7 +17,7 @@ package com.hashmapinc.tempus.sdk.messages;
 
 import java.util.ArrayList;
 import java.util.List;
-//TODO: Rename DeviceTelemetryValues for ts devices messages
+
 //TODO: Add Atrribe Messages
 public class DeviceValue {
 

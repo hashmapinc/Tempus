@@ -50,5 +50,4 @@
         <main.dir>${basedir}/../..</main.dir>
         <jdk.version>1.8</jdk.version>
     </properties>
-
 </project>
