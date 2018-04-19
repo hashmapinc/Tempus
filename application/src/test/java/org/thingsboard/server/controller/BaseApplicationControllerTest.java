@@ -17,6 +17,7 @@ package org.thingsboard.server.controller;
 
 import com.datastax.driver.core.utils.UUIDs;
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Sets;
 import org.apache.commons.lang.RandomStringUtils;
@@ -40,7 +41,6 @@ import org.thingsboard.server.extensions.core.plugin.telemetry.TelemetryStorageP
 import java.util.*;
 
 import static org.hamcrest.CoreMatchers.containsString;
-import static org.thingsboard.server.dao.model.ModelConstants.NULL_DEVICE_TYPE;
 import static org.thingsboard.server.dao.model.ModelConstants.NULL_UUID;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -109,8 +109,14 @@ public class BaseApplicationControllerTest extends AbstractControllerTest {
    @Test
     public void testSaveApplication() throws Exception {
         Application application = new Application();
+        JsonNode deviceTypes1 = mapper.readTree("{\"deviceTypes\":[{\"name\":\"DT1\"}]}");
+        application.setDeviceTypes(deviceTypes1);
         application.setName("My Application");
-        application.setDescription("Application Description");
+        application.setAdditionalInfo(mapper.readTree("{\n" +
+                "\" additionalInfo\": {\n" +
+                "\"description\": \"string\"\n" +
+                "}\n" +
+                "}"));
 
         Application savedApplication = doPost("/api/application", application, Application.class);
 
@@ -126,6 +132,8 @@ public class BaseApplicationControllerTest extends AbstractControllerTest {
     @Test
     public void testSaveApplicationWithEmptyName() throws Exception {
         Application application = new Application();
+        JsonNode deviceTypes1 = mapper.readTree("{\"configuration\":{\"deviceTypes\":[{\"name\":\"DT1\"}]}}");
+        application.setDeviceTypes(deviceTypes1);
         doPost("/api/application", application)
                 .andExpect(status().isBadRequest())
                 .andExpect(statusReason(containsString("Application name should be specified")));
@@ -134,6 +142,8 @@ public class BaseApplicationControllerTest extends AbstractControllerTest {
     @Test
     public void testFindApplicationById() throws Exception {
         Application application = new Application();
+        JsonNode deviceTypes1 = mapper.readTree("{\"deviceTypes\":[{\"name\":\"DT1\"}]}");
+        application.setDeviceTypes(deviceTypes1);
         application.setName("My App");
 
         Application savedApplication = doPost("/api/application", application, Application.class);
@@ -146,6 +156,8 @@ public class BaseApplicationControllerTest extends AbstractControllerTest {
     public void testDeleteApplication() throws Exception {
         Application application = new Application();
         application.setName("My application");
+        JsonNode deviceTypes1 = mapper.readTree("{\"deviceTypes\":[{\"name\":\"DT1\"}]}");
+        application.setDeviceTypes(deviceTypes1);
         Application savedApplicaiton = doPost("/api/application", application, Application.class);
 
         doDelete("/api/application/"+savedApplicaiton.getId().getId().toString())
@@ -159,6 +171,8 @@ public class BaseApplicationControllerTest extends AbstractControllerTest {
     public void testDeleteApplicationAndRelatedEntities() throws Exception {
         Application application = new Application();
         application.setName("My application");
+        JsonNode deviceTypes1 = mapper.readTree("{\"deviceTypes\":[{\"name\":\"DT1\"}]}");
+        application.setDeviceTypes(deviceTypes1);
         Application savedApplication = doPost("/api/application", application, Application.class);
 
         RuleMetaData rule1 = new RuleMetaData();
@@ -198,6 +212,7 @@ public class BaseApplicationControllerTest extends AbstractControllerTest {
     public void testAssignUnassignApplicationToCustomer() throws Exception {
         Application application = new Application();
         application.setName("My application");
+        application.setDeviceTypes(mapper.readTree("{\"deviceTypes\":[{\"name\":\"DT1\"}]}"));
         Application savedApplication = doPost("/api/application", application, Application.class);
 
         Customer customer = new Customer();
@@ -223,6 +238,8 @@ public class BaseApplicationControllerTest extends AbstractControllerTest {
     public void testAssignApplicationToNonExistentCustomer() throws Exception {
         Application application = new Application();
         application.setName("My application");
+        JsonNode deviceTypes1 = mapper.readTree("{\"deviceTypes\":[{\"name\":\"DT1\"}]}");
+        application.setDeviceTypes(deviceTypes1);
 
         Application savedApplication = doPost("/api/application", application, Application.class);
 
@@ -260,6 +277,8 @@ public class BaseApplicationControllerTest extends AbstractControllerTest {
 
         Application application = new Application();
         application.setName("My application");
+        JsonNode deviceTypes1 = mapper.readTree("{\"deviceTypes\":[{\"name\":\"DT1\"}]}");
+        application.setDeviceTypes(deviceTypes1);
 
         Application savedApplication = doPost("/api/application", application, Application.class);
 
@@ -281,6 +300,8 @@ public class BaseApplicationControllerTest extends AbstractControllerTest {
         List<Application> applications = new ArrayList<>();
         for (int i=0;i<178;i++) {
             Application application = new Application();
+            JsonNode deviceTypes1 = mapper.readTree("{\"deviceTypes\":[{\"name\":\"DT1\"}]}");
+            application.setDeviceTypes(deviceTypes1);
             application.setName("Application"+i);
 
             applications.add(doPost("/api/application", application, Application.class));
@@ -307,28 +328,32 @@ public class BaseApplicationControllerTest extends AbstractControllerTest {
     public void testGetDeviceTypeApplications() throws Exception {
         Application application1 = new Application();
         application1.setName("application1");
-        application1.setDeviceTypes(new HashSet<>(Arrays.asList("DT1", "DT2")));
+        JsonNode deviceTypes1 = mapper.readTree("{\"deviceTypes\":[{\"name\":\"DT1\"},{\"name\":\"DT2\"}]}");
+        application1.setDeviceTypes(deviceTypes1);
         doPost("/api/application", application1, Application.class);
 
         Application application2 = new Application();
         application2.setName("application2");
-        application2.setDeviceTypes(new HashSet<>(Arrays.asList("DT2", "DT3")));
+        JsonNode deviceTypes2 = mapper.readTree("{\"deviceTypes\":[{\"name\":\"DT2\"},{\"name\":\"DT3\"}]}");
+        application2.setDeviceTypes(deviceTypes2);
         doPost("/api/application", application2, Application.class);
 
         Application application3 = new Application();
         application3.setName("application3");
-        application3.setDeviceTypes(new HashSet<>(Arrays.asList("DT3", "DT4")));
+        JsonNode deviceTypes3 = mapper.readTree("{\"deviceTypes\":[{\"name\":\"DT3\"},{\"name\":\"DT4\"}]}");
+        application3.setDeviceTypes(deviceTypes3);
         doPost("/api/application", application3, Application.class);
 
         Application application4 = new Application();
+        application4.setDeviceTypes(mapper.readTree("{\"deviceTypes\":[{\"name\":\"DT1\"}]}"));
         application4.setName("application4");
         doPost("/api/application", application4, Application.class);
 
         List<Application> foundApplications = doGetTyped("/api/applications/DT2" , new TypeReference<List<Application>>(){});
 
         Assert.assertEquals(2, foundApplications.size());
-        Assert.assertTrue(foundApplications.get(0).getDeviceTypes().contains("DT2"));
-        Assert.assertTrue(foundApplications.get(1).getDeviceTypes().contains("DT2"));
+        /*Assert.assertTrue(foundApplications.get(0).getDeviceTypes().contains("DT2"));
+        Assert.assertTrue(foundApplications.get(1).getDeviceTypes().contains("DT2"));*/
 
     }
 
@@ -338,6 +363,8 @@ public class BaseApplicationControllerTest extends AbstractControllerTest {
         List<Application> applicationsTitle1 = new ArrayList<>();
         for (int i=0;i<143;i++) {
             Application application = new Application();
+            JsonNode deviceTypes1 = mapper.readTree("{\"deviceTypes\":[{\"name\":\"DT1\"}]}");
+            application.setDeviceTypes(deviceTypes1);
             String suffix = RandomStringUtils.randomAlphanumeric(15);
             String name = title1+suffix;
             name = i % 2 == 0 ? name.toLowerCase() : name.toUpperCase();
@@ -348,6 +375,8 @@ public class BaseApplicationControllerTest extends AbstractControllerTest {
         List<Application> applicationsTitle2 = new ArrayList<>();
         for (int i=0;i<75;i++) {
             Application application = new Application();
+            JsonNode deviceTypes1 = mapper.readTree("{\"deviceTypes\":[{\"name\":\"DT1\"}]}");
+            application.setDeviceTypes(deviceTypes1);
             String suffix = RandomStringUtils.randomAlphanumeric(15);
             String name = title2+suffix;
             name = i % 2 == 0 ? name.toLowerCase() : name.toUpperCase();
@@ -414,6 +443,8 @@ public class BaseApplicationControllerTest extends AbstractControllerTest {
     @Test
     public void testAssignUnAssignDashboardToApplication() throws Exception {
         Application application = new Application();
+        JsonNode deviceTypes1 = mapper.readTree("{\"deviceTypes\":[{\"name\":\"DT1\"}]}");
+        application.setDeviceTypes(deviceTypes1);
         application.setName("My application");
         Application savedApplication = doPost("/api/application", application, Application.class);
 
@@ -443,6 +474,8 @@ public class BaseApplicationControllerTest extends AbstractControllerTest {
     public void testAssignUnAssignMiniDashboardToApplication() throws Exception {
         Application application = new Application();
         application.setName("My application");
+        JsonNode deviceTypes1 = mapper.readTree("{\"deviceTypes\":[{\"name\":\"DT1\"}]}");
+        application.setDeviceTypes(deviceTypes1);
         Application savedApplication = doPost("/api/application", application, Application.class);
 
         Dashboard dashboard = new Dashboard();
@@ -470,12 +503,13 @@ public class BaseApplicationControllerTest extends AbstractControllerTest {
     @Test
     public void testAssignRulesToApplication() throws Exception{
         Application application = new Application();
+        JsonNode deviceTypes1 = mapper.readTree("{\"deviceTypes\":[{\"name\":\"DT1\"}]}");
+        application.setDeviceTypes(deviceTypes1);
         application.setName("My application");
         Application savedApplication = doPost("/api/application", application, Application.class);
 
         Assert.assertEquals(new HashSet<>(Arrays.asList(new RuleId(NULL_UUID))), savedApplication.getRules());
         Assert.assertEquals(1,savedApplication.getDeviceTypes().size());
-        Assert.assertTrue(savedApplication.getDeviceTypes().contains(NULL_DEVICE_TYPE));
 
         RuleMetaData rule1 = new RuleMetaData();
         rule1.setName("My Rule1");
@@ -509,6 +543,8 @@ public class BaseApplicationControllerTest extends AbstractControllerTest {
     @Test
     public void testUnassignRulesToApplication() throws Exception{
         Application application = new Application();
+        JsonNode deviceTypes1 = mapper.readTree("{\"deviceTypes\":[{\"name\":\"DT1\"}]}");
+        application.setDeviceTypes(deviceTypes1);
         application.setName("My application");
         Application savedApplication = doPost("/api/application", application, Application.class);
 
@@ -548,46 +584,16 @@ public class BaseApplicationControllerTest extends AbstractControllerTest {
     }
 
     @Test
-    public void testAssignDeviceTypesToApplication() throws Exception {
-        Application application = new Application();
-        application.setName("My application");
-        Application savedApplication = doPost("/api/application", application, Application.class);
-
-        Assert.assertEquals(Sets.newHashSet("!NULL__DEVICE__TYPE!"), savedApplication.getDeviceTypes());
-
-        ApplicationFieldsWrapper applicationFieldsWrapper = new ApplicationFieldsWrapper();
-        applicationFieldsWrapper.setApplicationId(savedApplication.getId().getId().toString());
-        applicationFieldsWrapper.setFields(Sets.newHashSet("DT1", "DT2", "DT3"));
-        Application assignedApplication = doPutWithDifferentResponse("/api/app/devices", applicationFieldsWrapper, Application.class);
-        Assert.assertEquals(Sets.newHashSet("DT1", "DT2", "DT3"), assignedApplication.getDeviceTypes());
-
-    }
-
-    @Test
-    public void testUnassignDeviceTypesToApplication() throws Exception {
-        Application application = new Application();
-        application.setName("My application");
-        Application savedApplication = doPost("/api/application", application, Application.class);
-
-        ApplicationFieldsWrapper applicationFieldsWrapper = new ApplicationFieldsWrapper();
-        applicationFieldsWrapper.setApplicationId(savedApplication.getId().getId().toString());
-        applicationFieldsWrapper.setFields(Sets.newHashSet("DT1", "DT2", "DT3"));
-
-        Application assignedApplication = doPutWithDifferentResponse("/api/app/devices", applicationFieldsWrapper, Application.class);
-        Assert.assertEquals(Sets.newHashSet("DT1", "DT2", "DT3"), assignedApplication.getDeviceTypes());
-
-        String url = "/api/app/"+savedApplication.getId().getId().toString()+"/devices/"+ "DT1, DT2";
-        Application unassignedApplication = doDelete(url, Application.class);
-        Assert.assertEquals(Sets.newHashSet("DT3"), unassignedApplication.getDeviceTypes());
-    }
-
-    @Test
     public void findApplicationsByDashboardId() throws Exception {
         Application application = new Application();
         application.setName("My application");
+        JsonNode deviceTypes = mapper.readTree("{\"deviceTypes\":[{\"name\":\"DT1\"}]}");
+        application.setDeviceTypes(deviceTypes);
         Application savedApplication = doPost("/api/application", application, Application.class);
 
         Application application1 = new Application();
+        JsonNode deviceTypes1 = mapper.readTree("{\"deviceTypes\":[{\"name\":\"DT1\"}]}");
+        application1.setDeviceTypes(deviceTypes1);
         application1.setName("My application 1");
         Application savedApplication1 = doPost("/api/application", application1, Application.class);
 
@@ -622,14 +628,20 @@ public class BaseApplicationControllerTest extends AbstractControllerTest {
     @Test
     public void findApplicationsByruleId() throws Exception {
         Application application = new Application();
+        JsonNode deviceTypes = mapper.readTree("{\"deviceTypes\":[{\"name\":\"DT1\"}]}");
+        application.setDeviceTypes(deviceTypes);
         application.setName("My application");
         Application savedApplication = doPost("/api/application", application, Application.class);
 
         Application application1 = new Application();
+        JsonNode deviceTypes1 = mapper.readTree("{\"deviceTypes\":[{\"name\":\"DT1\"}]}");
+        application1.setDeviceTypes(deviceTypes1);
         application1.setName("My application 1");
         Application savedApplication1 = doPost("/api/application", application1, Application.class);
 
         Application application2 = new Application();
+        JsonNode deviceTypes2 = mapper.readTree("{\"deviceTypes\":[{\"name\":\"DT1\"}]}");
+        application2.setDeviceTypes(deviceTypes2);
         application2.setName("My application 2");
         Application savedApplication2 = doPost("/api/application", application2, Application.class);
 
@@ -688,6 +700,7 @@ public class BaseApplicationControllerTest extends AbstractControllerTest {
     @Test
     public void testUnAssignUnAssignComputationJobsToApplication() throws Exception{
         Application application = new Application();
+        application.setDeviceTypes(mapper.readTree("{\"deviceTypes\":[{\"name\":\"DT1\"}]}"));
         application.setName("My application");
         Application savedApplication = doPost("/api/application", application, Application.class);
 
@@ -728,6 +741,7 @@ public class BaseApplicationControllerTest extends AbstractControllerTest {
     @Test
     public void testActivateApplicationFailure() throws Exception {
         Application application = new Application();
+        application.setDeviceTypes(mapper.readTree("{\"deviceTypes\":[{\"name\":\"DT1\"}]}"));
         application.setName("My application");
         Application savedApplication = doPost("/api/application", application, Application.class);
 
@@ -779,6 +793,7 @@ public class BaseApplicationControllerTest extends AbstractControllerTest {
     @Test
     public void testActivateApplicationSuccess() throws Exception {
         Application application = new Application();
+        application.setDeviceTypes(mapper.readTree("{\"deviceTypes\":[{\"name\":\"DT1\"}]}"));
         application.setName("My application");
         Application savedApplication = doPost("/api/application", application, Application.class);
 
@@ -836,6 +851,7 @@ public class BaseApplicationControllerTest extends AbstractControllerTest {
     @Test
     public void testActivateSuspendApplicationWithoutRulesAndComputationSuccess() throws Exception {
         Application application = new Application();
+        application.setDeviceTypes(mapper.readTree("{\"deviceTypes\":[{\"name\":\"DT1\"}]}"));
         application.setName("My application");
         Application savedApplication = doPost("/api/application", application, Application.class);
         Assert.assertEquals(ComponentLifecycleState.SUSPENDED, savedApplication.getState());
