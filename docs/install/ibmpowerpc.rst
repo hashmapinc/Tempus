@@ -99,6 +99,21 @@ docker-compose.yml -> main docker-compose file.
 
 tb.env -> default tempus environment variables.
 
+.env file
+=========
+One can modify .env file to configure following parameters:
+
+CASSANDRA_DATA_DIR - location of cassandra data folder on host machine
+POSTGRES_DATA_DIR - location of postgres data folder on host machine
+HSQLDB_DATA_DIR - location of hsqldb data folder on host machine
+ADD_SCHEMA_AND_SYSTEM_DATA - create schema and add system user, plugins and rules. by default false
+ADD_DEMO_DATA - add demo accounts, plugins and rules. by default false
+CASSANDRA_URL - url of cassandra container
+
+
+tb.env file
+===========
+One can set tempus service environment variables using this file
 
 External database installation
 =========================================
