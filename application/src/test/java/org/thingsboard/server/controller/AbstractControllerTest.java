@@ -244,16 +244,15 @@ public abstract class AbstractControllerTest {
 
     protected User createUserAndLogin(User user, String password) throws Exception {
         User savedUser = doPost("/api/user?activationType=mail", user, User.class);
-        log.info("CHDC User Created = " + user + " + " + password);
         logout();
-        log.info("Logged Out Admin");
         doGet("/api/noauth/activate?activateToken={activateToken}", TestMailService.currentActivateToken)
                 .andExpect(status().isSeeOther())
                 .andExpect(header().string(HttpHeaders.LOCATION, "/login/createPassword?activateToken=" + TestMailService.currentActivateToken));
-        log.info("Received token request response");
-        JsonNode tokenInfo = readResponse(doPost("/api/noauth/activate", "activateToken", TestMailService.currentActivateToken, "password", password).andExpect(status().isOk()), JsonNode.class);
+        JsonNode activateRequest = new ObjectMapper().createObjectNode()
+                .put("activateToken", TestMailService.currentActivateToken)
+                .put("password", password);
+        JsonNode tokenInfo = readResponse(doPost("/api/noauth/activate", activateRequest).andExpect(status().isOk()), JsonNode.class);
         validateAndSetJwtToken(tokenInfo, user.getEmail());
-        log.info("JWT token validated");
         return savedUser;
     }
 
