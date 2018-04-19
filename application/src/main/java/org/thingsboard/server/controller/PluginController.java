@@ -1,5 +1,5 @@
 /**
- * Copyright © 2016-2017 The Thingsboard Authors
+ * Copyright © 2016-2018 The Thingsboard Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,8 @@ package org.thingsboard.server.controller;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.thingsboard.server.common.data.EntityType;
+import org.thingsboard.server.common.data.audit.ActionType;
 import org.thingsboard.server.common.data.id.PluginId;
 import org.thingsboard.server.common.data.id.TenantId;
 import org.thingsboard.server.common.data.page.TextPageData;
@@ -34,11 +36,13 @@ import java.util.List;
 @RequestMapping("/api")
 public class PluginController extends BaseController {
 
+    public static final String PLUGIN_ID = "pluginId";
+
     @PreAuthorize("hasAnyAuthority('SYS_ADMIN', 'TENANT_ADMIN')")
     @RequestMapping(value = "/plugin/{pluginId}", method = RequestMethod.GET)
     @ResponseBody
-    public PluginMetaData getPluginById(@PathVariable("pluginId") String strPluginId) throws ThingsboardException {
-        checkParameter("pluginId", strPluginId);
+    public PluginMetaData getPluginById(@PathVariable(PLUGIN_ID) String strPluginId) throws ThingsboardException {
+        checkParameter(PLUGIN_ID, strPluginId);
         try {
             PluginId pluginId = new PluginId(toUUID(strPluginId));
             return checkPlugin(pluginService.findPluginById(pluginId));
@@ -69,8 +73,17 @@ public class PluginController extends BaseController {
             PluginMetaData plugin = checkNotNull(pluginService.savePlugin(source));
             actorService.onPluginStateChange(plugin.getTenantId(), plugin.getId(),
                     created ? ComponentLifecycleEvent.CREATED : ComponentLifecycleEvent.UPDATED);
+
+            logEntityAction(plugin.getId(), plugin,
+                    null,
+                    created ? ActionType.ADDED : ActionType.UPDATED, null);
+
             return plugin;
         } catch (Exception e) {
+
+            logEntityAction(emptyId(EntityType.PLUGIN), source,
+                    null, source.getId() == null ? ActionType.ADDED : ActionType.UPDATED, e);
+
             throw handleException(e);
         }
     }
@@ -78,14 +91,25 @@ public class PluginController extends BaseController {
     @PreAuthorize("hasAnyAuthority('SYS_ADMIN', 'TENANT_ADMIN')")
     @RequestMapping(value = "/plugin/{pluginId}/activate", method = RequestMethod.POST)
     @ResponseStatus(value = HttpStatus.OK)
-    public void activatePluginById(@PathVariable("pluginId") String strPluginId) throws ThingsboardException {
-        checkParameter("pluginId", strPluginId);
+    public void activatePluginById(@PathVariable(PLUGIN_ID) String strPluginId) throws ThingsboardException {
+        checkParameter(PLUGIN_ID, strPluginId);
         try {
             PluginId pluginId = new PluginId(toUUID(strPluginId));
             PluginMetaData plugin = checkPlugin(pluginService.findPluginById(pluginId));
             pluginService.activatePluginById(pluginId);
             actorService.onPluginStateChange(plugin.getTenantId(), plugin.getId(), ComponentLifecycleEvent.ACTIVATED);
+
+            logEntityAction(plugin.getId(), plugin,
+                    null,
+                    ActionType.ACTIVATED, null, strPluginId);
+
         } catch (Exception e) {
+
+            logEntityAction(emptyId(EntityType.PLUGIN),
+                    null,
+                    null,
+                    ActionType.ACTIVATED, e, strPluginId);
+
             throw handleException(e);
         }
     }
@@ -93,14 +117,25 @@ public class PluginController extends BaseController {
     @PreAuthorize("hasAnyAuthority('SYS_ADMIN', 'TENANT_ADMIN')")
     @RequestMapping(value = "/plugin/{pluginId}/suspend", method = RequestMethod.POST)
     @ResponseStatus(value = HttpStatus.OK)
-    public void suspendPluginById(@PathVariable("pluginId") String strPluginId) throws ThingsboardException {
-        checkParameter("pluginId", strPluginId);
+    public void suspendPluginById(@PathVariable(PLUGIN_ID) String strPluginId) throws ThingsboardException {
+        checkParameter(PLUGIN_ID, strPluginId);
         try {
             PluginId pluginId = new PluginId(toUUID(strPluginId));
             PluginMetaData plugin = checkPlugin(pluginService.findPluginById(pluginId));
             pluginService.suspendPluginById(pluginId);
             actorService.onPluginStateChange(plugin.getTenantId(), plugin.getId(), ComponentLifecycleEvent.SUSPENDED);
+
+            logEntityAction(plugin.getId(), plugin,
+                    null,
+                    ActionType.SUSPENDED, null, strPluginId);
+
         } catch (Exception e) {
+
+            logEntityAction(emptyId(EntityType.PLUGIN),
+                    null,
+                    null,
+                    ActionType.SUSPENDED, e, strPluginId);
+
             throw handleException(e);
         }
     }
@@ -180,14 +215,23 @@ public class PluginController extends BaseController {
     @PreAuthorize("hasAnyAuthority('SYS_ADMIN', 'TENANT_ADMIN')")
     @RequestMapping(value = "/plugin/{pluginId}", method = RequestMethod.DELETE)
     @ResponseStatus(value = HttpStatus.OK)
-    public void deletePlugin(@PathVariable("pluginId") String strPluginId) throws ThingsboardException {
-        checkParameter("pluginId", strPluginId);
+    public void deletePlugin(@PathVariable(PLUGIN_ID) String strPluginId) throws ThingsboardException {
+        checkParameter(PLUGIN_ID, strPluginId);
         try {
             PluginId pluginId = new PluginId(toUUID(strPluginId));
             PluginMetaData plugin = checkPlugin(pluginService.findPluginById(pluginId));
             pluginService.deletePluginById(pluginId);
             actorService.onPluginStateChange(plugin.getTenantId(), plugin.getId(), ComponentLifecycleEvent.DELETED);
+
+            logEntityAction(pluginId, plugin,
+                    null,
+                    ActionType.DELETED, null, strPluginId);
+
         } catch (Exception e) {
+            logEntityAction(emptyId(EntityType.PLUGIN),
+                    null,
+                    null,
+                    ActionType.DELETED, e, strPluginId);
             throw handleException(e);
         }
     }

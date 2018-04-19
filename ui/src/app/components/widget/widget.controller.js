@@ -1,5 +1,5 @@
 /*
- * Copyright © 2016-2017 The Thingsboard Authors
+ * Copyright © 2016-2018 The Thingsboard Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,8 +21,8 @@ import Subscription from '../../api/subscription';
 
 /*@ngInject*/
 export default function WidgetController($scope, $state, $timeout, $window, $element, $q, $log, $injector, $filter, $compile, tbRaf, types, utils, timeService, depthService,
-                                         datasourceService, alarmService, entityService, deviceService, visibleRect, isEdit, isMobile, stDiff, dashboardTimewindow, dashboardDepthwindow,
-                                         dashboardTimewindowApi, dashboardDepthwindowApi, widget, aliasController, stateController, widgetInfo, widgetType) {
+                                         datasourceService, alarmService, entityService, dashboardService, deviceService, visibleRect, isEdit, isMobile, dashboardTimewindow, dashboardDepthwindow,
+                                         dashboardTimewindowApi, dashboardDepthwindowApi, dashboard, widget, aliasController, stateController, widgetInfo, widgetType) {
 
     var vm = this;
 
@@ -68,6 +68,7 @@ export default function WidgetController($scope, $state, $timeout, $window, $ele
         hideTitlePanel: false,
         isEdit: isEdit,
         isMobile: isMobile,
+        dashboard: dashboard,
         widgetConfig: widget.config,
         settings: widget.config.settings,
         units: widget.config.units || '',
@@ -175,7 +176,7 @@ export default function WidgetController($scope, $state, $timeout, $window, $ele
         dashboardTimewindowApi: dashboardTimewindowApi,
         dashboardDepthwindowApi: dashboardDepthwindowApi,
         types: types,
-        stDiff: stDiff,
+        getStDiff: dashboardService.getServerTimeDiff,
         aliasController: aliasController
     };
 
@@ -217,7 +218,6 @@ export default function WidgetController($scope, $state, $timeout, $window, $ele
     //var bounds = {top: 0, left: 0, bottom: 0, right: 0};
     /*var visible = false;*/
     /*vm.visibleRectChanged = visibleRectChanged;
-
     function visibleRectChanged(newVisibleRect) {
         visibleRect = newVisibleRect;
         updateVisibility();
@@ -482,7 +482,7 @@ export default function WidgetController($scope, $state, $timeout, $window, $ele
         }
     }
 
-    function handleWidgetAction($event, descriptor, entityId, entityName) {
+    function handleWidgetAction($event, descriptor, entityId, entityName, additionalParams) {
         var type = descriptor.type;
         var targetEntityParamName = descriptor.stateEntityParamName;
         var targetEntityId;
@@ -523,8 +523,11 @@ export default function WidgetController($scope, $state, $timeout, $window, $ele
                 var customFunction = descriptor.customFunction;
                 if (angular.isDefined(customFunction) && customFunction.length > 0) {
                     try {
-                        var customActionFunction = new Function('$event', 'widgetContext', 'entityId', 'entityName', customFunction);
-                        customActionFunction($event, widgetContext, entityId, entityName);
+                        if (!additionalParams) {
+                            additionalParams = {};
+                        }
+                        var customActionFunction = new Function('$event', 'widgetContext', 'entityId', 'entityName', 'additionalParams', customFunction);
+                        customActionFunction($event, widgetContext, entityId, entityName, additionalParams);
                     } catch (e) {
                         //
                     }
@@ -587,16 +590,16 @@ export default function WidgetController($scope, $state, $timeout, $window, $ele
             var legendStyle;
             switch($scope.legendConfig.position) {
                 case types.position.top.value:
-                    legendStyle = 'padding-bottom: 8px;';
+                    legendStyle = 'padding-bottom: 8px; max-height: 50%; overflow-y: auto;';
                     break;
                 case types.position.bottom.value:
-                    legendStyle = 'padding-top: 8px;';
+                    legendStyle = 'padding-top: 8px; max-height: 50%; overflow-y: auto;';
                     break;
                 case types.position.left.value:
-                    legendStyle = 'padding-right: 0px;';
+                    legendStyle = 'padding-right: 0px; max-width: 50%; overflow-y: auto;';
                     break;
                 case types.position.right.value:
-                    legendStyle = 'padding-left: 0px;';
+                    legendStyle = 'padding-left: 0px; max-width: 50%; overflow-y: auto;';
                     break;
             }
 
@@ -620,7 +623,6 @@ export default function WidgetController($scope, $state, $timeout, $window, $ele
         /*if (progressElement) {
          progressScope.$destroy();
          progressScope = null;
-
          progressElement.remove();
          progressElement = null;
          }*/

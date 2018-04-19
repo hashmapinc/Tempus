@@ -1,5 +1,5 @@
 /*
- * Copyright © 2016-2017 The Thingsboard Authors
+ * Copyright © 2016-2018 The Thingsboard Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 import './ie.support';
 
 import 'event-source-polyfill';
@@ -39,6 +38,7 @@ import uiRouter from 'angular-ui-router';
 import angularJwt from 'angular-jwt';
 import 'angular-drag-and-drop-lists';
 import mdDataTable from 'angular-material-data-table';
+import 'angular-material-expansion-panel';
 import ngTouch from 'angular-touch';
 import 'angular-carousel';
 import 'clipboard';
@@ -63,6 +63,7 @@ import thingsboardApiDepth from './api/depth.service';
 import thingsboardKeyboardShortcut from './components/keyboard-shortcut.filter';
 import thingsboardHelp from './help/help.directive';
 import thingsboardToast from './services/toast';
+import thingsboardClipboard from './services/clipboard.service';
 import thingsboardHome from './layout';
 import thingsboardApiLogin from './api/login.service';
 import thingsboardApiDevice from './api/device.service';
@@ -77,6 +78,7 @@ import thingsboardApiComputation from './api/computation.service';
 import thingsboardApiComputationJob from './api/computation-job.service';
 import thingsboardTempusboard from './tempusboard';
 import thingsboardApplications from './applications';
+import thingsboardApiAuditLog from './api/audit-log.service';
 
 import 'typeface-roboto';
 import 'font-awesome/css/font-awesome.min.css';
@@ -88,6 +90,7 @@ import 'md-color-picker/dist/mdColorPicker.min.css';
 import 'mdPickers/dist/mdPickers.min.css';
 import 'angular-hotkeys/build/hotkeys.min.css';
 import 'angular-carousel/dist/angular-carousel.min.css';
+import 'angular-material-expansion-panel/dist/md-expansion-panel.min.css';
 import '../scss/main.scss';
 
 import AppConfig from './app.config';
@@ -109,6 +112,7 @@ angular.module('thingsboard', [
     angularJwt,
     'dndLists',
     mdDataTable,
+    'material.components.expansionPanels',
     ngTouch,
     'angular-carousel',
     'ngclipboard',
@@ -127,6 +131,7 @@ angular.module('thingsboard', [
     thingsboardKeyboardShortcut,
     thingsboardHelp,
     thingsboardToast,
+    thingsboardClipboard,
     thingsboardHome,
     thingsboardApiLogin,
     thingsboardApiDevice,
@@ -141,6 +146,7 @@ angular.module('thingsboard', [
     thingsboardApiComputationJob,
     thingsboardTempusboard,
     thingsboardApplications,
+    thingsboardApiAuditLog,
     uiRouter])
     .config(AppConfig)
     .factory('globalInterceptor', GlobalInterceptor)

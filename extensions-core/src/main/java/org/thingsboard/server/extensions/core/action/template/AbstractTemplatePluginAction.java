@@ -1,5 +1,5 @@
 /**
- * Copyright © 2016-2017 The Thingsboard Authors
+ * Copyright © 2016-2018 The Thingsboard Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -52,7 +52,7 @@ public abstract class AbstractTemplatePluginAction<T extends TemplateActionConfi
     }
 
     @Override
-    public Optional<RuleToPluginMsg<?>> convert(RuleContext ctx, ToDeviceActorMsg msg, RuleProcessingMetaData deviceMsgMd) {
+    public Optional<RuleToPluginMsg> convert(RuleContext ctx, ToDeviceActorMsg msg, RuleProcessingMetaData deviceMsgMd) {
         FromDeviceRequestMsg payload;
         if (msg.getPayload() instanceof FromDeviceRequestMsg) {
             payload = (FromDeviceRequestMsg) msg.getPayload();
@@ -76,7 +76,7 @@ public abstract class AbstractTemplatePluginAction<T extends TemplateActionConfi
         return VelocityUtils.merge(template, context);
     }
 
-    abstract protected Optional<RuleToPluginMsg<?>> buildRuleToPluginMsg(RuleContext ctx,
+    abstract protected Optional<RuleToPluginMsg> buildRuleToPluginMsg(RuleContext ctx,
                                                                          ToDeviceActorMsg msg,
                                                                          FromDeviceRequestMsg payload);
 

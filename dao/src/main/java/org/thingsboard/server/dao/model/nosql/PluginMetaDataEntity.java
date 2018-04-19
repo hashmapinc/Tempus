@@ -1,5 +1,5 @@
 /**
- * Copyright © 2016-2017 The Thingsboard Authors
+ * Copyright © 2016-2018 The Thingsboard Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,8 @@ package org.thingsboard.server.dao.model.nosql;
 import com.datastax.driver.core.utils.UUIDs;
 import com.datastax.driver.mapping.annotations.*;
 import com.fasterxml.jackson.databind.JsonNode;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 import org.thingsboard.server.common.data.id.PluginId;
 import org.thingsboard.server.common.data.id.TenantId;
 import org.thingsboard.server.common.data.plugin.ComponentLifecycleState;
@@ -32,10 +34,9 @@ import java.util.UUID;
 import static org.thingsboard.server.dao.model.ModelConstants.*;
 
 @Table(name = PLUGIN_COLUMN_FAMILY_NAME)
+@EqualsAndHashCode
+@ToString
 public class PluginMetaDataEntity implements SearchTextEntity<PluginMetaData> {
-
-    @Transient
-    private static final long serialVersionUID = -5231612734979707866L;
 
     @PartitionKey
     @Column(name = ID_PROPERTY)
@@ -89,7 +90,7 @@ public class PluginMetaDataEntity implements SearchTextEntity<PluginMetaData> {
 
     @Override
     public String getSearchTextSource() {
-        return searchText;
+        return getSearchText();
     }
 
     @Override
@@ -190,27 +191,4 @@ public class PluginMetaDataEntity implements SearchTextEntity<PluginMetaData> {
         return data;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o)
-            return true;
-        if (o == null || getClass() != o.getClass())
-            return false;
-        PluginMetaDataEntity entity = (PluginMetaDataEntity) o;
-        return Objects.equals(id, entity.id) && Objects.equals(apiToken, entity.apiToken) && Objects.equals(tenantId, entity.tenantId)
-                && Objects.equals(name, entity.name) && Objects.equals(clazz, entity.clazz) && Objects.equals(state, entity.state)
-                && Objects.equals(configuration, entity.configuration)
-                && Objects.equals(searchText, entity.searchText);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, apiToken, tenantId, name, clazz, state, configuration, searchText);
-    }
-
-    @Override
-    public String toString() {
-        return "PluginMetaDataEntity{" + "id=" + id + ", apiToken='" + apiToken + '\'' + ", tenantId=" + tenantId + ", name='" + name + '\'' + ", clazz='"
-                + clazz + '\'' + ", state=" + state + ", configuration=" + configuration + ", searchText='" + searchText + '\'' + '}';
-    }
 }

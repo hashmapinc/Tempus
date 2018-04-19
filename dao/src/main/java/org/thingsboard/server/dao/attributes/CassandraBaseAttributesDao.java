@@ -1,5 +1,5 @@
 /**
- * Copyright © 2016-2017 The Thingsboard Authors
+ * Copyright © 2016-2018 The Thingsboard Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -109,18 +109,21 @@ public class CassandraBaseAttributesDao extends CassandraAbstractAsyncDao implem
         stmt.setString(3, attribute.getKey());
         stmt.setLong(4, attribute.getLastUpdateTs());
         stmt.setString(5, attribute.getStrValue().orElse(null));
-        if (attribute.getBooleanValue().isPresent()) {
-            stmt.setBool(6, attribute.getBooleanValue().get());
+        Optional<Boolean> booleanValue = attribute.getBooleanValue();
+        if (booleanValue.isPresent()) {
+            stmt.setBool(6, booleanValue.get());
         } else {
             stmt.setToNull(6);
         }
-        if (attribute.getLongValue().isPresent()) {
-            stmt.setLong(7, attribute.getLongValue().get());
+        Optional<Long> longValue = attribute.getLongValue();
+        if (longValue.isPresent()) {
+            stmt.setLong(7, longValue.get());
         } else {
             stmt.setToNull(7);
         }
-        if (attribute.getDoubleValue().isPresent()) {
-            stmt.setDouble(8, attribute.getDoubleValue().get());
+        Optional<Double> doubleValue = attribute.getDoubleValue();
+        if (doubleValue.isPresent()) {
+            stmt.setDouble(8, doubleValue.get());
         } else {
             stmt.setToNull(8);
         }
@@ -147,7 +150,7 @@ public class CassandraBaseAttributesDao extends CassandraAbstractAsyncDao implem
         Select.Where select = QueryBuilder.select(LAST_UPDATE_TS_COLUMN, ATTRIBUTE_KEY_COLUMN, BOOLEAN_VALUE_COLUMN, DOUBLE_VALUE_COLUMN, JSON_VALUE_COLUMN, LONG_VALUE_COLUMN, STRING_VALUE_COLUMN)
                 .from(ATTRIBUTES_KV_CF)
                 .where(eq(ENTITY_TYPE_COLUMN, entityId.getEntityType().name())).and(eq(ModelConstants.ENTITY_ID_COLUMN, entityId.getId()));
-        select.and(QueryBuilder.in(ATTRIBUTE_TYPE_COLUMN, DataConstants.ALL_SCOPES));
+        select.and(QueryBuilder.in(ATTRIBUTE_TYPE_COLUMN, DataConstants.allScopes()));
         List<Row> rows = executeRead(select).all();
         List<String> headerColumns = new ArrayList<>();
         headerColumns.add(LAST_UPDATE_TS_COLUMN);

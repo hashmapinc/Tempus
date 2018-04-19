@@ -1,6 +1,6 @@
 <!--
 
-    Copyright © 2016-2017 The Thingsboard Authors
+    Copyright © 2016-2018 The Thingsboard Authors
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<md-select ng-show="vm.displayStateSelection()" aria-label="{{ 'dashboard.state' | translate }}" ng-model="vm.stateObject[0].id">
+<md-select class="default-state-controller" ng-show="vm.displayStateSelection()" aria-label="{{ 'dashboard.state' | translate }}" ng-model="vm.stateObject[0].id">
     <md-option ng-repeat="(stateId, state) in vm.states" ng-value="stateId">
         {{vm.getStateName(stateId, state)}}
     </md-option>

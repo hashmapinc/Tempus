@@ -1,5 +1,5 @@
 /**
- * Copyright © 2016-2017 The Thingsboard Authors
+ * Copyright © 2016-2018 The Thingsboard Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@ public class Dashboard extends DashboardInfo {
 
     private static final long serialVersionUID = 872682138346187503L;
     
-    private JsonNode configuration;
+    private transient JsonNode configuration;
     
     public Dashboard() {
         super();
@@ -79,8 +79,6 @@ public class Dashboard extends DashboardInfo {
         StringBuilder builder = new StringBuilder();
         builder.append("Dashboard [tenantId=");
         builder.append(getTenantId());
-        builder.append(", customerId=");
-        builder.append(getCustomerId());
         builder.append(", title=");
         builder.append(getTitle());
         builder.append(", configuration=");

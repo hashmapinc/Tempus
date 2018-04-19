@@ -31,9 +31,10 @@ import java.util.Optional;
 @Action(name = "Pass Through Plugin Action")
 public class PassThroughAction extends SimpleRuleLifecycleComponent implements PluginAction<EmptyComponentConfiguration> {
     @Override
-    public Optional<RuleToPluginMsg<?>> convert(RuleContext ruleContext, ToDeviceActorMsg toDeviceActorMsg, RuleProcessingMetaData ruleProcessingMetaData) {
+    public Optional<RuleToPluginMsg> convert(RuleContext ruleContext, ToDeviceActorMsg toDeviceActorMsg, RuleProcessingMetaData ruleProcessingMetaData) {
         return Optional.empty();
     }
+
 
     @Override
     public Optional<ToDeviceMsg> convert(PluginToRuleMsg<?> pluginToRuleMsg) {

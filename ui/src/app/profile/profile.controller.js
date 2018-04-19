@@ -1,5 +1,5 @@
 /*
- * Copyright © 2016-2017 The Thingsboard Authors
+ * Copyright © 2016-2018 The Thingsboard Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,15 +40,19 @@ export default function ProfileController(userService, $scope, $document, $mdDia
     function loadProfile() {
         userService.getUser(userService.getCurrentUser().userId).then(function success(user) {
             vm.profileUser = user;
-            vm.profileUser.lang = $translate.use();
+            if (!vm.profileUser.additionalInfo) {
+                vm.profileUser.additionalInfo = {};
+            }
+            if (!vm.profileUser.additionalInfo.lang) {
+                vm.profileUser.additionalInfo.lang = $translate.use();
+            }
         });
     }
 
     function save() {
         userService.saveUser(vm.profileUser).then(function success(user) {
-            $translate.use(vm.profileUser.lang);
+            $translate.use(vm.profileUser.additionalInfo.lang);
             vm.profileUser = user;
-            vm.profileUser.lang = $translate.use();
             $scope.theForm.$setPristine();
         });
     }

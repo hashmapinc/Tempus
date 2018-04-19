@@ -1,5 +1,5 @@
 /*
- * Copyright © 2016-2017 The Thingsboard Authors
+ * Copyright © 2016-2018 The Thingsboard Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 /* eslint-disable import/no-unresolved, import/default */
 
 import entityListTemplate from './entity-list.tpl.html';
@@ -38,7 +37,7 @@ export default function EntityListDirective($compile, $templateCache, $q, $mdUti
 
         scope.fetchEntities = function(searchText, limit) {
              var deferred = $q.defer();
-             entityService.getEntitiesByNameFilter(scope.entityType, searchText, limit).then(
+             entityService.getEntitiesByNameFilter(scope.entityType, searchText, limit, {ignoreLoading: true}).then(
                  function success(result) {
                     if (result) {
                         deferred.resolve(result);

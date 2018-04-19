@@ -1,5 +1,5 @@
 /**
- * Copyright © 2016-2017 The Thingsboard Authors
+ * Copyright © 2016-2018 The Thingsboard Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,6 +30,7 @@ import org.springframework.web.context.request.async.DeferredResult;
 import org.thingsboard.server.actors.service.ActorService;
 import org.thingsboard.server.common.data.id.CustomerId;
 import org.thingsboard.server.common.data.id.TenantId;
+import org.thingsboard.server.common.data.id.UserId;
 import org.thingsboard.server.common.data.plugin.PluginMetaData;
 import org.thingsboard.server.controller.BaseController;
 import org.thingsboard.server.dao.model.ModelConstants;
@@ -46,12 +47,6 @@ import javax.servlet.http.HttpServletRequest;
 @RequestMapping(PluginConstants.PLUGIN_URL_PREFIX)
 @Slf4j
 public class PluginApiController extends BaseController {
-
-    @Autowired
-    private ActorService actorService;
-
-    @Autowired
-    private PluginService pluginService;
 
     @SuppressWarnings("rawtypes")
     @PreAuthorize("hasAnyAuthority('SYS_ADMIN', 'TENANT_ADMIN', 'CUSTOMER_USER')")
@@ -71,10 +66,13 @@ public class PluginApiController extends BaseController {
             TenantId tenantId = getCurrentUser().getTenantId();
             CustomerId customerId = getCurrentUser().getCustomerId();
             if (validatePluginAccess(pluginMd, tenantId, customerId)) {
-                if(ModelConstants.NULL_UUID.equals(tenantId.getId())){
+                if(tenantId != null && ModelConstants.NULL_UUID.equals(tenantId.getId())){
                     tenantId = null;
                 }
-                PluginApiCallSecurityContext securityCtx = new PluginApiCallSecurityContext(pluginMd.getTenantId(), pluginMd.getId(), tenantId, customerId);
+                UserId userId = getCurrentUser().getId();
+                String userName = getCurrentUser().getName();
+                PluginApiCallSecurityContext securityCtx = new PluginApiCallSecurityContext(pluginMd.getTenantId(), pluginMd.getId(),
+                        tenantId, customerId, userId, userName);
                 actorService.process(new BasicPluginRestMsg(securityCtx, new RestRequest(requestEntity, request), result));
             } else {
                 result.setResult(new ResponseEntity<>(HttpStatus.FORBIDDEN));
@@ -97,7 +95,7 @@ public class PluginApiController extends BaseController {
                 validUser = true;
             }
         } else {
-            if ((pluginMd.isPublicAccess() || tenantAdministrator) && tenantId.equals(pluginMd.getTenantId())) {
+            if ((pluginMd.isPublicAccess() || tenantAdministrator) && tenantId != null && tenantId.equals(pluginMd.getTenantId())) {
                 // All tenant users can access public tenant plugins. Only tenant
                 // administrator can access private tenant plugins
                 validUser = true;

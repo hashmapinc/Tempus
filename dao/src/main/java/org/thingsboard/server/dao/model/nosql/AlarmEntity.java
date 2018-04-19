@@ -1,5 +1,5 @@
 /**
- * Copyright © 2016-2017 The Thingsboard Authors
+ * Copyright © 2016-2018 The Thingsboard Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,8 @@ package org.thingsboard.server.dao.model.nosql;
 import com.datastax.driver.core.utils.UUIDs;
 import com.datastax.driver.mapping.annotations.*;
 import com.fasterxml.jackson.databind.JsonNode;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 import org.thingsboard.server.common.data.EntityType;
 import org.thingsboard.server.common.data.alarm.Alarm;
 import org.thingsboard.server.common.data.alarm.AlarmId;
@@ -36,10 +38,9 @@ import java.util.UUID;
 import static org.thingsboard.server.dao.model.ModelConstants.*;
 
 @Table(name = ALARM_COLUMN_FAMILY_NAME)
+@EqualsAndHashCode
+@ToString
 public final class AlarmEntity implements BaseEntity<Alarm> {
-
-    @Transient
-    private static final long serialVersionUID = -1265181166886910152L;
 
     @ClusteringColumn(value = 1)
     @Column(name = ID_PROPERTY)

@@ -1,5 +1,5 @@
 /**
- * Copyright © 2016-2017 The Thingsboard Authors
+ * Copyright © 2016-2018 The Thingsboard Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,7 +32,8 @@ public class SubscriptionState<T> {
     @Getter protected final EntityId entityId;
     @Getter protected final SubscriptionType type;
     @Getter protected final boolean allKeys;
-    @Getter private final Map<String, T> keyStates;
+    @Getter protected final Map<String, Long> keyStates;
+    @Getter protected final String scope;
 
     @Override
     public boolean equals(Object o) {

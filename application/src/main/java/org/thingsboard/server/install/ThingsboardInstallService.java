@@ -1,5 +1,5 @@
 /**
- * Copyright © 2016-2017 The Thingsboard Authors
+ * Copyright © 2016-2018 The Thingsboard Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.thingsboard.server.install;
 
 import lombok.extern.slf4j.Slf4j;
@@ -28,7 +27,6 @@ import org.thingsboard.server.service.install.DatabaseSchemaService;
 import org.thingsboard.server.service.install.DatabaseUpgradeService;
 import org.thingsboard.server.service.install.SystemDataLoaderService;
 
-import java.nio.file.Files;
 import java.nio.file.Paths;
 
 @Service
@@ -66,26 +64,23 @@ public class ThingsboardInstallService {
     public void performInstall() {
         try {
             if (isUpgrade) {
-                log.info("Starting ThingsBoard Upgrade from version {} ...", upgradeFromVersion);
+                log.info("Starting Tempus Upgrade from version {} ...", upgradeFromVersion);
 
                 switch (upgradeFromVersion) {
-                    case "1.2.3":
-                        log.info("Upgrading ThingsBoard from version 1.2.3 to 1.3.0 ...");
+                    case "1.2.3": //NOSONAR, Need to execute gradual upgrade starting from upgradeFromVersion
+                        log.info("Upgrading Tempus from version 1.2.3 to 1.3.0 ...");
 
-                        databaseUpgradeService.upgradeDatabase(upgradeFromVersion);
+                        databaseUpgradeService.upgradeDatabase("1.2.3");
 
-                        log.info("Updating system data...");
+                    case "1.3.0":  //NOSONAR, Need to execute gradual upgrade starting from upgradeFromVersion
+                        log.info("Upgrading Tempus from version 1.3.0 to 1.3.1 ...");
 
-                        systemDataLoaderService.deleteSystemWidgetBundle("charts");
-                        systemDataLoaderService.deleteSystemWidgetBundle("cards");
-                        systemDataLoaderService.deleteSystemWidgetBundle("maps");
-                        systemDataLoaderService.deleteSystemWidgetBundle("analogue_gauges");
-                        systemDataLoaderService.deleteSystemWidgetBundle("digital_gauges");
-                        systemDataLoaderService.deleteSystemWidgetBundle("gpio_widgets");
-                        systemDataLoaderService.deleteSystemWidgetBundle("alarm_widgets");
+                        databaseUpgradeService.upgradeDatabase("1.3.0");
 
-                    case "1.3.0":
-                        log.info("Upgrading ThingsBoard from version 1.3.0 to 1.3.1 ...");
+                    case "1.3.1":
+                        log.info("Upgrading Tempus from version 1.3.1 to 1.4.0 ...");
+
+                        databaseUpgradeService.upgradeDatabase("1.3.1");
 
                         log.info("Updating system data...");
 
@@ -98,24 +93,25 @@ public class ThingsboardInstallService {
                         systemDataLoaderService.deleteSystemWidgetBundle("alarm_widgets");
                         systemDataLoaderService.deleteSystemWidgetBundle("control_widgets");
                         systemDataLoaderService.deleteSystemWidgetBundle("maps_v2");
+                        systemDataLoaderService.deleteSystemWidgetBundle("gateway_widgets");
 
                         systemDataLoaderService.loadSystemWidgets();
 
                         break;
                     default:
-                        throw new RuntimeException("Unable to upgrade ThingsBoard, unsupported fromVersion: " + upgradeFromVersion);
+                        throw new RuntimeException("Unable to upgrade Tempus, unsupported fromVersion: " + upgradeFromVersion);
 
                 }
                 log.info("Upgrade finished successfully!");
 
             } else {
 
-                log.info("Starting ThingsBoard Installation...");
+                log.info("Starting Tempus Installation...");
 
                 if (this.dataDir == null) {
                     throw new RuntimeException("'install.data_dir' property should specified!");
                 }
-                if (!Files.isDirectory(Paths.get(this.dataDir))) {
+                if (!Paths.get(this.dataDir).toFile().isDirectory()) {
                     throw new RuntimeException("'install.data_dir' property value is not a valid directory!");
                 }
 
@@ -142,8 +138,8 @@ public class ThingsboardInstallService {
 
 
         } catch (Exception e) {
-            log.error("Unexpected error during ThingsBoard installation!", e);
-            throw new ThingsboardInstallException("Unexpected error during ThingsBoard installation!", e);
+            log.error("Unexpected error during Tempus installation!", e);
+            throw new ThingsboardInstallException("Unexpected error during Tempus installation!", e);
         } finally {
             SpringApplication.exit(context);
         }

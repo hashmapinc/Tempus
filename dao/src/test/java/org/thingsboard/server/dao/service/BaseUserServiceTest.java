@@ -1,5 +1,5 @@
 /**
- * Copyright © 2016-2017 The Thingsboard Authors
+ * Copyright © 2016-2018 The Thingsboard Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -75,7 +75,7 @@ public abstract class BaseUserServiceTest extends AbstractServiceTest {
 
     @Test
     public void testFindUserByEmail() {
-        User user = userService.findUserByEmail("sysadmin@thingsboard.org");
+        User user = userService.findUserByEmail("sysadmin@hashmapinc.com");
         Assert.assertNotNull(user);
         Assert.assertEquals(Authority.SYS_ADMIN, user.getAuthority());
         user = userService.findUserByEmail("tenant@thingsboard.org");
@@ -90,7 +90,7 @@ public abstract class BaseUserServiceTest extends AbstractServiceTest {
 
     @Test
     public void testFindUserById() {
-        User user = userService.findUserByEmail("sysadmin@thingsboard.org");
+        User user = userService.findUserByEmail("sysadmin@hashmapinc.com");
         Assert.assertNotNull(user);
         User foundUser = userService.findUserById(user.getId());
         Assert.assertNotNull(foundUser);
@@ -99,7 +99,7 @@ public abstract class BaseUserServiceTest extends AbstractServiceTest {
 
     @Test
     public void testFindUserCredentials() {
-        User user = userService.findUserByEmail("sysadmin@thingsboard.org");
+        User user = userService.findUserByEmail("sysadmin@hashmapinc.com");
         Assert.assertNotNull(user);
         UserCredentials userCredentials = userService.findUserCredentialsByUserId(user.getId());
         Assert.assertNotNull(userCredentials);
@@ -139,7 +139,7 @@ public abstract class BaseUserServiceTest extends AbstractServiceTest {
     @Test(expected = DataValidationException.class)
     public void testSaveUserWithSameEmail() {
         User tenantAdminUser = userService.findUserByEmail("tenant@thingsboard.org");
-        tenantAdminUser.setEmail("sysadmin@thingsboard.org");
+        tenantAdminUser.setEmail("sysadmin@hashmapinc.com");
         userService.saveUser(tenantAdminUser);
     }
 

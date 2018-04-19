@@ -1,5 +1,5 @@
 /*
- * Copyright © 2016-2017 The Thingsboard Authors
+ * Copyright © 2016-2018 The Thingsboard Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 /*@ngInject*/
 export default function StatesComponent($compile, $templateCache, $controller, statesControllerService) {
 
@@ -67,6 +66,22 @@ export default function StatesComponent($compile, $templateCache, $controller, s
             stateController.getStateId = function() {
                 if (scope.statesController) {
                     return scope.statesController.getStateId();
+                } else {
+                    return '';
+                }
+            }
+
+            stateController.getStateIndex = function() {
+                if (scope.statesController) {
+                    return scope.statesController.getStateIndex();
+                } else {
+                    return -1;
+                }
+            }
+
+            stateController.getStateIdAtIndex = function(index) {
+                if (scope.statesController) {
+                    return scope.statesController.getStateIdAtIndex(index);
                 } else {
                     return '';
                 }

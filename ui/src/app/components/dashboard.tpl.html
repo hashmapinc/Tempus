@@ -1,6 +1,6 @@
 <!--
 
-    Copyright © 2016-2017 The Thingsboard Authors
+    Copyright © 2016-2018 The Thingsboard Authors
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -56,7 +56,7 @@
 											   ng-show="!vm.isEdit"
 											   ng-click="action.onAction($event)"
 											   class="md-icon-button">
-										<md-tooltip md-direction="top">
+										<md-tooltip md-direction="{{vm.isWidgetExpanded ? 'bottom' : 'top'}}">
 											{{action.displayName}}
 										</md-tooltip>
 										<ng-md-icon size="20" icon="{{action.icon}}"></ng-md-icon>
@@ -66,7 +66,7 @@
 											   ng-show="!vm.isEdit && action.show"
 											   ng-click="action.onAction($event)"
 											   class="md-icon-button">
-											   <md-tooltip md-direction="top">
+											   <md-tooltip md-direction="{{vm.isWidgetExpanded ? 'bottom' : 'top'}}">
 												   {{ action.name | translate }}
 											   </md-tooltip>
 											   <ng-md-icon size="20" icon="{{action.icon}}"></ng-md-icon>
@@ -114,11 +114,11 @@
 										 stateController: vm.stateController,
 										 isEdit: vm.isEdit,
 										 isMobile: vm.isMobileSize,
-										 stDiff: vm.stDiff,
 										 dashboardTimewindow: vm.dashboardTimewindow,
 										 dashboardTimewindowApi: vm.dashboardTimewindowApi,
 										 dashboardDepthwindow: vm.dashboardDepthwindow,
-										 dashboardDepthwindowApi: vm.dashboardDepthwindowApi
+										 dashboardDepthwindowApi: vm.dashboardDepthwindowApi,
+										 dashboard: vm 
 									     }">
 									</div>
 								</div>

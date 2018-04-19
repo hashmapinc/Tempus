@@ -1,5 +1,5 @@
 /**
- * Copyright © 2016-2017 The Thingsboard Authors
+ * Copyright © 2016-2018 The Thingsboard Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,13 +15,17 @@
  */
 package org.thingsboard.server.extensions.api.plugins;
 
+import com.google.common.util.concurrent.ListenableFuture;
 import org.thingsboard.server.common.data.Device;
 import org.thingsboard.server.common.data.id.*;
 import org.thingsboard.server.common.data.kv.*;
+import org.thingsboard.server.common.data.kv.AttributeKvEntry;
+import org.thingsboard.server.common.data.kv.TsKvEntry;
+import org.thingsboard.server.common.data.kv.TsKvQuery;
+import org.thingsboard.server.common.data.relation.EntityRelation;
+import org.thingsboard.server.common.data.relation.RelationTypeGroup;
 import org.thingsboard.server.common.msg.cluster.ServerAddress;
-import org.thingsboard.server.extensions.api.plugins.msg.PluginToRuleMsg;
-import org.thingsboard.server.extensions.api.plugins.msg.TimeoutMsg;
-import org.thingsboard.server.extensions.api.plugins.msg.ToDeviceRpcRequest;
+import org.thingsboard.server.extensions.api.plugins.msg.*;
 import org.thingsboard.server.extensions.api.plugins.rpc.RpcMsg;
 import org.thingsboard.server.extensions.api.plugins.ws.PluginWebsocketSessionRef;
 import org.thingsboard.server.extensions.api.plugins.ws.msg.PluginWebsocketMsg;
@@ -55,6 +59,7 @@ public interface PluginContext {
 
     void scheduleTimeoutMsg(TimeoutMsg<?> timeoutMsg);
 
+    void logRpcRequest(PluginApiCallSecurityContext ctx, DeviceId deviceId, ToDeviceRpcRequestBody body, boolean oneWay, Optional<RpcError> rpcError, Exception e);
 
     /*
         Websocket API
@@ -99,6 +104,12 @@ public interface PluginContext {
         Attributes API
      */
 
+    void logAttributesUpdated(PluginApiCallSecurityContext ctx, EntityId entityId, String attributeType, List<AttributeKvEntry> attributes, Exception e);
+
+    void logAttributesDeleted(PluginApiCallSecurityContext ctx, EntityId entityId, String attributeType, List<String> keys, Exception e);
+
+    void logAttributesRead(PluginApiCallSecurityContext ctx, EntityId entityId, String attributeType, List<String> keys, Exception e);
+
     void saveAttributes(TenantId tenantId, EntityId entityId, String attributeType, List<AttributeKvEntry> attributes, PluginCallback<Void> callback);
 
     void removeAttributes(TenantId tenantId, EntityId entityId, String scope, List<String> attributeKeys, PluginCallback<Void> callback);
@@ -115,4 +126,12 @@ public interface PluginContext {
 
     void getCustomerDevices(TenantId tenantId, CustomerId customerId, int limit, PluginCallback<List<Device>> callback);
 
+
+    /*
+    *   Relations API
+    * */
+
+    ListenableFuture<List<EntityRelation>> findByFromAndType(EntityId from, String relationType);
+
+    ListenableFuture<List<EntityRelation>> findByToAndType(EntityId from, String relationType);
 }

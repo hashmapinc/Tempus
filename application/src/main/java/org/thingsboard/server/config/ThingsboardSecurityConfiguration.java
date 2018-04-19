@@ -1,5 +1,5 @@
 /**
- * Copyright © 2016-2017 The Thingsboard Authors
+ * Copyright © 2016-2018 The Thingsboard Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,6 +28,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -39,6 +40,7 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.web.cors.CorsUtils;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
+import org.thingsboard.server.dao.audit.AuditLogLevelFilter;
 import org.thingsboard.server.exception.ThingsboardErrorResponseHandler;
 import org.thingsboard.server.service.security.auth.rest.RestAuthenticationProvider;
 import org.thingsboard.server.service.security.auth.rest.RestLoginProcessingFilter;
@@ -64,7 +66,7 @@ public class ThingsboardSecurityConfiguration extends WebSecurityConfigurerAdapt
     public static final String FORM_BASED_LOGIN_ENTRY_POINT = "/api/auth/login";
     public static final String PUBLIC_LOGIN_ENTRY_POINT = "/api/auth/login/public";
     public static final String TOKEN_REFRESH_ENTRY_POINT = "/api/auth/token";
-    public static final String[] NON_TOKEN_BASED_AUTH_ENTRY_POINTS = new String[] {"/index.html", "/static/**", "/api/noauth/**", "/webjars/**"};
+    protected static final String[] NON_TOKEN_BASED_AUTH_ENTRY_POINTS = new String[] {"/index.html", "/static/**", "/api/noauth/**", "/webjars/**"};
     public static final String TOKEN_BASED_AUTH_ENTRY_POINT = "/api/**";
     public static final String WS_TOKEN_BASED_AUTH_ENTRY_POINT = "/api/ws/**";
 
@@ -148,8 +150,13 @@ public class ThingsboardSecurityConfiguration extends WebSecurityConfigurerAdapt
     }
 
     @Override
+    public void configure(WebSecurity web) throws Exception {
+        web.ignoring().antMatchers("/static/**");
+    }
+
+    @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http.headers().cacheControl().disable().frameOptions().disable()
+        http.headers().cacheControl().and().frameOptions().disable()
                 .and()
                 .cors()
                 .and()
@@ -191,5 +198,10 @@ public class ThingsboardSecurityConfiguration extends WebSecurityConfigurerAdapt
             source.setCorsConfigurations(mvcCorsProperties.getMappings());
             return new CorsFilter(source);
         }
+    }
+
+    @Bean
+    public AuditLogLevelFilter auditLogLevelFilter(@Autowired AuditLogLevelProperties auditLogLevelProperties) {
+        return new AuditLogLevelFilter(auditLogLevelProperties.getMask());
     }
 }

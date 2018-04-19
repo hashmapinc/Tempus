@@ -1,5 +1,5 @@
 /*
- * Copyright © 2016-2017 The Thingsboard Authors
+ * Copyright © 2016-2018 The Thingsboard Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,8 @@ export default angular.module('thingsboard.api.telemetryWebsocket', [thingsboard
 
 const RECONNECT_INTERVAL = 2000;
 const WS_IDLE_TIMEOUT = 90000;
+
+const MAX_PUBLISH_COMMANDS = 10;
 
 /*@ngInject*/
 function TelemetryWebsocketService($rootScope, $websocket, $timeout, $window, types, userService) {
@@ -78,23 +80,51 @@ function TelemetryWebsocketService($rootScope, $websocket, $timeout, $window, ty
     return service;
 
     function publishCommands () {
-        if (isOpened && (cmdsWrapper.tsSubCmds.length > 0 ||
+        while(isOpened && hasCommands()) {
+            dataStream.send(preparePublishCommands()).then(function () {
+                checkToClose();
+            });
+        }
+        tryOpenSocket();
+    }
+
+    function hasCommands() {
+        return cmdsWrapper.tsSubCmds.length > 0 ||
             cmdsWrapper.historyCmds.length > 0 ||
             cmdsWrapper.attrSubCmds.length > 0 ||
             //##### ADDED dsSubCmd.length
             cmdsWrapper.dsSubCmds.length > 0||
-            cmdsWrapper.depthHistoryCmds.length > 0)) {
-          dataStream.send(angular.copy(cmdsWrapper)).then(function () {
-                checkToClose();
-            });
-            cmdsWrapper.tsSubCmds = [];
-            cmdsWrapper.historyCmds = [];
-            cmdsWrapper.attrSubCmds = [];
-            //##### Resetting dsSubCmds
-            cmdsWrapper.dsSubCmds = [];
-            cmdsWrapper.depthHistoryCmds = [];
+            cmdsWrapper.depthHistoryCmds.length > 0;
+    }
+
+    function preparePublishCommands() {
+        var preparedWrapper = {};
+        var leftCount = MAX_PUBLISH_COMMANDS;
+        preparedWrapper.tsSubCmds = popCmds(cmdsWrapper.tsSubCmds, leftCount);
+        leftCount -= preparedWrapper.tsSubCmds.length;
+        preparedWrapper.historyCmds = popCmds(cmdsWrapper.historyCmds, leftCount);
+        leftCount -= preparedWrapper.historyCmds.length;
+	
+	
+        preparedWrapper.attrSubCmds = popCmds(cmdsWrapper.attrSubCmds, leftCount);
+	
+	preparedWrapper.dsSubCmds = popCmds(cmdsWrapper.dsSubCmds, leftCount);
+        leftCount -= preparedWrapper.dsSubCmds.length;
+	
+	preparedWrapper.depthHistoryCmds = popCmds(cmdsWrapper.depthHistoryCmds, leftCount);
+        leftCount -= preparedWrapper.depthHistoryCmds.length;
+	
+	
+        return preparedWrapper;
+    }
+
+    function popCmds(cmds, leftCount) {
+        var toPublish = Math.min(cmds.length, leftCount);
+        if (toPublish > 0) {
+            return cmds.splice(0, toPublish);
+        } else {
+            return [];
         }
-        tryOpenSocket();
     }
 
     function onError (/*message*/) {
@@ -267,6 +297,10 @@ function TelemetryWebsocketService($rootScope, $websocket, $timeout, $window, ty
                         }
                     }
                 }
+            }
+            var index = reconnectSubscribers.indexOf(subscriber);
+            if (index > -1) {
+                reconnectSubscribers.splice(index, 1);
             }
             subscribersCount--;
             publishCommands();

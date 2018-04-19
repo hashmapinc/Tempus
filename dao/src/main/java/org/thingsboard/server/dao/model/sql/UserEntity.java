@@ -1,5 +1,5 @@
 /**
- * Copyright © 2016-2017 The Thingsboard Authors
+ * Copyright © 2016-2018 The Thingsboard Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -45,8 +45,6 @@ import static org.thingsboard.server.common.data.UUIDConverter.fromTimeUUID;
 @TypeDef(name = "json", typeClass = JsonStringType.class)
 @Table(name = ModelConstants.USER_PG_HIBERNATE_COLUMN_FAMILY_NAME)
 public class UserEntity extends BaseSqlEntity<User> implements SearchTextEntity<User> {
-    @Transient
-    private static final long serialVersionUID = -271106508790582977L;
 
     @Column(name = ModelConstants.USER_TENANT_ID_PROPERTY)
     private String tenantId;

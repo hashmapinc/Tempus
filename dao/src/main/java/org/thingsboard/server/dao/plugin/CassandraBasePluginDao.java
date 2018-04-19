@@ -1,5 +1,5 @@
 /**
- * Copyright © 2016-2017 The Thingsboard Authors
+ * Copyright © 2016-2018 The Thingsboard Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,6 +41,8 @@ import static org.thingsboard.server.dao.model.ModelConstants.PLUGIN_BY_CLASS_CO
 @NoSqlDao
 public class CassandraBasePluginDao extends CassandraAbstractSearchTextDao<PluginMetaDataEntity, PluginMetaData> implements PluginDao {
 
+    public static final String SEARCH_RESULT = "Search result: [{}]";
+
     @Override
     protected Class<PluginMetaDataEntity> getColumnFamilyClass() {
         return PluginMetaDataEntity.class;
@@ -58,7 +60,7 @@ public class CassandraBasePluginDao extends CassandraAbstractSearchTextDao<Plugi
         if (log.isTraceEnabled()) {
             log.trace("Search result: [{}] for plugin entity [{}]", pluginMetaData != null, pluginMetaData);
         } else {
-            log.debug("Search result: [{}]", pluginMetaData != null);
+            log.debug(SEARCH_RESULT, pluginMetaData != null);
         }
         return pluginMetaData;
     }
@@ -72,7 +74,7 @@ public class CassandraBasePluginDao extends CassandraAbstractSearchTextDao<Plugi
         if (log.isTraceEnabled()) {
             log.trace("Search result: [{}] for plugin entity [{}]", entity != null, entity);
         } else {
-            log.debug("Search result: [{}]", entity != null);
+            log.debug(SEARCH_RESULT, entity != null);
         }
         return DaoUtil.getData(entity);
     }
@@ -95,9 +97,9 @@ public class CassandraBasePluginDao extends CassandraAbstractSearchTextDao<Plugi
         List<PluginMetaDataEntity> entities = findPageWithTextSearch(ModelConstants.PLUGIN_BY_TENANT_AND_SEARCH_TEXT_COLUMN_FAMILY_NAME,
                 Arrays.asList(eq(ModelConstants.PLUGIN_TENANT_ID_PROPERTY, tenantId.getId())), pageLink);
         if (log.isTraceEnabled()) {
-            log.trace("Search result: [{}]", Arrays.toString(entities.toArray()));
+            log.trace(SEARCH_RESULT, Arrays.toString(entities.toArray()));
         } else {
-            log.debug("Search result: [{}]", entities.size());
+            log.debug(SEARCH_RESULT, entities.size());
         }
         return DaoUtil.convertDataList(entities);
     }
@@ -109,9 +111,9 @@ public class CassandraBasePluginDao extends CassandraAbstractSearchTextDao<Plugi
                 Arrays.asList(in(ModelConstants.PLUGIN_TENANT_ID_PROPERTY, Arrays.asList(NULL_UUID, tenantId))),
                 pageLink);
         if (log.isTraceEnabled()) {
-            log.trace("Search result: [{}]", Arrays.toString(pluginEntities.toArray()));
+            log.trace(SEARCH_RESULT, Arrays.toString(pluginEntities.toArray()));
         } else {
-            log.debug("Search result: [{}]", pluginEntities.size());
+            log.debug(SEARCH_RESULT, pluginEntities.size());
         }
         return DaoUtil.convertDataList(pluginEntities);
     }

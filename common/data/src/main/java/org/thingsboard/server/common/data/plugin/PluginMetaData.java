@@ -1,5 +1,5 @@
 /**
- * Copyright © 2016-2017 The Thingsboard Authors
+ * Copyright © 2016-2018 The Thingsboard Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,14 +15,24 @@
  */
 package org.thingsboard.server.common.data.plugin;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.EqualsAndHashCode;
+import lombok.extern.slf4j.Slf4j;
 import org.thingsboard.server.common.data.HasName;
-import org.thingsboard.server.common.data.SearchTextBased;
+import org.thingsboard.server.common.data.SearchTextBasedWithAdditionalInfo;
 import org.thingsboard.server.common.data.id.PluginId;
 import org.thingsboard.server.common.data.id.TenantId;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
-public class PluginMetaData extends SearchTextBased<PluginId> implements HasName {
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+
+@EqualsAndHashCode(callSuper = true)
+@Slf4j
+public class PluginMetaData extends SearchTextBasedWithAdditionalInfo<PluginId> implements HasName {
 
     private static final long serialVersionUID = 1L;
 
@@ -32,8 +42,10 @@ public class PluginMetaData extends SearchTextBased<PluginId> implements HasName
     private String clazz;
     private boolean publicAccess;
     private ComponentLifecycleState state;
-    private JsonNode configuration;
-    private JsonNode additionalInfo;
+    private transient JsonNode configuration;
+    @JsonIgnore
+    private byte[] configurationBytes;
+
 
     public PluginMetaData() {
         super();
@@ -52,12 +64,11 @@ public class PluginMetaData extends SearchTextBased<PluginId> implements HasName
         this.publicAccess = plugin.isPublicAccess();
         this.state = plugin.getState();
         this.configuration = plugin.getConfiguration();
-        this.additionalInfo = plugin.getAdditionalInfo();
     }
 
     @Override
     public String getSearchText() {
-        return name;
+        return getName();
     }
 
     public String getApiToken() {
@@ -94,11 +105,11 @@ public class PluginMetaData extends SearchTextBased<PluginId> implements HasName
     }
 
     public JsonNode getConfiguration() {
-        return configuration;
+        return getJson(() -> configuration, () -> configurationBytes);
     }
 
-    public void setConfiguration(JsonNode configuration) {
-        this.configuration = configuration;
+    public void setConfiguration(JsonNode data) {
+        setJson(data, json -> this.configuration = json, bytes -> this.configurationBytes = bytes);
     }
 
     public boolean isPublicAccess() {
@@ -115,57 +126,6 @@ public class PluginMetaData extends SearchTextBased<PluginId> implements HasName
 
     public ComponentLifecycleState getState() {
         return state;
-    }
-
-    public JsonNode getAdditionalInfo() {
-        return additionalInfo;
-    }
-
-    public void setAdditionalInfo(JsonNode additionalInfo) {
-        this.additionalInfo = additionalInfo;
-    }
-
-    @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = super.hashCode();
-        result = prime * result + ((apiToken == null) ? 0 : apiToken.hashCode());
-        result = prime * result + ((clazz == null) ? 0 : clazz.hashCode());
-        result = prime * result + ((name == null) ? 0 : name.hashCode());
-        result = prime * result + ((tenantId == null) ? 0 : tenantId.hashCode());
-        return result;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj)
-            return true;
-        if (!super.equals(obj))
-            return false;
-        if (getClass() != obj.getClass())
-            return false;
-        PluginMetaData other = (PluginMetaData) obj;
-        if (apiToken == null) {
-            if (other.apiToken != null)
-                return false;
-        } else if (!apiToken.equals(other.apiToken))
-            return false;
-        if (clazz == null) {
-            if (other.clazz != null)
-                return false;
-        } else if (!clazz.equals(other.clazz))
-            return false;
-        if (name == null) {
-            if (other.name != null)
-                return false;
-        } else if (!name.equals(other.name))
-            return false;
-        if (tenantId == null) {
-            if (other.tenantId != null)
-                return false;
-        } else if (!tenantId.equals(other.tenantId))
-            return false;
-        return true;
     }
 
     @Override

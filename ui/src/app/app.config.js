@@ -1,5 +1,5 @@
 /*
- * Copyright © 2016-2017 The Thingsboard Authors
+ * Copyright © 2016-2018 The Thingsboard Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -46,33 +46,37 @@ export default function AppConfig($provide,
     $urlRouterProvider.otherwise(UrlHandler);
     storeProvider.setCaching(false);
 
-    $translateProvider.useSanitizeValueStrategy('sce');
-    $translateProvider.preferredLanguage('en_US');
-    $translateProvider.useLocalStorage();
+    $translateProvider.useSanitizeValueStrategy(null);
     $translateProvider.useMissingTranslationHandler('tbMissingTranslationHandler');
     $translateProvider.addInterpolation('$translateMessageFormatInterpolation');
+    $translateProvider.fallbackLanguage('en_US');
 
     addLocaleKorean(locales);
     addLocaleChinese(locales);
     addLocaleRussian(locales);
     addLocaleSpanish(locales);
 
-    var $window = angular.injector(['ng']).get('$window');
-    var lang = $window.navigator.language || $window.navigator.userLanguage;
-    if (lang === 'ko') {
-        $translateProvider.useSanitizeValueStrategy(null);
-        $translateProvider.preferredLanguage('ko_KR');
-    } else if (lang === 'zh') {
-        $translateProvider.useSanitizeValueStrategy(null);
-        $translateProvider.preferredLanguage('zh_CN');
-    } else if (lang === 'es') {
-        $translateProvider.useSanitizeValueStrategy(null);
-        $translateProvider.preferredLanguage('es_ES');
-    }
-
     for (var langKey in locales) {
         var translationTable = locales[langKey];
         $translateProvider.translations(langKey, translationTable);
+    }
+
+    var lang = $translateProvider.resolveClientLocale();
+    if (lang) {
+        lang = lang.toLowerCase();
+        if (lang.startsWith('ko')) {
+            $translateProvider.preferredLanguage('ko_KR');
+        } else if (lang.startsWith('zh')) {
+            $translateProvider.preferredLanguage('zh_CN');
+        } else if (lang.startsWith('es')) {
+            $translateProvider.preferredLanguage('es_ES');
+        } else if (lang.startsWith('ru')) {
+            $translateProvider.preferredLanguage('ru_RU');
+        } else {
+            $translateProvider.preferredLanguage('en_US');
+        }
+    } else {
+        $translateProvider.preferredLanguage('en_US');
     }
 
     $httpProvider.interceptors.push('globalInterceptor');

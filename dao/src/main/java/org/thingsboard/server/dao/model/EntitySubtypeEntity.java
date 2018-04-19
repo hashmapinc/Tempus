@@ -1,5 +1,5 @@
 /**
- * Copyright © 2016-2017 The Thingsboard Authors
+ * Copyright © 2016-2018 The Thingsboard Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,13 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.thingsboard.server.dao.model;
 
 import com.datastax.driver.mapping.annotations.Column;
 import com.datastax.driver.mapping.annotations.PartitionKey;
 import com.datastax.driver.mapping.annotations.Table;
-import com.datastax.driver.mapping.annotations.Transient;
 import org.thingsboard.server.common.data.EntitySubtype;
 import org.thingsboard.server.common.data.EntityType;
 import org.thingsboard.server.common.data.id.TenantId;
@@ -31,9 +29,6 @@ import static org.thingsboard.server.dao.model.ModelConstants.*;
 
 @Table(name = ENTITY_SUBTYPE_COLUMN_FAMILY_NAME)
 public class EntitySubtypeEntity {
-
-    @Transient
-    private static final long serialVersionUID = -1268181961886910152L;
 
     @PartitionKey(value = 0)
     @Column(name = ENTITY_SUBTYPE_TENANT_ID_PROPERTY)

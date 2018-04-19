@@ -830,7 +830,7 @@ public class BaseApplicationControllerTest extends AbstractControllerTest {
         doPost("/api/application/"+savedApplication.getId().getId().toString() +"/suspend").andExpect(status().isOk());
         Assert.assertEquals(ComponentLifecycleState.SUSPENDED, doGet("/api/application/" + savedApplication.getId().getId().toString(), Application.class).getState());
         Assert.assertEquals(ComponentLifecycleState.SUSPENDED ,doGet("/api/rule/"+savedRule1.getId().getId().toString(), RuleMetaData.class).getState());
-        Assert.assertEquals(ComponentLifecycleState.SUSPENDED, doGet("/api/computations/"+savedComputations.getId().getId().toString()+"/jobs/"+ savedComputationJob1.getId(), ComputationJob.class));
+        Assert.assertEquals(ComponentLifecycleState.SUSPENDED, doGet("/api/computations/"+savedComputations.getId().getId().toString()+"/jobs/"+ savedComputationJob1.getId(), ComputationJob.class).getState());
     }
 
     @Test
