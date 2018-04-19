@@ -44,18 +44,18 @@ import java.util.stream.Collectors;
 @Slf4j
 public class CustomSqlUnit extends ExternalResource {
 
-    private final List<String> sqlFiles;
+    private List<String> sqlFiles;
     private final String dropAllTablesSqlFile;
+    private final String upgradePath;
     private final String dbUrl;
     private final String dbUserName;
     private final String dbPassword;
     //private final String upgradePath;
 
-    public CustomSqlUnit(List<String> sqlFiles, String dropAllTablesSqlFile, String configurationFileName//, String upgradePath
-    ) {
+    public CustomSqlUnit(List<String> sqlFiles, String dropAllTablesSqlFile, String configurationFileName, String upgradePath) {
         this.sqlFiles = sqlFiles;
         this.dropAllTablesSqlFile = dropAllTablesSqlFile;
-        //this.upgradePath = upgradePath;
+        this.upgradePath = upgradePath;
         final Properties properties = new Properties();
         try (final InputStream stream = this.getClass().getClassLoader().getResourceAsStream(configurationFileName)) {
             properties.load(stream);
@@ -70,38 +70,30 @@ public class CustomSqlUnit extends ExternalResource {
     @Override
     public void before() {
         cleanUpDb();
-
+        List<String> files = new ArrayList<>();
+        files.addAll(sqlFiles);
         Connection conn = null;
         try {
             conn = DriverManager.getConnection(dbUrl, dbUserName, dbPassword);
             //Path upgradeScriptsDirectory = Paths.get(upgradePath);
+            ClassLoader loader = Thread.currentThread().getContextClassLoader();
+            URL url = loader.getResource(upgradePath);
+            String path = url.getPath();
+            Path upgradeScriptsDirectory = Paths.get(path);
 
-            for (String sqlFile : sqlFiles) {
-                URL sqlFileUrl = Resources.getResource(sqlFile);
+            List<Integer> sortedScriptsIndexes = Files.list(upgradeScriptsDirectory).map(a -> stripExtensionFromName(a.getFileName().toString())).sorted().collect(Collectors.toList());
+            List<String> upgradeFiles = new ArrayList<>();
+            for(Integer i: sortedScriptsIndexes) {
+                upgradeFiles.add(upgradePath + i.toString()+".sql");
+            }
+
+            files.addAll(upgradeFiles);
+
+            for (String sqlFile : files) {
+                 URL sqlFileUrl = Resources.getResource(sqlFile);
                 String sql = Resources.toString(sqlFileUrl, Charsets.UTF_8);
                 conn.createStatement().execute(sql);
             }
-
-            log.info("Installing pending upgrades ...");
-
-            List<String> executedUpgrades = new ArrayList<>();
-            ResultSet rs = conn.createStatement().executeQuery("select "+ ModelConstants.INSTALLED_SCRIPTS_COLUMN + " from "+ ModelConstants.INSTALLED_SCHEMA_VERSIONS);
-            while (rs.next()) {
-                executedUpgrades.add(rs.getString(ModelConstants.INSTALLED_SCRIPTS_COLUMN));
-            }
-
-           // List<Integer> sortedScriptsIndexes = Files.list(upgradeScriptsDirectory).map(a -> stripExtensionFromName(a.getFileName().toString())).sorted().collect(Collectors.toList());
-
-           /* for(Integer i: sortedScriptsIndexes) {
-                String scriptFileName = i.toString()+".sql";
-                if(!executedUpgrades.contains(scriptFileName)) {
-                    String upgradeQueries = new String(Files.readAllBytes(upgradeScriptsDirectory.resolve(scriptFileName)), Charset.forName("UTF-8"));
-                    conn.createStatement().execute(upgradeQueries);
-                    conn.createStatement().execute("insert into " + ModelConstants.INSTALLED_SCHEMA_VERSIONS+ " values('"+scriptFileName+"'"+")");
-                }
-            }*/
-
-
         } catch (IOException | SQLException e) {
             throw new RuntimeException("Unable to start embedded hsqldb. Reason: " + e.getMessage(), e);
         } finally {
