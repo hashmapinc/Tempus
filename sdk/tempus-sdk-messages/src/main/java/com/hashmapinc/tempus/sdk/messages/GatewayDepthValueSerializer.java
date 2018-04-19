@@ -22,12 +22,23 @@ import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 
 import java.io.IOException;
 
+/**
+ * The type Gateway depth value serializer.
+ */
 public class GatewayDepthValueSerializer extends StdSerializer<GatewayDepthValue> {
 
+    /**
+     * Instantiates a new Gateway depth value serializer.
+     */
     public GatewayDepthValueSerializer() {
         this(null);
     }
 
+    /**
+     * Instantiates a new Gateway depth value serializer.
+     *
+     * @param t the t
+     */
     public GatewayDepthValueSerializer(Class<GatewayDepthValue> t){
         super(t);
     }
