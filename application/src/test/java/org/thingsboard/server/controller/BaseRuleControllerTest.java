@@ -127,6 +127,7 @@ public abstract class BaseRuleControllerTest extends AbstractControllerTest {
 
         Application application = new Application();
         application.setName("My Application");
+        application.setDeviceTypes(mapper.readTree("{\"deviceTypes\":[{\"name\":\"DT1\"}]}"));
         application.setAdditionalInfo(mapper.readTree("{\n" +
                 "\" additionalInfo\": {\n" +
                 "\"description\": \"string\"\n" +

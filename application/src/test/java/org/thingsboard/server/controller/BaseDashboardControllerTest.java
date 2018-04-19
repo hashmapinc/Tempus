@@ -30,6 +30,7 @@ import java.util.List;
 
 
 import com.datastax.driver.core.utils.UUIDs;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -140,6 +141,7 @@ public abstract class BaseDashboardControllerTest extends AbstractControllerTest
 
         Application application = new Application();
         application.setName("My Application");
+        application.setDeviceTypes(mapper.readTree("{\"deviceTypes\":[{\"name\":\"DT1\"}]}"));
         application.setAdditionalInfo(mapper.readTree("{\n" +
                 "\" additionalInfo\": {\n" +
                 "\"description\": \"string\"\n" +
