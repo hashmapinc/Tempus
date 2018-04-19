@@ -1,5 +1,5 @@
 /*
- * Copyright © 2016-2017 The Thingsboard Authors
+ * Copyright © 2016-2018 The Thingsboard Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -125,7 +125,7 @@ function Grid() {
 }
 
 /*@ngInject*/
-function GridController(applicationService, $scope, $state, $mdDialog, $document, $q, $timeout, $translate, $mdMedia, $templateCache, $window) {
+function GridController(applicationService, $scope, $state, $mdDialog, $document, $q, $mdUtil, $timeout, $translate, $mdMedia, $templateCache, $window, userService) { 
 
     var vm = this;
 
@@ -157,6 +157,7 @@ function GridController(applicationService, $scope, $state, $mdDialog, $document
     vm.saveItem = saveItem;
     vm.toggleItemSelection = toggleItemSelection;
     vm.triggerResize = triggerResize;
+    vm.isTenantAdmin = isTenantAdmin;
 
     $scope.$watch(function () {
         return $mdMedia('xs') || $mdMedia('sm');
@@ -300,6 +301,11 @@ function GridController(applicationService, $scope, $state, $mdDialog, $document
                                     vm.openItem(null, vm.newApp);
                                     $window.localStorage.removeItem('currentApp');
                                 }
+
+                                if (vm.items.loadCallback) {
+                                    vm.items.loadCallback();
+                                    vm.items.loadCallback = null;
+                                 }
                             }
                         },
                         function fail() {
@@ -532,7 +538,25 @@ function GridController(applicationService, $scope, $state, $mdDialog, $document
     }
 
     function refreshList() {
-        $state.go($state.current, vm.refreshParamsFunc(), {reload: true});
+        let preservedTopIndex = vm.topIndex;
+        vm.items.data.length = 0;
+        vm.items.rowData.length = 0;
+        vm.items.nextPageLink = {
+            limit: preservedTopIndex + pageSize,
+            textSearch: $scope.searchConfig.searchText
+        };
+        vm.items.selections = {};
+        vm.items.selectedCount = 0;
+        vm.items.hasNext = true;
+        vm.items.pending = false;
+        vm.detailsConfig.isDetailsOpen = false;
+        vm.items.reloadPending = false;
+        vm.items.loadCallback = () => {
+            $mdUtil.nextTick(() => {
+                moveToIndex(preservedTopIndex);
+            });
+        };
+        vm.itemRows.getItemAtIndex(preservedTopIndex+pageSize);
     }
 
     function addItem($event) {
@@ -776,6 +800,10 @@ function GridController(applicationService, $scope, $state, $mdDialog, $document
     function triggerResize() {
         var w = angular.element($window);
         w.triggerHandler('resize');
+    }
+
+    function isTenantAdmin() {
+        return userService.getAuthority() == 'TENANT_ADMIN';
     }
 
     function moveToTop() {

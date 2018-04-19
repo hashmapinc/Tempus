@@ -1,5 +1,5 @@
 /**
- * Copyright © 2016-2017 The Thingsboard Authors
+ * Copyright © 2016-2018 The Thingsboard Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,8 @@ package org.thingsboard.server.controller;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.thingsboard.server.common.data.EntityType;
+import org.thingsboard.server.common.data.audit.ActionType;
 import org.thingsboard.server.common.data.id.RuleId;
 import org.thingsboard.server.common.data.id.TenantId;
 import org.thingsboard.server.common.data.page.TextPageData;
@@ -34,11 +36,13 @@ import java.util.List;
 @RequestMapping("/api")
 public class RuleController extends BaseController {
 
+    public static final String RULE_ID = "ruleId";
+
     @PreAuthorize("hasAnyAuthority('SYS_ADMIN', 'TENANT_ADMIN')")
     @RequestMapping(value = "/rule/{ruleId}", method = RequestMethod.GET)
     @ResponseBody
-    public RuleMetaData getRuleById(@PathVariable("ruleId") String strRuleId) throws ThingsboardException {
-        checkParameter("ruleId", strRuleId);
+    public RuleMetaData getRuleById(@PathVariable(RULE_ID) String strRuleId) throws ThingsboardException {
+        checkParameter(RULE_ID, strRuleId);
         try {
             RuleId ruleId = new RuleId(toUUID(strRuleId));
             return checkRule(ruleService.findRuleById(ruleId));
@@ -71,8 +75,17 @@ public class RuleController extends BaseController {
             RuleMetaData rule = checkNotNull(ruleService.saveRule(source));
             actorService.onRuleStateChange(rule.getTenantId(), rule.getId(),
                     created ? ComponentLifecycleEvent.CREATED : ComponentLifecycleEvent.UPDATED);
+
+            logEntityAction(rule.getId(), rule,
+                    null,
+                    created ? ActionType.ADDED : ActionType.UPDATED, null);
+
             return rule;
         } catch (Exception e) {
+
+            logEntityAction(emptyId(EntityType.RULE), source,
+                    null, source.getId() == null ? ActionType.ADDED : ActionType.UPDATED, e);
+
             throw handleException(e);
         }
     }
@@ -80,14 +93,25 @@ public class RuleController extends BaseController {
     @PreAuthorize("hasAnyAuthority('SYS_ADMIN', 'TENANT_ADMIN')")
     @RequestMapping(value = "/rule/{ruleId}/activate", method = RequestMethod.POST)
     @ResponseStatus(value = HttpStatus.OK)
-    public void activateRuleById(@PathVariable("ruleId") String strRuleId) throws ThingsboardException {
-        checkParameter("ruleId", strRuleId);
+    public void activateRuleById(@PathVariable(RULE_ID) String strRuleId) throws ThingsboardException {
+        checkParameter(RULE_ID, strRuleId);
         try {
             RuleId ruleId = new RuleId(toUUID(strRuleId));
             RuleMetaData rule = checkRule(ruleService.findRuleById(ruleId));
             ruleService.activateRuleById(ruleId);
             actorService.onRuleStateChange(rule.getTenantId(), rule.getId(), ComponentLifecycleEvent.ACTIVATED);
+
+            logEntityAction(rule.getId(), rule,
+                    null,
+                    ActionType.ACTIVATED, null, strRuleId);
+
         } catch (Exception e) {
+
+            logEntityAction(emptyId(EntityType.RULE),
+                    null,
+                    null,
+                    ActionType.ACTIVATED, e, strRuleId);
+
             throw handleException(e);
         }
     }
@@ -95,14 +119,25 @@ public class RuleController extends BaseController {
     @PreAuthorize("hasAnyAuthority('SYS_ADMIN', 'TENANT_ADMIN')")
     @RequestMapping(value = "/rule/{ruleId}/suspend", method = RequestMethod.POST)
     @ResponseStatus(value = HttpStatus.OK)
-    public void suspendRuleById(@PathVariable("ruleId") String strRuleId) throws ThingsboardException {
-        checkParameter("ruleId", strRuleId);
+    public void suspendRuleById(@PathVariable(RULE_ID) String strRuleId) throws ThingsboardException {
+        checkParameter(RULE_ID, strRuleId);
         try {
             RuleId ruleId = new RuleId(toUUID(strRuleId));
             RuleMetaData rule = checkRule(ruleService.findRuleById(ruleId));
             ruleService.suspendRuleById(ruleId);
             actorService.onRuleStateChange(rule.getTenantId(), rule.getId(), ComponentLifecycleEvent.SUSPENDED);
+
+            logEntityAction(rule.getId(), rule,
+                    null,
+                    ActionType.SUSPENDED, null, strRuleId);
+
         } catch (Exception e) {
+
+            logEntityAction(emptyId(EntityType.RULE),
+                    null,
+                    null,
+                    ActionType.SUSPENDED, e, strRuleId);
+
             throw handleException(e);
         }
     }
@@ -178,14 +213,25 @@ public class RuleController extends BaseController {
     @PreAuthorize("hasAnyAuthority('SYS_ADMIN', 'TENANT_ADMIN')")
     @RequestMapping(value = "/rule/{ruleId}", method = RequestMethod.DELETE)
     @ResponseStatus(value = HttpStatus.OK)
-    public void deleteRule(@PathVariable("ruleId") String strRuleId) throws ThingsboardException {
-        checkParameter("ruleId", strRuleId);
+    public void deleteRule(@PathVariable(RULE_ID) String strRuleId) throws ThingsboardException {
+        checkParameter(RULE_ID, strRuleId);
         try {
             RuleId ruleId = new RuleId(toUUID(strRuleId));
             RuleMetaData rule = checkRule(ruleService.findRuleById(ruleId));
             ruleService.deleteRuleById(ruleId);
             actorService.onRuleStateChange(rule.getTenantId(), rule.getId(), ComponentLifecycleEvent.DELETED);
+
+            logEntityAction(ruleId, rule,
+                    null,
+                    ActionType.DELETED, null, strRuleId);
+
         } catch (Exception e) {
+
+            logEntityAction(emptyId(EntityType.RULE),
+                    null,
+                    null,
+                    ActionType.DELETED, e, strRuleId);
+
             throw handleException(e);
         }
     }

@@ -1,5 +1,5 @@
 /**
- * Copyright © 2016-2017 The Thingsboard Authors
+ * Copyright © 2016-2018 The Thingsboard Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.thingsboard.server.common.data.EntityType;
 
+import java.io.Serializable;
 import java.util.UUID;
 
 /**
@@ -28,7 +29,7 @@ import java.util.UUID;
 
 @JsonDeserialize(using = EntityIdDeserializer.class)
 @JsonSerialize(using = EntityIdSerializer.class)
-public interface EntityId {
+public interface EntityId extends Serializable { //NOSONAR, the constant is closely related to EntityId
 
     UUID NULL_UUID = UUID.fromString("13814000-1dd2-11b2-8080-808080808080");
 

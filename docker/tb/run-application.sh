@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Copyright © 2016-2017 The Thingsboard Authors
+# Copyright © 2016-2018 The Thingsboard Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@
 dpkg -i /tempus.deb
 
 if [ "$DATABASE_TYPE" == "cassandra" ]; then
-    until nmap $CASSANDRA_HOST -p $CASSANDRA_PORT | grep "$CASSANDRA_PORT/tcp open"
+    until nmap $CASSANDRA_HOST -p $CASSANDRA_PORT | grep "$CASSANDRA_PORT/tcp open\|filtered"
     do
       echo "Wait for cassandra db to start..."
       sleep 10

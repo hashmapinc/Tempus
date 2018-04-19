@@ -1,5 +1,5 @@
 /**
- * Copyright © 2016-2017 The Thingsboard Authors
+ * Copyright © 2016-2018 The Thingsboard Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -49,6 +49,8 @@ import static org.thingsboard.server.dao.service.Validator.*;
 public class UserServiceImpl extends AbstractEntityService implements UserService {
 
     private static final int DEFAULT_TOKEN_LENGTH = 30;
+    public static final String INCORRECT_USER_ID = "Incorrect userId ";
+    public static final String INCORRECT_TENANT_ID = "Incorrect tenantId ";
 
     @Autowired
     private UserDao userDao;
@@ -72,14 +74,14 @@ public class UserServiceImpl extends AbstractEntityService implements UserServic
 	@Override
 	public User findUserById(UserId userId) {
 	    log.trace("Executing findUserById [{}]", userId);
-		validateId(userId, "Incorrect userId " + userId);
+		validateId(userId, INCORRECT_USER_ID + userId);
 		return userDao.findById(userId.getId());
 	}
 
     @Override
     public ListenableFuture<User> findUserByIdAsync(UserId userId) {
         log.trace("Executing findUserByIdAsync [{}]", userId);
-        validateId(userId, "Incorrect userId " + userId);
+        validateId(userId, INCORRECT_USER_ID + userId);
         return userDao.findByIdAsync(userId.getId());
     }
 
@@ -116,7 +118,7 @@ public class UserServiceImpl extends AbstractEntityService implements UserServic
     @Override
     public UserCredentials findUserCredentialsByUserId(UserId userId) {
         log.trace("Executing findUserCredentialsByUserId [{}]", userId);
-        validateId(userId, "Incorrect userId " + userId);
+        validateId(userId, INCORRECT_USER_ID + userId);
         return userCredentialsDao.findByUserId(userId.getId());
     }
 
@@ -180,7 +182,7 @@ public class UserServiceImpl extends AbstractEntityService implements UserServic
     @Override
     public void deleteUser(UserId userId) {
         log.trace("Executing deleteUser [{}]", userId);
-        validateId(userId, "Incorrect userId " + userId);
+        validateId(userId, INCORRECT_USER_ID + userId);
         UserCredentials userCredentials = userCredentialsDao.findByUserId(userId.getId());
         userCredentialsDao.removeById(userCredentials.getUuidId());
         deleteEntityRelations(userId);
@@ -190,7 +192,7 @@ public class UserServiceImpl extends AbstractEntityService implements UserServic
     @Override
     public TextPageData<User> findTenantAdmins(TenantId tenantId, TextPageLink pageLink) {
         log.trace("Executing findTenantAdmins, tenantId [{}], pageLink [{}]", tenantId, pageLink);
-        validateId(tenantId, "Incorrect tenantId " + tenantId);
+        validateId(tenantId, INCORRECT_TENANT_ID + tenantId);
         validatePageLink(pageLink, "Incorrect page link " + pageLink);
         List<User> users = userDao.findTenantAdmins(tenantId.getId(), pageLink);
         return new TextPageData<>(users, pageLink);
@@ -199,14 +201,14 @@ public class UserServiceImpl extends AbstractEntityService implements UserServic
     @Override
     public void deleteTenantAdmins(TenantId tenantId) {
         log.trace("Executing deleteTenantAdmins, tenantId [{}]", tenantId);
-        validateId(tenantId, "Incorrect tenantId " + tenantId);
+        validateId(tenantId, INCORRECT_TENANT_ID + tenantId);
         tenantAdminsRemover.removeEntities(tenantId);
     }
 
     @Override
     public TextPageData<User> findCustomerUsers(TenantId tenantId, CustomerId customerId, TextPageLink pageLink) {
         log.trace("Executing findCustomerUsers, tenantId [{}], customerId [{}], pageLink [{}]", tenantId, customerId, pageLink);
-        validateId(tenantId, "Incorrect tenantId " + tenantId);
+        validateId(tenantId, INCORRECT_TENANT_ID + tenantId);
         validateId(customerId, "Incorrect customerId " + customerId);
         validatePageLink(pageLink, "Incorrect page link " + pageLink);
         List<User> users = userDao.findCustomerUsers(tenantId.getId(), customerId.getId(), pageLink);
@@ -216,7 +218,7 @@ public class UserServiceImpl extends AbstractEntityService implements UserServic
     @Override
     public void deleteCustomerUsers(TenantId tenantId, CustomerId customerId) {
         log.trace("Executing deleteCustomerUsers, customerId [{}]", customerId);
-        validateId(tenantId, "Incorrect tenantId " + tenantId);
+        validateId(tenantId, INCORRECT_TENANT_ID + tenantId);
         validateId(customerId, "Incorrect customerId " + customerId);
         new CustomerUsersRemover(tenantId).removeEntities(customerId);
     }

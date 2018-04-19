@@ -1,5 +1,5 @@
 /**
- * Copyright © 2016-2017 The Thingsboard Authors
+ * Copyright © 2016-2018 The Thingsboard Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,6 +39,8 @@ import org.thingsboard.server.actors.shared.plugin.TenantPluginManager;
 import org.thingsboard.server.actors.shared.rule.RuleManager;
 import org.thingsboard.server.actors.shared.rule.TenantRuleManager;
 import org.thingsboard.server.common.data.id.DeviceId;
+import org.thingsboard.server.common.data.id.PluginId;
+import org.thingsboard.server.common.data.id.RuleId;
 import org.thingsboard.server.common.data.id.TenantId;
 import org.thingsboard.server.common.data.plugin.ComponentLifecycleEvent;
 import org.thingsboard.server.common.msg.cluster.ClusterEventMsg;
@@ -147,8 +149,10 @@ public class TenantActor extends ContextAwareActor {
     }
 
     private void onComponentLifecycleMsg(ComponentLifecycleMsg msg) {
-        if (msg.getPluginId().isPresent()) {
-            ActorRef pluginActor = pluginManager.getOrCreatePluginActor(this.context(), msg.getPluginId().get());
+        Optional<PluginId> pluginId = msg.getPluginId();
+        Optional<RuleId> ruleId = msg.getRuleId();
+        if (pluginId.isPresent()) {
+            ActorRef pluginActor = pluginManager.getOrCreatePluginActor(this.context(), pluginId.get());
             pluginActor.tell(msg, ActorRef.noSender());
         } else if (msg.getRuleId().isPresent()) {
             if(msg.getEvent().equals(ComponentLifecycleEvent.DELETED)) {
@@ -157,11 +161,11 @@ public class TenantActor extends ContextAwareActor {
                 applicationActor.tell(ruleDeleteMessage, ActorRef.noSender());
             }
             ActorRef target;
-            Optional<ActorRef> ref = ruleManager.update(this.context(), msg.getRuleId().get(), msg.getEvent());
+            Optional<ActorRef> ref = ruleManager.update(this.context(), ruleId.get(), msg.getEvent());
             if (ref.isPresent()) {
                 target = ref.get();
             } else {
-                logger.debug("Failed to find actor for rule: [{}]", msg.getRuleId());
+                logger.debug("Failed to find actor for rule: [{}]", ruleId);
                 return;
             }
             target.tell(msg, ActorRef.noSender());

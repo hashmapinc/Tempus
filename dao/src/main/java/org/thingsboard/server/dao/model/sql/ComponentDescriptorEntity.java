@@ -1,5 +1,5 @@
 /**
- * Copyright © 2016-2017 The Thingsboard Authors
+ * Copyright © 2016-2018 The Thingsboard Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,9 +37,6 @@ import javax.persistence.*;
 @TypeDef(name = "json", typeClass = JsonStringType.class)
 @Table(name = ModelConstants.COMPONENT_DESCRIPTOR_COLUMN_FAMILY_NAME)
 public class ComponentDescriptorEntity extends BaseSqlEntity<ComponentDescriptor> implements SearchTextEntity<ComponentDescriptor> {
-
-    @Transient
-    private static final long serialVersionUID = 253590350877992402L;
 
     @Enumerated(EnumType.STRING)
     @Column(name = ModelConstants.COMPONENT_DESCRIPTOR_TYPE_PROPERTY)
@@ -104,6 +101,6 @@ public class ComponentDescriptorEntity extends BaseSqlEntity<ComponentDescriptor
 
     @Override
     public String getSearchTextSource() {
-        return searchText;
+        return getSearchText();
     }
 }

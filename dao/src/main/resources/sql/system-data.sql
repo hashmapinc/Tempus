@@ -1,5 +1,5 @@
 --
--- Copyright © 2016-2017 The Thingsboard Authors
+-- Copyright © 2016-2018 The Thingsboard Authors
 --
 -- Licensed under the Apache License, Version 2.0 (the "License");
 -- you may not use this file except in compliance with the License.
@@ -18,8 +18,8 @@
 
 /** System admin **/
 INSERT INTO tb_user ( id, tenant_id, customer_id, email, search_text, authority )
-VALUES ( '1e746125a797660a91992ebcb67fe33', '1b21dd2138140008080808080808080', '1b21dd2138140008080808080808080', 'sysadmin@thingsboard.org',
-         'sysadmin@thingsboard.org', 'SYS_ADMIN' );
+VALUES ( '1e746125a797660a91992ebcb67fe33', '1b21dd2138140008080808080808080', '1b21dd2138140008080808080808080', 'sysadmin@hashmapinc.com',
+         'sysadmin@hashmapinc.com', 'SYS_ADMIN' );
 
 INSERT INTO user_credentials ( id, user_id, enabled, password )
 VALUES ( '1e7461261441950a91992ebcb67fe33', '1e746125a797660a91992ebcb67fe33', true,

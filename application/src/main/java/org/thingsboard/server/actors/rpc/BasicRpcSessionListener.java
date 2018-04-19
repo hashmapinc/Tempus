@@ -1,5 +1,5 @@
 /**
- * Copyright © 2016-2017 The Thingsboard Authors
+ * Copyright © 2016-2018 The Thingsboard Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -45,6 +45,7 @@ import java.util.UUID;
 @Slf4j
 public class BasicRpcSessionListener implements GrpcSessionListener {
 
+    public static final String SESSION_RECEIVED_SESSION_ACTOR_MSG = "{} session [{}] received session actor msg {}";
     private final ActorSystemContext context;
     private final ActorService service;
     private final ActorRef manager;
@@ -93,25 +94,25 @@ public class BasicRpcSessionListener implements GrpcSessionListener {
 
     @Override
     public void onToDeviceSessionActorRpcMsg(GrpcSession session, ClusterAPIProtos.ToDeviceSessionActorRpcMessage msg) {
-        log.trace("{} session [{}] received session actor msg {}", getType(session), session.getRemoteServer(), msg);
+        log.trace(SESSION_RECEIVED_SESSION_ACTOR_MSG, getType(session), session.getRemoteServer(), msg);
         service.onMsg((ToDeviceSessionActorMsg) deserialize(msg.getData().toByteArray()));
     }
 
     @Override
     public void onToDeviceRpcRequestRpcMsg(GrpcSession session, ClusterAPIProtos.ToDeviceRpcRequestRpcMessage msg) {
-        log.trace("{} session [{}] received session actor msg {}", getType(session), session.getRemoteServer(), msg);
+        log.trace(SESSION_RECEIVED_SESSION_ACTOR_MSG, getType(session), session.getRemoteServer(), msg);
         service.onMsg(deserialize(session.getRemoteServer(), msg));
     }
 
     @Override
     public void onFromDeviceRpcResponseRpcMsg(GrpcSession session, ClusterAPIProtos.ToPluginRpcResponseRpcMessage msg) {
-        log.trace("{} session [{}] received session actor msg {}", getType(session), session.getRemoteServer(), msg);
+        log.trace(SESSION_RECEIVED_SESSION_ACTOR_MSG, getType(session), session.getRemoteServer(), msg);
         service.onMsg(deserialize(session.getRemoteServer(), msg));
     }
 
     @Override
     public void onToAllNodesRpcMessage(GrpcSession session, ClusterAPIProtos.ToAllNodesRpcMessage msg) {
-        log.trace("{} session [{}] received session actor msg {}", getType(session), session.getRemoteServer(), msg);
+        log.trace(SESSION_RECEIVED_SESSION_ACTOR_MSG, getType(session), session.getRemoteServer(), msg);
         service.onMsg((ToAllNodesMsg) deserialize(msg.getData().toByteArray()));
     }
 
@@ -147,7 +148,7 @@ public class BasicRpcSessionListener implements GrpcSessionListener {
         DeviceId deviceId = new DeviceId(toUUID(msg.getDeviceId()));
 
         ToDeviceRpcRequestBody requestBody = new ToDeviceRpcRequestBody(msg.getMethod(), msg.getParams());
-        ToDeviceRpcRequest request = new ToDeviceRpcRequest(toUUID(msg.getMsgId()), deviceTenantId, deviceId, msg.getOneway(), msg.getExpTime(), requestBody);
+        ToDeviceRpcRequest request = new ToDeviceRpcRequest(toUUID(msg.getMsgId()), null, deviceTenantId, deviceId, msg.getOneway(), msg.getExpTime(), requestBody);
 
         return new ToDeviceRpcRequestPluginMsg(serverAddress, pluginId, pluginTenantId, request);
     }

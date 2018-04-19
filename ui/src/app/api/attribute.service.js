@@ -1,5 +1,5 @@
 /*
- * Copyright © 2016-2017 The Thingsboard Authors
+ * Copyright © 2016-2018 The Thingsboard Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,7 +35,7 @@ function AttributeService($http, $q, $filter, types, telemetryWebsocketService) 
 
     return service;
 
-    function getEntityKeys(entityType, entityId, query, type) {
+    function getEntityKeys(entityType, entityId, query, type, config) {
         var deferred = $q.defer();
         var url = '/api/plugins/telemetry/' + entityType + '/' + entityId + '/keys/';
         if (type === types.dataKeyType.timeseries) {
@@ -45,7 +45,7 @@ function AttributeService($http, $q, $filter, types, telemetryWebsocketService) 
         } else if (type === types.dataKeyType.depthSeries) {
             url += 'depthseries';
         }
-        $http.get(url, null).then(function success(response) {
+        $http.get(url, config).then(function success(response) {
             var result = [];
             if (response.data) {
                 if (query) {

@@ -1,5 +1,5 @@
 /**
- * Copyright © 2016-2017 The Thingsboard Authors
+ * Copyright © 2016-2018 The Thingsboard Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -80,7 +80,7 @@ public class DeviceEmulator {
                         Thread.sleep(1000);
                     }
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    log.error("Error occurred while sending COAP requests", e);
                 }
             }
 
@@ -113,18 +113,18 @@ public class DeviceEmulator {
 
                                 @Override
                                 public void onError() {
-
+                                    //Do nothing
                                 }
                             }, mapper.writeValueAsString(response), MediaTypeRegistry.APPLICATION_JSON);
 
                         } catch (IOException e) {
-                            e.printStackTrace();
+                            log.error("Error occurred while processing COAP response", e);
                         }
                     }
 
                     @Override
                     public void onError() {
-
+                        //Do nothing
                     }
                 });
             }

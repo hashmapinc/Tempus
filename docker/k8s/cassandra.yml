@@ -30,7 +30,7 @@ spec:
     spec:
       containers:
       - name: cassandra
-        image: cassandra:3.9
+        image: cassandra:3.11.2
         imagePullPolicy: Always
         ports:
         - containerPort: 9160

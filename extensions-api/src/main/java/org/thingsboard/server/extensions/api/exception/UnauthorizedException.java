@@ -1,5 +1,5 @@
 /**
- * Copyright © 2016-2017 The Thingsboard Authors
+ * Copyright © 2016-2018 The Thingsboard Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,13 +15,20 @@
  */
 package org.thingsboard.server.extensions.api.exception;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+
 /**
  * Created by ashvayka on 21.02.17.
  */
-public class UnauthorizedException extends Exception {
+public class UnauthorizedException extends Exception implements ToErrorResponseEntity {
 
     public UnauthorizedException(String message) {
         super(message);
     }
 
+    @Override
+    public ResponseEntity<String> toErrorResponseEntity() {
+        return new ResponseEntity<>(getMessage(), HttpStatus.UNAUTHORIZED);
+    }
 }

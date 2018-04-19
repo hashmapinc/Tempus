@@ -1,5 +1,5 @@
 /**
- * Copyright © 2016-2017 The Thingsboard Authors
+ * Copyright © 2016-2018 The Thingsboard Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,15 +19,23 @@ import com.google.common.base.Charsets;
 import com.google.common.io.Resources;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.rules.ExternalResource;
+import org.thingsboard.server.dao.model.ModelConstants;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
+import java.util.stream.Collectors;
 
 
 /**
@@ -36,15 +44,18 @@ import java.util.Properties;
 @Slf4j
 public class CustomSqlUnit extends ExternalResource {
 
-    private final List<String> sqlFiles;
+    private List<String> sqlFiles;
     private final String dropAllTablesSqlFile;
+    private final String upgradePath;
     private final String dbUrl;
     private final String dbUserName;
     private final String dbPassword;
+    //private final String upgradePath;
 
-    public CustomSqlUnit(List<String> sqlFiles, String dropAllTablesSqlFile, String configurationFileName) {
+    public CustomSqlUnit(List<String> sqlFiles, String dropAllTablesSqlFile, String configurationFileName, String upgradePath) {
         this.sqlFiles = sqlFiles;
         this.dropAllTablesSqlFile = dropAllTablesSqlFile;
+        this.upgradePath = upgradePath;
         final Properties properties = new Properties();
         try (final InputStream stream = this.getClass().getClassLoader().getResourceAsStream(configurationFileName)) {
             properties.load(stream);
@@ -59,12 +70,27 @@ public class CustomSqlUnit extends ExternalResource {
     @Override
     public void before() {
         cleanUpDb();
-
+        List<String> files = new ArrayList<>();
+        files.addAll(sqlFiles);
         Connection conn = null;
         try {
             conn = DriverManager.getConnection(dbUrl, dbUserName, dbPassword);
-            for (String sqlFile : sqlFiles) {
-                URL sqlFileUrl = Resources.getResource(sqlFile);
+            //Path upgradeScriptsDirectory = Paths.get(upgradePath);
+            ClassLoader loader = Thread.currentThread().getContextClassLoader();
+            URL url = loader.getResource(upgradePath);
+            String path = url.getPath();
+            Path upgradeScriptsDirectory = Paths.get(path);
+
+            List<Integer> sortedScriptsIndexes = Files.list(upgradeScriptsDirectory).map(a -> stripExtensionFromName(a.getFileName().toString())).sorted().collect(Collectors.toList());
+            List<String> upgradeFiles = new ArrayList<>();
+            for(Integer i: sortedScriptsIndexes) {
+                upgradeFiles.add(upgradePath + i.toString()+".sql");
+            }
+
+            files.addAll(upgradeFiles);
+
+            for (String sqlFile : files) {
+                 URL sqlFileUrl = Resources.getResource(sqlFile);
                 String sql = Resources.toString(sqlFileUrl, Charsets.UTF_8);
                 conn.createStatement().execute(sql);
             }
@@ -104,5 +130,9 @@ public class CustomSqlUnit extends ExternalResource {
                 }
             }
         }
+    }
+
+    private Integer stripExtensionFromName(String fileName) {
+        return Integer.parseInt(fileName.substring(0, fileName.indexOf(".sql")));
     }
 }

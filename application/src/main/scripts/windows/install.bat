@@ -93,7 +93,7 @@ java -cp %jarfile% -Dloader.main=org.thingsboard.server.ThingsboardInstallApplic
                     org.springframework.boot.loader.PropertiesLauncher
 
 if errorlevel 1 (
-   @echo ThingsBoard installation failed!
+   @echo Tempus installation failed!
    POPD
    exit /b %errorlevel%
 )
@@ -101,7 +101,7 @@ POPD
 
 %BASE%${pkg.name}.exe install
 
-@ECHO ThingsBoard installed successfully!
+@ECHO Tempus installed successfully!
 
 GOTO END
 

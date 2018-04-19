@@ -1,5 +1,5 @@
 /**
- * Copyright © 2016-2017 The Thingsboard Authors
+ * Copyright © 2016-2018 The Thingsboard Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -57,12 +57,7 @@ public abstract class DataValidator<D extends BaseData<?>> {
     }
     
     protected boolean isSameData(D existentData, D actualData) {
-        if (actualData.getId() == null) {
-            return false;
-        } else if (!existentData.getId().equals(actualData.getId())) {
-            return false;
-        }
-        return true;
+        return actualData.getId() != null && existentData.getId().equals(actualData.getId());
     }
     
     protected static void validateEmail(String email) {

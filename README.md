@@ -9,7 +9,8 @@ Tempus is an Apache 2.0 licensed IIoT framework for industrial data ingestion an
 
 Thingsboard can now support depthseries data also. Earlier thingsboard supported timeseries data i.e timestamp based telemetry data, but there is a need for the support of depthseries data also i.e depth based telemetry data.
 
-## Configurations
+[**Smart metering**](https://thingsboard.io/smart-metering/)
+[![Smart metering](https://user-images.githubusercontent.com/8308069/31455788-6888a948-aec1-11e7-9819-410e0ba785e0.gif "Smart metering")](https://thingsboard.io/smart-metering/)
 
 1. There is only one configuration to be made, it is in thingsboard.yml. Under the heading UI Related configuration set depthSeries to true like:
 ```

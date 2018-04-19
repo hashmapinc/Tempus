@@ -1,5 +1,5 @@
 /**
- * Copyright © 2016-2017 The Thingsboard Authors
+ * Copyright © 2016-2018 The Thingsboard Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,16 +30,12 @@ import org.thingsboard.server.dao.model.SearchTextEntity;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
-import javax.persistence.Transient;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
 @Entity
 @Table(name = ModelConstants.WIDGETS_BUNDLE_COLUMN_FAMILY_NAME)
 public final class WidgetsBundleEntity extends BaseSqlEntity<WidgetsBundle> implements SearchTextEntity<WidgetsBundle> {
-
-    @Transient
-    private static final long serialVersionUID = 6897035686422298096L;
 
     @Column(name = ModelConstants.WIDGETS_BUNDLE_TENANT_ID_PROPERTY)
     private String tenantId;
