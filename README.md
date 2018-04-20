@@ -2,6 +2,8 @@
 
 [![License](http://img.shields.io/:license-Apache%202-blue.svg)](http://www.apache.org/licenses/LICENSE-2.0.txt)
 
+<a href="https://cla-assistant.io/hashmapinc/Tempus"><img src="https://cla-assistant.io/readme/badge/hashmapinc/Tempus" alt="CLA assistant" /></a>
+
 Tempus is an Apache 2.0 licensed IIoT framework for industrial data ingestion and analysis.
 
 
