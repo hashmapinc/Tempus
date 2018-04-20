@@ -243,4 +243,5 @@ public class GenerateMessageTest {
         Assert.assertNotNull(out);
         Assert.assertEquals(out,msg);
     }
+
 }
