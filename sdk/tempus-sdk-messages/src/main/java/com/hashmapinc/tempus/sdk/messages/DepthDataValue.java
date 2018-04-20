@@ -29,7 +29,6 @@ public class DepthDataValue {
     private Map<String, Object> values;
 
     public double getDepth(){
-
         return depth;
     }
 
