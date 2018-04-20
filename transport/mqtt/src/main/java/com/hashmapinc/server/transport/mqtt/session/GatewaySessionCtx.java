@@ -34,7 +34,6 @@ import com.hashmapinc.server.common.transport.adaptor.JsonConverter;
 import com.hashmapinc.server.common.transport.auth.DeviceAuthService;
 import com.hashmapinc.server.dao.device.DeviceService;
 import com.hashmapinc.server.dao.relation.RelationService;
-import com.hashmapinc.server.transport.mqtt.adaptors.JsonMqttAdaptor;
 import com.hashmapinc.server.transport.mqtt.sparkplugB.data.SparkPlugDecodedMsg;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.mqtt.MqttMessage;
@@ -48,6 +47,8 @@ import com.hashmapinc.server.common.data.kv.KvEntry;
 import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static com.hashmapinc.server.transport.mqtt.adaptors.JsonMqttAdaptor.validateJsonPayload;
 
 /**
  * Created by ashvayka on 19.01.17.
@@ -109,6 +110,7 @@ public class GatewaySessionCtx {
         if (!devices.containsKey(deviceName)) {
             Device device = deviceService.findDeviceByTenantIdAndName(gateway.getTenantId(), deviceName);
             if (device == null) {
+                device = new Device();
                 device.setTenantId(gateway.getTenantId());
                 device.setName(deviceName);
                 device.setType(deviceType);
@@ -152,8 +154,8 @@ public class GatewaySessionCtx {
     }
 
     public void onDeviceTelemetry(MqttPublishMessage mqttMsg) throws AdaptorException {
-        JsonElement json = JsonMqttAdaptor.validateJsonPayload(gatewaySessionId, mqttMsg.payload());
-        int requestId = mqttMsg.variableHeader().messageId();
+        JsonElement json = validateJsonPayload(gatewaySessionId, mqttMsg.payload());
+        int requestId = mqttMsg.variableHeader().packetId();
         if (json.isJsonObject()) {
             JsonObject jsonObj = json.getAsJsonObject();
             for (Map.Entry<String, JsonElement> deviceEntry : jsonObj.entrySet()) {
@@ -190,8 +192,8 @@ public class GatewaySessionCtx {
     }
 
     public void onDeviceDepthTelemetry(MqttPublishMessage mqttMsg) throws AdaptorException {
-        JsonElement json = JsonMqttAdaptor.validateJsonPayload(gatewaySessionId, mqttMsg.payload());
-        int requestId = mqttMsg.variableHeader().messageId();
+        JsonElement json = validateJsonPayload(gatewaySessionId, mqttMsg.payload());
+        int requestId = mqttMsg.variableHeader().packetId();
         if (json.isJsonObject()) {
             JsonObject jsonObj = json.getAsJsonObject();
             for (Map.Entry<String, JsonElement> deviceEntry : jsonObj.entrySet()) {
@@ -214,7 +216,7 @@ public class GatewaySessionCtx {
     }
 
     public void onDeviceRpcResponse(MqttPublishMessage mqttMsg) throws AdaptorException {
-        JsonElement json = JsonMqttAdaptor.validateJsonPayload(gatewaySessionId, mqttMsg.payload());
+        JsonElement json = validateJsonPayload(gatewaySessionId, mqttMsg.payload());
         if (json.isJsonObject()) {
             JsonObject jsonObj = json.getAsJsonObject();
             String deviceName = checkDeviceConnected(jsonObj.get(DEVICE_PROPERTY).getAsString());
@@ -229,8 +231,8 @@ public class GatewaySessionCtx {
     }
 
     public void onDeviceAttributes(MqttPublishMessage mqttMsg) throws AdaptorException {
-        JsonElement json = JsonMqttAdaptor.validateJsonPayload(gatewaySessionId, mqttMsg.payload());
-        int requestId = mqttMsg.variableHeader().messageId();
+        JsonElement json = validateJsonPayload(gatewaySessionId, mqttMsg.payload());
+        int requestId = mqttMsg.variableHeader().packetId();
         if (json.isJsonObject()) {
             JsonObject jsonObj = json.getAsJsonObject();
             for (Map.Entry<String, JsonElement> deviceEntry : jsonObj.entrySet()) {
@@ -252,7 +254,7 @@ public class GatewaySessionCtx {
     }
 
     public void onDeviceAttributesRequest(MqttPublishMessage msg) throws AdaptorException {
-        JsonElement json = JsonMqttAdaptor.validateJsonPayload(gatewaySessionId, msg.payload());
+        JsonElement json = validateJsonPayload(gatewaySessionId, msg.payload());
         if (json.isJsonObject()) {
             JsonObject jsonObj = json.getAsJsonObject();
             int requestId = jsonObj.get("id").getAsInt();
@@ -318,7 +320,7 @@ public class GatewaySessionCtx {
     }
 
     private JsonElement getJson(MqttPublishMessage mqttMsg) throws AdaptorException {
-        return JsonMqttAdaptor.validateJsonPayload(gatewaySessionId, mqttMsg.payload());
+        return validateJsonPayload(gatewaySessionId, mqttMsg.payload());
     }
 
     protected SessionMsgProcessor getProcessor() {
@@ -334,8 +336,8 @@ public class GatewaySessionCtx {
     }
 
     private void ack(MqttPublishMessage msg) {
-        if (msg.variableHeader().messageId() > 0) {
-            writeAndFlush(MqttTransportHandler.createMqttPubAckMsg(msg.variableHeader().messageId()));
+        if (msg.variableHeader().packetId() > 0) {
+            writeAndFlush(MqttTransportHandler.createMqttPubAckMsg(msg.variableHeader().packetId()));
         }
     }
 

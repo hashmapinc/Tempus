@@ -47,7 +47,7 @@ public class SparkPlugDecodeService extends SparkPlugUtils {
             SparkplugBPayload sparkplugBPayload = extractSparkPlugBPayload(inbound.payload());
             Long ts = sparkplugBPayload.getTimestamp().getTime();
             List<KvEntry> kvEntryList = extractKvEntryFromSparkPlugBPayload(sparkplugBPayload);
-            int requestId = inbound.variableHeader().messageId();
+            int requestId = inbound.variableHeader().packetId();
             SparkPlugDecodedMsg sparkPlugDecodedMsg = new SparkPlugDecodedMsg(requestId, ts, kvEntryList);
             String topic = extractTopicWithoutMsgType(inbound.variableHeader().topicName());
             String deviceName = extractDeviceName(inbound.variableHeader().topicName());
