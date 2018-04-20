@@ -8,13 +8,13 @@ import java.util.Map;
 public class DepthDataValue {
 
     @JsonProperty(value = "ds", index = 1)
-    private  double depthSeries;
+    private  double depth;
 
     @JsonProperty(index = 2)
     private Map<String, Object> values;
 
     public double getDepth(){
-        return depthSeries;
+        return depth;
     }
 
     public Map getValues(){
@@ -26,7 +26,7 @@ public class DepthDataValue {
     }
 
     public void setDepth (double ds){
-        this.depthSeries = ds;
+        this.depth = ds;
     }
 
     public void addValue(String key, Object value){
