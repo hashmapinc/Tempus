@@ -2,7 +2,7 @@
 
 [![License](http://img.shields.io/:license-Apache%202-blue.svg)](http://www.apache.org/licenses/LICENSE-2.0.txt) [![CLA assistant](https://cla-assistant.io/readme/badge/hashmapinc/Tempus)](https://cla-assistant.io/hashmapinc/Tempus)
 
-Tempus is an Apache 2.0 licensed IIoT framework for industrial data ingestion and analysis.
+Tempus is an Apache 2.0 licensed IIoT framework for industrial data ingestion and analysis..
 
 
 # Depth Data Support 
