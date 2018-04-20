@@ -57,6 +57,7 @@ public class CustomSqlUnit extends ExternalResource {
         this.dropAllTablesSqlFile = dropAllTablesSqlFile;
         this.upgradePath = upgradePath;
         final Properties properties = new Properties();
+
         try (final InputStream stream = this.getClass().getClassLoader().getResourceAsStream(configurationFileName)) {
             properties.load(stream);
             this.dbUrl = properties.getProperty("spring.datasource.url");
@@ -75,22 +76,17 @@ public class CustomSqlUnit extends ExternalResource {
         Connection conn = null;
         try {
             conn = DriverManager.getConnection(dbUrl, dbUserName, dbPassword);
-            //Path upgradeScriptsDirectory = Paths.get(upgradePath);
-            ClassLoader loader = Thread.currentThread().getContextClassLoader();
-            URL url = loader.getResource(upgradePath);
+            URL url = this.getClass().getClassLoader().getResource(upgradePath);
             String path = url.getPath();
             Path upgradeScriptsDirectory = Paths.get(path);
-
             List<Integer> sortedScriptsIndexes = Files.list(upgradeScriptsDirectory).map(a -> stripExtensionFromName(a.getFileName().toString())).sorted().collect(Collectors.toList());
             List<String> upgradeFiles = new ArrayList<>();
             for(Integer i: sortedScriptsIndexes) {
                 upgradeFiles.add(upgradePath + i.toString()+".sql");
             }
-
             files.addAll(upgradeFiles);
-
             for (String sqlFile : files) {
-                 URL sqlFileUrl = Resources.getResource(sqlFile);
+                URL sqlFileUrl = Resources.getResource(sqlFile);
                 String sql = Resources.toString(sqlFileUrl, Charsets.UTF_8);
                 conn.createStatement().execute(sql);
             }

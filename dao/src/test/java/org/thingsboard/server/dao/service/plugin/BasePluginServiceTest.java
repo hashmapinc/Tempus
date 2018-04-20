@@ -73,7 +73,7 @@ public abstract class BasePluginServiceTest extends AbstractServiceTest {
     pluginService.savePlugin(generatePlugin(systemTenant, null));
     pluginService.savePlugin(generatePlugin(systemTenant, null));
     TextPageData<PluginMetaData> found = pluginService.findSystemPlugins(new TextPageLink(100));
-    Assert.assertEquals(2, found.getData().size());
+    Assert.assertEquals(4, found.getData().size());
     Assert.assertFalse(found.hasNext());
   }
 
