@@ -1,5 +1,5 @@
 /**
- * Copyright © 2016-2018 The Thingsboard Authors
+ * Copyright © 2016-2018 Hashmap, Inc
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -47,32 +47,8 @@ public class SystemNoSqlTestSuite {
 
     @ClassRule
     public static CustomCassandraCQLUnit cassandraUnit =
-            new CustomCassandraCQLUnit(getDataSetLists(),
-                    "cassandra-test.yaml", 30000l);
-
-    private static List<CQLDataSet> getDataSetLists(){
-        List<CQLDataSet> dataSets = new ArrayList<>();
-        dataSets.add(new ClassPathCQLDataSet("cassandra/schema.cql", false, false));
-        dataSets.add(new ClassPathCQLDataSet("cassandra/system-data.cql", false, false));
-        String upgradePath = "cassandra/upgrade/";
-        ClassLoader loader = Thread.currentThread().getContextClassLoader();
-        URL url = loader.getResource(upgradePath);
-        String path = url.getPath();
-        Path upgradeScriptsDirectory = Paths.get(path);
-        List<Integer> sortedScriptsIndexes = null;
-        try {
-            sortedScriptsIndexes = Files.list(upgradeScriptsDirectory).map(a -> stripExtensionFromName(a.getFileName().toString())).sorted().collect(Collectors.toList());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        for(Integer i: sortedScriptsIndexes) {
-            String scriptFileName = upgradePath + i.toString()+".cql";
-            dataSets.add(new ClassPathCQLDataSet(scriptFileName, false, false));
-        }
-        return dataSets;
-    }
-
-    private static Integer stripExtensionFromName(String fileName) {
-        return Integer.parseInt(fileName.substring(0, fileName.indexOf(".cql")));
-    }
+            new CustomCassandraCQLUnit(Arrays.asList(
+                    new ClassPathCQLDataSet("cassandra/schema.cql", false, false),
+                    new ClassPathCQLDataSet("cassandra/system-data.cql", false, false)),
+                    "cassandra-test.yaml", 30000l, "cassandra/upgrade/");
 }

@@ -1,5 +1,5 @@
 /**
- * Copyright © 2016-2018 The Thingsboard Authors
+ * Copyright © 2016-2018 Hashmap, Inc
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -73,7 +73,7 @@ public abstract class BasePluginServiceTest extends AbstractServiceTest {
     pluginService.savePlugin(generatePlugin(systemTenant, null));
     pluginService.savePlugin(generatePlugin(systemTenant, null));
     TextPageData<PluginMetaData> found = pluginService.findSystemPlugins(new TextPageLink(100));
-    Assert.assertEquals(2, found.getData().size());
+    Assert.assertEquals(4, found.getData().size());
     Assert.assertFalse(found.hasNext());
   }
 
