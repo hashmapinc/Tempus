@@ -114,6 +114,7 @@ public class BaseComputationJobControllerTest extends AbstractControllerTest {
                 "}\n" +
                 "}"));
 
+        application.setDeviceTypes(mapper.readTree("{\"deviceTypes\":[{\"name\":\"DT1\"}]}"));
         Application savedApplication = doPost("/api/application", application, Application.class);
 
 
