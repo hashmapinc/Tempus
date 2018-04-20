@@ -21,7 +21,6 @@ public class GenerateMessageTest {
     }
 
     @Test
-
     public void testGatewayConnectDeviceWithTypeMessage() throws Exception {
         String msg = "{\"device\":\"Device A\",\"type\":\"Device Type\"}";
         ObjectMapper objectMapper = new ObjectMapper();
