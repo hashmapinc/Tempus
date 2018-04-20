@@ -1,93 +1,26 @@
 package com.hashmapinc.server.transport.mqtt.sparkplugB;
 
-import com.cirruslink.sparkplug.SparkplugException;
 import com.cirruslink.sparkplug.message.SparkplugBPayloadDecoder;
-import com.cirruslink.sparkplug.message.SparkplugBPayloadEncoder;
 import com.cirruslink.sparkplug.message.model.Metric;
 import com.cirruslink.sparkplug.message.model.MetricDataType;
 import com.cirruslink.sparkplug.message.model.SparkplugBPayload;
-import com.hashmapinc.server.transport.mqtt.session.DeviceSessionCtx;
+import com.hashmapinc.server.transport.mqtt.sparkplugB.data.SparkPlugDecodedMsg;
 import io.netty.buffer.ByteBuf;
 import io.netty.handler.codec.mqtt.MqttPublishMessage;
 import lombok.extern.slf4j.Slf4j;
 import com.hashmapinc.server.common.data.kv.*;
 import com.hashmapinc.server.transport.mqtt.session.GatewaySessionCtx;
-import com.hashmapinc.server.common.msg.kv.TelemetryKVMsg;
 
-import java.io.IOException;
+
 import java.util.*;
 
 import static com.hashmapinc.server.transport.mqtt.sparkplugB.SparkPlugMsgTypes.DBIRTH;
 import static com.hashmapinc.server.transport.mqtt.sparkplugB.SparkPlugMsgTypes.DDATA;
 
 @Slf4j
-public class SparkPlugSpecificationService {
+public class SparkPlugDecodeService extends SparkPlugUtils {
 
     private Map<String, Boolean> deviceMap = new HashMap<>();
-
-    public static byte[] createSparkPlugPayload(DeviceSessionCtx ctx, TelemetryKVMsg payload){
-        List<TsKvEntry> tsKvEntries = payload.getDeviceTelemetry();
-        byte[] payloadByteArray = null;
-        try {
-            List<Metric> metricList = createMetricFromTsKvEntries(tsKvEntries);
-            SparkplugBPayload sparkplugBPayload = new SparkplugBPayload(new Date(), metricList, getSeqNum(ctx),
-                    newUUID(),
-                    null);
-            payloadByteArray = encodeSparkPlugBPayload(sparkplugBPayload);
-
-        }catch (SparkplugException e){
-            log.error("Problem occured in creating metric from tsKvEntries exception [{}]", e);
-        }
-        return payloadByteArray;
-    }
-
-    private static List<Metric> createMetricFromTsKvEntries(List<TsKvEntry> tsKvEntries) throws SparkplugException{
-        List<Metric> metricList = new ArrayList<>();
-        for (TsKvEntry tsKvEntry :tsKvEntries) {
-            MetricDataType metricDataType = inferTsKvEntryType(tsKvEntry);
-            Metric.MetricBuilder metricBuilder = new Metric.MetricBuilder(tsKvEntry.getKey(), metricDataType, tsKvEntry.getValue());
-            metricBuilder.timestamp(new Date(tsKvEntry.getTs()));
-            metricList.add(metricBuilder.createMetric());
-        }
-        return metricList;
-    }
-
-    private static MetricDataType inferTsKvEntryType(TsKvEntry tsKvEntry){
-        BasicTsKvEntry basicTsKvEntry = (BasicTsKvEntry) tsKvEntry;
-        if(basicTsKvEntry.getDataType() == DataType.STRING)
-            return MetricDataType.String;
-        else if(basicTsKvEntry.getDataType() == DataType.DOUBLE)
-            return MetricDataType.Double;
-        else if(basicTsKvEntry.getDataType() == DataType.LONG)
-            return MetricDataType.Int64;
-        else if(basicTsKvEntry.getDataType() == DataType.BOOLEAN)
-            return MetricDataType.Boolean;
-
-        return MetricDataType.Unknown;
-    }
-
-    private static int getSeqNum(DeviceSessionCtx ctx) {
-        if(ctx.getSparkPlugMetaData().getSeq() == 256){
-            ctx.getSparkPlugMetaData().setSeq(0);
-        }
-        int seq = ctx.getSparkPlugMetaData().getSeq();
-        ctx.getSparkPlugMetaData().setSeq(seq + 1);
-        return seq;
-    }
-
-    private static String newUUID() {
-        return java.util.UUID.randomUUID().toString();
-    }
-
-    private static byte[] encodeSparkPlugBPayload(SparkplugBPayload sparkplugBPayload){
-        byte[] payloadByteArray = null;
-        try {
-            payloadByteArray = new SparkplugBPayloadEncoder().getBytes(sparkplugBPayload);
-        }catch (IOException e){
-            log.error("Exception occured in converting sparkplugBPayload to bytes, exception [{}]", e);
-        }
-        return payloadByteArray;
-    }
 
     public void processSparkPlugbPostTelemetry(GatewaySessionCtx ctx, MqttPublishMessage inbound){
         String topicName = inbound.variableHeader().topicName();
@@ -114,7 +47,11 @@ public class SparkPlugSpecificationService {
             SparkplugBPayload sparkplugBPayload = extractSparkPlugBPayload(inbound.payload());
             Long ts = sparkplugBPayload.getTimestamp().getTime();
             List<KvEntry> kvEntryList = extractKvEntryFromSparkPlugBPayload(sparkplugBPayload);
-            ctx.onSparkPlugDecodedMsg(ts, inbound, kvEntryList);
+            int requestId = inbound.variableHeader().messageId();
+            SparkPlugDecodedMsg sparkPlugDecodedMsg = new SparkPlugDecodedMsg(requestId, ts, kvEntryList);
+            String topic = extractTopicWithoutMsgType(inbound.variableHeader().topicName());
+            String deviceName = extractDeviceName(inbound.variableHeader().topicName());
+            ctx.onSparkPlugDecodedMsg(sparkPlugDecodedMsg, topic, deviceName);
         } catch (Exception e) {
             log.error("Exception occurred while extracting sparkplugBPayload : " + e );
         }

@@ -29,7 +29,7 @@ import com.hashmapinc.server.common.msg.session.SessionType;
 import com.hashmapinc.server.common.transport.SessionMsgProcessor;
 import com.hashmapinc.server.common.transport.adaptor.AdaptorException;
 import com.hashmapinc.server.common.transport.session.DeviceAwareSessionContext;
-import com.hashmapinc.server.transport.mqtt.sparkplugB.SparkPlugMetaData;
+import com.hashmapinc.server.transport.mqtt.sparkplugB.data.SparkPlugMetaData;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**

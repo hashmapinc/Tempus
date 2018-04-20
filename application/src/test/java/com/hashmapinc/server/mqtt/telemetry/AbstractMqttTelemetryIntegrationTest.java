@@ -139,7 +139,7 @@ public abstract class AbstractMqttTelemetryIntegrationTest extends AbstractContr
         client.publish("spBv1.0/hashmap/DBIRTH/tempus device/SparkplugBdevice", sparkPlugMsgByeArray, 0, false);
 
         Thread.sleep(10000);
-        Device device = deviceService.findDeviceByTenantIdAndName(tenantId,"spBv1.0/hashmap/tempus device/SparkplugBdevice");
+        Device device = deviceService.findDeviceByTenantIdAndName(tenantId,"SparkplugBdevice");
         String deviceId = device.getId().getId().toString();
         Thread.sleep(1000);
         List<String> actualKeys = doGetAsync("/api/plugins/telemetry/DEVICE/" + deviceId +  "/keys/timeseries", List.class);
