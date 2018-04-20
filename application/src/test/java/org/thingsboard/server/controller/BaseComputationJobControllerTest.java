@@ -7,18 +7,17 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.thingsboard.server.common.data.Application;
-import org.thingsboard.server.common.data.ApplicationFieldsWrapper;
-import org.thingsboard.server.common.data.Tenant;
-import org.thingsboard.server.common.data.User;
+import org.thingsboard.server.common.data.*;
 import org.thingsboard.server.common.data.computation.ComputationJob;
 import org.thingsboard.server.common.data.computation.Computations;
 import org.thingsboard.server.common.data.id.ComputationId;
 import org.thingsboard.server.common.data.plugin.PluginMetaData;
+import org.thingsboard.server.common.data.rule.RuleMetaData;
 import org.thingsboard.server.common.data.security.Authority;
 import org.thingsboard.server.dao.computations.ComputationsService;
 import org.thingsboard.server.extensions.core.plugin.telemetry.TelemetryStoragePlugin;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashSet;
 
@@ -117,6 +116,23 @@ public class BaseComputationJobControllerTest extends AbstractControllerTest {
         application.setDeviceTypes(mapper.readTree("{\"deviceTypes\":[{\"name\":\"DT1\"}]}"));
         Application savedApplication = doPost("/api/application", application, Application.class);
 
+        Dashboard dashboard = new Dashboard();
+        dashboard.setTitle("My Dashboard");
+        Dashboard savedDashboard = doPost("/api/dashboard", dashboard, Dashboard.class);
+        String dashboardType = "mini";
+        doPost("/api/dashboard/"+dashboardType+"/"+savedDashboard.getId().getId().toString()
+                +"/application/"+savedApplication.getId().getId().toString(), Application.class);
+
+
+        RuleMetaData rule = createRuleMetaData(tenantPlugin);
+        RuleMetaData savedRule = doPost("/api/rule", rule, RuleMetaData.class);
+        RuleMetaData foundRule = doGet("/api/rule/" + savedRule.getId().getId().toString(), RuleMetaData.class);
+        Assert.assertNotNull(foundRule);
+        ApplicationFieldsWrapper applicationRulesWrapper = new ApplicationFieldsWrapper();
+        applicationRulesWrapper.setApplicationId(savedApplication.getId().getId().toString());
+        applicationRulesWrapper.setFields(new HashSet<>(Arrays.asList(savedRule.getId().getId().toString())));
+        doPostWithDifferentResponse("/api/app/assignRules", applicationRulesWrapper, Application.class);
+
 
         ApplicationFieldsWrapper applicationComputationJosWrapper = new ApplicationFieldsWrapper();
         applicationComputationJosWrapper.setApplicationId(savedApplication.getId().getId().toString());
@@ -128,12 +144,24 @@ public class BaseComputationJobControllerTest extends AbstractControllerTest {
         Assert.assertTrue(assignedApplication.getIsValid());
 
 
-        doDelete("/api/computationJob/"+savedComputationJob.getId().getId().toString()).andExpect(status().isOk());
+        doDelete("/api/computations/jobs/"+savedComputationJob.getId().getId().toString()).andExpect(status().isOk());
         doGet("/api/computations/"+savedComputations.getId().getId().toString()+"/jobs/"+savedComputationJob.getId().getId().toString()).andExpect(status().isNotFound());
         Thread.sleep(10000);
 
         Application foundApplication = doGet("/api/application/" + savedApplication.getId().getId().toString(), Application.class);
         Assert.assertFalse(foundApplication.getIsValid());
 
+    }
+
+    public static RuleMetaData createRuleMetaData(PluginMetaData plugin) throws IOException {
+        RuleMetaData rule = new RuleMetaData();
+        rule.setName("My Rule");
+        rule.setPluginToken(plugin.getApiToken());
+        rule.setFilters(mapper.readTree("[{\"clazz\":\"org.thingsboard.server.extensions.core.filter.MsgTypeFilter\", " +
+                "\"name\":\"TelemetryFilter\", " +
+                "\"configuration\": {\"messageTypes\":[\"POST_TELEMETRY\",\"POST_ATTRIBUTES\",\"GET_ATTRIBUTES\"]}}]"));
+        rule.setAction(mapper.readTree("{\"clazz\":\"org.thingsboard.server.extensions.core.action.telemetry.TelemetryPluginAction\", \"name\":\"TelemetryMsgConverterAction\", " +
+                "\"configuration\":{\"timeUnit\":\"DAYS\", \"ttlValue\":1}}"));
+        return rule;
     }
 }

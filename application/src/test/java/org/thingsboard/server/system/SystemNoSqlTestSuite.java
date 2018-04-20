@@ -54,21 +54,10 @@ public class SystemNoSqlTestSuite {
         List<CQLDataSet> dataSets = new ArrayList<>();
         dataSets.add(new ClassPathCQLDataSet("cassandra/schema.cql", false, false));
         dataSets.add(new ClassPathCQLDataSet("cassandra/system-data.cql", false, false));
-        String upgradePath = "cassandra/upgrade/";
-        ClassLoader loader = Thread.currentThread().getContextClassLoader();
-        URL url = loader.getResource(upgradePath);
-        String path = url.getPath();
-        Path upgradeScriptsDirectory = Paths.get(path);
-        List<Integer> sortedScriptsIndexes = null;
-        try {
-            sortedScriptsIndexes = Files.list(upgradeScriptsDirectory).map(a -> stripExtensionFromName(a.getFileName().toString())).sorted().collect(Collectors.toList());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        for(Integer i: sortedScriptsIndexes) {
-            String scriptFileName = upgradePath + i.toString()+".cql";
-            dataSets.add(new ClassPathCQLDataSet(scriptFileName, false, false));
-        }
+        dataSets.addAll(Arrays.asList(
+                new ClassPathCQLDataSet("cassandra/upgrade/1.cql", false, false)
+
+        ));
         return dataSets;
     }
 

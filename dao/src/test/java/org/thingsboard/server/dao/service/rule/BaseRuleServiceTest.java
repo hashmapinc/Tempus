@@ -81,7 +81,7 @@ public abstract class BaseRuleServiceTest extends AbstractServiceTest {
     @Test
     public void findSystemRules() throws Exception {
         TenantId systemTenant = new TenantId(ModelConstants.NULL_UUID); // system tenant id
-
+        ruleService.deleteRulesByTenantId(systemTenant);
         PluginMetaData plugin = generatePlugin(systemTenant, "testPluginToken" + ThreadLocalRandom.current().nextInt());
         pluginService.savePlugin(plugin);
         ruleService.saveRule(generateRule(systemTenant, null, plugin.getApiToken()));
