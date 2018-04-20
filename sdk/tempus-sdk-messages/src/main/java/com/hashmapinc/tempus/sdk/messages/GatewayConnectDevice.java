@@ -19,7 +19,6 @@ public class GatewayConnectDevice {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     @JsonProperty(value = "type", index = 2)
     private String deviceType;
-
     /**
      * Instantiates a new Gateway connect device.
      */
@@ -81,9 +80,4 @@ public class GatewayConnectDevice {
     public void setDeviceType(String deviceType) {
         this.deviceType = deviceType;
     }
-
-
-
-
-
 }
