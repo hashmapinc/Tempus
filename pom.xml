@@ -90,6 +90,7 @@
         <module>ui</module>
         <module>tools</module>
         <module>application</module>
+        <module>sdk</module>
     </modules>
 
     <profiles>
