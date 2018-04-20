@@ -210,7 +210,6 @@ public class GenerateMessageTest {
         Assert.assertEquals(out,msg);
     }
 
-
     /**
      * Test gateway telemetry message array.
      *
@@ -243,7 +242,7 @@ public class GenerateMessageTest {
         Assert.assertEquals(out,msg);
     }
 
-    /**
+     /**
      * Test gateway depth message.
      *
      * @throws Exception the exception
