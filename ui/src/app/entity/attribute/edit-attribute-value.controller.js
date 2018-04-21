@@ -36,12 +36,7 @@ export default function EditAttributeValueController($scope, $q, $element, types
 
     $scope.submit = submit;
     $scope.dismiss = dismiss;
-	$scope.max=false;
-    $scope.toggleMaximize = function()
-	{
-		$scope.max=!$scope.max;
-	}
-	
+
     function dismiss() {
         $element.remove();
     }
