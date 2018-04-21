@@ -24,3 +24,7 @@ DROP TABLE IF EXISTS widgets_bundle;
 DROP TABLE IF EXISTS application;
 DROP TABLE IF EXISTS application_device_types;
 DROP TABLE IF EXISTS application_associated_rules;
+DROP TABLE IF EXISTS application_associated_computation_jobs;
+DROP TABLE IF EXISTS computations;
+DROP TABLE IF EXISTS computation_job;
+DROP TABLE IF EXISTS installed_schema_versions;

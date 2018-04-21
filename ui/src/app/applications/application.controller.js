@@ -150,6 +150,7 @@ export function ApplicationController($timeout, $log, $rootScope, userService, a
             vm.showComputationJobs = false;
             vm.showAppDetails = true; 
             vm.tabSelectedIndex = 0;
+            $window.localStorage.removeItem('currentTab');
         }  
         else if(selectedTab == 'Computation'){
             vm.showAppMini = false;
@@ -159,9 +160,7 @@ export function ApplicationController($timeout, $log, $rootScope, userService, a
             vm.tabSelectedIndex = 4;
             vm.showComputations = true;
             vm.showComputationJobs = false;
-
         }
-
     }
 
     vm.detailesClicked = function() {
@@ -173,8 +172,9 @@ export function ApplicationController($timeout, $log, $rootScope, userService, a
             vm.showComputations = false;
             vm.showComputationJobs = false;
             vm.showAppDetails = true; 
-            vm.grid.detailsConfig.isDetailsOpen = false;
+            vm.grid.detailsConfig.isDetailsOpen = true;
             vm.appSliderOpen = true;
+            vm.tabSelectedIndex = 0;
             $timeout( function(){
                 vm.grid.openItem(null, vm.currentApplication);
             }, 100 ); 
@@ -828,9 +828,16 @@ export function ApplicationController($timeout, $log, $rootScope, userService, a
         return ruleService.saveRule(rule).then(
             function(savedRule) {
                 var rules = {"applicationId": vm.currentApplication.id.id, "fields":[savedRule.id.id]};
-                applicationService.assignRulesToApplication(rules);
-                $window.localStorage.setItem('currentApp', angular.toJson(vm.currentApplication));
-                $window.localStorage.setItem('currentTab', angular.toJson(vm.tabSelectedIndex));
+                applicationService.assignRulesToApplication(rules).then(
+                    function success(application) {
+                        $window.localStorage.setItem('currentApp', angular.toJson(application));
+                        $window.localStorage.setItem('currentTab', angular.toJson(vm.tabSelectedIndex));
+                        vm.currentApplication = application;
+                    },
+                    function fail() {
+                        $rootScope.$broadcast('Rule couldn\'t be assigned to the application');                    
+                    }
+                );
            }
         );
     }
@@ -839,9 +846,16 @@ export function ApplicationController($timeout, $log, $rootScope, userService, a
         return ruleService.deleteRule(ruleId).then(
             function() {
                 var rules = {"applicationId": vm.currentApplication.id.id, "fields":[ruleId]};
-                applicationService.unAssignRulesFromApplication(rules);
-                $window.localStorage.setItem('currentApp', angular.toJson(vm.currentApplication));
-                $window.localStorage.setItem('currentTab', angular.toJson(vm.tabSelectedIndex));
+                applicationService.unAssignRulesFromApplication(rules).then(
+                    function success(application) {
+                        $window.localStorage.setItem('currentApp', angular.toJson(application));
+                        $window.localStorage.setItem('currentTab', angular.toJson(vm.tabSelectedIndex));
+                        vm.currentApplication = application;
+                    },
+                    function fail() {
+                        $rootScope.$broadcast('Rule couldn\'t be unassigned from the application');
+                    }
+                );
             }
         );
     }
@@ -1209,14 +1223,31 @@ export function ApplicationController($timeout, $log, $rootScope, userService, a
         dashboardService.saveDashboard(dashboard).then(
             function success(savedDashboard) {
                 var dashboards = [ savedDashboard ];
-                $window.localStorage.setItem('currentApp', angular.toJson(vm.currentApplication));
-                $window.localStorage.setItem('currentTab', angular.toJson(vm.tabSelectedIndex));
                 if(vm.showAppMini){
-                    applicationService.assignMiniDashboardToApplication(vm.currentApplication.id.id, savedDashboard.id.id);
+                    applicationService.assignMiniDashboardToApplication(vm.currentApplication.id.id, savedDashboard.id.id).then(
+                        function success(application) {
+                            $window.localStorage.setItem('currentApp', angular.toJson(application));
+                            $window.localStorage.setItem('currentTab', angular.toJson(vm.tabSelectedIndex));
+                            vm.currentApplication = application;
+                        },
+                        function fail() {
+                            deferred.reject();
+                        }
+                    );
                 }
                 else if(vm.showAppMain) {
-                    applicationService.assignDashboardToApplication(vm.currentApplication.id.id, savedDashboard.id.id);
+                    applicationService.assignDashboardToApplication(vm.currentApplication.id.id, savedDashboard.id.id).then(
+                        function success(application) {
+                            $window.localStorage.setItem('currentApp', angular.toJson(application));
+                            $window.localStorage.setItem('currentTab', angular.toJson(vm.tabSelectedIndex));
+                            vm.currentApplication = application;
+                        },
+                        function fail() {
+                            deferred.reject();
+                        }
+                    );
                 }
+               
                 customerService.applyAssignedCustomersInfo(dashboards).then(
                     function success(items) {
                         if (items && items.length == 1) {
@@ -1675,9 +1706,16 @@ export function ApplicationController($timeout, $log, $rootScope, userService, a
         return computationJobService.saveComputationJob(computationJob, vm.computation.id.id).then(
             function(savedComputationJob) {
                 var computationJob = {"applicationId": vm.currentApplication.id.id, "fields":[savedComputationJob.id.id]};
-                applicationService.assignComputationJobToApplication(computationJob);
-                $window.localStorage.setItem('currentApp', angular.toJson(vm.currentApplication));
-                $window.localStorage.setItem('currentTab', angular.toJson(vm.tabSelectedIndex));
+                applicationService.assignComputationJobToApplication(computationJob).then(
+                    function success(application) {
+                        $window.localStorage.setItem('currentApp', angular.toJson(application));
+                        $window.localStorage.setItem('currentTab', angular.toJson(vm.tabSelectedIndex));
+                        vm.currentApplication = application;
+                    },
+                    function fail() {
+                        $rootScope.$broadcast('Computation couldn\'t be assigned to the application');                    
+                    }
+                );
            }
         );
     }

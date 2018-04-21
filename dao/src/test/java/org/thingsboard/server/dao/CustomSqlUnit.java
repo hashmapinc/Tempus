@@ -46,16 +46,16 @@ public class CustomSqlUnit extends ExternalResource {
 
     private List<String> sqlFiles;
     private final String dropAllTablesSqlFile;
-    private final String upgradePath;
+    private final List<String> upgradeFiles;
     private final String dbUrl;
     private final String dbUserName;
     private final String dbPassword;
     //private final String upgradePath;
 
-    public CustomSqlUnit(List<String> sqlFiles, String dropAllTablesSqlFile, String configurationFileName, String upgradePath) {
+    public CustomSqlUnit(List<String> sqlFiles, String dropAllTablesSqlFile, String configurationFileName, List<String> upgradeFiles) {
         this.sqlFiles = sqlFiles;
         this.dropAllTablesSqlFile = dropAllTablesSqlFile;
-        this.upgradePath = upgradePath;
+        this.upgradeFiles = upgradeFiles;
         final Properties properties = new Properties();
         try (final InputStream stream = this.getClass().getClassLoader().getResourceAsStream(configurationFileName)) {
             properties.load(stream);
@@ -72,25 +72,12 @@ public class CustomSqlUnit extends ExternalResource {
         cleanUpDb();
         List<String> files = new ArrayList<>();
         files.addAll(sqlFiles);
+        files.addAll(upgradeFiles);
         Connection conn = null;
         try {
             conn = DriverManager.getConnection(dbUrl, dbUserName, dbPassword);
-            //Path upgradeScriptsDirectory = Paths.get(upgradePath);
-            ClassLoader loader = Thread.currentThread().getContextClassLoader();
-            URL url = loader.getResource(upgradePath);
-            String path = url.getPath();
-            Path upgradeScriptsDirectory = Paths.get(path);
-
-            List<Integer> sortedScriptsIndexes = Files.list(upgradeScriptsDirectory).map(a -> stripExtensionFromName(a.getFileName().toString())).sorted().collect(Collectors.toList());
-            List<String> upgradeFiles = new ArrayList<>();
-            for(Integer i: sortedScriptsIndexes) {
-                upgradeFiles.add(upgradePath + i.toString()+".sql");
-            }
-
-            files.addAll(upgradeFiles);
-
             for (String sqlFile : files) {
-                 URL sqlFileUrl = Resources.getResource(sqlFile);
+                URL sqlFileUrl = Resources.getResource(sqlFile);
                 String sql = Resources.toString(sqlFileUrl, Charsets.UTF_8);
                 conn.createStatement().execute(sql);
             }

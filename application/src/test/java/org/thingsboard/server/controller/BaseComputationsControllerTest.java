@@ -1,6 +1,7 @@
 package org.thingsboard.server.controller;
 
 import com.datastax.driver.core.utils.UUIDs;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.After;
 import org.junit.Assert;
@@ -114,6 +115,7 @@ public class BaseComputationsControllerTest extends AbstractControllerTest {
                 "\"description\": \"string\"\n" +
                 "}\n" +
                 "}"));
+        application.setDeviceTypes(mapper.readTree("{\"deviceTypes\":[{\"name\":\"DT1\"}]}"));
 
         Application savedApplication = doPost("/api/application", application, Application.class);
 
