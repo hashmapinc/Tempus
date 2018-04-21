@@ -18,7 +18,7 @@
 
 BASE=${project.basedir}/target
 CONF_FOLDER=${BASE}/conf
-jarfile="${BASE}/thingsboard-${project.version}-boot.jar"
+jarfile="${BASE}/tempus-${project.version}-boot.jar"
 installDir=${BASE}/data
 loadDemo=true
 
@@ -28,9 +28,9 @@ export LOADER_PATH=${BASE}/conf,${BASE}/extensions
 export SQL_DATA_FOLDER=${SQL_DATA_FOLDER:-/tmp}
 
 
-run_user=thingsboard
+run_user=tempus
 
-su -s /bin/sh -c "java -cp ${jarfile} $JAVA_OPTS -Dloader.main=org.thingsboard.server.ThingsboardInstallApplication \
+su -s /bin/sh -c "java -cp ${jarfile} $JAVA_OPTS -Dloader.main=com.hashmapinc.server.TempusInstallApplication \
                     -Dinstall.data_dir=${installDir} \
                     -Dinstall.load_demo=${loadDemo} \
                     -Dspring.jpa.hibernate.ddl-auto=none \

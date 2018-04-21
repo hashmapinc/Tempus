@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 import React from 'react';
-import ThingsboardBaseComponent from './json-form-base-component.jsx';
+import tempusBaseComponent from './json-form-base-component.jsx';
 import Checkbox from 'material-ui/Checkbox';
 
-class ThingsboardCheckbox extends React.Component {
+class tempusCheckbox extends React.Component {
     render() {
         return (
             <Checkbox
@@ -33,4 +33,4 @@ class ThingsboardCheckbox extends React.Component {
     }
 }
 
-export default ThingsboardBaseComponent(ThingsboardCheckbox);
+export default tempusBaseComponent(tempusCheckbox);

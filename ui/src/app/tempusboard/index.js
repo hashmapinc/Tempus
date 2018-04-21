@@ -17,28 +17,28 @@
 import '../dashboard/dashboard.scss';
 
 import uiRouter from 'angular-ui-router';
-import thingsboardGrid from '../components/grid.directive';
-import thingsboardApiUser from '../api/user.service';
-import thingsboardApiDevice from '../api/device.service';
-import thingsboardApiCustomer from '../api/customer.service';
-import thingsboardApiDashboard from '../api/dashboard.service';
-import thingsboardApiWidget from '../api/widget.service';
-import thingsboardWidgetConfig from '../components/widget/widget-config.directive';
+import tempusGrid from '../components/grid.directive';
+import tempusApiUser from '../api/user.service';
+import tempusApiDevice from '../api/device.service';
+import tempusApiCustomer from '../api/customer.service';
+import tempusApiDashboard from '../api/dashboard.service';
+import tempusApiWidget from '../api/widget.service';
+import tempusWidgetConfig from '../components/widget/widget-config.directive';
 import dashboardStates from '../dashboard/states';
 
 
 import TempusboardRoutes from './tempusboard.routes';
 import {TempusboardController} from './tempusboard.controller';
 
-export default angular.module('thingsboard.tempusboard', [
+export default angular.module('tempus.tempusboard', [
     uiRouter,
-    thingsboardGrid,
-    thingsboardApiUser,
-    thingsboardApiDevice,
-    thingsboardApiCustomer,
-    thingsboardApiDashboard,
-    thingsboardApiWidget,
-    thingsboardWidgetConfig,
+    tempusGrid,
+    tempusApiUser,
+    tempusApiDevice,
+    tempusApiCustomer,
+    tempusApiDashboard,
+    tempusApiWidget,
+    tempusWidgetConfig,
     dashboardStates
 ])
     .config(TempusboardRoutes)

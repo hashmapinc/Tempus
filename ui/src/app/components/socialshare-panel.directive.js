@@ -20,7 +20,7 @@ import socialsharePanelTemplate from './socialshare-panel.tpl.html';
 /* eslint-enable import/no-unresolved, import/default */
 
 
-export default angular.module('thingsboard.directives.socialsharePanel', [])
+export default angular.module('tempus.directives.socialsharePanel', [])
     .directive('tbSocialSharePanel', SocialsharePanel)
     .name;
 

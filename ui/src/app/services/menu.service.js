@@ -13,9 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import thingsboardApiUser from '../api/user.service';
+import tempusApiUser from '../api/user.service';
 
-export default angular.module('thingsboard.menu', [thingsboardApiUser])
+export default angular.module('tempus.menu', [tempusApiUser])
     .factory('menu', Menu)
     .name;
 

@@ -21,7 +21,7 @@ import userMenuTemplate from './user-menu.tpl.html';
 
 /* eslint-enable import/no-unresolved, import/default */
 
-export default angular.module('thingsboard.directives.usermenu', [])
+export default angular.module('tempus.directives.usermenu', [])
     .directive('tbUserMenu', UserMenu)
     .name;
 

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-export default angular.module('thingsboard.api.plugin', [])
+export default angular.module('tempus.api.plugin', [])
     .factory('pluginService', PluginService).name;
 
 /*@ngInject*/

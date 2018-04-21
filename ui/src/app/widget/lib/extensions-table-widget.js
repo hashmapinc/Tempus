@@ -21,7 +21,7 @@ import extensionsTableWidgetTemplate from './extensions-table-widget.tpl.html';
 
 /* eslint-enable import/no-unresolved, import/default */
 
-export default angular.module('thingsboard.widgets.extensionsTableWidget', [])
+export default angular.module('tempus.widgets.extensionsTableWidget', [])
     .directive('tbExtensionsTableWidget', ExtensionsTableWidget)
     .name;
 

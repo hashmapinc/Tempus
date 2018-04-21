@@ -15,13 +15,13 @@
  */
 import './widget.scss';
 
-import thingsboardLegend from '../legend.directive';
-import thingsboardTypes from '../../common/types.constant';
-import thingsboardApiDatasource from '../../api/datasource.service';
+import tempusLegend from '../legend.directive';
+import tempusTypes from '../../common/types.constant';
+import tempusApiDatasource from '../../api/datasource.service';
 
 import WidgetController from './widget.controller';
 
-export default angular.module('thingsboard.directives.widget', [thingsboardLegend, thingsboardTypes, thingsboardApiDatasource])
+export default angular.module('tempus.directives.widget', [tempusLegend, tempusTypes, tempusApiDatasource])
     .controller('WidgetController', WidgetController)
     .directive('tbWidget', Widget)
     .name;

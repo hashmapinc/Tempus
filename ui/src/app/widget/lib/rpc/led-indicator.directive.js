@@ -23,7 +23,7 @@ import ledIndicatorTemplate from './led-indicator.tpl.html';
 
 /* eslint-enable import/no-unresolved, import/default */
 
-export default angular.module('thingsboard.widgets.rpc.ledIndicator', [])
+export default angular.module('tempus.widgets.rpc.ledIndicator', [])
     .directive('tbLedIndicator', LedIndicator)
     .name;
 

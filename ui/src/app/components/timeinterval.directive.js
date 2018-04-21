@@ -21,7 +21,7 @@ import timeintervalTemplate from './timeinterval.tpl.html';
 
 /* eslint-enable import/no-unresolved, import/default */
 
-export default angular.module('thingsboard.directives.timeinterval', [])
+export default angular.module('tempus.directives.timeinterval', [])
     .directive('tbTimeinterval', Timeinterval)
     .name;
 

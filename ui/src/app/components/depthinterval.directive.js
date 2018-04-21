@@ -21,7 +21,7 @@ import depthintervalTemplate from './depthinterval.tpl.html';
 
 /* eslint-enable import/no-unresolved, import/default */
 
-export default angular.module('thingsboard.directives.depthinterval', [])
+export default angular.module('tempus.directives.depthinterval', [])
     .directive('tbDepthinterval', Depthinterval)
     .name;
 

@@ -15,8 +15,8 @@
  */
 import './grid.scss';
 
-import thingsboardScopeElement from './scope-element.directive';
-import thingsboardDetailsSidenav from './details-sidenav.directive';
+import tempusScopeElement from './scope-element.directive';
+import tempusDetailsSidenav from './details-sidenav.directive';
 
 /* eslint-disable import/no-unresolved, import/default */
 
@@ -24,7 +24,7 @@ import gridTemplate from './grid.tpl.html';
 
 /* eslint-enable import/no-unresolved, import/default */
 
-export default angular.module('thingsboard.directives.grid', [thingsboardScopeElement, thingsboardDetailsSidenav])
+export default angular.module('tempus.directives.grid', [tempusScopeElement, tempusDetailsSidenav])
     .directive('tbGrid', Grid)
     .controller('AddItemController', AddItemController)
     .controller('ItemCardController', ItemCardController)

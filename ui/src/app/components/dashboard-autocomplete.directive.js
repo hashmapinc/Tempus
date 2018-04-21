@@ -15,8 +15,8 @@
  */
 import './dashboard-autocomplete.scss';
 
-import thingsboardApiDashboard from '../api/dashboard.service';
-import thingsboardApiUser from '../api/user.service';
+import tempusApiDashboard from '../api/dashboard.service';
+import tempusApiUser from '../api/user.service';
 
 /* eslint-disable import/no-unresolved, import/default */
 
@@ -25,7 +25,7 @@ import dashboardAutocompleteTemplate from './dashboard-autocomplete.tpl.html';
 /* eslint-enable import/no-unresolved, import/default */
 
 
-export default angular.module('thingsboard.directives.dashboardAutocomplete', [thingsboardApiDashboard, thingsboardApiUser])
+export default angular.module('tempus.directives.dashboardAutocomplete', [tempusApiDashboard, tempusApiUser])
     .directive('tbDashboardAutocomplete', DashboardAutocomplete)
     .name;
 

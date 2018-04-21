@@ -16,9 +16,9 @@
 import './login.scss';
 
 import uiRouter from 'angular-ui-router';
-import thingsboardApiLogin from '../api/login.service';
-import thingsboardApiUser from '../api/user.service';
-import thingsboardToast from '../services/toast';
+import tempusApiLogin from '../api/login.service';
+import tempusApiUser from '../api/user.service';
+import tempusToast from '../services/toast';
 
 import LoginRoutes from './login.routes';
 import LoginController from './login.controller';
@@ -26,11 +26,11 @@ import ResetPasswordRequestController from './reset-password-request.controller'
 import ResetPasswordController from './reset-password.controller';
 import CreatePasswordController from './create-password.controller';
 
-export default angular.module('thingsboard.login', [
+export default angular.module('tempus.login', [
     uiRouter,
-    thingsboardApiLogin,
-    thingsboardApiUser,
-    thingsboardToast
+    tempusApiLogin,
+    tempusApiUser,
+    tempusToast
 ])
     .config(LoginRoutes)
     .controller('LoginController', LoginController)

@@ -16,8 +16,8 @@
 import './timewindow.scss';
 
 import $ from 'jquery';
-import thingsboardTimeinterval from './timeinterval.directive';
-import thingsboardDatetimePeriod from './datetime-period.directive';
+import tempusTimeinterval from './timeinterval.directive';
+import tempusDatetimePeriod from './datetime-period.directive';
 
 /* eslint-disable import/no-unresolved, import/default */
 
@@ -29,7 +29,7 @@ import timewindowPanelTemplate from './timewindow-panel.tpl.html';
 
 import TimewindowPanelController from './timewindow-panel.controller';
 
-export default angular.module('thingsboard.directives.timewindow', [thingsboardTimeinterval, thingsboardDatetimePeriod])
+export default angular.module('tempus.directives.timewindow', [tempusTimeinterval, tempusDatetimePeriod])
     .controller('TimewindowPanelController', TimewindowPanelController)
     .directive('tbTimewindow', Timewindow)
     .filter('milliSecondsToTimeString', MillisecondsToTimeString)

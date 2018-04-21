@@ -34,7 +34,7 @@ import RelationFiltersDirective from './relation/relation-filters.directive';
 import RelationTableDirective from './relation/relation-table.directive';
 import RelationTypeAutocompleteDirective from './relation/relation-type-autocomplete.directive';
 
-export default angular.module('thingsboard.entity', [])
+export default angular.module('tempus.entity', [])
     .controller('EntityAliasesController', EntityAliasesController)
     .controller('EntityAliasDialogController', EntityAliasDialogController)
     .controller('AliasesEntitySelectPanelController', AliasesEntitySelectPanelController)

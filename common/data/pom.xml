@@ -19,16 +19,16 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>org.thingsboard</groupId>
+        <groupId>com.hashmapinc</groupId>
         <version>1.4.0</version>
         <artifactId>common</artifactId>
     </parent>
-    <groupId>org.thingsboard.common</groupId>
+    <groupId>com.hashmapinc.common</groupId>
     <artifactId>data</artifactId>
     <packaging>jar</packaging>
 
     <name>Tempus Server Common Data</name>
-    <url>https://thingsboard.io</url>
+    <url>https://hashmapinc.com</url>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

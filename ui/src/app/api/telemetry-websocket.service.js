@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 import 'angular-websocket';
-import thingsboardTypes from '../common/types.constant';
+import tempusTypes from '../common/types.constant';
 
-export default angular.module('thingsboard.api.telemetryWebsocket', [thingsboardTypes])
+export default angular.module('tempus.api.telemetryWebsocket', [tempusTypes])
     .factory('telemetryWebsocketService', TelemetryWebsocketService)
     .name;
 

@@ -40,15 +40,15 @@
         </encoder>
     </appender>
 
-    <logger name="org.thingsboard.server.install" level="INFO">
+    <logger name="com.hashmapinc.server.install" level="INFO">
         <appender-ref ref="STDOUT" />
     </logger>
 
-    <logger name="org.thingsboard.server.service.install" level="INFO">
+    <logger name="com.hashmapinc.server.service.install" level="INFO">
         <appender-ref ref="STDOUT" />
     </logger>
 
-    <logger name="org.thingsboard.server.ThingsboardInstallApplication" level="ERROR">
+    <logger name="com.hashmapinc.server.tempusInstallApplication" level="ERROR">
         <appender-ref ref="STDOUT" />
     </logger>
 
@@ -56,7 +56,7 @@
         <appender-ref ref="STDOUT" />
     </logger>
 
-    <logger name="org.thingsboard.server" level="INFO" />
+    <logger name="com.hashmapinc.server" level="INFO" />
     <logger name="akka" level="INFO" />
 
     <root level="INFO">

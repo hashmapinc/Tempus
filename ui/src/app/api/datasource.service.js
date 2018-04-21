@@ -13,14 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import thingsboardApiDevice from './device.service';
-import thingsboardApiTelemetryWebsocket from './telemetry-websocket.service';
-import thingsboardTypes from '../common/types.constant';
-import thingsboardUtils from '../common/utils.service';
+import tempusApiDevice from './device.service';
+import tempusApiTelemetryWebsocket from './telemetry-websocket.service';
+import tempusTypes from '../common/types.constant';
+import tempusUtils from '../common/utils.service';
 import DataAggregator from './data-aggregator';
 import DepthDataAggregator from './depth-data-aggregator';
 
-export default angular.module('thingsboard.api.datasource', [thingsboardApiDevice, thingsboardApiTelemetryWebsocket, thingsboardTypes, thingsboardUtils])
+export default angular.module('tempus.api.datasource', [tempusApiDevice, tempusApiTelemetryWebsocket, tempusTypes, tempusUtils])
     .factory('datasourceService', DatasourceService)
     .name;
 

@@ -18,9 +18,9 @@ import './js-func.scss';
 import ace from 'brace';
 import 'brace/ext/language_tools';
 import $ from 'jquery';
-import thingsboardToast from '../services/toast';
-import thingsboardUtils from '../common/utils.service';
-import thingsboardExpandFullscreen from './expand-fullscreen.directive';
+import tempusToast from '../services/toast';
+import tempusUtils from '../common/utils.service';
+import tempusExpandFullscreen from './expand-fullscreen.directive';
 
 /* eslint-disable import/no-unresolved, import/default */
 
@@ -30,7 +30,7 @@ import jsFuncTemplate from './js-func.tpl.html';
 
 /* eslint-disable angular/angularelement */
 
-export default angular.module('thingsboard.directives.jsFunc', [thingsboardToast, thingsboardUtils, thingsboardExpandFullscreen])
+export default angular.module('tempus.directives.jsFunc', [tempusToast, tempusUtils, tempusExpandFullscreen])
     .directive('tbJsFunc', JsFunc)
     .name;
 

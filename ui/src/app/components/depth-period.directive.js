@@ -20,7 +20,7 @@ import depthPeriodTemplate from './depth-period.tpl.html';
 
 /* eslint-enable import/no-unresolved, import/default */
 
-export default angular.module('thingsboard.directives.depthPeriod', [])
+export default angular.module('tempus.directives.depthPeriod', [])
     .directive('tbDepthPeriod', DepthPeriod)
     .name;
 

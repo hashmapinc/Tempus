@@ -15,11 +15,11 @@
  */
 import './help.scss';
 
-import thingsboardHelpLinks from './help-links.constant';
+import tempusHelpLinks from './help-links.constant';
 
 import $ from 'jquery';
 
-export default angular.module('thingsboard.directives.help', [thingsboardHelpLinks])
+export default angular.module('tempus.directives.help', [tempusHelpLinks])
     .directive('tbHelp', Help)
     .name;
 

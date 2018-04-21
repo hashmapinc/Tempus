@@ -24,9 +24,9 @@ import jsonSchemaDefaults from 'json-schema-defaults';
 import base64js from 'base64-js';
 import {utf8Encode, utf8Decode} from './utf8-support';
 
-import thingsboardTypes from './types.constant';
+import tempusTypes from './types.constant';
 
-export default angular.module('thingsboard.utils', [thingsboardTypes])
+export default angular.module('tempus.utils', [tempusTypes])
     .factory('utils', Utils)
     .name;
 

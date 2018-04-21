@@ -20,7 +20,7 @@ import AuditLogHeaderDirective from './audit-log-header.directive';
 import AuditLogRowDirective from './audit-log-row.directive';
 import AuditLogTableDirective from './audit-log-table.directive';
 
-export default angular.module('thingsboard.auditLog', [])
+export default angular.module('tempus.auditLog', [])
     .config(AuditLogRoutes)
     .controller('AuditLogsController', AuditLogsController)
     .controller('AuditLogDetailsDialogController', AuditLogDetailsDialogController)

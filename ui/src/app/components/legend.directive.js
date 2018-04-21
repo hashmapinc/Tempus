@@ -22,7 +22,7 @@ import legendTemplate from './legend.tpl.html';
 /* eslint-enable import/no-unresolved, import/default */
 
 
-export default angular.module('thingsboard.directives.legend', [])
+export default angular.module('tempus.directives.legend', [])
     .directive('tbLegend', Legend)
     .name;
 

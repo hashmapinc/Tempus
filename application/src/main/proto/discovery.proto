@@ -16,7 +16,7 @@
 syntax = "proto3";
 package discovery;
 
-option java_package = "org.thingsboard.server.gen.discovery";
+option java_package = "com.hashmapinc.server.gen.discovery";
 option java_outer_classname = "ServerInstanceProtos";
 
 message ServerInfo {

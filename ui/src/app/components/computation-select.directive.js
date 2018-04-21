@@ -15,7 +15,7 @@
  */
 import './plugin-select.scss';
 
-import thingsboardApiComputation from '../api/computation.service';
+import TempusApiComputation from '../api/computation.service';
 
 /* eslint-disable import/no-unresolved, import/default */
 
@@ -24,7 +24,7 @@ import computationSelectTemplate from './computation-select.tpl.html';
 /* eslint-enable import/no-unresolved, import/default */
 
 
-export default angular.module('thingsboard.directives.computationSelect', [thingsboardApiComputation])
+export default angular.module('tempus.directives.computationSelect', [TempusApiComputation])
     .directive('tbComputationSelect', ComputationSelect)
     .name;
 

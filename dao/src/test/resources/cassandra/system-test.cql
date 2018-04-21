@@ -1,2 +1,2 @@
-TRUNCATE thingsboard.plugin;
-TRUNCATE thingsboard.rule;
+TRUNCATE tempus.plugin;
+TRUNCATE tempus.rule;

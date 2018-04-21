@@ -15,7 +15,7 @@
  */
 import ngAnimate from 'angular-animate';
 
-export default angular.module('thingsboard.directives.noAnimate', [ngAnimate])
+export default angular.module('tempus.directives.noAnimate', [ngAnimate])
     .directive('tbNoAnimate', NoAnimate)
     .name;
 

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-export default angular.module('thingsboard.api.ui_configuration', [])
+export default angular.module('tempus.api.ui_configuration', [])
   .factory('uiConfigurationService', UiConfiguration)
   .name;
 

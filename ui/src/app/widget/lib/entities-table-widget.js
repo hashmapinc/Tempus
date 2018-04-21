@@ -25,7 +25,7 @@ import entitiesTableWidgetTemplate from './entities-table-widget.tpl.html';
 import tinycolor from 'tinycolor2';
 import cssjs from '../../../vendor/css.js/css';
 
-export default angular.module('thingsboard.widgets.entitiesTableWidget', [])
+export default angular.module('tempus.widgets.entitiesTableWidget', [])
     .directive('tbEntitiesTableWidget', EntitiesTableWidget)
     .name;
 

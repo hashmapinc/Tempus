@@ -21,7 +21,7 @@ import switchTemplate from './switch.tpl.html';
 
 /* eslint-enable import/no-unresolved, import/default */
 
-export default angular.module('thingsboard.widgets.rpc.switch', [])
+export default angular.module('tempus.widgets.rpc.switch', [])
     .directive('tbSwitch', Switch)
     .name;
 

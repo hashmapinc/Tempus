@@ -26,7 +26,7 @@ import entityAliasSelectTemplate from './entity-alias-select.tpl.html';
 
 /* eslint-disable angular/angularelement */
 
-export default angular.module('thingsboard.directives.entityAliasSelect', [])
+export default angular.module('tempus.directives.entityAliasSelect', [])
     .directive('tbEntityAliasSelect', EntityAliasSelect)
     .name;
 

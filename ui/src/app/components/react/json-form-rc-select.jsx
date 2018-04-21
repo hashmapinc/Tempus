@@ -16,10 +16,10 @@
 import 'rc-select/assets/index.css';
 
 import React from 'react';
-import ThingsboardBaseComponent from './json-form-base-component.jsx';
+import tempusBaseComponent from './json-form-base-component.jsx';
 import Select, {Option} from 'rc-select';
 
-class ThingsboardRcSelect extends React.Component {
+class tempusRcSelect extends React.Component {
 
     constructor(props) {
         super(props);
@@ -120,4 +120,4 @@ class ThingsboardRcSelect extends React.Component {
     }
 }
 
-export default ThingsboardBaseComponent(ThingsboardRcSelect);
+export default tempusBaseComponent(tempusRcSelect);

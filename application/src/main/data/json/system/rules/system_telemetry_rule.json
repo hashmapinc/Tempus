@@ -5,7 +5,7 @@
   "pluginToken": "telemetry",
   "filters": [
     {
-      "clazz": "org.thingsboard.server.extensions.core.filter.MsgTypeFilter",
+      "clazz": "com.hashmapinc.server.extensions.core.filter.MsgTypeFilter",
       "name": "TelemetryFilter",
       "configuration": {
         "messageTypes": [
@@ -18,7 +18,7 @@
   ],
   "processor": null,
   "action": {
-    "clazz": "org.thingsboard.server.extensions.core.action.telemetry.TelemetryPluginAction",
+    "clazz": "com.hashmapinc.server.extensions.core.action.telemetry.TelemetryPluginAction",
     "name": "TelemetryMsgConverterAction",
     "configuration": {
       "timeUnit": "DAYS",

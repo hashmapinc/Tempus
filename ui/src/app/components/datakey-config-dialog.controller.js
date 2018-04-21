@@ -13,9 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import thingsboardDatakeyConfig from './datakey-config.directive';
+import tempusDatakeyConfig from './datakey-config.directive';
 
-export default angular.module('thingsboard.dialogs.datakeyConfigDialog', [thingsboardDatakeyConfig])
+export default angular.module('tempus.dialogs.datakeyConfigDialog', [tempusDatakeyConfig])
     .controller('DatakeyConfigDialogController', DatakeyConfigDialogController)
     .name;
 

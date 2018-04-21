@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 /*@ngInject*/
-export default function ThingsboardMissingTranslateHandler($log, types) {
+export default function tempusMissingTranslateHandler($log, types) {
 
     return function (translationId) {
         if (translationId && !translationId.startsWith(types.translate.customTranslationsPrefix)) {

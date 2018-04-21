@@ -27,7 +27,7 @@ import legendConfigPanelTemplate from './legend-config-panel.tpl.html';
 import LegendConfigPanelController from './legend-config-panel.controller';
 
 
-export default angular.module('thingsboard.directives.legendConfig', [])
+export default angular.module('tempus.directives.legendConfig', [])
     .controller('LegendConfigPanelController', LegendConfigPanelController)
     .directive('tbLegendConfig', LegendConfig)
     .name;

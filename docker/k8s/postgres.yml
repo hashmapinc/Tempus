@@ -30,7 +30,7 @@ spec:
         imagePullPolicy: Always
         env:
         - name: POSTGRES_DB
-          value: "thingsboard"
+          value: "tempus"
         ports:
         - containerPort: 5432
           name: psql

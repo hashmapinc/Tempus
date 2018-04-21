@@ -24,7 +24,7 @@ import timeseriesTableWidgetTemplate from './timeseries-table-widget.tpl.html';
 import tinycolor from 'tinycolor2';
 import cssjs from '../../../vendor/css.js/css';
 
-export default angular.module('thingsboard.widgets.timeseriesTableWidget', [])
+export default angular.module('tempus.widgets.timeseriesTableWidget', [])
     .directive('tbTimeseriesTableWidget', TimeseriesTableWidget)
     .name;
 

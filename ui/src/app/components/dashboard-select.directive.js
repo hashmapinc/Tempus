@@ -15,8 +15,8 @@
  */
 import './dashboard-select.scss';
 
-import thingsboardApiDashboard from '../api/dashboard.service';
-import thingsboardApiUser from '../api/user.service';
+import tempusApiDashboard from '../api/dashboard.service';
+import tempusApiUser from '../api/user.service';
 
 /* eslint-disable import/no-unresolved, import/default */
 
@@ -28,7 +28,7 @@ import dashboardSelectPanelTemplate from './dashboard-select-panel.tpl.html';
 import DashboardSelectPanelController from './dashboard-select-panel.controller';
 
 
-export default angular.module('thingsboard.directives.dashboardSelect', [thingsboardApiDashboard, thingsboardApiUser])
+export default angular.module('tempus.directives.dashboardSelect', [tempusApiDashboard, tempusApiUser])
     .directive('tbDashboardSelect', DashboardSelect)
     .controller('DashboardSelectPanelController', DashboardSelectPanelController)
     .name;

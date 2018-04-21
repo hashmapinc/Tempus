@@ -26,7 +26,7 @@ import knobTemplate from './knob.tpl.html';
 
 /* eslint-enable import/no-unresolved, import/default */
 
-export default angular.module('thingsboard.widgets.rpc.knob', [])
+export default angular.module('tempus.widgets.rpc.knob', [])
     .directive('tbKnob', Knob)
     .name;
 

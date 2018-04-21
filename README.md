@@ -11,12 +11,12 @@ Tempus is an open IIoT framework for industrial data ingestion and analysis.
 
 # Depth Data Support 
 
-Thingsboard can now support depthseries data also. Earlier thingsboard supported timeseries data i.e timestamp based telemetry data, but there is a need for the support of depthseries data also i.e depth based telemetry data.
+tempus can now support depthseries data also. Earlier tempus supported timeseries data i.e timestamp based telemetry data, but there is a need for the support of depthseries data also i.e depth based telemetry data.
 
-[**Smart metering**](https://thingsboard.io/smart-metering/)
-[![Smart metering](https://user-images.githubusercontent.com/8308069/31455788-6888a948-aec1-11e7-9819-410e0ba785e0.gif "Smart metering")](https://thingsboard.io/smart-metering/)
+[**Smart metering**](https://tempus.io/smart-metering/)
+[![Smart metering](https://user-images.githubusercontent.com/8308069/31455788-6888a948-aec1-11e7-9819-410e0ba785e0.gif "Smart metering")](https://tempus.io/smart-metering/)
 
-1. There is only one configuration to be made, it is in thingsboard.yml. Under the heading UI Related configuration set depthSeries to true like:
+1. There is only one configuration to be made, it is in tempus.yml. Under the heading UI Related configuration set depthSeries to true like:
 ```
 #UI Related Configuration
   configurations:
@@ -26,7 +26,7 @@ Thingsboard can now support depthseries data also. Earlier thingsboard supported
 
 ## Build
 
-1. Checkout branch "save_depthdata_to_thingsboardDb".
+1. Checkout branch "save_depthdata_to_tempusDb".
 2. Do : mvn clean install -DskipTests
 
 ## Add a rule for depthseries data
@@ -59,7 +59,7 @@ Thingsboard can now support depthseries data also. Earlier thingsboard supported
 1. Latest values can be seen on the respective devices on which the depthseries data has been published.
 2. It can also be visualized on widgets: analog and digital gauges.
 * For that create/use a new/existing dashboard. Use the following link for that
-  -[Getting Started](https://thingsboard.io/docs/getting-started-guides/helloworld/)
+  -[Getting Started](https://tempus.io/docs/getting-started-guides/helloworld/)
   Go to the heading "Create new dashboard to visualize the data".
 
 ### REALTIME OR HISTORICAL depthseries data
@@ -67,7 +67,7 @@ Thingsboard can now support depthseries data also. Earlier thingsboard supported
 1. Go to the the dashboard created/used in the previous step.
 2. Create a new widget of chart type as "new depthseries flot".
 3. Add datasources with Entity alias as device name and then select from depthseries keys.
-4. Click add. A "new depthseries flot" would get displayed on dashboard for realtime depthseries data for the selected key(s)(It needs realtime depthseries data being published to thingsboard).
+4. Click add. A "new depthseries flot" would get displayed on dashboard for realtime depthseries data for the selected key(s)(It needs realtime depthseries data being published to tempus).
 5. For historical data go to history tab of the depthwindow panel present at top right of the dashboard(A clock icon).
 6. Set the required range of depth and click update.
 7. Now the depthseries data for the specified range and the selected key(s) would get plotted on the "new depthseries flot".
@@ -78,9 +78,9 @@ Thingsboard can now support depthseries data also. Earlier thingsboard supported
 
 The default installation doesn't use LDAP security.  However, It can be changed to use LDAP server for authentication and tempus to authorize the user based on the authentication.
 
-To enable LDAP authentication change the value of flag 'authentication-enabled' under 'ldap' in thingsboard.yml to 'true'. Other settings under ldap also needs to be changed accordingly to point to the right ldap server, dn etc.
+To enable LDAP authentication change the value of flag 'authentication-enabled' under 'ldap' in tempus.yml to 'true'. Other settings under ldap also needs to be changed accordingly to point to the right ldap server, dn etc.
 
-The corresponding code can be found in class ThingsboardSecurityConfiguration.java and RestAuthenticationProvider.java. Please refer the official oracle documentation on how LDAP security has been implemented - [LDAP authentication in Java](https://docs.oracle.com/javase/jndi/tutorial/ldap/security/ldap.html)
+The corresponding code can be found in class TempusSecurityConfiguration.java and RestAuthenticationProvider.java. Please refer the official oracle documentation on how LDAP security has been implemented - [LDAP authentication in Java](https://docs.oracle.com/javase/jndi/tutorial/ldap/security/ldap.html)
 
 ## SCHEMA MODIFICATION
 

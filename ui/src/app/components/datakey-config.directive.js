@@ -15,9 +15,9 @@
  */
 import './datakey-config.scss';
 
-import thingsboardJsonForm from "./json-form.directive";
-import thingsboardTypes from '../common/types.constant';
-import thingsboardJsFunc from './js-func.directive';
+import tempusJsonForm from "./json-form.directive";
+import tempusTypes from '../common/types.constant';
+import tempusJsFunc from './js-func.directive';
 
 /* eslint-disable import/no-unresolved, import/default */
 
@@ -25,7 +25,7 @@ import datakeyConfigTemplate from './datakey-config.tpl.html';
 
 /* eslint-enable import/no-unresolved, import/default */
 
-export default angular.module('thingsboard.directives.datakeyConfig', [thingsboardTypes, thingsboardJsFunc, thingsboardJsonForm])
+export default angular.module('tempus.directives.datakeyConfig', [tempusTypes, tempusJsFunc, tempusJsonForm])
     .directive('tbDatakeyConfig', DatakeyConfig)
     .name;
 

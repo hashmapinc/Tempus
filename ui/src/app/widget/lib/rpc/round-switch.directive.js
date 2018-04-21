@@ -21,7 +21,7 @@ import roundSwitchTemplate from './round-switch.tpl.html';
 
 /* eslint-enable import/no-unresolved, import/default */
 
-export default angular.module('thingsboard.widgets.rpc.roundSwitch', [])
+export default angular.module('tempus.widgets.rpc.roundSwitch', [])
     .directive('tbRoundSwitch', RoundSwitch)
     .name;
 

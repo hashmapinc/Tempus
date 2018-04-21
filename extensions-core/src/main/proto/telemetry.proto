@@ -16,7 +16,7 @@
 syntax = "proto3";
 package telemetry;
 
-option java_package = "org.thingsboard.server.extensions.core.plugin.telemetry.gen";
+option java_package = "com.hashmapinc.server.extensions.core.plugin.telemetry.gen";
 option java_outer_classname = "TelemetryPluginProtos";
 
 message SubscriptionProto {

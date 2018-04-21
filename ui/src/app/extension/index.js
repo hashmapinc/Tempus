@@ -19,7 +19,7 @@ import ExtensionFormMqttDirective from './extensions-forms/extension-form-mqtt.d
 import ExtensionFormOpcDirective from './extensions-forms/extension-form-opc.directive';
 import {ParseToNull} from './extension-dialog.controller';
 
-export default angular.module('thingsboard.extension', [])
+export default angular.module('tempus.extension', [])
     .directive('tbExtensionTable', ExtensionTableDirective)
     .directive('tbExtensionFormHttp', ExtensionFormHttpDirective)
     .directive('tbExtensionFormMqtt', ExtensionFormMqttDirective)

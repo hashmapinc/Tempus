@@ -16,16 +16,16 @@
 import uiRouter from 'angular-ui-router';
 import ngMaterial from 'angular-material';
 import ngMessages from 'angular-messages';
-import thingsboardJsonForm from "../components/json-form.directive";
+import tempusJsonForm from "../components/json-form.directive";
 
 import JsonFormRoutes from './jsonform.routes';
 import JsonFormController from './jsonform.controller';
 
-export default angular.module('thingsboard.jsonform', [
+export default angular.module('tempus.jsonform', [
     uiRouter,
     ngMaterial,
     ngMessages,
-    thingsboardJsonForm
+    tempusJsonForm
 ])
     .config(JsonFormRoutes)
     .controller('JsonFormController', JsonFormController)

@@ -15,8 +15,8 @@
  */
 import './side-menu.scss';
 
-import thingsboardMenu from '../services/menu.service';
-import thingsboardMenuLink from './menu-link.directive';
+import tempusMenu from '../services/menu.service';
+import tempusMenuLink from './menu-link.directive';
 
 /* eslint-disable import/no-unresolved, import/default */
 
@@ -24,7 +24,7 @@ import sidemenuTemplate from './side-menu.tpl.html';
 
 /* eslint-enable import/no-unresolved, import/default */
 
-export default angular.module('thingsboard.directives.sideMenu', [thingsboardMenu, thingsboardMenuLink])
+export default angular.module('tempus.directives.sideMenu', [tempusMenu, tempusMenuLink])
     .directive('tbSideMenu', SideMenu)
     .name;
 

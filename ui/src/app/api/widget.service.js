@@ -17,13 +17,13 @@ import $ from 'jquery';
 import moment from 'moment';
 import tinycolor from 'tinycolor2';
 
-import thingsboardLedLight from '../components/led-light.directive';
-import thingsboardTimeseriesTableWidget from '../widget/lib/timeseries-table-widget';
-import thingsboardAlarmsTableWidget from '../widget/lib/alarms-table-widget';
-import thingsboardEntitiesTableWidget from '../widget/lib/entities-table-widget';
-import thingsboardExtensionsTableWidget from '../widget/lib/extensions-table-widget';
+import tempusLedLight from '../components/led-light.directive';
+import tempusTimeseriesTableWidget from '../widget/lib/timeseries-table-widget';
+import tempusAlarmsTableWidget from '../widget/lib/alarms-table-widget';
+import tempusEntitiesTableWidget from '../widget/lib/entities-table-widget';
+import tempusExtensionsTableWidget from '../widget/lib/extensions-table-widget';
 
-import thingsboardRpcWidgets from '../widget/lib/rpc';
+import tempusRpcWidgets from '../widget/lib/rpc';
 
 import TbFlot from '../widget/lib/flot-widget';
 import TbDsFlot from '../widget/lib/depth-flot-widget';
@@ -40,11 +40,11 @@ import 'jquery.terminal/css/jquery.terminal.min.css';
 import 'oclazyload';
 import cssjs from '../../vendor/css.js/css';
 
-import thingsboardTypes from '../common/types.constant';
-import thingsboardUtils from '../common/utils.service';
+import tempusTypes from '../common/types.constant';
+import tempusUtils from '../common/utils.service';
 
-export default angular.module('thingsboard.api.widget', ['oc.lazyLoad', thingsboardLedLight, thingsboardTimeseriesTableWidget,
-    thingsboardAlarmsTableWidget, thingsboardEntitiesTableWidget, thingsboardExtensionsTableWidget, thingsboardRpcWidgets, thingsboardTypes, thingsboardUtils])
+export default angular.module('tempus.api.widget', ['oc.lazyLoad', tempusLedLight, tempusTimeseriesTableWidget,
+    tempusAlarmsTableWidget, tempusEntitiesTableWidget, tempusExtensionsTableWidget, tempusRpcWidgets, tempusTypes, tempusUtils])
     .factory('widgetService', WidgetService)
     .name;
 

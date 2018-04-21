@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-export default angular.module('thingsboard.directives.confirmOnExit', [])
+export default angular.module('tempus.directives.confirmOnExit', [])
     .directive('tbConfirmOnExit', ConfirmOnExit)
     .name;
 

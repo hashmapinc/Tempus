@@ -17,7 +17,7 @@ import ManageDashboardLayoutsController from './manage-dashboard-layouts.control
 import SelectTargetLayoutController from './select-target-layout.controller';
 import DashboardLayoutDirective from './dashboard-layout.directive';
 
-export default angular.module('thingsboard.dashboard.layouts', [])
+export default angular.module('tempus.dashboard.layouts', [])
     .controller('ManageDashboardLayoutsController', ManageDashboardLayoutsController)
     .controller('SelectTargetLayoutController', SelectTargetLayoutController)
     .directive('tbDashboardLayout', DashboardLayoutDirective)

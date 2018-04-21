@@ -13,9 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import thingsboardTypes from '../common/types.constant';
+import tempusTypes from '../common/types.constant';
 
-export default angular.module('thingsboard.api.application', [thingsboardTypes])
+export default angular.module('tempus.api.application', [tempusTypes])
     .factory('applicationService', ApplicationService)
     .name;
 

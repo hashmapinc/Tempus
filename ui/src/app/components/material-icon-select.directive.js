@@ -25,7 +25,7 @@ import materialIconsDialogTemplate from './material-icons-dialog.tpl.html';
 /* eslint-enable import/no-unresolved, import/default */
 
 
-export default angular.module('thingsboard.directives.materialIconSelect', [])
+export default angular.module('tempus.directives.materialIconSelect', [])
     .controller('MaterialIconsDialogController', MaterialIconsDialogController)
     .directive('tbMaterialIconSelect', MaterialIconSelect)
     .name;

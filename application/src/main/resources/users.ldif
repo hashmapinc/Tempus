@@ -26,11 +26,11 @@ objectclass: organizationalRole
 userpassword: {SSHA}zGtcC9nLBX7XRFEI8+hM0eDTzFDz9toT
 
 
-# Entry 4: uid=tenant@thingsboard.org,dc=example,dc=org
-dn: uid=tenant@thingsboard.org,dc=example,dc=org
+# Entry 4: uid=tenant@tempus.org,dc=example,dc=org
+dn: uid=tenant@tempus.org,dc=example,dc=org
 objectclass: account
 objectclass: simpleSecurityObject
 objectclass: top
-uid: tenant@thingsboard.org
+uid: tenant@tempus.org
 userpassword: {MD5}rftomJeytSVa3K7nKUXHkQ==
 

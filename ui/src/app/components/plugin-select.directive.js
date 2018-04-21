@@ -15,7 +15,7 @@
  */
 import './plugin-select.scss';
 
-import thingsboardApiPlugin from '../api/plugin.service';
+import tempusApiPlugin from '../api/plugin.service';
 
 /* eslint-disable import/no-unresolved, import/default */
 
@@ -24,7 +24,7 @@ import pluginSelectTemplate from './plugin-select.tpl.html';
 /* eslint-enable import/no-unresolved, import/default */
 
 
-export default angular.module('thingsboard.directives.pluginSelect', [thingsboardApiPlugin])
+export default angular.module('tempus.directives.pluginSelect', [tempusApiPlugin])
     .directive('tbPluginSelect', PluginSelect)
     .name;
 

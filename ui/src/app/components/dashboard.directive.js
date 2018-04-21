@@ -17,14 +17,14 @@ import './dashboard.scss';
 
 import 'javascript-detect-element-resize/detect-element-resize';
 import angularGridster from 'angular-gridster';
-import thingsboardTypes from '../common/types.constant';
-import thingsboardApiWidget from '../api/widget.service';
-import thingsboardWidget from './widget/widget.directive';
-import thingsboardToast from '../services/toast';
-import thingsboardTimewindow from './timewindow.directive';
-import thingsboardDepthwindow from './depthwindow.directive';
-import thingsboardEvents from './tb-event-directives';
-import thingsboardMousepointMenu from './mousepoint-menu.directive';
+import tempusTypes from '../common/types.constant';
+import tempusApiWidget from '../api/widget.service';
+import tempusWidget from './widget/widget.directive';
+import tempusToast from '../services/toast';
+import tempusTimewindow from './timewindow.directive';
+import tempusDepthwindow from './depthwindow.directive';
+import tempusEvents from './tb-event-directives';
+import tempusMousepointMenu from './mousepoint-menu.directive';
 
 /* eslint-disable import/no-unresolved, import/default */
 
@@ -34,14 +34,14 @@ import dashboardTemplate from './dashboard.tpl.html';
 
 /* eslint-disable angular/angularelement */
 
-export default angular.module('thingsboard.directives.dashboard', [thingsboardTypes,
-    thingsboardToast,
-    thingsboardApiWidget,
-    thingsboardWidget,
-    thingsboardTimewindow,
-    thingsboardDepthwindow,
-    thingsboardEvents,
-    thingsboardMousepointMenu,
+export default angular.module('tempus.directives.dashboard', [tempusTypes,
+    tempusToast,
+    tempusApiWidget,
+    tempusWidget,
+    tempusTimewindow,
+    tempusDepthwindow,
+    tempusEvents,
+    tempusMousepointMenu,
     angularGridster.name])
     .directive('tbDashboard', Dashboard)
     .name;

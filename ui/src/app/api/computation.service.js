@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
- export default angular.module('thingsboard.api.computation', [])
+ export default angular.module('tempus.api.computation', [])
      .factory('computationService', ComputationService)
      .name;
 

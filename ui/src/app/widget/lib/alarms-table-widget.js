@@ -25,7 +25,7 @@ import alarmDetailsDialogTemplate from '../../alarm/alarm-details-dialog.tpl.htm
 import tinycolor from 'tinycolor2';
 import cssjs from '../../../vendor/css.js/css';
 
-export default angular.module('thingsboard.widgets.alarmsTableWidget', [])
+export default angular.module('tempus.widgets.alarmsTableWidget', [])
     .directive('tbAlarmsTableWidget', AlarmsTableWidget)
     .name;
 

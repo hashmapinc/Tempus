@@ -15,7 +15,7 @@
  */
 import React from 'react';
 
-class ThingsboardFieldSet extends React.Component {
+class tempusFieldSet extends React.Component {
 
     render() {
         let forms = this.props.form.items.map(function(form, index){
@@ -35,4 +35,4 @@ class ThingsboardFieldSet extends React.Component {
     }
 }
 
-export default ThingsboardFieldSet;
+export default tempusFieldSet;

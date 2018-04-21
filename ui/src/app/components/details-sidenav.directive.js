@@ -21,7 +21,7 @@ import detailsSidenavTemplate from './details-sidenav.tpl.html';
 
 /* eslint-enable import/no-unresolved, import/default */
 
-export default angular.module('thingsboard.directives.detailsSidenav', [])
+export default angular.module('tempus.directives.detailsSidenav', [])
     .directive('tbDetailsSidenav', DetailsSidenav)
     .name;
 

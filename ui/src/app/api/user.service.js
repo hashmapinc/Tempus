@@ -13,10 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import thingsboardApiLogin  from './login.service';
+import tempusApiLogin  from './login.service';
 import angularStorage from 'angular-storage';
 
-export default angular.module('thingsboard.api.user', [thingsboardApiLogin,
+export default angular.module('tempus.api.user', [tempusApiLogin,
     angularStorage])
     .factory('userService', UserService)
     .name;

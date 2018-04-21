@@ -1,1 +1,1 @@
-ALTER TABLE thingsboard.application ADD state text;
+ALTER TABLE tempus.application ADD state text;

@@ -22,7 +22,7 @@ import ReactSchemaForm from './react/json-form-react.jsx';
 import jsonFormTemplate from './json-form.tpl.html';
 import { utils } from 'react-schema-form';
 
-export default angular.module('thingsboard.directives.jsonForm', [])
+export default angular.module('tempus.directives.jsonForm', [])
     .directive('tbJsonForm', JsonForm)
     .value('ReactSchemaForm', ReactSchemaForm)
     .name;

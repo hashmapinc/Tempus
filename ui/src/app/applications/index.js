@@ -16,25 +16,25 @@
 import '../dashboard/dashboard.scss';
 
 import uiRouter from 'angular-ui-router';
-import thingsboardGrid from '../components/grid.directive';
-import thingsboardApiUser from '../api/user.service';
-import thingsboardApiDevice from '../api/device.service';
-import thingsboardApiCustomer from '../api/customer.service';
-import thingsboardApiApplication from '../api/application.service';
+import tempusGrid from '../components/grid.directive';
+import tempusApiUser from '../api/user.service';
+import tempusApiDevice from '../api/device.service';
+import tempusApiCustomer from '../api/customer.service';
+import tempusApiApplication from '../api/application.service';
 
-import thingsboardApiWidget from '../api/widget.service';
-import thingsboardApiDashboard from '../api/dashboard.service';
-import thingsboardDetailsSidenav from '../components/details-sidenav.directive';
-import thingsboardWidgetConfig from '../components/widget/widget-config.directive';
-import thingsboardDashboardSelect from '../components/dashboard-select.directive';
-import thingsboardRelatedEntityAutocomplete from '../components/related-entity-autocomplete.directive';
-import thingsboardDashboard from '../components/dashboard.directive';
-import thingsboardExpandFullscreen from '../components/expand-fullscreen.directive';
-import thingsboardWidgetsBundleSelect from '../components/widgets-bundle-select.directive';
-import thingsboardSocialsharePanel from '../components/socialshare-panel.directive';
-import thingsboardTypes from '../common/types.constant';
-import thingsboardItemBuffer from '../services/item-buffer.service';
-import thingsboardImportExport from '../import-export';
+import tempusApiWidget from '../api/widget.service';
+import tempusApiDashboard from '../api/dashboard.service';
+import tempusDetailsSidenav from '../components/details-sidenav.directive';
+import tempusWidgetConfig from '../components/widget/widget-config.directive';
+import tempusDashboardSelect from '../components/dashboard-select.directive';
+import tempusRelatedEntityAutocomplete from '../components/related-entity-autocomplete.directive';
+import tempusDashboard from '../components/dashboard.directive';
+import tempusExpandFullscreen from '../components/expand-fullscreen.directive';
+import tempusWidgetsBundleSelect from '../components/widgets-bundle-select.directive';
+import tempusSocialsharePanel from '../components/socialshare-panel.directive';
+import tempusTypes from '../common/types.constant';
+import tempusItemBuffer from '../services/item-buffer.service';
+import tempusImportExport from '../import-export';
 import dashboardLayouts from '../dashboard/layouts';
 import dashboardStates from '../dashboard/states';
 
@@ -43,18 +43,18 @@ import ApplicationRoutes from './application.routes';
 import {ApplicationController} from './application.controller';
 import ApplicationDirective from './application.directive';
 
-import thingsboardPluginSelect from '../components/plugin-select.directive';
-import thingsboardComponent from '../component';
-import thingsboardApiRule from '../api/rule.service';
-import thingsboardApiPlugin from '../api/plugin.service';
-import thingsboardApiComponentDescriptor from '../api/component-descriptor.service';
+import tempusPluginSelect from '../components/plugin-select.directive';
+import tempusComponent from '../component';
+import tempusApiRule from '../api/rule.service';
+import tempusApiPlugin from '../api/plugin.service';
+import tempusApiComponentDescriptor from '../api/component-descriptor.service';
 
 import DashboardController from '../dashboard/dashboard.controller';
 import DashboardSettingsController from '../dashboard/dashboard-settings.controller';
 import AddWidgetController from '../dashboard/add-widget.controller';
 
-import thingsboardApiComputation from '../api/computation.service';
-import thingsboardApiComputationJob from '../api/computation-job.service';
+import TempusApiComputation from '../api/computation.service';
+import TempusApiComputationJob from '../api/computation-job.service';
 //import ComputationJobController from '../computations/computation-job.controller';
 
 //import DashboardDirective from '../dashboard/dashboard.directive';
@@ -65,33 +65,33 @@ import thingsboardApiComputationJob from '../api/computation-job.service';
 //import RuleController from '../rule/rule.controller';
 //import RuleDirective from '../rule/rule.directive';
 
-export default angular.module('thingsboard.application', [
+export default angular.module('tempus.application', [
     uiRouter,
-    thingsboardGrid,
-    thingsboardApiUser,
-    thingsboardApiDevice,
-    thingsboardApiApplication,
-    thingsboardApiCustomer,
-    thingsboardPluginSelect,
-    thingsboardComponent,
-    thingsboardApiRule,
-    thingsboardApiPlugin,
-    thingsboardApiComponentDescriptor,
-    thingsboardApiComputation,
-    thingsboardApiComputationJob,
-    thingsboardTypes,
-    thingsboardItemBuffer,
-    thingsboardImportExport,
-    thingsboardApiWidget,
-    thingsboardApiDashboard,
-    thingsboardDetailsSidenav,
-    thingsboardWidgetConfig,
-    thingsboardDashboardSelect,
-    thingsboardRelatedEntityAutocomplete,
-    thingsboardDashboard,
-    thingsboardExpandFullscreen,
-    thingsboardWidgetsBundleSelect,
-    thingsboardSocialsharePanel,
+    tempusGrid,
+    tempusApiUser,
+    tempusApiDevice,
+    tempusApiApplication,
+    tempusApiCustomer,
+    tempusPluginSelect,
+    tempusComponent,
+    tempusApiRule,
+    tempusApiPlugin,
+    tempusApiComponentDescriptor,
+    TempusApiComputation,
+    TempusApiComputationJob,
+    tempusTypes,
+    tempusItemBuffer,
+    tempusImportExport,
+    tempusApiWidget,
+    tempusApiDashboard,
+    tempusDetailsSidenav,
+    tempusWidgetConfig,
+    tempusDashboardSelect,
+    tempusRelatedEntityAutocomplete,
+    tempusDashboard,
+    tempusExpandFullscreen,
+    tempusWidgetsBundleSelect,
+    tempusSocialsharePanel,
     dashboardLayouts,
     dashboardStates
 ])

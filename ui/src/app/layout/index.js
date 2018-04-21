@@ -20,38 +20,38 @@ import ngSanitize from 'angular-sanitize';
 import FBAngular from 'angular-fullscreen';
 import 'angular-breadcrumb';
 
-import thingsboardMenu from '../services/menu.service';
-import thingsboardApiDevice from '../api/device.service';
-import thingsboardApiLogin from '../api/login.service';
-import thingsboardApiUser from '../api/user.service';
+import tempusMenu from '../services/menu.service';
+import tempusApiDevice from '../api/device.service';
+import tempusApiLogin from '../api/login.service';
+import tempusApiUser from '../api/user.service';
 
-import thingsboardNoAnimate from '../components/no-animate.directive';
-import thingsboardOnFinishRender from '../components/finish-render.directive';
-import thingsboardSideMenu from '../components/side-menu.directive';
-import thingsboardDashboardAutocomplete from '../components/dashboard-autocomplete.directive';
+import tempusNoAnimate from '../components/no-animate.directive';
+import tempusOnFinishRender from '../components/finish-render.directive';
+import tempusSideMenu from '../components/side-menu.directive';
+import tempusDashboardAutocomplete from '../components/dashboard-autocomplete.directive';
 
-import thingsboardUserMenu from './user-menu.directive';
+import tempusUserMenu from './user-menu.directive';
 
-import thingsboardEntity from '../entity';
-import thingsboardEvent from '../event';
-import thingsboardAlarm from '../alarm';
-import thingsboardAuditLog from '../audit';
-import thingsboardExtension from '../extension';
-import thingsboardTenant from '../tenant';
-import thingsboardCustomer from '../customer';
-import thingsboardUser from '../user';
-import thingsboardHomeLinks from '../home';
-import thingsboardAdmin from '../admin';
-import thingsboardProfile from '../profile';
-import thingsboardAsset from '../asset';
-import thingsboardDevice from '../device';
-import thingsboardWidgetLibrary from '../widget';
-import thingsboardDashboard from '../dashboard';
-import thingsboardPlugin from '../plugin';
-import thingsboardRule from '../rule';
-import thingsboardComputation from '../computations';
+import tempusEntity from '../entity';
+import tempusEvent from '../event';
+import tempusAlarm from '../alarm';
+import tempusAuditLog from '../audit';
+import tempusExtension from '../extension';
+import tempusTenant from '../tenant';
+import tempusCustomer from '../customer';
+import tempusUser from '../user';
+import tempusHomeLinks from '../home';
+import tempusAdmin from '../admin';
+import tempusProfile from '../profile';
+import tempusAsset from '../asset';
+import tempusDevice from '../device';
+import tempusWidgetLibrary from '../widget';
+import tempusDashboard from '../dashboard';
+import tempusPlugin from '../plugin';
+import tempusRule from '../rule';
+import tempusComputation from '../computations';
 
-import thingsboardJsonForm from '../jsonform';
+import tempusJsonForm from '../jsonform';
 
 import HomeRoutes from './home.routes';
 import HomeController from './home.controller';
@@ -59,39 +59,39 @@ import BreadcrumbLabel from './breadcrumb-label.filter';
 import BreadcrumbIcon from './breadcrumb-icon.filter';
 import BreadcrumbLink from './breadcrumb-link.filter';
 
-export default angular.module('thingsboard.home', [
+export default angular.module('tempus.home', [
     uiRouter,
     ngSanitize,
     FBAngular.name,
     'ncy-angular-breadcrumb',
-    thingsboardMenu,
-    thingsboardHomeLinks,
-    thingsboardUserMenu,
-    thingsboardEntity,
-    thingsboardEvent,
-    thingsboardAlarm,
-    thingsboardAuditLog,
-    thingsboardExtension,
-    thingsboardTenant,
-    thingsboardCustomer,
-    thingsboardUser,
-    thingsboardAdmin,
-    thingsboardProfile,
-    thingsboardAsset,
-    thingsboardDevice,
-    thingsboardWidgetLibrary,
-    thingsboardDashboard,
-    thingsboardPlugin,
-    thingsboardRule,
-    thingsboardJsonForm,
-    thingsboardApiDevice,
-    thingsboardApiLogin,
-    thingsboardApiUser,
-    thingsboardNoAnimate,
-    thingsboardOnFinishRender,
-    thingsboardSideMenu,
-    thingsboardDashboardAutocomplete,
-    thingsboardComputation
+    tempusMenu,
+    tempusHomeLinks,
+    tempusUserMenu,
+    tempusEntity,
+    tempusEvent,
+    tempusAlarm,
+    tempusAuditLog,
+    tempusExtension,
+    tempusTenant,
+    tempusCustomer,
+    tempusUser,
+    tempusAdmin,
+    tempusProfile,
+    tempusAsset,
+    tempusDevice,
+    tempusWidgetLibrary,
+    tempusDashboard,
+    tempusPlugin,
+    tempusRule,
+    tempusJsonForm,
+    tempusApiDevice,
+    tempusApiLogin,
+    tempusApiUser,
+    tempusNoAnimate,
+    tempusOnFinishRender,
+    tempusSideMenu,
+    tempusDashboardAutocomplete,
+    tempusComputation
 ])
     .config(HomeRoutes)
     .controller('HomeController', HomeController)

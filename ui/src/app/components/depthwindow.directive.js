@@ -17,8 +17,8 @@
 import './depthwindow.scss';
 
 import $ from 'jquery';
-import thingsboardDepthinterval from './depthinterval.directive';
-import thingsboardDepthPeriod from './depth-period.directive';
+import tempusDepthinterval from './depthinterval.directive';
+import tempusDepthPeriod from './depth-period.directive';
 
 /* eslint-disable import/no-unresolved, import/default */
 
@@ -30,7 +30,7 @@ import depthwindowPanelTemplate from './depthwindow-panel.tpl.html';
 
 import DepthwindowPanelController from './depthwindow-panel.controller';
 
-export default angular.module('thingsboard.directives.depthwindow', [thingsboardDepthinterval, thingsboardDepthPeriod])
+export default angular.module('tempus.directives.depthwindow', [tempusDepthinterval, tempusDepthPeriod])
     .controller('DepthwindowPanelController', DepthwindowPanelController)
     .directive('tbDepthwindow', Depthwindow)
     .name;

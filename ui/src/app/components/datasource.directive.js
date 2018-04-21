@@ -15,9 +15,9 @@
  */
 import './datasource.scss';
 
-import thingsboardTypes from '../common/types.constant';
-import thingsboardDatasourceFunc from './datasource-func.directive'
-import thingsboardDatasourceEntity from './datasource-entity.directive';
+import tempusTypes from '../common/types.constant';
+import tempusDatasourceFunc from './datasource-func.directive'
+import tempusDatasourceEntity from './datasource-entity.directive';
 
 /* eslint-disable import/no-unresolved, import/default */
 
@@ -25,7 +25,7 @@ import datasourceTemplate from './datasource.tpl.html';
 
 /* eslint-enable import/no-unresolved, import/default */
 
-export default angular.module('thingsboard.directives.datasource', [thingsboardTypes, thingsboardDatasourceFunc, thingsboardDatasourceEntity])
+export default angular.module('tempus.directives.datasource', [tempusTypes, tempusDatasourceFunc, tempusDatasourceEntity])
     .directive('tbDatasource', Datasource)
     .name;
 

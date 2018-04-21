@@ -18,7 +18,7 @@ import AlarmHeaderDirective from './alarm-header.directive';
 import AlarmRowDirective from './alarm-row.directive';
 import AlarmTableDirective from './alarm-table.directive';
 
-export default angular.module('thingsboard.alarm', [])
+export default angular.module('tempus.alarm', [])
     .controller('AlarmDetailsDialogController', AlarmDetailsDialogController)
     .directive('tbAlarmHeader', AlarmHeaderDirective)
     .directive('tbAlarmRow', AlarmRowDirective)

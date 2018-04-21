@@ -84,7 +84,7 @@ SET installDir=%BASE%\data
 
 PUSHD %BASE%\conf
 
-java -cp %jarfile% -Dloader.main=org.thingsboard.server.ThingsboardInstallApplication^
+java -cp %jarfile% -Dloader.main=com.hashmapinc.server.TempusInstallApplication^
                     -Dinstall.data_dir=%installDir%^
                     -Dinstall.load_demo=%loadDemo%^
                     -Dspring.jpa.hibernate.ddl-auto=none^

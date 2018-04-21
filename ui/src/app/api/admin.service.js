@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-export default angular.module('thingsboard.api.admin', [])
+export default angular.module('tempus.api.admin', [])
     .factory('adminService', AdminService)
     .name;
 
