@@ -68,6 +68,8 @@ public abstract class BasePluginServiceTest extends AbstractServiceTest {
   @Test
   public void findSystemPlugins() throws Exception {
     TenantId systemTenant = new TenantId(ModelConstants.NULL_UUID); // system tenant id
+    ruleService.deleteRulesByTenantId(systemTenant);
+    pluginService.deletePluginsByTenantId(systemTenant);
     pluginService.savePlugin(generatePlugin(null, null));
     pluginService.savePlugin(generatePlugin(null, null));
     pluginService.savePlugin(generatePlugin(systemTenant, null));

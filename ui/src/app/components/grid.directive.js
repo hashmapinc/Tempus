@@ -620,6 +620,24 @@ function GridController(applicationService, $scope, $state, $mdDialog, $document
     function onCloseDetails() {
         vm.detailsConfig.currentItem = null;
         $window.localStorage.removeItem('currentApp')
+        $window.localStorage.removeItem('currentTab')
+        if(angular.isDefined(vm.parentCtl.currentApplication)){
+           
+            vm.parentCtl.appSliderOpen = false;
+            vm.parentCtl.currentApplication = null;
+            vm.parentCtl.showAppMini = false;
+            vm.parentCtl.showAppMain = false;
+            vm.parentCtl.showAppRules = false;
+            vm.parentCtl.showComputations = false;
+            vm.parentCtl.showComputationJobs = false;
+            vm.parentCtl.showAppDetails = true; 
+            vm.parentCtl.tabSelectedIndex = 0;
+            vm.detailsConfig.isDetailsOpen = false;
+            $timeout( function(){
+                vm.parentCtl.appSliderOpen = true;
+            }, 100 ); 
+
+        }
     }
 
     function operatingItem() {

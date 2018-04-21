@@ -24,7 +24,7 @@ import java.util.Arrays;
 
 @RunWith(ClasspathSuite.class)
 @ClasspathSuite.ClassnameFilters({
-        "org.thingsboard.server.controller.sql.*SqlTest",
+        "org.thingsboard.server.controller.sql.*ComputationJobControllerSqlTest",
         })
 public class ControllerSqlTestSuite {
 
@@ -33,6 +33,6 @@ public class ControllerSqlTestSuite {
             Arrays.asList("sql/schema.sql", "sql/system-data.sql"),
             "sql/drop-all-tables.sql",
             "sql-test.properties",
-            "sql/upgrade/"
+            Arrays.asList("sql/upgrade/1.sql", "sql/upgrade/2.sql")
     );
 }
