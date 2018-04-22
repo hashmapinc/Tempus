@@ -1,9 +1,9 @@
 <img src="https://github.com/hashmapinc/hashmap.github.io/blob/master/images/tempus/TempusLogoBlack2.png" width="910" height="245" alt="Hashmap, Inc Tempus"/>
 
 [![License](http://img.shields.io/:license-Apache%202-blue.svg)](http://www.apache.org/licenses/LICENSE-2.0.txt) 
-[![CLA assistant](https://cla-assistant.io/readme/badge/hashmapinc/Tempus)](https://cla-assistant.io/hashmapinc/Tempus)
 [![Build Status](https://travis-ci.org/hashmapinc/Tempus.svg?branch=dev)](https://travis-ci.org/hashmapinc/Tempus)
 [![Docker pulls](https://img.shields.io/docker/pulls/hashmapinc/tempus.svg)](https://hub.docker.com/r/hashmapinc/tempus/)
+[![CLA assistant](https://cla-assistant.io/readme/badge/hashmapinc/Tempus)](https://cla-assistant.io/hashmapinc/Tempus)
 
 
 Tempus is an open IIoT framework for industrial data ingestion and analysis.
