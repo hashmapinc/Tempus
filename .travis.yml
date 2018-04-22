@@ -30,5 +30,3 @@ deploy:
     - "$TRAVIS_BUILD_DIR/application/target/tempus-windows.zip"
   skip_cleanup: true
   overwrite: true
-  on:
-    tags: true
