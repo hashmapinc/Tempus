@@ -4,6 +4,7 @@
 [![Build Status](https://travis-ci.org/hashmapinc/Tempus.svg?branch=dev)](https://travis-ci.org/hashmapinc/Tempus)
 [![Docker pulls](https://img.shields.io/docker/pulls/hashmapinc/tempus.svg)](https://hub.docker.com/r/hashmapinc/tempus/)
 [![CLA assistant](https://cla-assistant.io/readme/badge/hashmapinc/Tempus)](https://cla-assistant.io/hashmapinc/Tempus)
+[![Quality Gate](https://sonarcloud.io/api/badges/gate?key=com.hashmapinc%3Atempus)](https://sonarcloud.io/dashboard/index/com.hashmapinc%3Atempus)
 
 
 Tempus is an open IIoT framework for industrial data ingestion and analysis.
