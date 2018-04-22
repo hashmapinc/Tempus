@@ -2,6 +2,7 @@ before_install:
 - sudo rm -f /etc/mavenrc
 - export M2_HOME=/usr/local/maven
 - export MAVEN_OPTS="-Dmaven.repo.local=$HOME/.m2/repository -Xms1024m -Xmx3072m"
+
 jdk:
 - oraclejdk8
 language: java
@@ -15,3 +16,19 @@ addons:
 script:
   - mvn -T 2C clean install
   - mvn sonar:sonar
+  
+  before_deploy:
+  - git tag "1.4.0-SNAPSHOT"
+
+deploy:
+  provider: releases
+  api_key:
+    secure: "KXCAuF5zg7je0OSJOyCcT6V6vv11FCb/VGVJkAnVYCYXvofx4a4Uxm4m6xqRCXp8WWJGzYKG0ivVuCdSDVk2+VvMzB6WGLISK3vyqUluHHx1JwMW/5GlO2DhbHuUjrMMlwZ9eWsJDAo4ANfckBrDdkUBc8glKw2kvq4XG6dyOuZe02zSCudcfxFahmsSWV8a1vannZyLfpHLvmcwqQQAZP2k1lSs0vHpjDyrXB31871Ff4J/LASj6QeZXHYuJXBHARrm8XFbUA1vnbdVY15QC5SLAAcr4BmJDIGup7vWicRohOMO0oSHA9Heewn+VNaemceGESVsxmgdJ+r4EAG8Qo++JC9m5Gk2yEBf8ZtlXEMvMwuZKJLPfcwcBXGcuplwyEwxgsj+Eyw9RUgLl2M8Tn4PtoOzNQjk6SC8U2wCxcD56h4b/jm/sUvGQWVkHJBuwmih9kOZlk5kE22R0rQL0GovbnHwi7u6bvTNER5YUEg+K1sWUWu7AjSjtTgf7pKVcvKuBT4a24nSpABINaD3gQIMpDGLvY3Lmn1tkS+Jr8LI8rAXZHZXBR0jkA/9YgLD7/Iz+iWFBv7FW2mvaWCNf2snxAb32iG2lKlpH298QlM/KK7bpaRbqjF+e26nXOHABPYW7xGpXotxTHBT/fhpWvZY781W2rYnRIz7ER0KvEw="
+  file:
+    - "$TRAVIS_BUILD_DIR/application/target/tempus.deb"
+    - "$TRAVIS_BUILD_DIR/application/target/tempus.rpm"
+    - "$TRAVIS_BUILD_DIR/application/target/tempus-windows.zip"
+  skip_cleanup: true
+  overwrite: true
+  on:
+    tags: true
