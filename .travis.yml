@@ -17,7 +17,7 @@ script:
   - mvn -T 2C clean install
   - mvn sonar:sonar
   
-  before_deploy:
+before_deploy:
   - git tag "1.4.0-SNAPSHOT"
 
 deploy:
