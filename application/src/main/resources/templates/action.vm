@@ -1,5 +1,5 @@
 #*
- * Copyright © 2016-2017 Hashmap, Inc
+ * Copyright © 2017-2018 Hashmap, Inc
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,10 +33,10 @@ package ${model.getPackageName()};
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.thingsboard.server.extensions.spark.computation.action.SparkComputationRequest;
+import com.hashmapinc.server.extensions.spark.computation.action.SparkComputationRequest;
 import lombok.extern.slf4j.Slf4j;
-import org.thingsboard.server.extensions.api.component.Action;
-import org.thingsboard.server.extensions.spark.computation.action.AbstractSparkAppAction;
+import com.hashmapinc.server.extensions.api.component.Action;
+import com.hashmapinc.server.extensions.spark.computation.action.AbstractSparkAppAction;
 
 @Action(name = "${model.getName()}",
         descriptor = "${model.getDescriptor()}", configuration = ${model.getConfiguration().getClassName()}.class)

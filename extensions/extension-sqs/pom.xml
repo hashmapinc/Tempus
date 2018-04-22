@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
 
-    Copyright © 2016-2018 Hashmap, Inc
+    Copyright © 2017-2018 Hashmap, Inc
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -21,16 +21,16 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
         <artifactId>extensions</artifactId>
-        <groupId>org.thingsboard</groupId>
+        <groupId>com.hashmapinc</groupId>
         <version>1.4.0</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
-    <groupId>org.thingsboard.extensions</groupId>
+    <groupId>com.hashmapinc.extensions</groupId>
     <artifactId>extension-sqs</artifactId>
     <packaging>jar</packaging>
 
     <name>Tempus Server SQS Extension</name>
-    <url>https://thingsboard.io</url>
+    <url>https://hashmapinc.com</url>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -40,12 +40,12 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.thingsboard</groupId>
+            <groupId>com.hashmapinc</groupId>
             <artifactId>extensions-api</artifactId>
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>org.thingsboard</groupId>
+            <groupId>com.hashmapinc</groupId>
             <artifactId>extensions-core</artifactId>
             <scope>provided</scope>
         </dependency>

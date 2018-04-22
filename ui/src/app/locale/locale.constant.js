@@ -1,5 +1,5 @@
 /*
- * Copyright © 2016-2018 Hashmap, Inc
+ * Copyright © 2017-2018 Hashmap, Inc
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -11,12 +11,12 @@
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
- * limitations under the License
+ * limitations under the License.
  */
-import ThingsboardMissingTranslateHandler from './translate-handler';
+import tempusMissingTranslateHandler from './translate-handler';
 
-export default angular.module('thingsboard.locale', [])
-    .factory('tbMissingTranslationHandler', ThingsboardMissingTranslateHandler)
+export default angular.module('tempus.locale', [])
+    .factory('tbMissingTranslationHandler', tempusMissingTranslateHandler)
     .constant('locales',
         {
             'en_US': {
@@ -457,8 +457,8 @@ export default angular.module('thingsboard.locale', [])
                     "make-private-dashboard-title": "Are you sure you want to make the dashboard '{{dashboardTitle}}' private?",
                     "make-private-dashboard-text": "After the confirmation the dashboard will be made private and won't be accessible by others.",
                     "make-private-dashboard": "Make dashboard private",
-                    "socialshare-text": "'{{dashboardTitle}}' powered by ThingsBoard",
-                    "socialshare-title": "'{{dashboardTitle}}' powered by ThingsBoard",
+                    "socialshare-text": "'{{dashboardTitle}}' powered by tempus",
+                    "socialshare-title": "'{{dashboardTitle}}' powered by tempus",
                     "select-dashboard": "Select dashboard",
                     "no-dashboards-matching": "No dashboards matching '{{entity}}' were found.",
                     "dashboard-required": "Dashboard is required.",
@@ -592,8 +592,8 @@ export default angular.module('thingsboard.locale', [])
                     "make-private-application-title": "Are you sure you want to make the application '{{applicationTitle}}' private?",
                     "make-private-application-text": "After the confirmation the application will be made private and won't be accessible by others.",
                     "make-private-application": "Make application private",
-                    "socialshare-text": "'{{applicationTitle}}' powered by ThingsBoard",
-                    "socialshare-title": "'{{applicationTitle}}' powered by ThingsBoard",
+                    "socialshare-text": "'{{applicationTitle}}' powered by tempus",
+                    "socialshare-title": "'{{applicationTitle}}' powered by tempus",
                     "select-application": "Select application",
                     "no-applications-matching": "No applications matching '{{entity}}' were found.",
                     "application-required": "Application is required.",

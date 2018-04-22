@@ -1,5 +1,5 @@
 /*
- * Copyright © 2016-2018 Hashmap, Inc
+ * Copyright © 2017-2018 Hashmap, Inc
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,8 +15,8 @@
  */
 import './dashboard-select.scss';
 
-import thingsboardApiDashboard from '../api/dashboard.service';
-import thingsboardApiUser from '../api/user.service';
+import tempusApiDashboard from '../api/dashboard.service';
+import tempusApiUser from '../api/user.service';
 
 /* eslint-disable import/no-unresolved, import/default */
 
@@ -28,7 +28,7 @@ import dashboardSelectPanelTemplate from './dashboard-select-panel.tpl.html';
 import DashboardSelectPanelController from './dashboard-select-panel.controller';
 
 
-export default angular.module('thingsboard.directives.dashboardSelect', [thingsboardApiDashboard, thingsboardApiUser])
+export default angular.module('tempus.directives.dashboardSelect', [tempusApiDashboard, tempusApiUser])
     .directive('tbDashboardSelect', DashboardSelect)
     .controller('DashboardSelectPanelController', DashboardSelectPanelController)
     .name;

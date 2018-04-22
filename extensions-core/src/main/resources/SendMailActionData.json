@@ -1,7 +1,7 @@
 {
   "sendFlag": "isNewAlarm",
-  "fromTemplate": "thingsboard@ukr.net",
+  "fromTemplate": "tempus@ukr.net",
   "toTemplate": "andrew.shvayka@gmail.com",
-  "subjectTemplate": "Thingsboard",
+  "subjectTemplate": "tempus",
   "bodyTemplate": "Hello World!"
 }

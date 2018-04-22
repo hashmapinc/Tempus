@@ -1,5 +1,5 @@
 /*
- * Copyright © 2016-2018 Hashmap, Inc
+ * Copyright © 2017-2018 Hashmap, Inc
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,7 +27,7 @@ import legendConfigPanelTemplate from './legend-config-panel.tpl.html';
 import LegendConfigPanelController from './legend-config-panel.controller';
 
 
-export default angular.module('thingsboard.directives.legendConfig', [])
+export default angular.module('tempus.directives.legendConfig', [])
     .controller('LegendConfigPanelController', LegendConfigPanelController)
     .directive('tbLegendConfig', LegendConfig)
     .name;

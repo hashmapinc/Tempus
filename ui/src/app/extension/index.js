@@ -1,5 +1,5 @@
 /*
- * Copyright © 2016-2018 Hashmap, Inc
+ * Copyright © 2017-2018 Hashmap, Inc
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@ import ExtensionFormMqttDirective from './extensions-forms/extension-form-mqtt.d
 import ExtensionFormOpcDirective from './extensions-forms/extension-form-opc.directive';
 import {ParseToNull} from './extension-dialog.controller';
 
-export default angular.module('thingsboard.extension', [])
+export default angular.module('tempus.extension', [])
     .directive('tbExtensionTable', ExtensionTableDirective)
     .directive('tbExtensionFormHttp', ExtensionFormHttpDirective)
     .directive('tbExtensionFormMqtt', ExtensionFormMqttDirective)

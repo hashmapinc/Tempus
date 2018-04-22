@@ -1,5 +1,5 @@
 /*
- * Copyright © 2016-2018 Hashmap, Inc
+ * Copyright © 2017-2018 Hashmap, Inc
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@ import AuditLogHeaderDirective from './audit-log-header.directive';
 import AuditLogRowDirective from './audit-log-row.directive';
 import AuditLogTableDirective from './audit-log-table.directive';
 
-export default angular.module('thingsboard.auditLog', [])
+export default angular.module('tempus.auditLog', [])
     .config(AuditLogRoutes)
     .controller('AuditLogsController', AuditLogsController)
     .controller('AuditLogDetailsDialogController', AuditLogDetailsDialogController)

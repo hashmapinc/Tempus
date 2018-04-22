@@ -1,5 +1,5 @@
 /*
- * Copyright © 2016-2018 Hashmap, Inc
+ * Copyright © 2017-2018 Hashmap, Inc
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,15 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import thingsboardTypes from '../../common/types.constant';
-import thingsboardUtils from '../../common/utils.service';
-import thingsboardEntityAliasSelect from '../entity-alias-select.directive';
-import thingsboardDatasource from '../datasource.directive';
-import thingsboardTimewindow from '../timewindow.directive';
-import thingsboardDepthwindow from '../depthwindow.directive';
-import thingsboardLegendConfig from '../legend-config.directive';
-import thingsboardJsonForm from '../json-form.directive';
-import thingsboardManageWidgetActions from './action/manage-widget-actions.directive';
+import tempusTypes from '../../common/types.constant';
+import tempusUtils from '../../common/utils.service';
+import tempusEntityAliasSelect from '../entity-alias-select.directive';
+import tempusDatasource from '../datasource.directive';
+import tempusTimewindow from '../timewindow.directive';
+import tempusDepthwindow from '../depthwindow.directive';
+import tempusLegendConfig from '../legend-config.directive';
+import tempusJsonForm from '../json-form.directive';
+import tempusManageWidgetActions from './action/manage-widget-actions.directive';
 import 'angular-ui-ace';
 
 import './widget-config.scss';
@@ -34,15 +34,15 @@ import widgetConfigTemplate from './widget-config.tpl.html';
 
 /* eslint-disable angular/angularelement */
 
-export default angular.module('thingsboard.directives.widgetConfig', [thingsboardTypes,
-    thingsboardUtils,
-    thingsboardJsonForm,
-    thingsboardEntityAliasSelect,
-    thingsboardDatasource,
-    thingsboardTimewindow,
-    thingsboardDepthwindow,
-    thingsboardLegendConfig,
-    thingsboardManageWidgetActions,
+export default angular.module('tempus.directives.widgetConfig', [tempusTypes,
+    tempusUtils,
+    tempusJsonForm,
+    tempusEntityAliasSelect,
+    tempusDatasource,
+    tempusTimewindow,
+    tempusDepthwindow,
+    tempusLegendConfig,
+    tempusManageWidgetActions,
     'ui.ace'])
     .directive('tbWidgetConfig', WidgetConfig)
     .name;

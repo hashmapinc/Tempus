@@ -1,5 +1,5 @@
 /*
- * Copyright © 2016-2018 Hashmap, Inc
+ * Copyright © 2017-2018 Hashmap, Inc
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 import React from 'react';
-import ThingsboardAceEditor from './json-form-ace-editor.jsx';
+import tempusAceEditor from './json-form-ace-editor.jsx';
 import 'brace/mode/css';
 import beautify from 'js-beautify';
 
 const css_beautify = beautify.css;
 
-class ThingsboardCss extends React.Component {
+class tempusCss extends React.Component {
 
     constructor(props) {
         super(props);
@@ -33,9 +33,9 @@ class ThingsboardCss extends React.Component {
 
     render() {
         return (
-            <ThingsboardAceEditor {...this.props} mode='css' onTidy={this.onTidyCss} {...this.state}></ThingsboardAceEditor>
+            <tempusAceEditor {...this.props} mode='css' onTidy={this.onTidyCss} {...this.state}></tempusAceEditor>
         );
     }
 }
 
-export default ThingsboardCss;
+export default tempusCss;

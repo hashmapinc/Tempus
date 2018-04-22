@@ -1,5 +1,5 @@
 #
-# Copyright © 2016-2018 Hashmap, Inc
+# Copyright © 2017-2018 Hashmap, Inc
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -26,7 +26,7 @@ server:
     # Path to the key store that holds the SSL certificate
     key-store: "${SSL_KEY_STORE:classpath:keystore/keystore.p12}"
     # Password used to access the key store
-    key-store-password: "${SSL_KEY_STORE_PASSWORD:thingsboard}"
+    key-store-password: "${SSL_KEY_STORE_PASSWORD:tempus}"
     # Type of the key store
     key-store-type: "${SSL_KEY_STORE_TYPE:PKCS12}"
     # Alias that identifies the key in the key store
@@ -52,7 +52,7 @@ zk:
   # Zookeeper session timeout in milliseconds
   session_timeout_ms: "${ZOOKEEPER_SESSION_TIMEOUT_MS:3000}"
   # Name of the directory in zookeeper 'filesystem'
-  zk_dir: "${ZOOKEEPER_NODES_DIR:/thingsboard}"
+  zk_dir: "${ZOOKEEPER_NODES_DIR:/tempus}"
 
 # RPC connection parameters. Used only in cluster mode only.
 rpc:
@@ -69,7 +69,7 @@ cluster:
 # Plugins configuration parameters
 plugins:
   # Comma seperated package list used during classpath scanning for plugins
-  scan_packages: "${PLUGINS_SCAN_PACKAGES:org.thingsboard.server.extensions}"
+  scan_packages: "${PLUGINS_SCAN_PACKAGES:com.hashmapinc.server.extensions}"
 
 spark:
   jar_path: "${SPARK_COMPUTATIONS_PATH:/Users/jay/Poller}"
@@ -79,8 +79,8 @@ spark:
 security.jwt:
   tokenExpirationTime: "${JWT_TOKEN_EXPIRATION_TIME:900}" # Number of seconds (15 mins)
   refreshTokenExpTime: "${JWT_REFRESH_TOKEN_EXPIRATION_TIME:3600}" # Seconds (1 hour)
-  tokenIssuer: "${JWT_TOKEN_ISSUER:thingsboard.io}"
-  tokenSigningKey: "${JWT_TOKEN_SIGNING_KEY:thingsboardDefaultSigningKey}"
+  tokenIssuer: "${JWT_TOKEN_ISSUER:tempus.io}"
+  tokenSigningKey: "${JWT_TOKEN_SIGNING_KEY:tempusDefaultSigningKey}"
 
 # Device communication protocol parameters
 http:
@@ -148,10 +148,10 @@ database:
 
 # Cassandra driver configuration parameters
 cassandra:
-  # Thingsboard cluster name
-  cluster_name: "${CASSANDRA_CLUSTER_NAME:Thingsboard Cluster}"
-  # Thingsboard keyspace name
-  keyspace_name: "${CASSANDRA_KEYSPACE_NAME:thingsboard}"
+  # tempus cluster name
+  cluster_name: "${CASSANDRA_CLUSTER_NAME:tempus Cluster}"
+  # tempus keyspace name
+  keyspace_name: "${CASSANDRA_KEYSPACE_NAME:tempus}"
   # Specify node list
   url: "${CASSANDRA_URL:127.0.0.1:9042}"
   # Enable/disable secure connection
@@ -302,7 +302,7 @@ spring:
     database-platform: "${SPRING_JPA_DATABASE_PLATFORM:org.hibernate.dialect.HSQLDialect}"
   datasource:
     driverClassName: "${SPRING_DRIVER_CLASS_NAME:org.hsqldb.jdbc.JDBCDriver}"
-    url: "${SPRING_DATASOURCE_URL:jdbc:hsqldb:file:${SQL_DATA_FOLDER:/tmp}/thingsboardDb;sql.enforce_size=false}"
+    url: "${SPRING_DATASOURCE_URL:jdbc:hsqldb:file:${SQL_DATA_FOLDER:/tmp}/tempusDb;sql.enforce_size=false}"
     username: "${SPRING_DATASOURCE_USERNAME:sa}"
     password: "${SPRING_DATASOURCE_PASSWORD:}"
 
@@ -318,7 +318,7 @@ spring:
 #    database-platform: "${SPRING_JPA_DATABASE_PLATFORM:org.hibernate.dialect.PostgreSQLDialect}"
 #  datasource:
 #    driverClassName: "${SPRING_DRIVER_CLASS_NAME:org.postgresql.Driver}"
-#    url: "${SPRING_DATASOURCE_URL:jdbc:postgresql://postgres:5432/thingsboard}"
+#    url: "${SPRING_DATASOURCE_URL:jdbc:postgresql://postgres:5432/tempus}"
 #    username: "${SPRING_DATASOURCE_USERNAME:postgres}"
 #    password: "${SPRING_DATASOURCE_PASSWORD:postgres}"
 

@@ -1,5 +1,5 @@
 /*
- * Copyright © 2016-2018 Hashmap, Inc
+ * Copyright © 2017-2018 Hashmap, Inc
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,9 +24,9 @@ import jsonSchemaDefaults from 'json-schema-defaults';
 import base64js from 'base64-js';
 import {utf8Encode, utf8Decode} from './utf8-support';
 
-import thingsboardTypes from './types.constant';
+import tempusTypes from './types.constant';
 
-export default angular.module('thingsboard.utils', [thingsboardTypes])
+export default angular.module('tempus.utils', [tempusTypes])
     .factory('utils', Utils)
     .name;
 

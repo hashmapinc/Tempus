@@ -1,5 +1,5 @@
 /*
- * Copyright © 2016-2018 Hashmap, Inc
+ * Copyright © 2017-2018 Hashmap, Inc
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,16 +16,16 @@
 import uiRouter from 'angular-ui-router';
 import ngMaterial from 'angular-material';
 import ngMessages from 'angular-messages';
-import thingsboardJsonForm from "../components/json-form.directive";
+import tempusJsonForm from "../components/json-form.directive";
 
 import JsonFormRoutes from './jsonform.routes';
 import JsonFormController from './jsonform.controller';
 
-export default angular.module('thingsboard.jsonform', [
+export default angular.module('tempus.jsonform', [
     uiRouter,
     ngMaterial,
     ngMessages,
-    thingsboardJsonForm
+    tempusJsonForm
 ])
     .config(JsonFormRoutes)
     .controller('JsonFormController', JsonFormController)

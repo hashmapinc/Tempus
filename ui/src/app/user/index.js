@@ -1,5 +1,5 @@
 /*
- * Copyright © 2016-2018 Hashmap, Inc
+ * Copyright © 2017-2018 Hashmap, Inc
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 import uiRouter from 'angular-ui-router';
-import thingsboardGrid from '../components/grid.directive';
-import thingsboardApiUser from '../api/user.service';
-import thingsboardToast from '../services/toast';
+import tempusGrid from '../components/grid.directive';
+import tempusApiUser from '../api/user.service';
+import tempusToast from '../services/toast';
 
 import UserRoutes from './user.routes';
 import UserController from './user.controller';
@@ -24,11 +24,11 @@ import AddUserController from './add-user.controller';
 import ActivationLinkDialogController from './activation-link.controller';
 import UserDirective from './user.directive';
 
-export default angular.module('thingsboard.user', [
+export default angular.module('tempus.user', [
     uiRouter,
-    thingsboardGrid,
-    thingsboardApiUser,
-    thingsboardToast
+    tempusGrid,
+    tempusApiUser,
+    tempusToast
 ])
     .config(UserRoutes)
     .controller('UserController', UserController)

@@ -1,5 +1,5 @@
 /*
- * Copyright © 2016-2018 Hashmap, Inc
+ * Copyright © 2017-2018 Hashmap, Inc
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,21 +14,21 @@
  * limitations under the License.
  */
 import uiRouter from 'angular-ui-router';
-import thingsboardGrid from '../components/grid.directive';
-import thingsboardJsonForm from '../components/json-form.directive';
-import thingsboardApiPlugin from '../api/plugin.service';
-import thingsboardApiComponentDescriptor from '../api/component-descriptor.service';
+import tempusGrid from '../components/grid.directive';
+import tempusJsonForm from '../components/json-form.directive';
+import tempusApiPlugin from '../api/plugin.service';
+import tempusApiComponentDescriptor from '../api/component-descriptor.service';
 
 import PluginRoutes from './plugin.routes';
 import PluginController from './plugin.controller';
 import PluginDirective from './plugin.directive';
 
-export default angular.module('thingsboard.plugin', [
+export default angular.module('tempus.plugin', [
     uiRouter,
-    thingsboardGrid,
-    thingsboardJsonForm,
-    thingsboardApiPlugin,
-    thingsboardApiComponentDescriptor
+    tempusGrid,
+    tempusJsonForm,
+    tempusApiPlugin,
+    tempusApiComponentDescriptor
 ])
     .config(PluginRoutes)
     .controller('PluginController', PluginController)

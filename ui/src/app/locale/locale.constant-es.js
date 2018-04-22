@@ -1,5 +1,5 @@
 /*
- * Copyright © 2016-2018 Hashmap, Inc
+ * Copyright © 2017-2018 Hashmap, Inc
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -231,8 +231,8 @@
               "make-private-dashboard-title": "¿Estás seguro que quieres hacer el panel '{{dashboardTitle}}' privado?",
               "make-private-dashboard-text": "Luego de confirmar, el panel será privado y no podrá ser accesible por otros.",
               "make-private-dashboard": "Hacer panel privado",
-              "socialshare-text": "'{{dashboardTitle}}' powered by ThingsBoard",
-              "socialshare-title": "'{{dashboardTitle}}' powered by ThingsBoard",
+              "socialshare-text": "'{{dashboardTitle}}' powered by tempus",
+              "socialshare-title": "'{{dashboardTitle}}' powered by tempus",
               "select-dashboard": "Seleccionar panel",
               "no-dashboards-matching": "Panel '{{entity}}' no encontrado.",
               "dashboard-required": "Panel requerido.",

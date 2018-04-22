@@ -1,5 +1,5 @@
 /*
- * Copyright © 2016-2018 Hashmap, Inc
+ * Copyright © 2017-2018 Hashmap, Inc
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,7 @@ import ledIndicatorTemplate from './led-indicator.tpl.html';
 
 /* eslint-enable import/no-unresolved, import/default */
 
-export default angular.module('thingsboard.widgets.rpc.ledIndicator', [])
+export default angular.module('tempus.widgets.rpc.ledIndicator', [])
     .directive('tbLedIndicator', LedIndicator)
     .name;
 

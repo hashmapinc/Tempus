@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Copyright © 2016-2018 Hashmap, Inc
+# Copyright © 2017-2018 Hashmap, Inc
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -24,7 +24,7 @@ do
   sleep 10
 done
 
-echo "Creating 'Thingsboard' schema and system data..."
+echo "Creating 'tempus' schema and system data..."
 if [ "$ADD_DEMO_DATA" == "true" ]; then
     echo "plus demo data..."
     /usr/share/tempus/bin/install/install.sh --loadDemo

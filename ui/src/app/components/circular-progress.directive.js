@@ -1,5 +1,5 @@
 /*
- * Copyright © 2016-2018 Hashmap, Inc
+ * Copyright © 2017-2018 Hashmap, Inc
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
  */
 import $ from 'jquery';
 
-export default angular.module('thingsboard.directives.circularProgress', [])
+export default angular.module('tempus.directives.circularProgress', [])
     .directive('tbCircularProgress', CircularProgress)
     .name;
 

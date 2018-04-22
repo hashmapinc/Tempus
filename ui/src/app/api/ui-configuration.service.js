@@ -1,5 +1,5 @@
 /*
- * Copyright © 2016-2017 Hashmap, Inc
+ * Copyright © 2017-2018 Hashmap, Inc
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-export default angular.module('thingsboard.api.ui_configuration', [])
+export default angular.module('tempus.api.ui_configuration', [])
   .factory('uiConfigurationService', UiConfiguration)
   .name;
 

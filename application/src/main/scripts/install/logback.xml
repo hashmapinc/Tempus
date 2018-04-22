@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!--
 
-    Copyright © 2016-2018 Hashmap, Inc
+    Copyright © 2017-2018 Hashmap, Inc
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -40,15 +40,15 @@
         </encoder>
     </appender>
 
-    <logger name="org.thingsboard.server.install" level="INFO">
+    <logger name="com.hashmapinc.server.install" level="INFO">
         <appender-ref ref="STDOUT" />
     </logger>
 
-    <logger name="org.thingsboard.server.service.install" level="INFO">
+    <logger name="com.hashmapinc.server.service.install" level="INFO">
         <appender-ref ref="STDOUT" />
     </logger>
 
-    <logger name="org.thingsboard.server.ThingsboardInstallApplication" level="ERROR">
+    <logger name="com.hashmapinc.server.tempusInstallApplication" level="ERROR">
         <appender-ref ref="STDOUT" />
     </logger>
 
@@ -56,7 +56,7 @@
         <appender-ref ref="STDOUT" />
     </logger>
 
-    <logger name="org.thingsboard.server" level="INFO" />
+    <logger name="com.hashmapinc.server" level="INFO" />
     <logger name="akka" level="INFO" />
 
     <root level="INFO">

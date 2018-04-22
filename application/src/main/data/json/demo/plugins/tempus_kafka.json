@@ -1,7 +1,7 @@
 {
   "apiToken": "kafka_plugin_token",
   "name": "Tempus Kafka Plugin",
-  "clazz": "org.thingsboard.server.extensions.kafka.plugin.KafkaPlugin",
+  "clazz": "com.hashmapinc.server.extensions.kafka.plugin.KafkaPlugin",
   "publicAccess": false,
   "state": "ACTIVE",
   "configuration": {

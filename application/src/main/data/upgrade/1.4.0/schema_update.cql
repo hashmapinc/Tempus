@@ -1,5 +1,5 @@
 --
--- Copyright © 2016-2018 Hashmap, Inc
+-- Copyright © 2017-2018 Hashmap, Inc
 --
 -- Licensed under the Apache License, Version 2.0 (the "License");
 -- you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
 -- limitations under the License.
 --
 
-CREATE TABLE IF NOT EXISTS thingsboard.audit_log_by_entity_id (
+CREATE TABLE IF NOT EXISTS tempus.audit_log_by_entity_id (
   tenant_id timeuuid,
   id timeuuid,
   customer_id timeuuid,
@@ -30,7 +30,7 @@ CREATE TABLE IF NOT EXISTS thingsboard.audit_log_by_entity_id (
   PRIMARY KEY ((tenant_id, entity_id, entity_type), id)
 );
 
-CREATE TABLE IF NOT EXISTS thingsboard.audit_log_by_customer_id (
+CREATE TABLE IF NOT EXISTS tempus.audit_log_by_customer_id (
   tenant_id timeuuid,
   id timeuuid,
   customer_id timeuuid,
@@ -46,7 +46,7 @@ CREATE TABLE IF NOT EXISTS thingsboard.audit_log_by_customer_id (
   PRIMARY KEY ((tenant_id, customer_id), id)
 );
 
-CREATE TABLE IF NOT EXISTS thingsboard.audit_log_by_user_id (
+CREATE TABLE IF NOT EXISTS tempus.audit_log_by_user_id (
   tenant_id timeuuid,
   id timeuuid,
   customer_id timeuuid,
@@ -64,7 +64,7 @@ CREATE TABLE IF NOT EXISTS thingsboard.audit_log_by_user_id (
 
 
 
-CREATE TABLE IF NOT EXISTS thingsboard.audit_log_by_tenant_id (
+CREATE TABLE IF NOT EXISTS tempus.audit_log_by_tenant_id (
   tenant_id timeuuid,
   id timeuuid,
   partition bigint,
@@ -81,19 +81,19 @@ CREATE TABLE IF NOT EXISTS thingsboard.audit_log_by_tenant_id (
   PRIMARY KEY ((tenant_id, partition), id)
 );
 
-CREATE TABLE IF NOT EXISTS thingsboard.audit_log_by_tenant_id_partitions (
+CREATE TABLE IF NOT EXISTS tempus.audit_log_by_tenant_id_partitions (
   tenant_id timeuuid,
   partition bigint,
   PRIMARY KEY (( tenant_id ), partition)
 ) WITH CLUSTERING ORDER BY ( partition ASC )
 AND compaction = { 'class' :  'LeveledCompactionStrategy'  };
 
-DROP MATERIALIZED VIEW IF EXISTS thingsboard.dashboard_by_tenant_and_search_text;
-DROP MATERIALIZED VIEW IF EXISTS thingsboard.dashboard_by_customer_and_search_text;
+DROP MATERIALIZED VIEW IF EXISTS tempus.dashboard_by_tenant_and_search_text;
+DROP MATERIALIZED VIEW IF EXISTS tempus.dashboard_by_customer_and_search_text;
 
-DROP TABLE IF EXISTS thingsboard.dashboard;
+DROP TABLE IF EXISTS tempus.dashboard;
 
-CREATE TABLE IF NOT EXISTS thingsboard.dashboard (
+CREATE TABLE IF NOT EXISTS tempus.dashboard (
 	id timeuuid,
 	tenant_id timeuuid,
 	title text,
@@ -103,9 +103,9 @@ CREATE TABLE IF NOT EXISTS thingsboard.dashboard (
 	PRIMARY KEY (id, tenant_id)
 );
 
-CREATE MATERIALIZED VIEW IF NOT EXISTS thingsboard.dashboard_by_tenant_and_search_text AS
+CREATE MATERIALIZED VIEW IF NOT EXISTS tempus.dashboard_by_tenant_and_search_text AS
 	SELECT *
-	from thingsboard.dashboard
+	from tempus.dashboard
 	WHERE tenant_id IS NOT NULL AND search_text IS NOT NULL AND id IS NOT NULL
 	PRIMARY KEY ( tenant_id, search_text, id )
 	WITH CLUSTERING ORDER BY ( search_text ASC, id DESC );

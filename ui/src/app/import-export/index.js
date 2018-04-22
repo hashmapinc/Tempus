@@ -1,5 +1,5 @@
 /*
- * Copyright © 2016-2018 Hashmap, Inc
+ * Copyright © 2017-2018 Hashmap, Inc
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@ import ImportExport from './import-export.service';
 import ImportDialogController from './import-dialog.controller';
 
 
-export default angular.module('thingsboard.importexport', [])
+export default angular.module('tempus.importexport', [])
     .factory('importExport', ImportExport)
     .controller('ImportDialogController', ImportDialogController)
     .name;

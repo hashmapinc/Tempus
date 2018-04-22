@@ -1,5 +1,5 @@
 /*
- * Copyright © 2016-2018 Hashmap, Inc
+ * Copyright © 2017-2018 Hashmap, Inc
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 /*@ngInject*/
-export default function ThingsboardMissingTranslateHandler($log, types) {
+export default function tempusMissingTranslateHandler($log, types) {
 
     return function (translationId) {
         if (translationId && !translationId.startsWith(types.translate.customTranslationsPrefix)) {

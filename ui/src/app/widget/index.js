@@ -1,5 +1,5 @@
 /*
- * Copyright © 2016-2018 Hashmap, Inc
+ * Copyright © 2017-2018 Hashmap, Inc
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,14 +19,14 @@ import 'angular-hotkeys';
 import 'angular-ui-ace';
 
 import uiRouter from 'angular-ui-router';
-import thingsboardApiUser from '../api/user.service';
-import thingsboardApiWidget from '../api/widget.service';
-import thingsboardTypes from '../common/types.constant';
-import thingsboardToast from '../services/toast';
-import thingsboardConfirmOnExit from '../components/confirm-on-exit.directive';
-import thingsboardDashboard from '../components/dashboard.directive';
-import thingsboardExpandFullscreen from '../components/expand-fullscreen.directive';
-import thingsboardCircularProgress from '../components/circular-progress.directive';
+import tempusApiUser from '../api/user.service';
+import tempusApiWidget from '../api/widget.service';
+import tempusTypes from '../common/types.constant';
+import tempusToast from '../services/toast';
+import tempusConfirmOnExit from '../components/confirm-on-exit.directive';
+import tempusDashboard from '../components/dashboard.directive';
+import tempusExpandFullscreen from '../components/expand-fullscreen.directive';
+import tempusCircularProgress from '../components/circular-progress.directive';
 
 import WidgetLibraryRoutes from './widget-library.routes';
 import WidgetLibraryController from './widget-library.controller';
@@ -36,16 +36,16 @@ import WidgetsBundleController from './widgets-bundle.controller';
 import WidgetsBundleDirective from './widgets-bundle.directive';
 import SaveWidgetTypeAsController from './save-widget-type-as.controller';
 
-export default angular.module('thingsboard.widget-library', [
+export default angular.module('tempus.widget-library', [
     uiRouter,
-    thingsboardApiWidget,
-    thingsboardApiUser,
-    thingsboardTypes,
-    thingsboardToast,
-    thingsboardConfirmOnExit,
-    thingsboardDashboard,
-    thingsboardExpandFullscreen,
-    thingsboardCircularProgress,
+    tempusApiWidget,
+    tempusApiUser,
+    tempusTypes,
+    tempusToast,
+    tempusConfirmOnExit,
+    tempusDashboard,
+    tempusExpandFullscreen,
+    tempusCircularProgress,
     'cfp.hotkeys',
     'ui.ace'
 ])

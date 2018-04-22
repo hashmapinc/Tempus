@@ -1,5 +1,5 @@
 /*
- * Copyright © 2016-2018 Hashmap, Inc
+ * Copyright © 2017-2018 Hashmap, Inc
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@ import uiRouter from 'angular-ui-router';
 import HomeLinksRoutes from './home-links.routes';
 import HomeLinksController from './home-links.controller';
 
-export default angular.module('thingsboard.homeLinks', [
+export default angular.module('tempus.homeLinks', [
     uiRouter
 ])
     .config(HomeLinksRoutes)

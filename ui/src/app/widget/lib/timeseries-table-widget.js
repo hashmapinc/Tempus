@@ -1,5 +1,5 @@
 /*
- * Copyright © 2016-2018 Hashmap, Inc
+ * Copyright © 2017-2018 Hashmap, Inc
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,7 @@ import timeseriesTableWidgetTemplate from './timeseries-table-widget.tpl.html';
 import tinycolor from 'tinycolor2';
 import cssjs from '../../../vendor/css.js/css';
 
-export default angular.module('thingsboard.widgets.timeseriesTableWidget', [])
+export default angular.module('tempus.widgets.timeseriesTableWidget', [])
     .directive('tbTimeseriesTableWidget', TimeseriesTableWidget)
     .name;
 
