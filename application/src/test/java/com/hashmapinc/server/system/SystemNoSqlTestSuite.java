@@ -1,5 +1,5 @@
 /**
- * Copyright © 2016-2018 Hashmap, Inc
+ * Copyright © 2017-2018 Hashmap, Inc
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,10 +42,6 @@ public class SystemNoSqlTestSuite {
         List<CQLDataSet> dataSets = new ArrayList<>();
         dataSets.add(new ClassPathCQLDataSet("cassandra/schema.cql", false, false));
         dataSets.add(new ClassPathCQLDataSet("cassandra/system-data.cql", false, false));
-        dataSets.addAll(Arrays.asList(
-                new ClassPathCQLDataSet("cassandra/upgrade/1.cql", false, false)
-
-        ));
         return dataSets;
     }
 

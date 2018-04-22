@@ -1,5 +1,5 @@
 /**
- * Copyright © 2016-2018 Hashmap, Inc
+ * Copyright © 2017-2018 Hashmap, Inc
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,23 +34,13 @@ public class MqttNoSqlTestSuite {
     @ClassRule
     public static CustomCassandraCQLUnit cassandraUnit =
             new CustomCassandraCQLUnit(
-                    Arrays.asList(
-                            new ClassPathCQLDataSet("cassandra/schema.cql", false, false),
-                            new ClassPathCQLDataSet("cassandra/system-data.cql", false, false)),
+                    getDataSetLists(),
                     "cassandra-test.yaml", 30000l);
 
     private static List<CQLDataSet> getDataSetLists(){
         List<CQLDataSet> dataSets = new ArrayList<>();
         dataSets.add(new ClassPathCQLDataSet("cassandra/schema.cql", false, false));
         dataSets.add(new ClassPathCQLDataSet("cassandra/system-data.cql", false, false));
-        dataSets.addAll(Arrays.asList(
-                new ClassPathCQLDataSet("cassandra/upgrade/1.cql", false, false)
-
-        ));
         return dataSets;
-    }
-
-    private static Integer stripExtensionFromName(String fileName) {
-        return Integer.parseInt(fileName.substring(0, fileName.indexOf(".cql")));
     }
 }

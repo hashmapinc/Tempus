@@ -1,6 +1,6 @@
 <!--
 
-    Copyright © 2016-2018 Hashmap, Inc
+    Copyright © 2017-2018 Hashmap, Inc
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -25,7 +25,7 @@
 
     <name>Tempus</name>
     <url>https://hashmapinc.com</url>
-    <inceptionYear>2016</inceptionYear>
+    <inceptionYear>2017</inceptionYear>
 
     <properties>
         <main.dir>${basedir}</main.dir>
@@ -35,7 +35,7 @@
         <spring-data-redis.version>1.8.10.RELEASE</spring-data-redis.version>
         <jedis.version>2.9.0</jedis.version>
         <jjwt.version>0.7.0</jjwt.version>
-         <json-path.version>2.2.0</json-path.version>
+        <json-path.version>2.2.0</json-path.version>
         <junit.version>4.12</junit.version>
         <slf4j.version>1.7.7</slf4j.version>
         <logback.version>1.2.3</logback.version>
@@ -261,7 +261,7 @@
                     <artifactId>license-maven-plugin</artifactId>
                     <version>3.0</version>
                     <configuration>
-                        <!--<header>${main.dir}/license-header-template.txt</header>-->
+                        <header>${main.dir}/license-header-template.txt</header>
                         <properties>
                             <owner>Hashmap, Inc</owner>
                         </properties>
@@ -283,6 +283,8 @@
                             <exclude>src/sh/**</exclude>
                             <exclude>src/main/scripts/control/**</exclude>
                             <exclude>src/main/scripts/windows/**</exclude>
+                            <exclude>docs/**</exclude>
+                            <exclude>**/Makefile</exclude>
                         </excludes>
                         <mapping>
                             <proto>JAVADOC_STYLE</proto>
@@ -823,7 +825,6 @@
                 <scope>provided</scope>
             </dependency>
             <dependency>
-
                 <groupId>eu.infomas</groupId>
                 <artifactId>annotation-detector</artifactId>
                 <version>3.0.5</version>
@@ -837,7 +838,6 @@
                 <groupId>org.elasticsearch.client</groupId>
                 <artifactId>rest</artifactId>
                 <version>${elasticsearch.version}</version>
-
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -873,5 +873,4 @@
             <url>https://oss.sonatype.org/content/groups/public</url>
         </repository>
     </repositories>
-
 </project>
