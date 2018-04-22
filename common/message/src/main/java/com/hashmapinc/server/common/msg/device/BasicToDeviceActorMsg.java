@@ -1,0 +1,101 @@
+/**
+ * Copyright © 2017-2018 Hashmap, Inc
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package com.hashmapinc.server.common.msg.device;
+
+import com.hashmapinc.server.common.data.id.DeviceId;
+import com.hashmapinc.server.common.data.id.SessionId;
+import com.hashmapinc.server.common.data.id.TenantId;
+import lombok.ToString;
+import com.hashmapinc.server.common.data.id.CustomerId;
+import com.hashmapinc.server.common.msg.cluster.ServerAddress;
+import com.hashmapinc.server.common.msg.session.FromDeviceMsg;
+import com.hashmapinc.server.common.msg.session.SessionType;
+import com.hashmapinc.server.common.msg.session.ToDeviceActorSessionMsg;
+
+import java.util.Optional;
+
+@ToString
+public class BasicToDeviceActorMsg implements ToDeviceActorMsg {
+
+    private static final long serialVersionUID = -1866795134993115408L;
+
+    private final TenantId tenantId;
+    private final CustomerId customerId;
+    private final DeviceId deviceId;
+    private final SessionId sessionId;
+    private final SessionType sessionType;
+    private final ServerAddress serverAddress;
+    private final FromDeviceMsg msg;
+
+    public BasicToDeviceActorMsg(ToDeviceActorMsg other, FromDeviceMsg msg) {
+        this(null, other.getTenantId(), other.getCustomerId(), other.getDeviceId(), other.getSessionId(), other.getSessionType(), msg);
+    }
+
+    public BasicToDeviceActorMsg(ToDeviceActorSessionMsg msg, SessionType sessionType) {
+        this(null, msg.getTenantId(), msg.getCustomerId(), msg.getDeviceId(), msg.getSessionId(), sessionType, msg.getSessionMsg().getMsg());
+    }
+
+    private BasicToDeviceActorMsg(ServerAddress serverAddress, TenantId tenantId, CustomerId customerId, DeviceId deviceId, SessionId sessionId, SessionType sessionType,
+                                  FromDeviceMsg msg) {
+        super();
+        this.serverAddress = serverAddress;
+        this.tenantId = tenantId;
+        this.customerId = customerId;
+        this.deviceId = deviceId;
+        this.sessionId = sessionId;
+        this.sessionType = sessionType;
+        this.msg = msg;
+    }
+
+    @Override
+    public DeviceId getDeviceId() {
+        return deviceId;
+    }
+
+    @Override
+    public CustomerId getCustomerId() {
+        return customerId;
+    }
+
+    public TenantId getTenantId() {
+        return tenantId;
+    }
+
+    @Override
+    public SessionId getSessionId() {
+        return sessionId;
+    }
+
+    @Override
+    public SessionType getSessionType() {
+        return sessionType;
+    }
+
+    @Override
+    public Optional<ServerAddress> getServerAddress() {
+        return Optional.ofNullable(serverAddress);
+    }
+
+    @Override
+    public FromDeviceMsg getPayload() {
+        return msg;
+    }
+
+    @Override
+    public ToDeviceActorMsg toOtherAddress(ServerAddress otherAddress) {
+        return new BasicToDeviceActorMsg(otherAddress, tenantId, customerId, deviceId, sessionId, sessionType, msg);
+    }
+}

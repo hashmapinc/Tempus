@@ -1,5 +1,5 @@
 /*
- * Copyright © 2016-2018 The Thingsboard Authors
+ * Copyright © 2017-2018 Hashmap, Inc
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,13 +15,13 @@
  */
 import './widget.scss';
 
-import thingsboardLegend from '../legend.directive';
-import thingsboardTypes from '../../common/types.constant';
-import thingsboardApiDatasource from '../../api/datasource.service';
+import tempusLegend from '../legend.directive';
+import tempusTypes from '../../common/types.constant';
+import tempusApiDatasource from '../../api/datasource.service';
 
 import WidgetController from './widget.controller';
 
-export default angular.module('thingsboard.directives.widget', [thingsboardLegend, thingsboardTypes, thingsboardApiDatasource])
+export default angular.module('tempus.directives.widget', [tempusLegend, tempusTypes, tempusApiDatasource])
     .controller('WidgetController', WidgetController)
     .directive('tbWidget', Widget)
     .name;

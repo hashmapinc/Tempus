@@ -1,5 +1,5 @@
 /*
- * Copyright © 2016-2018 The Thingsboard Authors
+ * Copyright © 2017-2018 Hashmap, Inc
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,7 +33,7 @@ export default function ExtensionFormOpcDirective($compile, $templateCache, $tra
 
 
         function Server() {
-            this.applicationName = "Thingsboard OPC-UA client";
+            this.applicationName = "tempus OPC-UA client";
             this.applicationUri = "";
             this.host = "localhost";
             this.port = 49320;

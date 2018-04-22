@@ -1,5 +1,5 @@
 /*
- * Copyright © 2016-2018 The Thingsboard Authors
+ * Copyright © 2017-2018 Hashmap, Inc
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,7 +25,7 @@ import alarmDetailsDialogTemplate from '../../alarm/alarm-details-dialog.tpl.htm
 import tinycolor from 'tinycolor2';
 import cssjs from '../../../vendor/css.js/css';
 
-export default angular.module('thingsboard.widgets.alarmsTableWidget', [])
+export default angular.module('tempus.widgets.alarmsTableWidget', [])
     .directive('tbAlarmsTableWidget', AlarmsTableWidget)
     .name;
 

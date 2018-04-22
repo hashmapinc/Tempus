@@ -1,5 +1,5 @@
 /*
- * Copyright © 2016-2018 The Thingsboard Authors
+ * Copyright © 2017-2018 Hashmap, Inc
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,20 +16,20 @@
 import uiRouter from 'angular-ui-router';
 import ngMaterial from 'angular-material';
 import ngMessages from 'angular-messages';
-import thingsboardApiAdmin from '../api/admin.service';
-import thingsboardConfirmOnExit from '../components/confirm-on-exit.directive';
-import thingsboardToast from '../services/toast';
+import tempusApiAdmin from '../api/admin.service';
+import tempusConfirmOnExit from '../components/confirm-on-exit.directive';
+import tempusToast from '../services/toast';
 
 import AdminRoutes from './admin.routes';
 import AdminController from './admin.controller';
 
-export default angular.module('thingsboard.admin', [
+export default angular.module('tempus.admin', [
     uiRouter,
     ngMaterial,
     ngMessages,
-    thingsboardApiAdmin,
-    thingsboardConfirmOnExit,
-    thingsboardToast
+    tempusApiAdmin,
+    tempusConfirmOnExit,
+    tempusToast
 ])
     .config(AdminRoutes)
     .controller('AdminController', AdminController)

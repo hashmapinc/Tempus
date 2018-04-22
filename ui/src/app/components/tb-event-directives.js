@@ -1,5 +1,5 @@
 /*
- * Copyright © 2016-2018 The Thingsboard Authors
+ * Copyright © 2017-2018 Hashmap, Inc
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,7 +42,7 @@ angular.forEach(
     }
 );
 
-export default angular.module('thingsboard.directives.event', [])
+export default angular.module('tempus.directives.event', [])
     .directive(tbEventDirectives)
     .name;
 

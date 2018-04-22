@@ -1,5 +1,5 @@
 /*
- * Copyright © 2016-2018 The Thingsboard Authors
+ * Copyright © 2017-2018 Hashmap, Inc
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,7 +34,7 @@ import RelationFiltersDirective from './relation/relation-filters.directive';
 import RelationTableDirective from './relation/relation-table.directive';
 import RelationTypeAutocompleteDirective from './relation/relation-type-autocomplete.directive';
 
-export default angular.module('thingsboard.entity', [])
+export default angular.module('tempus.entity', [])
     .controller('EntityAliasesController', EntityAliasesController)
     .controller('EntityAliasDialogController', EntityAliasDialogController)
     .controller('AliasesEntitySelectPanelController', AliasesEntitySelectPanelController)

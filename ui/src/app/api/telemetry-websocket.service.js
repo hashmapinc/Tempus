@@ -1,5 +1,5 @@
 /*
- * Copyright © 2016-2018 The Thingsboard Authors
+ * Copyright © 2017-2018 Hashmap, Inc
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 import 'angular-websocket';
-import thingsboardTypes from '../common/types.constant';
+import tempusTypes from '../common/types.constant';
 
-export default angular.module('thingsboard.api.telemetryWebsocket', [thingsboardTypes])
+export default angular.module('tempus.api.telemetryWebsocket', [tempusTypes])
     .factory('telemetryWebsocketService', TelemetryWebsocketService)
     .name;
 

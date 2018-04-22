@@ -1,5 +1,5 @@
 /**
- * Copyright © 2016-2018 The Thingsboard Authors
+ * Copyright © 2017-2018 Hashmap, Inc
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
 syntax = "proto3";
 package discovery;
 
-option java_package = "org.thingsboard.server.gen.discovery";
+option java_package = "com.hashmapinc.server.gen.discovery";
 option java_outer_classname = "ServerInstanceProtos";
 
 message ServerInfo {

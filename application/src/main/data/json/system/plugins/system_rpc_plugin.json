@@ -1,7 +1,7 @@
 {
   "apiToken": "rpc",
   "name": "System RPC Plugin",
-  "clazz": "org.thingsboard.server.extensions.core.plugin.rpc.RpcPlugin",
+  "clazz": "com.hashmapinc.server.extensions.core.plugin.rpc.RpcPlugin",
   "publicAccess": true,
   "state": "ACTIVE",
   "configuration": {

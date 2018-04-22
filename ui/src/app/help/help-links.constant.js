@@ -1,5 +1,5 @@
 /*
- * Copyright © 2016-2018 The Thingsboard Authors
+ * Copyright © 2017-2018 Hashmap, Inc
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,40 +14,40 @@
  * limitations under the License.
  */
 var pluginClazzHelpLinkMap = {
-    'org.thingsboard.server.extensions.core.plugin.messaging.DeviceMessagingPlugin': 'pluginDeviceMessaging',
-    'org.thingsboard.server.extensions.core.plugin.telemetry.TelemetryStoragePlugin': 'pluginTelemetryStorage',
-    'org.thingsboard.server.extensions.core.plugin.rpc.RpcPlugin': 'pluginRpcPlugin',
-    'org.thingsboard.server.extensions.core.plugin.mail.MailPlugin': 'pluginMailPlugin',
-    'org.thingsboard.server.extensions.rest.plugin.RestApiCallPlugin': 'pluginRestApiCallPlugin',
-    'org.thingsboard.server.extensions.core.plugin.time.TimePlugin': 'pluginTimePlugin',
-    'org.thingsboard.server.extensions.kafka.plugin.KafkaPlugin': 'pluginKafkaPlugin',
-    'org.thingsboard.server.extensions.rabbitmq.plugin.RabbitMqPlugin': 'pluginRabbitMqPlugin'
+    'com.hashmapinc.server.extensions.core.plugin.messaging.DeviceMessagingPlugin': 'pluginDeviceMessaging',
+    'com.hashmapinc.server.extensions.core.plugin.telemetry.TelemetryStoragePlugin': 'pluginTelemetryStorage',
+    'com.hashmapinc.server.extensions.core.plugin.rpc.RpcPlugin': 'pluginRpcPlugin',
+    'com.hashmapinc.server.extensions.core.plugin.mail.MailPlugin': 'pluginMailPlugin',
+    'com.hashmapinc.server.extensions.rest.plugin.RestApiCallPlugin': 'pluginRestApiCallPlugin',
+    'com.hashmapinc.server.extensions.core.plugin.time.TimePlugin': 'pluginTimePlugin',
+    'com.hashmapinc.server.extensions.kafka.plugin.KafkaPlugin': 'pluginKafkaPlugin',
+    'com.hashmapinc.server.extensions.rabbitmq.plugin.RabbitMqPlugin': 'pluginRabbitMqPlugin'
 
 };
 
 var filterClazzHelpLinkMap = {
-    'org.thingsboard.server.extensions.core.filter.MsgTypeFilter': 'filterMsgType',
-    'org.thingsboard.server.extensions.core.filter.DeviceTelemetryFilter': 'filterDeviceTelemetry',
-    'org.thingsboard.server.extensions.core.filter.MethodNameFilter': 'filterMethodName',
-    'org.thingsboard.server.extensions.core.filter.DeviceAttributesFilter': 'filterDeviceAttributes'
+    'com.hashmapinc.server.extensions.core.filter.MsgTypeFilter': 'filterMsgType',
+    'com.hashmapinc.server.extensions.core.filter.DeviceTelemetryFilter': 'filterDeviceTelemetry',
+    'com.hashmapinc.server.extensions.core.filter.MethodNameFilter': 'filterMethodName',
+    'com.hashmapinc.server.extensions.core.filter.DeviceAttributesFilter': 'filterDeviceAttributes'
 };
 
 var processorClazzHelpLinkMap = {
-    'org.thingsboard.server.extensions.core.processor.AlarmDeduplicationProcessor': 'processorAlarmDeduplication'
+    'com.hashmapinc.server.extensions.core.processor.AlarmDeduplicationProcessor': 'processorAlarmDeduplication'
 };
 
 var pluginActionsClazzHelpLinkMap = {
-    'org.thingsboard.server.extensions.core.action.rpc.RpcPluginAction': 'pluginActionRpc',
-    'org.thingsboard.server.extensions.core.action.mail.SendMailAction': 'pluginActionSendMail',
-    'org.thingsboard.server.extensions.core.action.telemetry.TelemetryPluginAction': 'pluginActionTelemetry',
-    'org.thingsboard.server.extensions.kafka.action.KafkaPluginAction': 'pluginActionKafka',
-    'org.thingsboard.server.extensions.rabbitmq.action.RabbitMqPluginAction': 'pluginActionRabbitMq',
-    'org.thingsboard.server.extensions.rest.action.RestApiCallPluginAction': 'pluginActionRestApiCall'
+    'com.hashmapinc.server.extensions.core.action.rpc.RpcPluginAction': 'pluginActionRpc',
+    'com.hashmapinc.server.extensions.core.action.mail.SendMailAction': 'pluginActionSendMail',
+    'com.hashmapinc.server.extensions.core.action.telemetry.TelemetryPluginAction': 'pluginActionTelemetry',
+    'com.hashmapinc.server.extensions.kafka.action.KafkaPluginAction': 'pluginActionKafka',
+    'com.hashmapinc.server.extensions.rabbitmq.action.RabbitMqPluginAction': 'pluginActionRabbitMq',
+    'com.hashmapinc.server.extensions.rest.action.RestApiCallPluginAction': 'pluginActionRestApiCall'
 };
 
 var helpBaseUrl = "http://tempus-cloud.s3-website-us-west-2.amazonaws.com/help";
 
-export default angular.module('thingsboard.help', [])
+export default angular.module('tempus.help', [])
     .constant('helpLinks',
         {
             linksMap: {

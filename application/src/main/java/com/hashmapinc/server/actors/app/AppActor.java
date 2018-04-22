@@ -1,0 +1,261 @@
+/**
+ * Copyright © 2017-2018 Hashmap, Inc
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package com.hashmapinc.server.actors.app;
+
+import akka.Done;
+import akka.actor.*;
+import akka.actor.SupervisorStrategy.Directive;
+import akka.event.Logging;
+import akka.event.LoggingAdapter;
+import akka.japi.Function;
+import com.hashmapinc.server.actors.plugin.PluginTerminationMsg;
+import com.hashmapinc.server.actors.ActorSystemContext;
+import com.hashmapinc.server.actors.service.ContextAwareActor;
+import com.hashmapinc.server.actors.service.ContextBasedCreator;
+import com.hashmapinc.server.actors.service.DefaultActorService;
+import com.hashmapinc.server.actors.shared.plugin.PluginManager;
+import com.hashmapinc.server.actors.shared.plugin.SystemPluginManager;
+import com.hashmapinc.server.actors.shared.rule.RuleManager;
+import com.hashmapinc.server.actors.shared.rule.SystemRuleManager;
+import com.hashmapinc.server.actors.tenant.RuleChainDeviceMsg;
+import com.hashmapinc.server.actors.tenant.TenantActor;
+import com.hashmapinc.server.common.data.Tenant;
+import com.hashmapinc.server.common.data.id.PluginId;
+import com.hashmapinc.server.common.data.id.RuleId;
+import com.hashmapinc.server.common.data.id.TenantId;
+import com.hashmapinc.server.common.data.page.PageDataIterable;
+import com.hashmapinc.server.common.data.plugin.ComponentLifecycleEvent;
+import com.hashmapinc.server.common.data.rule.RuleMetaData;
+import com.hashmapinc.server.common.msg.cluster.ClusterEventMsg;
+import com.hashmapinc.server.common.msg.computation.ComputationActionDeleted;
+import com.hashmapinc.server.common.msg.computation.ComputationMsg;
+import com.hashmapinc.server.common.msg.device.ToDeviceActorMsg;
+import com.hashmapinc.server.common.msg.plugin.ComponentLifecycleMsg;
+import com.hashmapinc.server.dao.model.ModelConstants;
+import com.hashmapinc.server.dao.tenant.TenantService;
+import com.hashmapinc.server.extensions.api.device.ToDeviceActorNotificationMsg;
+import com.hashmapinc.server.extensions.api.plugins.msg.ToPluginActorMsg;
+import com.hashmapinc.server.extensions.api.rules.ToRuleActorMsg;
+import scala.concurrent.duration.Duration;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+
+public class AppActor extends ContextAwareActor {
+
+    private final LoggingAdapter logger = Logging.getLogger(getContext().system(), this);
+
+    public static final TenantId SYSTEM_TENANT = new TenantId(ModelConstants.NULL_UUID);
+    private final RuleManager ruleManager;
+    private final PluginManager pluginManager;
+    private final TenantService tenantService;
+    private final Map<TenantId, ActorRef> tenantActors;
+
+    private AppActor(ActorSystemContext systemContext) {
+        super(systemContext);
+        this.ruleManager = new SystemRuleManager(systemContext);
+        this.pluginManager = new SystemPluginManager(systemContext);
+        this.tenantService = systemContext.getTenantService();
+        this.tenantActors = new HashMap<>();
+    }
+
+    @Override
+    public SupervisorStrategy supervisorStrategy() {
+        return strategy;
+    }
+
+    @Override
+    public void preStart() {
+        logger.info("Starting main system actor.");
+        try {
+            ruleManager.init(this.context());
+            pluginManager.init(this.context());
+
+            if (systemContext.isTenantComponentsInitEnabled()) {
+                PageDataIterable<Tenant> tenantIterator = new PageDataIterable<>(tenantService::findTenants, ENTITY_PACK_LIMIT);
+                for (Tenant tenant : tenantIterator) {
+                    logger.debug("[{}] Creating tenant actor", tenant.getId());
+                    getOrCreateTenantActor(tenant.getId());
+                    logger.debug("Tenant actor created.");
+                }
+            }
+
+            logger.info("Main system actor started.");
+        } catch (Exception e) {
+            logger.error(e, "Unknown failure");
+        }
+    }
+
+    @Override
+    public void onReceive(Object msg) throws Exception {
+        logger.debug("Received message: {}", msg);
+        if (msg instanceof ToDeviceActorMsg) {
+            processDeviceMsg((ToDeviceActorMsg) msg);
+        } else if (msg instanceof ToPluginActorMsg) {
+            onToPluginMsg((ToPluginActorMsg) msg);
+        } else if (msg instanceof ToRuleActorMsg) {
+            onToRuleMsg((ToRuleActorMsg) msg);
+        } else if (msg instanceof ToDeviceActorNotificationMsg) {
+            onToDeviceActorMsg((ToDeviceActorNotificationMsg) msg);
+        } else if (msg instanceof Terminated) {
+            processTermination((Terminated) msg);
+        } else if (msg instanceof ClusterEventMsg) {
+            broadcast(msg);
+        } else if (msg instanceof ComponentLifecycleMsg) {
+            onComponentLifecycleMsg((ComponentLifecycleMsg) msg);
+        } else if (msg instanceof PluginTerminationMsg) {
+            onPluginTerminated((PluginTerminationMsg) msg);
+        } else if(msg instanceof ComputationMsg){
+            onComputationMsg((ComputationMsg)msg);
+        }else {
+            logger.warning("Unknown message: {}!", msg);
+        }
+    }
+
+    private void onPluginTerminated(PluginTerminationMsg msg) {
+        pluginManager.remove(msg.getId());
+    }
+
+    private void broadcast(Object msg) {
+        pluginManager.broadcast(msg);
+        tenantActors.values().forEach(actorRef -> actorRef.tell(msg, ActorRef.noSender()));
+    }
+
+    private void onToRuleMsg(ToRuleActorMsg msg) {
+        ActorRef target;
+        if (SYSTEM_TENANT.equals(msg.getTenantId())) {
+            target = ruleManager.getOrCreateRuleActor(this.context(), msg.getRuleId());
+        } else {
+            target = getOrCreateTenantActor(msg.getTenantId());
+        }
+        target.tell(msg, ActorRef.noSender());
+    }
+
+    private void onToPluginMsg(ToPluginActorMsg msg) {
+        ActorRef target;
+        if (SYSTEM_TENANT.equals(msg.getPluginTenantId())) {
+            target = pluginManager.getOrCreatePluginActor(this.context(), msg.getPluginId());
+        } else {
+            target = getOrCreateTenantActor(msg.getPluginTenantId());
+        }
+        target.tell(msg, ActorRef.noSender());
+    }
+
+    private void onComponentLifecycleMsg(ComponentLifecycleMsg msg) {
+        ActorRef target = null;
+        if (SYSTEM_TENANT.equals(msg.getTenantId())) {
+            Optional<PluginId> pluginId = msg.getPluginId();
+            Optional<RuleId> ruleId = msg.getRuleId();
+            if (pluginId.isPresent()) {
+                target = pluginManager.getOrCreatePluginActor(this.context(), pluginId.get());
+            } else if (ruleId.isPresent()) {
+                Optional<ActorRef> ref = ruleManager.update(this.context(), ruleId.get(), msg.getEvent());
+                if (ref.isPresent()) {
+                    target = ref.get();
+                } else {
+                    logger.debug("Failed to find actor for rule: [{}]", ruleId);
+                    return;
+                }
+            }
+        } else {
+            target = getOrCreateTenantActor(msg.getTenantId());
+        }
+        if (target != null) {
+            target.tell(msg, ActorRef.noSender());
+        }
+    }
+
+    private void onToDeviceActorMsg(ToDeviceActorNotificationMsg msg) {
+        getOrCreateTenantActor(msg.getTenantId()).tell(msg, ActorRef.noSender());
+    }
+
+    private void processDeviceMsg(ToDeviceActorMsg toDeviceActorMsg) {
+        TenantId tenantId = toDeviceActorMsg.getTenantId();
+        ActorRef tenantActor = getOrCreateTenantActor(tenantId);
+        if (toDeviceActorMsg.getPayload().getMsgType().requiresRulesProcessing()) {
+            tenantActor.tell(new RuleChainDeviceMsg(toDeviceActorMsg, ruleManager.getRuleChain(this.context())), context().self());
+        } else {
+            tenantActor.tell(toDeviceActorMsg, context().self());
+        }
+    }
+
+    private void onComputationMsg(ComputationMsg msg){
+        if(msg instanceof ComputationActionDeleted){
+            ComputationActionDeleted deleted = (ComputationActionDeleted)msg;
+            List<RuleMetaData> pluginRules = systemContext.getRuleService().findPluginRules(deleted.getPluginApiToken());
+            notifyTenantsFor(deleted, pluginRules);
+            getContext().sender().tell(Done.getInstance(), getContext().self());
+        }
+    }
+
+    private void notifyTenantsFor(ComputationActionDeleted deleted, List<RuleMetaData> pluginRules) {
+        pluginRules.stream().
+                filter(r -> deleted.getActionClasses().contains(r.getAction().get("clazz").asText())).
+                forEach(r -> {
+                    deleteRuleByRuleId(r.getId());
+                    ActorRef tenantActor = tenantActors.get(r.getTenantId());
+                    if(tenantActor != null) {
+                        tenantActor.tell(ComponentLifecycleMsg.forRule(r.getTenantId(), r.getId(), ComponentLifecycleEvent.DELETED),
+                                ActorRef.noSender());
+                    }
+                });
+    }
+
+    private void deleteRuleByRuleId(RuleId r) {
+        systemContext.getRuleService().deleteRuleById(r);
+    }
+
+    private ActorRef getOrCreateTenantActor(TenantId tenantId) {
+        return tenantActors.computeIfAbsent(tenantId, k -> context().actorOf(Props.create(new TenantActor.ActorCreator(systemContext, tenantId))
+                .withDispatcher(DefaultActorService.CORE_DISPATCHER_NAME), tenantId.toString()));
+    }
+
+    private void processTermination(Terminated message) {
+        ActorRef terminated = message.actor();
+        if (terminated instanceof LocalActorRef) {
+            logger.debug("Removed actor: {}", terminated);
+        } else {
+            throw new IllegalStateException("Remote actors are not supported!");
+        }
+    }
+
+    public static class ActorCreator extends ContextBasedCreator<AppActor> {
+        private static final long serialVersionUID = 1L;
+
+        public ActorCreator(ActorSystemContext context) {
+            super(context);
+        }
+
+        @Override
+        public AppActor create() throws Exception {
+            return new AppActor(context);
+        }
+    }
+
+    private final SupervisorStrategy strategy = new OneForOneStrategy(3, Duration.create("1 minute"), new Function<Throwable, Directive>() {
+        @Override
+        public Directive apply(Throwable t) {
+            logger.error(t, "Unknown failure");
+            if (t instanceof RuntimeException) {
+                return SupervisorStrategy.restart();
+            } else {
+                return SupervisorStrategy.stop();
+            }
+        }
+    });
+}

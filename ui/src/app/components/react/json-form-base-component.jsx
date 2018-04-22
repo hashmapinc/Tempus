@@ -1,5 +1,5 @@
 /*
- * Copyright © 2016-2018 The Thingsboard Authors
+ * Copyright © 2017-2018 Hashmap, Inc
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
 import React from 'react';
 import { utils } from 'react-schema-form';
 
-export default ThingsboardBaseComponent => class extends React.Component {
+export default tempusBaseComponent => class extends React.Component {
 
     constructor(props) {
         super(props);
@@ -109,7 +109,7 @@ export default ThingsboardBaseComponent => class extends React.Component {
 
     render() {
         if (this.props.form && this.props.form.schema) {
-            return <ThingsboardBaseComponent {...this.props} {...this.state} onChangeValidate={this.onChangeValidate}/>;
+            return <tempusBaseComponent {...this.props} {...this.state} onChangeValidate={this.onChangeValidate}/>;
         } else {
             return <div></div>;
         }

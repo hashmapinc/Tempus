@@ -1,5 +1,5 @@
 /*
- * Copyright © 2016-2018 The Thingsboard Authors
+ * Copyright © 2017-2018 Hashmap, Inc
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,8 +15,8 @@
  */
 import './grid.scss';
 
-import thingsboardScopeElement from './scope-element.directive';
-import thingsboardDetailsSidenav from './details-sidenav.directive';
+import tempusScopeElement from './scope-element.directive';
+import tempusDetailsSidenav from './details-sidenav.directive';
 
 /* eslint-disable import/no-unresolved, import/default */
 
@@ -24,7 +24,7 @@ import gridTemplate from './grid.tpl.html';
 
 /* eslint-enable import/no-unresolved, import/default */
 
-export default angular.module('thingsboard.directives.grid', [thingsboardScopeElement, thingsboardDetailsSidenav])
+export default angular.module('tempus.directives.grid', [tempusScopeElement, tempusDetailsSidenav])
     .directive('tbGrid', Grid)
     .controller('AddItemController', AddItemController)
     .controller('ItemCardController', ItemCardController)
@@ -620,6 +620,24 @@ function GridController(applicationService, $scope, $state, $mdDialog, $document
     function onCloseDetails() {
         vm.detailsConfig.currentItem = null;
         $window.localStorage.removeItem('currentApp')
+        $window.localStorage.removeItem('currentTab')
+        if(angular.isDefined(vm.parentCtl.currentApplication)){
+           
+            vm.parentCtl.appSliderOpen = false;
+            vm.parentCtl.currentApplication = null;
+            vm.parentCtl.showAppMini = false;
+            vm.parentCtl.showAppMain = false;
+            vm.parentCtl.showAppRules = false;
+            vm.parentCtl.showComputations = false;
+            vm.parentCtl.showComputationJobs = false;
+            vm.parentCtl.showAppDetails = true; 
+            vm.parentCtl.tabSelectedIndex = 0;
+            vm.detailsConfig.isDetailsOpen = false;
+            $timeout( function(){
+                vm.parentCtl.appSliderOpen = true;
+            }, 100 ); 
+
+        }
     }
 
     function operatingItem() {

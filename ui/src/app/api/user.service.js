@@ -1,5 +1,5 @@
 /*
- * Copyright © 2016-2018 The Thingsboard Authors
+ * Copyright © 2017-2018 Hashmap, Inc
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,10 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import thingsboardApiLogin  from './login.service';
+import tempusApiLogin  from './login.service';
 import angularStorage from 'angular-storage';
 
-export default angular.module('thingsboard.api.user', [thingsboardApiLogin,
+export default angular.module('tempus.api.user', [tempusApiLogin,
     angularStorage])
     .factory('userService', UserService)
     .name;

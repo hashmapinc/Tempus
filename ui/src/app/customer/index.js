@@ -1,5 +1,5 @@
 /*
- * Copyright © 2016-2018 The Thingsboard Authors
+ * Copyright © 2017-2018 Hashmap, Inc
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,21 +14,21 @@
  * limitations under the License.
  */
 import uiRouter from 'angular-ui-router';
-import thingsboardApiCustomer from '../api/customer.service';
-import thingsboardGrid from '../components/grid.directive';
-import thingsboardContact from '../components/contact.directive';
-import thingsboardContactShort from '../components/contact-short.filter';
+import tempusApiCustomer from '../api/customer.service';
+import tempusGrid from '../components/grid.directive';
+import tempusContact from '../components/contact.directive';
+import tempusContactShort from '../components/contact-short.filter';
 
 import CustomerRoutes from './customer.routes';
 import CustomerController from './customer.controller';
 import CustomerDirective from './customer.directive';
 
-export default angular.module('thingsboard.customer', [
+export default angular.module('tempus.customer', [
     uiRouter,
-    thingsboardApiCustomer,
-    thingsboardGrid,
-    thingsboardContact,
-    thingsboardContactShort
+    tempusApiCustomer,
+    tempusGrid,
+    tempusContact,
+    tempusContactShort
 ])
     .config(CustomerRoutes)
     .controller('CustomerController', CustomerController)

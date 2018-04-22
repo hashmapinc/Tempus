@@ -1,5 +1,5 @@
 /*
- * Copyright © 2016-2018 The Thingsboard Authors
+ * Copyright © 2017-2018 Hashmap, Inc
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,21 +16,21 @@
 import uiRouter from 'angular-ui-router';
 import ngMaterial from 'angular-material';
 import ngMessages from 'angular-messages';
-import thingsboardApiUser from '../api/user.service';
-import thingsboardApiLogin from '../api/login.service';
-import thingsboardConfirmOnExit from '../components/confirm-on-exit.directive';
+import tempusApiUser from '../api/user.service';
+import tempusApiLogin from '../api/login.service';
+import tempusConfirmOnExit from '../components/confirm-on-exit.directive';
 
 import ProfileRoutes from './profile.routes';
 import ProfileController from './profile.controller';
 import ChangePasswordController from './change-password.controller';
 
-export default angular.module('thingsboard.profile', [
+export default angular.module('tempus.profile', [
     uiRouter,
     ngMaterial,
     ngMessages,
-    thingsboardApiUser,
-    thingsboardApiLogin,
-    thingsboardConfirmOnExit
+    tempusApiUser,
+    tempusApiLogin,
+    tempusConfirmOnExit
 ])
     .config(ProfileRoutes)
     .controller('ProfileController', ProfileController)

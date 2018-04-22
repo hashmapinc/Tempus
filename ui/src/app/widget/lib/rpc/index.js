@@ -1,5 +1,5 @@
 /*
- * Copyright © 2016-2018 The Thingsboard Authors
+ * Copyright © 2017-2018 Hashmap, Inc
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@ import tbSwitch from './switch.directive';
 import tbRoundSwitch from './round-switch.directive';
 import tbLedIndicator from './led-indicator.directive';
 
-export default angular.module('thingsboard.widgets.rpc', [
+export default angular.module('tempus.widgets.rpc', [
     tbKnob,
     tbSwitch,
     tbRoundSwitch,

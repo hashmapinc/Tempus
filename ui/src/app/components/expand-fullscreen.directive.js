@@ -1,5 +1,5 @@
 /*
- * Copyright © 2016-2018 The Thingsboard Authors
+ * Copyright © 2017-2018 Hashmap, Inc
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@ import './expand-fullscreen.scss';
 
 import $ from 'jquery';
 
-export default angular.module('thingsboard.directives.expandFullscreen', [])
+export default angular.module('tempus.directives.expandFullscreen', [])
     .directive('tbExpandFullscreen', ExpandFullscreen)
     .name;
 

@@ -1,0 +1,363 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Tempus Developer Quickstart &mdash; Tempus Developer Quickstart 0.1 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+        <link rel="index" title="Index"
+              href="genindex.html"/>
+        <link rel="search" title="Search" href="search.html"/>
+    <link rel="top" title="Tempus Developer Quickstart 0.1 documentation" href="#"/> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="#" class="icon icon-home"> Tempus Developer Quickstart
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">Tempus Developer Quickstart</a><ul>
+<li><a class="reference internal" href="#source-code">Source Code</a></li>
+<li><a class="reference internal" href="#issue-tracking">Issue Tracking</a></li>
+<li><a class="reference internal" href="#building">Building</a><ul>
+<li><a class="reference internal" href="#configure-your-git-client">Configure your git client</a></li>
+<li><a class="reference internal" href="#checking-out-from-git">Checking out from Git</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#tempus-development-environment-setup">Tempus Development Environment Setup</a><ul>
+<li><a class="reference internal" href="#pre-requisites">Pre-requisites</a></li>
+<li><a class="reference internal" href="#id3">Source Code</a></li>
+<li><a class="reference internal" href="#id6">Issue Tracking</a></li>
+<li><a class="reference internal" href="#introduction">Introduction</a></li>
+<li><a class="reference internal" href="#checking-out-the-tempusdevenvironment-from-git">Checking out the TempusDevEnvironment from Git</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="#">Tempus Developer Quickstart</a>
+        
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="#">Docs</a> &raquo;</li>
+        
+      <li>Tempus Developer Quickstart</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/index.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="tempus-developer-quickstart">
+<h1>Tempus Developer Quickstart<a class="headerlink" href="#tempus-developer-quickstart" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="source-code">
+<h2>Source Code<a class="headerlink" href="#source-code" title="Permalink to this headline">¶</a></h2>
+<p>The Tempus source code is version controlled using Git version control at <a class="reference external" href="https://github.com/hashmapinc/Tempus/">GitHub</a></p>
+<p>The Tempus documentation source code is available at <a class="reference external" href="https://github.com/hashmapinc/Tempus/tree/dev/docs">GitHub</a></p>
+</div>
+<div class="section" id="issue-tracking">
+<h2>Issue Tracking<a class="headerlink" href="#issue-tracking" title="Permalink to this headline">¶</a></h2>
+<p>Track issues on <a class="reference external" href="https://github.com/hashmapinc/Tempus/issues">GitHub</a></p>
+</div>
+<div class="section" id="building">
+<h2>Building<a class="headerlink" href="#building" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="configure-your-git-client">
+<h3>Configure your git client<a class="headerlink" href="#configure-your-git-client" title="Permalink to this headline">¶</a></h3>
+<p>We recommend running the following git config commands in order to ensure
+that git checks out the repository in a consistent manner. These changes
+are particularly important if running on Windows, as the git client has
+trouble with long filenames otherwise. Additionally, in Windows, the
+default behavior of the git client, when installed, is to set the
+core.autocrlf configuration option to true, which can cause some of
+the unit tests to fail.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git config --global core.longpaths <span class="nb">true</span>
+git config --global core.autocrlf <span class="nb">false</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="checking-out-from-git">
+<h3>Checking out from Git<a class="headerlink" href="#checking-out-from-git" title="Permalink to this headline">¶</a></h3>
+<p>To check out the code:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git clone https://github.com/hashmapinc/Tempus.git
+</pre></div>
+</div>
+<p>Then checkout the ‘master’ branch</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git checkout master
+</pre></div>
+</div>
+<p>The master branch currently represents the last release of Tempus. If you would like to work on the active / stable branch you need to check out the ‘dev’ branch.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git checkout dev
+</pre></div>
+</div>
+<div class="toctree-wrapper compound">
+</div>
+</div>
+</div>
+<div class="section" id="tempus-development-environment-setup">
+<h2>Tempus Development Environment Setup<a class="headerlink" href="#tempus-development-environment-setup" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="pre-requisites">
+<h3>Pre-requisites<a class="headerlink" href="#pre-requisites" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>Docker</li>
+<li>Docker Compose</li>
+<li>Make</li>
+<li>Maven &gt; 3.1</li>
+<li>JDK 8</li>
+</ul>
+</div>
+<div class="section" id="id3">
+<h3>Source Code<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h3>
+<p>The Tempus source code is version controlled using Git version control at <a class="reference external" href="https://github.com/hashmapinc/TempusDevEnvironment">GitHub</a></p>
+<p>The Tempus documentation source code is available at <a class="reference external" href="https://github.com/hashmapinc/Tempus/tree/dev/docs">GitHub</a></p>
+</div>
+<div class="section" id="id6">
+<h3>Issue Tracking<a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h3>
+<p>Track issues on <a class="reference external" href="https://github.com/hashmapinc/TempusDevEnvironment/issues">GitHub</a></p>
+</div>
+<div class="section" id="introduction">
+<h3>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h3>
+<p>The TempusDevEnvironment orchestrates the setup of a developer environment suitable for demos or development work. This setup requires 3 repositories to be pulled:</p>
+<ol class="arabic simple">
+<li>TempusDevEnvironment (this one)</li>
+<li>Tempus (described above)</li>
+<li>Nifi-simulator-bundle (described below)</li>
+</ol>
+</div>
+<div class="section" id="checking-out-the-tempusdevenvironment-from-git">
+<h3>Checking out the TempusDevEnvironment from Git<a class="headerlink" href="#checking-out-the-tempusdevenvironment-from-git" title="Permalink to this headline">¶</a></h3>
+<p>To clone the TempusDevEnvironment code:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git clone https://github.com/hashmapinc/TempusDevEnvironment.git
+</pre></div>
+</div>
+<p>To clone out the simulator bundle:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git clone https://github.com/hashmapinc/nifi-simulator-bundle.git
+</pre></div>
+</div>
+<p>Once you have cloned both repositories edit the Makefile in the root of the TempusDevEnvironment project.</p>
+<p>Modify the top 2 lines that specify PROJECT_DIR (this is the root of the Tempus project) and the SIM_PROJECT_DIR (this is the simulator bundle that was cloned with the command above).</p>
+<p>There are 6 options in this make file:</p>
+<ol class="arabic simple">
+<li><dl class="first docutils">
+<dt>Install</dt>
+<dd><ul class="first last">
+<li>This will only build Tempus and the Simulator bundle following the steps in the first section</li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>Copy</dt>
+<dd><ul class="first last">
+<li>This will copy the files to the appropriate place so the docker images can be built</li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>Build</dt>
+<dd><ul class="first last">
+<li>This will build and start the docker compose</li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>Build-ldap</dt>
+<dd><ul class="first last">
+<li>This will build the environment with openLdap and ldapAdmin</li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+<p>To get started run</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>make all
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+
+
+           </div>
+           <div class="articleComments">
+            
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Hashmap, Inc.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'0.1',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

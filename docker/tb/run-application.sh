@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Copyright © 2016-2018 The Thingsboard Authors
+# Copyright © 2017-2018 Hashmap, Inc
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -37,7 +37,7 @@ if [ "$DATABASE_TYPE" == "sql" ]; then
 fi
 
 if [ "$ADD_SCHEMA_AND_SYSTEM_DATA" == "true" ]; then
-    echo "Creating 'Thingsboard' schema and system data..."
+    echo "Creating 'tempus' schema and system data..."
     if [ "$ADD_DEMO_DATA" == "true" ]; then
         echo "plus demo data..."
         /usr/share/tempus/bin/install/install.sh --loadDemo
@@ -52,7 +52,7 @@ printenv | awk -F "=" '{print "export " $1 "='\''" $2 "'\''"}' >> /usr/share/tem
 
 cat /usr/share/tempus/conf/tempus.conf
 
-echo "Starting 'Thingsboard' service..."
+echo "Starting 'tempus' service..."
 service tempus start
 
 # Wait until log file is created
