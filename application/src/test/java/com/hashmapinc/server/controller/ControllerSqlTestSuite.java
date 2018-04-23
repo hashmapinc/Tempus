@@ -24,7 +24,7 @@ import java.util.Arrays;
 
 @RunWith(ClasspathSuite.class)
 @ClasspathSuite.ClassnameFilters({
-        "com.hashmapinc.server.controller.sql.*ComputationJobControllerSqlTest",
+        "com.hashmapinc.server.controller.sql.*SqlTest"
         })
 public class ControllerSqlTestSuite {
 
