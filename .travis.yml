@@ -39,5 +39,4 @@ deploy:
     repo: hashmapinc/Tempus
     branches:
       only:
-        - master
         - dev
