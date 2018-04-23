@@ -29,7 +29,6 @@ import java.util.Map;
  *
  * Where ds is a depth value,  and the depth measurement values are represented as key value pairs.
  */
-
 public class DepthDataValue {
 
     @JsonProperty(value = "ds", index = 1)

@@ -17,7 +17,6 @@ package com.hashmapinc.tempus.sdk.messages;
 
 import java.util.ArrayList;
 import java.util.List;
-
 //TODO: Add Atrribe Messages
 public class DeviceValue {
 
