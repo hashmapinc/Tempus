@@ -33,7 +33,7 @@ export default function ExtensionFormOpcDirective($compile, $templateCache, $tra
 
 
         function Server() {
-            this.applicationName = "tempus OPC-UA client";
+            this.applicationName = "Tempus OPC-UA client";
             this.applicationUri = "";
             this.host = "localhost";
             this.port = 49320;

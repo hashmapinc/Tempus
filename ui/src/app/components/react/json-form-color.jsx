@@ -18,13 +18,13 @@ import './json-form-color.scss';
 import $ from 'jquery';
 import React from 'react';
 import ReactDOM from 'react-dom';
-import tempusBaseComponent from './json-form-base-component.jsx';
+import TempusBaseComponent from './json-form-base-component.jsx';
 import reactCSS from 'reactcss';
 import tinycolor from 'tinycolor2';
 import TextField from 'material-ui/TextField';
 import IconButton from 'material-ui/IconButton';
 
-class tempusColor extends React.Component {
+class TempusColor extends React.Component {
 
     constructor(props) {
         super(props);
@@ -158,4 +158,4 @@ class tempusColor extends React.Component {
     }
 }
 
-export default tempusBaseComponent(tempusColor);
+export default TempusBaseComponent(TempusColor);

@@ -53,8 +53,8 @@ import DashboardController from '../dashboard/dashboard.controller';
 import DashboardSettingsController from '../dashboard/dashboard-settings.controller';
 import AddWidgetController from '../dashboard/add-widget.controller';
 
-import TempusApiComputation from '../api/computation.service';
-import TempusApiComputationJob from '../api/computation-job.service';
+import tempusApiComputation from '../api/computation.service';
+import tempusApiComputationJob from '../api/computation-job.service';
 //import ComputationJobController from '../computations/computation-job.controller';
 
 //import DashboardDirective from '../dashboard/dashboard.directive';
@@ -77,8 +77,8 @@ export default angular.module('tempus.application', [
     tempusApiRule,
     tempusApiPlugin,
     tempusApiComponentDescriptor,
-    TempusApiComputation,
-    TempusApiComputationJob,
+    tempusApiComputation,
+    tempusApiComputationJob,
     tempusTypes,
     tempusItemBuffer,
     tempusImportExport,
