@@ -16,14 +16,14 @@
 import './json-form-ace-editor.scss';
 
 import React from 'react';
-import tempusBaseComponent from './json-form-base-component.jsx';
+import TempusBaseComponent from './json-form-base-component.jsx';
 import reactCSS from 'reactcss';
 import AceEditor from 'react-ace';
 import FlatButton from 'material-ui/FlatButton';
 import 'brace/ext/language_tools';
 import 'brace/theme/github';
 
-class tempusAceEditor extends React.Component {
+class TempusAceEditor extends React.Component {
 
     constructor(props) {
         super(props);
@@ -133,4 +133,4 @@ class tempusAceEditor extends React.Component {
     }
 }
 
-export default tempusBaseComponent(tempusAceEditor);
+export default TempusBaseComponent(TempusAceEditor);

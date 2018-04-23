@@ -16,11 +16,11 @@
 import './json-form-image.scss';
 
 import React from 'react';
-import tempusBaseComponent from './json-form-base-component.jsx';
+import TempusBaseComponent from './json-form-base-component.jsx';
 import Dropzone from 'react-dropzone';
 import IconButton from 'material-ui/IconButton';
 
-class tempusImage extends React.Component {
+class TempusImage extends React.Component {
 
     constructor(props) {
         super(props);
@@ -101,4 +101,4 @@ class tempusImage extends React.Component {
     }
 }
 
-export default tempusBaseComponent(tempusImage);
+export default TempusBaseComponent(TempusImage);

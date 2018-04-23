@@ -13,10 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import tempusMissingTranslateHandler from './translate-handler';
+import TempusMissingTranslateHandler from './translate-handler';
 
 export default angular.module('tempus.locale', [])
-    .factory('tbMissingTranslationHandler', tempusMissingTranslateHandler)
+    .factory('tbMissingTranslationHandler', TempusMissingTranslateHandler)
     .constant('locales',
         {
             'en_US': {

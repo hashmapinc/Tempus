@@ -15,8 +15,8 @@
  */
 /* eslint-disable import/no-unresolved, import/default */
 import uiRouter from 'angular-ui-router';
-import TempusApiComputation from '../api/computation.service';
-import TempusApiComputationJob from '../api/computation-job.service';
+import tempusApiComputation from '../api/computation.service';
+import tempusApiComputationJob from '../api/computation-job.service';
 import ComputationController from './computation.controller';
 //import ComputationTestController from './computationsTest.controller';
 import ComputationJobController from './computation-job.controller';
@@ -28,8 +28,8 @@ import ComputationRoutes from './computation.routes';
 
 export default angular.module('tempus.computation', [
     uiRouter,
-    TempusApiComputation,
-    TempusApiComputationJob
+    tempusApiComputation,
+    tempusApiComputationJob
 ])
     .config(ComputationRoutes)
     .controller('ComputationController', ComputationController)

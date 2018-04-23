@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 import React from 'react';
-import tempusAceEditor from './json-form-ace-editor.jsx';
+import TempusAceEditor from './json-form-ace-editor.jsx';
 import 'brace/mode/css';
 import beautify from 'js-beautify';
 
 const css_beautify = beautify.css;
 
-class tempusCss extends React.Component {
+class TempusCss extends React.Component {
 
     constructor(props) {
         super(props);
@@ -33,9 +33,9 @@ class tempusCss extends React.Component {
 
     render() {
         return (
-            <tempusAceEditor {...this.props} mode='css' onTidy={this.onTidyCss} {...this.state}></tempusAceEditor>
+            <TempusAceEditor {...this.props} mode='css' onTidy={this.onTidyCss} {...this.state}></TempusAceEditor>
         );
     }
 }
 
-export default tempusCss;
+export default TempusCss;
