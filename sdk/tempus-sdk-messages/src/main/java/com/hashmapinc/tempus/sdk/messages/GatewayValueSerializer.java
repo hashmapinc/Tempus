@@ -21,31 +21,22 @@ import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 
 import java.io.IOException;
 
-/**
- * The type Device depth value serializer.
- */
-public class DeviceDepthValueSerializer extends StdSerializer<DeviceDepthValue> {
+public class GatewayValueSerializer extends StdSerializer<GatewayValue> {
 
-    /**
-     * Instantiates a new Device depth value serializer.
-     */
-    public DeviceDepthValueSerializer() {
+    public GatewayValueSerializer() {
         this(null);
     }
 
-    /**
-     * Instantiates a new Device depth value serializer.
-     *
-     * @param t the t
-     */
-    public DeviceDepthValueSerializer(Class<DeviceDepthValue> t){
+    public GatewayValueSerializer(Class<GatewayValue> t){
         super(t);
     }
 
     @Override
-    public void serialize(DeviceDepthValue deviceValue, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException {
+    public void serialize(GatewayValue gatewayValue, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException {
+        jsonGenerator.writeStartObject();
 
-        jsonGenerator.writeObject(deviceValue.getDepthDataValues());
+        jsonGenerator.writeObjectField(gatewayValue.getDeviceName(), gatewayValue.getDataValues());
 
+        jsonGenerator.writeEndObject();
     }
 }
