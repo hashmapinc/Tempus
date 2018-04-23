@@ -23,7 +23,7 @@ cache:
     - '$HOME/.sonar/cache'
   
 before_deploy:
-  - git tag "1.4.0-SNAPSHOT"
+  - git tag -f "1.4.0-SNAPSHOT"
 
 deploy:
   provider: releases
