@@ -26,7 +26,7 @@
 [![Slack](https://now-examples-slackin-sdipawcoxa.now.sh/badge.svg)](https://now-examples-slackin-sdipawcoxa.now.sh)
 
 
-[Tempus](https://www.hashmapinc.com/tempuscloud) is an open IIoT framework for industrial data ingestion and analysis.
+[Tempus](https://www.hashmapinc.com/tempuscloud) is an IIoT framework for industrial data ingestion and analysis.
 
 [![Tempus Video](https://img.youtube.com/vi/BQ8QG5S3-Fc/0.jpg)](https://www.youtube.com/watch?v=BQ8QG5S3-Fc)
 
