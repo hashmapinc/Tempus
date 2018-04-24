@@ -107,7 +107,6 @@ public class GenerateMessageTest {
     public void testDeviceTelemetryArrayMessage() throws Exception {
         String msg = "[{\"values\":{\"temp\":42.0,\"humidity\":82.0},\"ts\":\"1524242990171\"},{\"values\":{\"temp\":42.0,\"humidity\":82.0},\"ts\":\"1624242990171\"}]";
         DeviceTelemetryValue device = new DeviceTelemetryValue();
-
         TelemetryDataValue ts1 = new TelemetryDataValue();
         ts1.addValue("temp",42.0);
         ts1.addValue("humidity",82.0);

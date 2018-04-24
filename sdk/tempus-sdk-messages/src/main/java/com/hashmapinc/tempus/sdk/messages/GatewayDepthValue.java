@@ -51,7 +51,6 @@ import com.fasterxml.jackson.annotation.JsonInclude;
  *
  * Where Device A id the device names, WOB and ROP are parameters keys and values and ds the depth value.
  */
-
 public class GatewayDepthValue {
 
     private String deviceName;

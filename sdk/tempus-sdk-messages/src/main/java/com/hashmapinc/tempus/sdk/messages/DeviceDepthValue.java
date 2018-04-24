@@ -18,7 +18,6 @@ package com.hashmapinc.tempus.sdk.messages;
 import java.util.ArrayList;
 import java.util.List;
 
-
 /**
  * In order to publish telemetry data to Tempus server node, one sends PUBLISH message with the following format
  *

@@ -20,7 +20,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.HashMap;
 import java.util.Map;
 
-<<<<<<< HEAD
 /**
  * In order to publish telemetry data to Tempus server node, one sends PUBLISH message with the following format
  *
@@ -30,10 +29,6 @@ import java.util.Map;
  *
  * Where ds is a depth value,  and the depth measurement values are represented as key value pairs.
  */
-=======
-//TODO: javadoc format for each file //*  */ with min of 50%
->>>>>>> add license:format goal to pom
-
 public class DepthDataValue {
 
     @JsonProperty(value = "ds", index = 1)
