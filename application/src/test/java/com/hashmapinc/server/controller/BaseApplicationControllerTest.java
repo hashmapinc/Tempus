@@ -802,7 +802,17 @@ public class BaseApplicationControllerTest extends AbstractControllerTest {
         Computations savedComputations = saveComputation();
         ComputationJob computationJob1 = new ComputationJob();
         computationJob1.setName("Computation Job 1");
-        computationJob1.setArgParameters(mapper.readTree("{\"host\": \"localhost\", \"port\": 8080}"));
+        computationJob1.setArgParameters(mapper.readTree("{\n" +
+                "\t\"port\": 8998,\n" +
+                "\t\"host\": \"spark - master\",\n" +
+                "\t\"window\": 1,\n" +
+                "\t\"kafkaUrl\": \"kafka: 9092\",\n" +
+                "\t\"kafkaTopic\": \"water - tank - level - data\",\n" +
+                "\t\"actionPath\": \"batches\",\n" +
+                "\t\"mqttUrl\": \"tb: 1883\",\n" +
+                "\t\"highWaterMark\": \"70\",\n" +
+                "\t\"gatewayAccessToken\": \"GATEWAY_ACCESS_TOKEN\"\n" +
+                "}"));
         ComputationJob savedComputationJob1 = doPost("/api/computations/"+savedComputations.getId().getId().toString()+"/jobs", computationJob1, ComputationJob.class);
 
         ApplicationFieldsWrapper applicationComputationJosWrapper = new ApplicationFieldsWrapper();
