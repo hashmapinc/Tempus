@@ -1,3 +1,18 @@
+/**
+ * Copyright © 2017-2018 Hashmap, Inc
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.hashmapinc.server.transport.mqtt.sparkplugB;
 
 import com.cirruslink.sparkplug.message.SparkplugBPayloadDecoder;
@@ -26,7 +41,7 @@ public class SparkPlugDecodeService extends SparkPlugUtils {
         String topicName = inbound.variableHeader().topicName();
 
         if(topicName.contains(DBIRTH)){
-            String device = topicName.replace(SparkPlugMsgTypes.DBIRTH + "/","");
+            String device = extractDeviceName(topicName);
             if(!deviceMap.containsKey(device)) {
                 deviceMap.put(device, true);
                 convertToPostTelemetry(ctx, inbound);
@@ -34,7 +49,7 @@ public class SparkPlugDecodeService extends SparkPlugUtils {
 
         }
         else if(topicName.contains(DDATA)){
-            String device = topicName.replace(SparkPlugMsgTypes.DDATA + "/","");
+            String device = extractDeviceName(topicName);
             if(deviceMap.containsKey(device) && deviceMap.get(device) == true) {
                 convertToPostTelemetry(ctx, inbound);
             }
