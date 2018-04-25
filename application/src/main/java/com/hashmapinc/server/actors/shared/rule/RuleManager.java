@@ -119,7 +119,7 @@ public abstract class RuleManager {
 
     public ActorRef getOrCreateRuleActor(ActorContext context, RuleId ruleId) {
         return ruleActors.computeIfAbsent(ruleId, rId ->
-                context.actorOf(Props.create(new RuleActor.ActorCreator(systemContext, tenantId, rId))
+                context.actorOf(Props.create(RuleActor.class, new RuleActor.ActorCreator(systemContext, tenantId, rId))
                         .withDispatcher(getDispatcherName()), rId.toString()));
     }
 
