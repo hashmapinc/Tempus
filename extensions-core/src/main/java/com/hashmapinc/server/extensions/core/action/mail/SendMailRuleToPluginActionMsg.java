@@ -18,6 +18,7 @@ package com.hashmapinc.server.extensions.core.action.mail;
 import com.hashmapinc.server.common.data.id.DeviceId;
 import com.hashmapinc.server.common.data.id.TenantId;
 import com.hashmapinc.server.extensions.api.plugins.msg.AbstractRuleToPluginMsg;
+import com.hashmapinc.server.extensions.api.plugins.msg.RuleToPluginMsg;
 import lombok.Data;
 import com.hashmapinc.server.common.data.id.CustomerId;
 
@@ -32,4 +33,12 @@ public class SendMailRuleToPluginActionMsg extends AbstractRuleToPluginMsg<SendM
         super(tenantId, customerId, deviceId, payload);
     }
 
+    private SendMailRuleToPluginActionMsg(SendMailRuleToPluginActionMsg msg, Long deliveryId){
+        super(msg, deliveryId);
+    }
+
+    @Override
+    public RuleToPluginMsg<SendMailActionMsg> copyDeliveryId(Long deliveryId) {
+        return new SendMailRuleToPluginActionMsg(this, deliveryId);
+    }
 }

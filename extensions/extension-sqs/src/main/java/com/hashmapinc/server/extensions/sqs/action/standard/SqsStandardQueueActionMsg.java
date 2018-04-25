@@ -19,6 +19,7 @@ import com.hashmapinc.server.common.data.id.DeviceId;
 import com.hashmapinc.server.common.data.id.TenantId;
 import com.hashmapinc.server.extensions.api.plugins.msg.AbstractRuleToPluginMsg;
 import com.hashmapinc.server.common.data.id.CustomerId;
+import com.hashmapinc.server.extensions.api.plugins.msg.RuleToPluginMsg;
 
 /**
  * Created by Valerii Sosliuk on 11/6/2017.
@@ -27,5 +28,14 @@ public class SqsStandardQueueActionMsg extends AbstractRuleToPluginMsg<SqsStanda
 
     public SqsStandardQueueActionMsg(TenantId tenantId, CustomerId customerId, DeviceId deviceId, SqsStandardQueueActionPayload payload) {
         super(tenantId, customerId, deviceId, payload);
+    }
+
+    private SqsStandardQueueActionMsg(SqsStandardQueueActionMsg msg, Long deliveryId){
+        super(msg, deliveryId);
+    }
+
+    @Override
+    public RuleToPluginMsg<SqsStandardQueueActionPayload> copyDeliveryId(Long deliveryId) {
+        return new SqsStandardQueueActionMsg(this, deliveryId);
     }
 }

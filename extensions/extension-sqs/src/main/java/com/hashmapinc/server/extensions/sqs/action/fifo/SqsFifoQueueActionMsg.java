@@ -19,6 +19,7 @@ import com.hashmapinc.server.common.data.id.DeviceId;
 import com.hashmapinc.server.common.data.id.TenantId;
 import com.hashmapinc.server.extensions.api.plugins.msg.AbstractRuleToPluginMsg;
 import com.hashmapinc.server.common.data.id.CustomerId;
+import com.hashmapinc.server.extensions.api.plugins.msg.RuleToPluginMsg;
 
 /**
  * Created by Valerii Sosliuk on 11/10/2017.
@@ -27,5 +28,14 @@ public class SqsFifoQueueActionMsg extends AbstractRuleToPluginMsg<SqsFifoQueueA
 
     public SqsFifoQueueActionMsg(TenantId tenantId, CustomerId customerId, DeviceId deviceId, SqsFifoQueueActionPayload payload) {
         super(tenantId, customerId, deviceId, payload);
+    }
+
+    private SqsFifoQueueActionMsg(SqsFifoQueueActionMsg msg, Long deliveryId){
+        super(msg, deliveryId);
+    }
+
+    @Override
+    public RuleToPluginMsg<SqsFifoQueueActionPayload> copyDeliveryId(Long deliveryId) {
+        return new SqsFifoQueueActionMsg(this, deliveryId);
     }
 }

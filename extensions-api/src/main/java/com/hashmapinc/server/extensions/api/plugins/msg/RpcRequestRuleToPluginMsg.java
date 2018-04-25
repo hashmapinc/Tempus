@@ -28,4 +28,12 @@ public class RpcRequestRuleToPluginMsg extends AbstractRuleToPluginMsg<ToServerR
         super(tenantId, customerId, deviceId, payload);
     }
 
+    private RpcRequestRuleToPluginMsg(RpcRequestRuleToPluginMsg msg, Long deliveryId){
+        super(msg, deliveryId);
+    }
+
+    @Override
+    public RuleToPluginMsg<ToServerRpcRequestMsg> copyDeliveryId(Long deliveryId) {
+        return new RpcRequestRuleToPluginMsg(this, deliveryId);
+    }
 }

@@ -30,4 +30,13 @@ public class GetAttributesRequestRuleToPluginMsg extends AbstractRuleToPluginMsg
     public GetAttributesRequestRuleToPluginMsg(TenantId tenantId, CustomerId customerId, DeviceId deviceId, GetAttributesRequest payload) {
         super(tenantId, customerId, deviceId, payload);
     }
+
+    private GetAttributesRequestRuleToPluginMsg(GetAttributesRequestRuleToPluginMsg msg, Long deliveryId){
+        super(msg, deliveryId);
+    }
+
+    @Override
+    public RuleToPluginMsg<GetAttributesRequest> copyDeliveryId(Long deliveryId) {
+        return new GetAttributesRequestRuleToPluginMsg(this, deliveryId);
+    }
 }

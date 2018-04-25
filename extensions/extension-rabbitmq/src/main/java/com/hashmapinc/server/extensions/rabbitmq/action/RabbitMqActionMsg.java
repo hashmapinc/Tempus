@@ -19,6 +19,7 @@ import com.hashmapinc.server.common.data.id.DeviceId;
 import com.hashmapinc.server.common.data.id.TenantId;
 import com.hashmapinc.server.common.data.id.CustomerId;
 import com.hashmapinc.server.extensions.api.plugins.msg.AbstractRuleToPluginMsg;
+import com.hashmapinc.server.extensions.api.plugins.msg.RuleToPluginMsg;
 
 /**
  * @author Andrew Shvayka
@@ -27,5 +28,14 @@ public class RabbitMqActionMsg extends AbstractRuleToPluginMsg<RabbitMqActionPay
 
     public RabbitMqActionMsg(TenantId tenantId, CustomerId customerId, DeviceId deviceId, RabbitMqActionPayload payload) {
         super(tenantId, customerId, deviceId, payload);
+    }
+
+    private RabbitMqActionMsg(RabbitMqActionMsg msg, Long deliveryId){
+        super(msg, deliveryId);
+    }
+
+    @Override
+    public RuleToPluginMsg<RabbitMqActionPayload> copyDeliveryId(Long deliveryId) {
+        return new RabbitMqActionMsg(this, deliveryId);
     }
 }

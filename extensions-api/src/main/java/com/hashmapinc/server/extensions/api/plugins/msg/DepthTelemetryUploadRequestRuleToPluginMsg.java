@@ -30,7 +30,17 @@ public class DepthTelemetryUploadRequestRuleToPluginMsg extends AbstractRuleToPl
         this.ttl = ttl;
     }
 
+    private DepthTelemetryUploadRequestRuleToPluginMsg(DepthTelemetryUploadRequestRuleToPluginMsg msg, Long deliveryId){
+        super(msg, deliveryId);
+        this.ttl = msg.getTtl();
+    }
+
     public long getTtl() {
         return ttl;
+    }
+
+    @Override
+    public RuleToPluginMsg<DepthTelemetryUploadRequest> copyDeliveryId(Long deliveryId) {
+        return new DepthTelemetryUploadRequestRuleToPluginMsg(this, deliveryId);
     }
 }

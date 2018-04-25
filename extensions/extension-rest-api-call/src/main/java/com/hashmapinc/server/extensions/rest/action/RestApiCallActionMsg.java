@@ -19,10 +19,20 @@ import com.hashmapinc.server.common.data.id.DeviceId;
 import com.hashmapinc.server.common.data.id.TenantId;
 import com.hashmapinc.server.extensions.api.plugins.msg.AbstractRuleToPluginMsg;
 import com.hashmapinc.server.common.data.id.CustomerId;
+import com.hashmapinc.server.extensions.api.plugins.msg.RuleToPluginMsg;
 
 public class RestApiCallActionMsg extends AbstractRuleToPluginMsg<RestApiCallActionPayload> {
 
     public RestApiCallActionMsg(TenantId tenantId, CustomerId customerId, DeviceId deviceId, RestApiCallActionPayload payload) {
         super(tenantId, customerId, deviceId, payload);
+    }
+
+    private RestApiCallActionMsg(RestApiCallActionMsg msg, Long deliveryId){
+        super(msg, deliveryId);
+    }
+
+    @Override
+    public RuleToPluginMsg<RestApiCallActionPayload> copyDeliveryId(Long deliveryId) {
+        return new RestApiCallActionMsg(this, deliveryId);
     }
 }

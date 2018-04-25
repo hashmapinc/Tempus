@@ -43,7 +43,7 @@ public class RuleActor extends ComponentActor<RuleId, RuleActorMessageProcessor>
         logger.debug("[{}] Received message: {}", id, msg);
         if (msg instanceof RuleProcessingMsg) {
             try {
-                processor.onRuleProcessingMsg(context(), (RuleProcessingMsg) msg, ruleProcessingFunction());
+                processor.onRuleProcessingMsg(context(), (RuleProcessingMsg) msg, ruleToPluginPersistFunction());
                 increaseMessagesProcessedCount();
             }catch (Exception e) {
                 logAndPersist("onDeviceMsg", e);
@@ -87,7 +87,7 @@ public class RuleActor extends ComponentActor<RuleId, RuleActorMessageProcessor>
             };
         }
 
-        private Function1<RuleToPluginMsg<?>, BoxedUnit> ruleProcessingFunction(){
+        private Function1<RuleToPluginMsg<?>, BoxedUnit> ruleToPluginPersistFunction(){
             return new AbstractFunction1<RuleToPluginMsg<?>, BoxedUnit>() {
                 @Override
                 public BoxedUnit apply(RuleToPluginMsg<?> msg) {
@@ -101,7 +101,7 @@ public class RuleActor extends ComponentActor<RuleId, RuleActorMessageProcessor>
             return new AbstractFunction1<RuleToPluginMsg<?>, BoxedUnit>() {
                 @Override
                 public BoxedUnit apply(RuleToPluginMsg<?> v1) {
-                    deliver(context().parent().path(), (Long param) -> processor.buildRuleToPluginMessage(v1));
+                    deliver(context().parent().path(), (Long param) -> processor.buildRuleToPluginMessage(v1, param));
                     return BoxedUnit.UNIT;
                 }
             };
@@ -118,7 +118,9 @@ public class RuleActor extends ComponentActor<RuleId, RuleActorMessageProcessor>
         }
 
         private void persistPluginToRuleMsg(PluginToRuleMsg<?> msg){
-            persistAsync(msg, confirmDeliveryOfRuleToPluginMessageFunction());
+            if(processor.shouldPersistMessage()){
+                persistAsync(msg, confirmDeliveryOfRuleToPluginMessageFunction());
+            }
         }
 
         @Override

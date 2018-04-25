@@ -19,10 +19,20 @@ import com.hashmapinc.server.common.data.id.CustomerId;
 import com.hashmapinc.server.common.data.id.DeviceId;
 import com.hashmapinc.server.common.data.id.TenantId;
 import com.hashmapinc.server.extensions.api.plugins.msg.AbstractRuleToPluginMsg;
+import com.hashmapinc.server.extensions.api.plugins.msg.RuleToPluginMsg;
 
 public class MqttActionMsg extends AbstractRuleToPluginMsg<MqttActionPayload> {
 
     public MqttActionMsg(TenantId tenantId, CustomerId customerId, DeviceId deviceId, MqttActionPayload payload) {
         super(tenantId, customerId, deviceId, payload);
+    }
+
+    private MqttActionMsg(MqttActionMsg msg, Long deliveryId){
+        super(msg, deliveryId);
+    }
+
+    @Override
+    public RuleToPluginMsg<MqttActionPayload> copyDeliveryId(Long deliveryId) {
+        return new MqttActionMsg(this, deliveryId);
     }
 }

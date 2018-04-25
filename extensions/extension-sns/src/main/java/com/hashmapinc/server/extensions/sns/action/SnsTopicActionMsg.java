@@ -19,6 +19,7 @@ import com.hashmapinc.server.common.data.id.CustomerId;
 import com.hashmapinc.server.common.data.id.DeviceId;
 import com.hashmapinc.server.common.data.id.TenantId;
 import com.hashmapinc.server.extensions.api.plugins.msg.AbstractRuleToPluginMsg;
+import com.hashmapinc.server.extensions.api.plugins.msg.RuleToPluginMsg;
 
 /**
  * Created by Valerii Sosliuk on 11/15/2017.
@@ -27,5 +28,14 @@ public class SnsTopicActionMsg extends AbstractRuleToPluginMsg<SnsTopicActionPay
 
     public SnsTopicActionMsg(TenantId tenantId, CustomerId customerId, DeviceId deviceId, SnsTopicActionPayload payload) {
         super(tenantId, customerId, deviceId, payload);
+    }
+
+    private SnsTopicActionMsg(SnsTopicActionMsg msg, Long deliveryId){
+        super(msg, deliveryId);
+    }
+
+    @Override
+    public RuleToPluginMsg<SnsTopicActionPayload> copyDeliveryId(Long deliveryId) {
+        return new SnsTopicActionMsg(this, deliveryId);
     }
 }

@@ -19,10 +19,20 @@ import com.hashmapinc.server.common.data.id.CustomerId;
 import com.hashmapinc.server.common.data.id.DeviceId;
 import com.hashmapinc.server.common.data.id.TenantId;
 import com.hashmapinc.server.extensions.api.plugins.msg.AbstractRuleToPluginMsg;
+import com.hashmapinc.server.extensions.api.plugins.msg.RuleToPluginMsg;
 
 public class KafkaActionMsg extends AbstractRuleToPluginMsg<KafkaActionPayload> {
 
     public KafkaActionMsg(TenantId tenantId, CustomerId customerId, DeviceId deviceId, KafkaActionPayload payload) {
         super(tenantId, customerId, deviceId, payload);
+    }
+
+    public KafkaActionMsg(KafkaActionMsg msg, Long deliveryId){
+        super(msg, deliveryId);
+    }
+
+    @Override
+    public RuleToPluginMsg<KafkaActionPayload> copyDeliveryId(Long deliveryId) {
+        return new KafkaActionMsg(this, deliveryId);
     }
 }

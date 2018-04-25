@@ -19,9 +19,19 @@ import com.hashmapinc.server.common.data.id.DeviceId;
 import com.hashmapinc.server.common.data.id.TenantId;
 import com.hashmapinc.server.extensions.api.plugins.msg.AbstractRuleToPluginMsg;
 import com.hashmapinc.server.common.data.id.CustomerId;
+import com.hashmapinc.server.extensions.api.plugins.msg.RuleToPluginMsg;
 
 public class SparkComputationActionMessage extends AbstractRuleToPluginMsg<SparkComputationActionPayload> {
     public SparkComputationActionMessage(TenantId tenantId, CustomerId customerId, DeviceId deviceId, SparkComputationActionPayload payload) {
         super(tenantId, customerId, deviceId, payload);
+    }
+
+    private SparkComputationActionMessage(SparkComputationActionMessage msg, Long deliveryId){
+        super(msg, deliveryId);
+    }
+
+    @Override
+    public RuleToPluginMsg<SparkComputationActionPayload> copyDeliveryId(Long deliveryId) {
+        return new SparkComputationActionMessage(this, deliveryId);
     }
 }

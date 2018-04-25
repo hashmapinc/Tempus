@@ -28,4 +28,12 @@ public class UpdateAttributesRequestRuleToPluginMsg extends AbstractRuleToPlugin
         super(tenantId, customerId, deviceId, payload);
     }
 
+    private UpdateAttributesRequestRuleToPluginMsg(UpdateAttributesRequestRuleToPluginMsg msg, Long deliveryId){
+        super(msg, deliveryId);
+    }
+
+    @Override
+    public RuleToPluginMsg<UpdateAttributesRequest> copyDeliveryId(Long deliveryId) {
+        return new UpdateAttributesRequestRuleToPluginMsg(this, deliveryId);
+    }
 }

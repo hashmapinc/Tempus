@@ -28,4 +28,12 @@ public class GetRequestRuleToPluginMsg extends AbstractRuleToPluginMsg<String[]>
         super(tenantId, customerId, deviceId, payload);
     }
 
+    private GetRequestRuleToPluginMsg(GetRequestRuleToPluginMsg msg, Long deliveryId){
+        super(msg, deliveryId);
+    }
+
+    @Override
+    public RuleToPluginMsg<String[]> copyDeliveryId(Long deliveryId) {
+        return new GetRequestRuleToPluginMsg(this, deliveryId);
+    }
 }

@@ -184,8 +184,8 @@ class RuleActorMessageProcessor extends ComponentMsgProcessor<RuleId> {
         pushToNextRule(context, msg.getCtx(), RuleEngineError.NO_TWO_WAY_ACTIONS);
     }
 
-    protected RuleToPluginMsgWrapper buildRuleToPluginMessage(RuleToPluginMsg<?> ruleToPluginMsg){
-        return new RuleToPluginMsgWrapper(pluginTenantId, pluginId, tenantId, entityId, ruleToPluginMsg);
+    protected RuleToPluginMsgWrapper buildRuleToPluginMessage(RuleToPluginMsg<?> ruleToPluginMsg, Long deliveryId){
+        return new RuleToPluginMsgWrapper(pluginTenantId, pluginId, tenantId, entityId, ruleToPluginMsg.copyDeliveryId(deliveryId));
     }
 
     void onPluginMsg(ActorContext context, PluginToRuleMsg<?> msg) {
@@ -211,6 +211,10 @@ class RuleActorMessageProcessor extends ComponentMsgProcessor<RuleId> {
             ChainProcessingContext ctx = pendingMsg.getCtx();
             pushToNextRule(context, ctx, RuleEngineError.PLUGIN_TIMEOUT);
         }
+    }
+
+    protected boolean shouldPersistMessage(){
+        return state == ComponentLifecycleState.ACTIVE && !action.isOneWayAction();
     }
 
     private void pushToNextRule(ActorContext context, ChainProcessingContext ctx, RuleEngineError error) {

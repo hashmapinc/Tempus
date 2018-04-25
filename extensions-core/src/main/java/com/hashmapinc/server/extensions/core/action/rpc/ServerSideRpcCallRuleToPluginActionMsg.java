@@ -19,6 +19,7 @@ import com.hashmapinc.server.common.data.id.DeviceId;
 import com.hashmapinc.server.common.data.id.TenantId;
 import com.hashmapinc.server.extensions.api.plugins.msg.AbstractRuleToPluginMsg;
 import com.hashmapinc.server.common.data.id.CustomerId;
+import com.hashmapinc.server.extensions.api.plugins.msg.RuleToPluginMsg;
 
 /**
  * Created by ashvayka on 14.09.17.
@@ -28,5 +29,14 @@ public class ServerSideRpcCallRuleToPluginActionMsg extends AbstractRuleToPlugin
     public ServerSideRpcCallRuleToPluginActionMsg(TenantId tenantId, CustomerId customerId, DeviceId deviceId,
                                                   ServerSideRpcCallActionMsg payload) {
         super(tenantId, customerId, deviceId, payload);
+    }
+
+    private ServerSideRpcCallRuleToPluginActionMsg(ServerSideRpcCallRuleToPluginActionMsg msg, Long deliveryId){
+        super(msg, deliveryId);
+    }
+
+    @Override
+    public RuleToPluginMsg<ServerSideRpcCallActionMsg> copyDeliveryId(Long deliveryId) {
+        return new ServerSideRpcCallRuleToPluginActionMsg(this, deliveryId);
     }
 }

@@ -30,7 +30,17 @@ public class TelemetryUploadRequestRuleToPluginMsg extends AbstractRuleToPluginM
         this.ttl = ttl;
     }
 
+    private TelemetryUploadRequestRuleToPluginMsg(TelemetryUploadRequestRuleToPluginMsg msg, Long deliveryId){
+        super(msg, deliveryId);
+        this.ttl = msg.getTtl();
+    }
+
     public long getTtl() {
         return ttl;
+    }
+
+    @Override
+    public RuleToPluginMsg<TelemetryUploadRequest> copyDeliveryId(Long deliveryId) {
+        return new TelemetryUploadRequestRuleToPluginMsg(this, deliveryId);
     }
 }
