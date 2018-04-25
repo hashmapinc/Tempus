@@ -56,7 +56,7 @@ public class TimePlugin extends AbstractPlugin<TimePluginConfiguration> implemen
                 reply = Long.toString(System.currentTimeMillis());
             }
             ToServerRpcResponseMsg response = new ToServerRpcResponseMsg(request.getRequestId(), "{\"time\":" + reply + "}");
-            ctx.reply(new RpcResponsePluginToRuleMsg(msg.getUid(), tenantId, ruleId, response));
+            ctx.reply(new RpcResponsePluginToRuleMsg(msg.getUid(), tenantId, ruleId, response, msg.getDeliveryId()));
         } else {
             throw new RuntimeException("Not supported msg type: " + msg.getPayload().getClass() + "!");
         }

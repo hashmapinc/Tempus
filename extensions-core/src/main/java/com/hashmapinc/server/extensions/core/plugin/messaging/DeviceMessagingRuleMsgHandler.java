@@ -64,7 +64,7 @@ public class DeviceMessagingRuleMsgHandler implements RuleMsgHandler {
             ToServerRpcRequestMsg request = (ToServerRpcRequestMsg) msg.getPayload();
             try {
                 PendingRpcRequestMetadata md = new PendingRpcRequestMetadata(msg.getUid(),
-                        request.getRequestId(), tenantId, ruleId, msg.getCustomerId(), msg.getDeviceId());
+                        request.getRequestId(), tenantId, ruleId, msg.getCustomerId(), msg.getDeviceId(), msg.getDeliveryId());
                 switch (request.getMethod()) {
                     case GET_DEVICE_LIST_METHOD_NAME:
                         processGetDeviceList(ctx, md);
@@ -96,7 +96,7 @@ public class DeviceMessagingRuleMsgHandler implements RuleMsgHandler {
                 response = new ToServerRpcResponseMsg(pendindMsg.getRequestId(), msg.getResponse().orElse(""));
             }
             ctx.reply(new RpcResponsePluginToRuleMsg(
-                    pendindMsg.getUid(), pendindMsg.getTenantId(), pendindMsg.getRuleId(), response));
+                    pendindMsg.getUid(), pendindMsg.getTenantId(), pendindMsg.getRuleId(), response, pendindMsg.getDeliveryId()));
         } else {
             log.trace("[{}] Received stale response: {}", requestId, msg);
         }
@@ -117,7 +117,7 @@ public class DeviceMessagingRuleMsgHandler implements RuleMsgHandler {
                     });
                     ToServerRpcResponseMsg response = new ToServerRpcResponseMsg(requestMd.getRequestId(), GSON.toJson(deviceList));
                     ctx.reply(new RpcResponsePluginToRuleMsg(
-                            requestMd.getUid(), requestMd.getTenantId(), requestMd.getRuleId(), response));
+                            requestMd.getUid(), requestMd.getTenantId(), requestMd.getRuleId(), response, requestMd.getDeliveryId()));
                 }
 
                 @Override
@@ -196,7 +196,7 @@ public class DeviceMessagingRuleMsgHandler implements RuleMsgHandler {
     private void replyWithErrorJson(PluginContext ctx, PendingRpcRequestMetadata requestMd, String error) {
         ToServerRpcResponseMsg response = new ToServerRpcResponseMsg(requestMd.getRequestId(), error);
         ctx.reply(new RpcResponsePluginToRuleMsg(
-                requestMd.getUid(), requestMd.getTenantId(), requestMd.getRuleId(), response));
+                requestMd.getUid(), requestMd.getTenantId(), requestMd.getRuleId(), response, requestMd.getDeliveryId()));
     }
 
     private String toJsonString(String error) {

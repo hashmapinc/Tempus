@@ -25,8 +25,8 @@ public class RpcResponsePluginToRuleMsg extends AbstractPluginToRuleMsg<ToServer
 
     private static final long serialVersionUID = 1L;
 
-    public RpcResponsePluginToRuleMsg(UUID uid, TenantId tenantId, RuleId ruleId, ToServerRpcResponseMsg payload) {
-        super(uid, tenantId, ruleId, payload);
+    public RpcResponsePluginToRuleMsg(UUID uid, TenantId tenantId, RuleId ruleId, ToServerRpcResponseMsg payload, Long deliveryId) {
+        super(uid, tenantId, ruleId, payload, deliveryId);
     }
 
 }

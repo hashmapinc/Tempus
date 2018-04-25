@@ -55,13 +55,13 @@ public class TelemetryRuleMsgHandler extends DefaultRuleMsgHandler {
             public void onSuccess(PluginContext ctx, List<AttributeKvEntry> clientAttributes, List<AttributeKvEntry> sharedAttributes) {
                 BasicGetAttributesResponse response = BasicGetAttributesResponse.onSuccess(request.getMsgType(),
                         request.getRequestId(), BasicAttributeKVMsg.from(clientAttributes, sharedAttributes));
-                ctx.reply(new ResponsePluginToRuleMsg(msg.getUid(), tenantId, ruleId, response));
+                ctx.reply(new ResponsePluginToRuleMsg(msg.getUid(), tenantId, ruleId, response, msg.getDeliveryId()));
             }
 
             @Override
             public void onFailure(PluginContext ctx, Exception e) {
                 log.error("Failed to process get attributes request", e);
-                ctx.reply(new ResponsePluginToRuleMsg(msg.getUid(), tenantId, ruleId, BasicStatusCodeResponse.onError(request.getMsgType(), request.getRequestId(), e)));
+                ctx.reply(new ResponsePluginToRuleMsg(msg.getUid(), tenantId, ruleId, BasicStatusCodeResponse.onError(request.getMsgType(), request.getRequestId(), e), msg.getDeliveryId()));
             }
         };
 
@@ -94,7 +94,7 @@ public class TelemetryRuleMsgHandler extends DefaultRuleMsgHandler {
         ctx.saveTsData(msg.getDeviceId(), tsKvEntries, msg.getTtl(), new PluginCallback<Void>() {
             @Override
             public void onSuccess(PluginContext ctx, Void data) {
-                ctx.reply(new ResponsePluginToRuleMsg(msg.getUid(), tenantId, ruleId, BasicStatusCodeResponse.onSuccess(request.getMsgType(), request.getRequestId())));
+                ctx.reply(new ResponsePluginToRuleMsg(msg.getUid(), tenantId, ruleId, BasicStatusCodeResponse.onSuccess(request.getMsgType(), request.getRequestId()), msg.getDeliveryId()));
                 subscriptionManager.onLocalSubscriptionUpdate(ctx, msg.getDeviceId(), SubscriptionType.TIMESERIES, s ->
                     prepareSubscriptionUpdate(request, s)
                 );
@@ -103,7 +103,7 @@ public class TelemetryRuleMsgHandler extends DefaultRuleMsgHandler {
             @Override
             public void onFailure(PluginContext ctx, Exception e) {
                 log.error("Failed to process telemetry upload request", e);
-                ctx.reply(new ResponsePluginToRuleMsg(msg.getUid(), tenantId, ruleId, BasicStatusCodeResponse.onError(request.getMsgType(), request.getRequestId(), e)));
+                ctx.reply(new ResponsePluginToRuleMsg(msg.getUid(), tenantId, ruleId, BasicStatusCodeResponse.onError(request.getMsgType(), request.getRequestId(), e), msg.getDeliveryId()));
             }
         });
     }
@@ -136,7 +136,7 @@ public class TelemetryRuleMsgHandler extends DefaultRuleMsgHandler {
             @Override
             public void onSuccess(PluginContext ctx, Void data) {
                 log.debug(" ctx.saveDsData On success");
-                ctx.reply(new ResponsePluginToRuleMsg(msg.getUid(), tenantId, ruleId, BasicStatusCodeResponse.onSuccess(request.getMsgType(), request.getRequestId())));
+                ctx.reply(new ResponsePluginToRuleMsg(msg.getUid(), tenantId, ruleId, BasicStatusCodeResponse.onSuccess(request.getMsgType(), request.getRequestId()), msg.getDeliveryId()));
                 subscriptionManager.onLocalSubscriptionUpdateForDepth(ctx, msg.getDeviceId(), SubscriptionType.DEPTHSERIES, s -> {
                     List<DsKvEntry> subscriptionUpdate = new ArrayList<DsKvEntry>();
                     for (Map.Entry<Double, List<KvEntry>> entry : request.getData().entrySet()) {
@@ -155,7 +155,7 @@ public class TelemetryRuleMsgHandler extends DefaultRuleMsgHandler {
             @Override
             public void onFailure(PluginContext ctx, Exception e) {
                 log.error("Failed to process telemetry upload request", e);
-                ctx.reply(new ResponsePluginToRuleMsg(msg.getUid(), tenantId, ruleId, BasicStatusCodeResponse.onError(request.getMsgType(), request.getRequestId(), e)));
+                ctx.reply(new ResponsePluginToRuleMsg(msg.getUid(), tenantId, ruleId, BasicStatusCodeResponse.onError(request.getMsgType(), request.getRequestId(), e), msg.getDeliveryId()));
             }
         });
     }
@@ -167,7 +167,7 @@ public class TelemetryRuleMsgHandler extends DefaultRuleMsgHandler {
                 new PluginCallback<Void>() {
                     @Override
                     public void onSuccess(PluginContext ctx, Void value) {
-                        ctx.reply(new ResponsePluginToRuleMsg(msg.getUid(), tenantId, ruleId, BasicStatusCodeResponse.onSuccess(request.getMsgType(), request.getRequestId())));
+                        ctx.reply(new ResponsePluginToRuleMsg(msg.getUid(), tenantId, ruleId, BasicStatusCodeResponse.onSuccess(request.getMsgType(), request.getRequestId()), msg.getDeliveryId()));
 
                         subscriptionManager.onLocalSubscriptionUpdate(ctx, msg.getDeviceId(), SubscriptionType.ATTRIBUTES, s -> {
                             List<TsKvEntry> subscriptionUpdate = new ArrayList<>();
@@ -183,7 +183,7 @@ public class TelemetryRuleMsgHandler extends DefaultRuleMsgHandler {
                     @Override
                     public void onFailure(PluginContext ctx, Exception e) {
                         log.error("Failed to process attributes update request", e);
-                        ctx.reply(new ResponsePluginToRuleMsg(msg.getUid(), tenantId, ruleId, BasicStatusCodeResponse.onError(request.getMsgType(), request.getRequestId(), e)));
+                        ctx.reply(new ResponsePluginToRuleMsg(msg.getUid(), tenantId, ruleId, BasicStatusCodeResponse.onError(request.getMsgType(), request.getRequestId(), e), msg.getDeliveryId()));
                     }
                 });
     }

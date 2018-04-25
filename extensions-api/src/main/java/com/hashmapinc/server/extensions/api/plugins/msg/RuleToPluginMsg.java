@@ -66,4 +66,11 @@ public interface RuleToPluginMsg<V extends Serializable> extends Serializable {
      * @return New Instance of message with delivery id
      */
     RuleToPluginMsg<V> copyDeliveryId(Long deliveryId);
+
+    /**
+     * Return delivery id which will act as correlation id
+     *
+     * @return delivery id
+     */
+    Long getDeliveryId();
 }

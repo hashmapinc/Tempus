@@ -63,7 +63,7 @@ public class SqsMessageHandler implements RuleMsgHandler {
         sqs.sendMessage(sendMsgRequest);
         if (payload.isSync()) {
             ctx.reply(new ResponsePluginToRuleMsg(msg.getUid(), tenantId, ruleId,
-                    BasicStatusCodeResponse.onSuccess(payload.getMsgType(), payload.getRequestId())));
+                    BasicStatusCodeResponse.onSuccess(payload.getMsgType(), payload.getRequestId()), msg.getDeliveryId()));
         }
     }
 
@@ -76,7 +76,7 @@ public class SqsMessageHandler implements RuleMsgHandler {
         sqs.sendMessage(sendMsgRequest);
         if (payload.isSync()) {
             ctx.reply(new ResponsePluginToRuleMsg(msg.getUid(), tenantId, ruleId,
-                    BasicStatusCodeResponse.onSuccess(payload.getMsgType(), payload.getRequestId())));
+                    BasicStatusCodeResponse.onSuccess(payload.getMsgType(), payload.getRequestId()), msg.getDeliveryId()));
         }
     }
 }

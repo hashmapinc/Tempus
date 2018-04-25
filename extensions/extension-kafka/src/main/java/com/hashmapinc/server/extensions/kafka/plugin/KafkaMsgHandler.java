@@ -49,10 +49,10 @@ public class KafkaMsgHandler implements RuleMsgHandler {
                         if (payload.isSync()) {
                             if (metadata != null) {
                                 ctx.reply(new ResponsePluginToRuleMsg(msg.getUid(), tenantId, ruleId,
-                                        BasicStatusCodeResponse.onSuccess(payload.getMsgType(), payload.getRequestId())));
+                                        BasicStatusCodeResponse.onSuccess(payload.getMsgType(), payload.getRequestId()), msg.getDeliveryId()));
                             } else {
                                 ctx.reply(new ResponsePluginToRuleMsg(msg.getUid(), tenantId, ruleId,
-                                        BasicStatusCodeResponse.onError(payload.getMsgType(), payload.getRequestId(), e)));
+                                        BasicStatusCodeResponse.onError(payload.getMsgType(), payload.getRequestId(), e), msg.getDeliveryId()));
                             }
                         }
                     });

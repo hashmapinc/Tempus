@@ -34,4 +34,5 @@ class PendingRpcRequestMetadata {
     private final RuleId ruleId;
     private final CustomerId customerId;
     private final DeviceId deviceId;
+    private final Long deliveryId;
 }

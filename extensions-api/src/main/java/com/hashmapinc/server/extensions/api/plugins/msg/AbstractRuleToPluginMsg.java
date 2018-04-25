@@ -77,6 +77,11 @@ public abstract class AbstractRuleToPluginMsg<T extends Serializable> implements
     }
 
     @Override
+    public Long getDeliveryId() {
+        return deliveryId;
+    }
+
+    @Override
     public String toString() {
         return "AbstractRuleToPluginMsg [uid=" + uid + ", tenantId=" + tenantId + ", customerId=" + customerId
                 + ", deviceId=" + deviceId + ", payload=" + payload + "]";

@@ -85,48 +85,45 @@ public class RuleActor extends ComponentActor<RuleId, RuleActorMessageProcessor>
                     return BoxedUnit.UNIT;
                 }
             };
-        }
+    }
 
-        private Function1<RuleToPluginMsg<?>, BoxedUnit> ruleToPluginPersistFunction(){
-            return new AbstractFunction1<RuleToPluginMsg<?>, BoxedUnit>() {
-                @Override
-                public BoxedUnit apply(RuleToPluginMsg<?> msg) {
-                    persistAsync(msg, deliverRuleToPluginMessageFunction());
-                    return BoxedUnit.UNIT;
-                }
-            };
-        }
-
-        private Function1<RuleToPluginMsg<?>, BoxedUnit> deliverRuleToPluginMessageFunction(){
-            return new AbstractFunction1<RuleToPluginMsg<?>, BoxedUnit>() {
-                @Override
-                public BoxedUnit apply(RuleToPluginMsg<?> v1) {
-                    deliver(context().parent().path(), (Long param) -> processor.buildRuleToPluginMessage(v1, param));
-                    return BoxedUnit.UNIT;
-                }
-            };
-        }
-
-        private Function1<PluginToRuleMsg<?>, BoxedUnit> confirmDeliveryOfRuleToPluginMessageFunction(){
-            return new AbstractFunction1<PluginToRuleMsg<?>, BoxedUnit>() {
-                @Override
-                public BoxedUnit apply(PluginToRuleMsg<?> v1) {
-                    //confirmDelivery(v1.);
-                    return BoxedUnit.UNIT;
-                }
-            };
-        }
-
-        private void persistPluginToRuleMsg(PluginToRuleMsg<?> msg){
-            if(processor.shouldPersistMessage()){
-                persistAsync(msg, confirmDeliveryOfRuleToPluginMessageFunction());
+    private Function1<RuleToPluginMsg<?>, BoxedUnit> ruleToPluginPersistFunction(){
+        return new AbstractFunction1<RuleToPluginMsg<?>, BoxedUnit>() {
+            @Override
+            public BoxedUnit apply(RuleToPluginMsg<?> msg) {
+                persistAsync(msg, deliverRuleToPluginMessageFunction());
+                return BoxedUnit.UNIT;
             }
-        }
+        };
+    }
 
-        @Override
-        public String persistenceId() {
-            return id.getId().toString();
+    private Function1<RuleToPluginMsg<?>, BoxedUnit> deliverRuleToPluginMessageFunction(){
+        return new AbstractFunction1<RuleToPluginMsg<?>, BoxedUnit>() {
+            @Override
+            public BoxedUnit apply(RuleToPluginMsg<?> v1) {
+                deliver(context().parent().path(), (Long param) -> processor.buildRuleToPluginMessage(v1, param));
+                return BoxedUnit.UNIT;
+            }
+        };
+    }
+
+    private Function1<PluginToRuleMsg<?>, BoxedUnit> confirmDeliveryOfRuleToPluginMessageFunction(){
+        return new AbstractFunction1<PluginToRuleMsg<?>, BoxedUnit>() {
+            @Override
+            public BoxedUnit apply(PluginToRuleMsg<?> v1) {
+                //Before confirming delivery check if there are no errors in message from plugin
+                confirmDelivery(v1.getDeliveryId());
+                return BoxedUnit.UNIT;
+            }
+        };
+    }
+
+    private void persistPluginToRuleMsg(PluginToRuleMsg<?> msg){
+        if(processor.shouldPersistMessage()){
+            persistAsync(msg, confirmDeliveryOfRuleToPluginMessageFunction());
         }
+    }
+
 
     public static class ActorCreator extends ContextBasedCreator<RuleActor> {
         private static final long serialVersionUID = 1L;

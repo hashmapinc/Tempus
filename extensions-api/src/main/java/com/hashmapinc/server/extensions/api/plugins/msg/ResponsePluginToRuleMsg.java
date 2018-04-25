@@ -25,8 +25,8 @@ public class ResponsePluginToRuleMsg extends AbstractPluginToRuleMsg<ToDeviceMsg
 
     private static final long serialVersionUID = 1L;
 
-    public ResponsePluginToRuleMsg(UUID uid, TenantId tenantId, RuleId ruleId, ToDeviceMsg payload) {
-        super(uid, tenantId, ruleId, payload);
+    public ResponsePluginToRuleMsg(UUID uid, TenantId tenantId, RuleId ruleId, ToDeviceMsg payload, Long deliveryId) {
+        super(uid, tenantId, ruleId, payload, deliveryId);
     }
 
 }
