@@ -848,6 +848,11 @@
             <url>http://repo1.maven.org/maven2/</url>
         </repository>
         <repository>
+            <id>aws-release</id>
+            <name>AWS S3 Release Repository</name>
+            <url>s3://cirrus-link-maven-repo/release</url>
+        </repository>
+        <repository>
             <id>spring-snapshots</id>
             <name>Spring Snapshots</name>
             <url>https://repo.spring.io/snapshot</url>

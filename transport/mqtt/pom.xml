@@ -34,40 +34,11 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <main.dir>${basedir}/../..</main.dir>
     </properties>
-
-    <build>
-        <plugins>
-        <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-install-plugin</artifactId>
-        <version>2.5.1</version>
-        <configuration>
-            <groupId>com.cirruslink.sparkplug</groupId>
-            <artifactId>sparkplug-java</artifactId>
-            <version>1.1.11</version>
-            <packaging>jar</packaging>
-            <file>src/main/java/com/hashmapinc/server/transport/mqtt/sparkplugB/lib/sparkplug-java-1.1.11.jar</file>
-            <generatePom>true</generatePom>
-        </configuration>
-        <executions>
-            <execution>
-                <id>install-jar-lib</id>
-                <goals>
-                    <goal>install-file</goal>
-                </goals>
-                <phase>validate</phase>
-            </execution>
-        </executions>
-        </plugin>
-        </plugins>
-
-    </build>
-
     <dependencies>
         <dependency>
             <groupId>com.cirruslink.sparkplug</groupId>
             <artifactId>sparkplug-java</artifactId>
-            <version>1.1.11</version>
+            <version>1.1.12</version>
         </dependency>
         <dependency>
             <groupId>com.hashmapinc.common</groupId>
