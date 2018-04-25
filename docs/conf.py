@@ -96,6 +96,9 @@ html_static_path = ['_static']
 #
 # html_sidebars = {}
 
+# apply css widening of the too-narrow read-the-docs content section
+def setup(app):
+    app.add_stylesheet('wider-content.css')
 
 # -- Options for HTMLHelp output ---------------------------------------------
 

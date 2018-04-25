@@ -1,5 +1,5 @@
 /*
- * Copyright © 2016-2017 The Thingsboard Authors
+ * Copyright © 2017-2018 Hashmap, Inc
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-export default angular.module('thingsboard.api.asset', [])
+export default angular.module('tempus.api.asset', [])
     .factory('assetService', AssetService)
     .name;
 
@@ -265,10 +265,10 @@ function AssetService($http, $q, customerService, userService) {
         return deferred.promise;
     }
 
-    function getAssetTypes() {
+    function getAssetTypes(config) {
         var deferred = $q.defer();
         var url = '/api/asset/types';
-        $http.get(url).then(function success(response) {
+        $http.get(url, config).then(function success(response) {
             deferred.resolve(response.data);
         }, function fail() {
             deferred.reject();

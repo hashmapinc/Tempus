@@ -1,5 +1,5 @@
 /*
- * Copyright © 2016-2017 The Thingsboard Authors
+ * Copyright © 2017-2018 Hashmap, Inc
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,14 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import thingsboardTypes from '../common/types.constant';
+import tempusTypes from '../common/types.constant';
 
-export default angular.module('thingsboard.api.device', [thingsboardTypes])
+export default angular.module('tempus.api.device', [tempusTypes])
     .factory('deviceService', DeviceService)
     .name;
 
 /*@ngInject*/
-function DeviceService($http, $q, attributeService, customerService, types) {
+function DeviceService($http, $q, $window, userService, attributeService, customerService, types) {
 
     var service = {
         assignDeviceToCustomer: assignDeviceToCustomer,
@@ -181,14 +181,27 @@ function DeviceService($http, $q, attributeService, customerService, types) {
         return deferred.promise;
     }
 
-    function getDeviceCredentials(deviceId) {
+    function getDeviceCredentials(deviceId, sync) {
         var deferred = $q.defer();
         var url = '/api/device/' + deviceId + '/credentials';
-        $http.get(url, null).then(function success(response) {
-            deferred.resolve(response.data);
-        }, function fail() {
-            deferred.reject();
-        });
+        if (sync) {
+            var request = new $window.XMLHttpRequest();
+            request.open('GET', url, false);
+            request.setRequestHeader("Accept", "application/json, text/plain, */*");
+            userService.setAuthorizationRequestHeader(request);
+            request.send(null);
+            if (request.status === 200) {
+                deferred.resolve(angular.fromJson(request.responseText));
+            } else {
+                deferred.reject();
+            }
+        } else {
+            $http.get(url, null).then(function success(response) {
+                deferred.resolve(response.data);
+            }, function fail() {
+                deferred.reject();
+            });
+        }
         return deferred.promise;
     }
 
@@ -293,10 +306,10 @@ function DeviceService($http, $q, attributeService, customerService, types) {
         return deferred.promise;
     }
 
-    function getDeviceTypes() {
+    function getDeviceTypes(config) {
         var deferred = $q.defer();
         var url = '/api/device/types';
-        $http.get(url).then(function success(response) {
+        $http.get(url, config).then(function success(response) {
             deferred.resolve(response.data);
         }, function fail() {
             deferred.reject();

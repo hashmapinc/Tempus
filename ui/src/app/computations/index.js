@@ -1,5 +1,5 @@
 /*
- * Copyright © 2016-2017 The Thingsboard Authors
+ * Copyright © 2017-2018 Hashmap, Inc
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,11 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 /* eslint-disable import/no-unresolved, import/default */
 import uiRouter from 'angular-ui-router';
-import thingsboardApiComputation from '../api/computation.service';
-import thingsboardApiComputationJob from '../api/computation-job.service';
+import TempusApiComputation from '../api/computation.service';
+import TempusApiComputationJob from '../api/computation-job.service';
 import ComputationController from './computation.controller';
 //import ComputationTestController from './computationsTest.controller';
 import ComputationJobController from './computation-job.controller';
@@ -27,10 +26,10 @@ import ComputationJobDirective from './computation-job.directive';
 import ComputationRoutes from './computation.routes';
 /* eslint-enable import/no-unresolved, import/default */
 
-export default angular.module('thingsboard.computation', [
+export default angular.module('tempus.computation', [
     uiRouter,
-    thingsboardApiComputation,
-    thingsboardApiComputationJob
+    TempusApiComputation,
+    TempusApiComputationJob
 ])
     .config(ComputationRoutes)
     .controller('ComputationController', ComputationController)

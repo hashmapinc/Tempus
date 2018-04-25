@@ -7,10 +7,10 @@
         </encoder>
     </appender>
 
-    <logger name="org.thingsboard.server.dao" level="WARN"/>
+    <logger name="com.hashmapinc.server.dao" level="WARN"/>
     <logger name="org.apache.cassandra" level="WARN"/>
-    <logger name="org.cassandraunit" level="INFO" />
-    <logger name="org.apache.cassandra" level="INFO" />
+    <logger name="org.cassandraunit" level="WARN" />
+    <logger name="org.apache.cassandra" level="WARN" />
 
     <root level="WARN">
         <appender-ref ref="console"/>

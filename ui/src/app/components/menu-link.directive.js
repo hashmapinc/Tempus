@@ -1,5 +1,5 @@
 /*
- * Copyright © 2016-2017 The Thingsboard Authors
+ * Copyright © 2017-2018 Hashmap, Inc
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
  */
 import './menu-link.scss';
 
-import thingsboardMenu from '../services/menu.service';
+import tempusMenu from '../services/menu.service';
 
 /* eslint-disable import/no-unresolved, import/default */
 
@@ -24,7 +24,7 @@ import menutoggleTemplate from './menu-toggle.tpl.html';
 
 /* eslint-enable import/no-unresolved, import/default */
 
-export default angular.module('thingsboard.directives.menuLink', [thingsboardMenu])
+export default angular.module('tempus.directives.menuLink', [tempusMenu])
     .directive('tbMenuLink', MenuLink)
     .filter('nospace', NoSpace)
     .name;

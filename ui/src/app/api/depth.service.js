@@ -1,5 +1,5 @@
 /*
- * Copyright © 2016-2017 The Thingsboard Authors
+ * Copyright © 2017-2018 Hashmap, Inc
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-export default angular.module('thingsboard.api.depth', [])
+export default angular.module('tempus.api.depth', [])
     .factory('depthService', DepthService)
     .name;
 
@@ -78,7 +78,7 @@ function DepthService($translate, types) {
                 }
             },
             aggregation: {
-                type: types.depthAggregation.none.value,
+                type: types.aggregation.none.value,
                 limit: 200
             }
         }
@@ -96,9 +96,9 @@ function DepthService($translate, types) {
 
         var aggType;
         if (depthwindow.aggregation) {
-            aggType = depthwindow.aggregation.type || types.depthAggregation.none.value;
+            aggType = depthwindow.aggregation.type || types.aggregation.none.value;
         } else {
-            aggType = types.depthAggregation.none.value;
+            aggType = types.aggregation.none.value;
         }
 
         var historyDepthwindow = {
@@ -125,7 +125,7 @@ function DepthService($translate, types) {
             aggregation: {
                 interval: DECI_FT,
                 limit: AVG_LIMIT,
-                type: types.depthAggregation.none.value
+                type: types.aggregation.none.value
             }
         };
         var aggDepthwindow = 0;
@@ -133,20 +133,20 @@ function DepthService($translate, types) {
             subscriptionDepthwindow.aggregation = {
                 interval: DECI_FT,
                 limit: MAX_LIMIT,
-                type: types.depthAggregation.none.value,
+                type: types.aggregation.none.value,
                 stateData: true
             };
         } else {
             subscriptionDepthwindow.aggregation = {
                 interval: DECI_FT,
                 limit: AVG_LIMIT,
-                type: types.depthAggregation.none.value
+                type: types.aggregation.none.value
             };
         }
 
         if (angular.isDefined(depthwindow.aggregation) && !stateData) {
             subscriptionDepthwindow.aggregation = {
-                type: depthwindow.aggregation.type || types.depthAggregation.none.value,
+                type: depthwindow.aggregation.type || types.aggregation.none.value,
                 limit: depthwindow.aggregation.limit || AVG_LIMIT
             };
         }
@@ -155,7 +155,6 @@ function DepthService($translate, types) {
             subscriptionDepthwindow.aggregation.interval =
                 boundIntervalToDepthwindow(subscriptionDepthwindow.realtimeWindowFt, depthwindow.realtime.interval,
                     subscriptionDepthwindow.aggregation.type);
-            subscriptionDepthwindow.startDs = startDpt + stDiff - subscriptionDepthwindow.realtimeWindowFt;
 
             subscriptionDepthwindow.startDs = START_DS;
 
@@ -187,7 +186,7 @@ function DepthService($translate, types) {
         }
         var aggregation = subscriptionDepthwindow.aggregation;
         aggregation.depthWindow = aggDepthwindow;
-        if (aggregation.type !== types.depthAggregation.none.value) {
+        if (aggregation.type !== types.aggregation.none.value) {
             aggregation.limit = Math.ceil(aggDepthwindow / subscriptionDepthwindow.aggregation.interval);
         }
         return subscriptionDepthwindow;
@@ -222,9 +221,10 @@ function DepthService($translate, types) {
 
 
     function boundIntervalToDepthwindow(depthwindow, intervalFt, aggType) {
-        if (aggType === types.depthAggregation.none.value) {
+        if (aggType === types.aggregation.none.value) {
             return DECI_FT;
         }
+        return Number(intervalFt);
     }
 
 

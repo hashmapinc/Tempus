@@ -1,0 +1,208 @@
+#
+# Copyright © 2017-2018 Hashmap, Inc
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+kind: Service
+apiVersion: v1
+metadata:
+  name: tb
+  labels:
+    app: tb
+spec:
+  type: LoadBalancer
+  selector:
+    app: tb
+  ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: 8080
+      name: ui
+    - protocol: TCP
+      port: 1883
+      targetPort: 1883
+      name: mqtt
+#    - protocol: UDP
+#      port: 5683
+#      targetPort: 5683
+#      name: coap
+    - protocol: TCP
+      port: 9999
+      targetPort: 9999
+      name: tb-port
+---
+apiVersion: policy/v1beta1
+kind: PodDisruptionBudget
+metadata:
+  name: tb-budget
+spec:
+  selector:
+    matchLabels:
+      app: tb
+  minAvailable: 1
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: tb-config
+data:
+  zookeeper.enabled: "true"
+  zookeeper.url: "zk-cs:2181"
+  cassandra.url: "cassandra:9042"
+  cassandra.host: "cassandra"
+  cassandra.port: "9042"
+  database.type: "sql"
+  postgres.host: "postgres"
+  postgres.port: "5432"
+  schema.data: "true"
+  demo.data: "true"
+  mqtt.address: "0.0.0.0"
+  mqtt.port: "1883"
+  coap.address: "0.0.0.0"
+  coap.port: "5683"
+  spark.path: "/home"
+---
+apiVersion: "apps/v1beta1"
+kind: StatefulSet
+metadata:
+  name: tb
+spec:
+  selector:
+    matchLabels:
+      app: tb
+  serviceName: tb
+  replicas: 1
+  updateStrategy:
+    type: RollingUpdate
+  podManagementPolicy: Parallel
+  template:
+    metadata:
+      labels:
+        app: tb
+    spec:
+      containers:
+      - name: tb
+        image: hashmapinc/tempus:latest
+        ports:
+        - containerPort: 8080
+          name: ui
+        - containerPort: 1883
+          name: mqtt
+        - containerPort: 5683
+          protocol: UDP
+          name: coap
+        - containerPort: 9001
+          name: rpc
+        - containerPort: 9999
+          name: tb-port
+#        imagePullSecrets:
+#        - name: regcred
+        env:
+        - name: SPARK_COMPUTATIONS_PATH
+          valueFrom:
+            configMapKeyRef:
+              name: tb-config
+              key: spark.path
+        - name: MQTT_BIND_ADDRESS
+          valueFrom:
+            configMapKeyRef:
+              name: tb-config
+              key: mqtt.address
+        - name: MQTT_BIND_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: tb-config
+              key: mqtt.port
+        - name: COAP_BIND_ADDRESS
+          valueFrom:
+            configMapKeyRef:
+              name: tb-config
+              key: coap.address
+        - name: COAP_BIND_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: tb-config
+              key: coap.port
+        - name: DATABASE_TYPE
+          valueFrom:
+            configMapKeyRef:
+              name: tb-config
+              key: database.type
+        - name: ZOOKEEPER_ENABLED
+          valueFrom:
+            configMapKeyRef:
+              name: tb-config
+              key: zookeeper.enabled
+        - name: ZOOKEEPER_URL
+          valueFrom:
+            configMapKeyRef:
+              name: tb-config
+              key: zookeeper.url
+        - name: CASSANDRA_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: tb-config
+              key: cassandra.host
+        - name: CASSANDRA_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: tb-config
+              key: cassandra.port
+        - name: CASSANDRA_URL
+          valueFrom:
+            configMapKeyRef:
+              name: tb-config
+              key: cassandra.url
+        - name: POSTGRES_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: tb-config
+              key: postgres.host
+        - name: POSTGRES_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: tb-config
+              key: postgres.port
+        - name: ADD_SCHEMA_AND_SYSTEM_DATA
+          valueFrom:
+            configMapKeyRef:
+              name: tb-config
+              key: schema.data
+        - name: ADD_DEMO_DATA
+          valueFrom:
+            configMapKeyRef:
+              name: tb-config
+              key: demo.data
+        command:
+        - sh
+        - -c
+        - /run-application.sh
+#        livenessProbe:
+#          httpGet:
+#            path: /login
+#            port: ui-port
+#          initialDelaySeconds: 120
+#          timeoutSeconds: 10
+        volumeMounts:
+          - mountPath: /usr/share/tempus/data/sql
+            name: hsql-dir
+  volumeClaimTemplates:
+  - metadata:
+      name: hsql-dir
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: 1Gi
+      storageClassName: gold

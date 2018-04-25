@@ -1,5 +1,5 @@
 #
-# Copyright © 2016-2017 The Thingsboard Authors
+# Copyright © 2017-2018 Hashmap, Inc
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@ spec:
   containers:
   - name: cassandra-setup
     imagePullPolicy: Always
-    image: tempus/cassandra-setup:1.3.0
+    image: tempus/cassandra-setup:1.4.0
     env:
     - name: ADD_DEMO_DATA
       value: "true"

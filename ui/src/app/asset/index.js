@@ -1,5 +1,5 @@
 /*
- * Copyright © 2016-2017 The Thingsboard Authors
+ * Copyright © 2017-2018 Hashmap, Inc
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 import uiRouter from 'angular-ui-router';
-import thingsboardGrid from '../components/grid.directive';
-import thingsboardApiUser from '../api/user.service';
-import thingsboardApiAsset from '../api/asset.service';
-import thingsboardApiCustomer from '../api/customer.service';
+import tempusGrid from '../components/grid.directive';
+import tempusApiUser from '../api/user.service';
+import tempusApiAsset from '../api/asset.service';
+import tempusApiCustomer from '../api/customer.service';
 
 import AssetRoutes from './asset.routes';
 import {AssetController, AssetCardController} from './asset.controller';
@@ -25,12 +25,12 @@ import AssignAssetToCustomerController from './assign-to-customer.controller';
 import AddAssetsToCustomerController from './add-assets-to-customer.controller';
 import AssetDirective from './asset.directive';
 
-export default angular.module('thingsboard.asset', [
+export default angular.module('tempus.asset', [
     uiRouter,
-    thingsboardGrid,
-    thingsboardApiUser,
-    thingsboardApiAsset,
-    thingsboardApiCustomer
+    tempusGrid,
+    tempusApiUser,
+    tempusApiAsset,
+    tempusApiCustomer
 ])
     .config(AssetRoutes)
     .controller('AssetController', AssetController)

@@ -1,5 +1,5 @@
 /*
- * Copyright © 2016-2017 The Thingsboard Authors
+ * Copyright © 2017-2018 Hashmap, Inc
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
  */
 import angularStorage from 'angular-storage';
 
-export default angular.module('thingsboard.itembuffer', [angularStorage])
+export default angular.module('tempus.itembuffer', [angularStorage])
     .factory('itembuffer', ItemBuffer)
     .factory('bufferStore', function(store) {
         var newStore = store.getNamespacedStore('tbBufferStore', null, null, false);

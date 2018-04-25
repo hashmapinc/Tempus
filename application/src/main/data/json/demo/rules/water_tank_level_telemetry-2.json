@@ -10,7 +10,7 @@
           "POST_TELEMETRY"
         ]
       },
-      "clazz": "org.thingsboard.server.extensions.core.filter.MsgTypeFilter",
+      "clazz": "com.hashmapinc.server.extensions.core.filter.MsgTypeFilter",
       "name": "Telemetry Type Filter"
     },
     {
@@ -22,14 +22,14 @@
         ]
       },
       "name": "Water Tank Filter",
-      "clazz": "org.thingsboard.server.extensions.core.filter.DeviceTypeFilter"
+      "clazz": "com.hashmapinc.server.extensions.core.filter.DeviceTypeFilter"
     },
     {
       "configuration": {
         "filter": "typeof waterTankLevel !== 'undefined'"
       },
       "name": "waterTankLevel Filter",
-      "clazz": "org.thingsboard.server.extensions.core.filter.DeviceTelemetryFilter"
+      "clazz": "com.hashmapinc.server.extensions.core.filter.DeviceTelemetryFilter"
     }
   ],
   "processor": null,
@@ -39,7 +39,7 @@
       "template": "{\"tankId\":\"$cs.get('tankId')\", \"ts\":\"$waterTankLevel.getTs()\", \"waterTankLevel\":$waterTankLevel.valueAsString}",
       "topic": "water-tank-level-data"
     },
-    "clazz": "org.thingsboard.server.extensions.kafka.action.KafkaPluginAction",
+    "clazz": "com.hashmapinc.server.extensions.kafka.action.KafkaPluginAction",
     "name": "Water Tank Level Data Publisher"
   },
   "additionalInfo": null

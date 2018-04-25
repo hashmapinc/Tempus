@@ -1,5 +1,5 @@
 /*
- * Copyright © 2016-2017 The Thingsboard Authors
+ * Copyright © 2017-2018 Hashmap, Inc
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,7 @@ export default function ApplicationRoutes($stateProvider, types) {
     $stateProvider
         .state('home.applications', {
             url: '/applications',
-            params: {'topIndex': 0},
+            params: {'topIndex': 0, computationId: null, reload: false},
             module: 'private',
             auth: ['TENANT_ADMIN', 'CUSTOMER_USER'],
             views: {

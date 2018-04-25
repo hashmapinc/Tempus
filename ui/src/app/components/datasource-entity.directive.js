@@ -1,5 +1,5 @@
 /*
- * Copyright © 2016-2017 The Thingsboard Authors
+ * Copyright © 2017-2018 Hashmap, Inc
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,9 +18,9 @@ import './datasource-entity.scss';
 import 'md-color-picker';
 import tinycolor from 'tinycolor2';
 import $ from 'jquery';
-import thingsboardTypes from '../common/types.constant';
-import thingsboardDatakeyConfigDialog from './datakey-config-dialog.controller';
-import thingsboardTruncate from './truncate.filter';
+import tempusTypes from '../common/types.constant';
+import tempusDatakeyConfigDialog from './datakey-config-dialog.controller';
+import tempusTruncate from './truncate.filter';
 
 /* eslint-disable import/no-unresolved, import/default */
 
@@ -31,7 +31,7 @@ import datakeyConfigDialogTemplate from './datakey-config-dialog.tpl.html';
 
 /* eslint-disable angular/angularelement */
 
-export default angular.module('thingsboard.directives.datasourceEntity', [thingsboardTruncate, thingsboardTypes, thingsboardDatakeyConfigDialog])
+export default angular.module('tempus.directives.datasourceEntity', [tempusTruncate, tempusTypes, tempusDatakeyConfigDialog])
     .directive('tbDatasourceEntity', DatasourceEntity)
     .name;
 

@@ -1,6 +1,7 @@
 DROP TABLE IF EXISTS admin_settings;
 DROP TABLE IF EXISTS alarm;
 DROP TABLE IF EXISTS asset;
+DROP TABLE IF EXISTS audit_log;
 DROP TABLE IF EXISTS attribute_kv;
 DROP TABLE IF EXISTS component_descriptor;
 DROP TABLE IF EXISTS customer;
@@ -23,3 +24,7 @@ DROP TABLE IF EXISTS widgets_bundle;
 DROP TABLE IF EXISTS application;
 DROP TABLE IF EXISTS application_device_types;
 DROP TABLE IF EXISTS application_associated_rules;
+DROP TABLE IF EXISTS application_associated_computation_jobs;
+DROP TABLE IF EXISTS computations;
+DROP TABLE IF EXISTS computation_job;
+DROP TABLE IF EXISTS installed_schema_versions;

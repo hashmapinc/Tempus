@@ -1,5 +1,5 @@
 /*
- * Copyright © 2016-2017 The Thingsboard Authors
+ * Copyright © 2017-2018 Hashmap, Inc
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 import React from 'react';
-import ThingsboardBaseComponent from './json-form-base-component.jsx';
+import tempusBaseComponent from './json-form-base-component.jsx';
 import NumberInput from 'material-ui-number-input';
 
-class ThingsboardNumber extends React.Component {
+class tempusNumber extends React.Component {
 
     constructor(props) {
         super(props);
@@ -87,4 +87,4 @@ class ThingsboardNumber extends React.Component {
     }
 }
 
-export default ThingsboardBaseComponent(ThingsboardNumber);
+export default tempusBaseComponent(tempusNumber);

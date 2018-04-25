@@ -1,3 +1,16 @@
+# BlueJ files
+*.ctxt
+
+# Mobile Tools for Java (J2ME)
+.mtj.tmp/
+
+# Package Files #
+*.jar
+*.war
+*.ear
+*.zip
+*.tar.gz
+*.rar
 *.toDelete
 output/**
 *.class
@@ -26,11 +39,13 @@ bin/
 pom.xml.versionsBackup
 .DS_Store
 **/.gradle
+.gradle/
 **/local.properties
 **/build
 **/target
 **/Californium.properties
 **/.env
-.instance_id
+.instance_idm
 .vscode/
 docs/_build
+docs/developerQS/_build

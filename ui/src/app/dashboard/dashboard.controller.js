@@ -1,5 +1,5 @@
 /*
- * Copyright © 2016-2017 The Thingsboard Authors
+ * Copyright © 2017-2018 Hashmap, Inc
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -56,7 +56,7 @@ export default function DashboardController(types, utils, dashboardUtils, widget
 
     vm.isToolbarOpened = false;
 
-    vm.thingsboardVersion = THINGSBOARD_VERSION; //eslint-disable-line
+    vm.tempusVersion = tempus_VERSION; //eslint-disable-line
 
     vm.currentDashboardId = $stateParams.dashboardId;
     if ($stateParams.customerId) {
@@ -70,7 +70,7 @@ export default function DashboardController(types, utils, dashboardUtils, widget
     Object.defineProperty(vm, 'toolbarOpened', {
         get: function() {
             return !vm.widgetEditMode &&
-                (toolbarAlwaysOpen() || $scope.forceFullscreen || vm.isToolbarOpened || vm.isEdit || vm.showRightLayoutSwitch()); },
+                (toolbarAlwaysOpen() || vm.isToolbarOpened || vm.isEdit || vm.showRightLayoutSwitch()); },
         set: function() { }
     });
 
@@ -116,7 +116,7 @@ export default function DashboardController(types, utils, dashboardUtils, widget
     }
 
     vm.showCloseToolbar = function() {
-        return !vm.toolbarAlwaysOpen() && !$scope.forceFullscreen && !vm.isEdit && !vm.showRightLayoutSwitch();
+        return !vm.toolbarAlwaysOpen() && !vm.isEdit && !vm.showRightLayoutSwitch();
     }
 
     vm.toolbarAlwaysOpen = toolbarAlwaysOpen;
@@ -172,7 +172,6 @@ export default function DashboardController(types, utils, dashboardUtils, widget
         }
     }
 
-    vm.getServerTimeDiff = getServerTimeDiff;
     vm.addWidget = addWidget;
     vm.addWidgetFromType = addWidgetFromType;
     vm.exportDashboard = exportDashboard;
@@ -338,10 +337,6 @@ export default function DashboardController(types, utils, dashboardUtils, widget
                 }
             );
         }
-    }
-
-    function getServerTimeDiff() {
-        return dashboardService.getServerTimeDiff();
     }
 
     function loadDashboard() {

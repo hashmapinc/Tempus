@@ -1,5 +1,5 @@
 /*
- * Copyright © 2016-2017 The Thingsboard Authors
+ * Copyright © 2017-2018 Hashmap, Inc
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,7 @@ export default function DepthwindowPanelController(mdPanelRef, $scope, depthServ
     vm.historyOnly = historyOnly;
     vm.aggregation = aggregation;
     vm.onDepthwindowUpdate = onDepthwindowUpdate;
-    vm.aggregationTypes = types.depthAggregation;
+    vm.aggregationTypes = types.aggregation;
     vm.showLimit = showLimit;
     vm.showRealtimeDepthAggInterval = showRealtimeAggInterval;
     vm.showHistoryDepthAggInterval = showHistoryAggInterval;

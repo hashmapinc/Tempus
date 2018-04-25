@@ -1,5 +1,5 @@
 /*
- * Copyright © 2016-2017 The Thingsboard Authors
+ * Copyright © 2017-2018 Hashmap, Inc
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,9 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import thingsboardApiUser from '../api/user.service';
+import tempusApiUser from '../api/user.service';
 
-export default angular.module('thingsboard.menu', [thingsboardApiUser])
+export default angular.module('tempus.menu', [tempusApiUser])
     .factory('menu', Menu)
     .name;
 
@@ -243,6 +243,12 @@ function Menu(userService, $state, $rootScope) {
                             state: 'home.computations',
                             icon: 'dashboards',
                             link: '/static/svg/computationslightgray.svg'
+                        },
+                        {
+                            name: 'audit-log.audit-logs',
+                            type: 'link',
+                            state: 'home.auditLogs',
+                            icon: 'track_changes'
                         }];
 
                     homeSections =
@@ -322,6 +328,16 @@ function Menu(userService, $state, $rootScope) {
                                         icon: 'dashboard',
                                         state: 'home.dashboards',
                                         link: '/static/svg/dashboardlightgray.svg'
+                                    }
+                                ]
+                            },
+                            {
+                                name: 'audit-log.audit',
+                                places: [
+                                    {
+                                        name: 'audit-log.audit-logs',
+                                        icon: 'track_changes',
+                                        state: 'home.auditLogs'
                                     }
                                 ]
                             }];

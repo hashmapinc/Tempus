@@ -1,5 +1,5 @@
 /*
- * Copyright © 2016-2017 The Thingsboard Authors
+ * Copyright © 2017-2018 Hashmap, Inc
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 /* eslint-disable import/no-unresolved, import/default */
 
 import materialIconsCodepoints from 'raw-loader!material-design-icons/iconfont/codepoints';
@@ -25,9 +24,9 @@ import jsonSchemaDefaults from 'json-schema-defaults';
 import base64js from 'base64-js';
 import {utf8Encode, utf8Decode} from './utf8-support';
 
-import thingsboardTypes from './types.constant';
+import tempusTypes from './types.constant';
 
-export default angular.module('thingsboard.utils', [thingsboardTypes])
+export default angular.module('tempus.utils', [tempusTypes])
     .factory('utils', Utils)
     .name;
 
@@ -134,8 +133,11 @@ function Utils($mdColorPalette, $rootScope, $window, $translate, $q, $timeout, t
         defaultAlarmDataKeys.push(dataKey);
     }
 
+    var imageAspectMap = {};
+
     var service = {
         getDefaultDatasource: getDefaultDatasource,
+        generateObjectFromJsonSchema: generateObjectFromJsonSchema,
         getDefaultDatasourceJson: getDefaultDatasourceJson,
         getDefaultAlarmDataKeys: getDefaultAlarmDataKeys,
         getMaterialColor: getMaterialColor,
@@ -158,7 +160,8 @@ function Utils($mdColorPalette, $rootScope, $window, $translate, $q, $timeout, t
         insertVariable: insertVariable,
         customTranslation: customTranslation,
         objToBase64: objToBase64,
-        base64toObj: base64toObj
+        base64toObj: base64toObj,
+        loadImageAspect: loadImageAspect
     }
 
     return service;
@@ -277,9 +280,32 @@ function Utils($mdColorPalette, $rootScope, $window, $translate, $q, $timeout, t
     function getDefaultDatasource(dataKeySchema) {
         var datasource = angular.copy(defaultDatasource);
         if (angular.isDefined(dataKeySchema)) {
-            datasource.dataKeys[0].settings = jsonSchemaDefaults(dataKeySchema);
+            datasource.dataKeys[0].settings = generateObjectFromJsonSchema(dataKeySchema);
         }
         return datasource;
+    }
+
+    function generateObjectFromJsonSchema(schema) {
+        var obj = jsonSchemaDefaults(schema);
+        deleteNullProperties(obj);
+        return obj;
+    }
+
+    function deleteNullProperties(obj) {
+        if (angular.isUndefined(obj) || obj == null) {
+            return;
+        }
+        for (var propName in obj) {
+            if (obj[propName] === null || angular.isUndefined(obj[propName])) {
+                delete obj[propName];
+            } else if (angular.isObject(obj[propName])) {
+                deleteNullProperties(obj[propName]);
+            } else if (angular.isArray(obj[propName])) {
+                for (var i=0;i<obj[propName].length;i++) {
+                    deleteNullProperties(obj[propName][i]);
+                }
+            }
+        }
     }
 
     function getDefaultDatasourceJson(dataKeySchema) {
@@ -517,6 +543,38 @@ function Utils($mdColorPalette, $rootScope, $window, $translate, $q, $timeout, t
         var json = utf8Decode(encoded);
         var obj = angular.fromJson(json);
         return obj;
+    }
+
+    function loadImageAspect(imageUrl) {
+        var deferred = $q.defer();
+        if (imageUrl && imageUrl.length) {
+            var urlHashCode = hashCode(imageUrl);
+            var aspect = imageAspectMap[urlHashCode];
+            if (angular.isUndefined(aspect)) {
+                var testImage = document.createElement('img'); // eslint-disable-line
+                testImage.style.position = 'absolute';
+                testImage.style.left = '-99999px';
+                testImage.style.top = '-99999px';
+                testImage.onload = function() {
+                    aspect = testImage.width / testImage.height;
+                    document.body.removeChild(testImage); //eslint-disable-line
+                    imageAspectMap[urlHashCode] = aspect;
+                    deferred.resolve(aspect);
+                };
+                testImage.onerror = function() {
+                    aspect = 0;
+                    imageAspectMap[urlHashCode] = aspect;
+                    deferred.resolve(aspect);
+                };
+                document.body.appendChild(testImage); //eslint-disable-line
+                testImage.src = imageUrl;
+            } else {
+                deferred.resolve(aspect);
+            }
+        } else {
+            deferred.resolve(0);
+        }
+        return deferred.promise;
     }
 
 }

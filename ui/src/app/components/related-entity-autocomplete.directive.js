@@ -1,5 +1,5 @@
 /*
- * Copyright © 2016-2017 The Thingsboard Authors
+ * Copyright © 2017-2018 Hashmap, Inc
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@ import relatedEntityAutocompleteTemplate from './related-entity-autocomplete.tpl
 /* eslint-enable import/no-unresolved, import/default */
 
 
-export default angular.module('thingsboard.directives.relatedEntityAutocomplete', [])
+export default angular.module('tempus.directives.relatedEntityAutocomplete', [])
     .directive('tbRelatedEntityAutocomplete', RelatedEntityAutocomplete)
     .name;
 

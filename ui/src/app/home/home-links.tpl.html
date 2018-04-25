@@ -1,6 +1,6 @@
 <!--
 
-    Copyright © 2016-2017 The Thingsboard Authors
+    Copyright © 2017-2018 Hashmap, Inc
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -15,8 +15,8 @@
     limitations under the License.
 
 -->
-<md-grid-list md-cols="2" md-cols-gt-sm="4" md-row-height="280px">
-	<md-grid-tile md-colspan="2" md-colspan-gt-sm="{{section.places.length}}" ng-repeat="section in vm.model">
+<md-grid-list class="tb-home-links" md-cols="{{vm.cols}}" md-row-height="280px">
+	<md-grid-tile md-colspan="2" md-colspan-gt-sm="{{vm.sectionColspan(section)}}" ng-repeat="section in vm.model">
 		<md-card style='width: 100%;'>
 			<md-card-title>
 				<md-card-title-text>
@@ -32,7 +32,7 @@
 			   				<span translate>{{place.name}}</span>
 			        	</md-button>
 					 </md-grid-tile>
-				</md-grid-list>
+            	</md-grid-list>
 			</md-card-content>
 		</md-card>
 	</md-grid-tile>

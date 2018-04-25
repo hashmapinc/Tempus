@@ -1,6 +1,6 @@
 <!--
 
-    Copyright © 2016-2017 Ganesh hegde - HashmapInc Authors
+    Copyright © 2017-2018 Hashmap, Inc
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -47,6 +47,14 @@
 	      		<div translate ng-message="required">application.name-required</div>
 	    	</div>				
 		</md-input-container>
+    <md-input-container class="md-block">
+    <tb-json-form schema="application.configurationDescriptor.schema"
+                                          form="application.configurationDescriptor.form"
+                                          model="application.deviceTypes"
+                                          readonly="loading || !isEdit"
+                                          form-control="theForm">
+      </tb-json-form>
+    </md-input-container>
     <md-input-container class="md-block">
         <label translate>application.description</label>
         <textarea ng-model="application.additionalInfo.description" rows="2"></textarea>

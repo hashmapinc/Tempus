@@ -1,5 +1,5 @@
 /*
- * Copyright © 2016-2017 The Thingsboard Authors
+ * Copyright © 2017-2018 Hashmap, Inc
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,13 +15,13 @@
  */
 import React from 'react';
 import { utils } from 'react-schema-form';
-import ThingsboardBaseComponent from './json-form-base-component.jsx';
+import tempusBaseComponent from './json-form-base-component.jsx';
 import RaisedButton from 'material-ui/RaisedButton';
 import FontIcon from 'material-ui/FontIcon';
 import _ from 'lodash';
 import IconButton from 'material-ui/IconButton';
 
-class ThingsboardArray extends React.Component {
+class tempusArray extends React.Component {
 
     constructor(props) {
         super(props);
@@ -162,4 +162,4 @@ class ThingsboardArray extends React.Component {
     }
 }
 
-export default ThingsboardBaseComponent(ThingsboardArray);
+export default tempusBaseComponent(tempusArray);

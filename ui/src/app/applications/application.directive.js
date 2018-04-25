@@ -1,5 +1,5 @@
 /*
- * Copyright © 2016-2017 Ganesh hegde - HashmapInc Authors
+ * Copyright © 2017-2018 Hashmap, Inc
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,16 +31,44 @@ export default function ApplicationDirective($compile, $templateCache, toast, $t
         scope.assignedCustomer = null;
 
         scope.applicationCredentials = null;
+        scope.application.configurationDescriptor = {
+          "schema": {
+            "title": "Device Type Filter Configuration",
+            "type": "object",
+            "properties": {
+              "deviceTypes": {
+                "title": "Device types",
+                "type": "array",
+                "minItems" : 1,
+                "items": {
+                  "type": "object",
+                  "title": "Device Type",
+                  "properties": {
+                    "name": {
+                      "title": "Device Type",
+                      "type": "string"
+                    }
+                  }
+                },
+                "uniqueItems": true
+              }
+            },
+            "required": ["deviceTypes"]
+          },
+          "form": [
+            "deviceTypes"
+          ]
+        }
 
         scope.$watch('application', function(newVal) {
             if (newVal) {
-                if (scope.application.id) {
-                    applicationService.getApplicationCredentials(scope.application.id.id).then(
-                        function success(credentials) {
-                            scope.applicationCredentials = credentials;
-                        }
-                    );
-                }
+                // if (scope.application.id) {
+                //     applicationService.getApplicationCredentials(scope.application.id.id).then(
+                //         function success(credentials) {
+                //             scope.applicationCredentials = credentials;
+                //         }
+                //     );
+                // }
                 if (scope.application.customerId && scope.application.customerId.id !== types.id.nullUid) {
                     scope.isAssignedToCustomer = true;
                     customerService.getShortCustomerInfo(scope.application.customerId.id).then(
