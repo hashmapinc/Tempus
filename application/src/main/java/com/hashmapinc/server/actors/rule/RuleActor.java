@@ -15,6 +15,7 @@
  */
 package com.hashmapinc.server.actors.rule;
 
+import akka.japi.JavaPartialFunction;
 import com.hashmapinc.server.extensions.api.plugins.msg.PluginToRuleMsg;
 import com.hashmapinc.server.actors.ActorSystemContext;
 import com.hashmapinc.server.actors.service.ComponentActor;
@@ -24,6 +25,11 @@ import com.hashmapinc.server.common.data.id.RuleId;
 import com.hashmapinc.server.common.data.id.TenantId;
 import com.hashmapinc.server.common.msg.cluster.ClusterEventMsg;
 import com.hashmapinc.server.common.msg.plugin.ComponentLifecycleMsg;
+import com.hashmapinc.server.extensions.api.plugins.msg.RuleToPluginMsg;
+import scala.Function1;
+import scala.PartialFunction;
+import scala.runtime.AbstractFunction1;
+import scala.runtime.BoxedUnit;
 
 public class RuleActor extends ComponentActor<RuleId, RuleActorMessageProcessor> {
 
@@ -33,43 +39,92 @@ public class RuleActor extends ComponentActor<RuleId, RuleActorMessageProcessor>
     }
 
     @Override
-    public void onReceive(Object msg) throws Exception {
+    protected void onReceive(Object msg) throws Exception {
         logger.debug("[{}] Received message: {}", id, msg);
         if (msg instanceof RuleProcessingMsg) {
             try {
-                logger.debug("msg type RuleRrocessing -->");
-                processor.onRuleProcessingMsg(context(), (RuleProcessingMsg) msg);
+                processor.onRuleProcessingMsg(context(), (RuleProcessingMsg) msg, ruleProcessingFunction());
                 increaseMessagesProcessedCount();
-            } catch (Exception e) {
+            }catch (Exception e) {
                 logAndPersist("onDeviceMsg", e);
             }
-        } else if (msg instanceof PluginToRuleMsg<?>) {
+        }else if(msg instanceof PluginToRuleMsg<?>){
             try {
-                logger.debug("msg type PluginToRuleMsg<?> -->");
+                persistPluginToRuleMsg((PluginToRuleMsg<?>)msg);
                 processor.onPluginMsg(context(), (PluginToRuleMsg<?>) msg);
             } catch (Exception e) {
                 logAndPersist("onPluginMsg", e);
             }
-        } else if (msg instanceof ComponentLifecycleMsg) {
-            logger.debug("msg type ComponentLifecycleMsg -->");
+        }else if (msg instanceof ComponentLifecycleMsg) {
             onComponentLifecycleMsg((ComponentLifecycleMsg) msg);
         } else if (msg instanceof ClusterEventMsg) {
-            logger.debug("msg type ClusterEventMsg -->");
             onClusterEventMsg((ClusterEventMsg) msg);
         } else if (msg instanceof RuleToPluginTimeoutMsg) {
             try {
-                logger.debug("msg type RuleToPluginTimeoutMsg -->");
                 processor.onTimeoutMsg(context(), (RuleToPluginTimeoutMsg) msg);
             } catch (Exception e) {
                 logAndPersist("onTimeoutMsg", e);
             }
         } else if (msg instanceof StatsPersistTick) {
-            logger.debug("msg type StatsPersistTick -->");
             onStatsPersistTick(id);
         } else {
             logger.debug("[{}][{}] Unknown msg type.", tenantId, id, msg.getClass().getName());
         }
     }
+
+    @Override
+    public PartialFunction<Object, BoxedUnit> receiveRecover() {
+            return new JavaPartialFunction<Object, BoxedUnit>() {
+                @Override
+                public BoxedUnit apply(Object msg, boolean isCheck) throws Exception {
+                    if(msg instanceof RuleToPluginMsg){
+                        deliverRuleToPluginMessageFunction().apply((RuleToPluginMsg)msg);
+                    }else if(msg instanceof PluginToRuleMsg<?>){
+                        confirmDeliveryOfRuleToPluginMessageFunction().apply((PluginToRuleMsg<?>)msg);
+                    }
+                    return BoxedUnit.UNIT;
+                }
+            };
+        }
+
+        private Function1<RuleToPluginMsg<?>, BoxedUnit> ruleProcessingFunction(){
+            return new AbstractFunction1<RuleToPluginMsg<?>, BoxedUnit>() {
+                @Override
+                public BoxedUnit apply(RuleToPluginMsg<?> msg) {
+                    persistAsync(msg, deliverRuleToPluginMessageFunction());
+                    return BoxedUnit.UNIT;
+                }
+            };
+        }
+
+        private Function1<RuleToPluginMsg<?>, BoxedUnit> deliverRuleToPluginMessageFunction(){
+            return new AbstractFunction1<RuleToPluginMsg<?>, BoxedUnit>() {
+                @Override
+                public BoxedUnit apply(RuleToPluginMsg<?> v1) {
+                    deliver(context().parent().path(), (Long param) -> processor.buildRuleToPluginMessage(v1));
+                    return BoxedUnit.UNIT;
+                }
+            };
+        }
+
+        private Function1<PluginToRuleMsg<?>, BoxedUnit> confirmDeliveryOfRuleToPluginMessageFunction(){
+            return new AbstractFunction1<PluginToRuleMsg<?>, BoxedUnit>() {
+                @Override
+                public BoxedUnit apply(PluginToRuleMsg<?> v1) {
+                    //confirmDelivery(v1.);
+                    return BoxedUnit.UNIT;
+                }
+            };
+        }
+
+        private void persistPluginToRuleMsg(PluginToRuleMsg<?> msg){
+            persistAsync(msg, confirmDeliveryOfRuleToPluginMessageFunction());
+        }
+
+        @Override
+        public String persistenceId() {
+            return id.getId().toString();
+        }
 
     public static class ActorCreator extends ContextBasedCreator<RuleActor> {
         private static final long serialVersionUID = 1L;

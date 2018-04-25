@@ -18,19 +18,31 @@ package com.hashmapinc.server.actors.service;
 import akka.actor.ActorRef;
 import akka.event.Logging;
 import akka.event.LoggingAdapter;
+import akka.japi.JavaPartialFunction;
 import com.hashmapinc.server.actors.ActorSystemContext;
+import com.hashmapinc.server.actors.plugin.PluginCallbackMessage;
+import com.hashmapinc.server.actors.plugin.PluginTerminationMsg;
+import com.hashmapinc.server.actors.plugin.RuleToPluginMsgWrapper;
 import com.hashmapinc.server.actors.stats.StatsPersistMsg;
+import com.hashmapinc.server.actors.stats.StatsPersistTick;
 import com.hashmapinc.server.common.data.id.EntityId;
 import com.hashmapinc.server.common.data.id.TenantId;
 import com.hashmapinc.server.common.data.plugin.ComponentLifecycleEvent;
 import com.hashmapinc.server.common.msg.cluster.ClusterEventMsg;
 import com.hashmapinc.server.actors.shared.ComponentMsgProcessor;
 import com.hashmapinc.server.common.msg.plugin.ComponentLifecycleMsg;
+import com.hashmapinc.server.extensions.api.plugins.msg.TimeoutMsg;
+import com.hashmapinc.server.extensions.api.plugins.msg.ToPluginRpcResponseDeviceMsg;
+import com.hashmapinc.server.extensions.api.plugins.rest.PluginRestMsg;
+import com.hashmapinc.server.extensions.api.plugins.rpc.PluginRpcMsg;
+import com.hashmapinc.server.extensions.api.plugins.ws.msg.PluginWebsocketMsg;
+import scala.PartialFunction;
+import scala.runtime.BoxedUnit;
 
 /**
  * @author Andrew Shvayka
  */
-public abstract class ComponentActor<T extends EntityId, P extends ComponentMsgProcessor<T>> extends ContextAwareActor {
+public abstract class ComponentActor<T extends EntityId, P extends ComponentMsgProcessor<T>> extends ContextAwarePersistentActor {
 
     protected final LoggingAdapter logger = Logging.getLogger(getContext().system(), this);
 
@@ -85,6 +97,33 @@ public abstract class ComponentActor<T extends EntityId, P extends ComponentMsgP
             logAndPersist("OnStop", e, true);
             logLifecycleEvent(ComponentLifecycleEvent.STOPPED, e);
         }
+    }
+
+    @Override
+    public PartialFunction<Object, BoxedUnit> receiveRecover() {
+        return new JavaPartialFunction<Object, BoxedUnit>() {
+            @Override
+            public BoxedUnit apply(Object msg, boolean isCheck) throws Exception {
+                return BoxedUnit.UNIT;
+            }
+        };
+    }
+
+    @Override
+    public PartialFunction<Object, BoxedUnit> receiveCommand() {
+
+        return new JavaPartialFunction<Object, BoxedUnit>() {
+            @Override
+            public BoxedUnit apply(Object msg, boolean isCheck) throws Exception {
+                onReceive(msg);
+                return BoxedUnit.UNIT;
+            }
+        };
+    }
+
+    @Override
+    public String persistenceId() {
+        return id.getId().toString();
     }
 
     protected void onComponentLifecycleMsg(ComponentLifecycleMsg msg) {
@@ -169,4 +208,5 @@ public abstract class ComponentActor<T extends EntityId, P extends ComponentMsgP
     }
 
     protected abstract long getErrorPersistFrequency();
+    protected abstract void onReceive(Object msg) throws Exception;
 }

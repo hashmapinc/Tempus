@@ -41,6 +41,8 @@ import com.hashmapinc.server.extensions.api.rules.*;
 import akka.actor.ActorContext;
 import akka.actor.ActorRef;
 import akka.event.LoggingAdapter;
+import scala.Function1;
+import scala.runtime.BoxedUnit;
 
 class RuleActorMessageProcessor extends ComponentMsgProcessor<RuleId> {
 
@@ -135,7 +137,7 @@ class RuleActorMessageProcessor extends ComponentMsgProcessor<RuleId> {
         }
     }
 
-    protected void onRuleProcessingMsg(ActorContext context, RuleProcessingMsg msg) throws RuleException {
+    protected void onRuleProcessingMsg(ActorContext context, RuleProcessingMsg msg, Function1<RuleToPluginMsg<?>, BoxedUnit> f) throws RuleException {
         if (state != ComponentLifecycleState.ACTIVE) {
             pushToNextRule(context, msg.getCtx(), RuleEngineError.NO_ACTIVE_RULES);
             return;
@@ -147,7 +149,6 @@ class RuleActorMessageProcessor extends ComponentMsgProcessor<RuleId> {
 
         logger.debug("[{}] Going to filter in msg: {}", entityId, inMsg);
         for (RuleFilter filter : filters) {
-            logger.debug("\n Filter is " + filter);
             if (!filter.filter(ruleCtx, inMsg)) {
                 logger.debug("[{}] In msg is NOT valid for processing by current rule: {}", entityId, inMsg);
                 pushToNextRule(context, msg.getCtx(), RuleEngineError.NO_FILTERS_MATCHED);
@@ -163,16 +164,16 @@ class RuleActorMessageProcessor extends ComponentMsgProcessor<RuleId> {
         }
         logger.debug("[{}] Going to convert in msg: {}", entityId, inMsg);
         if (action != null) {
-            logger.debug("\nInside action \n" + inMsg + "\n");
             Optional<RuleToPluginMsg<?>> ruleToPluginMsgOptional = action.convert(ruleCtx, inMsg, inMsgMd);
             if (ruleToPluginMsgOptional.isPresent()) {
                 RuleToPluginMsg<?> ruleToPluginMsg = ruleToPluginMsgOptional.get();
                 logger.debug("[{}] Device msg is converted to: {}", entityId, ruleToPluginMsg);
-                context.parent().tell(new RuleToPluginMsgWrapper(pluginTenantId, pluginId, tenantId, entityId, ruleToPluginMsg), context.self());
                 if (action.isOneWayAction()) {
+                    context.parent().tell(new RuleToPluginMsgWrapper(pluginTenantId, pluginId, tenantId, entityId, ruleToPluginMsg), context.self());
                     pushToNextRule(context, msg.getCtx(), RuleEngineError.NO_TWO_WAY_ACTIONS);
                     return;
                 } else {
+                    f.apply(ruleToPluginMsg);
                     pendingMsgMap.put(ruleToPluginMsg.getUid(), msg);
                     scheduleMsgWithDelay(context, new RuleToPluginTimeoutMsg(ruleToPluginMsg.getUid()), systemContext.getPluginProcessingTimeout());
                     return;
@@ -181,6 +182,10 @@ class RuleActorMessageProcessor extends ComponentMsgProcessor<RuleId> {
         }
         logger.debug("[{}] Nothing to send to plugin: {}", entityId, pluginId);
         pushToNextRule(context, msg.getCtx(), RuleEngineError.NO_TWO_WAY_ACTIONS);
+    }
+
+    protected RuleToPluginMsgWrapper buildRuleToPluginMessage(RuleToPluginMsg<?> ruleToPluginMsg){
+        return new RuleToPluginMsgWrapper(pluginTenantId, pluginId, tenantId, entityId, ruleToPluginMsg);
     }
 
     void onPluginMsg(ActorContext context, PluginToRuleMsg<?> msg) {
