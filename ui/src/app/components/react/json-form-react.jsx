@@ -18,7 +18,7 @@ import './json-form.scss';
 import React from 'react';
 import getMuiTheme from 'material-ui/styles/getMuiTheme';
 import tempusTheme from './styles/tempusTheme';
-import tempusSchemaForm from './json-form-schema-form.jsx';
+import TempusSchemaForm from './json-form-schema-form.jsx';
 
 class ReactSchemaForm extends React.Component {
 
@@ -37,7 +37,7 @@ class ReactSchemaForm extends React.Component {
 
     render () {
         if (this.props.form.length > 0) {
-            return <tempusSchemaForm {...this.props} />;
+            return <TempusSchemaForm {...this.props} />;
         } else {
             return <div></div>;
         }

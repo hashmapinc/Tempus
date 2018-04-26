@@ -14,11 +14,11 @@
 -- limitations under the License.
 --
 
-
-CREATE TABLE IF NOT EXISTS admin_settings (
-    id varchar(31) NOT NULL CONSTRAINT admin_settings_pkey PRIMARY KEY,
+CREATE TABLE IF NOT EXISTS user_settings (
+    id varchar(31) NOT NULL CONSTRAINT user_settings_pkey PRIMARY KEY,
     json_value varchar,
-    key varchar(255)
+    key varchar(255),
+    user_id varchar(31)
 );
 
 CREATE TABLE IF NOT EXISTS alarm (

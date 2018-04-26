@@ -31,7 +31,7 @@ function AdminService($http, $q) {
 
     function getAdminSettings(key) {
         var deferred = $q.defer();
-        var url = '/api/admin/settings/' + key;
+        var url = '/api/settings/' + key;
         $http.get(url, null).then(function success(response) {
             deferred.resolve(response.data);
         }, function fail() {
@@ -42,7 +42,7 @@ function AdminService($http, $q) {
 
     function saveAdminSettings(settings) {
         var deferred = $q.defer();
-        var url = '/api/admin/settings';
+        var url = '/api/settings';
         $http.post(url, settings).then(function success(response) {
             deferred.resolve(response.data);
         }, function fail(response) {
@@ -53,7 +53,7 @@ function AdminService($http, $q) {
 
     function sendTestMail(settings) {
         var deferred = $q.defer();
-        var url = '/api/admin/settings/testMail';
+        var url = '/api/settings/testMail';
         $http.post(url, settings).then(function success() {
             deferred.resolve();
         }, function fail(response) {
@@ -64,7 +64,7 @@ function AdminService($http, $q) {
 
     function checkUpdates() {
         var deferred = $q.defer();
-        var url = '/api/admin/updates';
+        var url = '/api/updates';
         $http.get(url, null).then(function success(response) {
             deferred.resolve(response.data);
         }, function fail() {

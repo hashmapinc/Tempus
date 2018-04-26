@@ -17,14 +17,15 @@ package com.hashmapinc.server.dao.model.sql;
 
 import com.datastax.driver.core.utils.UUIDs;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.hashmapinc.server.common.data.id.AdminSettingsId;
+import com.hashmapinc.server.common.data.UserSettings;
+import com.hashmapinc.server.common.data.id.UserId;
+import com.hashmapinc.server.common.data.id.UserSettingsId;
 import com.hashmapinc.server.dao.model.BaseSqlEntity;
 import com.hashmapinc.server.dao.util.mapping.JsonStringType;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
-import com.hashmapinc.server.common.data.AdminSettings;
 import com.hashmapinc.server.common.data.UUIDConverter;
 import com.hashmapinc.server.dao.model.BaseEntity;
 
@@ -38,35 +39,40 @@ import static com.hashmapinc.server.dao.model.ModelConstants.*;
 @EqualsAndHashCode(callSuper = true)
 @Entity
 @TypeDef(name = "json", typeClass = JsonStringType.class)
-@Table(name = ADMIN_SETTINGS_COLUMN_FAMILY_NAME)
-public final class AdminSettingsEntity extends BaseSqlEntity<AdminSettings> implements BaseEntity<AdminSettings> {
+@Table(name = USER_SETTINGS_COLUMN_FAMILY_NAME)
+public final class UserSettingsEntity extends BaseSqlEntity<UserSettings> implements BaseEntity<UserSettings> {
 
-    @Column(name = ADMIN_SETTINGS_KEY_PROPERTY)
+    @Column(name = USER_SETTINGS_KEY_PROPERTY)
     private String key;
 
     @Type(type = "json")
-    @Column(name = ADMIN_SETTINGS_JSON_VALUE_PROPERTY)
+    @Column(name = USER_SETTINGS_JSON_VALUE_PROPERTY)
     private JsonNode jsonValue;
 
-    public AdminSettingsEntity() {
+    @Column(name = USER_SETTINGS_USER_ID_PROPERTY)
+    protected String userId;
+
+    public UserSettingsEntity() {
         super();
     }
 
-    public AdminSettingsEntity(AdminSettings adminSettings) {
-        if (adminSettings.getId() != null) {
-            this.setId(adminSettings.getId().getId());
+    public UserSettingsEntity(UserSettings userSettings) {
+        if (userSettings.getId() != null) {
+            this.setId(userSettings.getId().getId());
         }
-        this.key = adminSettings.getKey();
-        this.jsonValue = adminSettings.getJsonValue();
+        this.key = userSettings.getKey();
+        this.jsonValue = userSettings.getJsonValue();
+        this.userId = toString(userSettings.getUserId().getId());
     }
 
     @Override
-    public AdminSettings toData() {
-        AdminSettings adminSettings = new AdminSettings(new AdminSettingsId(UUIDConverter.fromString(id)));
-        adminSettings.setCreatedTime(UUIDs.unixTimestamp(UUIDConverter.fromString(id)));
-        adminSettings.setKey(key);
-        adminSettings.setJsonValue(jsonValue);
-        return adminSettings;
+    public UserSettings toData() {
+        UserSettings userSettings = new UserSettings(new UserSettingsId(UUIDConverter.fromString(id)));
+        userSettings.setCreatedTime(UUIDs.unixTimestamp(UUIDConverter.fromString(id)));
+        userSettings.setKey(key);
+        userSettings.setJsonValue(jsonValue);
+        userSettings.setUserId(new UserId(toUUID(userId)));
+        return userSettings;
     }
 
 }

@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 import React from 'react';
-import tempusBaseComponent from './json-form-base-component.jsx';
+import TempusBaseComponent from './json-form-base-component.jsx';
 import TextField from 'material-ui/TextField';
 
-class tempusText extends React.Component {
+class TempusText extends React.Component {
 
     constructor(props) {
         super(props);
@@ -75,4 +75,4 @@ class tempusText extends React.Component {
     }
 }
 
-export default tempusBaseComponent(tempusText);
+export default TempusBaseComponent(TempusText);

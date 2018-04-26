@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 import React from 'react';
-import tempusBaseComponent from './json-form-base-component.jsx';
+import TempusBaseComponent from './json-form-base-component.jsx';
 import DatePicker from 'material-ui/DatePicker/DatePicker';
 
-class tempusDate extends React.Component {
+class TempusDate extends React.Component {
 
     constructor(props) {
         super(props);
@@ -57,4 +57,4 @@ class tempusDate extends React.Component {
     }
 }
 
-export default tempusBaseComponent(tempusDate);
+export default TempusBaseComponent(TempusDate);

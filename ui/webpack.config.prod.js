@@ -60,7 +60,7 @@ module.exports = {
             allChunks: true,
         }),
         new webpack.DefinePlugin({
-            tempus_VERSION: JSON.stringify(require('./package.json').version),
+            TEMPUS_VERSION: JSON.stringify(require('./package.json').version),
             '__DEVTOOLS__': false,
             'process.env': {
                 NODE_ENV: JSON.stringify('production'),

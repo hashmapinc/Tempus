@@ -15,10 +15,12 @@
  */
 package com.hashmapinc.server.dao.sql.settings;
 
-import com.hashmapinc.server.common.data.AdminSettings;
+import com.hashmapinc.server.common.data.UUIDConverter;
+import com.hashmapinc.server.common.data.UserSettings;
+import com.hashmapinc.server.common.data.id.UserId;
 import com.hashmapinc.server.dao.DaoUtil;
-import com.hashmapinc.server.dao.model.sql.AdminSettingsEntity;
-import com.hashmapinc.server.dao.settings.AdminSettingsDao;
+import com.hashmapinc.server.dao.model.sql.UserSettingsEntity;
+import com.hashmapinc.server.dao.settings.UserSettingsDao;
 import com.hashmapinc.server.dao.sql.JpaAbstractDao;
 import com.hashmapinc.server.dao.util.SqlDao;
 import lombok.extern.slf4j.Slf4j;
@@ -26,26 +28,28 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Component;
 
+import java.util.UUID;
+
 @Component
 @Slf4j
 @SqlDao
-public class JpaAdminSettingsDao extends JpaAbstractDao<AdminSettingsEntity, AdminSettings> implements AdminSettingsDao {
+public class JpaUserSettingsDao extends JpaAbstractDao<UserSettingsEntity, UserSettings> implements UserSettingsDao {
 
     @Autowired
-    private AdminSettingsRepository adminSettingsRepository;
+    private UserSettingsRepository userSettingsRepository;
 
     @Override
-    protected Class<AdminSettingsEntity> getEntityClass() {
-        return AdminSettingsEntity.class;
+    protected Class<UserSettingsEntity> getEntityClass() {
+        return UserSettingsEntity.class;
     }
 
     @Override
-    protected CrudRepository<AdminSettingsEntity, String> getCrudRepository() {
-        return adminSettingsRepository;
+    protected CrudRepository<UserSettingsEntity, String> getCrudRepository() {
+        return userSettingsRepository;
     }
 
     @Override
-    public AdminSettings findByKey(String key) {
-        return DaoUtil.getData(adminSettingsRepository.findByKey(key));
+    public UserSettings findByKeyAndUserId(String key, UUID userId) {
+        return DaoUtil.getData(userSettingsRepository.findByKeyAndUserId(key, UUIDConverter.fromTimeUUID(userId)));
     }
 }
