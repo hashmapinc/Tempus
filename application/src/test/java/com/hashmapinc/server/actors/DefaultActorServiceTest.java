@@ -20,8 +20,10 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.io.File;
 import java.util.*;
 
+import akka.persistence.cassandra.testkit.CassandraLauncher;
 import com.google.common.util.concurrent.Futures;
 import com.hashmapinc.server.common.data.id.*;
 import com.hashmapinc.server.common.data.plugin.ComponentDescriptor;
@@ -64,9 +66,7 @@ import com.hashmapinc.server.dao.rule.RuleService;
 import com.hashmapinc.server.dao.tenant.TenantService;
 import com.hashmapinc.server.dao.timeseries.TimeseriesService;
 import com.hashmapinc.server.extensions.core.plugin.telemetry.TelemetryStoragePlugin;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.*;
 import org.mockito.Mockito;
 import org.springframework.test.util.ReflectionTestUtils;
 
@@ -104,6 +104,20 @@ public class DefaultActorServiceTest {
     private RuleId ruleId = new RuleId(UUID.randomUUID());
     private PluginId pluginId = new PluginId(UUID.fromString(PLUGIN_ID));
     private TenantId tenantId = new TenantId(UUID.randomUUID());
+
+    @BeforeClass
+    public static void setup() throws Exception {
+        File dir = new File("target/persistence");
+        if((!dir.exists() && dir.mkdirs()) || dir.exists()) {
+            File cassandraDirectory = new File("target/persistence");
+            CassandraLauncher.start(cassandraDirectory, CassandraLauncher.DefaultTestConfigResource(), true, 19042);
+        }
+    }
+
+    @AfterClass
+    public static void tearDown() {
+        CassandraLauncher.stop();
+    }
 
 
     @Before
