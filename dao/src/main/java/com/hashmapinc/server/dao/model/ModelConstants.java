@@ -94,11 +94,12 @@ public class ModelConstants {
     /**
      * Cassandra admin_settings constants.
      */
-    public static final String ADMIN_SETTINGS_COLUMN_FAMILY_NAME = "admin_settings";
-    public static final String ADMIN_SETTINGS_KEY_PROPERTY = "key";
-    public static final String ADMIN_SETTINGS_JSON_VALUE_PROPERTY = "json_value";
+    public static final String USER_SETTINGS_COLUMN_FAMILY_NAME = "user_settings";
+    public static final String USER_SETTINGS_KEY_PROPERTY = "key";
+    public static final String USER_SETTINGS_JSON_VALUE_PROPERTY = "json_value";
+    public static final String USER_SETTINGS_USER_ID_PROPERTY = "user_id";
 
-    public static final String ADMIN_SETTINGS_BY_KEY_COLUMN_FAMILY_NAME = "admin_settings_by_key";
+    public static final String USER_SETTINGS_BY_KEY_COLUMN_FAMILY_NAME = "user_settings_by_key";
 
     /**
      * Cassandra contact constants.

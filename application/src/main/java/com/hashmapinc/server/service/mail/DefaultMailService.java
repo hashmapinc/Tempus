@@ -16,21 +16,24 @@
 package com.hashmapinc.server.service.mail;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.hashmapinc.server.common.data.AdminSettings;
+import com.hashmapinc.server.common.data.User;
+import com.hashmapinc.server.common.data.UserSettings;
 import com.hashmapinc.server.dao.exception.IncorrectParameterException;
+import com.hashmapinc.server.dao.user.UserService;
 import com.hashmapinc.server.exception.TempusException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.velocity.app.VelocityEngine;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.MessageSource;
 import org.springframework.core.NestedRuntimeException;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.velocity.VelocityEngineUtils;
-import com.hashmapinc.server.dao.settings.AdminSettingsService;
+import com.hashmapinc.server.dao.settings.UserSettingsService;
 import com.hashmapinc.server.exception.TempusErrorCode;
 
 import javax.annotation.PostConstruct;
@@ -59,8 +62,14 @@ public class DefaultMailService implements MailService {
     private String mailFrom;
     
     @Autowired
-    private AdminSettingsService adminSettingsService; 
-    
+    private UserSettingsService userSettingsService;
+
+    @Value("${ldap.admin-email}")
+    private String adminEmail;
+
+    @Autowired
+    private UserService userService;
+
     @PostConstruct
     private void init() {
         updateMailConfiguration();
@@ -68,7 +77,8 @@ public class DefaultMailService implements MailService {
 
     @Override
     public void updateMailConfiguration() {
-        AdminSettings settings = adminSettingsService.findAdminSettingsByKey("mail");
+        User adminUser = userService.findUserByEmail(adminEmail);
+        UserSettings settings = userSettingsService.findUserSettingsByKeyAndUserId("mail", adminUser.getId());
         if (settings != null) {
             JsonNode jsonConfig = settings.getJsonValue();
             mailSender = createMailSender(jsonConfig);

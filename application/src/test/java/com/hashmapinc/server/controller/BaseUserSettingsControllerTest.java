@@ -16,27 +16,45 @@
 package com.hashmapinc.server.controller;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.hashmapinc.server.common.data.AdminSettings;
+import com.hashmapinc.server.common.data.User;
+import com.hashmapinc.server.common.data.UserSettings;
 import org.junit.Test;
 
 import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 
-public abstract class BaseAdminControllerTest extends AbstractControllerTest {
+public abstract class BaseUserSettingsControllerTest extends AbstractControllerTest {
+
+    private static final ObjectMapper mapper = new ObjectMapper();
+
+    @Test
+    public void testSaveUserSettingsByCustomerUser() throws Exception {
+        loginCustomerUser();
+        UserSettings userSettings = new UserSettings();
+        userSettings.setKey("deviceTypes");
+        userSettings.setJsonValue(mapper.readTree("{\"deviceType\":\"DT_A\"}"));
+        doPost("/api/settings", userSettings).andExpect(status().isOk());
+
+        doGet("/api/settings/deviceTypes")
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(contentType))
+                .andExpect(jsonPath("$.jsonValue.deviceType", is("DT_A")));
+    }
 
     @Test
     public void testFindAdminSettingsByKey() throws Exception {
         loginSysAdmin();
-        doGet("/api/admin/settings/general")
+        doGet("/api/settings/general")
         .andExpect(status().isOk())
         .andExpect(content().contentType(contentType))
         .andExpect(jsonPath("$.id", notNullValue()))
         .andExpect(jsonPath("$.key", is("general")))
         .andExpect(jsonPath("$.jsonValue.baseUrl", is("http://localhost:8080")));
         
-        doGet("/api/admin/settings/mail")
+        doGet("/api/settings/mail")
         .andExpect(status().isOk())
         .andExpect(content().contentType(contentType))
         .andExpect(jsonPath("$.id", notNullValue()))
@@ -45,50 +63,58 @@ public abstract class BaseAdminControllerTest extends AbstractControllerTest {
         .andExpect(jsonPath("$.jsonValue.smtpHost", is("localhost")))
         .andExpect(jsonPath("$.jsonValue.smtpPort", is("25")));
         
-        doGet("/api/admin/settings/unknown")
+        doGet("/api/settings/unknown")
         .andExpect(status().isNotFound());
         
     }
+
     
     @Test
     public void testSaveAdminSettings() throws Exception {
         loginSysAdmin();
-        AdminSettings adminSettings = doGet("/api/admin/settings/general", AdminSettings.class);
+        UserSettings userSettings = doGet("/api/settings/general", UserSettings.class);
         
-        JsonNode jsonValue = adminSettings.getJsonValue();
+        JsonNode jsonValue = userSettings.getJsonValue();
         ((ObjectNode) jsonValue).put("baseUrl", "http://myhost.org");
-        adminSettings.setJsonValue(jsonValue);
+        userSettings.setJsonValue(jsonValue);
 
-        doPost("/api/admin/settings", adminSettings).andExpect(status().isOk());
+        doPost("/api/settings", userSettings).andExpect(status().isOk());
         
-        doGet("/api/admin/settings/general")
+        doGet("/api/settings/general")
         .andExpect(status().isOk())
         .andExpect(content().contentType(contentType))
         .andExpect(jsonPath("$.jsonValue.baseUrl", is("http://myhost.org")));
         
         ((ObjectNode) jsonValue).put("baseUrl", "http://localhost:8080");
-        adminSettings.setJsonValue(jsonValue);
+        userSettings.setJsonValue(jsonValue);
         
-        doPost("/api/admin/settings", adminSettings)
+        doPost("/api/settings", userSettings)
         .andExpect(status().isOk());
     }
 
     @Test
-    public void testSaveAdminSettingsWithEmptyKey() throws Exception {
-        loginSysAdmin();
-        AdminSettings adminSettings = doGet("/api/admin/settings/mail", AdminSettings.class); 
-        adminSettings.setKey(null);
-        doPost("/api/admin/settings", adminSettings)
+    public void testSaveUserSettingsWithEmptyKey() throws Exception {
+        loginCustomerUser();
+        UserSettings userSettings = new UserSettings();
+        userSettings.setJsonValue(mapper.readTree("{\"deviceType\":\"DT_A\"}"));
+        userSettings.setKey(null);
+        doPost("/api/settings", userSettings)
         .andExpect(status().isBadRequest())
         .andExpect(statusReason(containsString("Key should be specified")));
     }
     
     @Test
-    public void testChangeAdminSettingsKey() throws Exception {
-        loginSysAdmin();
-        AdminSettings adminSettings = doGet("/api/admin/settings/mail", AdminSettings.class); 
-        adminSettings.setKey("newKey");
-        doPost("/api/admin/settings", adminSettings)
+    public void testChangeUserSettingsKey() throws Exception {
+        loginCustomerUser();
+        UserSettings userSettings = new UserSettings();
+        userSettings.setJsonValue(mapper.readTree("{\"deviceType\":\"DT_A\"}"));
+        userSettings.setKey("deviceTypes");
+        doPost("/api/settings", userSettings).andExpect(status().isOk());
+
+        userSettings = doGet("/api/settings/deviceTypes", UserSettings.class);
+
+        userSettings.setKey("newKey");
+        doPost("/api/settings", userSettings)
         .andExpect(status().isBadRequest())
         .andExpect(statusReason(containsString("is prohibited")));
     }
@@ -96,11 +122,11 @@ public abstract class BaseAdminControllerTest extends AbstractControllerTest {
     @Test
     public void testSaveAdminSettingsWithNewJsonStructure() throws Exception {
         loginSysAdmin();
-        AdminSettings adminSettings = doGet("/api/admin/settings/mail", AdminSettings.class); 
-        JsonNode json = adminSettings.getJsonValue();
+        UserSettings userSettings = doGet("/api/settings/mail", UserSettings.class);
+        JsonNode json = userSettings.getJsonValue();
         ((ObjectNode) json).put("newKey", "my new value");
-        adminSettings.setJsonValue(json);
-        doPost("/api/admin/settings", adminSettings)
+        userSettings.setJsonValue(json);
+        doPost("/api/settings", userSettings)
         .andExpect(status().isBadRequest())
         .andExpect(statusReason(containsString("Provided json structure is different")));
     }
@@ -108,11 +134,11 @@ public abstract class BaseAdminControllerTest extends AbstractControllerTest {
     @Test
     public void testSaveAdminSettingsWithNonTextValue() throws Exception {
         loginSysAdmin();
-        AdminSettings adminSettings = doGet("/api/admin/settings/mail", AdminSettings.class); 
-        JsonNode json = adminSettings.getJsonValue();
+        UserSettings userSettings = doGet("/api/settings/mail", UserSettings.class);
+        JsonNode json = userSettings.getJsonValue();
         ((ObjectNode) json).put("timeout", 10000L);
-        adminSettings.setJsonValue(json);
-        doPost("/api/admin/settings", adminSettings)
+        userSettings.setJsonValue(json);
+        doPost("/api/settings", userSettings)
         .andExpect(status().isBadRequest())
         .andExpect(statusReason(containsString("Provided json structure can't contain non-text values")));
     }
@@ -120,8 +146,8 @@ public abstract class BaseAdminControllerTest extends AbstractControllerTest {
     @Test
     public void testSendTestMail() throws Exception {
         loginSysAdmin();
-        AdminSettings adminSettings = doGet("/api/admin/settings/mail", AdminSettings.class);
-        doPost("/api/admin/settings/testMail", adminSettings)
+        UserSettings userSettings = doGet("/api/settings/mail", UserSettings.class);
+        doPost("/api/settings/testMail", userSettings)
         .andExpect(status().isOk());
     }
     

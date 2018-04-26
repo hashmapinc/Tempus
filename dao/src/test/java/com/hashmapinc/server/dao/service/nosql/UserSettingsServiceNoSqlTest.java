@@ -13,18 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.hashmapinc.server.common.data.id;
+package com.hashmapinc.server.dao.service.nosql;
 
-import java.util.UUID;
+import com.hashmapinc.server.dao.service.BaseUserServiceTest;
+import com.hashmapinc.server.dao.service.DaoNoSqlTest;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
-
-public class AdminSettingsId extends UUIDBased {
-
-    @JsonCreator
-    public AdminSettingsId(@JsonProperty("id") UUID id){
-        super(id);
-    }
-    
+@DaoNoSqlTest
+public class UserSettingsServiceNoSqlTest extends BaseUserServiceTest {
 }
