@@ -13,15 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.hashmapinc.server.dao.sql.settings;
+package com.hashmapinc.server.dao.settings;
 
-import com.hashmapinc.server.dao.model.sql.AdminSettingsEntity;
-import org.springframework.data.repository.CrudRepository;
+import com.hashmapinc.server.common.data.UserSettings;
+import com.hashmapinc.server.common.data.id.UserId;
+import com.hashmapinc.server.common.data.id.UserSettingsId;
 
-/**
- * Created by Valerii Sosliuk on 5/6/2017.
- */
-public interface AdminSettingsRepository extends CrudRepository<AdminSettingsEntity, String> {
+public interface UserSettingsService {
 
-    AdminSettingsEntity findByKey(String key);
+    UserSettings findUserSettingsById(UserSettingsId userSettingsId);
+
+    UserSettings findUserSettingsByKeyAndUserId(String key, UserId userId);
+    
+    UserSettings saveUserSettings(UserSettings userSettings);
+    
 }

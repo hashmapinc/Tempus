@@ -15,25 +15,29 @@
  */
 package com.hashmapinc.server.dao.settings;
 
-import com.hashmapinc.server.common.data.AdminSettings;
+import com.hashmapinc.server.common.data.UserSettings;
+import com.hashmapinc.server.common.data.id.UserId;
 import com.hashmapinc.server.dao.Dao;
 
-public interface AdminSettingsDao extends Dao<AdminSettings> {
+import java.util.UUID;
+
+public interface UserSettingsDao extends Dao<UserSettings> {
 
     /**
-     * Save or update admin settings object
+     * Save or update user settings object
      *
-     * @param adminSettings the admin settings object
-     * @return saved admin settings object
+     * @param userSettings the user settings object
+     * @return saved user settings object
      */
-    AdminSettings save(AdminSettings adminSettings);
+    UserSettings save(UserSettings userSettings);
     
     /**
-     * Find admin settings by key.
+     * Find user settings by key.
      *
      * @param key the key
-     * @return the admin settings object
+     * @param userId the userId
+     * @return the user settings object
      */
-    AdminSettings findByKey(String key);
+    UserSettings findByKeyAndUserId(String key, UUID userId);
 
 }

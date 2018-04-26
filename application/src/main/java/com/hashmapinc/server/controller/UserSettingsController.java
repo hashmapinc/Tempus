@@ -15,50 +15,55 @@
  */
 package com.hashmapinc.server.controller;
 
-import com.hashmapinc.server.common.data.AdminSettings;
+import com.hashmapinc.server.common.data.UserSettings;
+import com.hashmapinc.server.common.data.id.UserId;
+import com.hashmapinc.server.common.data.security.Authority;
 import com.hashmapinc.server.service.update.UpdateService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import com.hashmapinc.server.dao.settings.AdminSettingsService;
+import com.hashmapinc.server.dao.settings.UserSettingsService;
 import com.hashmapinc.server.exception.TempusException;
 import com.hashmapinc.server.service.mail.MailService;
 import com.hashmapinc.server.service.update.model.UpdateMessage;
 
 @RestController
-@RequestMapping("/api/admin")
-public class AdminController extends BaseController {
+@RequestMapping("/api")
+public class UserSettingsController extends BaseController {
 
     @Autowired
     private MailService mailService;
     
     @Autowired
-    private AdminSettingsService adminSettingsService;
+    private UserSettingsService userSettingsService;
 
     @Autowired
     private UpdateService updateService;
 
-    @PreAuthorize("hasAuthority('SYS_ADMIN')")
+    @PreAuthorize("hasAnyAuthority('TENANT_ADMIN', 'CUSTOMER_USER', 'SYS_ADMIN')")
     @RequestMapping(value = "/settings/{key}", method = RequestMethod.GET)
     @ResponseBody
-    public AdminSettings getAdminSettings(@PathVariable("key") String key) throws TempusException {
+    public UserSettings getUserSettings(@PathVariable("key") String key) throws TempusException {
         try {
-            return checkNotNull(adminSettingsService.findAdminSettingsByKey(key));
+            UserId userId = getCurrentUser().getId();
+            return checkNotNull(userSettingsService.findUserSettingsByKeyAndUserId(key, userId));
         } catch (Exception e) {
             throw handleException(e);
         }
     }
 
-    @PreAuthorize("hasAuthority('SYS_ADMIN')")
+    @PreAuthorize("hasAnyAuthority('TENANT_ADMIN', 'CUSTOMER_USER', 'SYS_ADMIN')")
     @RequestMapping(value = "/settings", method = RequestMethod.POST)
     @ResponseBody 
-    public AdminSettings saveAdminSettings(@RequestBody AdminSettings adminSettings) throws TempusException {
+    public UserSettings saveUserSettings(@RequestBody UserSettings userSettings) throws TempusException {
         try {
-            adminSettings = checkNotNull(adminSettingsService.saveAdminSettings(adminSettings));
-            if (adminSettings.getKey().equals("mail")) {
+            UserId userId = getCurrentUser().getId();
+            userSettings.setUserId(userId);
+            userSettings = checkNotNull(userSettingsService.saveUserSettings(userSettings));
+            if (userSettings.getKey().equals("mail") && (getCurrentUser().getAuthority() == Authority.CUSTOMER_USER)) {
                 mailService.updateMailConfiguration();
             }
-            return adminSettings;
+            return userSettings;
         } catch (Exception e) {
             throw handleException(e);
         }
@@ -66,12 +71,12 @@ public class AdminController extends BaseController {
 
     @PreAuthorize("hasAuthority('SYS_ADMIN')")
     @RequestMapping(value = "/settings/testMail", method = RequestMethod.POST)
-    public void sendTestMail(@RequestBody AdminSettings adminSettings) throws TempusException {
+    public void sendTestMail(@RequestBody UserSettings userSettings) throws TempusException {
         try {
-            adminSettings = checkNotNull(adminSettings);
-            if (adminSettings.getKey().equals("mail")) {
+            userSettings = checkNotNull(userSettings);
+            if (userSettings.getKey().equals("mail")) {
                String email = getCurrentUser().getEmail();
-               mailService.sendTestMail(adminSettings.getJsonValue(), email);
+               mailService.sendTestMail(userSettings.getJsonValue(), email);
             }
         } catch (Exception e) {
             throw handleException(e);
