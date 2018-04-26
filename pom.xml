@@ -113,11 +113,6 @@
                 <artifactId>os-maven-plugin</artifactId>
                 <version>1.5.0.Final</version>
             </extension>
-            <extension>
-                <groupId>org.kuali.maven.wagons</groupId>
-                <artifactId>maven-s3-wagon</artifactId>
-                <version>1.2.1</version>
-            </extension>
         </extensions>
         <pluginManagement>
             <plugins>
@@ -851,11 +846,6 @@
         <repository>
             <id>central</id>
             <url>http://repo1.maven.org/maven2/</url>
-        </repository>
-        <repository>
-            <id>aws-release</id>
-            <name>AWS S3 Release Repository</name>
-            <url>s3://cirrus-link-maven-repo/release</url>
         </repository>
         <repository>
             <id>spring-snapshots</id>
