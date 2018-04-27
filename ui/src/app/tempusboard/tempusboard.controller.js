@@ -17,8 +17,10 @@
 
 //import AliasController from '../api/alias-controller';
 
+import './tempusboard.scss';
+
 /*@ngInject*/
-export function TempusboardController($scope, $log, $state, $stateParams, userService, deviceService, types, attributeService, $q, dashboardService, applicationService) {
+export function TempusboardController($scope, $log, $state, $stateParams, userService, deviceService, types, attributeService, $q, dashboardService, applicationService, entityService) {
 	var vm = this;
     var customerId = $stateParams.customerId;
 
@@ -59,12 +61,11 @@ export function TempusboardController($scope, $log, $state, $stateParams, userSe
                 vm.configurationError = true;
             });
 	}
-	var pageLink = {limit: 100};
 
+	var pageLink = {limit: 100};
 
     var subscriptionIdMap = {};
 //	var entityAttributesSubscriptionMap = {};
-
 
     function success(attributes, update, apply) {
         vm.last_telemetry = attributes;
@@ -147,32 +148,78 @@ export function TempusboardController($scope, $log, $state, $stateParams, userSe
 
 		$scope.entityType = 'DEVICE';
 		$scope.attributeScope = {value:'LATEST_TELEMETRY'};
+
+        deviceService.getDeviceTypes({ignoreLoading: true}).then(
+            function success(deviceTypes) {
+                vm.allDeviceTypes = [];
+                deviceTypes.forEach(function(deviceType){
+                    for (var i = 0; i < vm.devices.length; i++) {
+                        if (vm.devices[i].type === deviceType.type){
+                            entityService.getEntityKeys('DEVICE', vm.devices[i].id.id, null, 'timeseries', {ignoreLoading: true}).then(
+                                function success(keys) {
+                                     vm.allDeviceTypes.push({
+                                        type: deviceType.type,
+                                        selectedItem: null,
+                                        selected: keys.slice(0,4),
+                                        tags: keys
+                                     });
+                                },
+                                function fail() {
+                                    vm.configurationError = true;
+                                }
+                            );
+                            break;
+                        }
+                    }
+                })
+                vm.devices.forEach(function(device, index, theArray){
+                    theArray[index].subscriptionId = $scope.entityType + device.id.id + $scope.attributeScope.value;
+                    $scope.query = {limit:100, order:"key", page:1, search:null};
+                    $scope.entityId = device.id.id;
+                    getEntityAttributes(true, false);
+                })
+            }, function fail() {
+                vm.configurationError = true;
+        });
+
+        vm.searchText = null;
 		
-		vm.devices.forEach(function(device, index, theArray){
-			theArray[index].subscriptionId = $scope.entityType + device.id.id + $scope.attributeScope.value;
-			$scope.query = {limit:5, order:"key", page:1, search:null};
-			$scope.entityId = device.id.id;
-			if(device.id.id == 'fdaa4a90-f0a7-11e7-a908-81edfb2c80e3'){
-				getEntityAttributes(true, false);
-			}
-
-
-		})
-
-		vm.assetSelected(vm.devices[0]);
+	vm.assetSelected(vm.devices[0]);
 		
 	}, function() {
 		$log.log('Failed: ');
 	})
 
-	
-
+    vm.chipSearch = function(text, chipSet) {
+      return chipSet.filter(function(object) {
+        if (angular.isString(text)) {
+          return object.search(text) > -1;
+        } else {
+          return false;
+        }
+      });
+    };
+    
+    vm.transformChip = function(chip) {
+      return chip;
+    };
+    
 
     $scope.$on('$destroy', function() {
-
-            if ($scope.subscriptionId) {
-                attributeService.unsubscribeForEntityAttributes($scope.subscriptionId);
-            }
-        });
+        if ($scope.subscriptionId) {
+            attributeService.unsubscribeForEntityAttributes($scope.subscriptionId);
+        }
+    });
+    $scope.$watch("vm.allDeviceTypes", function(newValue, oldValue){
+        if(newValue != oldValue){
+            newValue.forEach(function(deviceType){
+                vm.devices.forEach(function(device){
+                    if(deviceType.type === device.type){
+                        device.selectedTags = deviceType.selected;
+                    }
+                })
+            })
+        }
+    }, true);
 
 }
