@@ -13,4 +13,4 @@ kubectl create -f cassandra.yaml
 kubectl create -f nifi.yaml
 
 # deploy thingsboard
-kubectl create -f tb.yaml
+kubectl create -f tempus.yaml

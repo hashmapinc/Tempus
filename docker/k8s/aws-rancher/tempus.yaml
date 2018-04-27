@@ -17,13 +17,13 @@
 kind: Service
 apiVersion: v1
 metadata:
-  name: tb
+  name: tempus
   labels:
-    app: tb
+    app: tempus
 spec:
   type: LoadBalancer
   selector:
-    app: tb
+    app: tempus
   ports:
     - protocol: TCP
       port: 8080
@@ -40,22 +40,22 @@ spec:
     - protocol: TCP
       port: 9999
       targetPort: 9999
-      name: tb-port
+      name: tempus-port
 ---
 apiVersion: policy/v1beta1
 kind: PodDisruptionBudget
 metadata:
-  name: tb-budget
+  name: tempus-budget
 spec:
   selector:
     matchLabels:
-      app: tb
+      app: tempus
   minAvailable: 1
 ---
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: tb-config
+  name: tempus-config
 data:
   zookeeper.enabled: "true"
   zookeeper.url: "zk-cs:2181"
@@ -76,12 +76,12 @@ data:
 apiVersion: "apps/v1beta1"
 kind: StatefulSet
 metadata:
-  name: tb
+  name: tempus
 spec:
   selector:
     matchLabels:
-      app: tb
-  serviceName: tb
+      app: tempus
+  serviceName: tempus
   replicas: 1
   updateStrategy:
     type: RollingUpdate
@@ -89,10 +89,10 @@ spec:
   template:
     metadata:
       labels:
-        app: tb
+        app: tempus
     spec:
       containers:
-      - name: tb
+      - name: tempus
         image: hashmapinc/tempus:latest
         ports:
         - containerPort: 8080
@@ -105,82 +105,82 @@ spec:
         - containerPort: 9001
           name: rpc
         - containerPort: 9999
-          name: tb-port
+          name: tempus-port
         env:
         - name: SPARK_COMPUTATIONS_PATH
           valueFrom:
             configMapKeyRef:
-              name: tb-config
+              name: tempus-config
               key: spark.path
         - name: MQTT_BIND_ADDRESS
           valueFrom:
             configMapKeyRef:
-              name: tb-config
+              name: tempus-config
               key: mqtt.address
         - name: MQTT_BIND_PORT
           valueFrom:
             configMapKeyRef:
-              name: tb-config
+              name: tempus-config
               key: mqtt.port
         - name: COAP_BIND_ADDRESS
           valueFrom:
             configMapKeyRef:
-              name: tb-config
+              name: tempus-config
               key: coap.address
         - name: COAP_BIND_PORT
           valueFrom:
             configMapKeyRef:
-              name: tb-config
+              name: tempus-config
               key: coap.port
         - name: DATABASE_TYPE
           valueFrom:
             configMapKeyRef:
-              name: tb-config
+              name: tempus-config
               key: database.type
         - name: ZOOKEEPER_ENABLED
           valueFrom:
             configMapKeyRef:
-              name: tb-config
+              name: tempus-config
               key: zookeeper.enabled
         - name: ZOOKEEPER_URL
           valueFrom:
             configMapKeyRef:
-              name: tb-config
+              name: tempus-config
               key: zookeeper.url
         - name: CASSANDRA_HOST
           valueFrom:
             configMapKeyRef:
-              name: tb-config
+              name: tempus-config
               key: cassandra.host
         - name: CASSANDRA_PORT
           valueFrom:
             configMapKeyRef:
-              name: tb-config
+              name: tempus-config
               key: cassandra.port
         - name: CASSANDRA_URL
           valueFrom:
             configMapKeyRef:
-              name: tb-config
+              name: tempus-config
               key: cassandra.url
         - name: POSTGRES_HOST
           valueFrom:
             configMapKeyRef:
-              name: tb-config
+              name: tempus-config
               key: postgres.host
         - name: POSTGRES_PORT
           valueFrom:
             configMapKeyRef:
-              name: tb-config
+              name: tempus-config
               key: postgres.port
         - name: ADD_SCHEMA_AND_SYSTEM_DATA
           valueFrom:
             configMapKeyRef:
-              name: tb-config
+              name: tempus-config
               key: schema.data
         - name: ADD_DEMO_DATA
           valueFrom:
             configMapKeyRef:
-              name: tb-config
+              name: tempus-config
               key: demo.data
         command:
         - sh

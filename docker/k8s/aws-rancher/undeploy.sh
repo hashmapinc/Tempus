@@ -3,14 +3,14 @@
 # delete tempus services
 kubectl delete service  cassandra-headless \
                         nifi \
-                        tb \
+                        tempus \
                         zk-cs \
                         zk-hs
 
 # delete tempus stateful sets
 kubectl delete statefulset  cassandra \
                             nifi \
-                            tb \
+                            tempus \
                             zk
 
 # delete all tempus storage classes
@@ -29,8 +29,8 @@ kubectl delete pvc  cassandra-commitlog-cassandra-0 \
                     zk-datadir-zk-2
 
 # delete all tempus configmaps
-kubectl delete configmap tb-config
+kubectl delete configmap tempus-config
 
 # delete all tempus pod disruption budgets
-kubectl delete poddisruptionbudget  tb-budget \
+kubectl delete poddisruptionbudget  tempus-budget \
                                     zk-pdb
