@@ -93,5 +93,8 @@ From there, select Upgrade and allow the kubernetes changes to take effect.
 
 If you have issues, you may have to delete and recreate the hosts after this step.
 
+## Note on Storage Class YAMLs
+Ensure that your rancher hosts and the EBS Storage Classes you define share the same Availability Zone, or you will get errors. In this case, the zone is `us-east-2a`. This is defined in the `common.yaml` file.
+
 ## Help
 If you have any issues, please reach out to [Randy Pitcher](https://github.com/randypitcherii)
