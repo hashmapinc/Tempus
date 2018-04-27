@@ -40,15 +40,16 @@
 			  	 	<md-card style="height: calc(120px); margin-bottom: 3px; margin-top: 3px; cursor: pointer;" ng-click="vm.assetSelected(device);">
 			  	 		<md-card-header>
 			  	 			<md-card-header-text>
-			  	 				{{device.name}}
+			  	 				{{device.name}} ({{device.type}})
 			  	 			</md-card-header-text>
 			  	 		</md-card-header>
 			  	 		<md-card-content>
 			  	 			 <div layout="row">
-							    <div flex><strong>{{device.data[0].key}}:</strong>{{device.data[0].value | number : 2}}</div>
-							    <div flex><strong>{{device.data[1].key}}:</strong>{{device.data[1].value | number : 2}}</div>
-							    <div flex><strong>{{device.data[2].key}}:</strong>{{device.data[2].value | number : 2}}</div>
-							    <div flex><strong>{{device.data[3].key}}:</strong>{{device.data[3].value | number : 2}}</div>
+			  	 			 	<div ng-repeat="deviceType in device.selectedTags">
+			  	 			 		<div ng-repeat="data in device.data">
+							   			<div flex class="tb-tags" ng-if="data.key == deviceType"><strong>{{data.key}}:</strong>{{data.value | number : 2}}</div>
+							   		</div>
+								</div>
 							  </div>
 			  	 		</md-card-content>
 			  	 		
@@ -56,7 +57,60 @@
 	
 			  	 </md-content>
 			  </md-tab>
-			  <md-tab label="Alerts"></md-tab>
+			  <md-tab label="Settings">
+			  	<v-accordion class="vAccordion--default tb-checkbox-wrapper" multiple>
+
+					  <!-- add expanded attribute to open the section -->
+					<div ng-repeat="device in vm.allDeviceTypes">
+					  <v-pane>
+					    <v-pane-header>
+					      {{device.type}}
+					    </v-pane-header>
+
+					    <v-pane-content>
+						  <md-chips ng-model="device.selected" md-autocomplete-snap md-require-match="true" md-max-chips="4">
+						    <md-autocomplete md-selected-item="device.selectedItem" md-search-text="vm.searchText" md-items="item in vm.chipSearch(vm.searchText, device.tags)" md-item-text="item.text" placeholder="Tag name (max 4)">
+						      <span md-highlight-text="vm.searchText">{{item}}</span>
+						    </md-autocomplete>
+						    <md-chip-template>
+						      <span>{{$chip}}</span>
+						    </md-chip-template>
+						  </md-chips>
+					    </v-pane-content>
+					  </v-pane>
+					</div>
+				</v-accordion>
+
+<!-- 				<md-expansion-panel-group md-component-id="panelGroup" multiple>
+					<div ng-repeat="deviceType in vm.allDeviceTypes">
+					  <md-expansion-panel md-component-id="deviceType.type">
+					    <md-expansion-panel-collapsed>
+					    {{deviceType.type}}
+					    <md-icon class="md-expansion-panel-icon" md-font-icon="keyboard_arrow_down" aria-label="android">keyboard_arrow_right</md-icon>
+						</md-expansion-panel-collapsed>
+					    <md-expansion-panel-expanded>
+					      <md-expansion-panel-header>
+					      	{{deviceType.type}}
+					      	<!-- <md-icon class="md-expansion-panel-icon" md-font-icon="keyboard_arrow_left" aria-label="android">keyboard_arrow_left</md-icon> 
+					      </md-expansion-panel-header>
+					      <md-expansion-panel-content>
+					    	<div class="tb-checkbox-wrapper">
+					         <fieldset class="standard" >
+					          <div layout="row" layout-wrap flex>
+					            <div flex="50" ng-repeat="item in vm.items">
+					              <md-checkbox ng-checked="vm.exists(item, vm.selected)" ng-click="vm.toggle(item, vm.selected)">
+					                {{ item }} <span ng-if="vm.exists(item, vm.selected)">selected</span>
+					              </md-checkbox>
+					            </div>
+					          </div>
+					         </fieldset>
+					        </div>
+					      </md-expansion-panel-content>
+					    </md-expansion-panel-expanded>
+					  </md-expansion-panel>
+					</div>
+				</md-expansion-panel-group>	 -->		
+				</md-tab>
 		    </md-tabs>
 		</md-card>
 	</div>
