@@ -1,8 +1,5 @@
 #!/bin/bash
 
-# delete tempus pods
-kubectl delete pod cassandra-setup
-
 # delete tempus services
 kubectl delete service  cassandra-headless \
                         nifi \

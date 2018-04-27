@@ -7,7 +7,6 @@ kubectl create -f common.yaml
 kubectl create -f zookeeper.yaml
 
 # deploy cassandra
-kubectl create -f cassandra-setup.yaml
 kubectl create -f cassandra.yaml 
 
 # deploy nifi
