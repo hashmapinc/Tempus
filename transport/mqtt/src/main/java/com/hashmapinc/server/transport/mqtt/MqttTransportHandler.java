@@ -17,7 +17,6 @@ package com.hashmapinc.server.transport.mqtt;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.hashmapinc.server.common.data.Device;
-import com.hashmapinc.server.common.data.id.TenantId;
 import com.hashmapinc.server.common.data.security.DeviceTokenCredentials;
 import com.hashmapinc.server.common.data.security.DeviceX509Credentials;
 import com.hashmapinc.server.common.msg.session.AdaptorToSessionActorMsg;
@@ -36,9 +35,6 @@ import com.hashmapinc.server.transport.mqtt.session.DeviceSessionCtx;
 import com.hashmapinc.server.transport.mqtt.session.GatewaySessionCtx;
 import com.hashmapinc.server.transport.mqtt.sparkplugB.SparkPlugMsgTypes;
 import com.hashmapinc.server.transport.mqtt.util.SslUtil;
-import io.netty.buffer.ByteBuf;
-import io.netty.buffer.ByteBufAllocator;
-import io.netty.buffer.UnpooledByteBufAllocator;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.handler.codec.mqtt.*;
@@ -57,7 +53,6 @@ import javax.security.cert.X509Certificate;
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import static com.hashmapinc.server.common.msg.session.MsgType.*;
 import static com.hashmapinc.server.transport.mqtt.MqttTopics.DEVICE_RPC_REQUESTS_SUB_TOPIC;
@@ -88,9 +83,6 @@ public class MqttTransportHandler extends ChannelInboundHandlerAdapter implement
     private volatile GatewaySessionCtx gatewaySessionCtx;
     private SparkPlugDecodeService sparkPlugDecodeService;
     private SparkPlugUtils sparkPlugUtils;
-    private static final ByteBufAllocator ALLOCATOR = new UnpooledByteBufAllocator(false);
-
-
 
     public MqttTransportHandler(SessionMsgProcessor processor, DeviceService deviceService, DeviceAuthService authService, RelationService relationService,
                                 MqttTransportAdaptor adaptor, SslHandler sslHandler, QuotaService quotaService) {
