@@ -16,6 +16,8 @@
 package com.hashmapinc.server.actors.rule;
 
 import akka.japi.JavaPartialFunction;
+import akka.persistence.AtLeastOnceDelivery.AtLeastOnceDeliverySnapshot;
+import akka.persistence.*;
 import com.hashmapinc.server.actors.ActorSystemContext;
 import com.hashmapinc.server.actors.service.ComponentActor;
 import com.hashmapinc.server.actors.service.ContextBasedCreator;
@@ -28,6 +30,9 @@ import com.hashmapinc.server.extensions.api.plugins.msg.PluginToRuleMsg;
 import com.hashmapinc.server.extensions.api.plugins.msg.RuleToPluginMsg;
 import scala.PartialFunction;
 import scala.runtime.BoxedUnit;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class RuleActor extends ComponentActor<RuleId, RuleActorMessageProcessor> {
 
@@ -43,6 +48,7 @@ public class RuleActor extends ComponentActor<RuleId, RuleActorMessageProcessor>
             try {
                 processor.onRuleProcessingMsg(context(), (RuleProcessingMsg) msg, m -> {
                     persistAsync(m, this::deliverRuleToPluginMessage);
+                    saveSnapshots();
                 });
                 increaseMessagesProcessedCount();
             }catch (Exception e) {
@@ -50,6 +56,7 @@ public class RuleActor extends ComponentActor<RuleId, RuleActorMessageProcessor>
             }
         }else if(msg instanceof PluginToRuleMsg<?>){
             try {
+                //Move this functions to Processor.onPluginMsg to make sure only success responses are marked as confirmed
                 persistPluginToRuleMsg((PluginToRuleMsg<?>)msg);
                 processor.onPluginMsg(context(), (PluginToRuleMsg<?>) msg);
             } catch (Exception e) {
@@ -67,6 +74,14 @@ public class RuleActor extends ComponentActor<RuleId, RuleActorMessageProcessor>
             }
         } else if (msg instanceof StatsPersistTick) {
             onStatsPersistTick(id);
+        } else if(msg instanceof SaveSnapshotSuccess) {
+            long sequenceNr = ((SaveSnapshotSuccess) msg).metadata().sequenceNr();
+            deleteMessages(sequenceNr);
+            deleteSnapshots(SnapshotSelectionCriteria.create(sequenceNr - 1, System.currentTimeMillis()));
+        } else if(msg instanceof SaveSnapshotFailure) {
+            logger.error("Snapshot failed to save:");
+            logger.error("Metadata: [{}]", ((SaveSnapshotFailure) msg).metadata());
+            logger.error("Reason: [{}]", ((SaveSnapshotFailure) msg).cause());
         } else {
             logger.debug("[{}][{}] Unknown msg type.", tenantId, id, msg.getClass().getName());
         }
@@ -82,10 +97,26 @@ public class RuleActor extends ComponentActor<RuleId, RuleActorMessageProcessor>
                     deliverRuleToPluginMessage((RuleToPluginMsg<?>) msg);
                 }else if(msg instanceof PluginToRuleMsg<?>){
                     confirmDelivery(((PluginToRuleMsg) msg).getDeliveryId());
+                } else if(msg instanceof SnapshotOffer){
+                    logger.warning("Got snapshot [{}] while recovering.", ((SnapshotOffer) msg).metadata());
+                    setDeliverySnapshot((AtLeastOnceDeliverySnapshot) ((SnapshotOffer) msg).snapshot());
+                } else if(msg instanceof RecoveryCompleted) {
+                    List<RuleToPluginMsg> unconfirmed = getDeliverySnapshot().getUnconfirmedDeliveries().stream()
+                            .filter(u -> u.message() instanceof RuleToPluginMsg)
+                            .map(u -> (RuleToPluginMsg) u.message())
+                            .collect(Collectors.toList());
+                    logger.warning("Unconfirmed messages of size [{}] found: [{}]", unconfirmed.size(), unconfirmed);
+                } else{
+                    logger.debug("[{}][{}] Unknown recovery msg type while recovering.", tenantId, id, msg.getClass().getName());
                 }
                 return BoxedUnit.UNIT;
             }
         };
+    }
+
+    private void saveSnapshots(){
+        if (lastSequenceNr() % snapshotInterval == 0 && lastSequenceNr() != 0)
+            saveSnapshot(getDeliverySnapshot());
     }
 
     private void persistPluginToRuleMsg(PluginToRuleMsg<?> msg){
@@ -93,6 +124,7 @@ public class RuleActor extends ComponentActor<RuleId, RuleActorMessageProcessor>
             persistAsync(msg, m -> {
                 confirmDelivery(m.getDeliveryId());
             });
+            saveSnapshots();
         }
     }
 

@@ -197,7 +197,7 @@ class RuleActorMessageProcessor extends ComponentMsgProcessor<RuleId> {
                 pushToNextRule(context, ctx, RuleEngineError.NO_RESPONSE_FROM_ACTIONS);
             }
         } else {
-            logger.warning("[{}] Processing timeout detected: [{}]", entityId, msg.getUid());
+            logger.warning("[{}] Processing timeout detected: [{}] delivery id {}", entityId, msg.getUid(), msg.getDeliveryId());
         }
     }
 

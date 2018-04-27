@@ -20,23 +20,16 @@ import akka.event.Logging;
 import akka.event.LoggingAdapter;
 import akka.japi.JavaPartialFunction;
 import com.hashmapinc.server.actors.ActorSystemContext;
-import com.hashmapinc.server.actors.plugin.PluginCallbackMessage;
-import com.hashmapinc.server.actors.plugin.PluginTerminationMsg;
-import com.hashmapinc.server.actors.plugin.RuleToPluginMsgWrapper;
+import com.hashmapinc.server.actors.shared.ComponentMsgProcessor;
 import com.hashmapinc.server.actors.stats.StatsPersistMsg;
-import com.hashmapinc.server.actors.stats.StatsPersistTick;
 import com.hashmapinc.server.common.data.id.EntityId;
 import com.hashmapinc.server.common.data.id.TenantId;
 import com.hashmapinc.server.common.data.plugin.ComponentLifecycleEvent;
 import com.hashmapinc.server.common.msg.cluster.ClusterEventMsg;
-import com.hashmapinc.server.actors.shared.ComponentMsgProcessor;
 import com.hashmapinc.server.common.msg.plugin.ComponentLifecycleMsg;
-import com.hashmapinc.server.extensions.api.plugins.msg.TimeoutMsg;
-import com.hashmapinc.server.extensions.api.plugins.msg.ToPluginRpcResponseDeviceMsg;
-import com.hashmapinc.server.extensions.api.plugins.rest.PluginRestMsg;
-import com.hashmapinc.server.extensions.api.plugins.rpc.PluginRpcMsg;
-import com.hashmapinc.server.extensions.api.plugins.ws.msg.PluginWebsocketMsg;
 import scala.PartialFunction;
+import scala.concurrent.duration.Duration;
+import scala.concurrent.duration.FiniteDuration;
 import scala.runtime.BoxedUnit;
 
 /**
@@ -52,6 +45,8 @@ public abstract class ComponentActor<T extends EntityId, P extends ComponentMsgP
     protected P processor;
     private long messagesProcessed;
     private long errorsOccurred;
+    //TODO: Configure this in YAML
+    protected final long snapshotInterval = 100;
 
     public ComponentActor(ActorSystemContext systemContext, TenantId tenantId, T id) {
         super(systemContext);
@@ -205,6 +200,15 @@ public abstract class ComponentActor<T extends EntityId, P extends ComponentMsgP
 
     protected void logLifecycleEvent(ComponentLifecycleEvent event, Exception e) {
         systemContext.persistLifecycleEvent(tenantId, id, event, e);
+    }
+
+    /**
+     * We needed to make sure actor is not redelivering message before plugin times out or responds with ack
+     * @return 10 millis greater than plugin timeout
+     */
+    @Override
+    public FiniteDuration redeliverInterval() {
+        return Duration.apply( systemContext.getPluginProcessingTimeout() + 10L,"milli");
     }
 
     protected abstract long getErrorPersistFrequency();
