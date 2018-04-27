@@ -17,6 +17,7 @@ package com.hashmapinc.server.transport.mqtt;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.hashmapinc.server.common.data.Device;
+import com.hashmapinc.server.common.data.id.TenantId;
 import com.hashmapinc.server.common.data.security.DeviceTokenCredentials;
 import com.hashmapinc.server.common.data.security.DeviceX509Credentials;
 import com.hashmapinc.server.common.msg.session.AdaptorToSessionActorMsg;
@@ -33,7 +34,11 @@ import com.hashmapinc.server.dao.relation.RelationService;
 import com.hashmapinc.server.transport.mqtt.adaptors.MqttTransportAdaptor;
 import com.hashmapinc.server.transport.mqtt.session.DeviceSessionCtx;
 import com.hashmapinc.server.transport.mqtt.session.GatewaySessionCtx;
+import com.hashmapinc.server.transport.mqtt.sparkplugB.SparkPlugMsgTypes;
 import com.hashmapinc.server.transport.mqtt.util.SslUtil;
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.ByteBufAllocator;
+import io.netty.buffer.UnpooledByteBufAllocator;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.handler.codec.mqtt.*;
@@ -52,9 +57,9 @@ import javax.security.cert.X509Certificate;
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
-import static com.hashmapinc.server.common.msg.session.MsgType.SUBSCRIBE_RPC_COMMANDS_REQUEST;
-import static com.hashmapinc.server.common.msg.session.MsgType.SUBSCRIBE_SPARKPLUG_TELEMETRY_REQUEST;
+import static com.hashmapinc.server.common.msg.session.MsgType.*;
 import static com.hashmapinc.server.transport.mqtt.MqttTopics.DEVICE_RPC_REQUESTS_SUB_TOPIC;
 import static io.netty.handler.codec.mqtt.MqttConnectReturnCode.*;
 import static io.netty.handler.codec.mqtt.MqttMessageType.*;
@@ -83,6 +88,8 @@ public class MqttTransportHandler extends ChannelInboundHandlerAdapter implement
     private volatile GatewaySessionCtx gatewaySessionCtx;
     private SparkPlugDecodeService sparkPlugDecodeService;
     private SparkPlugUtils sparkPlugUtils;
+    private static final ByteBufAllocator ALLOCATOR = new UnpooledByteBufAllocator(false);
+
 
 
     public MqttTransportHandler(SessionMsgProcessor processor, DeviceService deviceService, DeviceAuthService authService, RelationService relationService,
@@ -248,12 +255,22 @@ public class MqttTransportHandler extends ChannelInboundHandlerAdapter implement
                     processor.process(new BasicToDeviceActorSessionMsg(deviceSessionCtx.getDevice(), msg));
                     grantedQoSList.add(getMinSupportedQos(reqQoS));
                 } else if (topicName.startsWith(sparkPlugNameSpace)) {
-                    AdaptorToSessionActorMsg msg = adaptor.convertToActorMsg(deviceSessionCtx, SUBSCRIBE_SPARKPLUG_TELEMETRY_REQUEST, mqttMsg);
-                    String topic = processAndGetSparkPlugSubscriptionTopic(topicName);
-                    String addInfoTopic = deviceSessionCtx.getDevice().getAdditionalInfo().get("topic").asText();
-                    if(addInfoTopic.contentEquals(topic))
-                        processor.process(new BasicToDeviceActorSessionMsg(deviceSessionCtx.getDevice(), msg));
-                    grantedQoSList.add(getMinSupportedQos(reqQoS));
+                    if(topicName.contains(SparkPlugMsgTypes.DDEATH)) {
+                        AdaptorToSessionActorMsg msg = adaptor.convertToActorMsg(deviceSessionCtx, SPARKPLUG_DEATH_SUBSCRIBE, mqttMsg);
+                        String topic = processAndGetSparkPlugSubscriptionTopic(topicName);
+                        String addInfoTopic = deviceSessionCtx.getDevice().getAdditionalInfo().get("topic").asText();
+                        if (addInfoTopic.contentEquals(topic))
+                            processor.process(new BasicToDeviceActorSessionMsg(deviceSessionCtx.getDevice(), msg));
+                        grantedQoSList.add(getMinSupportedQos(reqQoS));
+                    }
+                    else {
+                        AdaptorToSessionActorMsg msg = adaptor.convertToActorMsg(deviceSessionCtx, SUBSCRIBE_SPARKPLUG_TELEMETRY_REQUEST, mqttMsg);
+                        String topic = processAndGetSparkPlugSubscriptionTopic(topicName);
+                        String addInfoTopic = deviceSessionCtx.getDevice().getAdditionalInfo().get("topic").asText();
+                        if (addInfoTopic.contentEquals(topic))
+                            processor.process(new BasicToDeviceActorSessionMsg(deviceSessionCtx.getDevice(), msg));
+                        grantedQoSList.add(getMinSupportedQos(reqQoS));
+                    }
                 } else if (topicName.equals(DEVICE_RPC_REQUESTS_SUB_TOPIC)) {
                     AdaptorToSessionActorMsg msg = adaptor.convertToActorMsg(deviceSessionCtx, SUBSCRIBE_RPC_COMMANDS_REQUEST, mqttMsg);
                     processor.process(new BasicToDeviceActorSessionMsg(deviceSessionCtx.getDevice(), msg));
@@ -366,7 +383,9 @@ public class MqttTransportHandler extends ChannelInboundHandlerAdapter implement
     private void processDisconnect(ChannelHandlerContext ctx) {
         ctx.close();
         if (connected) {
-            processor.process(SessionCloseMsg.onDisconnect(deviceSessionCtx.getSessionId()));
+            SessionCloseMsg sessionCloseMsg = SessionCloseMsg.onDisconnect(deviceSessionCtx.getSessionId());
+            sessionCloseMsg.setDeviceId(deviceSessionCtx.getDevice().getId());
+            processor.process(sessionCloseMsg);
             if (gatewaySessionCtx != null) {
                 gatewaySessionCtx.onGatewayDisconnect();
                 sparkPlugDecodeService.updateDeviceMapState();
@@ -391,6 +410,11 @@ public class MqttTransportHandler extends ChannelInboundHandlerAdapter implement
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
         log.error("[{}] Unexpected Exception", sessionId, cause);
         ctx.close();
+    }
+
+    @Override
+    public void channelInactive(ChannelHandlerContext ctx) {
+        processDisconnect(ctx);
     }
 
     private static MqttSubAckMessage createSubAckMessage(Integer msgId, List<Integer> grantedQoSList) {

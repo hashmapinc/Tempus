@@ -98,4 +98,16 @@ public class SparkPlugEncodeService {
         }
         return payloadByteArray;
     }
+
+    public static byte[] createSparkPlugPayload(){
+        SparkplugBPayload.SparkplugBPayloadBuilder deathPayload = new SparkplugBPayload.SparkplugBPayloadBuilder().setTimestamp(new Date());
+        deathPayload.setSeq(0);
+        byte [] deathBytes = null;
+        try {
+            deathBytes = new SparkplugBPayloadEncoder().getBytes(deathPayload.createPayload());
+        }catch (Exception e){
+
+        }
+        return deathBytes;
+    }
 }

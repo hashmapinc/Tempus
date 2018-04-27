@@ -114,7 +114,6 @@ public class GatewaySessionCtx {
                 device.setTenantId(gateway.getTenantId());
                 device.setName(deviceName);
                 device.setType(deviceType);
-                log.info("topic on Sparkplug device connect " + topic);
                 try {
                     ObjectMapper mapper = new ObjectMapper();
                     JsonNode additionalInfo = mapper.readTree("{\"topic\":\"" + topic + "\"}");
@@ -138,7 +137,9 @@ public class GatewaySessionCtx {
         String deviceName = checkDeviceName(getDeviceName(getJson(msg)));
         GatewayDeviceSessionCtx deviceSessionCtx = devices.remove(deviceName);
         if (deviceSessionCtx != null) {
-            processor.process(SessionCloseMsg.onDisconnect(deviceSessionCtx.getSessionId()));
+            SessionCloseMsg sessionCloseMsg = SessionCloseMsg.onDisconnect(deviceSessionCtx.getSessionId());
+            sessionCloseMsg.setDeviceId(deviceSessionCtx.getDevice().getId());
+            processor.process(sessionCloseMsg);
             deviceSessionCtx.setClosed(true);
             log.debug("[{}] Removed device [{}] from the gateway session", gatewaySessionId, deviceName);
         } else {
@@ -149,7 +150,9 @@ public class GatewaySessionCtx {
 
     public void onGatewayDisconnect() {
         devices.forEach((k, v) -> {
-            processor.process(SessionCloseMsg.onDisconnect(v.getSessionId()));
+            SessionCloseMsg sessionCloseMsg = SessionCloseMsg.onDisconnect(v.getSessionId());
+            sessionCloseMsg.setDeviceId(v.getDevice().getId());
+            processor.process(sessionCloseMsg);
         });
     }
 

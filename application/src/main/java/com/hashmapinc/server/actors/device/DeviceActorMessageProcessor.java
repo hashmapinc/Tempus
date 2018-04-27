@@ -319,6 +319,7 @@ public class DeviceActorMessageProcessor extends AbstractContextAwareMsgProcesso
             Predicate<Map.Entry<SessionId, SessionInfo>> filter = e -> e.getValue().getServer()
                     .map(serverAddress -> serverAddress.equals(msg.getServerAddress())).orElse(false);
             attributeSubscriptions.entrySet().removeIf(filter);
+            telemetrySubscriptions.entrySet().removeIf(filter);
             rpcSubscriptions.entrySet().removeIf(filter);
         }
     }
@@ -391,6 +392,7 @@ public class DeviceActorMessageProcessor extends AbstractContextAwareMsgProcesso
             logger.debug("[{}] Canceling subscriptions for closed session [{}]", deviceId, sessionId);
             sessions.remove(sessionId);
             attributeSubscriptions.remove(sessionId);
+            telemetrySubscriptions.remove(sessionId);
             rpcSubscriptions.remove(sessionId);
         }
     }
@@ -429,6 +431,7 @@ public class DeviceActorMessageProcessor extends AbstractContextAwareMsgProcesso
             sendMsgToSessionActor(new BasicToDeviceSessionActorMsg(new SessionCloseNotification(), k), v.getServer());
         });
         attributeSubscriptions.clear();
+        telemetrySubscriptions.clear();
         rpcSubscriptions.clear();
     }
 

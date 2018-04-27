@@ -81,6 +81,9 @@ public class JsonMqttAdaptor implements MqttTransportAdaptor {
             case SUBSCRIBE_SPARKPLUG_TELEMETRY_REQUEST:
                 msg = new TelemetrySubscribeMsg();
                 break;
+            case SPARKPLUG_DEATH_SUBSCRIBE:
+                msg = new SparkPlugDeathSubscribeMsg();
+                break;
             case UNSUBSCRIBE_SPARKPLUG_TELEMETRY_REQUEST:
                 msg = new TelemetryUnsubscribeMsg();
                 break;
@@ -133,6 +136,13 @@ public class JsonMqttAdaptor implements MqttTransportAdaptor {
                 String topic = extractTopicFromDeviceAdditionalInfo(ctx);
                 String topicWithMsgType = createTopicNameWithMsgType(topic, msgType);
                 byte[] sparkPlugPayload = SparkPlugEncodeService.createSparkPlugPayload(ctx, telemetryUpdateNotification.getData());
+                result = createMqttPublishMsg(ctx, topicWithMsgType, sparkPlugPayload);
+                break;
+            case SPARKPLUG_SUBSCRIBE_TERMINATE:
+                msgType = ctx.getSparkPlugMetaData().getMsgType();
+                topic = extractTopicFromDeviceAdditionalInfo(ctx);
+                topicWithMsgType = createTopicNameWithMsgType(topic, msgType);
+                sparkPlugPayload = SparkPlugEncodeService.createSparkPlugPayload();
                 result = createMqttPublishMsg(ctx, topicWithMsgType, sparkPlugPayload);
                 break;
             case TO_DEVICE_RPC_REQUEST:
@@ -206,7 +216,7 @@ public class JsonMqttAdaptor implements MqttTransportAdaptor {
 
     private MqttPublishMessage createMqttPublishMsg(DeviceSessionCtx ctx, String topic, byte[] sparkPlugPayLoad) {
         MqttFixedHeader mqttFixedHeader =
-                new MqttFixedHeader(MqttMessageType.PUBLISH, false, MqttQoS.AT_LEAST_ONCE, false, 0);
+                new MqttFixedHeader(MqttMessageType.PUBLISH, false, MqttQoS.AT_MOST_ONCE, false, 0);
         MqttPublishVariableHeader header = new MqttPublishVariableHeader(topic, ctx.nextMsgId());
         ByteBuf payload = ALLOCATOR.buffer();
         payload.writeBytes(sparkPlugPayLoad);
