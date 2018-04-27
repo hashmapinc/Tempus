@@ -13,14 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.hashmapinc.server.controller.sql;
+package com.hashmapinc.server.common.data.id;
 
-import com.hashmapinc.server.dao.service.DaoSqlTest;
-import com.hashmapinc.server.controller.BaseAdminControllerTest;
+import java.util.UUID;
 
-/**
- * Created by Valerii Sosliuk on 6/28/2017.
- */
-@DaoSqlTest
-public class AdminControllerSqlTest extends BaseAdminControllerTest {
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+public class UserSettingsId extends UUIDBased {
+
+    @JsonCreator
+    public UserSettingsId(@JsonProperty("id") UUID id){
+        super(id);
+    }
+    
 }

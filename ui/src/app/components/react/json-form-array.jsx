@@ -15,13 +15,13 @@
  */
 import React from 'react';
 import { utils } from 'react-schema-form';
-import tempusBaseComponent from './json-form-base-component.jsx';
+import TempusBaseComponent from './json-form-base-component.jsx';
 import RaisedButton from 'material-ui/RaisedButton';
 import FontIcon from 'material-ui/FontIcon';
 import _ from 'lodash';
 import IconButton from 'material-ui/IconButton';
 
-class tempusArray extends React.Component {
+class TempusArray extends React.Component {
 
     constructor(props) {
         super(props);
@@ -162,4 +162,4 @@ class tempusArray extends React.Component {
     }
 }
 
-export default tempusBaseComponent(tempusArray);
+export default TempusBaseComponent(TempusArray);

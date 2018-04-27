@@ -13,11 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.hashmapinc.server.dao.service.nosql;
+package com.hashmapinc.server.dao.service.sql;
 
-import com.hashmapinc.server.dao.service.BaseAdminSettingsServiceTest;
-import com.hashmapinc.server.dao.service.DaoNoSqlTest;
+import com.hashmapinc.server.dao.service.BaseUserSettingsServiceTest;
+import com.hashmapinc.server.dao.service.DaoSqlTest;
 
-@DaoNoSqlTest
-public class AdminSettingsServiceNoSqlTest extends BaseAdminSettingsServiceTest {
+@DaoSqlTest
+public class UserSettingsServiceSqlTest extends BaseUserSettingsServiceTest {
 }

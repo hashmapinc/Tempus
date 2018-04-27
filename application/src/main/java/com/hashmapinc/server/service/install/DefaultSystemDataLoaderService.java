@@ -50,11 +50,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Profile;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-import com.hashmapinc.server.common.data.*;
 import com.hashmapinc.server.common.data.id.CustomerId;
-import com.hashmapinc.server.common.data.kv.*;
 import com.hashmapinc.server.common.data.plugin.PluginMetaData;
-import com.hashmapinc.server.dao.settings.AdminSettingsService;
+import com.hashmapinc.server.dao.settings.UserSettingsService;
 
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
@@ -91,7 +89,7 @@ public class DefaultSystemDataLoaderService implements SystemDataLoaderService {
     private UserService userService;
 
     @Autowired
-    private AdminSettingsService adminSettingsService;
+    private UserSettingsService userSettingsService;
 
     @Autowired
     private WidgetsBundleService widgetsBundleService;
@@ -134,25 +132,28 @@ public class DefaultSystemDataLoaderService implements SystemDataLoaderService {
     @Value("${ldap.authentication-enabled}")
     private boolean isLdapEnabled;
 
+    public User adminUser;
+
     @Override
     public void createSysAdmin() {
         if(isLdapEnabled) {
-            createUser(Authority.SYS_ADMIN, null, null, adminEmail, null, true);
+            adminUser = createUser(Authority.SYS_ADMIN, null, null, adminEmail, null, true);
         } else {
-            createUser(Authority.SYS_ADMIN, null, null, "sysadmin@hashmapinc.com", "sysadmin", false);
+            adminUser = createUser(Authority.SYS_ADMIN, null, null, adminEmail, "sysadmin", false);
         }
     }
 
     @Override
     public void createAdminSettings() throws Exception {
-        AdminSettings generalSettings = new AdminSettings();
+        UserSettings generalSettings = new UserSettings();
         generalSettings.setKey("general");
         ObjectNode node = objectMapper.createObjectNode();
         node.put("baseUrl", "http://localhost:8080");
         generalSettings.setJsonValue(node);
-        adminSettingsService.saveAdminSettings(generalSettings);
+        generalSettings.setUserId(adminUser.getId());
+        userSettingsService.saveUserSettings(generalSettings);
 
-        AdminSettings mailSettings = new AdminSettings();
+        UserSettings mailSettings = new UserSettings();
         mailSettings.setKey("mail");
         node = objectMapper.createObjectNode();
         node.put("mailFrom", "tempus <sysadmin@localhost.localdomain>");
@@ -163,8 +164,9 @@ public class DefaultSystemDataLoaderService implements SystemDataLoaderService {
         node.put("enableTls", "false");
         node.put("username", "");
         node.put("password", ""); //NOSONAR, key used to identify password field (not password value itself)
+        mailSettings.setUserId(adminUser.getId());
         mailSettings.setJsonValue(node);
-        adminSettingsService.saveAdminSettings(mailSettings);
+        userSettingsService.saveUserSettings(mailSettings);
     }
 
     @Override

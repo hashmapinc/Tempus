@@ -83,18 +83,17 @@ CREATE MATERIALIZED VIEW IF NOT EXISTS tempus.user_credentials_by_reset_token AS
 	WHERE reset_token IS NOT NULL AND id IS NOT NULL
 	PRIMARY KEY ( reset_token, id );
 
-CREATE TABLE IF NOT EXISTS tempus.admin_settings (
-	id timeuuid PRIMARY KEY,
-	key text,
-	json_value text
+CREATE TABLE IF NOT EXISTS tempus.user_settings (
+  id timeuuid ,
+  key text,
+  json_value text,
+  user_id timeuuid,
+  PRIMARY KEY (id, user_id )
 );
 
-CREATE MATERIALIZED VIEW IF NOT EXISTS tempus.admin_settings_by_key AS
-	SELECT *
-	from tempus.admin_settings
-	WHERE key IS NOT NULL AND id IS NOT NULL
-	PRIMARY KEY ( key, id )
-	WITH CLUSTERING ORDER BY ( id DESC );
+CREATE MATERIALIZED VIEW IF NOT EXISTS tempus.user_settings_by_key AS
+  SELECT * FROM tempus.user_settings WHERE key IS NOT NULL AND id IS NOT NULL AND user_id IS NOT NULL
+  PRIMARY KEY (user_id, key, id ) WITH CLUSTERING ORDER BY ( id DESC );
 
 CREATE TABLE IF NOT EXISTS tempus.tenant (
 	id timeuuid,

@@ -26,12 +26,12 @@ VALUES ( now ( ), minTimeuuid ( '2016-11-01 01:01:01+0000' ), true,
 '$2a$10$5JTB8/hxWc9WAy62nCGSxeefl3KWmipA9nFpVdDa0/xfIseeBB4Bu' );
 
 /** System settings **/
-INSERT INTO tempus.admin_settings ( id, key, json_value )
+INSERT INTO tempus.user_settings ( id, key, json_value, user_id )
 VALUES ( now ( ), 'general', '{
 	"baseUrl": "http://localhost:8080"
-}' );
+}', minTimeuuid ( '2016-11-01 01:01:01+0000' ) );
 
-INSERT INTO tempus.admin_settings ( id, key, json_value )
+INSERT INTO tempus.user_settings ( id, key, json_value, user_id )
 VALUES ( now ( ), 'mail', '{
 	"mailFrom": "tempus <sysadmin@localhost.localdomain>",
 	"smtpProtocol": "smtp",
@@ -41,7 +41,7 @@ VALUES ( now ( ), 'mail', '{
 	"enableTls": "false",
 	"username": "",
 	"password": ""
-}' );
+}',minTimeuuid ( '2016-11-01 01:01:01+0000' ) );
 
 /** System widgets library **/
 INSERT INTO "tempus"."widgets_bundle" ( "id", "tenant_id", "alias", "search_text", "title" )

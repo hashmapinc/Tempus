@@ -3,7 +3,9 @@ Rancher and AWS will work together, but it's poorly documented...
 
 ## Step 1 - Create AWS Policy
 Ensure that the following policy exists in AWS IAM:
+
 **Name**: `rancher-aws`
+
 **JSON**:
 ```json
 {
@@ -57,12 +59,14 @@ Ensure that the following policy exists in AWS IAM:
 
 ## Step 2 - Create AWS Role
 Ensure that the following role exists in AWS IAM:
+
 **Name**: `rancher-instance-role`
 
 Make sure to attach the AWS Policy you just created to this role.
 
 ## Step 3 - Create AWS User
 Create the following user in AWS IAM:
+
 **Name**: `rancher`
  
 Make sure to attach the AWS Policy you just created to this user.

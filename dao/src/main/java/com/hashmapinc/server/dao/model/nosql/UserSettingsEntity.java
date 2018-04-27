@@ -20,10 +20,11 @@ import com.datastax.driver.mapping.annotations.Column;
 import com.datastax.driver.mapping.annotations.PartitionKey;
 import com.datastax.driver.mapping.annotations.Table;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.hashmapinc.server.common.data.id.UserId;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
-import com.hashmapinc.server.common.data.AdminSettings;
-import com.hashmapinc.server.common.data.id.AdminSettingsId;
+import com.hashmapinc.server.common.data.UserSettings;
+import com.hashmapinc.server.common.data.id.UserSettingsId;
 import com.hashmapinc.server.dao.model.BaseEntity;
 import com.hashmapinc.server.dao.model.type.JsonCodec;
 
@@ -31,31 +32,35 @@ import java.util.UUID;
 
 import static com.hashmapinc.server.dao.model.ModelConstants.*;
 
-@Table(name = ADMIN_SETTINGS_COLUMN_FAMILY_NAME)
+@Table(name = USER_SETTINGS_COLUMN_FAMILY_NAME)
 @EqualsAndHashCode
 @ToString
-public final class AdminSettingsEntity implements BaseEntity<AdminSettings> {
+public final class UserSettingsEntity implements BaseEntity<UserSettings> {
 
     @PartitionKey(value = 0)
     @Column(name = ID_PROPERTY)
     private UUID id;
     
-    @Column(name = ADMIN_SETTINGS_KEY_PROPERTY)
+    @Column(name = USER_SETTINGS_KEY_PROPERTY)
     private String key;
 
-    @Column(name = ADMIN_SETTINGS_JSON_VALUE_PROPERTY, codec = JsonCodec.class)
+    @Column(name = USER_SETTINGS_JSON_VALUE_PROPERTY, codec = JsonCodec.class)
     private JsonNode jsonValue;
 
-    public AdminSettingsEntity() {
+    @Column(name = USER_SETTINGS_USER_ID_PROPERTY)
+    private UUID userId;
+
+    public UserSettingsEntity() {
         super();
     }
 
-    public AdminSettingsEntity(AdminSettings adminSettings) {
-        if (adminSettings.getId() != null) {
-            this.id = adminSettings.getId().getId();
+    public UserSettingsEntity(UserSettings userSettings) {
+        if (userSettings.getId() != null) {
+            this.id = userSettings.getId().getId();
         }
-        this.key = adminSettings.getKey();
-        this.jsonValue = adminSettings.getJsonValue();
+        this.key = userSettings.getKey();
+        this.jsonValue = userSettings.getJsonValue();
+        this.userId = userSettings.getUserId().getId();
     }
     
     public UUID getId() {
@@ -82,13 +87,24 @@ public final class AdminSettingsEntity implements BaseEntity<AdminSettings> {
         this.jsonValue = jsonValue;
     }
 
+    public UUID getUserId() {
+        return userId;
+    }
+
+    public void setUserId(UUID userId) {
+        this.userId = userId;
+    }
+
     @Override
-    public AdminSettings toData() {
-        AdminSettings adminSettings = new AdminSettings(new AdminSettingsId(id));
-        adminSettings.setCreatedTime(UUIDs.unixTimestamp(id));
-        adminSettings.setKey(key);
-        adminSettings.setJsonValue(jsonValue);
-        return adminSettings;
+    public UserSettings toData() {
+        UserSettings userSettings = new UserSettings(new UserSettingsId(id));
+        userSettings.setCreatedTime(UUIDs.unixTimestamp(id));
+        userSettings.setKey(key);
+        userSettings.setJsonValue(jsonValue);
+        if (userId != null) {
+            userSettings.setUserId(new UserId(userId));
+        }
+        return userSettings;
     }
 
 }

@@ -16,13 +16,15 @@
 package com.hashmapinc.server.dao.settings;
 
 import com.datastax.driver.core.querybuilder.Select.Where;
+import com.hashmapinc.server.common.data.UserSettings;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-import com.hashmapinc.server.common.data.AdminSettings;
 import com.hashmapinc.server.dao.DaoUtil;
-import com.hashmapinc.server.dao.model.nosql.AdminSettingsEntity;
+import com.hashmapinc.server.dao.model.nosql.UserSettingsEntity;
 import com.hashmapinc.server.dao.nosql.CassandraAbstractModelDao;
 import com.hashmapinc.server.dao.util.NoSqlDao;
+
+import java.util.UUID;
 
 import static com.datastax.driver.core.querybuilder.QueryBuilder.eq;
 import static com.datastax.driver.core.querybuilder.QueryBuilder.select;
@@ -31,26 +33,28 @@ import static com.hashmapinc.server.dao.model.ModelConstants.*;
 @Component
 @Slf4j
 @NoSqlDao
-public class CassandraAdminSettingsDao extends CassandraAbstractModelDao<AdminSettingsEntity, AdminSettings> implements AdminSettingsDao {
+public class CassandraUserSettingsDao extends CassandraAbstractModelDao<UserSettingsEntity, UserSettings> implements UserSettingsDao {
 
     @Override
-    protected Class<AdminSettingsEntity> getColumnFamilyClass() {
-        return AdminSettingsEntity.class;
+    protected Class<UserSettingsEntity> getColumnFamilyClass() {
+        return UserSettingsEntity.class;
     }
 
     @Override
     protected String getColumnFamilyName() {
-        return ADMIN_SETTINGS_COLUMN_FAMILY_NAME;
+        return USER_SETTINGS_COLUMN_FAMILY_NAME;
     }
 
     @Override
-    public AdminSettings findByKey(String key) {
-        log.debug("Try to find admin settings by key [{}] ", key);
-        Where query = select().from(ADMIN_SETTINGS_BY_KEY_COLUMN_FAMILY_NAME).where(eq(ADMIN_SETTINGS_KEY_PROPERTY, key));
+    public UserSettings findByKeyAndUserId(String key, UUID userId) {
+        log.debug("Try to find user settings by key [{}], userId [{}] ", key, userId);
+        Where query = select().from(USER_SETTINGS_BY_KEY_COLUMN_FAMILY_NAME)
+                .where(eq(USER_SETTINGS_KEY_PROPERTY, key))
+                .and(eq(USER_SETTINGS_USER_ID_PROPERTY, userId));
         log.trace("Execute query {}", query);
-        AdminSettingsEntity adminSettingsEntity = findOneByStatement(query);
-        log.trace("Found admin settings [{}] by key [{}]", adminSettingsEntity, key);
-        return DaoUtil.getData(adminSettingsEntity);
+        UserSettingsEntity userSettingsEntity = findOneByStatement(query);
+        log.trace("Found user settings [{}] by key [{}] and userId [{}]", userSettingsEntity, key, userId);
+        return DaoUtil.getData(userSettingsEntity);
     }
 
 }
