@@ -21,7 +21,7 @@ cache:
   directories:
     - '$HOME/.m2/repository'
     - '$HOME/.sonar/cache'
-  
+
 before_deploy:
   - git tag "1.4.0-SNAPSHOT" --force
 
@@ -37,4 +37,4 @@ deploy:
   overwrite: true
   on:
     all_branches: true
-    condition: $TRAVIS_BRANCH =~ ^master|dev$
+condition: $TRAVIS_BRANCH =~ ^master|dev$
