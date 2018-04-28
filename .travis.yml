@@ -31,10 +31,10 @@ cache:
 
 after_success:
   - cp $TRAVIS_BUILD_DIR/application/target/tempus.deb $TRAVIS_BUILD_DIR/docker/tb/tempus.deb
-  - docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS
+  - docker login -u $DOCKER_USER -p $DOCKER_PASS
   - export REPO=hashmapinc/tempus
   - export TAG=`if [ "$TRAVIS_BRANCH" == "dev" ]; then echo "dev"; else echo "latest" ; fi`
-  - docker build -f Dockerfile -t $REPO:$COMMIT $TRAVIS_BUILD_DIR/docker/tb/
+  - docker build -f $TRAVIS_BUILD_DIR/docker/tb/Dockerfile -t $REPO:$COMMIT
   - docker tag $REPO:$COMMIT $REPO:$TAG
   - docker tag $REPO:$COMMIT $REPO:travis-$TRAVIS_BUILD_NUMBER
   - docker push $REPO
