@@ -18,9 +18,7 @@ package com.hashmapinc.server.common.msg.core;
 import com.hashmapinc.server.common.msg.session.MsgType;
 import com.hashmapinc.server.common.msg.session.FromDeviceMsg;
 
-/**
- * @author Andrew Shvayka
- */
+
 public class AttributesUnsubscribeMsg implements FromDeviceMsg {
     @Override
     public MsgType getMsgType() {

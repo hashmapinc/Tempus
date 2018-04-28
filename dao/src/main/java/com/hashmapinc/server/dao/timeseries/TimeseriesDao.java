@@ -23,9 +23,7 @@ import com.hashmapinc.server.common.data.kv.TsKvQuery;
 
 import java.util.List;
 
-/**
- * @author Andrew Shvayka
- */
+
 public interface TimeseriesDao {
 
     ListenableFuture<List<TsKvEntry>> findAllAsync(EntityId entityId, List<TsKvQuery> queries);

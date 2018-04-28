@@ -15,9 +15,7 @@
  */
 package com.hashmapinc.server.common.msg.core;
 
-/**
- * @author Andrew Shvayka
- */
+
 
 public enum RuleEngineError {
 

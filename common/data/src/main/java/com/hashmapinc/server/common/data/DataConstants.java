@@ -15,9 +15,7 @@
  */
 package com.hashmapinc.server.common.data;
 
-/**
- * @author Andrew Shvayka
- */
+
 public class DataConstants {
 
     public static final String SYSTEM = "SYSTEM";

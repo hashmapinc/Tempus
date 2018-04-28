@@ -19,9 +19,7 @@ import com.hashmapinc.server.common.data.id.SessionId;
 
 import java.util.UUID;
 
-/**
- * @author Andrew Shvayka
- */
+
 public class HttpSessionId implements SessionId {
 
     private final UUID id;

@@ -33,9 +33,7 @@ import java.util.List;
 
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
-/**
- * @author Andrew Shvayka
- */
+
 @Service
 @Slf4j
 public class BaseTimeseriesService implements TimeseriesService {

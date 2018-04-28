@@ -24,9 +24,7 @@ import com.hashmapinc.server.common.msg.cluster.ServerAddress;
 import java.io.Closeable;
 import java.util.UUID;
 
-/**
- * @author Andrew Shvayka
- */
+
 @Data
 @Slf4j
 public final class GrpcSession implements Closeable {

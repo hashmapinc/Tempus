@@ -36,9 +36,7 @@ import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
-/**
- * @author Andrew Shvayka
- */
+
 @Slf4j
 @RequiredArgsConstructor
 public class TelemetryRpcMsgHandler implements RpcMsgHandler {

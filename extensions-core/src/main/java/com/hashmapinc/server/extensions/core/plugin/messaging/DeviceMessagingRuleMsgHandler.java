@@ -37,9 +37,7 @@ import com.hashmapinc.server.extensions.api.rules.RuleException;
 
 import java.util.*;
 
-/**
- * @author Andrew Shvayka
- */
+
 @Slf4j
 public class DeviceMessagingRuleMsgHandler implements RuleMsgHandler {
 

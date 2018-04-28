@@ -15,9 +15,7 @@
  */
 package com.hashmapinc.server.extensions.core.plugin.telemetry.cmd;
 
-/**
- * @author Andrew Shvayka
- */
+
 public interface TelemetryPluginCmd {
 
     int getCmdId();

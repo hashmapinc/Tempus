@@ -37,9 +37,7 @@ import com.hashmapinc.server.transport.mqtt.adaptors.MqttTransportAdaptor;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
-/**
- * @author Andrew Shvayka
- */
+
 @Service("MqttTransportService")
 @ConditionalOnProperty(prefix = "mqtt", value = "enabled", havingValue = "true", matchIfMissing = false)
 @Slf4j

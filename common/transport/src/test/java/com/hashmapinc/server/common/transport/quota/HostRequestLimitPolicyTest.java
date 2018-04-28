@@ -20,10 +20,7 @@ import org.junit.Test;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-/**
- * @author Vitaliy Paromskiy
- * @version 1.0
- */
+
 public class HostRequestLimitPolicyTest {
 
     private HostRequestLimitPolicy limitPolicy = new HostRequestLimitPolicy(10L);

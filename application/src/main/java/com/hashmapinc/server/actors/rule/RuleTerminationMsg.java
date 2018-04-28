@@ -18,9 +18,7 @@ package com.hashmapinc.server.actors.rule;
 import com.hashmapinc.server.actors.shared.ActorTerminationMsg;
 import com.hashmapinc.server.common.data.id.RuleId;
 
-/**
- * @author Andrew Shvayka
- */
+
 public class RuleTerminationMsg extends ActorTerminationMsg<RuleId> {
 
     public RuleTerminationMsg(RuleId id) {

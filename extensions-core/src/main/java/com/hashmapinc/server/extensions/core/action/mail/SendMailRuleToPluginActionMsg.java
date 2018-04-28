@@ -21,9 +21,7 @@ import com.hashmapinc.server.extensions.api.plugins.msg.AbstractRuleToPluginMsg;
 import lombok.Data;
 import com.hashmapinc.server.common.data.id.CustomerId;
 
-/**
- * @author Andrew Shvayka
- */
+
 @Data
 public class SendMailRuleToPluginActionMsg extends AbstractRuleToPluginMsg<SendMailActionMsg> {
 

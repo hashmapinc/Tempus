@@ -44,9 +44,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
-/**
- * @author Andrew Shvayka
- */
+
 @Processor(name = "Alarm Processor", descriptor = "AlarmProcessorDescriptor.json",
         configuration = AlarmProcessorConfiguration.class)
 @Slf4j

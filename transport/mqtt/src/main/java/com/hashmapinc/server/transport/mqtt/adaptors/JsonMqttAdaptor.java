@@ -43,9 +43,7 @@ import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 
-/**
- * @author Andrew Shvayka
- */
+
 @Component("JsonMqttAdaptor")
 @Slf4j
 public class JsonMqttAdaptor implements MqttTransportAdaptor {

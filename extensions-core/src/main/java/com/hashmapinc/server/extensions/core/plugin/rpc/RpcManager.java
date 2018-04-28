@@ -26,9 +26,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-/**
- * @author Andrew Shvayka
- */
+
 @Slf4j
 public class RpcManager {
 

@@ -24,9 +24,7 @@ import com.hashmapinc.server.common.msg.device.ToDeviceActorMsg;
 import com.hashmapinc.server.extensions.api.device.ToDeviceActorNotificationMsg;
 import com.hashmapinc.server.extensions.api.plugins.msg.ToPluginActorMsg;
 
-/**
- * @author Andrew Shvayka
- */
+
 public interface RpcMsgListener {
 
     void onMsg(ToDeviceActorMsg msg);

@@ -34,9 +34,7 @@ import com.hashmapinc.server.common.transport.session.DeviceAwareSessionContext;
 import java.util.Optional;
 import java.util.function.Consumer;
 
-/**
- * @author Andrew Shvayka
- */
+
 @Slf4j
 public class HttpSessionCtx extends DeviceAwareSessionContext {
 

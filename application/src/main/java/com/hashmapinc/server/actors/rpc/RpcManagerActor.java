@@ -30,9 +30,7 @@ import com.hashmapinc.server.common.msg.cluster.ServerAddress;
 
 import java.util.*;
 
-/**
- * @author Andrew Shvayka
- */
+
 public class RpcManagerActor extends ContextAwareActor {
 
     private final LoggingAdapter log = Logging.getLogger(getContext().system(), this);

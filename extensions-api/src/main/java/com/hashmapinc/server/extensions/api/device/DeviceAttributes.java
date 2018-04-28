@@ -21,9 +21,7 @@ import com.hashmapinc.server.common.data.DataConstants;
 
 import java.util.*;
 
-/**
- * @author Andrew Shvayka
- */
+
 public class DeviceAttributes {
 
     private final Map<String, AttributeKvEntry> clientSideAttributesMap;

@@ -21,9 +21,7 @@ import com.hashmapinc.server.common.msg.cluster.ServerAddress;
 import java.util.Optional;
 import java.util.UUID;
 
-/**
- * @author Andrew Shvayka
- */
+
 public interface ClusterRoutingService {
 
     ServerAddress getCurrentServer();

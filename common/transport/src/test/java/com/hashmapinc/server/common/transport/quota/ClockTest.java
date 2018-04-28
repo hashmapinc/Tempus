@@ -21,10 +21,7 @@ import org.junit.Test;
 
 import static org.junit.Assert.*;
 
-/**
- * @author Vitaliy Paromskiy
- * @version 1.0
- */
+
 public class ClockTest {
 
     @Before

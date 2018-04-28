@@ -20,9 +20,7 @@ import com.hashmapinc.server.common.msg.aware.TenantAwareMsg;
 
 import java.io.Serializable;
 
-/**
- * @author Andrew Shvayka
- */
+
 public interface ToDeviceActorNotificationMsg extends TenantAwareMsg, DeviceAwareMsg, Serializable {
 
 }

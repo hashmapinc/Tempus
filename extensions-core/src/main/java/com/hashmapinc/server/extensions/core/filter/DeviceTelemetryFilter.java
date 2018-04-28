@@ -26,9 +26,7 @@ import com.hashmapinc.server.common.msg.session.FromDeviceMsg;
 import javax.script.ScriptException;
 import java.util.List;
 
-/**
- * @author Andrew Shvayka
- */
+
 @Filter(name = "Device Telemetry Filter", descriptor = "JsFilterDescriptor.json", configuration = JsFilterConfiguration.class)
 @Slf4j
 public class DeviceTelemetryFilter extends BasicJsFilter {

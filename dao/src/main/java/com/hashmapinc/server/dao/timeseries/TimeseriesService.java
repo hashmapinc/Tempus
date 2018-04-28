@@ -24,9 +24,7 @@ import com.hashmapinc.server.common.data.kv.TsKvQuery;
 import java.util.Collection;
 import java.util.List;
 
-/**
- * @author Andrew Shvayka
- */
+
 public interface TimeseriesService {
 
     ListenableFuture<List<TsKvEntry>> findAll(EntityId entityId, List<TsKvQuery> queries);

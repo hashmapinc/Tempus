@@ -30,9 +30,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
-/**
- * @author Andrew Shvayka
- */
+
 @Service
 public class BaseAttributesService implements AttributesService {
 

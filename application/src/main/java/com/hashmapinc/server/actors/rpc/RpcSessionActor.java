@@ -31,9 +31,7 @@ import com.hashmapinc.server.service.cluster.rpc.GrpcSession;
 
 import java.util.UUID;
 
-/**
- * @author Andrew Shvayka
- */
+
 public class RpcSessionActor extends ContextAwareActor {
 
     private final LoggingAdapter log = Logging.getLogger(getContext().system(), this);

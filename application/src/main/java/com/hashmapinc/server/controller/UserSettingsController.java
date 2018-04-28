@@ -18,14 +18,12 @@ package com.hashmapinc.server.controller;
 import com.hashmapinc.server.common.data.UserSettings;
 import com.hashmapinc.server.common.data.id.UserId;
 import com.hashmapinc.server.common.data.security.Authority;
-import com.hashmapinc.server.service.update.UpdateService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import com.hashmapinc.server.dao.settings.UserSettingsService;
 import com.hashmapinc.server.exception.TempusException;
 import com.hashmapinc.server.service.mail.MailService;
-import com.hashmapinc.server.service.update.model.UpdateMessage;
 
 @RestController
 @RequestMapping("/api")
@@ -36,9 +34,6 @@ public class UserSettingsController extends BaseController {
     
     @Autowired
     private UserSettingsService userSettingsService;
-
-    @Autowired
-    private UpdateService updateService;
 
     @PreAuthorize("hasAnyAuthority('TENANT_ADMIN', 'CUSTOMER_USER', 'SYS_ADMIN')")
     @RequestMapping(value = "/settings/{key}", method = RequestMethod.GET)
@@ -78,17 +73,6 @@ public class UserSettingsController extends BaseController {
                String email = getCurrentUser().getEmail();
                mailService.sendTestMail(userSettings.getJsonValue(), email);
             }
-        } catch (Exception e) {
-            throw handleException(e);
-        }
-    }
-
-    @PreAuthorize("hasAuthority('SYS_ADMIN')")
-    @RequestMapping(value = "/updates", method = RequestMethod.GET)
-    @ResponseBody
-    public UpdateMessage checkUpdates() throws TempusException {
-        try {
-            return updateService.checkUpdates();
         } catch (Exception e) {
             throw handleException(e);
         }

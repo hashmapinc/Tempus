@@ -32,9 +32,7 @@ import com.hashmapinc.server.extensions.core.plugin.telemetry.sub.*;
 import java.util.*;
 import java.util.function.Function;
 
-/**
- * @author Andrew Shvayka
- */
+
 @Slf4j
 public class SubscriptionManager {
 

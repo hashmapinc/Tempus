@@ -28,10 +28,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-/**
- * @author Vitaliy Paromskiy
- * @version 1.0
- */
+
 @Component
 @Slf4j
 public class IntervalRegistryLogger {

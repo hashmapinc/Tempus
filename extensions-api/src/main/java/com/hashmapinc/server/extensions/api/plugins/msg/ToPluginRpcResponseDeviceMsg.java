@@ -19,9 +19,7 @@ import com.hashmapinc.server.common.data.id.PluginId;
 import com.hashmapinc.server.common.data.id.TenantId;
 import lombok.Data;
 
-/**
- * @author Andrew Shvayka
- */
+
 @Data
 public class ToPluginRpcResponseDeviceMsg implements ToPluginActorMsg {
     private final PluginId pluginId;

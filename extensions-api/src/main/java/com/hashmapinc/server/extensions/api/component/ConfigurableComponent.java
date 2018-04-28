@@ -15,9 +15,7 @@
  */
 package com.hashmapinc.server.extensions.api.component;
 
-/**
- * @author Andrew Shvayka
- */
+
 public interface ConfigurableComponent<T> {
 
     void init(T configuration);

@@ -19,9 +19,7 @@ import com.hashmapinc.server.common.data.id.SessionId;
 
 import java.util.concurrent.atomic.AtomicLong;
 
-/**
- * @author Andrew Shvayka
- */
+
 public class MqttSessionId implements SessionId {
 
     private static final AtomicLong idSeq = new AtomicLong();

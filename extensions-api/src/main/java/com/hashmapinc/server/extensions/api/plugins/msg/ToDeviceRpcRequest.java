@@ -23,9 +23,7 @@ import lombok.Data;
 import java.io.Serializable;
 import java.util.UUID;
 
-/**
- * @author Andrew Shvayka
- */
+
 @Data
 public class ToDeviceRpcRequest implements Serializable {
     private final UUID id;

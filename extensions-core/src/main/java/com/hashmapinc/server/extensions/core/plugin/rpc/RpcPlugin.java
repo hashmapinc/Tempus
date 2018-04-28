@@ -27,9 +27,7 @@ import com.hashmapinc.server.extensions.core.action.rpc.ServerSideRpcCallAction;
 import com.hashmapinc.server.extensions.core.plugin.rpc.handlers.RpcRestMsgHandler;
 import com.hashmapinc.server.extensions.core.plugin.rpc.handlers.RpcRuleMsgHandler;
 
-/**
- * @author Andrew Shvayka
- */
+
 @Plugin(name = "RPC Plugin", actions = {ServerSideRpcCallAction.class}, descriptor = "RpcPluginDescriptor.json", configuration = RpcPluginConfiguration.class)
 @Slf4j
 public class RpcPlugin extends AbstractPlugin<RpcPluginConfiguration> {
