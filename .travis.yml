@@ -34,10 +34,8 @@ after_success:
   - docker login -u $DOCKER_USER -p $DOCKER_PASS
   - export REPO=hashmapinc/tempus
   - export TAG=`if [ "$TRAVIS_BRANCH" == "dev" ]; then echo "dev"; else echo "latest" ; fi`
-  - docker build -f $TRAVIS_BUILD_DIR/docker/tb/Dockerfile -t $REPO:$COMMIT
-  - docker tag $REPO:$COMMIT $REPO:$TAG
-  - docker tag $REPO:$COMMIT $REPO:travis-$TRAVIS_BUILD_NUMBER
-  - docker push $REPO
+  - docker build $TRAVIS_BUILD_DIR/docker/tb/ -t $REPO:$TAG
+  - docker push $REPO:$TAG
 
 before_deploy:
   - git tag "1.4.0-SNAPSHOT" --force
