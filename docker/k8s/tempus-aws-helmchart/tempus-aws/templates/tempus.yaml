@@ -94,6 +94,7 @@ spec:
       containers:
       - name: tempus
         image: hashmapinc/tempus:latest
+        imagePullPolicy: always
         ports:
         - containerPort: 8080
           name: ui
