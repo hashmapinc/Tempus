@@ -73,16 +73,54 @@ Make sure to attach the AWS Policy you just created to this user.
 
 This is the user that will be used in rancher to connect to AWS. Take note of the `Access Key` and `Secret Key` for this user.
 
-## Step 4 - Create AWS Hosts in Rancher
+## Step 4 - Create AWS EC2 Security Group (if it doesn't exist!)
+Create the following EC2 security group in AWS:
+
+**Name**: `rancher-hosts`
+ 
+The security group should have the following inbound traffic policies:
+
++-----------------+----------+------------+-----------+
+|      Type       | Protocol | Port Range |  Source   |
++=================+==========+============+===========+
+| Custom TCP Rule | TCP      | 8080       | 0.0.0.0/0 |
++-----------------+----------+------------+-----------+
+| Custom TCP Rule | TCP      | 9191       | 0.0.0.0/0 |
++-----------------+----------+------------+-----------+
+| Custom TCP Rule | TCP      | 44134      | 0.0.0.0/0 |
++-----------------+----------+------------+-----------+
+| Custom TCP Rule | TCP      | 44134      | ::/0      |
++-----------------+----------+------------+-----------+
+| SSH             | TCP      | 22         | 0.0.0.0/0 |
++-----------------+----------+------------+-----------+
+| Custom TCP Rule | TCP      | 2376       | 0.0.0.0/0 |
++-----------------+----------+------------+-----------+
+| Custom TCP Rule | TCP      | 10250      | 0.0.0.0/0 |
++-----------------+----------+------------+-----------+
+| Custom TCP Rule | TCP      | 10250      | ::/0      |
++-----------------+----------+------------+-----------+
+| Custom TCP Rule | TCP      | 9090       | 0.0.0.0/0 |
++-----------------+----------+------------+-----------+
+| Custom UDP Rule | UDP      | 4500       | 0.0.0.0/0 |
++-----------------+----------+------------+-----------+
+| Custom UDP Rule | UDP      | 500        | 0.0.0.0/0 |
++-----------------+----------+------------+-----------+
+| Custom TCP Rule | TCP      | 1883       | 0.0.0.0/0 |
++-----------------+----------+------------+-----------+
+
+
+## Step 5 - Create AWS Hosts in Rancher
 In your rancher environment, add a host and select Amazon EC2 as the host type.
 
 Enter the `Access Key` and `Secret Key` for the `rancher` user.
+
+For the `Security Group`, choose select the Custom option and in the drop down, pick `rancher-hosts` as the security group.
 
 Continue with the setup as usual until you're able to name the host. At this point, you should see a feild called `IAM Profile`. Enter the name of the AWS Role you created above for this value.
 
 Finish the host creation process as usual.
 
-## Step 5 - Update Rancher Kubernetes Cloud Provider:
+## Step 6 - Update Rancher Kubernetes Cloud Provider:
 In rancher, go to the Kubernetes tab and select Infrastructure Stack.
 
 Click the `up to date` section of the `kubernetes` entry. If you do not see a configuration screen, select a template version and proceed.
