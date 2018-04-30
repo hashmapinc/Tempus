@@ -33,10 +33,10 @@ spec:
       port: 1883
       targetPort: 1883
       name: mqtt
-    - protocol: UDP
-      port: 5683
-      targetPort: 5683
-      name: coap
+    #- protocol: UDP
+    #  port: 5683
+    #  targetPort: 5683
+    #  name: coap
     - protocol: TCP
       port: 9999
       targetPort: 9999
@@ -186,9 +186,3 @@ spec:
         - sh
         - -c
         - /run-application.sh
-#        livenessProbe:
-#          httpGet:
-#            path: /login
-#            port: ui-port
-#          initialDelaySeconds: 120
-#          timeoutSeconds: 10
