@@ -20,10 +20,7 @@ import com.hashmapinc.server.common.transport.quota.Clock;
 
 import java.util.concurrent.atomic.LongAdder;
 
-/**
- * @author Vitaliy Paromskiy
- * @version 1.0
- */
+
 public class IntervalCount {
 
     private final LongAdder adder = new LongAdder();

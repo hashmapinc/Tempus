@@ -19,9 +19,7 @@ import com.hashmapinc.server.common.data.id.DeviceId;
 import com.hashmapinc.server.common.data.id.TenantId;
 import lombok.Data;
 
-/**
- * @author Andrew Shvayka
- */
+
 @Data
 public class DeviceCredentialsUpdateNotificationMsg implements ToDeviceActorNotificationMsg {
 

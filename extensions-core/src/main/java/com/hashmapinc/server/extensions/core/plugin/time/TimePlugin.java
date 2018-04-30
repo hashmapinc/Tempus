@@ -33,9 +33,7 @@ import com.hashmapinc.server.extensions.core.action.rpc.RpcPluginAction;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 
-/**
- * @author Andrew Shvayka
- */
+
 @Plugin(name = "Time Plugin", actions = {RpcPluginAction.class},
         descriptor = "TimePluginDescriptor.json", configuration = TimePluginConfiguration.class)
 @Slf4j

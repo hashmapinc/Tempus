@@ -28,9 +28,7 @@ import com.hashmapinc.server.common.msg.device.ToDeviceActorMsg;
 
 import java.util.UUID;
 
-/**
- * @author Andrew Shvayka
- */
+
 public interface ClusterRpcService {
 
     void init(RpcMsgListener listener);

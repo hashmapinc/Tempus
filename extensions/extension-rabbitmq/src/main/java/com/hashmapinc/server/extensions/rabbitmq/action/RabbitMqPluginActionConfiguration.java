@@ -18,9 +18,7 @@ package com.hashmapinc.server.extensions.rabbitmq.action;
 import lombok.Data;
 import com.hashmapinc.server.extensions.core.action.template.TemplateActionConfiguration;
 
-/**
- * @author Andrew Shvayka
- */
+
 @Data
 public class RabbitMqPluginActionConfiguration implements TemplateActionConfiguration{
 

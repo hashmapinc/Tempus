@@ -46,9 +46,7 @@ import java.io.IOException;
 import java.util.Optional;
 import java.util.UUID;
 
-/**
- * @author Andrew Shvayka
- */
+
 @Slf4j
 @RequiredArgsConstructor
 public class RpcRestMsgHandler extends DefaultRestMsgHandler {

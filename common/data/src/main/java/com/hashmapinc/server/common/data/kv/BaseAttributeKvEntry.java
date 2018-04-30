@@ -19,9 +19,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 
 import java.util.Optional;
 
-/**
- * @author Andrew Shvayka
- */
+
 public class BaseAttributeKvEntry implements AttributeKvEntry {
 
     private final long lastUpdateTs;

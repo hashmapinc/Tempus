@@ -18,9 +18,7 @@ package com.hashmapinc.server.extensions.api.plugins.handlers;
 import com.hashmapinc.server.extensions.api.plugins.PluginContext;
 import com.hashmapinc.server.extensions.api.plugins.rest.PluginRestMsg;
 
-/**
- * @author Andrew Shvayka
- */
+
 public interface RestMsgHandler {
 
     void process(PluginContext ctx, PluginRestMsg msg);

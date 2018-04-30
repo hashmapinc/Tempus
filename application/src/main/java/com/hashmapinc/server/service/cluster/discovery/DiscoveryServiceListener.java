@@ -15,9 +15,7 @@
  */
 package com.hashmapinc.server.service.cluster.discovery;
 
-/**
- * @author Andrew Shvayka
- */
+
 public interface DiscoveryServiceListener {
 
     void onServerAdded(ServerInstance server);

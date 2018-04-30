@@ -24,9 +24,7 @@ import org.springframework.util.Assert;
 
 import javax.annotation.PostConstruct;
 
-/**
- * @author Andrew Shvayka
- */
+
 @Service
 @Slf4j
 public class CurrentServerInstanceService implements ServerInstanceService {

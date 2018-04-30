@@ -24,9 +24,7 @@ import lombok.extern.slf4j.Slf4j;
 import com.hashmapinc.server.extensions.api.plugins.msg.*;
 import com.hashmapinc.server.extensions.api.rules.RuleException;
 
-/**
- * @author Andrew Shvayka
- */
+
 @Slf4j
 public class DefaultRuleMsgHandler implements RuleMsgHandler {
 

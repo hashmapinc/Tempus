@@ -17,9 +17,7 @@ package com.hashmapinc.server.extensions.core.action.mail;
 
 import lombok.Data;
 
-/**
- * @author Andrew Shvayka
- */
+
 @Data
 public class SendMailActionConfiguration {
 

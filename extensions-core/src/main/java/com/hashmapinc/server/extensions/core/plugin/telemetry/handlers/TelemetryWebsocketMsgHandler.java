@@ -42,9 +42,7 @@ import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
-/**
- * @author Andrew Shvayka
- */
+
 @Slf4j
 public class TelemetryWebsocketMsgHandler extends DefaultWebsocketMsgHandler {
 

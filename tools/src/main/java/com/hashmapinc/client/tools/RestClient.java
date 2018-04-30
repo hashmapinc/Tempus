@@ -43,9 +43,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-/**
- * @author Andrew Shvayka
- */
+
 @RequiredArgsConstructor
 public class RestClient implements ClientHttpRequestInterceptor {
     private static final String JWT_TOKEN_HEADER_PARAM = "X-Authorization";

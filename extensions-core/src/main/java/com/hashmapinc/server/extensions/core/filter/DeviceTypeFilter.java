@@ -26,9 +26,7 @@ import java.util.Arrays;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-/**
- * @author Andrew Shvayka
- */
+
 @Filter(name = "Device Type Filter", descriptor = "DeviceTypeFilterDescriptor.json", configuration = DeviceTypeFilterConfiguration.class)
 @Slf4j
 public class DeviceTypeFilter extends SimpleRuleLifecycleComponent implements RuleFilter<DeviceTypeFilterConfiguration> {

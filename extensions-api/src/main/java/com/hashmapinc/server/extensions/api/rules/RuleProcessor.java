@@ -18,9 +18,7 @@ package com.hashmapinc.server.extensions.api.rules;
 import com.hashmapinc.server.extensions.api.component.ConfigurableComponent;
 import com.hashmapinc.server.common.msg.device.ToDeviceActorMsg;
 
-/**
- * @author Andrew Shvayka
- */
+
 public interface RuleProcessor<T> extends ConfigurableComponent<T>, RuleLifecycleComponent {
 
     RuleProcessingMetaData process(RuleContext ctx, ToDeviceActorMsg msg) throws RuleException;

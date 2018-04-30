@@ -18,9 +18,7 @@ package com.hashmapinc.server.extensions.api.plugins.handlers;
 import com.hashmapinc.server.extensions.api.plugins.PluginContext;
 import com.hashmapinc.server.extensions.api.plugins.ws.msg.PluginWebsocketMsg;
 
-/**
- * @author Andrew Shvayka
- */
+
 public interface WebsocketMsgHandler {
 
     void process(PluginContext ctx, PluginWebsocketMsg<?> wsMsg);

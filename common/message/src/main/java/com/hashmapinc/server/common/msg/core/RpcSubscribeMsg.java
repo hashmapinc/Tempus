@@ -18,9 +18,7 @@ package com.hashmapinc.server.common.msg.core;
 import com.hashmapinc.server.common.msg.session.FromDeviceMsg;
 import com.hashmapinc.server.common.msg.session.MsgType;
 
-/**
- * @author Andrew Shvayka
- */
+
 public class RpcSubscribeMsg implements FromDeviceMsg {
     @Override
     public MsgType getMsgType() {

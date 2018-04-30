@@ -40,9 +40,7 @@ import com.hashmapinc.server.service.cluster.rpc.GrpcSessionListener;
 import java.io.Serializable;
 import java.util.UUID;
 
-/**
- * @author Andrew Shvayka
- */
+
 @Slf4j
 public class BasicRpcSessionListener implements GrpcSessionListener {
 

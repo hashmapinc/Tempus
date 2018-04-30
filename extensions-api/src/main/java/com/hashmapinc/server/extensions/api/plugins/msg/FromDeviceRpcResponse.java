@@ -22,9 +22,7 @@ import lombok.ToString;
 import java.util.Optional;
 import java.util.UUID;
 
-/**
- * @author Andrew Shvayka
- */
+
 @RequiredArgsConstructor
 @ToString
 public class FromDeviceRpcResponse {

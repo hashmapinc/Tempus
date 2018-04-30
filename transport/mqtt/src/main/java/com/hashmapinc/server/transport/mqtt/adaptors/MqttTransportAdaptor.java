@@ -19,8 +19,6 @@ import io.netty.handler.codec.mqtt.MqttMessage;
 import com.hashmapinc.server.common.transport.TransportAdaptor;
 import com.hashmapinc.server.transport.mqtt.session.DeviceSessionCtx;
 
-/**
- * @author Andrew Shvayka
- */
+
 public interface MqttTransportAdaptor extends TransportAdaptor<DeviceSessionCtx, MqttMessage, MqttMessage> {
 }

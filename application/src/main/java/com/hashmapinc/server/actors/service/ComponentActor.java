@@ -27,9 +27,7 @@ import com.hashmapinc.server.common.msg.cluster.ClusterEventMsg;
 import com.hashmapinc.server.actors.shared.ComponentMsgProcessor;
 import com.hashmapinc.server.common.msg.plugin.ComponentLifecycleMsg;
 
-/**
- * @author Andrew Shvayka
- */
+
 public abstract class ComponentActor<T extends EntityId, P extends ComponentMsgProcessor<T>> extends ContextAwareActor {
 
     protected final LoggingAdapter logger = Logging.getLogger(getContext().system(), this);

@@ -36,9 +36,7 @@ import java.util.Properties;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-/**
- * @author Andrew Shvayka
- */
+
 @Plugin(name = "Mail Plugin", actions = {SendMailAction.class}, descriptor = "MailPluginDescriptor.json", configuration = MailPluginConfiguration.class)
 @Slf4j
 public class MailPlugin extends AbstractPlugin<MailPluginConfiguration> implements RuleMsgHandler {

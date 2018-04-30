@@ -24,6 +24,7 @@
 [![CLA assistant](https://cla-assistant.io/readme/badge/hashmapinc/Tempus)](https://cla-assistant.io/hashmapinc/Tempus)
 [![Quality Gate](https://sonarcloud.io/api/badges/gate?key=com.hashmapinc%3Atempus)](https://sonarcloud.io/dashboard/index/com.hashmapinc%3Atempus)
 [![Slack](https://now-examples-slackin-sdipawcoxa.now.sh/badge.svg)](https://now-examples-slackin-sdipawcoxa.now.sh)
+[![Documentation Status](https://readthedocs.org/projects/tempus/badge/?version=latest)](http://tempus.readthedocs.io/?badge=latest)
 
 
 [Tempus](https://www.hashmapinc.com/tempuscloud) is an IIoT framework for industrial data ingestion and analysis.

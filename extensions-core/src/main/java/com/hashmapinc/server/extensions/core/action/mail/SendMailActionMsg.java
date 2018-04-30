@@ -20,9 +20,7 @@ import lombok.Data;
 
 import java.io.Serializable;
 
-/**
- * @author Andrew Shvayka
- */
+
 @Data
 @Builder
 public class SendMailActionMsg implements Serializable {

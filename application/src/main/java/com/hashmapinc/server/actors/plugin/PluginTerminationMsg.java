@@ -18,9 +18,7 @@ package com.hashmapinc.server.actors.plugin;
 import com.hashmapinc.server.actors.shared.ActorTerminationMsg;
 import com.hashmapinc.server.common.data.id.PluginId;
 
-/**
- * @author Andrew Shvayka
- */
+
 public class PluginTerminationMsg extends ActorTerminationMsg<PluginId> {
 
     public PluginTerminationMsg(PluginId id) {

@@ -34,9 +34,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-/**
- * @author Andrew Shvayka
- */
+
 @RunWith(MockitoJUnitRunner.class)
 public class DeviceAttributesFilterTest {
 

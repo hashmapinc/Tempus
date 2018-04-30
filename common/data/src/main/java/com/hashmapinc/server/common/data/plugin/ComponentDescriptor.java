@@ -20,9 +20,7 @@ import lombok.*;
 import com.hashmapinc.server.common.data.SearchTextBased;
 import com.hashmapinc.server.common.data.id.ComponentDescriptorId;
 
-/**
- * @author Andrew Shvayka
- */
+
 @ToString
 public class ComponentDescriptor extends SearchTextBased<ComponentDescriptorId> {
 

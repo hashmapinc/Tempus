@@ -23,9 +23,7 @@ import com.hashmapinc.server.common.data.EntityType;
 import java.io.Serializable;
 import java.util.UUID;
 
-/**
- * @author Andrew Shvayka
- */
+
 
 @JsonDeserialize(using = EntityIdDeserializer.class)
 @JsonSerialize(using = EntityIdSerializer.class)

@@ -15,9 +15,7 @@
  */
 package com.hashmapinc.server.extensions.core.plugin.telemetry.sub;
 
-/**
- * @author Andrew Shvayka
- */
+
 public enum SubscriptionType {
     ATTRIBUTES, TIMESERIES, DEPTHSERIES
 }

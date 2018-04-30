@@ -21,9 +21,7 @@ import com.hashmapinc.server.extensions.api.plugins.PluginContext;
 import com.hashmapinc.server.extensions.api.plugins.msg.RuleToPluginMsg;
 import com.hashmapinc.server.extensions.api.rules.RuleException;
 
-/**
- * @author Andrew Shvayka
- */
+
 public interface RuleMsgHandler {
 
     void process(PluginContext ctx, TenantId tenantId, RuleId ruleId, RuleToPluginMsg<?> msg) throws RuleException;

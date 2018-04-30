@@ -33,9 +33,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-/**
- * @author Andrew Shvayka
- */
+
 public abstract class BaseAttributesServiceTest extends AbstractServiceTest {
 
     @Autowired

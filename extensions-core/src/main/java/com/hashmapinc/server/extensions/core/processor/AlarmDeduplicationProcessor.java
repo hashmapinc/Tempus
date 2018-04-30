@@ -30,9 +30,7 @@ import com.hashmapinc.server.extensions.core.utils.VelocityUtils;
 
 import java.util.Optional;
 
-/**
- * @author Andrew Shvayka
- */
+
 @Processor(name = "(Deprecated) Alarm Deduplication Processor", descriptor = "AlarmDeduplicationProcessorDescriptor.json",
         configuration = AlarmDeduplicationProcessorConfiguration.class)
 @Slf4j

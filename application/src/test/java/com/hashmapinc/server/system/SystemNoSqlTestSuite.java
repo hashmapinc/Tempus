@@ -26,9 +26,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-/**
- * @author Andrew Shvayka
- */
+
 @RunWith(ClasspathSuite.class)
 @ClasspathSuite.ClassnameFilters({"com.hashmapinc.server.system.*NoSqlTest"})
 public class SystemNoSqlTestSuite {

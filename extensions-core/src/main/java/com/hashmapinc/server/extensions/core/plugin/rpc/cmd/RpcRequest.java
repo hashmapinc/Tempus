@@ -17,9 +17,7 @@ package com.hashmapinc.server.extensions.core.plugin.rpc.cmd;
 
 import lombok.Data;
 
-/**
- * @author Andrew Shvayka
- */
+
 @Data
 public class RpcRequest {
     private final String methodName;

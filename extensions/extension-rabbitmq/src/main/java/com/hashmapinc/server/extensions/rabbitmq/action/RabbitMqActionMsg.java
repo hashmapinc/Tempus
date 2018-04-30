@@ -20,9 +20,7 @@ import com.hashmapinc.server.common.data.id.TenantId;
 import com.hashmapinc.server.common.data.id.CustomerId;
 import com.hashmapinc.server.extensions.api.plugins.msg.AbstractRuleToPluginMsg;
 
-/**
- * @author Andrew Shvayka
- */
+
 public class RabbitMqActionMsg extends AbstractRuleToPluginMsg<RabbitMqActionPayload> {
 
     public RabbitMqActionMsg(TenantId tenantId, CustomerId customerId, DeviceId deviceId, RabbitMqActionPayload payload) {

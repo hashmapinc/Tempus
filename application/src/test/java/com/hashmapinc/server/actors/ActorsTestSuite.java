@@ -18,9 +18,7 @@ package com.hashmapinc.server.actors;
 import org.junit.extensions.cpsuite.ClasspathSuite;
 import org.junit.runner.RunWith;
 
-/**
- * @author Andrew Shvayka
- */
+
 @RunWith(ClasspathSuite.class)
 @ClasspathSuite.ClassnameFilters({"com.hashmapinc.server.actors.*Test"})
 public class ActorsTestSuite {

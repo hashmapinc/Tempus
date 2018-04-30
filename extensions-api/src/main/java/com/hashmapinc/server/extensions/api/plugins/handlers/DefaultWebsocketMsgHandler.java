@@ -28,9 +28,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * @author Andrew Shvayka
- */
+
 @Slf4j
 public class DefaultWebsocketMsgHandler implements WebsocketMsgHandler {
 

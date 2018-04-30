@@ -26,9 +26,7 @@ import com.hashmapinc.server.common.data.kv.AttributeKey;
 import java.util.List;
 import java.util.Set;
 
-/**
- * @author Andrew Shvayka
- */
+
 @ToString
 @AllArgsConstructor
 public class DeviceAttributesEventNotificationMsg implements ToDeviceActorNotificationMsg {

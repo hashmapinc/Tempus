@@ -23,9 +23,6 @@ import com.hashmapinc.server.common.data.kv.DsKvQuery;
 
 import java.util.List;
 
-/**
- * @author Himanshu Mishra
- */
 public interface DepthSeriesDao {
 
     ListenableFuture<List<DsKvEntry>> findAllAsync(EntityId entityId, List<DsKvQuery> queries);
