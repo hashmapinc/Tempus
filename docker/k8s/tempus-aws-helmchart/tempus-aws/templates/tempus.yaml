@@ -59,14 +59,14 @@ metadata:
 data:
   zookeeper.enabled: "true"
   zookeeper.url: "zk-cs:2181"
-  cassandra.url: "cassandra:9042"
-  cassandra.host: "cassandra"
+  cassandra.url: "cassandra-headless:9042"
+  cassandra.host: "cassandra-headless"
   cassandra.port: "9042"
   database.type: "cassandra"
   postgres.host: "postgres"
   postgres.port: "5432"
-  schema.data: "true"
-  demo.data: "true"
+  schema.data: "false"
+  demo.data: "false"
   mqtt.address: "0.0.0.0"
   mqtt.port: "1883"
   coap.address: "0.0.0.0"
@@ -82,7 +82,7 @@ spec:
     matchLabels:
       app: tempus
   serviceName: tempus
-  replicas: 3
+  replicas: 1
   updateStrategy:
     type: RollingUpdate
   podManagementPolicy: Parallel
@@ -93,7 +93,8 @@ spec:
     spec:
       containers:
       - name: tempus
-        image: hashmapinc/tempus:latest
+        image: hashmapinc/tempus:dev
+        imagePullPolicy: Always
         ports:
         - containerPort: 8080
           name: ui

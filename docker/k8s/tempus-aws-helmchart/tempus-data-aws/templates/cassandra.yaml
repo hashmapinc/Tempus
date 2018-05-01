@@ -40,8 +40,6 @@ spec:
       labels:
         app: cassandra
     spec:
-      nodeSelector:
-        machinetype: other
       affinity:
         podAntiAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:
@@ -54,7 +52,7 @@ spec:
               topologyKey: "kubernetes.io/hostname"
       containers:
       - name: cassandra
-        image: tempus/cassandra:1.4.0
+        image: hashmapinc/cassandra:dev
         imagePullPolicy: Always
         ports:
         - containerPort: 7000

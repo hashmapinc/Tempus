@@ -14,8 +14,11 @@
 # limitations under the License.
 #
 
-apiVersion: v1
-appVersion: "1.0"
-description: A Helm chart for Tempus deployments on AWS K8s clusters
-name: tempus-aws
-version: 0.1.2
+FROM openjdk:8-jre
+
+ADD install.sh /install.sh
+ADD tempus.deb /tempus.deb
+
+RUN apt-get update \
+        && apt-get install -y nmap \
+        && chmod +x /install.sh

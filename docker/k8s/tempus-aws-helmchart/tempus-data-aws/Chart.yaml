@@ -16,6 +16,6 @@
 
 apiVersion: v1
 appVersion: "1.0"
-description: A Helm chart for Tempus deployments on AWS K8s clusters
-name: tempus-aws
+description: A Helm chart for Cassandra Tempus Model deployments on AWS K8s clusters
+name: tempus-data-aws
 version: 0.1.2

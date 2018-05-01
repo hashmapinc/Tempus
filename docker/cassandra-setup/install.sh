@@ -1,3 +1,4 @@
+#!/bin/bash
 #
 # Copyright © 2017-2018 Hashmap, Inc
 #
@@ -14,8 +15,19 @@
 # limitations under the License.
 #
 
-apiVersion: v1
-appVersion: "1.0"
-description: A Helm chart for Tempus deployments on AWS K8s clusters
-name: tempus-aws
-version: 0.1.2
+
+dpkg -i /tempus.deb
+
+until nmap $CASSANDRA_HOST -p $CASSANDRA_PORT | grep "$CASSANDRA_PORT/tcp open"
+do
+  echo "Wait for cassandra db to start..."
+  sleep 10
+done
+
+echo "Creating 'Tempus' schema and system data..."
+if [ "$ADD_DEMO_DATA" == "true" ]; then
+    echo "plus demo data..."
+    /usr/share/tempus/bin/install/install.sh --loadDemo
+elif [ "$ADD_DEMO_DATA" == "false" ]; then
+    /usr/share/tempus/bin/install/install.sh
+fi
