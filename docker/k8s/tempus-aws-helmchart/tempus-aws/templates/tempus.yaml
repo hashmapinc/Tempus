@@ -62,7 +62,7 @@ data:
   cassandra.url: "cassandra:9042"
   cassandra.host: "cassandra"
   cassandra.port: "9042"
-  database.type: "sql"
+  database.type: "cassandra"
   postgres.host: "postgres"
   postgres.port: "5432"
   schema.data: "true"
