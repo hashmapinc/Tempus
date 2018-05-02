@@ -20,35 +20,38 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.module.SimpleModule;
 
 /**
  * A Gateway is a special type of device in Tempus that is able to act as a bridge between external devices
  * connected to different systems and Tempus. Gateway API provides the ability to exchange data between multiple
  * devices and the platform using single connection.
- *
+ * <p>
  * In order to publish device depth data to Tempus server node, one sends the following publish message:
- *
+ * <p>
  * Message:
- *
+ * <p>
  * {
- *   "Device A": [
- *     {
- *       "ds": 315.0,
- *       "values": {
- *         "WOB": 42,
- *         "ROP": 80
- *       }
- *     },
- *     {
- *       "ds": "320.0",
- *       "values": {
- *         "WOB": 43,
- *         "ROP": 82
- *       }
- *     }
- *   ]
+ * "Device A": [
+ * {
+ * "ds": 315.0,
+ * "values": {
+ * "WOB": 42,
+ * "ROP": 80
  * }
- *
+ * },
+ * {
+ * "ds": "320.0",
+ * "values": {
+ * "WOB": 43,
+ * "ROP": 82
+ * }
+ * }
+ * ]
+ * }
+ * <p>
  * Where Device A id the device names, WOB and ROP are parameters keys and values and ds the depth value.
  */
 public class GatewayDepthValue {
@@ -98,5 +101,21 @@ public class GatewayDepthValue {
      */
     public void addDepthDataValue(DepthDataValue value){
         dataValues.add(value);
+    }
+
+    /**
+     * Write value as string string.
+     *
+     * @param msg the msg
+     * @return the string
+     * @throws JsonProcessingException the json processing exception
+     */
+    public String writeValueAsString(GatewayDepthValue msg) throws JsonProcessingException {
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        SimpleModule module = new SimpleModule();
+        module.addSerializer(GatewayDepthValue.class, new GatewayDepthValueSerializer());
+        objectMapper.registerModule(module);
+        return objectMapper.writeValueAsString(msg);
     }
 }

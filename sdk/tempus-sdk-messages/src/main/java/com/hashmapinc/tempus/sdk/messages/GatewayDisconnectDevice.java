@@ -16,6 +16,8 @@
 package com.hashmapinc.tempus.sdk.messages;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * In order to inform Tempus that device is disconnected from the Gateway, one needs to publish following message:
@@ -61,6 +63,19 @@ public class GatewayDisconnectDevice {
      */
     public void setDeviceName(String deviceName) {
         this.deviceName = deviceName;
+    }
+
+    /**
+     * Write GatewayDisconnectDevice as string.
+     *
+     * @param device the device
+     * @return the string
+     * @throws JsonProcessingException the json processing exception
+     */
+    public String writeValueAsString(GatewayDisconnectDevice device) throws JsonProcessingException {
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        return objectMapper.writeValueAsString(device);
     }
 
 }

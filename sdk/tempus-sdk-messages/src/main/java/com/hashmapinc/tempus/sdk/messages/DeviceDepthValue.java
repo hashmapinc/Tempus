@@ -15,6 +15,10 @@
  */
 package com.hashmapinc.tempus.sdk.messages;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.module.SimpleModule;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -54,5 +58,21 @@ public class DeviceDepthValue {
      */
     public void addDepthDataValue(DepthDataValue value){
         dataValues.add(value);
+    }
+
+    /**
+     * Write DeviceDepthValue as string.
+     *
+     * @param msg the message object
+     * @return the string
+     * @throws JsonProcessingException the json processing exception
+     */
+    public String writeValueAsString(DeviceDepthValue msg) throws JsonProcessingException {
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        SimpleModule module = new SimpleModule();
+        module.addSerializer(DeviceDepthValue.class, new DeviceDepthValueSerializer());
+        objectMapper.registerModule(module);
+        return objectMapper.writeValueAsString(msg);
     }
 }

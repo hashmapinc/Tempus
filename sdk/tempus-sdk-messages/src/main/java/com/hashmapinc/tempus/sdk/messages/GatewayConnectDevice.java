@@ -17,12 +17,14 @@ package com.hashmapinc.tempus.sdk.messages;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * To inform Tempus that device is connected to the Gateway, one needs to publish following message:
- *
- *       Message: {"device":"Device A", "type":"Pump"}
- *
+ * <p>
+ * Message: {"device":"Device A", "type":"Pump"}
+ * <p>
  * where Device A is your device name and Pump is the type of device.  is a Once received, Tempus
  * will lookup or create a device with the name specified and type.
  */
@@ -34,6 +36,7 @@ public class GatewayConnectDevice {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     @JsonProperty(value = "type", index = 2)
     private String deviceType;
+
     /**
      * Instantiates a new Gateway connect device.
      */
@@ -95,4 +98,19 @@ public class GatewayConnectDevice {
     public void setDeviceType(String deviceType) {
         this.deviceType = deviceType;
     }
+
+    /**
+     * Write value as string string.
+     *
+     * @param device the device
+     * @return the string
+     * @throws JsonProcessingException the json processing exception
+     */
+    public String writeValueAsString(GatewayConnectDevice device) throws JsonProcessingException {
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        return objectMapper.writeValueAsString(device);
+    }
+
+
 }
