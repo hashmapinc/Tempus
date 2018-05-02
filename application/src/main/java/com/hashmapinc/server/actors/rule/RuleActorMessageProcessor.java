@@ -54,6 +54,7 @@ class RuleActorMessageProcessor extends ComponentMsgProcessor<RuleId> {
 
     private TenantId pluginTenantId;
     private PluginId pluginId;
+    private List<UUID> unconfirmed;
 
     protected RuleActorMessageProcessor(TenantId tenantId, RuleId ruleId, ActorSystemContext systemContext, LoggingAdapter logger) {
         super(systemContext, logger, tenantId, ruleId);
@@ -196,6 +197,9 @@ class RuleActorMessageProcessor extends ComponentMsgProcessor<RuleId> {
             } else {
                 pushToNextRule(context, ctx, RuleEngineError.NO_RESPONSE_FROM_ACTIONS);
             }
+        }else if(unconfirmed.contains(msg.getUid())) {
+            logger.info("[{}] Unconfirmed message confirmed: [{}]", entityId, msg.getUid());
+            unconfirmed.remove(msg.getUid());
         } else {
             logger.warning("[{}] Processing timeout detected: [{}] delivery id {}", entityId, msg.getUid(), msg.getDeliveryId());
         }
@@ -212,6 +216,10 @@ class RuleActorMessageProcessor extends ComponentMsgProcessor<RuleId> {
 
     protected boolean shouldPersistMessage(){
         return state == ComponentLifecycleState.ACTIVE && !action.isOneWayAction();
+    }
+
+    protected void setUnconfirmed(List<UUID> unconfirmed){
+        this.unconfirmed = unconfirmed;
     }
 
     private void pushToNextRule(ActorContext context, ChainProcessingContext ctx, RuleEngineError error) {

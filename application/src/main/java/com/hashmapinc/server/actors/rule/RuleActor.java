@@ -32,6 +32,7 @@ import scala.PartialFunction;
 import scala.runtime.BoxedUnit;
 
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 public class RuleActor extends ComponentActor<RuleId, RuleActorMessageProcessor> {
@@ -80,8 +81,8 @@ public class RuleActor extends ComponentActor<RuleId, RuleActorMessageProcessor>
             deleteSnapshots(SnapshotSelectionCriteria.create(sequenceNr - 1, System.currentTimeMillis()));
         } else if(msg instanceof SaveSnapshotFailure) {
             logger.error("Snapshot failed to save:");
-            logger.error("Metadata: [{}]", ((SaveSnapshotFailure) msg).metadata());
             logger.error("Reason: [{}]", ((SaveSnapshotFailure) msg).cause());
+            logger.error("Metadata: [{}]", ((SaveSnapshotFailure) msg).metadata());
         } else {
             logger.debug("[{}][{}] Unknown msg type.", tenantId, id, msg.getClass().getName());
         }
@@ -99,13 +100,13 @@ public class RuleActor extends ComponentActor<RuleId, RuleActorMessageProcessor>
                     confirmDelivery(((PluginToRuleMsg) msg).getDeliveryId());
                 } else if(msg instanceof SnapshotOffer){
                     logger.warning("Got snapshot [{}] while recovering.", ((SnapshotOffer) msg).metadata());
-                    setDeliverySnapshot((AtLeastOnceDeliverySnapshot) ((SnapshotOffer) msg).snapshot());
-                } else if(msg instanceof RecoveryCompleted) {
-                    List<RuleToPluginMsg> unconfirmed = getDeliverySnapshot().getUnconfirmedDeliveries().stream()
+                    AtLeastOnceDeliverySnapshot snapshot = (AtLeastOnceDeliverySnapshot) ((SnapshotOffer) msg).snapshot();
+                    List<UUID> unconfirmed = snapshot.getUnconfirmedDeliveries().stream()
                             .filter(u -> u.message() instanceof RuleToPluginMsg)
-                            .map(u -> (RuleToPluginMsg) u.message())
+                            .map(u -> ((RuleToPluginMsg) u.message()).getUid())
                             .collect(Collectors.toList());
-                    logger.warning("Unconfirmed messages of size [{}] found: [{}]", unconfirmed.size(), unconfirmed);
+                    processor.setUnconfirmed(unconfirmed);
+                    setDeliverySnapshot(snapshot);
                 } else{
                     logger.debug("[{}][{}] Unknown recovery msg type while recovering.", tenantId, id, msg.getClass().getName());
                 }
