@@ -15,19 +15,22 @@
  */
 package com.hashmapinc.tempus.sdk.messages;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.module.SimpleModule;
+
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  * In order to publish device telemetry to Tempus server node, one sends the following publish message:
- *
+ * <p>
  * Message:
- *
+ * <p>
  * [{"ts":1451649600512, "values":{"key1":"value1", "key2":"value2"}}]
- *
+ * <p>
  * Where ts is a unix timestamp in milliseconds, and the telemetry values are represented as key value pairs.
  */
-
 //TODO: Add Attribute Messages
 public class DeviceTelemetryValue {
 
@@ -57,4 +60,22 @@ public class DeviceTelemetryValue {
     public void addDataValue(TelemetryDataValue value){
         telemetryDataValues.add(value);
     }
+
+    /**
+     * Write DeviceTelemetryValue as string.
+     *
+     * @param msg the msg
+     * @return the string
+     * @throws JsonProcessingException the json processing exception
+     */
+    public String writeValueAsString(DeviceTelemetryValue msg) throws JsonProcessingException {
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        SimpleModule module = new SimpleModule();
+        module.addSerializer(DeviceTelemetryValue.class, new DeviceTelemetryValueSerializer());
+        objectMapper.registerModule(module);
+        return objectMapper.writeValueAsString(msg);
+    }
+
+
 }

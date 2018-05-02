@@ -33,10 +33,9 @@ public class GenerateMessageTest {
     @Test
     public void testGatewayConnectDeviceMessage() throws Exception {
         String msg = "{\"device\":\"Device A\"}";
-        ObjectMapper objectMapper = new ObjectMapper();
-        GatewayConnectDevice device = objectMapper.readValue(msg, GatewayConnectDevice.class);
+        GatewayConnectDevice device = new GatewayConnectDevice("Device A");
         Assert.assertNotNull(device);
-        String out = objectMapper.writeValueAsString(device);
+        String out = device.writeValueAsString(device);
         Assert.assertNotNull(out);
         Assert.assertEquals(out,msg);
     }
@@ -49,10 +48,9 @@ public class GenerateMessageTest {
     @Test
     public void testGatewayConnectDeviceWithTypeMessage() throws Exception {
         String msg = "{\"device\":\"Device A\",\"type\":\"Device Type\"}";
-        ObjectMapper objectMapper = new ObjectMapper();
-        GatewayConnectDevice device = objectMapper.readValue(msg, GatewayConnectDevice.class);
+        GatewayConnectDevice device = new GatewayConnectDevice("Device A", "Device Type");
         Assert.assertNotNull(device);
-        String out = objectMapper.writeValueAsString(device);
+        String out = device.writeValueAsString(device);
         Assert.assertNotNull(out);
         Assert.assertEquals(out,msg);
     }
@@ -65,10 +63,9 @@ public class GenerateMessageTest {
     @Test
     public void testGatewayDisconnectDeviceMessage() throws Exception {
         String msg = "{\"device\":\"Device A\"}";
-        ObjectMapper objectMapper = new ObjectMapper();
-        GatewayDisconnectDevice device = objectMapper.readValue(msg, GatewayDisconnectDevice.class);
+        GatewayDisconnectDevice device = new GatewayDisconnectDevice("Device A");
         Assert.assertNotNull(device);
-        String out = objectMapper.writeValueAsString(device);
+        String out = device.writeValueAsString(device);
         Assert.assertNotNull(out);
         Assert.assertEquals(out,msg);
     }
@@ -89,11 +86,7 @@ public class GenerateMessageTest {
         device.addDataValue(values);
         values.setTimeStamp("1524242990171");
 
-        ObjectMapper objectMapper = new ObjectMapper();
-        SimpleModule module = new SimpleModule();
-        module.addSerializer(DeviceTelemetryValue.class, new DeviceTelemetryValueSerializer());
-        objectMapper.registerModule(module);
-        String out = objectMapper.writeValueAsString(device);
+        String out = device.writeValueAsString(device);
         Assert.assertNotNull(out);
         Assert.assertEquals(out,msg);
     }
@@ -145,11 +138,7 @@ public class GenerateMessageTest {
         device.addDepthDataValue(values);
         values.setDepth(305.1);
 
-        ObjectMapper objectMapper = new ObjectMapper();
-        SimpleModule module = new SimpleModule();
-        module.addSerializer(DeviceDepthValue.class, new DeviceDepthValueSerializer());
-        objectMapper.registerModule(module);
-        String out = objectMapper.writeValueAsString(device);
+        String out = device.writeValueAsString(device);
         Assert.assertNotNull(out);
         Assert.assertEquals(out,msg);
     }
@@ -176,11 +165,7 @@ public class GenerateMessageTest {
         device.addDepthDataValue(depth2);
         depth2.setDepth(315.1);
 
-        ObjectMapper objectMapper = new ObjectMapper();
-        SimpleModule module = new SimpleModule();
-        module.addSerializer(DeviceDepthValue.class, new DeviceDepthValueSerializer());
-        objectMapper.registerModule(module);
-        String out = objectMapper.writeValueAsString(device);
+        String out = device.writeValueAsString(device);
         Assert.assertNotNull(out);
         Assert.assertEquals(out,msg);
     }
@@ -201,13 +186,10 @@ public class GenerateMessageTest {
         gateway.addDataValue(values);
         values.setTimeStamp("1524242990171");
 
-        ObjectMapper objectMapper = new ObjectMapper();
-        SimpleModule module = new SimpleModule();
-        module.addSerializer(GatewayTelemetryValue.class, new GatewayTelemetryValueSerializer());
-        objectMapper.registerModule(module);
-        String out = objectMapper.writeValueAsString(gateway);
+        String out = gateway.writeValueAsString(gateway);
         Assert.assertNotNull(out);
         Assert.assertEquals(out,msg);
+
     }
 
     /**
@@ -233,11 +215,7 @@ public class GenerateMessageTest {
         ts2.setTimeStamp("1624242990171");
         gateway.addDataValue(ts2);
 
-        ObjectMapper objectMapper = new ObjectMapper();
-        SimpleModule module = new SimpleModule();
-        module.addSerializer(GatewayTelemetryValue.class, new GatewayTelemetryValueSerializer());
-        objectMapper.registerModule(module);
-        String out = objectMapper.writeValueAsString(gateway);
+        String out = gateway.writeValueAsString(gateway);
         Assert.assertNotNull(out);
         Assert.assertEquals(out,msg);
     }
@@ -258,11 +236,7 @@ public class GenerateMessageTest {
         gateway.addDepthDataValue(values);
         values.setDepth(305.1);
 
-        ObjectMapper objectMapper = new ObjectMapper();
-        SimpleModule module = new SimpleModule();
-        module.addSerializer(GatewayDepthValue.class, new GatewayDepthValueSerializer());
-        objectMapper.registerModule(module);
-        String out = objectMapper.writeValueAsString(gateway);
+        String out = gateway.writeValueAsString(gateway);
         Assert.assertNotNull(out);
         Assert.assertEquals(out,msg);
     }
@@ -290,11 +264,7 @@ public class GenerateMessageTest {
         gateway.addDepthDataValue(depth2);
         depth2.setDepth(315.1);
 
-        ObjectMapper objectMapper = new ObjectMapper();
-        SimpleModule module = new SimpleModule();
-        module.addSerializer(GatewayDepthValue.class, new GatewayDepthValueSerializer());
-        objectMapper.registerModule(module);
-        String out = objectMapper.writeValueAsString(gateway);
+        String out = gateway.writeValueAsString(gateway);
         Assert.assertNotNull(out);
         Assert.assertEquals(out,msg);
     }
