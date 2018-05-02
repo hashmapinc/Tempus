@@ -21,6 +21,7 @@ import com.fasterxml.jackson.databind.module.SimpleModule;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * A Gateway is a special type of device in Tempus that is able to act as a bridge between external devices
@@ -116,4 +117,26 @@ public class GatewayTelemetryValue {
         return objectMapper.writeValueAsString(gateway);
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof GatewayTelemetryValue)) return false;
+        GatewayTelemetryValue that = (GatewayTelemetryValue) o;
+        return Objects.equals(getDeviceName(), that.getDeviceName()) &&
+                Objects.equals(telemetryDataValues, that.telemetryDataValues);
+    }
+
+    @Override
+    public int hashCode() {
+
+        return Objects.hash(getDeviceName(), telemetryDataValues);
+    }
+
+    @Override
+    public String toString() {
+        return "GatewayTelemetryValue{" +
+                "deviceName='" + deviceName + '\'' +
+                ", telemetryDataValues=" + telemetryDataValues +
+                '}';
+    }
 }

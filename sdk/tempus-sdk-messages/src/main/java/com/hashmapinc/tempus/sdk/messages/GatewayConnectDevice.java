@@ -20,6 +20,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import java.util.Objects;
+
 /**
  * To inform Tempus that device is connected to the Gateway, one needs to publish following message:
  * <p>
@@ -112,5 +114,26 @@ public class GatewayConnectDevice {
         return objectMapper.writeValueAsString(device);
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof GatewayConnectDevice)) return false;
+        GatewayConnectDevice that = (GatewayConnectDevice) o;
+        return Objects.equals(getDeviceName(), that.getDeviceName()) &&
+                Objects.equals(getDeviceType(), that.getDeviceType());
+    }
 
+    @Override
+    public int hashCode() {
+
+        return Objects.hash(getDeviceName(), getDeviceType());
+    }
+
+    @Override
+    public String toString() {
+        return "GatewayConnectDevice{" +
+                "deviceName='" + deviceName + '\'' +
+                ", deviceType='" + deviceType + '\'' +
+                '}';
+    }
 }

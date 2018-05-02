@@ -17,6 +17,7 @@ package com.hashmapinc.tempus.sdk.messages;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -117,5 +118,28 @@ public class GatewayDepthValue {
         module.addSerializer(GatewayDepthValue.class, new GatewayDepthValueSerializer());
         objectMapper.registerModule(module);
         return objectMapper.writeValueAsString(msg);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof GatewayDepthValue)) return false;
+        GatewayDepthValue that = (GatewayDepthValue) o;
+        return Objects.equals(getDeviceName(), that.getDeviceName()) &&
+                Objects.equals(dataValues, that.dataValues);
+    }
+
+    @Override
+    public int hashCode() {
+
+        return Objects.hash(getDeviceName(), dataValues);
+    }
+
+    @Override
+    public String toString() {
+        return "GatewayDepthValue{" +
+                "deviceName='" + deviceName + '\'' +
+                ", dataValues=" + dataValues +
+                '}';
     }
 }
