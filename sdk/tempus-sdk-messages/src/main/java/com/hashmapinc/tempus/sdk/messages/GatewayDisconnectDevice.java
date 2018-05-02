@@ -19,6 +19,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import java.util.Objects;
+
 /**
  * In order to inform Tempus that device is disconnected from the Gateway, one needs to publish following message:
  *
@@ -78,4 +80,24 @@ public class GatewayDisconnectDevice {
         return objectMapper.writeValueAsString(device);
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof GatewayDisconnectDevice)) return false;
+        GatewayDisconnectDevice that = (GatewayDisconnectDevice) o;
+        return Objects.equals(getDeviceName(), that.getDeviceName());
+    }
+
+    @Override
+    public int hashCode() {
+
+        return Objects.hash(getDeviceName());
+    }
+
+    @Override
+    public String toString() {
+        return "GatewayDisconnectDevice{" +
+                "deviceName='" + deviceName + '\'' +
+                '}';
+    }
 }

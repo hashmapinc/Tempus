@@ -21,6 +21,7 @@ import com.fasterxml.jackson.databind.module.SimpleModule;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * In order to publish device telemetry to Tempus server node, one sends the following publish message:
@@ -77,5 +78,24 @@ public class DeviceTelemetryValue {
         return objectMapper.writeValueAsString(msg);
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof DeviceTelemetryValue)) return false;
+        DeviceTelemetryValue that = (DeviceTelemetryValue) o;
+        return Objects.equals(telemetryDataValues, that.telemetryDataValues);
+    }
 
+    @Override
+    public int hashCode() {
+
+        return Objects.hash(telemetryDataValues);
+    }
+
+    @Override
+    public String toString() {
+        return "DeviceTelemetryValue{" +
+                "telemetryDataValues=" + telemetryDataValues +
+                '}';
+    }
 }

@@ -19,6 +19,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * In order to publish telemetry data to Tempus server node, one sends PUBLISH message with the following format
@@ -80,5 +81,28 @@ public class DepthDataValue {
     public void addValue(String key, Object value){
         //TODO: add type check on supported values (boolean, string, double, long) throw un supported type exception
         values.put(key, value);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof DepthDataValue)) return false;
+        DepthDataValue that = (DepthDataValue) o;
+        return Double.compare(that.getDepth(), getDepth()) == 0 &&
+                Objects.equals(getValues(), that.getValues());
+    }
+
+    @Override
+    public int hashCode() {
+
+        return Objects.hash(getDepth(), getValues());
+    }
+
+    @Override
+    public String toString() {
+        return "DepthDataValue{" +
+                "depth=" + depth +
+                ", values=" + values +
+                '}';
     }
 }

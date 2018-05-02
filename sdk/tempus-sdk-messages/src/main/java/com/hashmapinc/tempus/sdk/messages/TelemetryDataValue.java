@@ -19,14 +19,15 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * The type Telemetry Data value.  In order to publish telemetry data to Tempus server node, one sends PUBLISH message with the following format
- *
+ * <p>
  * Message:
- *
+ * <p>
  * [{"ts":"1451649600512", "values":{"key1":"value1", "key2":"value2"}}]
- *
+ * <p>
  * Where ts is a unix timestamp in milliseconds,  and the telemetry values are represented as key value pairs.
  */
 public class TelemetryDataValue {
@@ -82,4 +83,26 @@ public class TelemetryDataValue {
         values.put(key, value);
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof TelemetryDataValue)) return false;
+        TelemetryDataValue that = (TelemetryDataValue) o;
+        return Objects.equals(getTimeStamp(), that.getTimeStamp()) &&
+                Objects.equals(getValues(), that.getValues());
+    }
+
+    @Override
+    public int hashCode() {
+
+        return Objects.hash(getTimeStamp(), getValues());
+    }
+
+    @Override
+    public String toString() {
+        return "TelemetryDataValue{" +
+                "timeStamp='" + timeStamp + '\'' +
+                ", values=" + values +
+                '}';
+    }
 }
