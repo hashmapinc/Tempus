@@ -15,8 +15,6 @@
  */
 package com.hashmapinc.tempus.sdk.messages;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.module.SimpleModule;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -113,11 +111,7 @@ public class GenerateMessageTest {
         device.addDataValue(ts2);
         ts2.setTimeStamp("1624242990171");
 
-        ObjectMapper objectMapper = new ObjectMapper();
-        SimpleModule module = new SimpleModule();
-        module.addSerializer(DeviceTelemetryValue.class, new DeviceTelemetryValueSerializer());
-        objectMapper.registerModule(module);
-        String out = objectMapper.writeValueAsString(device);
+        String out = device.writeValueAsString(device);
         Assert.assertNotNull(out);
         Assert.assertEquals(out,msg);
     }
@@ -267,5 +261,36 @@ public class GenerateMessageTest {
         String out = gateway.writeValueAsString(gateway);
         Assert.assertNotNull(out);
         Assert.assertEquals(out,msg);
+    }
+
+    @Test
+    public void testDeviceAttributeMessage() throws  Exception {
+        String msg = "{\"attribute1\":\"value1\",\"attribute2\":82.0}";
+        DeviceAttributeMessage attribMsg = new DeviceAttributeMessage();
+        AttributeDataValue attribValues = new AttributeDataValue();
+        attribValues.addValue("attribute1","value1");
+        attribValues.addValue("attribute2",82.0);
+
+        attribMsg.addAttributeValue(attribValues);
+
+        String out = attribMsg.writeValueAsString(attribMsg);
+        Assert.assertNotNull(out);
+        Assert.assertEquals(msg,out);
+    }
+
+    @Test
+    public void testGatewayDeviceAttributeMessage() throws  Exception {
+        String msg = "{\"Device A\":{\"attribute1\":\"value1\",\"attribute2\":82.0}}";
+        GatewayDeviceAttributeMessage attribMsg = new GatewayDeviceAttributeMessage();
+        attribMsg.setDeviceName("Device A");
+        AttributeDataValue attribValues = new AttributeDataValue();
+        attribValues.addValue("attribute1","value1");
+        attribValues.addValue("attribute2",82.0);
+
+        attribMsg.addAttributeValue(attribValues);
+
+        String out = attribMsg.writeValueAsString(attribMsg);
+        Assert.assertNotNull(out);
+        Assert.assertEquals(msg,out);
     }
 }

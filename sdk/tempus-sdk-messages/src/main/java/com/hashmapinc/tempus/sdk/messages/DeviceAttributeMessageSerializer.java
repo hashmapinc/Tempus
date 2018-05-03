@@ -21,20 +21,33 @@ import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 
 import java.io.IOException;
 
-public class DeviceValueSerializer extends StdSerializer<DeviceValue> {
+/**
+ * The type Device value serializer.
+ */
+public class DeviceAttributeMessageSerializer extends StdSerializer<DeviceAttributeMessage> {
 
-    public DeviceValueSerializer() {
+    /**
+     * Instantiates a new Device value serializer.
+     */
+    public DeviceAttributeMessageSerializer() {
         this(null);
     }
 
-    public DeviceValueSerializer(Class<DeviceValue> t){
+    /**
+     * Instantiates a new Device value serializer.
+     *
+     * @param t the t
+     */
+    public DeviceAttributeMessageSerializer(Class<DeviceAttributeMessage> t){
         super(t);
     }
 
     @Override
-    public void serialize(DeviceValue deviceValue, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException {
+    public void serialize(DeviceAttributeMessage deviceAtttributeValue, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException {
 
-        jsonGenerator.writeObject(deviceValue.getDataValues());
+        for (AttributeDataValue temp : deviceAtttributeValue.getAttributeValues()) {
+            jsonGenerator.writeObject(temp.getValues());
+        }
 
     }
 }

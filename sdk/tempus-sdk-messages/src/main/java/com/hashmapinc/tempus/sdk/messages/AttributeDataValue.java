@@ -15,22 +15,26 @@
  */
 package com.hashmapinc.tempus.sdk.messages;
 
-import java.util.ArrayList;
-import java.util.List;
-//TODO: Add Atrribe Messages
-public class DeviceValue {
+import com.fasterxml.jackson.annotation.JsonProperty;
 
-    private List<DataValue> dataValues;
+import java.util.HashMap;
+import java.util.Map;
 
-    public List<DataValue> getDataValues(){
-        return dataValues;
+public class AttributeDataValue {
+
+    @JsonProperty(index = 1)
+    private Map<String, Object> values;
+
+    public Map getValues(){
+        return values;
     }
 
-    public DeviceValue(){
-        dataValues = new ArrayList<>();
+    public AttributeDataValue(){
+        values = new HashMap<>();
     }
 
-    public void addDataValue(DataValue value){
-        dataValues.add(value);
+    public void addValue(String key, Object value){
+        values.put(key, value);
     }
+
 }
