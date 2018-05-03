@@ -46,7 +46,7 @@ public class UserSettingsController extends BaseController {
     public UserSettings getUserSettings(@PathVariable("key") String key) throws TempusException {
         try {
             UserId userId = getCurrentUser().getId();
-            return checkNotNull(userSettingsService.findUserSettingsByKeyAndUserId(key, userId));
+            return userSettingsService.findUserSettingsByKeyAndUserId(key, userId);
         } catch (Exception e) {
             throw handleException(e);
         }
