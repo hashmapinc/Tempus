@@ -15,11 +15,15 @@
  */
 package com.hashmapinc.server.extensions.kafka.action;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.hashmapinc.server.common.data.id.CustomerId;
 import com.hashmapinc.server.common.data.id.DeviceId;
 import com.hashmapinc.server.common.data.id.TenantId;
 import com.hashmapinc.server.extensions.api.plugins.msg.AbstractRuleToPluginMsg;
 import com.hashmapinc.server.extensions.api.plugins.msg.RuleToPluginMsg;
+
+import java.util.UUID;
 
 public class KafkaActionMsg extends AbstractRuleToPluginMsg<KafkaActionPayload> {
 
@@ -27,12 +31,19 @@ public class KafkaActionMsg extends AbstractRuleToPluginMsg<KafkaActionPayload> 
         super(tenantId, customerId, deviceId, payload);
     }
 
-    public KafkaActionMsg(KafkaActionMsg msg, Long deliveryId){
-        super(msg, deliveryId);
+    @JsonCreator
+    public KafkaActionMsg(@JsonProperty("uid") UUID id,
+                          @JsonProperty("tenantId") TenantId tenantId,
+                          @JsonProperty("customerId") CustomerId customerId,
+                          @JsonProperty("deviceId") DeviceId deviceId,
+                          @JsonProperty("payload") KafkaActionPayload payload,
+                          @JsonProperty("deliveryId") Long deliveryId){
+        super(id, tenantId, customerId, deviceId, payload, deliveryId);
     }
 
     @Override
     public RuleToPluginMsg<KafkaActionPayload> copyDeliveryId(Long deliveryId) {
-        return new KafkaActionMsg(this, deliveryId);
+        return new KafkaActionMsg(this.getUid(), this.getTenantId(), this.getCustomerId(),
+                this.getDeviceId(), this.getPayload(), deliveryId);
     }
 }

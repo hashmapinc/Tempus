@@ -15,6 +15,8 @@
  */
 package com.hashmapinc.server.common.data.kv;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.JsonNode;
 
 import java.util.Optional;
@@ -27,7 +29,9 @@ public class BaseAttributeKvEntry implements AttributeKvEntry {
     private final long lastUpdateTs;
     private final KvEntry kv;
 
-    public BaseAttributeKvEntry(KvEntry kv, long lastUpdateTs) {
+    @JsonCreator
+    public BaseAttributeKvEntry(@JsonProperty("kv") KvEntry kv,
+                                @JsonProperty("lastUpdateTs") long lastUpdateTs) {
         this.kv = kv;
         this.lastUpdateTs = lastUpdateTs;
     }

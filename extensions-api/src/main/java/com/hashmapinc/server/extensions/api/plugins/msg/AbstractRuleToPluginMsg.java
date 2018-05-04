@@ -15,12 +15,11 @@
  */
 package com.hashmapinc.server.extensions.api.plugins.msg;
 
+import com.hashmapinc.server.common.data.id.CustomerId;
 import com.hashmapinc.server.common.data.id.DeviceId;
 import com.hashmapinc.server.common.data.id.TenantId;
-import com.hashmapinc.server.common.data.id.CustomerId;
 
 import java.io.Serializable;
-import java.util.Optional;
 import java.util.UUID;
 
 public abstract class AbstractRuleToPluginMsg<T extends Serializable> implements RuleToPluginMsg<T> {
@@ -44,13 +43,13 @@ public abstract class AbstractRuleToPluginMsg<T extends Serializable> implements
         this.deliveryId = -1L;
     }
 
-    public AbstractRuleToPluginMsg(AbstractRuleToPluginMsg<T> msg, Long deliveryId){
+    public AbstractRuleToPluginMsg(UUID id, TenantId tenantId, CustomerId customerId, DeviceId deviceId, T payload, Long deliveryId) {
         super();
-        this.uid = msg.getUid();
-        this.tenantId = msg.getTenantId();
-        this.customerId = msg.getCustomerId();
-        this.deviceId = msg.getDeviceId();
-        this.payload = msg.getPayload();
+        this.uid = id;
+        this.tenantId = tenantId;
+        this.customerId = customerId;
+        this.deviceId = deviceId;
+        this.payload = payload;
         this.deliveryId = deliveryId;
     }
 

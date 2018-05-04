@@ -15,11 +15,15 @@
  */
 package com.hashmapinc.server.extensions.sqs.action.standard;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.hashmapinc.server.common.data.id.CustomerId;
 import com.hashmapinc.server.common.data.id.DeviceId;
 import com.hashmapinc.server.common.data.id.TenantId;
 import com.hashmapinc.server.extensions.api.plugins.msg.AbstractRuleToPluginMsg;
-import com.hashmapinc.server.common.data.id.CustomerId;
 import com.hashmapinc.server.extensions.api.plugins.msg.RuleToPluginMsg;
+
+import java.util.UUID;
 
 /**
  * Created by Valerii Sosliuk on 11/6/2017.
@@ -30,12 +34,19 @@ public class SqsStandardQueueActionMsg extends AbstractRuleToPluginMsg<SqsStanda
         super(tenantId, customerId, deviceId, payload);
     }
 
-    private SqsStandardQueueActionMsg(SqsStandardQueueActionMsg msg, Long deliveryId){
-        super(msg, deliveryId);
+    @JsonCreator
+    private SqsStandardQueueActionMsg(@JsonProperty("uid") UUID id,
+                                      @JsonProperty("tenantId") TenantId tenantId,
+                                      @JsonProperty("customerId") CustomerId customerId,
+                                      @JsonProperty("deviceId") DeviceId deviceId,
+                                      @JsonProperty("payload") SqsStandardQueueActionPayload payload,
+                                      @JsonProperty("deliveryId") Long deliveryId){
+        super(id, tenantId, customerId, deviceId, payload, deliveryId);
     }
 
     @Override
     public RuleToPluginMsg<SqsStandardQueueActionPayload> copyDeliveryId(Long deliveryId) {
-        return new SqsStandardQueueActionMsg(this, deliveryId);
+        return new SqsStandardQueueActionMsg(this.getUid(), this.getTenantId(), this.getCustomerId(),
+                this.getDeviceId(), this.getPayload(), deliveryId);
     }
 }

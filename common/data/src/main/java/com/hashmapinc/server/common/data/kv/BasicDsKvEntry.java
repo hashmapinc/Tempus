@@ -15,6 +15,8 @@
  */
 package com.hashmapinc.server.common.data.kv;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.JsonNode;
 import lombok.ToString;
 
@@ -26,8 +28,9 @@ public class BasicDsKvEntry implements DsKvEntry{
     private final Double ds;
     private final KvEntry kv;
 
-    public BasicDsKvEntry(Double Ds, KvEntry kv) {
-        this.ds = Ds;
+    @JsonCreator
+    public BasicDsKvEntry(@JsonProperty("ds") Double ds, @JsonProperty("kv") KvEntry kv) {
+        this.ds = ds;
         this.kv = kv;
     }
 

@@ -20,6 +20,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.hashmapinc.server.common.msg.session.MsgType;
 import lombok.ToString;
 import com.hashmapinc.server.common.data.kv.KvEntry;
@@ -35,7 +38,8 @@ public class BasicDepthTelemetryUploadRequest extends BasicRequest implements De
         this(DEFAULT_REQUEST_ID);
     }
 
-    public BasicDepthTelemetryUploadRequest(Integer requestId) {
+    @JsonCreator
+    public BasicDepthTelemetryUploadRequest(@JsonProperty("requestId") Integer requestId) {
         super(requestId);
         this.data = new HashMap<>();
     }
@@ -50,6 +54,7 @@ public class BasicDepthTelemetryUploadRequest extends BasicRequest implements De
         tsEntries.add(entry);
     }
 
+    @JsonIgnore
     @Override
     public MsgType getMsgType() {
         return MsgType.POST_TELEMETRY_REQUEST_DEPTH;

@@ -15,10 +15,14 @@
  */
 package com.hashmapinc.server.extensions.api.plugins.msg;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.hashmapinc.server.common.data.id.CustomerId;
 import com.hashmapinc.server.common.data.id.DeviceId;
 import com.hashmapinc.server.common.data.id.TenantId;
 import com.hashmapinc.server.common.msg.core.GetAttributesRequest;
+
+import java.util.UUID;
 
 /**
  * @author Andrew Shvayka
@@ -31,12 +35,19 @@ public class GetAttributesRequestRuleToPluginMsg extends AbstractRuleToPluginMsg
         super(tenantId, customerId, deviceId, payload);
     }
 
-    private GetAttributesRequestRuleToPluginMsg(GetAttributesRequestRuleToPluginMsg msg, Long deliveryId){
-        super(msg, deliveryId);
+    @JsonCreator
+    private GetAttributesRequestRuleToPluginMsg(@JsonProperty("uid") UUID id,
+                                                @JsonProperty("tenantId") TenantId tenantId,
+                                                @JsonProperty("customerId") CustomerId customerId,
+                                                @JsonProperty("deviceId") DeviceId deviceId,
+                                                @JsonProperty("payload") GetAttributesRequest payload,
+                                                @JsonProperty("deliveryId") Long deliveryId){
+        super(id, tenantId, customerId, deviceId, payload, deliveryId);
     }
 
     @Override
     public RuleToPluginMsg<GetAttributesRequest> copyDeliveryId(Long deliveryId) {
-        return new GetAttributesRequestRuleToPluginMsg(this, deliveryId);
+        return new GetAttributesRequestRuleToPluginMsg(this.getUid(), this.getTenantId(), this.getCustomerId(),
+                this.getDeviceId(), this.getPayload(), deliveryId);
     }
 }

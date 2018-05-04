@@ -15,6 +15,8 @@
  */
 package com.hashmapinc.server.common.data.kv;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.JsonNode;
 import java.util.Objects;
 import java.util.Optional;
@@ -24,7 +26,8 @@ public class BasicTsKvEntry implements TsKvEntry {
     private final long ts;
     private final KvEntry kv;
 
-    public BasicTsKvEntry(long ts, KvEntry kv) {
+    @JsonCreator
+    public BasicTsKvEntry(@JsonProperty("ts") long ts, @JsonProperty("kv") KvEntry kv) {
         this.ts = ts;
         this.kv = kv;
     }

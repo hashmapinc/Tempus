@@ -15,11 +15,15 @@
  */
 package com.hashmapinc.server.extensions.rest.action;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.hashmapinc.server.common.data.id.CustomerId;
 import com.hashmapinc.server.common.data.id.DeviceId;
 import com.hashmapinc.server.common.data.id.TenantId;
 import com.hashmapinc.server.extensions.api.plugins.msg.AbstractRuleToPluginMsg;
-import com.hashmapinc.server.common.data.id.CustomerId;
 import com.hashmapinc.server.extensions.api.plugins.msg.RuleToPluginMsg;
+
+import java.util.UUID;
 
 public class RestApiCallActionMsg extends AbstractRuleToPluginMsg<RestApiCallActionPayload> {
 
@@ -27,12 +31,19 @@ public class RestApiCallActionMsg extends AbstractRuleToPluginMsg<RestApiCallAct
         super(tenantId, customerId, deviceId, payload);
     }
 
-    private RestApiCallActionMsg(RestApiCallActionMsg msg, Long deliveryId){
-        super(msg, deliveryId);
+    @JsonCreator
+    private RestApiCallActionMsg(@JsonProperty("uid") UUID id,
+                                 @JsonProperty("tenantId") TenantId tenantId,
+                                 @JsonProperty("customerId") CustomerId customerId,
+                                 @JsonProperty("deviceId") DeviceId deviceId,
+                                 @JsonProperty("payload") RestApiCallActionPayload payload,
+                                 @JsonProperty("deliveryId") Long deliveryId){
+        super(id, tenantId, customerId, deviceId, payload, deliveryId);
     }
 
     @Override
     public RuleToPluginMsg<RestApiCallActionPayload> copyDeliveryId(Long deliveryId) {
-        return new RestApiCallActionMsg(this, deliveryId);
+        return new RestApiCallActionMsg(this.getUid(), this.getTenantId(), this.getCustomerId(),
+                this.getDeviceId(), this.getPayload(), deliveryId);
     }
 }
