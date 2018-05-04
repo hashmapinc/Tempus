@@ -18,7 +18,8 @@
 
 <img src="https://github.com/hashmapinc/hashmap.github.io/blob/master/images/tempus/TempusLogoBlack2.png" width="910" height="245" alt="Hashmap, Inc Tempus"/>
 
-[![License](http://img.shields.io/:license-Apache%202-blue.svg)](http://www.apache.org/licenses/LICENSE-2.0.txt) 
+[![License](http://img.shields.io/:license-Apache%202-blue.svg)](http://www.apache.org/licenses/LICENSE-2.0.txt) [![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fhashmapinc%2FTempus.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Fhashmapinc%2FTempus?ref=badge_shield)
+
 [![Build Status](https://travis-ci.org/hashmapinc/Tempus.svg?branch=dev)](https://travis-ci.org/hashmapinc/Tempus)
 [![Docker pulls](https://img.shields.io/docker/pulls/hashmapinc/tempus.svg)](https://hub.docker.com/r/hashmapinc/tempus/)
 [![CLA assistant](https://cla-assistant.io/readme/badge/hashmapinc/Tempus)](https://cla-assistant.io/hashmapinc/Tempus)
@@ -31,6 +32,9 @@
 
 [![Tempus Video](https://img.youtube.com/vi/BQ8QG5S3-Fc/0.jpg)](https://www.youtube.com/watch?v=BQ8QG5S3-Fc)
 
+
+
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fhashmapinc%2FTempus.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Fhashmapinc%2FTempus?ref=badge_large)
 
 ### Table of Contents
 
