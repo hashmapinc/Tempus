@@ -18,6 +18,9 @@ package com.hashmapinc.server.common.msg.core;
 import java.io.Serializable;
 import java.util.Optional;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.hashmapinc.server.common.msg.session.MsgType;
 
 
@@ -29,7 +32,9 @@ public class BasicResponseMsg<T extends Serializable> implements ResponseMsg<T> 
     private final Integer requestId;
     private final MsgType msgType;
     private final boolean success;
+    @JsonProperty
     private final T data;
+    @JsonProperty
     private final Exception error;
 
     protected BasicResponseMsg(MsgType requestMsgType, Integer requestId, MsgType msgType, boolean success, Exception error, T data) {
@@ -57,11 +62,13 @@ public class BasicResponseMsg<T extends Serializable> implements ResponseMsg<T> 
         return success;
     }
 
+    @JsonIgnore
     @Override
     public Optional<Exception> getError() {
         return Optional.ofNullable(error);
     }
 
+    @JsonIgnore
     @Override
     public Optional<T> getData() {
         return Optional.ofNullable(data);

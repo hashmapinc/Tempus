@@ -16,6 +16,7 @@
 package com.hashmapinc.server.common.data.kv;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.JsonNode;
 
@@ -26,7 +27,9 @@ import java.util.Optional;
  */
 public class BaseAttributeKvEntry implements AttributeKvEntry {
 
+    @JsonProperty
     private final long lastUpdateTs;
+    @JsonProperty
     private final KvEntry kv;
 
     @JsonCreator
@@ -41,46 +44,55 @@ public class BaseAttributeKvEntry implements AttributeKvEntry {
         return lastUpdateTs;
     }
 
+    @JsonIgnore
     @Override
     public String getKey() {
         return kv.getKey();
     }
 
+    @JsonIgnore
     @Override
     public DataType getDataType() {
         return kv.getDataType();
     }
 
+    @JsonIgnore
     @Override
     public Optional<String> getStrValue() {
         return kv.getStrValue();
     }
 
+    @JsonIgnore
     @Override
     public Optional<Long> getLongValue() {
         return kv.getLongValue();
     }
 
+    @JsonIgnore
     @Override
     public Optional<Boolean> getBooleanValue() {
         return kv.getBooleanValue();
     }
 
+    @JsonIgnore
     @Override
     public Optional<Double> getDoubleValue() {
         return kv.getDoubleValue();
     }
 
+    @JsonIgnore
     @Override
     public  Optional<JsonNode> getJsonValue() {
         return kv.getJsonValue();
     }
 
+    @JsonIgnore
     @Override
     public String getValueAsString() {
         return kv.getValueAsString();
     }
 
+    @JsonIgnore
     @Override
     public Object getValue() {
         return kv.getValue();

@@ -16,26 +16,37 @@
 package com.hashmapinc.server.actors.rule.serializers;
 
 import akka.serialization.JSerializer;
-import akka.serialization.SerializerWithStringManifest;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import lombok.extern.slf4j.Slf4j;
+
 import java.io.IOException;
 
 @Slf4j
-public class RuleToPluginMsgSerializer extends JSerializer{
+public class PluginToRuleMsgSerializer extends JSerializer{
     private final ObjectMapper mapper;
 
-    public RuleToPluginMsgSerializer(){
-        mapper = new ObjectMapper();
-        mapper.enableDefaultTyping(); //This will hold the type information
+    public PluginToRuleMsgSerializer() {
+        this.mapper = new ObjectMapper();
+        mapper.enableDefaultTyping();
         mapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
     }
 
     @Override
+    public Object fromBinaryJava(byte[] bytes, Class<?> manifest) {
+        try {
+            return mapper.readValue(bytes, manifest);
+        } catch (IOException e) {
+            log.error("Error while deserializing data for manifest: [{}]", manifest.getName(), e);
+        }
+
+        return null;
+    }
+
+    @Override
     public int identifier() {
-        return 51;
+        return 52;
     }
 
     @Override
@@ -51,16 +62,5 @@ public class RuleToPluginMsgSerializer extends JSerializer{
     @Override
     public boolean includeManifest() {
         return true;
-    }
-
-    @Override
-    public Object fromBinaryJava(byte[] bytes, Class<?> manifest) {
-        try {
-            return mapper.readValue(bytes, manifest);
-        } catch (IOException e) {
-            log.error("Error while deserializing data for manifest: [{}]", manifest.getName(), e);
-        }
-
-        return null;
     }
 }

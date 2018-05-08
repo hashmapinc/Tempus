@@ -15,6 +15,9 @@
  */
 package com.hashmapinc.server.common.msg.core;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.hashmapinc.server.common.msg.kv.AttributesKVMsg;
 import com.hashmapinc.server.common.msg.session.MsgType;
 import com.hashmapinc.server.common.msg.session.ToDeviceMsg;
@@ -25,17 +28,21 @@ public class AttributesUpdateNotification implements ToDeviceMsg {
 
     private static final long serialVersionUID = 1L;
 
+    @JsonProperty
     private AttributesKVMsg data;
 
-    public AttributesUpdateNotification(AttributesKVMsg data) {
+    @JsonCreator
+    public AttributesUpdateNotification(@JsonProperty("msg") AttributesKVMsg data) {
         this.data = data;
     }
 
+    @JsonIgnore
     @Override
     public boolean isSuccess() {
         return true;
     }
 
+    @JsonIgnore
     @Override
     public MsgType getMsgType() {
         return MsgType.ATTRIBUTES_UPDATE_NOTIFICATION;

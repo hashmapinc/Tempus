@@ -25,13 +25,13 @@ import com.hashmapinc.server.common.data.kv.*;
 
 import java.io.IOException;
 
-public class BasicKvEntryDeserializer extends JsonDeserializer<KvEntry> {
+public class BasicKvEntryDeserializer extends JsonDeserializer<BasicKvEntry> {
 
     @Override
-    public KvEntry deserialize(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException, JsonProcessingException {
+    public BasicKvEntry deserialize(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException, JsonProcessingException {
         ObjectCodec oc = jsonParser.getCodec();
         ObjectNode node = oc.readTree(jsonParser);
-        KvEntry entry = null;
+        BasicKvEntry entry = null;
         if(node.get("dataType") != null){
             String dataType = node.get("dataType").asText();
             switch(dataType){

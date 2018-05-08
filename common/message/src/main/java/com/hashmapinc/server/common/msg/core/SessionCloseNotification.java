@@ -15,6 +15,7 @@
  */
 package com.hashmapinc.server.common.msg.core;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.hashmapinc.server.common.msg.session.MsgType;
 import lombok.ToString;
 import com.hashmapinc.server.common.msg.session.ToDeviceMsg;
@@ -24,11 +25,13 @@ public class SessionCloseNotification implements ToDeviceMsg {
 
     private static final long serialVersionUID = 1L;
 
+    @JsonIgnore
     @Override
     public boolean isSuccess() {
         return true;
     }
 
+    @JsonIgnore
     @Override
     public MsgType getMsgType() {
         return MsgType.SESSION_CLOSE;

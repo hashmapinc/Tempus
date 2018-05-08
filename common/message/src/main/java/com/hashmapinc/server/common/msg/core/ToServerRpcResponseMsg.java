@@ -15,6 +15,7 @@
  */
 package com.hashmapinc.server.common.msg.core;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.hashmapinc.server.common.msg.session.MsgType;
 import com.hashmapinc.server.common.msg.session.ToDeviceMsg;
 import lombok.Data;
@@ -28,11 +29,13 @@ public class ToServerRpcResponseMsg implements ToDeviceMsg {
     private final int requestId;
     private final String data;
 
+    @JsonIgnore
     @Override
     public MsgType getMsgType() {
         return MsgType.TO_SERVER_RPC_RESPONSE;
     }
 
+    @JsonIgnore
     @Override
     public boolean isSuccess() {
         return true;

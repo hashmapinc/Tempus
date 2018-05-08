@@ -15,6 +15,8 @@
  */
 package com.hashmapinc.server.common.data.kv;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.JsonNode;
 
 import java.io.Serializable;
@@ -29,18 +31,25 @@ public interface KvEntry extends Serializable {
 
     String getKey();
 
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     DataType getDataType();
 
+    @JsonIgnore
     Optional<String> getStrValue();
 
+    @JsonIgnore
     Optional<Long> getLongValue();
 
+    @JsonIgnore
     Optional<Boolean> getBooleanValue();
 
+    @JsonIgnore
     Optional<Double> getDoubleValue();
 
+    @JsonIgnore
     Optional<JsonNode> getJsonValue();
 
+    @JsonIgnore
     String getValueAsString();
 
     Object getValue();

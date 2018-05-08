@@ -30,7 +30,9 @@ public class BasicGetAttributesRequest extends BasicRequest implements GetAttrib
 
     private static final long serialVersionUID = 1L;
 
+    @JsonProperty
     private final Set<String> clientKeys;
+    @JsonProperty
     private final Set<String> sharedKeys;
 
     public BasicGetAttributesRequest(Integer requestId) {
@@ -52,11 +54,13 @@ public class BasicGetAttributesRequest extends BasicRequest implements GetAttrib
         return MsgType.GET_ATTRIBUTES_REQUEST;
     }
 
+    @JsonIgnore
     @Override
     public Optional<Set<String>> getClientAttributeNames() {
         return Optional.ofNullable(clientKeys);
     }
 
+    @JsonIgnore
     @Override
     public Optional<Set<String>> getSharedAttributeNames() {
         return Optional.ofNullable(sharedKeys);

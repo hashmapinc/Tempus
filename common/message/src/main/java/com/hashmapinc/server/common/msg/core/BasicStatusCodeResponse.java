@@ -15,6 +15,8 @@
  */
 package com.hashmapinc.server.common.msg.core;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.hashmapinc.server.common.msg.session.MsgType;
 import lombok.ToString;
 
@@ -27,15 +29,20 @@ public class BasicStatusCodeResponse extends BasicResponseMsg<Integer> implement
         return BasicStatusCodeResponse.onSuccess(requestMsgType, requestId, 0);
     }
 
-    public static BasicStatusCodeResponse onSuccess(MsgType requestMsgType, Integer requestId, Integer code) {
-        return new BasicStatusCodeResponse(requestMsgType, requestId, true, null, code);
+    public static BasicStatusCodeResponse onSuccess(MsgType requestMsgType, Integer requestId, Integer data) {
+        return new BasicStatusCodeResponse(requestMsgType, requestId, true, null, data);
     }
 
     public static BasicStatusCodeResponse onError(MsgType requestMsgType, Integer requestId, Exception error) {
         return new BasicStatusCodeResponse(requestMsgType, requestId, false, error, null);
     }
 
-    private BasicStatusCodeResponse(MsgType requestMsgType, Integer requestId, boolean success, Exception error, Integer code) {
-        super(requestMsgType, requestId, MsgType.STATUS_CODE_RESPONSE, success, error, code);
+    @JsonCreator
+    private BasicStatusCodeResponse(@JsonProperty("requestMsgType") MsgType requestMsgType,
+                                    @JsonProperty("requestId") Integer requestId,
+                                    @JsonProperty("success") boolean success,
+                                    @JsonProperty("error") Exception error,
+                                    @JsonProperty("data") Integer data) {
+        super(requestMsgType, requestId, MsgType.STATUS_CODE_RESPONSE, success, error, data);
     }
 }
