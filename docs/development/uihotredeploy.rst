@@ -23,22 +23,24 @@ Running server-side container
 
 To start server-side container there are 2 options:
 
-1.  Run the main method of com.hashmapinc.server.TempusServerApplication class that is located in the application module from the IDE.
+* Run the main method of com.hashmapinc.server.TempusServerApplication class that is located in the application module from the IDE.
 
-2. Start the server from command line as a regular Spring boot application:
+* Start the server from command line as a regular Spring boot application:
 
     .. code-block:: bash
 
         cd ${TB_WORK_DIR}
         java -jar application/target/tempus-${VERSION}-boot.jar
 
-3. Run the TempusDevEnvironment as described in the Developer Quick Start
+* Run the TempusDevEnvironment as described in the Developer Quick Start
 
+*******
 Dry run
+*******
 
 Navigate to http://localhost:3000/ or http://localhost:8080/ and login into Tempus Cloud using demo data credentials:
 
-login tenant@thingsboard.org
-password tenant
+**login** demo@hashmapinc.com
+**password** tenant
 
 Make sure that you are able to login and everything has started correctly.
