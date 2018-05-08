@@ -25,6 +25,7 @@ import java.util.*;
 
 import akka.persistence.cassandra.testkit.CassandraLauncher;
 import com.google.common.util.concurrent.Futures;
+import com.hashmapinc.server.common.data.computation.Computations;
 import com.hashmapinc.server.common.data.id.*;
 import com.hashmapinc.server.common.data.plugin.ComponentDescriptor;
 import com.hashmapinc.server.common.data.security.DeviceTokenCredentials;
@@ -33,6 +34,7 @@ import com.hashmapinc.server.common.msg.session.BasicToDeviceActorSessionMsg;
 import com.hashmapinc.server.common.msg.session.SessionContext;
 import com.hashmapinc.server.common.msg.session.SessionType;
 import com.hashmapinc.server.dao.attributes.AttributesService;
+import com.hashmapinc.server.dao.computations.ComputationsService;
 import com.hashmapinc.server.gen.discovery.ServerInstanceProtos;
 import com.hashmapinc.server.service.cluster.discovery.ServerInstance;
 import com.hashmapinc.server.actors.service.DefaultActorService;
@@ -98,6 +100,7 @@ public class DefaultActorServiceTest {
     private ComponentDiscoveryService componentService;
     private EventService eventService;
     private ServerInstance serverInstance;
+    private ComputationsService computationsService;
 
     private RuleMetaData ruleMock;
     private PluginMetaData pluginMock;
@@ -137,6 +140,7 @@ public class DefaultActorServiceTest {
         attributesService = mock(AttributesService.class);
         componentService = mock(ComponentDiscoveryService.class);
         eventService = mock(EventService.class);
+        computationsService = mock(ComputationsService.class);
         serverInstance = new ServerInstance(ServerInstanceProtos.ServerInfo.newBuilder().setHost("localhost").setPort(8080).build());
 
         ReflectionTestUtils.setField(actorService, "actorContext", actorContext);
@@ -162,6 +166,7 @@ public class DefaultActorServiceTest {
         ReflectionTestUtils.setField(actorContext, "attributesService", attributesService);
         ReflectionTestUtils.setField(actorContext, "componentService", componentService);
         ReflectionTestUtils.setField(actorContext, "eventService", eventService);
+        ReflectionTestUtils.setField(actorContext, "computationsService", computationsService);
 
 
         when(routingService.resolveById((EntityId) any())).thenReturn(Optional.empty());
@@ -191,6 +196,9 @@ public class DefaultActorServiceTest {
 
         TextPageData<Tenant> tenants = new TextPageData<>(Collections.emptyList(), null, false);
         when(tenantService.findTenants(any())).thenReturn(tenants);
+
+        TextPageData<Computations> computations = new TextPageData<>(Collections.emptyList(), null, false);
+        when(computationsService.findTenantComputations(any(), any())).thenReturn(computations);
     }
 
     private void initActorSystem() {
