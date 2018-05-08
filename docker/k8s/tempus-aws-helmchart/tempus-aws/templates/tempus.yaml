@@ -26,21 +26,13 @@ spec:
     app: tempus
   ports:
     - protocol: TCP
-      port: 8080
+      port: 80
       targetPort: 8080
       name: ui
     - protocol: TCP
       port: 1883
       targetPort: 1883
       name: mqtt
-    #- protocol: UDP
-    #  port: 5683
-    #  targetPort: 5683
-    #  name: coap
-    - protocol: TCP
-      port: 9999
-      targetPort: 9999
-      name: tempus-port
 ---
 apiVersion: policy/v1beta1
 kind: PodDisruptionBudget
@@ -72,6 +64,7 @@ data:
   coap.address: "0.0.0.0"
   coap.port: "5683"
   spark.path: "/home"
+  http.port: "8080"
 ---
 apiVersion: "apps/v1beta1"
 kind: StatefulSet
@@ -113,6 +106,11 @@ spec:
             configMapKeyRef:
               name: tempus-config
               key: spark.path
+        - name: HTTP_BIND_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: tempus-config
+              key: http.port
         - name: MQTT_BIND_ADDRESS
           valueFrom:
             configMapKeyRef:
