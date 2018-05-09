@@ -13,9 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.hashmapinc.server.common.data;
+package com.hashmapinc.server.dao.sql.cluster;
 
+import com.hashmapinc.server.dao.model.sql.ClusterMetricEntity;
+import com.hashmapinc.server.dao.util.SqlDao;
+import org.springframework.data.repository.CrudRepository;
 
-public enum EntityType {
-    TENANT, CUSTOMER, USER, RULE, PLUGIN, DASHBOARD, ASSET, DEVICE, ALARM, APPLICATION, COMPUTATION, COMPUTATION_JOB, CLUSTER_METRIC
+@SqlDao
+public interface ClusterMetricRepository extends CrudRepository<ClusterMetricEntity, String> {
+
+    ClusterMetricEntity findClusterMetricByNodeIpAndNodePort(String nodeIp, int nodePort);
 }
