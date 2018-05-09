@@ -15,17 +15,26 @@
  */
 const RAD_CONVERSION_FACTOR = Math.PI / 180.0 // multiply this with an angle in degrees to get radians
 
-// converts an array of trajectory objects into an array of XYZ objects
-function convertTrajectoryArray(trajectoryArray) {
+/* converts an array of trajectory objects into an array of XYZ objects
+ *
+ * @param trajectoryArray - array of trajectory readings of the well ordered by measured depth
+ * @param origin          - point object with the x, y, and z value to begin well plotting from
+ * 
+ * @returns results       - point array with XYZ fields describing coordinates of the well
+*/
+function convertRawToXYZ(trajectoryArray, origin) {
   // catch empty input
   if(trajectoryArray.length === 0) {
     return [];
   }
 
-  // holds ongoing results
-  var results = [{x: 0, y: 0, z: 0}]; // all start at 0,0,0
+  // instantiate origin if it doesn't exist (param is optional)
+  origin = origin || { x: 0, y: 0, z: 0 }
 
-  // catch only 1 point
+  // holds ongoing results
+  var results = [origin]; // all results start at origin
+
+  // catch when there is only 1 trajectory reading
   if (trajectoryArray.length === 1) {
     return results;
   }
