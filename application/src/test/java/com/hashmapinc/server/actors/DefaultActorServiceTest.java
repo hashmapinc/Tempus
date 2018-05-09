@@ -113,7 +113,7 @@ public class DefaultActorServiceTest {
         File dir = new File("target/persistence");
         if((!dir.exists() && dir.mkdirs()) || dir.exists()) {
             File cassandraDirectory = new File("target/persistence");
-            CassandraLauncher.start(cassandraDirectory, "cassandra-test.yaml", true, 9142);
+            CassandraLauncher.start(cassandraDirectory, "akka-cassandra-test.yaml", true, 9142);
         }
     }
 

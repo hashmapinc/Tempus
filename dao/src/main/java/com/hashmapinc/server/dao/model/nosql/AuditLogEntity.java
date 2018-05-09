@@ -36,7 +36,7 @@ import com.hashmapinc.server.dao.model.type.JsonCodec;
 
 import java.util.UUID;
 
-@Table(name = ModelConstants.AUDIT_LOG_COLUMN_FAMILY_NAME)
+@Table(name = ModelConstants.AUDIT_LOG_BY_TENANT_ID_CF)
 @Data
 @NoArgsConstructor
 public class AuditLogEntity implements BaseEntity<AuditLog> {
