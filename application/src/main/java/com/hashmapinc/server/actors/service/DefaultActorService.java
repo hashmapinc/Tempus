@@ -202,7 +202,7 @@ public class DefaultActorService implements ActorService {
 
     @Override
     public void onServerAdded(ServerInstance server) {
-        log.trace("Processing onServerAdded msg: {}", server);
+        log.error("#########Processing onServerAdded msg: {}", server.getServerAddress());
         broadcast(new ClusterEventMsg(server.getServerAddress(), true));
     }
 
@@ -213,7 +213,7 @@ public class DefaultActorService implements ActorService {
 
     @Override
     public void onServerRemoved(ServerInstance server) {
-        log.trace("Processing onServerRemoved msg: {}", server);
+        log.error("########Processing onServerRemoved msg: {}", server.getServerAddress());
         broadcast(new ClusterEventMsg(server.getServerAddress(), false));
     }
 

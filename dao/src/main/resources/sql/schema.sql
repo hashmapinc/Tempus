@@ -312,6 +312,16 @@ CREATE TABLE IF NOT EXISTS application_associated_computation_jobs(
     application_computation_job_id varchar(31)
 );
 
+CREATE TABLE IF NOT EXISTS cluster_metric (
+    id varchar (31) NOT NULL CONSTRAINT cluster_metric_pkey PRIMARY KEY,
+    node_ip varchar NOT NULL,
+    node_port integer NOT NULL,
+    node_status boolean,
+    rpc_session_count integer DEFAULT 0,
+    device_session_count integer DEFAULT 0,
+    CONSTRAINT unq_node UNIQUE (node_ip, node_port)
+);
+
 CREATE TABLE IF NOT EXISTS computations (
     id varchar(31) NOT NULL CONSTRAINT computations_pkey PRIMARY KEY,
     jar_name varchar,

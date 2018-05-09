@@ -25,6 +25,7 @@ import com.hashmapinc.server.common.data.plugin.ComponentLifecycleEvent;
 import com.hashmapinc.server.controller.plugin.PluginWebSocketMsgEndpoint;
 import com.hashmapinc.server.dao.application.ApplicationService;
 import com.hashmapinc.server.dao.attributes.AttributesService;
+import com.hashmapinc.server.dao.cluster.ClusterMetricService;
 import com.hashmapinc.server.dao.event.EventService;
 import com.hashmapinc.server.service.cluster.discovery.DiscoveryService;
 import com.hashmapinc.server.service.component.ComponentDiscoveryService;
@@ -132,6 +133,9 @@ public class ActorSystemContext {
 
     @Autowired
     @Getter private AuditLogService auditLogService;
+
+    @Autowired
+    @Getter private ClusterMetricService clusterMetricService;
 
     @Autowired
     @Getter @Setter private PluginWebSocketMsgEndpoint wsMsgEndpoint;

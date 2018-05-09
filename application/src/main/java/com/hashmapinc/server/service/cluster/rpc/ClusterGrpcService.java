@@ -66,21 +66,27 @@ public class ClusterGrpcService extends ClusterRpcServiceGrpc.ClusterRpcServiceI
 
     public void init(RpcMsgListener listener) {
         this.listener = listener;
-        log.info("Initializing RPC service!");
+        log.error("###Initializing RPC service!");
         instance = instanceService.getSelf();
+        log.error("###Instance Port : " + instance.getPort());
+        log.error("###Instance Host : " + instance.getHost());
         server = ServerBuilder.forPort(instance.getPort()).addService(this).build();
         log.info("Going to start RPC server using port: {}", instance.getPort());
         try {
             server.start();
+            log.error("###Server Start : " + server.getPort());
         } catch (IOException e) {
             log.error("Failed to start RPC server!", e);
             throw new RuntimeException("Failed to start RPC server!");
         }
-        log.info("RPC service initialized!");
+        log.error("RPC service initialized!");
     }
 
     @Override
     public void onSessionCreated(UUID msgUid, StreamObserver<ClusterAPIProtos.ToRpcServerMessage> msg) {
+        log.error("\n\n\n\n######################################################" +
+                "************ON SESSION CREATED**************" +
+                "################################################\n\n\n\n");
         RpcSessionCreationFuture future = pendingSessionMap.remove(msgUid);
         if (future != null) {
             try {
@@ -169,6 +175,9 @@ public class ClusterGrpcService extends ClusterRpcServiceGrpc.ClusterRpcServiceI
     }
 
     private StreamObserver<ClusterAPIProtos.ToRpcServerMessage> createSession(RpcSessionCreateRequestMsg msg) {
+        log.error("\n\n\n\n\n#############################################" +
+                "$$$$$$$$$$$$$$$$ CREATE SESSION $$$$$$$$$$$$$$$$$$$" +
+                "###############################################\n\n\n\n\n");
         RpcSessionCreationFuture future = new RpcSessionCreationFuture();
         pendingSessionMap.put(msg.getMsgUid(), future);
         listener.onMsg(msg);
