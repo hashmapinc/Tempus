@@ -644,12 +644,6 @@
                 <version>0.30</version>
             </dependency>
             <dependency>
-                <groupId>com.typesafe.akka</groupId>
-                <artifactId>akka-persistence-cassandra-launcher_${scala.version}</artifactId>
-                <version>0.52</version>
-                <scope>test</scope>
-            </dependency>
-            <dependency>
                 <groupId>org.eclipse.californium</groupId>
                 <artifactId>californium-core</artifactId>
                 <version>${californium.version}</version>

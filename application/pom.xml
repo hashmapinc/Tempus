@@ -187,11 +187,6 @@
             <artifactId>akka-persistence-cassandra_${scala.version}</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.typesafe.akka</groupId>
-            <artifactId>akka-persistence-cassandra-launcher_${scala.version}</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
         </dependency>
