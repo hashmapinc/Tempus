@@ -57,6 +57,7 @@ Contents
    security/index
    admin/index
    reference/index
+   development/index
 
 Indices and tables
 ==================
