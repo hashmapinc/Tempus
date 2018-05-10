@@ -17,18 +17,15 @@
 apiVersion: v1
 kind: Service
 metadata:
+  name: cassandra-headless
+  namespace: ns-tempus
   labels:
-    app: cassandra
-  name: cassandra
+    app: cassandra-headless
 spec:
-#  clusterIP: None
   ports:
-    - name: cql
-      port: 9042
-      targetPort: 9043
-    - name: thrift
-      port: 9160
-      targetPort: 9160
+    - port: 9042
+      name: cql
+  clusterIP: None
   selector:
     app: cassandra
 ---
@@ -36,32 +33,102 @@ apiVersion: "apps/v1beta1"
 kind: StatefulSet
 metadata:
   name: cassandra
+  namespace: ns-tempus
 spec:
-  serviceName: cassandra
-  replicas: 1
+  serviceName: cassandra-headless
+  replicas: 2
   template:
     metadata:
       labels:
         app: cassandra
     spec:
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                  - key: "app"
+                    operator: In
+                    values:
+                    - cassandra-headless
+              topologyKey: "kubernetes.io/hostname"
       containers:
       - name: cassandra
-        image: cassandra:3.9
+        image: hashmapinc/cassandra:dev
         imagePullPolicy: Always
         ports:
-        - containerPort: 9160
-          name: thrift
+        - containerPort: 7000
+          name: intra-node
+        - containerPort: 7001
+          name: tls-intra-node
+        - containerPort: 7199
+          name: jmx
         - containerPort: 9042
           name: cql
+        - containerPort: 9160
+          name: thrift
+        securityContext:
+          capabilities:
+            add:
+              - IPC_LOCK
+        lifecycle:
+          preStop:
+            exec:
+              command: ["/bin/sh", "-c", "PID=$(pidof java) && kill $PID && while ps -p $PID > /dev/null; do sleep 1; done"]
+        env:
+          - name: MAX_HEAP_SIZE
+            value: 2048M
+          - name: HEAP_NEWSIZE
+            value: 100M
+          - name: CASSANDRA_SEEDS
+            value: "cassandra-0.cassandra-headless.ns-tempus.svc.cluster.local"
+          - name: CASSANDRA_CLUSTER_NAME
+            value: "tempus-Cluster"
+          - name: CASSANDRA_DC
+            value: "DC1-tempus-Cluster"
+          - name: CASSANDRA_RACK
+            value: "Rack-tempus-Cluster"
+          - name: CASSANDRA_AUTO_BOOTSTRAP
+            value: "false"
+          - name: POD_IP
+            valueFrom:
+              fieldRef:
+                fieldPath: status.podIP
+          - name: POD_NAMESPACE
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.namespace
+        readinessProbe:
+          exec:
+            command:
+            - /bin/bash
+            - -c
+            - /ready-probe.sh
+          initialDelaySeconds: 15
+          timeoutSeconds: 5
         volumeMounts:
         - name: cassandra-data
-          mountPath: /var/lib/cassandra
+          mountPath: /var/lib/cassandra/data
+        - name: cassandra-commitlog
+          mountPath: /var/lib/cassandra/commitlog
   volumeClaimTemplates:
   - metadata:
       name: cassandra-data
+      namespace: ns-tempus
+      annotations:
+        volume.beta.kubernetes.io/storage-class: tempus
     spec:
       accessModes: [ "ReadWriteOnce" ]
       resources:
         requests:
-          storage: 1Gi
-      storageClassName: gold
+          storage: 3Gi
+  - metadata:
+      name: cassandra-commitlog
+      namespace: ns-tempus
+      annotations:
+        volume.beta.kubernetes.io/storage-class: tempus
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: 2Gi
