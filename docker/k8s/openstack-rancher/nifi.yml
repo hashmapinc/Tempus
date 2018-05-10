@@ -18,6 +18,7 @@ kind: Service
 apiVersion: v1
 metadata:
   name: nifi
+  namespace: ns-tempus
   labels:
     app: nifi
 spec:
@@ -38,6 +39,7 @@ apiVersion: "apps/v1beta1"
 kind: StatefulSet
 metadata:
   name: nifi
+  namespace: ns-tempus
 spec:
   selector:
     matchLabels:
@@ -74,41 +76,41 @@ spec:
   volumeClaimTemplates:
   - metadata:
       name: nifi-flowfile-repo-dir 
+      namespace: ns-tempus
     spec:
       accessModes: [ "ReadWriteOnce" ]
       resources:
         requests:
           storage: 1Gi
-      storageClassName: gold
   - metadata:
       name: nifi-db-repo-dir
+      namespace: ns-tempus
     spec:
       accessModes: [ "ReadWriteOnce" ]
       resources:
         requests:
           storage: 1Gi
-      storageClassName: gold
   - metadata:
       name: nifi-content-repo-dir
+      namespace: ns-tempus
     spec:
       accessModes: [ "ReadWriteOnce" ]
       resources:
         requests:
           storage: 1Gi
-      storageClassName: gold
   - metadata:
       name: nifi-provenance-repo-dir
+      namespace: ns-tempus
     spec:
       accessModes: [ "ReadWriteOnce" ]
       resources:
         requests:
           storage: 1Gi
-      storageClassName: gold
   - metadata:
       name: nifi-log-dir
+      namespace: ns-tempus
     spec:
       accessModes: [ "ReadWriteOnce" ]
       resources:
         requests:
           storage: 1Gi
-      storageClassName: gold
