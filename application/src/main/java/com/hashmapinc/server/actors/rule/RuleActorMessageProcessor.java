@@ -226,10 +226,11 @@ class RuleActorMessageProcessor extends ComponentMsgProcessor<RuleId> {
         if (error != null) {
             ctx = ctx.withError(error);
         }
-        if (ctx.isFailure()) {
+        /*if (ctx.isFailure()) {
             logger.debug("[{}][{}] Forwarding processing chain to device actor due to failure.", ruleMd.getId(), ctx.getInMsg().getDeviceId());
             ctx.getDeviceActor().tell(new RulesProcessedMsg(ctx), ActorRef.noSender());
-        } else if (!ctx.hasNext()) {
+        } else */
+        if (!ctx.hasNext()) {
             logger.debug("[{}][{}] Forwarding processing chain to device actor due to end of chain.", ruleMd.getId(), ctx.getInMsg().getDeviceId());
             ctx.getDeviceActor().tell(new RulesProcessedMsg(ctx), ActorRef.noSender());
         } else {

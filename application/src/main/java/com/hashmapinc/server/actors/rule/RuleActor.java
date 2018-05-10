@@ -19,6 +19,7 @@ import akka.japi.JavaPartialFunction;
 import akka.persistence.AtLeastOnceDelivery.AtLeastOnceDeliverySnapshot;
 import akka.persistence.*;
 import com.hashmapinc.server.actors.ActorSystemContext;
+import com.hashmapinc.server.actors.plugin.RuleToPluginMsgWrapper;
 import com.hashmapinc.server.actors.service.ComponentActor;
 import com.hashmapinc.server.actors.service.ContextBasedCreator;
 import com.hashmapinc.server.actors.stats.StatsPersistTick;
@@ -102,8 +103,8 @@ public class RuleActor extends ComponentActor<RuleId, RuleActorMessageProcessor>
                     logger.warning("Got snapshot [{}] while recovering.", ((SnapshotOffer) msg).metadata());
                     AtLeastOnceDeliverySnapshot snapshot = (AtLeastOnceDeliverySnapshot) ((SnapshotOffer) msg).snapshot();
                     List<UUID> unconfirmed = snapshot.getUnconfirmedDeliveries().stream()
-                            .filter(u -> u.message() instanceof RuleToPluginMsg)
-                            .map(u -> ((RuleToPluginMsg) u.message()).getUid())
+                            .filter(u -> u.message() instanceof RuleToPluginMsgWrapper)
+                            .map(u -> ((RuleToPluginMsgWrapper) u.message()).getMsg().getUid())
                             .collect(Collectors.toList());
                     processor.setUnconfirmed(unconfirmed);
                     setDeliverySnapshot(snapshot);

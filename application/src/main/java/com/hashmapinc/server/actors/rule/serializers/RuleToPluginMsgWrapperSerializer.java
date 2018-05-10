@@ -15,13 +15,10 @@
  */
 package com.hashmapinc.server.actors.rule.serializers;
 
-import lombok.extern.slf4j.Slf4j;
-
-@Slf4j
-public class PluginToRuleMsgSerializer extends AbstractMsgSerializer{
+public class RuleToPluginMsgWrapperSerializer extends AbstractMsgSerializer {
 
     @Override
     public int identifier() {
-        return 52;
+        return 53;
     }
 }
