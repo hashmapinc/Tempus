@@ -55,7 +55,6 @@ public class AggregatePartitionsFunction implements com.google.common.base.Funct
         this.ds = ds;
     }
 
-    @Nullable
     @Override
     public Optional<DsKvEntry> apply(@Nullable List<ResultSet> rsList) {
         try {
