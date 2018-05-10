@@ -136,7 +136,10 @@ public class CassandraBaseDepthSeriesDao extends CassandraAbstractAsyncDao imple
                 @Nullable
                 @Override
                 public List<DsKvEntry> apply(@Nullable List<Optional<DsKvEntry>> input) {
-                    return input.stream().filter(v -> v.isPresent()).map(v -> v.get()).collect(Collectors.toList());
+                    if(input != null)
+                        return input.stream().filter(v -> v.isPresent()).map(v -> v.get()).collect(Collectors.toList());
+                    else
+                        return Collections.emptyList();
                 }
             }, readResultsProcessingExecutor);
         }
@@ -189,7 +192,7 @@ public class CassandraBaseDepthSeriesDao extends CassandraAbstractAsyncDao imple
             Futures.addCallback(executeAsyncRead(stmt), new FutureCallback<ResultSet>() {
                 @Override
                 public void onSuccess(@Nullable ResultSet result) {
-                    cursor.addData(convertResultToDsKvEntryList(result.all()));
+                    cursor.addData(convertResultToDsKvEntryList(result == null ? Collections.emptyList() : result.all()));
                     findAllAsyncSequentiallyWithLimit(cursor, resultFuture);
                 }
 
