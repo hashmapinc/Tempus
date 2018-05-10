@@ -40,15 +40,14 @@ public class MetaDataAggregator {
     private final int limit = 10000;
 
     public MetaDataAggregator(PluginContext ctx, long aggregationPeriod, EntityId entityId){
-        log.info("Aggregation Period " + aggregationPeriod);
         this.aggregationPeriod = aggregationPeriod;
         this.ctx = ctx;
         this.entityId = entityId;
     }
 
-    public void aggregateMetaData(Long endTs, List<KvEntry> kvEntries){
+    public void aggregateMetaData(Long endTs, List<TsKvEntry> tsKvEntries){
         Set<String> keys = new HashSet<>();
-        for (KvEntry entry: kvEntries){
+        for (TsKvEntry entry: tsKvEntries){
             keys.add(entry.getKey());
         }
         List<TsKvQuery> queries = keys.stream().map(key -> new BaseTsKvQuery(key,endTs - aggregationPeriod, endTs, aggregationPeriod, limit, Aggregation.NONE)).collect(Collectors.toList());
@@ -156,7 +155,7 @@ public class MetaDataAggregator {
         ctx.saveTagMetaData(entityId, tagMetaData, new PluginCallback<Void>() {
             @Override
             public void onSuccess(PluginContext ctx, Void value) {
-                log.info("Saved data to TagMetaData");
+                log.debug("Saved data to TagMetaData");
             }
 
             @Override

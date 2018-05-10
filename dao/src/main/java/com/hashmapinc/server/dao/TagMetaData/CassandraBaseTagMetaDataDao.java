@@ -87,7 +87,7 @@ public class CassandraBaseTagMetaDataDao  extends CassandraAbstractAsyncDao impl
     }
     @Override
     public ListenableFuture<Void> save(TagMetaData tagMetaData) {
-        log.info("Saving tag MetaData [{}]", tagMetaData );
+        log.debug("Saving tag MetaData [{}]", tagMetaData );
         BoundStatement stmt = getLatestStmt().bind()
                 .setString(0, tagMetaData.getEntityType().name())
                 .setUUID(1, UUID.fromString(tagMetaData.getEntityId()))
@@ -99,13 +99,11 @@ public class CassandraBaseTagMetaDataDao  extends CassandraAbstractAsyncDao impl
                 .setDouble(7, tagMetaData.getMeanFrequency())
                 .setDouble(8, tagMetaData.getMedianFrequency())
                 .setString(9, tagMetaData.getSource());
-        log.info("Statement created [{}] ", stmt );
         return getFuture(executeAsyncWrite(stmt), rs -> null);
     }
 
     private PreparedStatement getLatestStmt() {
         if (latestInsertStmts == null) {
-            log.info("latestInsertStmts is null");
             String strStatement = INSERT_INTO + ModelConstants.TAG_METADATA_COLUMN_FAMILY_NAME +
                     "(" + ModelConstants.ENTITY_TYPE_COLUMN +
                     "," + ModelConstants.ENTITY_ID_COLUMN +
@@ -118,12 +116,10 @@ public class CassandraBaseTagMetaDataDao  extends CassandraAbstractAsyncDao impl
                     "," + TAG_METADATA_MEDIAN_FREQUENCY +
                     "," + TAG_METADATA_SOURCE + ")" +
                     " VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-            log.info("strStatement " + strStatement);
             Session session = getSession();
             latestInsertStmts = session.prepare(strStatement);
 
         }
-        log.info("Latest Insert Statemet " + latestInsertStmts);
         return latestInsertStmts;
     }
 

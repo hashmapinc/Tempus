@@ -116,9 +116,8 @@ public class TelemetryRuleMsgHandler extends DefaultRuleMsgHandler {
                             subscriptionManager.onLocalSubscriptionUpdate(ctx, msg.getDeviceId(), SubscriptionType.TIMESERIES, s ->
                                     prepareSubscriptionUpdate(request, s)
                             );
-                            /*metaDataAggregator = new MetaDataAggregator(ctx, msg.getQualityTimeWindow(), msg.getDeviceId());
-                            log.info("\n\n\n\nstarting aggregation .... \n\n\n\n");
-                            metaDataAggregator.aggregateMetaData(entry.getKey(), tsKvEntries);*/
+                            metaDataAggregator = new MetaDataAggregator(ctx, msg.getQualityTimeWindow(), msg.getDeviceId());
+                            metaDataAggregator.aggregateMetaData(entry.getKey(), tsKvEntries);
                         }
 
                         @Override
@@ -152,9 +151,6 @@ public class TelemetryRuleMsgHandler extends DefaultRuleMsgHandler {
     @Override
     public void handleDepthTelemetryUploadRequest(PluginContext ctx, TenantId tenantId, RuleId ruleId, DepthTelemetryUploadRequestRuleToPluginMsg msg) {
         DepthTelemetryUploadRequest request = msg.getPayload();
-        log.debug("\n\n request data post : " + request.getData().toString() + "\n\n");
-        /*if(true)
-            return;*/
         List<DsKvEntry> dsKvEntries = new ArrayList<>();
         for (Map.Entry<Double, List<KvEntry>> entry : request.getData().entrySet()) {
             for (KvEntry kv : entry.getValue()) {
