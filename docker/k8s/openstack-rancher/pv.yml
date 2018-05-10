@@ -1,0 +1,223 @@
+kind: PersistentVolume
+apiVersion: v1
+metadata:
+  name: cassandra-data-0
+  namespace: ns-tempus
+  labels:
+    type: local
+spec:
+  storageClassName: tempus
+  capacity:
+    storage: 3Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: "/mnt/data"
+---
+kind: PersistentVolume
+apiVersion: v1
+metadata:
+  name: cassandra-commitlog-0
+  namespace: ns-tempus
+  labels:
+    type: local
+spec:
+  storageClassName: tempus
+  capacity:
+    storage: 2Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: "/mnt/data"
+---
+kind: PersistentVolume
+apiVersion: v1
+metadata:
+  name: cassandra-data-1
+  namespace: ns-tempus
+  labels:
+    type: local
+spec:
+  storageClassName: tempus
+  capacity:
+    storage: 3Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: "/mnt/data"
+---
+kind: PersistentVolume
+apiVersion: v1
+metadata:
+  name: cassandra-commitlog-1
+  namespace: ns-tempus
+  labels:
+    type: local
+spec:
+  storageClassName: tempus
+  capacity:
+    storage: 2Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: "/mnt/data"
+---
+kind: PersistentVolume
+apiVersion: v1
+metadata:
+  name: cassandra-data-2
+  namespace: ns-tempus
+  labels:
+    type: local
+spec:
+  storageClassName: tempus
+  capacity:
+    storage: 3Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: "/mnt/data"
+---
+kind: PersistentVolume
+apiVersion: v1
+metadata:
+  name: cassandra-commitlog-2
+  namespace: ns-tempus
+  labels:
+    type: local
+spec:
+  storageClassName: tempus
+  capacity:
+    storage: 2Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: "/mnt/data"
+---
+kind: PersistentVolume
+apiVersion: v1
+metadata:
+  name: nifi-0
+  namespace: ns-tempus
+  labels:
+    type: local
+spec:
+  storageClassName: tempus
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: "/mnt/data"
+---
+kind: PersistentVolume
+apiVersion: v1
+metadata:
+  name: nifi-1
+  namespace: ns-tempus
+  labels:
+    type: local
+spec:
+  storageClassName: tempus
+  capacity:
+    storage: 10Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: "/mnt/data"
+---
+kind: PersistentVolume
+apiVersion: v1
+metadata:
+  name: nifi-2
+  namespace: ns-tempus
+  labels:
+    type: local
+spec:
+  storageClassName: tempus
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: "/mnt/data"
+---
+kind: PersistentVolume
+apiVersion: v1
+metadata:
+  name: nifi-3
+  namespace: ns-tempus
+  labels:
+    type: local
+spec:
+  storageClassName: tempus
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: "/mnt/data"
+---
+kind: PersistentVolume
+apiVersion: v1
+metadata:
+  name: nifi-4
+  namespace: ns-tempus
+  labels:
+    type: local
+spec:
+  storageClassName: tempus
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: "/mnt/data"
+---
+kind: PersistentVolume
+apiVersion: v1
+metadata:
+  name: zk-datadir-zk-2
+  namespace: ns-tempus
+  labels:
+    type: local
+spec:
+  storageClassName: tempus
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: "/mnt/data"
+---
+kind: PersistentVolume
+apiVersion: v1
+metadata:
+  name: zk-datadir-zk-0
+  namespace: ns-tempus
+  labels:
+    type: local
+spec:
+  storageClassName: tempus
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: "/mnt/data"
+---
+kind: PersistentVolume
+apiVersion: v1
+metadata:
+  name: zk-datadir-zk-1
+  namespace: ns-tempus
+  labels:
+    type: local
+spec:
+  storageClassName: tempus
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: "/mnt/data"
