@@ -15,6 +15,8 @@
  */
 package com.hashmapinc.server.controller;
 
+import com.hashmapinc.server.common.data.EntityType;
+import com.hashmapinc.server.common.data.audit.ActionType;
 import com.hashmapinc.server.common.data.computation.ComputationJob;
 import com.hashmapinc.server.common.data.id.ComputationId;
 import com.hashmapinc.server.common.data.page.TextPageLink;
@@ -54,6 +56,8 @@ import static com.hashmapinc.server.dao.service.Validator.validateId;
 @RequestMapping("/api")
 public class ComputationsController extends BaseController {
 
+    public static final String COMPUTATION_ID = "computationId";
+
     @Value("${spark.jar_path}")
     private String uploadPath;
 
@@ -70,6 +74,8 @@ public class ComputationsController extends BaseController {
     @RequestMapping(value = "/computations/upload", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     public Computations upload(@RequestParam("file") MultipartFile file) throws TempusException {
+
+        Computations computation = null;
         try {
             List<String> filesAtDestination = Files.list(Paths.get(this.uploadPath)).map(f -> f.getFileName().toString()).collect(Collectors.toList());
             if(filesAtDestination.contains(file.getOriginalFilename())) {
@@ -80,9 +86,17 @@ public class ComputationsController extends BaseController {
             try (InputStream input = file.getInputStream()) {
                 Files.copy(input, Paths.get(destinationFile.toURI()), StandardCopyOption.REPLACE_EXISTING);
             }
+
             TenantId tenantId = getCurrentUser().getTenantId();
-            return computationDiscoveryService.onJarUpload(path, tenantId);
+            computation = computationDiscoveryService.onJarUpload(path, tenantId);
+            checkNotNull(computation);
+
+            logEntityAction(computation.getId(), computation, getCurrentUser().getCustomerId(),
+                    ActionType.ADDED,null);
+            return computation;
         } catch (Exception e) {
+            logEntityAction(emptyId(EntityType.COMPUTATION), computation, null,
+                    ActionType.ADDED, e);
             throw handleException(e);
         }
     }
@@ -90,16 +104,31 @@ public class ComputationsController extends BaseController {
     @PreAuthorize("hasAuthority('TENANT_ADMIN')")
     @RequestMapping(value = "/computations/{computationId}", method = RequestMethod.DELETE)
     @ResponseBody
-    public void delete(@PathVariable("computationId") String strComputationId) throws TempusException, IOException {
-        ComputationId computationId = new ComputationId(toUUID(strComputationId));
-        Computations computation = checkComputation(computationsService.findById(computationId));
-        List<ComputationJob> computationJobs = checkNotNull(computationJobService.findByComputationId(computation.getId()));
-        for (ComputationJob computationJob: computationJobs) {
-            computationJobService.deleteComputationJobById(computationJob.getId());
-            actorService.onComputationJobStateChange(computationJob.getTenantId(), computationJob.getComputationId(), computationJob.getId(), ComponentLifecycleEvent.DELETED);
+    public void delete(@PathVariable(COMPUTATION_ID) String strComputationId) throws TempusException, IOException {
+
+        checkParameter(COMPUTATION_ID, strComputationId);
+        try
+        {
+            ComputationId computationId = new ComputationId(toUUID(strComputationId));
+            Computations computation = checkComputation(computationsService.findById(computationId));
+            List<ComputationJob> computationJobs = checkNotNull(computationJobService.findByComputationId(computation.getId()));
+            for (ComputationJob computationJob: computationJobs) {
+                computationJobService.deleteComputationJobById(computationJob.getId());
+                actorService.onComputationJobStateChange(computationJob.getTenantId(), computationJob.getComputationId(), computationJob.getId(), ComponentLifecycleEvent.DELETED);
+            }
+            computationsService.deleteById(computationId);
+            Files.deleteIfExists(Paths.get(computation.getJarPath()));
+
+            logEntityAction(computationId,computation,getCurrentUser().getCustomerId(),
+                    ActionType.DELETED, null, strComputationId);
         }
-        computationsService.deleteById(computationId);
-        Files.deleteIfExists(Paths.get(computation.getJarPath()));
+        catch (Exception e) {
+            logEntityAction(emptyId(EntityType.COMPUTATION),
+                    null,
+                    null,
+                    ActionType.DELETED, e, strComputationId);
+            throw handleException(e);
+        }
     }
 
     @PreAuthorize("hasAuthority('TENANT_ADMIN')")
@@ -138,7 +167,7 @@ public class ComputationsController extends BaseController {
     @PreAuthorize("hasAnyAuthority('SYS_ADMIN', 'TENANT_ADMIN')")
     @RequestMapping(value = "/computations/{computationId}", method = RequestMethod.GET)
     @ResponseBody
-    public Computations getComputation(@PathVariable("computationId") String strComputationId) throws TempusException {
+    public Computations getComputation(@PathVariable(COMPUTATION_ID) String strComputationId) throws TempusException {
 
         try {
             ComputationId computationId = new ComputationId(toUUID(strComputationId));
