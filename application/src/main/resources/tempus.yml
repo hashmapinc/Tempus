@@ -347,6 +347,7 @@ audit_log:
       "rule": "${AUDIT_LOG_MASK_RULE:W}"
       "plugin": "${AUDIT_LOG_MASK_PLUGIN:W}"
       "computation": "${AUDIT_LOG_MASK_PLUGIN:W}"
+      "computation_job": "${AUDIT_LOG_MASK_PLUGIN:W}"
   sink:
     # Type of external sink. possible options: none, elasticsearch
     type: "${AUDIT_LOG_SINK_TYPE:none}"
