@@ -63,12 +63,14 @@ public class ComputationJobController extends BaseController{
                     computationJob.getId(), created ? ComponentLifecycleEvent.CREATED : ComponentLifecycleEvent.UPDATED);
 
             logEntityAction(computationJob.getId(), computationJob,
-                    getCurrentUser().getCustomerId(),ActionType.ADDED, null);
+                    getCurrentUser().getCustomerId(),
+                    source.getId() == null ? ActionType.ADDED : ActionType.UPDATED, null);
 
             return computationJob;
         } catch (Exception e) {
             logEntityAction(emptyId(EntityType.COMPUTATION_JOB), computationJob,
-                    null, ActionType.ADDED, e);
+                    null,
+                    source.getId() == null ? ActionType.ADDED : ActionType.UPDATED, e);
             throw handleException(e);
         }
     }
@@ -89,7 +91,7 @@ public class ComputationJobController extends BaseController{
 
         } catch (Exception e) {
             logEntityAction(emptyId(EntityType.COMPUTATION_JOB),null,
-                    null, ActionType.DELETED, e);
+                    null, ActionType.DELETED, e, strComputationJobId);
             throw handleException(e);
         }
     }
@@ -134,7 +136,7 @@ public class ComputationJobController extends BaseController{
         } catch (Exception e) {
 
             logEntityAction(emptyId(EntityType.COMPUTATION_JOB),null,
-                    null, ActionType.ACTIVATED, e);
+                    null, ActionType.ACTIVATED, e, strComputationId);
 
             throw handleException(e);
         }
@@ -163,7 +165,7 @@ public class ComputationJobController extends BaseController{
         } catch (Exception e) {
 
             logEntityAction(emptyId(EntityType.COMPUTATION_JOB),null,
-                    null, ActionType.SUSPENDED, e);
+                    null, ActionType.SUSPENDED, e, strComputationJobId);
 
             throw handleException(e);
         }
