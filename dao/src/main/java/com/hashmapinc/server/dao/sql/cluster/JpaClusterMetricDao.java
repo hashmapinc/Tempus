@@ -48,8 +48,8 @@ public class JpaClusterMetricDao extends JpaAbstractDao<ClusterMetricEntity, Clu
     }
 
     @Override
-    public Optional<ClusterMetric> findClusterMetricByNodeIpAndNodePort(String nodeIp, int nodePort) {
-        log.error("In findClusterMetricByNodeIpAndNodePort nodeIp [{}], nodePort [{}]", nodeIp, nodePort);
+    public Optional<ClusterMetric>
+    findClusterMetricByNodeIpAndNodePort(String nodeIp, int nodePort) {
         ClusterMetric clusterMetric = DaoUtil.getData(clusterMetricRepository.findClusterMetricByNodeIpAndNodePort(nodeIp, nodePort));
         return Optional.of(clusterMetric);
     }
