@@ -93,7 +93,7 @@ public abstract class AbstractMqttServerSideRpcIntegrationTest extends AbstractC
         MqttAsyncClient client = new MqttAsyncClient(MQTT_URL, clientId);
 
         MqttConnectOptions options = new MqttConnectOptions();
-        options.setUserName(accessToken);
+        options.setPassword(accessToken.toCharArray());
         client.connect(options).waitForCompletion();
         client.subscribe("v1/devices/me/rpc/request/+", 1);
         client.setCallback(new TestMqttCallback(client));
@@ -150,7 +150,7 @@ public abstract class AbstractMqttServerSideRpcIntegrationTest extends AbstractC
         MqttAsyncClient client = new MqttAsyncClient(MQTT_URL, clientId);
 
         MqttConnectOptions options = new MqttConnectOptions();
-        options.setUserName(accessToken);
+        options.setPassword(accessToken.toCharArray());
         client.connect(options).waitForCompletion();
         client.subscribe("v1/devices/me/rpc/request/+", 1);
         client.setCallback(new TestMqttCallback(client));
