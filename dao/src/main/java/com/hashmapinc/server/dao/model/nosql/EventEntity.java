@@ -33,9 +33,7 @@ import java.util.UUID;
 
 import static com.hashmapinc.server.dao.model.ModelConstants.*;
 
-/**
- * @author Andrew Shvayka
- */
+
 @Data
 @NoArgsConstructor
 @Table(name = EVENT_COLUMN_FAMILY_NAME)

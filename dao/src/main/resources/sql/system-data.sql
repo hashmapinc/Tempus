@@ -26,12 +26,12 @@ VALUES ( '1e7461261441950a91992ebcb67fe33', '1e746125a797660a91992ebcb67fe33', t
          '$2a$10$5JTB8/hxWc9WAy62nCGSxeefl3KWmipA9nFpVdDa0/xfIseeBB4Bu' );
 
 /** System settings **/
-INSERT INTO admin_settings ( id, key, json_value )
+INSERT INTO user_settings ( id, key, json_value, user_id )
 VALUES ( '1e746126a2266e4a91992ebcb67fe33', 'general', '{
 	"baseUrl": "http://localhost:8080"
-}' );
+}',  '1e746125a797660a91992ebcb67fe33' );
 
-INSERT INTO admin_settings ( id, key, json_value )
+INSERT INTO user_settings ( id, key, json_value, user_id )
 VALUES ( '1e746126eaaefa6a91992ebcb67fe33', 'mail', '{
 	"mailFrom": "tempus <sysadmin@localhost.localdomain>",
 	"smtpProtocol": "smtp",
@@ -41,7 +41,7 @@ VALUES ( '1e746126eaaefa6a91992ebcb67fe33', 'mail', '{
 	"enableTls": "false",
 	"username": "",
 	"password": ""
-}' );
+}', '1e746125a797660a91992ebcb67fe33' );
 
 /** System plugins and rules **/
 INSERT INTO plugin ( id, tenant_id, name, state, search_text, api_token, plugin_class, public_access, configuration )

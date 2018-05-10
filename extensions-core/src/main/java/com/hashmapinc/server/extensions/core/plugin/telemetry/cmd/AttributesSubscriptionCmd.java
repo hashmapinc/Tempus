@@ -18,9 +18,7 @@ package com.hashmapinc.server.extensions.core.plugin.telemetry.cmd;
 import lombok.NoArgsConstructor;
 import com.hashmapinc.server.extensions.core.plugin.telemetry.sub.SubscriptionType;
 
-/**
- * @author Andrew Shvayka
- */
+
 @NoArgsConstructor
 public class AttributesSubscriptionCmd extends SubscriptionCmd {
 

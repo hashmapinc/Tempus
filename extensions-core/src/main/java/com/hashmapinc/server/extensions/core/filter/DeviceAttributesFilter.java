@@ -26,9 +26,7 @@ import com.hashmapinc.server.common.msg.device.ToDeviceActorMsg;
 import javax.script.Bindings;
 import javax.script.ScriptException;
 
-/**
- * @author Andrew Shvayka
- */
+
 @Filter(name = "Device Attributes Filter", descriptor = "JsFilterDescriptor.json", configuration = JsFilterConfiguration.class)
 @Slf4j
 public class DeviceAttributesFilter extends BasicJsFilter {

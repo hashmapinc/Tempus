@@ -38,9 +38,7 @@ import com.hashmapinc.server.dao.service.Validator;
 import java.util.List;
 import java.util.Optional;
 
-/**
- * @author Andrew Shvayka
- */
+
 @Service
 @Slf4j
 public class BaseComponentDescriptorService implements ComponentDescriptorService {

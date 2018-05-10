@@ -25,10 +25,7 @@ import java.util.Map;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 
-/**
- * @author Vitaliy Paromskiy
- * @version 1.0
- */
+
 public class IntervalRegistryLoggerTest {
 
     private IntervalRegistryLogger logger;

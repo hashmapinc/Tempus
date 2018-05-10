@@ -25,9 +25,7 @@ import com.hashmapinc.server.common.data.id.*;
 
 import java.util.Optional;
 
-/**
- * @author Andrew Shvayka
- */
+
 @ToString
 public class ComponentLifecycleMsg implements TenantAwareMsg, ToAllNodesMsg {
     @Getter

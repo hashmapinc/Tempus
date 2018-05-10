@@ -34,9 +34,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
-/**
- * @author Valerii Sosliuk
- */
+
 @Component
 @SqlDao
 public class JpaUserDao extends JpaAbstractSearchTextDao<UserEntity, User> implements UserDao {

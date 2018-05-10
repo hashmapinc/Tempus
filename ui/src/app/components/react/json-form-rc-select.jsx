@@ -16,10 +16,10 @@
 import 'rc-select/assets/index.css';
 
 import React from 'react';
-import tempusBaseComponent from './json-form-base-component.jsx';
+import TempusBaseComponent from './json-form-base-component.jsx';
 import Select, {Option} from 'rc-select';
 
-class tempusRcSelect extends React.Component {
+class TempusRcSelect extends React.Component {
 
     constructor(props) {
         super(props);
@@ -120,4 +120,4 @@ class tempusRcSelect extends React.Component {
     }
 }
 
-export default tempusBaseComponent(tempusRcSelect);
+export default TempusBaseComponent(TempusRcSelect);

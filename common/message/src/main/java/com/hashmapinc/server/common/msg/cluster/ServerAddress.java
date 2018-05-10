@@ -20,9 +20,7 @@ import lombok.EqualsAndHashCode;
 
 import java.io.Serializable;
 
-/**
- * @author Andrew Shvayka
- */
+
 @Data
 @EqualsAndHashCode
 public class ServerAddress implements Comparable<ServerAddress>, Serializable {

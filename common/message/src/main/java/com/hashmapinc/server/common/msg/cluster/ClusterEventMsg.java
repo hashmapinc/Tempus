@@ -17,9 +17,7 @@ package com.hashmapinc.server.common.msg.cluster;
 
 import lombok.Data;
 
-/**
- * @author Andrew Shvayka
- */
+
 @Data
 public final class ClusterEventMsg {
 

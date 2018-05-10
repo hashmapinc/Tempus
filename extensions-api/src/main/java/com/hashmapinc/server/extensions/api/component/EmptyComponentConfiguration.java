@@ -15,8 +15,6 @@
  */
 package com.hashmapinc.server.extensions.api.component;
 
-/**
- * @author Andrew Shvayka
- */
+
 public class EmptyComponentConfiguration {
 }

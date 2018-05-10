@@ -24,9 +24,7 @@ import com.hashmapinc.server.common.data.kv.DsKvQuery;
 import java.util.Collection;
 import java.util.List;
 
-/**
- * @author Himanshu Mishra
- */
+
 public interface DepthSeriesService {
 
     ListenableFuture<List<DsKvEntry>> findAll(EntityId entityId, List<DsKvQuery> queries);

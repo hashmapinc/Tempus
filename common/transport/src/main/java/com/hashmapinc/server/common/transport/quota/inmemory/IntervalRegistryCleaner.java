@@ -23,10 +23,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-/**
- * @author Vitaliy Paromskiy
- * @version 1.0
- */
+
 @Component
 @Slf4j
 public class IntervalRegistryCleaner {

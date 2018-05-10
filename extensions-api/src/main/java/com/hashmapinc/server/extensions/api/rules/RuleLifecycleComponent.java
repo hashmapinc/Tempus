@@ -15,9 +15,7 @@
  */
 package com.hashmapinc.server.extensions.api.rules;
 
-/**
- * @author Andrew Shvayka
- */
+
 public interface RuleLifecycleComponent {
 
     void resume();

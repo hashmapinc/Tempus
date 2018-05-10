@@ -25,9 +25,7 @@ import com.hashmapinc.server.extensions.api.plugins.msg.RuleToPluginMsg;
 
 import java.util.UUID;
 
-/**
- * @author Andrew Shvayka
- */
+
 public class RabbitMqActionMsg extends AbstractRuleToPluginMsg<RabbitMqActionPayload> {
 
     public RabbitMqActionMsg(TenantId tenantId, CustomerId customerId, DeviceId deviceId, RabbitMqActionPayload payload) {

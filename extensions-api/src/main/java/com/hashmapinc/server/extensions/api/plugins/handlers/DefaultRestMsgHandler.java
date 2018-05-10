@@ -24,9 +24,7 @@ import com.hashmapinc.server.extensions.api.plugins.rest.PluginRestMsg;
 
 import javax.servlet.ServletException;
 
-/**
- * @author Andrew Shvayka
- */
+
 @Slf4j
 public class DefaultRestMsgHandler implements RestMsgHandler {
 

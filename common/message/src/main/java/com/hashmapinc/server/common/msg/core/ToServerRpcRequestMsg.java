@@ -20,9 +20,7 @@ import com.hashmapinc.server.common.msg.session.FromDeviceMsg;
 import com.hashmapinc.server.common.msg.session.MsgType;
 import lombok.Data;
 
-/**
- * @author Andrew Shvayka
- */
+
 @Data
 public class ToServerRpcRequestMsg implements FromDeviceMsg {
 

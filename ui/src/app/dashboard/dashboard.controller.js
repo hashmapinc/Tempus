@@ -56,7 +56,7 @@ export default function DashboardController(types, utils, dashboardUtils, widget
 
     vm.isToolbarOpened = false;
 
-    vm.tempusVersion = tempus_VERSION; //eslint-disable-line
+    vm.tempusVersion = TEMPUS_VERSION; //eslint-disable-line
 
     vm.currentDashboardId = $stateParams.dashboardId;
     if ($stateParams.customerId) {

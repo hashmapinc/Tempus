@@ -1,11 +1,11 @@
 VERSION=1.4.0
-PROJECT=tempus
+PROJECT=thingsboard
 APP=cassandra-setup
 
 build:
-	cp ../../application/target/tempus.deb .
+	cp ../../application/target/thingsboard.deb .
 	docker build --pull -t ${PROJECT}/${APP}:${VERSION} -t ${PROJECT}/${APP}:latest .
-	rm tempus.deb
+	rm thingsboard.deb
 
 push: build
 	docker push ${PROJECT}/${APP}:${VERSION}

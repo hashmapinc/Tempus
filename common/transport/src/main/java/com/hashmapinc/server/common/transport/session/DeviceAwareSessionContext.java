@@ -25,9 +25,7 @@ import com.hashmapinc.server.common.transport.auth.DeviceAuthResult;
 
 import java.util.Optional;
 
-/**
- * @author Andrew Shvayka
- */
+
 @Slf4j
 public abstract class DeviceAwareSessionContext implements SessionContext {
 

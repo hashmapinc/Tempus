@@ -25,10 +25,7 @@ import com.hashmapinc.server.common.transport.quota.inmemory.IntervalRegistryLog
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
-/**
- * @author Vitaliy Paromskiy
- * @version 1.0
- */
+
 @Service
 @Slf4j
 public class HostRequestsQuotaService implements QuotaService {

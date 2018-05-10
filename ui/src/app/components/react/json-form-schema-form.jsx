@@ -16,49 +16,49 @@
 import React from 'react';
 import { utils } from 'react-schema-form';
 
-import tempusArray from './json-form-array.jsx';
-import tempusJavaScript from './json-form-javascript.jsx';
-import tempusJson from './json-form-json.jsx';
-import tempusHtml from './json-form-html.jsx';
-import tempusCss from './json-form-css.jsx';
-import tempusColor from './json-form-color.jsx'
-import tempusRcSelect from './json-form-rc-select.jsx';
-import tempusNumber from './json-form-number.jsx';
-import tempusText from './json-form-text.jsx';
+import TempusArray from './json-form-array.jsx';
+import TempusJavaScript from './json-form-javascript.jsx';
+import TempusJson from './json-form-json.jsx';
+import TempusHtml from './json-form-html.jsx';
+import TempusCss from './json-form-css.jsx';
+import TempusColor from './json-form-color.jsx'
+import TempusRcSelect from './json-form-rc-select.jsx';
+import TempusNumber from './json-form-number.jsx';
+import TempusText from './json-form-text.jsx';
 import Select from 'react-schema-form/lib/Select';
 import Radios from 'react-schema-form/lib/Radios';
-import tempusDate from './json-form-date.jsx';
-import tempusImage from './json-form-image.jsx';
-import tempusCheckbox from './json-form-checkbox.jsx';
+import TempusDate from './json-form-date.jsx';
+import TempusImage from './json-form-image.jsx';
+import TempusCheckbox from './json-form-checkbox.jsx';
 import Help from 'react-schema-form/lib/Help';
-import tempusFieldSet from './json-form-fieldset.jsx';
+import TempusFieldSet from './json-form-fieldset.jsx';
 
 import _ from 'lodash';
 
-class tempusSchemaForm extends React.Component {
+class TempusSchemaForm extends React.Component {
 
     constructor(props) {
         super(props);
 
         this.mapper = {
-            'number': tempusNumber,
-            'text': tempusText,
-            'password': tempusText,
-            'textarea': tempusText,
+            'number': TempusNumber,
+            'text': TempusText,
+            'password': TempusText,
+            'textarea': TempusText,
             'select': Select,
             'radios': Radios,
-            'date': tempusDate,
-            'image': tempusImage,
-            'checkbox': tempusCheckbox,
+            'date': TempusDate,
+            'image': TempusImage,
+            'checkbox': TempusCheckbox,
             'help': Help,
-            'array': tempusArray,
-            'javascript': tempusJavaScript,
-            'json': tempusJson,
-            'html': tempusHtml,
-            'css': tempusCss,
-            'color': tempusColor,
-            'rc-select': tempusRcSelect,
-            'fieldset': tempusFieldSet
+            'array': TempusArray,
+            'javascript': TempusJavaScript,
+            'json': TempusJson,
+            'html': TempusHtml,
+            'css': TempusCss,
+            'color': TempusColor,
+            'rc-select': TempusRcSelect,
+            'fieldset': TempusFieldSet
         };
 
         this.onChange = this.onChange.bind(this);
@@ -102,4 +102,4 @@ class tempusSchemaForm extends React.Component {
         );
     }
 }
-export default tempusSchemaForm;
+export default TempusSchemaForm;

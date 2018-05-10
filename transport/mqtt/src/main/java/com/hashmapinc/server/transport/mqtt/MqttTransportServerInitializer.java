@@ -28,9 +28,7 @@ import com.hashmapinc.server.dao.device.DeviceService;
 import com.hashmapinc.server.dao.relation.RelationService;
 import com.hashmapinc.server.transport.mqtt.adaptors.MqttTransportAdaptor;
 
-/**
- * @author Andrew Shvayka
- */
+
 public class MqttTransportServerInitializer extends ChannelInitializer<SocketChannel> {
 
     private static final int MAX_PAYLOAD_SIZE = 64 * 1024 * 1024;

@@ -20,9 +20,7 @@ import com.hashmapinc.server.extensions.core.plugin.KeyValuePluginProperties;
 
 import java.util.List;
 
-/**
- * @author Andrew Shvayka
- */
+
 @Data
 public class MailPluginConfiguration {
     private String host;

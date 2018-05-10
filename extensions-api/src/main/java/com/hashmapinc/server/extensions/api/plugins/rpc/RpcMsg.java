@@ -20,9 +20,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 import com.hashmapinc.server.common.msg.cluster.ServerAddress;
 
-/**
- * @author Andrew Shvayka
- */
+
 @ToString
 @RequiredArgsConstructor
 public class RpcMsg {

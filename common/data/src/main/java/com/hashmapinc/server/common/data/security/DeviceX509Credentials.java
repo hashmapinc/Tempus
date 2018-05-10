@@ -15,9 +15,7 @@
  */
 package com.hashmapinc.server.common.data.security;
 
-/**
- * @author Valerii Sosliuk
- */
+
 public class DeviceX509Credentials implements DeviceCredentialsFilter {
 
     private final String sha3Hash;

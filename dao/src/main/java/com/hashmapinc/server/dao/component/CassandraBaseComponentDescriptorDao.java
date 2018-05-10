@@ -41,9 +41,7 @@ import java.util.UUID;
 import static com.datastax.driver.core.querybuilder.QueryBuilder.eq;
 import static com.datastax.driver.core.querybuilder.QueryBuilder.select;
 
-/**
- * @author Andrew Shvayka
- */
+
 @Component
 @Slf4j
 @NoSqlDao

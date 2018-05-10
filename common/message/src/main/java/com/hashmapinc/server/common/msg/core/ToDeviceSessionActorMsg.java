@@ -20,9 +20,7 @@ import com.hashmapinc.server.common.msg.session.ToDeviceMsg;
 
 import java.io.Serializable;
 
-/**
- * @author Andrew Shvayka
- */
+
 public interface ToDeviceSessionActorMsg extends SessionAwareMsg, Serializable {
 
     ToDeviceMsg getMsg();

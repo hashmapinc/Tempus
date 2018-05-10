@@ -34,9 +34,7 @@ import com.hashmapinc.server.extensions.core.utils.VelocityUtils;
 
 import java.util.Optional;
 
-/**
- * @author Andrew Shvayka
- */
+
 @Action(name = "Send Mail Action", descriptor = "SendMailActionDescriptor.json", configuration = SendMailActionConfiguration.class)
 @Slf4j
 public class SendMailAction extends SimpleRuleLifecycleComponent implements PluginAction<SendMailActionConfiguration> {

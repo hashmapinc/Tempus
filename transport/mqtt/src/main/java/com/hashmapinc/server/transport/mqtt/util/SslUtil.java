@@ -23,9 +23,7 @@ import java.io.IOException;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 
-/**
- * @author Valerii Sosliuk
- */
+
 @Slf4j
 public class SslUtil {
 

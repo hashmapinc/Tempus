@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 import React from 'react';
-import tempusBaseComponent from './json-form-base-component.jsx';
+import TempusBaseComponent from './json-form-base-component.jsx';
 import Checkbox from 'material-ui/Checkbox';
 
-class tempusCheckbox extends React.Component {
+class TempusCheckbox extends React.Component {
     render() {
         return (
             <Checkbox
@@ -33,4 +33,4 @@ class tempusCheckbox extends React.Component {
     }
 }
 
-export default tempusBaseComponent(tempusCheckbox);
+export default TempusBaseComponent(TempusCheckbox);

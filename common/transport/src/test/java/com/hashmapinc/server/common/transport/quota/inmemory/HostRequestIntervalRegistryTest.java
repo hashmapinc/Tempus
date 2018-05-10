@@ -20,10 +20,7 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 
-/**
- * @author Vitaliy Paromskiy
- * @version 1.0
- */
+
 public class HostRequestIntervalRegistryTest {
 
     private HostRequestIntervalRegistry registry;

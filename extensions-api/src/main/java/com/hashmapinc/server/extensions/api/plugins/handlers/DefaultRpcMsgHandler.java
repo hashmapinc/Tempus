@@ -18,9 +18,7 @@ package com.hashmapinc.server.extensions.api.plugins.handlers;
 import com.hashmapinc.server.extensions.api.plugins.PluginContext;
 import com.hashmapinc.server.extensions.api.plugins.rpc.RpcMsg;
 
-/**
- * @author Andrew Shvayka
- */
+
 public class DefaultRpcMsgHandler implements RpcMsgHandler {
 
     @Override

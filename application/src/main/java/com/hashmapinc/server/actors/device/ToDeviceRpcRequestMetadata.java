@@ -18,9 +18,7 @@ package com.hashmapinc.server.actors.device;
 import com.hashmapinc.server.extensions.api.plugins.msg.ToDeviceRpcRequestPluginMsg;
 import lombok.Data;
 
-/**
- * @author Andrew Shvayka
- */
+
 @Data
 public class ToDeviceRpcRequestMetadata {
     private final ToDeviceRpcRequestPluginMsg msg;

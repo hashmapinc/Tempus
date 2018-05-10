@@ -1,0 +1,192 @@
+#
+# Copyright © 2017-2018 Hashmap, Inc
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+kind: Service
+apiVersion: v1
+metadata:
+  name: tempus
+  labels:
+    app: tempus
+  annotations:
+    service.beta.kubernetes.io/aws-load-balancer-ssl-ports: "443"
+    service.beta.kubernetes.io/aws-load-balancer-ssl-cert: "arn:aws:acm:us-east-2:660239660726:certificate/ec088a03-f323-4523-bfde-e93c9b0815e6"
+    service.beta.kubernetes.io/aws-load-balancer-backend-protocol: "http"
+    service.beta.kubernetes.io/aws-load-balancer-connection-idle-timeout: '3600'
+spec:
+  type: LoadBalancer
+  selector:
+    app: tempus
+  ports:
+    - protocol: TCP
+      port: 443
+      targetPort: 8080
+      name: https
+    - protocol: TCP
+      port: 1883
+      targetPort: 1883
+      name: mqtt
+---
+apiVersion: policy/v1beta1
+kind: PodDisruptionBudget
+metadata:
+  name: tempus-budget
+spec:
+  selector:
+    matchLabels:
+      app: tempus
+  minAvailable: 1
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: tempus-config
+data:
+  zookeeper.enabled: "true"
+  zookeeper.url: "zk-cs:2181"
+  cassandra.url: "cassandra-headless:9042"
+  cassandra.host: "cassandra-headless"
+  cassandra.port: "9042"
+  database.type: "cassandra"
+  postgres.host: "postgres"
+  postgres.port: "5432"
+  schema.data: "false"
+  demo.data: "false"
+  mqtt.address: "0.0.0.0"
+  mqtt.port: "1883"
+  coap.address: "0.0.0.0"
+  coap.port: "5683"
+  spark.path: "/home"
+  http.port: "8080"
+---
+apiVersion: "apps/v1beta1"
+kind: StatefulSet
+metadata:
+  name: tempus
+spec:
+  selector:
+    matchLabels:
+      app: tempus
+  serviceName: tempus
+  replicas: 1
+  updateStrategy:
+    type: RollingUpdate
+  podManagementPolicy: Parallel
+  template:
+    metadata:
+      labels:
+        app: tempus
+    spec:
+      containers:
+      - name: tempus
+        image: hashmapinc/tempus:dev
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8080
+          name: ui
+        - containerPort: 1883
+          name: mqtt
+        - containerPort: 5683
+          protocol: UDP
+          name: coap
+        - containerPort: 9001
+          name: rpc
+        - containerPort: 9999
+          name: tempus-port
+        env:
+        - name: SPARK_COMPUTATIONS_PATH
+          valueFrom:
+            configMapKeyRef:
+              name: tempus-config
+              key: spark.path
+        - name: HTTP_BIND_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: tempus-config
+              key: http.port
+        - name: MQTT_BIND_ADDRESS
+          valueFrom:
+            configMapKeyRef:
+              name: tempus-config
+              key: mqtt.address
+        - name: MQTT_BIND_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: tempus-config
+              key: mqtt.port
+        - name: COAP_BIND_ADDRESS
+          valueFrom:
+            configMapKeyRef:
+              name: tempus-config
+              key: coap.address
+        - name: COAP_BIND_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: tempus-config
+              key: coap.port
+        - name: DATABASE_TYPE
+          valueFrom:
+            configMapKeyRef:
+              name: tempus-config
+              key: database.type
+        - name: ZOOKEEPER_ENABLED
+          valueFrom:
+            configMapKeyRef:
+              name: tempus-config
+              key: zookeeper.enabled
+        - name: ZOOKEEPER_URL
+          valueFrom:
+            configMapKeyRef:
+              name: tempus-config
+              key: zookeeper.url
+        - name: CASSANDRA_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: tempus-config
+              key: cassandra.host
+        - name: CASSANDRA_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: tempus-config
+              key: cassandra.port
+        - name: CASSANDRA_URL
+          valueFrom:
+            configMapKeyRef:
+              name: tempus-config
+              key: cassandra.url
+        - name: POSTGRES_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: tempus-config
+              key: postgres.host
+        - name: POSTGRES_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: tempus-config
+              key: postgres.port
+        - name: ADD_SCHEMA_AND_SYSTEM_DATA
+          valueFrom:
+            configMapKeyRef:
+              name: tempus-config
+              key: schema.data
+        - name: ADD_DEMO_DATA
+          valueFrom:
+            configMapKeyRef:
+              name: tempus-config
+              key: demo.data
+        command:
+        - sh
+        - -c
+        - /run-application.sh

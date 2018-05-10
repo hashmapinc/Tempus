@@ -37,9 +37,7 @@ import com.hashmapinc.server.extensions.api.plugins.rest.PluginRestMsg;
 import com.hashmapinc.server.extensions.api.plugins.ws.msg.PluginWebsocketMsg;
 import com.hashmapinc.server.extensions.api.rules.RuleException;
 
-/**
- * @author Andrew Shvayka
- */
+
 public class PluginActorMessageProcessor extends ComponentMsgProcessor<PluginId> {
 
     private final SharedPluginProcessingContext pluginCtx;

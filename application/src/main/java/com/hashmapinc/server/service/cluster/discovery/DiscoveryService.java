@@ -17,9 +17,7 @@ package com.hashmapinc.server.service.cluster.discovery;
 
 import java.util.List;
 
-/**
- * @author Andrew Shvayka
- */
+
 public interface DiscoveryService {
 
     void publishCurrentServer();

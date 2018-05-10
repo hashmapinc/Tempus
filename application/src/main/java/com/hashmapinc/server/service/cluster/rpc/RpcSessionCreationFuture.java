@@ -20,9 +20,7 @@ import com.hashmapinc.server.gen.cluster.ClusterAPIProtos;
 
 import java.util.concurrent.*;
 
-/**
- * @author Andrew Shvayka
- */
+
 public class RpcSessionCreationFuture implements Future<StreamObserver<ClusterAPIProtos.ToRpcServerMessage>> {
 
     private final BlockingQueue<StreamObserver<ClusterAPIProtos.ToRpcServerMessage>> queue = new ArrayBlockingQueue<>(1);

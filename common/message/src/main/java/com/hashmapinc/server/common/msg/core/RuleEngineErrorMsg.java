@@ -20,9 +20,7 @@ import com.hashmapinc.server.common.msg.session.MsgType;
 import lombok.Data;
 import com.hashmapinc.server.common.msg.session.ToDeviceMsg;
 
-/**
- * @author Andrew Shvayka
- */
+
 @Data
 public class RuleEngineErrorMsg implements ToDeviceMsg {
 

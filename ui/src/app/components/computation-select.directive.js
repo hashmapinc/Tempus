@@ -15,7 +15,7 @@
  */
 import './plugin-select.scss';
 
-import TempusApiComputation from '../api/computation.service';
+import tempusApiComputation from '../api/computation.service';
 
 /* eslint-disable import/no-unresolved, import/default */
 
@@ -24,7 +24,7 @@ import computationSelectTemplate from './computation-select.tpl.html';
 /* eslint-enable import/no-unresolved, import/default */
 
 
-export default angular.module('tempus.directives.computationSelect', [TempusApiComputation])
+export default angular.module('tempus.directives.computationSelect', [tempusApiComputation])
     .directive('tbComputationSelect', ComputationSelect)
     .name;
 

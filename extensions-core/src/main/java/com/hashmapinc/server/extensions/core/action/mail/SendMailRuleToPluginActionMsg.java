@@ -26,9 +26,7 @@ import lombok.Data;
 
 import java.util.UUID;
 
-/**
- * @author Andrew Shvayka
- */
+
 @Data
 public class SendMailRuleToPluginActionMsg extends AbstractRuleToPluginMsg<SendMailActionMsg> {
 

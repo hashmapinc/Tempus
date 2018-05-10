@@ -15,10 +15,7 @@
  */
 package com.hashmapinc.server.common.transport.quota;
 
-/**
- * @author Vitaliy Paromskiy
- * @version 1.0
- */
+
 public final class Clock {
 
     private static long time = 0L;

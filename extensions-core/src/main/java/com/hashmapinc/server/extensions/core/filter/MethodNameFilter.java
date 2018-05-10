@@ -28,9 +28,7 @@ import java.util.Arrays;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-/**
- * @author Andrew Shvayka
- */
+
 @Filter(name = "Method Name Filter", descriptor = "MethodNameFilterDescriptor.json", configuration = MethodNameFilterConfiguration.class)
 @Slf4j
 public class MethodNameFilter extends SimpleRuleLifecycleComponent implements RuleFilter<MethodNameFilterConfiguration> {

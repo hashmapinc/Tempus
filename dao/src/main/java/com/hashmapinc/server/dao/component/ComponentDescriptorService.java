@@ -23,9 +23,7 @@ import com.hashmapinc.server.common.data.plugin.ComponentScope;
 import com.hashmapinc.server.common.data.plugin.ComponentType;
 import com.hashmapinc.server.common.data.id.ComponentDescriptorId;
 
-/**
- * @author Andrew Shvayka
- */
+
 public interface ComponentDescriptorService {
 
     ComponentDescriptor saveComponent(ComponentDescriptor component);

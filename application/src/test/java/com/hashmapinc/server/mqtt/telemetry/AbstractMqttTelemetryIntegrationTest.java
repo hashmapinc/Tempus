@@ -30,9 +30,7 @@ import java.util.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-/**
- * @author Valerii Sosliuk
- */
+
 @Slf4j
 public abstract class AbstractMqttTelemetryIntegrationTest extends AbstractControllerTest {
 

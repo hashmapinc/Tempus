@@ -19,9 +19,7 @@ import lombok.Data;
 import com.hashmapinc.server.common.msg.cluster.ServerAddress;
 import com.hashmapinc.server.gen.cluster.ClusterAPIProtos;
 
-/**
- * @author Andrew Shvayka
- */
+
 @Data
 public final class RpcSessionTellMsg {
     private final ServerAddress serverAddress;

@@ -24,9 +24,7 @@ import com.hashmapinc.server.common.msg.core.GetAttributesRequest;
 
 import java.util.UUID;
 
-/**
- * @author Andrew Shvayka
- */
+
 public class GetAttributesRequestRuleToPluginMsg extends AbstractRuleToPluginMsg<GetAttributesRequest> {
 
     private static final long serialVersionUID = 1L;

@@ -24,9 +24,7 @@ import com.hashmapinc.server.extensions.api.component.Action;
 
 import java.util.Optional;
 
-/**
- * @author Andrew Shvayka
- */
+
 @Action(name = "RabbitMQ Plugin Action",
         descriptor = "RabbitMqActionDescriptor.json", configuration = RabbitMqPluginActionConfiguration.class)
 public class RabbitMqPluginAction extends AbstractTemplatePluginAction<RabbitMqPluginActionConfiguration> {

@@ -15,9 +15,7 @@
  */
 package com.hashmapinc.server.common.data;
 
-/**
- * @author Andrew Shvayka
- */
+
 public enum EntityType {
     TENANT, CUSTOMER, USER, RULE, PLUGIN, DASHBOARD, ASSET, DEVICE, ALARM, APPLICATION, COMPUTATION, COMPUTATION_JOB
 }

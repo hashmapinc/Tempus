@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 import React from 'react';
-import tempusBaseComponent from './json-form-base-component.jsx';
+import TempusBaseComponent from './json-form-base-component.jsx';
 import NumberInput from 'material-ui-number-input';
 
-class tempusNumber extends React.Component {
+class TempusNumber extends React.Component {
 
     constructor(props) {
         super(props);
@@ -87,4 +87,4 @@ class tempusNumber extends React.Component {
     }
 }
 
-export default tempusBaseComponent(tempusNumber);
+export default TempusBaseComponent(TempusNumber);
