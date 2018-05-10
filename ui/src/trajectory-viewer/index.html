@@ -35,6 +35,24 @@
   </head>
 
   <body>
+    <div id="controls">
+      <div>
+        Camera X Position
+        <input id="camX" type="number" oninput="updateCameraPosition();">
+      </div>
+      <div>
+        Camera Y Position
+        <input id="camY" type="number" oninput="updateCameraPosition();">
+      </div>
+      <div>
+        Camera Z Position
+        <input id="camZ" type="number" oninput="updateCameraPosition();">
+      </div>
+      <button type="button" onclick="resetCameraPosition();">reset camera</button>
+    </div>
+
+    <div id="scene"></div>
+
     <script src="three/three.js"></script>
 
     <script src="three/TrackballControls.js"></script>

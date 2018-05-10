@@ -57,7 +57,7 @@ function updatePoints(newReadings, overwrite) {
 
 // use orbit controls
 function setOrbitControls() {
-  controls = new THREE.OrbitControls(camera);
+  controls = new THREE.OrbitControls(camera, renderer.domElement);
   controls.enablePan = false;
 }
 
@@ -118,7 +118,7 @@ function updateGrids() {
   }
 
   // make grids
-  var gridXY = new THREE.GridHelper(gridSize, 10, gridColor, gridColor);
+  var gridXY = new THREE.GridHelper(gridSize, 100, gridColor, gridColor);
   var gridXZ = new THREE.GridHelper(gridSize, 10, gridColor, gridColor); // needs rotated and moved
   var gridYZ = new THREE.GridHelper(gridSize, 10, gridColor, gridColor); // needs rotated and moved
 
@@ -139,6 +139,20 @@ function updateGrids() {
   scene.add(gridYZ);
 }
 
+// resets camera position
+function resetCameraPosition(){
+  document.getElementById('camX').value = 500;
+  document.getElementById('camY').value = 500;
+  document.getElementById('camZ').value = 1000;
+  updateCameraPosition();
+}
+
+// sets camera position based on current input settings from html
+function updateCameraPosition() {
+  camera.position.z = document.getElementById('camY').value;
+  camera.position.x = document.getElementById('camX').value;
+  camera.position.y = document.getElementById('camZ').value;
+}
 
 //=============================================================================
 // initializes the application
@@ -156,12 +170,10 @@ function init() {
 
   // attach renderer
   renderer.setSize(window.innerWidth, window.innerHeight);
-  document.body.appendChild(renderer.domElement);
+  var container = document.getElementById('scene').appendChild(renderer.domElement);
 
   // position the camera
-  camera.position.z = 200;
-  camera.position.y = 200;
-  camera.position.x = 200;
+  resetCameraPosition();
 
   // setup object selection listeners
   document.addEventListener('mousemove', onMouseMove, false); // monitor mouse positioning
