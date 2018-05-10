@@ -36,22 +36,19 @@ import com.hashmapinc.server.extensions.api.plugins.msg.*;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 @Slf4j
-@Action(name = "Telemetry Plugin Action", descriptor = "TelemetryPluginActionDescriptor.json", configuration = TelemetryPluginActionConfiguration.class)
-public class TelemetryPluginAction extends SimpleRuleLifecycleComponent implements PluginAction<TelemetryPluginActionConfiguration> {
+@Action(name = "Telemetry Tag Plugin Action", descriptor = "TelemetryTagPluginActionDescriptor.json", configuration = TelemetryTagPluginActionConfiguration.class)
+public class TelemetryTagPluginAction extends SimpleRuleLifecycleComponent implements PluginAction<TelemetryTagPluginActionConfiguration> {
 
-    protected TelemetryPluginActionConfiguration configuration;
-    protected long ttl;
+    protected TelemetryTagPluginActionConfiguration configuration;
+    protected long ttl = 0;
     protected long qualityTimeWindow;
+    protected long qualityDepthWindow;
 
     @Override
-    public void init(TelemetryPluginActionConfiguration configuration) {
+    public void init(TelemetryTagPluginActionConfiguration configuration) {
         this.configuration = configuration;
-        if (StringUtils.isEmpty(configuration.getTimeUnit()) || configuration.getTtlValue() == 0L) {
-            this.ttl = 0L;
-        } else {
-            this.ttl = TimeUnit.valueOf(configuration.getTimeUnit()).toSeconds(configuration.getTtlValue());
-        }
         this.qualityTimeWindow = configuration.getQualityTimeWindow();
+        this.qualityDepthWindow = configuration.getQualityDepthWindow();
     }
 
     @Override
@@ -70,15 +67,7 @@ public class TelemetryPluginAction extends SimpleRuleLifecycleComponent implemen
             return Optional.of(new DepthTelemetryUploadRequestRuleToPluginMsg(toDeviceActorMsg.getTenantId(), toDeviceActorMsg.getCustomerId(),
                     toDeviceActorMsg.getDeviceId(), payload, ttl));
         }
-        else if (msg.getMsgType() == MsgType.POST_ATTRIBUTES_REQUEST) {
-            UpdateAttributesRequest payload = (UpdateAttributesRequest) msg;
-            return Optional.of(new UpdateAttributesRequestRuleToPluginMsg(toDeviceActorMsg.getTenantId(), toDeviceActorMsg.getCustomerId(),
-                    toDeviceActorMsg.getDeviceId(), payload));
-        } else if (msg.getMsgType() == MsgType.GET_ATTRIBUTES_REQUEST) {
-            GetAttributesRequest payload = (GetAttributesRequest) msg;
-            return Optional.of(new GetAttributesRequestRuleToPluginMsg(toDeviceActorMsg.getTenantId(), toDeviceActorMsg.getCustomerId(),
-                    toDeviceActorMsg.getDeviceId(), payload));
-        } else {
+        else {
             return Optional.empty();
         }
     }

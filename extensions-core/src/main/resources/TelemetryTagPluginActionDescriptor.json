@@ -1,0 +1,30 @@
+{
+  "schema": {
+    "title": "Telemetry Tag Plugin Action Configuration",
+    "type": "object",
+    "properties": {
+      "qualityTimeWindow": {
+        "title": "Tag Quality Time Window",
+        "type": "integer",
+        "default": 60000,
+        "minimum": 0,
+        "maximum": 3600000
+      },
+      "qualityDepthWindow": {
+        "title": "Tag Quality Depth Window",
+        "type": "integer",
+        "default": 3000,
+        "minimum": 0,
+        "maximum": 3000000
+      }
+    },
+    "required": [
+      "qualityTimeWindow",
+      "qualityDepthWindow"
+    ]
+  },
+  "form": [
+    "qualityTimeWindow",
+    "qualityDepthWindow"
+  ]
+}

@@ -18,13 +18,9 @@ package com.hashmapinc.server.extensions.core.action.telemetry;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
 
-
 @Data
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class TelemetryPluginActionConfiguration {
-
-    private String timeUnit;
-    private int ttlValue;
+public class TelemetryTagPluginActionConfiguration {
     private int qualityTimeWindow;
-
+    private int qualityDepthWindow;
 }

@@ -33,7 +33,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 import com.hashmapinc.server.common.data.id.EntityId;
-import com.hashmapinc.server.common.data.kv.*;
 import com.hashmapinc.server.dao.model.ModelConstants;
 import com.hashmapinc.server.dao.nosql.CassandraAbstractAsyncDao;
 import com.hashmapinc.server.dao.util.NoSqlDao;
@@ -92,7 +91,6 @@ public class CassandraBaseTimeseriesDao extends CassandraAbstractAsyncDao implem
         super.startExecutor();
         if (!isInstall()) {
             getFetchStmt(Aggregation.NONE);
-            log.debug("HMDC partioning value " + partitioning );
             Optional<TsPartitionDate> partition = TsPartitionDate.parse(partitioning);
             if (partition.isPresent()) {
                 tsFormat = partition.get();
@@ -345,17 +343,17 @@ public class CassandraBaseTimeseriesDao extends CassandraAbstractAsyncDao implem
     @Override
     public ListenableFuture<Void> save(EntityId entityId, TsKvEntry tsKvEntry, long ttl) {
         long partition = toPartitionTs(tsKvEntry.getTs());
-        log.debug("HMDC Partition value " + partition);
         DataType type = tsKvEntry.getDataType();
         BoundStatement stmt = (ttl == 0 ? getSaveStmt(type) : getSaveTtlStmt(type)).bind();
         stmt.setString(0, entityId.getEntityType().name())
                 .setUUID(1, entityId.getId())
                 .setString(2, tsKvEntry.getKey())
                 .setLong(3, partition)
-                .setLong(4, tsKvEntry.getTs());
-        addValue(tsKvEntry, stmt, 5);
+                .setLong(4, ((BasicTsKvEntry)tsKvEntry).getTsDiff())
+                .setLong(5, tsKvEntry.getTs());
+        addValue(tsKvEntry, stmt, 6);
         if (ttl > 0) {
-            stmt.setInt(6, (int) ttl);
+            stmt.setInt(7, (int) ttl);
         }
         return getFuture(executeAsyncWrite(stmt), rs -> null);
     }
@@ -407,7 +405,11 @@ public class CassandraBaseTimeseriesDao extends CassandraAbstractAsyncDao implem
     private TsKvEntry convertResultToTsKvEntry(Row row) {
         String key = row.getString(KEY_COLUMN);
         long ts = row.getLong(TS_COLUMN);
-        return new BasicTsKvEntry(ts, toKvEntry(row, key));
+        long diff = row.getLong(TS_DIFF);
+        BasicTsKvEntry basicTsKvEntry = new BasicTsKvEntry(ts, toKvEntry(row, key));
+        basicTsKvEntry.setTsDiff(diff);
+        return basicTsKvEntry;
+        //return new BasicTsKvEntry(ts, toKvEntry(row, key));
     }
 
     public static KvEntry toKvEntry(Row row, String key) {
@@ -470,9 +472,10 @@ public class CassandraBaseTimeseriesDao extends CassandraAbstractAsyncDao implem
                         "," + ModelConstants.ENTITY_ID_COLUMN +
                         "," + KEY_COLUMN +
                         "," + ModelConstants.PARTITION_COLUMN +
+                        "," + ModelConstants.TS_DIFF +
                         "," + TS_COLUMN +
                         "," + getColumnName(type) + ")" +
-                        " VALUES(?, ?, ?, ?, ?, ?)");
+                        " VALUES(?, ?, ?, ?, ?, ?, ?)");
             }
         }
         return saveStmts[dataType.ordinal()];
@@ -487,9 +490,10 @@ public class CassandraBaseTimeseriesDao extends CassandraAbstractAsyncDao implem
                         "," + ModelConstants.ENTITY_ID_COLUMN +
                         "," + KEY_COLUMN +
                         "," + ModelConstants.PARTITION_COLUMN +
+                        "," + ModelConstants.TS_DIFF +
                         "," + TS_COLUMN +
                         "," + getColumnName(type) + ")" +
-                        " VALUES(?, ?, ?, ?, ?, ?) USING TTL ?");
+                        " VALUES(?, ?, ?, ?, ?, ?, ?) USING TTL ?");
             }
         }
         return saveTtlStmts[dataType.ordinal()];

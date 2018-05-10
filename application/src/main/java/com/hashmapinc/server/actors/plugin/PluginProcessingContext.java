@@ -20,8 +20,7 @@ import com.google.common.base.Function;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
-import com.hashmapinc.server.common.data.Customer;
-import com.hashmapinc.server.common.data.Device;
+import com.hashmapinc.server.common.data.*;
 import com.hashmapinc.server.common.data.asset.Asset;
 import com.hashmapinc.server.common.data.audit.ActionType;
 import com.hashmapinc.server.common.data.id.*;
@@ -34,8 +33,6 @@ import com.hashmapinc.server.extensions.api.plugins.PluginContext;
 import com.hashmapinc.server.extensions.api.plugins.msg.*;
 import com.hashmapinc.server.extensions.api.plugins.rpc.PluginRpcMsg;
 import lombok.extern.slf4j.Slf4j;
-import com.hashmapinc.server.common.data.EntityType;
-import com.hashmapinc.server.common.data.Tenant;
 import com.hashmapinc.server.common.data.id.*;
 import com.hashmapinc.server.common.data.kv.*;
 import com.hashmapinc.server.common.data.plugin.PluginMetaData;
@@ -195,6 +192,13 @@ public final class PluginProcessingContext implements PluginContext {
         }));
     }
 
+    @Override
+    public void saveTagMetaData(EntityId entityId, TagMetaData tagMetaData, final PluginCallback<Void> callback) {
+        validate(entityId, new ValidationCallback(callback, ctx -> {
+            ListenableFuture<List<Void>> rsListFuture = pluginCtx.tagMetaDataService.saveTagMetaData(tagMetaData);
+            Futures.addCallback(rsListFuture, getListCallback(callback, v -> null), executor);
+        }));
+    }
 
     @Override
     public void loadTimeseries(final EntityId entityId, final List<TsKvQuery> queries, final PluginCallback<List<TsKvEntry>> callback) {
@@ -268,6 +272,18 @@ public final class PluginProcessingContext implements PluginContext {
 
     @Override
     public void loadLatestTimeseries(final EntityId entityId, final Collection<String> keys, final PluginCallback<List<TsKvEntry>> callback) {
+        validate(entityId, new ValidationCallback(callback, ctx -> {
+            ListenableFuture<List<TsKvEntry>> rsListFuture = pluginCtx.tsService.findLatest(entityId, keys);
+            Futures.addCallback(rsListFuture, getCallback(callback, v -> v), executor);
+        }));
+    }
+
+    @Override
+    public void loadLatestTimeseries(final EntityId entityId, final List<KvEntry> kvEntries, final PluginCallback<List<TsKvEntry>> callback) {
+        Set<String> keys = new HashSet<>();
+        for (KvEntry kv : kvEntries) {
+            keys.add(kv.getKey());
+        }
         validate(entityId, new ValidationCallback(callback, ctx -> {
             ListenableFuture<List<TsKvEntry>> rsListFuture = pluginCtx.tsService.findLatest(entityId, keys);
             Futures.addCallback(rsListFuture, getCallback(callback, v -> v), executor);
