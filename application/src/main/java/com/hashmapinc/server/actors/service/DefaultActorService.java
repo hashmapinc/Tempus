@@ -22,6 +22,8 @@ import akka.actor.Terminated;
 import akka.pattern.Patterns;
 import com.hashmapinc.server.actors.ActorSystemContext;
 import com.hashmapinc.server.actors.app.AppActor;
+import com.hashmapinc.server.actors.cluster.ClusterMetricActor;
+import com.hashmapinc.server.actors.cluster.RegisterNodeMsg;
 import com.hashmapinc.server.actors.rpc.RpcSessionCreateRequestMsg;
 import com.hashmapinc.server.actors.rpc.RpcSessionTellMsg;
 import com.hashmapinc.server.actors.stats.StatsActor;
@@ -91,6 +93,8 @@ public class DefaultActorService implements ActorService {
 
     private ActorRef rpcManagerActor;
 
+    private ActorRef clusterMetricActor;
+
     @PostConstruct
     public void initActorSystem() {
         log.info("Initializing Actor system. {}", actorContext.getRuleService());
@@ -101,11 +105,16 @@ public class DefaultActorService implements ActorService {
         appActor = system.actorOf(Props.create(new AppActor.ActorCreator(actorContext)).withDispatcher(APP_DISPATCHER_NAME), "appActor");
         actorContext.setAppActor(appActor);
 
-        sessionManagerActor = system.actorOf(Props.create(new SessionManagerActor.ActorCreator(actorContext)).withDispatcher(CORE_DISPATCHER_NAME),
+        String nodeIp = discoveryService.getCurrentServer().getHost();
+        int nodePort = discoveryService.getCurrentServer().getPort();
+        clusterMetricActor = system.actorOf(Props.create(new ClusterMetricActor.ActorCreator(actorContext, nodeIp, nodePort)));
+        clusterMetricActor.tell(new RegisterNodeMsg(), ActorRef.noSender());
+
+        sessionManagerActor = system.actorOf(Props.create(new SessionManagerActor.ActorCreator(actorContext, clusterMetricActor)).withDispatcher(CORE_DISPATCHER_NAME),
                 "sessionManagerActor");
         actorContext.setSessionManagerActor(sessionManagerActor);
 
-        rpcManagerActor = system.actorOf(Props.create(new RpcManagerActor.ActorCreator(actorContext)).withDispatcher(CORE_DISPATCHER_NAME),
+        rpcManagerActor = system.actorOf(Props.create(new RpcManagerActor.ActorCreator(actorContext, clusterMetricActor)).withDispatcher(CORE_DISPATCHER_NAME),
                 "rpcManagerActor");
 
         ActorRef statsActor = system.actorOf(Props.create(new StatsActor.ActorCreator(actorContext)).withDispatcher(CORE_DISPATCHER_NAME), "statsActor");
@@ -202,7 +211,7 @@ public class DefaultActorService implements ActorService {
 
     @Override
     public void onServerAdded(ServerInstance server) {
-        log.error("#########Processing onServerAdded msg: {}", server.getServerAddress());
+        log.trace("Processing onServerAdded msg: {}", server.getServerAddress());
         broadcast(new ClusterEventMsg(server.getServerAddress(), true));
     }
 
@@ -213,7 +222,7 @@ public class DefaultActorService implements ActorService {
 
     @Override
     public void onServerRemoved(ServerInstance server) {
-        log.error("########Processing onServerRemoved msg: {}", server.getServerAddress());
+        log.trace("Processing onServerRemoved msg: {}", server.getServerAddress());
         broadcast(new ClusterEventMsg(server.getServerAddress(), false));
     }
 

@@ -15,9 +15,12 @@
  */
 package com.hashmapinc.server.actors.session;
 
+import akka.actor.ActorRef;
 import akka.actor.OneForOneStrategy;
 import akka.actor.SupervisorStrategy;
 import com.hashmapinc.server.actors.ActorSystemContext;
+import com.hashmapinc.server.actors.cluster.DecrementDeviceSessionCountMsg;
+import com.hashmapinc.server.actors.cluster.IncrementDeviceSessionCountMsg;
 import com.hashmapinc.server.actors.service.ContextAwareActor;
 import com.hashmapinc.server.actors.service.ContextBasedCreator;
 import com.hashmapinc.server.actors.shared.SessionTimeoutMsg;
@@ -40,10 +43,24 @@ public class SessionActor extends ContextAwareActor {
 
     private final SessionId sessionId;
     private AbstractSessionActorMsgProcessor processor;
+    private final ActorRef clusterMetricActor;
 
-    private SessionActor(ActorSystemContext systemContext, SessionId sessionId) {
+    private SessionActor(ActorSystemContext systemContext, SessionId sessionId, ActorRef clusterMetricActor) {
         super(systemContext);
         this.sessionId = sessionId;
+        this.clusterMetricActor = clusterMetricActor;
+    }
+
+    @Override
+    public void preStart() throws Exception {
+        super.preStart();
+        clusterMetricActor.tell(new IncrementDeviceSessionCountMsg(), ActorRef.noSender());
+    }
+
+    @Override
+    public void postStop() throws Exception {
+        super.postStop();
+        clusterMetricActor.tell(new DecrementDeviceSessionCountMsg(), ActorRef.noSender());
     }
 
     @Override
@@ -123,15 +140,17 @@ public class SessionActor extends ContextAwareActor {
         private static final long serialVersionUID = 1L;
 
         private final SessionId sessionId;
+        private final ActorRef clusterMetricActor;
 
-        public ActorCreator(ActorSystemContext context, SessionId sessionId) {
+        public ActorCreator(ActorSystemContext context, SessionId sessionId, ActorRef clusterMetricActor) {
             super(context);
             this.sessionId = sessionId;
+            this.clusterMetricActor = clusterMetricActor;
         }
 
         @Override
         public SessionActor create() throws Exception {
-            return new SessionActor(context, sessionId);
+            return new SessionActor(context, sessionId, clusterMetricActor);
         }
     }
 

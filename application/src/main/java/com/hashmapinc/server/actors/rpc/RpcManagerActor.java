@@ -41,11 +41,14 @@ public class RpcManagerActor extends ContextAwareActor {
 
     private final ServerAddress instance;
 
-    public RpcManagerActor(ActorSystemContext systemContext) {
+    private final ActorRef clusterMetricActor;
+
+    public RpcManagerActor(ActorSystemContext systemContext, ActorRef clusterMetricActor) {
         super(systemContext);
         this.sessionActors = new HashMap<>();
         this.pendingMsgs = new HashMap<>();
         this.instance = systemContext.getDiscoveryService().getCurrentServer().getServerAddress();
+        this.clusterMetricActor = clusterMetricActor;
 
         systemContext.getDiscoveryService().getOtherServers().stream()
                 .filter(otherServer -> otherServer.getServerAddress().compareTo(instance) > 0)
@@ -170,21 +173,23 @@ public class RpcManagerActor extends ContextAwareActor {
     private ActorRef createSessionActor(RpcSessionCreateRequestMsg msg) {
         log.debug("[{}] Creating session actor.", msg.getMsgUid());
         ActorRef actor = context().actorOf(
-                Props.create(new RpcSessionActor.ActorCreator(systemContext, msg.getMsgUid())).withDispatcher(DefaultActorService.RPC_DISPATCHER_NAME));
+                Props.create(new RpcSessionActor.ActorCreator(systemContext, msg.getMsgUid(), clusterMetricActor)).withDispatcher(DefaultActorService.RPC_DISPATCHER_NAME));
         actor.tell(msg, context().self());
         return actor;
     }
 
     public static class ActorCreator extends ContextBasedCreator<RpcManagerActor> {
         private static final long serialVersionUID = 1L;
+        private final ActorRef clusterMetricActor;
 
-        public ActorCreator(ActorSystemContext context) {
+        public ActorCreator(ActorSystemContext context, ActorRef clusterMetricActor) {
             super(context);
+            this.clusterMetricActor = clusterMetricActor;
         }
 
         @Override
         public RpcManagerActor create() throws Exception {
-            return new RpcManagerActor(context);
+            return new RpcManagerActor(context, clusterMetricActor);
         }
     }
 }

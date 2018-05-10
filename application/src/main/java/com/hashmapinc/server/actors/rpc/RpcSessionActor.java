@@ -15,9 +15,12 @@
  */
 package com.hashmapinc.server.actors.rpc;
 
+import akka.actor.ActorRef;
 import akka.event.Logging;
 import akka.event.LoggingAdapter;
 import com.hashmapinc.server.actors.ActorSystemContext;
+import com.hashmapinc.server.actors.cluster.DecrementRpcSessionCountMsg;
+import com.hashmapinc.server.actors.cluster.IncrementRpcSessionCountMsg;
 import com.hashmapinc.server.actors.service.ContextAwareActor;
 import com.hashmapinc.server.actors.service.ContextBasedCreator;
 import com.hashmapinc.server.gen.cluster.ClusterAPIProtos;
@@ -40,9 +43,12 @@ public class RpcSessionActor extends ContextAwareActor {
     private GrpcSession session;
     private GrpcSessionListener listener;
 
-    public RpcSessionActor(ActorSystemContext systemContext, UUID sessionId) {
+    private final ActorRef clusterMetricActor;
+
+    public RpcSessionActor(ActorSystemContext systemContext, UUID sessionId, ActorRef clusterMetricActor) {
         super(systemContext);
         this.sessionId = sessionId;
+        this.clusterMetricActor = clusterMetricActor;
     }
 
     @Override
@@ -59,9 +65,16 @@ public class RpcSessionActor extends ContextAwareActor {
     }
 
     @Override
+    public void preStart() throws Exception {
+        super.preStart();
+        clusterMetricActor.tell(new IncrementRpcSessionCountMsg(), ActorRef.noSender());
+    }
+
+    @Override
     public void postStop() {
         log.info("Closing session -> {}", session.getRemoteServer());
         session.close();
+        clusterMetricActor.tell(new DecrementRpcSessionCountMsg(), ActorRef.noSender());
     }
 
     private void initSession(RpcSessionCreateRequestMsg msg) {
@@ -95,14 +108,17 @@ public class RpcSessionActor extends ContextAwareActor {
 
         private final UUID sessionId;
 
-        public ActorCreator(ActorSystemContext context, UUID sessionId) {
+        private final ActorRef clusterMetricActor;
+
+        public ActorCreator(ActorSystemContext context, UUID sessionId, ActorRef clusterMetricActor) {
             super(context);
             this.sessionId = sessionId;
+            this.clusterMetricActor = clusterMetricActor;
         }
 
         @Override
         public RpcSessionActor create() throws Exception {
-            return new RpcSessionActor(context, sessionId);
+            return new RpcSessionActor(context, sessionId, clusterMetricActor);
         }
     }
 

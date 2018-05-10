@@ -19,6 +19,8 @@ import java.util.*;
 
 import akka.actor.*;
 import com.hashmapinc.server.actors.ActorSystemContext;
+import com.hashmapinc.server.actors.cluster.DecrementDeviceSessionCountMsg;
+import com.hashmapinc.server.actors.cluster.IncrementDeviceSessionCountMsg;
 import com.hashmapinc.server.actors.service.ContextAwareActor;
 import com.hashmapinc.server.actors.service.ContextBasedCreator;
 import com.hashmapinc.server.actors.service.DefaultActorService;
@@ -50,25 +52,34 @@ public class SessionManagerActor extends ContextAwareActor {
 
     private Map<String, List<DeviceSessionInfo>> deviceSessionInfoMap;
 
-    public SessionManagerActor(ActorSystemContext systemContext) {
+    private final ActorRef clusterMetricActor;
+
+    public SessionManagerActor(ActorSystemContext systemContext, ActorRef clusterMetricActor) {
         super(systemContext);
         this.sessionActors = new HashMap<>(INITIAL_SESSION_MAP_SIZE);
         this.deviceSessionInfoMap = new HashMap<>();
+        this.clusterMetricActor = clusterMetricActor;
     }
 
     @Override
     public void onReceive(Object msg) throws Exception {
         if (msg instanceof SessionCtrlMsg) {
+            log.debug("Executing SessionManagerActor SessionCtrlMsg");
             onSessionCtrlMsg((SessionCtrlMsg) msg);
         } else if (msg instanceof SessionAwareMsg) {
+            log.debug("Executing SessionManagerActor SessionAwareMsg");
             forwardToSessionActor((SessionAwareMsg) msg);
         } else if (msg instanceof SessionTerminationMsg) {
+            log.debug("Executing SessionManagerActor SessionTerminationMsg");
             onSessionTermination((SessionTerminationMsg) msg);
         } else if (msg instanceof Terminated) {
+            log.debug("Executing SessionManagerActor Terminated");
             onTermination((Terminated) msg);
         } else if (msg instanceof SessionTimeoutMsg) {
+            log.debug("Executing SessionManagerActor SessionTimeoutMsg");
             onSessionTimeout((SessionTimeoutMsg) msg);
         } else if (msg instanceof ClusterEventMsg) {
+            log.debug("Executing SessionManagerActor ClusterEventMsg");
             broadcast(msg);
         }
     }
@@ -198,7 +209,7 @@ public class SessionManagerActor extends ContextAwareActor {
         if (sessionActor == null) {
             log.debug("[{}] Creating session actor.", sessionIdStr);
             sessionActor = context().actorOf(
-                    Props.create(new SessionActor.ActorCreator(systemContext, sessionId)).withDispatcher(DefaultActorService.SESSION_DISPATCHER_NAME),
+                    Props.create(new SessionActor.ActorCreator(systemContext, sessionId, clusterMetricActor)).withDispatcher(DefaultActorService.SESSION_DISPATCHER_NAME),
                     sessionIdStr);
             sessionActors.put(sessionIdStr, sessionActor);
             log.debug("[{}] Created session actor.", sessionIdStr);
@@ -219,13 +230,16 @@ public class SessionManagerActor extends ContextAwareActor {
     public static class ActorCreator extends ContextBasedCreator<SessionManagerActor> {
         private static final long serialVersionUID = 1L;
 
-        public ActorCreator(ActorSystemContext context) {
+        private final ActorRef clusterMetricActor;
+
+        public ActorCreator(ActorSystemContext context, ActorRef clusterMetricActor) {
             super(context);
+            this.clusterMetricActor = clusterMetricActor;
         }
 
         @Override
         public SessionManagerActor create() throws Exception {
-            return new SessionManagerActor(context);
+            return new SessionManagerActor(context, clusterMetricActor);
         }
     }
 
