@@ -33,7 +33,7 @@ import scala.concurrent.duration.FiniteDuration;
 import scala.runtime.BoxedUnit;
 
 
-public abstract class ComponentActor<T extends EntityId, P extends ComponentMsgProcessor<T>> extends ContextAwareActor {
+public abstract class ComponentActor<T extends EntityId, P extends ComponentMsgProcessor<T>> extends ContextAwarePersistentActor {
 
     protected final LoggingAdapter logger = Logging.getLogger(getContext().system(), this);
 
