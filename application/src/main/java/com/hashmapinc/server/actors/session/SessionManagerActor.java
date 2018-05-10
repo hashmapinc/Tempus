@@ -20,8 +20,6 @@ import java.util.Map;
 
 import akka.actor.*;
 import com.hashmapinc.server.actors.ActorSystemContext;
-import com.hashmapinc.server.actors.cluster.DecrementDeviceSessionCountMsg;
-import com.hashmapinc.server.actors.cluster.IncrementDeviceSessionCountMsg;
 import com.hashmapinc.server.actors.service.ContextAwareActor;
 import com.hashmapinc.server.actors.service.ContextBasedCreator;
 import com.hashmapinc.server.actors.service.DefaultActorService;
@@ -55,22 +53,16 @@ public class SessionManagerActor extends ContextAwareActor {
     @Override
     public void onReceive(Object msg) throws Exception {
         if (msg instanceof SessionCtrlMsg) {
-            log.debug("Executing SessionManagerActor SessionCtrlMsg");
             onSessionCtrlMsg((SessionCtrlMsg) msg);
         } else if (msg instanceof SessionAwareMsg) {
-            log.debug("Executing SessionManagerActor SessionAwareMsg");
             forwardToSessionActor((SessionAwareMsg) msg);
         } else if (msg instanceof SessionTerminationMsg) {
-            log.debug("Executing SessionManagerActor SessionTerminationMsg");
             onSessionTermination((SessionTerminationMsg) msg);
         } else if (msg instanceof Terminated) {
-            log.debug("Executing SessionManagerActor Terminated");
             onTermination((Terminated) msg);
         } else if (msg instanceof SessionTimeoutMsg) {
-            log.debug("Executing SessionManagerActor SessionTimeoutMsg");
             onSessionTimeout((SessionTimeoutMsg) msg);
         } else if (msg instanceof ClusterEventMsg) {
-            log.debug("Executing SessionManagerActor ClusterEventMsg");
             broadcast(msg);
         }
     }

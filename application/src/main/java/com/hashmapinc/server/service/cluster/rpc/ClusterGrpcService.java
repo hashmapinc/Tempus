@@ -66,6 +66,7 @@ public class ClusterGrpcService extends ClusterRpcServiceGrpc.ClusterRpcServiceI
 
     public void init(RpcMsgListener listener) {
         this.listener = listener;
+        log.info("Initializing RPC service!");
         instance = instanceService.getSelf();
         server = ServerBuilder.forPort(instance.getPort()).addService(this).build();
         log.info("Going to start RPC server using port: {}", instance.getPort());
@@ -75,7 +76,7 @@ public class ClusterGrpcService extends ClusterRpcServiceGrpc.ClusterRpcServiceI
             log.error("Failed to start RPC server!", e);
             throw new RuntimeException("Failed to start RPC server!");
         }
-        log.error("RPC service initialized!");
+        log.info("RPC service initialized!");
     }
 
     @Override

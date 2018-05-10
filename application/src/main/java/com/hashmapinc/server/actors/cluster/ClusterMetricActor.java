@@ -37,25 +37,24 @@ public class ClusterMetricActor extends ContextAwareActor {
     @Override
     public void onReceive(Object message) throws Exception {
         if (message instanceof RegisterNodeMsg) {
-            logger.error("message type RegisterNodeMsg");
+            logger.debug("message type RegisterNodeMsg");
             systemContext.getClusterMetricService().save(getClusterMetric());
         } else if (message instanceof IncrementRpcSessionCountMsg) {
-            logger.error("message type IncrementRpcSessionCountMsg");
+            logger.debug("message type IncrementRpcSessionCountMsg");
             systemContext.getClusterMetricService().incrementRpcSessionCount(nodeIp, nodePort);
         } else if (message instanceof DecrementRpcSessionCountMsg) {
-            logger.error("message type DecrementRpcSessionCountMsg");
+            logger.debug("message type DecrementRpcSessionCountMsg");
             systemContext.getClusterMetricService().decrementRpcSessionCount(nodeIp, nodePort);
         } else if (message instanceof IncrementDeviceSessionCountMsg) {
-            logger.error("message type IncrementDeviceSessionCountMsg");
+            logger.debug("message type IncrementDeviceSessionCountMsg");
             systemContext.getClusterMetricService().incrementDeviceSessionCount(nodeIp, nodePort);
         } else if (message instanceof DecrementDeviceSessionCountMsg) {
-            logger.error("message type DecrementDeviceSessionCountMsg");
+            logger.debug("message type DecrementDeviceSessionCountMsg");
             systemContext.getClusterMetricService().decrementDeviceSessionCount(nodeIp, nodePort);
         }
     }
 
     private ClusterMetric getClusterMetric() {
-        logger.error("In get Cluster Metric...");
         ClusterMetric clusterMetric = new ClusterMetric();
         clusterMetric.setNodeIp(nodeIp);
         clusterMetric.setNodePort(nodePort);
