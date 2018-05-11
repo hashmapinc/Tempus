@@ -23,10 +23,26 @@
     <style>
       body {
 				font-family: Monospace;
-				background-color: #f0f0f0;
 				margin: 0px;
 				overflow: hidden;
 			}
+
+      #scene {
+        z-index: -10;
+      }
+
+      #labels {
+        font-size: 15pt;
+      }
+
+      #controls {
+        margin: 10px;
+        margin-left: 20px;
+      }
+
+      div {
+        position: absolute;
+      }
 
       canvas {
         width: 100%;
@@ -36,9 +52,30 @@
   </head>
 
   <body>
+    <!-- threejs scene -->
+    <div id="scene"></div>
+
+    <!-- camera controls -->
+    <div id="controls">
+      camera east: </br>
+      <input id="camX" type="number" oninput="updateCameraPosition();"> </br>
+      camera north: </br>
+      <input id="camZ" type="number" oninput="updateCameraPosition();"> </br>
+      camera depth: </br>
+      <input id="camY" type="number" oninput="updateCameraPosition();"> </br>
+      <button type="button" onclick="resetCameraPosition();">reset camera</button>
+    </div>
+
+    <!-- axis labels -->
+    <div id="labelX" class="labels">east</div>
+    <div id="labelY" class="labels">tvd</div>
+    <div id="labelZ" class="labels">north</div>
+
     <script src="three/three.js"></script>
+    <script src="THREE.MeshLine.js"></script>
 
     <script src="three/TrackballControls.js"></script>
+    <script src="three/OrbitControls.js"></script>
     
     <script src="trajectoryXYZconverter.js"></script>
     <script src="main.js"></script>
