@@ -611,22 +611,38 @@ public class CassandraBaseDepthSeriesDao extends CassandraAbstractAsyncDao imple
         }
     }
 
+
     private static void addValue(KvEntry kvEntry, BoundStatement stmt, int column) {
         switch (kvEntry.getDataType()) {
             case BOOLEAN:
-                stmt.setBool(column, kvEntry.getBooleanValue().get().booleanValue());
+                Optional<Boolean> booleanValue = kvEntry.getBooleanValue();
+                if (booleanValue.isPresent()) {
+                    stmt.setBool(column, booleanValue.get().booleanValue());
+                }
                 break;
             case STRING:
-                stmt.setString(column, kvEntry.getStrValue().get());
+                Optional<String> stringValue = kvEntry.getStrValue();
+                if (stringValue.isPresent()) {
+                    stmt.setString(column, stringValue.get());
+                }
                 break;
             case LONG:
-                stmt.setLong(column, kvEntry.getLongValue().get().longValue());
+                Optional<Long> longValue = kvEntry.getLongValue();
+                if (longValue.isPresent()) {
+                    stmt.setLong(column, longValue.get().longValue());
+                }
                 break;
             case DOUBLE:
-                stmt.setDouble(column, kvEntry.getDoubleValue().get().doubleValue());
+                Optional<Double> doubleValue = kvEntry.getDoubleValue();
+                if (doubleValue.isPresent()) {
+                    stmt.setDouble(column, doubleValue.get().doubleValue());
+                }
                 break;
             case JSON:
-                stmt.setString(column, kvEntry.getJsonValue().get().toString());
+                Optional<JsonNode> jsonNodeValue =  kvEntry.getJsonValue();
+                if(jsonNodeValue.isPresent()) {
+                    stmt.setString(column, jsonNodeValue.get().toString());
+                }
                 break;
         }
     }

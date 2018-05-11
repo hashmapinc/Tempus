@@ -640,7 +640,10 @@ public class CassandraBaseTimeseriesDao extends CassandraAbstractAsyncDao implem
                 }
                 break;
             case JSON:
-                stmt.setString(column, kvEntry.getJsonValue().get().toString());
+                Optional<JsonNode> jsonNodeValue =  kvEntry.getJsonValue();
+                if(jsonNodeValue.isPresent()) {
+                    stmt.setString(column, jsonNodeValue.get().toString());
+                }
                 break;
         }
     }
