@@ -98,7 +98,7 @@ Tempus was made to simplify ingest/analysis/storage/visualization of your IIoT d
 
 ## Getting Started
 
-- Read through the [Tempus Developer Quickstart](http://tempus-cloud.s3-website-us-west-2.amazonaws.com/help/developerQS/html/).
+- Read through the [Tempus Developer Quickstart](https://tempus.readthedocs.io/development/quickstart.html/).
   It will include a section on how to build the local development environment via Docker to get you up and running quickly.
 
 To build:
@@ -147,7 +147,7 @@ You can also submit issues or questions via GitHub Issues [here](https://github.
 
 ## Documentation
 
-See [The Documentation Here](http://tempus-cloud.s3-website-us-west-2.amazonaws.com/help/) for the latest updates.
+See [The Documentation Here](https://tempus.readthedocs.io) for the latest updates.
 
 ## License
 
