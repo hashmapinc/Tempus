@@ -15,7 +15,7 @@
  */
 package com.hashmapinc.server.dao.cluster;
 
-import com.hashmapinc.server.common.data.cluster.ClusterMetric;
+import com.hashmapinc.server.common.data.cluster.NodeMetric;
 import com.hashmapinc.server.dao.DaoUtil;
 import com.hashmapinc.server.dao.model.ModelConstants;
 import com.hashmapinc.server.dao.model.nosql.ClusterMetricEntity;
@@ -33,7 +33,7 @@ import static com.datastax.driver.core.querybuilder.QueryBuilder.eq;
 @Component
 @Slf4j
 @NoSqlDao
-public class CassandraClusterMetricDao extends CassandraAbstractModelDao<ClusterMetricEntity, ClusterMetric> implements ClusterMetricDao {
+public class CassandraClusterMetricDao extends CassandraAbstractModelDao<ClusterMetricEntity, NodeMetric> implements ClusterMetricDao {
 
     @Override
     protected Class<ClusterMetricEntity> getColumnFamilyClass() {
@@ -46,7 +46,7 @@ public class CassandraClusterMetricDao extends CassandraAbstractModelDao<Cluster
     }
 
     @Override
-    public Optional<ClusterMetric> findClusterMetricByNodeIpAndNodePort(String nodeIp, int nodePort) {
+    public Optional<NodeMetric> findClusterMetricByNodeIpAndNodePort(String nodeIp, int nodePort) {
         Select select = select().from(ModelConstants.CLUSTER_METRIC_COLUMN_FAMILY_NAME).allowFiltering();
         Select.Where query = select.where();
         query.and(eq(ModelConstants.CLUSTER_METRIC_IP_PROPERTY, nodeIp));

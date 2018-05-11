@@ -15,7 +15,7 @@
  */
 package com.hashmapinc.server.dao.cluster;
 
-import com.hashmapinc.server.common.data.cluster.ClusterMetric;
+import com.hashmapinc.server.common.data.cluster.NodeMetric;
 import com.hashmapinc.server.dao.entity.AbstractEntityService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,26 +32,26 @@ public class ClusterMetricServiceImpl extends AbstractEntityService implements C
     private ClusterMetricDao clusterMetricDao;
 
     @Override
-    public ClusterMetric save(ClusterMetric clusterMetric) {
-        log.debug("Executing ClusterMetricServiceImpl saveClusterMetric [{}]", clusterMetric);
-        return clusterMetricDao.save(clusterMetric);
+    public NodeMetric save(NodeMetric nodeMetric) {
+        log.debug("Executing ClusterMetricServiceImpl saveClusterMetric [{}]", nodeMetric);
+        return clusterMetricDao.save(nodeMetric);
     }
 
     @Override
-    public Optional<ClusterMetric> findClusterMetricByNodeIpAndNodePort(String nodeIp, int nodePort) {
+    public Optional<NodeMetric> findClusterMetricByNodeIpAndNodePort(String nodeIp, int nodePort) {
         log.debug("Executing ClusterMetricServiceImpl findByNodeIpAndNodePort, nodeIp [{}], nodePort [{}]", nodeIp, nodePort);
         return clusterMetricDao.findClusterMetricByNodeIpAndNodePort(nodeIp, nodePort);
     }
 
     @Override
-    public List<ClusterMetric> findAll() {
-        log.debug("Executing ClusterMetricServiceImpl findAll ClusterMetric");
+    public List<NodeMetric> findAll() {
+        log.debug("Executing ClusterMetricServiceImpl findAll NodeMetric");
         return clusterMetricDao.find();
     }
 
     @Override
-    public ClusterMetric incrementRpcSessionCount(String nodeIp, int nodePort) {
-        Optional<ClusterMetric> clusterMetric = findClusterMetricByNodeIpAndNodePort(nodeIp, nodePort);
+    public NodeMetric incrementRpcSessionCount(String nodeIp, int nodePort) {
+        Optional<NodeMetric> clusterMetric = findClusterMetricByNodeIpAndNodePort(nodeIp, nodePort);
         if (clusterMetric.isPresent()) {
             int rpcSessionCount = clusterMetric.get().getRpcSessionCount();
             log.debug("ClusterMetricServiceImpl rpcSessionCount [{}]", rpcSessionCount);
@@ -62,8 +62,8 @@ public class ClusterMetricServiceImpl extends AbstractEntityService implements C
     }
 
     @Override
-    public ClusterMetric decrementRpcSessionCount(String nodeIp, int nodePort) {
-        Optional<ClusterMetric> clusterMetric = findClusterMetricByNodeIpAndNodePort(nodeIp, nodePort);
+    public NodeMetric decrementRpcSessionCount(String nodeIp, int nodePort) {
+        Optional<NodeMetric> clusterMetric = findClusterMetricByNodeIpAndNodePort(nodeIp, nodePort);
         if (clusterMetric.isPresent()) {
             int rpcSessionCount = clusterMetric.get().getRpcSessionCount();
             log.debug("ClusterMetricServiceImpl rpcSessionCount [{}]", rpcSessionCount);
@@ -80,8 +80,8 @@ public class ClusterMetricServiceImpl extends AbstractEntityService implements C
     }
 
     @Override
-    public ClusterMetric incrementDeviceSessionCount(String nodeIp, int nodePort) {
-        Optional<ClusterMetric> clusterMetric = findClusterMetricByNodeIpAndNodePort(nodeIp, nodePort);
+    public NodeMetric incrementDeviceSessionCount(String nodeIp, int nodePort) {
+        Optional<NodeMetric> clusterMetric = findClusterMetricByNodeIpAndNodePort(nodeIp, nodePort);
         if (clusterMetric.isPresent()) {
             int deviceSessionCount = clusterMetric.get().getDeviceSessionCount();
             log.debug("ClusterMetricServiceImpl deviceSessionCount [{}]", deviceSessionCount);
@@ -92,8 +92,8 @@ public class ClusterMetricServiceImpl extends AbstractEntityService implements C
     }
 
     @Override
-    public ClusterMetric decrementDeviceSessionCount(String nodeIp, int nodePort) {
-        Optional<ClusterMetric> clusterMetric = findClusterMetricByNodeIpAndNodePort(nodeIp, nodePort);
+    public NodeMetric decrementDeviceSessionCount(String nodeIp, int nodePort) {
+        Optional<NodeMetric> clusterMetric = findClusterMetricByNodeIpAndNodePort(nodeIp, nodePort);
         if (clusterMetric.isPresent()) {
             int deviceSessionCount = clusterMetric.get().getDeviceSessionCount();
             log.debug("ClusterMetricServiceImpl deviceSessionCount [{}]", deviceSessionCount);
