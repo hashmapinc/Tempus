@@ -20,19 +20,19 @@ import com.hashmapinc.server.common.data.cluster.NodeMetric;
 import java.util.List;
 import java.util.Optional;
 
-public interface ClusterMetricService {
+public interface NodeMetricService {
 
-    Optional<NodeMetric> findClusterMetricByNodeIpAndNodePort(String nodeIp, int nodePort);
+    Optional<NodeMetric> findNodeMetricByHostAndPort(String host, int port);
 
     NodeMetric save(NodeMetric nodeMetric);
 
     List<NodeMetric> findAll();
 
-    NodeMetric incrementRpcSessionCount(String nodeIp, int nodePort);
+    NodeMetric incrementRpcSessionCount(String host, int port);
 
-    NodeMetric decrementRpcSessionCount(String nodeIp, int nodePort);
+    NodeMetric decrementRpcSessionCount(String host, int port);
 
-    NodeMetric incrementDeviceSessionCount(String nodeIp, int nodePort);
+    NodeMetric incrementDeviceSessionCount(String host, int port);
 
-    NodeMetric decrementDeviceSessionCount(String nodeIp, int nodePort);
+    NodeMetric decrementDeviceSessionCount(String host, int port);
 }

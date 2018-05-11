@@ -41,14 +41,14 @@ public class RpcManagerActor extends ContextAwareActor {
 
     private final ServerAddress instance;
 
-    private final ActorRef clusterMetricActor;
+    private final ActorRef nodeMetricActor;
 
-    public RpcManagerActor(ActorSystemContext systemContext, ActorRef clusterMetricActor) {
+    public RpcManagerActor(ActorSystemContext systemContext, ActorRef nodeMetricActor) {
         super(systemContext);
         this.sessionActors = new HashMap<>();
         this.pendingMsgs = new HashMap<>();
         this.instance = systemContext.getDiscoveryService().getCurrentServer().getServerAddress();
-        this.clusterMetricActor = clusterMetricActor;
+        this.nodeMetricActor = nodeMetricActor;
 
         systemContext.getDiscoveryService().getOtherServers().stream()
                 .filter(otherServer -> otherServer.getServerAddress().compareTo(instance) > 0)
@@ -173,23 +173,23 @@ public class RpcManagerActor extends ContextAwareActor {
     private ActorRef createSessionActor(RpcSessionCreateRequestMsg msg) {
         log.debug("[{}] Creating session actor.", msg.getMsgUid());
         ActorRef actor = context().actorOf(
-                Props.create(new RpcSessionActor.ActorCreator(systemContext, msg.getMsgUid(), clusterMetricActor)).withDispatcher(DefaultActorService.RPC_DISPATCHER_NAME));
+                Props.create(new RpcSessionActor.ActorCreator(systemContext, msg.getMsgUid(), nodeMetricActor)).withDispatcher(DefaultActorService.RPC_DISPATCHER_NAME));
         actor.tell(msg, context().self());
         return actor;
     }
 
     public static class ActorCreator extends ContextBasedCreator<RpcManagerActor> {
         private static final long serialVersionUID = 1L;
-        private final ActorRef clusterMetricActor;
+        private final ActorRef nodeMetricActor;
 
-        public ActorCreator(ActorSystemContext context, ActorRef clusterMetricActor) {
+        public ActorCreator(ActorSystemContext context, ActorRef nodeMetricActor) {
             super(context);
-            this.clusterMetricActor = clusterMetricActor;
+            this.nodeMetricActor = nodeMetricActor;
         }
 
         @Override
         public RpcManagerActor create() throws Exception {
-            return new RpcManagerActor(context, clusterMetricActor);
+            return new RpcManagerActor(context, nodeMetricActor);
         }
     }
 }

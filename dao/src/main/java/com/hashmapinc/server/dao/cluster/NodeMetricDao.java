@@ -21,11 +21,11 @@ import com.hashmapinc.server.dao.Dao;
 import java.util.List;
 import java.util.Optional;
 
-public interface ClusterMetricDao extends Dao<NodeMetric> {
+public interface NodeMetricDao extends Dao<NodeMetric> {
 
     NodeMetric save(NodeMetric nodeMetric);
 
-    Optional<NodeMetric> findClusterMetricByNodeIpAndNodePort(String nodeIp, int nodePort);
+    Optional<NodeMetric> findNodeMetricByHostAndPort(String host, int port);
 
     List<NodeMetric> find();
 }

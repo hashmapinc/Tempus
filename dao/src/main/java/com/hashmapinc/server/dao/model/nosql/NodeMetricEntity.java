@@ -28,39 +28,39 @@ import java.util.UUID;
 
 import static com.hashmapinc.server.dao.model.ModelConstants.ID_PROPERTY;
 
-@Table(name = ModelConstants.CLUSTER_METRIC_COLUMN_FAMILY_NAME)
-public class ClusterMetricEntity implements BaseEntity<NodeMetric> {
+@Table(name = ModelConstants.NODE_METRIC_COLUMN_FAMILY_NAME)
+public class NodeMetricEntity implements BaseEntity<NodeMetric> {
 
     @PartitionKey
     @Column(name = ID_PROPERTY)
     private UUID id;
 
-    @Column(name = ModelConstants.CLUSTER_METRIC_IP_PROPERTY)
-    private String nodeIp;
+    @Column(name = ModelConstants.NODE_METRIC_HOST_PROPERTY)
+    private String host;
 
-    @Column(name = ModelConstants.CLUSTER_METRIC_PORT_PROPERTY)
-    private int nodePort;
+    @Column(name = ModelConstants.NODE_METRIC_PORT_PROPERTY)
+    private int port;
 
-    @Column(name = ModelConstants.CLUSTER_METRIC_NODE_STATUS_PROPERTY)
+    @Column(name = ModelConstants.NODE_METRIC_STATUS_PROPERTY)
     private boolean nodeStatus;
 
-    @Column(name = ModelConstants.CLUSTER_METRIC_RPC_SESSION_PROPERTY)
+    @Column(name = ModelConstants.NODE_METRIC_RPC_SESSION_PROPERTY)
     private int rpcSessionCount;
 
-    @Column(name = ModelConstants.CLUSTER_METRIC_DEVICE_SESSION_PROPERTY)
+    @Column(name = ModelConstants.NODE_METRIC_DEVICE_SESSION_PROPERTY)
     private int deviceSessionCount;
 
-    public ClusterMetricEntity() {
+    public NodeMetricEntity() {
         super();
     }
 
-    public ClusterMetricEntity(NodeMetric nodeMetric) {
+    public NodeMetricEntity(NodeMetric nodeMetric) {
         if (nodeMetric.getId() != null) {
             this.setId(nodeMetric.getId().getId());
         }
 
-        this.nodeIp = nodeMetric.getNodeIp();
-        this.nodePort = nodeMetric.getNodePort();
+        this.host = nodeMetric.getHost();
+        this.port = nodeMetric.getPort();
         this.nodeStatus = nodeMetric.isNodeStatus();
         this.rpcSessionCount = nodeMetric.getRpcSessionCount();
         this.deviceSessionCount = nodeMetric.getDeviceSessionCount();
@@ -76,20 +76,20 @@ public class ClusterMetricEntity implements BaseEntity<NodeMetric> {
         this.id = id;
     }
 
-    public String getNodeIp() {
-        return nodeIp;
+    public String getHost() {
+        return host;
     }
 
-    public void setNodeIp(String nodeIp) {
-        this.nodeIp = nodeIp;
+    public void setHost(String host) {
+        this.host = host;
     }
 
-    public int getNodePort() {
-        return nodePort;
+    public int getPort() {
+        return port;
     }
 
-    public void setNodePort(int nodePort) {
-        this.nodePort = nodePort;
+    public void setPort(int port) {
+        this.port = port;
     }
 
     public boolean isNodeStatus() {
@@ -119,8 +119,8 @@ public class ClusterMetricEntity implements BaseEntity<NodeMetric> {
     @Override
     public NodeMetric toData() {
         NodeMetric nodeMetric = new NodeMetric(new NodeMetricId(getId()));
-        nodeMetric.setNodeIp(nodeIp);
-        nodeMetric.setNodePort(nodePort);
+        nodeMetric.setHost(host);
+        nodeMetric.setPort(port);
         nodeMetric.setNodeStatus(nodeStatus);
         nodeMetric.setRpcSessionCount(rpcSessionCount);
         nodeMetric.setDeviceSessionCount(deviceSessionCount);

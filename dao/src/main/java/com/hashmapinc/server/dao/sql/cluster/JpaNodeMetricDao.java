@@ -17,8 +17,8 @@ package com.hashmapinc.server.dao.sql.cluster;
 
 import com.hashmapinc.server.common.data.cluster.NodeMetric;
 import com.hashmapinc.server.dao.DaoUtil;
-import com.hashmapinc.server.dao.cluster.ClusterMetricDao;
-import com.hashmapinc.server.dao.model.sql.ClusterMetricEntity;
+import com.hashmapinc.server.dao.cluster.NodeMetricDao;
+import com.hashmapinc.server.dao.model.sql.NodeMetricEntity;
 import com.hashmapinc.server.dao.sql.JpaAbstractDao;
 import com.hashmapinc.server.dao.util.SqlDao;
 import lombok.extern.slf4j.Slf4j;
@@ -31,25 +31,24 @@ import java.util.Optional;
 @Component
 @SqlDao
 @Slf4j
-public class JpaClusterMetricDao extends JpaAbstractDao<ClusterMetricEntity, NodeMetric> implements ClusterMetricDao {
+public class JpaNodeMetricDao extends JpaAbstractDao<NodeMetricEntity, NodeMetric> implements NodeMetricDao {
 
     @Autowired
-    private ClusterMetricRepository clusterMetricRepository;
+    private NodeMetricRepository nodeMetricRepository;
 
     @Override
-    protected Class<ClusterMetricEntity> getEntityClass() {
-        return ClusterMetricEntity.class;
+    protected Class<NodeMetricEntity> getEntityClass() {
+        return NodeMetricEntity.class;
     }
 
     @Override
-    protected CrudRepository<ClusterMetricEntity, String> getCrudRepository() {
-        return clusterMetricRepository;
+    protected CrudRepository<NodeMetricEntity, String> getCrudRepository() {
+        return nodeMetricRepository;
     }
 
     @Override
-    public Optional<NodeMetric>
-    findClusterMetricByNodeIpAndNodePort(String nodeIp, int nodePort) {
-        NodeMetric nodeMetric = DaoUtil.getData(clusterMetricRepository.findClusterMetricByNodeIpAndNodePort(nodeIp, nodePort));
+    public Optional<NodeMetric> findNodeMetricByHostAndPort(String host, int port) {
+        NodeMetric nodeMetric = DaoUtil.getData(nodeMetricRepository.findNodeMetricByHostAndPort(host, port));
         return Optional.of(nodeMetric);
     }
 }

@@ -34,35 +34,35 @@ import javax.persistence.Table;
 @EqualsAndHashCode(callSuper = true)
 @Entity
 @TypeDef(name = "json", typeClass = JsonStringType.class)
-@Table(name = ModelConstants.CLUSTER_METRIC_TALBE_NAME)
-public class ClusterMetricEntity extends BaseSqlEntity<NodeMetric> implements BaseEntity<NodeMetric> {
+@Table(name = ModelConstants.NODE_METRIC_TALBE_NAME)
+public class NodeMetricEntity extends BaseSqlEntity<NodeMetric> implements BaseEntity<NodeMetric> {
 
-    @Column(name = ModelConstants.CLUSTER_METRIC_IP)
-    private String nodeIp;
+    @Column(name = ModelConstants.NODE_METRIC_HOST)
+    private String host;
 
-    @Column(name = ModelConstants.CLUSTER_METRIC_PORT)
-    private int nodePort;
+    @Column(name = ModelConstants.NODE_METRIC_PORT)
+    private int port;
 
-    @Column(name = ModelConstants.CLUSTER_METRIC_NODE_STATUS)
+    @Column(name = ModelConstants.NODE_METRIC_STATUS)
     private boolean nodeStatus;
 
-    @Column(name = ModelConstants.CLUSTER_METRIC_RPC_SESSION)
+    @Column(name = ModelConstants.NODE_METRIC_RPC_SESSION)
     private int rpcSessionCount;
 
-    @Column(name = ModelConstants.CLUSTER_METRIC_DEVICE_SESSION)
+    @Column(name = ModelConstants.NODE_METRIC_DEVICE_SESSION)
     private int deviceSessionCount;
 
-    public ClusterMetricEntity() {
+    public NodeMetricEntity() {
         super();
     }
 
-    public ClusterMetricEntity(NodeMetric nodeMetric) {
+    public NodeMetricEntity(NodeMetric nodeMetric) {
         if (nodeMetric.getId() != null) {
             this.setId(nodeMetric.getId().getId());
         }
 
-        this.nodeIp = nodeMetric.getNodeIp();
-        this.nodePort = nodeMetric.getNodePort();
+        this.host = nodeMetric.getHost();
+        this.port = nodeMetric.getPort();
         this.nodeStatus = nodeMetric.isNodeStatus();
         this.rpcSessionCount = nodeMetric.getRpcSessionCount();
         this.deviceSessionCount = nodeMetric.getDeviceSessionCount();
@@ -71,8 +71,8 @@ public class ClusterMetricEntity extends BaseSqlEntity<NodeMetric> implements Ba
     @Override
     public NodeMetric toData() {
         NodeMetric nodeMetric = new NodeMetric(new NodeMetricId(getId()));
-        nodeMetric.setNodeIp(nodeIp);
-        nodeMetric.setNodePort(nodePort);
+        nodeMetric.setHost(host);
+        nodeMetric.setPort(port);
         nodeMetric.setNodeStatus(nodeStatus);
         nodeMetric.setRpcSessionCount(rpcSessionCount);
         nodeMetric.setDeviceSessionCount(deviceSessionCount);

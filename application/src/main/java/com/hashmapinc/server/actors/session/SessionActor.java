@@ -43,24 +43,24 @@ public class SessionActor extends ContextAwareActor {
 
     private final SessionId sessionId;
     private AbstractSessionActorMsgProcessor processor;
-    private final ActorRef clusterMetricActor;
+    private final ActorRef nodeMetricActor;
 
-    private SessionActor(ActorSystemContext systemContext, SessionId sessionId, ActorRef clusterMetricActor) {
+    private SessionActor(ActorSystemContext systemContext, SessionId sessionId, ActorRef nodeMetricActor) {
         super(systemContext);
         this.sessionId = sessionId;
-        this.clusterMetricActor = clusterMetricActor;
+        this.nodeMetricActor = nodeMetricActor;
     }
 
     @Override
     public void preStart() throws Exception {
         super.preStart();
-        clusterMetricActor.tell(new IncrementDeviceSessionCountMsg(), ActorRef.noSender());
+        nodeMetricActor.tell(new IncrementDeviceSessionCountMsg(), ActorRef.noSender());
     }
 
     @Override
     public void postStop() throws Exception {
         super.postStop();
-        clusterMetricActor.tell(new DecrementDeviceSessionCountMsg(), ActorRef.noSender());
+        nodeMetricActor.tell(new DecrementDeviceSessionCountMsg(), ActorRef.noSender());
     }
 
     @Override
@@ -140,17 +140,17 @@ public class SessionActor extends ContextAwareActor {
         private static final long serialVersionUID = 1L;
 
         private final SessionId sessionId;
-        private final ActorRef clusterMetricActor;
+        private final ActorRef nodeMetricActor;
 
-        public ActorCreator(ActorSystemContext context, SessionId sessionId, ActorRef clusterMetricActor) {
+        public ActorCreator(ActorSystemContext context, SessionId sessionId, ActorRef nodeMetricActor) {
             super(context);
             this.sessionId = sessionId;
-            this.clusterMetricActor = clusterMetricActor;
+            this.nodeMetricActor = nodeMetricActor;
         }
 
         @Override
         public SessionActor create() throws Exception {
-            return new SessionActor(context, sessionId, clusterMetricActor);
+            return new SessionActor(context, sessionId, nodeMetricActor);
         }
     }
 

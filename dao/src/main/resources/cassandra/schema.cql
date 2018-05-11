@@ -628,14 +628,14 @@ CREATE MATERIALIZED VIEW IF NOT EXISTS tempus.event_by_id AS
     PRIMARY KEY ((tenant_id, entity_type, entity_id), id, event_type, event_uid)
     WITH CLUSTERING ORDER BY (id ASC, event_type ASC, event_uid ASC);
 
-CREATE TABLE IF NOT EXISTS tempus.cluster_metric (
+CREATE TABLE IF NOT EXISTS tempus.node_metric (
     id uuid,
-    node_ip text,
-    node_port int,
-    node_status boolean,
+    host text,
+    port int,
+    status boolean,
     rpc_session_count int,
     device_session_count int,
-    PRIMARY KEY (id, node_ip, node_port)
+    PRIMARY KEY (id, host, port)
 );
 
 CREATE TABLE IF NOT EXISTS tempus.computations (

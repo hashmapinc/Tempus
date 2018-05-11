@@ -48,15 +48,23 @@ public class SessionManagerActor extends ContextAwareActor {
 
     private final Map<String, ActorRef> sessionActors;
 
+<<<<<<< 28f4caa5737271857dddcd9cbf47a34f538a8ed3
     private Map<String, List<DeviceSessionInfo>> deviceSessionInfoMap;
 
     private final ActorRef clusterMetricActor;
+=======
+    private final ActorRef nodeMetricActor;
+>>>>>>> renaming ClusterMetric to NodeMetric
 
-    public SessionManagerActor(ActorSystemContext systemContext, ActorRef clusterMetricActor) {
+    public SessionManagerActor(ActorSystemContext systemContext, ActorRef nodeMetricActor) {
         super(systemContext);
         this.sessionActors = new HashMap<>(INITIAL_SESSION_MAP_SIZE);
+<<<<<<< 28f4caa5737271857dddcd9cbf47a34f538a8ed3
         this.deviceSessionInfoMap = new HashMap<>();
         this.clusterMetricActor = clusterMetricActor;
+=======
+        this.nodeMetricActor = nodeMetricActor;
+>>>>>>> renaming ClusterMetric to NodeMetric
     }
 
     @Override
@@ -201,7 +209,7 @@ public class SessionManagerActor extends ContextAwareActor {
         if (sessionActor == null) {
             log.debug("[{}] Creating session actor.", sessionIdStr);
             sessionActor = context().actorOf(
-                    Props.create(new SessionActor.ActorCreator(systemContext, sessionId, clusterMetricActor)).withDispatcher(DefaultActorService.SESSION_DISPATCHER_NAME),
+                    Props.create(new SessionActor.ActorCreator(systemContext, sessionId, nodeMetricActor)).withDispatcher(DefaultActorService.SESSION_DISPATCHER_NAME),
                     sessionIdStr);
             sessionActors.put(sessionIdStr, sessionActor);
             log.debug("[{}] Created session actor.", sessionIdStr);
@@ -222,16 +230,16 @@ public class SessionManagerActor extends ContextAwareActor {
     public static class ActorCreator extends ContextBasedCreator<SessionManagerActor> {
         private static final long serialVersionUID = 1L;
 
-        private final ActorRef clusterMetricActor;
+        private final ActorRef nodeMetricActor;
 
-        public ActorCreator(ActorSystemContext context, ActorRef clusterMetricActor) {
+        public ActorCreator(ActorSystemContext context, ActorRef nodeMetricActor) {
             super(context);
-            this.clusterMetricActor = clusterMetricActor;
+            this.nodeMetricActor = nodeMetricActor;
         }
 
         @Override
         public SessionManagerActor create() throws Exception {
-            return new SessionManagerActor(context, clusterMetricActor);
+            return new SessionManagerActor(context, nodeMetricActor);
         }
     }
 

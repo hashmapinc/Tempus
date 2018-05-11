@@ -15,12 +15,12 @@
  */
 package com.hashmapinc.server.dao.sql.cluster;
 
-import com.hashmapinc.server.dao.model.sql.ClusterMetricEntity;
+import com.hashmapinc.server.dao.model.sql.NodeMetricEntity;
 import com.hashmapinc.server.dao.util.SqlDao;
 import org.springframework.data.repository.CrudRepository;
 
 @SqlDao
-public interface ClusterMetricRepository extends CrudRepository<ClusterMetricEntity, String> {
+public interface NodeMetricRepository extends CrudRepository<NodeMetricEntity, String> {
 
-    ClusterMetricEntity findClusterMetricByNodeIpAndNodePort(String nodeIp, int nodePort);
+    NodeMetricEntity findNodeMetricByHostAndPort(String host, int port);
 }
