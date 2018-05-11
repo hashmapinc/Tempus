@@ -18,7 +18,7 @@ package com.hashmapinc.server.dao.cluster;
 import com.hashmapinc.server.common.data.cluster.NodeMetric;
 import com.hashmapinc.server.dao.DaoUtil;
 import com.hashmapinc.server.dao.model.ModelConstants;
-import com.hashmapinc.server.dao.model.nosql.ClusterMetricEntity;
+import com.hashmapinc.server.dao.model.nosql.NodeMetricEntity;
 import com.hashmapinc.server.dao.nosql.CassandraAbstractModelDao;
 import com.hashmapinc.server.dao.util.NoSqlDao;
 import lombok.extern.slf4j.Slf4j;
@@ -33,24 +33,24 @@ import static com.datastax.driver.core.querybuilder.QueryBuilder.eq;
 @Component
 @Slf4j
 @NoSqlDao
-public class CassandraClusterMetricDao extends CassandraAbstractModelDao<ClusterMetricEntity, NodeMetric> implements ClusterMetricDao {
+public class CassandraNodeMetricDao extends CassandraAbstractModelDao<NodeMetricEntity, NodeMetric> implements NodeMetricDao {
 
     @Override
-    protected Class<ClusterMetricEntity> getColumnFamilyClass() {
-        return ClusterMetricEntity.class;
+    protected Class<NodeMetricEntity> getColumnFamilyClass() {
+        return NodeMetricEntity.class;
     }
 
     @Override
     protected String getColumnFamilyName() {
-        return ModelConstants.CLUSTER_METRIC_COLUMN_FAMILY_NAME;
+        return ModelConstants.NODE_METRIC_COLUMN_FAMILY_NAME;
     }
 
     @Override
-    public Optional<NodeMetric> findClusterMetricByNodeIpAndNodePort(String nodeIp, int nodePort) {
-        Select select = select().from(ModelConstants.CLUSTER_METRIC_COLUMN_FAMILY_NAME).allowFiltering();
+    public Optional<NodeMetric> findNodeMetricByHostAndPort(String host, int port) {
+        Select select = select().from(ModelConstants.NODE_METRIC_COLUMN_FAMILY_NAME).allowFiltering();
         Select.Where query = select.where();
-        query.and(eq(ModelConstants.CLUSTER_METRIC_IP_PROPERTY, nodeIp));
-        query.and(eq(ModelConstants.CLUSTER_METRIC_PORT_PROPERTY, nodePort));
+        query.and(eq(ModelConstants.NODE_METRIC_HOST_PROPERTY, host));
+        query.and(eq(ModelConstants.NODE_METRIC_PORT_PROPERTY, port));
         return Optional.ofNullable(DaoUtil.getData(findOneByStatement(query)));
     }
 }

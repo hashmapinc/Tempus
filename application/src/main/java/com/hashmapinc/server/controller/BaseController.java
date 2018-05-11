@@ -142,7 +142,7 @@ public abstract class BaseController {
     protected AuditLogService auditLogService;
 
     @Autowired
-    protected ClusterMetricService clusterMetricService;
+    protected NodeMetricService nodeMetricService;
 
 
     @ExceptionHandler(TempusException.class)

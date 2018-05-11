@@ -22,22 +22,22 @@ import com.hashmapinc.server.common.data.EntityType;
 
 import java.util.UUID;
 
-public final class ClusterMetricId extends UUIDBased implements EntityId {
+public final class NodeMetricId extends UUIDBased implements EntityId {
 
     private static final long serialVersionUID = 1L;
 
     @JsonCreator
-    public ClusterMetricId(@JsonProperty("id") UUID id) {
+    public NodeMetricId(@JsonProperty("id") UUID id) {
         super(id);
     }
 
-    public static ClusterMetricId fromString(String clusterMetricId) {
-        return new ClusterMetricId(UUID.fromString(clusterMetricId));
+    public static NodeMetricId fromString(String nodeMetricId) {
+        return new NodeMetricId(UUID.fromString(nodeMetricId));
     }
 
     @JsonIgnore
     @Override
     public EntityType getEntityType() {
-        return EntityType.CLUSTER_METRIC;
+        return EntityType.NODE_METRIC;
     }
 }

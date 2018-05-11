@@ -16,49 +16,49 @@
 package com.hashmapinc.server.common.data.cluster;
 
 import com.hashmapinc.server.common.data.BaseData;
-import com.hashmapinc.server.common.data.id.ClusterMetricId;
+import com.hashmapinc.server.common.data.id.NodeMetricId;
 import lombok.EqualsAndHashCode;
 
 @EqualsAndHashCode(callSuper = true)
-public class ClusterMetric extends BaseData<ClusterMetricId> {
+public class NodeMetric extends BaseData<NodeMetricId> {
 
-    private String nodeIp;
-    private int nodePort;
+    private String host;
+    private int port;
     private boolean nodeStatus;
     private int rpcSessionCount;
     private int deviceSessionCount;
 
-    public ClusterMetric() {
+    public NodeMetric() {
         super();
     }
 
-    public ClusterMetric(ClusterMetricId id) {
+    public NodeMetric(NodeMetricId id) {
         super(id);
     }
 
-    public ClusterMetric(ClusterMetric clusterMetric) {
-        super(clusterMetric);
-        this.nodeIp = clusterMetric.nodeIp;
-        this.nodePort = clusterMetric.nodePort;
-        this.nodeStatus = clusterMetric.nodeStatus;
-        this.rpcSessionCount = clusterMetric.rpcSessionCount;
-        this.deviceSessionCount = clusterMetric.deviceSessionCount;
+    public NodeMetric(NodeMetric nodeMetric) {
+        super(nodeMetric);
+        this.host = nodeMetric.host;
+        this.port = nodeMetric.port;
+        this.nodeStatus = nodeMetric.nodeStatus;
+        this.rpcSessionCount = nodeMetric.rpcSessionCount;
+        this.deviceSessionCount = nodeMetric.deviceSessionCount;
     }
 
-    public String getNodeIp() {
-        return nodeIp;
+    public String getHost() {
+        return host;
     }
 
-    public void setNodeIp(String nodeIp) {
-        this.nodeIp = nodeIp;
+    public void setHost(String host) {
+        this.host = host;
     }
 
-    public int getNodePort() {
-        return nodePort;
+    public int getPort() {
+        return port;
     }
 
-    public void setNodePort(int nodePort) {
-        this.nodePort = nodePort;
+    public void setPort(int port) {
+        this.port = port;
     }
 
     public boolean isNodeStatus() {
@@ -87,9 +87,9 @@ public class ClusterMetric extends BaseData<ClusterMetricId> {
 
     @Override
     public String toString() {
-        return "ClusterMetric{" +
-                "nodeIp=" + nodeIp +
-                ", nodePort=" + nodePort +
+        return "NodeMetric{" +
+                "host=" + host +
+                ", port=" + port +
                 ", rpcSessionCount=" + rpcSessionCount +
                 ", deviceSessionCount=" + deviceSessionCount +
                 ", nodeStatus=" + nodeStatus +

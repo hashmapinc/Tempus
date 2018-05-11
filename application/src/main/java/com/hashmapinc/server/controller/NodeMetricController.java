@@ -15,7 +15,7 @@
  */
 package com.hashmapinc.server.controller;
 
-import com.hashmapinc.server.common.data.cluster.ClusterMetric;
+import com.hashmapinc.server.common.data.cluster.NodeMetric;
 import com.hashmapinc.server.exception.TempusException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -29,16 +29,16 @@ import java.util.List;
 @RestController
 @RequestMapping("/api")
 @Slf4j
-public class ClusterMetricController extends BaseController {
+public class NodeMetricController extends BaseController {
 
     @PreAuthorize("hasAuthority('SYS_ADMIN')")
     @RequestMapping(value = "/nodes", method = RequestMethod.GET)
     @ResponseBody
-    public List<ClusterMetric> getClusterMetric() throws TempusException {
+    public List<NodeMetric> getNodeMetric() throws TempusException {
         try {
-            List<ClusterMetric> clusterMetrics = checkNotNull(clusterMetricService.findAll());
-            log.error("clusterMetric : [{}]", clusterMetrics);
-            return clusterMetrics;
+            List<NodeMetric> nodeMetrics = checkNotNull(nodeMetricService.findAll());
+            log.error("CLUSTERMetrics : [{}]", nodeMetrics);
+            return nodeMetrics;
         } catch (Exception e) {
             throw handleException(e);
         }

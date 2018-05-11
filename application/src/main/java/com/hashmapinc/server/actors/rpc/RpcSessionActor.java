@@ -43,12 +43,12 @@ public class RpcSessionActor extends ContextAwareActor {
     private GrpcSession session;
     private GrpcSessionListener listener;
 
-    private final ActorRef clusterMetricActor;
+    private final ActorRef nodeMetricActor;
 
-    public RpcSessionActor(ActorSystemContext systemContext, UUID sessionId, ActorRef clusterMetricActor) {
+    public RpcSessionActor(ActorSystemContext systemContext, UUID sessionId, ActorRef nodeMetricActor) {
         super(systemContext);
         this.sessionId = sessionId;
-        this.clusterMetricActor = clusterMetricActor;
+        this.nodeMetricActor = nodeMetricActor;
     }
 
     @Override
@@ -67,14 +67,14 @@ public class RpcSessionActor extends ContextAwareActor {
     @Override
     public void preStart() throws Exception {
         super.preStart();
-        clusterMetricActor.tell(new IncrementRpcSessionCountMsg(), ActorRef.noSender());
+        nodeMetricActor.tell(new IncrementRpcSessionCountMsg(), ActorRef.noSender());
     }
 
     @Override
     public void postStop() {
         log.info("Closing session -> {}", session.getRemoteServer());
         session.close();
-        clusterMetricActor.tell(new DecrementRpcSessionCountMsg(), ActorRef.noSender());
+        nodeMetricActor.tell(new DecrementRpcSessionCountMsg(), ActorRef.noSender());
     }
 
     private void initSession(RpcSessionCreateRequestMsg msg) {
@@ -108,17 +108,17 @@ public class RpcSessionActor extends ContextAwareActor {
 
         private final UUID sessionId;
 
-        private final ActorRef clusterMetricActor;
+        private final ActorRef nodeMetricActor;
 
-        public ActorCreator(ActorSystemContext context, UUID sessionId, ActorRef clusterMetricActor) {
+        public ActorCreator(ActorSystemContext context, UUID sessionId, ActorRef nodeMetricActor) {
             super(context);
             this.sessionId = sessionId;
-            this.clusterMetricActor = clusterMetricActor;
+            this.nodeMetricActor = nodeMetricActor;
         }
 
         @Override
         public RpcSessionActor create() throws Exception {
-            return new RpcSessionActor(context, sessionId, clusterMetricActor);
+            return new RpcSessionActor(context, sessionId, nodeMetricActor);
         }
     }
 

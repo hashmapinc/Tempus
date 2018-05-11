@@ -15,7 +15,7 @@
  */
 package com.hashmapinc.server.common.data.cluster;
 
-public enum ClusterNodeStatus {
+public enum NodeStatus {
     UP(true),
     DOWN(false);
 
@@ -25,7 +25,7 @@ public enum ClusterNodeStatus {
         return this.nodeStatus;
     }
 
-    private ClusterNodeStatus(boolean nodeStatus) {
+    private NodeStatus(boolean nodeStatus) {
         this.nodeStatus = nodeStatus;
     }
 }

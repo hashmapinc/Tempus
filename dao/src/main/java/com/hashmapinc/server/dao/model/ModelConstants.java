@@ -200,14 +200,14 @@ public class ModelConstants {
     public static final String COMPUTATION_JOB_TENANT_ID = TENANT_ID_PROPERTY;
 
     /**
-     * Cluster Metric Constants
+     * Node Metric Constants
      */
-    public static final String CLUSTER_METRIC_TALBE_NAME = "cluster_metric";
-    public static final String CLUSTER_METRIC_IP = "node_ip";
-    public static final String CLUSTER_METRIC_PORT = "node_port";
-    public static final String CLUSTER_METRIC_NODE_STATUS = "node_status";
-    public static final String CLUSTER_METRIC_RPC_SESSION = "rpc_session_count";
-    public static final String CLUSTER_METRIC_DEVICE_SESSION = "device_session_count";
+    public static final String NODE_METRIC_TALBE_NAME = "node_metric";
+    public static final String NODE_METRIC_HOST = "host";
+    public static final String NODE_METRIC_PORT = "port";
+    public static final String NODE_METRIC_STATUS = "status";
+    public static final String NODE_METRIC_RPC_SESSION = "rpc_session_count";
+    public static final String NODE_METRIC_DEVICE_SESSION = "device_session_count";
      
     /* Cassandra audit log constants.
      */
@@ -381,14 +381,14 @@ public class ModelConstants {
     public static final String COMPUTATION_JOB_TENANT_ID_PROPERTY = TENANT_ID_PROPERTY;
 
     /**
-     * Cassandra Cluster Metric Contants
+     * Cassandra Node Metric Contants
      */
-    public static final String CLUSTER_METRIC_COLUMN_FAMILY_NAME = "cluster_metric";
-    public static final String CLUSTER_METRIC_IP_PROPERTY = "node_ip";
-    public static final String CLUSTER_METRIC_PORT_PROPERTY = "node_port";
-    public static final String CLUSTER_METRIC_NODE_STATUS_PROPERTY = "node_status";
-    public static final String CLUSTER_METRIC_RPC_SESSION_PROPERTY = "rpc_session_count";
-    public static final String CLUSTER_METRIC_DEVICE_SESSION_PROPERTY = "device_session_count";
+    public static final String NODE_METRIC_COLUMN_FAMILY_NAME = "node_metric";
+    public static final String NODE_METRIC_HOST_PROPERTY = "host";
+    public static final String NODE_METRIC_PORT_PROPERTY = "port";
+    public static final String NODE_METRIC_STATUS_PROPERTY = "status";
+    public static final String NODE_METRIC_RPC_SESSION_PROPERTY = "rpc_session_count";
+    public static final String NODE_METRIC_DEVICE_SESSION_PROPERTY = "device_session_count";
 
     /**
      * Cassandra plugin component metadata constants.

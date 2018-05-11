@@ -26,86 +26,86 @@ import java.util.Optional;
 
 @Service
 @Slf4j
-public class ClusterMetricServiceImpl extends AbstractEntityService implements ClusterMetricService {
+public class NodeMetricServiceImpl extends AbstractEntityService implements NodeMetricService {
 
     @Autowired
-    private ClusterMetricDao clusterMetricDao;
+    private NodeMetricDao nodeMetricDao;
 
     @Override
     public NodeMetric save(NodeMetric nodeMetric) {
-        log.debug("Executing ClusterMetricServiceImpl saveClusterMetric [{}]", nodeMetric);
-        return clusterMetricDao.save(nodeMetric);
+        log.debug("Executing NodeMetricServiceImpl save NodeMetric [{}]", nodeMetric);
+        return nodeMetricDao.save(nodeMetric);
     }
 
     @Override
-    public Optional<NodeMetric> findClusterMetricByNodeIpAndNodePort(String nodeIp, int nodePort) {
-        log.debug("Executing ClusterMetricServiceImpl findByNodeIpAndNodePort, nodeIp [{}], nodePort [{}]", nodeIp, nodePort);
-        return clusterMetricDao.findClusterMetricByNodeIpAndNodePort(nodeIp, nodePort);
+    public Optional<NodeMetric> findNodeMetricByHostAndPort(String host, int port) {
+        log.debug("Executing NodeMetricServiceImpl findNodeMetricByHostAndPort, host [{}], port [{}]", host, port);
+        return nodeMetricDao.findNodeMetricByHostAndPort(host, port);
     }
 
     @Override
     public List<NodeMetric> findAll() {
-        log.debug("Executing ClusterMetricServiceImpl findAll NodeMetric");
-        return clusterMetricDao.find();
+        log.debug("Executing NodeMetricServiceImpl findAll NodeMetric");
+        return nodeMetricDao.find();
     }
 
     @Override
-    public NodeMetric incrementRpcSessionCount(String nodeIp, int nodePort) {
-        Optional<NodeMetric> clusterMetric = findClusterMetricByNodeIpAndNodePort(nodeIp, nodePort);
-        if (clusterMetric.isPresent()) {
-            int rpcSessionCount = clusterMetric.get().getRpcSessionCount();
-            log.debug("ClusterMetricServiceImpl rpcSessionCount [{}]", rpcSessionCount);
-            clusterMetric.get().setRpcSessionCount(rpcSessionCount + 1);
-            return clusterMetricDao.save(clusterMetric.get());
+    public NodeMetric incrementRpcSessionCount(String host, int port) {
+        Optional<NodeMetric> nodeMetric = findNodeMetricByHostAndPort(host, port);
+        if (nodeMetric.isPresent()) {
+            int rpcSessionCount = nodeMetric.get().getRpcSessionCount();
+            log.debug("NodeMetricServiceImpl rpcSessionCount [{}]", rpcSessionCount);
+            nodeMetric.get().setRpcSessionCount(rpcSessionCount + 1);
+            return nodeMetricDao.save(nodeMetric.get());
         }
-        return clusterMetric.get();
+        return nodeMetric.get();
     }
 
     @Override
-    public NodeMetric decrementRpcSessionCount(String nodeIp, int nodePort) {
-        Optional<NodeMetric> clusterMetric = findClusterMetricByNodeIpAndNodePort(nodeIp, nodePort);
-        if (clusterMetric.isPresent()) {
-            int rpcSessionCount = clusterMetric.get().getRpcSessionCount();
-            log.debug("ClusterMetricServiceImpl rpcSessionCount [{}]", rpcSessionCount);
+    public NodeMetric decrementRpcSessionCount(String host, int port) {
+        Optional<NodeMetric> nodeMetric = findNodeMetricByHostAndPort(host, port);
+        if (nodeMetric.isPresent()) {
+            int rpcSessionCount = nodeMetric.get().getRpcSessionCount();
+            log.debug("NodeMetricServiceImpl rpcSessionCount [{}]", rpcSessionCount);
             rpcSessionCount--;
-            clusterMetric.get().setRpcSessionCount(rpcSessionCount);
+            nodeMetric.get().setRpcSessionCount(rpcSessionCount);
             /*if (rpcSessionCount < 0) {
-                clusterMetric.get().setRpcSessionCount(0);
+                nodeMetric.get().setRpcSessionCount(0);
             } else {
-                clusterMetric.get().setRpcSessionCount(rpcSessionCount);
+                nodeMetric.get().setRpcSessionCount(rpcSessionCount);
             }*/
-            return clusterMetricDao.save(clusterMetric.get());
+            return nodeMetricDao.save(nodeMetric.get());
         }
-        return clusterMetric.get();
+        return nodeMetric.get();
     }
 
     @Override
-    public NodeMetric incrementDeviceSessionCount(String nodeIp, int nodePort) {
-        Optional<NodeMetric> clusterMetric = findClusterMetricByNodeIpAndNodePort(nodeIp, nodePort);
-        if (clusterMetric.isPresent()) {
-            int deviceSessionCount = clusterMetric.get().getDeviceSessionCount();
-            log.debug("ClusterMetricServiceImpl deviceSessionCount [{}]", deviceSessionCount);
-            clusterMetric.get().setDeviceSessionCount(deviceSessionCount + 1);
-            return clusterMetricDao.save(clusterMetric.get());
+    public NodeMetric incrementDeviceSessionCount(String host, int port) {
+        Optional<NodeMetric> nodeMetric = findNodeMetricByHostAndPort(host, port);
+        if (nodeMetric.isPresent()) {
+            int deviceSessionCount = nodeMetric.get().getDeviceSessionCount();
+            log.debug("NodeMetricServiceImpl deviceSessionCount [{}]", deviceSessionCount);
+            nodeMetric.get().setDeviceSessionCount(deviceSessionCount + 1);
+            return nodeMetricDao.save(nodeMetric.get());
         }
-        return clusterMetric.get();
+        return nodeMetric.get();
     }
 
     @Override
-    public NodeMetric decrementDeviceSessionCount(String nodeIp, int nodePort) {
-        Optional<NodeMetric> clusterMetric = findClusterMetricByNodeIpAndNodePort(nodeIp, nodePort);
-        if (clusterMetric.isPresent()) {
-            int deviceSessionCount = clusterMetric.get().getDeviceSessionCount();
-            log.debug("ClusterMetricServiceImpl deviceSessionCount [{}]", deviceSessionCount);
+    public NodeMetric decrementDeviceSessionCount(String host, int port) {
+        Optional<NodeMetric> nodeMetric = findNodeMetricByHostAndPort(host, port);
+        if (nodeMetric.isPresent()) {
+            int deviceSessionCount = nodeMetric.get().getDeviceSessionCount();
+            log.debug("NodeMetricServiceImpl deviceSessionCount [{}]", deviceSessionCount);
             deviceSessionCount--;
-            clusterMetric.get().setDeviceSessionCount(deviceSessionCount);
+            nodeMetric.get().setDeviceSessionCount(deviceSessionCount);
             /*if (deviceSessionCount < 0) {
-                clusterMetric.get().setDeviceSessionCount(0);
+                nodeMetric.get().setDeviceSessionCount(0);
             } else {
-                clusterMetric.get().setDeviceSessionCount(deviceSessionCount);
+                nodeMetric.get().setDeviceSessionCount(deviceSessionCount);
             }*/
-            return clusterMetricDao.save(clusterMetric.get());
+            return nodeMetricDao.save(nodeMetric.get());
         }
-        return clusterMetric.get();
+        return nodeMetric.get();
     }
 }
