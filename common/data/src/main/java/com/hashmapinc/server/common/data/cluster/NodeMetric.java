@@ -24,7 +24,7 @@ public class NodeMetric extends BaseData<NodeMetricId> {
 
     private String host;
     private int port;
-    private boolean nodeStatus;
+    private NodeStatus nodeStatus;
     private int rpcSessionCount;
     private int deviceSessionCount;
 
@@ -61,11 +61,11 @@ public class NodeMetric extends BaseData<NodeMetricId> {
         this.port = port;
     }
 
-    public boolean isNodeStatus() {
+    public NodeStatus getNodeStatus() {
         return nodeStatus;
     }
 
-    public void setNodeStatus(boolean nodeStatus) {
+    public void setNodeStatus(NodeStatus nodeStatus) {
         this.nodeStatus = nodeStatus;
     }
 

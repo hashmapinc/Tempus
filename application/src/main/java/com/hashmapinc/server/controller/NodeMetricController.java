@@ -37,7 +37,7 @@ public class NodeMetricController extends BaseController {
     public List<NodeMetric> getNodeMetric() throws TempusException {
         try {
             List<NodeMetric> nodeMetrics = checkNotNull(nodeMetricService.findAll());
-            log.error("CLUSTERMetrics : [{}]", nodeMetrics);
+            log.debug("NodeMetrics : [{}]", nodeMetrics);
             return nodeMetrics;
         } catch (Exception e) {
             throw handleException(e);

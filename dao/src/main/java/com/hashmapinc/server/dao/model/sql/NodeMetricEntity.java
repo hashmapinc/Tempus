@@ -17,6 +17,7 @@ package com.hashmapinc.server.dao.model.sql;
 
 
 import com.hashmapinc.server.common.data.cluster.NodeMetric;
+import com.hashmapinc.server.common.data.cluster.NodeStatus;
 import com.hashmapinc.server.common.data.id.NodeMetricId;
 import com.hashmapinc.server.dao.model.BaseEntity;
 import com.hashmapinc.server.dao.model.BaseSqlEntity;
@@ -44,7 +45,7 @@ public class NodeMetricEntity extends BaseSqlEntity<NodeMetric> implements BaseE
     private int port;
 
     @Column(name = ModelConstants.NODE_METRIC_STATUS)
-    private boolean nodeStatus;
+    private String nodeStatus;
 
     @Column(name = ModelConstants.NODE_METRIC_RPC_SESSION)
     private int rpcSessionCount;
@@ -63,7 +64,7 @@ public class NodeMetricEntity extends BaseSqlEntity<NodeMetric> implements BaseE
 
         this.host = nodeMetric.getHost();
         this.port = nodeMetric.getPort();
-        this.nodeStatus = nodeMetric.isNodeStatus();
+        this.nodeStatus = nodeMetric.getNodeStatus().getNodeStatus();
         this.rpcSessionCount = nodeMetric.getRpcSessionCount();
         this.deviceSessionCount = nodeMetric.getDeviceSessionCount();
     }
@@ -73,7 +74,7 @@ public class NodeMetricEntity extends BaseSqlEntity<NodeMetric> implements BaseE
         NodeMetric nodeMetric = new NodeMetric(new NodeMetricId(getId()));
         nodeMetric.setHost(host);
         nodeMetric.setPort(port);
-        nodeMetric.setNodeStatus(nodeStatus);
+        nodeMetric.setNodeStatus(NodeStatus.valueOf(nodeStatus));
         nodeMetric.setRpcSessionCount(rpcSessionCount);
         nodeMetric.setDeviceSessionCount(deviceSessionCount);
         return nodeMetric;

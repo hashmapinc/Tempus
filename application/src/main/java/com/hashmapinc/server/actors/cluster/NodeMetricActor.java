@@ -21,6 +21,7 @@ import com.hashmapinc.server.actors.ActorSystemContext;
 import com.hashmapinc.server.actors.service.ContextAwareActor;
 import com.hashmapinc.server.actors.service.ContextBasedCreator;
 import com.hashmapinc.server.common.data.cluster.NodeMetric;
+import com.hashmapinc.server.common.data.cluster.NodeStatus;
 
 public class NodeMetricActor extends ContextAwareActor {
 
@@ -58,7 +59,7 @@ public class NodeMetricActor extends ContextAwareActor {
         NodeMetric nodeMetric = new NodeMetric();
         nodeMetric.setHost(host);
         nodeMetric.setPort(port);
-        nodeMetric.setNodeStatus(true);
+        nodeMetric.setNodeStatus(NodeStatus.UP);
         nodeMetric.setDeviceSessionCount(0);
         nodeMetric.setRpcSessionCount(0);
         return nodeMetric;
