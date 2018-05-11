@@ -72,7 +72,7 @@ plugins:
   scan_packages: "${PLUGINS_SCAN_PACKAGES:com.hashmapinc.server.extensions}"
 
 spark:
-  jar_path: "${SPARK_COMPUTATIONS_PATH:/Users/jay/Poller}"
+  jar_path: "${SPARK_COMPUTATIONS_PATH:${java.io.tmpdir}}"
   polling_interval: "${DIRECTORY_POLLING_INTERVAL:10}" # Number of Seconds
 
 # JWT Token parameters
