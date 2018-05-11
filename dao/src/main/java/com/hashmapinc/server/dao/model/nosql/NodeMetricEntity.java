@@ -22,8 +22,9 @@ import com.hashmapinc.server.common.data.id.NodeMetricId;
 import com.hashmapinc.server.dao.model.BaseEntity;
 import com.hashmapinc.server.dao.model.ModelConstants;
 
-import javax.persistence.Column;
-import javax.persistence.Table;
+import com.datastax.driver.mapping.annotations.Table;
+import com.datastax.driver.mapping.annotations.Column;
+import com.hashmapinc.server.dao.model.type.NodeStatusCodec;
 
 import java.util.UUID;
 
@@ -42,8 +43,8 @@ public class NodeMetricEntity implements BaseEntity<NodeMetric> {
     @Column(name = ModelConstants.NODE_METRIC_PORT_PROPERTY)
     private int port;
 
-    @Column(name = ModelConstants.NODE_METRIC_STATUS_PROPERTY)
-    private String nodeStatus;
+    @Column(name = ModelConstants.NODE_METRIC_STATUS_PROPERTY, codec = NodeStatusCodec.class)
+    private NodeStatus nodeStatus;
 
     @Column(name = ModelConstants.NODE_METRIC_RPC_SESSION_PROPERTY)
     private int rpcSessionCount;
@@ -62,7 +63,7 @@ public class NodeMetricEntity implements BaseEntity<NodeMetric> {
 
         this.host = nodeMetric.getHost();
         this.port = nodeMetric.getPort();
-        this.nodeStatus = nodeMetric.getNodeStatus().getNodeStatus();
+        this.nodeStatus = nodeMetric.getNodeStatus();
         this.rpcSessionCount = nodeMetric.getRpcSessionCount();
         this.deviceSessionCount = nodeMetric.getDeviceSessionCount();
     }
@@ -93,11 +94,11 @@ public class NodeMetricEntity implements BaseEntity<NodeMetric> {
         this.port = port;
     }
 
-    public String getNodeStatus() {
+    public NodeStatus getNodeStatus() {
         return nodeStatus;
     }
 
-    public void setNodeStatus(String nodeStatus) {
+    public void setNodeStatus(NodeStatus nodeStatus) {
         this.nodeStatus = nodeStatus;
     }
 
@@ -122,7 +123,7 @@ public class NodeMetricEntity implements BaseEntity<NodeMetric> {
         NodeMetric nodeMetric = new NodeMetric(new NodeMetricId(getId()));
         nodeMetric.setHost(host);
         nodeMetric.setPort(port);
-        nodeMetric.setNodeStatus(NodeStatus.valueOf(nodeStatus));
+        nodeMetric.setNodeStatus(nodeStatus);
         nodeMetric.setRpcSessionCount(rpcSessionCount);
         nodeMetric.setDeviceSessionCount(deviceSessionCount);
         return nodeMetric;

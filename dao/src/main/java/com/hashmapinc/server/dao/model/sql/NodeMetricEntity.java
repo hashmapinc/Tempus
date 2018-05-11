@@ -27,9 +27,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.hibernate.annotations.TypeDef;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
@@ -44,8 +42,9 @@ public class NodeMetricEntity extends BaseSqlEntity<NodeMetric> implements BaseE
     @Column(name = ModelConstants.NODE_METRIC_PORT)
     private int port;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = ModelConstants.NODE_METRIC_STATUS)
-    private String nodeStatus;
+    private NodeStatus nodeStatus;
 
     @Column(name = ModelConstants.NODE_METRIC_RPC_SESSION)
     private int rpcSessionCount;
@@ -64,7 +63,7 @@ public class NodeMetricEntity extends BaseSqlEntity<NodeMetric> implements BaseE
 
         this.host = nodeMetric.getHost();
         this.port = nodeMetric.getPort();
-        this.nodeStatus = nodeMetric.getNodeStatus().getNodeStatus();
+        this.nodeStatus = nodeMetric.getNodeStatus();
         this.rpcSessionCount = nodeMetric.getRpcSessionCount();
         this.deviceSessionCount = nodeMetric.getDeviceSessionCount();
     }
@@ -74,7 +73,7 @@ public class NodeMetricEntity extends BaseSqlEntity<NodeMetric> implements BaseE
         NodeMetric nodeMetric = new NodeMetric(new NodeMetricId(getId()));
         nodeMetric.setHost(host);
         nodeMetric.setPort(port);
-        nodeMetric.setNodeStatus(NodeStatus.valueOf(nodeStatus));
+        nodeMetric.setNodeStatus(nodeStatus);
         nodeMetric.setRpcSessionCount(rpcSessionCount);
         nodeMetric.setDeviceSessionCount(deviceSessionCount);
         return nodeMetric;
