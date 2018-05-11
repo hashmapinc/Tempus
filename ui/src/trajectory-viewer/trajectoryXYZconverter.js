@@ -68,7 +68,7 @@ function convertRawToXYZ(trajectoryArray, origin) {
 
     // add new XYZ to results
     let lastPoint = results[results.length - 1];
-    results.push({x: lastPoint.x + eastDelta, y: lastPoint.y + northDelta, z: lastPoint.z + depthDelta});
+    results.push({x: lastPoint.x + eastDelta, z: lastPoint.z + northDelta, y: lastPoint.y - depthDelta});
   }
 
   // return the results!!

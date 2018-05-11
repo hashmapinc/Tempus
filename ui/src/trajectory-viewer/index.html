@@ -27,6 +27,18 @@
 				overflow: hidden;
 			}
 
+      #scene {
+        z-index: -10;
+      }
+
+      #abs {
+        z-index: 1;
+      }
+
+      div {
+        position: absolute;
+      }
+
       canvas {
         width: 100%;
         height: 100%
@@ -35,23 +47,24 @@
   </head>
 
   <body>
-    <div id="controls">
-      <div>
-        Camera X Position
-        <input id="camX" type="number" oninput="updateCameraPosition();">
-      </div>
-      <div>
-        Camera Y Position
-        <input id="camY" type="number" oninput="updateCameraPosition();">
-      </div>
-      <div>
-        Camera Z Position
-        <input id="camZ" type="number" oninput="updateCameraPosition();">
-      </div>
+    <!-- threejs scene -->
+    <div id="scene"></div>
+
+    <!-- camera controls -->
+    <div>
+      camera east: </br>
+      <input id="camX" type="number" oninput="updateCameraPosition();"> </br>
+      camera north: </br>
+      <input id="camZ" type="number" oninput="updateCameraPosition();"> </br>
+      camera depth: </br>
+      <input id="camY" type="number" oninput="updateCameraPosition();"> </br>
       <button type="button" onclick="resetCameraPosition();">reset camera</button>
     </div>
 
-    <div id="scene"></div>
+    <!-- axis labels -->
+    <div id="labelX">east</div>
+    <div id="labelY">tvd</div>
+    <div id="labelZ">north</div>
 
     <script src="three/three.js"></script>
 

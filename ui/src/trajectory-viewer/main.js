@@ -19,6 +19,7 @@
 //=============================================================================
 // threejs 
 var scene; // threejs scene
+var sceneContainer = document.getElementById('scene');
 var camera; // threejs camera
 var renderer; // threejs renderer
 var controls; // camera controls
@@ -28,11 +29,12 @@ var mousePosition; // XY coordinates of the mouse
 // trajectory data
 var rawReadings; // array of trajectory readings describing plotted trajectory
 var points; // array of 3D points describing plotted trajectory
+var gridSize; // size of grid to bound the plot
 
 // colors
 backgroundColor = 0xffffff;
-plotColor = 0xff6666;
-gridColor = 0x222266;
+plotColor = 0x555555;
+gridColor = 0xaaaaaa;
 //=============================================================================
 
 // compute new points array. If overwrite, delete rawReadings first
@@ -96,8 +98,8 @@ function plotPoints() {
     var sphere = new THREE.Mesh(geometry, material);
     sphere.name = "well-plot-point";
     sphere.position.x = point.x;
-    sphere.position.z = point.y;
-    sphere.position.y = -point.z;
+    sphere.position.y = point.y;
+    sphere.position.z = point.z;
     scene.add(sphere);
   });
 }
@@ -108,50 +110,94 @@ function updateGrids() {
   removeAllFromScene("grid");
 
   // get new grid sizes
-  var gridSize = 1000;
-  if (points && points[0]) {
-    var deepest = points[points.length - 1];
-    gridSize = Math.ceil(Math.max(deepest.x, deepest.y, deepest.z));
-    if (gridSize % 2 > 0) {
-      gridSize += 1; //make sure it is an even number
-    }
+  gridSize = 1000;
+  if (rawReadings && rawReadings[0]) {
+    gridSize = rawReadings[rawReadings.length-1].md;
+    gridSize = 2*(Math.floor(gridSize / 100) + 1) * 100; // make an even multiple of 100
+
   }
 
+  // get num divisions in grid
+  var numDivisions = gridSize / 100;
+
   // make grids
-  var gridXY = new THREE.GridHelper(gridSize, 100, gridColor, gridColor);
-  var gridXZ = new THREE.GridHelper(gridSize, 10, gridColor, gridColor); // needs rotated and moved
-  var gridYZ = new THREE.GridHelper(gridSize, 10, gridColor, gridColor); // needs rotated and moved
+  var gridXZ = new THREE.GridHelper(gridSize, numDivisions, 0xff0000, gridColor);
+  var gridXY = new THREE.GridHelper(gridSize, numDivisions, 0x00ff00, gridColor); // needs rotated and moved
+  var gridZY = new THREE.GridHelper(gridSize, numDivisions, 0x0000ff, gridColor); // needs rotated and moved
 
   // position grids
-  gridXZ.rotateX(Math.PI / 2);
-  gridXZ.position.set(0, -gridSize / 2, 0);
-  gridYZ.rotateZ(Math.PI / 2);
-  gridYZ.position.set(0, -gridSize / 2, 0);
+  gridXZ.position.set(0,10,0); // move up just a tad to show the grid center coloring better
+  gridXY.rotateX(Math.PI / 2);
+  gridXY.position.set(0, -gridSize / 2, 0);
+  gridZY.rotateZ(Math.PI / 2);
+  gridZY.position.set(0, -gridSize / 2, 0);
 
   // name the grids
-  gridXY.name = "grid"
   gridXZ.name = "grid"
-  gridYZ.name = "grid"
+  gridXY.name = "grid"
+  gridZY.name = "grid"
 
   // add grids to scene
-  scene.add(gridXY);
   scene.add(gridXZ);
-  scene.add(gridYZ);
+  scene.add(gridXY);
+  scene.add(gridZY);
+
+  // update axis labels
+  document.getElementById('labelX').innerHTML = gridSize/2 + "east";
+  document.getElementById('labelY').innerHTML = gridSize/2 + "tvd";
+  document.getElementById('labelZ').innerHTML = gridSize + "north";
+}
+
+// moves the axis labels with the 3D world
+function updateLabelPositions() {
+  // get window dimensions
+  var widthHalf = window.innerWidth / 2;
+  var heightHalf = window.innerHeight / 2;
+
+  // define 3D and 2D label positions
+  var xLabelPosition = new THREE.Vector3(gridSize / 2, 0, 0);
+  xLabelPosition.project(camera)
+  xLabelPosition.x = (xLabelPosition.x * widthHalf) + widthHalf;
+  xLabelPosition.y = -(xLabelPosition.y * heightHalf) + heightHalf;
+
+  var yLabelPosition = new THREE.Vector3(0, -gridSize, 0);
+  yLabelPosition.project(camera)
+  yLabelPosition.x = (yLabelPosition.x * widthHalf) + widthHalf;
+  yLabelPosition.y = -(yLabelPosition.y * heightHalf) + heightHalf;
+
+  var zLabelPosition = new THREE.Vector3(0, 0, gridSize / 2);
+  zLabelPosition.project(camera)
+  zLabelPosition.x = (zLabelPosition.x * widthHalf) + widthHalf;
+  zLabelPosition.y = -(zLabelPosition.y * heightHalf) + heightHalf;
+
+  // update positions
+  var xLabel = document.getElementById('labelX');
+  xLabel.style.left = xLabelPosition.x + 'px';
+  xLabel.style.top = xLabelPosition.y + 'px';
+
+  var yLabel = document.getElementById('labelY');
+  yLabel.style.left = yLabelPosition.x + 'px';
+  yLabel.style.top = yLabelPosition.y + 'px';
+
+  var zLabel = document.getElementById('labelZ');
+  zLabel.style.left = zLabelPosition.x + 'px';
+  zLabel.style.top = zLabelPosition.y + 'px';
 }
 
 // resets camera position
 function resetCameraPosition(){
-  document.getElementById('camX').value = 500;
-  document.getElementById('camY').value = 500;
+  document.getElementById('camX').value = 1000;
+  document.getElementById('camY').value = 1000;
   document.getElementById('camZ').value = 1000;
+  camera.lookAt(new THREE.Vector3(0,0,0));
   updateCameraPosition();
 }
 
 // sets camera position based on current input settings from html
 function updateCameraPosition() {
-  camera.position.z = document.getElementById('camY').value;
   camera.position.x = document.getElementById('camX').value;
-  camera.position.y = document.getElementById('camZ').value;
+  camera.position.y = document.getElementById('camY').value;
+  camera.position.z = document.getElementById('camZ').value;  
 }
 
 //=============================================================================
@@ -170,7 +216,7 @@ function init() {
 
   // attach renderer
   renderer.setSize(window.innerWidth, window.innerHeight);
-  var container = document.getElementById('scene').appendChild(renderer.domElement);
+  sceneContainer.appendChild(renderer.domElement);
 
   // position the camera
   resetCameraPosition();
@@ -200,8 +246,15 @@ function init() {
 //=============================================================================
 function animate() {
   controls.update();
+  updateLabelPositions();
   requestAnimationFrame(animate);
   renderer.render(scene, camera);
+
+  // update current cam position
+  var camPos = camera.position;
+  document.getElementById('camX').value = Math.floor(camPos.x);
+  document.getElementById('camY').value = Math.floor(camPos.y);
+  document.getElementById('camZ').value = Math.floor(camPos.z);
 }
 //=============================================================================
 
