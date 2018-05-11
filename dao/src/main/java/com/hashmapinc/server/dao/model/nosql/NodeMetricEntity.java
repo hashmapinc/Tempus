@@ -17,6 +17,7 @@ package com.hashmapinc.server.dao.model.nosql;
 
 import com.datastax.driver.mapping.annotations.PartitionKey;
 import com.hashmapinc.server.common.data.cluster.NodeMetric;
+import com.hashmapinc.server.common.data.cluster.NodeStatus;
 import com.hashmapinc.server.common.data.id.NodeMetricId;
 import com.hashmapinc.server.dao.model.BaseEntity;
 import com.hashmapinc.server.dao.model.ModelConstants;
@@ -42,7 +43,7 @@ public class NodeMetricEntity implements BaseEntity<NodeMetric> {
     private int port;
 
     @Column(name = ModelConstants.NODE_METRIC_STATUS_PROPERTY)
-    private boolean nodeStatus;
+    private String nodeStatus;
 
     @Column(name = ModelConstants.NODE_METRIC_RPC_SESSION_PROPERTY)
     private int rpcSessionCount;
@@ -61,7 +62,7 @@ public class NodeMetricEntity implements BaseEntity<NodeMetric> {
 
         this.host = nodeMetric.getHost();
         this.port = nodeMetric.getPort();
-        this.nodeStatus = nodeMetric.isNodeStatus();
+        this.nodeStatus = nodeMetric.getNodeStatus().getNodeStatus();
         this.rpcSessionCount = nodeMetric.getRpcSessionCount();
         this.deviceSessionCount = nodeMetric.getDeviceSessionCount();
     }
@@ -92,11 +93,11 @@ public class NodeMetricEntity implements BaseEntity<NodeMetric> {
         this.port = port;
     }
 
-    public boolean isNodeStatus() {
+    public String getNodeStatus() {
         return nodeStatus;
     }
 
-    public void setNodeStatus(boolean nodeStatus) {
+    public void setNodeStatus(String nodeStatus) {
         this.nodeStatus = nodeStatus;
     }
 
@@ -121,7 +122,7 @@ public class NodeMetricEntity implements BaseEntity<NodeMetric> {
         NodeMetric nodeMetric = new NodeMetric(new NodeMetricId(getId()));
         nodeMetric.setHost(host);
         nodeMetric.setPort(port);
-        nodeMetric.setNodeStatus(nodeStatus);
+        nodeMetric.setNodeStatus(NodeStatus.valueOf(nodeStatus));
         nodeMetric.setRpcSessionCount(rpcSessionCount);
         nodeMetric.setDeviceSessionCount(deviceSessionCount);
         return nodeMetric;

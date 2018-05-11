@@ -632,7 +632,7 @@ CREATE TABLE IF NOT EXISTS tempus.node_metric (
     id uuid,
     host text,
     port int,
-    status boolean,
+    status text,
     rpc_session_count int,
     device_session_count int,
     PRIMARY KEY (id, host, port)

@@ -16,16 +16,20 @@
 package com.hashmapinc.server.common.data.cluster;
 
 public enum NodeStatus {
-    UP(true),
-    DOWN(false);
+    UP("UP"),
+    DOWN("DOWN");
 
-    private boolean nodeStatus;
+    private String nodeStatus;
 
-    public boolean getNodeStatus() {
+    public String getNodeStatus() {
         return this.nodeStatus;
     }
 
-    private NodeStatus(boolean nodeStatus) {
+    public void setNodeStatus(String nodeStatus) {
+        this.nodeStatus = nodeStatus;
+    }
+
+    private NodeStatus(String nodeStatus) {
         this.nodeStatus = nodeStatus;
     }
 }

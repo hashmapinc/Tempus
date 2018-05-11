@@ -316,7 +316,7 @@ CREATE TABLE IF NOT EXISTS node_metric (
     id varchar (31) NOT NULL CONSTRAINT cluster_metric_pkey PRIMARY KEY,
     host varchar NOT NULL,
     port integer NOT NULL,
-    status boolean,
+    status varchar,
     rpc_session_count integer DEFAULT 0,
     device_session_count integer DEFAULT 0,
     CONSTRAINT unq_node UNIQUE (host, port)
