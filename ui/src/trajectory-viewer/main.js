@@ -24,7 +24,7 @@ var camera; // threejs camera
 var renderer; // threejs renderer
 var controls; // camera controls
 var raycaster; // threejs raycaster
-var mousePosition; // XY coordinates of the mouse
+var mouse; // XY coordinates of the mouse
 var resolution; // screen resolution
 
 // trajectory data
@@ -35,6 +35,7 @@ var gridSize; // size of grid to bound the plot
 // colors
 backgroundColor = 0xffffff;
 plotColor = 0x0000ff;
+plotPointColor = 0xff0000;
 gridColor = 0xaaaaaa;
 gridCenterColor = 0x000000;
 //=============================================================================
@@ -83,14 +84,26 @@ function removeAllFromScene(objName) {
 
 // redraw the points
 function plot() {
-  // remove old points
-  removeAllFromScene("well-plot-point");
+  // remove old plot
+  removeAllFromScene("well-plot");
+  removeAllFromScene("well-plot-points");
 
   // get line geometry
   var geometry = new THREE.Geometry();
   points.forEach(point => {
     // add point to line
     geometry.vertices.push(new THREE.Vector3(point.x, point.y, point.z));
+
+    // add point to scene
+    var spriteMaterial = new THREE.SpriteMaterial({ color: plotPointColor});
+    spriteMaterial.rotation = Math.PI / 4;
+    spriteMaterial.transparent = true;
+    spriteMaterial.opacity = 0.3;    
+    var sprite = new THREE.Sprite(spriteMaterial);
+    sprite.position.set(point.x, point.y, point.z);
+    sprite.name = "well-plot-points";
+    sprite.scale.set(30,30,30);
+    scene.add(sprite);
   });
 
   // create line material
@@ -98,7 +111,9 @@ function plot() {
     color: new THREE.Color(plotColor), 
     sizeAttenuation: true,
     lineWidth: 15,
-    resolution: resolution
+    resolution: resolution,
+    transparent: true,
+    opacity: .8
   });
 
   // create line
@@ -107,7 +122,7 @@ function plot() {
 
   // add the line to the scene
   var mesh = new THREE.Mesh(line.geometry, material);
-  mesh.name="well-plot-line";
+  mesh.name="well-plot";
   scene.add(mesh);
 }
 
@@ -196,7 +211,7 @@ function resetCameraPosition(){
   document.getElementById('camX').value = -1500;
   document.getElementById('camY').value = 3500;
   document.getElementById('camZ').value = -1500;
-  camera.lookAt(new THREE.Vector3(0,0,0));
+  controls.target.set(0,0,0);
   updateCameraPosition();
 }
 
@@ -241,8 +256,9 @@ function init() {
   plot();
   updateGrids();
 
-  // listen for window resizes
+  // listen for window resizes and mouse clicks
   window.addEventListener('resize', onWindowResize, false);
+  sceneContainer.addEventListener('dblclick', onDoubleClick, false);
 
   // begin animating
   animate();
@@ -267,7 +283,7 @@ function animate() {
 //=============================================================================
 
 //=============================================================================
-// handle resizes
+// handle events
 //=============================================================================
 function onWindowResize() {
   var newWidth = window.innerWidth;
@@ -282,6 +298,15 @@ function onWindowResize() {
   resolution.set(sceneContainer.clientWidth, sceneContainer.clientHeight);
 
   animate();
+}
+
+function onDoubleClick() {
+  raycaster.setFromCamera(mouse, camera);
+  var intersects = raycaster.intersectObjects(scene.getObjectByName("well-plot").children, true);
+
+  if (intersects && intersects.length > 0) {
+    var a = 3;
+  }
 }
 //=============================================================================
 
