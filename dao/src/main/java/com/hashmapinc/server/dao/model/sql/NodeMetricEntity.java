@@ -16,8 +16,8 @@
 package com.hashmapinc.server.dao.model.sql;
 
 
-import com.hashmapinc.server.common.data.cluster.ClusterMetric;
-import com.hashmapinc.server.common.data.id.ClusterMetricId;
+import com.hashmapinc.server.common.data.cluster.NodeMetric;
+import com.hashmapinc.server.common.data.id.NodeMetricId;
 import com.hashmapinc.server.dao.model.BaseEntity;
 import com.hashmapinc.server.dao.model.BaseSqlEntity;
 import com.hashmapinc.server.dao.model.ModelConstants;
@@ -35,7 +35,7 @@ import javax.persistence.Table;
 @Entity
 @TypeDef(name = "json", typeClass = JsonStringType.class)
 @Table(name = ModelConstants.CLUSTER_METRIC_TALBE_NAME)
-public class ClusterMetricEntity extends BaseSqlEntity<ClusterMetric> implements BaseEntity<ClusterMetric> {
+public class ClusterMetricEntity extends BaseSqlEntity<NodeMetric> implements BaseEntity<NodeMetric> {
 
     @Column(name = ModelConstants.CLUSTER_METRIC_IP)
     private String nodeIp;
@@ -56,26 +56,26 @@ public class ClusterMetricEntity extends BaseSqlEntity<ClusterMetric> implements
         super();
     }
 
-    public ClusterMetricEntity(ClusterMetric clusterMetric) {
-        if (clusterMetric.getId() != null) {
-            this.setId(clusterMetric.getId().getId());
+    public ClusterMetricEntity(NodeMetric nodeMetric) {
+        if (nodeMetric.getId() != null) {
+            this.setId(nodeMetric.getId().getId());
         }
 
-        this.nodeIp = clusterMetric.getNodeIp();
-        this.nodePort = clusterMetric.getNodePort();
-        this.nodeStatus = clusterMetric.isNodeStatus();
-        this.rpcSessionCount = clusterMetric.getRpcSessionCount();
-        this.deviceSessionCount = clusterMetric.getDeviceSessionCount();
+        this.nodeIp = nodeMetric.getNodeIp();
+        this.nodePort = nodeMetric.getNodePort();
+        this.nodeStatus = nodeMetric.isNodeStatus();
+        this.rpcSessionCount = nodeMetric.getRpcSessionCount();
+        this.deviceSessionCount = nodeMetric.getDeviceSessionCount();
     }
 
     @Override
-    public ClusterMetric toData() {
-        ClusterMetric clusterMetric = new ClusterMetric(new ClusterMetricId(getId()));
-        clusterMetric.setNodeIp(nodeIp);
-        clusterMetric.setNodePort(nodePort);
-        clusterMetric.setNodeStatus(nodeStatus);
-        clusterMetric.setRpcSessionCount(rpcSessionCount);
-        clusterMetric.setDeviceSessionCount(deviceSessionCount);
-        return clusterMetric;
+    public NodeMetric toData() {
+        NodeMetric nodeMetric = new NodeMetric(new NodeMetricId(getId()));
+        nodeMetric.setNodeIp(nodeIp);
+        nodeMetric.setNodePort(nodePort);
+        nodeMetric.setNodeStatus(nodeStatus);
+        nodeMetric.setRpcSessionCount(rpcSessionCount);
+        nodeMetric.setDeviceSessionCount(deviceSessionCount);
+        return nodeMetric;
     }
 }

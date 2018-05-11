@@ -15,12 +15,11 @@
  */
 package com.hashmapinc.server.dao.sql.cluster;
 
-import com.hashmapinc.server.common.data.cluster.ClusterMetric;
+import com.hashmapinc.server.common.data.cluster.NodeMetric;
 import com.hashmapinc.server.dao.DaoUtil;
 import com.hashmapinc.server.dao.cluster.ClusterMetricDao;
 import com.hashmapinc.server.dao.model.sql.ClusterMetricEntity;
 import com.hashmapinc.server.dao.sql.JpaAbstractDao;
-import com.hashmapinc.server.dao.sql.JpaAbstractSearchTextDao;
 import com.hashmapinc.server.dao.util.SqlDao;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,7 +31,7 @@ import java.util.Optional;
 @Component
 @SqlDao
 @Slf4j
-public class JpaClusterMetricDao extends JpaAbstractDao<ClusterMetricEntity, ClusterMetric> implements ClusterMetricDao {
+public class JpaClusterMetricDao extends JpaAbstractDao<ClusterMetricEntity, NodeMetric> implements ClusterMetricDao {
 
     @Autowired
     private ClusterMetricRepository clusterMetricRepository;
@@ -48,9 +47,9 @@ public class JpaClusterMetricDao extends JpaAbstractDao<ClusterMetricEntity, Clu
     }
 
     @Override
-    public Optional<ClusterMetric>
+    public Optional<NodeMetric>
     findClusterMetricByNodeIpAndNodePort(String nodeIp, int nodePort) {
-        ClusterMetric clusterMetric = DaoUtil.getData(clusterMetricRepository.findClusterMetricByNodeIpAndNodePort(nodeIp, nodePort));
-        return Optional.of(clusterMetric);
+        NodeMetric nodeMetric = DaoUtil.getData(clusterMetricRepository.findClusterMetricByNodeIpAndNodePort(nodeIp, nodePort));
+        return Optional.of(nodeMetric);
     }
 }

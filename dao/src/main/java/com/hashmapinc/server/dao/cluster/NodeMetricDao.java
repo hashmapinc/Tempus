@@ -15,24 +15,17 @@
  */
 package com.hashmapinc.server.dao.cluster;
 
-import com.hashmapinc.server.common.data.cluster.ClusterMetric;
+import com.hashmapinc.server.common.data.cluster.NodeMetric;
+import com.hashmapinc.server.dao.Dao;
 
 import java.util.List;
 import java.util.Optional;
 
-public interface ClusterMetricService {
+public interface ClusterMetricDao extends Dao<NodeMetric> {
 
-    Optional<ClusterMetric> findClusterMetricByNodeIpAndNodePort(String nodeIp, int nodePort);
+    NodeMetric save(NodeMetric nodeMetric);
 
-    ClusterMetric save(ClusterMetric clusterMetric);
+    Optional<NodeMetric> findClusterMetricByNodeIpAndNodePort(String nodeIp, int nodePort);
 
-    List<ClusterMetric> findAll();
-
-    ClusterMetric incrementRpcSessionCount(String nodeIp, int nodePort);
-
-    ClusterMetric decrementRpcSessionCount(String nodeIp, int nodePort);
-
-    ClusterMetric incrementDeviceSessionCount(String nodeIp, int nodePort);
-
-    ClusterMetric decrementDeviceSessionCount(String nodeIp, int nodePort);
+    List<NodeMetric> find();
 }
