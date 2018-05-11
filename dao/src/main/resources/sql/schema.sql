@@ -313,7 +313,7 @@ CREATE TABLE IF NOT EXISTS application_associated_computation_jobs(
 );
 
 CREATE TABLE IF NOT EXISTS node_metric (
-    id varchar (31) NOT NULL CONSTRAINT cluster_metric_pkey PRIMARY KEY,
+    id varchar (31) NOT NULL CONSTRAINT node_metric_pkey PRIMARY KEY,
     host varchar NOT NULL,
     port integer NOT NULL,
     status varchar,
