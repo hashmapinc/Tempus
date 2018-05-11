@@ -31,8 +31,13 @@
         z-index: -10;
       }
 
-      #abs {
-        z-index: 1;
+      #labels {
+        font-size: 15pt;
+      }
+
+      #controls {
+        margin: 10px;
+        margin-left: 20px;
       }
 
       div {
@@ -51,7 +56,7 @@
     <div id="scene"></div>
 
     <!-- camera controls -->
-    <div>
+    <div id="controls">
       camera east: </br>
       <input id="camX" type="number" oninput="updateCameraPosition();"> </br>
       camera north: </br>
@@ -62,11 +67,12 @@
     </div>
 
     <!-- axis labels -->
-    <div id="labelX">east</div>
-    <div id="labelY">tvd</div>
-    <div id="labelZ">north</div>
+    <div id="labelX" class="labels">east</div>
+    <div id="labelY" class="labels">tvd</div>
+    <div id="labelZ" class="labels">north</div>
 
     <script src="three/three.js"></script>
+    <script src="THREE.MeshLine.js"></script>
 
     <script src="three/TrackballControls.js"></script>
     <script src="three/OrbitControls.js"></script>

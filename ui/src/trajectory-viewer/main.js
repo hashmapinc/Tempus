@@ -25,6 +25,7 @@ var renderer; // threejs renderer
 var controls; // camera controls
 var raycaster; // threejs raycaster
 var mousePosition; // XY coordinates of the mouse
+var resolution; // screen resolution
 
 // trajectory data
 var rawReadings; // array of trajectory readings describing plotted trajectory
@@ -33,8 +34,9 @@ var gridSize; // size of grid to bound the plot
 
 // colors
 backgroundColor = 0xffffff;
-plotColor = 0x555555;
+plotColor = 0x0000ff;
 gridColor = 0xaaaaaa;
+gridCenterColor = 0x000000;
 //=============================================================================
 
 // compute new points array. If overwrite, delete rawReadings first
@@ -63,13 +65,6 @@ function setOrbitControls() {
   controls.enablePan = false;
 }
 
-// use trackball controls
-function setTrackballControls() {
-  controls = new THREE.TrackballControls(camera);
-  controls.staticMoving = true;
-  controls.dynamicDampingFactor = 0.15;
-}
-
 // keep track of the mouse's 2D positioning on the screen
 function onMouseMove(event) {
   event.preventDefault();
@@ -87,21 +82,33 @@ function removeAllFromScene(objName) {
 }
 
 // redraw the points
-function plotPoints() {
+function plot() {
   // remove old points
   removeAllFromScene("well-plot-point");
 
-  // plot new points
+  // get line geometry
+  var geometry = new THREE.Geometry();
   points.forEach(point => {
-    var geometry = new THREE.SphereBufferGeometry(20, 32, 32);
-    var material = new THREE.MeshBasicMaterial({ color: plotColor });
-    var sphere = new THREE.Mesh(geometry, material);
-    sphere.name = "well-plot-point";
-    sphere.position.x = point.x;
-    sphere.position.y = point.y;
-    sphere.position.z = point.z;
-    scene.add(sphere);
+    // add point to line
+    geometry.vertices.push(new THREE.Vector3(point.x, point.y, point.z));
   });
+
+  // create line material
+  var material = new MeshLineMaterial({
+    color: new THREE.Color(plotColor), 
+    sizeAttenuation: true,
+    lineWidth: 15,
+    resolution: resolution
+  });
+
+  // create line
+  var line = new MeshLine();
+  line.setGeometry(geometry);
+
+  // add the line to the scene
+  var mesh = new THREE.Mesh(line.geometry, material);
+  mesh.name="well-plot-line";
+  scene.add(mesh);
 }
 
 // redraw the grids
@@ -121,9 +128,9 @@ function updateGrids() {
   var numDivisions = gridSize / 100;
 
   // make grids
-  var gridXZ = new THREE.GridHelper(gridSize, numDivisions, 0xff0000, gridColor);
-  var gridXY = new THREE.GridHelper(gridSize, numDivisions, 0x00ff00, gridColor); // needs rotated and moved
-  var gridZY = new THREE.GridHelper(gridSize, numDivisions, 0x0000ff, gridColor); // needs rotated and moved
+  var gridXZ = new THREE.GridHelper(gridSize, numDivisions, gridCenterColor, gridColor);
+  var gridXY = new THREE.GridHelper(gridSize, numDivisions, gridCenterColor, gridColor); // needs rotated and moved
+  var gridZY = new THREE.GridHelper(gridSize, numDivisions, gridCenterColor, gridColor); // needs rotated and moved
 
   // position grids
   gridXZ.position.set(0,10,0); // move up just a tad to show the grid center coloring better
@@ -184,11 +191,11 @@ function updateLabelPositions() {
   zLabel.style.top = zLabelPosition.y + 'px';
 }
 
-// resets camera position
+// -s camera position
 function resetCameraPosition(){
-  document.getElementById('camX').value = 1000;
-  document.getElementById('camY').value = 1000;
-  document.getElementById('camZ').value = 1000;
+  document.getElementById('camX').value = -1500;
+  document.getElementById('camY').value = 3500;
+  document.getElementById('camZ').value = -1500;
   camera.lookAt(new THREE.Vector3(0,0,0));
   updateCameraPosition();
 }
@@ -213,6 +220,7 @@ function init() {
   mouse = new THREE.Vector2();
   gridIDs = {};
   setOrbitControls();
+  resolution = new THREE.Vector2(window.innerWidth, window.innerHeight);
 
   // attach renderer
   renderer.setSize(window.innerWidth, window.innerHeight);
@@ -230,7 +238,7 @@ function init() {
   updatePoints(newReading, true);
 
   // plot the well
-  plotPoints();
+  plot();
   updateGrids();
 
   // listen for window resizes
@@ -262,10 +270,17 @@ function animate() {
 // handle resizes
 //=============================================================================
 function onWindowResize() {
-  camera.aspect = window.innerWidth / window.innerHeight;
+  var newWidth = window.innerWidth;
+  var newHeight = window.innerHeight;
+
+  camera.aspect = newWidth / newHeight;
   camera.updateProjectionMatrix();
-  renderer.setSize(window.innerWidth, window.innerHeight);
-  controls.handleResize();
+
+  renderer.setSize(newWidth, newHeight);
+
+  // update resolution
+  resolution.set(sceneContainer.clientWidth, sceneContainer.clientHeight);
+
   animate();
 }
 //=============================================================================
