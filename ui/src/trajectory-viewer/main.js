@@ -302,11 +302,16 @@ function onWindowResize() {
 
 function onDoubleClick() {
   raycaster.setFromCamera(mouse, camera);
-  var intersects = raycaster.intersectObjects(scene.getObjectByName("well-plot").children, true);
+  var intersects = raycaster.intersectObjects(scene.children, true);
 
-  if (intersects && intersects.length > 0) {
-    var a = 3;
-  }
+  intersects.forEach(intersect => {
+    let obj = intersect.object;
+    if(obj.name === "well-plot-points") {
+      let pos = obj.position;
+      controls.target.set(pos.x, pos.y, pos.z);
+      return
+    }
+  });
 }
 //=============================================================================
 
