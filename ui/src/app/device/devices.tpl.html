@@ -49,7 +49,7 @@
 
     <div class="md-toolbar-tools">
         <span flex></span>
-        <md-button  class="md-icon-button" ng-click="addDevice($event)">
+        <md-button ng-show = "vm.devicesScope != 'customer_user'" class="md-icon-button" ng-click="addDevice($event)">
             <md-icon>add</md-icon>
             <md-tooltip md-direction="top">
                 {{ 'action.add' | translate }}
@@ -71,8 +71,8 @@
 </md-toolbar>
 
 <md-table-container ng-show="tableView">
-    <table class="tb-device-table" md-table md-row-select multiple>
-        <thead md-head md-order="query.order" md-on-reorder="onReorder" md-progress="devicesDeferred.promise">
+    <table class="tb-device-table" md-table>
+        <thead md-head md-order="query.order" md-on-reorder="onReorder">
         <tr md-row>
             <th md-column md-order-by="name"><span translate>Name</span></th>
             <th md-column md-order-by="createdTime"><span translate>Description</span></th>
@@ -83,14 +83,14 @@
         </tr>
         </thead>
         <tbody md-body>
-        <tr md-row md-select="attribute" md-select-id="key" md-auto-select ng-repeat="device in devices.data">
+        <tr md-row  ng-repeat="device in devices.data">
             <td md-cell><a href ng-click="deviceDetailFunc($event,device)">{{device.name}}</a></td>
             <td md-cell>{{device.additionalInfo.description}}</td>
             <td md-cell>NA</td>
             <td md-cell>NA</td>
             <td md-cell>{{device.createdTime | date :  'yyyy-MM-dd HH:mm:ss'}}</td>
-            <td md-cell class="tb-value-cell" ng-click="deleteDevice($event, device)">
-                <span ng-show="!attributeScope.clientSide"><ng-md-icon size="16" icon="delete"></ng-md-icon></span>
+            <td ng-show = "vm.devicesScope != 'customer_user'" md-cell class="tb-value-cell" ng-click="deleteDevice($event, device)">
+                <span><ng-md-icon size="16" icon="delete"></ng-md-icon></span>
             </td>
         </tr>
         </tbody>
