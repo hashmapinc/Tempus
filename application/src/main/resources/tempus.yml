@@ -72,7 +72,7 @@ plugins:
   scan_packages: "${PLUGINS_SCAN_PACKAGES:com.hashmapinc.server.extensions}"
 
 spark:
-  jar_path: "${SPARK_COMPUTATIONS_PATH:/Users/jay/Poller}"
+  jar_path: "${SPARK_COMPUTATIONS_PATH:${java.io.tmpdir}}"
   polling_interval: "${DIRECTORY_POLLING_INTERVAL:10}" # Number of Seconds
 
 # JWT Token parameters
@@ -95,7 +95,7 @@ mqtt:
   adaptor: "${MQTT_ADAPTOR_NAME:JsonMqttAdaptor}"
   timeout: "${MQTT_TIMEOUT:10000}"
   netty:
-    leak_detector_level: "${NETTY_LEASK_DETECTOR_LVL:DISABLED}"
+    leak_detector_level: "${NETTY_LEAK_DETECTOR_LVL:DISABLED}"
     boss_group_thread_count: "${NETTY_BOSS_GROUP_THREADS:1}"
     worker_group_thread_count: "${NETTY_WORKER_GROUP_THREADS:12}"
   # MQTT SSL configuration
@@ -346,6 +346,9 @@ audit_log:
       "user": "${AUDIT_LOG_MASK_USER:W}"
       "rule": "${AUDIT_LOG_MASK_RULE:W}"
       "plugin": "${AUDIT_LOG_MASK_PLUGIN:W}"
+      "application": "${AUDIT_LOG_MASK_PLUGIN:W}"
+      "computation": "${AUDIT_LOG_MASK_PLUGIN:W}"
+      "computation_job": "${AUDIT_LOG_MASK_PLUGIN:W}"
   sink:
     # Type of external sink. possible options: none, elasticsearch
     type: "${AUDIT_LOG_SINK_TYPE:none}"

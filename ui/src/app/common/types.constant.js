@@ -297,7 +297,10 @@ export default angular.module('tempus.types', [])
                 user: "USER",
                 dashboard: "DASHBOARD",
                 alarm: "ALARM",
-                application:"APPLICATION"
+                application:"APPLICATION",
+                computation:"COMPUTATION",
+                computationJob:"COMPUTATION_JOB"
+
             },
             aliasEntityType: {
                 current_customer: "CURRENT_CUSTOMER"
@@ -362,6 +365,18 @@ export default angular.module('tempus.types', [])
                     typePlural: 'entity.type-applications',
                     list: 'entity.list-of-applications',
                     nameStartsWith: 'entity.application-name-starts-with'
+                },
+                "COMPUTATION": {
+                    type: 'entity.type-computation',
+                    typePlural: 'entity.type-computations',
+                    list: 'entity.list-of-computations',
+                    nameStartsWith: 'entity.computation-name-starts-with'
+                },
+                "COMPUTATION_JOB": {
+                    type: 'entity.type-computationJob',
+                    typePlural: 'entity.type-computationJobs',
+                    list: 'entity.list-of-computationJobs',
+                    nameStartsWith: 'entity.computationJob-name-starts-with'
                 },
 
                 "CURRENT_CUSTOMER": {
