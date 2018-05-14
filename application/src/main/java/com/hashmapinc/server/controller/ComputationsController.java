@@ -44,10 +44,12 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static com.hashmapinc.server.dao.service.Validator.validateId;
 
@@ -76,8 +78,8 @@ public class ComputationsController extends BaseController {
     public Computations upload(@RequestParam("file") MultipartFile file) throws TempusException {
 
         Computations computation = null;
-        try {
-            List<String> filesAtDestination = Files.list(Paths.get(this.uploadPath)).map(f -> f.getFileName().toString()).collect(Collectors.toList());
+        try(Stream<Path> filesStream = Files.list(Paths.get(this.uploadPath))) {
+            List<String> filesAtDestination = filesStream.map(f -> f.getFileName().toString()).collect(Collectors.toList());
             if(filesAtDestination.contains(file.getOriginalFilename())) {
                 throw new TempusException("Cant upload the same computation artifact again. Delete the existing computation first to upload it again" , TempusErrorCode.GENERAL);
             }
