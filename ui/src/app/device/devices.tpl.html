@@ -15,7 +15,94 @@
     limitations under the License.
 
 -->
-<tb-grid grid-configuration="vm.deviceGridConfig">
+<section layout="row" layout-align="center center" style="margin-left: 80%;">
+    <label class="tb-small" translate>Grid View</label>
+    <md-switch class="device-switch" ng-model="tableView" aria-label="predefined-switcher" style="
+    margin-left: 4px;
+    margin-right: -5px;
+">
+    </md-switch>
+    <label class="tb-small" translate>Tabular View</label>
+</section>
+
+<md-toolbar class="md-table-toolbar md-default" ng-show="tableView && query.search != null">
+    <div class="md-toolbar-tools">
+        <md-button class="md-icon-button" aria-label="{{ 'action.search' | translate }}">
+            <md-icon aria-label="{{ 'action.search' | translate }}" class="material-icons">search</md-icon>
+            <md-tooltip md-direction="top">
+                {{ 'action.search' | translate }}
+            </md-tooltip>
+        </md-button>
+        <md-input-container flex>
+            <label>&nbsp;</label>
+            <input ng-model="query.search" placeholder="{{ 'common.enter-search' | translate }}"/>
+        </md-input-container>
+        <md-button class="md-icon-button" aria-label="{{ 'action.back' | translate }}" ng-click="exitFilterMode()">
+            <md-icon aria-label="{{ 'action.close' | translate }}" class="material-icons">close</md-icon>
+            <md-tooltip md-direction="top">
+                {{ 'action.close' | translate }}
+            </md-tooltip>
+        </md-button>
+    </div>
+</md-toolbar>
+<md-toolbar class="md-table-toolbar md-default" ng-show="tableView && query.search === null">
+
+    <div class="md-toolbar-tools">
+        <span flex></span>
+        <md-button  class="md-icon-button" ng-click="addDevice($event)">
+            <md-icon>add</md-icon>
+            <md-tooltip md-direction="top">
+                {{ 'action.add' | translate }}
+            </md-tooltip>
+        </md-button>
+        <md-button class="md-icon-button" ng-click="enterFilterMode()">
+            <md-icon>search</md-icon>
+            <md-tooltip md-direction="top">
+                {{ 'action.search' | translate }}
+            </md-tooltip>
+        </md-button>
+        <md-button  class="md-icon-button" ng-click="resetFilter()">
+            <md-icon>refresh</md-icon>
+            <md-tooltip md-direction="top">
+                {{ 'action.refresh' | translate }}
+            </md-tooltip>
+        </md-button>
+    </div>
+</md-toolbar>
+
+<md-table-container ng-show="tableView">
+    <table class="tb-device-table" md-table md-row-select multiple>
+        <thead md-head md-order="query.order" md-on-reorder="onReorder" md-progress="devicesDeferred.promise">
+        <tr md-row>
+            <th md-column md-order-by="name"><span translate>Name</span></th>
+            <th md-column md-order-by="createdTime"><span translate>Description</span></th>
+            <th md-column md-order-by="createdTime"><span translate>Status</span></th>
+            <th md-column><span translate>Age</span></th>
+            <th md-column md-order-by="createdTime"><span translate>Last Time Received</span></th>
+
+        </tr>
+        </thead>
+        <tbody md-body>
+        <tr md-row md-select="attribute" md-select-id="key" md-auto-select ng-repeat="device in devices.data">
+            <td md-cell><a href ng-click="deviceDetailFunc($event,device)">{{device.name}}</a></td>
+            <td md-cell>{{device.additionalInfo.description}}</td>
+            <td md-cell>NA</td>
+            <td md-cell>NA</td>
+            <td md-cell>{{device.createdTime | date :  'yyyy-MM-dd HH:mm:ss'}}</td>
+            <td md-cell class="tb-value-cell" ng-click="deleteDevice($event, device)">
+                <span ng-show="!attributeScope.clientSide"><ng-md-icon size="16" icon="delete"></ng-md-icon></span>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</md-table-container>
+<md-table-pagination ng-show="tableView" md-limit="query.limit" md-limit-options="[5, 10, 15]"
+                     md-page="query.page" md-total="{{devices.count}}"
+                     md-on-paginate="onPaginate" md-page-select>
+</md-table-pagination>
+
+
+<tb-grid grid-configuration="vm.deviceGridConfig" class="device-grid">
     <details-buttons tb-help="'devices'" help-container-id="help-container">
         <div id="help-container"></div>
     </details-buttons>

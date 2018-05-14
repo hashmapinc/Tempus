@@ -46,8 +46,16 @@
 
 #tb-vertical-container {
   position: absolute;
-  top: 0;
+  top: 0px;
   left: 0;
   right: 0;
   bottom: 0;
+}
+
+.device-grid #tb-vertical-container{
+  top: 30px !important;
+}
+
+.tb-device-table {
+  background-color: white;
 }

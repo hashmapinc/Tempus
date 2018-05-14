@@ -125,7 +125,7 @@ function Grid() {
 }
 
 /*@ngInject*/
-function GridController(applicationService, $scope, $state, $mdDialog, $document, $q, $mdUtil, $timeout, $translate, $mdMedia, $templateCache, $window, userService) { 
+function GridController(applicationService, $scope, $rootScope, $state, $mdDialog, $document, $q, $mdUtil, $timeout, $translate, $mdMedia, $templateCache, $window, userService) {
 
     var vm = this;
 
@@ -513,6 +513,12 @@ function GridController(applicationService, $scope, $state, $mdDialog, $document
         reload();
     });
 
+   var gridDetailDevice = $rootScope.$on("CallGridDetailDevice", function($event, data){
+       vm.clickItemFunc(data[0],data[1]);
+    });
+
+    $scope.$on('$destroy', gridDetailDevice);
+
     vm.onGridInited(vm);
 
     vm.itemRows.getItemAtIndex(pageSize);
@@ -584,6 +590,7 @@ function GridController(applicationService, $scope, $state, $mdDialog, $document
                 return;
             }
         }
+
         vm.loadItemDetailsFunc(item).then(function success(detailsItem) {
             if(angular.isDefined(vm.config.parentCtl)){
                 if((angular.isFunction(vm.config.parentCtl.currentApp) || angular.isObject(vm.config.parentCtl.currentApp)) && detailsItem.id.entityType == 'APPLICATION')
@@ -727,6 +734,7 @@ function GridController(applicationService, $scope, $state, $mdDialog, $document
             );
         }
         else {
+
             var confirm = $mdDialog.confirm()
                 .targetEvent($event)
                 .title(vm.deleteItemTitleFunc(item))
@@ -882,7 +890,6 @@ function GridController(applicationService, $scope, $state, $mdDialog, $document
 function AddItemController($scope, $mdDialog, saveItemFunction, helpLinks) {
 
     var vm = this;
-
     vm.helpLinks = helpLinks;
     vm.item = {};
 

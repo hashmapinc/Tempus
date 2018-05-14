@@ -21,7 +21,7 @@
       ng-show="vm.noData()">{{vm.noItemsText()}}</span>
 <section layout="row" flex style="height: 100%;" flex layout-wrap>
     <div layout="column" style="height: 100%;" flex layout-wrap>
-        <md-virtual-repeat-container ng-show="vm.hasData()" tb-scope-element="repeatContainer" id="tb-vertical-container" md-top-index="vm.topIndex" flex>
+        <md-virtual-repeat-container ng-show="vm.hasData() && !tableView" tb-scope-element="repeatContainer" id="tb-vertical-container" md-top-index="vm.topIndex" flex>
             <div class="md-padding" layout="column">
                 <section layout="row"  md-virtual-repeat="rowItem in vm.itemRows" md-on-demand md-item-size="vm.itemHeight">
                     <div flex ng-repeat="n in [] | range:vm.columns" ng-style="{'height':vm.itemHeight+'px'}" ng-if="rowItem[n]">
@@ -74,13 +74,13 @@
         <details-buttons>
             <div ng-transclude="detailsButtons"></div>
         </details-buttons>
-        <form name="vm.detailsForm">
+        <form name="vm.FdetailsForm">
             <div ng-transclude></div>
         </form>
     </tb-details-sidenav>
 </section>
 
-<section layout="row" layout-wrap class="tb-footer-buttons md-fab " layout-align="start end">
+<section ng-show="!tableView" layout="row" layout-wrap class="tb-footer-buttons md-fab " layout-align="start end">
     <md-button ng-disabled="$root.loading" ng-show="vm.items.selectedCount > 0" class="tb-btn-footer md-accent md-hue-2 md-fab" ng-repeat="groupAction in vm.groupActionsList"
                ng-click="groupAction.onAction($event, vm.items)" aria-label="{{ groupAction.name() }}">
         <md-tooltip md-direction="top">
