@@ -1084,7 +1084,11 @@ export default angular.module('tempus.locale', [])
                     "wits-device-type": "Device type",
                     "wits-record-specifications-location": "Record Specification location*",
                     "wits-channel-specifications-location": "Channel Specification location*",
-
+                    "witsml-server":"Servers",
+                    "witsml-add-server": "Add server",
+                    "witsml-scan-period-in-seconds": "Scan period in seconds",
+                    "witsml-version": "WITSML Version",
+                    "witsml-object-types": "Object Types",
                     "sync": {
                         "status": "Status",
                         "sync": "Sync",

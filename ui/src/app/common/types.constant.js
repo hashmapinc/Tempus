@@ -411,6 +411,7 @@ export default angular.module('tempus.types', [])
                 mqtt: "MQTT",
                 opc: "OPC UA",
                 wits: "WITS"
+                witsml: "WITSML"
             },
             extensionValueType: {
                 string: 'value.string',
@@ -439,6 +440,18 @@ export default angular.module('tempus.types', [])
                     value: "cert.PEM",
                     name: "extension.pem"
                 }
+            },
+            witsmlVersions: {
+              v1411: "1.4.1.1",
+              v1311: "1.3.1.1"
+            },
+            witsmlObjectTypes: {
+              wellbore: "Wellbore",
+                logs: "Logs",
+                mudLogs: "Mudlogs",
+                messages: "Messages",
+                rig: "Rig",
+                trajectory: "Trajectory"
             },
             extensionOpcSecurityTypes: {
                 Basic128Rsa15: "Basic128Rsa15",
