@@ -16,7 +16,7 @@
 
 package com.hashmapinc.server.dao.model.sql;
 
-import com.hashmapinc.server.common.data.TagMetaData;
+import com.hashmapinc.server.common.data.TagMetaDataQuality;
 import com.hashmapinc.server.common.data.EntityType;
 import com.hashmapinc.server.dao.model.ToData;
 import lombok.Data;
@@ -27,9 +27,9 @@ import static com.hashmapinc.server.dao.model.ModelConstants.*;
 
 @Data
 @Entity
-@Table(name = "tag_metadata")
-@IdClass(TagMetaDataCompositeKey.class)
-public class TagMetaDataEntity implements ToData<TagMetaData>{
+@Table(name = "tag_metadata_quality")
+@IdClass(TagMetaDataQualityCompositeKey.class)
+public class TagMetaDataQualityEntity implements ToData<TagMetaDataQuality>{
 
     @Id
     @Column(name = ENTITY_ID_COLUMN)
@@ -44,46 +44,46 @@ public class TagMetaDataEntity implements ToData<TagMetaData>{
     @Column(name = KEY_COLUMN)
     private String key;
 
-    @Column(name = TAG_METADATA_UNIT)
+    @Column(name = TAG_METADATA_QUALITY_UNIT)
     private String unit;
 
-    @Column(name = TAG_METADATA_AVG_FREQUENCY)
+    @Column(name = TAG_METADATA_QUALITY_AVG_FREQUENCY)
     private double avgFrequency;
 
-    @Column(name = TAG_METADATA_MAX_FREQUENCY)
+    @Column(name = TAG_METADATA_QUALITY_MAX_FREQUENCY)
     private double maxFrequency;
 
-    @Column(name = TAG_METADATA_MIN_FREQUENCY)
+    @Column(name = TAG_METADATA_QUALITY_MIN_FREQUENCY)
     private double minFrequency;
 
-    @Column(name = TAG_METADATA_MEAN_FREQUENCY)
+    @Column(name = TAG_METADATA_QUALITY_MEAN_FREQUENCY)
     private double meanFrequency;
 
-    @Column(name = TAG_METADATA_MEDIAN_FREQUENCY)
+    @Column(name = TAG_METADATA_QUALITY_MEDIAN_FREQUENCY)
     private double medianFrequency;
 
-    @Column(name = TAG_METADATA_SOURCE)
+    @Column(name = TAG_METADATA_QUALITY_SOURCE)
     private String source;
 
-    public TagMetaDataEntity(){
+    public TagMetaDataQualityEntity(){
 
     }
 
-    public TagMetaDataEntity(TagMetaData tagMetaData){
-        if(tagMetaData.getEntityId() != null && tagMetaData.getEntityType() != null
-                && tagMetaData.getKey() != null){
-            entityId = tagMetaData.getEntityId();
-            entityType = tagMetaData.getEntityType();
-            key = tagMetaData.getKey();
+    public TagMetaDataQualityEntity(TagMetaDataQuality tagMetaDataQuality){
+        if(tagMetaDataQuality.getEntityId() != null && tagMetaDataQuality.getEntityType() != null
+                && tagMetaDataQuality.getKey() != null){
+            entityId = tagMetaDataQuality.getEntityId();
+            entityType = tagMetaDataQuality.getEntityType();
+            key = tagMetaDataQuality.getKey();
         }
 
-        unit = tagMetaData.getUnit();
-        avgFrequency = tagMetaData.getAvgFrequency();
-        minFrequency = tagMetaData.getMinFrequency();
-        maxFrequency = tagMetaData.getMaxFrequency();
-        meanFrequency = tagMetaData.getMeanFrequency();
-        medianFrequency = tagMetaData.getMedianFrequency();
-        source = tagMetaData.getSource();
+        unit = tagMetaDataQuality.getUnit();
+        avgFrequency = tagMetaDataQuality.getAvgFrequency();
+        minFrequency = tagMetaDataQuality.getMinFrequency();
+        maxFrequency = tagMetaDataQuality.getMaxFrequency();
+        meanFrequency = tagMetaDataQuality.getMeanFrequency();
+        medianFrequency = tagMetaDataQuality.getMedianFrequency();
+        source = tagMetaDataQuality.getSource();
     }
 
     public String getEntityId() {
@@ -167,23 +167,23 @@ public class TagMetaDataEntity implements ToData<TagMetaData>{
     }
 
     @Override
-    public TagMetaData toData(){
+    public TagMetaDataQuality toData(){
 
-        TagMetaData tagMetaData = new TagMetaData();
+        TagMetaDataQuality tagMetaDataQuality = new TagMetaDataQuality();
         if(this.entityId != null && this.entityType != null && this.key != null){
-            tagMetaData.setEntityId(this.entityId);
-            tagMetaData.setEntityType(this.entityType);
-            tagMetaData.setKey(this.key);
+            tagMetaDataQuality.setEntityId(this.entityId);
+            tagMetaDataQuality.setEntityType(this.entityType);
+            tagMetaDataQuality.setKey(this.key);
         }
         else
             return null;
-        tagMetaData.setAvgFrequency(this.avgFrequency);
-        tagMetaData.setMaxFrequency(this.maxFrequency);
-        tagMetaData.setMinFrequency(this.minFrequency);
-        tagMetaData.setMeanFrequency(this.meanFrequency);
-        tagMetaData.setMedianFrequency(this.medianFrequency);
-        tagMetaData.setSource(this.source);
+        tagMetaDataQuality.setAvgFrequency(this.avgFrequency);
+        tagMetaDataQuality.setMaxFrequency(this.maxFrequency);
+        tagMetaDataQuality.setMinFrequency(this.minFrequency);
+        tagMetaDataQuality.setMeanFrequency(this.meanFrequency);
+        tagMetaDataQuality.setMedianFrequency(this.medianFrequency);
+        tagMetaDataQuality.setSource(this.source);
 
-        return tagMetaData;
+        return tagMetaDataQuality;
     }
 }

@@ -33,14 +33,11 @@ import com.hashmapinc.server.extensions.api.plugins.PluginContext;
 import com.hashmapinc.server.extensions.api.plugins.msg.*;
 import com.hashmapinc.server.extensions.api.plugins.rpc.PluginRpcMsg;
 import lombok.extern.slf4j.Slf4j;
-import com.hashmapinc.server.common.data.id.*;
-import com.hashmapinc.server.common.data.kv.*;
 import com.hashmapinc.server.common.data.plugin.PluginMetaData;
 import com.hashmapinc.server.common.data.relation.EntityRelation;
 import com.hashmapinc.server.common.data.rule.RuleMetaData;
 import com.hashmapinc.server.common.msg.cluster.ServerAddress;
 import com.hashmapinc.server.extensions.api.plugins.PluginCallback;
-import com.hashmapinc.server.extensions.api.plugins.msg.*;
 import com.hashmapinc.server.extensions.api.plugins.rpc.RpcMsg;
 import com.hashmapinc.server.extensions.api.plugins.ws.PluginWebsocketSessionRef;
 import com.hashmapinc.server.extensions.api.plugins.ws.msg.PluginWebsocketMsg;
@@ -193,9 +190,9 @@ public final class PluginProcessingContext implements PluginContext {
     }
 
     @Override
-    public void saveTagMetaData(EntityId entityId, TagMetaData tagMetaData, final PluginCallback<Void> callback) {
+    public void saveTagMetaData(EntityId entityId, TagMetaDataQuality tagMetaDataQuality, final PluginCallback<Void> callback) {
         validate(entityId, new ValidationCallback(callback, ctx -> {
-            ListenableFuture<List<Void>> rsListFuture = pluginCtx.tagMetaDataService.saveTagMetaData(tagMetaData);
+            ListenableFuture<List<Void>> rsListFuture = pluginCtx.tagMetaDataQualityService.saveTagMetaData(tagMetaDataQuality);
             Futures.addCallback(rsListFuture, getListCallback(callback, v -> null), executor);
         }));
     }

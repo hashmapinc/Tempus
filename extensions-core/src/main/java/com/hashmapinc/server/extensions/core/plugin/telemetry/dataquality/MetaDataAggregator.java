@@ -16,8 +16,7 @@
 package com.hashmapinc.server.extensions.core.plugin.telemetry.dataquality;
 
 import com.hashmapinc.server.common.data.EntityType;
-import com.hashmapinc.server.common.data.TagMetaData;
-import com.hashmapinc.server.common.data.UUIDConverter;
+import com.hashmapinc.server.common.data.TagMetaDataQuality;
 import com.hashmapinc.server.common.data.id.EntityId;
 import com.hashmapinc.server.common.data.kv.*;
 import com.hashmapinc.server.extensions.api.plugins.PluginCallback;
@@ -29,8 +28,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
-
-import static com.hashmapinc.server.common.data.UUIDConverter.fromTimeUUID;
 
 @Slf4j
 public class MetaDataAggregator {
@@ -143,24 +140,24 @@ public class MetaDataAggregator {
     }
 
     private void saveToTagMetaData(Double avg, Long min, Long max, Double median,String key){
-        TagMetaData tagMetaData = new TagMetaData();
-        tagMetaData.setEntityId(entityId.getId().toString());
-        tagMetaData.setEntityType(EntityType.DEVICE);
-        tagMetaData.setAvgFrequency(avg);
-        tagMetaData.setKey(key);
-        tagMetaData.setMaxFrequency(max);
-        tagMetaData.setMinFrequency(min);
-        tagMetaData.setMeanFrequency(avg);
-        tagMetaData.setMedianFrequency(median);
-        ctx.saveTagMetaData(entityId, tagMetaData, new PluginCallback<Void>() {
+        TagMetaDataQuality tagMetaDataQuality = new TagMetaDataQuality();
+        tagMetaDataQuality.setEntityId(entityId.getId().toString());
+        tagMetaDataQuality.setEntityType(EntityType.DEVICE);
+        tagMetaDataQuality.setAvgFrequency(avg);
+        tagMetaDataQuality.setKey(key);
+        tagMetaDataQuality.setMaxFrequency(max);
+        tagMetaDataQuality.setMinFrequency(min);
+        tagMetaDataQuality.setMeanFrequency(avg);
+        tagMetaDataQuality.setMedianFrequency(median);
+        ctx.saveTagMetaData(entityId, tagMetaDataQuality, new PluginCallback<Void>() {
             @Override
             public void onSuccess(PluginContext ctx, Void value) {
-                log.debug("Saved data to TagMetaData");
+                log.debug("Saved data to TagMetaDataQuality");
             }
 
             @Override
             public void onFailure(PluginContext ctx, Exception e) {
-                log.info("Unable to save to tagMetaData");
+                log.info("Unable to save to tagMetaDataQuality");
             }
         });
     }

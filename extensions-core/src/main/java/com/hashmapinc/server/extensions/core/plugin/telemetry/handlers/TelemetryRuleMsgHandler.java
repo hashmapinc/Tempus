@@ -31,6 +31,7 @@ import com.hashmapinc.server.extensions.core.plugin.telemetry.dataquality.MetaDa
 import com.hashmapinc.server.extensions.core.plugin.telemetry.sub.Subscription;
 import com.hashmapinc.server.extensions.core.plugin.telemetry.sub.SubscriptionType;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.time.StopWatch;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -133,7 +134,6 @@ public class TelemetryRuleMsgHandler extends DefaultRuleMsgHandler {
                 }
             });
         }
-
     }
 
     private List<TsKvEntry> prepareSubscriptionUpdate(TelemetryUploadRequest request, Subscription s) {

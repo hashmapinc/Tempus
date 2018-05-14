@@ -14,17 +14,14 @@
  * limitations under the License.
  */
 
-package com.hashmapinc.server.dao.TagMetaData;
+package com.hashmapinc.server.dao.sql.TagMetaData;
 
-import com.google.common.util.concurrent.ListenableFuture;
-import com.hashmapinc.server.common.data.TagMetaData;
-import com.hashmapinc.server.common.data.id.EntityId;
+import com.hashmapinc.server.dao.model.sql.TagMetaDataQualityCompositeKey;
+import com.hashmapinc.server.dao.model.sql.TagMetaDataQualityEntity;
+import org.springframework.data.repository.CrudRepository;
 
-import javax.swing.text.html.parser.Entity;
 import java.util.List;
 
-public interface TagMetaDataDao {
-    ListenableFuture<Void> save(TagMetaData tagMetaData);
-    ListenableFuture<TagMetaData> getByEntityIdAndKey(EntityId entityId, String key);
-    ListenableFuture<List<TagMetaData>> getAllByEntityId(EntityId entityId);
+public interface TagMetaDataQualityRepository extends CrudRepository<TagMetaDataQualityEntity, TagMetaDataQualityCompositeKey> {
+    List<TagMetaDataQualityEntity> findAllByEntityId(String entityId);
 }

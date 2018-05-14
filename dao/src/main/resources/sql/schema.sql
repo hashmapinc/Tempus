@@ -260,7 +260,7 @@ CREATE TABLE IF NOT EXISTS ds_kv_latest (
     CONSTRAINT ds_kv_latest_unq_key UNIQUE (entity_type, entity_id, key)
 );
 
-CREATE TABLE IF NOT EXISTS tag_metadata (
+CREATE TABLE IF NOT EXISTS tag_metadata_quality (
     entity_type varchar(255) NOT NULL,
     entity_id varchar(31) NOT NULL,
     key varchar(255) NOT NULL,
@@ -271,7 +271,7 @@ CREATE TABLE IF NOT EXISTS tag_metadata (
     mean_frequency double precision,
     median_frequency double precision,
     source varchar,
-    CONSTRAINT tag_metadata_unq_key UNIQUE (entity_type, entity_id, key)
+    CONSTRAINT tag_metadata_quality_unq_key UNIQUE (entity_type, entity_id, key)
 );
 
 CREATE TABLE IF NOT EXISTS user_credentials (

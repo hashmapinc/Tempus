@@ -494,7 +494,7 @@ CREATE TABLE IF NOT EXISTS tempus.ds_kv_latest_cf (
     PRIMARY KEY (( entity_type, entity_id ), key)
 ) WITH compaction = { 'class' :  'LeveledCompactionStrategy'  };
 
-CREATE TABLE IF NOT EXISTS tempus.tag_metadata_cf (
+CREATE TABLE IF NOT EXISTS tempus.tag_metadata_quality_cf (
     entity_type text,
     entity_id timeuuid,
     key text,

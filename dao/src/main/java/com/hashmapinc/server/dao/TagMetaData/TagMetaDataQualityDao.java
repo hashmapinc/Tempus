@@ -13,25 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.hashmapinc.server.dao.model.sql;
 
-import com.hashmapinc.server.common.data.EntityType;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+package com.hashmapinc.server.dao.TagMetaData;
 
-import javax.persistence.Transient;
-import java.io.Serializable;
+import com.google.common.util.concurrent.ListenableFuture;
+import com.hashmapinc.server.common.data.TagMetaDataQuality;
+import com.hashmapinc.server.common.data.id.EntityId;
 
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
-public class TagMetaDataCompositeKey implements Serializable {
+import java.util.List;
 
-    @Transient
-    private static final long serialVersionUID = -4089175869616037526L;
-
-    private EntityType entityType;
-    private String entityId;
-    private String key;
+public interface TagMetaDataQualityDao {
+    ListenableFuture<Void> save(TagMetaDataQuality tagMetaDataQuality);
+    ListenableFuture<TagMetaDataQuality> getByEntityIdAndKey(EntityId entityId, String key);
+    ListenableFuture<List<TagMetaDataQuality>> getAllByEntityId(EntityId entityId);
 }
