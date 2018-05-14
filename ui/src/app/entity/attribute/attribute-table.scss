@@ -69,22 +69,35 @@ md-toolbar.md-table-toolbar.alternate {
 
 .max-text
 {
-	max-height: 350px
+	max-height: 350px;
+    width:162% !important
 }
 
 .min-text
 {
-	max-height: 30px;
-	overflow:true
+	max-height: 50px;
+	overflow:true;
+    width:130% !important
 }
 
-.center-modal {
+.center-modal-min {
     position: fixed;
-    top: 18% !important;
-    left: 50.5% !important;
-    margin-left: -10%;
+    top: 58% !important;
+    left: 74.5% !important;
+    margin-left: -12%;
 }
 
+.center-modal-max {
+  position: fixed;
+  top: 19% !important;
+  left: 59.5% !important;
+  margin-left: -12%;
+}
+
+.section-max {
+
+  margin-top:-40%
+}
 .icon-fullscreen
 {
 	icon:fullscreen;
@@ -93,4 +106,11 @@ md-toolbar.md-table-toolbar.alternate {
 icon-fullscreen-exit
 {
 	idon : fullscreen-exit
+}
+
+.edit-heading{
+
+  background-color: #0c3483;
+  color:white;
+
 }
