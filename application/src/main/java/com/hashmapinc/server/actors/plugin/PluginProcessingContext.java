@@ -174,25 +174,16 @@ public final class PluginProcessingContext implements PluginContext {
 
     @Override
     public void saveDsData(final EntityId entityId, final List<DsKvEntry> entries, long ttl, final PluginCallback<Void> callback) {
-        log.debug(" here in saveDsData");
         validate(entityId, new ValidationCallback(callback, ctx -> {
-            log.debug(" inside validate");
             ListenableFuture<List<Void>> rsListFuture = pluginCtx.dsService.save(entityId, entries, ttl);
-            ListenableFuture<List<DsKvEntry>> rsGetListFuture = pluginCtx.dsService.findAllLatest(entityId);
-            try {
-                List<DsKvEntry> list = rsGetListFuture.get();
-                log.debug(" DsKvList " + list);
-            }catch (Exception e){
-                log.error(" exception " + e);
-            }
             Futures.addCallback(rsListFuture, getListCallback(callback, v -> null), executor);
         }));
     }
 
     @Override
-    public void saveTagMetaData(EntityId entityId, TagMetaDataQuality tagMetaDataQuality, final PluginCallback<Void> callback) {
+    public void saveTagMetaData(EntityId entityId, TagMetaData tagMetaData, final PluginCallback<Void> callback) {
         validate(entityId, new ValidationCallback(callback, ctx -> {
-            ListenableFuture<List<Void>> rsListFuture = pluginCtx.tagMetaDataQualityService.saveTagMetaData(tagMetaDataQuality);
+            ListenableFuture<List<Void>> rsListFuture = pluginCtx.tagMetaDataService.saveTagMetaData(tagMetaData);
             Futures.addCallback(rsListFuture, getListCallback(callback, v -> null), executor);
         }));
     }

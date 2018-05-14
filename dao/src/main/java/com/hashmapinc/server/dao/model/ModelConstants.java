@@ -154,14 +154,14 @@ public class ModelConstants {
     /**
      * Device MetaData constants.
      */
-    public static final String TAG_METADATA_QUALITY_COLUMN_FAMILY_NAME = "tag_metadata_quality_cf";
-    public static final String TAG_METADATA_QUALITY_UNIT = "unit";
-    public static final String TAG_METADATA_QUALITY_AVG_FREQUENCY = "avg_frequency";
-    public static final String TAG_METADATA_QUALITY_MIN_FREQUENCY = "min_frequency";
-    public static final String TAG_METADATA_QUALITY_MAX_FREQUENCY = "max_frequency";
-    public static final String TAG_METADATA_QUALITY_MEAN_FREQUENCY = "mean_frequency";
-    public static final String TAG_METADATA_QUALITY_MEDIAN_FREQUENCY = "median_frequency";
-    public static final String TAG_METADATA_QUALITY_SOURCE = "source";
+    public static final String TAG_METADATA_COLUMN_FAMILY_NAME = "tag_metadata_cf";
+    public static final String TAG_METADATA_UNIT = "unit";
+    public static final String TAG_METADATA_AVG_FREQUENCY = "avg_frequency";
+    public static final String TAG_METADATA_MIN_FREQUENCY = "min_frequency";
+    public static final String TAG_METADATA_MAX_FREQUENCY = "max_frequency";
+    public static final String TAG_METADATA_MEAN_FREQUENCY = "mean_frequency";
+    public static final String TAG_METADATA_MEDIAN_FREQUENCY = "median_frequency";
+    public static final String TAG_METADATA_SOURCE = "source";
 
     /**
      * Application constants

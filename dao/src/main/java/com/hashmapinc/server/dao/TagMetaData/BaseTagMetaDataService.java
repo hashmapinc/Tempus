@@ -19,7 +19,7 @@ package com.hashmapinc.server.dao.TagMetaData;
 import com.google.common.collect.Lists;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
-import com.hashmapinc.server.common.data.TagMetaDataQuality;
+import com.hashmapinc.server.common.data.TagMetaData;
 import com.hashmapinc.server.common.data.id.EntityId;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,26 +29,26 @@ import java.util.List;
 
 @Service
 @Slf4j
-public class BaseTagMetaDataQualityService implements TagMetaDataQualityService {
+public class BaseTagMetaDataService implements TagMetaDataService {
 
     @Autowired
-    TagMetaDataQualityDao tagMetaDataQualityDao;
+    TagMetaDataDao tagMetaDataDao;
 
     @Override
-    public ListenableFuture<List<Void>> saveTagMetaData(TagMetaDataQuality tagMetaDataQuality) {
+    public ListenableFuture<List<Void>> saveTagMetaData(TagMetaData tagMetaData) {
         List<ListenableFuture<Void>> futures = Lists.newArrayListWithExpectedSize(1);
-        futures.add(tagMetaDataQualityDao.save(tagMetaDataQuality));
+        futures.add(tagMetaDataDao.save(tagMetaData));
         return Futures.allAsList(futures);
     }
 
     @Override
-    public ListenableFuture<TagMetaDataQuality> getTagMetaDataByEntityIdAndKey(EntityId entityId, String key) {
-        return tagMetaDataQualityDao.getByEntityIdAndKey(entityId, key);
+    public ListenableFuture<TagMetaData> getTagMetaDataByEntityIdAndKey(EntityId entityId, String key) {
+        return tagMetaDataDao.getByEntityIdAndKey(entityId, key);
     }
 
     @Override
-    public ListenableFuture<List<TagMetaDataQuality>> getAllTagMetaDataByEntityId(EntityId entityId) {
-        return tagMetaDataQualityDao.getAllByEntityId(entityId);
+    public ListenableFuture<List<TagMetaData>> getAllTagMetaDataByEntityId(EntityId entityId) {
+        return tagMetaDataDao.getAllByEntityId(entityId);
     }
 
 }

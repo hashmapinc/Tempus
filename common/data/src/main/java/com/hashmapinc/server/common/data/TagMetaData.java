@@ -16,7 +16,7 @@
 
 package com.hashmapinc.server.common.data;
 
-public class TagMetaDataQuality {
+public class TagMetaData {
 
     private String entityId;
     private EntityType entityType;
@@ -29,7 +29,7 @@ public class TagMetaDataQuality {
     private double medianFrequency;
     private String source;
 
-    public TagMetaDataQuality(){
+    public TagMetaData(){
         this.avgFrequency = 0.0;
         this.maxFrequency = 0.0;
         this.meanFrequency = 0.0;

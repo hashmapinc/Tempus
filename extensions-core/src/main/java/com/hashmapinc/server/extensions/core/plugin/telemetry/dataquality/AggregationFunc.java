@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.hashmapinc.server.extensions.core.plugin.telemetry.dataquality;
 
 import com.hashmapinc.server.common.data.kv.*;
@@ -28,9 +27,7 @@ public class AggregationFunc<T> {
     AggregationFunc(List<T> list){
         this.list = list;
     }
-
     public double calAvg(String key){
-        log.info("Calculating avg ");
         double avg = 0.0;
         double sum = 0.0;
         int count = 0;

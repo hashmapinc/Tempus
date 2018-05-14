@@ -17,7 +17,7 @@ package com.hashmapinc.server.extensions.api.plugins;
 
 import com.google.common.util.concurrent.ListenableFuture;
 import com.hashmapinc.server.common.data.Device;
-import com.hashmapinc.server.common.data.TagMetaDataQuality;
+import com.hashmapinc.server.common.data.TagMetaData;
 import com.hashmapinc.server.common.data.id.*;
 import com.hashmapinc.server.common.data.kv.*;
 import com.hashmapinc.server.extensions.api.plugins.msg.*;
@@ -86,7 +86,7 @@ public interface PluginContext {
 
     void saveDsData(EntityId deviceId, List<DsKvEntry> entries, long ttl, PluginCallback<Void> pluginCallback);
 
-    void saveTagMetaData(EntityId entityId, TagMetaDataQuality tagMetaDataQuality, PluginCallback<Void> pluginCallback);
+    void saveTagMetaData(EntityId entityId, TagMetaData tagMetaData, PluginCallback<Void> pluginCallback);
 
     void loadTimeseries(EntityId entityId, List<TsKvQuery> queries, PluginCallback<List<TsKvEntry>> callback);
 

@@ -21,13 +21,13 @@ import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.ListeningExecutorService;
 import com.google.common.util.concurrent.MoreExecutors;
-import com.hashmapinc.server.common.data.TagMetaDataQuality;
+import com.hashmapinc.server.common.data.TagMetaData;
 import com.hashmapinc.server.common.data.UUIDConverter;
 import com.hashmapinc.server.common.data.id.EntityId;
 import com.hashmapinc.server.dao.DaoUtil;
-import com.hashmapinc.server.dao.TagMetaData.TagMetaDataQualityDao;
-import com.hashmapinc.server.dao.model.sql.TagMetaDataQualityCompositeKey;
-import com.hashmapinc.server.dao.model.sql.TagMetaDataQualityEntity;
+import com.hashmapinc.server.dao.TagMetaData.TagMetaDataDao;
+import com.hashmapinc.server.dao.model.sql.TagMetaDataCompositeKey;
+import com.hashmapinc.server.dao.model.sql.TagMetaDataEntity;
 import com.hashmapinc.server.dao.sql.JpaAbstractDaoListeningExecutorService;
 import com.hashmapinc.server.dao.timeseries.TsInsertExecutorType;
 import com.hashmapinc.server.dao.util.SqlDao;
@@ -45,7 +45,7 @@ import java.util.concurrent.Executors;
 @Component
 @Slf4j
 @SqlDao
-public class JpaTagMetaDataQualityDao extends JpaAbstractDaoListeningExecutorService implements TagMetaDataQualityDao {
+public class JpaTagMetaDataDao extends JpaAbstractDaoListeningExecutorService implements TagMetaDataDao {
 
     @Value("${sql.ts_inserts_executor_type}")
     private String insertExecutorType;
@@ -56,7 +56,7 @@ public class JpaTagMetaDataQualityDao extends JpaAbstractDaoListeningExecutorSer
     private ListeningExecutorService insertService;
 
     @Autowired
-    private TagMetaDataQualityRepository tagMetaDataQualityRepository;
+    private TagMetaDataRepository tagMetaDataRepository;
 
     @PostConstruct
     public void init() {
@@ -87,32 +87,32 @@ public class JpaTagMetaDataQualityDao extends JpaAbstractDaoListeningExecutorSer
 
 
     @Override
-    public ListenableFuture<Void> save(TagMetaDataQuality tagMetaDataQuality) {
-        UUID id = UUID.fromString(tagMetaDataQuality.getEntityId());
-        tagMetaDataQuality.setEntityId(UUIDConverter.fromTimeUUID(id));
-        TagMetaDataQualityEntity tagMetaDataQualityEntity = new TagMetaDataQualityEntity(tagMetaDataQuality);
+    public ListenableFuture<Void> save(TagMetaData tagMetaData) {
+        UUID id = UUID.fromString(tagMetaData.getEntityId());
+        tagMetaData.setEntityId(UUIDConverter.fromTimeUUID(id));
+        TagMetaDataEntity tagMetaDataEntity = new TagMetaDataEntity(tagMetaData);
         return insertService.submit(() -> {
-            tagMetaDataQualityRepository.save(tagMetaDataQualityEntity);
+            tagMetaDataRepository.save(tagMetaDataEntity);
             return null;
         });
     }
 
     @Override
-    public ListenableFuture<TagMetaDataQuality> getByEntityIdAndKey(EntityId entityId, String key) {
-        TagMetaDataQualityCompositeKey tagMetaDataQualityCompositeKey = new TagMetaDataQualityCompositeKey(entityId.getEntityType(),
+    public ListenableFuture<TagMetaData> getByEntityIdAndKey(EntityId entityId, String key) {
+        TagMetaDataCompositeKey tagMetaDataCompositeKey = new TagMetaDataCompositeKey(entityId.getEntityType(),
                 UUIDConverter.fromTimeUUID(entityId.getId()), key);
-        TagMetaDataQualityEntity tagMetaDataQualityEntity = tagMetaDataQualityRepository.findOne(tagMetaDataQualityCompositeKey);
-        TagMetaDataQuality tagMetaDataQuality = new TagMetaDataQuality();
-        if(tagMetaDataQualityEntity != null){
-            tagMetaDataQuality = tagMetaDataQualityEntity.toData();
+        TagMetaDataEntity tagMetaDataEntity = tagMetaDataRepository.findOne(tagMetaDataCompositeKey);
+        TagMetaData tagMetaData = new TagMetaData();
+        if(tagMetaDataEntity != null){
+            tagMetaData = tagMetaDataEntity.toData();
         }
-        return Futures.immediateFuture(tagMetaDataQuality);
+        return Futures.immediateFuture(tagMetaData);
     }
 
     @Override
-    public ListenableFuture<List<TagMetaDataQuality>> getAllByEntityId(EntityId entityId) {
+    public ListenableFuture<List<TagMetaData>> getAllByEntityId(EntityId entityId) {
         return Futures.immediateFuture(
                 DaoUtil.convertDataList(Lists.newArrayList(
-                        tagMetaDataQualityRepository.findAllByEntityId(UUIDConverter.fromTimeUUID(entityId.getId())))));
+                        tagMetaDataRepository.findAllByEntityId(UUIDConverter.fromTimeUUID(entityId.getId())))));
     }
 }

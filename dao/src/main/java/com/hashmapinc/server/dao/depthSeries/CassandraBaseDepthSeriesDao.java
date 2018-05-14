@@ -270,7 +270,6 @@ public class CassandraBaseDepthSeriesDao extends CassandraAbstractAsyncDao imple
     @Override
     public ListenableFuture<Void> save(EntityId entityId, DsKvEntry dsKvEntry, long ttl) {
         Double partition = dsKvEntry.getDs();
-        log.debug("HMDC Partition value " + partition);
         com.hashmapinc.server.common.data.kv.DataType type = dsKvEntry.getDataType();
         BoundStatement stmt = (ttl == 0 ? getSaveStmt(type) : getSaveTtlStmt(type)).bind();
         stmt.setString(0, entityId.getEntityType().name())

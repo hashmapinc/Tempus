@@ -17,13 +17,13 @@
 package com.hashmapinc.server.dao.TagMetaData;
 
 import com.google.common.util.concurrent.ListenableFuture;
-import com.hashmapinc.server.common.data.TagMetaDataQuality;
+import com.hashmapinc.server.common.data.TagMetaData;
 import com.hashmapinc.server.common.data.id.EntityId;
 
 import java.util.List;
 
-public interface TagMetaDataQualityService {
-    ListenableFuture<List<Void>> saveTagMetaData(TagMetaDataQuality tagMetaDataQuality);
-    ListenableFuture<TagMetaDataQuality> getTagMetaDataByEntityIdAndKey(EntityId entityId, String key);
-    ListenableFuture<List<TagMetaDataQuality>> getAllTagMetaDataByEntityId(EntityId entityId);
+public interface TagMetaDataDao {
+    ListenableFuture<Void> save(TagMetaData tagMetaData);
+    ListenableFuture<TagMetaData> getByEntityIdAndKey(EntityId entityId, String key);
+    ListenableFuture<List<TagMetaData>> getAllByEntityId(EntityId entityId);
 }

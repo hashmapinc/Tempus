@@ -21,7 +21,7 @@ import com.datastax.driver.core.PreparedStatement;
 import com.datastax.driver.core.Row;
 import com.datastax.driver.core.Session;
 import com.google.common.util.concurrent.ListenableFuture;
-import com.hashmapinc.server.common.data.TagMetaDataQuality;
+import com.hashmapinc.server.common.data.TagMetaData;
 import com.hashmapinc.server.common.data.id.EntityId;
 import com.hashmapinc.server.dao.model.ModelConstants;
 import com.hashmapinc.server.dao.nosql.CassandraAbstractAsyncDao;
@@ -45,7 +45,7 @@ import static com.hashmapinc.server.dao.model.ModelConstants.*;
 @Component
 @Slf4j
 @NoSqlDao
-public class CassandraBaseTagMetaDataQualityDao extends CassandraAbstractAsyncDao implements TagMetaDataQualityDao {
+public class CassandraBaseTagMetaDataDao extends CassandraAbstractAsyncDao implements TagMetaDataDao {
 
     public static final String INSERT_INTO = "INSERT INTO ";
     public static final String GENERATED_QUERY_FOR_ENTITY_TYPE_AND_ENTITY_ID = "Generated query [{}] for entityType {} and entityId {}";
@@ -86,35 +86,35 @@ public class CassandraBaseTagMetaDataQualityDao extends CassandraAbstractAsyncDa
         super.stopExecutor();
     }
     @Override
-    public ListenableFuture<Void> save(TagMetaDataQuality tagMetaDataQuality) {
-        log.debug("Saving tag MetaData [{}]", tagMetaDataQuality);
+    public ListenableFuture<Void> save(TagMetaData tagMetaData) {
+        log.debug("Saving tag MetaData [{}]", tagMetaData);
         BoundStatement stmt = getLatestStmt().bind()
-                .setString(0, tagMetaDataQuality.getEntityType().name())
-                .setUUID(1, UUID.fromString(tagMetaDataQuality.getEntityId()))
-                .setString(2, tagMetaDataQuality.getKey())
-                .setString(3, tagMetaDataQuality.getUnit())
-                .setDouble(4, tagMetaDataQuality.getAvgFrequency())
-                .setDouble(5, tagMetaDataQuality.getMinFrequency())
-                .setDouble(6, tagMetaDataQuality.getMaxFrequency())
-                .setDouble(7, tagMetaDataQuality.getMeanFrequency())
-                .setDouble(8, tagMetaDataQuality.getMedianFrequency())
-                .setString(9, tagMetaDataQuality.getSource());
+                .setString(0, tagMetaData.getEntityType().name())
+                .setUUID(1, UUID.fromString(tagMetaData.getEntityId()))
+                .setString(2, tagMetaData.getKey())
+                .setString(3, tagMetaData.getUnit())
+                .setDouble(4, tagMetaData.getAvgFrequency())
+                .setDouble(5, tagMetaData.getMinFrequency())
+                .setDouble(6, tagMetaData.getMaxFrequency())
+                .setDouble(7, tagMetaData.getMeanFrequency())
+                .setDouble(8, tagMetaData.getMedianFrequency())
+                .setString(9, tagMetaData.getSource());
         return getFuture(executeAsyncWrite(stmt), rs -> null);
     }
 
     private PreparedStatement getLatestStmt() {
         if (latestInsertStmts == null) {
-            String strStatement = INSERT_INTO + ModelConstants.TAG_METADATA_QUALITY_COLUMN_FAMILY_NAME +
+            String strStatement = INSERT_INTO + ModelConstants.TAG_METADATA_COLUMN_FAMILY_NAME +
                     "(" + ModelConstants.ENTITY_TYPE_COLUMN +
                     "," + ModelConstants.ENTITY_ID_COLUMN +
                     "," + KEY_COLUMN +
-                    "," + TAG_METADATA_QUALITY_UNIT +
-                    "," + TAG_METADATA_QUALITY_AVG_FREQUENCY +
-                    "," + TAG_METADATA_QUALITY_MIN_FREQUENCY +
-                    "," + TAG_METADATA_QUALITY_MAX_FREQUENCY +
-                    "," + TAG_METADATA_QUALITY_MEAN_FREQUENCY +
-                    "," + TAG_METADATA_QUALITY_MEDIAN_FREQUENCY +
-                    "," + TAG_METADATA_QUALITY_SOURCE + ")" +
+                    "," + TAG_METADATA_UNIT +
+                    "," + TAG_METADATA_AVG_FREQUENCY +
+                    "," + TAG_METADATA_MIN_FREQUENCY +
+                    "," + TAG_METADATA_MAX_FREQUENCY +
+                    "," + TAG_METADATA_MEAN_FREQUENCY +
+                    "," + TAG_METADATA_MEDIAN_FREQUENCY +
+                    "," + TAG_METADATA_SOURCE + ")" +
                     " VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
             Session session = getSession();
             latestInsertStmts = session.prepare(strStatement);
@@ -124,7 +124,7 @@ public class CassandraBaseTagMetaDataQualityDao extends CassandraAbstractAsyncDa
     }
 
     @Override
-    public ListenableFuture<TagMetaDataQuality> getByEntityIdAndKey(EntityId entityId, String key) {
+    public ListenableFuture<TagMetaData> getByEntityIdAndKey(EntityId entityId, String key) {
         BoundStatement stmt = createLatestStmt().bind();
         stmt.setUUID(0, entityId.getId());
         stmt.setString(1, key);
@@ -135,7 +135,7 @@ public class CassandraBaseTagMetaDataQualityDao extends CassandraAbstractAsyncDa
     private PreparedStatement createLatestStmt() {
         if (findLatestStmt == null) {
             findLatestStmt = getSession().prepare(SELECT_PREFIX + "* " +
-                    "FROM " + ModelConstants.TAG_METADATA_QUALITY_COLUMN_FAMILY_NAME + " " +
+                    "FROM " + ModelConstants.TAG_METADATA_COLUMN_FAMILY_NAME + " " +
                     "WHERE " + ModelConstants.ENTITY_ID_COLUMN + EQUALS_PARAM +
                     "AND " + ModelConstants.KEY_COLUMN + EQUALS_PARAM);
         }
@@ -143,38 +143,38 @@ public class CassandraBaseTagMetaDataQualityDao extends CassandraAbstractAsyncDa
     }
 
     @Override
-    public ListenableFuture<List<TagMetaDataQuality>> getAllByEntityId(EntityId entityId) {
+    public ListenableFuture<List<TagMetaData>> getAllByEntityId(EntityId entityId) {
         BoundStatement stmt = createLatestAllStmt().bind();
         stmt.setUUID(0, entityId.getId());
         log.debug(GENERATED_QUERY_FOR_ENTITY_TYPE_AND_ENTITY_ID, stmt, entityId.getEntityType(), entityId.getId());
         return getFuture(executeAsyncRead(stmt), rs -> convertToTagMetaDataEntities(entityId, rs.all()));
     }
 
-    private List<TagMetaDataQuality> convertToTagMetaDataEntities(EntityId entityId, List<Row> rs){
+    private List<TagMetaData> convertToTagMetaDataEntities(EntityId entityId, List<Row> rs){
         if(!rs.isEmpty()){
-            List<TagMetaDataQuality> tagMetaDataQualityList = new ArrayList<>();
+            List<TagMetaData> tagMetaDataList = new ArrayList<>();
             for(Row row : rs) {
-                TagMetaDataQuality tagMetaDataQuality = convertToTagMetaDataEntity(entityId, row.getString(KEY_COLUMN), row);
-                tagMetaDataQualityList.add(tagMetaDataQuality);
+                TagMetaData tagMetaData = convertToTagMetaDataEntity(entityId, row.getString(KEY_COLUMN), row);
+                tagMetaDataList.add(tagMetaData);
             }
-            return tagMetaDataQualityList;
+            return tagMetaDataList;
         }
         return null;
     }
 
-    private TagMetaDataQuality convertToTagMetaDataEntity(EntityId entityId, String key, Row row){
+    private TagMetaData convertToTagMetaDataEntity(EntityId entityId, String key, Row row){
         if(row != null){
-            TagMetaDataQuality tagMetaDataQuality = new TagMetaDataQuality();
-            tagMetaDataQuality.setEntityId(entityId.getId().toString());
-            tagMetaDataQuality.setKey(key);
-            tagMetaDataQuality.setUnit(row.getString(TAG_METADATA_QUALITY_UNIT));
-            tagMetaDataQuality.setAvgFrequency(row.getDouble(TAG_METADATA_QUALITY_AVG_FREQUENCY));
-            tagMetaDataQuality.setMinFrequency(row.getDouble(TAG_METADATA_QUALITY_MIN_FREQUENCY));
-            tagMetaDataQuality.setMaxFrequency(row.getDouble(TAG_METADATA_QUALITY_MAX_FREQUENCY));
-            tagMetaDataQuality.setMeanFrequency(row.getDouble(TAG_METADATA_QUALITY_MEAN_FREQUENCY));
-            tagMetaDataQuality.setMedianFrequency(row.getDouble(TAG_METADATA_QUALITY_MEDIAN_FREQUENCY));
-            tagMetaDataQuality.setSource(row.getString(TAG_METADATA_QUALITY_SOURCE));
-            return tagMetaDataQuality;
+            TagMetaData tagMetaData = new TagMetaData();
+            tagMetaData.setEntityId(entityId.getId().toString());
+            tagMetaData.setKey(key);
+            tagMetaData.setUnit(row.getString(TAG_METADATA_UNIT));
+            tagMetaData.setAvgFrequency(row.getDouble(TAG_METADATA_AVG_FREQUENCY));
+            tagMetaData.setMinFrequency(row.getDouble(TAG_METADATA_MIN_FREQUENCY));
+            tagMetaData.setMaxFrequency(row.getDouble(TAG_METADATA_MAX_FREQUENCY));
+            tagMetaData.setMeanFrequency(row.getDouble(TAG_METADATA_MEAN_FREQUENCY));
+            tagMetaData.setMedianFrequency(row.getDouble(TAG_METADATA_MEDIAN_FREQUENCY));
+            tagMetaData.setSource(row.getString(TAG_METADATA_SOURCE));
+            return tagMetaData;
         }
         return null;
     }
@@ -182,7 +182,7 @@ public class CassandraBaseTagMetaDataQualityDao extends CassandraAbstractAsyncDa
     private PreparedStatement createLatestAllStmt() {
         if (findLatestStmt == null) {
             findLatestStmt = getSession().prepare(SELECT_PREFIX + "* " +
-                    "FROM " + ModelConstants.TAG_METADATA_QUALITY_COLUMN_FAMILY_NAME + " " +
+                    "FROM " + ModelConstants.TAG_METADATA_COLUMN_FAMILY_NAME + " " +
                     "WHERE " + ModelConstants.ENTITY_ID_COLUMN + EQUALS_PARAM);
         }
         return findLatestStmt;

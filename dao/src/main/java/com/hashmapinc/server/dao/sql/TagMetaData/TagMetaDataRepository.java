@@ -16,12 +16,12 @@
 
 package com.hashmapinc.server.dao.sql.TagMetaData;
 
-import com.hashmapinc.server.dao.model.sql.TagMetaDataQualityCompositeKey;
-import com.hashmapinc.server.dao.model.sql.TagMetaDataQualityEntity;
+import com.hashmapinc.server.dao.model.sql.TagMetaDataCompositeKey;
+import com.hashmapinc.server.dao.model.sql.TagMetaDataEntity;
 import org.springframework.data.repository.CrudRepository;
 
 import java.util.List;
 
-public interface TagMetaDataQualityRepository extends CrudRepository<TagMetaDataQualityEntity, TagMetaDataQualityCompositeKey> {
-    List<TagMetaDataQualityEntity> findAllByEntityId(String entityId);
+public interface TagMetaDataRepository extends CrudRepository<TagMetaDataEntity, TagMetaDataCompositeKey> {
+    List<TagMetaDataEntity> findAllByEntityId(String entityId);
 }
