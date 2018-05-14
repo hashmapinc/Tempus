@@ -123,7 +123,6 @@ public final class TsKvEntity implements ToData<TsKvEntry> {
         BasicTsKvEntry basicTsKvEntry = new BasicTsKvEntry(ts, kvEntry);
         basicTsKvEntry.setTsDiff(tsDiff);
         return basicTsKvEntry;
-        //return new BasicTsKvEntry(ts, kvEntry);
     }
 
     public boolean isNotEmpty() {

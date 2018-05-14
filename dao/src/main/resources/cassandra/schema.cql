@@ -464,6 +464,7 @@ CREATE TABLE IF NOT EXISTS tempus.ds_kv_cf (
     key text,
     partition double,
     ds double,
+    ds_diff double,
     bool_v boolean,
     str_v text,
     long_v bigint,

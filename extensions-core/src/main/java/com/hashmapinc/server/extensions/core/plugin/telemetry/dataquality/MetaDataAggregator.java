@@ -32,14 +32,22 @@ import java.util.stream.Collectors;
 @Slf4j
 public class MetaDataAggregator {
     private long aggregationPeriod;
+    private double depthAggregationPeriod;
     private PluginContext ctx;
     private EntityId entityId;
     private final int limit = 10000;
 
-    public MetaDataAggregator(PluginContext ctx, long aggregationPeriod, EntityId entityId){
-        this.aggregationPeriod = aggregationPeriod;
+    public MetaDataAggregator(PluginContext ctx, EntityId entityId){
         this.ctx = ctx;
         this.entityId = entityId;
+    }
+
+    public void setAggregationPeriod(long aggregationPeriod) {
+        this.aggregationPeriod = aggregationPeriod;
+    }
+
+    public void setDepthAggregationPeriod(double depthAggregationPeriod) {
+        this.depthAggregationPeriod = depthAggregationPeriod;
     }
 
     public void aggregateMetaData(Long endTs, List<TsKvEntry> tsKvEntries){
@@ -53,15 +61,11 @@ public class MetaDataAggregator {
             public void onSuccess(PluginContext ctx, List<TsKvEntry> data) {
                 if(!data.isEmpty()) {
                     for (String key : keys) {
-                        log.debug("Key " + key);
-                        Double avg = calAvg(data, key);
-                        log.debug("Avg " + avg);
-                        Long min = calMin(data, key);
-                        log.debug("Min " + min);
-                        Long max = calMax(data, key);
-                        log.debug("Max " + max);
-                        Double median = calMedian(data, key);
-                        log.debug("Median " + median);
+                        AggregationFunc<TsKvEntry> aggregationFunc = new AggregationFunc<>(data);
+                        Double avg = aggregationFunc.calAvg(key);
+                        double min = aggregationFunc.calMin(key);
+                        double max = aggregationFunc.calMax(key);
+                        Double median = aggregationFunc.calMedian(key);
                         saveToTagMetaData(avg, min, max, median, key);
                     }
                 }
@@ -73,73 +77,34 @@ public class MetaDataAggregator {
         });
     }
 
-
-    private Double calAvg(List<TsKvEntry> tsKvEntries, String key){
-        Double avg = 0.0;
-        long sum = 0;
-        int count = 0;
-        for (TsKvEntry entry: tsKvEntries){
-            if(entry.getKey().contentEquals(key)) {
-                long diff = ((BasicTsKvEntry) entry).getTsDiff();
-                sum += diff;
-                count++;
-            }
+    public void aggregateDepthMetaData(double endDs, List<DsKvEntry> dsKvEntries){
+        Set<String> keys = new HashSet<>();
+        for (DsKvEntry entry: dsKvEntries){
+            keys.add(entry.getKey());
         }
-
-        if(count > 0)
-            avg = (double)(sum/count);
-
-        return avg;
+        List<DsKvQuery> queries = keys.stream().map(key -> new BaseDsKvQuery(key,endDs - depthAggregationPeriod, endDs, depthAggregationPeriod, limit, DepthAggregation.NONE)).collect(Collectors.toList());
+        ctx.loadDepthSeries(entityId, queries, new PluginCallback<List<DsKvEntry>>() {
+            @Override
+            public void onSuccess(PluginContext ctx, List<DsKvEntry> data) {
+                if(!data.isEmpty()) {
+                    for (String key : keys) {
+                        AggregationFunc<DsKvEntry> aggregationFunc = new AggregationFunc<>(data);
+                        Double avg = aggregationFunc.calAvg(key);
+                        double min = aggregationFunc.calMin(key);
+                        double max = aggregationFunc.calMax(key);
+                        Double median = aggregationFunc.calMedian(key);
+                        saveToTagMetaData(avg, min, max, median, key);
+                    }
+                }
+            }
+            @Override
+            public void onFailure(PluginContext ctx, Exception e) {
+                log.info("Failed to fetch TsKvEntry List.");
+            }
+        });
     }
 
-    private Long calMin(List<TsKvEntry> tsKvEntries, String key){
-        long min = 9999999999L;
-        for (TsKvEntry entry: tsKvEntries){
-            if(entry.getKey().contentEquals(key)) {
-                long diff = ((BasicTsKvEntry) entry).getTsDiff();
-                if (diff < min)
-                    min = diff;
-            }
-        }
-
-        return min;
-    }
-
-    private Long calMax(List<TsKvEntry> tsKvEntries, String key){
-        long max = -1;
-        for (TsKvEntry entry: tsKvEntries){
-            if(entry.getKey().contentEquals(key)) {
-                long diff = ((BasicTsKvEntry) entry).getTsDiff();
-                if (diff > max)
-                    max = diff;
-            }
-        }
-
-        return max;
-    }
-
-    private Double calMedian(List<TsKvEntry> tsKvEntries, String key){
-        Double median = 0.0;
-        List<Long> keyFrequencyList = new ArrayList<>();
-        for (TsKvEntry entry: tsKvEntries){
-            if(entry.getKey().contentEquals(key)) {
-                long diff = ((BasicTsKvEntry) entry).getTsDiff();
-                keyFrequencyList.add(diff);
-            }
-        }
-        if(!keyFrequencyList.isEmpty()){
-            int listSize = keyFrequencyList.size();
-            if(listSize % 2 == 0){
-                int index = listSize / 2;
-                median = ((double)(keyFrequencyList.get(index)) + (double)(keyFrequencyList.get(index - 1)))/2;
-            }else {
-                median = (double)(keyFrequencyList.get(listSize / 2));
-            }
-        }
-        return median;
-    }
-
-    private void saveToTagMetaData(Double avg, Long min, Long max, Double median,String key){
+    private void saveToTagMetaData(Double avg, double min, double max, double median,String key){
         TagMetaDataQuality tagMetaDataQuality = new TagMetaDataQuality();
         tagMetaDataQuality.setEntityId(entityId.getId().toString());
         tagMetaDataQuality.setEntityType(EntityType.DEVICE);

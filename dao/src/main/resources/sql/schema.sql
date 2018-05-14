@@ -239,6 +239,7 @@ CREATE TABLE IF NOT EXISTS ds_kv (
     entity_id varchar(31) NOT NULL,
     key varchar(255) NOT NULL,
     ds double precision NOT NULL,
+    ds_diff double precision,
     bool_v boolean,
     str_v varchar(10000000),
     long_v bigint,

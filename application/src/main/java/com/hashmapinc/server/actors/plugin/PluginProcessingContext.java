@@ -303,6 +303,18 @@ public final class PluginProcessingContext implements PluginContext {
         }));
     }
 
+    @Override
+    public void loadLatestDepthSeries(final EntityId entityId, final List<KvEntry> kvEntries, final PluginCallback<List<DsKvEntry>> callback) {
+        Set<String> keys = new HashSet<>();
+        for (KvEntry kv : kvEntries) {
+            keys.add(kv.getKey());
+        }
+        validate(entityId, new ValidationCallback(callback, ctx -> {
+            ListenableFuture<List<DsKvEntry>> rsListFuture = pluginCtx.dsService.findLatest(entityId, keys);
+            Futures.addCallback(rsListFuture, getCallback(callback, v -> v), executor);
+        }));
+    }
+
 
     @Override
     public void reply(PluginToRuleMsg<?> msg) {

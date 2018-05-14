@@ -26,5 +26,6 @@ public class TelemetryPluginActionConfiguration {
     private String timeUnit;
     private int ttlValue;
     private int qualityTimeWindow;
+    private int qualityDepthWindow;
 
 }

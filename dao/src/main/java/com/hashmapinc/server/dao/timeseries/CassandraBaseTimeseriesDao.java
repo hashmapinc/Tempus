@@ -409,7 +409,6 @@ public class CassandraBaseTimeseriesDao extends CassandraAbstractAsyncDao implem
         BasicTsKvEntry basicTsKvEntry = new BasicTsKvEntry(ts, toKvEntry(row, key));
         basicTsKvEntry.setTsDiff(diff);
         return basicTsKvEntry;
-        //return new BasicTsKvEntry(ts, toKvEntry(row, key));
     }
 
     public static KvEntry toKvEntry(Row row, String key) {

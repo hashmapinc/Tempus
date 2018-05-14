@@ -21,12 +21,20 @@
         "default": 60000,
         "minimum": 0,
         "maximum": 3600000
+      },
+      "qualityDepthWindow": {
+        "title": "Tag Quality Time Window",
+        "type": "integer",
+        "default": 3000,
+        "minimum": 0,
+        "maximum": 300000
       }
     },
     "required": [
       "timeUnit",
       "ttlValue",
-      "qualityTimeWindow"
+      "qualityTimeWindow",
+      "qualityDepthWindow"
     ]
   },
   "form": [
@@ -54,6 +62,7 @@
       ]
     },
     "ttlValue",
-    "qualityTimeWindow"
+    "qualityTimeWindow",
+    "qualityDepthWindow"
   ]
 }

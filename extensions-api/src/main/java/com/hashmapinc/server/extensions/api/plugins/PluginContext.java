@@ -100,6 +100,8 @@ public interface PluginContext {
 
     void loadLatestDepthSeries(EntityId entityId, Collection<String> keys, PluginCallback<List<DsKvEntry>> callback);
 
+    void loadLatestDepthSeries(EntityId entityId, List<KvEntry> kvEntries, PluginCallback<List<DsKvEntry>> callback);
+
     void loadLatestDepthSeries(EntityId entityId, PluginCallback<List<DsKvEntry>> callback);
 
     /*

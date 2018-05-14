@@ -42,6 +42,7 @@ public class TelemetryPluginAction extends SimpleRuleLifecycleComponent implemen
     protected TelemetryPluginActionConfiguration configuration;
     protected long ttl;
     protected long qualityTimeWindow;
+    protected double qualityDepthWindow;
 
     @Override
     public void init(TelemetryPluginActionConfiguration configuration) {
@@ -52,6 +53,7 @@ public class TelemetryPluginAction extends SimpleRuleLifecycleComponent implemen
             this.ttl = TimeUnit.valueOf(configuration.getTimeUnit()).toSeconds(configuration.getTtlValue());
         }
         this.qualityTimeWindow = configuration.getQualityTimeWindow();
+        this.qualityDepthWindow = configuration.getQualityDepthWindow();
     }
 
     @Override
@@ -68,7 +70,7 @@ public class TelemetryPluginAction extends SimpleRuleLifecycleComponent implemen
             log.debug("Post telemetry requestDs : " + msg);
             DepthTelemetryUploadRequest payload = (DepthTelemetryUploadRequest) msg;
             return Optional.of(new DepthTelemetryUploadRequestRuleToPluginMsg(toDeviceActorMsg.getTenantId(), toDeviceActorMsg.getCustomerId(),
-                    toDeviceActorMsg.getDeviceId(), payload, ttl));
+                    toDeviceActorMsg.getDeviceId(), payload, ttl, qualityDepthWindow));
         }
         else if (msg.getMsgType() == MsgType.POST_ATTRIBUTES_REQUEST) {
             UpdateAttributesRequest payload = (UpdateAttributesRequest) msg;
