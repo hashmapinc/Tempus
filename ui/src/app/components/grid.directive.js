@@ -513,11 +513,11 @@ function GridController(applicationService, $scope, $rootScope, $state, $mdDialo
         reload();
     });
 
-   var gridDetailDevice = $rootScope.$on("CallGridDetailDevice", function($event, data){
+   var gridTableDevice = $rootScope.$on("CallTableDetailDevice", function($event, data){
        vm.clickItemFunc(data[0],data[1]);
     });
 
-    $scope.$on('$destroy', gridDetailDevice);
+    $scope.$on('$destroy', gridTableDevice);
 
     vm.onGridInited(vm);
 

@@ -461,7 +461,7 @@ export function DeviceController($rootScope,userService, deviceService, customer
     }
 
     $scope.deviceDetailFunc = function($event,device) {
-        $rootScope.$emit("CallGridDetailDevice", [$event, device]);
+        $rootScope.$emit("CallTableDetailDevice", [$event, device]);
     }
 
     function deleteDeviceTitle(device) {
