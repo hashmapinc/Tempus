@@ -43,6 +43,8 @@ public abstract class BaseTagMetaDataServiceTest extends AbstractServiceTest{
         tagMetaData = createTagMetaData(key);
         tagMetaDataService.saveTagMetaData(tagMetaData);
 
+        Thread.sleep(4000);
+
         List<TagMetaData> tagMetaDataList = tagMetaDataService.getAllTagMetaDataByEntityId(deviceId).get();
         assertNotNull(tagMetaDataList);
         assertEquals(3, tagMetaDataList.size());
