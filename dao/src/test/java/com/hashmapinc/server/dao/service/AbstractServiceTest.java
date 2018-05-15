@@ -21,7 +21,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.TextNode;
 import com.hashmapinc.server.common.data.BaseData;
+import com.hashmapinc.server.common.data.cluster.NodeMetric;
+import com.hashmapinc.server.common.data.cluster.NodeStatus;
+import com.hashmapinc.server.common.data.id.*;
 import com.hashmapinc.server.common.data.plugin.ComponentDescriptor;
+import com.hashmapinc.server.dao.cluster.NodeMetricService;
 import com.hashmapinc.server.dao.user.UserService;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,10 +39,6 @@ import org.springframework.test.context.support.AnnotationConfigContextLoader;
 import com.hashmapinc.server.common.data.EntityType;
 import com.hashmapinc.server.common.data.Event;
 import com.hashmapinc.server.common.data.computation.Computations;
-import com.hashmapinc.server.common.data.id.ComputationId;
-import com.hashmapinc.server.common.data.id.EntityId;
-import com.hashmapinc.server.common.data.id.TenantId;
-import com.hashmapinc.server.common.data.id.UUIDBased;
 import com.hashmapinc.server.common.data.plugin.ComponentScope;
 import com.hashmapinc.server.common.data.plugin.ComponentType;
 import com.hashmapinc.server.common.data.plugin.PluginMetaData;
@@ -138,6 +138,9 @@ public abstract class AbstractServiceTest {
     @Autowired
     private ComponentDescriptorService componentDescriptorService;
 
+    @Autowired
+    protected NodeMetricService nodeMetricService;
+
     class IdComparator<D extends BaseData<? extends UUIDBased>> implements Comparator<D> {
         @Override
         public int compare(D o1, D o2) {
@@ -183,6 +186,21 @@ public abstract class AbstractServiceTest {
             throw new RuntimeException(e);
         }
         return pluginMetaData;
+    }
+
+    protected NodeMetric generateNodeMetric(String host, int port) throws  IOException {
+        return generateNodeMetric(host, port, NodeStatus.UP, 0,0);
+    }
+
+    protected NodeMetric generateNodeMetric(String host, int port, NodeStatus nodeStatus, int rpcSessionCount, int deviceSessionCount) throws IOException {
+        NodeMetric nodeMetric = new NodeMetric();
+        nodeMetric.setHost(host);
+        nodeMetric.setPort(port);
+        nodeMetric.setNodeStatus(nodeStatus);
+        nodeMetric.setDeviceSessionCount(deviceSessionCount);
+        nodeMetric.setRpcSessionCount(rpcSessionCount);
+        nodeMetric.setId(new NodeMetricId(UUIDs.timeBased()));
+        return nodeMetric;
     }
 
     protected Computations generateComputation(TenantId tenantId) throws IOException {
