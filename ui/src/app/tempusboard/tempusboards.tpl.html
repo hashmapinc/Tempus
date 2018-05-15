@@ -26,7 +26,11 @@
 				    </md-card-title-text>
 				    <a ng-href={{widgets.dashboard}} target="_blank"> <i class="material-icons">open_in_new</i></a>
 				</md-card-title>
+			    <tb-states-component flex-xs flex-sm states-controller-id="default" dashboard-ctrl="vm" states="vm.dashboardConfiguration.states">
+                </tb-states-component>
  	           <tb-dashboard
+ 	          		alias-controller="vm.dashboardCtx.aliasController"
+ 	          		state-controller="vm.dashboardCtx.stateController"
                     widgets="widgets.widget"
                     is-remove-action-enabled="false" >
                </tb-dashboard>
