@@ -132,7 +132,7 @@ public class DefaultSystemDataLoaderService implements SystemDataLoaderService {
     @Value("${ldap.authentication-enabled}")
     private boolean isLdapEnabled;
 
-    public User adminUser;
+    private User adminUser;
 
     @Override
     public void createSysAdmin() {
