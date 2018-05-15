@@ -18,9 +18,10 @@
 //import AliasController from '../api/alias-controller';
 
 import './tempusboard.scss';
+import AliasController from '../api/alias-controller';
 
 /*@ngInject*/
-export function TempusboardController($scope, $log, $state, $stateParams, userService, deviceService, types, attributeService, $q, dashboardService, applicationService, entityService, tempusboardService) {
+export function TempusboardController($scope, $log, $state, $stateParams, userService, deviceService, types, attributeService, $q, dashboardService, applicationService, entityService, tempusboardService, utils, $filter, dashboardUtils) {
 	var vm = this;
 
     if(angular.isDefined($stateParams.customerId)){
@@ -36,14 +37,20 @@ export function TempusboardController($scope, $log, $state, $stateParams, userSe
         vm.devicesScope = 'tenant';
     }
 
+    vm.openRightLayout = function() {
+        vm.isRightLayoutOpened = true;
+    }
+
 	vm.types = types;
     vm.deviceSelected = false;
     vm.dashboardCtx = {
         state: null,
         stateController: {
-            openRightLayout: false
+            openRightLayout: function() {
+                vm.openRightLayout();
             }
-    };
+        }
+    }
     vm.tempusboardSettings = null;
 
     function initTempusboard() {
@@ -59,27 +66,32 @@ export function TempusboardController($scope, $log, $state, $stateParams, userSe
     initTempusboard();
 
 	vm.assetSelected = function(device){
+        vm.selectedDevice = device
         vm.widgetsSet = [];
         applicationService.getApplicationsByDeviceType(device.type.toLowerCase())
             .then(function success(applications) {
                 applications.forEach(function(application){
-                    if(application.isValid){
+                  //  if(application.isValid){
                          dashboardService.getDashboard(application.miniDashboardId.id)
                         .then(function success(dashboard) {
                             vm.deviceSelected = true;
-                          //  vm.dashboard = dashboardUtils.validateAndUpdateDashboard(dashboard);
-                            vm.dashboardConfiguration = dashboard.configuration;
-                            vm.dashboardCtx.dashboard = dashboard;
-                           // vm.dashboardCtx.dashboardTimewindow = vm.dashboardConfiguration.timewindow;
-                          //  vm.dashboardCtx.aliasController = new AliasController($scope, $q, $filter, utils,
-                            //    types, entityService, null, vm.dashboardConfiguration.entityAliases);
-                          vm.timeseriesWidgetTypes = dashboard.configuration.widgets;
-                          var widgetObj = {'widget': dashboard.configuration.widgets, 'name': application.name, 'dashboard': 'dashboards/'+application.dashboardId.id};
+                            vm.dashboard = dashboardUtils.validateAndUpdateDashboard(dashboard);
+                            vm.dashboardConfiguration = vm.dashboard.configuration;
+                            vm.dashboardCtx.dashboard = vm.dashboard;
+                            vm.dashboardCtx.dashboardTimewindow = vm.dashboardConfiguration.timewindow;
+                            vm.dashboardCtx.dashboardDepthwindow = vm.dashboardConfiguration.depthwindow;
+
+                       
+                            vm.dashboardCtx.aliasController = new AliasController($scope, $q, $filter, utils,
+                        types, entityService, vm.dashboardCtx.stateController, vm.dashboardConfiguration.entityAliases, vm.selectedDevice);
+                          vm.timeseriesWidgetTypes = vm.dashboard.configuration.widgets;
+                          var widgetObj = {'widget': vm.dashboard.configuration.widgets, 'name': application.name, 'dashboard': 'dashboards/'+application.dashboardId.id};
                           vm.widgetsSet.push(widgetObj);
+
                         }, function fail() {
                             vm.configurationError = true;
                         });
-                    }
+                 //   }
                 })                
                
             }, function fail() {
@@ -142,7 +154,7 @@ export function TempusboardController($scope, $log, $state, $stateParams, userSe
             newSubscriptionId = attributeService.subscribeForEntityAttributes($scope.entityType, $scope.entityId, $scope.attributeScope.value);
         }
         if ($scope.subscriptionId && $scope.subscriptionId != newSubscriptionId) {
-            //attributeService.unsubscribeForEntityAttributes($scope.subscriptionId);
+            attributeService.unsubscribeForEntityAttributes($scope.subscriptionId);
         }
         $scope.subscriptionId = newSubscriptionId;
         subscriptionIdMap[$scope.entityId] = newSubscriptionId;
