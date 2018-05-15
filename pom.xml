@@ -285,6 +285,9 @@
                             <exclude>src/main/scripts/windows/**</exclude>
                             <exclude>docs/**</exclude>
                             <exclude>**/Makefile</exclude>
+                            <exclude>**/*.env</exclude>
+                            <exclude>**/*.deb</exclude>
+                            <exclude>**/.helmignore</exclude>
                         </excludes>
                         <mapping>
                             <proto>JAVADOC_STYLE</proto>
