@@ -51,15 +51,23 @@ export var gridCenterColor = 0x000000;
 // creates all dom elements for widget
 export function constructWidget() {
   var raw_html = `
-    <div>camera east: <br></div>
-    <input id='trajectory-viewer-camX' type='number'/> <br>
-    <div>camera north: <br></div>
-    <input id='trajectory-viewer-camZ' type='number'/> <br>
-    <div>camera depth: <br></div>
-    <input id='trajectory-viewer-camY' type='number'/> <br>
-    <button id='trajectory-viewer-reset-cam-button' type='button'>reset camera</button>
+    <div id='trajectory-viewer-scene' style="width: 100%; height: 100%;"></div>
 
-    <div id='trajectory-viewer-scene'></div>
+    <div id="trajectory-viewer-controls">
+      camera east: 
+      <br>
+      <input id='trajectory-viewer-camX' type='number' value="1000"/> 
+      <br>
+      camera north: 
+      <br>
+      <input id='trajectory-viewer-camZ' type='number' value="1000"/> 
+      <br>
+      camera depth: 
+      <br>
+      <input id='trajectory-viewer-camY' type='number' value="1000"/> 
+      <br>
+      <button id='trajectory-viewer-reset-cam-button' type='button'>reset camera</button>
+    </div>
 
     <div id='trajectory-viewer-labelX' class='trajectory-viewer-labels trajectory-viewer-absolute'>east</div>
     <div id='trajectory-viewer-labelY' class='trajectory-viewer-labels trajectory-viewer-absolute'>tvd</div>
@@ -69,8 +77,7 @@ export function constructWidget() {
   widgetContext.$container.append(angular.element(raw_html));
 
   // style elements
-  
-  //widgetContext.$container.css('margin', '0px').css('overflow', 'hidden');
+  widgetContext.$container.css('margin', '0px').css('overflow', 'hidden');
   angular.element('#trajectory-viewer-scene').css({'z-index': -1, 'position': 'absolute'});
   angular.element('#trajectory-viewer-scene').children().css('height', '100%').css('width', '100%');
   angular.element('.trajectory-viewer-labels').css('font-size', '15pt');
@@ -114,8 +121,8 @@ export function setOrbitControls() {
 // keep track of the mouse's 2D positioning on the screen
 export function onMouseMove(event) {
   event.preventDefault();
-  mouse.x = (event.clientX / widgetContext.$container.innerWidth()) * 2 - 1;
-  mouse.y = - (event.clientY / widgetContext.$container.innerHeight()) * 2 + 1;
+  mouse.x = (event.clientX / window.innerWidth) * 2 - 1; //eslint-disable-line
+  mouse.y = - (event.clientY / window.innerHeight) * 2 + 1; //eslint-disable-line
 }
 
 // removes all objects from a scene that have name === objName
@@ -168,7 +175,7 @@ export function plot() {
   // add the line to the scene
   var mesh = new THREE.Mesh(line.geometry, material);
   mesh.name="well-plot";
-  scene.add(mesh);
+  //scene.add(mesh);
 }
 
 // redraw the grids
@@ -218,7 +225,7 @@ export function updateGrids() {
 // moves the axis labels with the 3D world
 export function updateLabelPositions() {
   // get window dimensions
-  var widthHalf = widgetContext.$container.innerWidth() / 2;
+  var widthHalf = widgetContext.$container.innerWidth() / 2; 
   var heightHalf = widgetContext.$container.innerHeight() / 2;
 
   // define 3D and 2D label positions
@@ -263,9 +270,9 @@ export function resetCameraPosition(){
 
 // sets camera position based on current input settings from html
 export function updateCameraPosition() {
-  camera.position.x = angular.element('#camX').val();
-  camera.position.y = angular.element('#camY').val();
-  camera.position.z = angular.element('#camZ').val();  
+  camera.position.x = angular.element('#trajectory-viewer-camX').val();
+  camera.position.y = angular.element('#trajectory-viewer-camY').val();
+  camera.position.z = angular.element('#trajectory-viewer-camZ').val();  
 }
 
 //=============================================================================
@@ -275,12 +282,12 @@ export function init(ctx) {
   widgetContext = ctx;
   scene = new THREE.Scene();
   scene.background = new THREE.Color( backgroundColor );
-  camera = new THREE.PerspectiveCamera(75, widgetContext.width / widgetContext.height, 0.1, 100000);
+  camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 100000); //eslint-disable-line
   renderer = new THREE.WebGLRenderer();
   raycaster = new THREE.Raycaster();
   mouse = new THREE.Vector2();
   setOrbitControls();
-  resolution = new THREE.Vector2(widgetContext.width, widgetContext.height);
+  resolution = new THREE.Vector2(window.innerWidth, window.innerHeight); //eslint-disable-line
 
   // construct widget
   constructWidget();
@@ -306,11 +313,11 @@ export function init(ctx) {
   updateGrids();
 
   // listen for window resizes and mouse clicks
-  widgetContext.$container.resize(onWindowResize);
+  window.addEventListener('resize', onWindowResize, false); //eslint-disable-line
   sceneContainer.dblclick(onDoubleClick);
 
   // begin animating
-  animate();
+  onWindowResize();
 }
 //=============================================================================
 
@@ -337,8 +344,8 @@ export function animate() {
 // handle events
 //=============================================================================
 export function onWindowResize() {
-  var newWidth = widgetContext.$container.innerWidth();
-  var newHeight = widgetContext.$container.innerHeight();
+  var newWidth = sceneContainer.width();
+  var newHeight = sceneContainer.height();
 
   camera.aspect = newWidth / newHeight;
   camera.updateProjectionMatrix();
