@@ -65,6 +65,7 @@ export function DeviceController($rootScope,userService, deviceService, customer
 
     $scope.tableView = false;
 
+
     $scope.devices = {
         count: 0,
         data: []
@@ -385,6 +386,7 @@ export function DeviceController($rootScope,userService, deviceService, customer
         }
     }
 
+
     $scope.enterFilterMode = function() {
         $scope.query.search = '';
     }
@@ -407,6 +409,7 @@ export function DeviceController($rootScope,userService, deviceService, customer
         loadTableData();
     }
 
+    vm.loadTableData = loadTableData;
     $scope.$watch("query.search", function(newVal, prevVal) {
         if (!angular.equals(newVal, prevVal) && $scope.query.search != null) {
             loadTableData();

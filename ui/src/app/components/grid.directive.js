@@ -680,6 +680,7 @@ function GridController(applicationService, $scope, $rootScope, $state, $mdDialo
             vm.saveItemFunc(vm.detailsConfig.editingItem).then(function success(item) {
             theForm.$setPristine();
             vm.detailsConfig.isDetailsEditMode = false;
+            vm.parentCtl.loadTableData();
             var index = vm.detailsConfig.currentItem.index;
             item.index = index;
             vm.detailsConfig.currentItem = item;
@@ -688,6 +689,7 @@ function GridController(applicationService, $scope, $rootScope, $state, $mdDialo
             var itemRow = vm.items.rowData[row];
             var column = index % vm.columns;
             itemRow[column] = item;
+
         });
         }
 

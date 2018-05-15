@@ -25,7 +25,7 @@
     <label class="tb-small" translate>Tabular View</label>
 </section>
 
-<md-toolbar class="md-table-toolbar md-default" ng-show="tableView && query.search != null">
+<md-toolbar class="md-table-toolbar tb-device-toolbar md-default" ng-show="tableView && query.search != null">
     <div class="md-toolbar-tools">
         <md-button class="md-icon-button" aria-label="{{ 'action.search' | translate }}">
             <md-icon aria-label="{{ 'action.search' | translate }}" class="material-icons">search</md-icon>
@@ -45,7 +45,7 @@
         </md-button>
     </div>
 </md-toolbar>
-<md-toolbar class="md-table-toolbar md-default" ng-show="tableView && query.search === null">
+<md-toolbar class="md-table-toolbar tb-device-toolbar md-default " ng-show="tableView && query.search === null">
 
     <div class="md-toolbar-tools">
         <span flex></span>
@@ -70,11 +70,12 @@
     </div>
 </md-toolbar>
 
-<md-table-container ng-show="tableView">
+<md-table-container ng-show="tableView" class ="tb-device-container">
     <table class="tb-device-table" md-table>
         <thead md-head md-order="query.order" md-on-reorder="onReorder">
         <tr md-row>
             <th md-column md-order-by="name"><span translate>Name</span></th>
+            <th md-column md-order-by="name"><span translate>Type</span></th>
             <th md-column md-order-by="createdTime"><span translate>Description</span></th>
             <th md-column md-order-by="createdTime"><span translate>Status</span></th>
             <th md-column><span translate>Age</span></th>
@@ -85,6 +86,7 @@
         <tbody md-body>
         <tr md-row  ng-repeat="device in devices.data">
             <td md-cell><a href ng-click="deviceDetailFunc($event,device)">{{device.name}}</a></td>
+            <td md-cell style="text-transform: uppercase">{{device.type}}</td>
             <td md-cell>{{device.additionalInfo.description}}</td>
             <td md-cell>NA</td>
             <td md-cell>NA</td>
@@ -96,7 +98,7 @@
         </tbody>
     </table>
 </md-table-container>
-<md-table-pagination ng-show="tableView" md-limit="query.limit" md-limit-options="[5, 10, 15]"
+<md-table-pagination class ="tb-device-container" ng-show="tableView" md-limit="query.limit" md-limit-options="[5, 10, 15]"
                      md-page="query.page" md-total="{{devices.count}}"
                      md-on-paginate="onPaginate" md-page-select>
 </md-table-pagination>
