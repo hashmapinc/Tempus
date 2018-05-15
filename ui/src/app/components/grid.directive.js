@@ -680,7 +680,9 @@ function GridController(applicationService, $scope, $rootScope, $state, $mdDialo
             vm.saveItemFunc(vm.detailsConfig.editingItem).then(function success(item) {
             theForm.$setPristine();
             vm.detailsConfig.isDetailsEditMode = false;
-            vm.parentCtl.loadTableData();
+            if(angular.isDefined(vm.parentCtl.loadTableData)) {
+                vm.parentCtl.loadTableData();
+            }
             var index = vm.detailsConfig.currentItem.index;
             item.index = index;
             vm.detailsConfig.currentItem = item;
