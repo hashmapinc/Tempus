@@ -71,7 +71,7 @@ export function TempusboardController($scope, $log, $state, $stateParams, userSe
         applicationService.getApplicationsByDeviceType(device.type.toLowerCase())
             .then(function success(applications) {
                 applications.forEach(function(application){
-                  //  if(application.isValid){
+                    if(application.isValid){
                          dashboardService.getDashboard(application.miniDashboardId.id)
                         .then(function success(dashboard) {
                             vm.deviceSelected = true;
@@ -80,8 +80,6 @@ export function TempusboardController($scope, $log, $state, $stateParams, userSe
                             vm.dashboardCtx.dashboard = vm.dashboard;
                             vm.dashboardCtx.dashboardTimewindow = vm.dashboardConfiguration.timewindow;
                             vm.dashboardCtx.dashboardDepthwindow = vm.dashboardConfiguration.depthwindow;
-
-                       
                             vm.dashboardCtx.aliasController = new AliasController($scope, $q, $filter, utils,
                         types, entityService, vm.dashboardCtx.stateController, vm.dashboardConfiguration.entityAliases, vm.selectedDevice);
                           vm.timeseriesWidgetTypes = vm.dashboard.configuration.widgets;
@@ -91,7 +89,7 @@ export function TempusboardController($scope, $log, $state, $stateParams, userSe
                         }, function fail() {
                             vm.configurationError = true;
                         });
-                 //   }
+                    }
                 })                
                
             }, function fail() {
