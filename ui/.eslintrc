@@ -15,5 +15,8 @@
   "globals": {
     "FileReader": true,
     "FormData": true
+  },
+  "env": {
+    "browser": true
   }
 }
