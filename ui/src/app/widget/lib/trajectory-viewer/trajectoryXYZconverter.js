@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-const RAD_CONVERSION_FACTOR = Math.PI / 180.0 // multiply this with an angle in degrees to get radians
 
 /* converts an array of trajectory objects into an array of XYZ objects
  *
@@ -22,7 +21,7 @@ const RAD_CONVERSION_FACTOR = Math.PI / 180.0 // multiply this with an angle in 
  * 
  * @returns results       - point array with XYZ fields describing coordinates of the well
 */
-function convertRawToXYZ(trajectoryArray, origin) {
+export function convertRawToXYZ(trajectoryArray, origin) {
   // catch empty input
   if(trajectoryArray.length === 0) {
     return [];
@@ -46,6 +45,7 @@ function convertRawToXYZ(trajectoryArray, origin) {
     let prev = trajectoryArray[position - 1];
     
     // extract values
+    const RAD_CONVERSION_FACTOR = Math.PI / 180.0 // multiply this with an angle in degrees to get radians
     let mdDelta = curr.md - prev.md; // measured depth difference between readings
     let incl0 = prev.incl * RAD_CONVERSION_FACTOR; // previous inclination in radians
     let incl1 = curr.incl * RAD_CONVERSION_FACTOR; // current inclination in radians
