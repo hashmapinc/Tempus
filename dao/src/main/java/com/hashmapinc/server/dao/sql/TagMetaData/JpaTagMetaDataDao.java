@@ -21,6 +21,7 @@ import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.ListeningExecutorService;
 import com.google.common.util.concurrent.MoreExecutors;
+import com.hashmapinc.server.common.data.EntityType;
 import com.hashmapinc.server.common.data.TagMetaData;
 import com.hashmapinc.server.common.data.UUIDConverter;
 import com.hashmapinc.server.common.data.id.EntityId;
@@ -113,6 +114,6 @@ public class JpaTagMetaDataDao extends JpaAbstractDaoListeningExecutorService im
     public ListenableFuture<List<TagMetaData>> getAllByEntityId(EntityId entityId) {
         return Futures.immediateFuture(
                 DaoUtil.convertDataList(Lists.newArrayList(
-                        tagMetaDataRepository.findAllByEntityId(UUIDConverter.fromTimeUUID(entityId.getId())))));
+                        tagMetaDataRepository.findAllByEntityIdAndEntityType(UUIDConverter.fromTimeUUID(entityId.getId()), entityId.getEntityType()))));
     }
 }

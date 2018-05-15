@@ -88,7 +88,7 @@ public final class DsKvEntity implements ToData<DsKvEntry> {
     private Double ds;
 
     @Column(name = DS_DIFF)
-    private Double dsDiff;
+    private double dsDiff;
 
     @Column(name = BOOLEAN_VALUE_COLUMN)
     private Boolean booleanValue;

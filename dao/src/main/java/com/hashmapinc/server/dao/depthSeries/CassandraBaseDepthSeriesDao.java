@@ -264,7 +264,7 @@ public class CassandraBaseDepthSeriesDao extends CassandraAbstractAsyncDao imple
         stmt.setString(0, entityId.getEntityType().name());
         stmt.setUUID(1, entityId.getId());
         log.debug("Generated query [{}] for entityType {} and entityId {}", stmt, entityId.getEntityType(), entityId.getId());
-        return getFuture(executeAsyncRead(stmt), rs -> convertResultToDsKvEntryList(rs.all()));
+        return getFuture(executeAsyncRead(stmt), rs -> convertResultToDsKvEntryListForLatest(rs.all()));
     }
 
     @Override
@@ -395,6 +395,14 @@ public class CassandraBaseDepthSeriesDao extends CassandraAbstractAsyncDao imple
         return entries;
     }
 
+    private List<DsKvEntry> convertResultToDsKvEntryListForLatest(List<Row> rows) {
+        List<DsKvEntry> entries = new ArrayList<>(rows.size());
+        if (!rows.isEmpty()) {
+            rows.forEach(row -> entries.add(convertResultToDsKvEntryForLatest(row)));
+        }
+        return entries;
+    }
+
     private DsKvEntry convertResultToDsKvEntry(String key, Row row) {
         if (row != null) {
             Double ds = row.getDouble(ModelConstants.DS_COLUMN);
@@ -411,6 +419,12 @@ public class CassandraBaseDepthSeriesDao extends CassandraAbstractAsyncDao imple
         BasicDsKvEntry basicDsKvEntry = new BasicDsKvEntry(ds, toKvEntry(row, key));
         basicDsKvEntry.setDsDiff(dsDiff);
         return basicDsKvEntry;
+    }
+
+    private DsKvEntry convertResultToDsKvEntryForLatest(Row row) {
+        String key = row.getString(ModelConstants.KEY_COLUMN);
+        Double ds = row.getDouble(ModelConstants.DS_COLUMN);
+        return new BasicDsKvEntry(ds, toKvEntry(row, key));
     }
 
     public static KvEntry toKvEntry(Row row, String key) {

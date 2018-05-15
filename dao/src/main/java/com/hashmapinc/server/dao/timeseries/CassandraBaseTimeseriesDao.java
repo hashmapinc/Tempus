@@ -337,7 +337,7 @@ public class CassandraBaseTimeseriesDao extends CassandraAbstractAsyncDao implem
         stmt.setString(0, entityId.getEntityType().name());
         stmt.setUUID(1, entityId.getId());
         log.debug(GENERATED_QUERY_FOR_ENTITY_TYPE_AND_ENTITY_ID, stmt, entityId.getEntityType(), entityId.getId());
-        return getFuture(executeAsyncRead(stmt), rs -> convertResultToTsKvEntryList(rs.all()));
+        return getFuture(executeAsyncRead(stmt), rs -> convertResultToTsKvEntryListForLatest(rs.all()));
     }
 
     @Override
@@ -393,6 +393,14 @@ public class CassandraBaseTimeseriesDao extends CassandraAbstractAsyncDao implem
         return entries;
     }
 
+    private List<TsKvEntry> convertResultToTsKvEntryListForLatest(List<Row> rows) {
+        List<TsKvEntry> entries = new ArrayList<>(rows.size());
+        if (!rows.isEmpty()) {
+            rows.forEach(row -> entries.add(convertResultToTsKvEntryForLatest(row)));
+        }
+        return entries;
+    }
+
     private TsKvEntry convertResultToTsKvEntry(String key, Row row) {
         if (row != null) {
             long ts = row.getLong(TS_COLUMN);
@@ -409,6 +417,12 @@ public class CassandraBaseTimeseriesDao extends CassandraAbstractAsyncDao implem
         BasicTsKvEntry basicTsKvEntry = new BasicTsKvEntry(ts, toKvEntry(row, key));
         basicTsKvEntry.setTsDiff(diff);
         return basicTsKvEntry;
+    }
+
+    private TsKvEntry convertResultToTsKvEntryForLatest(Row row) {
+        String key = row.getString(KEY_COLUMN);
+        long ts = row.getLong(TS_COLUMN);
+        return new BasicTsKvEntry(ts, toKvEntry(row, key));
     }
 
     public static KvEntry toKvEntry(Row row, String key) {

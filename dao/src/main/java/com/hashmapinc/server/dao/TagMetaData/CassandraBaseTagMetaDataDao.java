@@ -21,6 +21,7 @@ import com.datastax.driver.core.PreparedStatement;
 import com.datastax.driver.core.Row;
 import com.datastax.driver.core.Session;
 import com.google.common.util.concurrent.ListenableFuture;
+import com.hashmapinc.server.common.data.EntityType;
 import com.hashmapinc.server.common.data.TagMetaData;
 import com.hashmapinc.server.common.data.id.EntityId;
 import com.hashmapinc.server.dao.model.ModelConstants;
@@ -62,6 +63,7 @@ public class CassandraBaseTagMetaDataDao extends CassandraAbstractAsyncDao imple
 
     private PreparedStatement latestInsertStmts;
     private PreparedStatement findLatestStmt;
+    private PreparedStatement findLatestAllStmt;
 
     private boolean isInstall() {
         return environment.acceptsProfiles("install");
@@ -127,16 +129,26 @@ public class CassandraBaseTagMetaDataDao extends CassandraAbstractAsyncDao imple
     public ListenableFuture<TagMetaData> getByEntityIdAndKey(EntityId entityId, String key) {
         BoundStatement stmt = createLatestStmt().bind();
         stmt.setUUID(0, entityId.getId());
-        stmt.setString(1, key);
+        stmt.setString(1, entityId.getEntityType().name());
+        stmt.setString(2, key);
         log.debug(GENERATED_QUERY_FOR_ENTITY_TYPE_AND_ENTITY_ID, stmt, entityId.getEntityType(), entityId.getId());
         return getFuture(executeAsyncRead(stmt), rs -> convertToTagMetaDataEntity(entityId, key, rs.one()));
     }
 
     private PreparedStatement createLatestStmt() {
         if (findLatestStmt == null) {
-            findLatestStmt = getSession().prepare(SELECT_PREFIX + "* " +
+            findLatestStmt = getSession().prepare(SELECT_PREFIX +
+                    TAG_METADATA_UNIT + "," +
+                    TAG_METADATA_AVG_FREQUENCY + "," +
+                    TAG_METADATA_MIN_FREQUENCY + "," +
+                    TAG_METADATA_MAX_FREQUENCY + "," +
+                    TAG_METADATA_MEAN_FREQUENCY + "," +
+                    TAG_METADATA_MEDIAN_FREQUENCY + "," +
+                    TAG_METADATA_SOURCE + "," +
+                    KEY_COLUMN + " " +
                     "FROM " + ModelConstants.TAG_METADATA_COLUMN_FAMILY_NAME + " " +
                     "WHERE " + ModelConstants.ENTITY_ID_COLUMN + EQUALS_PARAM +
+                    "AND " + ModelConstants.ENTITY_TYPE_COLUMN + EQUALS_PARAM +
                     "AND " + ModelConstants.KEY_COLUMN + EQUALS_PARAM);
         }
         return findLatestStmt;
@@ -146,6 +158,7 @@ public class CassandraBaseTagMetaDataDao extends CassandraAbstractAsyncDao imple
     public ListenableFuture<List<TagMetaData>> getAllByEntityId(EntityId entityId) {
         BoundStatement stmt = createLatestAllStmt().bind();
         stmt.setUUID(0, entityId.getId());
+        stmt.setString(1, entityId.getEntityType().name());
         log.debug(GENERATED_QUERY_FOR_ENTITY_TYPE_AND_ENTITY_ID, stmt, entityId.getEntityType(), entityId.getId());
         return getFuture(executeAsyncRead(stmt), rs -> convertToTagMetaDataEntities(entityId, rs.all()));
     }
@@ -180,12 +193,21 @@ public class CassandraBaseTagMetaDataDao extends CassandraAbstractAsyncDao imple
     }
 
     private PreparedStatement createLatestAllStmt() {
-        if (findLatestStmt == null) {
-            findLatestStmt = getSession().prepare(SELECT_PREFIX + "* " +
+        if (findLatestAllStmt == null) {
+            findLatestAllStmt = getSession().prepare(SELECT_PREFIX +
+                    TAG_METADATA_UNIT + "," +
+                    TAG_METADATA_AVG_FREQUENCY + "," +
+                    TAG_METADATA_MIN_FREQUENCY + "," +
+                    TAG_METADATA_MAX_FREQUENCY + "," +
+                    TAG_METADATA_MEAN_FREQUENCY + "," +
+                    TAG_METADATA_MEDIAN_FREQUENCY + "," +
+                    TAG_METADATA_SOURCE + "," +
+                    KEY_COLUMN + " " +
                     "FROM " + ModelConstants.TAG_METADATA_COLUMN_FAMILY_NAME + " " +
-                    "WHERE " + ModelConstants.ENTITY_ID_COLUMN + EQUALS_PARAM);
+                    "WHERE " + ModelConstants.ENTITY_ID_COLUMN + EQUALS_PARAM +
+                    "AND " + ModelConstants.ENTITY_TYPE_COLUMN + EQUALS_PARAM);
         }
-        return findLatestStmt;
+        return findLatestAllStmt;
     }
 
 }

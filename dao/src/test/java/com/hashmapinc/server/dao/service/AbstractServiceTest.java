@@ -22,6 +22,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.TextNode;
 import com.hashmapinc.server.common.data.BaseData;
 import com.hashmapinc.server.common.data.plugin.ComponentDescriptor;
+import com.hashmapinc.server.dao.TagMetaData.TagMetaDataService;
 import com.hashmapinc.server.dao.user.UserService;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -116,6 +117,9 @@ public abstract class AbstractServiceTest {
 
     @Autowired
     protected DepthSeriesService dsService;
+
+    @Autowired
+    protected TagMetaDataService tagMetaDataService;
 
     @Autowired
     protected PluginService pluginService;

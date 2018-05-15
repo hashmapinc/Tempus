@@ -16,6 +16,7 @@
 
 package com.hashmapinc.server.dao.sql.TagMetaData;
 
+import com.hashmapinc.server.common.data.EntityType;
 import com.hashmapinc.server.dao.model.sql.TagMetaDataCompositeKey;
 import com.hashmapinc.server.dao.model.sql.TagMetaDataEntity;
 import org.springframework.data.repository.CrudRepository;
@@ -23,5 +24,5 @@ import org.springframework.data.repository.CrudRepository;
 import java.util.List;
 
 public interface TagMetaDataRepository extends CrudRepository<TagMetaDataEntity, TagMetaDataCompositeKey> {
-    List<TagMetaDataEntity> findAllByEntityId(String entityId);
+    List<TagMetaDataEntity> findAllByEntityIdAndEntityType(String entityId, EntityType entityType);
 }

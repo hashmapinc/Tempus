@@ -17,6 +17,7 @@
 package com.hashmapinc.server.dao.TagMetaData;
 
 import com.google.common.util.concurrent.ListenableFuture;
+import com.hashmapinc.server.common.data.EntityType;
 import com.hashmapinc.server.common.data.TagMetaData;
 import com.hashmapinc.server.common.data.id.EntityId;
 
