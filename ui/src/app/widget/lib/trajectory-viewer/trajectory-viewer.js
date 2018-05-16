@@ -24,6 +24,7 @@ import angular from 'angular';
 //=============================================================================
 // injected vars
 var widgetContainer; // element that holds the widget
+var widgetContext; // context of the widget
 
 // threejs 
 var scene; // threejs scene
@@ -102,6 +103,21 @@ export function updatePoints(newReadings, overwrite) {
   points = trajConverter.convertRawToXYZ(rawReadings);
 }
 
+// handles new data event
+export function onDataUpdated() {
+  var newData = widgetContext.data[0].data;
+  var newReadings = [{md: 0, azi: 0, incl: 0}];
+  for (let position = 1; position < newData.length; position++) {
+    let prev = newReadings[position - 1];
+    newReadings.push({ 
+      md: prev.md + 100 * Math.random(), 
+      azi: prev.azi + Math.PI - 2 * Math.PI * Math.random(), 
+      incl: prev.incl + Math.PI - 2 * Math.PI * Math.random()
+    });
+  }
+  updatePoints(newReadings, true);
+  plot();
+}
 // use orbit controls
 export function setOrbitControls() {
   controls = new OrbitControls(camera, renderer.domElement);
@@ -152,7 +168,7 @@ export function plot() {
   var material = new MeshLine.MeshLineMaterial({
     color: new THREE.Color(plotColor), 
     sizeAttenuation: true,
-    lineWidth: 15,
+    lineWidth: 18,
     resolution: resolution,
     transparent: true,
     opacity: .8
@@ -166,6 +182,9 @@ export function plot() {
   var mesh = new THREE.Mesh(line.geometry, material);
   mesh.name="well-plot";
   scene.add(mesh);
+
+  // update the grid now
+  updateGrids();
 }
 
 // redraw the grids
@@ -208,8 +227,8 @@ export function updateGrids() {
 
   // update axis labels
   angular.element('#trajectory-viewer-labelX').html(gridSize/2 + "east");
-  angular.element('#trajectory-viewer-labelY').html(gridSize/2 + "tvd");
-  angular.element('#trajectory-viewer-labelZ').html(gridSize + "north");
+  angular.element('#trajectory-viewer-labelY').html(gridSize + "tvd");
+  angular.element('#trajectory-viewer-labelZ').html(gridSize/2 + "north");
 }
 
 // moves the axis labels with the 3D world
@@ -259,8 +278,9 @@ export function resetCameraPosition(){
 // initializes the application
 //=============================================================================
 export function init(ctx) {
-  // get container
+  // get injected vars
   widgetContainer = ctx.$container;
+  widgetContext = ctx;
 
   // construct widget
   constructWidget();
