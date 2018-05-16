@@ -66,9 +66,9 @@ public class KinesisConfigTest {
 
     private KinesisPluginConfiguration configWithBasicCredentials() {
         KinesisPluginConfiguration config = new KinesisPluginConfiguration();
-        config.setAccessKeyId("AKIAIGYQ6OMH7NS5NRFQ");
+        config.setAccessKeyId("test");
         config.setRegion("us-east-2");
-        config.setSecretAccessKey("CR+FJYzzuzINjwKyWmzyWwtq0ks1vcz8p3+iPYKs");
+        config.setSecretAccessKey("CR+test+iPYKs");
         return config;
     }
 

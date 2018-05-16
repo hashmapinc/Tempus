@@ -106,6 +106,48 @@ Similar, to import the plugin you should navigate to the Plugins page and click 
     :align: center
     :alt: Plugin import
 
+
+
+***************
+Kinesis Plugins
+***************
+
+.. image:: ../_images/admin/plugins_kinesis_details.png
+    :align: center
+    :alt: Kinesis Plugin details
+
+    You are also able to review plugin life-cycle events, stats, and errors during message processing. Please note that in case of frequent errors the error messages are sampled.
+
+.. image:: ../_images/admin/plugins_kinesis_events.png
+    :align: center
+    :alt: Kinesis Plugin events
+
+
+********************
+Plugin import/export
+********************
+
+=============
+Plugin export
+=============
+
+You are able to export your plugin to JSON format and import it to the same or another Tempus instance.
+In order to export plugin, you should navigate to the Plugins page and click on the export button located on the particular plugin card.
+
+.. image:: ../_images/admin/plugins_kinesis_export.png
+    :align: center
+    :alt: Plugin export
+
+=============
+Plugin import
+=============
+
+Similar, to import the plugin you should navigate to the Plugins page and click on the big “+” button in the bottom-right part of the screen and then click on the import button.
+
+.. image:: ../_images/admin/plugins_import.png
+    :align: center
+    :alt: Plugin import
+
 **Note** All imported plugins are in the suspended state. Don’t forget to **activate** your plugin after import.
 
 
