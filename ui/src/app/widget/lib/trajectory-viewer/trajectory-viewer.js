@@ -58,21 +58,29 @@ export function constructWidget() {
   });
   
   var raw_html = `
-    <button id='trajectory-viewer-reset-cam-button' type='button'>reset camera</button>
+    <div id='trajectory-viewer-scene'></div>
+    <button id='trajectory-viewer-reset' type='button'>reset camera</button>
 
-    <div id='trajectory-viewer-labelX' class='trajectory-viewer-labels trajectory-viewer-absolute'>east</div>
-    <div id='trajectory-viewer-labelY' class='trajectory-viewer-labels trajectory-viewer-absolute'>tvd</div>
-    <div id='trajectory-viewer-labelZ' class='trajectory-viewer-labels trajectory-viewer-absolute'>north</div>`
+    <div id='trajectory-viewer-labelX' class='trajectory-viewer-labels'>east</div>
+    <div id='trajectory-viewer-labelY' class='trajectory-viewer-labels'>tvd</div>
+    <div id='trajectory-viewer-labelZ' class='trajectory-viewer-labels'>north</div>`
 
   // build elements
   widgetContainer.append(angular.element(raw_html));
 
-  
-  angular.element('.trajectory-viewer-absolute').css('position', 'absolute');
+  // style elements
+  widgetContainer.children().css('position', 'absolute');
 
   // add event listeners
-  angular.element('#trajectory-viewer-reset-cam-button').click(resetCameraPosition);
+  angular.element('#trajectory-viewer-reset').click(resetCameraPosition);
 }
+
+// destroys all widget components
+export function destroyWidget() {
+  // remove widget components
+  widgetContainer.children().remove();
+}
+
 
 // compute new points array. If overwrite, delete rawReadings first
 export function updatePoints(newReadings, overwrite) {
@@ -103,8 +111,8 @@ export function setOrbitControls() {
 // keep track of the mouse's 2D positioning on the screen
 export function onMouseMove(event) {
   event.preventDefault();
-  mouse.x = (event.clientX / window.innerWidth) * 2 - 1; //eslint-disable-line
-  mouse.y = - (event.clientY / window.innerHeight) * 2 + 1; //eslint-disable-line
+  mouse.x = (event.clientX / widgetContainer.width()) * 2 - 1; //eslint-disable-line
+  mouse.y = - (event.clientY / widgetContainer.height()) * 2 + 1; //eslint-disable-line
 }
 
 // removes all objects from a scene that have name === objName
