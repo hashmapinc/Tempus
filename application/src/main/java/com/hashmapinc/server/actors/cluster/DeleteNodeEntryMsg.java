@@ -13,11 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.hashmapinc.server.controller.sql;
+package com.hashmapinc.server.actors.cluster;
 
-import com.hashmapinc.server.controller.BaseNodeMetricControllerTest;
-import com.hashmapinc.server.dao.service.DaoSqlTest;
-
-@DaoSqlTest
-public class NodeMetricControllerSqlTest extends BaseNodeMetricControllerTest {
+public class DeleteNodeEntryMsg {
 }

@@ -49,6 +49,10 @@ public class JpaNodeMetricDao extends JpaAbstractDao<NodeMetricEntity, NodeMetri
     @Override
     public Optional<NodeMetric> findNodeMetricByHostAndPort(String host, int port) {
         NodeMetric nodeMetric = DaoUtil.getData(nodeMetricRepository.findNodeMetricByHostAndPort(host, port));
-        return Optional.of(nodeMetric);
+        if (nodeMetric != null) {
+            return Optional.of(nodeMetric);
+        } else {
+            return Optional.empty();
+        }
     }
 }

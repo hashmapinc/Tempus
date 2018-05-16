@@ -13,11 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.hashmapinc.server.controller.sql;
+package com.hashmapinc.server.actors.cluster;
 
-import com.hashmapinc.server.controller.BaseNodeMetricControllerTest;
-import com.hashmapinc.server.dao.service.DaoSqlTest;
+import com.hashmapinc.server.common.data.cluster.NodeStatus;
 
-@DaoSqlTest
-public class NodeMetricControllerSqlTest extends BaseNodeMetricControllerTest {
+public class UpdateNodeStatusMsg {
+    private final NodeStatus nodeStatus;
+
+    public UpdateNodeStatusMsg(NodeStatus nodeStatus) {
+        super();
+        this.nodeStatus = nodeStatus;
+    }
+
+    public NodeStatus getNodeStatus() {
+        return nodeStatus;
+    }
 }

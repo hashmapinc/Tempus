@@ -16,6 +16,7 @@
 package com.hashmapinc.server.dao.cluster;
 
 import com.hashmapinc.server.common.data.cluster.NodeMetric;
+import com.hashmapinc.server.common.data.cluster.NodeStatus;
 import com.hashmapinc.server.dao.entity.AbstractEntityService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -104,6 +105,26 @@ public class NodeMetricServiceImpl extends AbstractEntityService implements Node
             } else {
                 nodeMetric.get().setDeviceSessionCount(deviceSessionCount);
             }*/
+            return nodeMetricDao.save(nodeMetric.get());
+        }
+        return nodeMetric.get();
+    }
+
+    @Override
+    public void deleteNodeEntryByHostAndPort(String host, int port) {
+        Optional<NodeMetric> nodeMetric = findNodeMetricByHostAndPort(host, port);
+        if (nodeMetric.isPresent()) {
+            log.debug("NodeMetricServiceImpl deleteNodeMetricByHostAndPort [{}]", nodeMetric.get().getUuidId());
+            nodeMetricDao.removeById(nodeMetric.get().getUuidId());
+        }
+    }
+
+    @Override
+    public NodeMetric updateNodeStatus(NodeStatus nodeStatus, String host, int port) {
+        Optional<NodeMetric> nodeMetric = findNodeMetricByHostAndPort(host, port);
+        if (nodeMetric.isPresent()) {
+            log.error("NodeMetricServiceImpl updating NodeStatus [{}]", nodeStatus);
+            nodeMetric.get().setNodeStatus(nodeStatus);
             return nodeMetricDao.save(nodeMetric.get());
         }
         return nodeMetric.get();
