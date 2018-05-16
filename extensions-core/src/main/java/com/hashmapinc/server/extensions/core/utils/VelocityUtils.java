@@ -47,9 +47,7 @@ import java.util.stream.Collectors;
 import java.util.Set;
 import java.util.HashSet;
 
-/**
- * @author Andrew Shvayka
- */
+
 @Slf4j
 public class VelocityUtils {
 

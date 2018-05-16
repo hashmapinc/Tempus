@@ -54,9 +54,7 @@ import java.util.stream.Collectors;
 import static com.datastax.driver.core.querybuilder.QueryBuilder.eq;
 import static com.hashmapinc.server.dao.model.ModelConstants.*;
 
-/**
- * @author Andrew Shvayka
- */
+
 @Component
 @Slf4j
 @NoSqlDao

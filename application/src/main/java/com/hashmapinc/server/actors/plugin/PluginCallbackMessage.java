@@ -19,9 +19,7 @@ import lombok.Getter;
 import lombok.ToString;
 import com.hashmapinc.server.extensions.api.plugins.PluginCallback;
 
-/**
- * @author Andrew Shvayka
- */
+
 @ToString
 public final class PluginCallbackMessage<V> {
     @Getter

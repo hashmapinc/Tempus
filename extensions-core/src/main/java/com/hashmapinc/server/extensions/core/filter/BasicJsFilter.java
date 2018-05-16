@@ -22,9 +22,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import javax.script.ScriptException;
 
-/**
- * @author Andrew Shvayka
- */
+
 @Slf4j
 public abstract class BasicJsFilter implements RuleFilter<JsFilterConfiguration> {
 

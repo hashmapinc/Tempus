@@ -18,9 +18,7 @@ package com.hashmapinc.server.actors.rpc;
 import lombok.Data;
 import com.hashmapinc.server.common.msg.cluster.ServerAddress;
 
-/**
- * @author Andrew Shvayka
- */
+
 @Data
 public final class RpcSessionDisconnectedMsg {
 

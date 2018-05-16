@@ -24,9 +24,7 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
 
-/**
- * @author Andrew Shvayka
- */
+
 public interface ComponentDiscoveryService {
 
     void discoverComponents();

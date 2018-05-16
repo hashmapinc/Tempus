@@ -37,9 +37,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-/**
- * @author Valerii Sosliuk
- */
+
 @Slf4j
 public abstract class AbstractMqttServerSideRpcIntegrationTest extends AbstractControllerTest {
 

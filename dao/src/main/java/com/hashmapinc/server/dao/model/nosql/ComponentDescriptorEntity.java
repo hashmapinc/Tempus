@@ -30,9 +30,7 @@ import java.util.UUID;
 
 import static com.hashmapinc.server.dao.model.ModelConstants.*;
 
-/**
- * @author Andrew Shvayka
- */
+
 @Table(name = COMPONENT_DESCRIPTOR_COLUMN_FAMILY_NAME)
 public class ComponentDescriptorEntity implements SearchTextEntity<ComponentDescriptor> {
 

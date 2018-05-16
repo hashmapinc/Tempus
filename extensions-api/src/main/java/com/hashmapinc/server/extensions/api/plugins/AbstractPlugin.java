@@ -28,9 +28,7 @@ import com.hashmapinc.server.common.msg.cluster.ServerAddress;
 import com.hashmapinc.server.extensions.api.plugins.handlers.*;
 import com.hashmapinc.server.extensions.api.rules.RuleException;
 
-/**
- * @author Andrew Shvayka
- */
+
 public abstract class AbstractPlugin<T> implements Plugin<T> {
 
     @Override

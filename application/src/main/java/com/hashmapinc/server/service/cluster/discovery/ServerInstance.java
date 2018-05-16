@@ -22,9 +22,7 @@ import lombok.Getter;
 import lombok.ToString;
 import com.hashmapinc.server.common.msg.cluster.ServerAddress;
 
-/**
- * @author Andrew Shvayka
- */
+
 @ToString
 @EqualsAndHashCode(exclude = {"serverInfo", "serverAddress"})
 public final class ServerInstance implements Comparable<ServerInstance> {

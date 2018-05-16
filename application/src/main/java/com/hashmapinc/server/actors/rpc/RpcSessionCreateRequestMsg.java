@@ -22,9 +22,7 @@ import com.hashmapinc.server.gen.cluster.ClusterAPIProtos;
 
 import java.util.UUID;
 
-/**
- * @author Andrew Shvayka
- */
+
 @Data
 public final class RpcSessionCreateRequestMsg {
 

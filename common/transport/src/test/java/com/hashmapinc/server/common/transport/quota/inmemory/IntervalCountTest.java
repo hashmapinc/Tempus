@@ -22,10 +22,7 @@ import com.hashmapinc.server.common.transport.quota.Clock;
 
 import static org.junit.Assert.assertEquals;
 
-/**
- * @author Vitaliy Paromskiy
- * @version 1.0
- */
+
 public class IntervalCountTest {
 
     @Before

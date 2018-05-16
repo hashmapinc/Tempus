@@ -25,9 +25,7 @@ import javax.annotation.PostConstruct;
 import java.util.Collections;
 import java.util.List;
 
-/**
- * @author Andrew Shvayka
- */
+
 @Service
 @ConditionalOnProperty(prefix = "zk", value = "enabled", havingValue = "false", matchIfMissing = true)
 @Slf4j

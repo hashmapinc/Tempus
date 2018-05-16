@@ -25,9 +25,7 @@ import com.hashmapinc.server.common.data.id.ComponentDescriptorId;
 import java.util.List;
 import java.util.Optional;
 
-/**
- * @author Andrew Shvayka
- */
+
 public interface ComponentDescriptorDao extends Dao<ComponentDescriptor> {
 
     Optional<ComponentDescriptor> saveIfNotExist(ComponentDescriptor component);

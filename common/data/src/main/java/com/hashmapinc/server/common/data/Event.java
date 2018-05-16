@@ -21,9 +21,7 @@ import com.hashmapinc.server.common.data.id.EventId;
 import com.hashmapinc.server.common.data.id.TenantId;
 import lombok.Data;
 
-/**
- * @author Andrew Shvayka
- */
+
 @Data
 public class Event extends BaseData<EventId> {
 

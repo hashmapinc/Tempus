@@ -33,9 +33,7 @@ import com.hashmapinc.server.extensions.rabbitmq.action.RabbitMqActionMsg;
 import java.io.IOException;
 import java.nio.charset.Charset;
 
-/**
- * @author Andrew Shvayka
- */
+
 @RequiredArgsConstructor
 public class RabbitMqMsgHandler implements RuleMsgHandler {
     private static final Charset UTF8 = Charset.forName("UTF-8");

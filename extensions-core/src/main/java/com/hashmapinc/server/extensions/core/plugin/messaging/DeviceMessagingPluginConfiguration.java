@@ -17,9 +17,7 @@ package com.hashmapinc.server.extensions.core.plugin.messaging;
 
 import lombok.Data;
 
-/**
- * @author Andrew Shvayka
- */
+
 @Data
 public class DeviceMessagingPluginConfiguration {
 

@@ -23,9 +23,7 @@ import com.hashmapinc.server.extensions.api.plugins.handlers.RuleMsgHandler;
 import com.hashmapinc.server.extensions.api.plugins.msg.FromDeviceRpcResponse;
 import com.hashmapinc.server.extensions.core.action.rpc.RpcPluginAction;
 
-/**
- * @author Andrew Shvayka
- */
+
 @Plugin(name = "Device Messaging Plugin", actions = {RpcPluginAction.class},
         descriptor = "DeviceMessagingPluginDescriptor.json", configuration = DeviceMessagingPluginConfiguration.class)
 @Slf4j

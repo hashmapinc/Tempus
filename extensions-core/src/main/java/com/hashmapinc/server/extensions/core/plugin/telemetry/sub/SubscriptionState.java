@@ -21,9 +21,7 @@ import lombok.Getter;
 
 import java.util.Map;
 
-/**
- * @author Andrew Shvayka
- */
+
 @AllArgsConstructor
 public class SubscriptionState<T> {
 

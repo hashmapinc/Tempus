@@ -18,12 +18,14 @@
 
 <img src="https://github.com/hashmapinc/hashmap.github.io/blob/master/images/tempus/TempusLogoBlack2.png" width="910" height="245" alt="Hashmap, Inc Tempus"/>
 
-[![License](http://img.shields.io/:license-Apache%202-blue.svg)](http://www.apache.org/licenses/LICENSE-2.0.txt) 
+[![License](http://img.shields.io/:license-Apache%202-blue.svg)](http://www.apache.org/licenses/LICENSE-2.0.txt) [![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fhashmapinc%2FTempus.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Fhashmapinc%2FTempus?ref=badge_shield)
 [![Build Status](https://travis-ci.org/hashmapinc/Tempus.svg?branch=dev)](https://travis-ci.org/hashmapinc/Tempus)
 [![Docker pulls](https://img.shields.io/docker/pulls/hashmapinc/tempus.svg)](https://hub.docker.com/r/hashmapinc/tempus/)
 [![CLA assistant](https://cla-assistant.io/readme/badge/hashmapinc/Tempus)](https://cla-assistant.io/hashmapinc/Tempus)
-[![Quality Gate](https://sonarcloud.io/api/badges/gate?key=com.hashmapinc%3Atempus)](https://sonarcloud.io/dashboard/index/com.hashmapinc%3Atempus)
+[![Quality Gate](https://sonarcloud.io/api/project_badges/measure?project=com.hashmapinc%3Atempus&metric=coverage)](https://sonarcloud.io/dashboard?id=com.hashmapinc%3Atempus)
 [![Slack](https://now-examples-slackin-sdipawcoxa.now.sh/badge.svg)](https://now-examples-slackin-sdipawcoxa.now.sh)
+[![Documentation Status](https://readthedocs.org/projects/tempus/badge/?version=latest)](http://tempus.readthedocs.io/?badge=latest)
+[![SSL Rating](https://sslbadge.org/?domain=tempus.hashmapinc.com)](https://www.ssllabs.com/ssltest/analyze.html?d=tempus.hashmapinc.com)
 
 
 [Tempus](https://www.hashmapinc.com/tempuscloud) is an IIoT framework for industrial data ingestion and analysis.
@@ -96,7 +98,7 @@ Tempus was made to simplify ingest/analysis/storage/visualization of your IIoT d
 
 ## Getting Started
 
-- Read through the [Tempus Developer Quickstart](http://tempus-cloud.s3-website-us-west-2.amazonaws.com/help/developerQS/html/).
+- Read through the [Tempus Developer Quickstart](https://tempus.readthedocs.io/development/quickstart.html/).
   It will include a section on how to build the local development environment via Docker to get you up and running quickly.
 
 To build:
@@ -145,7 +147,7 @@ You can also submit issues or questions via GitHub Issues [here](https://github.
 
 ## Documentation
 
-See [The Documentation Here](http://tempus-cloud.s3-website-us-west-2.amazonaws.com/help/) for the latest updates.
+See [The Documentation Here](https://tempus.readthedocs.io) for the latest updates.
 
 ## License
 
@@ -178,7 +180,7 @@ The U.S. Government Department of Commerce, Bureau of Industry and Security
 (BIS), has classified this software as Export Commodity Control Number (ECCN)
 5D002.C.1, which includes information security software using or performing
 cryptographic functions with asymmetric algorithms. The form and manner of this
-Apache Software Foundation distribution makes it eligible for export under the
+distribution makes it eligible for export under the
 License Exception ENC Technology Software Unrestricted (TSU) exception (see the
 BIS Export Administration Regulations, Section 740.13) for both object code and
 source code.
@@ -190,3 +192,5 @@ java cryptography libraries for SSL, SSH. See
 http://bouncycastle.org/about.html
 http://www.oracle.com/us/products/export/export-regulations-345813.html
 for more details on each of these libraries cryptography features.
+
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fhashmapinc%2FTempus.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Fhashmapinc%2FTempus?ref=badge_large)

@@ -27,10 +27,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
-/**
- * @author Vitaliy Paromskiy
- * @version 1.0
- */
+
 @Component
 @Slf4j
 public class HostRequestIntervalRegistry {

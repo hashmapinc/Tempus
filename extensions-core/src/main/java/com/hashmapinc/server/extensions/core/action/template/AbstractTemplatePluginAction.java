@@ -33,9 +33,7 @@ import com.hashmapinc.server.extensions.core.utils.VelocityUtils;
 
 import java.util.Optional;
 
-/**
- * @author Andrew Shvayka
- */
+
 @Slf4j
 public abstract class AbstractTemplatePluginAction<T extends TemplateActionConfiguration> extends SimpleRuleLifecycleComponent implements PluginAction<T> {
     protected T configuration;

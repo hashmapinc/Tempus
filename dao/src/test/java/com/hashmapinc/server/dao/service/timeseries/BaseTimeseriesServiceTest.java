@@ -34,9 +34,7 @@ import java.util.concurrent.ExecutionException;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-/**
- * @author Andrew Shvayka
- */
+
 
 @Slf4j
 public abstract class BaseTimeseriesServiceTest extends AbstractServiceTest {

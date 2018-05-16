@@ -17,9 +17,7 @@ package com.hashmapinc.server.extensions.api.rules;
 
 import lombok.extern.slf4j.Slf4j;
 
-/**
- * @author Andrew Shvayka
- */
+
 @Slf4j
 public abstract class SimpleRuleLifecycleComponent implements RuleLifecycleComponent {
 

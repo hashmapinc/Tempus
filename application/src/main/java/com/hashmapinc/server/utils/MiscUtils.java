@@ -21,9 +21,7 @@ import com.google.common.hash.Hashing;
 import java.nio.charset.Charset;
 
 
-/**
- * @author Andrew Shvayka
- */
+
 public class MiscUtils {
 
     public static final Charset UTF8 = Charset.forName("UTF-8");

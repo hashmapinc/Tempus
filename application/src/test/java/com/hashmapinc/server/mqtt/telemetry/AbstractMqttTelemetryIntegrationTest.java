@@ -38,9 +38,7 @@ import static com.cirruslink.sparkplug.message.model.MetricDataType.String;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-/**
- * @author Valerii Sosliuk
- */
+
 @Slf4j
 public abstract class AbstractMqttTelemetryIntegrationTest extends AbstractControllerTest {
 

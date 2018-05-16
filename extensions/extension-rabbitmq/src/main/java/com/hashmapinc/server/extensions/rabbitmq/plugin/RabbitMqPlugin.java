@@ -30,9 +30,7 @@ import java.util.concurrent.TimeoutException;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
-/**
- * @author Andrew Shvayka
- */
+
 @Plugin(name = "RabbitMQ Plugin", actions = {RabbitMqPluginAction.class},
 descriptor = "RabbitMqPluginDescriptor.json", configuration = RabbitMqPluginConfiguration.class)
 @Slf4j

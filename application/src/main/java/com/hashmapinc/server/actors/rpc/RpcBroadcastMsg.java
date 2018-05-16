@@ -18,9 +18,7 @@ package com.hashmapinc.server.actors.rpc;
 import com.hashmapinc.server.gen.cluster.ClusterAPIProtos;
 import lombok.Data;
 
-/**
- * @author Andrew Shvayka
- */
+
 @Data
 public final class RpcBroadcastMsg {
     private final ClusterAPIProtos.ToRpcServerMessage msg;

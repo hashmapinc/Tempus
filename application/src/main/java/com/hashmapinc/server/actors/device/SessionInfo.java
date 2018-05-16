@@ -21,9 +21,7 @@ import lombok.Data;
 
 import java.util.Optional;
 
-/**
- * @author Andrew Shvayka
- */
+
 @Data
 public class SessionInfo {
     private final SessionType type;

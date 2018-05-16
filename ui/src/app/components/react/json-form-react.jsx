@@ -17,7 +17,7 @@ import './json-form.scss';
 
 import React from 'react';
 import getMuiTheme from 'material-ui/styles/getMuiTheme';
-import tempusTheme from './styles/tempusTheme';
+import tempusTheme from './styles/TempusTheme';
 import TempusSchemaForm from './json-form-schema-form.jsx';
 
 class ReactSchemaForm extends React.Component {

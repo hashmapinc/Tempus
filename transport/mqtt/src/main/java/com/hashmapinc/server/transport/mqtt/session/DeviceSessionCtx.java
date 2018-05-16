@@ -32,9 +32,7 @@ import com.hashmapinc.server.common.transport.session.DeviceAwareSessionContext;
 import com.hashmapinc.server.transport.mqtt.sparkplugB.data.SparkPlugMetaData;
 import java.util.concurrent.atomic.AtomicInteger;
 
-/**
- * @author Andrew Shvayka
- */
+
 @Slf4j
 public class DeviceSessionCtx extends DeviceAwareSessionContext {
 

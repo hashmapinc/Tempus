@@ -19,9 +19,7 @@ import com.rabbitmq.client.*;
 
 import java.io.IOException;
 
-/**
- * @author Andrew Shvayka
- */
+
 public class RabbitMqDemoClient {
 
     private static final String HOST = "localhost";

@@ -19,9 +19,7 @@ import lombok.Data;
 
 import java.util.List;
 
-/**
- * @author Andrew Shvayka
- */
+
 @Data
 public class RabbitMqPluginConfiguration {
     private String host;

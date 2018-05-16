@@ -17,9 +17,7 @@ package com.hashmapinc.server.service.cluster.rpc;
 
 import com.hashmapinc.server.gen.cluster.ClusterAPIProtos;
 
-/**
- * @author Andrew Shvayka
- */
+
 public interface GrpcSessionListener {
 
     void onConnected(GrpcSession session);

@@ -26,9 +26,7 @@ import com.hashmapinc.server.extensions.api.device.ToDeviceActorNotificationMsg;
 
 import java.util.Optional;
 
-/**
- * @author Andrew Shvayka
- */
+
 @ToString
 @RequiredArgsConstructor
 public class ToDeviceRpcRequestPluginMsg implements ToDeviceActorNotificationMsg {

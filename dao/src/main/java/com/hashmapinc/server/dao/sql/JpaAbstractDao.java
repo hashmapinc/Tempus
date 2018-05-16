@@ -30,9 +30,7 @@ import java.util.UUID;
 
 import static com.hashmapinc.server.common.data.UUIDConverter.fromTimeUUID;
 
-/**
- * @author Valerii Sosliuk
- */
+
 @Slf4j
 public abstract class JpaAbstractDao<E extends BaseEntity<D>, D>
         extends JpaAbstractDaoListeningExecutorService
