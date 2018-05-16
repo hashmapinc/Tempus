@@ -165,13 +165,13 @@
                                             <md-input-container flex="50" class="md-block tb-container-for-select">
                                                 <label translate>extension.witsml-status</label>
                                                 <md-select required
-                                                           name="status_{{serverIndex}}"
-                                                           ng-model="server.status">
+                                                           name="wellStatus_{{serverIndex}}"
+                                                           ng-model="server.wellStatus">
                                                     <md-option ng-value="statusType"
                                                                ng-repeat="(statusType, statusValue) in types.witsmlWellStatus"
                                                     ><span ng-bind="::statusValue"></span></md-option>
                                                 </md-select>
-                                                <div ng-messages="theForm['status_' + serverIndex].$error">
+                                                <div ng-messages="theForm['wellStatus_' + serverIndex].$error">
                                                     <div translate
                                                          ng-message="required"
                                                     >extension.field-required</div>
