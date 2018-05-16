@@ -23,7 +23,7 @@
         "maximum": 3600000
       },
       "qualityDepthWindow": {
-        "title": "Tag Quality Time Window",
+        "title": "Tag Quality Depth Window",
         "type": "integer",
         "default": 3000,
         "minimum": 0,
