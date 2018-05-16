@@ -13,5 +13,4 @@ There are several Features to the Tempus Cloud Framework that are delivered out 
     rpc
     ruleengine
     visualization
-    sparkplug
   
