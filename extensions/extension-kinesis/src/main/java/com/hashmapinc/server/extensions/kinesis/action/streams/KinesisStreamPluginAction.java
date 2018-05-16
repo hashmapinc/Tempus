@@ -13,36 +13,36 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.hashmapinc.server.extensions.kinesis.action;
+package com.hashmapinc.server.extensions.kinesis.action.streams;
 
-import com.hashmapinc.server.extensions.api.plugins.msg.RuleToPluginMsg;
-import com.hashmapinc.server.extensions.api.rules.RuleContext;
-import com.hashmapinc.server.extensions.core.action.template.AbstractTemplatePluginAction;
 import com.hashmapinc.server.common.msg.device.ToDeviceActorMsg;
 import com.hashmapinc.server.common.msg.session.FromDeviceRequestMsg;
 import com.hashmapinc.server.extensions.api.component.Action;
+import com.hashmapinc.server.extensions.api.plugins.msg.RuleToPluginMsg;
+import com.hashmapinc.server.extensions.api.rules.RuleContext;
+import com.hashmapinc.server.extensions.core.action.template.AbstractTemplatePluginAction;
+
 
 import java.util.Optional;
 
 /**
  * @author Mitesh Rathore
  */
-@Action(name = "Kinesis Plugin Action", descriptor = "KinesisActionDescriptor.json", configuration = KinesisPluginActionConfiguration.class)
-public class KinesisPluginAction extends AbstractTemplatePluginAction<KinesisPluginActionConfiguration> {
 
+@Action(name = "Kinesis Stream Plugin Action", descriptor = "KinesisActionDescriptor.json", configuration = KinesisStreamPluginActionConfiguration.class)
+public class KinesisStreamPluginAction extends AbstractTemplatePluginAction<KinesisStreamPluginActionConfiguration> {
 
     @Override
     protected Optional<RuleToPluginMsg> buildRuleToPluginMsg(RuleContext ctx, ToDeviceActorMsg msg, FromDeviceRequestMsg payload) {
-        KinesisActionPayload.KinesisActionPayloadBuilder builder = KinesisActionPayload.builder();
+        KinesisStreamActionPayload.KinesisStreamActionPayloadBuilder builder = KinesisStreamActionPayload.builder();
         builder.msgType(payload.getMsgType());
         builder.requestId(payload.getRequestId());
         builder.sync(configuration.isSync());
         builder.stream(configuration.getStream());
         builder.msgBody(getMsgBody(ctx, msg));
-        return Optional.of(new KinesisActionMsg(msg.getTenantId(),
+        return Optional.of(new KinesisStreamActionMsg(msg.getTenantId(),
                 msg.getCustomerId(),
                 msg.getDeviceId(),
                 builder.build()));
     }
-
 }

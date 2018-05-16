@@ -20,27 +20,25 @@ import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.auth.AWSStaticCredentialsProvider;
 import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.auth.profile.ProfileCredentialsProvider;
-import com.amazonaws.services.kinesis.AmazonKinesisAsync;
-import com.amazonaws.services.kinesis.AmazonKinesisAsyncClientBuilder;
 import com.amazonaws.services.kinesisfirehose.AmazonKinesisFirehoseAsync;
 import com.amazonaws.services.kinesisfirehose.AmazonKinesisFirehoseAsyncClientBuilder;
-import com.amazonaws.services.kinesisfirehose.AmazonKinesisFirehoseClient;
 
 /**
  * @author Mitesh Rathore
  */
-public class KinesisAsyncFactory {
+public class KinesisFirehoseFactory {
 
-    public static final KinesisAsyncFactory INSTANCE = new KinesisAsyncFactory();
+    private KinesisFirehoseFactory() {}
 
-    private KinesisAsyncFactory() {
-    }
+    public static final KinesisFirehoseFactory INSTANCE = new KinesisFirehoseFactory();
 
-    public AmazonKinesisAsync create(KinesisPluginConfiguration configuration) {
+
+
+    public AmazonKinesisFirehoseAsync create(KinesisPluginConfiguration configuration) {
         if (basicCredentialsDefined(configuration)) {
-            return initBasedOnBasicCredentials(configuration);
+            return initFirehoseBasedOnBasicCredentials(configuration);
         } else if (profileCredentialsDefined(configuration)) {
-            return initBasedOnProfileCredentials(configuration);
+            return initFirehoseBasedOnProfileCredentials(configuration);
         } else {
             throw new IllegalStateException("Plugin configuration incomplete. Basic AWS Credentials or Profile required");
         }
@@ -60,11 +58,11 @@ public class KinesisAsyncFactory {
         return isNotEmpty(configuration.getProfile());
     }
 
-    private AmazonKinesisAsync initBasedOnProfileCredentials(KinesisPluginConfiguration configuration) {
+    private AmazonKinesisFirehoseAsync initFirehoseBasedOnProfileCredentials(KinesisPluginConfiguration configuration) {
         ProfileCredentialsProvider credentialsProvider = new ProfileCredentialsProvider(configuration.getProfile());
         try {
             credentialsProvider.getCredentials();
-            return AmazonKinesisAsyncClientBuilder.standard()
+            return AmazonKinesisFirehoseAsyncClientBuilder.standard()
                     .withCredentials(credentialsProvider)
                     .build();
         } catch (Exception e) {
@@ -74,13 +72,14 @@ public class KinesisAsyncFactory {
         }
     }
 
-    private AmazonKinesisAsync initBasedOnBasicCredentials(KinesisPluginConfiguration configuration) {
+
+    private AmazonKinesisFirehoseAsync initFirehoseBasedOnBasicCredentials(KinesisPluginConfiguration configuration) {
         AWSCredentials awsCredentials = new BasicAWSCredentials(configuration.getAccessKeyId(), configuration.getSecretAccessKey());
         AWSStaticCredentialsProvider awsStaticCredentialsProvider = new AWSStaticCredentialsProvider(awsCredentials);
-        return AmazonKinesisAsyncClientBuilder.standard()
+        return  AmazonKinesisFirehoseAsyncClientBuilder.standard()
                 .withCredentials(awsStaticCredentialsProvider)
                 .withRegion(configuration.getRegion())
                 .build();
     }
-}
 
+}

@@ -18,8 +18,8 @@ package com.hashmapinc.server.extensions.kinesis.plugin;
 
 import com.amazonaws.services.kinesisfirehose.model.PutRecordRequest;
 import com.amazonaws.services.kinesisfirehose.model.Record;
-import com.hashmapinc.server.extensions.kinesis.action.KinesisActionMsg;
-import com.hashmapinc.server.extensions.kinesis.action.KinesisActionPayload;
+import com.hashmapinc.server.extensions.kinesis.action.firehose.KinesisFirehoseActionMsg;
+import com.hashmapinc.server.extensions.kinesis.action.firehose.KinesisFirehoseActionPayload;
 
 import java.nio.ByteBuffer;
 
@@ -33,8 +33,8 @@ public class KinesisFirehosePutRecordFactory {
 
     private KinesisFirehosePutRecordFactory() {}
 
-    public PutRecordRequest create(KinesisActionMsg msg) {
-        KinesisActionPayload payload = msg.getPayload();
+    public PutRecordRequest create(KinesisFirehoseActionMsg msg) {
+        KinesisFirehoseActionPayload payload = msg.getPayload();
 
 
         //String msgs = new String(payload.getMsgBody())+"\n";

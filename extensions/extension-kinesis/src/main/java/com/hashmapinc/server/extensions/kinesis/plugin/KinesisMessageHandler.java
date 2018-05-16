@@ -19,24 +19,24 @@ package com.hashmapinc.server.extensions.kinesis.plugin;
 
 import com.amazonaws.services.kinesis.model.PutRecordRequest;
 import com.amazonaws.services.kinesis.model.PutRecordResult;
+import com.amazonaws.services.kinesisfirehose.AmazonKinesisFirehoseAsync;
 import com.hashmapinc.server.common.data.id.RuleId;
 import com.hashmapinc.server.common.data.id.TenantId;
 import com.hashmapinc.server.extensions.api.plugins.PluginContext;
 import com.hashmapinc.server.extensions.api.plugins.msg.ResponsePluginToRuleMsg;
 import com.hashmapinc.server.extensions.api.plugins.msg.RuleToPluginMsg;
 
+import com.hashmapinc.server.extensions.kinesis.action.firehose.KinesisFirehoseActionMsg;
+import com.hashmapinc.server.extensions.kinesis.action.firehose.KinesisFirehoseActionPayload;
+import com.hashmapinc.server.extensions.kinesis.action.streams.KinesisStreamActionMsg;
+import com.hashmapinc.server.extensions.kinesis.action.streams.KinesisStreamActionPayload;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import com.hashmapinc.server.common.msg.core.BasicStatusCodeResponse;
 import com.hashmapinc.server.extensions.api.plugins.handlers.RuleMsgHandler;
 import com.hashmapinc.server.extensions.api.rules.RuleException;
-import com.hashmapinc.server.extensions.kinesis.action.KinesisActionMsg;
-import com.hashmapinc.server.extensions.kinesis.action.KinesisActionPayload;
 import com.amazonaws.handlers.AsyncHandler;
 import com.amazonaws.services.kinesis.AmazonKinesisAsync;
-
-
-
 
 
 
@@ -47,20 +47,32 @@ import com.amazonaws.services.kinesis.AmazonKinesisAsync;
 @Slf4j
 public class KinesisMessageHandler implements RuleMsgHandler {
 
-    private final AmazonKinesisAsync kinesis;
+    private final AmazonKinesisAsync streamKinesis;
+    private final AmazonKinesisFirehoseAsync firehoseKinesis;
+
+
 
     @Override
     public void process(PluginContext ctx, TenantId tenantId, RuleId ruleId, RuleToPluginMsg<?> msg) throws RuleException {
-        if (!(msg instanceof KinesisActionMsg)) {
+        if (msg instanceof KinesisStreamActionMsg || msg instanceof KinesisFirehoseActionMsg ) {
+            if (msg instanceof KinesisStreamActionMsg) {
+                sendMessageToKinesisStream(ctx, tenantId, ruleId, msg);
+                return;
+            }
+            if (msg instanceof KinesisFirehoseActionMsg) {
+                sendMessageToKinesisFirehose(ctx, tenantId, ruleId, msg);
+                return;
+            }
+        }else{
             throw new RuleException("Unsupported message type " + msg.getClass().getName() + "!");
         }
+    }
 
-        KinesisActionPayload payload = ((KinesisActionMsg) msg).getPayload();
-        log.debug("Processing Kinesis payload: {}", payload);
-
-        try {
-            PutRecordRequest putRecordRequest = KinesisPutRecordRequestFactory.INSTANCE.create((KinesisActionMsg) msg);
-            kinesis.putRecordAsync(putRecordRequest, new AsyncHandler<PutRecordRequest, PutRecordResult>() {
+    private void sendMessageToKinesisStream(PluginContext ctx, TenantId tenantId, RuleId ruleId, RuleToPluginMsg<?> msg) {
+        KinesisStreamActionPayload payload = ((KinesisStreamActionMsg) msg).getPayload();
+        log.debug("Processing Kinesis stream payload: {}", payload);
+            PutRecordRequest putRecordRequest = KinesisStreamPutRecordFactory.INSTANCE.create((KinesisStreamActionMsg) msg);
+            streamKinesis.putRecordAsync(putRecordRequest, new AsyncHandler<PutRecordRequest, PutRecordResult>() {
 
                 @Override
                 public void onError(Exception e) {
@@ -68,7 +80,7 @@ public class KinesisMessageHandler implements RuleMsgHandler {
                         ctx.reply(new ResponsePluginToRuleMsg(msg.getUid(), tenantId, ruleId,
                                 BasicStatusCodeResponse.onError(payload.getMsgType(), payload.getRequestId(), e)));
                     }
-                    log.error("Processing Kinesis data stream failed: {}", e.getMessage());
+                    log.error("Processing Kinesis data stream failed: {}", e);
                 }
 
                 @Override
@@ -79,9 +91,31 @@ public class KinesisMessageHandler implements RuleMsgHandler {
                     }
                 }
             });
-        } catch (Exception e) {
-            throw new RuleException(e.getMessage(), e);
-        }
+    }
+
+    private void sendMessageToKinesisFirehose(PluginContext ctx, TenantId tenantId, RuleId ruleId, RuleToPluginMsg<?> msg) {
+        KinesisFirehoseActionPayload payload = ((KinesisFirehoseActionMsg) msg).getPayload();
+        log.debug("Processing Kinesis firehose payload: {}", payload);
+        com.amazonaws.services.kinesisfirehose.model.PutRecordRequest putRecordRequest = KinesisFirehosePutRecordFactory.INSTANCE.create((KinesisFirehoseActionMsg) msg);
+        firehoseKinesis.putRecordAsync(putRecordRequest, new AsyncHandler<com.amazonaws.services.kinesisfirehose.model.PutRecordRequest, com.amazonaws.services.kinesisfirehose.model.PutRecordResult>() {
+
+            @Override
+            public void onError(Exception e) {
+                if (payload.isSync()) {
+                    ctx.reply(new ResponsePluginToRuleMsg(msg.getUid(), tenantId, ruleId,
+                            BasicStatusCodeResponse.onError(payload.getMsgType(), payload.getRequestId(), e)));
+                }
+                log.error("Processing Kinesis firehose stream failed: {}", e.getMessage());
+            }
+
+            @Override
+            public void onSuccess(com.amazonaws.services.kinesisfirehose.model.PutRecordRequest request, com.amazonaws.services.kinesisfirehose.model.PutRecordResult putRecordResult) {
+                if (payload.isSync()) {
+                    ctx.reply(new ResponsePluginToRuleMsg(msg.getUid(), tenantId, ruleId,
+                            BasicStatusCodeResponse.onSuccess(payload.getMsgType(), payload.getRequestId())));
+                }
+            }
+        });
     }
 
 

@@ -13,25 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.hashmapinc.server.extensions.kinesis.action;
+package com.hashmapinc.server.extensions.kinesis.action.streams;
 
-import com.hashmapinc.server.common.msg.session.MsgType;
-import lombok.Builder;
+import com.hashmapinc.server.extensions.core.action.template.TemplateActionConfiguration;
 import lombok.Data;
-
-import java.io.Serializable;
 
 /**
  * @author Mitesh Rathore
  */
 @Data
-@Builder
-public class KinesisActionPayload implements Serializable {
+public class KinesisStreamPluginActionConfiguration implements TemplateActionConfiguration {
 
-    private final String stream;
-    private final String msgBody;
-    private final boolean sync;
-    private final Integer requestId;
-    private final MsgType msgType;
+    private String stream;
+    private boolean sync;
+    private String template;
 
 }

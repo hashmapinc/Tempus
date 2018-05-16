@@ -16,26 +16,26 @@
 package com.hashmapinc.server.extensions.kinesis.plugin;
 
 import com.amazonaws.services.kinesis.model.PutRecordRequest;
-import com.hashmapinc.server.extensions.kinesis.action.KinesisActionMsg;
-import com.hashmapinc.server.extensions.kinesis.action.KinesisActionPayload;
+import com.hashmapinc.server.extensions.kinesis.action.streams.KinesisStreamActionMsg;
+import com.hashmapinc.server.extensions.kinesis.action.streams.KinesisStreamActionPayload;
+
 import java.nio.ByteBuffer;
 
 /**
  * @author Mitesh Rathore
  */
-public class KinesisPutRecordRequestFactory {
+public class KinesisStreamPutRecordFactory {
 
-    public static final KinesisPutRecordRequestFactory INSTANCE = new KinesisPutRecordRequestFactory();
+    public static final KinesisStreamPutRecordFactory INSTANCE = new KinesisStreamPutRecordFactory();
 
-    private KinesisPutRecordRequestFactory() {}
+    private KinesisStreamPutRecordFactory() {}
 
-    public PutRecordRequest create(KinesisActionMsg msg) {
-        KinesisActionPayload payload = msg.getPayload();
+    public PutRecordRequest create(KinesisStreamActionMsg msg) {
+        KinesisStreamActionPayload payload = msg.getPayload();
 
         return new PutRecordRequest()
                 .withData(ByteBuffer.wrap(payload.getMsgBody().getBytes()))
                 .withStreamName(payload.getStream())
                 .withPartitionKey(msg.getUid().toString());
     }
-
 }

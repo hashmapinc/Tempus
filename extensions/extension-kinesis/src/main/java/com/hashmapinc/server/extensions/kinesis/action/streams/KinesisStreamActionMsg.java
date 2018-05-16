@@ -13,19 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.hashmapinc.server.extensions.kinesis.action;
+package com.hashmapinc.server.extensions.kinesis.action.streams;
 
+import com.hashmapinc.server.common.data.id.CustomerId;
 import com.hashmapinc.server.common.data.id.DeviceId;
 import com.hashmapinc.server.common.data.id.TenantId;
 import com.hashmapinc.server.extensions.api.plugins.msg.AbstractRuleToPluginMsg;
-import com.hashmapinc.server.common.data.id.CustomerId;
+
 
 /**
  * @author Mitesh Rathore
  */
-public class KinesisActionMsg extends AbstractRuleToPluginMsg<KinesisActionPayload> {
+public class KinesisStreamActionMsg extends AbstractRuleToPluginMsg<KinesisStreamActionPayload> {
 
-    public KinesisActionMsg(TenantId tenantId, CustomerId customerId, DeviceId deviceId, KinesisActionPayload payload) {
+    public KinesisStreamActionMsg(TenantId tenantId, CustomerId customerId, DeviceId deviceId, KinesisStreamActionPayload payload) {
         super(tenantId, customerId, deviceId, payload);
     }
 }

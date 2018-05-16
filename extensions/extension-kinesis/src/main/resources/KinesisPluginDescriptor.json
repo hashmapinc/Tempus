@@ -23,8 +23,14 @@
     ]
   },
   "form": [
-    "accessKeyId",
-    "secretAccessKey",
+    {
+      "key": "accessKeyId",
+      "type": "password"
+    },
+    {
+      "key": "secretAccessKey",
+      "type": "password"
+    },
     "region"
   ]
 }

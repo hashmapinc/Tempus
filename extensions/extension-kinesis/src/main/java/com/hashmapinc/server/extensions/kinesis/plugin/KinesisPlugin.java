@@ -17,14 +17,14 @@ package com.hashmapinc.server.extensions.kinesis.plugin;
 
 
 import com.amazonaws.services.kinesisfirehose.AmazonKinesisFirehoseAsync;
-import com.amazonaws.services.kinesisfirehose.AmazonKinesisFirehoseClient;
 import com.hashmapinc.server.extensions.api.plugins.PluginContext;
-import com.hashmapinc.server.extensions.kinesis.action.KinesisPluginAction;
 import com.hashmapinc.server.extensions.api.component.Plugin;
 import com.hashmapinc.server.extensions.api.plugins.AbstractPlugin;
 import com.hashmapinc.server.extensions.api.plugins.handlers.RuleMsgHandler;
 
 import com.amazonaws.services.kinesis.AmazonKinesisAsync;
+import com.hashmapinc.server.extensions.kinesis.action.firehose.KinesisFirehosePluginAction;
+import com.hashmapinc.server.extensions.kinesis.action.streams.KinesisStreamPluginAction;
 import lombok.extern.slf4j.Slf4j;
 import com.hashmapinc.server.extensions.api.plugins.PluginInitializationException;
 
@@ -32,18 +32,20 @@ import com.hashmapinc.server.extensions.api.plugins.PluginInitializationExceptio
  * @author Mitesh Rathore
  */
 
-@Plugin(name = "Kinesis Plugin", actions = {KinesisPluginAction.class},
+@Plugin(name = "Kinesis Plugin", actions = {KinesisStreamPluginAction.class, KinesisFirehosePluginAction.class},
         descriptor = "KinesisPluginDescriptor.json", configuration = KinesisPluginConfiguration.class)
 @Slf4j
 public class KinesisPlugin extends AbstractPlugin<KinesisPluginConfiguration> {
 
     private KinesisMessageHandler kinesisHandler;
-    private AmazonKinesisAsync kinesis;
+    private AmazonKinesisAsync streamKinesis;
+    private AmazonKinesisFirehoseAsync firehoseKinesis;
 
     @Override
     public void init(KinesisPluginConfiguration configuration) {
         try {
-            kinesis = KinesisAsyncFactory.INSTANCE.create(configuration);
+            streamKinesis = KinesisStreamFactory.INSTANCE.create(configuration);
+            firehoseKinesis = KinesisFirehoseFactory.INSTANCE.create(configuration);
             init();
         } catch (Exception e) {
             throw new PluginInitializationException("Could not initialize Kinesis plugin", e);
@@ -51,13 +53,15 @@ public class KinesisPlugin extends AbstractPlugin<KinesisPluginConfiguration> {
     }
 
     private void init() {
-        this.kinesisHandler = new KinesisMessageHandler(kinesis);
+
+        this.kinesisHandler = new KinesisMessageHandler(streamKinesis,firehoseKinesis);
     }
 
     private void destroy() {
         try {
             this.kinesisHandler = null;
-            this.kinesis.shutdown();
+            this.streamKinesis.shutdown();
+            this.firehoseKinesis.shutdown();
         } catch (Exception e) {
             log.error("Failed to shutdown Kinesis client during destroy()", e);
             throw new RuntimeException(e);
