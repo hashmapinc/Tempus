@@ -368,8 +368,14 @@ export function DeviceController($rootScope,userService, deviceService, customer
 
 
                 if ($scope.query.search != null) {
-                    deviceSortList = $filter('filter')(items.data, {name: $scope.query.search});
 
+                    deviceSortList = $filter('filter')(items.data, function(data) {
+                        if ($scope.query.search) {
+                            return data.name.toLowerCase().indexOf($scope.query.search.toLowerCase()) > -1 || data.type.toLowerCase().indexOf($scope.query.search.toLowerCase()) > -1;
+                        } else {
+                            return true;
+                        }
+                    });
                 }
 
                 var startIndex = $scope.query.limit * ($scope.query.page - 1);
