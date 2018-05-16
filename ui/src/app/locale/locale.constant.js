@@ -1088,6 +1088,7 @@ export default angular.module('tempus.locale', [])
                     "witsml-add-server": "Add server",
                     "witsml-scan-period-in-seconds": "Scan period in seconds",
                     "witsml-version": "WITSML Version",
+                    "witsml-status": "Well Status",
                     "witsml-object-types": "Object Types",
                     "sync": {
                         "status": "Status",

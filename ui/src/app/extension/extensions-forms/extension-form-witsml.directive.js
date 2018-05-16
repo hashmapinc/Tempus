@@ -39,6 +39,7 @@ export default function ExtensionFormWitsmlDirective($compile, $templateCache, $
             };
             this.version = "v1311";
             this.objectTypes = [];
+            this.status = "drilling";
             this.mapping = []
         }
 

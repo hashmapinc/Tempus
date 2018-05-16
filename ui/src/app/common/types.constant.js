@@ -453,6 +453,10 @@ export default angular.module('tempus.types', [])
                 rig: "Rig",
                 trajectory: "Trajectory"
             },
+            witsmlWellStatus: {
+                active: "Active",
+                drilling: "Drilling"
+            },
             extensionOpcSecurityTypes: {
                 Basic128Rsa15: "Basic128Rsa15",
                 Basic256: "Basic256",
