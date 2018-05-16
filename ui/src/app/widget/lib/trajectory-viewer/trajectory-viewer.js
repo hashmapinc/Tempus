@@ -207,9 +207,9 @@ export function updateGrids() {
   scene.add(gridZY);
 
   // update axis labels
-  angular.element('trajectory-viewer-labelX').html(gridSize/2 + "east");
-  angular.element('trajectory-viewer-labelY').html(gridSize/2 + "tvd");
-  angular.element('trajectory-viewer-labelZ').html(gridSize + "north");
+  angular.element('#trajectory-viewer-labelX').html(gridSize/2 + "east");
+  angular.element('#trajectory-viewer-labelY').html(gridSize/2 + "tvd");
+  angular.element('#trajectory-viewer-labelZ').html(gridSize + "north");
 }
 
 // moves the axis labels with the 3D world
