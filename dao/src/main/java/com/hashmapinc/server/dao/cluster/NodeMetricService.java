@@ -16,6 +16,7 @@
 package com.hashmapinc.server.dao.cluster;
 
 import com.hashmapinc.server.common.data.cluster.NodeMetric;
+import com.hashmapinc.server.common.data.cluster.NodeStatus;
 
 import java.util.List;
 import java.util.Optional;
@@ -35,4 +36,8 @@ public interface NodeMetricService {
     NodeMetric incrementDeviceSessionCount(String host, int port);
 
     NodeMetric decrementDeviceSessionCount(String host, int port);
+
+    void deleteNodeEntryByHostAndPort(String host, int port);
+
+    NodeMetric updateNodeStatus(NodeStatus nodeStatus, String host, int port);
 }
