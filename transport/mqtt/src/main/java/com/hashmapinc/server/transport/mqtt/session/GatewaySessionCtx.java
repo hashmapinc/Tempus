@@ -15,6 +15,8 @@
  */
 package com.hashmapinc.server.transport.mqtt.session;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -32,18 +34,21 @@ import com.hashmapinc.server.common.transport.adaptor.JsonConverter;
 import com.hashmapinc.server.common.transport.auth.DeviceAuthService;
 import com.hashmapinc.server.dao.device.DeviceService;
 import com.hashmapinc.server.dao.relation.RelationService;
-import com.hashmapinc.server.transport.mqtt.adaptors.JsonMqttAdaptor;
+import com.hashmapinc.server.transport.mqtt.sparkplugB.data.SparkPlugDecodedMsg;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.mqtt.MqttMessage;
 import io.netty.handler.codec.mqtt.MqttPublishMessage;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.StringUtils;
-import com.hashmapinc.server.common.msg.core.*;
 import com.hashmapinc.server.common.transport.SessionMsgProcessor;
 import com.hashmapinc.server.transport.mqtt.MqttTransportHandler;
+import com.hashmapinc.server.common.data.kv.KvEntry;
 
+import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static com.hashmapinc.server.transport.mqtt.adaptors.JsonMqttAdaptor.validateJsonPayload;
 
 /**
  * Created by ashvayka on 19.01.17.
@@ -54,6 +59,7 @@ public class GatewaySessionCtx {
     private static final String DEFAULT_DEVICE_TYPE = "default";
     public static final String CAN_T_PARSE_VALUE = "Can't parse value: ";
     public static final String DEVICE_PROPERTY = "device";
+    private static final String SPARKPLUG_DEVICE_TYPE = "sparkplug";
     private final Device gateway;
     private final SessionId gatewaySessionId;
     private final SessionMsgProcessor processor;
@@ -100,11 +106,40 @@ public class GatewaySessionCtx {
         }
     }
 
+    private void onSparkPlugDeviceConnect(String deviceName, String deviceType, String topic) {
+        if (!devices.containsKey(deviceName)) {
+            Device device = deviceService.findDeviceByTenantIdAndName(gateway.getTenantId(), deviceName);
+            if (device == null) {
+                device = new Device();
+                device.setTenantId(gateway.getTenantId());
+                device.setName(deviceName);
+                device.setType(deviceType);
+                try {
+                    ObjectMapper mapper = new ObjectMapper();
+                    JsonNode additionalInfo = mapper.readTree("{\"topic\":\"" + topic + "\"}");
+                    device.setAdditionalInfo(additionalInfo);
+                }
+                catch (IOException e){
+                    log.error("Topic could not be parsed to additional info " + e);
+                }
+                device = deviceService.saveDevice(device);
+                relationService.saveRelation(new EntityRelation(gateway.getId(), device.getId(), "Created"));
+            }
+            GatewayDeviceSessionCtx ctx = new GatewayDeviceSessionCtx(this, device);
+            devices.put(deviceName, ctx);
+            log.debug("[{}] Added device [{}] to the gateway session", gatewaySessionId, deviceName);
+            processor.process(new BasicToDeviceActorSessionMsg(device, new BasicAdaptorToSessionActorMsg(ctx, new AttributesSubscribeMsg())));
+            processor.process(new BasicToDeviceActorSessionMsg(device, new BasicAdaptorToSessionActorMsg(ctx, new RpcSubscribeMsg())));
+        }
+    }
+
     public void onDeviceDisconnect(MqttPublishMessage msg) throws AdaptorException {
         String deviceName = checkDeviceName(getDeviceName(getJson(msg)));
         GatewayDeviceSessionCtx deviceSessionCtx = devices.remove(deviceName);
         if (deviceSessionCtx != null) {
-            processor.process(SessionCloseMsg.onDisconnect(deviceSessionCtx.getSessionId()));
+            SessionCloseMsg sessionCloseMsg = SessionCloseMsg.onDisconnect(deviceSessionCtx.getSessionId());
+            sessionCloseMsg.setDeviceId(deviceSessionCtx.getDevice().getId());
+            processor.process(sessionCloseMsg);
             deviceSessionCtx.setClosed(true);
             log.debug("[{}] Removed device [{}] from the gateway session", gatewaySessionId, deviceName);
         } else {
@@ -115,13 +150,15 @@ public class GatewaySessionCtx {
 
     public void onGatewayDisconnect() {
         devices.forEach((k, v) -> {
-            processor.process(SessionCloseMsg.onDisconnect(v.getSessionId()));
+            SessionCloseMsg sessionCloseMsg = SessionCloseMsg.onDisconnect(v.getSessionId());
+            sessionCloseMsg.setDeviceId(v.getDevice().getId());
+            processor.process(sessionCloseMsg);
         });
     }
 
     public void onDeviceTelemetry(MqttPublishMessage mqttMsg) throws AdaptorException {
-        JsonElement json = JsonMqttAdaptor.validateJsonPayload(gatewaySessionId, mqttMsg.payload());
-        int requestId = mqttMsg.variableHeader().messageId();
+        JsonElement json = validateJsonPayload(gatewaySessionId, mqttMsg.payload());
+        int requestId = mqttMsg.variableHeader().packetId();
         if (json.isJsonObject()) {
             JsonObject jsonObj = json.getAsJsonObject();
             for (Map.Entry<String, JsonElement> deviceEntry : jsonObj.entrySet()) {
@@ -143,9 +180,23 @@ public class GatewaySessionCtx {
         }
     }
 
+    public void onSparkPlugDecodedMsg(SparkPlugDecodedMsg sparkPlugDecodedMsg, String topic, String deviceName) throws AdaptorException {
+        int requestId = sparkPlugDecodedMsg.getRequestId();
+        deviceName = checkSparkPlugDeviceConnected(deviceName, topic);
+        List<KvEntry> kvEntryList = sparkPlugDecodedMsg.getKvEntryList();
+        Long ts = sparkPlugDecodedMsg.getTs();
+        BasicTelemetryUploadRequest request = new BasicTelemetryUploadRequest(requestId);
+        for (KvEntry entry : kvEntryList) {
+            request.add(ts, entry);
+        }
+        GatewayDeviceSessionCtx deviceSessionCtx = devices.get(deviceName);
+        processor.process(new BasicToDeviceActorSessionMsg(deviceSessionCtx.getDevice(),
+                new BasicAdaptorToSessionActorMsg(deviceSessionCtx, request)));
+    }
+
     public void onDeviceDepthTelemetry(MqttPublishMessage mqttMsg) throws AdaptorException {
-        JsonElement json = JsonMqttAdaptor.validateJsonPayload(gatewaySessionId, mqttMsg.payload());
-        int requestId = mqttMsg.variableHeader().messageId();
+        JsonElement json = validateJsonPayload(gatewaySessionId, mqttMsg.payload());
+        int requestId = mqttMsg.variableHeader().packetId();
         if (json.isJsonObject()) {
             JsonObject jsonObj = json.getAsJsonObject();
             for (Map.Entry<String, JsonElement> deviceEntry : jsonObj.entrySet()) {
@@ -168,7 +219,7 @@ public class GatewaySessionCtx {
     }
 
     public void onDeviceRpcResponse(MqttPublishMessage mqttMsg) throws AdaptorException {
-        JsonElement json = JsonMqttAdaptor.validateJsonPayload(gatewaySessionId, mqttMsg.payload());
+        JsonElement json = validateJsonPayload(gatewaySessionId, mqttMsg.payload());
         if (json.isJsonObject()) {
             JsonObject jsonObj = json.getAsJsonObject();
             String deviceName = checkDeviceConnected(jsonObj.get(DEVICE_PROPERTY).getAsString());
@@ -183,8 +234,8 @@ public class GatewaySessionCtx {
     }
 
     public void onDeviceAttributes(MqttPublishMessage mqttMsg) throws AdaptorException {
-        JsonElement json = JsonMqttAdaptor.validateJsonPayload(gatewaySessionId, mqttMsg.payload());
-        int requestId = mqttMsg.variableHeader().messageId();
+        JsonElement json = validateJsonPayload(gatewaySessionId, mqttMsg.payload());
+        int requestId = mqttMsg.variableHeader().packetId();
         if (json.isJsonObject()) {
             JsonObject jsonObj = json.getAsJsonObject();
             for (Map.Entry<String, JsonElement> deviceEntry : jsonObj.entrySet()) {
@@ -206,7 +257,7 @@ public class GatewaySessionCtx {
     }
 
     public void onDeviceAttributesRequest(MqttPublishMessage msg) throws AdaptorException {
-        JsonElement json = JsonMqttAdaptor.validateJsonPayload(gatewaySessionId, msg.payload());
+        JsonElement json = validateJsonPayload(gatewaySessionId, msg.payload());
         if (json.isJsonObject()) {
             JsonObject jsonObj = json.getAsJsonObject();
             int requestId = jsonObj.get("id").getAsInt();
@@ -246,6 +297,14 @@ public class GatewaySessionCtx {
         return deviceName;
     }
 
+    private String checkSparkPlugDeviceConnected(String deviceName, String topic) {
+        if (!devices.containsKey(deviceName)) {
+            log.debug("[{}] Missing device [{}] for the gateway session", gatewaySessionId, deviceName);
+            onSparkPlugDeviceConnect(deviceName, SPARKPLUG_DEVICE_TYPE, topic);
+        }
+        return deviceName;
+    }
+
     private String checkDeviceName(String deviceName) {
         if (StringUtils.isEmpty(deviceName)) {
             throw new RuntimeException("Device name is empty!");
@@ -264,7 +323,7 @@ public class GatewaySessionCtx {
     }
 
     private JsonElement getJson(MqttPublishMessage mqttMsg) throws AdaptorException {
-        return JsonMqttAdaptor.validateJsonPayload(gatewaySessionId, mqttMsg.payload());
+        return validateJsonPayload(gatewaySessionId, mqttMsg.payload());
     }
 
     protected SessionMsgProcessor getProcessor() {
@@ -280,8 +339,8 @@ public class GatewaySessionCtx {
     }
 
     private void ack(MqttPublishMessage msg) {
-        if (msg.variableHeader().messageId() > 0) {
-            writeAndFlush(MqttTransportHandler.createMqttPubAckMsg(msg.variableHeader().messageId()));
+        if (msg.variableHeader().packetId() > 0) {
+            writeAndFlush(MqttTransportHandler.createMqttPubAckMsg(msg.variableHeader().packetId()));
         }
     }
 

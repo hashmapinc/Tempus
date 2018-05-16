@@ -17,6 +17,7 @@ package com.hashmapinc.server.actors.device;
 
 import akka.event.Logging;
 import akka.event.LoggingAdapter;
+import com.hashmapinc.server.extensions.api.device.*;
 import com.hashmapinc.server.extensions.api.plugins.msg.TimeoutMsg;
 import com.hashmapinc.server.actors.ActorSystemContext;
 import com.hashmapinc.server.actors.rule.RulesProcessedMsg;
@@ -27,12 +28,7 @@ import com.hashmapinc.server.common.data.id.DeviceId;
 import com.hashmapinc.server.common.data.id.TenantId;
 import com.hashmapinc.server.common.msg.cluster.ClusterEventMsg;
 import com.hashmapinc.server.common.msg.device.ToDeviceActorMsg;
-import com.hashmapinc.server.extensions.api.device.DeviceAttributesEventNotificationMsg;
-import com.hashmapinc.server.extensions.api.device.DeviceCredentialsUpdateNotificationMsg;
-import com.hashmapinc.server.extensions.api.device.DeviceNameOrTypeUpdateMsg;
-import com.hashmapinc.server.extensions.api.device.ToDeviceActorNotificationMsg;
 import com.hashmapinc.server.extensions.api.plugins.msg.ToDeviceRpcRequestPluginMsg;
-import com.hashmapinc.server.extensions.api.plugins.msg.*;
 
 public class DeviceActor extends ContextAwareActor {
 
@@ -52,33 +48,26 @@ public class DeviceActor extends ContextAwareActor {
     @Override
     public void onReceive(Object msg) throws Exception {
         if (msg instanceof RuleChainDeviceMsg) {
-            logger.debug(" msg type RuleChainDeviceMsg -->");
             processor.process(context(), (RuleChainDeviceMsg) msg);
         } else if (msg instanceof RulesProcessedMsg) {
-            logger.debug(" msg type RulesProcessedMsg -->");
             processor.onRulesProcessedMsg(context(), (RulesProcessedMsg) msg);
         } else if (msg instanceof ToDeviceActorMsg) {
-            logger.debug(" msg type ToDeviceActorMsg -->");
             processor.process(context(), (ToDeviceActorMsg) msg);
         } else if (msg instanceof ToDeviceActorNotificationMsg) {
             if (msg instanceof DeviceAttributesEventNotificationMsg) {
-                logger.debug(" msg type DeviceAttributesEventNotificationMsg -->");
                 processor.processAttributesUpdate(context(), (DeviceAttributesEventNotificationMsg) msg);
-            } else if (msg instanceof ToDeviceRpcRequestPluginMsg) {
-                logger.debug(" msg type ToDeviceRpcRequestPluginMsg -->");
+            }else if (msg instanceof DeviceTelemetryEventNotificationMsg) {
+                processor.processTelemetryUpdate(context(), (DeviceTelemetryEventNotificationMsg) msg);
+            }else if (msg instanceof ToDeviceRpcRequestPluginMsg) {
                 processor.processRpcRequest(context(), (ToDeviceRpcRequestPluginMsg) msg);
             } else if (msg instanceof DeviceCredentialsUpdateNotificationMsg){
-                logger.debug(" msg type DeviceCredentialsUpdateNotificationMsg -->");
                 processor.processCredentialsUpdate();
             } else if (msg instanceof DeviceNameOrTypeUpdateMsg){
-                logger.debug(" msg type DeviceNameOrTypeUpdateMsg -->");
                 processor.processNameOrTypeUpdate((DeviceNameOrTypeUpdateMsg) msg);
             }
         } else if (msg instanceof TimeoutMsg) {
-            logger.debug(" msg type TimeoutMsg -->");
             processor.processTimeout(context(), (TimeoutMsg) msg);
         } else if (msg instanceof ClusterEventMsg) {
-            logger.debug(" msg type ClusterEventMsg -->");
             processor.processClusterEventMsg((ClusterEventMsg) msg);
         } else {
             logger.debug("[{}][{}] Unknown msg type.", tenantId, deviceId, msg.getClass().getName());

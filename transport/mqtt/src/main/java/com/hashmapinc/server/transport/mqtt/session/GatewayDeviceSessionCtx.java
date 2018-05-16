@@ -37,10 +37,8 @@ import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;
 import io.netty.buffer.UnpooledByteBufAllocator;
 import io.netty.handler.codec.mqtt.*;
-import com.hashmapinc.server.common.msg.core.*;
-import com.hashmapinc.server.common.msg.session.*;
 import com.hashmapinc.server.transport.mqtt.MqttTransportHandler;
-
+import lombok.extern.slf4j.Slf4j;
 import java.nio.charset.Charset;
 import java.util.List;
 import java.util.Optional;
@@ -49,7 +47,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 /**
  * Created by ashvayka on 19.01.17.
  */
-
+@Slf4j
 public class GatewayDeviceSessionCtx extends DeviceAwareSessionContext {
 
     private static final Gson GSON = new Gson();

@@ -15,6 +15,7 @@ Data Acqusition
     coap
     http
     witsml
+    sparkplug
 
 =========
 API Usage
