@@ -328,6 +328,16 @@ CREATE TABLE IF NOT EXISTS application_associated_computation_jobs(
     application_computation_job_id varchar(31)
 );
 
+CREATE TABLE IF NOT EXISTS node_metric (
+    id varchar (31) NOT NULL CONSTRAINT node_metric_pkey PRIMARY KEY,
+    host varchar NOT NULL,
+    port integer NOT NULL,
+    status varchar,
+    rpc_session_count integer DEFAULT 0,
+    device_session_count integer DEFAULT 0,
+    CONSTRAINT unq_node UNIQUE (host, port)
+);
+
 CREATE TABLE IF NOT EXISTS computations (
     id varchar(31) NOT NULL CONSTRAINT computations_pkey PRIMARY KEY,
     jar_name varchar,

@@ -18,15 +18,16 @@ export default angular.module('tempus.api.ui_configuration', [])
   .name;
 
 /*@ngInject*/
-function UiConfiguration($http, $q, $log) {
+function UiConfiguration($http, $q, $log, $timeout) {
     var configs;
 
     var service = {
       getUiConfiguration : getUiConfiguration,
       isDepthSeriesEnabled: isDepthSeriesEnabled
     }
-
-    getUiConfiguration();
+    $timeout( function(){
+        getUiConfiguration();
+    }, 1000 );
     return service;
 
     function getUiConfiguration() {

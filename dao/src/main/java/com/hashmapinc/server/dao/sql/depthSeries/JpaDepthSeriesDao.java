@@ -169,7 +169,6 @@ public class JpaDepthSeriesDao extends JpaAbstractDaoListeningExecutorService im
             }
         });
         return Futures.transform(listenableFuture, new Function<DsKvEntity, Optional<DsKvEntry>>() {
-            @Nullable
             @Override
             public Optional<DsKvEntry> apply(@Nullable DsKvEntity entity) {
                 if (entity != null && entity.isNotEmpty()) {

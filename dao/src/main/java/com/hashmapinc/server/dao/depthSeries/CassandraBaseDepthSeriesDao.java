@@ -136,7 +136,10 @@ public class CassandraBaseDepthSeriesDao extends CassandraAbstractAsyncDao imple
                 @Nullable
                 @Override
                 public List<DsKvEntry> apply(@Nullable List<Optional<DsKvEntry>> input) {
-                    return input.stream().filter(v -> v.isPresent()).map(v -> v.get()).collect(Collectors.toList());
+                    if(input != null)
+                        return input.stream().filter(v -> v.isPresent()).map(v -> v.get()).collect(Collectors.toList());
+                    else
+                        return Collections.emptyList();
                 }
             }, readResultsProcessingExecutor);
         }
@@ -189,7 +192,7 @@ public class CassandraBaseDepthSeriesDao extends CassandraAbstractAsyncDao imple
             Futures.addCallback(executeAsyncRead(stmt), new FutureCallback<ResultSet>() {
                 @Override
                 public void onSuccess(@Nullable ResultSet result) {
-                    cursor.addData(convertResultToDsKvEntryList(result.all()));
+                    cursor.addData(convertResultToDsKvEntryList(result == null ? Collections.emptyList() : result.all()));
                     findAllAsyncSequentiallyWithLimit(cursor, resultFuture);
                 }
 
@@ -627,22 +630,38 @@ public class CassandraBaseDepthSeriesDao extends CassandraAbstractAsyncDao imple
         }
     }
 
+
     private static void addValue(KvEntry kvEntry, BoundStatement stmt, int column) {
         switch (kvEntry.getDataType()) {
             case BOOLEAN:
-                stmt.setBool(column, kvEntry.getBooleanValue().get().booleanValue());
+                Optional<Boolean> booleanValue = kvEntry.getBooleanValue();
+                if (booleanValue.isPresent()) {
+                    stmt.setBool(column, booleanValue.get().booleanValue());
+                }
                 break;
             case STRING:
-                stmt.setString(column, kvEntry.getStrValue().get());
+                Optional<String> stringValue = kvEntry.getStrValue();
+                if (stringValue.isPresent()) {
+                    stmt.setString(column, stringValue.get());
+                }
                 break;
             case LONG:
-                stmt.setLong(column, kvEntry.getLongValue().get().longValue());
+                Optional<Long> longValue = kvEntry.getLongValue();
+                if (longValue.isPresent()) {
+                    stmt.setLong(column, longValue.get().longValue());
+                }
                 break;
             case DOUBLE:
-                stmt.setDouble(column, kvEntry.getDoubleValue().get().doubleValue());
+                Optional<Double> doubleValue = kvEntry.getDoubleValue();
+                if (doubleValue.isPresent()) {
+                    stmt.setDouble(column, doubleValue.get().doubleValue());
+                }
                 break;
             case JSON:
-                stmt.setString(column, kvEntry.getJsonValue().get().toString());
+                Optional<JsonNode> jsonNodeValue =  kvEntry.getJsonValue();
+                if(jsonNodeValue.isPresent()) {
+                    stmt.setString(column, jsonNodeValue.get().toString());
+                }
                 break;
         }
     }

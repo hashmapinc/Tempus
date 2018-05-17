@@ -50,10 +50,13 @@ public class SessionManagerActor extends ContextAwareActor {
 
     private Map<String, List<DeviceSessionInfo>> deviceSessionInfoMap;
 
-    public SessionManagerActor(ActorSystemContext systemContext) {
+    private final ActorRef nodeMetricActor;
+
+    public SessionManagerActor(ActorSystemContext systemContext, ActorRef nodeMetricActor) {
         super(systemContext);
         this.sessionActors = new HashMap<>(INITIAL_SESSION_MAP_SIZE);
         this.deviceSessionInfoMap = new HashMap<>();
+        this.nodeMetricActor = nodeMetricActor;
     }
 
     @Override
@@ -198,7 +201,7 @@ public class SessionManagerActor extends ContextAwareActor {
         if (sessionActor == null) {
             log.debug("[{}] Creating session actor.", sessionIdStr);
             sessionActor = context().actorOf(
-                    Props.create(new SessionActor.ActorCreator(systemContext, sessionId)).withDispatcher(DefaultActorService.SESSION_DISPATCHER_NAME),
+                    Props.create(new SessionActor.ActorCreator(systemContext, sessionId, nodeMetricActor)).withDispatcher(DefaultActorService.SESSION_DISPATCHER_NAME),
                     sessionIdStr);
             sessionActors.put(sessionIdStr, sessionActor);
             log.debug("[{}] Created session actor.", sessionIdStr);
@@ -219,13 +222,16 @@ public class SessionManagerActor extends ContextAwareActor {
     public static class ActorCreator extends ContextBasedCreator<SessionManagerActor> {
         private static final long serialVersionUID = 1L;
 
-        public ActorCreator(ActorSystemContext context) {
+        private final ActorRef nodeMetricActor;
+
+        public ActorCreator(ActorSystemContext context, ActorRef nodeMetricActor) {
             super(context);
+            this.nodeMetricActor = nodeMetricActor;
         }
 
         @Override
         public SessionManagerActor create() throws Exception {
-            return new SessionManagerActor(context);
+            return new SessionManagerActor(context, nodeMetricActor);
         }
     }
 
