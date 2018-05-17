@@ -152,7 +152,7 @@ export function TempusboardController($scope, $log, $state, $stateParams, userSe
             newSubscriptionId = attributeService.subscribeForEntityAttributes($scope.entityType, $scope.entityId, $scope.attributeScope.value);
         }
         if ($scope.subscriptionId && $scope.subscriptionId != newSubscriptionId) {
-            attributeService.unsubscribeForEntityAttributes($scope.subscriptionId);
+       //     attributeService.unsubscribeForEntityAttributes($scope.subscriptionId);
         }
         $scope.subscriptionId = newSubscriptionId;
         subscriptionIdMap[$scope.entityId] = newSubscriptionId;
@@ -183,30 +183,8 @@ export function TempusboardController($scope, $log, $state, $stateParams, userSe
                         if (vm.devices[i].type === deviceType.type){
                             entityService.getEntityKeys('DEVICE', vm.devices[i].id.id, null, 'timeseries', {ignoreLoading: true}).then(
                                 function success(keys) {
-                                    if(vm.tempusboardSettings === null) {
-                                        vm.allDeviceTypes.push({
-                                            type: deviceType.type,
-                                            selectedItem: null,
-                                            selected: keys.slice(0,4),
-                                            tags: keys
-                                        });
-                                    }
-                                    else {
-                                        var newType = true;
-                                        if(vm.tempusboardSettings.jsonValue.length > 0 ){ 
-                                            vm.tempusboardSettings.jsonValue.forEach(function(dType){     
-                                                if(dType.type === deviceType.type){
-                                                    newType = false;
-                                                    vm.allDeviceTypes.push({
-                                                        type: deviceType.type,
-                                                        selectedItem: null,
-                                                        selected: dType.selected,
-                                                        tags: keys
-                                                    });
-                                                }
-                                            });
-                                        }
-                                        if(newType){
+                                    if(keys.length > 0){
+                                        if(vm.tempusboardSettings === null || vm.tempusboardSettings === '') {
                                             vm.allDeviceTypes.push({
                                                 type: deviceType.type,
                                                 selectedItem: null,
@@ -214,8 +192,32 @@ export function TempusboardController($scope, $log, $state, $stateParams, userSe
                                                 tags: keys
                                             });
                                         }
+                                        else {
+                                            var newType = true;
+                                            if(vm.tempusboardSettings.jsonValue.length > 0 ){ 
+                                                vm.tempusboardSettings.jsonValue.forEach(function(dType){     
+                                                    if(dType.type === deviceType.type){
+                                                        newType = false;
+                                                        vm.allDeviceTypes.push({
+                                                            type: deviceType.type,
+                                                            selectedItem: null,
+                                                            selected: dType.selected,
+                                                            tags: keys
+                                                        });
+                                                    }
+                                                });
+                                            }
+                                            if(newType){
+                                                vm.allDeviceTypes.push({
+                                                    type: deviceType.type,
+                                                    selectedItem: null,
+                                                    selected: keys.slice(0,4),
+                                                    tags: keys
+                                                });
+                                            }
+                                        }
+                                        
                                     }
-                                    
                                 },
                                 function fail() {
                                     vm.configurationError = true;
@@ -225,16 +227,16 @@ export function TempusboardController($scope, $log, $state, $stateParams, userSe
                         }
                     }
                 })
-                vm.devices.forEach(function(device, index, theArray){
-                    theArray[index].subscriptionId = $scope.entityType + device.id.id + $scope.attributeScope.value;
-                    $scope.query = {limit:100, order:"key", page:1, search:null};
-                    $scope.entityId = device.id.id;
-                    getEntityAttributes(true, false);
-                })
             }, function fail() {
                 vm.configurationError = true;
         });
 
+        vm.devices.forEach(function(device, index, theArray){
+            theArray[index].subscriptionId = $scope.entityType + device.id.id + $scope.attributeScope.value;
+            $scope.query = {limit:100, order:"key", page:1, search:null};
+            $scope.entityId = device.id.id;
+            getEntityAttributes(true, false);
+        })
         vm.searchText = null;
 
     if(angular.isDefined(vm.devices[0])){
@@ -275,7 +277,7 @@ export function TempusboardController($scope, $log, $state, $stateParams, userSe
                 })
             });
             if(angular.isDefined(newValue) && newValue.length > 0){
-                if(vm.tempusboardSettings === null){
+                if(vm.tempusboardSettings === null || vm.tempusboardSettings === ''){
                     tempusboardService.saveTempusboardSettings({key : user.userId, jsonValue: newValue}).then(
                         function success(settings) {
                              vm.tempusboardSettings = settings;
