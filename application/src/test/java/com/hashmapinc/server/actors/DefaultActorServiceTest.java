@@ -15,63 +15,60 @@
  */
 package com.hashmapinc.server.actors;
 
-import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
-import java.util.*;
-
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.util.concurrent.Futures;
+import com.hashmapinc.server.actors.service.DefaultActorService;
+import com.hashmapinc.server.common.data.DataConstants;
+import com.hashmapinc.server.common.data.Device;
+import com.hashmapinc.server.common.data.Tenant;
+import com.hashmapinc.server.common.data.computation.Computations;
 import com.hashmapinc.server.common.data.id.*;
+import com.hashmapinc.server.common.data.kv.BasicTsKvEntry;
+import com.hashmapinc.server.common.data.kv.KvEntry;
+import com.hashmapinc.server.common.data.kv.StringDataEntry;
+import com.hashmapinc.server.common.data.kv.TsKvEntry;
+import com.hashmapinc.server.common.data.page.TextPageData;
 import com.hashmapinc.server.common.data.plugin.ComponentDescriptor;
+import com.hashmapinc.server.common.data.plugin.ComponentLifecycleState;
+import com.hashmapinc.server.common.data.plugin.ComponentType;
+import com.hashmapinc.server.common.data.plugin.PluginMetaData;
+import com.hashmapinc.server.common.data.rule.RuleMetaData;
+import com.hashmapinc.server.common.data.security.DeviceCredentialsFilter;
 import com.hashmapinc.server.common.data.security.DeviceTokenCredentials;
+import com.hashmapinc.server.common.msg.core.BasicTelemetryUploadRequest;
 import com.hashmapinc.server.common.msg.session.BasicAdaptorToSessionActorMsg;
 import com.hashmapinc.server.common.msg.session.BasicToDeviceActorSessionMsg;
 import com.hashmapinc.server.common.msg.session.SessionContext;
 import com.hashmapinc.server.common.msg.session.SessionType;
-import com.hashmapinc.server.dao.attributes.AttributesService;
-import com.hashmapinc.server.gen.discovery.ServerInstanceProtos;
-import com.hashmapinc.server.service.cluster.discovery.ServerInstance;
-import com.hashmapinc.server.actors.service.DefaultActorService;
-import com.hashmapinc.server.common.data.id.*;
-import com.hashmapinc.server.common.data.kv.TsKvEntry;
-import com.hashmapinc.server.common.data.page.TextPageData;
-import com.hashmapinc.server.common.data.plugin.ComponentLifecycleState;
-import com.hashmapinc.server.common.data.plugin.ComponentType;
-import com.hashmapinc.server.common.msg.session.*;
-import com.hashmapinc.server.dao.event.EventService;
-import com.hashmapinc.server.service.cluster.discovery.DiscoveryService;
-import com.hashmapinc.server.service.cluster.routing.ClusterRoutingService;
-import com.hashmapinc.server.service.cluster.rpc.ClusterRpcService;
-import com.hashmapinc.server.service.component.ComponentDiscoveryService;
 import com.hashmapinc.server.common.transport.auth.DeviceAuthResult;
 import com.hashmapinc.server.common.transport.auth.DeviceAuthService;
-import com.hashmapinc.server.common.data.DataConstants;
-import com.hashmapinc.server.common.data.Device;
-import com.hashmapinc.server.common.data.Tenant;
-import com.hashmapinc.server.common.data.kv.BasicTsKvEntry;
-import com.hashmapinc.server.common.data.kv.KvEntry;
-import com.hashmapinc.server.common.data.kv.StringDataEntry;
-import com.hashmapinc.server.common.data.plugin.PluginMetaData;
-import com.hashmapinc.server.common.data.rule.RuleMetaData;
-import com.hashmapinc.server.common.data.security.DeviceCredentialsFilter;
-import com.hashmapinc.server.common.msg.core.BasicTelemetryUploadRequest;
+import com.hashmapinc.server.dao.attributes.AttributesService;
+import com.hashmapinc.server.dao.computations.ComputationsService;
 import com.hashmapinc.server.dao.device.DeviceService;
+import com.hashmapinc.server.dao.event.EventService;
 import com.hashmapinc.server.dao.model.ModelConstants;
 import com.hashmapinc.server.dao.plugin.PluginService;
 import com.hashmapinc.server.dao.rule.RuleService;
 import com.hashmapinc.server.dao.tenant.TenantService;
 import com.hashmapinc.server.dao.timeseries.TimeseriesService;
 import com.hashmapinc.server.extensions.core.plugin.telemetry.TelemetryStoragePlugin;
+import com.hashmapinc.server.gen.discovery.ServerInstanceProtos;
+import com.hashmapinc.server.service.cluster.discovery.DiscoveryService;
+import com.hashmapinc.server.service.cluster.discovery.ServerInstance;
+import com.hashmapinc.server.service.cluster.routing.ClusterRoutingService;
+import com.hashmapinc.server.service.cluster.rpc.ClusterRpcService;
+import com.hashmapinc.server.service.component.ComponentDiscoveryService;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.springframework.test.util.ReflectionTestUtils;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.*;
+
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.*;
 
 public class DefaultActorServiceTest {
 
@@ -98,13 +95,13 @@ public class DefaultActorServiceTest {
     private ComponentDiscoveryService componentService;
     private EventService eventService;
     private ServerInstance serverInstance;
+    private ComputationsService computationsService;
 
     private RuleMetaData ruleMock;
     private PluginMetaData pluginMock;
     private RuleId ruleId = new RuleId(UUID.randomUUID());
     private PluginId pluginId = new PluginId(UUID.fromString(PLUGIN_ID));
     private TenantId tenantId = new TenantId(UUID.randomUUID());
-
 
     @Before
     public void before() throws Exception {
@@ -123,6 +120,7 @@ public class DefaultActorServiceTest {
         attributesService = mock(AttributesService.class);
         componentService = mock(ComponentDiscoveryService.class);
         eventService = mock(EventService.class);
+        computationsService = mock(ComputationsService.class);
         serverInstance = new ServerInstance(ServerInstanceProtos.ServerInfo.newBuilder().setHost("localhost").setPort(8080).build());
 
         ReflectionTestUtils.setField(actorService, "actorContext", actorContext);
@@ -148,6 +146,7 @@ public class DefaultActorServiceTest {
         ReflectionTestUtils.setField(actorContext, "attributesService", attributesService);
         ReflectionTestUtils.setField(actorContext, "componentService", componentService);
         ReflectionTestUtils.setField(actorContext, "eventService", eventService);
+        ReflectionTestUtils.setField(actorContext, "computationsService", computationsService);
 
 
         when(routingService.resolveById((EntityId) any())).thenReturn(Optional.empty());
@@ -177,6 +176,9 @@ public class DefaultActorServiceTest {
 
         TextPageData<Tenant> tenants = new TextPageData<>(Collections.emptyList(), null, false);
         when(tenantService.findTenants(any())).thenReturn(tenants);
+
+        TextPageData<Computations> computations = new TextPageData<>(Collections.emptyList(), null, false);
+        when(computationsService.findTenantComputations(any(), any())).thenReturn(computations);
     }
 
     private void initActorSystem() {

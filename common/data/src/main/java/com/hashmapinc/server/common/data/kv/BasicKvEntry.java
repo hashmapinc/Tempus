@@ -16,10 +16,13 @@
 package com.hashmapinc.server.common.data.kv;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.hashmapinc.server.common.data.kv.serializers.BasicKvEntryDeserializer;
 
 import java.util.Objects;
 import java.util.Optional;
 
+@JsonDeserialize(using = BasicKvEntryDeserializer.class)
 public abstract class BasicKvEntry implements KvEntry {
 
     private final String key;

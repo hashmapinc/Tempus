@@ -108,7 +108,7 @@ public class AppActor extends ContextAwareActor {
             processDeviceMsg((ToDeviceActorMsg) msg);
         } else if (msg instanceof ToPluginActorMsg) {
             onToPluginMsg((ToPluginActorMsg) msg);
-        } else if (msg instanceof ToRuleActorMsg) {
+        } else if (msg instanceof ToRuleActorMsg) { //This is an ACK from plugin
             onToRuleMsg((ToRuleActorMsg) msg);
         } else if (msg instanceof ToDeviceActorNotificationMsg) {
             onToDeviceActorMsg((ToDeviceActorNotificationMsg) msg);

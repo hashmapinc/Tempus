@@ -15,11 +15,16 @@
  */
 package com.hashmapinc.server.extensions.core.action.mail;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.hashmapinc.server.common.data.id.CustomerId;
 import com.hashmapinc.server.common.data.id.DeviceId;
 import com.hashmapinc.server.common.data.id.TenantId;
 import com.hashmapinc.server.extensions.api.plugins.msg.AbstractRuleToPluginMsg;
+import com.hashmapinc.server.extensions.api.plugins.msg.RuleToPluginMsg;
 import lombok.Data;
-import com.hashmapinc.server.common.data.id.CustomerId;
+
+import java.util.UUID;
 
 
 @Data
@@ -30,4 +35,19 @@ public class SendMailRuleToPluginActionMsg extends AbstractRuleToPluginMsg<SendM
         super(tenantId, customerId, deviceId, payload);
     }
 
+    @JsonCreator
+    private SendMailRuleToPluginActionMsg(@JsonProperty("uid") UUID id,
+                                          @JsonProperty("tenantId") TenantId tenantId,
+                                          @JsonProperty("customerId") CustomerId customerId,
+                                          @JsonProperty("deviceId") DeviceId deviceId,
+                                          @JsonProperty("payload") SendMailActionMsg payload,
+                                          @JsonProperty("deliveryId") Long deliveryId){
+        super(id, tenantId, customerId, deviceId, payload, deliveryId);
+    }
+
+    @Override
+    public RuleToPluginMsg<SendMailActionMsg> copyDeliveryId(Long deliveryId) {
+        return new SendMailRuleToPluginActionMsg(this.getUid(), this.getTenantId(), this.getCustomerId(),
+                this.getDeviceId(), this.getPayload(), deliveryId);
+    }
 }

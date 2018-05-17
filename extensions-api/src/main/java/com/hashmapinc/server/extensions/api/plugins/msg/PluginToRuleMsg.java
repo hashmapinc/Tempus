@@ -61,4 +61,11 @@ public interface PluginToRuleMsg<V extends Serializable> extends ToRuleActorMsg,
      */
     V getPayload();
 
+    /**
+     * Return delivery id set from RuleToPluginMsg as correlation id
+     *
+     * @return delivery id from RuleToPluginMsg
+     */
+    Long getDeliveryId();
+
 }

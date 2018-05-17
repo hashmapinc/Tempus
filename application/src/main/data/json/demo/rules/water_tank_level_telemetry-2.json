@@ -35,7 +35,7 @@
   "processor": null,
   "action": {
     "configuration": {
-      "sync": false,
+      "sync": true,
       "template": "{\"tankId\":\"$cs.get('tankId')\", \"ts\":\"$waterTankLevel.getTs()\", \"waterTankLevel\":$waterTankLevel.valueAsString}",
       "topic": "water-tank-level-data"
     },

@@ -15,32 +15,31 @@
  */
 package com.hashmapinc.server.actors.rule;
 
-import java.util.*;
-
+import akka.actor.ActorContext;
+import akka.actor.ActorRef;
+import akka.event.LoggingAdapter;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.hashmapinc.server.actors.ActorSystemContext;
 import com.hashmapinc.server.actors.plugin.RuleToPluginMsgWrapper;
+import com.hashmapinc.server.actors.shared.ComponentMsgProcessor;
 import com.hashmapinc.server.common.data.id.PluginId;
 import com.hashmapinc.server.common.data.id.RuleId;
 import com.hashmapinc.server.common.data.id.TenantId;
 import com.hashmapinc.server.common.data.plugin.ComponentLifecycleState;
+import com.hashmapinc.server.common.data.plugin.PluginMetaData;
 import com.hashmapinc.server.common.data.rule.RuleMetaData;
 import com.hashmapinc.server.common.msg.cluster.ClusterEventMsg;
 import com.hashmapinc.server.common.msg.core.RuleEngineError;
+import com.hashmapinc.server.common.msg.device.ToDeviceActorMsg;
 import com.hashmapinc.server.common.msg.session.ToDeviceMsg;
 import com.hashmapinc.server.extensions.api.plugins.PluginAction;
 import com.hashmapinc.server.extensions.api.plugins.msg.PluginToRuleMsg;
 import com.hashmapinc.server.extensions.api.plugins.msg.RuleToPluginMsg;
 import com.hashmapinc.server.extensions.api.rules.*;
 import org.springframework.util.StringUtils;
-import com.hashmapinc.server.actors.shared.ComponentMsgProcessor;
-import com.hashmapinc.server.common.data.plugin.PluginMetaData;
-import com.hashmapinc.server.common.msg.device.ToDeviceActorMsg;
-import com.hashmapinc.server.extensions.api.rules.*;
 
-import akka.actor.ActorContext;
-import akka.actor.ActorRef;
-import akka.event.LoggingAdapter;
+import java.util.*;
+import java.util.function.Consumer;
 
 class RuleActorMessageProcessor extends ComponentMsgProcessor<RuleId> {
 
@@ -55,6 +54,7 @@ class RuleActorMessageProcessor extends ComponentMsgProcessor<RuleId> {
 
     private TenantId pluginTenantId;
     private PluginId pluginId;
+    private List<UUID> unconfirmed;
 
     protected RuleActorMessageProcessor(TenantId tenantId, RuleId ruleId, ActorSystemContext systemContext, LoggingAdapter logger) {
         super(systemContext, logger, tenantId, ruleId);
@@ -135,7 +135,7 @@ class RuleActorMessageProcessor extends ComponentMsgProcessor<RuleId> {
         }
     }
 
-    protected void onRuleProcessingMsg(ActorContext context, RuleProcessingMsg msg) throws RuleException {
+    protected void onRuleProcessingMsg(ActorContext context, RuleProcessingMsg msg, Consumer<RuleToPluginMsg<?>> f) throws RuleException {
         if (state != ComponentLifecycleState.ACTIVE) {
             pushToNextRule(context, msg.getCtx(), RuleEngineError.NO_ACTIVE_RULES);
             return;
@@ -147,7 +147,6 @@ class RuleActorMessageProcessor extends ComponentMsgProcessor<RuleId> {
 
         logger.debug("[{}] Going to filter in msg: {}", entityId, inMsg);
         for (RuleFilter filter : filters) {
-            logger.debug("\n Filter is " + filter);
             if (!filter.filter(ruleCtx, inMsg)) {
                 logger.debug("[{}] In msg is NOT valid for processing by current rule: {}", entityId, inMsg);
                 pushToNextRule(context, msg.getCtx(), RuleEngineError.NO_FILTERS_MATCHED);
@@ -163,16 +162,16 @@ class RuleActorMessageProcessor extends ComponentMsgProcessor<RuleId> {
         }
         logger.debug("[{}] Going to convert in msg: {}", entityId, inMsg);
         if (action != null) {
-            logger.debug("\nInside action \n" + inMsg + "\n");
             Optional<RuleToPluginMsg<?>> ruleToPluginMsgOptional = action.convert(ruleCtx, inMsg, inMsgMd);
             if (ruleToPluginMsgOptional.isPresent()) {
                 RuleToPluginMsg<?> ruleToPluginMsg = ruleToPluginMsgOptional.get();
                 logger.debug("[{}] Device msg is converted to: {}", entityId, ruleToPluginMsg);
-                context.parent().tell(new RuleToPluginMsgWrapper(pluginTenantId, pluginId, tenantId, entityId, ruleToPluginMsg), context.self());
                 if (action.isOneWayAction()) {
+                    context.parent().tell(new RuleToPluginMsgWrapper(pluginTenantId, pluginId, tenantId, entityId, ruleToPluginMsg), context.self());
                     pushToNextRule(context, msg.getCtx(), RuleEngineError.NO_TWO_WAY_ACTIONS);
                     return;
                 } else {
+                    f.accept(ruleToPluginMsg);
                     pendingMsgMap.put(ruleToPluginMsg.getUid(), msg);
                     scheduleMsgWithDelay(context, new RuleToPluginTimeoutMsg(ruleToPluginMsg.getUid()), systemContext.getPluginProcessingTimeout());
                     return;
@@ -181,6 +180,10 @@ class RuleActorMessageProcessor extends ComponentMsgProcessor<RuleId> {
         }
         logger.debug("[{}] Nothing to send to plugin: {}", entityId, pluginId);
         pushToNextRule(context, msg.getCtx(), RuleEngineError.NO_TWO_WAY_ACTIONS);
+    }
+
+    protected RuleToPluginMsgWrapper buildRuleToPluginMessage(RuleToPluginMsg<?> ruleToPluginMsg, Long deliveryId){
+        return new RuleToPluginMsgWrapper(pluginTenantId, pluginId, tenantId, entityId, ruleToPluginMsg.copyDeliveryId(deliveryId));
     }
 
     void onPluginMsg(ActorContext context, PluginToRuleMsg<?> msg) {
@@ -194,8 +197,11 @@ class RuleActorMessageProcessor extends ComponentMsgProcessor<RuleId> {
             } else {
                 pushToNextRule(context, ctx, RuleEngineError.NO_RESPONSE_FROM_ACTIONS);
             }
+        }else if(unconfirmed.contains(msg.getUid())) {
+            logger.info("[{}] Unconfirmed message confirmed: [{}]", entityId, msg.getUid());
+            unconfirmed.remove(msg.getUid());
         } else {
-            logger.warning("[{}] Processing timeout detected: [{}]", entityId, msg.getUid());
+            logger.warning("[{}] Processing timeout detected: [{}] delivery id {}", entityId, msg.getUid(), msg.getDeliveryId());
         }
     }
 
@@ -208,14 +214,23 @@ class RuleActorMessageProcessor extends ComponentMsgProcessor<RuleId> {
         }
     }
 
+    protected boolean shouldPersistMessage(){
+        return state == ComponentLifecycleState.ACTIVE && !action.isOneWayAction();
+    }
+
+    protected void setUnconfirmed(List<UUID> unconfirmed){
+        this.unconfirmed = unconfirmed;
+    }
+
     private void pushToNextRule(ActorContext context, ChainProcessingContext ctx, RuleEngineError error) {
         if (error != null) {
             ctx = ctx.withError(error);
         }
-        if (ctx.isFailure()) {
+        /*if (ctx.isFailure()) {
             logger.debug("[{}][{}] Forwarding processing chain to device actor due to failure.", ruleMd.getId(), ctx.getInMsg().getDeviceId());
             ctx.getDeviceActor().tell(new RulesProcessedMsg(ctx), ActorRef.noSender());
-        } else if (!ctx.hasNext()) {
+        } else */
+        if (!ctx.hasNext()) {
             logger.debug("[{}][{}] Forwarding processing chain to device actor due to end of chain.", ruleMd.getId(), ctx.getInMsg().getDeviceId());
             ctx.getDeviceActor().tell(new RulesProcessedMsg(ctx), ActorRef.noSender());
         } else {

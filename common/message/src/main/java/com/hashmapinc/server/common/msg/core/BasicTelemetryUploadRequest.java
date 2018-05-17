@@ -20,6 +20,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.hashmapinc.server.common.msg.session.MsgType;
 import com.hashmapinc.server.common.data.kv.KvEntry;
 
@@ -33,7 +36,8 @@ public class BasicTelemetryUploadRequest extends BasicRequest implements Telemet
         this(DEFAULT_REQUEST_ID);
     }
 
-    public BasicTelemetryUploadRequest(Integer requestId) {
+    @JsonCreator
+    public BasicTelemetryUploadRequest(@JsonProperty("requestId") Integer requestId) {
         super(requestId);
         this.data = new HashMap<>();
     }
@@ -47,6 +51,7 @@ public class BasicTelemetryUploadRequest extends BasicRequest implements Telemet
         tsEntries.add(entry);
     }
 
+    @JsonIgnore
     @Override
     public MsgType getMsgType() {
         return MsgType.POST_TELEMETRY_REQUEST;

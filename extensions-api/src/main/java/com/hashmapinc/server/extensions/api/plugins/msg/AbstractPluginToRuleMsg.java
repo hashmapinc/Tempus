@@ -29,13 +29,15 @@ public class AbstractPluginToRuleMsg<T extends Serializable> implements PluginTo
     private final TenantId tenantId;
     private final RuleId ruleId;
     private final T payload;
+    private final Long deliveryId;
 
-    public AbstractPluginToRuleMsg(UUID uid, TenantId tenantId, RuleId ruleId, T payload) {
+    public AbstractPluginToRuleMsg(UUID uid, TenantId tenantId, RuleId ruleId, T payload, Long deliveryId) {
         super();
         this.uid = uid;
         this.tenantId = tenantId;
         this.ruleId = ruleId;
         this.payload = payload;
+        this.deliveryId = deliveryId;
     }
 
     @Override
@@ -51,6 +53,11 @@ public class AbstractPluginToRuleMsg<T extends Serializable> implements PluginTo
     @Override
     public T getPayload() {
         return payload;
+    }
+
+    @Override
+    public Long getDeliveryId() {
+        return deliveryId;
     }
 
     @Override

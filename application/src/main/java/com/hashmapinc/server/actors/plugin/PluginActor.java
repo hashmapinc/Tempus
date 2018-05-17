@@ -17,6 +17,7 @@ package com.hashmapinc.server.actors.plugin;
 
 import akka.actor.ActorContext;
 import akka.actor.ActorRef;
+import akka.japi.JavaPartialFunction;
 import com.hashmapinc.server.extensions.api.plugins.msg.TimeoutMsg;
 import com.hashmapinc.server.actors.ActorSystemContext;
 import com.hashmapinc.server.actors.service.ComponentActor;
@@ -31,6 +32,8 @@ import com.hashmapinc.server.extensions.api.plugins.rest.PluginRestMsg;
 import com.hashmapinc.server.extensions.api.plugins.rpc.PluginRpcMsg;
 import com.hashmapinc.server.extensions.api.plugins.ws.msg.PluginWebsocketMsg;
 import com.hashmapinc.server.extensions.api.rules.RuleException;
+import scala.PartialFunction;
+import scala.runtime.BoxedUnit;
 
 public class PluginActor extends ComponentActor<PluginId, PluginActorMessageProcessor> {
 
@@ -49,7 +52,6 @@ public class PluginActor extends ComponentActor<PluginId, PluginActorMessageProc
         } else if (msg instanceof PluginCallbackMessage) {
             onPluginCallback((PluginCallbackMessage) msg);
         } else if (msg instanceof RuleToPluginMsgWrapper) {
-            logger.debug("\n msg type is RuleToPluginMsgWrapper" + msg);
             onRuleToPluginMsg((RuleToPluginMsgWrapper) msg);
         } else if (msg instanceof PluginRpcMsg) {
             onRpcMsg((PluginRpcMsg) msg);

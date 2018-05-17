@@ -63,7 +63,7 @@ public abstract class PluginManager {
 
     public ActorRef getOrCreatePluginActor(ActorContext context, PluginId pluginId) {
         return pluginActors.computeIfAbsent(pluginId, pId ->
-                context.actorOf(Props.create(new PluginActor.ActorCreator(systemContext, getTenantId(), pId))
+                context.actorOf(Props.create(PluginActor.class, new PluginActor.ActorCreator(systemContext, getTenantId(), pId))
                         .withDispatcher(getDispatcherName()), pId.toString()));
     }
 

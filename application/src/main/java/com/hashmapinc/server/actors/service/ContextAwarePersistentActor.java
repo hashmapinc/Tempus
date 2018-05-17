@@ -13,24 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.hashmapinc.server.common.msg.core;
+package com.hashmapinc.server.actors.service;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.hashmapinc.server.common.msg.session.FromDeviceMsg;
-import com.hashmapinc.server.common.msg.session.MsgType;
-import lombok.Data;
+import akka.persistence.AbstractPersistentActorWithAtLeastOnceDelivery;
+import com.hashmapinc.server.actors.ActorSystemContext;
 
+public abstract class ContextAwarePersistentActor extends AbstractPersistentActorWithAtLeastOnceDelivery {
+    public static final int ENTITY_PACK_LIMIT = 1024;
 
-@Data
-public class ToServerRpcRequestMsg implements FromDeviceMsg {
+    protected final ActorSystemContext systemContext;
 
-    private final int requestId;
-    private final String method;
-    private final String params;
-
-    @JsonIgnore
-    @Override
-    public MsgType getMsgType() {
-        return MsgType.TO_SERVER_RPC_REQUEST;
+    public ContextAwarePersistentActor(ActorSystemContext systemContext) {
+        super();
+        this.systemContext = systemContext;
     }
 }

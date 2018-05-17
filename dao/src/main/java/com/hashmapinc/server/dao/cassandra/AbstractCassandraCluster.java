@@ -18,8 +18,7 @@ package com.hashmapinc.server.dao.cassandra;
 
 import com.datastax.driver.core.*;
 import com.datastax.driver.core.ProtocolOptions.Compression;
-import com.datastax.driver.mapping.Mapper;
-import com.datastax.driver.mapping.MappingManager;
+import com.datastax.driver.mapping.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -145,7 +144,7 @@ public abstract class AbstractCassandraCluster {
                 } else {
                     session = cluster.connect();
                 }
-                mappingManager = new MappingManager(session);
+                mappingManager = new MappingManager(session, configurations());
                 break;
             } catch (Exception e) {
                 log.warn("Failed to initialize cassandra cluster due to {}. Will retry in {} ms", e.getMessage(), initRetryInterval);
@@ -157,6 +156,14 @@ public abstract class AbstractCassandraCluster {
                 }
             }
         }
+    }
+
+    private MappingConfiguration configurations(){
+        DefaultPropertyMapper mapper = new DefaultPropertyMapper()
+                .setPropertyTransienceStrategy(PropertyTransienceStrategy.OPT_IN)
+                .setNamingStrategy(new DefaultNamingStrategy(
+                        NamingConventions.LOWER_CAMEL_CASE, NamingConventions.LOWER_SNAKE_CASE));
+        return MappingConfiguration.builder().withPropertyMapper(mapper).build();
     }
 
     @PreDestroy

@@ -15,11 +15,13 @@
  */
 package com.hashmapinc.server.mqtt;
 
+import com.hashmapinc.server.dao.CustomCassandraCQLUnit;
 import com.hashmapinc.server.dao.CustomSqlUnit;
 import org.junit.ClassRule;
 import org.junit.extensions.cpsuite.ClasspathSuite;
 import org.junit.runner.RunWith;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 
 @RunWith(ClasspathSuite.class)
@@ -33,4 +35,11 @@ public class MqttSqlTestSuite {
             "sql/drop-all-tables.sql",
             "sql-test.properties",
             Arrays.asList("sql/upgrade/1.sql", "sql/upgrade/2.sql"));
+
+    //This will be needed for akka-persistence
+    @ClassRule
+    public static CustomCassandraCQLUnit cassandraUnit =
+            new CustomCassandraCQLUnit(
+                    new ArrayList<>(),
+                    "cassandra-test.yaml", 30000l);
 }

@@ -15,6 +15,8 @@
  */
 package com.hashmapinc.server.extensions.api.plugins.msg;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.hashmapinc.server.common.data.id.RuleId;
 import com.hashmapinc.server.common.data.id.TenantId;
 import com.hashmapinc.server.common.msg.session.ToDeviceMsg;
@@ -25,8 +27,13 @@ public class ResponsePluginToRuleMsg extends AbstractPluginToRuleMsg<ToDeviceMsg
 
     private static final long serialVersionUID = 1L;
 
-    public ResponsePluginToRuleMsg(UUID uid, TenantId tenantId, RuleId ruleId, ToDeviceMsg payload) {
-        super(uid, tenantId, ruleId, payload);
+    @JsonCreator
+    public ResponsePluginToRuleMsg(@JsonProperty("uid") UUID uid,
+                                   @JsonProperty("tenantId") TenantId tenantId,
+                                   @JsonProperty("ruleId") RuleId ruleId,
+                                   @JsonProperty("payload") ToDeviceMsg payload,
+                                   @JsonProperty("deliveryId") Long deliveryId) {
+        super(uid, tenantId, ruleId, payload, deliveryId);
     }
 
 }

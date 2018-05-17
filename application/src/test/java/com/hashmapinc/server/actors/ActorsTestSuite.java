@@ -15,11 +15,21 @@
  */
 package com.hashmapinc.server.actors;
 
+import com.hashmapinc.server.dao.CustomCassandraCQLUnit;
+import org.junit.ClassRule;
 import org.junit.extensions.cpsuite.ClasspathSuite;
 import org.junit.runner.RunWith;
+
+import java.util.ArrayList;
 
 
 @RunWith(ClasspathSuite.class)
 @ClasspathSuite.ClassnameFilters({"com.hashmapinc.server.actors.*Test"})
 public class ActorsTestSuite {
+    //This will be needed for akka-persistence
+    @ClassRule
+    public static CustomCassandraCQLUnit cassandraUnit =
+            new CustomCassandraCQLUnit(
+                    new ArrayList<>(),
+                    "cassandra-test.yaml", 30000l);
 }

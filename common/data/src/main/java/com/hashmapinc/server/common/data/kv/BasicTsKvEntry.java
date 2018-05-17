@@ -15,20 +15,28 @@
  */
 package com.hashmapinc.server.common.data.kv;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.JsonNode;
+
 import java.util.Objects;
 import java.util.Optional;
 
 public class BasicTsKvEntry implements TsKvEntry {
 
+    @JsonProperty
     private final long ts;
+    @JsonProperty
     private final KvEntry kv;
 
-    public BasicTsKvEntry(long ts, KvEntry kv) {
+    @JsonCreator
+    public BasicTsKvEntry(@JsonProperty("ts") long ts, @JsonProperty("kv") KvEntry kv) {
         this.ts = ts;
         this.kv = kv;
     }
 
+    @JsonIgnore
     @Override
     public String getKey() {
         return kv.getKey();
@@ -64,6 +72,7 @@ public class BasicTsKvEntry implements TsKvEntry {
         return kv.getJsonValue();
     }
 
+    @JsonIgnore
     @Override
     public Object getValue() {
         return kv.getValue();

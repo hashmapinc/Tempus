@@ -15,6 +15,8 @@
  */
 package com.hashmapinc.server.common.msg.core;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.hashmapinc.server.common.msg.session.MsgType;
 
 public class BasicCommandAckResponse extends BasicResponseMsg<Integer> implements StatusCodeResponse {
@@ -33,8 +35,13 @@ public class BasicCommandAckResponse extends BasicResponseMsg<Integer> implement
         return new BasicCommandAckResponse(requestMsgType, requestId, false, error, null);
     }
 
-    private BasicCommandAckResponse(MsgType requestMsgType, Integer requestId, boolean success, Exception error, Integer code) {
-        super(requestMsgType, requestId, MsgType.TO_DEVICE_RPC_RESPONSE_ACK, success, error, code);
+    @JsonCreator
+    private BasicCommandAckResponse(@JsonProperty("requestMsgType") MsgType requestMsgType,
+                                    @JsonProperty("requestId") Integer requestId,
+                                    @JsonProperty("success") boolean success,
+                                    @JsonProperty("error") Exception error,
+                                    @JsonProperty("data") Integer data) {
+        super(requestMsgType, requestId, MsgType.TO_DEVICE_RPC_RESPONSE_ACK, success, error, data);
     }
 
     @Override

@@ -23,12 +23,16 @@ import com.hashmapinc.server.extensions.api.device.DeviceAttributes;
 import com.hashmapinc.server.common.msg.device.ToDeviceActorMsg;
 import com.hashmapinc.server.extensions.api.device.DeviceMetaData;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class ChainProcessingContext {
 
     private final ChainProcessingMetaData md;
     private final int index;
     private final RuleEngineError error;
     private ToDeviceMsg response;
+    private List<ToDeviceMsg> responses;
 
 
     public ChainProcessingContext(ChainProcessingMetaData md) {
@@ -36,6 +40,7 @@ public class ChainProcessingContext {
         this.md = md;
         this.index = 0;
         this.error = RuleEngineError.NO_RULES;
+        this.responses = new ArrayList<>();
     }
 
     private ChainProcessingContext(ChainProcessingContext other, int indexOffset, RuleEngineError error) {
@@ -43,6 +48,7 @@ public class ChainProcessingContext {
         this.md = other.md;
         this.index = other.index + indexOffset;
         this.error = error;
+        this.responses = other.responses;
         this.response = other.response;
 
         if (this.index < 0 || this.index >= this.md.chain.size()) {
@@ -107,7 +113,9 @@ public class ChainProcessingContext {
     }
 
     public void mergeResponse(ToDeviceMsg response) {
-        // TODO add merge logic
+        if(this.response != null) {
+            this.responses.add(this.response);
+        }
         this.response = response;
     }
 

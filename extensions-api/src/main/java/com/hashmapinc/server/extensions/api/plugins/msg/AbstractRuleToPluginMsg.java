@@ -15,9 +15,9 @@
  */
 package com.hashmapinc.server.extensions.api.plugins.msg;
 
+import com.hashmapinc.server.common.data.id.CustomerId;
 import com.hashmapinc.server.common.data.id.DeviceId;
 import com.hashmapinc.server.common.data.id.TenantId;
-import com.hashmapinc.server.common.data.id.CustomerId;
 
 import java.io.Serializable;
 import java.util.UUID;
@@ -31,6 +31,7 @@ public abstract class AbstractRuleToPluginMsg<T extends Serializable> implements
     private final CustomerId customerId;
     private final DeviceId deviceId;
     private final T payload;
+    private final Long deliveryId;
 
     public AbstractRuleToPluginMsg(TenantId tenantId, CustomerId customerId, DeviceId deviceId, T payload) {
         super();
@@ -39,6 +40,17 @@ public abstract class AbstractRuleToPluginMsg<T extends Serializable> implements
         this.customerId = customerId;
         this.deviceId = deviceId;
         this.payload = payload;
+        this.deliveryId = -1L;
+    }
+
+    public AbstractRuleToPluginMsg(UUID id, TenantId tenantId, CustomerId customerId, DeviceId deviceId, T payload, Long deliveryId) {
+        super();
+        this.uid = id;
+        this.tenantId = tenantId;
+        this.customerId = customerId;
+        this.deviceId = deviceId;
+        this.payload = payload;
+        this.deliveryId = deliveryId;
     }
 
     @Override
@@ -61,6 +73,11 @@ public abstract class AbstractRuleToPluginMsg<T extends Serializable> implements
 
     public T getPayload() {
         return payload;
+    }
+
+    @Override
+    public Long getDeliveryId() {
+        return deliveryId;
     }
 
     @Override

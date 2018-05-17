@@ -18,17 +18,22 @@ package com.hashmapinc.server.actors.service;
 import akka.actor.ActorRef;
 import akka.event.Logging;
 import akka.event.LoggingAdapter;
+import akka.japi.JavaPartialFunction;
 import com.hashmapinc.server.actors.ActorSystemContext;
+import com.hashmapinc.server.actors.shared.ComponentMsgProcessor;
 import com.hashmapinc.server.actors.stats.StatsPersistMsg;
 import com.hashmapinc.server.common.data.id.EntityId;
 import com.hashmapinc.server.common.data.id.TenantId;
 import com.hashmapinc.server.common.data.plugin.ComponentLifecycleEvent;
 import com.hashmapinc.server.common.msg.cluster.ClusterEventMsg;
-import com.hashmapinc.server.actors.shared.ComponentMsgProcessor;
 import com.hashmapinc.server.common.msg.plugin.ComponentLifecycleMsg;
+import scala.PartialFunction;
+import scala.concurrent.duration.Duration;
+import scala.concurrent.duration.FiniteDuration;
+import scala.runtime.BoxedUnit;
 
 
-public abstract class ComponentActor<T extends EntityId, P extends ComponentMsgProcessor<T>> extends ContextAwareActor {
+public abstract class ComponentActor<T extends EntityId, P extends ComponentMsgProcessor<T>> extends ContextAwarePersistentActor {
 
     protected final LoggingAdapter logger = Logging.getLogger(getContext().system(), this);
 
@@ -38,6 +43,8 @@ public abstract class ComponentActor<T extends EntityId, P extends ComponentMsgP
     protected P processor;
     private long messagesProcessed;
     private long errorsOccurred;
+    //TODO: Configure this in YAML
+    protected final long snapshotInterval = 100;
 
     public ComponentActor(ActorSystemContext systemContext, TenantId tenantId, T id) {
         super(systemContext);
@@ -83,6 +90,33 @@ public abstract class ComponentActor<T extends EntityId, P extends ComponentMsgP
             logAndPersist("OnStop", e, true);
             logLifecycleEvent(ComponentLifecycleEvent.STOPPED, e);
         }
+    }
+
+    @Override
+    public PartialFunction<Object, BoxedUnit> receiveRecover() {
+        return new JavaPartialFunction<Object, BoxedUnit>() {
+            @Override
+            public BoxedUnit apply(Object msg, boolean isCheck) throws Exception {
+                return BoxedUnit.UNIT;
+            }
+        };
+    }
+
+    @Override
+    public PartialFunction<Object, BoxedUnit> receiveCommand() {
+
+        return new JavaPartialFunction<Object, BoxedUnit>() {
+            @Override
+            public BoxedUnit apply(Object msg, boolean isCheck) throws Exception {
+                onReceive(msg);
+                return BoxedUnit.UNIT;
+            }
+        };
+    }
+
+    @Override
+    public String persistenceId() {
+        return id.getId().toString();
     }
 
     protected void onComponentLifecycleMsg(ComponentLifecycleMsg msg) {
@@ -166,5 +200,15 @@ public abstract class ComponentActor<T extends EntityId, P extends ComponentMsgP
         systemContext.persistLifecycleEvent(tenantId, id, event, e);
     }
 
+    /**
+     * We needed to make sure actor is not redelivering message before plugin times out or responds with ack
+     * @return 10 millis greater than plugin timeout
+     */
+    @Override
+    public FiniteDuration redeliverInterval() {
+        return Duration.apply( systemContext.getPluginProcessingTimeout() + 10L,"milli");
+    }
+
     protected abstract long getErrorPersistFrequency();
+    protected abstract void onReceive(Object msg) throws Exception;
 }

@@ -129,7 +129,7 @@ public class ComputationActor extends ContextAwareActor {
 
     private ActorRef getOrCreateComputationJobActor(ComputationJobId computationJobId) {
         return computationJobActors.computeIfAbsent(computationJobId, k ->
-                context().actorOf(Props.create(new ComputationJobActor.ActorCreator(systemContext, tenantId, computation, computationJobId))
+                context().actorOf(Props.create(ComputationJobActor.class, new ComputationJobActor.ActorCreator(systemContext, tenantId, computation, computationJobId))
                 .withDispatcher(DefaultActorService.CORE_DISPATCHER_NAME), computationJobId.toString()));
     }
 

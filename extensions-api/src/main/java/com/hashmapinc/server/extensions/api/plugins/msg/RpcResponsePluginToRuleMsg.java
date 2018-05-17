@@ -15,6 +15,8 @@
  */
 package com.hashmapinc.server.extensions.api.plugins.msg;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.hashmapinc.server.common.data.id.RuleId;
 import com.hashmapinc.server.common.data.id.TenantId;
 import com.hashmapinc.server.common.msg.core.ToServerRpcResponseMsg;
@@ -25,8 +27,13 @@ public class RpcResponsePluginToRuleMsg extends AbstractPluginToRuleMsg<ToServer
 
     private static final long serialVersionUID = 1L;
 
-    public RpcResponsePluginToRuleMsg(UUID uid, TenantId tenantId, RuleId ruleId, ToServerRpcResponseMsg payload) {
-        super(uid, tenantId, ruleId, payload);
+    @JsonCreator
+    public RpcResponsePluginToRuleMsg(@JsonProperty("uid") UUID uid,
+                                      @JsonProperty("tenantId") TenantId tenantId,
+                                      @JsonProperty("ruleId") RuleId ruleId,
+                                      @JsonProperty("payload") ToServerRpcResponseMsg payload,
+                                      @JsonProperty("deliveryId") Long deliveryId) {
+        super(uid, tenantId, ruleId, payload, deliveryId);
     }
 
 }

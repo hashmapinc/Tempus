@@ -41,7 +41,7 @@
         <logback.version>1.2.3</logback.version>
         <mockito.version>1.9.5</mockito.version>
         <rat.version>0.10</rat.version>
-        <cassandra.version>3.0.0</cassandra.version>
+        <cassandra.version>3.3.0</cassandra.version>
         <cassandra-unit.version>3.0.0.1</cassandra-unit.version>
         <takari-cpsuite.version>1.2.7</takari-cpsuite.version>
         <guava.version>18.0</guava.version>
@@ -53,7 +53,7 @@
         <jackson.version>2.8.8.1</jackson.version>
         <json-schema-validator.version>2.2.6</json-schema-validator.version>
         <scala.version>2.11</scala.version>
-        <akka.version>2.4.2</akka.version>
+        <akka.version>2.4.20</akka.version>
         <californium.version>1.0.2</californium.version>
         <gson.version>2.6.2</gson.version>
         <velocity.version>1.7</velocity.version>
@@ -625,6 +625,26 @@
                 <groupId>com.typesafe.akka</groupId>
                 <artifactId>akka-slf4j_${scala.version}</artifactId>
                 <version>${akka.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.typesafe.akka</groupId>
+                <artifactId>akka-persistence_${scala.version}</artifactId>
+                <version>${akka.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.iq80.leveldb</groupId>
+                <artifactId>leveldb</artifactId>
+                <version>0.7</version>
+            </dependency>
+            <dependency>
+                <groupId>org.fusesource.leveldbjni</groupId>
+                <artifactId>leveldbjni-all</artifactId>
+                <version>1.8</version>
+            </dependency>
+            <dependency>
+                <groupId>com.typesafe.akka</groupId>
+                <artifactId>akka-persistence-cassandra_${scala.version}</artifactId>
+                <version>0.30</version>
             </dependency>
             <dependency>
                 <groupId>org.eclipse.californium</groupId>

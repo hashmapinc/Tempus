@@ -15,6 +15,7 @@
  */
 package com.hashmapinc.server.common.msg.core;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.hashmapinc.server.common.msg.session.MsgType;
 import lombok.Data;
 import com.hashmapinc.server.common.msg.session.ToDeviceMsg;
@@ -26,16 +27,19 @@ public class RuleEngineErrorMsg implements ToDeviceMsg {
     private final MsgType inMsgType;
     private final RuleEngineError error;
 
+    @JsonIgnore
     @Override
     public boolean isSuccess() {
         return false;
     }
 
+    @JsonIgnore
     @Override
     public MsgType getMsgType() {
         return MsgType.RULE_ENGINE_ERROR;
     }
 
+    @JsonIgnore
     public String getErrorMsg() {
         switch (error) {
             case NO_RULES:

@@ -15,9 +15,13 @@
  */
 package com.hashmapinc.server.extensions.api.plugins.msg;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.hashmapinc.server.common.data.id.CustomerId;
 import com.hashmapinc.server.common.data.id.DeviceId;
 import com.hashmapinc.server.common.data.id.TenantId;
+
+import java.util.UUID;
 
 public class GetRequestRuleToPluginMsg extends AbstractRuleToPluginMsg<String[]>{
 
@@ -28,4 +32,19 @@ public class GetRequestRuleToPluginMsg extends AbstractRuleToPluginMsg<String[]>
         super(tenantId, customerId, deviceId, payload);
     }
 
+    @JsonCreator
+    private GetRequestRuleToPluginMsg(@JsonProperty("uid") UUID id,
+                                      @JsonProperty("tenantId") TenantId tenantId,
+                                      @JsonProperty("customerId") CustomerId customerId,
+                                      @JsonProperty("deviceId") DeviceId deviceId,
+                                      @JsonProperty("payload") String[] payload,
+                                      @JsonProperty("deliveryId") Long deliveryId){
+        super(id, tenantId, customerId, deviceId, payload, deliveryId);
+    }
+
+    @Override
+    public RuleToPluginMsg<String[]> copyDeliveryId(Long deliveryId) {
+        return new GetRequestRuleToPluginMsg(this.getUid(), this.getTenantId(), this.getCustomerId(),
+                this.getDeviceId(), this.getPayload(), deliveryId);
+    }
 }

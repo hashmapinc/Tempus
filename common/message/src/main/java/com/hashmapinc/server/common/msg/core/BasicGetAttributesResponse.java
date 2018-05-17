@@ -15,6 +15,8 @@
  */
 package com.hashmapinc.server.common.msg.core;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.hashmapinc.server.common.msg.session.MsgType;
 import lombok.ToString;
 import com.hashmapinc.server.common.msg.kv.AttributesKVMsg;
@@ -32,8 +34,13 @@ public class BasicGetAttributesResponse extends BasicResponseMsg<AttributesKVMsg
         return new BasicGetAttributesResponse(requestMsgType, requestId, false, error, null);
     }
 
-    private BasicGetAttributesResponse(MsgType requestMsgType, int requestId, boolean success, Exception error, AttributesKVMsg code) {
-        super(requestMsgType, requestId, MsgType.GET_ATTRIBUTES_RESPONSE, success, error, code);
+    @JsonCreator
+    private BasicGetAttributesResponse(@JsonProperty("requestMsgType") MsgType requestMsgType,
+                                       @JsonProperty("requestId") Integer requestId,
+                                       @JsonProperty("success") boolean success,
+                                       @JsonProperty("error") Exception error,
+                                       @JsonProperty("data") AttributesKVMsg data) {
+        super(requestMsgType, requestId, MsgType.GET_ATTRIBUTES_RESPONSE, success, error, data);
     }
 
 }

@@ -13,24 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.hashmapinc.server.common.msg.core;
+package com.hashmapinc.server.actors.rule.serializers;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.hashmapinc.server.common.msg.session.FromDeviceMsg;
-import com.hashmapinc.server.common.msg.session.MsgType;
-import lombok.Data;
+public class RuleToPluginMsgWrapperSerializer extends AbstractMsgSerializer {
 
-
-@Data
-public class ToServerRpcRequestMsg implements FromDeviceMsg {
-
-    private final int requestId;
-    private final String method;
-    private final String params;
-
-    @JsonIgnore
     @Override
-    public MsgType getMsgType() {
-        return MsgType.TO_SERVER_RPC_REQUEST;
+    public int identifier() {
+        return 53;
     }
 }
