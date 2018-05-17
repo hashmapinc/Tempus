@@ -539,6 +539,11 @@
                                     <artifactId>extension-sns</artifactId>
                                     <classifier>extension</classifier>
                                 </artifactItem>
+                                <artifactItem>
+                                    <groupId>com.hashmapinc.extensions</groupId>
+                                    <artifactId>extension-kinesis</artifactId>
+                                    <classifier>extension</classifier>
+                                </artifactItem>
                             </artifactItems>
                         </configuration>
                     </execution>

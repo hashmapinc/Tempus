@@ -205,7 +205,7 @@ public class DefaultActorService implements ActorService {
     @Override
     public Future<Object> onMsg(ComputationMsg msg) {
         log.warn("Processing Computation message: {}", msg);
-        return Patterns.ask(appActor, msg, 10 * 1000);
+        return Patterns.ask(appActor, msg, 10 * 1000L);
     }
 
     @Override
