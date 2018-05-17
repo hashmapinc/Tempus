@@ -70,6 +70,7 @@ Tempus was made to simplify ingest/analysis/storage/visualization of your IIoT d
   - Ability to integrate with any system on the backend. Out of the box support for:
     - Apache Kafka
     - AWS SQS/SNS
+    - AWS Kinesis Data Stream/Firehose Delivery Stream
     - Kudu
     - HBase
     - MQTT
@@ -125,6 +126,7 @@ To build:
       [INFO] Tempus Server Livy Extension ....................... SUCCESS
       [INFO] Tempus Server SQS Extension ........................ SUCCESS
       [INFO] Tempus Server SNS Extension ........................ SUCCESS
+      [INFO] Tempus Server Kinesis Extension .................... SUCCESS
       [INFO] Tempus Server Transport Modules .................... SUCCESS
       [INFO] Tempus HTTP Transport .............................. SUCCESS
       [INFO] Tempus COAP Transport .............................. SUCCESS

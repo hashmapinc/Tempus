@@ -44,7 +44,6 @@ public class NoSqlDaoServiceTestSuite {
         dataSets.add(new ClassPathCQLDataSet("cassandra/system-test.cql", false, false));
         dataSets.addAll(Arrays.asList(
                 new ClassPathCQLDataSet("cassandra/upgrade/1.cql", false, false)
-
         ));
         return dataSets;
     }

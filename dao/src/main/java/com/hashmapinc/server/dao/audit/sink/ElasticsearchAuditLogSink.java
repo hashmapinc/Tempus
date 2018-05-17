@@ -98,17 +98,26 @@ public class ElasticsearchAuditLogSink implements AuditLogSink {
     @Override
     public void logAction(AuditLog auditLogEntry) {
         String jsonContent = createElasticJsonRecord(auditLogEntry);
+        HttpEntity entity = null;
+        try {
+            entity = new NStringEntity(
+                   jsonContent,
+                   ContentType.APPLICATION_JSON);
 
-        HttpEntity entity = new NStringEntity(
-                jsonContent,
-                ContentType.APPLICATION_JSON);
+            restClient.performRequestAsync(
+                   HttpMethod.POST.name(),
+                   String.format("/%s/%s", getIndexName(auditLogEntry.getTenantId()), INDEX_TYPE),
+                   Collections.emptyMap(),
+                   entity,
+                   responseListener);
 
-        restClient.performRequestAsync(
-                HttpMethod.POST.name(),
-                String.format("/%s/%s", getIndexName(auditLogEntry.getTenantId()), INDEX_TYPE),
-                Collections.emptyMap(),
-                entity,
-                responseListener);
+       } catch(Exception exp){
+            log.error("logAction failed", exp);
+        } finally {
+           if(entity != null)
+               ((NStringEntity) entity).close();
+       }
+
     }
 
     private String createElasticJsonRecord(AuditLog auditLog) {

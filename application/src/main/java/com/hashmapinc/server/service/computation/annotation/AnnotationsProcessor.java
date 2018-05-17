@@ -178,8 +178,13 @@ public class AnnotationsProcessor {
             Properties props = new Properties();
             URL url = this.getClass().getClassLoader().getResource("velocity.properties");
             props.load(url.openStream());
-            JsonNode descriptor = descriptorNode(model.getDescriptor());
-            return new ComputationRequestCompiled(model.getArgs(), model.getArgType(), model.getName(), descriptor, model.getMainClass());
+            if(model != null) {
+                JsonNode descriptor = descriptorNode(model.getDescriptor());
+                return new ComputationRequestCompiled(model.getArgs(), model.getArgType(), model.getName(), descriptor, model.getMainClass());
+            } else {
+                return null;
+            }
+
         } catch (IOException e) {
             log.error("Exception occurred while generating java source", e);
         }
