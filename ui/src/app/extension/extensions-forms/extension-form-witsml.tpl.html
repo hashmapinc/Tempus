@@ -77,19 +77,33 @@
                                             </md-input-container>
                                         </div>
                                         <div layout="row">
+
                                             <md-input-container flex="50" class="md-block">
-                                                <label translate>extension.witsml-scan-period-in-seconds</label>
+                                                <label translate>extension.witsml-low-frquency-in-seconds</label>
                                                 <input type="number"
                                                        required
-                                                       name="scanPeriodInSeconds_{{serverIndex}}"
-                                                       ng-model="server.scanPeriodInSeconds">
-                                                <div ng-messages="theForm['scanPeriodInSeconds_' + serverIndex].$error">
+                                                       name="lowFrequencyInSeconds_{{serverIndex}}"
+                                                       ng-model="server.lowFrequencyInSeconds">
+                                                <div ng-messages="theForm['lowFrequencyInSeconds_' + serverIndex].$error">
                                                     <div translate
                                                          ng-message="required"
                                                     >extension.field-required</div>
                                                 </div>
                                             </md-input-container>
-
+                                            <md-input-container flex="50" class="md-block">
+                                                <label translate>extension.witsml-high-frquency-in-millis</label>
+                                                <input type="number"
+                                                       required
+                                                       name="highFrequencyInMillis_{{serverIndex}}"
+                                                       ng-model="server.highFrequencyInMillis">
+                                                <div ng-messages="theForm['highFrequencyInMillis_' + serverIndex].$error">
+                                                    <div translate
+                                                         ng-message="required"
+                                                    >extension.field-required</div>
+                                                </div>
+                                            </md-input-container>
+                                        </div>
+                                        <div layout="row">
                                             <md-input-container flex="50" class="md-block">
                                                 <label translate>extension.timeout</label>
                                                 <input type="number"
@@ -97,6 +111,21 @@
                                                        ng-model="server.timeoutInMillis"
                                                 >
                                                 <div ng-messages="theForm['timeoutInMillis_' + serverIndex].$error">
+                                                    <div translate
+                                                         ng-message="required"
+                                                    >extension.field-required</div>
+                                                </div>
+                                            </md-input-container>
+                                            <md-input-container flex="50" class="md-block tb-container-for-select">
+                                                <label translate>extension.witsml-status</label>
+                                                <md-select required
+                                                           name="wellStatus_{{serverIndex}}"
+                                                           ng-model="server.wellStatus">
+                                                    <md-option ng-value="statusType"
+                                                               ng-repeat="(statusType, statusValue) in types.witsmlWellStatus"
+                                                    ><span ng-bind="::statusValue"></span></md-option>
+                                                </md-select>
+                                                <div ng-messages="theForm['wellStatus_' + serverIndex].$error">
                                                     <div translate
                                                          ng-message="required"
                                                     >extension.field-required</div>
@@ -155,23 +184,6 @@
                                                     ><span ng-bind="::objectTypeValue"></span></md-option>
                                                 </md-select>
                                                 <div ng-messages="theForm['objectTypes_' + serverIndex].$error">
-                                                    <div translate
-                                                         ng-message="required"
-                                                    >extension.field-required</div>
-                                                </div>
-                                            </md-input-container>
-                                        </div>
-                                        <div layout="row">
-                                            <md-input-container flex="50" class="md-block tb-container-for-select">
-                                                <label translate>extension.witsml-status</label>
-                                                <md-select required
-                                                           name="wellStatus_{{serverIndex}}"
-                                                           ng-model="server.wellStatus">
-                                                    <md-option ng-value="statusType"
-                                                               ng-repeat="(statusType, statusValue) in types.witsmlWellStatus"
-                                                    ><span ng-bind="::statusValue"></span></md-option>
-                                                </md-select>
-                                                <div ng-messages="theForm['wellStatus_' + serverIndex].$error">
                                                     <div translate
                                                          ng-message="required"
                                                     >extension.field-required</div>

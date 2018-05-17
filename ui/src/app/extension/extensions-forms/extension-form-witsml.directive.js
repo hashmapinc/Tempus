@@ -32,7 +32,8 @@ export default function ExtensionFormWitsmlDirective($compile, $templateCache, $
         function Server() {
             this.host = "localhost";
             this.port = 49320;
-            this.scanPeriodInSeconds = 100;
+            this.highFrequencyInMillis = 5000;
+            this.lowFrequencyInSeconds = 60;
             this.timeoutInMillis = 5000;
             this.identity = {
                 "type": "username"
