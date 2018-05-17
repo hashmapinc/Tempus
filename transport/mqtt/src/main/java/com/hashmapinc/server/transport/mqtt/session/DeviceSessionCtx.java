@@ -29,7 +29,7 @@ import com.hashmapinc.server.common.msg.session.SessionType;
 import com.hashmapinc.server.common.transport.SessionMsgProcessor;
 import com.hashmapinc.server.common.transport.adaptor.AdaptorException;
 import com.hashmapinc.server.common.transport.session.DeviceAwareSessionContext;
-
+import com.hashmapinc.server.transport.mqtt.sparkplugB.data.SparkPlugMetaData;
 import java.util.concurrent.atomic.AtomicInteger;
 
 
@@ -41,6 +41,7 @@ public class DeviceSessionCtx extends DeviceAwareSessionContext {
     private ChannelHandlerContext channel;
     private volatile boolean allowAttributeResponses;
     private AtomicInteger msgIdSeq = new AtomicInteger(0);
+    private SparkPlugMetaData sparkPlugMetaData;
 
     public DeviceSessionCtx(SessionMsgProcessor processor, DeviceAuthService authService, MqttTransportAdaptor adaptor) {
         super(processor, authService);
@@ -93,6 +94,14 @@ public class DeviceSessionCtx extends DeviceAwareSessionContext {
     @Override
     public SessionId getSessionId() {
         return sessionId;
+    }
+
+    public SparkPlugMetaData getSparkPlugMetaData() {
+        return sparkPlugMetaData;
+    }
+
+    public void setSparkPlugMetaData(SparkPlugMetaData sparkPlugMetaData) {
+        this.sparkPlugMetaData = sparkPlugMetaData;
     }
 
     public void setChannel(ChannelHandlerContext channel) {

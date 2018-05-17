@@ -84,14 +84,13 @@ public class TelemetryRuleMsgHandler extends DefaultRuleMsgHandler {
     @Override
     public void handleTelemetryUploadRequest(PluginContext ctx, TenantId tenantId, RuleId ruleId, TelemetryUploadRequestRuleToPluginMsg msg) {
         TelemetryUploadRequest request = msg.getPayload();
-        log.debug("\n\n request data post : " + request.getData().toString() + "\n\n");
         List<TsKvEntry> tsKvEntries = new ArrayList<>();
         for (Map.Entry<Long, List<KvEntry>> entry : request.getData().entrySet()) {
             for (KvEntry kv : entry.getValue()) {
                 tsKvEntries.add(new BasicTsKvEntry(entry.getKey(), kv));
             }
         }
-        ctx.saveTsData(msg.getDeviceId(), tsKvEntries, msg.getTtl(), new PluginCallback<Void>() {
+        ctx.saveTsData(msg.getTenantId(), msg.getDeviceId(), tsKvEntries, msg.getTtl(), new PluginCallback<Void>() {
             @Override
             public void onSuccess(PluginContext ctx, Void data) {
                 ctx.reply(new ResponsePluginToRuleMsg(msg.getUid(), tenantId, ruleId, BasicStatusCodeResponse.onSuccess(request.getMsgType(), request.getRequestId())));

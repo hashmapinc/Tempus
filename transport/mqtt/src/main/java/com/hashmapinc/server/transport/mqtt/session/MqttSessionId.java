@@ -16,9 +16,9 @@
 package com.hashmapinc.server.transport.mqtt.session;
 
 import com.hashmapinc.server.common.data.id.SessionId;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.concurrent.atomic.AtomicLong;
-
 
 public class MqttSessionId implements SessionId {
 
@@ -28,6 +28,10 @@ public class MqttSessionId implements SessionId {
 
     public MqttSessionId() {
         this.id = idSeq.incrementAndGet();
+    }
+
+    public MqttSessionId(String id) {
+        this.id = new Long(id.replace("mqtt", ""));
     }
 
     @Override

@@ -15,6 +15,7 @@
  */
 package com.hashmapinc.server.common.msg.session.ctrl;
 
+import com.hashmapinc.server.common.data.id.DeviceId;
 import com.hashmapinc.server.common.data.id.SessionId;
 import com.hashmapinc.server.common.msg.session.SessionCtrlMsg;
 
@@ -23,6 +24,7 @@ public class SessionCloseMsg implements SessionCtrlMsg {
     private final SessionId sessionId;
     private final boolean revoked;
     private final boolean timeout;
+    private DeviceId deviceId;
 
     public static SessionCloseMsg onDisconnect(SessionId sessionId) {
         return new SessionCloseMsg(sessionId, false, false);
@@ -58,6 +60,14 @@ public class SessionCloseMsg implements SessionCtrlMsg {
 
     public boolean isTimeout() {
         return timeout;
+    }
+
+    public DeviceId getDeviceId() {
+        return deviceId;
+    }
+
+    public void setDeviceId(DeviceId deviceId) {
+        this.deviceId = deviceId;
     }
 
 }

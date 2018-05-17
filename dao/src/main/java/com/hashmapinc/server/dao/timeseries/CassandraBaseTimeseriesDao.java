@@ -92,7 +92,6 @@ public class CassandraBaseTimeseriesDao extends CassandraAbstractAsyncDao implem
         super.startExecutor();
         if (!isInstall()) {
             getFetchStmt(Aggregation.NONE);
-            log.debug("HMDC partioning value " + partitioning );
             Optional<TsPartitionDate> partition = TsPartitionDate.parse(partitioning);
             if (partition.isPresent()) {
                 tsFormat = partition.get();
@@ -345,7 +344,6 @@ public class CassandraBaseTimeseriesDao extends CassandraAbstractAsyncDao implem
     @Override
     public ListenableFuture<Void> save(EntityId entityId, TsKvEntry tsKvEntry, long ttl) {
         long partition = toPartitionTs(tsKvEntry.getTs());
-        log.debug("HMDC Partition value " + partition);
         DataType type = tsKvEntry.getDataType();
         BoundStatement stmt = (ttl == 0 ? getSaveStmt(type) : getSaveTtlStmt(type)).bind();
         stmt.setString(0, entityId.getEntityType().name())

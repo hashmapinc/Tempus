@@ -26,7 +26,6 @@ import com.hashmapinc.server.common.msg.session.*;
 import com.hashmapinc.server.common.msg.session.ctrl.SessionCloseMsg;
 import com.hashmapinc.server.common.msg.cluster.ServerAddress;
 import com.hashmapinc.server.common.msg.device.ToDeviceActorMsg;
-import com.hashmapinc.server.common.msg.session.*;
 
 import akka.actor.ActorContext;
 import akka.actor.ActorRef;

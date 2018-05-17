@@ -3,7 +3,7 @@
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at$mdDialog
+ * You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -368,8 +368,14 @@ export function DeviceController($rootScope,userService, deviceService, customer
 
 
                 if ($scope.query.search != null) {
-                    deviceSortList = $filter('filter')(items.data, {name: $scope.query.search});
 
+                    deviceSortList = $filter('filter')(items.data, function(data) {
+                        if ($scope.query.search) {
+                            return data.name.toLowerCase().indexOf($scope.query.search.toLowerCase()) > -1 || data.type.toLowerCase().indexOf($scope.query.search.toLowerCase()) > -1;
+                        } else {
+                            return true;
+                        }
+                    });
                 }
 
                 var startIndex = $scope.query.limit * ($scope.query.page - 1);
