@@ -16,6 +16,7 @@ Data Acqusition
     http
     witsml
     streamingdataquality
+    sparkplug
 
 =========
 API Usage

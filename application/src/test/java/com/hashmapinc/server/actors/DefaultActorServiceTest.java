@@ -235,6 +235,7 @@ public class DefaultActorServiceTest {
         when(attributesService.findAll(deviceId, DataConstants.CLIENT_SCOPE)).thenReturn(Futures.immediateFuture(Collections.emptyList()));
         when(attributesService.findAll(deviceId, DataConstants.SHARED_SCOPE)).thenReturn(Futures.immediateFuture(Collections.emptyList()));
         when(attributesService.findAll(deviceId, DataConstants.SERVER_SCOPE)).thenReturn(Futures.immediateFuture(Collections.emptyList()));
+        when(tsService.findAllLatest(deviceId)).thenReturn(Futures.immediateFuture(Collections.emptyList()));
 
         initActorSystem();
         Thread.sleep(1000);

@@ -108,8 +108,7 @@ public class TelemetryRuleMsgHandler extends DefaultRuleMsgHandler {
                             }
                         }
                     }
-
-                    ctx.saveTsData(msg.getDeviceId(), tsKvEntries, msg.getTtl(), new PluginCallback<Void>() {
+                    ctx.saveTsData(msg.getTenantId(), msg.getDeviceId(), tsKvEntries, msg.getTtl(), new PluginCallback<Void>() {
                         @Override
                         public void onSuccess(PluginContext ctx, Void data) {
                             ctx.reply(new ResponsePluginToRuleMsg(msg.getUid(), tenantId, ruleId, BasicStatusCodeResponse.onSuccess(request.getMsgType(), request.getRequestId())));

@@ -20,27 +20,24 @@ metadata:
   name: tempus
   labels:
     app: tempus
+  annotations:
+    service.beta.kubernetes.io/aws-load-balancer-ssl-ports: "443"
+    service.beta.kubernetes.io/aws-load-balancer-ssl-cert: "arn:aws:acm:us-east-2:660239660726:certificate/ec088a03-f323-4523-bfde-e93c9b0815e6"
+    service.beta.kubernetes.io/aws-load-balancer-backend-protocol: "http"
+    service.beta.kubernetes.io/aws-load-balancer-connection-idle-timeout: '3600'
 spec:
   type: LoadBalancer
   selector:
     app: tempus
   ports:
     - protocol: TCP
-      port: 8080
+      port: 443
       targetPort: 8080
-      name: ui
+      name: https
     - protocol: TCP
       port: 1883
       targetPort: 1883
       name: mqtt
-    #- protocol: UDP
-    #  port: 5683
-    #  targetPort: 5683
-    #  name: coap
-    - protocol: TCP
-      port: 9999
-      targetPort: 9999
-      name: tempus-port
 ---
 apiVersion: policy/v1beta1
 kind: PodDisruptionBudget
@@ -71,7 +68,8 @@ data:
   mqtt.port: "1883"
   coap.address: "0.0.0.0"
   coap.port: "5683"
-  spark.path: "/home"
+  spark.path: "/tmp"
+  http.port: "8080"
 ---
 apiVersion: "apps/v1beta1"
 kind: StatefulSet
@@ -113,6 +111,11 @@ spec:
             configMapKeyRef:
               name: tempus-config
               key: spark.path
+        - name: HTTP_BIND_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: tempus-config
+              key: http.port
         - name: MQTT_BIND_ADDRESS
           valueFrom:
             configMapKeyRef:

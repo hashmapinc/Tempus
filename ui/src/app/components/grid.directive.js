@@ -125,7 +125,7 @@ function Grid() {
 }
 
 /*@ngInject*/
-function GridController(applicationService, $scope, $state, $mdDialog, $document, $q, $mdUtil, $timeout, $translate, $mdMedia, $templateCache, $window, userService) { 
+function GridController(applicationService, $scope, $rootScope, $state, $mdDialog, $document, $q, $mdUtil, $timeout, $translate, $mdMedia, $templateCache, $window, userService) {
 
     var vm = this;
 
@@ -513,6 +513,12 @@ function GridController(applicationService, $scope, $state, $mdDialog, $document
         reload();
     });
 
+   var gridTableDevice = $rootScope.$on("CallTableDetailDevice", function($event, data){
+       vm.clickItemFunc(data[0],data[1]);
+    });
+
+    $scope.$on('$destroy', gridTableDevice);
+
     vm.onGridInited(vm);
 
     vm.itemRows.getItemAtIndex(pageSize);
@@ -584,6 +590,7 @@ function GridController(applicationService, $scope, $state, $mdDialog, $document
                 return;
             }
         }
+
         vm.loadItemDetailsFunc(item).then(function success(detailsItem) {
             if(angular.isDefined(vm.config.parentCtl)){
                 if((angular.isFunction(vm.config.parentCtl.currentApp) || angular.isObject(vm.config.parentCtl.currentApp)) && detailsItem.id.entityType == 'APPLICATION')
@@ -673,6 +680,9 @@ function GridController(applicationService, $scope, $state, $mdDialog, $document
             vm.saveItemFunc(vm.detailsConfig.editingItem).then(function success(item) {
             theForm.$setPristine();
             vm.detailsConfig.isDetailsEditMode = false;
+            if(angular.isDefined(vm.parentCtl.loadTableData)) {
+                vm.parentCtl.loadTableData();
+            }
             var index = vm.detailsConfig.currentItem.index;
             item.index = index;
             vm.detailsConfig.currentItem = item;
@@ -681,6 +691,7 @@ function GridController(applicationService, $scope, $state, $mdDialog, $document
             var itemRow = vm.items.rowData[row];
             var column = index % vm.columns;
             itemRow[column] = item;
+
         });
         }
 
@@ -727,6 +738,7 @@ function GridController(applicationService, $scope, $state, $mdDialog, $document
             );
         }
         else {
+
             var confirm = $mdDialog.confirm()
                 .targetEvent($event)
                 .title(vm.deleteItemTitleFunc(item))
@@ -882,7 +894,6 @@ function GridController(applicationService, $scope, $state, $mdDialog, $document
 function AddItemController($scope, $mdDialog, saveItemFunction, helpLinks) {
 
     var vm = this;
-
     vm.helpLinks = helpLinks;
     vm.item = {};
 

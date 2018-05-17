@@ -20,6 +20,7 @@ import com.hashmapinc.server.common.data.id.PluginId;
 import com.hashmapinc.server.controller.plugin.PluginWebSocketMsgEndpoint;
 import com.hashmapinc.server.dao.TagMetaData.TagMetaDataService;
 import com.hashmapinc.server.dao.attributes.AttributesService;
+import com.hashmapinc.server.extensions.api.device.DeviceTelemetryEventNotificationMsg;
 import com.hashmapinc.server.extensions.api.plugins.msg.TimeoutMsg;
 import lombok.extern.slf4j.Slf4j;
 import com.hashmapinc.server.actors.ActorSystemContext;
@@ -107,6 +108,9 @@ public final class SharedPluginProcessingContext {
         forward(msg.getDeviceId(), msg, rpcService::tell);
     }
 
+    public void toDeviceActor(DeviceTelemetryEventNotificationMsg msg) {
+        forward(msg.getDeviceId(), msg, rpcService::tell);
+    }
     public void sendRpcRequest(ToDeviceRpcRequest msg) {
         log.trace("[{}] Forwarding msg {} to device actor!", pluginId, msg);
         ToDeviceRpcRequestPluginMsg rpcMsg = new ToDeviceRpcRequestPluginMsg(pluginId, tenantId, msg);
