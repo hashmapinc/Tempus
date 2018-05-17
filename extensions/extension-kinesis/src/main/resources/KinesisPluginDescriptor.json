@@ -1,6 +1,6 @@
 {
   "schema": {
-    "title": "SNS Plugin Configuration",
+    "title": "Kinesis Plugin Configuration",
     "type": "object",
     "properties": {
       "accessKeyId": {
