@@ -978,6 +978,7 @@ export default angular.module('tempus.locale', [])
                     "field-required": "Field is required",
                     "brokers": "Brokers",
                     "add-broker": "Add broker",
+                    "add-server": "Add server",
                     "host": "Host",
                     "port": "Port",
                     "port-range": "Port should be in a range from 1 to 65535.",
@@ -1048,6 +1049,7 @@ export default angular.module('tempus.locale', [])
                     "opc-keystore-key-password":"Key password",
                     "opc-device-node-pattern":"Device node pattern",
                     "opc-device-name-pattern":"Device name pattern",
+                    "wits-servers": "Wits Servers",
 
                     "sync": {
                         "status": "Status",
