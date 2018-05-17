@@ -22,6 +22,8 @@ import akka.actor.Terminated;
 import akka.pattern.Patterns;
 import com.hashmapinc.server.actors.ActorSystemContext;
 import com.hashmapinc.server.actors.app.AppActor;
+import com.hashmapinc.server.actors.cluster.NodeMetricActor;
+import com.hashmapinc.server.actors.cluster.RegisterNodeMsg;
 import com.hashmapinc.server.actors.rpc.RpcSessionCreateRequestMsg;
 import com.hashmapinc.server.actors.rpc.RpcSessionTellMsg;
 import com.hashmapinc.server.actors.stats.StatsActor;
@@ -40,7 +42,6 @@ import org.springframework.stereotype.Service;
 import com.hashmapinc.server.actors.rpc.RpcBroadcastMsg;
 import com.hashmapinc.server.actors.rpc.RpcManagerActor;
 import com.hashmapinc.server.actors.session.SessionManagerActor;
-import com.hashmapinc.server.common.data.id.*;
 import com.hashmapinc.server.common.msg.cluster.ServerAddress;
 import com.hashmapinc.server.common.msg.computation.ComputationMsg;
 import com.hashmapinc.server.common.msg.core.ToDeviceSessionActorMsg;
@@ -91,6 +92,8 @@ public class DefaultActorService implements ActorService {
 
     private ActorRef rpcManagerActor;
 
+    private ActorRef nodeMetricActor;
+
     @PostConstruct
     public void initActorSystem() {
         log.info("Initializing Actor system. {}", actorContext.getRuleService());
@@ -101,11 +104,16 @@ public class DefaultActorService implements ActorService {
         appActor = system.actorOf(Props.create(new AppActor.ActorCreator(actorContext)).withDispatcher(APP_DISPATCHER_NAME), "appActor");
         actorContext.setAppActor(appActor);
 
-        sessionManagerActor = system.actorOf(Props.create(new SessionManagerActor.ActorCreator(actorContext)).withDispatcher(CORE_DISPATCHER_NAME),
+        String host = discoveryService.getCurrentServer().getHost();
+        int port = discoveryService.getCurrentServer().getPort();
+        nodeMetricActor = system.actorOf(Props.create(new NodeMetricActor.ActorCreator(actorContext, host, port)));
+        nodeMetricActor.tell(new RegisterNodeMsg(), ActorRef.noSender());
+
+        sessionManagerActor = system.actorOf(Props.create(new SessionManagerActor.ActorCreator(actorContext, nodeMetricActor)).withDispatcher(CORE_DISPATCHER_NAME),
                 "sessionManagerActor");
         actorContext.setSessionManagerActor(sessionManagerActor);
 
-        rpcManagerActor = system.actorOf(Props.create(new RpcManagerActor.ActorCreator(actorContext)).withDispatcher(CORE_DISPATCHER_NAME),
+        rpcManagerActor = system.actorOf(Props.create(new RpcManagerActor.ActorCreator(actorContext, nodeMetricActor)).withDispatcher(CORE_DISPATCHER_NAME),
                 "rpcManagerActor");
 
         ActorRef statsActor = system.actorOf(Props.create(new StatsActor.ActorCreator(actorContext)).withDispatcher(CORE_DISPATCHER_NAME), "statsActor");

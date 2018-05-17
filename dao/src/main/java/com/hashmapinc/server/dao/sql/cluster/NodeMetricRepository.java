@@ -13,9 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.hashmapinc.server.common.data;
+package com.hashmapinc.server.dao.sql.cluster;
 
+import com.hashmapinc.server.dao.model.sql.NodeMetricEntity;
+import com.hashmapinc.server.dao.util.SqlDao;
+import org.springframework.data.repository.CrudRepository;
 
-public enum EntityType {
-    TENANT, CUSTOMER, USER, RULE, PLUGIN, DASHBOARD, ASSET, DEVICE, ALARM, APPLICATION, COMPUTATION, COMPUTATION_JOB, NODE_METRIC
+@SqlDao
+public interface NodeMetricRepository extends CrudRepository<NodeMetricEntity, String> {
+
+    NodeMetricEntity findNodeMetricByHostAndPort(String host, int port);
 }

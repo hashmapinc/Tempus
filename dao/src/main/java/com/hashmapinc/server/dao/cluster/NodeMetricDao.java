@@ -13,9 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.hashmapinc.server.common.data;
+package com.hashmapinc.server.dao.cluster;
 
+import com.hashmapinc.server.common.data.cluster.NodeMetric;
+import com.hashmapinc.server.dao.Dao;
 
-public enum EntityType {
-    TENANT, CUSTOMER, USER, RULE, PLUGIN, DASHBOARD, ASSET, DEVICE, ALARM, APPLICATION, COMPUTATION, COMPUTATION_JOB, NODE_METRIC
+import java.util.List;
+import java.util.Optional;
+
+public interface NodeMetricDao extends Dao<NodeMetric> {
+
+    NodeMetric save(NodeMetric nodeMetric);
+
+    Optional<NodeMetric> findNodeMetricByHostAndPort(String host, int port);
+
+    List<NodeMetric> find();
 }

@@ -13,9 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.hashmapinc.server.common.data;
+package com.hashmapinc.server.dao.model.type;
 
+import com.datastax.driver.extras.codecs.enums.EnumNameCodec;
+import com.hashmapinc.server.common.data.cluster.NodeStatus;
 
-public enum EntityType {
-    TENANT, CUSTOMER, USER, RULE, PLUGIN, DASHBOARD, ASSET, DEVICE, ALARM, APPLICATION, COMPUTATION, COMPUTATION_JOB, NODE_METRIC
+public class NodeStatusCodec extends EnumNameCodec<NodeStatus> {
+
+    public NodeStatusCodec() {
+        super(NodeStatus.class);
+    }
 }

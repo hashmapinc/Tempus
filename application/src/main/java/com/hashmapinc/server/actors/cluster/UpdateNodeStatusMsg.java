@@ -13,9 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.hashmapinc.server.common.data;
+package com.hashmapinc.server.actors.cluster;
 
+import com.hashmapinc.server.common.data.cluster.NodeStatus;
 
-public enum EntityType {
-    TENANT, CUSTOMER, USER, RULE, PLUGIN, DASHBOARD, ASSET, DEVICE, ALARM, APPLICATION, COMPUTATION, COMPUTATION_JOB, NODE_METRIC
+public class UpdateNodeStatusMsg {
+    private final NodeStatus nodeStatus;
+
+    public UpdateNodeStatusMsg(NodeStatus nodeStatus) {
+        super();
+        this.nodeStatus = nodeStatus;
+    }
+
+    public NodeStatus getNodeStatus() {
+        return nodeStatus;
+    }
 }
