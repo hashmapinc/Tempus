@@ -1,6 +1,6 @@
 {
   "widgetsBundle": {
-    "alias": "trajectory-widgets",
+    "alias": "trajectory_widgets",
     "title": "Trajectory Viewers",
     "image": null
   },
