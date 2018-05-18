@@ -24,13 +24,19 @@ public class TelemetryUploadRequestRuleToPluginMsg extends AbstractRuleToPluginM
 
     private static final long serialVersionUID = 1L;
     private final long ttl;
+    private final long qualityTimeWindow;
 
-    public TelemetryUploadRequestRuleToPluginMsg(TenantId tenantId, CustomerId customerId, DeviceId deviceId, TelemetryUploadRequest payload, long ttl) {
+    public TelemetryUploadRequestRuleToPluginMsg(TenantId tenantId, CustomerId customerId, DeviceId deviceId, TelemetryUploadRequest payload, long ttl, long qualityTimeWindow) {
         super(tenantId, customerId, deviceId, payload);
         this.ttl = ttl;
+        this.qualityTimeWindow = qualityTimeWindow;
     }
 
     public long getTtl() {
         return ttl;
+    }
+
+    public long getQualityTimeWindow(){
+        return qualityTimeWindow;
     }
 }

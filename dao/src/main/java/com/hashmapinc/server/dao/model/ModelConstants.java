@@ -152,6 +152,18 @@ public class ModelConstants {
     public static final String DEVICE_TYPES_BY_TENANT_VIEW_NAME = "device_types_by_tenant";
 
     /**
+     * Device MetaData constants.
+     */
+    public static final String TAG_METADATA_COLUMN_FAMILY_NAME = "tag_metadata_cf";
+    public static final String TAG_METADATA_UNIT = "unit";
+    public static final String TAG_METADATA_AVG_FREQUENCY = "avg_frequency";
+    public static final String TAG_METADATA_MIN_FREQUENCY = "min_frequency";
+    public static final String TAG_METADATA_MAX_FREQUENCY = "max_frequency";
+    public static final String TAG_METADATA_MEAN_FREQUENCY = "mean_frequency";
+    public static final String TAG_METADATA_MEDIAN_FREQUENCY = "median_frequency";
+    public static final String TAG_METADATA_SOURCE = "source";
+
+    /**
      * Application constants
      */
     public static final String APPLICATION_TABLE_NAME = "application";
@@ -447,6 +459,8 @@ public class ModelConstants {
     public static final String DS_KV_LATEST_CF = "ds_kv_latest_cf";
 
     public static final String PARTITION_COLUMN = "partition";
+    public static final String TS_DIFF = "ts_diff";
+    public static final String DS_DIFF = "ds_diff";
     public static final String KEY_COLUMN = "key";
     public static final String TS_COLUMN = "ts";
     public static final String DS_COLUMN = "ds";
@@ -460,8 +474,8 @@ public class ModelConstants {
     public static final String DOUBLE_VALUE_COLUMN = "dbl_v";
     public static final String JSON_VALUE_COLUMN = "json_v";
 
-    protected static final String[] NONE_AGGREGATION_COLUMNS = new String[]{LONG_VALUE_COLUMN, DOUBLE_VALUE_COLUMN, BOOLEAN_VALUE_COLUMN, STRING_VALUE_COLUMN, JSON_VALUE_COLUMN, KEY_COLUMN, TS_COLUMN};
-    protected static final String[] NONE_DS_AGGREGATION_COLUMNS = new String[]{LONG_VALUE_COLUMN, DOUBLE_VALUE_COLUMN, BOOLEAN_VALUE_COLUMN, STRING_VALUE_COLUMN, JSON_VALUE_COLUMN, KEY_COLUMN, DS_COLUMN};
+    public static final String[] NONE_AGGREGATION_COLUMNS = new String[]{LONG_VALUE_COLUMN, DOUBLE_VALUE_COLUMN, BOOLEAN_VALUE_COLUMN, STRING_VALUE_COLUMN, JSON_VALUE_COLUMN, KEY_COLUMN, TS_COLUMN, TS_DIFF};
+    public static final String[] NONE_DS_AGGREGATION_COLUMNS = new String[]{LONG_VALUE_COLUMN, DOUBLE_VALUE_COLUMN, BOOLEAN_VALUE_COLUMN, STRING_VALUE_COLUMN, JSON_VALUE_COLUMN, KEY_COLUMN, DS_COLUMN, DS_DIFF};
 
     protected static final String[] COUNT_AGGREGATION_COLUMNS = new String[]{count(LONG_VALUE_COLUMN), count(DOUBLE_VALUE_COLUMN), count(BOOLEAN_VALUE_COLUMN), count(STRING_VALUE_COLUMN), count(JSON_VALUE_COLUMN)};
 

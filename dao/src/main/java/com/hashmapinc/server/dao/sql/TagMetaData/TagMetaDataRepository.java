@@ -13,19 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.hashmapinc.server.extensions.core.action.telemetry;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import lombok.Data;
+package com.hashmapinc.server.dao.sql.TagMetaData;
 
+import com.hashmapinc.server.common.data.EntityType;
+import com.hashmapinc.server.dao.model.sql.TagMetaDataCompositeKey;
+import com.hashmapinc.server.dao.model.sql.TagMetaDataEntity;
+import org.springframework.data.repository.CrudRepository;
 
-@Data
-@JsonInclude(JsonInclude.Include.NON_NULL)
-public class TelemetryPluginActionConfiguration {
+import java.util.List;
 
-    private String timeUnit;
-    private int ttlValue;
-    private int qualityTimeWindow;
-    private int qualityDepthWindow;
-
+public interface TagMetaDataRepository extends CrudRepository<TagMetaDataEntity, TagMetaDataCompositeKey> {
+    List<TagMetaDataEntity> findAllByEntityIdAndEntityType(String entityId, EntityType entityType);
 }

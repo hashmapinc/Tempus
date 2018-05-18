@@ -13,19 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.hashmapinc.server.extensions.core.action.telemetry;
+package com.hashmapinc.server.dao.model.sql;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
+import com.hashmapinc.server.common.data.EntityType;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
+import javax.persistence.Transient;
+import java.io.Serializable;
 
 @Data
-@JsonInclude(JsonInclude.Include.NON_NULL)
-public class TelemetryPluginActionConfiguration {
+@AllArgsConstructor
+@NoArgsConstructor
+public class TagMetaDataCompositeKey implements Serializable {
 
-    private String timeUnit;
-    private int ttlValue;
-    private int qualityTimeWindow;
-    private int qualityDepthWindow;
+    @Transient
+    private static final long serialVersionUID = -4089175869616037526L;
 
+    private EntityType entityType;
+    private String entityId;
+    private String key;
 }

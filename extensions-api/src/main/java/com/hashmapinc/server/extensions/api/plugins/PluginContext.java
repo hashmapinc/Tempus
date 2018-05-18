@@ -17,15 +17,13 @@ package com.hashmapinc.server.extensions.api.plugins;
 
 import com.google.common.util.concurrent.ListenableFuture;
 import com.hashmapinc.server.common.data.Device;
+import com.hashmapinc.server.common.data.TagMetaData;
 import com.hashmapinc.server.common.data.id.*;
 import com.hashmapinc.server.common.data.kv.*;
 import com.hashmapinc.server.extensions.api.plugins.msg.*;
-import com.hashmapinc.server.common.data.id.*;
-import com.hashmapinc.server.common.data.kv.*;
 import com.hashmapinc.server.common.data.kv.AttributeKvEntry;
 import com.hashmapinc.server.common.data.relation.EntityRelation;
 import com.hashmapinc.server.common.msg.cluster.ServerAddress;
-import com.hashmapinc.server.extensions.api.plugins.msg.*;
 import com.hashmapinc.server.extensions.api.plugins.rpc.RpcMsg;
 import com.hashmapinc.server.extensions.api.plugins.ws.PluginWebsocketSessionRef;
 import com.hashmapinc.server.extensions.api.plugins.ws.msg.PluginWebsocketMsg;
@@ -88,15 +86,21 @@ public interface PluginContext {
 
     void saveDsData(EntityId deviceId, List<DsKvEntry> entries, long ttl, PluginCallback<Void> pluginCallback);
 
+    void saveTagMetaData(EntityId entityId, TagMetaData tagMetaData, PluginCallback<Void> pluginCallback);
+
     void loadTimeseries(EntityId entityId, List<TsKvQuery> queries, PluginCallback<List<TsKvEntry>> callback);
 
     void loadDepthSeries(EntityId entityId, List<DsKvQuery> queries, PluginCallback<List<DsKvEntry>> callback);
 
     void loadLatestTimeseries(EntityId entityId, Collection<String> keys, PluginCallback<List<TsKvEntry>> callback);
 
+    void loadLatestTimeseries(EntityId entityId, List<KvEntry> kvEntries, PluginCallback<List<TsKvEntry>> callback);
+
     void loadLatestTimeseries(EntityId entityId, PluginCallback<List<TsKvEntry>> callback);
 
     void loadLatestDepthSeries(EntityId entityId, Collection<String> keys, PluginCallback<List<DsKvEntry>> callback);
+
+    void loadLatestDepthSeries(EntityId entityId, List<KvEntry> kvEntries, PluginCallback<List<DsKvEntry>> callback);
 
     void loadLatestDepthSeries(EntityId entityId, PluginCallback<List<DsKvEntry>> callback);
 

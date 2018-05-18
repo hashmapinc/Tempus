@@ -13,19 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.hashmapinc.server.extensions.core.action.telemetry;
+package com.hashmapinc.server.dao.service.tagmetadata.nosql;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import lombok.Data;
+import com.hashmapinc.server.dao.service.DaoNoSqlTest;
 
+import com.hashmapinc.server.dao.service.tagmetadata.BaseTagMetaDataServiceTest;
 
-@Data
-@JsonInclude(JsonInclude.Include.NON_NULL)
-public class TelemetryPluginActionConfiguration {
-
-    private String timeUnit;
-    private int ttlValue;
-    private int qualityTimeWindow;
-    private int qualityDepthWindow;
-
+@DaoNoSqlTest
+public class TagMetaDataServiceNoSqlTest extends BaseTagMetaDataServiceTest{
 }
