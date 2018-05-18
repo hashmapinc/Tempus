@@ -128,13 +128,8 @@ export function setOrbitControls() {
 // keep track of the mouse's 2D positioning on the screen
 export function onMouseMove(event) {
   event.preventDefault();
-  let canvasBounds = renderer.context.canvas.getBoundingClientRect();
-  mouse.x = ((event.clientX - canvasBounds.left) / (canvasBounds.right - canvasBounds.left)) * 2 - 1;
-  mouse.y = - ((event.clientY - canvasBounds.top) / (canvasBounds.bottom - canvasBounds.top)) * 2 + 1;
-
-  console.log("=========NewMouseEvent========="); //eslint-disable-line
-  console.log("event x,y = " + event.clientX + " , " + event.clientY); //eslint-disable-line
-  console.log("mouse x,y = " + mouse.x + " , " + mouse.y); //eslint-disable-line
+  mouse.x = event.clientX;
+  mouse.y = event.clientY;
 }
 
 // removes all objects from a scene that have name === objName
@@ -362,9 +357,16 @@ export function onWindowResize() {
 }
 
 export function onDoubleClick() {
+  // get proper mouse coordinates
+  let canvasBounds = renderer.context.canvas.getBoundingClientRect();
+  mouse.x = ((mouse.x - canvasBounds.left) / (canvasBounds.right - canvasBounds.left)) * 2 - 1;
+  mouse.y = - ((mouse.y - canvasBounds.top) / (canvasBounds.bottom - canvasBounds.top)) * 2 + 1;
+
+  // raycast
   raycaster.setFromCamera(mouse, camera);
   var intersects = raycaster.intersectObjects(scene.children, true);
 
+  // handle any objects clicked on
   intersects.forEach(intersect => {
     let obj = intersect.object;
     if(obj.name === "well-plot-points") {
