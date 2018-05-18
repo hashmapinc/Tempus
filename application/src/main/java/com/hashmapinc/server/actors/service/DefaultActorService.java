@@ -22,6 +22,7 @@ import akka.actor.Terminated;
 import akka.pattern.Patterns;
 import com.hashmapinc.server.actors.ActorSystemContext;
 import com.hashmapinc.server.actors.app.AppActor;
+import com.hashmapinc.server.actors.cluster.DeleteNodeEntryMsg;
 import com.hashmapinc.server.actors.cluster.NodeMetricActor;
 import com.hashmapinc.server.actors.cluster.RegisterNodeMsg;
 import com.hashmapinc.server.actors.rpc.RpcSessionCreateRequestMsg;
@@ -281,5 +282,8 @@ public class DefaultActorService implements ActorService {
         this.appActor.tell(msg, ActorRef.noSender());
         this.sessionManagerActor.tell(msg, ActorRef.noSender());
         this.rpcManagerActor.tell(msg, ActorRef.noSender());
+        if (!msg.isAdded()) {
+            nodeMetricActor.tell(new DeleteNodeEntryMsg(msg.getServerAddress().getHost(), msg.getServerAddress().getPort()), ActorRef.noSender());
+        }
     }
 }
