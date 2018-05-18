@@ -117,7 +117,7 @@ public class TelemetryRuleMsgHandler extends DefaultRuleMsgHandler {
                             );
                             MetaDataAggregator metaDataAggregator = new MetaDataAggregator(ctx, msg.getDeviceId());
                             metaDataAggregator.setAggregationPeriod(msg.getQualityTimeWindow());
-                            metaDataAggregator.aggregateMetaData(entry.getKey(), tsKvEntries);
+                            metaDataAggregator.aggregateMetaData(entry.getKey(), kvEntries);
                         }
 
                         @Override

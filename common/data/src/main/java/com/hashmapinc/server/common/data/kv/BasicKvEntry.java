@@ -24,8 +24,19 @@ public abstract class BasicKvEntry implements KvEntry {
 
     private final String key;
 
+    private Optional<String> unit;
+
     protected BasicKvEntry(String key) {
         this.key = key;
+    }
+
+    protected BasicKvEntry(String key, String unit) {
+        this.key = key;
+        this.unit = Optional.of(unit);
+    }
+
+    public Optional<String> getUnit() {
+        return unit;
     }
 
     @Override
