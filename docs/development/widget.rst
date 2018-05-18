@@ -696,3 +696,14 @@ While developing client-side js, if you need to access the ``document`` or ``win
 ``//eslint-disable-line``
 
 This will tell the linter to ignore the line. Only do this if you have to. In most cases, use the angular ``$window`` object instead.
+
+**************
+Custom Widgets
+**************
+See documentation on custom widgets below:
+
+.. toctree::
+    :maxdepth: 1
+
+    customWidgets/trajectory-viewer
+  
