@@ -181,7 +181,7 @@ public class BaseApplicationControllerTest extends AbstractControllerTest {
         rule1.setName("My Rule1");
         rule1.setPluginToken(tenantPlugin.getApiToken());
         rule1.setFilters(mapper.readTree("[{\"configuration\":{\"deviceTypes\":[{\"name\":\"Motor\"},{\"name\":\"Pump\"}]},\"clazz\":\"com.hashmapinc.server.extensions.core.filter.DeviceTypeFilter\",\"name\":\"jetinder\"},{\"configuration\":{\"deviceTypes\":[{\"name\":\"Well\"},{}]},\"clazz\":\"com.hashmapinc.server.extensions.core.filter.DeviceTypeFilter\",\"name\":\"F2\"},{\"configuration\":{\"methodNames\":[{\"name\":\"sdsdsdsdsdsdsd\"}]},\"clazz\":\"com.hashmapinc.server.extensions.core.filter.MethodNameFilter\",\"name\":\"sdsdsdsdsdsdsdsdsd\"}]"));
-        rule1.setAction(mapper.readTree("{\"clazz\":\"com.hashmapinc.server.extensions.core.action.telemetry.TelemetryPluginAction\", \"name\":\"TelemetryMsgConverterAction\", \"configuration\":{\"timeUnit\":\"DAYS\", \"ttlValue\":1}}"));
+        rule1.setAction(mapper.readTree("{\"clazz\":\"com.hashmapinc.server.extensions.core.action.telemetry.TelemetryPluginAction\", \"name\":\"TelemetryMsgConverterAction\", \"configuration\":{\"timeUnit\":\"DAYS\", \"ttlValue\":1, \"qualityTimeWindow\":60000, \"qualityDepthWindow\":3000}}"));
         RuleMetaData savedRule1 = doPost("/api/rule", rule1, RuleMetaData.class);
 
         doGet("/api/rule/"+savedRule1.getId().getId().toString()).andExpect(status().isOk());
@@ -517,7 +517,7 @@ public class BaseApplicationControllerTest extends AbstractControllerTest {
         rule1.setName("My Rule1");
         rule1.setPluginToken(tenantPlugin.getApiToken());
         rule1.setFilters(mapper.readTree("[{\"configuration\":{\"deviceTypes\":[{\"name\":\"Motor\"},{\"name\":\"Pump\"}]},\"clazz\":\"com.hashmapinc.server.extensions.core.filter.DeviceTypeFilter\",\"name\":\"jetinder\"},{\"configuration\":{\"deviceTypes\":[{\"name\":\"Well\"},{}]},\"clazz\":\"com.hashmapinc.server.extensions.core.filter.DeviceTypeFilter\",\"name\":\"F2\"},{\"configuration\":{\"methodNames\":[{\"name\":\"sdsdsdsdsdsdsd\"}]},\"clazz\":\"com.hashmapinc.server.extensions.core.filter.MethodNameFilter\",\"name\":\"sdsdsdsdsdsdsdsdsd\"}]"));
-        rule1.setAction(mapper.readTree("{\"clazz\":\"com.hashmapinc.server.extensions.core.action.telemetry.TelemetryPluginAction\", \"name\":\"TelemetryMsgConverterAction\", \"configuration\":{\"timeUnit\":\"DAYS\", \"ttlValue\":1}}"));
+        rule1.setAction(mapper.readTree("{\"clazz\":\"com.hashmapinc.server.extensions.core.action.telemetry.TelemetryPluginAction\", \"name\":\"TelemetryMsgConverterAction\", \"configuration\":{\"timeUnit\":\"DAYS\", \"ttlValue\":1, \"qualityTimeWindow\":60000, \"qualityDepthWindow\":3000}}"));
         RuleMetaData savedRule1 = doPost("/api/rule", rule1, RuleMetaData.class);
 
         RuleMetaData rule2 = new RuleMetaData();
@@ -526,7 +526,7 @@ public class BaseApplicationControllerTest extends AbstractControllerTest {
         rule2.setFilters(mapper.readTree("[{\"clazz\":\"com.hashmapinc.server.extensions.core.filter.MsgTypeFilter\", " +
                 "\"name\":\"TelemetryFilter\", " +
                 "\"configuration\": {\"messageTypes\":[\"POST_TELEMETRY\",\"POST_ATTRIBUTES\",\"GET_ATTRIBUTES\"]}}]"));
-        rule2.setAction(mapper.readTree("{\"clazz\":\"com.hashmapinc.server.extensions.core.action.telemetry.TelemetryPluginAction\", \"name\":\"TelemetryMsgConverterAction\", \"configuration\":{\"timeUnit\":\"DAYS\", \"ttlValue\":1}}"));
+        rule2.setAction(mapper.readTree("{\"clazz\":\"com.hashmapinc.server.extensions.core.action.telemetry.TelemetryPluginAction\", \"name\":\"TelemetryMsgConverterAction\", \"configuration\":{\"timeUnit\":\"DAYS\", \"ttlValue\":1, \"qualityTimeWindow\":60000, \"qualityDepthWindow\":3000}}"));
         RuleMetaData savedRule2 = doPost("/api/rule", rule2, RuleMetaData.class);
 
         ApplicationFieldsWrapper applicationRulesWrapper = new ApplicationFieldsWrapper();
@@ -555,15 +555,15 @@ public class BaseApplicationControllerTest extends AbstractControllerTest {
         rule1.setPluginToken(tenantPlugin.getApiToken());
         rule1.setFilters(mapper.readTree("[{\"configuration\": {\"deviceTypes\": [{\"name\": \"Motor\"}, {\"name\": \"Pump\"}]},\"clazz\": \"com.hashmapinc.server.extensions.core.filter.DeviceTypeFilter\",\"name\": \"jetinder\"\n" +
                 "}, {\"configuration\": {\"methodNames\": [{\"name\": \"sdsdsdsdsdsdsd\"}]},\"clazz\": \"com.hashmapinc.server.extensions.core.filter.MethodNameFilter\",\"name\": \"sdsdsdsdsdsdsdsdsd\"}]"));
-        rule1.setAction(mapper.readTree("{\"clazz\":\"com.hashmapinc.server.extensions.core.action.telemetry.TelemetryPluginAction\", \"name\":\"TelemetryMsgConverterAction\", \"configuration\":{\"timeUnit\":\"DAYS\", \"ttlValue\":1}}"));
+        rule1.setAction(mapper.readTree("{\"clazz\":\"com.hashmapinc.server.extensions.core.action.telemetry.TelemetryPluginAction\", \"name\":\"TelemetryMsgConverterAction\", \"configuration\":{\"timeUnit\":\"DAYS\", \"ttlValue\":1, \"qualityTimeWindow\":60000, \"qualityDepthWindow\":3000}}"));
         RuleMetaData savedRule1 = doPost("/api/rule", rule1, RuleMetaData.class);
 
         RuleMetaData rule2 = new RuleMetaData();
         rule2.setName("My Rule2");
         rule2.setPluginToken(tenantPlugin.getApiToken());
         rule2.setFilters(mapper.readTree("[{\"configuration\": {\"deviceTypes\": [{\"name\": \"Well\"}]},\"clazz\":\"com.hashmapinc.server.extensions.core.filter.DeviceTypeFilter\",\"name\": \"jetinder\"}, {\"configuration\": {\"methodNames\": [{\"name\": \"sdsdsdsdsdsdsd\"}]},\"clazz\":\"com.hashmapinc.server.extensions.core.filter.MethodNameFilter\",\"name\":\"sdsdsdsdsdsdsdsdsd\"}]"));
-        rule2.setAction(mapper.readTree("{\"clazz\":\"com.hashmapinc.server.extensions.core.action.telemetry.TelemetryPluginAction\", \"name\":\"TelemetryMsgConverterAction\", \"configuration\":{\"timeUnit\":\"DAYS\", \"ttlValue\":1}}"));
-        rule2.setAction(mapper.readTree("{\"clazz\":\"com.hashmapinc.server.extensions.core.action.telemetry.TelemetryPluginAction\", \"name\":\"TelemetryMsgConverterAction\", \"configuration\":{\"timeUnit\":\"DAYS\", \"ttlValue\":1}}"));
+        rule2.setAction(mapper.readTree("{\"clazz\":\"com.hashmapinc.server.extensions.core.action.telemetry.TelemetryPluginAction\", \"name\":\"TelemetryMsgConverterAction\", \"configuration\":{\"timeUnit\":\"DAYS\", \"ttlValue\":1, \"qualityTimeWindow\":60000, \"qualityDepthWindow\":3000}}"));
+        rule2.setAction(mapper.readTree("{\"clazz\":\"com.hashmapinc.server.extensions.core.action.telemetry.TelemetryPluginAction\", \"name\":\"TelemetryMsgConverterAction\", \"configuration\":{\"timeUnit\":\"DAYS\", \"ttlValue\":1, \"qualityTimeWindow\":60000, \"qualityDepthWindow\":3000}}"));
         RuleMetaData savedRule2 = doPost("/api/rule", rule2, RuleMetaData.class);
 
         ApplicationFieldsWrapper applicationRulesWrapper = new ApplicationFieldsWrapper();
@@ -654,7 +654,7 @@ public class BaseApplicationControllerTest extends AbstractControllerTest {
         rule1.setFilters(mapper.readTree("[{\"clazz\":\"com.hashmapinc.server.extensions.core.filter.MsgTypeFilter\", " +
                 "\"name\":\"TelemetryFilter\", " +
                 "\"configuration\": {\"messageTypes\":[\"POST_TELEMETRY\",\"POST_ATTRIBUTES\",\"GET_ATTRIBUTES\"]}}]"));
-        rule1.setAction(mapper.readTree("{\"clazz\":\"com.hashmapinc.server.extensions.core.action.telemetry.TelemetryPluginAction\", \"name\":\"TelemetryMsgConverterAction\", \"configuration\":{\"timeUnit\":\"DAYS\", \"ttlValue\":1}}"));
+        rule1.setAction(mapper.readTree("{\"clazz\":\"com.hashmapinc.server.extensions.core.action.telemetry.TelemetryPluginAction\", \"name\":\"TelemetryMsgConverterAction\", \"configuration\":{\"timeUnit\":\"DAYS\", \"ttlValue\":1, \"qualityTimeWindow\":60000, \"qualityDepthWindow\":3000}}"));
         RuleMetaData savedRule1 = doPost("/api/rule", rule1, RuleMetaData.class);
 
         RuleMetaData rule2 = new RuleMetaData();
@@ -663,7 +663,7 @@ public class BaseApplicationControllerTest extends AbstractControllerTest {
         rule2.setFilters(mapper.readTree("[{\"clazz\":\"com.hashmapinc.server.extensions.core.filter.MsgTypeFilter\", " +
                 "\"name\":\"TelemetryFilter\", " +
                 "\"configuration\": {\"messageTypes\":[\"POST_TELEMETRY\",\"POST_ATTRIBUTES\",\"GET_ATTRIBUTES\"]}}]"));
-        rule2.setAction(mapper.readTree("{\"clazz\":\"com.hashmapinc.server.extensions.core.action.telemetry.TelemetryPluginAction\", \"name\":\"TelemetryMsgConverterAction\", \"configuration\":{\"timeUnit\":\"DAYS\", \"ttlValue\":1}}"));
+        rule2.setAction(mapper.readTree("{\"clazz\":\"com.hashmapinc.server.extensions.core.action.telemetry.TelemetryPluginAction\", \"name\":\"TelemetryMsgConverterAction\", \"configuration\":{\"timeUnit\":\"DAYS\", \"ttlValue\":1, \"qualityTimeWindow\":60000, \"qualityDepthWindow\":3000}}"));
         RuleMetaData savedRule2 = doPost("/api/rule", rule2, RuleMetaData.class);
         JSONObject obj = new JSONObject(rule2.getFilters());
 
@@ -673,7 +673,7 @@ public class BaseApplicationControllerTest extends AbstractControllerTest {
         rule3.setFilters(mapper.readTree("[{\"clazz\":\"com.hashmapinc.server.extensions.core.filter.MsgTypeFilter\", " +
                 "\"name\":\"TelemetryFilter\", " +
                 "\"configuration\": {\"messageTypes\":[\"POST_TELEMETRY\",\"POST_ATTRIBUTES\",\"GET_ATTRIBUTES\"]}}]"));
-        rule3.setAction(mapper.readTree("{\"clazz\":\"com.hashmapinc.server.extensions.core.action.telemetry.TelemetryPluginAction\", \"name\":\"TelemetryMsgConverterAction\", \"configuration\":{\"timeUnit\":\"DAYS\", \"ttlValue\":1}}"));
+        rule3.setAction(mapper.readTree("{\"clazz\":\"com.hashmapinc.server.extensions.core.action.telemetry.TelemetryPluginAction\", \"name\":\"TelemetryMsgConverterAction\", \"configuration\":{\"timeUnit\":\"DAYS\", \"ttlValue\":1, \"qualityTimeWindow\":60000, \"qualityDepthWindow\":3000}}"));
         RuleMetaData savedRule3 = doPost("/api/rule", rule3, RuleMetaData.class);
 
         ApplicationFieldsWrapper applicationRulesWrapper = new ApplicationFieldsWrapper();
@@ -765,7 +765,7 @@ public class BaseApplicationControllerTest extends AbstractControllerTest {
         rule1.setFilters(mapper.readTree("[{\"clazz\":\"com.hashmapinc.server.extensions.core.filter.MsgTypeFilter\", " +
                 "\"name\":\"TelemetryFilter\", " +
                 "\"configuration\": {\"messageTypes\":[\"POST_TELEMETRY\",\"POST_ATTRIBUTES\",\"GET_ATTRIBUTES\"]}}]"));
-        rule1.setAction(mapper.readTree("{\"clazz\":\"com.hashmapinc.server.extensions.core.action.telemetry.TelemetryPluginAction\", \"name\":\"TelemetryMsgConverterAction\", \"configuration\":{\"timeUnit\":\"DAYS\", \"ttlValue\":1}}"));
+        rule1.setAction(mapper.readTree("{\"clazz\":\"com.hashmapinc.server.extensions.core.action.telemetry.TelemetryPluginAction\", \"name\":\"TelemetryMsgConverterAction\", \"configuration\":{\"timeUnit\":\"DAYS\", \"ttlValue\":1, \"qualityTimeWindow\":60000, \"qualityDepthWindow\":3000}}"));
         RuleMetaData savedRule1 = doPost("/api/rule", rule1, RuleMetaData.class);
 
 
@@ -828,7 +828,7 @@ public class BaseApplicationControllerTest extends AbstractControllerTest {
         rule1.setFilters(mapper.readTree("[{\"clazz\":\"com.hashmapinc.server.extensions.core.filter.MsgTypeFilter\", " +
                 "\"name\":\"TelemetryFilter\", " +
                 "\"configuration\": {\"messageTypes\":[\"POST_TELEMETRY\",\"POST_ATTRIBUTES\",\"GET_ATTRIBUTES\"]}}]"));
-        rule1.setAction(mapper.readTree("{\"clazz\":\"com.hashmapinc.server.extensions.core.action.telemetry.TelemetryPluginAction\", \"name\":\"TelemetryMsgConverterAction\", \"configuration\":{\"timeUnit\":\"DAYS\", \"ttlValue\":1}}"));
+        rule1.setAction(mapper.readTree("{\"clazz\":\"com.hashmapinc.server.extensions.core.action.telemetry.TelemetryPluginAction\", \"name\":\"TelemetryMsgConverterAction\", \"configuration\":{\"timeUnit\":\"DAYS\", \"ttlValue\":1, \"qualityTimeWindow\":60000, \"qualityDepthWindow\":3000}}"));
         RuleMetaData savedRule1 = doPost("/api/rule", rule1, RuleMetaData.class);
 
 

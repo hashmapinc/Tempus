@@ -15,6 +15,8 @@ Data Acqusition
     coap
     http
     witsml
+    streamingdataquality
+    sparkplug
 
 =========
 API Usage

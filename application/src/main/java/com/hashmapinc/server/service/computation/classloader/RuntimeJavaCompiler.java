@@ -154,9 +154,9 @@ public class RuntimeJavaCompiler {
         if(!source.exists() && !source.createNewFile()){
             throw new IOException("Error while writing source file.");
         }
-        FileWriter writer = new FileWriter(source);
-        writer.write(sourceCode);
-        writer.close();
+        try(FileWriter writer = new FileWriter(source)) {
+            writer.write(sourceCode);
+        }
         return source;
     }
 

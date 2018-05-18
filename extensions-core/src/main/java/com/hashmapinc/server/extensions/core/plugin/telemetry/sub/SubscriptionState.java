@@ -30,7 +30,7 @@ public class SubscriptionState<T> {
     @Getter protected final EntityId entityId;
     @Getter protected final SubscriptionType type;
     @Getter protected final boolean allKeys;
-    @Getter protected final Map<String, Long> keyStates;
+    @Getter protected final Map<String, T> keyStates;
     @Getter protected final String scope;
 
     @Override

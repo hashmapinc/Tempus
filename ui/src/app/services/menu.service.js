@@ -94,6 +94,12 @@ function Menu(userService, $state, $rootScope) {
                             link: '/static/svg/widgetslightgray.svg'
                         },
                         {
+                            name: 'cluster.cluster-info',
+                            type: 'link',
+                            state: 'home.nodes',
+                            icon: 'now_widgets'
+                        },
+                        {
                             name: 'admin.system-settings',
                             type: 'toggle',
                             state: 'home.settings',
@@ -163,6 +169,16 @@ function Menu(userService, $state, $rootScope) {
                                         name: 'admin.outgoing-mail',
                                         icon: 'mail',
                                         state: 'home.settings.outgoing-mail',
+                                    }
+                                ]
+                            },
+                            {
+                                name: 'cluster.management',
+                                places: [
+                                    {
+                                        name: 'cluster.cluster-info',
+                                        icon: 'now_widgets',
+                                        state: 'home.nodes',
                                     }
                                 ]
                             }];

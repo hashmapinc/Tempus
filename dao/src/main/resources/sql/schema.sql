@@ -212,6 +212,7 @@ CREATE TABLE IF NOT EXISTS ts_kv (
     entity_id varchar(31) NOT NULL,
     key varchar(255) NOT NULL,
     ts bigint NOT NULL,
+    ts_diff bigint,
     bool_v boolean,
     str_v varchar(10000000),
     long_v bigint,
@@ -238,6 +239,7 @@ CREATE TABLE IF NOT EXISTS ds_kv (
     entity_id varchar(31) NOT NULL,
     key varchar(255) NOT NULL,
     ds double precision NOT NULL,
+    ds_diff double precision,
     bool_v boolean,
     str_v varchar(10000000),
     long_v bigint,
@@ -257,6 +259,20 @@ CREATE TABLE IF NOT EXISTS ds_kv_latest (
     dbl_v double precision,
     json_v varchar,
     CONSTRAINT ds_kv_latest_unq_key UNIQUE (entity_type, entity_id, key)
+);
+
+CREATE TABLE IF NOT EXISTS tag_metadata (
+    entity_type varchar(255) NOT NULL,
+    entity_id varchar(31) NOT NULL,
+    key varchar(255) NOT NULL,
+    unit varchar(255),
+    avg_frequency double precision,
+    max_frequency double precision,
+    min_frequency double precision,
+    mean_frequency double precision,
+    median_frequency double precision,
+    source varchar,
+    CONSTRAINT tag_metadata_unq_key UNIQUE (entity_type, entity_id, key)
 );
 
 CREATE TABLE IF NOT EXISTS user_credentials (
@@ -310,6 +326,16 @@ CREATE TABLE IF NOT EXISTS application_associated_rules(
 CREATE TABLE IF NOT EXISTS application_associated_computation_jobs(
     application_id varchar(31),
     application_computation_job_id varchar(31)
+);
+
+CREATE TABLE IF NOT EXISTS node_metric (
+    id varchar (31) NOT NULL CONSTRAINT node_metric_pkey PRIMARY KEY,
+    host varchar NOT NULL,
+    port integer NOT NULL,
+    status varchar,
+    rpc_session_count integer DEFAULT 0,
+    device_session_count integer DEFAULT 0,
+    CONSTRAINT unq_node UNIQUE (host, port)
 );
 
 CREATE TABLE IF NOT EXISTS computations (

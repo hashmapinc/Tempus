@@ -48,8 +48,8 @@ export function DeviceCardController(types) {
 
 
 /*@ngInject*/
-export function DeviceController($rootScope, userService, deviceService, customerService, $state, $stateParams,
-                                 $document, $mdDialog, $q, $translate, types) {
+export function DeviceController($rootScope,userService, deviceService, customerService, $state, $stateParams,
+                                 $document, $mdDialog, $q, $translate, types, $scope, $filter) {
 
     var customerId = $stateParams.customerId;
 
@@ -59,7 +59,25 @@ export function DeviceController($rootScope, userService, deviceService, custome
 
     var vm = this;
 
+
+
     vm.types = types;
+
+    $scope.tableView = false;
+
+
+    $scope.devices = {
+        count: 0,
+        data: []
+    };
+
+    $scope.query = {
+        order: 'key',
+        limit: 5,
+        page: 1,
+        search: null
+    };
+
 
     vm.deviceGridConfig = {
         deleteItemTitleFunc: deleteDeviceTitle,
@@ -335,6 +353,124 @@ export function DeviceController($rootScope, userService, deviceService, custome
         vm.deviceGridConfig.fetchItemsFunc = fetchDevicesFunction;
         vm.deviceGridConfig.deleteItemFunc = deleteDeviceFunction;
 
+    }
+
+    loadTableData();
+
+    function loadTableData() {
+
+        var promise = vm.deviceGridConfig.fetchItemsFunc({limit: 30, textSearch: ''}, false);
+        if(promise) {
+
+            promise.then(function success(items) {
+
+                var deviceSortList = $filter('orderBy')(items.data, $scope.query.order);
+
+
+                if ($scope.query.search != null) {
+
+                    deviceSortList = $filter('filter')(items.data, function(data) {
+                        if ($scope.query.search) {
+                            return data.name.toLowerCase().indexOf($scope.query.search.toLowerCase()) > -1 || data.type.toLowerCase().indexOf($scope.query.search.toLowerCase()) > -1;
+                        } else {
+                            return true;
+                        }
+                    });
+                }
+
+                var startIndex = $scope.query.limit * ($scope.query.page - 1);
+                var devicePaginatedata = deviceSortList.slice(startIndex, startIndex + $scope.query.limit);
+
+                $scope.devices = {
+                    count: items.data.length,
+                    data: devicePaginatedata
+                };
+
+                },
+            )
+
+        }
+    }
+
+
+    $scope.enterFilterMode = function() {
+        $scope.query.search = '';
+    }
+
+    $scope.exitFilterMode = function() {
+
+        $scope.query.search = null;
+        loadTableData();
+    }
+
+    $scope.resetFilter = function() {
+
+        $scope.query = {
+            order: 'key',
+            limit: 5,
+            page: 1,
+            search: null
+        };
+
+        loadTableData();
+    }
+
+    vm.loadTableData = loadTableData;
+    $scope.$watch("query.search", function(newVal, prevVal) {
+        if (!angular.equals(newVal, prevVal) && $scope.query.search != null) {
+            loadTableData();
+        }
+    });
+
+    $scope.onReorder = function() {
+
+        loadTableData();
+    }
+
+    $scope.onPaginate = function() {
+
+        loadTableData();
+
+    }
+
+    $scope.deleteDevice = function($event,item) {
+
+        var confirm = $mdDialog.confirm()
+            .targetEvent($event)
+            .title(deleteDeviceTitle(item))
+            .htmlContent(deleteDeviceText(item))
+            .ariaLabel($translate.instant('grid.delete-item'))
+            .cancel($translate.instant('action.no'))
+            .ok($translate.instant('action.yes'));
+        $mdDialog.show(confirm).then(function () {
+                vm.deviceGridConfig.deleteItemFunc(item.id.id).then(function success() {
+                    $scope.resetFilter();
+
+                });
+            },
+            function () {
+            });
+    }
+
+    $scope.addDevice = function($event) {
+
+        $mdDialog.show({
+            controller: 'AddItemController',
+            controllerAs: 'vm',
+            templateUrl: 'device/add-device.tpl.html',
+            parent: angular.element($document[0].body),
+            locals: {saveItemFunction: vm.deviceGridConfig.saveItemFunc},
+            fullscreen: true,
+            targetEvent: $event
+        }).then(function () {
+            $scope.resetFilter();
+        }, function () {
+        });
+
+    }
+
+    $scope.deviceDetailFunc = function($event,device) {
+        $rootScope.$emit("CallTableDetailDevice", [$event, device]);
     }
 
     function deleteDeviceTitle(device) {

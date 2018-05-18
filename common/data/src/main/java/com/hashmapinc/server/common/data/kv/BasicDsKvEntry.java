@@ -25,10 +25,19 @@ import java.util.Optional;
 public class BasicDsKvEntry implements DsKvEntry{
     private final Double ds;
     private final KvEntry kv;
+    private double dsDiff;
 
     public BasicDsKvEntry(Double Ds, KvEntry kv) {
         this.ds = Ds;
         this.kv = kv;
+    }
+
+    public double getDsDiff() {
+        return dsDiff;
+    }
+
+    public void setDsDiff(double dsDiff) {
+        this.dsDiff = dsDiff;
     }
 
     @Override

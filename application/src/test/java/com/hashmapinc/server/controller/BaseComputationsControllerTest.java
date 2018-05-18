@@ -180,7 +180,7 @@ public class BaseComputationsControllerTest extends AbstractControllerTest {
                 "\"name\":\"TelemetryFilter\", " +
                 "\"configuration\": {\"messageTypes\":[\"POST_TELEMETRY\",\"POST_ATTRIBUTES\",\"GET_ATTRIBUTES\"]}}]"));
         rule.setAction(mapper.readTree("{\"clazz\":\"com.hashmapinc.server.extensions.core.action.telemetry.TelemetryPluginAction\", \"name\":\"TelemetryMsgConverterAction\", " +
-                "\"configuration\":{\"timeUnit\":\"DAYS\", \"ttlValue\":1}}"));
+                "\"configuration\":{\"timeUnit\":\"DAYS\", \"ttlValue\":1, \"qualityTimeWindow\":60000, \"qualityDepthWindow\":3000}}"));
         return rule;
     }
 
