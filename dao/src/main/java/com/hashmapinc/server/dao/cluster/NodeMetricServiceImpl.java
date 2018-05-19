@@ -59,7 +59,7 @@ public class NodeMetricServiceImpl extends AbstractEntityService implements Node
             nodeMetric.get().setRpcSessionCount(rpcSessionCount + 1);
             return nodeMetricDao.save(nodeMetric.get());
         }
-        return nodeMetric.get();
+        return null;
     }
 
     @Override
@@ -77,7 +77,7 @@ public class NodeMetricServiceImpl extends AbstractEntityService implements Node
             }*/
             return nodeMetricDao.save(nodeMetric.get());
         }
-        return nodeMetric.get();
+        return null;
     }
 
     @Override
@@ -89,7 +89,7 @@ public class NodeMetricServiceImpl extends AbstractEntityService implements Node
             nodeMetric.get().setDeviceSessionCount(deviceSessionCount + 1);
             return nodeMetricDao.save(nodeMetric.get());
         }
-        return nodeMetric.get();
+        return null;
     }
 
     @Override
@@ -107,7 +107,7 @@ public class NodeMetricServiceImpl extends AbstractEntityService implements Node
             }*/
             return nodeMetricDao.save(nodeMetric.get());
         }
-        return nodeMetric.get();
+        return null;
     }
 
     @Override
@@ -127,6 +127,6 @@ public class NodeMetricServiceImpl extends AbstractEntityService implements Node
             nodeMetric.get().setNodeStatus(nodeStatus);
             return nodeMetricDao.save(nodeMetric.get());
         }
-        return nodeMetric.get();
+        return null;
     }
 }

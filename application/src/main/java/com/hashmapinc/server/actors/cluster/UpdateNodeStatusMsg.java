@@ -19,10 +19,22 @@ import com.hashmapinc.server.common.data.cluster.NodeStatus;
 
 public class UpdateNodeStatusMsg {
     private final NodeStatus nodeStatus;
+    private final String host;
+    private final int port;
 
-    public UpdateNodeStatusMsg(NodeStatus nodeStatus) {
+    public UpdateNodeStatusMsg(NodeStatus nodeStatus, String host, int port) {
         super();
         this.nodeStatus = nodeStatus;
+        this.host = host;
+        this.port = port;
+    }
+
+    public String getHost() {
+        return host;
+    }
+
+    public int getPort() {
+        return port;
     }
 
     public NodeStatus getNodeStatus() {
