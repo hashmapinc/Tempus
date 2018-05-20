@@ -62,17 +62,8 @@ public class MetaDataAggregator {
                 if(!data.isEmpty()) {
                     for (KvEntry entry: kvEntries) {
                         AggregationFunc<TsKvEntry> aggregationFunc = new AggregationFunc<>(data);
-                        Double avg = aggregationFunc.calAvg(entry.getKey());
-                        double min = aggregationFunc.calMin(entry.getKey());
-                        double max = aggregationFunc.calMax(entry.getKey());
-                        Double median = aggregationFunc.calMedian(entry.getKey());
-                        String unit = "no unit";
-                        if(((BasicKvEntry)entry).getUnit().isPresent()){
-                            unit = ((BasicKvEntry)entry).getUnit().get();
+                        aggregateForKvEntry(aggregationFunc, entry);
                         }
-                        AggregatedMetaData aggregatedMetaData = new AggregatedMetaData(avg, max, min, avg, median);
-                        saveToTagMetaData(aggregatedMetaData, entry.getKey(), unit);
-                    }
                 }
             }
             @Override
@@ -82,9 +73,9 @@ public class MetaDataAggregator {
         });
     }
 
-    public void aggregateDepthMetaData(double endDs, List<DsKvEntry> dsKvEntries){
+    public void aggregateDepthMetaData(double endDs, List<KvEntry> kvEntries){
         Set<String> keys = new HashSet<>();
-        for (DsKvEntry entry: dsKvEntries){
+        for (KvEntry entry: kvEntries){
             keys.add(entry.getKey());
         }
         List<DsKvQuery> queries = keys.stream().map(key -> new BaseDsKvQuery(key,endDs - depthAggregationPeriod, endDs, depthAggregationPeriod, limit, DepthAggregation.NONE)).collect(Collectors.toList());
@@ -92,16 +83,10 @@ public class MetaDataAggregator {
             @Override
             public void onSuccess(PluginContext ctx, List<DsKvEntry> data) {
                 if(!data.isEmpty()) {
-                    for (String key : keys) {
+                    for (KvEntry entry : kvEntries) {
                         AggregationFunc<DsKvEntry> aggregationFunc = new AggregationFunc<>(data);
-                        Double avg = aggregationFunc.calAvg(key);
-                        double min = aggregationFunc.calMin(key);
-                        double max = aggregationFunc.calMax(key);
-                        Double median = aggregationFunc.calMedian(key);
-                        String unit = "no unit";
-                        AggregatedMetaData aggregatedMetaData = new AggregatedMetaData(avg, max, min, avg, median);
-                        saveToTagMetaData(aggregatedMetaData, key, unit);
-                    }
+                        aggregateForKvEntry(aggregationFunc, entry);
+                        }
                 }
             }
             @Override
@@ -109,6 +94,19 @@ public class MetaDataAggregator {
                 log.info("Failed to fetch TsKvEntry List.");
             }
         });
+    }
+
+    private void aggregateForKvEntry(AggregationFunc aggregationFunc, KvEntry entry){
+        Double avg = aggregationFunc.calAvg(entry.getKey());
+        double min = aggregationFunc.calMin(entry.getKey());
+        double max = aggregationFunc.calMax(entry.getKey());
+        Double median = aggregationFunc.calMedian(entry.getKey());
+        String unit = "no unit";
+        if(((BasicKvEntry)entry).getUnit().isPresent()){
+            unit = ((BasicKvEntry)entry).getUnit().get();
+        }
+        AggregatedMetaData aggregatedMetaData = new AggregatedMetaData(avg, max, min, avg, median);
+        saveToTagMetaData(aggregatedMetaData, entry.getKey(), unit);
     }
 
     private void saveToTagMetaData(AggregatedMetaData aggregatedMetaData, String key, String unit){

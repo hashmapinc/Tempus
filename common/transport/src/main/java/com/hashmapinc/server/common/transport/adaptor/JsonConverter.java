@@ -170,15 +170,15 @@ public class JsonConverter {
         boolean unitPresent = false;
         if (value.has("value") && value.has("unit")){
             if(value.get("value").getNodeType() == JsonNodeType.BOOLEAN){
-                result.add(new BooleanDataEntry(key, value.get("value").asBoolean()));
+                result.add(new BooleanDataEntry(key, value.get("unit").asText(), value.get("value").asBoolean()));
             }else if(value.get("value").getNodeType() == JsonNodeType.STRING){
-                result.add(new StringDataEntry(key, value.get("value").asText()));
+                result.add(new StringDataEntry(key, value.get("unit").asText(), value.get("value").asText()));
             }else if(value.get("value").getNodeType() == JsonNodeType.NUMBER){
                 parseNumericValue(result, key, value.get("unit").asText(), value.get("value"));
             }
             unitPresent = true;
         }
-        return true;
+        return unitPresent;
     }
 
     private static void parseNumericValue(List<KvEntry> result, Entry<String, JsonElement> valueEntry, JsonPrimitive value) {
