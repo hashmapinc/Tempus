@@ -54,10 +54,10 @@ public class NodeMetricActor extends ContextAwareActor {
             systemContext.getNodeMetricService().decrementDeviceSessionCount(host, port);
         } else if (message instanceof UpdateNodeStatusMsg) {
             logger.debug("message type UpdateNodeStatusMsg");
-            systemContext.getNodeMetricService().updateNodeStatus(((UpdateNodeStatusMsg) message).getNodeStatus(), host, port);
+            systemContext.getNodeMetricService().updateNodeStatus(((UpdateNodeStatusMsg) message).getNodeStatus(), ((UpdateNodeStatusMsg) message).getHost(), ((UpdateNodeStatusMsg) message).getPort());
         } else if (message instanceof DeleteNodeEntryMsg) {
             logger.error("message type DeleteNodeEntryMsg");
-            systemContext.getNodeMetricService().deleteNodeEntryByHostAndPort(host, port);
+            systemContext.getNodeMetricService().deleteNodeEntryByHostAndPort(((DeleteNodeEntryMsg) message).getHost(), ((DeleteNodeEntryMsg) message).getPort());
         }
     }
 
