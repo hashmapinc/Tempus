@@ -28,6 +28,7 @@ public abstract class BasicKvEntry implements KvEntry {
 
     protected BasicKvEntry(String key) {
         this.key = key;
+        this.unit = Optional.empty();
     }
 
     protected BasicKvEntry(String key, String unit) {

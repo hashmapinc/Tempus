@@ -16,9 +16,13 @@
 package com.hashmapinc.server.transport.mqtt.sparkplugB;
 
 import com.cirruslink.sparkplug.message.SparkplugBPayloadDecoder;
+import com.cirruslink.sparkplug.message.model.MetaData;
 import com.cirruslink.sparkplug.message.model.Metric;
 import com.cirruslink.sparkplug.message.model.MetricDataType;
 import com.cirruslink.sparkplug.message.model.SparkplugBPayload;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.hashmapinc.server.transport.mqtt.sparkplugB.data.SparkPlugDecodedMsg;
 import io.netty.buffer.ByteBuf;
 import io.netty.handler.codec.mqtt.MqttPublishMessage;
@@ -92,9 +96,33 @@ public class SparkPlugDecodeService extends SparkPlugUtils {
         List<Metric> metricList = sparkplugBPayload.getMetrics();
         List<KvEntry> kvEntryList = new ArrayList<>();
         for (Metric metric : metricList) {
-            createKvEntryByDatatype(metric, kvEntryList);
+            MetaData metaData = metric.getMetaData();
+            if(metaData != null && metaData.getContentType().contentEquals("json")){
+                String description = metaData.getDescription();
+                JsonElement jsonElement = new JsonParser().parse(description);
+                JsonObject jsonObject = jsonElement.getAsJsonObject();
+                if(jsonObject.has("unit")){
+                    String unit = jsonObject.getAsJsonPrimitive("unit").getAsString();
+                    createKvEntryByDatatype(metric, unit, kvEntryList);
+                }
+            }
+            else
+                createKvEntryByDatatype(metric, kvEntryList);
         }
         return kvEntryList;
+    }
+
+    private void createKvEntryByDatatype(Metric metric, String unit, List<KvEntry> kvEntryList){
+        MetricDataType dataType = metric.getDataType();
+        if(dataType.getClazz() == String.class){
+            kvEntryList.add(new StringDataEntry(metric.getName(), unit, (String) metric.getValue()));
+        }else if(dataType.getClazz() == Long.class){
+            kvEntryList.add(new LongDataEntry(metric.getName(), unit, (Long) metric.getValue()));
+        }else if(dataType.getClazz() == Double.class){
+            kvEntryList.add(new DoubleDataEntry(metric.getName(), unit,(Double) metric.getValue()));
+        }else if(dataType.getClazz() == Boolean.class){
+            kvEntryList.add(new BooleanDataEntry(metric.getName(), unit, (Boolean)metric.getValue()));
+        }
     }
 
     private void createKvEntryByDatatype(Metric metric, List<KvEntry> kvEntryList){
@@ -104,9 +132,9 @@ public class SparkPlugDecodeService extends SparkPlugUtils {
         }else if(dataType.getClazz() == Long.class){
             kvEntryList.add(new LongDataEntry(metric.getName(), (Long) metric.getValue()));
         }else if(dataType.getClazz() == Double.class){
-            kvEntryList.add(new DoubleDataEntry(metric.getName(),(Double) metric.getValue()));
+            kvEntryList.add(new DoubleDataEntry(metric.getName(), (Double) metric.getValue()));
         }else if(dataType.getClazz() == Boolean.class){
-            kvEntryList.add(new BooleanDataEntry(metric.getName(),(Boolean)metric.getValue()));
+            kvEntryList.add(new BooleanDataEntry(metric.getName(), (Boolean)metric.getValue()));
         }
     }
 

@@ -60,10 +60,10 @@ public class MetaDataAggregator {
             @Override
             public void onSuccess(PluginContext ctx, List<TsKvEntry> data) {
                 if(!data.isEmpty()) {
+                    AggregationFunc<TsKvEntry> aggregationFunc = new AggregationFunc<>(data);
                     for (KvEntry entry: kvEntries) {
-                        AggregationFunc<TsKvEntry> aggregationFunc = new AggregationFunc<>(data);
                         aggregateForKvEntry(aggregationFunc, entry);
-                        }
+                    }
                 }
             }
             @Override
@@ -83,10 +83,10 @@ public class MetaDataAggregator {
             @Override
             public void onSuccess(PluginContext ctx, List<DsKvEntry> data) {
                 if(!data.isEmpty()) {
+                    AggregationFunc<DsKvEntry> aggregationFunc = new AggregationFunc<>(data);
                     for (KvEntry entry : kvEntries) {
-                        AggregationFunc<DsKvEntry> aggregationFunc = new AggregationFunc<>(data);
                         aggregateForKvEntry(aggregationFunc, entry);
-                        }
+                    }
                 }
             }
             @Override
