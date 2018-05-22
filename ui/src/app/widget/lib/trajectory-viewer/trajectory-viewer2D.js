@@ -85,7 +85,7 @@ export function convertProjectionsToXY(projections) {
   var xyArray = [];
 
   // get origin point. This will be used to calculate the X dimension
-  var origin = xyArray[0];
+  var origin = projections[0];
 
   // iterate through projections and generate XY coordinates
   projections.forEach(projection => {
