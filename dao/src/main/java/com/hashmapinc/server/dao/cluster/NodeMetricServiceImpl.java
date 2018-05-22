@@ -35,7 +35,12 @@ public class NodeMetricServiceImpl extends AbstractEntityService implements Node
     @Override
     public NodeMetric save(NodeMetric nodeMetric) {
         log.debug("Executing NodeMetricServiceImpl save NodeMetric [{}]", nodeMetric);
-        return nodeMetricDao.save(nodeMetric);
+        Optional<NodeMetric> found = findNodeMetricByHostAndPort(nodeMetric.getHost(), nodeMetric.getPort());
+        if (found.isPresent()) {
+            return found.get();
+        } else {
+            return nodeMetricDao.save(nodeMetric);
+        }
     }
 
     @Override
