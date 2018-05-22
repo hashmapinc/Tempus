@@ -158,7 +158,7 @@ public class ComputationsController extends BaseController {
                 TenantId tenantId = getCurrentUser().getTenantId();
                 List<Computations> computations = checkNotNull(computationsService.findAllTenantComputationsByTenantId(tenantId));
                 computations = computations.stream()
-                        .filter(computation -> computation.getTenantId().getId().equals(ModelConstants.NULL_UUID)).collect(Collectors.toList());
+                        .filter(computation -> !computation.getTenantId().getId().equals(ModelConstants.NULL_UUID)).collect(Collectors.toList());
                 log.trace(" returning Computations {} ", computations);
                 return computations;
         } catch (Exception e) {
