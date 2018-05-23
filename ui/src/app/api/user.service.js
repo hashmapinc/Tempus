@@ -511,13 +511,13 @@ function UserService($http, $q, $rootScope, adminService, dashboardService, logi
                     params = {dashboardId: lastPublicDashboardId};
                 }
             } else if (currentUser.authority === 'SYS_ADMIN') {
-                adminService.checkUpdates().then(
-                    function (updateMessage) {
-                        if (updateMessage && updateMessage.updateAvailable) {
-                            toast.showInfo(updateMessage.message, 0, null, 'bottom right');
-                        }
-                    }
-                );
+                // adminService.checkUpdates().then(
+                //     function (updateMessage) {
+                //         if (updateMessage && updateMessage.updateAvailable) {
+                //             toast.showInfo(updateMessage.message, 0, null, 'bottom right');
+                //         }
+                //     }
+                // );
             }
             $state.go(place, params);
         } else {
