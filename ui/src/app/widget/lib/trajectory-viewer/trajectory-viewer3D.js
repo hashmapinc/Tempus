@@ -14,97 +14,9 @@
  * limitations under the License.
  */
 
-import * as THREE from 'three';
 import * as trajXYZ from './trajectoryXYZconverter';
 import angular from 'angular';
-import Plotly from 'plotly.js/lib/index-basic';
-
-/**
- * This function takes a XYZ trajectory array and returns the ideal plane of 
- * projection for a 2D view of the coordinates.
- * 
- * The plane is calculated by unbounding y (the tvd dimension) and calculating the line
- * between the first and last xyz points in the XZ plane, creating a plane in 3 dimensions
- * 
- * Coordinates should be ordered by the measured depth of the source reading.
- *
- * @param xyzArray - array of XYZ coordinates to calculate plane from
- * @returns normal - 3D vector normal to the calculated plane
- */
-export function calculatePlaneNormal(xyzArray) {
-  // get planar vector endpoints 
-  var p0 = xyzArray[0];
-  var pn = xyzArray[xyzArray.length - 1];
-
-  // create the 2 necessary vectors to describe a plane
-  var planarVectorA = new THREE.Vector3(0,1,0); // first planar vector
-  var planarVectorB = new THREE.Vector3(
-    pn.x - p0.x, 
-    pn.y - p0.y, 
-    pn.z - p0.z
-  );
-  
-  // compute the plane normal vector with cross product of the planar vectors
-  var normal = new THREE.Vector3(0,0,0);
-  normal.crossVectors(planarVectorA, planarVectorB);
-
-  return normal;
-}
-
-/**
- * This function projects all points in xyzArray onto the plane normal to planeNormal.
- * 
- * Coordinates should be ordered by the measured depth of the source reading.
- *
- * @param xyzArray - array of XYZ coordinates to project
- * @param planeNormal - vector normal to the plane of projection
- * @returns projectedArray - array of THREE.Vector3 objects containing the projection.
- */
-export function projectOnPlane(xyzArray, planeNormal) {
-  // create empty array to hold results
-  var projectedArray = [];
-
-  // iterate through each point and push projection into projectedArray
-  xyzArray.forEach(point => {
-    var pointVector = new THREE.Vector3(point.x, point.y, point.z);
-    projectedArray.push(pointVector.projectOnPlane(planeNormal));
-  });
-
-  return projectedArray;
-}
-
-/**
- * This function converts an array of THREE.Vector3 objects that have been projected
- * into the same plane to an array of objects with X and Y coordinates for 2D plotting
- * 
- * projections should be ordered by the measured depth of the source reading.
- * 
- * @param projections - array of XYZ coordinates to project
- * @returns xyArray - array of XY objects ready for plotting in 2 dimensions
- */
-export function convertProjectionsToXY(projections) {
-  // create empty array to hold results
-  var xyArray = [];
-
-  // get origin point. This will be used to calculate the X dimension
-  var origin = projections[0];
-
-  // iterate through projections and generate XY coordinates
-  projections.forEach(projection => {
-    // get y poisiton directly from projection
-    var y = projection.y;
-
-    // get x position as the distance between the origin and projection in the XZ plane
-    var xDelta = projection.x - origin.x;
-    var zDelta = projection.z - origin.z;
-    var x = Math.sqrt(xDelta*xDelta + zDelta*zDelta);
-
-    // push the new XY point to the results array
-    xyArray.push({x: x, y: y});
-  });
-
-  return xyArray;
-}
+import Plotly from 'plotly.js';
 
 /** 
  * this function builds the chart
@@ -114,7 +26,7 @@ export function convertProjectionsToXY(projections) {
 export function createWidget($container) {
   // create chart
   var rawHTML = `
-    <div id='trajectory-viewer2D-chart'></div>
+    <div id='trajectory-viewer3D-chart'></div>
   `
   var chart = angular.element(rawHTML);
 
@@ -132,22 +44,24 @@ export function createWidget($container) {
  * this function builds the chart
  */
 export function destroyWidget() {
-  angular.element("#trajectory-viewer2D-chart")
+  angular.element("#trajectory-viewer3D-chart")
 }
 
 /**
  * 
  * @param xArray - array containing data to plot in the x axis
  * @param yArray - array containing data to plot in the y axis
+ * @param zArray - array containing data to plot in the z axis
  */
-export function plot(xArray, yArray) {
+export function plot(xArray, yArray, zArray) {
   // get data
-  var trace1 = {
+  var data = [{
     x: xArray,
     y: yArray,
-    type: 'scatter'
-  };
-  var data = [trace1];
+    z: zArray,
+    type: 'scatter3d',
+    mode: 'lines'
+  }];
 
   // get layout
   var layout = {
@@ -159,7 +73,7 @@ export function plot(xArray, yArray) {
     }
   };
 
-  Plotly.plot('trajectory-viewer2D-chart', data, layout);
+  Plotly.plot('trajectory-viewer3D-chart', data, layout);
 }
 
 /**
@@ -179,7 +93,9 @@ export function onWindowResize($container) {
     height: $container.height(),
     width: $container.width()
   };
-  Plotly.relayout('trajectory-viewer2D-chart', newLayout);
+
+  // update layout with new size
+  Plotly.relayout('trajectory-viewer3D-chart', newLayout);
 }
 
 /**
@@ -187,20 +103,9 @@ export function onWindowResize($container) {
  * 
  * @param ctx - widget context
  */
-export function onDataUpdated(ctx) { 
+export function onDataUpdated(ctx) { //eslint-disable-line no-unused-vars
   // get new data from ctx
-  var xArray = [], yArray = [];
-  ctx.data[0].data.forEach(point => {
-    xArray.push(point[0]);
-    yArray.push(point[1]);
-  });
-
-  var newData = [{ //eslint-disable-line no-unused-vars
-    x: xArray,
-    y: yArray,
-    type: 'scatter'
-  }];
-  // Plotly.react('trajectory-viewer2D-chart', newData);
+  // Plotly.react('trajectory-viewer3D-chart', newData);
 }
 
 /**
@@ -220,18 +125,14 @@ export function init(widgetContext) {
   // convert to XYZ coordinates
   var xyz = trajXYZ.convertRawToXYZ(rawTrajectory);
 
-  // get 2D coordinates
-  var planeNormal = calculatePlaneNormal(xyz);
-  var projections = projectOnPlane(xyz, planeNormal);
-  var xy = convertProjectionsToXY(projections);
-
-  // process 2D coordinates for plotly
-  var xArray = [], yArray = [];
-  xy.forEach(point => {
+  // process 3D coordinates for plotly
+  var xArray = [], yArray = [], zArray = [];
+  xyz.forEach(point => {
     xArray.push(point.x);
-    yArray.push(point.y);
+    yArray.push(point.z); // this y/z thing is an oddity of THREE.js. I'll fix this if we remove THREE.js
+    zArray.push(point.y); // this y/z thing is an oddity of THREE.js. I'll fix this if we remove THREE.js
   });
 
   //plot the coordinates
-  plot(xArray,yArray);
+  plot(xArray, yArray, zArray);
 }
