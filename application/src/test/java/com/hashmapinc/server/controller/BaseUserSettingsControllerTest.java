@@ -20,6 +20,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.hashmapinc.server.common.data.User;
 import com.hashmapinc.server.common.data.UserSettings;
+import org.junit.Assert;
 import org.junit.Test;
 
 import static org.hamcrest.Matchers.*;
@@ -62,10 +63,14 @@ public abstract class BaseUserSettingsControllerTest extends AbstractControllerT
         .andExpect(jsonPath("$.jsonValue.smtpProtocol", is("smtp")))
         .andExpect(jsonPath("$.jsonValue.smtpHost", is("localhost")))
         .andExpect(jsonPath("$.jsonValue.smtpPort", is("25")));
-        
-        doGet("/api/settings/unknown")
-        .andExpect(status().isNotFound());
-        
+
+        try {
+            UserSettings userSettings = doGet("/api/settings/unknown", UserSettings.class);
+            Assert.fail();
+        } catch (Exception e) {
+            //Jackson Bind will fail to map it user setting in case of null
+            e.printStackTrace();
+        }
     }
 
     

@@ -86,9 +86,11 @@ public class BaseDepthseriesServiceTest extends AbstractServiceTest {
         saveEntries(deviceId, DS - 100D);
         saveEntries(deviceId, DS);
 
+        BasicDsKvEntry basicDsKvEntry = new BasicDsKvEntry(DS, stringKvEntry);
+
         List<DsKvEntry> entries = dsService.findLatest(deviceId, Collections.singleton(STRING_KEY)).get();
         Assert.assertEquals(1, entries.size());
-        Assert.assertEquals(toDsEntry(DS, stringKvEntry).toString().trim(),entries.get(0).toString().trim());
+        Assert.assertEquals(basicDsKvEntry.toString().trim(),entries.get(0).toString().trim());
     }
 
     @Test
@@ -116,6 +118,10 @@ public class BaseDepthseriesServiceTest extends AbstractServiceTest {
 
         assertEquals(new Double(35000), list.get(2).getDs());
         assertEquals(java.util.Optional.of(400L), list.get(2).getLongValue());
+
+        assertNotNull(((BasicDsKvEntry)list.get(0)).getDsDiff());
+        assertNotNull(((BasicDsKvEntry)list.get(0)).getDsDiff());
+        assertNotNull(((BasicDsKvEntry)list.get(0)).getDsDiff());
 
         list = dsService.findAll(deviceId, Collections.singletonList(new BaseDsKvQuery(LONG_KEY, 0D,
                 60000D, 20000D, 3, DepthAggregation.AVG))).get();
@@ -197,7 +203,9 @@ public class BaseDepthseriesServiceTest extends AbstractServiceTest {
     }
 
     private static DsKvEntry toDsEntry(Double ds, KvEntry entry) {
-        return new BasicDsKvEntry(ds, entry);
+        BasicDsKvEntry basicDsKvEntry =  new BasicDsKvEntry(ds, entry);
+        basicDsKvEntry.setDsDiff(0.0);
+        return basicDsKvEntry;
     }
 
 
