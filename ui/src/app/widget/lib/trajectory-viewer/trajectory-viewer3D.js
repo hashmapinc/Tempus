@@ -60,7 +60,11 @@ export function plot(xArray, yArray, zArray) {
     y: yArray,
     z: zArray,
     type: 'scatter3d',
-    mode: 'lines'
+    mode: 'lines+markers',
+    marker: {
+      symbol: 'diamond',
+      size: 3
+    }
   }];
 
   // get layout
@@ -70,10 +74,21 @@ export function plot(xArray, yArray, zArray) {
       l: 40, //left margin
       r: 40, //right margin
       b: 40 //bottom margin
+    },
+    scene: {
+      xaxis: {
+        title: 'East'
+      },
+      yaxis: {
+        title: 'North'
+      },
+      zaxis: {
+        title: 'TVD'
+      }
     }
   };
 
-  Plotly.plot('trajectory-viewer3D-chart', data, layout);
+  Plotly.newPlot('trajectory-viewer3D-chart', data, layout);
 }
 
 /**

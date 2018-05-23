@@ -142,12 +142,15 @@ export function destroyWidget() {
  */
 export function plot(xArray, yArray) {
   // get data
-  var trace1 = {
+  var data = [{
     x: xArray,
     y: yArray,
-    type: 'scatter'
-  };
-  var data = [trace1];
+    type: 'scatter',
+    mode: 'lines+markers',
+    marker: {
+      symbol: 'diamond'
+    }
+  }];
 
   // get layout
   var layout = {
@@ -159,7 +162,7 @@ export function plot(xArray, yArray) {
     }
   };
 
-  Plotly.plot('trajectory-viewer2D-chart', data, layout);
+  Plotly.newPlot('trajectory-viewer2D-chart', data, layout);
 }
 
 /**
