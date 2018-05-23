@@ -43,9 +43,9 @@
                 <configuration>
                     <groupId>com.cirruslink.sparkplug</groupId>
                     <artifactId>sparkplug-java</artifactId>
-                    <version>1.1.12</version>
+                    <version>1.1.13</version>
                     <packaging>jar</packaging>
-                    <file>${basedir}/lib/sparkplug-java-1.1.12.jar</file>
+                    <file>${basedir}/lib/sparkplug-java-1.1.13.jar</file>
                     <generatePom>true</generatePom>
                 </configuration>
                 <executions>
@@ -64,7 +64,7 @@
         <dependency>
             <groupId>com.cirruslink.sparkplug</groupId>
             <artifactId>sparkplug-java</artifactId>
-            <version>1.1.12</version>
+            <version>1.1.13</version>
         </dependency>
         <dependency>
             <groupId>com.hashmapinc.common</groupId>
