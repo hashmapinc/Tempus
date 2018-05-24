@@ -77,6 +77,16 @@ CREATE TABLE IF NOT EXISTS attribute_kv (
   CONSTRAINT attribute_kv_unq_key UNIQUE (entity_type, entity_id, attribute_type, attribute_key)
 );
 
+CREATE TABLE IF NOT EXISTS metadata_entries(
+    tenant_id varchar(31) NOT NULL,
+    metadata_config_id varchar(31) NOT NULL,
+    datasource_name varchar(255) NOT NULL,
+    key varchar(255) NOT NULL,
+    value varchar(10000000) NOT NULL,
+    last_update_ts bigint,
+    CONSTRAINT metadata_entries_unq_key UNIQUE (tenant_id, metadata_config_id, key)
+);
+
 CREATE TABLE IF NOT EXISTS component_descriptor (
     id varchar(31) NOT NULL CONSTRAINT component_descriptor_pkey PRIMARY KEY,
     actions varchar(255),

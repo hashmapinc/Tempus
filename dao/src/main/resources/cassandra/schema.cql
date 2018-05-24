@@ -396,6 +396,16 @@ CREATE MATERIALIZED VIEW IF NOT EXISTS tempus.dashboard_by_tenant_and_search_tex
 	PRIMARY KEY ( tenant_id, search_text, id )
 	WITH CLUSTERING ORDER BY ( search_text ASC, id DESC );
 
+CREATE TABLE IF NOT EXISTS tempus.metadata_entries(
+  tenant_id timeuuid,
+  metadata_config_id timeuuid,
+  datasource_name text,
+  key text,
+  value text,
+  last_update_ts bigint,
+  PRIMARY KEY(tenant_id, metadata_config_id, key)
+);
+
 CREATE TABLE IF NOT EXISTS tempus.ts_kv_cf (
     entity_type text, // (DEVICE, CUSTOMER, TENANT)
     entity_id timeuuid,
