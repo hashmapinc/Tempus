@@ -17,6 +17,8 @@ package com.hashmapinc.server.dao.nosql;
 
 import com.datastax.driver.core.*;
 import com.datastax.driver.core.exceptions.CodecNotFoundException;
+import com.datastax.driver.extras.codecs.enums.EnumNameCodec;
+import com.hashmapinc.server.common.data.security.EntitledServices;
 import com.hashmapinc.server.dao.cassandra.CassandraCluster;
 import com.hashmapinc.server.dao.model.type.*;
 import lombok.extern.slf4j.Slf4j;
@@ -48,6 +50,7 @@ public abstract class CassandraAbstractDao {
             registerCodecIfNotFound(registry, new ComponentScopeCodec());
             registerCodecIfNotFound(registry, new EntityTypeCodec());
             registerCodecIfNotFound(registry, new NodeStatusCodec());
+            registerCodecIfNotFound(registry, new EnumNameCodec<EntitledServices>(EntitledServices.class));
         }
         return session;
     }

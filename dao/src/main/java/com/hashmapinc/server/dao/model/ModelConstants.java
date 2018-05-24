@@ -102,6 +102,16 @@ public class ModelConstants {
     public static final String USER_SETTINGS_BY_KEY_COLUMN_FAMILY_NAME = "user_settings_by_key";
 
     /**
+     * Entitlements constants
+     */
+    public static final String ENTITLEMENTS_COLUMN_FAMILY_NAME = "user_entitlements";
+    public static final String USER_ENTITLEMENT_PROPERTY = "entitlement";
+    public static final String USER_ENTITLEMENTS_JOIN_TABLE = "user_entitlements_join_table";
+    public static final String ENTITLEMENTS_ENTITY_ID_COLUMN = "user_entitlements_id";
+
+
+
+    /**
      * Cassandra contact constants.
      */
     public static final String COUNTRY_PROPERTY = "country";

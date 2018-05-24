@@ -15,34 +15,29 @@
  */
 package com.hashmapinc.server.common.data.security;
 
-public enum Authority {
-    
-    SYS_ADMIN(0),
-    TENANT_ADMIN(1),
-    CUSTOMER_USER(2),
-    API_USER(3),
-    REFRESH_TOKEN(10);
+public enum EntitledServices {
+    NO_SERVICES(0),
+    METADATA_INGESTION(1);
 
     private int code;
 
-    Authority(int code) {
+    EntitledServices(int code) {
         this.code = code;
     }
-
     public int getCode() {
         return code;
     }
 
-    public static Authority parse(String value) {
-        Authority authority = null;
+    public static EntitledServices parse(String value) {
+        EntitledServices entitledServices = null;
         if (value != null && value.length() != 0) {
-            for (Authority current : Authority.values()) {
+            for (EntitledServices current : EntitledServices.values()) {
                 if (current.name().equalsIgnoreCase(value)) {
-                    authority = current;
+                    entitledServices = current;
                     break;
                 }
             }
         }
-        return authority;
+        return entitledServices;
     }
 }

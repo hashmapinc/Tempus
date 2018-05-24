@@ -27,6 +27,7 @@ import com.hashmapinc.server.common.data.plugin.ComponentDescriptor;
 import com.hashmapinc.server.dao.application.ApplicationService;
 import com.hashmapinc.server.dao.cluster.NodeMetricService;
 import com.hashmapinc.server.dao.device.DeviceCredentialsService;
+import com.hashmapinc.server.dao.entitlements.EntitlementsService;
 import com.hashmapinc.server.dao.rule.RuleService;
 import com.hashmapinc.server.dao.user.UserService;
 import com.hashmapinc.server.service.component.ComponentDiscoveryService;
@@ -127,6 +128,9 @@ public abstract class BaseController {
 
     @Autowired
     protected RelationService relationService;
+
+    @Autowired
+    protected EntitlementsService entitlementsService;
 
     @Autowired
     protected ApplicationService applicationService;

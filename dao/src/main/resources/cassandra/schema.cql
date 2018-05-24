@@ -212,6 +212,13 @@ CREATE TABLE IF NOT EXISTS tempus.application (
     PRIMARY KEY (id, tenant_id, customer_id)
 );
 
+CREATE TABLE IF NOT EXISTS tempus.user_entitlements (
+  id timeuuid,
+  user_id timeuuid,
+  entitlement set<text>,
+  PRIMARY KEY (id, user_id)
+);
+
 CREATE MATERIALIZED VIEW IF NOT EXISTS tempus.application_by_tenant_and_search_text AS
     SELECT *
     from tempus.application

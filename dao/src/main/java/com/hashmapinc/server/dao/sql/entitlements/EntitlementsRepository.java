@@ -13,9 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.hashmapinc.server.common.data;
+package com.hashmapinc.server.dao.sql.entitlements;
 
+import com.hashmapinc.server.dao.model.sql.EntitlementsEntity;
+import com.hashmapinc.server.dao.util.SqlDao;
+import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.repository.query.Param;
+import org.springframework.data.jpa.repository.Query;
 
-public enum EntityType {
-    TENANT, CUSTOMER, USER, RULE, PLUGIN, DASHBOARD, ASSET, DEVICE, ALARM, APPLICATION, COMPUTATION, COMPUTATION_JOB, NODE_METRIC, ENTITLEMENTS
+@SqlDao
+public interface EntitlementsRepository extends CrudRepository<EntitlementsEntity, String> {
+
+    @Query("SELECT e FROM EntitlementsEntity e WHERE e.userId = :userId")
+    EntitlementsEntity findByUserId(@Param("userId") String userId);
 }

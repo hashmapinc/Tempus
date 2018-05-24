@@ -318,6 +318,19 @@ CREATE TABLE IF NOT EXISTS application_device_types(
     device_type varchar(255)
 );
 
+
+CREATE TABLE IF NOT EXISTS user_entitlements(
+    id varchar(31) NOT NULL CONSTRAINT user_entitlements_pkey PRIMARY KEY,
+    user_id varchar(31)
+);
+
+
+CREATE TABLE IF NOT EXISTS user_entitlements_join_table(
+    user_entitlements_id varchar(31),
+    entitlement varchar(255)
+);
+
+
 CREATE TABLE IF NOT EXISTS application_associated_rules(
     application_id varchar(31),
     application_rule_id varchar(31)

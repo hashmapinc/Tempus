@@ -13,9 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.hashmapinc.server.common.data;
+package com.hashmapinc.server.controller.sql;
 
+import com.hashmapinc.server.controller.BaseEntitlementsControllerTest;
+import com.hashmapinc.server.dao.service.DaoSqlTest;
 
-public enum EntityType {
-    TENANT, CUSTOMER, USER, RULE, PLUGIN, DASHBOARD, ASSET, DEVICE, ALARM, APPLICATION, COMPUTATION, COMPUTATION_JOB, NODE_METRIC, ENTITLEMENTS
+@DaoSqlTest
+public class EntitlementsControllerSqlTest extends BaseEntitlementsControllerTest {
 }
