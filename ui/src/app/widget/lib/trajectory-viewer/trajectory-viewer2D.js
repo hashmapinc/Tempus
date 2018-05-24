@@ -161,7 +161,8 @@ export function plot(xArray, yArray) {
       b: 40 //bottom margin
     },
     yaxis: {
-      autorange: "reversed"
+      autorange: "reversed",
+      scaleanchor: "x"
     }
   };
 
