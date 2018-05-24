@@ -76,17 +76,14 @@ export function plot(xArray, yArray, zArray) {
       b: 40 //bottom margin
     },
     scene: {
-      camera: {
-        up: { y: 0, x: 0, z: -1 }
-      },
       aspectmode: 'data',
       xaxis: {
         title: 'East',
-        autorange: "reversed"
+        nticks: 4
       },
       yaxis: {
         title: 'North',
-        autorange: "reversed"
+        nticks: 4
       },
       zaxis: {
         title: 'TVD',
@@ -152,7 +149,7 @@ export function init(widgetContext) {
   xyz.forEach(point => {
     xArray.push(point.x);
     yArray.push(point.z); // this y/z thing is an oddity of THREE.js. I'll fix this if we remove THREE.js
-    zArray.push(-point.y); // this y/z thing is an oddity of THREE.js. I'll fix this if we remove THREE.js
+    zArray.push(point.y); // this y/z thing is an oddity of THREE.js. I'll fix this if we remove THREE.js
   });
 
   //plot the coordinates
