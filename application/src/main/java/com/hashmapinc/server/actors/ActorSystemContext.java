@@ -23,8 +23,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.hashmapinc.server.common.data.plugin.ComponentLifecycleEvent;
 import com.hashmapinc.server.controller.plugin.PluginWebSocketMsgEndpoint;
+import com.hashmapinc.server.dao.TagMetaData.TagMetaDataService;
 import com.hashmapinc.server.dao.application.ApplicationService;
 import com.hashmapinc.server.dao.attributes.AttributesService;
+import com.hashmapinc.server.dao.cluster.NodeMetricService;
 import com.hashmapinc.server.dao.event.EventService;
 import com.hashmapinc.server.service.cluster.discovery.DiscoveryService;
 import com.hashmapinc.server.service.component.ComponentDiscoveryService;
@@ -113,6 +115,9 @@ public class ActorSystemContext {
     @Getter private AttributesService attributesService;
 
     @Autowired
+    @Getter private TagMetaDataService tagMetaDataService;
+
+    @Autowired
     @Getter private EventService eventService;
 
     @Autowired
@@ -132,6 +137,9 @@ public class ActorSystemContext {
 
     @Autowired
     @Getter private AuditLogService auditLogService;
+
+    @Autowired
+    @Getter private NodeMetricService nodeMetricService;
 
     @Autowired
     @Getter @Setter private PluginWebSocketMsgEndpoint wsMsgEndpoint;

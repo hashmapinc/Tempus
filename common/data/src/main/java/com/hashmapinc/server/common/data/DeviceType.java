@@ -19,7 +19,7 @@ package com.hashmapinc.server.common.data;
 import java.io.Serializable;
 
 public class DeviceType implements Serializable{
-    public String name;
+    private String name;
 
     public String getName() {
         return name;

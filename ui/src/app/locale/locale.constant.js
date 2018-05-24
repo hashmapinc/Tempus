@@ -1405,6 +1405,11 @@ export default angular.module('tempus.locale', [])
                 "rule-plugin": {
                     "management": "Rules and plugins management"
                 },
+                "cluster": {
+                    "cluster-info": "Cluster Info",
+                    "management": "Cluster Information Management",
+                    "refresh": "Refresh"
+                },
                 "tenant": {
                     "tenant": "Tenant",
                     "tenants": "Tenants",

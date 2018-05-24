@@ -537,15 +537,17 @@ function DashboardController($scope, $rootScope, $element, $timeout, $mdMedia, $
     loadDashboard();
 
     function sortWidgets() {
-        vm.widgets.sort(function (widget1, widget2) {
-            var row1 = widgetOrder(widget1);
-            var row2 = widgetOrder(widget2);
-            var res = row1 - row2;
-            if (res === 0) {
-                res = widgetCol(widget1) - widgetCol(widget2);
-            }
-            return res;
-        });
+        if(angular.isFunction(vm.widgets.sort)){
+            vm.widgets.sort(function (widget1, widget2) {
+                var row1 = widgetOrder(widget1);
+                var row2 = widgetOrder(widget2);
+                var res = row1 - row2;
+                if (res === 0) {
+                    res = widgetCol(widget1) - widgetCol(widget2);
+                }
+                return res;
+            });
+        }
     }
 
     function reload() {

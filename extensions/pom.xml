@@ -41,6 +41,7 @@
         <module>extension-spark-computation</module>
         <module>extension-sqs</module>
         <module>extension-sns</module>
+        <module>extension-kinesis</module>
     </modules>
 
 </project>
