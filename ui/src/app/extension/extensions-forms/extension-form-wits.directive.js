@@ -37,7 +37,7 @@ export default function ExtensionFormWitsDirective($compile, $templateCache, $tr
             this.dateChannelNumbers="5",
             this.timeChannelNumbers = "6",
             this.attributesChannelNumbers="1",
-            this.depthChannelNumbers = "8,9,10",
+            this.depthChannelNumbers = "8",
             this.records = {},
             this.channels = {}
         }

@@ -1054,7 +1054,7 @@ export default angular.module('tempus.locale', [])
                     "wits-date-channels": "Date channel indexes",
                     "wits-depth-channels": "Depth channel indexes",
                     "wits-time-channels": "Time channel indexes",
-                    "wits-attributes-channels": "Attribute channel indexes",
+                    "wits-attributes-channels": "Attribute channel Item Number",
                     "wits-records-specifications": "Wits records specifications file",
                     "wits-channel-specifications": "Wits channel specifications file",
                     "wits-device-name": "Device name",
