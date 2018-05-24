@@ -221,6 +221,12 @@ sql:
     # Specify thread pool size for FIXED executor service type
     ts_inserts_fixed_thread_pool_size: "${SQL_TS_INSERTS_FIXED_THREAD_POOL_SIZE:10}"
 
+metadata-ingestion:
+    # Specify executor service type used to perform metadata insert tasks: SINGLE FIXED CACHED
+    inserts_executor_type: "${SQL_METADATA_INSERTS_EXECUTOR_TYPE:fixed}"
+    # Specify thread pool size for FIXED executor service type
+    inserts_fixed_thread_pool_size: "${SQL_METADATA_INSERTS_FIXED_THREAD_POOL_SIZE:10}"
+
 # Actor system parameters
 actors:
   tenant:

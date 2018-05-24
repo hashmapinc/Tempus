@@ -17,11 +17,11 @@
 package com.hashmapinc.server.dao.model;
 
 import com.datastax.driver.core.utils.UUIDs;
+import com.hashmapinc.server.common.data.UUIDConverter;
 import com.hashmapinc.server.common.data.kv.Aggregation;
 import com.hashmapinc.server.common.data.kv.DepthAggregation;
 import com.hashmapinc.server.common.msg.exception.TempusRuntimeException;
 import org.apache.commons.lang3.ArrayUtils;
-import com.hashmapinc.server.common.data.UUIDConverter;
 
 import java.util.UUID;
 
@@ -171,6 +171,15 @@ public class ModelConstants {
     public static final String TAG_METADATA_MEAN_FREQUENCY = "mean_frequency";
     public static final String TAG_METADATA_MEDIAN_FREQUENCY = "median_frequency";
     public static final String TAG_METADATA_SOURCE = "source";
+
+    /**
+     * Metadata Ingestion Constants
+     */
+    public static final String METADATA_ENTRIES_TABLE = "metadata_entries";
+    public static final String METADATA_CONFIG_ID = "metadata_config_id";
+    public static final String METADATA_INGESTION_KEY_COLUMN = "key";
+    public static final String METADATA_DATASOURCE_NAME_COLUMN = "datasource_name";
+    public static final String METADATA_INGESTION_VALUE_COLUMN = "value";
 
     /**
      * Computations Constants

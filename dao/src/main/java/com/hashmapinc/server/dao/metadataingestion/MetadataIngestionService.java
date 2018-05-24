@@ -14,10 +14,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.hashmapinc.server.common.data;
+package com.hashmapinc.server.dao.metadataingestion;
 
+import com.google.common.util.concurrent.ListenableFuture;
+import com.hashmapinc.server.common.data.kv.MetaDataKvEntry;
 
-public enum EntityType {
-    TENANT, CUSTOMER, USER, RULE, PLUGIN, DASHBOARD, ASSET, DEVICE, ALARM, COMPUTATION, COMPUTATION_JOB, NODE_METRIC,THEME, LOGO,
-    DATA_MODEL_OBJECT, DATA_MODEL, METADATA_CONFIG
+import java.util.List;
+
+public interface MetadataIngestionService {
+
+    ListenableFuture<List<Void>> save(String tenantId, String metadataConfigId, String dataSourceName, List<MetaDataKvEntry> metaDataKvEntries);
+
 }

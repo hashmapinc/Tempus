@@ -29,6 +29,7 @@ import com.hashmapinc.server.dao.cluster.NodeMetricService;
 import com.hashmapinc.server.dao.datamodel.DataModelObjectService;
 import com.hashmapinc.server.dao.datamodel.DataModelService;
 import com.hashmapinc.server.dao.device.DeviceCredentialsService;
+import com.hashmapinc.server.dao.metadataingestion.MetadataIngestionService;
 import com.hashmapinc.server.dao.rule.RuleService;
 import com.hashmapinc.server.dao.user.UserService;
 import com.hashmapinc.server.service.component.ComponentDiscoveryService;
@@ -148,6 +149,9 @@ public abstract class BaseController {
 
     @Autowired
     protected NodeMetricService nodeMetricService;
+
+    @Autowired
+    protected MetadataIngestionService metadataIngestionService;
 
 
     @ExceptionHandler(TempusException.class)

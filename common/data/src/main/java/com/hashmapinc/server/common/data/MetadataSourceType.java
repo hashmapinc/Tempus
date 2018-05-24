@@ -16,8 +16,7 @@
  */
 package com.hashmapinc.server.common.data;
 
-
-public enum EntityType {
-    TENANT, CUSTOMER, USER, RULE, PLUGIN, DASHBOARD, ASSET, DEVICE, ALARM, COMPUTATION, COMPUTATION_JOB, NODE_METRIC,THEME, LOGO,
-    DATA_MODEL_OBJECT, DATA_MODEL, METADATA_CONFIG
+public enum MetadataSourceType {
+    JDBC;
 }
+
