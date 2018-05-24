@@ -76,14 +76,18 @@ export function plot(xArray, yArray, zArray) {
       b: 40 //bottom margin
     },
     scene: {
+      aspectmode: 'data',
       xaxis: {
-        title: 'East'
+        title: 'East',
+        nticks: 4
       },
       yaxis: {
-        title: 'North'
+        title: 'North',
+        nticks: 4
       },
       zaxis: {
-        title: 'TVD'
+        title: 'TVD',
+        autorange: "reversed"
       }
     }
   };

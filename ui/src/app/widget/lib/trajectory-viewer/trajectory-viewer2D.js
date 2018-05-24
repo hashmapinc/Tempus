@@ -159,6 +159,10 @@ export function plot(xArray, yArray) {
       l: 40, //left margin
       r: 40, //right margin
       b: 40 //bottom margin
+    },
+    yaxis: {
+      autorange: "reversed",
+      scaleanchor: "x"
     }
   };
 
@@ -232,7 +236,7 @@ export function init(widgetContext) {
   var xArray = [], yArray = [];
   xy.forEach(point => {
     xArray.push(point.x);
-    yArray.push(point.y);
+    yArray.push(-point.y); // this is a THREE.js thing that causes TVD to be negative. Will remove when THREE is gone
   });
 
   //plot the coordinates
