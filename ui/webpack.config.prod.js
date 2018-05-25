@@ -72,6 +72,12 @@ module.exports = {
         fs: "empty"
     },
     module: {
+        rules: [
+            {
+                test: /\.js$/,
+                loader: 'ify-loader'
+            }
+        ],
         loaders: [
             {
                 test: /\.jsx$/,
