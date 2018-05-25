@@ -820,3 +820,17 @@ CREATE TABLE IF NOT EXISTS tempus.attribute_definition (
     source text,
     PRIMARY KEY (name, data_model_object_id)
 );
+
+CREATE TABLE IF NOT EXISTS tempus.tag_metadata_cf (
+    entity_type text,
+    entity_id timeuuid,
+    key text,
+    unit text,
+    avg_frequency double,
+    max_frequency double,
+    min_frequency double,
+    mean_frequency double,
+    median_frequency double,
+    source text,
+    PRIMARY KEY (( entity_type, entity_id ), key)
+) WITH compaction = { 'class' :  'LeveledCompactionStrategy'  };

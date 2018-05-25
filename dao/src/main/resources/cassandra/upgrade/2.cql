@@ -14,19 +14,5 @@
 -- limitations under the License.
 --
 
-CREATE TABLE IF NOT EXISTS tempus.tag_metadata_cf (
-    entity_type text,
-    entity_id timeuuid,
-    key text,
-    unit text,
-    avg_frequency double,
-    max_frequency double,
-    min_frequency double,
-    mean_frequency double,
-    median_frequency double,
-    source text,
-    PRIMARY KEY (( entity_type, entity_id ), key)
-) WITH compaction = { 'class' :  'LeveledCompactionStrategy'  };
-
 ALTER TABLE tempus.ds_kv_cf ADD ds_diff double;
 ALTER TABLE tempus.ts_kv_cf ADD ts_diff bigint;
