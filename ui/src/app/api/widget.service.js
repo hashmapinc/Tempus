@@ -34,6 +34,8 @@ import TbCanvasDigitalGauge from '../widget/lib/canvas-digital-gauge';
 import TbMapWidget from '../widget/lib/map-widget';
 import TbMapWidgetV2 from '../widget/lib/map-widget2';
 import * as TrajectoryViewer from '../widget/lib/trajectory-viewer/trajectory-viewer';
+import * as TrajectoryViewer2D from '../widget/lib/trajectory-viewer/trajectory-viewer2D';
+import * as TrajectoryViewer3D from '../widget/lib/trajectory-viewer/trajectory-viewer3D';
 
 import 'jquery.terminal/js/jquery.terminal.min.js';
 import 'jquery.terminal/css/jquery.terminal.min.css';
@@ -67,6 +69,8 @@ function WidgetService($rootScope, $http, $q, $filter, $ocLazyLoad, $window, $tr
     $window.TbMapWidget = TbMapWidget;
     $window.TbMapWidgetV2 = TbMapWidgetV2;
     $window.TrajectoryViewer = TrajectoryViewer;
+    $window.TrajectoryViewer2D = TrajectoryViewer2D;
+    $window.TrajectoryViewer3D = TrajectoryViewer3D;
 
     $window.cssjs = cssjs;
 

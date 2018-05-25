@@ -490,6 +490,9 @@ export function ApplicationController($timeout, $log, $rootScope, userService, a
 
     function saveApplication(application) {
         var deferred = $q.defer();
+        application.deviceTypes.deviceTypes.forEach(function(deviceType){
+            deviceType.name = deviceType.name.toLowerCase();
+        })
         applicationService.saveApplication(application).then(
             function success(savedApplication) {
                 $rootScope.$broadcast('applicationSaved');
