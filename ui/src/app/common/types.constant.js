@@ -409,7 +409,8 @@ export default angular.module('tempus.types', [])
             extensionType: {
                 http: "HTTP",
                 mqtt: "MQTT",
-                opc: "OPC UA"
+                opc: "OPC UA",
+                wits: "WITS"
             },
             extensionValueType: {
                 string: 'value.string',
