@@ -47,6 +47,7 @@ public abstract class CassandraAbstractDao {
             registerCodecIfNotFound(registry, new ComponentTypeCodec());
             registerCodecIfNotFound(registry, new ComponentScopeCodec());
             registerCodecIfNotFound(registry, new EntityTypeCodec());
+            registerCodecIfNotFound(registry, new NodeStatusCodec());
         }
         return session;
     }

@@ -978,6 +978,7 @@ export default angular.module('tempus.locale', [])
                     "field-required": "Field is required",
                     "brokers": "Brokers",
                     "add-broker": "Add broker",
+                    "add-server": "Add server",
                     "host": "Host",
                     "port": "Port",
                     "port-range": "Port should be in a range from 1 to 65535.",
@@ -1048,6 +1049,18 @@ export default angular.module('tempus.locale', [])
                     "opc-keystore-key-password":"Key password",
                     "opc-device-node-pattern":"Device node pattern",
                     "opc-device-name-pattern":"Device name pattern",
+                    "wits-servers": "Wits servers",
+                    "wits-add-server": "Add server",
+                    "wits-date-channels": "Date channel index",
+                    "wits-depth-channels": "Depth channel index",
+                    "wits-time-channels": "Time channel index",
+                    "wits-attributes-channels": "Attribute channel Item Number",
+                    "wits-records-specifications": "Wits records specifications file",
+                    "wits-channel-specifications": "Wits channel specifications file",
+                    "wits-device-name": "Device name",
+                    "wits-device-type": "Device type",
+                    "wits-record-specifications-location": "Record Specification location*",
+                    "wits-channel-specifications-location": "Channel Specification location*",
 
                     "sync": {
                         "status": "Status",
@@ -1391,6 +1404,11 @@ export default angular.module('tempus.locale', [])
                 },
                 "rule-plugin": {
                     "management": "Rules and plugins management"
+                },
+                "cluster": {
+                    "cluster-info": "Cluster Info",
+                    "management": "Cluster Information Management",
+                    "refresh": "Refresh"
                 },
                 "tenant": {
                     "tenant": "Tenant",

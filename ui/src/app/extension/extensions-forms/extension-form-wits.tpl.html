@@ -1,0 +1,178 @@
+<!--
+
+    Copyright © 2017-2018 Hashmap, Inc
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+        http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<md-card class="extension-form extension-wits">
+    <md-card-title>
+        <md-card-title-text>
+            <span translate class="md-headline">extension.configuration</span>
+        </md-card-title-text>
+    </md-card-title>
+    <md-card-content>
+        <v-accordion id="wits-brokers-accordion" class="vAccordion--default" onexpand="expandValidation(index, id)" oncollapse="collapseValidation(index, id)">
+            <v-pane id="wits-brokers-pane" expanded="true">
+                <v-pane-header>
+                    {{ 'extension.wits-servers' | translate }}
+                </v-pane-header>
+                <v-pane-content>
+                    <div ng-if="configuration.servers.length === 0">
+                        <!--???-->
+                        <span translate layout-align="center center" class="tb-prompt">extension.wits-add-server-prompt</span>
+                    </div>
+                    <div ng-if="configuration.servers.length > 0">
+                        <ol class="list-group">
+                            <li class="list-group-item" ng-repeat="(serverIndex, server) in configuration.servers">
+                                <md-button aria-label="{{ 'action.remove' | translate }}" class="md-icon-button"  ng-click="removeItem(server, configuration.servers)" ng-hide="configuration.servers.length < 2">
+                                    <ng-md-icon icon="close" aria-label="{{ 'action.remove' | translate }}"></ng-md-icon>
+                                    <md-tooltip md-direction="top">
+                                        {{ 'action.remove' | translate }}
+                                    </md-tooltip>
+                                </md-button>
+                                <md-card>
+                                    <div layout="row">
+                                        <md-input-container flex="50" class="md-block">
+                                            <label translate>extension.wits-device-name</label>
+                                            <input required name="device_name_{{serverIndex}}" ng-model="server.deviceName">
+                                        </md-input-container>
+                                        <md-input-container flex="50" class="md-block">
+                                            <label translate>extension.wits-device-type</label>
+                                            <input required name="device_type_{{serverIndex}}" ng-model="server.deviceType">
+                                        </md-input-container>
+                                    </div>
+                                    <div layout="row">
+                                        <md-input-container flex="50" class="md-block">
+                                            <label translate>extension.host</label>
+                                            <input required name="host_{{serverIndex}}" ng-model="server.tcpHost">
+                                            <div ng-messages="theForm['host_' + serverIndex].$error">
+                                                <div translate ng-message="required">extension.field-required</div>
+                                            </div>
+                                        </md-input-container>
+                                        <md-input-container flex="50" class="md-block">
+                                            <label translate>extension.port</label>
+                                            <input type="number"
+                                                   required
+                                                   name="port_{{serverIndex}}"
+                                                   ng-model="server.tcpPort"
+                                                   min="1"
+                                                   max="65535">
+                                            <div ng-messages="theForm['port_' + serverIndex].$error">
+                                                <div translate ng-message="required">extension.field-required</div>
+                                                <div translate ng-message="min">extension.port-range</div>
+                                                <div translate ng-message="max">extension.port-range</div>
+                                            </div>
+                                        </md-input-container>
+                                    </div>
+                                    <div layout="row">
+                                        <md-input-container flex="50" class="md-block">
+                                            <label translate>extension.wits-date-channels</label>
+                                            <input required name="date_channels_{{serverIndex}}" ng-model="server.dateChannelNumbers">
+                                        </md-input-container>
+                                        <md-input-container flex="50" class="md-block">
+                                            <label translate>extension.wits-time-channels</label>
+                                            <input required name="time_channels_{{serverIndex}}" ng-model="server.timeChannelNumbers">
+                                        </md-input-container>
+                                    </div>
+                                    <div layout="row">
+                                        <md-input-container flex="50" class="md-block">
+                                            <label translate>extension.wits-depth-channels</label>
+                                            <input required name="depth_channels_{{serverIndex}}" ng-model="server.depthChannelNumbers">
+                                        </md-input-container>
+                                        <md-input-container flex="50" class="md-block">
+                                            <label translate>extension.wits-attributes-channels</label>
+                                            <input required name="attributes_channels_{{serverIndex}}" ng-model="server.attributesChannelNumbers">
+                                        </md-input-container>
+                                    </div>
+                                    <section flex layout="column">
+                                        <div class="tb-container" ng-class="{'ng-invalid':!server.records.file}">
+                                            <span ng-init='fieldsToFill = {"fileName":"fileName", "file":"file"}'></span>
+                                            <label class="tb-label" translate>extension.wits-record-specifications-location</label>
+                                            <div flow-init="{singleFile:true}" flow-file-added='fileAdded($file, server.records, fieldsToFill)' class="tb-file-select-container">
+                                                <div class="tb-file-clear-container">
+                                                    <md-button ng-click='clearFile(server.records, fieldsToFill)' class="tb-file-clear-btn md-icon-button md-primary" aria-label="{{ 'action.remove' | translate }}">
+                                                        <md-tooltip md-direction="top">
+                                                            {{ 'action.remove' | translate }}
+                                                        </md-tooltip>
+                                                        <md-icon aria-label="{{ 'action.remove' | translate }}" class="material-icons">close</md-icon>
+                                                    </md-button>
+                                                </div>
+                                                <div class="alert tb-flow-drop" flow-drop>
+                                                    <label for="dropFileRecords_{{serverIndex}}" translate>extension.drop-file</label>
+                                                    <input flow-attrs="{accept:'.csv'}"
+                                                           type="file"
+                                                           class="file-input"
+                                                           flow-btn id="dropFileRecords_{{serverIndex}}"
+                                                           name="recordsFile"
+                                                           ng-model="server.records.file"
+                                                    >
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="dropdown-messages">
+                                            <div ng-if="!server.records[fieldsToFill.fileName]" class="tb-error-message" translate>extension.no-file</div>
+                                            <div ng-if="server.records[fieldsToFill.fileName]">{{server.records[fieldsToFill.fileName]}}</div>
+                                        </div>
+                                    </section>
+                                    <section flex layout="column">
+                                        <div class="tb-container" ng-class="{'ng-invalid':!server.channels.file}">
+                                            <span ng-init='fieldsToFill = {"fileName":"fileName", "file":"file"}'></span>
+                                            <label class="tb-label" translate>extension.wits-channel-specifications-location</label>
+                                            <div flow-init="{singleFile:true}" flow-file-added='fileAdded($file, server.channels, fieldsToFill)' class="tb-file-select-container">
+                                                <div class="tb-file-clear-container">
+                                                    <md-button ng-click='clearFile(server.channels, fieldsToFill)' class="tb-file-clear-btn md-icon-button md-primary" aria-label="{{ 'action.remove' | translate }}">
+                                                        <md-tooltip md-direction="top">
+                                                            {{ 'action.remove' | translate }}
+                                                        </md-tooltip>
+                                                        <md-icon aria-label="{{ 'action.remove' | translate }}" class="material-icons">close</md-icon>
+                                                    </md-button>
+                                                </div>
+                                                <div class="alert tb-flow-drop" flow-drop>
+                                                    <label for="dropFileChannels_{{serverIndex}}" translate>extension.drop-file</label>
+                                                    <input flow-attrs="{accept:'.csv'}"
+                                                           type="file"
+                                                           class="file-input"
+                                                           flow-btn id="dropFileChannels_{{serverIndex}}"
+                                                           name="channelsFile"
+                                                           ng-model="server.channels.file"
+                                                    >
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="dropdown-messages">
+                                            <div ng-if="!server.channels[fieldsToFill.fileName]" class="tb-error-message" translate>extension.no-file</div>
+                                            <div ng-if="server.channels[fieldsToFill.fileName]">{{server.channels[fieldsToFill.fileName]}}</div>
+                                        </div>
+                                    </section>
+                                </md-card>
+                            </li>
+                        </ol>
+                            <div flex
+                                 layout="row"
+                                 layout-align="start center">
+                                <md-button class="md-primary md-raised"
+                                           ng-click="addServer(configuration.servers)"
+                                           aria-label="{{ 'action.add' | translate }}">
+                                    <md-icon class="material-icons">add</md-icon>
+                                    <span translate>extension.wits-add-server</span>
+                                </md-button>
+                            </div>
+                    </div>
+                </v-pane-content>
+            </v-pane>
+        </v-accordion>
+    </md-card-content>
+
+
+</md-card>

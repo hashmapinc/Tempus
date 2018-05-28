@@ -34,6 +34,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static com.hashmapinc.server.dao.model.ModelConstants.tempus_KEYSPACE;
 
@@ -71,13 +72,16 @@ public class CassandraDatabaseSchemaService implements DatabaseSchemaService {
             Row row = rowIterator.next();
             executedUpgrades.add(row.getString(ModelConstants.INSTALLED_SCRIPTS_COLUMN));
         }
-        List<Integer> sortedScriptsIndexes = Files.list(upgradeScriptsDirectory).map(a -> stripExtensionFromName(a.getFileName().toString())).sorted().collect(Collectors.toList());
 
-        for(Integer i: sortedScriptsIndexes) {
-            String scriptFileName = i.toString()+".cql";
-            if(!executedUpgrades.contains(scriptFileName)) {
-                loadCql(upgradeScriptsDirectory.resolve(scriptFileName));
-                cluster.getSession().execute("insert into " +tempus_KEYSPACE +"."+ ModelConstants.INSTALLED_SCHEMA_VERSIONS+ "("+ModelConstants.INSTALLED_SCRIPTS_COLUMN+")" +" values('"+scriptFileName+"'"+")");
+        try (Stream<Path> filesStream = Files.list(upgradeScriptsDirectory)) {
+            List<Integer> sortedScriptsIndexes = filesStream.map(a -> stripExtensionFromName(a.getFileName().toString())).sorted().collect(Collectors.toList());
+
+            for (Integer i : sortedScriptsIndexes) {
+                String scriptFileName = i.toString() + ".cql";
+                if (!executedUpgrades.contains(scriptFileName)) {
+                    loadCql(upgradeScriptsDirectory.resolve(scriptFileName));
+                    cluster.getSession().execute("insert into " + tempus_KEYSPACE + "." + ModelConstants.INSTALLED_SCHEMA_VERSIONS + "(" + ModelConstants.INSTALLED_SCRIPTS_COLUMN + ")" + " values('" + scriptFileName + "'" + ")");
+                }
             }
         }
     }
