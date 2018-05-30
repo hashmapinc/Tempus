@@ -13,21 +13,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-@import "../../scss/constants";
+package com.hashmapinc.server.dao.theme;
+import com.hashmapinc.server.common.data.Theme;
+import com.hashmapinc.server.dao.Dao;
 
-.tb-home-links {
-    .md-headline {
-      font-size: 20px;
-      @media (min-width: $layout-breakpoint-xmd) {
-        font-size: 24px;
-      }
-    }
-}
+import java.util.List;
 
-.themeDark{
-  background: #0c3483 !important;
-}
+public interface ThemeDao extends Dao<Theme> {
 
-.themeBlue {
-  background: blue !important;
+    /**
+     * Find theme for listing
+     * @return the list of theme objects
+     */
+    List<Theme> find();
+
+    /**
+     * Find theme by status
+     * @return the list of theme object
+     */
+    Theme findEnabledTheme();
+
+    Theme save(Theme theme);
+
+    /**
+     * Find theme by value
+     * @return the theme object
+     */
+    Theme findByValue(String value);
 }

@@ -781,3 +781,10 @@ CREATE TABLE IF NOT EXISTS tempus.audit_log_by_tenant_id_partitions (
 ) WITH CLUSTERING ORDER BY ( partition ASC )
 AND compaction = { 'class' :  'LeveledCompactionStrategy'  };
 
+CREATE TABLE IF NOT EXISTS tempus.theme (
+  id uuid,
+  name text,
+  value text,
+  is_enabled boolean,
+  PRIMARY KEY (id,name)
+);

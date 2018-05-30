@@ -13,21 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-@import "../../scss/constants";
 
-.tb-home-links {
-    .md-headline {
-      font-size: 20px;
-      @media (min-width: $layout-breakpoint-xmd) {
-        font-size: 24px;
-      }
-    }
-}
+package com.hashmapinc.server.dao.theme;
+import com.hashmapinc.server.common.data.Theme;
 
-.themeDark{
-  background: #0c3483 !important;
-}
+import java.util.List;
 
-.themeBlue {
-  background: blue !important;
+public interface ThemeService {
+
+    List<Theme> findAll();
+
+    Theme findEnabledTheme();
+
+    Theme updateThemeStatus(String value);
+
+    Theme saveTheme(Theme theme);
+
+    void deleteThemeEntryByvalue(String value);
 }
