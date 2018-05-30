@@ -103,7 +103,15 @@ export default angular.module('tempus.locale', [])
                     "timeout-required": "Timeout is required.",
                     "timeout-invalid": "That doesn't look like a valid timeout.",
                     "enable-tls": "Enable TLS",
-                    "send-test-mail": "Send test mail"
+                    "send-test-mail": "Send test mail",
+                    "ui-configuration":"UI Configuration",
+                    "look-feel":"UI Configuration",
+                    "change-theme":"Change theme",
+                    "change-logo":"Change Logo",
+                    "current-theme":"Current theme",
+                    "select-theme":"Select theme",
+                    "bad-request": "Bad Request,Please Select A Theme."
+
                 },
                 "alarm": {
                     "alarm": "Alarm",
