@@ -27,6 +27,7 @@ import com.hashmapinc.server.common.data.id.*;
 import com.hashmapinc.server.common.data.plugin.ComponentDescriptor;
 import com.hashmapinc.server.dao.TagMetaData.TagMetaDataService;
 import com.hashmapinc.server.dao.cluster.NodeMetricService;
+import com.hashmapinc.server.dao.theme.ThemeService;
 import com.hashmapinc.server.dao.user.UserService;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -143,7 +144,12 @@ public abstract class AbstractServiceTest {
     private ComponentDescriptorService componentDescriptorService;
 
     @Autowired
+
     protected NodeMetricService nodeMetricService;
+
+    protected ThemeService themeService;
+
+
 
     class IdComparator<D extends BaseData<? extends UUIDBased>> implements Comparator<D> {
         @Override

@@ -24,7 +24,9 @@ function AdminService($http, $q) {
         getAdminSettings: getAdminSettings,
         saveAdminSettings: saveAdminSettings,
         sendTestMail: sendTestMail,
-        checkUpdates: checkUpdates
+        checkUpdates: checkUpdates,
+        getAllThemes:getAllThemes,
+        saveThemeSettings:saveThemeSettings
     }
 
     return service;
@@ -72,4 +74,29 @@ function AdminService($http, $q) {
         });
         return deferred.promise;
     }
+
+    function getAllThemes() {
+
+        var deferred = $q.defer();
+        var url = '/api/settings/themes';
+        $http.get(url, null).then(function success(response) {
+            deferred.resolve(response.data);
+        }, function fail() {
+            deferred.reject();
+        });
+        return deferred.promise;
+
+    }
+
+    function saveThemeSettings(themeData) {
+        var deferred = $q.defer();
+        var url = '/api/settings/theme';
+        $http.post(url, themeData).then(function success(response) {
+            deferred.resolve(response.data);
+        }, function fail(response) {
+            deferred.reject(response.data);
+        });
+        return deferred.promise;
+    }
+
 }

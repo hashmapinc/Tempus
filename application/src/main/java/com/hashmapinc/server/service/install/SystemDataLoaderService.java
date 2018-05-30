@@ -27,6 +27,8 @@ public interface SystemDataLoaderService {
 
     void loadSystemRules() throws Exception;
 
+    void loadSystemThemes() throws Exception;
+
     void loadDemoData() throws Exception;
 
     void deleteSystemWidgetBundle(String bundleAlias) throws Exception;

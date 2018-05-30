@@ -19,15 +19,27 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.hashmapinc.server.common.data.User;
+import com.hashmapinc.server.common.data.Theme;
+import com.hashmapinc.server.common.data.id.ThemeId;
 import com.hashmapinc.server.common.data.UserSettings;
 import org.junit.Assert;
+import com.hashmapinc.server.dao.theme.ThemeService;
+import org.springframework.beans.factory.annotation.Autowired;
+
+
 import org.junit.Test;
+import org.junit.Assert;
+
+import java.util.List;
 
 import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 
 public abstract class BaseUserSettingsControllerTest extends AbstractControllerTest {
+
+    @Autowired
+    ThemeService themeService;
 
     private static final ObjectMapper mapper = new ObjectMapper();
 
@@ -155,5 +167,46 @@ public abstract class BaseUserSettingsControllerTest extends AbstractControllerT
         doPost("/api/settings/testMail", userSettings)
         .andExpect(status().isOk());
     }
+
+    @Test
+    public void testgetEnabledTheme() throws Exception{
+
+        Theme theme = new Theme();
+        theme.setThemeName("Tempus Dark");
+        theme.setThemeValue("themeDark");
+        theme.setThemeStatus(true);
+        themeService.saveTheme(theme);
+        Theme themi = doGet("/api/theming", Theme.class);
+        Assert.assertEquals(theme.getThemeStatus(),themi.getThemeStatus());
+        themeService.deleteThemeEntryByvalue("themeDark");
+
+    }
+
+
+    @Test
+    public void getThemes() throws Exception{
+
+        loginSysAdmin();
+
+        Theme theme1 = new Theme();
+        theme1.setThemeName("Tempus Blue");
+        theme1.setThemeValue("themeBlue");
+        theme1.setThemeStatus(false);
+        themeService.saveTheme(theme1);
+
+        Theme theme2 = new Theme();
+        theme2.setThemeName("Tempus Dark");
+        theme2.setThemeValue("themeDark");
+        theme2.setThemeStatus(false);
+        themeService.saveTheme(theme2);
+
+        List<Theme> theme = doGet("/api/settings/themes", List.class);
+        Assert.assertEquals(2, theme.size());
+
+        themeService.deleteThemeEntryByvalue("themeDark");
+        themeService.deleteThemeEntryByvalue("themeBlue");
+
+    }
+
     
 }

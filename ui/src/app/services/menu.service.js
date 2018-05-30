@@ -103,7 +103,7 @@ function Menu(userService, $state, $rootScope) {
                             name: 'admin.system-settings',
                             type: 'toggle',
                             state: 'home.settings',
-                            height: '80px',
+                            height: '120px',
                             icon: 'settings',
                             pages: [
                                 {
@@ -115,7 +115,14 @@ function Menu(userService, $state, $rootScope) {
                                     name: 'admin.outgoing-mail',
                                     type: 'link',
                                     state: 'home.settings.outgoing-mail',
-                                    icon: 'mail'                                }
+                                    icon: 'mail'                                },
+
+                                {
+                                    name: 'admin.ui-configuration',
+                                    type: 'link',
+                                    state: 'home.settings.ui-config',
+                                    icon: 'settings_applications'                                }
+
                             ]
                         }];
                     homeSections =
@@ -182,6 +189,19 @@ function Menu(userService, $state, $rootScope) {
                                     }
                                 ]
                             }];
+
+                                name: 'admin.ui-configuration',
+                                places: [
+                                    {
+                                        name: 'admin.look-feel',
+                                        icon: 'settings_applications',
+                                        state: 'home.settings.ui-config'
+                                    }
+                                ]
+                            }
+
+                        ];
+
                 } else if (authority === 'TENANT_ADMIN') {
                     sections = [
                         {

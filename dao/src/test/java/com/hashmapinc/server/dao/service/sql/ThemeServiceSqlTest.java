@@ -13,21 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-@import "../../scss/constants";
 
-.tb-home-links {
-    .md-headline {
-      font-size: 20px;
-      @media (min-width: $layout-breakpoint-xmd) {
-        font-size: 24px;
-      }
-    }
-}
+package com.hashmapinc.server.dao.service.sql;
 
-.themeDark{
-  background: #0c3483 !important;
-}
 
-.themeBlue {
-  background: blue !important;
+import com.hashmapinc.server.dao.service.DaoSqlTest;
+import com.hashmapinc.server.dao.service.BaseThemeServiceTest;
+
+@DaoSqlTest
+public class ThemeServiceSqlTest extends BaseThemeServiceTest {
 }
