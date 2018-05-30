@@ -13,18 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.hashmapinc.server.dao.model.sql;
+package com.hashmapinc.server.dao.sql.computations;
 
-import com.hashmapinc.server.common.data.computation.ComputationMetadata;
-import com.hashmapinc.server.dao.model.BaseSqlEntity;
-import org.hibernate.annotations.GenericGenerator;
-import org.hibernate.annotations.Parameter;
+import com.hashmapinc.server.dao.model.sql.SparkComputationMetadataEntity;
+import com.hashmapinc.server.dao.util.SqlDao;
+import org.springframework.data.repository.CrudRepository;
 
-import javax.persistence.*;
-import java.io.Serializable;
-
-@Entity
-@Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
-public abstract class ComputationMetadataEntity<T extends ComputationMetadata> extends BaseSqlEntity<T> {
+@SqlDao
+public interface SparkComputationMetaDataRepository extends CrudRepository<SparkComputationMetadataEntity, String> {
 
 }

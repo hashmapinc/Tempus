@@ -140,6 +140,11 @@ public class ComputationsEntity extends BaseSqlEntity<Computations> implements S
         }
         computations.setJsonDescriptor(this.jsonDescriptor);
         computations.setType(ComputationType.valueOf(this.type));
+        if(this.type.contentEquals(ComputationType.SPARK.name()))
+            computations.setComputationMetadata(((SparkComputationMetadataEntity)this.computationMetadataEntity).toData());
+        else if(this.type.contentEquals(ComputationType.KUBELESS.name()))
+            computations.setComputationMetadata(((KubelessComputationMetadataEntity)this.computationMetadataEntity).toData());
+
         return computations;
     }
 

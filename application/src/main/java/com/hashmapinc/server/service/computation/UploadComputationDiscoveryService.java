@@ -64,6 +64,7 @@ public class UploadComputationDiscoveryService implements ComputationDiscoverySe
             if(isJar(j)){
                 AnnotationsProcessor processor = new AnnotationsProcessor(j, compiler);
                 List<ComputationRequestCompiled> c = processor.processAnnotations();
+                log.info("List size " + c.size());
                 if(c != null && !c.isEmpty()) {
                     for (ComputationRequestCompiled computationRequestCompiled : c) {
                         Computations computations = new Computations();
