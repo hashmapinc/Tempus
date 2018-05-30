@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.hashmapinc.models;
+package com.hashmapinc.kubeless.models;
 
 import com.google.gson.annotations.SerializedName;
 import io.kubernetes.client.models.AppsV1beta1Deployment;

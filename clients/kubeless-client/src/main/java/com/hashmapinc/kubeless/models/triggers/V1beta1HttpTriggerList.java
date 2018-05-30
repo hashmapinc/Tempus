@@ -13,17 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.hashmapinc.models.triggers;
+package com.hashmapinc.kubeless.models.triggers;
 
 import com.google.gson.annotations.SerializedName;
-import com.hashmapinc.models.V1beta1AbstractTypeList;
+import com.hashmapinc.kubeless.models.V1beta1AbstractTypeList;
 
-public class V1beta1KafkaTriggerList extends V1beta1AbstractTypeList<V1beta1KafkaTrigger>{
+public class V1beta1HttpTriggerList extends V1beta1AbstractTypeList<V1beta1HttpTrigger> {
 
     @SerializedName("kind")
-    protected String kind = "KafkaTriggerList";
+    protected String kind = "HTTPTriggerList";
 
-    public V1beta1KafkaTriggerList kind(String kind) {
+    public V1beta1HttpTriggerList kind(String kind) {
         this.kind = kind;
         return this;
     }

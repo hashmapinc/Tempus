@@ -13,26 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.hashmapinc.models.triggers;
+package com.hashmapinc.kubeless.models;
 
-import com.google.gson.annotations.SerializedName;
-import com.hashmapinc.models.V1beta1AbstractType;
-
-public class V1beta1HttpTrigger extends V1beta1AbstractType<V1beta1HttpTriggerSpec> {
-
-    @SerializedName("kind")
-    protected String kind = "HTTPTrigger";
-
-    public V1beta1HttpTrigger kind(String kind) {
-        this.kind = kind;
-        return this;
-    }
-
-    public String getKind() {
-        return kind;
-    }
-
-    public void setKind(String kind) {
-        this.kind = kind;
-    }
+public interface Spec {
 }

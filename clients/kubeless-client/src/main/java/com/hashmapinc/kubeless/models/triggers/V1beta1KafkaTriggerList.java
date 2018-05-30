@@ -13,17 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.hashmapinc.models.triggers;
+package com.hashmapinc.kubeless.models.triggers;
 
 import com.google.gson.annotations.SerializedName;
-import com.hashmapinc.models.V1beta1AbstractTypeList;
+import com.hashmapinc.kubeless.models.V1beta1AbstractTypeList;
 
-public class V1beta1CronJobTriggerList extends V1beta1AbstractTypeList<V1beta1CronJobTrigger>{
+public class V1beta1KafkaTriggerList extends V1beta1AbstractTypeList<V1beta1KafkaTrigger>{
 
     @SerializedName("kind")
-    protected String kind = "CronJobTriggerList";
+    protected String kind = "KafkaTriggerList";
 
-    public V1beta1CronJobTriggerList kind(String kind) {
+    public V1beta1KafkaTriggerList kind(String kind) {
         this.kind = kind;
         return this;
     }
@@ -35,5 +35,4 @@ public class V1beta1CronJobTriggerList extends V1beta1AbstractTypeList<V1beta1Cr
     public void setKind(String kind) {
         this.kind = kind;
     }
-
 }

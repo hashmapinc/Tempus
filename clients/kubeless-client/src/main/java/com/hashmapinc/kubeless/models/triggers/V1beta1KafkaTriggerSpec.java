@@ -13,10 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.hashmapinc.models.triggers;
+package com.hashmapinc.kubeless.models.triggers;
 
 import com.google.gson.annotations.SerializedName;
-import com.hashmapinc.models.Spec;
+import com.hashmapinc.kubeless.models.Spec;
 import io.kubernetes.client.models.V1LabelSelector;
 
 import java.util.Objects;

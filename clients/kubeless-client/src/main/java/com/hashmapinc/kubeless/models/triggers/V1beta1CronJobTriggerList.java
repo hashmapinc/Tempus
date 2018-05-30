@@ -13,7 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.hashmapinc.models;
+package com.hashmapinc.kubeless.models.triggers;
 
-public interface Spec {
+import com.google.gson.annotations.SerializedName;
+import com.hashmapinc.kubeless.models.V1beta1AbstractTypeList;
+
+public class V1beta1CronJobTriggerList extends V1beta1AbstractTypeList<V1beta1CronJobTrigger>{
+
+    @SerializedName("kind")
+    protected String kind = "CronJobTriggerList";
+
+    public V1beta1CronJobTriggerList kind(String kind) {
+        this.kind = kind;
+        return this;
+    }
+
+    public String getKind() {
+        return kind;
+    }
+
+    public void setKind(String kind) {
+        this.kind = kind;
+    }
+
 }

@@ -13,10 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.hashmapinc.apis;
+package com.hashmapinc.kubeless.apis;
 
 import com.google.common.collect.ImmutableMap;
-import com.hashmapinc.models.V1beta1Function;
+import com.hashmapinc.kubeless.models.triggers.V1beta1KafkaTrigger;
 import com.squareup.okhttp.Call;
 import io.kubernetes.client.ApiClient;
 import io.kubernetes.client.ApiException;
@@ -24,19 +24,20 @@ import io.kubernetes.client.Configuration;
 
 import java.util.Map;
 
-public class KubelessV1beta1FunctionApi {
+public class KubelessV1beta1KafkaTriggerApi {
+
     private ApiClient apiClient;
-    private final String kubelessFunctionsUri;
+    private final String kubelessKafkaTriggerUri;
     private final Map<String, String> headers;
     private String[] authNames = new String[] { "BearerToken" };
 
-    public KubelessV1beta1FunctionApi(ApiClient client, String namespace){
+    public KubelessV1beta1KafkaTriggerApi(ApiClient client, String namespace){
         this.apiClient = client;
-        this.kubelessFunctionsUri = "/apis/kubeless.io/v1beta1/namespaces/"+ namespace +"/functions";
+        this.kubelessKafkaTriggerUri = "/apis/kubeless.io/v1beta1/namespaces/"+ namespace +"/kafkatriggers/";
         this.headers = ImmutableMap.of("Accept", "application/json", "Content-type", "application/json");
     }
 
-    public KubelessV1beta1FunctionApi(String namespace){
+    public KubelessV1beta1KafkaTriggerApi(String namespace){
         this(Configuration.getDefaultApiClient(), namespace);
     }
 
@@ -48,29 +49,29 @@ public class KubelessV1beta1FunctionApi {
         this.apiClient = apiClient;
     }
 
-    public Call listFunctionsCall() throws ApiException {
-        return apiClient.buildCall(kubelessFunctionsUri, "GET", null, null, null,
+    public Call listKafkaTriggerCall() throws ApiException {
+        return apiClient.buildCall(kubelessKafkaTriggerUri, "GET", null, null, null,
                 headers, null, authNames, null);
     }
 
-    public Call getFunctionCall(String functionName) throws ApiException {
-        return apiClient.buildCall(kubelessFunctionsUri+"/"+functionName, "GET", null, null, null,
+    public Call getKafkaTriggerCall(String triggerName) throws ApiException {
+        return apiClient.buildCall(kubelessKafkaTriggerUri + triggerName, "GET", null, null, null,
                 headers, null, authNames, null);
     }
 
-    public Call createFunctionCall(V1beta1Function function) throws ApiException {
-        return apiClient.buildCall(kubelessFunctionsUri, "POST", null, null, function,
+    public Call createKafkaTriggerCall(V1beta1KafkaTrigger trigger) throws ApiException {
+        return apiClient.buildCall(kubelessKafkaTriggerUri, "POST", null, null, trigger,
                 headers, null, authNames, null);
     }
 
-    public Call patchFunctionCall(V1beta1Function function) throws ApiException {
-        String name = function.getMetadata().getName();
-        return apiClient.buildCall(kubelessFunctionsUri + name, "PUT", null, null, function,
+    public Call patchKafkaTriggerCall(V1beta1KafkaTrigger trigger) throws ApiException {
+        String name = trigger.getMetadata().getName();
+        return apiClient.buildCall(kubelessKafkaTriggerUri + name, "PUT", null, null, trigger,
                 headers, null, authNames, null);
     }
 
-    public Call deleteFunctionCall(String functionName) throws ApiException {
-        return apiClient.buildCall(kubelessFunctionsUri + functionName, "DELETE", null, null, null,
+    public Call deleteKafkaTriggerCall(String triggerName) throws ApiException {
+        return apiClient.buildCall(kubelessKafkaTriggerUri + triggerName, "DELETE", null, null, null,
                 headers, null, authNames, null);
     }
 }

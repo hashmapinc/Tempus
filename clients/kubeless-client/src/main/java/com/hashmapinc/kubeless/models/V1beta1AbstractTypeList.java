@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.hashmapinc.models;
+package com.hashmapinc.kubeless.models;
 
 import com.google.gson.annotations.SerializedName;
 import io.kubernetes.client.models.V1ListMeta;
@@ -25,7 +25,7 @@ import java.util.Objects;
 public abstract class V1beta1AbstractTypeList<T extends V1beta1AbstractType> {
 
     @SerializedName("apiVersion")
-    private String apiVersion = null;
+    private String apiVersion = "kubeless.io/v1beta1";
 
     @SerializedName("items")
     private List<T> items = new ArrayList<T>();
