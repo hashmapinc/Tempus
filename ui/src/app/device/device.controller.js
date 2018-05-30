@@ -63,7 +63,7 @@ export function DeviceController($rootScope,userService, deviceService, customer
 
     vm.types = types;
 
-    $scope.tableView = false;
+    $scope.tableView = true;
 
 
     $scope.devices = {
