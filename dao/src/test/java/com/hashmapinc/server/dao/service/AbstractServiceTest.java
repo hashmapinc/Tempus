@@ -144,9 +144,9 @@ public abstract class AbstractServiceTest {
     private ComponentDescriptorService componentDescriptorService;
 
     @Autowired
-
     protected NodeMetricService nodeMetricService;
 
+    @Autowired
     protected ThemeService themeService;
 
 
