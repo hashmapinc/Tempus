@@ -93,13 +93,13 @@ public class BaseComputationJobControllerTest extends AbstractControllerTest {
         Computations computations = new Computations();
         computations.setName("Computation");
         computations.setId(new ComputationId(UUIDs.timeBased()));
-        computations.setJarPath("/Some/Jar/path");
-        computations.setTenantId(savedTenant.getId());
-        computations.setJarName("SomeJar");
-        computations.setMainClass("MainClass");
-        //computations.setJsonDescriptor();
-        computations.setArgsformat("argsFormat");
-        computations.setArgsType("ArgsType");
+//        computations.setJarPath("/Some/Jar/path");
+//        computations.setTenantId(savedTenant.getId());
+//        computations.setJarName("SomeJar");
+//        computations.setMainClass("MainClass");
+//        //computations.setJsonDescriptor();
+//        computations.setArgsformat("argsFormat");
+//        computations.setArgsType("ArgsType");
         savedComputations = computationsService.save(computations);
     }
     @After

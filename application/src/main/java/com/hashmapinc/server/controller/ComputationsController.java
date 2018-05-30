@@ -18,6 +18,7 @@ package com.hashmapinc.server.controller;
 import com.hashmapinc.server.common.data.EntityType;
 import com.hashmapinc.server.common.data.audit.ActionType;
 import com.hashmapinc.server.common.data.computation.ComputationJob;
+import com.hashmapinc.server.common.data.computation.SparkComputationMetadata;
 import com.hashmapinc.server.common.data.id.ComputationId;
 import com.hashmapinc.server.common.data.page.TextPageLink;
 import com.hashmapinc.server.common.data.plugin.ComponentLifecycleEvent;
@@ -119,7 +120,7 @@ public class ComputationsController extends BaseController {
                 actorService.onComputationJobStateChange(computationJob.getTenantId(), computationJob.getComputationId(), computationJob.getId(), ComponentLifecycleEvent.DELETED);
             }
             computationsService.deleteById(computationId);
-            Files.deleteIfExists(Paths.get(computation.getJarPath()));
+            Files.deleteIfExists(Paths.get(((SparkComputationMetadata)computation.getComputationMetadata()).getJarPath()));
 
             logEntityAction(computationId,computation,getCurrentUser().getCustomerId(),
                     ActionType.DELETED, null, strComputationId);
@@ -142,6 +143,7 @@ public class ComputationsController extends BaseController {
             @RequestParam(required = false) String idOffset,
             @RequestParam(required = false) String textOffset) throws TempusException {
         try {
+
             TenantId tenantId = getCurrentUser().getTenantId();
             TextPageLink pageLink = createPageLink(limit, textSearch, idOffset, textOffset);
             return checkNotNull(computationDiscoveryService.findTenantComputations(tenantId, pageLink));
@@ -159,7 +161,7 @@ public class ComputationsController extends BaseController {
                 List<Computations> computations = checkNotNull(computationsService.findAllTenantComputationsByTenantId(tenantId));
                 computations = computations.stream()
                         .filter(computation -> computation.getTenantId().getId().equals(ModelConstants.NULL_UUID)).collect(Collectors.toList());
-                log.trace(" returning Computations {} ", computations);
+                log.info(" returning Computations {} ", computations);
                 return computations;
         } catch (Exception e) {
             throw handleException(e);

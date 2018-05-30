@@ -28,14 +28,10 @@ import lombok.EqualsAndHashCode;
 public class Computations extends SearchTextBased<ComputationId> implements HasName {
 
     private String name;
-    private String jarPath;
     private TenantId tenantId;
-    private String jarName;
-    private String mainClass;
-    private JsonNode jsonDescriptor;
-    private String argsformat;
-    private String argsType;
     private ComputationType type;
+    private JsonNode jsonDescriptor;
+    private ComputationMetadata computationMetadata;
 
     public Computations() {
         super();
@@ -48,13 +44,9 @@ public class Computations extends SearchTextBased<ComputationId> implements HasN
     public Computations(Computations computations) {
         super(computations);
         this.name = computations.name;
-        this.jarPath = computations.jarPath;
-        this.jarName = computations.jarName;
         this.tenantId = computations.tenantId;
-        this.argsformat = computations.argsformat;
         this.jsonDescriptor = computations.jsonDescriptor;
-        this.mainClass = computations.mainClass;
-        this.argsType = computations.argsType;
+        this.computationMetadata = computations.computationMetadata;
     }
 
     @Override

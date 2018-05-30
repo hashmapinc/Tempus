@@ -180,6 +180,7 @@ public abstract class BaseController {
         if (reference == null) {
             throw new TempusException("Requested item wasn't found!", TempusErrorCode.ITEM_NOT_FOUND);
         }
+        log.info("Comutation [{}]", reference );
         return reference;
     }
 

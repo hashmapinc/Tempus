@@ -23,6 +23,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hashmap.tempus.models.ArgType;
+import com.hashmapinc.server.common.data.computation.SparkComputationMetadata;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.http.*;
 import org.springframework.web.client.RestClientException;
@@ -203,10 +204,11 @@ public class ComputationJobActorMessageProcessor extends ComponentMsgProcessor<C
     }
 
     private String buildSparkComputationRequest() throws IOException {
-        logger.info("Jar name is {}, main class is {}, arg parameters are {}, location is {}", computation.getJarName(), computation.getMainClass(), computation.getArgsformat(), systemContext.getComputationLocation());
+        SparkComputationMetadata md = (SparkComputationMetadata) computation.getComputationMetadata();
+        logger.info("Jar name is {}, main class is {}, arg parameters are {}, location is {}", md.getJarName(), md.getMainClass(), md.getArgsformat(), systemContext.getComputationLocation());
         SparkComputationRequest.SparkComputationRequestBuilder builder = SparkComputationRequest.builder();
-        builder.file(systemContext.getComputationLocation() + computation.getJarName());
-        builder.className(computation.getMainClass());
+        builder.file(systemContext.getComputationLocation() + md.getJarName());
+        builder.className(md.getMainClass());
         builder.args(args());
         SparkComputationRequest sparkComputationRequest = builder.build();
         return mapper.writeValueAsString(sparkComputationRequest);
@@ -214,13 +216,14 @@ public class ComputationJobActorMessageProcessor extends ComponentMsgProcessor<C
 
     private String[] args() throws IOException {
         JsonNode conf = job.getArgParameters();
-        String argsFormat = computation.getArgsformat();
+        SparkComputationMetadata md = (SparkComputationMetadata) computation.getComputationMetadata();
+        String argsFormat = md.getArgsformat();
         List<String> args = new ArrayList<>();
         if(StringUtils.isNotEmpty(argsFormat)){
             String[] argsList = argsFormat.substring(1, argsFormat.length() - 1).split(",");
             for(String arg : argsList){
                 if(conf.get(arg.trim()) != null) {
-                    if (computation.getArgsType().equals(ArgType.NAMED)) {
+                    if (md.getArgsType().equals(ArgType.NAMED)) {
                         args.add("--" + arg.trim());
                     }
                     args.add(conf.get(arg.trim()).asText());

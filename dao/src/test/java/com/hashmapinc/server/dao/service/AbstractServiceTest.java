@@ -224,12 +224,12 @@ public abstract class AbstractServiceTest {
         Computations computationsTest = new Computations();
         computationsTest.setName(name);
         computationsTest.setTenantId(tenantId);
-        computationsTest.setMainClass(mainClazz);
-        computationsTest.setJsonDescriptor(jsonDescriptor);
-        computationsTest.setJarName(jarName);
-        computationsTest.setJarPath(jarPath);
-        computationsTest.setArgsformat(argsformat);
-        computationsTest.setArgsType(argsType);
+//        computationsTest.setMainClass(mainClazz);
+//        computationsTest.setJsonDescriptor(jsonDescriptor);
+//        computationsTest.setJarName(jarName);
+//        computationsTest.setJarPath(jarPath);
+//        computationsTest.setArgsformat(argsformat);
+//        computationsTest.setArgsType(argsType);
         computationsTest.setId(new ComputationId(UUIDs.timeBased()));
         return computationsTest;
     }

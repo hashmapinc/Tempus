@@ -210,6 +210,13 @@ public class ModelConstants {
     public static final String COMPUTATION_JOB_STATE = "state";
     public static final String COMPUTATION_JOB_ID = "job_id";
     public static final String COMPUTATION_JOB_TENANT_ID = TENANT_ID_PROPERTY;
+    public static final String SPARK_COMPUTATIONS_META_DATA = "spark_computation_meta_data";
+    public static final String KUBELESS_COMPUTATIONS_META_DATA = "kubeless_computation_meta_data";
+    public static final String KUBELESS_COMPUTATION_NAMESPACE = "namespace";
+    public static final String KUBELESS_COMPUTATION_FUNCTION = "function";
+    public static final String KUBELESS_COMPUTATION_HANDLER = "handler";
+    public static final String KUBELESS_COMPUTATION_DEPENDENCIES = "dependencies";
+    public static final String KUBELESS_COMPUTATION_RUNTIME = "runtime";
 
     /**
      * Node Metric Constants
@@ -375,6 +382,7 @@ public class ModelConstants {
     public static final String COMPUTATIONS_JAR_PROPERTY = "jar_name";
     public static final String COMPUTATIONS_JAR_PATH_PROPERTY = "jar_path";
     public static final String COMPUTATIONS_NAME_PROPERTY = "computation_name";
+    public static final String COMPUTATIONS_TYPE = "type";
     public static final String COMPUTATIONS_MAIN_CLASS_PROPERTY = "main_class";
     public static final String COMPUTATIONS_DESCRIPTOR_PROPERTY = "json_descriptor";
     public static final String COMPUTATIONS_TENANT_ID_PROPERTY = TENANT_ID_PROPERTY;
