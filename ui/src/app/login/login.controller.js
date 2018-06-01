@@ -32,6 +32,9 @@ export default function LoginController(toast, loginService, userService/*, $roo
 
     vm.login = login;
 
+
+
+
     function doLogin() {
         loginService.login(vm.user).then(function success(response) {
             var token = response.data.token;

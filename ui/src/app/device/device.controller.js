@@ -63,7 +63,7 @@ export function DeviceController($rootScope,userService, deviceService, customer
 
     vm.types = types;
 
-    $scope.tableView = false;
+    $scope.tableView = true;
 
 
     $scope.devices = {
@@ -73,7 +73,7 @@ export function DeviceController($rootScope,userService, deviceService, customer
 
     $scope.query = {
         order: 'key',
-        limit: 5,
+        limit: 15,
         page: 1,
         search: null
     };
@@ -359,7 +359,7 @@ export function DeviceController($rootScope,userService, deviceService, customer
 
     function loadTableData() {
 
-        var promise = vm.deviceGridConfig.fetchItemsFunc({limit: 30, textSearch: ''}, false);
+        var promise = vm.deviceGridConfig.fetchItemsFunc({limit: 200, textSearch: ''}, false);
         if(promise) {
 
             promise.then(function success(items) {
@@ -407,7 +407,7 @@ export function DeviceController($rootScope,userService, deviceService, customer
 
         $scope.query = {
             order: 'key',
-            limit: 5,
+            limit: 15,
             page: 1,
             search: null
         };
