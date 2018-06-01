@@ -174,6 +174,15 @@ public class ModelConstants {
     public static final String TAG_METADATA_SOURCE = "source";
 
     /**
+     * Metadata Ingestion Constants
+     */
+    public static final String METADATA_ENTRIES_TABLE = "metadata_entries";
+    public static final String METADATA_CONFIG_ID = "metadata_config_id";
+    public static final String METADATA_INGESTION_KEY_COLUMN = "key";
+    public static final String METADATA_DATASOURCE_NAME_COLUMN = "datasource_name";
+    public static final String METADATA_INGESTION_VALUE_COLUMN = "value";
+
+    /**
      * Application constants
      */
     public static final String APPLICATION_TABLE_NAME = "application";
