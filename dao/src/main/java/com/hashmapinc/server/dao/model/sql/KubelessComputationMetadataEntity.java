@@ -44,13 +44,23 @@ public class KubelessComputationMetadataEntity extends ComputationMetadataEntity
     @Column(name = ModelConstants.KUBELESS_COMPUTATION_DEPENDENCIES)
     private String dependencies;
 
+    @Column(name = ModelConstants.KUBELESS_COMPUTATION_FUNC_TYPE)
+    private String functionContentType;
+
+    @Column(name = ModelConstants.KUBELESS_COMPUTATION_CHECKSUM)
+    private String checksum;
+
+    @Column(name = ModelConstants.KUBELESS_COMPUTATION_TIMEOUT)
+    private String timeout;
+
+
     public KubelessComputationMetadataEntity(){
         super();
     }
 
     public KubelessComputationMetadataEntity(KubelessComputationMetadata md){
         if(md.getId() != null){
-            this.id = md.getId().getId().toString();
+            this.setId(md.getId().getId());
         }
         if(md.getFunction() != null){
             this.function = md.getFunction();
@@ -64,8 +74,18 @@ public class KubelessComputationMetadataEntity extends ComputationMetadataEntity
         if(md.getNamespace() != null){
             this.namespace = md.getNamespace();
         }
-        if(md.getFunction() != null){
+        if(md.getRuntime() != null){
             this.runtime = md.getRuntime().name();
+        }
+        if(md.getFunctionContentType() != null){
+            this.functionContentType = md.getFunctionContentType();
+        }
+        if(md.getChecksum() != null)
+        {
+            this.checksum = md.getChecksum();
+        }
+        if(md.getTimeout() != null){
+            this.timeout = md.getTimeout();
         }
     }
 
@@ -78,6 +98,9 @@ public class KubelessComputationMetadataEntity extends ComputationMetadataEntity
        md.setNamespace(this.namespace);
        md.setRuntime(Runtimes.valueOf(this.runtime));
        md.setHandler(this.handler);
+       md.setFunctionContentType(this.functionContentType);
+       md.setChecksum(this.checksum);
+       md.setTimeout(this.timeout);
 
        return md;
     }

@@ -19,7 +19,9 @@ import akka.actor.ActorContext;
 import akka.actor.ActorRef;
 import akka.actor.Props;
 import com.hashmapinc.server.actors.ActorSystemContext;
+import com.hashmapinc.server.common.data.computation.ComputationType;
 import com.hashmapinc.server.common.data.id.ComputationId;
+import com.hashmapinc.server.common.data.plugin.ComponentType;
 import lombok.extern.slf4j.Slf4j;
 import com.hashmapinc.server.actors.computation.ComputationActor;
 import com.hashmapinc.server.actors.service.ContextAwareActor;
@@ -55,7 +57,7 @@ public class TenantComputationManager {
                 ContextAwareActor.ENTITY_PACK_LIMIT);
         for(Computations c : computationsIterator){
             log.debug("[{}] Creating computation actor {}", c.getId(), c);
-            ActorRef ref = getOrCreateComputationActor(context, c.getId());
+            ActorRef ref = getOrCreateComputationActor(context, c.getId(), c.getType());
             computationActors.put(c.getId(), ref);
             log.debug("[{}] computation actor created.", c.getId());
         }
@@ -65,7 +67,7 @@ public class TenantComputationManager {
         return link -> computationsService.findTenantComputations(tenantId, link);
     }
 
-    public ActorRef getOrCreateComputationActor(ActorContext context, ComputationId computationId) {
+    public ActorRef getOrCreateComputationActor(ActorContext context, ComputationId computationId, ComputationType type) {
         return computationActors.computeIfAbsent(computationId, cId ->
                 context.actorOf(Props.create(new ComputationActor.ActorCreator(systemContext, tenantId, cId))
                         .withDispatcher(getDispatcherName()), cId.toString()));

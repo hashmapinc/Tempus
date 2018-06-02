@@ -23,6 +23,7 @@ import com.hashmapinc.server.actors.ActorSystemContext;
 import com.hashmapinc.server.actors.service.ContextAwareActor;
 import com.hashmapinc.server.actors.service.ContextBasedCreator;
 import com.hashmapinc.server.common.data.computation.ComputationJob;
+import com.hashmapinc.server.common.data.computation.ComputationType;
 import com.hashmapinc.server.common.data.computation.Computations;
 import com.hashmapinc.server.common.data.id.ComputationId;
 import com.hashmapinc.server.common.data.id.ComputationJobId;
@@ -36,12 +37,13 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class ComputationActor extends ContextAwareActor {
-    private final LoggingAdapter logger = Logging.getLogger(getContext().system(), this);
+    protected final LoggingAdapter logger = Logging.getLogger(getContext().system(), this);
 
-    private final TenantId tenantId;
-    private final ComputationId computationId;
-    private Computations computation;
-    private final Map<ComputationJobId, ActorRef> computationJobActors;
+    protected final TenantId tenantId;
+    protected final ComputationId computationId;
+    protected Computations computation;
+    protected final Map<ComputationJobId, ActorRef> computationJobActors;
+
 
     public ComputationActor(ActorSystemContext systemContext, TenantId tenantId, ComputationId computationId) {
         super(systemContext);

@@ -15,6 +15,7 @@
  */
 package com.hashmapinc.server.common.data.computation;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -26,6 +27,7 @@ public class SparkComputationMetadata extends ComputationMetadata{
     private String mainClass;
     private String argsformat;
     private String argsType;
+    private JsonNode jsonDescriptor;
 
     public SparkComputationMetadata(){
         super();
@@ -38,5 +40,6 @@ public class SparkComputationMetadata extends ComputationMetadata{
         this.mainClass = md.getMainClass();
         this.argsformat = md.getArgsformat();
         this.argsType = md.getArgsType();
+        this.jsonDescriptor = md.getJsonDescriptor();
     }
 }

@@ -15,11 +15,15 @@
  */
 package com.hashmapinc.server.dao.model.sql;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.hashmapinc.server.common.data.computation.SparkComputationMetadata;
 import com.hashmapinc.server.common.data.id.ComputationId;
 import com.hashmapinc.server.common.data.id.UUIDBased;
 import com.hashmapinc.server.dao.model.ModelConstants;
+import com.hashmapinc.server.dao.util.mapping.JsonStringType;
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.annotations.Type;
+import org.hibernate.annotations.TypeDef;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -28,6 +32,7 @@ import javax.persistence.Table;
 
 @Slf4j
 @Entity
+@TypeDef(name = "json", typeClass = JsonStringType.class)
 @Table(name = ModelConstants.SPARK_COMPUTATIONS_META_DATA)
 public class SparkComputationMetadataEntity extends ComputationMetadataEntity<SparkComputationMetadata>{
 
@@ -46,13 +51,16 @@ public class SparkComputationMetadataEntity extends ComputationMetadataEntity<Sp
     @Column(name = ModelConstants.COMPUTATIONS_ARGS_TYPE)
     private String argsType;
 
+    @Type(type = "json")
+    @Column(name = ModelConstants.COMPUTATIONS_DESCRIPTOR)
+    private JsonNode jsonDescriptor;
+
     public SparkComputationMetadataEntity(){
         super();
     }
 
     public SparkComputationMetadataEntity(SparkComputationMetadata md){
         if(md.getId() != null){
-            log.info("Id present " + md.getId().getId().toString());
             this.setId(md.getId().getId());
         }
         if(md.getJarName() != null)
@@ -65,6 +73,8 @@ public class SparkComputationMetadataEntity extends ComputationMetadataEntity<Sp
             this.argsFormat = md.getArgsformat();
         if(md.getArgsType() != null)
             this.argsType = md.getArgsType();
+        if(md.getJsonDescriptor() != null)
+            this.jsonDescriptor = md.getJsonDescriptor();
     }
 
     @Override
@@ -76,6 +86,7 @@ public class SparkComputationMetadataEntity extends ComputationMetadataEntity<Sp
         md.setJarPath(this.jarPath);
         md.setMainClass(this.mainClass);
         md.setArgsformat(this.argsFormat);
+        md.setJsonDescriptor(this.jsonDescriptor);
 
         return md;
     }

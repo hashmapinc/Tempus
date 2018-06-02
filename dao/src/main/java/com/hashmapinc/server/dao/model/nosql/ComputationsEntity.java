@@ -44,9 +44,6 @@ public class ComputationsEntity implements SearchTextEntity<Computations> {
     @Column(name = ModelConstants.SEARCH_TEXT_PROPERTY)
     private String searchText;
 
-    @Column(name = ModelConstants.COMPUTATIONS_DESCRIPTOR_PROPERTY, codec = JsonCodec.class)
-    private JsonNode jsonDescriptor;
-
     @Column(name = ModelConstants.COMPUTATIONS_TYPE)
     private String type;
 
@@ -70,9 +67,7 @@ public class ComputationsEntity implements SearchTextEntity<Computations> {
         if(computations.getName() != null) {
             this.name = computations.getName();
         }
-        if(computations.getJsonDescriptor() != null) {
-            this.jsonDescriptor = computations.getJsonDescriptor();
-        }
+
     }
 
     @Override
@@ -102,14 +97,6 @@ public class ComputationsEntity implements SearchTextEntity<Computations> {
         return searchText;
     }
 
-    public JsonNode getJsonDescriptor() {
-        return jsonDescriptor;
-    }
-
-    public void setJsonDescriptor(JsonNode jsonDescriptor) {
-        this.jsonDescriptor = jsonDescriptor;
-    }
-
     public UUID getTenantId() {
         return tenantId;
     }
@@ -127,7 +114,6 @@ public class ComputationsEntity implements SearchTextEntity<Computations> {
         ComputationsEntity that = (ComputationsEntity) o;
         if (name != null ? !name.equals(that.name) : that.name != null) return false;
         if (searchText != null ? !searchText.equals(that.searchText) : that.searchText != null) return false;
-        if (jsonDescriptor != null ? !jsonDescriptor.equals(that.jsonDescriptor) : that.jsonDescriptor != null) return false;
         if (tenantId != null ? !tenantId.equals(that.tenantId) : that.tenantId != null) return false;
 
         return true;
@@ -138,7 +124,6 @@ public class ComputationsEntity implements SearchTextEntity<Computations> {
         int result = super.hashCode();
         result = 31 * result + (name != null ? name.hashCode() : 0);
         result = 31 * result + (searchText != null ? searchText.hashCode() : 0);
-        result = 31 * result + (jsonDescriptor != null ? jsonDescriptor.hashCode() : 0);
         result = 31 * result + (tenantId != null ? tenantId.hashCode() : 0);
         return result;
     }
@@ -151,7 +136,6 @@ public class ComputationsEntity implements SearchTextEntity<Computations> {
         if (tenantId != null) {
             computations.setTenantId(new TenantId(tenantId));
         }
-        computations.setJsonDescriptor(jsonDescriptor);
         return computations;
     }
 

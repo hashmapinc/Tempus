@@ -35,6 +35,7 @@ import com.hashmapinc.server.actors.shared.computation.TenantComputationManager;
 import com.hashmapinc.server.actors.shared.plugin.PluginManager;
 import com.hashmapinc.server.actors.shared.rule.RuleManager;
 import com.hashmapinc.server.actors.shared.rule.TenantRuleManager;
+import com.hashmapinc.server.common.data.computation.ComputationType;
 import com.hashmapinc.server.common.data.id.DeviceId;
 import com.hashmapinc.server.common.data.id.PluginId;
 import com.hashmapinc.server.common.data.id.RuleId;
@@ -187,7 +188,7 @@ public class TenantActor extends ContextAwareActor {
                     logger.debug("Invalid message: Computation delete message without computationId or ComputationJobId");
                 }
             }
-            ActorRef computationActor = computationManager.getOrCreateComputationActor(this.context(), msg.getComputationId().get());
+            ActorRef computationActor = computationManager.getOrCreateComputationActor(this.context(), msg.getComputationId().get(), ComputationType.SPARK);
             computationActor.tell(msg, ActorRef.noSender());
         }else {
             logger.debug("[{}] Invalid component lifecycle msg.", tenantId);

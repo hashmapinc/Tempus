@@ -30,7 +30,6 @@ public class Computations extends SearchTextBased<ComputationId> implements HasN
     private String name;
     private TenantId tenantId;
     private ComputationType type;
-    private JsonNode jsonDescriptor;
     private ComputationMetadata computationMetadata;
 
     public Computations() {
@@ -45,7 +44,6 @@ public class Computations extends SearchTextBased<ComputationId> implements HasN
         super(computations);
         this.name = computations.name;
         this.tenantId = computations.tenantId;
-        this.jsonDescriptor = computations.jsonDescriptor;
         this.computationMetadata = computations.computationMetadata;
     }
 

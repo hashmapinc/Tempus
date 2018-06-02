@@ -40,7 +40,8 @@ import java.util.*;
 
 @Service("uploadComputationDiscoveryService")
 @Slf4j
-public class UploadComputationDiscoveryService implements ComputationDiscoveryService{
+public class
+UploadComputationDiscoveryService implements ComputationDiscoveryService{
 
     @Autowired
     private ComputationsService computationsService;
@@ -72,8 +73,6 @@ public class UploadComputationDiscoveryService implements ComputationDiscoverySe
                         String args = Arrays.toString(computationRequestCompiled.getArgs());
                         log.info("tenant ID " + tenantId);
                         computations.setTenantId(tenantId);
-                        computations.setJsonDescriptor(computationRequestCompiled.getConfigurationDescriptor());
-
                         SparkComputationMetadata sparkComputationMetadata = new SparkComputationMetadata();
 
                         sparkComputationMetadata.setMainClass(computationRequestCompiled.getMainClazz());
@@ -81,6 +80,7 @@ public class UploadComputationDiscoveryService implements ComputationDiscoverySe
                         sparkComputationMetadata.setJarPath(j.toString());
                         sparkComputationMetadata.setArgsType(computationRequestCompiled.getArgsType());
                         sparkComputationMetadata.setJarName(j.getFileName().toString());
+                        sparkComputationMetadata.setJsonDescriptor(computationRequestCompiled.getConfigurationDescriptor());
 
                         computations.setComputationMetadata(sparkComputationMetadata);
                         computations.setType(ComputationType.SPARK);
@@ -116,6 +116,11 @@ public class UploadComputationDiscoveryService implements ComputationDiscoverySe
     @Override
     public Computations onJarUpload(String path, TenantId tenantId) {
         return onFileCreate(new File(path), tenantId);
+    }
+
+    @Override
+    public void uploadToS3Bucket(){
+
     }
 
     @PreDestroy

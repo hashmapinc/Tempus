@@ -15,13 +15,15 @@
  */
 package com.hashmapinc.server.controller;
 
+import com.datastax.driver.core.utils.UUIDs;
+import com.google.gson.Gson;
 import com.hashmapinc.server.common.data.EntityType;
 import com.hashmapinc.server.common.data.audit.ActionType;
-import com.hashmapinc.server.common.data.computation.ComputationJob;
-import com.hashmapinc.server.common.data.computation.SparkComputationMetadata;
+import com.hashmapinc.server.common.data.computation.*;
 import com.hashmapinc.server.common.data.id.ComputationId;
 import com.hashmapinc.server.common.data.page.TextPageLink;
 import com.hashmapinc.server.common.data.plugin.ComponentLifecycleEvent;
+import com.hashmapinc.server.dao.model.sql.ComputationMetadataEntity;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -29,7 +31,6 @@ import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import com.hashmapinc.server.common.data.computation.Computations;
 import com.hashmapinc.server.common.data.id.TenantId;
 import com.hashmapinc.server.common.data.page.TextPageData;
 import com.hashmapinc.server.common.data.security.Authority;
@@ -48,11 +49,13 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.Base64;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static com.hashmapinc.server.dao.service.Validator.validateId;
+import static java.util.Base64.getDecoder;
 
 @Slf4j
 @RestController
@@ -60,6 +63,10 @@ import static com.hashmapinc.server.dao.service.Validator.validateId;
 public class ComputationsController extends BaseController {
 
     public static final String COMPUTATION_ID = "computationId";
+
+    private Gson gson = new Gson();
+
+    private Base64.Decoder decoder = getDecoder();
 
     @Value("${spark.jar_path}")
     private String uploadPath;
@@ -102,6 +109,32 @@ public class ComputationsController extends BaseController {
                     ActionType.ADDED, e);
             throw handleException(e);
         }
+    }
+
+    @PreAuthorize("hasAuthority('TENANT_ADMIN')")
+    @RequestMapping(value = "/computations/kubeless/", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public Computations addComputations(@RequestParam("computation") String computationStr,
+                                        @RequestParam("computationMetaData") String computationMdStr) throws TempusException {
+        Computations computation = null;
+        try {
+            computation = gson.fromJson(computationStr, Computations.class);
+            ComputationId computationId = new ComputationId(UUIDs.timeBased());
+            computation.setId(computationId);
+            ComputationMetadata md = gson.fromJson(computationMdStr, KubelessComputationMetadata.class);
+            md.setId(computationId);
+            computation.setComputationMetadata(md);
+            TenantId tenantId = getCurrentUser().getTenantId();
+            computation.setTenantId(tenantId);
+            computationsService.save(computation);
+        } catch (Exception e){
+            logEntityAction(emptyId(EntityType.COMPUTATION), computation, null,
+                   ActionType.ADDED, e);
+            log.info("Exception is : " + e);
+            throw handleException(e);
+        }
+
+        return null;
     }
 
     @PreAuthorize("hasAuthority('TENANT_ADMIN')")
@@ -194,10 +227,39 @@ public class ComputationsController extends BaseController {
                 throw new TempusException("You don't have permission to perform this operation!",
                         TempusErrorCode.PERMISSION_DENIED);
 
-            } else if (tenantId.getId().equals(ModelConstants.NULL_UUID)) {
-                computation.setJsonDescriptor(null);
             }
         }
         return computation;
+    }
+
+    private boolean uploadFile(MultipartFile file){
+        boolean status = false;
+        try(Stream<Path> filesStream = Files.list(Paths.get(this.uploadPath))) {
+
+            String path = uploadPath + File.separator + file.getOriginalFilename();
+            File destinationFile = new File(path);
+            try (InputStream input = file.getInputStream()) {
+                Files.copy(input, Paths.get(destinationFile.toURI()), StandardCopyOption.REPLACE_EXISTING);
+            }
+
+        } catch (Exception e){
+            log.info("Execption occured while uploading file error {} ", e);
+        }
+        return status;
+    }
+
+    private ComputationMetadata addMetaDataToComputation(ComputationType type, String computationMdStr){
+        ComputationMetadata md = null;
+        try {
+            if (type == ComputationType.SPARK) {
+                md = gson.fromJson(computationMdStr, SparkComputationMetadata.class);
+
+            } else if (type == ComputationType.KUBELESS) {
+                md = gson.fromJson(computationMdStr, KubelessComputationMetadata.class);
+            }
+        } catch (Exception e){
+            log.info("Exeption in mapping to ComputationMetaData ", e);
+        }
+        return md;
     }
 }

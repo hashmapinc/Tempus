@@ -20,13 +20,13 @@ CREATE TABLE IF NOT EXISTS computations (
     id varchar(31) NOT NULL CONSTRAINT computations_pkey PRIMARY KEY,
     search_text varchar,
     computation_name varchar,
-    json_descriptor varchar,
     type varchar,
     tenant_id varchar(31)
 );
 
 CREATE TABLE IF NOT EXISTS spark_computation_meta_data (
     id varchar(31) NOT NULL CONSTRAINT spark_computations_pkey PRIMARY KEY,
+    json_descriptor varchar,
     jar_name varchar,
     jar_path varchar,
     main_class varchar,
@@ -40,5 +40,8 @@ CREATE TABLE IF NOT EXISTS kubeless_computation_meta_data (
     function varchar,
     handler varchar,
     runtime varchar,
-    dependencies varchar
+    dependencies varchar,
+    func_type varchar,
+    timeout varchar,
+    checksum varchar
 );

@@ -23,9 +23,13 @@ import lombok.EqualsAndHashCode;
 public class KubelessComputationMetadata extends ComputationMetadata {
     private String namespace;
     private String function;
+    private String functionContentType;
     private String handler;
     private Runtimes runtime;
     private String dependencies;
+    private String checksum;
+    private String timeout;
+
 
     public KubelessComputationMetadata(){
         super();
@@ -38,5 +42,8 @@ public class KubelessComputationMetadata extends ComputationMetadata {
         this.runtime = md.runtime;
         this.handler = md.handler;
         this.dependencies = md.dependencies;
+        this.functionContentType = md.functionContentType;
+        this.checksum = md.checksum;
+        this.timeout = md.timeout;
     }
 }

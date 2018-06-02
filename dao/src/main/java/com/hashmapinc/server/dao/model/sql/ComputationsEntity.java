@@ -52,10 +52,6 @@ public class ComputationsEntity extends BaseSqlEntity<Computations> implements S
     @Column(name = ModelConstants.COMPUTATIONS_TENANT_ID)
     private String tenantId;
 
-    @Type(type = "json")
-    @Column(name = ModelConstants.COMPUTATIONS_DESCRIPTOR)
-    private JsonNode jsonDescriptor;
-
     @Column(name = ModelConstants.COMPUTATIONS_TYPE)
     private String type;
 
@@ -79,9 +75,6 @@ public class ComputationsEntity extends BaseSqlEntity<Computations> implements S
         }
         if(computations.getName() != null) {
             this.name = computations.getName();
-        }
-        if(computations.getJsonDescriptor() != null) {
-            this.jsonDescriptor = computations.getJsonDescriptor();
         }
         if(computations.getTenantId() != null){
             this.tenantId = fromTimeUUID(computations.getTenantId().getId());
@@ -115,7 +108,6 @@ public class ComputationsEntity extends BaseSqlEntity<Computations> implements S
         if (name != null ? !name.equals(that.name) : that.name != null) return false;
         if (searchText != null ? !searchText.equals(that.searchText) : that.searchText != null) return false;
         if (tenantId != null ? !tenantId.equals(that.tenantId) : that.tenantId != null) return false;
-        if (jsonDescriptor != null ? !jsonDescriptor.equals(that.jsonDescriptor) : that.jsonDescriptor != null) return false;
 
         return true;
     }
@@ -126,7 +118,6 @@ public class ComputationsEntity extends BaseSqlEntity<Computations> implements S
         result = 31 * result + (name != null ? name.hashCode() : 0);
         result = 31 * result + (searchText != null ? searchText.hashCode() : 0);
         result = 31 * result + (tenantId != null ? tenantId.hashCode() : 0);
-        result = 31 * result + (jsonDescriptor != null ? jsonDescriptor.hashCode() : 0);
         return result;
     }
 
@@ -138,7 +129,6 @@ public class ComputationsEntity extends BaseSqlEntity<Computations> implements S
         if (tenantId != null) {
             computations.setTenantId(new TenantId(fromString(tenantId)));
         }
-        computations.setJsonDescriptor(this.jsonDescriptor);
         computations.setType(ComputationType.valueOf(this.type));
         if(this.type.contentEquals(ComputationType.SPARK.name()))
             computations.setComputationMetadata(((SparkComputationMetadataEntity)this.computationMetadataEntity).toData());

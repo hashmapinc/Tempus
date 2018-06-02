@@ -216,6 +216,9 @@ public class ModelConstants {
     public static final String KUBELESS_COMPUTATION_FUNCTION = "function";
     public static final String KUBELESS_COMPUTATION_HANDLER = "handler";
     public static final String KUBELESS_COMPUTATION_DEPENDENCIES = "dependencies";
+    public static final String KUBELESS_COMPUTATION_FUNC_TYPE = "func_type";
+    public static final String KUBELESS_COMPUTATION_TIMEOUT = "timeout";
+    public static final String KUBELESS_COMPUTATION_CHECKSUM = "checksum";
     public static final String KUBELESS_COMPUTATION_RUNTIME = "runtime";
 
     /**

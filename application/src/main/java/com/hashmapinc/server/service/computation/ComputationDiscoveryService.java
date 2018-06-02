@@ -22,5 +22,6 @@ import com.hashmapinc.server.common.data.page.TextPageLink;
 
 public interface ComputationDiscoveryService {
     Computations onJarUpload(String path, TenantId tenantId);
+    void uploadToS3Bucket();
     TextPageData<Computations> findTenantComputations(TenantId tenantId, TextPageLink pageLink);
 }
