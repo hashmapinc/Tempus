@@ -144,7 +144,14 @@ quota:
     intervalMin: 2
 
 database:
-  type: "${DATABASE_TYPE:cassandra}" # cassandra OR sql
+  type: "${DATABASE_TYPE:orientdb}" # cassandra OR sql OR orientdb
+
+# Orient DB config
+orientdb:
+  db_name: "${ORIENTDB_DB_NAME:tempus}"
+  url: "${ORIENTDB_URL:127.0.0.1:2424}"
+  username: "${ORIENTDB_USERNAME:}"
+  password: "${ORIENTDB_PASSWORD:}"
 
 # Cassandra driver configuration parameters
 cassandra:
