@@ -22,8 +22,12 @@ import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import com.google.common.util.concurrent.ListenableFuture;
-import com.tinkerpop.blueprints.impls.orient.OrientGraph;
 import org.springframework.beans.factory.annotation.Value;
+
+import com.orientechnologies.orient.core.db.ODatabaseSession;
+import com.orientechnologies.orient.core.db.OrientDB;
+import com.orientechnologies.orient.core.db.OrientDBConfig;
+import com.orientechnologies.orient.core.metadata.schema.OType;
 
 import com.hashmapinc.server.common.data.Device;
 import com.hashmapinc.server.common.data.EntitySubtype;
@@ -46,6 +50,10 @@ public class OrientDeviceDao implements DeviceDao {
 
   @Value("${orientdb.password}")
   private String orient_db_password;
+
+  // define orient connection (use a factory in production)
+  OrientDB orient = new OrientDB("remote:" + orient_db_url, OrientDBConfig.defaultConfig());
+  ODatabaseSession db = orient.open(orient_db_name, orient_db_username, orient_db_password);
 
   /**
    * Save or update device object

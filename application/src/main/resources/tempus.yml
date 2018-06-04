@@ -149,7 +149,7 @@ database:
 # Orient DB config
 orientdb:
   db_name: "${ORIENTDB_DB_NAME:tempus}"
-  url: "${ORIENTDB_URL:127.0.0.1:2424}"
+  url: "${ORIENTDB_URL:localhost}"
   username: "${ORIENTDB_USERNAME:root}"
   password: "${ORIENTDB_PASSWORD:rootpwd}"
 
