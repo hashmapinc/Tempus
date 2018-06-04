@@ -34,7 +34,7 @@ public class SystemSqlTestSuite {
             Arrays.asList("sql/schema.sql", "sql/system-data.sql"),
             "sql/drop-all-tables.sql",
             "sql-test.properties",
-            Arrays.asList("sql/upgrade/1.sql", "sql/upgrade/2.sql", "sql/upgrade/3.sql")
+            Arrays.asList("sql/upgrade/1.sql", "sql/upgrade/2.sql")
     );
 
 
