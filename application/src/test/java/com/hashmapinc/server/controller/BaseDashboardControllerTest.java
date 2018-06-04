@@ -32,6 +32,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hashmapinc.server.common.data.*;
 import com.hashmapinc.server.common.data.computation.ComputationJob;
 import com.hashmapinc.server.common.data.page.TextPageLink;
+import com.hashmapinc.server.exception.TempusException;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.hashmapinc.server.common.data.*;
@@ -91,6 +92,7 @@ public abstract class BaseDashboardControllerTest extends AbstractControllerTest
         tenantPlugin.setConfiguration(mapper.readTree("{}"));
         tenantPlugin.setClazz(TelemetryStoragePlugin.class.getName());
         tenantPlugin = doPost("/api/plugin", tenantPlugin, PluginMetaData.class);
+
     }
     
     @After
@@ -118,6 +120,64 @@ public abstract class BaseDashboardControllerTest extends AbstractControllerTest
         
         Dashboard foundDashboard = doGet("/api/dashboard/" + savedDashboard.getId().getId().toString(), Dashboard.class);
         Assert.assertEquals(foundDashboard.getTitle(), savedDashboard.getTitle());
+    }
+
+   private Customer createCustomer() throws Exception {
+       Customer customer = new Customer();
+       customer.setTitle("Customer");
+       customer.setTenantId(savedTenant.getId());
+       return customer;
+   }
+
+   private Customer saveCustomer(Customer customer) throws Exception {
+       Customer savedCustomer = doPost("/api/customer", customer, Customer.class);
+       return savedCustomer;
+   }
+
+   private User createCustomerUser(Customer Customer) throws Exception {
+       User customerUser = new User();
+       customerUser.setAuthority(Authority.CUSTOMER_USER);
+       customerUser.setTenantId(savedTenant.getId());
+       customerUser.setCustomerId(Customer.getId());
+       customerUser.setEmail("customer@tempus.org");
+       return customerUser;
+   }
+
+    @Test
+    public void testSaveDashboardByCustomer() throws Exception {
+
+        Customer customer = createCustomer();
+        Customer savedCustomer = saveCustomer(customer);
+        User customerUser = createCustomerUser(savedCustomer);
+        createUserAndLogin(customerUser, "testPassword1");
+
+        Dashboard dashboard = new Dashboard();
+        dashboard.setTitle("My dashboard");
+        Dashboard savedDashboard = doPost("/api/dashboard", dashboard, Dashboard.class);
+
+        Assert.assertNotNull(savedDashboard);
+        Assert.assertNotNull(savedDashboard.getId());
+        Assert.assertTrue(savedDashboard.getCreatedTime() > 0);
+        Assert.assertEquals(savedCustomer.getTenantId() , savedDashboard.getTenantId());
+        Assert.assertEquals(dashboard.getTitle(), savedDashboard.getTitle());
+
+        Assert.assertEquals(savedDashboard.getAssignedCustomerInfo(savedCustomer.getId()).getCustomerId(),savedCustomer.getId());
+
+        savedDashboard.setTitle("My new dashboard");
+        doPost("/api/dashboard", savedDashboard, Dashboard.class);
+
+        Dashboard foundDashboard = doGet("/api/dashboard/" + savedDashboard.getId().getId().toString(), Dashboard.class);
+        Assert.assertEquals(foundDashboard.getTitle(), savedDashboard.getTitle());
+
+        deleteSavedCustomer(savedCustomer);
+
+    }
+
+    private void deleteSavedCustomer(Customer savedCustomer) throws  Exception {
+        logout();
+        login(tenantAdmin.getEmail(), "testPassword1");
+        doDelete("/api/customer/"+savedCustomer.getId().getId().toString())
+                .andExpect(status().isOk());
     }
     
     @Test
