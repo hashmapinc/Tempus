@@ -13,11 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.hashmapinc.server.common.data;
+package com.hashmapinc.server.dao.datamodel;
 
+import com.hashmapinc.server.common.data.DataModel;
 
-public enum EntityType {
+public interface DataModelService {
 
-    TENANT, CUSTOMER, USER, RULE, PLUGIN, DASHBOARD, ASSET, DEVICE, ALARM, APPLICATION, COMPUTATION, COMPUTATION_JOB, NODE_METRIC,THEME, DATA_MODEL
+    DataModel saveDataModel(DataModel dataModel);
 
 }

@@ -161,6 +161,16 @@ CREATE TABLE IF NOT EXISTS tempus.device (
     PRIMARY KEY (id, tenant_id, customer_id, type)
 );
 
+CREATE TABLE IF NOT EXISTS tempus.data_model (
+    id timeuuid,
+    tenant_id timeuuid,
+    name text,
+    search_text text,
+    additional_info text,
+    last_update_ts bigint,
+    PRIMARY KEY (id, tenant_id)
+);
+
 CREATE MATERIALIZED VIEW IF NOT EXISTS tempus.device_by_tenant_and_name AS
     SELECT *
     from tempus.device

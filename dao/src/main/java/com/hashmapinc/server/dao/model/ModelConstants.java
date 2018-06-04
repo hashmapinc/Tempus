@@ -37,6 +37,7 @@ public class ModelConstants {
     public static final String ID_PROPERTY = "id";
     public static final String USER_ID_PROPERTY = "user_id";
     public static final String TENANT_ID_PROPERTY = "tenant_id";
+    public static final String DATA_MODEL_ID_PROPERTY = "data_model_id";
     public static final String CUSTOMER_ID_PROPERTY = "customer_id";
     public static final String DEVICE_ID_PROPERTY = "device_id";
     public static final String TITLE_PROPERTY = "title";
@@ -128,6 +129,7 @@ public class ModelConstants {
      */
     public static final String CUSTOMER_COLUMN_FAMILY_NAME = "customer";
     public static final String CUSTOMER_TENANT_ID_PROPERTY = TENANT_ID_PROPERTY;
+    public static final String CUSTOMER_DATA_MODEL_ID_PROPERTY = DATA_MODEL_ID_PROPERTY;
     public static final String CUSTOMER_TITLE_PROPERTY = TITLE_PROPERTY;
     public static final String CUSTOMER_ADDITIONAL_INFO_PROPERTY = ADDITIONAL_INFO_PROPERTY;
 
