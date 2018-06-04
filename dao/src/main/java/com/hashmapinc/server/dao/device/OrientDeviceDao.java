@@ -28,6 +28,8 @@ import com.orientechnologies.orient.core.db.ODatabaseSession;
 import com.orientechnologies.orient.core.db.OrientDB;
 import com.orientechnologies.orient.core.db.OrientDBConfig;
 import com.orientechnologies.orient.core.metadata.schema.OType;
+import com.orientechnologies.orient.core.metadata.schema.OClass;
+import com.orientechnologies.orient.core.record.OVertex;
 
 import com.hashmapinc.server.common.data.Device;
 import com.hashmapinc.server.common.data.EntitySubtype;
@@ -56,6 +58,30 @@ public class OrientDeviceDao implements DeviceDao {
   ODatabaseSession db = orient.open(orient_db_name, orient_db_username, orient_db_password);
 
   /**
+   * retrieves the device class from the database.
+   * 
+   * @return device - OClass for devices
+   */
+  private OClass getDeviceClass() {
+    // look for "Device" class
+    OClass device = db.getClass("Device"); 
+
+    // if device isn't found, define it here
+    if (device == null) { 
+      // create device
+      device = db.createVertexClass("Device");  
+      // create some device fields
+      device.createProperty("name", OType.STRING);
+      device.createProperty("tenantId", OType.STRING); // Orient does not support UUID 128-bit numbers
+      device.createProperty("deviceId", OType.STRING); // Orient does not support UUID 128-bit numbers
+      device.createProperty("searchText", OType.STRING);
+      device.createProperty("type", OType.STRING);
+    }
+
+    return device;
+  }
+
+  /**
    * Save or update device object
    *
    * @param device the device object
@@ -66,6 +92,19 @@ public class OrientDeviceDao implements DeviceDao {
     Device device
   ) {
     log.debug("Try to save device [{}]", device);
+
+    // create vertex
+    OClass devClass = getDeviceClass();
+    OVertex devVertex = db.newVertex("Device");
+    devVertex.setProperty("name", device.getName());
+    devVertex.setProperty("tenantId", device.getTenantId());
+    devVertex.setProperty("deviceId", device.getId());
+    devVertex.setProperty("searchText", device.getSearchText());
+    devVertex.setProperty("type", device.getType());
+
+    // save vertex
+    devVertex.save();
+
     return device;
   }
 
