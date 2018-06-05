@@ -126,7 +126,7 @@ public class ComputationsController extends BaseController {
             computation.setComputationMetadata(md);
             TenantId tenantId = getCurrentUser().getTenantId();
             computation.setTenantId(tenantId);
-            computationsService.save(computation);
+            computationDiscoveryService.uploadToS3Bucket(computation);
         } catch (Exception e){
             logEntityAction(emptyId(EntityType.COMPUTATION), computation, null,
                    ActionType.ADDED, e);
@@ -232,34 +232,4 @@ public class ComputationsController extends BaseController {
         return computation;
     }
 
-    private boolean uploadFile(MultipartFile file){
-        boolean status = false;
-        try(Stream<Path> filesStream = Files.list(Paths.get(this.uploadPath))) {
-
-            String path = uploadPath + File.separator + file.getOriginalFilename();
-            File destinationFile = new File(path);
-            try (InputStream input = file.getInputStream()) {
-                Files.copy(input, Paths.get(destinationFile.toURI()), StandardCopyOption.REPLACE_EXISTING);
-            }
-
-        } catch (Exception e){
-            log.info("Execption occured while uploading file error {} ", e);
-        }
-        return status;
-    }
-
-    private ComputationMetadata addMetaDataToComputation(ComputationType type, String computationMdStr){
-        ComputationMetadata md = null;
-        try {
-            if (type == ComputationType.SPARK) {
-                md = gson.fromJson(computationMdStr, SparkComputationMetadata.class);
-
-            } else if (type == ComputationType.KUBELESS) {
-                md = gson.fromJson(computationMdStr, KubelessComputationMetadata.class);
-            }
-        } catch (Exception e){
-            log.info("Exeption in mapping to ComputationMetaData ", e);
-        }
-        return md;
-    }
 }

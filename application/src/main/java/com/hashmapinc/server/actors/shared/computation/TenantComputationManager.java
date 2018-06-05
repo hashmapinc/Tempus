@@ -69,7 +69,7 @@ public class TenantComputationManager {
 
     public ActorRef getOrCreateComputationActor(ActorContext context, ComputationId computationId, ComputationType type) {
         return computationActors.computeIfAbsent(computationId, cId ->
-                context.actorOf(Props.create(new ComputationActor.ActorCreator(systemContext, tenantId, cId))
+                context.actorOf(Props.create(new ComputationActor.ActorCreator(systemContext, tenantId, cId, type))
                         .withDispatcher(getDispatcherName()), cId.toString()));
     }
 

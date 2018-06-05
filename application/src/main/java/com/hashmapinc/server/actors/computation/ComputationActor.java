@@ -39,16 +39,18 @@ import java.util.Map;
 public class ComputationActor extends ContextAwareActor {
     protected final LoggingAdapter logger = Logging.getLogger(getContext().system(), this);
 
-    protected final TenantId tenantId;
-    protected final ComputationId computationId;
-    protected Computations computation;
-    protected final Map<ComputationJobId, ActorRef> computationJobActors;
+    private final TenantId tenantId;
+    private final ComputationId computationId;
+    private Computations computation;
+    private ComputationType type;
+    private final Map<ComputationJobId, ActorRef> computationJobActors;
 
 
-    public ComputationActor(ActorSystemContext systemContext, TenantId tenantId, ComputationId computationId) {
+    public ComputationActor(ActorSystemContext systemContext, TenantId tenantId, ComputationId computationId, ComputationType type) {
         super(systemContext);
         this.tenantId = tenantId;
         this.computationId = computationId;
+        this.type = type;
         this.computationJobActors = new HashMap<>();
     }
 
@@ -130,9 +132,19 @@ public class ComputationActor extends ContextAwareActor {
     }
 
     private ActorRef getOrCreateComputationJobActor(ComputationJobId computationJobId) {
-        return computationJobActors.computeIfAbsent(computationJobId, k ->
-                context().actorOf(Props.create(new ComputationJobActor.ActorCreator(systemContext, tenantId, computation, computationJobId))
-                .withDispatcher(DefaultActorService.CORE_DISPATCHER_NAME), computationJobId.toString()));
+        ActorRef actorRef = null;
+        if(this.type == ComputationType.SPARK) {
+            actorRef = computationJobActors.computeIfAbsent(computationJobId, k ->
+                    context().actorOf(Props.create(new SparkComputationJobActor.ActorCreator(systemContext, tenantId, computation, computationJobId))
+                            .withDispatcher(DefaultActorService.CORE_DISPATCHER_NAME), computationJobId.toString()));
+        }
+        else if(this.type == ComputationType.KUBELESS){
+            actorRef = computationJobActors.computeIfAbsent(computationJobId, k ->
+                    context().actorOf(Props.create(new KubelessComputationJobActor.ActorCreator(systemContext, tenantId, computation, computationJobId))
+                            .withDispatcher(DefaultActorService.CORE_DISPATCHER_NAME), computationJobId.toString()));
+
+        }
+        return actorRef;
     }
 
     public static class ActorCreator extends ContextBasedCreator<ComputationActor> {
@@ -140,16 +152,18 @@ public class ComputationActor extends ContextAwareActor {
 
         private final TenantId tenantId;
         private final ComputationId computationId;
+        private final ComputationType type;
 
-        public ActorCreator(ActorSystemContext context, TenantId tenantId, ComputationId computationId) {
+        public ActorCreator(ActorSystemContext context, TenantId tenantId, ComputationId computationId, ComputationType type) {
             super(context);
             this.tenantId = tenantId;
             this.computationId = computationId;
+            this.type = type;
         }
 
         @Override
         public ComputationActor create() throws Exception {
-            return new ComputationActor(context, tenantId, computationId);
+            return new ComputationActor(context, tenantId, computationId, type);
         }
     }
 }

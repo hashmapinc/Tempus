@@ -46,7 +46,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-public class ComputationJobActorMessageProcessor extends ComponentMsgProcessor<ComputationJobId> {
+public class SparkComputationJobActorMessageProcessor extends ComponentMsgProcessor<ComputationJobId> {
 
     private static final String BASE_URL_TEMPLATE = "http://%s:%d/";
     private static final String BATCH_STATE_URI = "batches/%s";
@@ -60,7 +60,7 @@ public class ComputationJobActorMessageProcessor extends ComponentMsgProcessor<C
     private final ActorRef self;
     private final ActorRef parent;
 
-    protected ComputationJobActorMessageProcessor(TenantId tenantId, ComputationJobId id, ActorSystemContext systemContext
+    protected SparkComputationJobActorMessageProcessor(TenantId tenantId, ComputationJobId id, ActorSystemContext systemContext
             , LoggingAdapter logger, ActorRef parent, ActorRef self, Computations computation) {
         super(systemContext, logger, tenantId, id);
         this.computation = computation;

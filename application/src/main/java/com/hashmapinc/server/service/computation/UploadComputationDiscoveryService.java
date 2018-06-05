@@ -46,6 +46,9 @@ UploadComputationDiscoveryService implements ComputationDiscoveryService{
     @Autowired
     private ComputationsService computationsService;
 
+    @Autowired
+    private S3BucketService s3BucketService;
+
     private RuntimeJavaCompiler compiler;
 
     private boolean isJar(Path jarPath) throws IOException {
@@ -65,13 +68,11 @@ UploadComputationDiscoveryService implements ComputationDiscoveryService{
             if(isJar(j)){
                 AnnotationsProcessor processor = new AnnotationsProcessor(j, compiler);
                 List<ComputationRequestCompiled> c = processor.processAnnotations();
-                log.info("List size " + c.size());
                 if(c != null && !c.isEmpty()) {
                     for (ComputationRequestCompiled computationRequestCompiled : c) {
                         Computations computations = new Computations();
                         computations.setName(computationRequestCompiled.getName());
                         String args = Arrays.toString(computationRequestCompiled.getArgs());
-                        log.info("tenant ID " + tenantId);
                         computations.setTenantId(tenantId);
                         SparkComputationMetadata sparkComputationMetadata = new SparkComputationMetadata();
 
@@ -88,13 +89,11 @@ UploadComputationDiscoveryService implements ComputationDiscoveryService{
                         Optional<Computations> persisted = computationsService.findByTenantIdAndName(tenantId, computations.getName());
                         if (!persisted.isPresent()) {
                             ComputationId computationId = new ComputationId(UUIDs.timeBased());
-                            log.info("\n\n\n\nNew computation \n\n\n\n");
                             sparkComputationMetadata.setId(computationId);
                             computations.setId(computationId);
                             savedComputations = computationsService.save(computations);
                         } else {
                             computations.setId(persisted.get().getId());
-                            log.info("\n\n\n\nOld computation \n\n\n\n");
                             sparkComputationMetadata.setId(persisted.get().getId());
                             savedComputations = computationsService.save(computations);
                         }
@@ -119,8 +118,9 @@ UploadComputationDiscoveryService implements ComputationDiscoveryService{
     }
 
     @Override
-    public void uploadToS3Bucket(){
-
+    public void uploadToS3Bucket(Computations computation){
+        if(s3BucketService.uploadToS3Bucket(computation))
+            computationsService.save(computation);
     }
 
     @PreDestroy
