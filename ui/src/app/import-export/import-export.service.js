@@ -18,6 +18,7 @@
 import importDialogTemplate from './import-dialog.tpl.html';
 import entityAliasesTemplate from '../entity/alias/entity-aliases.tpl.html';
 
+
 /* eslint-enable import/no-unresolved, import/default */
 
 
@@ -45,7 +46,8 @@ export default function ImportExport($log, $translate, $q, $mdDialog, $document,
         importComputation: importComputation,
         exportExtension: exportExtension,
         importExtension: importExtension,
-        exportToPc: exportToPc
+        exportToPc: exportToPc,
+        importLogo: importLogo,
     };
 
     return service;
@@ -61,8 +63,8 @@ export default function ImportExport($log, $translate, $q, $mdDialog, $document,
                     function success (widgetTypes) {
                         prepareExport(widgetsBundle);
                         var widgetsBundleItem = {
-                           widgetsBundle:  prepareExport(widgetsBundle),
-                           widgetTypes: []
+                            widgetsBundle:  prepareExport(widgetsBundle),
+                            widgetTypes: []
                         };
                         for (var t in widgetTypes) {
                             var widgetType = widgetTypes[t];
@@ -328,15 +330,15 @@ export default function ImportExport($log, $translate, $q, $mdDialog, $document,
         var deferred = $q.defer();
         openImportDialog($event, 'computation.import', 'computation.computation-file').then(
             function success(importData) {
-                    computationService.upload(importData.file).then(
-                        function success() {
-                            deferred.resolve();
-                            $window.localStorage.setItem('currentTab', 4);
-                        },
-                        function fail() {
-                            deferred.reject();
-                        }
-                    );
+                computationService.upload(importData.file).then(
+                    function success() {
+                        deferred.resolve();
+                        $window.localStorage.setItem('currentTab', 4);
+                    },
+                    function fail() {
+                        deferred.reject();
+                    }
+                );
             },
             function fail() {
                 deferred.reject();
@@ -344,6 +346,28 @@ export default function ImportExport($log, $translate, $q, $mdDialog, $document,
         );
         return deferred.promise;
     }
+
+    function importLogo($event) {
+        var deferred = $q.defer();
+        openImportDialog($event, 'admin.import', 'admin.logo-file').then(
+            function success(importData) { $log.log(importData);
+                // computationService.upload(importData.file).then(
+                //     function success() {
+                //         deferred.resolve();
+                //
+                //     },
+                //     function fail() {
+                //         deferred.reject();
+                //     }
+                // );
+            },
+            function fail() {
+                deferred.reject();
+            }
+        );
+        return deferred.promise;
+    }
+
 
     function validateImportedPlugin(plugin) {
         if (angular.isUndefined(plugin.name)
@@ -474,7 +498,7 @@ export default function ImportExport($log, $translate, $q, $mdDialog, $document,
                                 function(missingEntityAliases) {
                                     if (Object.keys(missingEntityAliases).length > 0) {
                                         editMissingAliases($event, [ widget ],
-                                              true, 'dashboard.widget-import-missing-aliases-title', missingEntityAliases).then(
+                                            true, 'dashboard.widget-import-missing-aliases-title', missingEntityAliases).then(
                                             function success(updatedEntityAliases) {
                                                 for (var aliasId in updatedEntityAliases) {
                                                     var entityAlias = updatedEntityAliases[aliasId];
@@ -539,14 +563,14 @@ export default function ImportExport($log, $translate, $q, $mdDialog, $document,
             function success(targetLayout) {
                 itembuffer.addWidgetToDashboard(dashboard, targetState, targetLayout, widget,
                     aliasesInfo, onAliasesUpdateFunction, originalColumns, originalSize, -1, -1).then(
-                        function() {
-                            deferred.resolve(
-                                {
-                                    widget: widget,
-                                    layoutId: targetLayout
-                                }
-                            );
-                        }
+                    function() {
+                        deferred.resolve(
+                            {
+                                widget: widget,
+                                layoutId: targetLayout
+                            }
+                        );
+                    }
                 );
             },
             function fail() {
@@ -600,7 +624,7 @@ export default function ImportExport($log, $translate, $q, $mdDialog, $document,
                                 function(missingEntityAliases) {
                                     if (Object.keys( missingEntityAliases ).length > 0) {
                                         editMissingAliases($event, dashboard.configuration.widgets,
-                                                false, 'dashboard.dashboard-import-missing-aliases-title', missingEntityAliases).then(
+                                            false, 'dashboard.dashboard-import-missing-aliases-title', missingEntityAliases).then(
                                             function success(updatedEntityAliases) {
                                                 for (var aliasId in updatedEntityAliases) {
                                                     entityAliases[aliasId] = updatedEntityAliases[aliasId];
@@ -862,6 +886,29 @@ export default function ImportExport($log, $translate, $q, $mdDialog, $document,
         });
         return deferred.promise;
     }
+
+    // function openImportDialogLogo($event, importTitle, importFileLabel) { $log.log(importLogoDialogTemplate);
+    //     var deferred = $q.defer();
+    //     $mdDialog.show({
+    //         controller: 'ImportDialogController',
+    //         controllerAs: 'vm',
+    //         templateUrl: importDialogTemplate,
+    //         locals: {
+    //             importTitle: importTitle,
+    //             importFileLabel: importFileLabel
+    //         },
+    //         parent: angular.element($document[0].body),
+    //         skipHide: true,
+    //         fullscreen: true,
+    //         targetEvent: $event
+    //     }).then(function (importData) {
+    //         deferred.resolve(importData);
+    //     }, function () {
+    //         deferred.reject();
+    //     });
+    //     return deferred.promise;
+    // }
+
 
 }
 

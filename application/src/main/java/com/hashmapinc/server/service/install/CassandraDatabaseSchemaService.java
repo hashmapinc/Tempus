@@ -78,6 +78,7 @@ public class CassandraDatabaseSchemaService implements DatabaseSchemaService {
 
             for (Integer i : sortedScriptsIndexes) {
                 String scriptFileName = i.toString() + ".cql";
+                log.info("Installing pending upgrades ..." + scriptFileName);
                 if (!executedUpgrades.contains(scriptFileName)) {
                     loadCql(upgradeScriptsDirectory.resolve(scriptFileName));
                     cluster.getSession().execute("insert into " + tempus_KEYSPACE + "." + ModelConstants.INSTALLED_SCHEMA_VERSIONS + "(" + ModelConstants.INSTALLED_SCRIPTS_COLUMN + ")" + " values('" + scriptFileName + "'" + ")");

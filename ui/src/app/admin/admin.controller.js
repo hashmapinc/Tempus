@@ -17,7 +17,7 @@ import changeThemeTemplate from './change-theme.tpl.html';
 
 /*@ngInject*/
 
-export default function AdminController(adminService, toast, $scope, $rootScope, $state, $translate, $mdDialog, $document) {
+export default function AdminController(adminService, toast, $scope, $rootScope, $state, $translate, $mdDialog, $document,importExport) {
 
     var vm = this;
     vm.save = save;
@@ -110,12 +110,10 @@ export default function AdminController(adminService, toast, $scope, $rootScope,
 
     }
 
-    function changeLogo() {
+    function changeLogo($event) {
 
-       // importExport.importComputation($event)
+        importExport.importLogo($event)
     }
-
-
 
 
 }
