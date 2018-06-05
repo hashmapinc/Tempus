@@ -268,6 +268,13 @@ function Menu(userService, $state, $rootScope) {
                             link: '/static/svg/widgetslightgray.svg'
                         },
                         {
+                            name: 'data_model.data_models',
+                            type: 'link',
+                            state: 'home.data_models',
+                            icon: 'dashboards',
+                            link: '/static/svg/dashboardlightgray.svg'
+                        },
+                        {
                             name: 'dashboard.dashboards',
                             type: 'link',
                             state: 'home.dashboards',
