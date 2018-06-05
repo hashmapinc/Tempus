@@ -362,5 +362,13 @@ CREATE TABLE IF NOT EXISTS computation_job (
     tenant_id varchar(31)
 );
 
+CREATE TABLE IF NOT EXISTS theme (
+    id varchar (31) NOT NULL CONSTRAINT theme_pkey PRIMARY KEY,
+    name varchar,
+    value varchar,
+    is_enabled boolean
+ );
+
+
 
 CREATE TABLE IF NOT EXISTS installed_schema_versions(executed_scripts varchar(255) UNIQUE);

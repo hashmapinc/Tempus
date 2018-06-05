@@ -55,15 +55,15 @@ public class ApplicationController extends BaseController {
             Application savedApplication = checkNotNull(applicationService.saveApplication(application));
 
             logEntityAction(savedApplication.getId(), savedApplication,
-                    savedApplication.getCustomerId(),
-                    application.getId() == null ? ActionType.ADDED : ActionType.UPDATED, null);
+                            savedApplication.getCustomerId(),
+                            application.getId() == null ? ActionType.ADDED : ActionType.UPDATED, null);
 
             return savedApplication;
         } catch (Exception e) {
 
             logEntityAction(emptyId(EntityType.APPLICATION), application,
-                    null,
-                    application.getId() == null ? ActionType.ADDED : ActionType.UPDATED, null);
+                            null,
+                            application.getId() == null ? ActionType.ADDED : ActionType.UPDATED, null);
 
             throw handleException(e);
         }
@@ -94,14 +94,14 @@ public class ApplicationController extends BaseController {
             cleanupApplicationRelatedEntities(application);
 
             logEntityAction(application.getId(),application, application.getCustomerId(),
-                    ActionType.DELETED, null, strApplicationId );
+                            ActionType.DELETED, null, strApplicationId );
 
         } catch (Exception e) {
 
             logEntityAction(emptyId(EntityType.APPLICATION),
-                    null ,
-                    null,
-                    ActionType.DELETED, e, strApplicationId );
+                            null ,
+                            null,
+                            ActionType.DELETED, e, strApplicationId );
 
             throw handleException(e);
         }
@@ -172,7 +172,7 @@ public class ApplicationController extends BaseController {
         return applicationService.findApplicationByRuleIds(tenantId, ruleIds);
     }
 
-    @PreAuthorize("hasAuthority('TENANT_ADMIN')")
+    @PreAuthorize("hasAnyAuthority('TENANT_ADMIN', 'CUSTOMER_USER')")
     @RequestMapping(value = "/applications/dashboard/{dashboardId}", method = RequestMethod.GET)
     @ResponseBody
     public List<String> findApplicationsByDashboardId(@PathVariable("dashboardId") String strDashboardId) throws TempusException {
@@ -355,15 +355,15 @@ public class ApplicationController extends BaseController {
             activateApplication(application);
 
             logEntityAction(application.getId(),application,
-                    application.getCustomerId(),
-                    ActionType.ACTIVATED, null, strApplicationId);
+                            application.getCustomerId(),
+                            ActionType.ACTIVATED, null, strApplicationId);
 
         } catch (Exception e) {
 
             logEntityAction(emptyId(EntityType.APPLICATION),
-                    null,
-                    null,
-                    ActionType.ACTIVATED,e , strApplicationId);
+                            null,
+                            null,
+                            ActionType.ACTIVATED,e , strApplicationId);
 
             throw handleException(e);
         }
@@ -427,15 +427,15 @@ public class ApplicationController extends BaseController {
             applicationService.suspendApplicationById(applicationId);
 
             logEntityAction(application.getId(),application,
-                    application.getCustomerId(),
-                    ActionType.SUSPENDED, null, strApplicationId);
+                            application.getCustomerId(),
+                            ActionType.SUSPENDED, null, strApplicationId);
 
         } catch (Exception e) {
 
             logEntityAction(emptyId(EntityType.APPLICATION),
-                    null,
-                    null,
-                    ActionType.SUSPENDED,e , strApplicationId);
+                            null,
+                            null,
+                            ActionType.SUSPENDED,e , strApplicationId);
 
             throw handleException(e);
         }

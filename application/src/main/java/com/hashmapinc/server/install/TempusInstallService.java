@@ -128,6 +128,7 @@ public class TempusInstallService {
                 systemDataLoaderService.loadSystemWidgets();
                 systemDataLoaderService.loadSystemPlugins();
                 systemDataLoaderService.loadSystemRules();
+                systemDataLoaderService.loadSystemThemes();
 
                 if (loadDemo) {
                     log.info("Loading demo data...");
