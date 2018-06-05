@@ -27,11 +27,13 @@ import java.util.Map;
 public class KubelessV1beta1FunctionApi {
     private ApiClient apiClient;
     private final String kubelessFunctionsUri;
+    private final String namespace;
     private final Map<String, String> headers;
     private String[] authNames = new String[] { "BearerToken" };
 
     public KubelessV1beta1FunctionApi(ApiClient client, String namespace){
         this.apiClient = client;
+        this.namespace = namespace;
         this.kubelessFunctionsUri = "/apis/kubeless.io/v1beta1/namespaces/"+ namespace +"/functions/";
         this.headers = ImmutableMap.of("Accept", "application/json", "Content-type", "application/json");
     }
@@ -59,6 +61,10 @@ public class KubelessV1beta1FunctionApi {
     }
 
     public Call createFunctionCall(V1beta1Function function) throws ApiException {
+        String namespace = function.getMetadata().getNamespace();
+        if(!this.namespace.equals(namespace)){
+            function.getMetadata().namespace(this.namespace);
+        }
         return apiClient.buildCall(kubelessFunctionsUri, "POST", null, null, function,
                 headers, null, authNames, null);
     }
