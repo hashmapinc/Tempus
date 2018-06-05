@@ -171,6 +171,14 @@ CREATE TABLE IF NOT EXISTS tempus.data_model (
     PRIMARY KEY (id, tenant_id)
 );
 
+CREATE MATERIALIZED VIEW IF NOT EXISTS tempus.data_model_by_tenant_and_name AS
+    SELECT *
+    from tempus.data_model
+    WHERE tenant_id IS NOT NULL AND name IS NOT NULL AND id IS NOT NULL
+    PRIMARY KEY ( tenant_id, name, id)
+    WITH CLUSTERING ORDER BY (name ASC, id DESC);
+
+
 CREATE MATERIALIZED VIEW IF NOT EXISTS tempus.device_by_tenant_and_name AS
     SELECT *
     from tempus.device

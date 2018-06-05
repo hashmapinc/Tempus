@@ -25,7 +25,7 @@ public class DataModel extends SearchTextBasedWithAdditionalInfo<DataModelId> im
 
     private TenantId tenantId;
     private String name;
-    private long lastUpdatedTs;
+    private Long lastUpdatedTs;
 
     public DataModel() {
         super();
@@ -54,11 +54,11 @@ public class DataModel extends SearchTextBasedWithAdditionalInfo<DataModelId> im
         this.name = name;
     }
 
-    public long getLastUpdatedTs() {
+    public Long getLastUpdatedTs() {
         return lastUpdatedTs;
     }
 
-    public void setLastUpdatedTs(long lastUpdatedTs) {
+    public void setLastUpdatedTs(Long lastUpdatedTs) {
         this.lastUpdatedTs = lastUpdatedTs;
     }
 

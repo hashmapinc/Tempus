@@ -15,41 +15,42 @@
  */
 package com.hashmapinc.server.dao.datamodel;
 
-import com.google.common.util.concurrent.ListenableFuture;
+import com.datastax.driver.core.querybuilder.Select;
 import com.hashmapinc.server.common.data.DataModel;
-
-import java.util.List;
+import com.hashmapinc.server.dao.DaoUtil;
+import com.hashmapinc.server.dao.model.ModelConstants;
+import com.hashmapinc.server.dao.model.nosql.DataModelEntity;
+import com.hashmapinc.server.dao.nosql.CassandraAbstractSearchTextDao;
+import com.hashmapinc.server.dao.util.NoSqlDao;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
 import java.util.Optional;
 import java.util.UUID;
 
-public class CassandraDataModelDao implements DataModelDao {
-    @Override
-    public List<DataModel> find() {
-        return null;
-    }
+import static com.datastax.driver.core.querybuilder.QueryBuilder.eq;
+import static com.datastax.driver.core.querybuilder.QueryBuilder.select;
 
-    @Override
-    public DataModel findById(UUID id) {
-        return null;
-    }
-
-    @Override
-    public ListenableFuture<DataModel> findByIdAsync(UUID id) {
-        return null;
-    }
-
-    @Override
-    public DataModel save(DataModel dataModel) {
-        return null;
-    }
-
-    @Override
-    public boolean removeById(UUID id) {
-        return false;
-    }
+@Component
+@Slf4j
+@NoSqlDao
+public class CassandraDataModelDao extends CassandraAbstractSearchTextDao<DataModelEntity, DataModel> implements DataModelDao {
 
     @Override
     public Optional<DataModel> findDataModelByTenantIdAndName(UUID tenantId, String name) {
-        return Optional.empty();
+        Select select = select().from(ModelConstants.DATA_MODEL_BY_TENANT_AND_NAME_VIEW_NAME);
+        Select.Where query = select.where();
+        query.and(eq(ModelConstants.DATA_MODEL_TENANT_ID_PROPERTY, tenantId));
+        query.and(eq(ModelConstants.DATA_MODEL_NAME_PROPERTY, name));
+        return Optional.ofNullable(DaoUtil.getData(findOneByStatement(query)));
+    }
+
+    @Override
+    protected Class<DataModelEntity> getColumnFamilyClass() {
+        return DataModelEntity.class;
+    }
+
+    @Override
+    protected String getColumnFamilyName() {
+        return ModelConstants.DATA_MODEL_TABLE_NAME;
     }
 }

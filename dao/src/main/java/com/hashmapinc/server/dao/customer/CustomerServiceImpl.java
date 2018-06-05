@@ -19,8 +19,10 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.hashmapinc.server.common.data.Customer;
+import com.hashmapinc.server.common.data.DataModel;
 import com.hashmapinc.server.common.data.id.DataModelId;
 import com.hashmapinc.server.common.data.page.TextPageLink;
+import com.hashmapinc.server.dao.datamodel.DataModelDao;
 import com.hashmapinc.server.dao.user.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -64,6 +66,9 @@ public class CustomerServiceImpl extends AbstractEntityService implements Custom
 
     @Autowired
     private TenantDao tenantDao;
+
+    @Autowired
+    private DataModelDao dataModelDao;
 
     @Autowired
     private AssetService assetService;
@@ -201,7 +206,10 @@ public class CustomerServiceImpl extends AbstractEntityService implements Custom
                     if(customer.getDataModelId() == null) {
                         customer.setDataModelId(new DataModelId(NULL_UUID));
                     } else if(!customer.getDataModelId().getId().equals(NULL_UUID)) {
-                        //todo Validation to check if data model exists or not before persisting
+                        DataModel dataModel = dataModelDao.findById(customer.getDataModelId().getId());
+                        if(dataModel == null) {
+                            throw new DataValidationException("Customer is referencing to non-existent data model!");
+                        }
                     }
                 }
             };

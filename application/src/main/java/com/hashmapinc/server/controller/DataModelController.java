@@ -16,13 +16,10 @@
 package com.hashmapinc.server.controller;
 
 import com.hashmapinc.server.common.data.DataModel;
-import com.hashmapinc.server.common.data.Device;
 import com.hashmapinc.server.common.data.EntityType;
 import com.hashmapinc.server.common.data.audit.ActionType;
-import com.hashmapinc.server.dao.datamodel.DataModelService;
 import com.hashmapinc.server.exception.TempusException;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -31,18 +28,17 @@ import org.springframework.web.bind.annotation.*;
 @Slf4j
 public class DataModelController extends BaseController {
 
-
-    @Autowired
-    private DataModelService dataModelService;
+    public static final String DATA_MODEL_ID = "dataModelId";
 
     @PreAuthorize("hasAuthority('TENANT_ADMIN')")
-    @RequestMapping(value = "/data-model/", method = RequestMethod.POST)
+    @RequestMapping(value = "/data-model", method = RequestMethod.POST)
     @ResponseBody
     public DataModel saveDataModel(@RequestBody DataModel dataModel) throws TempusException {
         dataModel.setTenantId(getCurrentUser().getTenantId());
+        dataModel.setLastUpdatedTs(System.currentTimeMillis());
         try {
             DataModel savedDataModel = checkNotNull(dataModelService.saveDataModel(dataModel));
-            logEntityAction(dataModel.getId(), savedDataModel,
+            logEntityAction(savedDataModel.getId(), savedDataModel,
                     null,
                     dataModel.getId() == null ? ActionType.ADDED : ActionType.UPDATED, null);
             return savedDataModel;

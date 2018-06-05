@@ -16,12 +16,15 @@
 package com.hashmapinc.server.dao.datamodel;
 
 import com.hashmapinc.server.common.data.DataModel;
+import com.hashmapinc.server.common.data.Tenant;
 import com.hashmapinc.server.dao.entity.AbstractEntityService;
 import com.hashmapinc.server.dao.exception.DataValidationException;
 import com.hashmapinc.server.dao.service.DataValidator;
+import com.hashmapinc.server.dao.tenant.TenantDao;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 @Service
 @Slf4j
@@ -30,6 +33,9 @@ public class DataModelServiceImpl extends AbstractEntityService implements DataM
 
     @Autowired
     private DataModelDao dataModelDao;
+
+    @Autowired
+    private TenantDao tenantDao;
 
     @Override
     public DataModel saveDataModel(DataModel dataModel) {
@@ -47,5 +53,36 @@ public class DataModelServiceImpl extends AbstractEntityService implements DataM
                     }
             );
         }
+
+        @Override
+        protected void validateUpdate(DataModel dataModel) {
+            dataModelDao.findDataModelByTenantIdAndName(dataModel.getTenantId().getId(), dataModel.getName()).ifPresent(
+                    d -> {
+                        if (!d.getUuidId().equals(dataModel.getUuidId())) {
+                            throw new DataValidationException("Device with such name already exists!");
+                        }
+                    }
+            );
+        }
+        @Override
+        protected void validateDataImpl(DataModel dataModel) {
+            if(StringUtils.isEmpty(dataModel.getName())) {
+                throw new DataValidationException("Data Model name should be specified");
+            }
+
+            if (dataModel.getTenantId() == null) {
+                throw new DataValidationException("Data Model should be assigned to tenant!");
+            } else {
+                Tenant tenant = tenantDao.findById(dataModel.getTenantId().getId());
+                if (tenant == null) {
+                    throw new DataValidationException("Data Model is referencing to non-existent tenant!");
+                }
+            }
+
+            if(dataModel.getLastUpdatedTs() == null) {
+                throw new DataValidationException("Data Model last updated time should be specified!");
+            }
+        }
+
     };
 }

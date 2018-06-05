@@ -132,9 +132,13 @@ public class ModelConstants {
     public static final String CUSTOMER_DATA_MODEL_ID_PROPERTY = DATA_MODEL_ID_PROPERTY;
     public static final String CUSTOMER_TITLE_PROPERTY = TITLE_PROPERTY;
     public static final String CUSTOMER_ADDITIONAL_INFO_PROPERTY = ADDITIONAL_INFO_PROPERTY;
-
     public static final String CUSTOMER_BY_TENANT_AND_SEARCH_TEXT_COLUMN_FAMILY_NAME = "customer_by_tenant_and_search_text";
     public static final String CUSTOMER_BY_TENANT_AND_TITLE_VIEW_NAME = "customer_by_tenant_and_title";
+    public static final String DATA_MODEL_TABLE_NAME = "data_model";
+    public static final String DATA_MODEL_TENANT_ID_PROPERTY = TENANT_ID_PROPERTY;
+    public static final String DATA_MODEL_NAME_PROPERTY = "name";
+    public static final String DATA_MODEL_ADDITIONAL_INFO_PROPERTY = ADDITIONAL_INFO_PROPERTY;
+    public static final String DATA_MODEL_BY_TENANT_AND_NAME_VIEW_NAME = "data_model_by_tenant_and_name";
 
     /**
      * Cassandra device constants.
@@ -222,10 +226,10 @@ public class ModelConstants {
     public static final String NODE_METRIC_STATUS = "status";
     public static final String NODE_METRIC_RPC_SESSION = "rpc_session_count";
     public static final String NODE_METRIC_DEVICE_SESSION = "device_session_count";
-     
+
     /* Cassandra audit log constants.
      */
-    
+
     public static final String AUDIT_LOG_COLUMN_FAMILY_NAME = "audit_log";
 
     public static final String AUDIT_LOG_BY_ENTITY_ID_CF = "audit_log_by_entity_id";
@@ -499,11 +503,11 @@ public class ModelConstants {
     protected static final String[] COUNT_AGGREGATION_COLUMNS = new String[]{count(LONG_VALUE_COLUMN), count(DOUBLE_VALUE_COLUMN), count(BOOLEAN_VALUE_COLUMN), count(STRING_VALUE_COLUMN), count(JSON_VALUE_COLUMN)};
 
     protected static final String[] MIN_AGGREGATION_COLUMNS = ArrayUtils.addAll(COUNT_AGGREGATION_COLUMNS,
-                                                                                new String[]{min(LONG_VALUE_COLUMN), min(DOUBLE_VALUE_COLUMN), min(BOOLEAN_VALUE_COLUMN), min(STRING_VALUE_COLUMN), min(JSON_VALUE_COLUMN)});
+            new String[]{min(LONG_VALUE_COLUMN), min(DOUBLE_VALUE_COLUMN), min(BOOLEAN_VALUE_COLUMN), min(STRING_VALUE_COLUMN), min(JSON_VALUE_COLUMN)});
     protected static final String[] MAX_AGGREGATION_COLUMNS = ArrayUtils.addAll(COUNT_AGGREGATION_COLUMNS,
-                                                                                new String[]{max(LONG_VALUE_COLUMN), max(DOUBLE_VALUE_COLUMN), max(BOOLEAN_VALUE_COLUMN), max(STRING_VALUE_COLUMN), min(JSON_VALUE_COLUMN)});
+            new String[]{max(LONG_VALUE_COLUMN), max(DOUBLE_VALUE_COLUMN), max(BOOLEAN_VALUE_COLUMN), max(STRING_VALUE_COLUMN), min(JSON_VALUE_COLUMN)});
     protected static final String[] SUM_AGGREGATION_COLUMNS = ArrayUtils.addAll(COUNT_AGGREGATION_COLUMNS,
-                                                                                new String[]{sum(LONG_VALUE_COLUMN), sum(DOUBLE_VALUE_COLUMN)});
+            new String[]{sum(LONG_VALUE_COLUMN), sum(DOUBLE_VALUE_COLUMN)});
     protected static final String[] AVG_AGGREGATION_COLUMNS = SUM_AGGREGATION_COLUMNS;
 
     public static String min(String s) {
