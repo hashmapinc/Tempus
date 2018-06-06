@@ -134,3 +134,38 @@ Sample of creation of function object is as below
                         .timeout("180")
                         .handler("functionFilename.methodName")
                         .runtime("Java1.8"));
+    KubelessV1beta1FunctionApi functionApi = new KubelessV1beta1FunctionApi("default");
+    Call createFunctionsCall = functionApi.createFunctionCall((V1beta1Function) function);
+
+    Response response = createFunctionsCall.execute();
+
+    JSON json = new JSON();
+    V1beta1Function functionCreated = json.deserialize(response.body().string(), V1beta1Function.class);
+
+
+
+Trigger API
+===========
+
+Once function is created next step is to add a trigger which will trigger an execution of function. Let's look at an example of adding Kafka trigger
+
+To create a Kafka trigger we need to provide few labels to match with a function to which we want to add a trigger like below:
+
+.. code-block:: java
+
+    V1beta1AbstractType<V1beta1KafkaTriggerSpec> trigger = new V1beta1KafkaTrigger()
+                .metadata(new V1ObjectMeta()
+                        .name("TestKafkaTrigger"))
+                .spec(new V1beta1KafkaTriggerSpec()
+                        .topic("test-topic")
+                        .labelSelector(new V1LabelSelector()
+                                .putMatchLabelsItem("created-by", "kubeless")
+                                .putMatchLabelsItem("function", "functionName")));
+
+Then using Kubeless Trigger API client we can send a request to deploy this trigger on K8s cluster as below,
+
+.. code-block:: java
+
+    KubelessV1beta1KafkaTriggerApi triggerApi = new KubelessV1beta1KafkaTriggerApi("default");
+    Call kafkaTriggerCall = triggerApi.createKafkaTriggerCall((V1beta1KafkaTrigger) trigger);
+    Response result = kafkaTriggerCall.execute();
