@@ -14,6 +14,14 @@
 -- limitations under the License.
 --
 
-ALTER TABLE tempus.customer ADD data_model_id timeuuid;
-
-ALTER TABLE application ADD state varchar(255) DEFAULT 'SUSPENDED';
+CREATE TABLE IF NOT EXISTS tempus.model_object_cf (
+    id timeuuid,
+    name text,
+    description text,
+    model_id timeuuid,
+    parent_id timeuuid,
+    tenant_id timeuuid,
+    customer_id timeuuid,
+    search_text text,
+    PRIMARY KEY (id, tenant_id)
+);
