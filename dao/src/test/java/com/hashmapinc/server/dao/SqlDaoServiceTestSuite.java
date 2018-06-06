@@ -33,8 +33,6 @@ public class SqlDaoServiceTestSuite {
             Arrays.asList("sql/hsql/schema.sql", "sql/system-data.sql"),
             "sql/drop-all-tables.sql",
             "sql-test.properties",
-            Arrays.asList("sql/hsql/upgrade/1.sql", "sql/hsql/upgrade/2.sql", "sql/hsql/upgrade/4.sql")
-
-
+            Arrays.asList("sql/upgrade/1.sql", "sql/upgrade/2.sql", "sql/upgrade/3.sql", "sql/upgrade/4.sql")
     );
 }
