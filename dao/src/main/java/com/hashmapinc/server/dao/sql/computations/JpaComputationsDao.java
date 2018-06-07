@@ -69,7 +69,7 @@ public class JpaComputationsDao extends JpaAbstractDaoListeningExecutorService i
 
     @Override
     public void deleteById(ComputationId computationId) {
-        computationsRepository.delete(UUIDConverter. fromTimeUUID(computationId.getId()));
+        computationsRepository.delete(UUIDConverter.fromTimeUUID(computationId.getId()));
     }
 
     @Override
@@ -111,13 +111,15 @@ public class JpaComputationsDao extends JpaAbstractDaoListeningExecutorService i
     }
 
     public void addComputationMetadataEntityToComputations(ComputationsEntity ce){
-        ComputationMetadataEntity computationMetadataEntity = null;
-        if (ce.getType().contentEquals(ComputationType.SPARK.name())) {
-            computationMetadataEntity = sparkComputationMetaDataRepository.findOne(UUIDConverter.fromTimeUUID(ce.getId()));
-        } else if(ce.getType().contentEquals(ComputationType.KUBELESS.name())){
-            computationMetadataEntity = kubelessComputationMetaDataRepository.findOne(UUIDConverter.fromTimeUUID(ce.getId()));
+        if(ce != null) {
+            ComputationMetadataEntity computationMetadataEntity = null;
+            if (ce.getType().contentEquals(ComputationType.SPARK.name())) {
+                computationMetadataEntity = sparkComputationMetaDataRepository.findOne(UUIDConverter.fromTimeUUID(ce.getId()));
+            } else if (ce.getType().contentEquals(ComputationType.KUBELESS.name())) {
+                computationMetadataEntity = kubelessComputationMetaDataRepository.findOne(UUIDConverter.fromTimeUUID(ce.getId()));
+            }
+            ce.setComputationMetadataEntity(computationMetadataEntity);
         }
-        ce.setComputationMetadataEntity(computationMetadataEntity);
     }
 
     @Override

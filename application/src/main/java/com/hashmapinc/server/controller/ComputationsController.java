@@ -112,7 +112,7 @@ public class ComputationsController extends BaseController {
     }
 
     @PreAuthorize("hasAuthority('TENANT_ADMIN')")
-    @RequestMapping(value = "/computations/kubeless/", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(value = "/computations/kubeless", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     public Computations addComputations(@RequestParam("computation") String computationStr,
                                         @RequestParam("computationMetaData") String computationMdStr) throws TempusException {

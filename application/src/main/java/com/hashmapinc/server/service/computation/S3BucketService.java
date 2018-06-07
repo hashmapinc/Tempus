@@ -39,7 +39,6 @@ public class S3BucketService {
     String fileName = "*** Path to file to upload ***";
 
     public boolean uploadToS3Bucket(Computations computation) {
-        log.info("\n\n Adding to S3 bucket\n\n");
         boolean status = false;
         try {
             AmazonS3 s3Client = AmazonS3ClientBuilder.standard()

@@ -19,7 +19,9 @@ import com.datastax.driver.core.utils.UUIDs;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hashmapinc.server.common.data.*;
 import com.hashmapinc.server.common.data.computation.ComputationJob;
+import com.hashmapinc.server.common.data.computation.ComputationType;
 import com.hashmapinc.server.common.data.computation.Computations;
+import com.hashmapinc.server.common.data.computation.SparkComputationMetadata;
 import com.hashmapinc.server.common.data.id.ComputationId;
 import com.hashmapinc.server.common.data.security.Authority;
 import org.junit.After;
@@ -92,15 +94,21 @@ public class BaseComputationsControllerTest extends AbstractControllerTest {
         tenantPlugin = doPost("/api/plugin", tenantPlugin, PluginMetaData.class);
 
         Computations computations = new Computations();
+        ComputationId computationId = new ComputationId(UUIDs.timeBased());
         computations.setName("Computation");
-        computations.setId(new ComputationId(UUIDs.timeBased()));
-//        computations.setJarPath("/Some/Jar/path");
-//        computations.setTenantId(savedTenant.getId());
-//        computations.setJarName("SomeJar");
-//        computations.setMainClass("MainClass");
-//        //computations.setJsonDescriptor();
-//        computations.setArgsformat("argsFormat");
-//        computations.setArgsType("ArgsType");
+        computations.setId(computationId);
+        computations.setTenantId(savedTenant.getId());
+        computations.setType(ComputationType.SPARK);
+
+        SparkComputationMetadata md = new SparkComputationMetadata();
+        md.setId(computationId);
+        md.setJarPath("/Some/Jar/path");
+        md.setMainClass("MainClass");
+        md.setArgsType("ArgsType");
+        md.setArgsformat("argsFormat");
+        md.setJarName("SomeJar");
+
+        computations.setComputationMetadata(md);
         savedComputations = computationsService.save(computations);
     }
     @After
