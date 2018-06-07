@@ -8,9 +8,9 @@ Introduction
 
 Tempus Cloud widgets are additional UI modules that can be easily integrated into any Dashboard and provide end-user functions such as data visualization, remote device control, alarms management and displaying static custom html content. According to the provided features each widget definition represents specific Widget Type.
 
-******************************
+****************************
 Creating a Widget Definition
-******************************
+****************************
 
 In order to create a new widget definition, navigate to the “Widget Library”, then open existing “Widgets Bundle” or create a new one. In the “Widgets Bundle” view, click on the big “+” button in the bottom-right part of the screen and then click on the “Create new widget type” button.
 
