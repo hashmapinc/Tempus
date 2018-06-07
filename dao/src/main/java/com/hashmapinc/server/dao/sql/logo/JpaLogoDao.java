@@ -61,4 +61,16 @@ public class JpaLogoDao extends JpaAbstractDao<LogoEntity,Logo> implements LogoD
     }
 
 
+    @Override
+    public Logo findByName(String name) {
+        Logo logo = DaoUtil.getData(logoRepository.findByName(name));
+        if (logo != null) {
+            return logo;
+        } else {
+            return null;
+        }
+    }
+
+
+
 }

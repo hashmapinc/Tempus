@@ -36,12 +36,18 @@ public class LogoServiceImpl extends AbstractEntityService implements LogoServic
     private LogoDao logoDao;
 
     @Override
-    public Logo find() {
-        return logoDao.find().get(0);
+    public List <Logo> find() {
+        return logoDao.find();
     }
 
     @Override
     public Logo saveLogo(Logo logo) {
+        List <Logo> logoOld = find();
+
+        if(logoOld.size() > 0) {
+
+            logoDao.removeById(logoOld.get(0).getUuidId());
+        }
         Logo logoNew =  logoDao.save(logo);
         if(logoNew != null) {
             return logoNew;
@@ -51,9 +57,9 @@ public class LogoServiceImpl extends AbstractEntityService implements LogoServic
 
 
     @Override
-    public void deleteLogoById (String id) {
+    public void deleteLogoByName (String name) {
 
-        Logo logo = logoDao.findById(id);
+        Logo logo = logoDao.findByName(name);
 
         if (logo != null) {
 

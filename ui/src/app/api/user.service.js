@@ -60,7 +60,8 @@ function UserService($http, $q, $rootScope, adminService, dashboardService, logi
         updateLastPublicDashboardId: updateLastPublicDashboardId,
         logout: logout,
         reloadUser: reloadUser,
-        getActivetheme:getActiveTheme
+        getActivetheme:getActiveTheme,
+        getLogo:getLogo
     }
 
     reloadUser();
@@ -88,6 +89,20 @@ function UserService($http, $q, $rootScope, adminService, dashboardService, logi
         return deferred.promise;
 
     }
+
+    function getLogo() {
+
+        var deferred = $q.defer();
+        var url = 'api/logo/';
+        $http.get(url, null).then(function success(response) {
+            deferred.resolve(response.data);
+        }, function fail() {
+            deferred.reject();
+        });
+        return deferred.promise;
+
+    }
+
 
     function updateAndValidateToken(token, prefix, notify) {
         var valid = false;

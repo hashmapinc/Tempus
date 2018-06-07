@@ -23,11 +23,11 @@ import java.util.List;
 
 public interface LogoService {
 
-    Logo find();
+    List <Logo> find();
 
     Logo saveLogo(Logo logo);
 
-    void deleteLogoById(String id);
+    void deleteLogoByName(String name);
 
 
 }
