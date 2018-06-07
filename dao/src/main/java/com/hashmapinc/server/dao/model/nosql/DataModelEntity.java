@@ -46,16 +46,16 @@ public final class DataModelEntity implements SearchTextEntity<DataModel> {
     private UUID id;
 
     @PartitionKey(value = 1)
-    @Column(name = DEVICE_TENANT_ID_PROPERTY)
+    @Column(name = DATA_MODEL_TENANT_ID_PROPERTY)
     private UUID tenantId;
 
-    @Column(name = DEVICE_NAME_PROPERTY)
+    @Column(name = DATA_MODEL_NAME_PROPERTY)
     private String name;
 
     @Column(name = SEARCH_TEXT_PROPERTY)
     private String searchText;
 
-    @Column(name = DEVICE_ADDITIONAL_INFO_PROPERTY, codec = JsonCodec.class)
+    @Column(name = DATA_MODEL_ADDITIONAL_INFO_PROPERTY, codec = JsonCodec.class)
     private JsonNode additionalInfo;
 
     @Column(name = ModelConstants.LAST_UPDATE_TS_COLUMN)
