@@ -111,7 +111,7 @@
                     <tb-states-component flex-xs flex-sm ng-if="!vm.isEdit" states-controller-id="vm.dashboardConfiguration.settings.stateControllerId"
                                          dashboard-ctrl="vm" states="vm.dashboardConfiguration.states">
                     </tb-states-component>
-                 </div>
+                </div>
             </div>
         </tb-dashboard-toolbar>
     </section>
@@ -203,9 +203,9 @@
                     <span class="tb-details-subtitle">{{ 'widgets-bundle.current' | translate }}</span>
                     <tb-widgets-bundle-select flex-offset="5"
                                               flex
-                            ng-model="vm.widgetsBundle"
-                            tb-required="true"
-                            select-first-bundle="false">
+                                              ng-model="vm.widgetsBundle"
+                                              tb-required="true"
+                                              select-first-bundle="false">
                     </tb-widgets-bundle-select>
                 </div>
             </header-pane>
@@ -328,7 +328,7 @@
                     </md-button>
                 </md-fab-actions>
             </md-fab-speed-dial>
-            <md-button ng-if="(vm.isTenantAdmin() || vm.isSystemAdmin()) && !forceFullscreen" ng-show="vm.isEdit && !vm.isAddingWidget && !$root.loading" ng-disabled="$root.loading"
+            <md-button ng-if="(vm.isTenantAdmin() || vm.isSystemAdmin() || vm.isCustomerUser()) && !forceFullscreen" ng-show="vm.isEdit && !vm.isAddingWidget && !$root.loading" ng-disabled="$root.loading"
                        class="tb-btn-footer md-accent md-hue-2 md-fab"
                        aria-label="{{ 'action.apply' | translate }}"
                        ng-click="vm.saveDashboard()">
@@ -338,7 +338,7 @@
                 <ng-md-icon icon="done"></ng-md-icon>
             </md-button>
             <md-button ng-show="!vm.isAddingWidget && !$root.loading"
-                       ng-if="(vm.isTenantAdmin() || vm.isSystemAdmin()) && !forceFullscreen" ng-disabled="$root.loading"
+                       ng-if="(vm.isTenantAdmin() || vm.isSystemAdmin() || vm.isCustomerUser()) && !forceFullscreen" ng-disabled="$root.loading"
                        class="tb-btn-footer md-accent md-hue-2 md-fab"
                        aria-label="{{ 'action.edit-mode' | translate }}"
                        ng-click="vm.toggleDashboardEditMode()">
@@ -351,6 +351,6 @@
         </section>
     </section>
     <section class="tb-powered-by-footer" ng-style="{'color': vm.dashboard.configuration.settings.titleColor}">
-<!--         <span>Powered by <a href="https://tempus.io" target="_blank">tempus v.{{ vm.tempusVersion }}</a></span>
- -->    </section>
+        <!--         <span>Powered by <a href="https://tempus.io" target="_blank">tempus v.{{ vm.tempusVersion }}</a></span>
+         -->    </section>
 </md-content>

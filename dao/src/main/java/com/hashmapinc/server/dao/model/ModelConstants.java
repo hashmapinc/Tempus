@@ -477,6 +477,23 @@ public class ModelConstants {
     public static final String DS_COLUMN = "ds";
 
     /**
+     * theme constants.
+     */
+    public static final String THEME_TABLE_NAME = "theme";
+    public static final String THEME_NAME = "name";
+    public static final String THEME_VALUE = "value";
+    public static final String IS_ENABLED = "is_enabled";
+
+
+    /**
+     * Cassandra theme Contants
+     */
+    public static final String THEME_COLUMN_FAMILY_NAME = "theme";
+    public static final String THEME_NAME_PROPERTY = "name";
+    public static final String THEME_VALUE_PROPERTY = "value";
+    public static final String THEME_IS_ENABLED_PROPERTY = "is_enabled";
+
+    /**
      * Main names of cassandra key-value columns storage.
      */
     public static final String BOOLEAN_VALUE_COLUMN = "bool_v";

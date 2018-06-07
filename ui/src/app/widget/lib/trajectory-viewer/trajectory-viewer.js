@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 import * as THREE from 'three';
 import OrbitControls from 'three-orbitcontrols';
 import * as MeshLine from 'three.meshline';
@@ -24,7 +25,7 @@ import angular from 'angular';
 //=============================================================================
 // injected vars
 var widgetContainer; // element that holds the widget
-var widgetContext; // context of the widget
+var widgetContext; //eslint-disable-line no-unused-vars
 
 // threejs 
 var sceneContainer; // element that holds the canvas element
@@ -106,7 +107,7 @@ export function updatePoints(newReadings, overwrite) {
 
 // handles new data event
 export function onDataUpdated() {
-  var newData = widgetContext.data[0].data;
+  /* var newData = widgetContext.data[0].data;
   var newReadings = [{md: 0, azi: 0, incl: 0}];
   for (let position = 1; position < newData.length; position++) {
     let prev = newReadings[position - 1];
@@ -117,7 +118,7 @@ export function onDataUpdated() {
     });
   }
   updatePoints(newReadings, true);
-  plot();
+  plot(); */
 }
 // use orbit controls
 export function setOrbitControls() {

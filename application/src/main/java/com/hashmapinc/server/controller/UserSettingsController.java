@@ -15,16 +15,30 @@
  */
 package com.hashmapinc.server.controller;
 
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import com.hashmapinc.server.common.data.Theme;
+import com.hashmapinc.server.common.data.User;
 import com.hashmapinc.server.common.data.UserSettings;
+import com.hashmapinc.server.common.data.id.CustomerId;
+import com.hashmapinc.server.common.data.id.TenantId;
 import com.hashmapinc.server.common.data.id.UserId;
+import com.hashmapinc.server.common.data.page.TextPageLink;
 import com.hashmapinc.server.common.data.security.Authority;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import com.hashmapinc.server.dao.settings.UserSettingsService;
+import com.hashmapinc.server.dao.theme.ThemeService;
 import com.hashmapinc.server.exception.TempusException;
 import com.hashmapinc.server.service.mail.MailService;
 
+import javax.servlet.http.HttpServletRequest;
+import java.util.List;
+
+@Slf4j
 @RestController
 @RequestMapping("/api")
 public class UserSettingsController extends BaseController {
@@ -34,6 +48,9 @@ public class UserSettingsController extends BaseController {
     
     @Autowired
     private UserSettingsService userSettingsService;
+
+    @Autowired
+    private ThemeService themeService;
 
     @PreAuthorize("hasAnyAuthority('TENANT_ADMIN', 'CUSTOMER_USER', 'SYS_ADMIN')")
     @RequestMapping(value = "/settings/{key}", method = RequestMethod.GET)
@@ -73,6 +90,39 @@ public class UserSettingsController extends BaseController {
                String email = getCurrentUser().getEmail();
                mailService.sendTestMail(userSettings.getJsonValue(), email);
             }
+        } catch (Exception e) {
+            throw handleException(e);
+        }
+    }
+
+    @PreAuthorize("hasAuthority('SYS_ADMIN')")
+    @RequestMapping(value = "/settings/themes", method = RequestMethod.GET)
+    public List<Theme> getThemes() throws TempusException  {
+        try {
+            return themeService.findAll();
+        } catch (Exception e) {
+            throw handleException(e);
+        }
+    }
+
+
+
+    @RequestMapping(value = "/theming", method = RequestMethod.GET)
+    @ResponseStatus(value = HttpStatus.OK)
+    public Theme getEnabledTheme() throws TempusException  {
+        try {
+            return themeService.findEnabledTheme();
+        } catch (Exception e) {
+            throw handleException(e);
+        }
+    }
+
+    @PreAuthorize("hasAuthority('SYS_ADMIN')")
+    @RequestMapping(value = "/settings/theme", method = RequestMethod.POST)
+    public Theme updateTheme(@RequestBody String value) throws TempusException {
+        try {
+            JsonObject request = new JsonParser().parse(value).getAsJsonObject();
+            return themeService.updateThemeStatus(request.get("value").getAsString());
         } catch (Exception e) {
             throw handleException(e);
         }

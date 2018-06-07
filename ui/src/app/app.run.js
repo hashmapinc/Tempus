@@ -40,9 +40,20 @@ export default function AppRun($rootScope, $window, $injector, $location, $log, 
             $rootScope.widgetEditMode = true;
         }
     }
-
+    getdefaultTheme();
     initWatchers();
-    
+
+    function getdefaultTheme() {
+        var promise =  userService.getActivetheme();
+        if(promise) {
+            promise.then(function success(theme) {
+                 $rootScope.theme = theme.themeValue;
+                 $rootScope.themeName = theme.themeName;
+                },
+            )
+        }
+    }
+
     function initWatchers() {
         $rootScope.unauthenticatedHandle = $rootScope.$on('unauthenticated', function (event, doLogout) {
             if (doLogout) {
@@ -77,6 +88,8 @@ export default function AppRun($rootScope, $window, $injector, $location, $log, 
                 waitForUserLoaded();
                 userService.reloadUser();
             }
+
+
 
             var locationSearch = $location.search();
             var publicId = locationSearch.publicId;
@@ -136,7 +149,6 @@ export default function AppRun($rootScope, $window, $injector, $location, $log, 
         })
 
         $rootScope.pageTitle = 'Tempus';
-
         $rootScope.stateChangeSuccessHandle = $rootScope.$on('$stateChangeSuccess', function (evt, to, params) {
             if (userService.isPublic() && to.name === 'home.dashboards.dashboard') {
                 $location.search('publicId', userService.getPublicId());

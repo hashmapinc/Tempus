@@ -30,14 +30,27 @@ md-card.tb-login-card {
   }
 }
 
-.hm-background {
-	width: 100%; 
+.hm-background-themeDark {
+	width: 100% !important;
 	//background: linear-gradient(to top, #0c3483 0%, #6b8cce 80%, transparent 100%, #a2b6df 80%, #a2b6df 80%), url("/static/images/LoginPage_Background_Image.png");
 	background: linear-gradient(to top, #0c3483 0%, transparent 200%), url("/static/images/LoginPage_Background_Image.png");
 }
 
+.hm-background-themeBlue {
+  width: 100% !important;
+  //background: linear-gradient(to top, #0c3483 0%, #6b8cce 80%, transparent 100%, #a2b6df 80%, #a2b6df 80%), url("/static/images/LoginPage_Background_Image.png");
+  background: linear-gradient(to top, blue 0%, transparent 200%), url("/static/images/LoginPage_Background_Image.png");
+}
 .hm-login-logo {
 	margin-left: 20%; 
 	min-height: 110px;
 	min-width: 250px;
+}
+
+md-input-container.md-themeDark-theme > md-icon {
+  color: white !important;
+}
+
+md-input-container.md-themeBlue-theme > md-icon {
+  color: white !important;
 }

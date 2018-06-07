@@ -29,3 +29,5 @@ DROP TABLE IF EXISTS computations;
 DROP TABLE IF EXISTS computation_job;
 DROP TABLE IF EXISTS installed_schema_versions;
 DROP TABLE IF EXISTS node_metric;
+DROP TABLE IF EXISTS theme;
+
