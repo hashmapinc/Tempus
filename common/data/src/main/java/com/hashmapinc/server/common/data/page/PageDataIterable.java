@@ -22,16 +22,11 @@ import java.util.NoSuchElementException;
 import com.hashmapinc.server.common.data.SearchTextBased;
 import com.hashmapinc.server.common.data.id.UUIDBased;
 
-public class PageDataIterable<T extends SearchTextBased<? extends UUIDBased>> implements Iterable<T>, Iterator<T> {
+public class PageDataIterable<T extends SearchTextBased<? extends UUIDBased>> implements Iterable<T> {
+
 
     private final FetchFunction<T> function;
     private final int fetchSize;
-
-    private List<T> currentItems;
-    private int currentIdx;
-    private boolean hasNextPack;
-    private TextPageLink nextPackLink;
-    private boolean initialized;
 
     public PageDataIterable(FetchFunction<T> function, int fetchSize) {
         super();
@@ -41,37 +36,46 @@ public class PageDataIterable<T extends SearchTextBased<? extends UUIDBased>> im
 
     @Override
     public Iterator<T> iterator() {
-        return this;
-    }
 
-    @Override
-    public boolean hasNext() {
-        if(!initialized){
-            fetch(new TextPageLink(fetchSize));
-            initialized = true;
-        }
-        if(currentIdx == currentItems.size()){
-            if(hasNextPack){
-                fetch(nextPackLink);
+        return new Iterator<T>() {
+
+            private List<T> currentItems;
+            private int currentIdx;
+            private boolean hasNextPack;
+            private TextPageLink nextPackLink;
+            private boolean initialized;
+
+            @Override
+            public boolean hasNext() {
+                if(!initialized){
+                    fetch(new TextPageLink(fetchSize));
+                    initialized = true;
+                }
+                if(currentIdx == currentItems.size()){
+                    if(hasNextPack){
+                        fetch(nextPackLink);
+                    }
+                }
+                return currentIdx < currentItems.size();
             }
-        }
-        return currentIdx < currentItems.size();
-    }
 
-    private void fetch(TextPageLink link) {
-        TextPageData<T> pageData = function.fetch(link);
-        currentIdx = 0;
-        currentItems = pageData.getData();
-        hasNextPack = pageData.hasNext();
-        nextPackLink = pageData.getNextPageLink();
-    }
+            private void fetch(TextPageLink link) {
+                TextPageData<T> pageData = function.fetch(link);
+                currentIdx = 0;
+                currentItems = pageData.getData();
+                hasNextPack = pageData.hasNext();
+                nextPackLink = pageData.getNextPageLink();
+            }
 
-    @Override
-    public T next() {
-        if(!hasNext()){
-            throw new NoSuchElementException();
-        }
-        return currentItems.get(currentIdx++);
+            @Override
+            public T next() {
+                if(!hasNext()){
+                    throw new NoSuchElementException();
+                }
+                return currentItems.get(currentIdx++);
+            }
+
+        };
     }
 
     public static interface FetchFunction<T extends SearchTextBased<? extends UUIDBased>> {

@@ -17,6 +17,7 @@ import ExtensionTableDirective from './extension-table.directive';
 import ExtensionFormHttpDirective from './extensions-forms/extension-form-http.directive';
 import ExtensionFormMqttDirective from './extensions-forms/extension-form-mqtt.directive'
 import ExtensionFormOpcDirective from './extensions-forms/extension-form-opc.directive';
+import ExtensionFormWitsDirective from './extensions-forms/extension-form-wits.directive';
 import {ParseToNull} from './extension-dialog.controller';
 
 export default angular.module('tempus.extension', [])
@@ -24,5 +25,6 @@ export default angular.module('tempus.extension', [])
     .directive('tbExtensionFormHttp', ExtensionFormHttpDirective)
     .directive('tbExtensionFormMqtt', ExtensionFormMqttDirective)
     .directive('tbExtensionFormOpc', ExtensionFormOpcDirective)
+    .directive('tbExtensionFormWits', ExtensionFormWitsDirective)
     .directive('parseToNull', ParseToNull)
     .name;

@@ -30,9 +30,11 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 
 import java.sql.ResultSet;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 
 @Service
@@ -65,31 +67,34 @@ public class SqlDatabaseSchemaService implements DatabaseSchemaService {
         Path schemaFile = Paths.get(this.dataDir, SQL_DIR, SCHEMA_SQL);
         Path upgradeScriptsDirectory = Paths.get(this.dataDir, SQL_DIR, UPGRADE_DIR);
 
-        try (Connection conn = DriverManager.getConnection(dbUrl, dbUserName, dbPassword)) {
+        try (Connection conn = DriverManager.getConnection(dbUrl, dbUserName, dbPassword);
+             Statement stmt = conn.createStatement()) {
             String sql = new String(Files.readAllBytes(schemaFile), Charset.forName("UTF-8"));
 
-            conn.createStatement().execute(sql);
+            stmt.execute(sql);
 
             log.info("Installing pending upgrades ...");
 
             List<String> executedUpgrades = new ArrayList<>();
-            ResultSet rs = conn.createStatement().executeQuery("select "+ ModelConstants.INSTALLED_SCRIPTS_COLUMN + " from "+ ModelConstants.INSTALLED_SCHEMA_VERSIONS);
+            ResultSet rs = stmt.executeQuery("select " + ModelConstants.INSTALLED_SCRIPTS_COLUMN + " from " + ModelConstants.INSTALLED_SCHEMA_VERSIONS);
             while (rs.next()) {
                 executedUpgrades.add(rs.getString(ModelConstants.INSTALLED_SCRIPTS_COLUMN));
             }
 
-            List<Integer> sortedScriptsIndexes = Files.list(upgradeScriptsDirectory).map(a -> stripExtensionFromName(a.getFileName().toString())).sorted().collect(Collectors.toList());
+            try (Stream<Path> filesStream = Files.list(upgradeScriptsDirectory)) {
+                List<Integer> sortedScriptsIndexes = filesStream.map(a -> stripExtensionFromName(a.getFileName().toString())).sorted().collect(Collectors.toList());
 
-            for(Integer i: sortedScriptsIndexes) {
-                String scriptFileName = i.toString()+".sql";
-                if(!executedUpgrades.contains(scriptFileName)) {
-                    String upgradeQueries = new String(Files.readAllBytes(upgradeScriptsDirectory.resolve(scriptFileName)), Charset.forName("UTF-8"));
-                    conn.createStatement().execute(upgradeQueries);
-                    conn.createStatement().execute("insert into " + ModelConstants.INSTALLED_SCHEMA_VERSIONS+ " values('"+scriptFileName+"'"+")");
+                for (Integer i : sortedScriptsIndexes) {
+                    String scriptFileName = i.toString() + ".sql";
+                    if (!executedUpgrades.contains(scriptFileName)) {
+                        String upgradeQueries = new String(Files.readAllBytes(upgradeScriptsDirectory.resolve(scriptFileName)), Charset.forName("UTF-8"));
+                        stmt.execute(upgradeQueries);
+                        stmt.execute("insert into " + ModelConstants.INSTALLED_SCHEMA_VERSIONS + " values('" + scriptFileName + "'" + ")");
+                    }
                 }
-            }
 
-            conn.createStatement().execute(sql); //NOSONAR, ignoring because method used to load initial tempus database schema
+                stmt.execute(sql); //NOSONAR, ignoring because method used to load initial tempus database schema
+            }
 
         }
 

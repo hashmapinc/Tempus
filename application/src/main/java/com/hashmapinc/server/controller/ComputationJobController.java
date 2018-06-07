@@ -15,6 +15,8 @@
  */
 package com.hashmapinc.server.controller;
 
+import com.hashmapinc.server.common.data.EntityType;
+import com.hashmapinc.server.common.data.audit.ActionType;
 import com.hashmapinc.server.common.data.computation.ComputationJob;
 import com.hashmapinc.server.common.data.id.ComputationId;
 import com.hashmapinc.server.common.data.id.ComputationJobId;
@@ -48,6 +50,7 @@ public class ComputationJobController extends BaseController{
     @ResponseBody
     public ComputationJob saveComputationJob(@PathVariable("computationid") String strComputationId,
                                              @RequestBody ComputationJob source) throws TempusException {
+        ComputationJob computationJob = null;
         if(!validateComputationId(strComputationId)){
             throw new TempusException("ComputationId " + strComputationId + " wasn't found! ",ITEM_NOT_FOUND);
         }
@@ -55,11 +58,19 @@ public class ComputationJobController extends BaseController{
             boolean created = source.getId() == null;
             source.setTenantId(getCurrentUser().getTenantId());
             source.setComputationId(new ComputationId(toUUID(strComputationId)));
-            ComputationJob computationJob = checkNotNull(computationJobService.saveComputationJob(source));
+            computationJob = checkNotNull(computationJobService.saveComputationJob(source));
             actorService.onComputationJobStateChange(computationJob.getTenantId(), computationJob.getComputationId(),
                     computationJob.getId(), created ? ComponentLifecycleEvent.CREATED : ComponentLifecycleEvent.UPDATED);
+
+            logEntityAction(computationJob.getId(), computationJob,
+                    getCurrentUser().getCustomerId(),
+                    source.getId() == null ? ActionType.ADDED : ActionType.UPDATED, null);
+
             return computationJob;
         } catch (Exception e) {
+            logEntityAction(emptyId(EntityType.COMPUTATION_JOB), computationJob,
+                    null,
+                    source.getId() == null ? ActionType.ADDED : ActionType.UPDATED, e);
             throw handleException(e);
         }
     }
@@ -74,7 +85,13 @@ public class ComputationJobController extends BaseController{
             ComputationJob computationJob = checkComputationJob(computationJobService.findComputationJobById(computationJobId));
             computationJobService.deleteComputationJobById(computationJobId);
             actorService.onComputationJobStateChange(computationJob.getTenantId(), computationJob.getComputationId(), computationJob.getId(), ComponentLifecycleEvent.DELETED);
+
+            logEntityAction(computationJob.getId(),computationJob,
+                    getCurrentUser().getCustomerId(), ActionType.DELETED,null);
+
         } catch (Exception e) {
+            logEntityAction(emptyId(EntityType.COMPUTATION_JOB),null,
+                    null, ActionType.DELETED, e, strComputationJobId);
             throw handleException(e);
         }
     }
@@ -112,7 +129,15 @@ public class ComputationJobController extends BaseController{
             ComputationJob computationJob = checkComputationJob(computationJobService.findComputationJobById(computationJobId));
             computationJobService.activateComputationJobById(computationJobId);
             actorService.onComputationJobStateChange(computationJob.getTenantId(), computationId, computationJob.getId(), ComponentLifecycleEvent.ACTIVATED);
+
+            logEntityAction(computationJob.getId(), computationJob,
+                    getCurrentUser().getCustomerId(), ActionType.ACTIVATED, null);
+
         } catch (Exception e) {
+
+            logEntityAction(emptyId(EntityType.COMPUTATION_JOB),null,
+                    null, ActionType.ACTIVATED, e, strComputationId);
+
             throw handleException(e);
         }
     }
@@ -133,7 +158,15 @@ public class ComputationJobController extends BaseController{
             ComputationJob computationJob = checkComputationJob(computationJobService.findComputationJobById(computationJobId));
             computationJobService.suspendComputationJobById(computationJobId);
             actorService.onComputationJobStateChange(computationJob.getTenantId(), computationId, computationJob.getId(), ComponentLifecycleEvent.SUSPENDED);
+
+            logEntityAction(computationJob.getId(), computationJob,
+                    getCurrentUser().getCustomerId(), ActionType.SUSPENDED, null);
+
         } catch (Exception e) {
+
+            logEntityAction(emptyId(EntityType.COMPUTATION_JOB),null,
+                    null, ActionType.SUSPENDED, e, strComputationJobId);
+
             throw handleException(e);
         }
     }

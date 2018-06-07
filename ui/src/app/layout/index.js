@@ -33,6 +33,7 @@ import tempusDashboardAutocomplete from '../components/dashboard-autocomplete.di
 import tempusUserMenu from './user-menu.directive';
 
 import tempusEntity from '../entity';
+import tempusCluster from '../cluster';
 import tempusEvent from '../event';
 import tempusAlarm from '../alarm';
 import tempusAuditLog from '../audit';
@@ -68,6 +69,7 @@ export default angular.module('tempus.home', [
     tempusHomeLinks,
     tempusUserMenu,
     tempusEntity,
+    tempusCluster,
     tempusEvent,
     tempusAlarm,
     tempusAuditLog,

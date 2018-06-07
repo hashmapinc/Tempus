@@ -17,6 +17,8 @@ package com.hashmapinc.server.controller;
 
 import com.google.common.collect.Iterables;
 import com.hashmapinc.server.common.data.Application;
+import com.hashmapinc.server.common.data.EntityType;
+import com.hashmapinc.server.common.data.audit.ActionType;
 import com.hashmapinc.server.common.data.computation.ComputationJob;
 import com.hashmapinc.server.common.data.id.*;
 import com.hashmapinc.server.common.data.page.TextPageData;
@@ -50,8 +52,19 @@ public class ApplicationController extends BaseController {
     public Application saveApplication(@RequestBody Application application) throws TempusException {
         try{
             application.setTenantId(getCurrentUser().getTenantId());
-            return checkNotNull(applicationService.saveApplication(application));
+            Application savedApplication = checkNotNull(applicationService.saveApplication(application));
+
+            logEntityAction(savedApplication.getId(), savedApplication,
+                            savedApplication.getCustomerId(),
+                            application.getId() == null ? ActionType.ADDED : ActionType.UPDATED, null);
+
+            return savedApplication;
         } catch (Exception e) {
+
+            logEntityAction(emptyId(EntityType.APPLICATION), application,
+                            null,
+                            application.getId() == null ? ActionType.ADDED : ActionType.UPDATED, null);
+
             throw handleException(e);
         }
     }
@@ -79,7 +92,17 @@ public class ApplicationController extends BaseController {
             Application application = checkApplicationId(applicationId);
             applicationService.deleteApplication(applicationId);
             cleanupApplicationRelatedEntities(application);
+
+            logEntityAction(application.getId(),application, application.getCustomerId(),
+                            ActionType.DELETED, null, strApplicationId );
+
         } catch (Exception e) {
+
+            logEntityAction(emptyId(EntityType.APPLICATION),
+                            null ,
+                            null,
+                            ActionType.DELETED, e, strApplicationId );
+
             throw handleException(e);
         }
     }
@@ -149,7 +172,7 @@ public class ApplicationController extends BaseController {
         return applicationService.findApplicationByRuleIds(tenantId, ruleIds);
     }
 
-    @PreAuthorize("hasAuthority('TENANT_ADMIN')")
+    @PreAuthorize("hasAnyAuthority('TENANT_ADMIN', 'CUSTOMER_USER')")
     @RequestMapping(value = "/applications/dashboard/{dashboardId}", method = RequestMethod.GET)
     @ResponseBody
     public List<String> findApplicationsByDashboardId(@PathVariable("dashboardId") String strDashboardId) throws TempusException {
@@ -330,7 +353,18 @@ public class ApplicationController extends BaseController {
             ApplicationId applicationId = new ApplicationId(toUUID(strApplicationId));
             Application application =  checkApplicationId(applicationId);
             activateApplication(application);
+
+            logEntityAction(application.getId(),application,
+                            application.getCustomerId(),
+                            ActionType.ACTIVATED, null, strApplicationId);
+
         } catch (Exception e) {
+
+            logEntityAction(emptyId(EntityType.APPLICATION),
+                            null,
+                            null,
+                            ActionType.ACTIVATED,e , strApplicationId);
+
             throw handleException(e);
         }
     }
@@ -391,7 +425,18 @@ public class ApplicationController extends BaseController {
             suspendRules(application.getRules());
             suspendComputations(application.getComputationJobIdSet());
             applicationService.suspendApplicationById(applicationId);
+
+            logEntityAction(application.getId(),application,
+                            application.getCustomerId(),
+                            ActionType.SUSPENDED, null, strApplicationId);
+
         } catch (Exception e) {
+
+            logEntityAction(emptyId(EntityType.APPLICATION),
+                            null,
+                            null,
+                            ActionType.SUSPENDED,e , strApplicationId);
+
             throw handleException(e);
         }
     }

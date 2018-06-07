@@ -23,6 +23,7 @@ import com.hashmapinc.server.common.data.page.TextPageData;
 import com.hashmapinc.server.common.data.page.TextPageLink;
 import com.hashmapinc.server.common.data.page.TimePageLink;
 import com.hashmapinc.server.common.data.plugin.ComponentLifecycleEvent;
+import com.hashmapinc.server.common.data.security.Authority;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -73,28 +74,41 @@ public class DashboardController extends BaseController {
         }
     }
 
-    @PreAuthorize("hasAuthority('TENANT_ADMIN')")
+    @PreAuthorize("hasAnyAuthority('TENANT_ADMIN' , 'CUSTOMER_USER')")
     @RequestMapping(value = "/dashboard", method = RequestMethod.POST)
-    @ResponseBody 
+    @ResponseBody
     public Dashboard saveDashboard(@RequestBody Dashboard dashboard) throws TempusException {
         try {
-            dashboard.setTenantId(getCurrentUser().getTenantId());
+            User user = getCurrentUser();
+            dashboard.setTenantId(user.getTenantId());
+
             Dashboard savedDashboard = checkNotNull(dashboardService.saveDashboard(dashboard));
 
+            if((user).getAuthority().compareTo(Authority.CUSTOMER_USER) == 0) {
+                savedDashboard = autoAssignedUserToDashboard(savedDashboard.getId(),user.getCustomerId());
+            }
+
             logEntityAction(savedDashboard.getId(), savedDashboard,
-                    null,
-                    dashboard.getId() == null ? ActionType.ADDED : ActionType.UPDATED, null);
+                            null,
+                            dashboard.getId() == null ? ActionType.ADDED : ActionType.UPDATED, null);
 
             return savedDashboard;
         } catch (Exception e) {
             logEntityAction(emptyId(EntityType.DASHBOARD), dashboard,
-                    null, dashboard.getId() == null ? ActionType.ADDED : ActionType.UPDATED, e);
+                            null, dashboard.getId() == null ? ActionType.ADDED : ActionType.UPDATED, e);
 
             throw handleException(e);
         }
     }
 
-    @PreAuthorize("hasAuthority('TENANT_ADMIN')")
+    private Dashboard autoAssignedUserToDashboard(DashboardId dashboardId,CustomerId customerId)throws TempusException {
+        Dashboard savedDashboard;
+        savedDashboard = checkNotNull(dashboardService.assignDashboardToCustomer(dashboardId, customerId));
+        return savedDashboard;
+    }
+
+
+    @PreAuthorize("hasAnyAuthority('TENANT_ADMIN')")
     @RequestMapping(value = "/dashboard/{dashboardId}", method = RequestMethod.DELETE)
     @ResponseStatus(value = HttpStatus.OK)
     public void deleteDashboard(@PathVariable(DASHBOARD_ID) String strDashboardId) throws TempusException {
@@ -106,15 +120,15 @@ public class DashboardController extends BaseController {
             actorService.onDashboardStateChange(getTenantId(), dashboardId, ComponentLifecycleEvent.DELETED);
 
             logEntityAction(dashboardId, dashboard,
-                    null,
-                    ActionType.DELETED, null, strDashboardId);
+                            null,
+                            ActionType.DELETED, null, strDashboardId);
 
         } catch (Exception e) {
 
             logEntityAction(emptyId(EntityType.DASHBOARD),
-                    null,
-                    null,
-                    ActionType.DELETED, e, strDashboardId);
+                            null,
+                            null,
+                            ActionType.DELETED, e, strDashboardId);
 
             throw handleException(e);
         }
@@ -122,9 +136,9 @@ public class DashboardController extends BaseController {
 
     @PreAuthorize("hasAuthority('TENANT_ADMIN')")
     @RequestMapping(value = "/customer/{customerId}/dashboard/{dashboardId}", method = RequestMethod.POST)
-    @ResponseBody 
+    @ResponseBody
     public Dashboard assignDashboardToCustomer(@PathVariable("customerId") String strCustomerId,
-                                         @PathVariable(DASHBOARD_ID) String strDashboardId) throws TempusException {
+                                               @PathVariable(DASHBOARD_ID) String strDashboardId) throws TempusException {
         checkParameter("customerId", strCustomerId);
         checkParameter(DASHBOARD_ID, strDashboardId);
         try {
@@ -133,28 +147,28 @@ public class DashboardController extends BaseController {
 
             DashboardId dashboardId = new DashboardId(toUUID(strDashboardId));
             checkDashboardId(dashboardId);
-            
+
             Dashboard savedDashboard = checkNotNull(dashboardService.assignDashboardToCustomer(dashboardId, customerId));
 
             logEntityAction(dashboardId, savedDashboard,
-                    customerId,
-                    ActionType.ASSIGNED_TO_CUSTOMER, null, strDashboardId, strCustomerId, customer.getName());
+                            customerId,
+                            ActionType.ASSIGNED_TO_CUSTOMER, null, strDashboardId, strCustomerId, customer.getName());
 
 
             return savedDashboard;
         } catch (Exception e) {
 
             logEntityAction(emptyId(EntityType.DASHBOARD), null,
-                    null,
-                    ActionType.ASSIGNED_TO_CUSTOMER, e, strDashboardId, strCustomerId);
+                            null,
+                            ActionType.ASSIGNED_TO_CUSTOMER, e, strDashboardId, strCustomerId);
 
             throw handleException(e);
         }
     }
 
-    @PreAuthorize("hasAuthority('TENANT_ADMIN')")
+    @PreAuthorize("hasAnyAuthority('TENANT_ADMIN','CUSTOMER_USER')")
     @RequestMapping(value = "/customer/{customerId}/dashboard/{dashboardId}", method = RequestMethod.DELETE)
-    @ResponseBody 
+    @ResponseBody
     public Dashboard unassignDashboardFromCustomer(@PathVariable("customerId") String strCustomerId,
                                                    @PathVariable(DASHBOARD_ID) String strDashboardId) throws TempusException {
         checkParameter("customerId", strCustomerId);
@@ -168,21 +182,21 @@ public class DashboardController extends BaseController {
             Dashboard savedDashboard = checkNotNull(dashboardService.unassignDashboardFromCustomer(dashboardId, customerId));
 
             logEntityAction(dashboardId, dashboard,
-                    customerId,
-                    ActionType.UNASSIGNED_FROM_CUSTOMER, null, strDashboardId, customer.getId().toString(), customer.getName());
+                            customerId,
+                            ActionType.UNASSIGNED_FROM_CUSTOMER, null, strDashboardId, customer.getId().toString(), customer.getName());
 
             return savedDashboard;
         } catch (Exception e) {
 
             logEntityAction(emptyId(EntityType.DASHBOARD), null,
-                    null,
-                    ActionType.UNASSIGNED_FROM_CUSTOMER, e, strDashboardId);
+                            null,
+                            ActionType.UNASSIGNED_FROM_CUSTOMER, e, strDashboardId);
 
             throw handleException(e);
         }
     }
 
-    @PreAuthorize("hasAuthority('TENANT_ADMIN')")
+    @PreAuthorize("hasAnyAuthority('TENANT_ADMIN')")
     @RequestMapping(value = "/dashboard/{dashboardId}/customers", method = RequestMethod.POST)
     @ResponseBody
     public Dashboard updateDashboardCustomers(@PathVariable(DASHBOARD_ID) String strDashboardId,
@@ -224,15 +238,15 @@ public class DashboardController extends BaseController {
                     savedDashboard = checkNotNull(dashboardService.assignDashboardToCustomer(dashboardId, customerId));
                     ShortCustomerInfo customerInfo = savedDashboard.getAssignedCustomerInfo(customerId);
                     logEntityAction(dashboardId, savedDashboard,
-                            customerId,
-                            ActionType.ASSIGNED_TO_CUSTOMER, null, strDashboardId, customerId.toString(), customerInfo.getTitle());
+                                    customerId,
+                                    ActionType.ASSIGNED_TO_CUSTOMER, null, strDashboardId, customerId.toString(), customerInfo.getTitle());
                 }
                 for (CustomerId customerId : removedCustomerIds) {
                     ShortCustomerInfo customerInfo = dashboard.getAssignedCustomerInfo(customerId);
                     savedDashboard = checkNotNull(dashboardService.unassignDashboardFromCustomer(dashboardId, customerId));
                     logEntityAction(dashboardId, dashboard,
-                            customerId,
-                            ActionType.UNASSIGNED_FROM_CUSTOMER, null, strDashboardId, customerId.toString(), customerInfo.getTitle());
+                                    customerId,
+                                    ActionType.UNASSIGNED_FROM_CUSTOMER, null, strDashboardId, customerId.toString(), customerInfo.getTitle());
 
                 }
                 return savedDashboard;
@@ -240,8 +254,8 @@ public class DashboardController extends BaseController {
         } catch (Exception e) {
 
             logEntityAction(emptyId(EntityType.DASHBOARD), null,
-                    null,
-                    ActionType.ASSIGNED_TO_CUSTOMER, e, strDashboardId);
+                            null,
+                            ActionType.ASSIGNED_TO_CUSTOMER, e, strDashboardId);
 
             throw handleException(e);
         }
@@ -275,22 +289,22 @@ public class DashboardController extends BaseController {
                     savedDashboard = checkNotNull(dashboardService.assignDashboardToCustomer(dashboardId, customerId));
                     ShortCustomerInfo customerInfo = savedDashboard.getAssignedCustomerInfo(customerId);
                     logEntityAction(dashboardId, savedDashboard,
-                            customerId,
-                            ActionType.ASSIGNED_TO_CUSTOMER, null, strDashboardId, customerId.toString(), customerInfo.getTitle());
+                                    customerId,
+                                    ActionType.ASSIGNED_TO_CUSTOMER, null, strDashboardId, customerId.toString(), customerInfo.getTitle());
                 }
                 return savedDashboard;
             }
         } catch (Exception e) {
 
             logEntityAction(emptyId(EntityType.DASHBOARD), null,
-                    null,
-                    ActionType.ASSIGNED_TO_CUSTOMER, e, strDashboardId);
+                            null,
+                            ActionType.ASSIGNED_TO_CUSTOMER, e, strDashboardId);
 
             throw handleException(e);
         }
     }
 
-    @PreAuthorize("hasAuthority('TENANT_ADMIN')")
+    @PreAuthorize("hasAnyAuthority('TENANT_ADMIN')")
     @RequestMapping(value = "/dashboard/{dashboardId}/customers/remove", method = RequestMethod.POST)
     @ResponseBody
     public Dashboard removeDashboardCustomers(@PathVariable(DASHBOARD_ID) String strDashboardId,
@@ -318,8 +332,8 @@ public class DashboardController extends BaseController {
                     ShortCustomerInfo customerInfo = dashboard.getAssignedCustomerInfo(customerId);
                     savedDashboard = checkNotNull(dashboardService.unassignDashboardFromCustomer(dashboardId, customerId));
                     logEntityAction(dashboardId, dashboard,
-                            customerId,
-                            ActionType.UNASSIGNED_FROM_CUSTOMER, null, strDashboardId, customerId.toString(), customerInfo.getTitle());
+                                    customerId,
+                                    ActionType.UNASSIGNED_FROM_CUSTOMER, null, strDashboardId, customerId.toString(), customerInfo.getTitle());
 
                 }
                 return savedDashboard;
@@ -327,8 +341,8 @@ public class DashboardController extends BaseController {
         } catch (Exception e) {
 
             logEntityAction(emptyId(EntityType.DASHBOARD), null,
-                    null,
-                    ActionType.UNASSIGNED_FROM_CUSTOMER, e, strDashboardId);
+                            null,
+                            ActionType.UNASSIGNED_FROM_CUSTOMER, e, strDashboardId);
 
             throw handleException(e);
         }
@@ -346,15 +360,15 @@ public class DashboardController extends BaseController {
             Dashboard savedDashboard = checkNotNull(dashboardService.assignDashboardToCustomer(dashboardId, publicCustomer.getId()));
 
             logEntityAction(dashboardId, savedDashboard,
-                    publicCustomer.getId(),
-                    ActionType.ASSIGNED_TO_CUSTOMER, null, strDashboardId, publicCustomer.getId().toString(), publicCustomer.getName());
+                            publicCustomer.getId(),
+                            ActionType.ASSIGNED_TO_CUSTOMER, null, strDashboardId, publicCustomer.getId().toString(), publicCustomer.getName());
 
             return savedDashboard;
         } catch (Exception e) {
 
             logEntityAction(emptyId(EntityType.DASHBOARD), null,
-                    null,
-                    ActionType.ASSIGNED_TO_CUSTOMER, e, strDashboardId);
+                            null,
+                            ActionType.ASSIGNED_TO_CUSTOMER, e, strDashboardId);
 
             throw handleException(e);
         }
@@ -373,15 +387,15 @@ public class DashboardController extends BaseController {
             Dashboard savedDashboard = checkNotNull(dashboardService.unassignDashboardFromCustomer(dashboardId, publicCustomer.getId()));
 
             logEntityAction(dashboardId, dashboard,
-                    publicCustomer.getId(),
-                    ActionType.UNASSIGNED_FROM_CUSTOMER, null, strDashboardId, publicCustomer.getId().toString(), publicCustomer.getName());
+                            publicCustomer.getId(),
+                            ActionType.UNASSIGNED_FROM_CUSTOMER, null, strDashboardId, publicCustomer.getId().toString(), publicCustomer.getName());
 
             return savedDashboard;
         } catch (Exception e) {
 
             logEntityAction(emptyId(EntityType.DASHBOARD), null,
-                    null,
-                    ActionType.UNASSIGNED_FROM_CUSTOMER, e, strDashboardId);
+                            null,
+                            ActionType.UNASSIGNED_FROM_CUSTOMER, e, strDashboardId);
 
             throw handleException(e);
         }

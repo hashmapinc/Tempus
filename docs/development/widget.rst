@@ -8,9 +8,9 @@ Introduction
 
 Tempus Cloud widgets are additional UI modules that can be easily integrated into any Dashboard and provide end-user functions such as data visualization, remote device control, alarms management and displaying static custom html content. According to the provided features each widget definition represents specific Widget Type.
 
-******************************
+****************************
 Creating a Widget Definition
-******************************
+****************************
 
 In order to create a new widget definition, navigate to the “Widget Library”, then open existing “Widgets Bundle” or create a new one. In the “Widgets Bundle” view, click on the big “+” button in the bottom-right part of the screen and then click on the “Create new widget type” button.
 
@@ -688,4 +688,22 @@ Widget code debugging tips
 **************************
 
 The most simple method of debugging is Web console output. Just place console.log(…) function inside any part of widget JavaScript code. Then click Run button to restart widget code and observe debug information in the Web console.
+
 Another and most effective method of debugging is to invoke browser debugger. Put debugger; statement into the place of widget code you are interested in and then click Run button to restart widget code. Browser debugger (if enabled) will automatically pause code execution at the debugger statement and you will be able to analyze script execution using browser debugging tools.
+
+While developing client-side js, if you need to access the ``document`` or ``window`` objects, add this comment at the end of the line in your code referencing the object: 
+
+``//eslint-disable-line``
+
+This will tell the linter to ignore the line. Only do this if you have to. In most cases, use the angular ``$window`` object instead.
+
+**************
+Custom Widgets
+**************
+See documentation on custom widgets below:
+
+.. toctree::
+    :maxdepth: 1
+
+    customWidgets/trajectory-viewer
+  

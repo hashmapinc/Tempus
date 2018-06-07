@@ -59,6 +59,8 @@ public class EntityIdFactory {
                 return new ComputationId(uuid);
             case COMPUTATION_JOB:
                 return new ComputationJobId(uuid);
+            case NODE_METRIC:
+                return new NodeMetricId(uuid);
         }
         throw new IllegalArgumentException("EntityType " + type + " is not supported!");
     }

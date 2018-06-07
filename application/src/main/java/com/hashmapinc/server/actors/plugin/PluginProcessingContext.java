@@ -20,8 +20,7 @@ import com.google.common.base.Function;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
-import com.hashmapinc.server.common.data.Customer;
-import com.hashmapinc.server.common.data.Device;
+import com.hashmapinc.server.common.data.*;
 import com.hashmapinc.server.common.data.asset.Asset;
 import com.hashmapinc.server.common.data.audit.ActionType;
 import com.hashmapinc.server.common.data.id.*;
@@ -34,20 +33,15 @@ import com.hashmapinc.server.extensions.api.plugins.PluginContext;
 import com.hashmapinc.server.extensions.api.plugins.msg.*;
 import com.hashmapinc.server.extensions.api.plugins.rpc.PluginRpcMsg;
 import lombok.extern.slf4j.Slf4j;
-import com.hashmapinc.server.common.data.EntityType;
-import com.hashmapinc.server.common.data.Tenant;
-import com.hashmapinc.server.common.data.id.*;
-import com.hashmapinc.server.common.data.kv.*;
 import com.hashmapinc.server.common.data.plugin.PluginMetaData;
 import com.hashmapinc.server.common.data.relation.EntityRelation;
 import com.hashmapinc.server.common.data.rule.RuleMetaData;
 import com.hashmapinc.server.common.msg.cluster.ServerAddress;
 import com.hashmapinc.server.extensions.api.plugins.PluginCallback;
-import com.hashmapinc.server.extensions.api.plugins.msg.*;
 import com.hashmapinc.server.extensions.api.plugins.rpc.RpcMsg;
 import com.hashmapinc.server.extensions.api.plugins.ws.PluginWebsocketSessionRef;
 import com.hashmapinc.server.extensions.api.plugins.ws.msg.PluginWebsocketMsg;
-
+import com.hashmapinc.server.extensions.api.device.DeviceTelemetryEventNotificationMsg;
 import javax.annotation.Nullable;
 import java.io.IOException;
 import java.util.*;
@@ -158,7 +152,7 @@ public final class PluginProcessingContext implements PluginContext {
     }
 
     @Override
-    public void saveTsData(final EntityId entityId, final TsKvEntry entry, final PluginCallback<Void> callback) {
+    public void saveTsData(final TenantId tenantId, final EntityId entityId, final TsKvEntry entry, final PluginCallback<Void> callback) {
         validate(entityId, new ValidationCallback(callback, ctx -> {
             ListenableFuture<List<Void>> rsListFuture = pluginCtx.tsService.save(entityId, entry);
             Futures.addCallback(rsListFuture, getListCallback(callback, v -> null), executor);
@@ -166,35 +160,38 @@ public final class PluginProcessingContext implements PluginContext {
     }
 
     @Override
-    public void saveTsData(final EntityId entityId, final List<TsKvEntry> entries, final PluginCallback<Void> callback) {
-        saveTsData(entityId, entries, 0L, callback);
+    public void saveTsData(final TenantId tenantId, final EntityId entityId, final List<TsKvEntry> entries, final PluginCallback<Void> callback) {
+        saveTsData(tenantId, entityId, entries, 0L, callback);
     }
 
     @Override
-    public void saveTsData(final EntityId entityId, final List<TsKvEntry> entries, long ttl, final PluginCallback<Void> callback) {
+    public void saveTsData(final TenantId tenantId, final EntityId entityId, final List<TsKvEntry> entries, long ttl, final PluginCallback<Void> callback) {
         validate(entityId, new ValidationCallback(callback, ctx -> {
             ListenableFuture<List<Void>> rsListFuture = pluginCtx.tsService.save(entityId, entries, ttl);
-            Futures.addCallback(rsListFuture, getListCallback(callback, v -> null), executor);
+            Futures.addCallback(rsListFuture, getListCallback(callback, v -> {
+                if (entityId.getEntityType() == EntityType.DEVICE) {
+                    onDeviceTelemetryChanged(tenantId, new DeviceId(entityId.getId()), entries);
+                }
+                return null;
+            }), executor);
         }));
     }
 
     @Override
     public void saveDsData(final EntityId entityId, final List<DsKvEntry> entries, long ttl, final PluginCallback<Void> callback) {
-        log.debug(" here in saveDsData");
         validate(entityId, new ValidationCallback(callback, ctx -> {
-            log.debug(" inside validate");
             ListenableFuture<List<Void>> rsListFuture = pluginCtx.dsService.save(entityId, entries, ttl);
-            ListenableFuture<List<DsKvEntry>> rsGetListFuture = pluginCtx.dsService.findAllLatest(entityId);
-            try {
-                List<DsKvEntry> list = rsGetListFuture.get();
-                log.debug(" DsKvList " + list);
-            }catch (Exception e){
-                log.error(" exception " + e);
-            }
             Futures.addCallback(rsListFuture, getListCallback(callback, v -> null), executor);
         }));
     }
 
+    @Override
+    public void saveTagMetaData(EntityId entityId, TagMetaData tagMetaData, final PluginCallback<Void> callback) {
+        validate(entityId, new ValidationCallback(callback, ctx -> {
+            ListenableFuture<List<Void>> rsListFuture = pluginCtx.tagMetaDataService.saveTagMetaData(tagMetaData);
+            Futures.addCallback(rsListFuture, getListCallback(callback, v -> null), executor);
+        }));
+    }
 
     @Override
     public void loadTimeseries(final EntityId entityId, final List<TsKvQuery> queries, final PluginCallback<List<TsKvEntry>> callback) {
@@ -275,6 +272,18 @@ public final class PluginProcessingContext implements PluginContext {
     }
 
     @Override
+    public void loadLatestTimeseries(final EntityId entityId, final List<KvEntry> kvEntries, final PluginCallback<List<TsKvEntry>> callback) {
+        Set<String> keys = new HashSet<>();
+        for (KvEntry kv : kvEntries) {
+            keys.add(kv.getKey());
+        }
+        validate(entityId, new ValidationCallback(callback, ctx -> {
+            ListenableFuture<List<TsKvEntry>> rsListFuture = pluginCtx.tsService.findLatest(entityId, keys);
+            Futures.addCallback(rsListFuture, getCallback(callback, v -> v), executor);
+        }));
+    }
+
+    @Override
     public void loadLatestDepthSeries(final EntityId entityId, final PluginCallback<List<DsKvEntry>> callback) {
         validate(entityId, new ValidationCallback(callback, ctx -> {
             ListenableFuture<List<DsKvEntry>> future = pluginCtx.dsService.findAllLatest(entityId);
@@ -284,6 +293,18 @@ public final class PluginProcessingContext implements PluginContext {
 
     @Override
     public void loadLatestDepthSeries(final EntityId entityId, final Collection<String> keys, final PluginCallback<List<DsKvEntry>> callback) {
+        validate(entityId, new ValidationCallback(callback, ctx -> {
+            ListenableFuture<List<DsKvEntry>> rsListFuture = pluginCtx.dsService.findLatest(entityId, keys);
+            Futures.addCallback(rsListFuture, getCallback(callback, v -> v), executor);
+        }));
+    }
+
+    @Override
+    public void loadLatestDepthSeries(final EntityId entityId, final List<KvEntry> kvEntries, final PluginCallback<List<DsKvEntry>> callback) {
+        Set<String> keys = new HashSet<>();
+        for (KvEntry kv : kvEntries) {
+            keys.add(kv.getKey());
+        }
         validate(entityId, new ValidationCallback(callback, ctx -> {
             ListenableFuture<List<DsKvEntry>> rsListFuture = pluginCtx.dsService.findLatest(entityId, keys);
             Futures.addCallback(rsListFuture, getCallback(callback, v -> v), executor);
@@ -312,6 +333,10 @@ public final class PluginProcessingContext implements PluginContext {
 
     private void onDeviceAttributesChanged(TenantId tenantId, DeviceId deviceId, String scope, List<AttributeKvEntry> values) {
         pluginCtx.toDeviceActor(DeviceAttributesEventNotificationMsg.onUpdate(tenantId, deviceId, scope, values));
+    }
+
+    private void onDeviceTelemetryChanged(TenantId tenantId, DeviceId deviceId, List<TsKvEntry> values) {
+        pluginCtx.toDeviceActor(DeviceTelemetryEventNotificationMsg.onUpdate(tenantId, deviceId, values));
     }
 
     private <T, R> FutureCallback<List<T>> getListCallback(final PluginCallback<R> callback, Function<List<T>, R> transformer) {

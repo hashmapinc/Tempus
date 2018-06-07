@@ -105,7 +105,7 @@ export function DashboardsController(userService, dashboardService, customerServ
         noItemsText: function() { return $translate.instant('dashboard.no-dashboards-text') },
         itemDetailsText: function() { return $translate.instant('dashboard.dashboard-details') },
         isDetailsReadOnly: function () {
-            return vm.dashboardsScope === 'customer_user';
+            return false;//vm.dashboardsScope === 'customer_user';
         },
         isSelectionEnabled: function () {
             return !(vm.dashboardsScope === 'customer_user');
@@ -243,6 +243,8 @@ export function DashboardsController(userService, dashboardService, customerServ
                 }
             );
 
+
+
             dashboardGroupActionsList.push(
                     {
                         onAction: function ($event, items) {
@@ -372,7 +374,86 @@ export function DashboardsController(userService, dashboardService, customerServ
                     icon: "add"
                 };
             } else if (vm.dashboardsScope === 'customer_user') {
-                vm.dashboardGridConfig.addItemAction = {};
+                //vm.dashboardGridConfig.addItemAction = {};
+                dashboardActionsList.push(
+                                {
+                                    onAction: function ($event, item) {
+                                        exportDashboard($event, item);
+                                    },
+                                    name: function() { $translate.instant('action.export') },
+                                    details: function() { return $translate.instant('dashboard.export') },
+                                    icon: "file_download"
+                                });
+
+                            dashboardActionsList.push({
+                                    onAction: function ($event, item) {
+                                        makePublic($event, item);
+                                    },
+                                    name: function() { return $translate.instant('action.share') },
+                                    details: function() { return $translate.instant('dashboard.make-public') },
+                                    icon: "share",
+                                    isEnabled: function(dashboard) {
+                                        return dashboard && !dashboard.publicCustomerId;
+                                    }
+                                });
+                            dashboardActionsList.push({
+                                onAction: function ($event, item) {
+                                    makePrivate($event, item);
+                                },
+                                name: function() { return $translate.instant('action.make-private') },
+                                details: function() { return $translate.instant('dashboard.make-private') },
+                                icon: "reply",
+                                isEnabled: function(dashboard) {
+                                    return dashboard && dashboard.publicCustomerId;
+                                }
+                            });
+
+                              dashboardActionsList.push(
+                                            {
+                                                onAction: function ($event, item) {
+                                                    vm.grid.deleteItem($event, item);
+                                                },
+                                                name: function() { return $translate.instant('action.delete') },
+                                                details: function() { return $translate.instant('dashboard.delete') },
+                                                icon: "delete"
+                                            }
+                                        );
+
+                dashboardGroupActionsList.push(
+                    {
+                        onAction: function ($event) {
+                            vm.grid.deleteItems($event);
+                        },
+                        name: function() { return $translate.instant('dashboard.delete-dashboards') },
+                        details: deleteDashboardsActionTitle,
+                        icon: "delete"
+                    }
+                );
+
+
+
+                vm.dashboardGridConfig.addItemActions = [];
+                            vm.dashboardGridConfig.addItemActions.push({
+                                onAction: function ($event) {
+                                    vm.grid.addItem($event);
+                                },
+                                name: function() { return $translate.instant('action.create') },
+                                details: function() { return $translate.instant('dashboard.create-new-dashboard') },
+                                icon: "insert_drive_file"
+                            });
+                            vm.dashboardGridConfig.addItemActions.push({
+                                onAction: function ($event) {
+                                    importExport.importDashboard($event).then(
+                                        function() {
+                                            vm.grid.refreshList();
+                                        }
+                                    );
+                                },
+                                name: function() { return $translate.instant('action.import') },
+                                details: function() { return $translate.instant('dashboard.import') },
+                                icon: "file_upload"
+                            });
+
             }
         }
 

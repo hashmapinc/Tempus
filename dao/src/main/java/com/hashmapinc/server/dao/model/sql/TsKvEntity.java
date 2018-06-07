@@ -21,7 +21,6 @@ import lombok.Data;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
 import com.hashmapinc.server.common.data.EntityType;
-import com.hashmapinc.server.common.data.kv.*;
 import com.hashmapinc.server.dao.model.ToData;
 import com.hashmapinc.server.dao.util.mapping.JsonStringType;
 
@@ -88,6 +87,9 @@ public final class TsKvEntity implements ToData<TsKvEntry> {
     @Column(name = TS_COLUMN)
     private long ts;
 
+    @Column(name = TS_DIFF)
+    private long tsDiff;
+
     @Column(name = BOOLEAN_VALUE_COLUMN)
     private Boolean booleanValue;
 
@@ -118,7 +120,9 @@ public final class TsKvEntity implements ToData<TsKvEntry> {
         } else if (jsonValue != null) {
             kvEntry = new JsonDataEntry(key, jsonValue);
         }
-        return new BasicTsKvEntry(ts, kvEntry);
+        BasicTsKvEntry basicTsKvEntry = new BasicTsKvEntry(ts, kvEntry);
+        basicTsKvEntry.setTsDiff(tsDiff);
+        return basicTsKvEntry;
     }
 
     public boolean isNotEmpty() {
