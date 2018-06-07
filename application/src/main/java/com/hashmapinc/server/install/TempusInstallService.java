@@ -123,12 +123,13 @@ public class TempusInstallService {
 
                 componentDiscoveryService.discoverComponents();
 
+                systemDataLoaderService.loadSystemThemes();
                 systemDataLoaderService.createSysAdmin();
                 systemDataLoaderService.createAdminSettings();
                 systemDataLoaderService.loadSystemWidgets();
                 systemDataLoaderService.loadSystemPlugins();
                 systemDataLoaderService.loadSystemRules();
-                systemDataLoaderService.loadSystemThemes();
+
 
                 if (loadDemo) {
                     log.info("Loading demo data...");
