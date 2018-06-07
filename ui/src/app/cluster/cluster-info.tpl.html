@@ -1,0 +1,53 @@
+<!--
+
+    Copyright © 2017-2018 Hashmap, Inc
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+        http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<md-table-container  class ="tb-cluster-container">
+    <md-toolbar class="md-table-toolbar tb-device-toolbar md-default" style="top: 10%;">
+        <div class="md-toolbar-tools" style="padding-left: 90%;">
+            <md-button ng-click="vm.getNodes()"
+                       aria-label=" {{ cluster.refresh | translate }}}">
+                <md-tooltip md-direction="bottom">
+                    {{ 'cluster.refresh' | translate }}
+                </md-tooltip>
+                <ng-md-icon icon="refresh"></ng-md-icon>
+            </md-button>
+        </div>
+    </md-toolbar>
+    <table class="tb-cluster-table" md-table>
+        <thead md-head>
+        <tr md-row>
+            <th md-column>Node Host</th>
+            <th md-column>Node Port</th>
+            <th md-column>Device Session Count</th>
+            <th md-column>RPC Session Count</th>
+            <th md-column>Node Status</th>
+        </tr>
+        </thead>
+        <tbody md-body>
+        <tr  md-row  ng-repeat="node in vm.cluster.nodes">
+            <td md-cell>{{node.host}}</td>
+            <td md-cell>{{node.port}}</td>
+            <td md-cell>{{node.deviceSessionCount}}</td>
+            <td md-cell>{{node.rpcSessionCount}}</td>
+            <td md-cell>{{node.nodeStatus}}</td>
+            <!--<td ng-show = "vm.devicesScope != 'customer_user'" md-cell class="tb-value-cell" ng-click="deleteDevice($event, device)">
+                <span><ng-md-icon size="16" icon="delete"></ng-md-icon></span>
+            </td>-->
+        </tr>
+        </tbody>
+    </table>
+</md-table-container>

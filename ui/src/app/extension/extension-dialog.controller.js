@@ -54,6 +54,11 @@ export default function ExtensionDialogController($scope, $mdDialog, $translate,
                 "servers": []
             };
         }
+        if (vm.extension.type === "WITS") {
+            vm.extension.configuration = {
+                "servers": []
+            };
+        }
     };
 
     vm.cancel = cancel;

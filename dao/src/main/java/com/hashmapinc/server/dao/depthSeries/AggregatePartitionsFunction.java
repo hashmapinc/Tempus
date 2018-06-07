@@ -55,7 +55,6 @@ public class AggregatePartitionsFunction implements com.google.common.base.Funct
         this.ds = ds;
     }
 
-    @Nullable
     @Override
     public Optional<DsKvEntry> apply(@Nullable List<ResultSet> rsList) {
         try {
@@ -203,7 +202,7 @@ public class AggregatePartitionsFunction implements com.google.common.base.Funct
             try {
                 return mapper.readTree(row.getString(JSON_POS));
             } catch (IOException ex) {
-                ex.printStackTrace();
+                log.error(ex.getMessage(),ex);
                 return null;
             }
         } else {

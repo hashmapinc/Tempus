@@ -17,21 +17,56 @@
 
 //import AliasController from '../api/alias-controller';
 
+import './tempusboard.scss';
+import AliasController from '../api/alias-controller';
+
 /*@ngInject*/
-export function TempusboardController($scope, $log, $state, $stateParams, userService, deviceService, types, attributeService, $q, dashboardService, applicationService) {
+export function TempusboardController($scope, $log, $state, $stateParams, userService, deviceService, types, attributeService, $q, dashboardService, applicationService, entityService, tempusboardService, utils, $filter, dashboardUtils) {
 	var vm = this;
-    var customerId = $stateParams.customerId;
+
+    if(angular.isDefined($stateParams.customerId)){
+        var customerId = $stateParams.customerId;
+    }
+
+    var user = userService.getCurrentUser();
+    if (user.authority === 'CUSTOMER_USER') {
+        vm.devicesScope = 'customer_user';
+        customerId = user.customerId;
+    }
+    else if (user.authority === 'TENANT_ADMIN') {
+        vm.devicesScope = 'tenant';
+    }
+
+    vm.openRightLayout = function() {
+        vm.isRightLayoutOpened = true;
+    }
 
 	vm.types = types;
     vm.deviceSelected = false;
     vm.dashboardCtx = {
         state: null,
         stateController: {
-            openRightLayout: false
+            openRightLayout: function() {
+                vm.openRightLayout();
             }
-    };
+        }
+    }
+    vm.tempusboardSettings = null;
+
+    function initTempusboard() {
+        tempusboardService.getTempusboardSettings(user.userId).then(
+            function success(settings) {
+                 vm.tempusboardSettings = settings;
+            },
+            function fail() {
+                vm.configurationError = true;
+            }
+        );
+    }
+    initTempusboard();
 
 	vm.assetSelected = function(device){
+        vm.selectedDevice = device
         vm.widgetsSet = [];
         applicationService.getApplicationsByDeviceType(device.type.toLowerCase())
             .then(function success(applications) {
@@ -40,15 +75,17 @@ export function TempusboardController($scope, $log, $state, $stateParams, userSe
                          dashboardService.getDashboard(application.miniDashboardId.id)
                         .then(function success(dashboard) {
                             vm.deviceSelected = true;
-                          //  vm.dashboard = dashboardUtils.validateAndUpdateDashboard(dashboard);
-                            vm.dashboardConfiguration = dashboard.configuration;
-                            vm.dashboardCtx.dashboard = dashboard;
-                           // vm.dashboardCtx.dashboardTimewindow = vm.dashboardConfiguration.timewindow;
-                          //  vm.dashboardCtx.aliasController = new AliasController($scope, $q, $filter, utils,
-                            //    types, entityService, null, vm.dashboardConfiguration.entityAliases);
-                          vm.timeseriesWidgetTypes = dashboard.configuration.widgets;
-                          var widgetObj = {'widget': dashboard.configuration.widgets, 'name': application.name, 'dashboard': 'dashboards/'+application.dashboardId.id};
+                            vm.dashboard = dashboardUtils.validateAndUpdateDashboard(dashboard);
+                            vm.dashboardConfiguration = vm.dashboard.configuration;
+                            vm.dashboardCtx.dashboard = vm.dashboard;
+                            vm.dashboardCtx.dashboardTimewindow = vm.dashboardConfiguration.timewindow;
+                            vm.dashboardCtx.dashboardDepthwindow = vm.dashboardConfiguration.depthwindow;
+                            vm.dashboardCtx.aliasController = new AliasController($scope, $q, $filter, utils,
+                        types, entityService, vm.dashboardCtx.stateController, vm.dashboardConfiguration.entityAliases, vm.selectedDevice);
+                          vm.timeseriesWidgetTypes = vm.dashboard.configuration.widgets;
+                          var widgetObj = {'widget': vm.dashboard.configuration.widgets, 'name': application.name, 'dashboard': 'dashboards/'+application.dashboardId.id};
                           vm.widgetsSet.push(widgetObj);
+
                         }, function fail() {
                             vm.configurationError = true;
                         });
@@ -59,12 +96,11 @@ export function TempusboardController($scope, $log, $state, $stateParams, userSe
                 vm.configurationError = true;
             });
 	}
-	var pageLink = {limit: 100};
 
+	var pageLink = {limit: 100};
 
     var subscriptionIdMap = {};
 //	var entityAttributesSubscriptionMap = {};
-
 
     function success(attributes, update, apply) {
         vm.last_telemetry = attributes;
@@ -116,20 +152,10 @@ export function TempusboardController($scope, $log, $state, $stateParams, userSe
             newSubscriptionId = attributeService.subscribeForEntityAttributes($scope.entityType, $scope.entityId, $scope.attributeScope.value);
         }
         if ($scope.subscriptionId && $scope.subscriptionId != newSubscriptionId) {
-            //attributeService.unsubscribeForEntityAttributes($scope.subscriptionId);
+       //     attributeService.unsubscribeForEntityAttributes($scope.subscriptionId);
         }
         $scope.subscriptionId = newSubscriptionId;
         subscriptionIdMap[$scope.entityId] = newSubscriptionId;
-        $log.log(subscriptionIdMap);
-    }
-
-    var user = userService.getCurrentUser();
-    if (user.authority === 'CUSTOMER_USER') {
-        vm.devicesScope = 'customer_user';
-        customerId = user.customerId;
-    }
-    else if (user.authority === 'TENANT_ADMIN') {
-        vm.devicesScope = 'tenant';
     }
 
     if (vm.devicesScope === 'tenant') {
@@ -147,32 +173,130 @@ export function TempusboardController($scope, $log, $state, $stateParams, userSe
 
 		$scope.entityType = 'DEVICE';
 		$scope.attributeScope = {value:'LATEST_TELEMETRY'};
-		
-		vm.devices.forEach(function(device, index, theArray){
-			theArray[index].subscriptionId = $scope.entityType + device.id.id + $scope.attributeScope.value;
-			$scope.query = {limit:5, order:"key", page:1, search:null};
-			$scope.entityId = device.id.id;
-			if(device.id.id == 'fdaa4a90-f0a7-11e7-a908-81edfb2c80e3'){
-				getEntityAttributes(true, false);
-			}
 
+        deviceService.getDeviceTypes({ignoreLoading: true}).then(
+            function success(deviceTypes) {
+                vm.allDeviceTypes = [];
+                deviceTypes.forEach(function(deviceType){
+                    for (var i = 0; i < vm.devices.length; i++) {
+                        if (vm.devices[i].type === deviceType.type){
+                            entityService.getEntityKeys('DEVICE', vm.devices[i].id.id, null, 'timeseries', {ignoreLoading: true}).then(
+                                function success(keys) {
+                                    if(keys.length > 0){
+                                        if(vm.tempusboardSettings === null || vm.tempusboardSettings === '') {
+                                            vm.allDeviceTypes.push({
+                                                type: deviceType.type,
+                                                selectedItem: null,
+                                                selected: keys.slice(0,4),
+                                                tags: keys
+                                            });
+                                        }
+                                        else {
+                                            var newType = true;
+                                            if(vm.tempusboardSettings.jsonValue.length > 0 ){ 
+                                                vm.tempusboardSettings.jsonValue.forEach(function(dType){     
+                                                    if(dType.type === deviceType.type){
+                                                        newType = false;
+                                                        vm.allDeviceTypes.push({
+                                                            type: deviceType.type,
+                                                            selectedItem: null,
+                                                            selected: dType.selected,
+                                                            tags: keys
+                                                        });
+                                                    }
+                                                });
+                                            }
+                                            if(newType){
+                                                vm.allDeviceTypes.push({
+                                                    type: deviceType.type,
+                                                    selectedItem: null,
+                                                    selected: keys.slice(0,4),
+                                                    tags: keys
+                                                });
+                                            }
+                                        }
+                                        
+                                    }
+                                },
+                                function fail() {
+                                    vm.configurationError = true;
+                                }
+                            );
+                            break;
+                        }
+                    }
+                })
+            }, function fail() {
+                vm.configurationError = true;
+        });
 
-		})
+        vm.devices.forEach(function(device, index, theArray){
+            theArray[index].subscriptionId = $scope.entityType + device.id.id + $scope.attributeScope.value;
+            $scope.query = {limit:100, order:"key", page:1, search:null};
+            $scope.entityId = device.id.id;
+            getEntityAttributes(true, false);
+        })
+        vm.searchText = null;
 
-		vm.assetSelected(vm.devices[0]);
+    if(angular.isDefined(vm.devices[0])){
+      vm.assetSelected(vm.devices[0]);
+    }
 		
 	}, function() {
 		$log.log('Failed: ');
 	})
 
-	
-
+    vm.chipSearch = function(text, chipSet) {
+      return chipSet.filter(function(object) {
+        if (angular.isString(text)) {
+          return object.search(text) > -1;
+        } else {
+          return false;
+        }
+      });
+    };
+    
+    vm.transformChip = function(chip) {
+      return chip;
+    };
+    
 
     $scope.$on('$destroy', function() {
-
-            if ($scope.subscriptionId) {
-                attributeService.unsubscribeForEntityAttributes($scope.subscriptionId);
+        if ($scope.subscriptionId) {
+            attributeService.unsubscribeForEntityAttributes($scope.subscriptionId);
+        }
+    });
+    $scope.$watch("vm.allDeviceTypes", function(newValue, oldValue){
+        if(newValue != oldValue){
+            newValue.forEach(function(deviceType){
+                vm.devices.forEach(function(device){
+                    if(deviceType.type === device.type){
+                        device.selectedTags = deviceType.selected;
+                    }
+                })
+            });
+            if(angular.isDefined(newValue) && newValue.length > 0){
+                if(vm.tempusboardSettings === null || vm.tempusboardSettings === ''){
+                    tempusboardService.saveTempusboardSettings({key : user.userId, jsonValue: newValue}).then(
+                        function success(settings) {
+                             vm.tempusboardSettings = settings;
+                        },
+                        function fail() {
+                            vm.configurationError = true;
+                        }
+                    );
+                }
+                else {
+                    for(var i=0; i < vm.tempusboardSettings.jsonValue.length; i++){
+                        if(vm.tempusboardSettings.jsonValue[i].type === newValue.type){
+                            vm.tempusboardSettings.jsonValue[i] = newValue;
+                        }
+                    }
+                    tempusboardService.saveTempusboardSettings(vm.tempusboardSettings);
+                }
             }
-        });
+            
+        }
+    }, true);
 
 }

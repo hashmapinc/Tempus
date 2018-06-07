@@ -15,6 +15,7 @@
  */
 package com.hashmapinc.server.extensions.core.plugin.telemetry.handlers;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.hashmapinc.server.common.data.id.EntityId;
@@ -268,7 +269,10 @@ public class TelemetryRpcMsgHandler implements RpcMsgHandler {
                 }
                 break;
             case JSON:
-                dataBuilder.setStrValue(attr.getJsonValue().get().toString());
+                Optional<JsonNode> jsonNodeValue = attr.getJsonValue();
+                if(jsonNodeValue.isPresent()) {
+                    dataBuilder.setStrValue(jsonNodeValue.get().toString());
+                }
                 break;
         }
         return dataBuilder;

@@ -20,4 +20,5 @@ Administration
     plugins
     widgets
     dashboards
+    cluster
     mail

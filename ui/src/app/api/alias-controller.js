@@ -15,7 +15,7 @@
  */
 export default class AliasController {
 
-    constructor($scope, $q, $filter, utils, types, entityService, stateController, entityAliases) {
+    constructor($scope, $q, $filter, utils, types, entityService, stateController, entityAliases, selectedDevice) {
         this.$scope = $scope;
         this.$q = $q;
         this.$filter = $filter;
@@ -27,6 +27,7 @@ export default class AliasController {
         this.resolvedAliases = {};
         this.resolvedAliasesPromise = {};
         this.resolvedAliasesToStateEntities = {};
+        this.selectedDevice = selectedDevice;
     }
 
     updateEntityAliases(newEntityAliases) {
@@ -249,7 +250,24 @@ export default class AliasController {
         });
         this.$q.all(datasorceResolveTasks).then(
             function success(datasourcesArrays) {
-                var datasources = [].concat.apply([], datasourcesArrays);
+                var datasources = [];
+                if(angular.isDefined(aliasCtrl.selectedDevice)){
+                    datasourcesArrays.forEach(function(deviceArray){
+                        deviceArray.forEach(function(device){
+                            if(device.type !== 'function'){
+                                if(device.entityId === aliasCtrl.selectedDevice.id.id){
+                                        datasources.push(device);
+                                }
+                            }
+                            else {
+                                datasources.push(device);
+                            }
+                        })
+                    })
+                }
+                else {
+                    datasources = [].concat.apply([], datasourcesArrays);
+                }
                 datasources = aliasCtrl.$filter('orderBy')(datasources, '+generated');
                 var index = 0;
                 var functionIndex = 0;

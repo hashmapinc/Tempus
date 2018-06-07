@@ -39,6 +39,7 @@ import com.hashmapinc.server.dao.model.ModelConstants;
 import com.hashmapinc.server.dao.plugin.PluginService;
 import com.hashmapinc.server.dao.rule.RuleService;
 import com.hashmapinc.server.dao.tenant.TenantService;
+import com.hashmapinc.server.dao.theme.ThemeService;
 import com.hashmapinc.server.dao.user.UserService;
 import com.hashmapinc.server.dao.widget.WidgetTypeService;
 import com.hashmapinc.server.dao.widget.WidgetsBundleService;
@@ -51,6 +52,7 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import com.hashmapinc.server.common.data.id.CustomerId;
+import com.hashmapinc.server.common.data.id.ThemeId;
 import com.hashmapinc.server.common.data.plugin.PluginMetaData;
 import com.hashmapinc.server.dao.settings.UserSettingsService;
 
@@ -121,6 +123,9 @@ public class DefaultSystemDataLoaderService implements SystemDataLoaderService {
     @Autowired
     private DashboardService dashboardService;
 
+    @Autowired
+    private ThemeService themeService;
+
     @Bean
     protected BCryptPasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
@@ -132,7 +137,7 @@ public class DefaultSystemDataLoaderService implements SystemDataLoaderService {
     @Value("${ldap.authentication-enabled}")
     private boolean isLdapEnabled;
 
-    public User adminUser;
+    private User adminUser;
 
     @Override
     public void createSysAdmin() {
@@ -167,6 +172,24 @@ public class DefaultSystemDataLoaderService implements SystemDataLoaderService {
         mailSettings.setUserId(adminUser.getId());
         mailSettings.setJsonValue(node);
         userSettingsService.saveUserSettings(mailSettings);
+    }
+
+    public void loadSystemThemes() throws Exception {
+
+        log.info("Loading theme  data...");
+        Theme theme1 = new Theme();
+        theme1.setThemeName("Tempus Blue");
+        theme1.setThemeValue("themeBlue");
+        theme1.setThemeStatus(false);
+        themeService.saveTheme(theme1);
+
+        Theme theme2 = new Theme();
+        theme2.setThemeName("Tempus Dark");
+        theme2.setThemeValue("themeDark");
+        theme2.setThemeStatus(true);
+        themeService.saveTheme(theme2);
+
+
     }
 
     @Override

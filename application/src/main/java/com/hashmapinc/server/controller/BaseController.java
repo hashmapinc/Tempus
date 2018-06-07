@@ -25,6 +25,7 @@ import com.hashmapinc.server.common.data.id.*;
 import com.hashmapinc.server.common.data.page.TextPageLink;
 import com.hashmapinc.server.common.data.plugin.ComponentDescriptor;
 import com.hashmapinc.server.dao.application.ApplicationService;
+import com.hashmapinc.server.dao.cluster.NodeMetricService;
 import com.hashmapinc.server.dao.device.DeviceCredentialsService;
 import com.hashmapinc.server.dao.rule.RuleService;
 import com.hashmapinc.server.dao.user.UserService;
@@ -37,9 +38,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import com.hashmapinc.server.actors.service.ActorService;
-import com.hashmapinc.server.common.data.*;
 import com.hashmapinc.server.common.data.alarm.AlarmId;
-import com.hashmapinc.server.common.data.id.*;
 import com.hashmapinc.server.common.data.page.TimePageLink;
 import com.hashmapinc.server.common.data.plugin.ComponentType;
 import com.hashmapinc.server.common.data.plugin.PluginMetaData;
@@ -141,6 +140,9 @@ public abstract class BaseController {
 
     @Autowired
     protected AuditLogService auditLogService;
+
+    @Autowired
+    protected NodeMetricService nodeMetricService;
 
 
     @ExceptionHandler(TempusException.class)

@@ -14,11 +14,27 @@
         "default": 365,
         "minimum": 0,
         "maximum": 100000
+      },
+      "qualityTimeWindow": {
+        "title": "Tag Quality Time Window",
+        "type": "integer",
+        "default": 60000,
+        "minimum": 0,
+        "maximum": 3600000
+      },
+      "qualityDepthWindow": {
+        "title": "Tag Quality Depth Window",
+        "type": "integer",
+        "default": 3000,
+        "minimum": 0,
+        "maximum": 300000
       }
     },
     "required": [
       "timeUnit",
-      "ttlValue"
+      "ttlValue",
+      "qualityTimeWindow",
+      "qualityDepthWindow"
     ]
   },
   "form": [
@@ -45,6 +61,8 @@
         }
       ]
     },
-    "ttlValue"
+    "ttlValue",
+    "qualityTimeWindow",
+    "qualityDepthWindow"
   ]
 }

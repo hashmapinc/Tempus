@@ -18,7 +18,9 @@ package com.hashmapinc.server.actors.plugin;
 import akka.actor.ActorRef;
 import com.hashmapinc.server.common.data.id.PluginId;
 import com.hashmapinc.server.controller.plugin.PluginWebSocketMsgEndpoint;
+import com.hashmapinc.server.dao.TagMetaData.TagMetaDataService;
 import com.hashmapinc.server.dao.attributes.AttributesService;
+import com.hashmapinc.server.extensions.api.device.DeviceTelemetryEventNotificationMsg;
 import com.hashmapinc.server.extensions.api.plugins.msg.TimeoutMsg;
 import lombok.extern.slf4j.Slf4j;
 import com.hashmapinc.server.actors.ActorSystemContext;
@@ -61,6 +63,7 @@ public final class SharedPluginProcessingContext {
     final TimeseriesService tsService;
     final DepthSeriesService dsService;
     final AttributesService attributesService;
+    final TagMetaDataService tagMetaDataService;
     final ClusterRpcService rpcService;
     final ClusterRoutingService routingService;
     final RelationService relationService;
@@ -80,6 +83,7 @@ public final class SharedPluginProcessingContext {
         this.tsService = sysContext.getTsService();
         this.dsService = sysContext.getDsService();
         this.attributesService = sysContext.getAttributesService();
+        this.tagMetaDataService = sysContext.getTagMetaDataService();
         this.assetService = sysContext.getAssetService();
         this.deviceService = sysContext.getDeviceService();
         this.rpcService = sysContext.getRpcService();
@@ -104,6 +108,9 @@ public final class SharedPluginProcessingContext {
         forward(msg.getDeviceId(), msg, rpcService::tell);
     }
 
+    public void toDeviceActor(DeviceTelemetryEventNotificationMsg msg) {
+        forward(msg.getDeviceId(), msg, rpcService::tell);
+    }
     public void sendRpcRequest(ToDeviceRpcRequest msg) {
         log.trace("[{}] Forwarding msg {} to device actor!", pluginId, msg);
         ToDeviceRpcRequestPluginMsg rpcMsg = new ToDeviceRpcRequestPluginMsg(pluginId, tenantId, msg);

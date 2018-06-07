@@ -70,6 +70,7 @@ Tempus was made to simplify ingest/analysis/storage/visualization of your IIoT d
   - Ability to integrate with any system on the backend. Out of the box support for:
     - Apache Kafka
     - AWS SQS/SNS
+    - AWS Kinesis Data Stream/Firehose Delivery Stream
     - Kudu
     - HBase
     - MQTT
@@ -98,7 +99,7 @@ Tempus was made to simplify ingest/analysis/storage/visualization of your IIoT d
 
 ## Getting Started
 
-- Read through the [Tempus Developer Quickstart](http://tempus-cloud.s3-website-us-west-2.amazonaws.com/help/developerQS/html/).
+- Read through the [Tempus Developer Quickstart](https://tempus.readthedocs.io/development/quickstart.html/).
   It will include a section on how to build the local development environment via Docker to get you up and running quickly.
 
 To build:
@@ -125,6 +126,7 @@ To build:
       [INFO] Tempus Server Livy Extension ....................... SUCCESS
       [INFO] Tempus Server SQS Extension ........................ SUCCESS
       [INFO] Tempus Server SNS Extension ........................ SUCCESS
+      [INFO] Tempus Server Kinesis Extension .................... SUCCESS
       [INFO] Tempus Server Transport Modules .................... SUCCESS
       [INFO] Tempus HTTP Transport .............................. SUCCESS
       [INFO] Tempus COAP Transport .............................. SUCCESS
@@ -147,7 +149,7 @@ You can also submit issues or questions via GitHub Issues [here](https://github.
 
 ## Documentation
 
-See [The Documentation Here](http://tempus-cloud.s3-website-us-west-2.amazonaws.com/help/) for the latest updates.
+See [The Documentation Here](https://tempus.readthedocs.io) for the latest updates.
 
 ## License
 
@@ -180,7 +182,7 @@ The U.S. Government Department of Commerce, Bureau of Industry and Security
 (BIS), has classified this software as Export Commodity Control Number (ECCN)
 5D002.C.1, which includes information security software using or performing
 cryptographic functions with asymmetric algorithms. The form and manner of this
-Apache Software Foundation distribution makes it eligible for export under the
+distribution makes it eligible for export under the
 License Exception ENC Technology Software Unrestricted (TSU) exception (see the
 BIS Export Administration Regulations, Section 740.13) for both object code and
 source code.

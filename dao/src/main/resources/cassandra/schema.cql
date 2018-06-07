@@ -427,6 +427,7 @@ CREATE TABLE IF NOT EXISTS tempus.ts_kv_cf (
     key text,
     partition bigint,
     ts bigint,
+    ts_diff bigint,
     bool_v boolean,
     str_v text,
     long_v bigint,
@@ -463,6 +464,7 @@ CREATE TABLE IF NOT EXISTS tempus.ds_kv_cf (
     key text,
     partition double,
     ds double,
+    ds_diff double,
     bool_v boolean,
     str_v text,
     long_v bigint,
@@ -490,6 +492,20 @@ CREATE TABLE IF NOT EXISTS tempus.ds_kv_latest_cf (
     long_v bigint,
     dbl_v double,
     json_v text,
+    PRIMARY KEY (( entity_type, entity_id ), key)
+) WITH compaction = { 'class' :  'LeveledCompactionStrategy'  };
+
+CREATE TABLE IF NOT EXISTS tempus.tag_metadata_cf (
+    entity_type text,
+    entity_id timeuuid,
+    key text,
+    unit text,
+    avg_frequency double,
+    max_frequency double,
+    min_frequency double,
+    mean_frequency double,
+    median_frequency double,
+    source text,
     PRIMARY KEY (( entity_type, entity_id ), key)
 ) WITH compaction = { 'class' :  'LeveledCompactionStrategy'  };
 
@@ -628,6 +644,15 @@ CREATE MATERIALIZED VIEW IF NOT EXISTS tempus.event_by_id AS
     PRIMARY KEY ((tenant_id, entity_type, entity_id), id, event_type, event_uid)
     WITH CLUSTERING ORDER BY (id ASC, event_type ASC, event_uid ASC);
 
+CREATE TABLE IF NOT EXISTS tempus.node_metric (
+    id uuid,
+    host text,
+    port int,
+    status text,
+    rpc_session_count int,
+    device_session_count int,
+    PRIMARY KEY (id, host, port)
+);
 
 CREATE TABLE IF NOT EXISTS tempus.computations (
     id uuid,
@@ -756,3 +781,10 @@ CREATE TABLE IF NOT EXISTS tempus.audit_log_by_tenant_id_partitions (
 ) WITH CLUSTERING ORDER BY ( partition ASC )
 AND compaction = { 'class' :  'LeveledCompactionStrategy'  };
 
+CREATE TABLE IF NOT EXISTS tempus.theme (
+  id uuid,
+  name text,
+  value text,
+  is_enabled boolean,
+  PRIMARY KEY (id,name)
+);

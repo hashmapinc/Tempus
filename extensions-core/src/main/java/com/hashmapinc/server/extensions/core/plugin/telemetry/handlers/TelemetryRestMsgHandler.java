@@ -83,7 +83,6 @@ public class TelemetryRestMsgHandler extends DefaultRestMsgHandler {
         if (method.equals("keys")) {
             handleHttpGetKeysMethod(ctx, msg, feature, scope, entityId);
         } else if (method.equals("values")) {
-
             handleHttpGetValuesMethod(ctx, msg, request, feature, scope, entityId);
             /*if (feature == TelemetryFeature.TIMESERIES) {
                 log.error("HMDC inside telemetry values ");
@@ -106,7 +105,6 @@ public class TelemetryRestMsgHandler extends DefaultRestMsgHandler {
                             .collect(Collectors.toList());
                     ctx.loadTimeseries(entityId, queries, getTsKvListCallback(msg));
                 } else {
-                    log.error("HMDC inside telemetry values ");
                     ctx.loadLatestTimeseries(entityId, keys, getTsKvListCallback(msg));
                 }
             } else if(feature == TelemetryFeature.DEPTHSERIES){
@@ -136,30 +134,9 @@ public class TelemetryRestMsgHandler extends DefaultRestMsgHandler {
 
             else if (feature == TelemetryFeature.ATTRIBUTES) {
                 String keys = request.getParameter("keys", "");
-                log.debug("HMDC inside attriibute values ");
-
-                PluginCallback<List<AttributeKvEntry>> callback = getAttributeKeysPluginCallback(msg);
-                if (!StringUtils.isEmpty(scope)) {
-                    if (!StringUtils.isEmpty(keys)) {
-                        List<String> keyList = Arrays.asList(keys.split(","));
-                        ctx.loadAttributes(entityId, scope, keyList, callback);
-                    } else {
-                        ctx.loadAttributes(entityId, scope, callback);
-                    }
-                } else {
-                    if (!StringUtils.isEmpty(keys)) {
-                        List<String> keyList = Arrays.asList(keys.split(","));
-                        ctx.loadAttributes(entityId, Arrays.asList(DataConstants.allScopes()), keyList, callback);
-                    } else {
-                        ctx.loadAttributes(entityId, Arrays.asList(DataConstants.allScopes()), callback);
-                    }
-                }
-            }*/
+        */
         }
-           /* else if (feature == TelemetryFeature.ATTRIBUTES) {
-                String keys = request.getParameter("keys", "");
-                log.error("HMDC inside attriibute values ");
-
+        /*
                 PluginCallback<List<AttributeKvEntry>> callback = getAttributeValuesPluginCallback(msg);
                 if (!StringUtils.isEmpty(scope)) {
                     if (!StringUtils.isEmpty(keys)) {
@@ -420,7 +397,6 @@ public class TelemetryRestMsgHandler extends DefaultRestMsgHandler {
                 if (attributes.isEmpty()) {
                     throw new IllegalArgumentException("No attributes data found in request body!");
                 }
-
                 ctx.saveAttributes(ctx.getSecurityCtx().orElseThrow(IllegalArgumentException::new).getTenantId(), entityId, scope, attributes, new PluginCallback<Void>() {
                     @Override
                     public void onSuccess(PluginContext ctx, Void value) {
@@ -487,7 +463,7 @@ public class TelemetryRestMsgHandler extends DefaultRestMsgHandler {
         if (entries.isEmpty()) {
             throw new IllegalArgumentException("No timeseries data found in request body!");
         }
-        ctx.saveTsData(entityId, entries, ttl, new PluginCallback<Void>() {
+        ctx.saveTsData(ctx.getSecurityCtx().orElseThrow(IllegalArgumentException::new).getTenantId(), entityId, entries, ttl, new PluginCallback<Void>() {
             @Override
             public void onSuccess(PluginContext ctx, Void value) {
                 msg.getResponseHolder().setResult(new ResponseEntity<>(HttpStatus.OK));

@@ -71,7 +71,7 @@ data:
   mqtt.port: "1883"
   coap.address: "0.0.0.0"
   coap.port: "5683"
-  spark.path: "/home"
+  spark.path: "/tmp"
 ---
 apiVersion: "apps/v1beta1"
 kind: StatefulSet

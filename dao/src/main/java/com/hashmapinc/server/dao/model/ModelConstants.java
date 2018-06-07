@@ -28,8 +28,8 @@ public class ModelConstants {
     private ModelConstants() {
     }
 
-    public static UUID NULL_UUID = UUIDs.startOf(0);
-    public static String NULL_UUID_STR = UUIDConverter.fromTimeUUID(NULL_UUID);
+    public static final UUID NULL_UUID = UUIDs.startOf(0);
+    public static final String NULL_UUID_STR = UUIDConverter.fromTimeUUID(NULL_UUID);
 
     /**
      * Generic constants.
@@ -152,6 +152,18 @@ public class ModelConstants {
     public static final String DEVICE_TYPES_BY_TENANT_VIEW_NAME = "device_types_by_tenant";
 
     /**
+     * Device MetaData constants.
+     */
+    public static final String TAG_METADATA_COLUMN_FAMILY_NAME = "tag_metadata_cf";
+    public static final String TAG_METADATA_UNIT = "unit";
+    public static final String TAG_METADATA_AVG_FREQUENCY = "avg_frequency";
+    public static final String TAG_METADATA_MIN_FREQUENCY = "min_frequency";
+    public static final String TAG_METADATA_MAX_FREQUENCY = "max_frequency";
+    public static final String TAG_METADATA_MEAN_FREQUENCY = "mean_frequency";
+    public static final String TAG_METADATA_MEDIAN_FREQUENCY = "median_frequency";
+    public static final String TAG_METADATA_SOURCE = "source";
+
+    /**
      * Application constants
      */
     public static final String APPLICATION_TABLE_NAME = "application";
@@ -198,6 +210,16 @@ public class ModelConstants {
     public static final String COMPUTATION_JOB_STATE = "state";
     public static final String COMPUTATION_JOB_ID = "job_id";
     public static final String COMPUTATION_JOB_TENANT_ID = TENANT_ID_PROPERTY;
+
+    /**
+     * Node Metric Constants
+     */
+    public static final String NODE_METRIC_TALBE_NAME = "node_metric";
+    public static final String NODE_METRIC_HOST = "host";
+    public static final String NODE_METRIC_PORT = "port";
+    public static final String NODE_METRIC_STATUS = "status";
+    public static final String NODE_METRIC_RPC_SESSION = "rpc_session_count";
+    public static final String NODE_METRIC_DEVICE_SESSION = "device_session_count";
      
     /* Cassandra audit log constants.
      */
@@ -370,6 +392,15 @@ public class ModelConstants {
     public static final String COMPUTATION_JOB_BY_TENANT_AND_COMPUTATION = "cmp_jobs_by_tenant_and_cmp_search_text";
     public static final String COMPUTATION_JOB_TENANT_ID_PROPERTY = TENANT_ID_PROPERTY;
 
+    /**
+     * Cassandra Node Metric Contants
+     */
+    public static final String NODE_METRIC_COLUMN_FAMILY_NAME = "node_metric";
+    public static final String NODE_METRIC_HOST_PROPERTY = "host";
+    public static final String NODE_METRIC_PORT_PROPERTY = "port";
+    public static final String NODE_METRIC_STATUS_PROPERTY = "status";
+    public static final String NODE_METRIC_RPC_SESSION_PROPERTY = "rpc_session_count";
+    public static final String NODE_METRIC_DEVICE_SESSION_PROPERTY = "device_session_count";
 
     /**
      * Cassandra plugin component metadata constants.
@@ -428,9 +459,28 @@ public class ModelConstants {
     public static final String DS_KV_LATEST_CF = "ds_kv_latest_cf";
 
     public static final String PARTITION_COLUMN = "partition";
+    public static final String TS_DIFF = "ts_diff";
+    public static final String DS_DIFF = "ds_diff";
     public static final String KEY_COLUMN = "key";
     public static final String TS_COLUMN = "ts";
     public static final String DS_COLUMN = "ds";
+
+    /**
+     * theme constants.
+     */
+    public static final String THEME_TABLE_NAME = "theme";
+    public static final String THEME_NAME = "name";
+    public static final String THEME_VALUE = "value";
+    public static final String IS_ENABLED = "is_enabled";
+
+
+    /**
+     * Cassandra theme Contants
+     */
+    public static final String THEME_COLUMN_FAMILY_NAME = "theme";
+    public static final String THEME_NAME_PROPERTY = "name";
+    public static final String THEME_VALUE_PROPERTY = "value";
+    public static final String THEME_IS_ENABLED_PROPERTY = "is_enabled";
 
     /**
      * Main names of cassandra key-value columns storage.
@@ -441,17 +491,17 @@ public class ModelConstants {
     public static final String DOUBLE_VALUE_COLUMN = "dbl_v";
     public static final String JSON_VALUE_COLUMN = "json_v";
 
-    public static final String[] NONE_AGGREGATION_COLUMNS = new String[]{LONG_VALUE_COLUMN, DOUBLE_VALUE_COLUMN, BOOLEAN_VALUE_COLUMN, STRING_VALUE_COLUMN, JSON_VALUE_COLUMN, KEY_COLUMN, TS_COLUMN};
-    public static final String[] NONE_DS_AGGREGATION_COLUMNS = new String[]{LONG_VALUE_COLUMN, DOUBLE_VALUE_COLUMN, BOOLEAN_VALUE_COLUMN, STRING_VALUE_COLUMN, JSON_VALUE_COLUMN, KEY_COLUMN, DS_COLUMN};
+    public static final String[] NONE_AGGREGATION_COLUMNS = new String[]{LONG_VALUE_COLUMN, DOUBLE_VALUE_COLUMN, BOOLEAN_VALUE_COLUMN, STRING_VALUE_COLUMN, JSON_VALUE_COLUMN, KEY_COLUMN, TS_COLUMN, TS_DIFF};
+    public static final String[] NONE_DS_AGGREGATION_COLUMNS = new String[]{LONG_VALUE_COLUMN, DOUBLE_VALUE_COLUMN, BOOLEAN_VALUE_COLUMN, STRING_VALUE_COLUMN, JSON_VALUE_COLUMN, KEY_COLUMN, DS_COLUMN, DS_DIFF};
 
-    public static final String[] COUNT_AGGREGATION_COLUMNS = new String[]{count(LONG_VALUE_COLUMN), count(DOUBLE_VALUE_COLUMN), count(BOOLEAN_VALUE_COLUMN), count(STRING_VALUE_COLUMN), count(JSON_VALUE_COLUMN)};
+    protected static final String[] COUNT_AGGREGATION_COLUMNS = new String[]{count(LONG_VALUE_COLUMN), count(DOUBLE_VALUE_COLUMN), count(BOOLEAN_VALUE_COLUMN), count(STRING_VALUE_COLUMN), count(JSON_VALUE_COLUMN)};
 
-    public static final String[] MIN_AGGREGATION_COLUMNS = ArrayUtils.addAll(COUNT_AGGREGATION_COLUMNS,
-            new String[]{min(LONG_VALUE_COLUMN), min(DOUBLE_VALUE_COLUMN), min(BOOLEAN_VALUE_COLUMN), min(STRING_VALUE_COLUMN), min(JSON_VALUE_COLUMN)});
-    public static final String[] MAX_AGGREGATION_COLUMNS = ArrayUtils.addAll(COUNT_AGGREGATION_COLUMNS,
-            new String[]{max(LONG_VALUE_COLUMN), max(DOUBLE_VALUE_COLUMN), max(BOOLEAN_VALUE_COLUMN), max(STRING_VALUE_COLUMN), min(JSON_VALUE_COLUMN)});
-    public static final String[] SUM_AGGREGATION_COLUMNS = ArrayUtils.addAll(COUNT_AGGREGATION_COLUMNS,
-            new String[]{sum(LONG_VALUE_COLUMN), sum(DOUBLE_VALUE_COLUMN)});
+    protected static final String[] MIN_AGGREGATION_COLUMNS = ArrayUtils.addAll(COUNT_AGGREGATION_COLUMNS,
+                                                                                new String[]{min(LONG_VALUE_COLUMN), min(DOUBLE_VALUE_COLUMN), min(BOOLEAN_VALUE_COLUMN), min(STRING_VALUE_COLUMN), min(JSON_VALUE_COLUMN)});
+    protected static final String[] MAX_AGGREGATION_COLUMNS = ArrayUtils.addAll(COUNT_AGGREGATION_COLUMNS,
+                                                                                new String[]{max(LONG_VALUE_COLUMN), max(DOUBLE_VALUE_COLUMN), max(BOOLEAN_VALUE_COLUMN), max(STRING_VALUE_COLUMN), min(JSON_VALUE_COLUMN)});
+    protected static final String[] SUM_AGGREGATION_COLUMNS = ArrayUtils.addAll(COUNT_AGGREGATION_COLUMNS,
+                                                                                new String[]{sum(LONG_VALUE_COLUMN), sum(DOUBLE_VALUE_COLUMN)});
     protected static final String[] AVG_AGGREGATION_COLUMNS = SUM_AGGREGATION_COLUMNS;
 
     public static String min(String s) {
