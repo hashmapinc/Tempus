@@ -15,12 +15,12 @@
  */
 
 
-package com.hashmapinc.server.dao.theme;
+package com.hashmapinc.server.dao.logo;
 
-import com.hashmapinc.server.common.data.Theme;
+import com.hashmapinc.server.common.data.Logo;
 import com.hashmapinc.server.dao.DaoUtil;
 import com.hashmapinc.server.dao.model.ModelConstants;
-import com.hashmapinc.server.dao.model.nosql.ThemeEntity;
+import com.hashmapinc.server.dao.model.nosql.LogoEntity;
 import com.hashmapinc.server.dao.nosql.CassandraAbstractModelDao;
 import com.hashmapinc.server.dao.util.NoSqlDao;
 import lombok.extern.slf4j.Slf4j;
@@ -35,31 +35,33 @@ import static com.datastax.driver.core.querybuilder.QueryBuilder.eq;
 @Component
 @Slf4j
 @NoSqlDao
-public class CassandraThemeDao extends CassandraAbstractModelDao<ThemeEntity,Theme> implements ThemeDao{
+
+
+public class CassandraLogoDao extends CassandraAbstractModelDao<LogoEntity,Logo> implements LogoDao{
 
     @Override
-    protected Class<ThemeEntity> getColumnFamilyClass() {
-        return ThemeEntity.class;
+    protected Class<LogoEntity> getColumnFamilyClass() {
+        return LogoEntity.class;
     }
 
     @Override
     protected String getColumnFamilyName() {
-        return ModelConstants.THEME_COLUMN_FAMILY_NAME;
+        return ModelConstants.LOGO_COLUMN_FAMILY_NAME;
     }
 
     @Override
-    public Theme findEnabledTheme() {
-        Select select = select().from(ModelConstants.THEME_COLUMN_FAMILY_NAME).allowFiltering();
+    public Logo findById(String id) {
+        Select select = select().from(ModelConstants.LOGO_COLUMN_FAMILY_NAME).allowFiltering();
         Select.Where query = select.where();
-        query.and(eq(ModelConstants.THEME_IS_ENABLED_PROPERTY,true));
+        query.and(eq(ModelConstants.ID_PROPERTY,id));
         return DaoUtil.getData(findOneByStatement(query));
     }
 
     @Override
-    public Theme findByValue (String value) {
-        Select select = select().from(ModelConstants.THEME_COLUMN_FAMILY_NAME).allowFiltering();
+    public Logo findByName(String name) {
+        Select select = select().from(ModelConstants.LOGO_COLUMN_FAMILY_NAME).allowFiltering();
         Select.Where query = select.where();
-        query.and(eq(ModelConstants.THEME_VALUE_PROPERTY,value));
+        query.and(eq(ModelConstants.LOGO_NAME_PROPERTY,name));
         return DaoUtil.getData(findOneByStatement(query));
     }
 

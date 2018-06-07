@@ -25,4 +25,6 @@ import org.springframework.data.repository.query.Param;
 public interface LogoRepository extends CrudRepository<LogoEntity, String> {
 
     LogoEntity findById(String id);
+
+    LogoEntity findByName(String name);
 }

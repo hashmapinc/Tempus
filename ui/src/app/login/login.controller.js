@@ -16,6 +16,7 @@
 /* eslint-disable import/no-unresolved, import/default */
 
 import logoSvg from '../../svg/logo_title_white.svg';
+import defaultLogoSvg from '../../svg/Tempus_Logo_E_TagLineExtended_vectorized.svg';
 
 /* eslint-enable import/no-unresolved, import/default */
 
@@ -24,6 +25,7 @@ export default function LoginController(toast, loginService, userService/*, $roo
     var vm = this;
 
     vm.logoSvg = logoSvg;
+    vm.defaultLogoSvg = defaultLogoSvg;
 
     vm.user = {
         name: '',

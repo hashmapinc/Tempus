@@ -483,6 +483,16 @@ public class ModelConstants {
     public static final String THEME_IS_ENABLED_PROPERTY = "is_enabled";
 
 
+
+    /**
+     * Cassandra logo Constants
+     */
+    public static final String LOGO_COLUMN_FAMILY_NAME = "logo";
+    public static final String LOGO_NAME_PROPERTY = "name";
+    public static final String LOGO_DISPLAY_PROPERTY = "enabled";
+    public static final String LOGO_FILE_PROPERTY = "file";
+
+
     /**
      * logo constants.
      */

@@ -29,7 +29,12 @@
         <md-progress-linear class="md-warn" style="z-index: 1; max-height: 0px; width: inherit;"
                             md-mode="indeterminate" ng-disabled="!$root.loading" ng-show="$root.loading"></md-progress-linear>
         <md-card-content>
-            <md-icon md-svg-src="/static/svg/Tempus_Logo_E_TagLineExtended_vectorized.svg" class="material-icons hm-login-logo" style=""></md-icon>
+
+            <md-icon ng-show ="fileType != ''" ng-switch on="fileType" class="material-icons hm-login-logo" style="">
+                <img ng-switch-when="svg" class="" style="width: 101%; margin-top: 1%;"ng-src="data:image/svg+xml;base64,{{logo}}">
+                <img ng-switch-default class="" style="width: 101%; margin-top: 1%;"ng-src="data:image/JPEG;base64,{{logo}}">
+            </md-icon>
+            <md-icon ng-show ="fileType == ''" md-svg-src="/static/svg/Tempus_Logo_E_TagLineExtended_vectorized.svg" class="material-icons hm-login-logo" style=""></md-icon>
             <form class="login-form" ng-submit="vm.login()">
                 <div layout="column" layout-padding="" id="toast-parent">
                     <span style="height: 50px;"></span>

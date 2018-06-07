@@ -59,6 +59,7 @@ public class UserSettingsController extends BaseController {
     @Autowired
     private ThemeService themeService;
 
+    @Autowired
     private LogoService logoService;
 
     @PreAuthorize("hasAnyAuthority('TENANT_ADMIN', 'CUSTOMER_USER', 'SYS_ADMIN')")
@@ -144,10 +145,8 @@ public class UserSettingsController extends BaseController {
 
             Logo l = new Logo();
             l.setDisplay(true);
-            l.setName(file.getName());
+            l.setName(file.getOriginalFilename());
             l.setFile(file.getBytes());
-            //JsonObject request = new JsonParser().parse(value).getAsJsonObject();
-            //return themeService.updateThemeStatus(request.get("value").getAsString());
 
            return logoService.saveLogo(l);
            // return null;
@@ -155,6 +154,26 @@ public class UserSettingsController extends BaseController {
             throw handleException(e);
         }
     }
+
+    @RequestMapping(value = "/logo", method = RequestMethod.GET)
+    @ResponseStatus(value = HttpStatus.OK)
+    public Logo getLogo() throws TempusException  {
+        try {
+
+            List <Logo> logo = logoService.find();
+
+            if(logo.size() > 0) {
+
+                return logo.get(0);
+            }
+
+            return null;
+
+        } catch (Exception e) {
+            throw handleException(e);
+        }
+    }
+
 
 
 }

@@ -34,5 +34,7 @@ public interface LogoDao extends Dao<Logo> {
 
     Logo findById(String id);
 
+    Logo findByName(String name);
+
 
 }

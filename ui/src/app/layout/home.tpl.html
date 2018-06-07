@@ -27,8 +27,14 @@
       <header class="tb-nav-header">
           <md-toolbar class="tb-nav-header-toolbar">
           	 <div flex layout="row" class="md-toolbar-tools inset">
-				<md-icon md-svg-src="{{vm.logoSvg}}" aria-label="logo" class="tb-logo-title"></md-icon>
-          	 </div>
+				 <md-icon ng-show ="fileType != ''" ng-switch on="fileType" class="material-icons hm-login-logo" style="">
+					 <img ng-switch-when="svg" class="" style="width: 54%; margin-top: 0%;"ng-src="data:image/svg+xml;base64,{{logo}}">
+
+					 <img ng-switch-default class="" style="width: 54%; margin-top: 0%;"ng-src="data:image/JPEG;base64,{{logo}}">
+				 </md-icon>
+
+				 <md-icon ng-show ="fileType == ''" md-svg-src="{{vm.logoSvg}}" aria-label="logo" class="tb-logo-title"></md-icon>
+			 </div>
           </md-toolbar>
       </header>
 	  <md-toolbar ng-class="{themeDarkSideMenu: theme == 'themeDark', themeBlueSideMenu: theme == 'themeBlue'}"
