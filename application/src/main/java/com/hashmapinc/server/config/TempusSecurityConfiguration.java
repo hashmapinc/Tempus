@@ -189,7 +189,7 @@ public class TempusSecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     @Bean
     @ConditionalOnMissingBean(CorsFilter.class)
-    public CorsFilter corsFilter(@Autowired MvcCorsProperties mvcCorsProperties) {
+    public CorsFilter corsFilter(MvcCorsProperties mvcCorsProperties) {
         if (mvcCorsProperties.getMappings().size() == 0) {
             return new CorsFilter(new UrlBasedCorsConfigurationSource());
         } else {
@@ -200,7 +200,7 @@ public class TempusSecurityConfiguration extends WebSecurityConfigurerAdapter {
     }
 
     @Bean
-    public AuditLogLevelFilter auditLogLevelFilter(@Autowired AuditLogLevelProperties auditLogLevelProperties) {
+    public AuditLogLevelFilter auditLogLevelFilter(AuditLogLevelProperties auditLogLevelProperties) {
         return new AuditLogLevelFilter(auditLogLevelProperties.getMask());
     }
 }

@@ -32,6 +32,15 @@ server:
     # Alias that identifies the key in the key store
     key-alias: "${SSL_KEY_ALIAS:tomcat}"
 
+oauth2:
+  client:
+    clientId: "${CLIENT_ID:-ingestion-service}"
+    clientSecret: "${CLIENT_SECRET:metadata-ingestion-service-secret}"
+  resource:
+    tokenInfoUri: "${TOKEN_INFO_URI:http://localhost:8080/oauth/check_token}"
+
+security.jwt.tokenSigningKey: "${JWT_TOKEN_SIGNING_KEY:hashmapIncDefaultSigningKey}"
+
 ldap:
   authentication-enabled: "${LDAP_AUTHENTICATION_ENABLED:false}"
   authentication-server: "${LDAP_AUTH_SERVER:ldap://openldap:389}"
