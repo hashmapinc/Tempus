@@ -62,7 +62,7 @@ public abstract class AbstractMqttTelemetryIntegrationTest extends AbstractContr
         MqttAsyncClient client = new MqttAsyncClient(MQTT_URL, clientId);
 
         MqttConnectOptions options = new MqttConnectOptions();
-        options.setUserName(accessToken);
+        options.setPassword(accessToken.toCharArray());
         client.connect(options);
         Thread.sleep(3000);
         MqttMessage message = new MqttMessage();
