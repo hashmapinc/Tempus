@@ -399,6 +399,9 @@ export default angular.module('tempus.locale', [])
                     "default-customer": "Default Business Unit",
                     "default-customer-required": "Default Business Unit is required in order to debug dashboard on Tenant level"
                 },
+                "data_model": {
+                    "data_models": "Data models"
+                },
                 "datetime": {
                     "date-from": "Date from",
                     "time-from": "Time from",
