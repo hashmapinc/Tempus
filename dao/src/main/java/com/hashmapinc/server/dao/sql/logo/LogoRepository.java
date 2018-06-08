@@ -15,31 +15,16 @@
  */
 
 
-package com.hashmapinc.server.dao.theme;
-import com.hashmapinc.server.common.data.Theme;
-import com.hashmapinc.server.dao.Dao;
+package com.hashmapinc.server.dao.sql.logo;
+import com.hashmapinc.server.dao.model.sql.LogoEntity;
+import com.hashmapinc.server.dao.util.SqlDao;
+import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.repository.query.Param;
 
-import java.util.List;
+@SqlDao
+public interface LogoRepository extends CrudRepository<LogoEntity, String> {
 
-public interface ThemeDao extends Dao<Theme> {
+    LogoEntity findById(String id);
 
-    /**
-     * Find theme for listing
-     * @return the list of theme objects
-     */
-    List<Theme> find();
-
-    /**
-     * Find theme by status
-     * @return the list of theme object
-     */
-    Theme findEnabledTheme();
-
-    Theme save(Theme theme);
-
-    /**
-     * Find theme by value
-     * @return the theme object
-     */
-    Theme findByValue(String value);
+    LogoEntity findByName(String name);
 }

@@ -15,31 +15,13 @@
  */
 
 
-package com.hashmapinc.server.dao.theme;
-import com.hashmapinc.server.common.data.Theme;
-import com.hashmapinc.server.dao.Dao;
+package com.hashmapinc.server.dao.service.sql;
 
-import java.util.List;
+import com.hashmapinc.server.dao.service.DaoSqlTest;
+import com.hashmapinc.server.dao.service.BaseLogoServiceTest;
 
-public interface ThemeDao extends Dao<Theme> {
+@DaoSqlTest
 
-    /**
-     * Find theme for listing
-     * @return the list of theme objects
-     */
-    List<Theme> find();
 
-    /**
-     * Find theme by status
-     * @return the list of theme object
-     */
-    Theme findEnabledTheme();
-
-    Theme save(Theme theme);
-
-    /**
-     * Find theme by value
-     * @return the theme object
-     */
-    Theme findByValue(String value);
+public class LogoServiceSqlTest extends BaseLogoServiceTest {
 }
