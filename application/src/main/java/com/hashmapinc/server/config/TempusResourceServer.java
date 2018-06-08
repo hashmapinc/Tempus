@@ -17,29 +17,18 @@ package com.hashmapinc.server.config;
 
 import com.hashmapinc.server.exception.TempusErrorResponseHandler;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Bean;
+import org.springframework.boot.autoconfigure.security.oauth2.resource.ResourceServerProperties;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Primary;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableResourceServer;
 import org.springframework.security.oauth2.config.annotation.web.configuration.ResourceServerConfigurerAdapter;
 import org.springframework.security.oauth2.config.annotation.web.configurers.ResourceServerSecurityConfigurer;
-import org.springframework.security.oauth2.provider.token.DefaultAccessTokenConverter;
-import org.springframework.security.oauth2.provider.token.DefaultTokenServices;
-import org.springframework.security.oauth2.provider.token.TokenStore;
-import org.springframework.security.oauth2.provider.token.UserAuthenticationConverter;
-import org.springframework.security.oauth2.provider.token.store.JwtAccessTokenConverter;
-import org.springframework.security.oauth2.provider.token.store.JwtTokenStore;
 
 
 @Configuration
 @EnableResourceServer
 public class TempusResourceServer extends ResourceServerConfigurerAdapter {
-
-    @Value("${security.jwt.tokenSigningKey}")
-    private String tokenSigningKey;
 
     public static final String WEBJARS_ENTRY_POINT = "/webjars/**";
     public static final String DEVICE_API_ENTRY_POINT = "/api/v1/**";
@@ -59,52 +48,7 @@ public class TempusResourceServer extends ResourceServerConfigurerAdapter {
     private TempusErrorResponseHandler restAccessDeniedHandler;
 
     @Autowired
-    private UserAuthenticationConverter userDetailsConverter;
-
-
-    @Override
-    public void configure(ResourceServerSecurityConfigurer config) {
-        config.resourceId(TEMPUS_RESOURCE_ID);
-        config.tokenServices(tokenServices());
-    }
-
-    @Bean
-    @Primary
-    public DefaultTokenServices tokenServices() {
-        DefaultTokenServices defaultTokenServices = new DefaultTokenServices();
-        defaultTokenServices.setTokenStore(tokenStore());
-        return defaultTokenServices;
-    }
-
-
-    /*Todo Is this needed or just one implemented is enough?
-    @Bean
-    @Primary
-    public DefaultTokenServices tokenService(){
-        DefaultTokenServices service = new DefaultTokenServices();
-        service.setTokenStore(tokenStore());
-        service.setSupportRefreshToken(true);
-        service.setAuthenticationManager(authenticationManager);
-        service.setRefreshTokenValiditySeconds(settings.getRefreshTokenExpTime());
-        service.setAccessTokenValiditySeconds(settings.getTokenExpirationTime());
-        return service;
-    }*/
-
-
-    @Bean
-    public JwtAccessTokenConverter accessTokenConverter() {
-        JwtAccessTokenConverter converter = new JwtAccessTokenConverter();
-        DefaultAccessTokenConverter accessTokenConverter = new DefaultAccessTokenConverter();
-        accessTokenConverter.setUserTokenConverter(userDetailsConverter);
-        converter.setAccessTokenConverter(accessTokenConverter);
-        converter.setSigningKey(tokenSigningKey);
-        return converter;
-    }
-
-    @Bean
-    public TokenStore tokenStore() {
-        return new JwtTokenStore(accessTokenConverter());
-    }
+    private ResourceServerProperties resourceServerProperties;
 
 
     @Override
