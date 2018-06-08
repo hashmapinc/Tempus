@@ -32,12 +32,17 @@ server:
     # Alias that identifies the key in the key store
     key-alias: "${SSL_KEY_ALIAS:tomcat}"
 
-oauth2:
-  client:
-    clientId: "${CLIENT_ID:-ingestion-service}"
-    clientSecret: "${CLIENT_SECRET:metadata-ingestion-service-secret}"
-  resource:
-    tokenInfoUri: "${TOKEN_INFO_URI:http://localhost:8080/oauth/check_token}"
+security:
+  oauth2:
+    client:
+      clientId: "${TEMPUS_CLIENT_ID:tempus-client}"
+      clientSecret: "${TEMPUS_CLIENT_SECRET:tempus-password}"
+      accessTokenUri: "${ACCESS_TOKEN_URI:http://localhost:9002/oauth/token}"
+      user-authorization-uri: "${AUTHORIZATION_URI:http://localhost:8761/oauth/authorize}"
+    resource:
+      resource-id: "${TEMPUS_RESOURCE_API_ID:tempus-resource-server-rest-api}"
+      tokenInfoUri: "${TOKEN_INFO_URI:http://localhost:8761/oauth/check_token}"
+      userInfoUri: "${USER_INFO_URI:http://localhost:8761/oauth/user_info}"
 
 security.jwt.tokenSigningKey: "${JWT_TOKEN_SIGNING_KEY:hashmapIncDefaultSigningKey}"
 
