@@ -13,35 +13,37 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.hashmapinc.server.common.data;
+package com.hashmapinc.server.common.data.DataModelObject;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.hashmapinc.server.common.data.HasName;
+import com.hashmapinc.server.common.data.SearchTextBased;
 import com.hashmapinc.server.common.data.id.*;
 
-public class ModelObject extends SearchTextBased<ModelObjectId> implements HasName {
+public class DataModelObject extends SearchTextBased<DataModelObjectId> implements HasName {
     private String name;
     private JsonNode decription;
-    private ModelId modelId;
+    private DataModelId dataModelId;
     private TenantId tenantId;
-    private ModelObjectId parentId;
+    private DataModelObjectId parentId;
     private CustomerId customerId;
 
-    public ModelObject() {
+    public DataModelObject() {
         super();
     }
 
-    public ModelObject(ModelObjectId id) {
+    public DataModelObject(DataModelObjectId id) {
         super(id);
     }
 
-    public ModelObject(ModelObject modelObject) {
-        super(modelObject);
-        this.name = modelObject.name;
-        this.decription = modelObject.decription;
-        this.modelId = modelObject.modelId;
-        this.tenantId = modelObject.tenantId;
-        this.parentId = modelObject.parentId;
-        this.customerId = modelObject.customerId;
+    public DataModelObject(DataModelObject dataModelObject) {
+        super(dataModelObject);
+        this.name = dataModelObject.name;
+        this.decription = dataModelObject.decription;
+        this.dataModelId = dataModelObject.dataModelId;
+        this.tenantId = dataModelObject.tenantId;
+        this.parentId = dataModelObject.parentId;
+        this.customerId = dataModelObject.customerId;
     }
 
     @Override
@@ -50,10 +52,10 @@ public class ModelObject extends SearchTextBased<ModelObjectId> implements HasNa
         if (o == null || getClass() != o.getClass()) return false;
         if (!super.equals(o)) return false;
 
-        ModelObject that = (ModelObject) o;
+        DataModelObject that = (DataModelObject) o;
          if (name != null ? !name.equals(that.name) : that.name != null) return false;
          if (decription != null ? !decription.equals(that.decription) : that.decription != null) return false;
-         if (modelId != null ? !modelId.equals(that.modelId) : that.modelId != null) return false;
+         if (dataModelId != null ? !dataModelId.equals(that.dataModelId) : that.dataModelId != null) return false;
          if (tenantId != null ? !tenantId.equals(that.tenantId) : that.tenantId != null) return false;
          if (parentId != null ? !parentId.equals(that.parentId) : that.parentId != null) return false;
          if (customerId != null ? !customerId.equals(that.customerId) : that.customerId != null) return false;
@@ -65,7 +67,7 @@ public class ModelObject extends SearchTextBased<ModelObjectId> implements HasNa
         int result = super.hashCode();
         result = 31 * result + (name != null ? name.hashCode() : 0);
         result = 31 * result + (decription != null ? decription.hashCode() : 0);
-        result = 31 * result + (modelId != null ? modelId.hashCode() : 0);
+        result = 31 * result + (dataModelId != null ? dataModelId.hashCode() : 0);
         result = 31 * result + (tenantId != null ? tenantId.hashCode() : 0);
         result = 31 * result + (parentId != null ? parentId.hashCode() : 0);
         result = 31 * result + (customerId != null ? customerId.hashCode() : 0);
@@ -84,12 +86,12 @@ public class ModelObject extends SearchTextBased<ModelObjectId> implements HasNa
         this.decription = decription;
     }
 
-    public ModelId getModelId() {
-        return modelId;
+    public DataModelId getDataModelId() {
+        return dataModelId;
     }
 
-    public void setModelId(ModelId modelId) {
-        this.modelId = modelId;
+    public void setDataModelId(DataModelId dataModelId) {
+        this.dataModelId = dataModelId;
     }
 
     public TenantId getTenantId() {
@@ -100,11 +102,11 @@ public class ModelObject extends SearchTextBased<ModelObjectId> implements HasNa
         this.tenantId = tenantId;
     }
 
-    public ModelObjectId getParentId() {
+    public DataModelObjectId getParentId() {
         return parentId;
     }
 
-    public void setParentId(ModelObjectId parentId) {
+    public void setParentId(DataModelObjectId parentId) {
         this.parentId = parentId;
     }
 

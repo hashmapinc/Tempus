@@ -14,11 +14,11 @@
 -- limitations under the License.
 --
 
-CREATE TABLE IF NOT EXISTS tempus.model_object_cf (
+CREATE TABLE IF NOT EXISTS tempus.data_model_object_cf (
     id timeuuid,
     name text,
     description text,
-    model_id timeuuid,
+    data_model_id timeuuid,
     parent_id timeuuid,
     tenant_id timeuuid,
     customer_id timeuuid,

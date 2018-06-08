@@ -14,11 +14,11 @@
 -- limitations under the License.
 --
 
-CREATE TABLE IF NOT EXISTS model_object (
-    id varchar(31) NOT NULL CONSTRAINT model_object_pkey PRIMARY KEY,
+CREATE TABLE IF NOT EXISTS data_model_object (
+    id varchar(31) NOT NULL CONSTRAINT data_model_object_pkey PRIMARY KEY,
     name varchar(250),
     description varchar,
-    model_id varchar(31),
+    data_model_id varchar(31),
     parent_id varchar(31),
     tenant_id varchar(31),
     customer_id varchar(31),

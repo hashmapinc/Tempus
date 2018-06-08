@@ -13,16 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.hashmapinc.server.dao.modelobjects;
+package com.hashmapinc.server.dao.datamodelobject;
 
 import com.datastax.driver.core.querybuilder.Select;
-import com.hashmapinc.server.common.data.ModelObject;
-import com.hashmapinc.server.common.data.id.ModelObjectId;
+import com.hashmapinc.server.common.data.DataModelObject.DataModelObject;
+import com.hashmapinc.server.common.data.id.DataModelObjectId;
 import com.hashmapinc.server.common.data.id.TenantId;
 import com.hashmapinc.server.dao.DaoUtil;
 import com.hashmapinc.server.dao.model.ModelConstants;
-import com.hashmapinc.server.dao.model.nosql.ComputationsEntity;
-import com.hashmapinc.server.dao.model.nosql.ModelObjectEntity;
+import com.hashmapinc.server.dao.model.nosql.DataModelObjectEntity;
 import com.hashmapinc.server.dao.nosql.CassandraAbstractSearchTextDao;
 import com.hashmapinc.server.dao.util.NoSqlDao;
 import lombok.extern.slf4j.Slf4j;
@@ -36,11 +35,11 @@ import static com.datastax.driver.core.querybuilder.QueryBuilder.select;
 @Service
 @Slf4j
 @NoSqlDao
-public class CassandraBaseModelObjectDao extends CassandraAbstractSearchTextDao<ModelObjectEntity, ModelObject> implements ModelObjectDao {
+public class CassandraBaseDataModelObjectDao extends CassandraAbstractSearchTextDao<DataModelObjectEntity, DataModelObject> implements DataModelObjectDao {
 
     @Override
-    protected Class<ModelObjectEntity> getColumnFamilyClass() {
-        return ModelObjectEntity.class;
+    protected Class<DataModelObjectEntity> getColumnFamilyClass() {
+        return DataModelObjectEntity.class;
     }
 
     @Override
@@ -49,16 +48,16 @@ public class CassandraBaseModelObjectDao extends CassandraAbstractSearchTextDao<
     }
 
     @Override
-    public ModelObject findById(ModelObjectId id) {
+    public DataModelObject findById(DataModelObjectId id) {
         return super.findById(id.getId());
     }
 
     @Override
-    public List<ModelObject> findByTenantId(TenantId tenantId) {
+    public List<DataModelObject> findByTenantId(TenantId tenantId) {
         Select select = select().from(ModelConstants.MODEL_OBJECT_CF).allowFiltering();
         Select.Where query = select.where();
         query.and(eq(ModelConstants.MODEL_OBJECT_TENANT_ID_PROPERTY, tenantId.getId()));
-        List<ModelObjectEntity> entities = findListByStatement(query);
+        List<DataModelObjectEntity> entities = findListByStatement(query);
         return DaoUtil.convertDataList(entities);
     }
 

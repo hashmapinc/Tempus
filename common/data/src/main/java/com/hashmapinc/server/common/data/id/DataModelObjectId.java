@@ -22,17 +22,17 @@ import com.hashmapinc.server.common.data.EntityType;
 
 import java.util.UUID;
 
-public class ModelId extends UUIDBased implements EntityId {
+public class DataModelObjectId extends UUIDBased implements EntityId {
     private static final long serialVersionUID = 1L;
 
     @JsonCreator
-    public ModelId(@JsonProperty("id") UUID id) {
+    public DataModelObjectId(@JsonProperty("id") UUID id) {
         super(id);
     }
 
     @JsonIgnore
     @Override
     public EntityType getEntityType() {
-        return EntityType.MODEL;
+        return EntityType.DATA_MODEL_OBJECT;
     }
 }

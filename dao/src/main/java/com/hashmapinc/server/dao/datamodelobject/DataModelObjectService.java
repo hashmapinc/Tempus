@@ -13,18 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.hashmapinc.server.dao.modelobjects;
+package com.hashmapinc.server.dao.datamodelobject;
 
-import com.hashmapinc.server.common.data.ModelObject;
-import com.hashmapinc.server.common.data.id.ModelObjectId;
+import com.hashmapinc.server.common.data.DataModelObject.DataModelObject;
+import com.hashmapinc.server.common.data.id.DataModelObjectId;
 import com.hashmapinc.server.common.data.id.TenantId;
 
 import java.util.List;
-import java.util.UUID;
 
-public interface ModelObjectDao {
-    ModelObject findById(ModelObjectId id);
-    ModelObject save(ModelObject modelObject);
-    List<ModelObject> findByTenantId(TenantId tenantId);
-    boolean removeById(UUID id);
+public interface DataModelObjectService {
+    DataModelObject save(DataModelObject dataModelObject);
+    DataModelObject findById(DataModelObjectId dataModelObjectId);
+    List<DataModelObject> findByTenantId(TenantId tenantId);
+    boolean deleteById(DataModelObjectId dataModelObjectId);
 }

@@ -475,18 +475,18 @@ public class ModelConstants {
      * modelObject constants.
      */
 
-    public static final String MODEL_OBJECT_TABLE = "model_object";
-    public static final String MODEL_OBJECT_NAME_PROPERTY = "name";
-    public static final String MODEL_OBJECT_DESCRIPTION = "description";
-    public static final String MODEL_OBJECT_TENANT_ID_PROPERTY = TENANT_ID_PROPERTY;
-    public static final String MODEL_OBJECT_PARENT_ID = "parent_id";
-    public static final String MODEL_ID = "model_id";
+    public static final String DATA_MODEL_OBJECT_TABLE = "data_model_object";
+    public static final String DATA_MODEL_OBJECT_NAME_PROPERTY = "name";
+    public static final String DATA_MODEL_OBJECT_DESCRIPTION = "description";
+    public static final String DATA_MODEL_OBJECT_TENANT_ID_PROPERTY = TENANT_ID_PROPERTY;
+    public static final String DATA_MODEL_OBJECT_PARENT_ID = "parent_id";
+    public static final String DATA_MODEL_ID = "model_id";
 
     /**
      * cassandra modelObject constants.
      */
 
-    public static final String MODEL_OBJECT_CF = "model_object_cf";
+    public static final String DATA_MODEL_OBJECT_CF = "data_model_object_cf";
 
     /**
      * theme constants.

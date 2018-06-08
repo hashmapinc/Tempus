@@ -28,7 +28,7 @@ import com.hashmapinc.server.common.data.plugin.ComponentDescriptor;
 import com.hashmapinc.server.dao.TagMetaData.TagMetaDataService;
 import com.hashmapinc.server.dao.cluster.NodeMetricService;
 import com.hashmapinc.server.dao.datamodel.DataModelService;
-import com.hashmapinc.server.dao.modelobjects.ModelObjectService;
+import com.hashmapinc.server.dao.datamodelobject.DataModelObjectService;
 import com.hashmapinc.server.dao.theme.ThemeService;
 import com.hashmapinc.server.dao.logo.LogoService;
 import com.hashmapinc.server.dao.user.UserService;
@@ -157,6 +157,9 @@ public abstract class AbstractServiceTest {
 
     @Autowired
     protected LogoService logoService;
+
+    @Autowired
+    protected DataModelObjectService dataModelObjectService;
 
     @Autowired
     protected ModelObjectService modelObjectService;

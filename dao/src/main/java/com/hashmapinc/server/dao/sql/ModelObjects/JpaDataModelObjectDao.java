@@ -15,13 +15,13 @@
  */
 package com.hashmapinc.server.dao.sql.ModelObjects;
 
-import com.hashmapinc.server.common.data.ModelObject;
+import com.hashmapinc.server.common.data.DataModelObject.DataModelObject;
 import com.hashmapinc.server.common.data.UUIDConverter;
-import com.hashmapinc.server.common.data.id.ModelObjectId;
+import com.hashmapinc.server.common.data.id.DataModelObjectId;
 import com.hashmapinc.server.common.data.id.TenantId;
 import com.hashmapinc.server.dao.DaoUtil;
-import com.hashmapinc.server.dao.model.sql.ModelObjectEntity;
-import com.hashmapinc.server.dao.modelobjects.ModelObjectDao;
+import com.hashmapinc.server.dao.model.sql.DataModelObjectEntity;
+import com.hashmapinc.server.dao.datamodelobject.DataModelObjectDao;
 import com.hashmapinc.server.dao.sql.JpaAbstractSearchTextDao;
 import com.hashmapinc.server.dao.util.SqlDao;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,30 +32,30 @@ import java.util.List;
 
 @Service
 @SqlDao
-public class JpaModelObjectDao extends JpaAbstractSearchTextDao<ModelObjectEntity, ModelObject> implements ModelObjectDao {
+public class JpaDataModelObjectDao extends JpaAbstractSearchTextDao<DataModelObjectEntity, DataModelObject> implements DataModelObjectDao {
 
     @Autowired
     ModelObjectRespository modelObjectRespository;
 
     @Override
-    protected Class<ModelObjectEntity> getEntityClass() {
-        return ModelObjectEntity.class;
+    protected Class<DataModelObjectEntity> getEntityClass() {
+        return DataModelObjectEntity.class;
     }
 
     @Override
-    protected CrudRepository<ModelObjectEntity, String> getCrudRepository() {
+    protected CrudRepository<DataModelObjectEntity, String> getCrudRepository() {
         return modelObjectRespository;
     }
 
     @Override
-    public ModelObject findById(ModelObjectId id) {
-        ModelObjectEntity entity = modelObjectRespository.findOne(UUIDConverter.fromTimeUUID(id.getId()));
+    public DataModelObject findById(DataModelObjectId id) {
+        DataModelObjectEntity entity = modelObjectRespository.findOne(UUIDConverter.fromTimeUUID(id.getId()));
         return DaoUtil.getData(entity);
     }
 
     @Override
-    public List<ModelObject> findByTenantId(TenantId tenantId) {
-        List<ModelObjectEntity> entities = modelObjectRespository.findByTenantId(UUIDConverter.fromTimeUUID(tenantId.getId()));
+    public List<DataModelObject> findByTenantId(TenantId tenantId) {
+        List<DataModelObjectEntity> entities = modelObjectRespository.findByTenantId(UUIDConverter.fromTimeUUID(tenantId.getId()));
         return DaoUtil.convertDataList(entities);
     }
 

@@ -18,7 +18,7 @@ package com.hashmapinc.server.dao.model.nosql;
 import com.datastax.driver.core.utils.UUIDs;
 import com.datastax.driver.mapping.annotations.PartitionKey;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.hashmapinc.server.common.data.ModelObject;
+import com.hashmapinc.server.common.data.DataModelObject.DataModelObject;
 import com.hashmapinc.server.common.data.id.*;
 import com.hashmapinc.server.dao.model.ModelConstants;
 import com.hashmapinc.server.dao.model.type.JsonCodec;
@@ -33,56 +33,56 @@ import static com.hashmapinc.server.dao.model.ModelConstants.ID_PROPERTY;
 
 @ToString
 @EqualsAndHashCode
-@Table(name = ModelConstants.MODEL_OBJECT_CF)
-public final class ModelObjectEntity  implements SearchTextEntity<ModelObject> {
+@Table(name = ModelConstants.DATA_MODEL_OBJECT_CF)
+public final class DataModelObjectEntity implements SearchTextEntity<DataModelObject> {
 
     @PartitionKey
     @com.datastax.driver.mapping.annotations.Column(name = ID_PROPERTY)
     private UUID id;
 
-    @Column(name = ModelConstants.MODEL_OBJECT_TENANT_ID_PROPERTY)
+    @Column(name = ModelConstants.DATA_MODEL_OBJECT_TENANT_ID_PROPERTY)
     private UUID tenantId;
 
-    @Column(name = ModelConstants.MODEL_OBJECT_PARENT_ID)
+    @Column(name = ModelConstants.DATA_MODEL_OBJECT_PARENT_ID)
     private UUID parentId;
 
-    @Column(name = ModelConstants.MODEL_OBJECT_NAME_PROPERTY)
+    @Column(name = ModelConstants.DATA_MODEL_OBJECT_NAME_PROPERTY)
     private String name;
 
     @Column(name = ModelConstants.SEARCH_TEXT_PROPERTY)
     private String searchText;
 
-    @Column(name = ModelConstants.MODEL_ID)
+    @Column(name = ModelConstants.DATA_MODEL_ID)
     private UUID modelId;
 
     @Column(name = ModelConstants.CUSTOMER_ID_PROPERTY)
     private UUID customerId;
 
-    @Column(name = ModelConstants.MODEL_OBJECT_DESCRIPTION, codec = JsonCodec.class)
+    @Column(name = ModelConstants.DATA_MODEL_OBJECT_DESCRIPTION, codec = JsonCodec.class)
     private JsonNode description;
 
-    public ModelObjectEntity() {
+    public DataModelObjectEntity() {
         super();
     }
 
-    public ModelObjectEntity(ModelObject modelObject) {
-        if (modelObject.getId() != null) {
-            this.setId(modelObject.getId().getId());
+    public DataModelObjectEntity(DataModelObject dataModelObject) {
+        if (dataModelObject.getId() != null) {
+            this.setId(dataModelObject.getId().getId());
         }
-        if (modelObject.getTenantId() != null) {
-            this.tenantId = modelObject.getTenantId().getId();
+        if (dataModelObject.getTenantId() != null) {
+            this.tenantId = dataModelObject.getTenantId().getId();
         }
-        if (modelObject.getModelId()!= null) {
-            this.modelId = modelObject.getModelId().getId();
+        if (dataModelObject.getDataModelId()!= null) {
+            this.modelId = dataModelObject.getDataModelId().getId();
         }
-        if (modelObject.getParentId()!= null) {
-            this.parentId = modelObject.getParentId().getId();
+        if (dataModelObject.getParentId()!= null) {
+            this.parentId = dataModelObject.getParentId().getId();
         }
-        if (modelObject.getParentId()!= null) {
-            this.customerId = modelObject.getParentId().getId();
+        if (dataModelObject.getParentId()!= null) {
+            this.customerId = dataModelObject.getParentId().getId();
         }
-        this.name = modelObject.getName();
-        this.description = modelObject.getDecription();
+        this.name = dataModelObject.getName();
+        this.description = dataModelObject.getDecription();
     }
 
     @Override
@@ -158,24 +158,24 @@ public final class ModelObjectEntity  implements SearchTextEntity<ModelObject> {
     }
 
     @Override
-    public ModelObject toData() {
-        ModelObject modelObject = new ModelObject(new ModelObjectId(id));
-        modelObject.setCreatedTime(UUIDs.unixTimestamp(id));
+    public DataModelObject toData() {
+        DataModelObject dataModelObject = new DataModelObject(new DataModelObjectId(id));
+        dataModelObject.setCreatedTime(UUIDs.unixTimestamp(id));
         if (tenantId != null) {
-            modelObject.setTenantId(new TenantId(tenantId));
+            dataModelObject.setTenantId(new TenantId(tenantId));
         }
         if (modelId != null) {
-            modelObject.setModelId(new ModelId(modelId));
+            dataModelObject.setDataModelId(new DataModelId(modelId));
         }
         if (customerId != null) {
-            modelObject.setCustomerId(new CustomerId(customerId));
+            dataModelObject.setCustomerId(new CustomerId(customerId));
         }
         if (parentId != null){
-            modelObject.setParentId(new ModelObjectId(parentId));
+            dataModelObject.setParentId(new DataModelObjectId(parentId));
         }
-        modelObject.setName(name);
-        modelObject.setDecription(description);
-        return modelObject;
+        dataModelObject.setName(name);
+        dataModelObject.setDecription(description);
+        return dataModelObject;
     }
 
 }
