@@ -17,7 +17,7 @@ import Flow from '@flowjs/ng-flow/dist/ng-flow-standalone.min';
 import UrlHandler from './url.handler';
 
 /*@ngInject*/
-export default function AppRun($rootScope, $window, $injector, $location, $state, $mdDialog, $filter, loginService, userService, $translate) {
+export default function AppRun($rootScope, $window, $injector, $location, $log, $state, $mdDialog, $filter, loginService, userService, $translate) {
 
     $window.Flow = Flow;
     var frame = null;
@@ -31,8 +31,6 @@ export default function AppRun($rootScope, $window, $injector, $location, $state
     var forbiddenDialog = null;
 
     $rootScope.iframeMode = false;
-    $rootScope.logo = '';
-    $rootScope.fileType = '';
 
     if (frame) {
         $rootScope.iframeMode = true;
@@ -43,7 +41,6 @@ export default function AppRun($rootScope, $window, $injector, $location, $state
         }
     }
     getdefaultTheme();
-    getLogo();
     initWatchers();
 
     function getdefaultTheme() {
@@ -56,23 +53,6 @@ export default function AppRun($rootScope, $window, $injector, $location, $state
             )
         }
     }
-
-    function getLogo() {
-        var promise =  userService.getLogo();
-        if(promise) {
-            promise.then(function success(logo) {
-
-                if(logo != '') {
-                    $rootScope.logo = logo.file;
-                    $rootScope.fileType = angular.lowercase(logo.name.substr(logo.name.lastIndexOf('.')+1));
-
-                 }
-
-                },
-            )
-        }
-    }
-
 
     function initWatchers() {
         $rootScope.unauthenticatedHandle = $rootScope.$on('unauthenticated', function (event, doLogout) {

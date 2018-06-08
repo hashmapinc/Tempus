@@ -18,12 +18,10 @@ package com.hashmapinc.server.controller;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.hashmapinc.server.common.data.Logo;
 import com.hashmapinc.server.common.data.User;
 import com.hashmapinc.server.common.data.Theme;
 import com.hashmapinc.server.common.data.id.ThemeId;
 import com.hashmapinc.server.common.data.UserSettings;
-import com.hashmapinc.server.dao.logo.LogoService;
 import org.junit.Assert;
 import com.hashmapinc.server.dao.theme.ThemeService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,9 +40,6 @@ public abstract class BaseUserSettingsControllerTest extends AbstractControllerT
 
     @Autowired
     ThemeService themeService;
-
-    @Autowired
-    LogoService logoService;
 
     private static final ObjectMapper mapper = new ObjectMapper();
 
@@ -210,26 +205,6 @@ public abstract class BaseUserSettingsControllerTest extends AbstractControllerT
 
         themeService.deleteThemeEntryByvalue("themeDark");
         themeService.deleteThemeEntryByvalue("themeBlue");
-
-    }
-
-
-    @Test
-    public void getLogo() throws Exception{
-
-        byte[] aByteArray = {0xa,0x2,0xf,(byte)0xff,(byte)0xff,(byte)0xff};
-
-        Logo logo = new Logo();
-        logo.setName("test.jpg");
-        logo.setDisplay(true);
-        logo.setFile(aByteArray);
-        logoService.saveLogo(logo);
-
-        Logo logoNew = doGet("/api/logo", Logo.class);
-
-        Assert.assertEquals(logo.isDisplay(),logoNew.isDisplay());
-
-        logoService.deleteLogoByName(logoNew.getName());
 
     }
 

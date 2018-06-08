@@ -110,10 +110,7 @@ export default angular.module('tempus.locale', [])
                     "change-logo":"Change Logo",
                     "current-theme":"Current theme",
                     "select-theme":"Select theme",
-                    "bad-request": "Bad Request,Please Select A Theme.",
-                    "logo-file":"Logo file",
-                    "import":"Upload Logo",
-                    "logo-file-badRequest":"File is not an image type",
+                    "bad-request": "Bad Request,Please Select A Theme."
 
                 },
                 "alarm": {
