@@ -33,7 +33,7 @@ export default function ImportDialogController($scope, $log, $mdDialog, toast, i
         $mdDialog.cancel();
     }
 
-    function fileAdded($file) {$log.log($file.getType());
+    function fileAdded($file) {
         if ($file.getExtension() === 'json') {
             var reader = new FileReader();
             reader.onload = function(event) {
@@ -59,16 +59,9 @@ export default function ImportDialogController($scope, $log, $mdDialog, toast, i
         else if ($file.getExtension() === 'jar') {
             $scope.$apply(function() {
                 $scope.theForm.$setDirty();
-                vm.importData = $file;
-                vm.fileName = $file.name;
+                    vm.importData = $file;
+                    vm.fileName = $file.name;
             })
-        } else if($file.getExtension() === 'png' || $file.getExtension() === 'jpeg' || $file.getExtension() === 'svg' || $file.getExtension() === 'jpg') {
-            $scope.$apply(function() {
-                $scope.theForm.$setDirty();
-                vm.importData = $file;
-                vm.fileName = $file.name;
-            })
-
         }
 
     }

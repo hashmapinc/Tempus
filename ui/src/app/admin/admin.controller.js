@@ -17,7 +17,7 @@ import changeThemeTemplate from './change-theme.tpl.html';
 
 /*@ngInject*/
 
-export default function AdminController(adminService, userService, toast, $scope, $rootScope, $state, $translate, $mdDialog, $document,importExport) {
+export default function AdminController(adminService, toast, $scope, $rootScope, $state, $translate, $mdDialog, $document) {
 
     var vm = this;
     vm.save = save;
@@ -26,7 +26,6 @@ export default function AdminController(adminService, userService, toast, $scope
     vm.cancel = cancel;
     vm.changeDefaultTheme = changeDefaultTheme;
     vm.changeLogo = changeLogo;
-
 
     $scope.selectedTheme = { };
 
@@ -88,7 +87,6 @@ export default function AdminController(adminService, userService, toast, $scope
         });
     }
 
-
     function cancel() {
         $mdDialog.cancel();
     }
@@ -112,23 +110,12 @@ export default function AdminController(adminService, userService, toast, $scope
 
     }
 
-    function changeLogo($event) {
+    function changeLogo() {
 
-         importExport.importLogo($event).then(function success(logo) {
-             $rootScope.logo = logo.file;
-             var promise =  userService.getLogo();
-             if(promise) {
-                 promise.then(function success(logo) {
-                         $rootScope.logo = logo.file;
-                         $rootScope.fileType = angular.lowercase(logo.name.substr(logo.name.lastIndexOf('.')+1));
-
-                     },
-                 )
-             }
-         });
-
-
+       // importExport.importComputation($event)
     }
+
+
 
 
 }
