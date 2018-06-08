@@ -26,7 +26,8 @@ function AdminService($http, $q) {
         sendTestMail: sendTestMail,
         checkUpdates: checkUpdates,
         getAllThemes:getAllThemes,
-        saveThemeSettings:saveThemeSettings
+        saveThemeSettings:saveThemeSettings,
+        uploadLogo:uploadLogo
     }
 
     return service;
@@ -38,6 +39,22 @@ function AdminService($http, $q) {
             deferred.resolve(response.data);
         }, function fail() {
             deferred.reject();
+        });
+        return deferred.promise;
+    }
+
+    function uploadLogo(file) {
+        var deferred = $q.defer();
+        var url = '/api/settings/uploadLogo';
+        var fd = new FormData();
+        fd.append("file", file);
+        $http.post(url, fd, {
+            transformRequest: angular.identity,
+            headers: {'Content-Type': undefined}
+        }).then(function success(response) {
+            deferred.resolve(response.data);
+        }, function fail(response) {
+            deferred.reject(response.data);
         });
         return deferred.promise;
     }

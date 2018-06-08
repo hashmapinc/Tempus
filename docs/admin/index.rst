@@ -22,3 +22,4 @@ Administration
     dashboards
     cluster
     mail
+    whitelabeling
