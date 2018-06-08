@@ -75,8 +75,8 @@ public class DataModelObjectServiceImp implements DataModelObjectService {
                     if (StringUtils.isEmpty(dataModelObject.getName())) {
                         throw new DataValidationException("Data Model object name should be specified!");
                     }
-                    if (dataModelObject.getTenantId() == null) {
-                        throw new DataValidationException("Data Model object should be assigned to tenant!");
+                    if (dataModelObject.getTenantId() == null || dataModelObject.getDataModelId() == null) {
+                        throw new DataValidationException("Data Model object should be assigned to tenant and a data model!");
                     } else {
                         Tenant tenant = tenantDao.findById(dataModelObject.getTenantId().getId());
                         if (tenant == null) {

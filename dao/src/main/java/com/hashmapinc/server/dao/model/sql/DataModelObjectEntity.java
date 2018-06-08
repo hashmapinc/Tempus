@@ -56,7 +56,7 @@ public final class DataModelObjectEntity extends BaseSqlEntity<DataModelObject> 
     private String searchText;
 
     @Column(name = ModelConstants.DATA_MODEL_ID)
-    private String modelId;
+    private String dataModelId;
 
     @Type(type = "json")
     @Column(name = ModelConstants.DATA_MODEL_OBJECT_DESCRIPTION)
@@ -74,7 +74,7 @@ public final class DataModelObjectEntity extends BaseSqlEntity<DataModelObject> 
             this.tenantId = UUIDConverter.fromTimeUUID(dataModelObject.getTenantId().getId());
         }
         if (dataModelObject.getDataModelId()!= null) {
-            this.modelId = UUIDConverter.fromTimeUUID(dataModelObject.getDataModelId().getId());
+            this.dataModelId = UUIDConverter.fromTimeUUID(dataModelObject.getDataModelId().getId());
         }
         if (dataModelObject.getParentId()!= null) {
             this.parentId = UUIDConverter.fromTimeUUID(dataModelObject.getParentId().getId());
@@ -107,8 +107,8 @@ public final class DataModelObjectEntity extends BaseSqlEntity<DataModelObject> 
         if (tenantId != null) {
             dataModelObject.setTenantId(new TenantId(UUIDConverter.fromString(tenantId)));
         }
-        if (modelId != null) {
-            dataModelObject.setDataModelId(new DataModelId(UUIDConverter.fromString(modelId)));
+        if (dataModelId != null) {
+            dataModelObject.setDataModelId(new DataModelId(UUIDConverter.fromString(dataModelId)));
         }
         if (customerId != null){
             dataModelObject.setCustomerId(new CustomerId(UUIDConverter.fromString(customerId)));

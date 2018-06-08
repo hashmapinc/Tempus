@@ -37,7 +37,7 @@ import static com.hashmapinc.server.dao.model.ModelConstants.ID_PROPERTY;
 public final class DataModelObjectEntity implements SearchTextEntity<DataModelObject> {
 
     @PartitionKey
-    @com.datastax.driver.mapping.annotations.Column(name = ID_PROPERTY)
+    @Column(name = ID_PROPERTY)
     private UUID id;
 
     @Column(name = ModelConstants.DATA_MODEL_OBJECT_TENANT_ID_PROPERTY)
@@ -53,7 +53,7 @@ public final class DataModelObjectEntity implements SearchTextEntity<DataModelOb
     private String searchText;
 
     @Column(name = ModelConstants.DATA_MODEL_ID)
-    private UUID modelId;
+    private UUID dataModelId;
 
     @Column(name = ModelConstants.CUSTOMER_ID_PROPERTY)
     private UUID customerId;
@@ -73,7 +73,7 @@ public final class DataModelObjectEntity implements SearchTextEntity<DataModelOb
             this.tenantId = dataModelObject.getTenantId().getId();
         }
         if (dataModelObject.getDataModelId()!= null) {
-            this.modelId = dataModelObject.getDataModelId().getId();
+            this.dataModelId = dataModelObject.getDataModelId().getId();
         }
         if (dataModelObject.getParentId()!= null) {
             this.parentId = dataModelObject.getParentId().getId();
@@ -119,12 +119,12 @@ public final class DataModelObjectEntity implements SearchTextEntity<DataModelOb
         this.name = name;
     }
 
-    public UUID getModelId() {
-        return modelId;
+    public UUID getDataModelId() {
+        return dataModelId;
     }
 
-    public void setModelId(UUID modelId) {
-        this.modelId = modelId;
+    public void setDataModelId(UUID dataModelId) {
+        this.dataModelId = dataModelId;
     }
 
     public JsonNode getDescription() {
@@ -164,8 +164,8 @@ public final class DataModelObjectEntity implements SearchTextEntity<DataModelOb
         if (tenantId != null) {
             dataModelObject.setTenantId(new TenantId(tenantId));
         }
-        if (modelId != null) {
-            dataModelObject.setDataModelId(new DataModelId(modelId));
+        if (dataModelId != null) {
+            dataModelObject.setDataModelId(new DataModelId(dataModelId));
         }
         if (customerId != null) {
             dataModelObject.setCustomerId(new CustomerId(customerId));

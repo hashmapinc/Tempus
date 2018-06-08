@@ -13,11 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.hashmapinc.server.dao.service.datamodelobject.nosql;
+package com.hashmapinc.server.dao.service.datamodelobject.sql;
 
-import com.hashmapinc.server.dao.service.DaoNoSqlTest;
-import com.hashmapinc.server.dao.service.datamodelobject.DataDataModelObjectServiceImpTest;
+import com.hashmapinc.server.dao.service.DaoSqlTest;
+import com.hashmapinc.server.dao.service.datamodelobject.DataModelObjectServiceImpTest;
 
-@DaoNoSqlTest
-public class DataDataModelObjectServiceNoSqlTest extends DataDataModelObjectServiceImpTest {
+@DaoSqlTest
+public class DataModelObjectServiceSqlTest extends DataModelObjectServiceImpTest {
 }

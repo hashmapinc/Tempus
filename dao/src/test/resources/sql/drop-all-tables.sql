@@ -31,4 +31,4 @@ DROP TABLE IF EXISTS installed_schema_versions;
 DROP TABLE IF EXISTS node_metric;
 DROP TABLE IF EXISTS theme;
 DROP TABLE IF EXISTS logo;
-
+DROP TABLE IF EXISTS data_model_object;

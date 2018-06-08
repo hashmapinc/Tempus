@@ -44,7 +44,7 @@ public class CassandraBaseDataModelObjectDao extends CassandraAbstractSearchText
 
     @Override
     protected String getColumnFamilyName() {
-        return ModelConstants.MODEL_OBJECT_CF;
+        return ModelConstants.DATA_MODEL_OBJECT_CF;
     }
 
     @Override
@@ -54,9 +54,9 @@ public class CassandraBaseDataModelObjectDao extends CassandraAbstractSearchText
 
     @Override
     public List<DataModelObject> findByTenantId(TenantId tenantId) {
-        Select select = select().from(ModelConstants.MODEL_OBJECT_CF).allowFiltering();
+        Select select = select().from(ModelConstants.DATA_MODEL_OBJECT_CF).allowFiltering();
         Select.Where query = select.where();
-        query.and(eq(ModelConstants.MODEL_OBJECT_TENANT_ID_PROPERTY, tenantId.getId()));
+        query.and(eq(ModelConstants.DATA_MODEL_OBJECT_TENANT_ID_PROPERTY, tenantId.getId()));
         List<DataModelObjectEntity> entities = findListByStatement(query);
         return DaoUtil.convertDataList(entities);
     }
