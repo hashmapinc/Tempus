@@ -112,29 +112,32 @@ public class ComputationsController extends BaseController {
     }
 
     @PreAuthorize("hasAuthority('TENANT_ADMIN')")
-    @RequestMapping(value = "/computations/kubeless", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(value = "/computations", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
-    public Computations addComputations(@RequestParam("computation") String computationStr,
-                                        @RequestParam("computationMetaData") String computationMdStr) throws TempusException {
-        Computations computation = null;
+    public Computations addComputations(@RequestBody Computations computation) throws TempusException {
         try {
-            computation = gson.fromJson(computationStr, Computations.class);
-            ComputationId computationId = new ComputationId(UUIDs.timeBased());
-            computation.setId(computationId);
-            ComputationMetadata md = gson.fromJson(computationMdStr, KubelessComputationMetadata.class);
-            md.setId(computationId);
-            computation.setComputationMetadata(md);
             TenantId tenantId = getCurrentUser().getTenantId();
             computation.setTenantId(tenantId);
+            log.info("\n\n\nComputation " + computation + "\n\n\n");
+            Computations savedComputation = computationsService.findByName(computation.getName());
+            if(savedComputation == null){
+                ComputationId computationId = new ComputationId(UUIDs.timeBased());
+                computation.setId(computationId);
+                computation.getComputationMetadata().setId(computationId);
+            } else {
+                computation.setId(savedComputation.getId());
+                computation.getComputationMetadata().setId(savedComputation.getId());
+            }
+            //computationsService.save(computation);
             computationDiscoveryService.uploadToS3Bucket(computation);
         } catch (Exception e){
             logEntityAction(emptyId(EntityType.COMPUTATION), computation, null,
-                   ActionType.ADDED, e);
+                    ActionType.ADDED, e);
             log.info("Exception is : " + e);
             throw handleException(e);
         }
 
-        return null;
+        return computation;
     }
 
     @PreAuthorize("hasAuthority('TENANT_ADMIN')")
@@ -152,8 +155,11 @@ public class ComputationsController extends BaseController {
                 computationJobService.deleteComputationJobById(computationJob.getId());
                 actorService.onComputationJobStateChange(computationJob.getTenantId(), computationJob.getComputationId(), computationJob.getId(), ComponentLifecycleEvent.DELETED);
             }
+
             computationsService.deleteById(computationId);
-            Files.deleteIfExists(Paths.get(((SparkComputationMetadata)computation.getComputationMetadata()).getJarPath()));
+
+            if (computation.getType() == ComputationType.SPARK)
+                Files.deleteIfExists(Paths.get(((SparkComputationMetadata)computation.getComputationMetadata()).getJarPath()));
 
             logEntityAction(computationId,computation,getCurrentUser().getCustomerId(),
                     ActionType.DELETED, null, strComputationId);
@@ -194,7 +200,7 @@ public class ComputationsController extends BaseController {
                 List<Computations> computations = checkNotNull(computationsService.findAllTenantComputationsByTenantId(tenantId));
                 computations = computations.stream()
                         .filter(computation -> !computation.getTenantId().getId().equals(ModelConstants.NULL_UUID)).collect(Collectors.toList());
-                log.trace(" returning Computations {} ", computations);
+                log.info(" returning Computations {} ", computations);
                 return computations;
         } catch (Exception e) {
             throw handleException(e);
@@ -209,7 +215,7 @@ public class ComputationsController extends BaseController {
         try {
             ComputationId computationId = new ComputationId(toUUID(strComputationId));
             Computations computation = checkNotNull(computationsService.findById(computationId));
-            log.trace(" returning Computations by id {} ", computation);
+            log.info(" returning Computations by id {} ", computation);
             return computation;
         } catch (Exception e) {
             throw handleException(e);

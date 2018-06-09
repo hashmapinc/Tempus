@@ -15,6 +15,8 @@
  */
 package com.hashmapinc.server.common.data.computation;
 
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.hashmapinc.server.common.data.BaseData;
 import com.hashmapinc.server.common.data.id.ComputationId;
 import lombok.Data;
@@ -22,6 +24,14 @@ import lombok.EqualsAndHashCode;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
+@JsonTypeInfo(
+        use = JsonTypeInfo.Id.NAME,
+        include = JsonTypeInfo.As.PROPERTY,
+        property = "type")
+@JsonSubTypes({
+        @JsonSubTypes.Type(value = KubelessComputationMetadata.class, name = "KUBELESS"),
+        @JsonSubTypes.Type(value = KubelessComputationMetadata.class, name = "SPARK")
+})
 public class ComputationMetadata extends BaseData<ComputationId> {
 
     public ComputationMetadata() {

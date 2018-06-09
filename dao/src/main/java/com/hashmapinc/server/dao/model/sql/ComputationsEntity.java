@@ -75,6 +75,7 @@ public class ComputationsEntity extends BaseSqlEntity<Computations> implements S
         }
         if(computations.getName() != null) {
             this.name = computations.getName();
+            setSearchText(this.name);
         }
         if(computations.getTenantId() != null){
             this.tenantId = fromTimeUUID(computations.getTenantId().getId());

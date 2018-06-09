@@ -15,9 +15,7 @@
  */
 package com.hashmapinc.server.dao.sql.computations;
 
-import com.hashmapinc.server.common.data.computation.ComputationType;
 import com.hashmapinc.server.dao.computations.ComputationsDao;
-import com.hashmapinc.server.dao.model.sql.ComputationMetadataEntity;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -43,12 +41,6 @@ public class JpaComputationsDao extends JpaAbstractDaoListeningExecutorService i
 
     @Autowired
     ComputationsRepository computationsRepository;
-
-    @Autowired
-    SparkComputationMetaDataRepository sparkComputationMetaDataRepository;
-
-    @Autowired
-    KubelessComputationMetaDataRepository kubelessComputationMetaDataRepository;
 
     @Override
     public Computations findByName(String name) {
@@ -93,7 +85,6 @@ public class JpaComputationsDao extends JpaAbstractDaoListeningExecutorService i
     @Override
     public Computations findById(UUID id) {
         ComputationsEntity entity = computationsRepository.findOne(UUIDConverter.fromTimeUUID(id));
-        addComputationMetadataEntityToComputations(entity);
         return DaoUtil.getData(entity);
     }
 
@@ -101,25 +92,8 @@ public class JpaComputationsDao extends JpaAbstractDaoListeningExecutorService i
     public List<Computations> findByTenantId(TenantId tenantId) {
         Iterable <ComputationsEntity> computationsEntities = computationsRepository.findByTenantId(UUIDConverter.fromTimeUUID(tenantId.getId()));
         List<ComputationsEntity> computationsEntityList = DaoUtil.toList(computationsEntities);
-
-        for (ComputationsEntity ce: computationsEntityList) {
-            addComputationMetadataEntityToComputations(ce);
-        }
-
         List<Computations> computationsList = DaoUtil.convertDataList(computationsEntityList);
         return computationsList;
-    }
-
-    public void addComputationMetadataEntityToComputations(ComputationsEntity ce){
-        if(ce != null) {
-            ComputationMetadataEntity computationMetadataEntity = null;
-            if (ce.getType().contentEquals(ComputationType.SPARK.name())) {
-                computationMetadataEntity = sparkComputationMetaDataRepository.findOne(UUIDConverter.fromTimeUUID(ce.getId()));
-            } else if (ce.getType().contentEquals(ComputationType.KUBELESS.name())) {
-                computationMetadataEntity = kubelessComputationMetaDataRepository.findOne(UUIDConverter.fromTimeUUID(ce.getId()));
-            }
-            ce.setComputationMetadataEntity(computationMetadataEntity);
-        }
     }
 
     @Override

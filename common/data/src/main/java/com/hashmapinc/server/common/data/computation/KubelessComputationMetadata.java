@@ -15,11 +15,13 @@
  */
 package com.hashmapinc.server.common.data.computation;
 
+import com.fasterxml.jackson.annotation.JsonTypeName;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
+@JsonTypeName("KUBELESS")
 public class KubelessComputationMetadata extends ComputationMetadata {
     private String namespace;
     private String function;

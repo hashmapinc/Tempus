@@ -15,12 +15,14 @@
  */
 package com.hashmapinc.server.common.data.computation;
 
+import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.databind.JsonNode;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
+@JsonTypeName("SPARK")
 public class SparkComputationMetadata extends ComputationMetadata{
     private String jarPath;
     private String jarName;
