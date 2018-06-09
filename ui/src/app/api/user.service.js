@@ -59,7 +59,8 @@ function UserService($http, $q, $rootScope, adminService, dashboardService, logi
         forceDefaultPlace: forceDefaultPlace,
         updateLastPublicDashboardId: updateLastPublicDashboardId,
         logout: logout,
-        reloadUser: reloadUser
+        reloadUser: reloadUser,
+        getActivetheme:getActiveTheme
     }
 
     reloadUser();
@@ -73,6 +74,19 @@ function UserService($http, $q, $rootScope, adminService, dashboardService, logi
         }, function fail() {
             notifyUserLoaded();
         });
+    }
+
+    function getActiveTheme() {
+
+        var deferred = $q.defer();
+        var url = 'api/theming/';
+        $http.get(url, null).then(function success(response) {
+            deferred.resolve(response.data);
+        }, function fail() {
+            deferred.reject();
+        });
+        return deferred.promise;
+
     }
 
     function updateAndValidateToken(token, prefix, notify) {
@@ -511,13 +525,13 @@ function UserService($http, $q, $rootScope, adminService, dashboardService, logi
                     params = {dashboardId: lastPublicDashboardId};
                 }
             } else if (currentUser.authority === 'SYS_ADMIN') {
-                adminService.checkUpdates().then(
-                    function (updateMessage) {
-                        if (updateMessage && updateMessage.updateAvailable) {
-                            toast.showInfo(updateMessage.message, 0, null, 'bottom right');
-                        }
-                    }
-                );
+                // adminService.checkUpdates().then(
+                //     function (updateMessage) {
+                //         if (updateMessage && updateMessage.updateAvailable) {
+                //             toast.showInfo(updateMessage.message, 0, null, 'bottom right');
+                //         }
+                //     }
+                // );
             }
             $state.go(place, params);
         } else {

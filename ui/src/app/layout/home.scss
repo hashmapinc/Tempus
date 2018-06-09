@@ -89,3 +89,11 @@ md-icon.tb-logo-title {
 .tb-entity-search {
   margin-top: 34px;
 }
+
+.themeDarkSideMenu{
+  background: linear-gradient(180deg,#0c3483 0,transparent 200%),url(/static/images/LoginPage_Background_Image.png);
+}
+
+.themeBlueSideMenu {
+  background: linear-gradient(180deg,blue 0,transparent 200%),url(/static/images/LoginPage_Background_Image.png);
+}

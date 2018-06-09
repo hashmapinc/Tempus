@@ -99,11 +99,12 @@ function Menu(userService, $state, $rootScope) {
                             state: 'home.nodes',
                             icon: 'now_widgets'
                         },
+
                         {
                             name: 'admin.system-settings',
                             type: 'toggle',
                             state: 'home.settings',
-                            height: '80px',
+                            height: '120px',
                             icon: 'settings',
                             pages: [
                                 {
@@ -115,7 +116,14 @@ function Menu(userService, $state, $rootScope) {
                                     name: 'admin.outgoing-mail',
                                     type: 'link',
                                     state: 'home.settings.outgoing-mail',
-                                    icon: 'mail'                                }
+                                    icon: 'mail'                                },
+
+                                {
+                                    name: 'admin.ui-configuration',
+                                    type: 'link',
+                                    state: 'home.settings.ui-config',
+                                    icon: 'settings_applications'                                }
+
                             ]
                         }];
                     homeSections =
@@ -136,16 +144,16 @@ function Menu(userService, $state, $rootScope) {
                                 }
                             ]
                         },
-                        {
-                            name: 'tenant.management',
-                            places: [
-                                {
-                                    name: 'tenant.tenants',
-                                    icon: 'supervisor_account',
-                                    state: 'home.tenants'
-                                }
-                            ]
-                        },
+                            {
+                                name: 'tenant.management',
+                                places: [
+                                    {
+                                        name: 'tenant.tenants',
+                                        icon: 'supervisor_account',
+                                        state: 'home.tenants'
+                                    }
+                                ]
+                            },
                             {
                                 name: 'widget.management',
                                 places: [
@@ -173,6 +181,16 @@ function Menu(userService, $state, $rootScope) {
                                 ]
                             },
                             {
+                                name: 'admin.ui-configuration',
+                                places: [
+                                    {
+                                        name: 'admin.look-feel',
+                                        icon: 'settings_applications',
+                                        state: 'home.settings.ui-config'
+                                    }
+                                ]
+                            },
+                            {
                                 name: 'cluster.management',
                                 places: [
                                     {
@@ -181,7 +199,10 @@ function Menu(userService, $state, $rootScope) {
                                         state: 'home.nodes',
                                     }
                                 ]
-                            }];
+                            }
+
+
+                        ];
                 } else if (authority === 'TENANT_ADMIN') {
                     sections = [
                         {
@@ -189,14 +210,14 @@ function Menu(userService, $state, $rootScope) {
                             type: 'link',
                             state: 'home.links',
                             icon: 'home'
-                        },  
+                        },
                         {
                             name: 'Applications',
                             type: 'link',
                             state: 'home.applications',
                             icon: 'dashboards',
                             link: '/static/svg/applicationslightgray.svg'
-                        }, 
+                        },
                         {
                             name: 'Tempusboard',
                             type: 'link',
@@ -247,6 +268,13 @@ function Menu(userService, $state, $rootScope) {
                             link: '/static/svg/widgetslightgray.svg'
                         },
                         {
+                            name: 'data_model.data_models',
+                            type: 'link',
+                            state: 'home.data_models',
+                            icon: 'data_models',
+                            link: '/static/svg/data-models-icon.svg'
+                        },
+                        {
                             name: 'dashboard.dashboards',
                             type: 'link',
                             state: 'home.dashboards',
@@ -286,17 +314,17 @@ function Menu(userService, $state, $rootScope) {
                                 }
                             ]
                         },
-                        {
-                            name: 'customer.management',
-                            places: [
-                                {
-                                    name: 'customer.customers',
-                                    icon: 'supervisor_account',
-                                    state: 'home.customers',
-                                    link: '/static/svg/businessunitslightgray.svg'
-                                }
-                            ]
-                        },
+                            {
+                                name: 'customer.management',
+                                places: [
+                                    {
+                                        name: 'customer.customers',
+                                        icon: 'supervisor_account',
+                                        state: 'home.customers',
+                                        link: '/static/svg/businessunitslightgray.svg'
+                                    }
+                                ]
+                            },
                             {
                                 name: 'asset.management',
                                 places: [
@@ -384,7 +412,7 @@ function Menu(userService, $state, $rootScope) {
                             name: 'dashboard.dashboards',
                             type: 'link',
                             state: 'home.dashboards',
-                            icon: 'dashboard',                            
+                            icon: 'dashboard',
                             link: '/static/svg/dashboardlightgray.svg'
                         }];
 
@@ -400,24 +428,24 @@ function Menu(userService, $state, $rootScope) {
                                 }
                             ]
                         },
-                        {
-                            name: 'device.view-devices',
-                            places: [
-                                {
-                                    name: 'device.devices',
-                                    icon: 'devices_other',
-                                    state: 'home.devices',                                        
-                                    link: '/static/svg/deviceslightgray.svg'
-                                }
-                            ]
-                        },
+                            {
+                                name: 'device.view-devices',
+                                places: [
+                                    {
+                                        name: 'device.devices',
+                                        icon: 'devices_other',
+                                        state: 'home.devices',
+                                        link: '/static/svg/deviceslightgray.svg'
+                                    }
+                                ]
+                            },
                             {
                                 name: 'dashboard.view-dashboards',
                                 places: [
                                     {
                                         name: 'dashboard.dashboards',
                                         icon: 'dashboard',
-                                        state: 'home.dashboards',                            
+                                        state: 'home.dashboards',
                                         link: '/static/svg/dashboardlightgray.svg'
                                     }
                                 ]
@@ -433,7 +461,7 @@ function Menu(userService, $state, $rootScope) {
                                     }
                                 ]
                             }
-                            ];
+                        ];
                 }
             }
         }

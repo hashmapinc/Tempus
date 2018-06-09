@@ -254,7 +254,12 @@ export default class AliasController {
                 if(angular.isDefined(aliasCtrl.selectedDevice)){
                     datasourcesArrays.forEach(function(deviceArray){
                         deviceArray.forEach(function(device){
-                            if(device.entityId === aliasCtrl.selectedDevice.id.id){
+                            if(device.type !== 'function'){
+                                if(device.entityId === aliasCtrl.selectedDevice.id.id){
+                                        datasources.push(device);
+                                }
+                            }
+                            else {
                                 datasources.push(device);
                             }
                         })

@@ -156,7 +156,6 @@ export function TempusboardController($scope, $log, $state, $stateParams, userSe
         }
         $scope.subscriptionId = newSubscriptionId;
         subscriptionIdMap[$scope.entityId] = newSubscriptionId;
-        $log.log(subscriptionIdMap);
     }
 
     if (vm.devicesScope === 'tenant') {

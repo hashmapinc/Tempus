@@ -103,7 +103,15 @@ export default angular.module('tempus.locale', [])
                     "timeout-required": "Timeout is required.",
                     "timeout-invalid": "That doesn't look like a valid timeout.",
                     "enable-tls": "Enable TLS",
-                    "send-test-mail": "Send test mail"
+                    "send-test-mail": "Send test mail",
+                    "ui-configuration":"UI Configuration",
+                    "look-feel":"UI Configuration",
+                    "change-theme":"Change theme",
+                    "change-logo":"Change Logo",
+                    "current-theme":"Current theme",
+                    "select-theme":"Select theme",
+                    "bad-request": "Bad Request,Please Select A Theme."
+
                 },
                 "alarm": {
                     "alarm": "Alarm",
@@ -390,6 +398,9 @@ export default angular.module('tempus.locale', [])
                     "select-default-customer": "Select default Business Unit",
                     "default-customer": "Default Business Unit",
                     "default-customer-required": "Default Business Unit is required in order to debug dashboard on Tenant level"
+                },
+                "data_model": {
+                    "data_models": "Data models"
                 },
                 "datetime": {
                     "date-from": "Date from",
@@ -978,6 +989,7 @@ export default angular.module('tempus.locale', [])
                     "field-required": "Field is required",
                     "brokers": "Brokers",
                     "add-broker": "Add broker",
+                    "add-server": "Add server",
                     "host": "Host",
                     "port": "Port",
                     "port-range": "Port should be in a range from 1 to 65535.",
@@ -1048,6 +1060,18 @@ export default angular.module('tempus.locale', [])
                     "opc-keystore-key-password":"Key password",
                     "opc-device-node-pattern":"Device node pattern",
                     "opc-device-name-pattern":"Device name pattern",
+                    "wits-servers": "Wits servers",
+                    "wits-add-server": "Add server",
+                    "wits-date-channels": "Date channel index",
+                    "wits-depth-channels": "Depth channel index",
+                    "wits-time-channels": "Time channel index",
+                    "wits-attributes-channels": "Attribute channel Item Number",
+                    "wits-records-specifications": "Wits records specifications file",
+                    "wits-channel-specifications": "Wits channel specifications file",
+                    "wits-device-name": "Device name",
+                    "wits-device-type": "Device type",
+                    "wits-record-specifications-location": "Record Specification location*",
+                    "wits-channel-specifications-location": "Channel Specification location*",
 
                     "sync": {
                         "status": "Status",
