@@ -382,6 +382,7 @@ public class ModelConstants {
      * Cassandra Computations Constants
      */
     public static final String COMPUTATIONS_COLUMN_FAMILY_NAME = "computations";
+    public static final String SPARK_COMPUTATIONS_META_DATA_PROPERTY = "spark_computation_meta_data";
     public static final String COMPUTATIONS_JAR_PROPERTY = "jar_name";
     public static final String COMPUTATIONS_JAR_PATH_PROPERTY = "jar_path";
     public static final String COMPUTATIONS_NAME_PROPERTY = "computation_name";
@@ -393,6 +394,17 @@ public class ModelConstants {
     public static final String COMPUTATIONS_ARGS_TYPE_PROPERTY = "args_type";
     public static final String COMPUTATIONS_BY_TENANT = "computations_by_tenant_and_search_text";
     public static final String COMPUTATIONS_BY_TENANT_AND_NAME_COLUMN_FAMILY = "computations_by_tenant_and_computation_name";
+    public static final String KUBELESS_COMPUTATIONS_META_DATA_COLUMN_FAMILY = "kubeless_computation_meta_data";
+    public static final String KUBELESS_COMPUTATION_NAMESPACE_PROPERTY = "namespace";
+    public static final String KUBELESS_COMPUTATION_FUNCTION_PROPERTY = "function";
+    public static final String KUBELESS_COMPUTATION_HANDLER_PROPERTY = "handler";
+    public static final String KUBELESS_COMPUTATION_DEPENDENCIES_PROPERTY = "dependencies";
+    public static final String KUBELESS_COMPUTATION_FUNC_TYPE_PROPERTY = "func_type";
+    public static final String KUBELESS_COMPUTATION_TIMEOUT_PROPERTY = "timeout";
+    public static final String KUBELESS_COMPUTATION_CHECKSUM_PROPERTY = "checksum";
+    public static final String KUBELESS_COMPUTATION_RUNTIME_PROPERTY = "runtime";
+
+
 
     public static final String COMPUTATION_JOB_COLUMN_FAMILY_NAME = "computation_job";
     public static final String COMPUTATION_JOB_NAME_PROPERTY = "job_name";

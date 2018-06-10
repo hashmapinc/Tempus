@@ -51,6 +51,7 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.Base64;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -118,15 +119,14 @@ public class ComputationsController extends BaseController {
         try {
             TenantId tenantId = getCurrentUser().getTenantId();
             computation.setTenantId(tenantId);
-            log.info("\n\n\nComputation " + computation + "\n\n\n");
-            Computations savedComputation = computationsService.findByName(computation.getName());
-            if(savedComputation == null){
+            Optional<Computations> savedComputation = computationsService.findByTenantIdAndName(tenantId, computation.getName());
+            if(!savedComputation.isPresent()){
                 ComputationId computationId = new ComputationId(UUIDs.timeBased());
                 computation.setId(computationId);
                 computation.getComputationMetadata().setId(computationId);
             } else {
-                computation.setId(savedComputation.getId());
-                computation.getComputationMetadata().setId(savedComputation.getId());
+                computation.setId(savedComputation.get().getId());
+                computation.getComputationMetadata().setId(savedComputation.get().getId());
             }
             //computationsService.save(computation);
             computationDiscoveryService.uploadToS3Bucket(computation);

@@ -17,13 +17,14 @@ package com.hashmapinc.server.dao.model.nosql;
 
 import com.datastax.driver.core.utils.UUIDs;
 import com.datastax.driver.mapping.annotations.*;
-import com.fasterxml.jackson.databind.JsonNode;
+import com.hashmapinc.server.common.data.computation.ComputationType;
 import com.hashmapinc.server.common.data.computation.Computations;
+import com.hashmapinc.server.common.data.computation.KubelessComputationMetadata;
+import com.hashmapinc.server.common.data.computation.SparkComputationMetadata;
 import com.hashmapinc.server.common.data.id.ComputationId;
 import com.hashmapinc.server.common.data.id.TenantId;
 import com.hashmapinc.server.dao.model.ModelConstants;
 import com.hashmapinc.server.dao.model.SearchTextEntity;
-import com.hashmapinc.server.dao.model.type.JsonCodec;
 
 import java.util.UUID;
 
@@ -51,6 +52,9 @@ public class ComputationsEntity implements SearchTextEntity<Computations> {
     @Column(name = ModelConstants.COMPUTATIONS_TENANT_ID_PROPERTY)
     private UUID tenantId;
 
+    @Transient
+    private ComputationMetadataEntity computationMetadataEntity;
+
     @Override
     public String getSearchTextSource() {
         return name;
@@ -67,7 +71,20 @@ public class ComputationsEntity implements SearchTextEntity<Computations> {
         if(computations.getName() != null) {
             this.name = computations.getName();
         }
+        if(computations.getTenantId() != null){
+            this.tenantId = computations.getTenantId().getId();
+        }
+        if(computations.getType() != null){
+            this.type = computations.getType().name();
+        }
+        if(computations.getComputationMetadata() != null){
+            if(computations.getType() == ComputationType.SPARK){
+                computationMetadataEntity = new SparkComputationMetadataEntity((SparkComputationMetadata) computations.getComputationMetadata());
+            } else if(computations.getType() == ComputationType.KUBELESS){
+                computationMetadataEntity = new KubelessComputationMetadataEntity((KubelessComputationMetadata) computations.getComputationMetadata());
+            }
 
+        }
     }
 
     @Override
@@ -101,9 +118,31 @@ public class ComputationsEntity implements SearchTextEntity<Computations> {
         return tenantId;
     }
 
+    public static long getSerialVersionUID() {
+        return serialVersionUID;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public ComputationMetadataEntity getComputationMetadataEntity() {
+        return computationMetadataEntity;
+    }
+
+    public void setComputationMetadataEntity(ComputationMetadataEntity computationMetadataEntity) {
+        this.computationMetadataEntity = computationMetadataEntity;
+    }
+
     public void setTenantId(UUID tenantId) {
         this.tenantId = tenantId;
     }
+
+
 
     @Override
     public boolean equals(Object o) {
@@ -136,6 +175,12 @@ public class ComputationsEntity implements SearchTextEntity<Computations> {
         if (tenantId != null) {
             computations.setTenantId(new TenantId(tenantId));
         }
+        computations.setType(ComputationType.valueOf(this.type));
+        if(this.type.contentEquals(ComputationType.SPARK.name()) && this.computationMetadataEntity != null)
+            computations.setComputationMetadata(((SparkComputationMetadataEntity)this.computationMetadataEntity).toData());
+        else if(this.type.contentEquals(ComputationType.KUBELESS.name()) && this.computationMetadataEntity != null)
+            computations.setComputationMetadata(((KubelessComputationMetadataEntity)this.computationMetadataEntity).toData());
+
         return computations;
     }
 

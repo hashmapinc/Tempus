@@ -13,15 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.hashmapinc.server.dao.model.sql;
+package com.hashmapinc.server.dao.model.nosql;
 
 import com.hashmapinc.server.common.data.computation.ComputationMetadata;
-import com.hashmapinc.server.dao.model.BaseSqlEntity;
+import com.hashmapinc.server.dao.model.BaseEntity;
 
-import javax.persistence.*;
-
-@Entity
-@Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
-public abstract class ComputationMetadataEntity<T extends ComputationMetadata> extends BaseSqlEntity<T> {
-
+public abstract class ComputationMetadataEntity<T extends ComputationMetadata> implements BaseEntity<T> {
 }
