@@ -36,6 +36,7 @@ public class SystemSqlTestSuite {
             "sql-test.properties",
             Arrays.asList("sql/hsql/upgrade/1.sql", "sql/hsql/upgrade/2.sql", "sql/upgrade/4.sql")
 
+
     );
 
 

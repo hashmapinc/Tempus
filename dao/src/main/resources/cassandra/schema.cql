@@ -815,6 +815,7 @@ CREATE TABLE IF NOT EXISTS tempus.logo (
     PRIMARY KEY (id,name)
  );
 
+
 CREATE TABLE IF NOT EXISTS tempus.data_model_object_cf (
    id timeuuid,
    name text,
