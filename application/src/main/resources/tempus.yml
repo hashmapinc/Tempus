@@ -35,15 +35,16 @@ server:
 security:
   oauth2:
     client:
-      clientId: "${TEMPUS_CLIENT_ID:tempus-client}"
-      clientSecret: "${TEMPUS_CLIENT_SECRET:tempus-password}"
+      clientId: "${TEMPUS_CLIENT_ID:tempus}"
+      clientSecret: "${TEMPUS_CLIENT_SECRET:tempus}"
       accessTokenUri: "${ACCESS_TOKEN_URI:http://localhost:9002/oauth/token}"
       user-authorization-uri: "${AUTHORIZATION_URI:http://localhost:8761/oauth/authorize}"
+      grant-type: "${TEMPUS_CLIENT_GRANT_TYPE:client_credentials}"
     resource:
       resource-id: "${TEMPUS_RESOURCE_API_ID:tempus-resource-server-rest-api}"
       tokenInfoUri: "${TOKEN_INFO_URI:http://localhost:8761/oauth/check_token}"
 
-security.jwt.tokenSigningKey: "${JWT_TOKEN_SIGNING_KEY:hashmapIncDefaultSigningKey}"
+#security.jwt.tokenSigningKey: "${JWT_TOKEN_SIGNING_KEY:hashmapIncDefaultSigningKey}"
 
 ldap:
   authentication-enabled: "${LDAP_AUTHENTICATION_ENABLED:false}"

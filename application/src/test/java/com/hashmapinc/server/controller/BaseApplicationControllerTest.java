@@ -665,7 +665,7 @@ public class BaseApplicationControllerTest extends AbstractControllerTest {
                 "\"configuration\": {\"messageTypes\":[\"POST_TELEMETRY\",\"POST_ATTRIBUTES\",\"GET_ATTRIBUTES\"]}}]"));
         rule2.setAction(mapper.readTree("{\"clazz\":\"com.hashmapinc.server.extensions.core.action.telemetry.TelemetryPluginAction\", \"name\":\"TelemetryMsgConverterAction\", \"configuration\":{\"timeUnit\":\"DAYS\", \"ttlValue\":1, \"qualityTimeWindow\":60000, \"qualityDepthWindow\":3000}}"));
         RuleMetaData savedRule2 = doPost("/api/rule", rule2, RuleMetaData.class);
-        JSONObject obj = new JSONObject(rule2.getFilters());
+        //JSONObject obj = new JSONObject(rule2.getFilters());
 
         RuleMetaData rule3 = new RuleMetaData();
         rule3.setName("My Rule3");

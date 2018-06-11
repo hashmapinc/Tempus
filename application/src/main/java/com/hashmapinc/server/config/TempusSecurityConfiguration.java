@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.hashmapinc.server.config;
+/*package com.hashmapinc.server.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hashmapinc.server.exception.TempusErrorResponseHandler;
@@ -203,4 +203,4 @@ public class TempusSecurityConfiguration extends WebSecurityConfigurerAdapter {
     public AuditLogLevelFilter auditLogLevelFilter(AuditLogLevelProperties auditLogLevelProperties) {
         return new AuditLogLevelFilter(auditLogLevelProperties.getMask());
     }
-}
+}*/

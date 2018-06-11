@@ -69,7 +69,6 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.context.WebApplicationContext;
 import com.hashmapinc.server.common.data.Tenant;
 import com.hashmapinc.server.common.data.id.UUIDBased;
-import com.hashmapinc.server.config.TempusSecurityConfiguration;
 import com.hashmapinc.server.service.mail.TestMailService;
 import com.hashmapinc.server.service.security.auth.rest.LoginRequest;
 
@@ -339,7 +338,7 @@ public abstract class AbstractControllerTest {
 
     protected void setJwtToken(MockHttpServletRequestBuilder request) {
         if (this.token != null) {
-            request.header(TempusSecurityConfiguration.JWT_TOKEN_HEADER_PARAM, "Bearer " + this.token);
+            //request.header(TempusSecurityConfiguration.JWT_TOKEN_HEADER_PARAM, "Bearer " + this.token);
         }
     }
 
