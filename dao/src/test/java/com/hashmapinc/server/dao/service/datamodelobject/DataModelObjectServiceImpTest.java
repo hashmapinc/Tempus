@@ -20,6 +20,7 @@ import com.hashmapinc.server.common.data.DataModelObject.DataModelObject;
 import com.hashmapinc.server.common.data.Tenant;
 import com.hashmapinc.server.common.data.id.CustomerId;
 import com.hashmapinc.server.common.data.id.DataModelId;
+import com.hashmapinc.server.common.data.id.DataModelObjectId;
 import com.hashmapinc.server.common.data.id.TenantId;
 import com.hashmapinc.server.dao.exception.DataValidationException;
 import com.hashmapinc.server.dao.exception.IncorrectParameterException;
@@ -110,12 +111,12 @@ public abstract class DataModelObjectServiceImpTest extends AbstractServiceTest 
     }
 
     @Test(expected = IncorrectParameterException.class)
-    public void throwErrorOnFindByInvalidModelObjectId() throws Exception {
+    public void testFindByNullModelObjectId() throws Exception {
         dataModelObjectService.findById(null);
     }
 
     @Test(expected = DataValidationException.class)
-    public void throwErrorOnSaveWhenInvalidDataModelId() throws Exception {
+    public void testSaveWithNullDataModelId() throws Exception {
         DataModelObject dataModelObject = new DataModelObject();
         dataModelObject.setName("well");
         dataModelObject.setCustomerId(new CustomerId(UUIDs.timeBased()));
@@ -127,7 +128,7 @@ public abstract class DataModelObjectServiceImpTest extends AbstractServiceTest 
     }
 
     @Test(expected = DataValidationException.class)
-    public void throwErrorOnSaveWhenInvalidTenantId() throws Exception {
+    public void testSaveWithInvalidTenantId() throws Exception {
         DataModelObject dataModelObject = new DataModelObject();
         dataModelObject.setName("well");
         dataModelObject.setCustomerId(new CustomerId(UUIDs.timeBased()));
