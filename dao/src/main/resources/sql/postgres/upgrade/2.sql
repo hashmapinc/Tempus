@@ -14,5 +14,6 @@
 -- limitations under the License.
 --
 
-ALTER TABLE tempus.customer ADD data_model_id timeuuid;
+ALTER TABLE application drop description;
 
+ALTER TABLE application ADD description varchar;
