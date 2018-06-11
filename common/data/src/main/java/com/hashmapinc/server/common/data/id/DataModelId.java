@@ -13,11 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.hashmapinc.server.common.data;
+package com.hashmapinc.server.common.data.id;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.hashmapinc.server.common.data.EntityType;
 
-public enum EntityType {
+import java.util.UUID;
 
-    TENANT, CUSTOMER, USER, RULE, PLUGIN, DASHBOARD, ASSET, DEVICE, ALARM, APPLICATION, COMPUTATION, COMPUTATION_JOB, NODE_METRIC,THEME, DATA_MODEL
+public class DataModelId extends UUIDBased implements EntityId {
+
+    @JsonCreator
+    public DataModelId(@JsonProperty("id") UUID id) {
+        super(id);
+    }
+
+    @JsonIgnore
+    @Override
+    public EntityType getEntityType() {
+        return EntityType.DATA_MODEL;
+    }
 
 }
