@@ -1,0 +1,48 @@
+<!--
+
+    Copyright © 2017-2018 Hashmap, Inc
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+        http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<section layout="row" class="ng-scope layout-row" layout-wrap>
+	<div layout="row" class="row" style="width:100%; clear:both;">
+	</div>
+</section>
+<section layout="row" layout-wrap class="tb-footer-buttons md-fab" layout-align="start end">
+	<md-fab-speed-dial ng-disabled="$root.loading" ng-show="true" md-open=""
+	 class="md-scale" md-direction="up">
+		<md-fab-trigger>
+			<md-button ng-disabled="$root.loading" class="tb-btn-footer md-accent md-hue-2 md-fab" aria-label="{{ 'add data model'}}">
+				<md-tooltip md-direction="top">
+					{{ "add data model"}}
+				</md-tooltip>
+				<ng-md-icon icon="add"></ng-md-icon>
+			</md-button>
+		</md-fab-trigger>
+		<md-fab-actions>
+			<md-button ng-disabled="$root.loading" class="tmd-accent md-hue-2 md-fab" ng-click="" aria-label="{{ 'action.create' | translate }}">
+				<md-tooltip md-direction="top">
+					{{ "create new data model" }}
+				</md-tooltip>
+				<ng-md-icon icon="insert_drive_file"></ng-md-icon>
+			</md-button>
+			<md-button ng-disabled="$root.loading" class="tmd-accent md-hue-2 md-fab" ng-click="" aria-label="{{ 'action.import' | translate }}">
+				<md-tooltip md-direction="top">
+					{{ "import data model" }}
+				</md-tooltip>
+				<ng-md-icon icon="file_upload"></ng-md-icon>
+			</md-button>
+		</md-fab-actions>
+	</md-fab-speed-dial>
+</section>
