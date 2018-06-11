@@ -42,7 +42,6 @@ security:
     resource:
       resource-id: "${TEMPUS_RESOURCE_API_ID:tempus-resource-server-rest-api}"
       tokenInfoUri: "${TOKEN_INFO_URI:http://localhost:8761/oauth/check_token}"
-      userInfoUri: "${USER_INFO_URI:http://localhost:8761/oauth/user_info}"
 
 security.jwt.tokenSigningKey: "${JWT_TOKEN_SIGNING_KEY:hashmapIncDefaultSigningKey}"
 

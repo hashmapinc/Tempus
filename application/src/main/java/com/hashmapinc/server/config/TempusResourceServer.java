@@ -23,7 +23,6 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableResourceServer;
 import org.springframework.security.oauth2.config.annotation.web.configuration.ResourceServerConfigurerAdapter;
-import org.springframework.security.oauth2.config.annotation.web.configurers.ResourceServerSecurityConfigurer;
 
 
 @Configuration
@@ -33,15 +32,13 @@ public class TempusResourceServer extends ResourceServerConfigurerAdapter {
     public static final String WEBJARS_ENTRY_POINT = "/webjars/**";
     public static final String DEVICE_API_ENTRY_POINT = "/api/v1/**";
     public static final String FORM_BASED_LOGIN_ENTRY_POINT = "/api/auth/login";
-    //public static final String PUBLIC_LOGIN_ENTRY_POINT = "/api/auth/login/public";
+    public static final String PUBLIC_LOGIN_ENTRY_POINT = "/api/auth/login/public";
     //public static final String TOKEN_REFRESH_ENTRY_POINT = "/api/auth/token";
     protected static final String[] NON_TOKEN_BASED_AUTH_ENTRY_POINTS = new String[] {"/index.html", "/static/**", "/api/noauth/**", "/api/theming/**", "/webjars/**"};
     public static final String TOKEN_BASED_AUTH_ENTRY_POINT = "/api/**";
     public static final String WS_TOKEN_BASED_AUTH_ENTRY_POINT = "/api/ws/**";
 
     public static final String EXTERNAL_API_WRITE_ENDPOINTS = "/api/external/write/**";
-
-    private static final String TEMPUS_RESOURCE_ID = "tempus-resource-server-rest-api";
 
 
     @Autowired
@@ -67,7 +64,7 @@ public class TempusResourceServer extends ResourceServerConfigurerAdapter {
                 .antMatchers(WEBJARS_ENTRY_POINT).permitAll() // Webjars
                 .antMatchers(DEVICE_API_ENTRY_POINT).permitAll() // Device HTTP Transport API
                 .antMatchers(FORM_BASED_LOGIN_ENTRY_POINT).permitAll() // Login end-point
-                //.antMatchers(PUBLIC_LOGIN_ENTRY_POINT).permitAll() // Public login end-point
+                .antMatchers(PUBLIC_LOGIN_ENTRY_POINT).permitAll() // Public login end-point
                 //.antMatchers(TOKEN_REFRESH_ENTRY_POINT).permitAll() // Token refresh end-point
                 .antMatchers(NON_TOKEN_BASED_AUTH_ENTRY_POINTS).permitAll() // static resources, user activation and password reset end-points
                 .and()
