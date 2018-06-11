@@ -21,6 +21,7 @@ import com.datastax.driver.mapping.annotations.PartitionKey;
 import com.datastax.driver.mapping.annotations.Table;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.hashmapinc.server.common.data.Customer;
+import com.hashmapinc.server.common.data.id.DataModelId;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import com.hashmapinc.server.common.data.id.CustomerId;
@@ -44,6 +45,9 @@ public final class CustomerEntity implements SearchTextEntity<Customer> {
     @PartitionKey(value = 1)
     @Column(name = CUSTOMER_TENANT_ID_PROPERTY)
     private UUID tenantId;
+
+    @Column(name = CUSTOMER_DATA_MODEL_ID_PROPERTY)
+    private UUID dataModelId;
     
     @Column(name = CUSTOMER_TITLE_PROPERTY)
     private String title;
@@ -87,6 +91,7 @@ public final class CustomerEntity implements SearchTextEntity<Customer> {
             this.id = customer.getId().getId();
         }
         this.tenantId = customer.getTenantId().getId();
+        this.dataModelId = customer.getDataModelId().getId();
         this.title = customer.getTitle();
         this.country = customer.getCountry();
         this.state = customer.getState();
@@ -113,6 +118,14 @@ public final class CustomerEntity implements SearchTextEntity<Customer> {
 
     public void setTenantId(UUID tenantId) {
         this.tenantId = tenantId;
+    }
+
+    public UUID getDataModelId() {
+        return dataModelId;
+    }
+
+    public void setDataModelId(UUID dataModelId) {
+        this.dataModelId = dataModelId;
     }
 
     public String getTitle() {
@@ -213,6 +226,11 @@ public final class CustomerEntity implements SearchTextEntity<Customer> {
     public Customer toData() {
         Customer customer = new Customer(new CustomerId(id));
         customer.setCreatedTime(UUIDs.unixTimestamp(id));
+        if(dataModelId != null) {
+            customer.setDataModelId(new DataModelId(dataModelId));
+        } else {
+            customer.setDataModelId(new DataModelId(NULL_UUID));
+        }
         customer.setTenantId(new TenantId(tenantId));
         customer.setTitle(title);
         customer.setCountry(country);

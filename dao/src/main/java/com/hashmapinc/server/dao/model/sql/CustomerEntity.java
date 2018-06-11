@@ -18,6 +18,8 @@ package com.hashmapinc.server.dao.model.sql;
 import com.datastax.driver.core.utils.UUIDs;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.hashmapinc.server.common.data.Customer;
+import com.hashmapinc.server.common.data.id.DataModelId;
+import com.hashmapinc.server.common.data.id.EntityId;
 import com.hashmapinc.server.common.data.id.TenantId;
 import com.hashmapinc.server.dao.model.BaseSqlEntity;
 import com.hashmapinc.server.dao.util.mapping.JsonStringType;
@@ -43,6 +45,9 @@ public final class CustomerEntity extends BaseSqlEntity<Customer> implements Sea
 
     @Column(name = ModelConstants.CUSTOMER_TENANT_ID_PROPERTY)
     private String tenantId;
+
+    @Column(name = ModelConstants.CUSTOMER_DATA_MODEL_ID_PROPERTY)
+    private String dataModelId;
     
     @Column(name = ModelConstants.CUSTOMER_TITLE_PROPERTY)
     private String title;
@@ -87,6 +92,7 @@ public final class CustomerEntity extends BaseSqlEntity<Customer> implements Sea
             this.setId(customer.getId().getId());
         }
         this.tenantId = UUIDConverter.fromTimeUUID(customer.getTenantId().getId());
+        this.dataModelId = UUIDConverter.fromTimeUUID(customer.getDataModelId().getId());
         this.title = customer.getTitle();
         this.country = customer.getCountry();
         this.state = customer.getState();
@@ -114,6 +120,11 @@ public final class CustomerEntity extends BaseSqlEntity<Customer> implements Sea
         Customer customer = new Customer(new CustomerId(getId()));
         customer.setCreatedTime(UUIDs.unixTimestamp(getId()));
         customer.setTenantId(new TenantId(UUIDConverter.fromString(tenantId)));
+        if(dataModelId != null) {
+            customer.setDataModelId(new DataModelId(UUIDConverter.fromString(dataModelId)));
+        } else {
+            customer.setDataModelId(new DataModelId(EntityId.NULL_UUID));
+        }
         customer.setTitle(title);
         customer.setCountry(country);
         customer.setState(state);

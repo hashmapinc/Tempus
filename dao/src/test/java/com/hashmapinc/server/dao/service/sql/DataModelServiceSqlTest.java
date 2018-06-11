@@ -13,11 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.hashmapinc.server.common.data;
+package com.hashmapinc.server.dao.service.sql;
 
+import com.hashmapinc.server.dao.service.BaseDataModelServiceTest;
+import com.hashmapinc.server.dao.service.DaoSqlTest;
 
-public enum EntityType {
-
-    TENANT, CUSTOMER, USER, RULE, PLUGIN, DASHBOARD, ASSET, DEVICE, ALARM, APPLICATION, COMPUTATION, COMPUTATION_JOB, NODE_METRIC,THEME, DATA_MODEL
-
+@DaoSqlTest
+public class DataModelServiceSqlTest extends BaseDataModelServiceTest {
 }
