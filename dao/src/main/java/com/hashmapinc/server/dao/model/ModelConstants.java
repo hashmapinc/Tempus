@@ -399,6 +399,17 @@ public class ModelConstants {
     public static final String COMPUTATION_JOB_TENANT_ID_PROPERTY = TENANT_ID_PROPERTY;
 
     /**
+     * Cassandra AttributeDefinition constants
+     */
+
+    public static final String ATTRIBUTE_DEFINITION_COLUMN_FAMILY_NAME = "attribute_definition";
+    public static final String ATTRIBUTE_DEFINITION_NAME = "name";
+    public static final String ATTRIBUTE_DEFINITION_VALUE = "attr_value";
+    public static final String ATTRIBUTE_DEFINITION_VALUE_TYPE = "value_type";
+    public static final String ATTRIBUTE_DEFINITION_MODEL_OBJECT_ID = "data_model_object_id";
+    public static final String ATTRIBUTE_DEFINITION_SOURCE = "source";
+
+    /**
      * Cassandra Node Metric Contants
      */
     public static final String NODE_METRIC_COLUMN_FAMILY_NAME = "node_metric";

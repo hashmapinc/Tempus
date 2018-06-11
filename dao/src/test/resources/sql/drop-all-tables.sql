@@ -32,3 +32,4 @@ DROP TABLE IF EXISTS node_metric;
 DROP TABLE IF EXISTS theme;
 DROP TABLE IF EXISTS logo;
 DROP TABLE IF EXISTS data_model_object;
+DROP TABLE IF EXISTS attribute_definition;
