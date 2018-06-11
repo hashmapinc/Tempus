@@ -75,13 +75,13 @@ public class SqlDatabaseSchemaService implements DatabaseSchemaService {
         if(postgresConn != -1) {
 
             SQL_DIR = SQL_DIR_POSTGRES;
-            log.info("Installing Post gress SQL DataBase schema...");
+
             //schemaFiles = schemaFile;
         }
 
         if(hsqldbConn != -1) {
 
-            log.info("Installing HSQL DataBase schema...");
+
             SQL_DIR = SQL_DIR_HSQL;
             //schemaFiles = schemaFile;
         }
@@ -98,7 +98,6 @@ public class SqlDatabaseSchemaService implements DatabaseSchemaService {
 
             stmt.execute(sql);
 
-            log.info("Installing pending upgrades ...");
 
             List<String> executedUpgrades = new ArrayList<>();
             ResultSet rs = stmt.executeQuery("select " + ModelConstants.INSTALLED_SCRIPTS_COLUMN + " from " + ModelConstants.INSTALLED_SCHEMA_VERSIONS);

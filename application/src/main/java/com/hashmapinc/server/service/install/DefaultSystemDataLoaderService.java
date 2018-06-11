@@ -180,7 +180,7 @@ public class DefaultSystemDataLoaderService implements SystemDataLoaderService {
 
         if(theme.size() < 2) {
 
-            log.info("Loading theme  data...");
+            
             Theme theme1 = new Theme();
             theme1.setThemeName("Tempus Blue");
             theme1.setThemeValue("themeBlue");
