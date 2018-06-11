@@ -78,6 +78,7 @@ import tempusClusterInfo from './api/cluster-info.service';
 import tempusApiComputation from './api/computation.service';
 import tempusApiComputationJob from './api/computation-job.service';
 import tempusTempusboard from './tempusboard';
+import tempusDataModels from './data_models';
 import tempusApplications from './applications';
 import tempusApiAuditLog from './api/audit-log.service';
 
@@ -147,6 +148,7 @@ angular.module('tempus', [
     tempusApiComputation,
     tempusApiComputationJob,
     tempusTempusboard,
+    tempusDataModels,
     tempusApplications,
     tempusApiAuditLog,
     uiRouter])
