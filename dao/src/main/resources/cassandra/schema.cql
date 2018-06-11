@@ -806,3 +806,24 @@ CREATE TABLE IF NOT EXISTS tempus.theme (
   is_enabled boolean,
   PRIMARY KEY (id,name)
 );
+
+CREATE TABLE IF NOT EXISTS tempus.logo (
+    id uuid,
+    name text,
+    enabled boolean,
+    file blob,
+    PRIMARY KEY (id,name)
+ );
+
+
+CREATE TABLE IF NOT EXISTS tempus.data_model_object_cf (
+   id timeuuid,
+   name text,
+   description text,
+   data_model_id timeuuid,
+   parent_id timeuuid,
+   tenant_id timeuuid,
+   customer_id timeuuid,
+   search_text text,
+   PRIMARY KEY (id, tenant_id)
+);

@@ -46,6 +46,9 @@ public class NoSqlDaoServiceTestSuite {
                 new ClassPathCQLDataSet("cassandra/upgrade/1.cql", false, false),
                 new ClassPathCQLDataSet("cassandra/upgrade/3.cql", false, false)
         ));
+
+
+
         return dataSets;
     }
 

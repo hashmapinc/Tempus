@@ -13,10 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.hashmapinc.server.common.data;
 
 
-public enum EntityType {
+package com.hashmapinc.server.dao.sql.logo;
+import com.hashmapinc.server.dao.model.sql.LogoEntity;
+import com.hashmapinc.server.dao.util.SqlDao;
+import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.repository.query.Param;
 
-    TENANT, CUSTOMER, USER, RULE, PLUGIN, DASHBOARD, ASSET, DEVICE, ALARM, APPLICATION, COMPUTATION, COMPUTATION_JOB, NODE_METRIC,THEME, LOGO, DATA_MODEL
+@SqlDao
+public interface LogoRepository extends CrudRepository<LogoEntity, String> {
+
+    LogoEntity findById(String id);
+
+    LogoEntity findByName(String name);
 }

@@ -13,10 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.hashmapinc.server.common.data;
 
 
-public enum EntityType {
 
-    TENANT, CUSTOMER, USER, RULE, PLUGIN, DASHBOARD, ASSET, DEVICE, ALARM, APPLICATION, COMPUTATION, COMPUTATION_JOB, NODE_METRIC,THEME, LOGO, DATA_MODEL
+package com.hashmapinc.server.dao.logo;
+import com.hashmapinc.server.common.data.Logo;
+
+import java.util.List;
+
+public interface LogoService {
+
+    List <Logo> find();
+
+    Logo saveLogo(Logo logo);
+
+    void deleteLogoByName(String name);
+
+
 }

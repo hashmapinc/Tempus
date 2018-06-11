@@ -122,15 +122,6 @@ CREATE TABLE IF NOT EXISTS device (
     tenant_id varchar(31)
 );
 
-CREATE TABLE IF NOT EXISTS data_model (
-    id varchar (31) NOT NULL CONSTRAINT data_model_pkey PRIMARY KEY,
-    name varchar(255),
-    tenant_id varchar(31),
-    search_text varchar(255),
-    additional_info varchar,
-    last_update_ts bigint
-);
-
 CREATE TABLE IF NOT EXISTS device_credentials (
     id varchar(31) NOT NULL CONSTRAINT device_credentials_pkey PRIMARY KEY,
     credentials_id varchar,
@@ -377,6 +368,23 @@ CREATE TABLE IF NOT EXISTS theme (
     value varchar,
     is_enabled boolean
  );
+
+ CREATE TABLE IF NOT EXISTS logo (
+    id varchar (31) NOT NULL CONSTRAINT logo_pkey PRIMARY KEY,
+    name varchar,
+    enabled boolean,
+    file LONGVARBINARY
+ );
+
+ CREATE TABLE IF NOT EXISTS data_model (
+   id varchar (31) NOT NULL CONSTRAINT data_model_pkey PRIMARY KEY,
+   name varchar(255),
+   tenant_id varchar(31),
+   search_text varchar(255),
+   additional_info varchar,
+   last_update_ts bigint
+);
+
 
 
 

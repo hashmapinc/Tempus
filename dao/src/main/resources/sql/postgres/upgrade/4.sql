@@ -14,4 +14,4 @@
 -- limitations under the License.
 --
 
-ALTER TABLE tempus.customer ADD data_model_id timeuuid;
+ALTER TABLE customer ADD data_model_id varchar(31) DEFAULT '1b21dd2138140008080808080808080';

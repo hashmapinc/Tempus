@@ -43,9 +43,13 @@ import java.util.stream.Stream;
 @SqlDao
 public class SqlDatabaseSchemaService implements DatabaseSchemaService {
 
-    private static final String SQL_DIR = "sql";
+    private static final String SQL_DIR_HSQL = "sql/hsql";
+    private static  String SQL_DIR = "";
+    private static final String SQL_DIR_POSTGRES = "sql/postgres";
     private static final String UPGRADE_DIR = "upgrade";
-    private static final String SCHEMA_SQL = "schema.sql";
+    protected static final  String SCHEMA_SQL = "schema.sql";
+    //private static final String SCHEMA_HSQLDB_SQL = "schemaH.sql";
+    //private static final String SCHEMA_POSTGRES_SQL = "schemaP.sql";
 
     @Value("${install.data_dir}")
     private String dataDir;
@@ -63,17 +67,37 @@ public class SqlDatabaseSchemaService implements DatabaseSchemaService {
     public void createDatabaseSchema() throws Exception {
 
         log.info("Installing SQL DataBase schema...");
+        int hsqldbConn = dbUrl.indexOf("hsqldb");
+        int postgresConn = dbUrl.indexOf("postgres");
+
+
+
+        if(postgresConn != -1) {
+
+            SQL_DIR = SQL_DIR_POSTGRES;
+
+            //schemaFiles = schemaFile;
+        }
+
+        if(hsqldbConn != -1) {
+
+
+            SQL_DIR = SQL_DIR_HSQL;
+            //schemaFiles = schemaFile;
+        }
+
 
         Path schemaFile = Paths.get(this.dataDir, SQL_DIR, SCHEMA_SQL);
         Path upgradeScriptsDirectory = Paths.get(this.dataDir, SQL_DIR, UPGRADE_DIR);
 
+
         try (Connection conn = DriverManager.getConnection(dbUrl, dbUserName, dbPassword);
              Statement stmt = conn.createStatement()) {
+
             String sql = new String(Files.readAllBytes(schemaFile), Charset.forName("UTF-8"));
 
             stmt.execute(sql);
 
-            log.info("Installing pending upgrades ...");
 
             List<String> executedUpgrades = new ArrayList<>();
             ResultSet rs = stmt.executeQuery("select " + ModelConstants.INSTALLED_SCRIPTS_COLUMN + " from " + ModelConstants.INSTALLED_SCHEMA_VERSIONS);
@@ -88,6 +112,7 @@ public class SqlDatabaseSchemaService implements DatabaseSchemaService {
                     String scriptFileName = i.toString() + ".sql";
                     if (!executedUpgrades.contains(scriptFileName)) {
                         String upgradeQueries = new String(Files.readAllBytes(upgradeScriptsDirectory.resolve(scriptFileName)), Charset.forName("UTF-8"));
+                        System.out.println(upgradeQueries);
                         stmt.execute(upgradeQueries);
                         stmt.execute("insert into " + ModelConstants.INSTALLED_SCHEMA_VERSIONS + " values('" + scriptFileName + "'" + ")");
                     }

@@ -13,10 +13,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.hashmapinc.server.common.data;
 
 
-public enum EntityType {
+package com.hashmapinc.server.dao.logo;
+import com.hashmapinc.server.common.data.Logo;
+import com.hashmapinc.server.dao.Dao;
 
-    TENANT, CUSTOMER, USER, RULE, PLUGIN, DASHBOARD, ASSET, DEVICE, ALARM, APPLICATION, COMPUTATION, COMPUTATION_JOB, NODE_METRIC,THEME, LOGO, DATA_MODEL
+import java.util.List;
+
+
+public interface LogoDao extends Dao<Logo> {
+
+    /**
+     * Find theme for listing
+     * @return the list of logo objects
+     */
+    List<Logo> find();
+
+    Logo save(Logo logo);
+
+    Logo findById(String id);
+
+    Logo findByName(String name);
+
+
 }
