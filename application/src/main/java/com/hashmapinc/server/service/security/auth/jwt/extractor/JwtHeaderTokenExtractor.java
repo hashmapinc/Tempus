@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.hashmapinc.server.service.security.auth.jwt.extractor;
+/*package com.hashmapinc.server.service.security.auth.jwt.extractor;
 
 import com.hashmapinc.server.config.TempusSecurityConfiguration;
 import org.apache.commons.lang3.StringUtils;
@@ -39,4 +39,4 @@ public class JwtHeaderTokenExtractor implements TokenExtractor {
 
         return header.substring(HEADER_PREFIX.length(), header.length());
     }
-}
+}*/
