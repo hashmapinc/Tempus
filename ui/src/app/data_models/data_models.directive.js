@@ -13,15 +13,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-/*@ngInject*/
-export default function DataModelsDirective() {
-    var linker = function () {
+/* eslint-disable import/no-unresolved, import/default */
 
+import dataModelFieldsetTemplate from './datamodel-fieldset.tpl.html';
+
+/* eslint-enable import/no-unresolved, import/default */
+
+/*@ngInject*/
+export default function DataModelsDirective($compile, $templateCache) {
+    var linker = function (scope, element) {
+        var template = $templateCache.get(dataModelFieldsetTemplate);
+        element.html(template);
+
+
+        $compile(element.contents())(scope);
     }
     return {
         restrict: "E",
         link: linker,
         scope: {
+            data: '=',
+            isEdit: '=',
+            applicationScope: '=',
+            theForm: '=',
         }
     };
 }
+
+
