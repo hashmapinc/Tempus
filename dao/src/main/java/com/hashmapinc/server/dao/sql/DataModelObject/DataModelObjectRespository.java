@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.hashmapinc.server.dao.sql.ModelObjects;
+package com.hashmapinc.server.dao.sql.DataModelObject;
 
 import com.hashmapinc.server.dao.model.sql.DataModelObjectEntity;
 import org.springframework.data.repository.CrudRepository;
@@ -21,6 +21,6 @@ import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
-public interface ModelObjectRespository extends CrudRepository<DataModelObjectEntity, String> {
+public interface DataModelObjectRespository extends CrudRepository<DataModelObjectEntity, String> {
     List<DataModelObjectEntity> findByTenantId(@Param("tenantId") String tenantId);
 }

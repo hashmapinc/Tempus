@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.hashmapinc.server.dao.sql.ModelObjects;
+package com.hashmapinc.server.dao.sql.DataModelObject;
 
 import com.hashmapinc.server.common.data.DataModelObject.DataModelObject;
 import com.hashmapinc.server.common.data.UUIDConverter;
@@ -35,7 +35,7 @@ import java.util.List;
 public class JpaDataModelObjectDao extends JpaAbstractSearchTextDao<DataModelObjectEntity, DataModelObject> implements DataModelObjectDao {
 
     @Autowired
-    ModelObjectRespository modelObjectRespository;
+    DataModelObjectRespository dataModelObjectRespository;
 
     @Override
     protected Class<DataModelObjectEntity> getEntityClass() {
@@ -44,18 +44,18 @@ public class JpaDataModelObjectDao extends JpaAbstractSearchTextDao<DataModelObj
 
     @Override
     protected CrudRepository<DataModelObjectEntity, String> getCrudRepository() {
-        return modelObjectRespository;
+        return dataModelObjectRespository;
     }
 
     @Override
     public DataModelObject findById(DataModelObjectId id) {
-        DataModelObjectEntity entity = modelObjectRespository.findOne(UUIDConverter.fromTimeUUID(id.getId()));
+        DataModelObjectEntity entity = dataModelObjectRespository.findOne(UUIDConverter.fromTimeUUID(id.getId()));
         return DaoUtil.getData(entity);
     }
 
     @Override
     public List<DataModelObject> findByTenantId(TenantId tenantId) {
-        List<DataModelObjectEntity> entities = modelObjectRespository.findByTenantId(UUIDConverter.fromTimeUUID(tenantId.getId()));
+        List<DataModelObjectEntity> entities = dataModelObjectRespository.findByTenantId(UUIDConverter.fromTimeUUID(tenantId.getId()));
         return DaoUtil.convertDataList(entities);
     }
 

@@ -37,6 +37,7 @@ public class DataModelObjectServiceImp implements DataModelObjectService {
 
     public static final String INCORRECT_TENANT_ID = "Incorrect tenantId ";
     public static final String INCORRECT_DATA_MODEL_OBJECT_ID = "Incorrect dataModelObjectId ";
+
     @Autowired
     DataModelObjectDao dataModelObjectDao;
 
