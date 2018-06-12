@@ -559,6 +559,15 @@ export default angular.module('tempus.locale', [])
                     "select-state": "Select target state",
                     "state-controller": "State controller"
                 },
+
+                "dataModels": {
+                    "add": "Add Data Model",
+                    "name": "Title",
+                    "description" :"Description",
+                    "name-required":"This feild is required"
+
+                },
+
                 "application": {
                     "application": "Application",
                     "applications": "Applications",

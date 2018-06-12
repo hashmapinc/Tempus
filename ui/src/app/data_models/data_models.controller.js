@@ -15,8 +15,66 @@
  */
 /* eslint-disable import/no-unresolved, import/default, no-unused-vars */
 import './data_models.scss';
+import addDataModel from './add-datamodel.tpl.html';
 
 /*@ngInject*/
-export function DataModelsController($scope, $log, $state, $stateParams, userService, deviceService, types, attributeService, $q, dashboardService, applicationService, entityService, tempusboardService, utils, $filter, dashboardUtils) {
+export function AddDataModelController($scope, $mdDialog, saveItemFunction, helpLinks, $log) {
+
+    var vm = this;
+    vm.helpLinks = helpLinks;
+    vm.item = {};
+
+    vm.add = add;
+    vm.cancel = cancel;
+
+    function cancel() {
+        $mdDialog.cancel();
+    }
+
+    function add() {
+        saveItemFunction(vm.item).then(function success(item) {
+            vm.item = item;
+            $scope.theForm.$setPristine();
+            $mdDialog.hide();
+        });
+    }
+}
+
+
+/*@ngInject*/
+export function DataModelsController($scope, $log, $rootScope, $state, $stateParams, userService, deviceService, types, attributeService, $q, dashboardService, applicationService, entityService, tempusboardService, utils, $filter, dashboardUtils, $mdDialog, $document, $translate) {
 	var vm = this;
+    //vm.save = save;
+
+    vm.openDataModelDialog = openDataModelDialog;
+    vm.cancel = cancel;
+    vm.saveDataModelFunc = saveDataModelFunc;
+    vm.AddDataModelController = AddDataModelController;
+
+
+    function openDataModelDialog($event) {
+
+        $mdDialog.show({
+            controller: vm.AddDataModelController,
+            controllerAs: 'vm',
+            templateUrl: addDataModel,
+            parent: angular.element($document[0].body),
+            locals: {saveItemFunction: vm.saveDataModelFunc},
+            fullscreen: true,
+            targetEvent: $event
+        }).then(function () {
+        }, function () {
+        });
+    }
+
+
+    function saveDataModelFunc(dataModel) { $log.log(dataModel);
+        var deferred = $q.defer();
+        return deferred.promise;
+    }
+
+    function cancel() {
+        $mdDialog.cancel();
+    }
+
 }
