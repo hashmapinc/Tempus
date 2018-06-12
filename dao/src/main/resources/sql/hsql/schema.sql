@@ -391,7 +391,7 @@ CREATE TABLE IF NOT EXISTS data_model_object (
     description varchar,
     data_model_id varchar(31),
     parent_id varchar(31),
-    tenant_id varchar(31),
+    type varchar(250),
     customer_id varchar(31),
     search_text varchar(255)
 );

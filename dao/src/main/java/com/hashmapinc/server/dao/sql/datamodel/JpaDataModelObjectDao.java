@@ -17,8 +17,8 @@ package com.hashmapinc.server.dao.sql.datamodel;
 
 import com.hashmapinc.server.common.data.DataModelObject.DataModelObject;
 import com.hashmapinc.server.common.data.UUIDConverter;
+import com.hashmapinc.server.common.data.id.DataModelId;
 import com.hashmapinc.server.common.data.id.DataModelObjectId;
-import com.hashmapinc.server.common.data.id.TenantId;
 import com.hashmapinc.server.dao.DaoUtil;
 import com.hashmapinc.server.dao.model.sql.DataModelObjectEntity;
 import com.hashmapinc.server.dao.datamodel.DataModelObjectDao;
@@ -54,8 +54,8 @@ public class JpaDataModelObjectDao extends JpaAbstractSearchTextDao<DataModelObj
     }
 
     @Override
-    public List<DataModelObject> findByTenantId(TenantId tenantId) {
-        List<DataModelObjectEntity> entities = dataModelObjectRespository.findByTenantId(UUIDConverter.fromTimeUUID(tenantId.getId()));
+    public List<DataModelObject> findByDataModelId(DataModelId dataModelId) {
+        List<DataModelObjectEntity> entities = dataModelObjectRespository.findByDataModelId(UUIDConverter.fromTimeUUID(dataModelId.getId()));
         return DaoUtil.convertDataList(entities);
     }
 

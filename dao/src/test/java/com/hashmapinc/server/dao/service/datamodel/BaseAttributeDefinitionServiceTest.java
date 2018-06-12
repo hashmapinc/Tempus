@@ -64,7 +64,6 @@ public abstract class BaseAttributeDefinitionServiceTest extends AbstractService
         DataModelObject dataModelObject = new DataModelObject();
         dataModelObject.setName("well");
         dataModelObject.setCustomerId(new CustomerId(UUIDs.timeBased()));
-        dataModelObject.setTenantId(tenantId);
         dataModelObject.setDataModelId(dataModelId);
 
         DataModelObject savedDataModelObj = dataModelObjectService.save(dataModelObject);

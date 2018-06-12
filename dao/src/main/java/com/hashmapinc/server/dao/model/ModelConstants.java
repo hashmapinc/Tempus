@@ -489,7 +489,7 @@ public class ModelConstants {
     public static final String DATA_MODEL_OBJECT_TABLE = "data_model_object";
     public static final String DATA_MODEL_OBJECT_NAME_PROPERTY = "name";
     public static final String DATA_MODEL_OBJECT_DESCRIPTION = "description";
-    public static final String DATA_MODEL_OBJECT_TENANT_ID_PROPERTY = TENANT_ID_PROPERTY;
+    public static final String DATA_MODEL_OBJECT_TYPE = "type";
     public static final String DATA_MODEL_OBJECT_PARENT_ID = "parent_id";
     public static final String DATA_MODEL_ID = "data_model_id";
 

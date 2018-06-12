@@ -24,7 +24,7 @@ public class DataModelObject extends SearchTextBased<DataModelObjectId> implemen
     private String name;
     private JsonNode decription;
     private DataModelId dataModelId;
-    private TenantId tenantId;
+    private String type;
     private DataModelObjectId parentId;
     private CustomerId customerId;
 
@@ -41,7 +41,7 @@ public class DataModelObject extends SearchTextBased<DataModelObjectId> implemen
         this.name = dataModelObject.name;
         this.decription = dataModelObject.decription;
         this.dataModelId = dataModelObject.dataModelId;
-        this.tenantId = dataModelObject.tenantId;
+        this.type = dataModelObject.type;
         this.parentId = dataModelObject.parentId;
         this.customerId = dataModelObject.customerId;
     }
@@ -56,7 +56,7 @@ public class DataModelObject extends SearchTextBased<DataModelObjectId> implemen
          if (name != null ? !name.equals(that.name) : that.name != null) return false;
          if (decription != null ? !decription.equals(that.decription) : that.decription != null) return false;
          if (dataModelId != null ? !dataModelId.equals(that.dataModelId) : that.dataModelId != null) return false;
-         if (tenantId != null ? !tenantId.equals(that.tenantId) : that.tenantId != null) return false;
+         if (type != null ? !type.equals(that.type) : that.type != null) return false;
          if (parentId != null ? !parentId.equals(that.parentId) : that.parentId != null) return false;
          if (customerId != null ? !customerId.equals(that.customerId) : that.customerId != null) return false;
         return true;
@@ -68,7 +68,7 @@ public class DataModelObject extends SearchTextBased<DataModelObjectId> implemen
         result = 31 * result + (name != null ? name.hashCode() : 0);
         result = 31 * result + (decription != null ? decription.hashCode() : 0);
         result = 31 * result + (dataModelId != null ? dataModelId.hashCode() : 0);
-        result = 31 * result + (tenantId != null ? tenantId.hashCode() : 0);
+        result = 31 * result + (type != null ? type.hashCode() : 0);
         result = 31 * result + (parentId != null ? parentId.hashCode() : 0);
         result = 31 * result + (customerId != null ? customerId.hashCode() : 0);
         return result;
@@ -94,12 +94,12 @@ public class DataModelObject extends SearchTextBased<DataModelObjectId> implemen
         this.dataModelId = dataModelId;
     }
 
-    public TenantId getTenantId() {
-        return tenantId;
+    public String getType() {
+        return type;
     }
 
-    public void setTenantId(TenantId tenantId) {
-        this.tenantId = tenantId;
+    public void setType(String type) {
+        this.type = type;
     }
 
     public DataModelObjectId getParentId() {

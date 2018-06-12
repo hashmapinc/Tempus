@@ -18,8 +18,8 @@ package com.hashmapinc.server.dao.datamodel;
 import com.hashmapinc.server.common.data.DataModel;
 import com.hashmapinc.server.common.data.DataModelObject.DataModelObject;
 import com.hashmapinc.server.common.data.Tenant;
+import com.hashmapinc.server.common.data.id.DataModelId;
 import com.hashmapinc.server.common.data.id.DataModelObjectId;
-import com.hashmapinc.server.common.data.id.TenantId;
 import com.hashmapinc.server.dao.exception.DataValidationException;
 import com.hashmapinc.server.dao.service.DataValidator;
 import com.hashmapinc.server.dao.tenant.TenantDao;
@@ -36,14 +36,11 @@ import static com.hashmapinc.server.dao.service.Validator.validateId;
 @Slf4j
 public class DataModelObjectServiceImp implements DataModelObjectService {
 
-    public static final String INCORRECT_TENANT_ID = "Incorrect tenantId ";
+    public static final String INCORRECT_DATA_MODEL_ID = "Incorrect dataModelId ";
     public static final String INCORRECT_DATA_MODEL_OBJECT_ID = "Incorrect dataModelObjectId ";
 
     @Autowired
     DataModelObjectDao dataModelObjectDao;
-
-    @Autowired
-    TenantDao tenantDao;
 
     @Autowired
     DataModelDao dataModelDao;
@@ -62,9 +59,9 @@ public class DataModelObjectServiceImp implements DataModelObjectService {
     }
 
     @Override
-    public List<DataModelObject> findByTenantId(TenantId tenantId) {
-        validateId(tenantId, INCORRECT_TENANT_ID + tenantId);
-        return dataModelObjectDao.findByTenantId(tenantId);
+    public List<DataModelObject> findByDataModelId(DataModelId dataModelId) {
+        validateId(dataModelId, INCORRECT_DATA_MODEL_ID + dataModelId);
+        return dataModelObjectDao.findByDataModelId(dataModelId);
     }
 
     @Override
@@ -79,13 +76,9 @@ public class DataModelObjectServiceImp implements DataModelObjectService {
                 protected void validateDataImpl(DataModelObject dataModelObject) {
                     if (StringUtils.isEmpty(dataModelObject.getName())) {
                         throw new DataValidationException("Data Model object name should be specified!");
-                    }else if (dataModelObject.getTenantId() == null || dataModelObject.getDataModelId() == null) {
-                        throw new DataValidationException("Data Model object should be assigned to tenant and a data model!");
+                    }else if (dataModelObject.getDataModelId() == null) {
+                        throw new DataValidationException("Data Model object should be assigned to a data model!");
                     } else {
-                        Tenant tenant = tenantDao.findById(dataModelObject.getTenantId().getId());
-                        if (tenant == null) {
-                            throw new DataValidationException("Data Model object is referencing to non-existent tenant!");
-                        }
                         DataModel dataModel = dataModelDao.findById(dataModelObject.getDataModelId().getId());
                         if(dataModel == null) {
                             throw new DataValidationException("Data Model object is referencing to non-existent data model!");

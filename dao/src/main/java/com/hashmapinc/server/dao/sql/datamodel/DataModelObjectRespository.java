@@ -22,5 +22,5 @@ import org.springframework.data.repository.query.Param;
 import java.util.List;
 
 public interface DataModelObjectRespository extends CrudRepository<DataModelObjectEntity, String> {
-    List<DataModelObjectEntity> findByTenantId(@Param("tenantId") String tenantId);
+    List<DataModelObjectEntity> findByDataModelId(@Param("dataModelId") String dataModelId);
 }

@@ -16,14 +16,14 @@
 package com.hashmapinc.server.dao.datamodel;
 
 import com.hashmapinc.server.common.data.DataModelObject.DataModelObject;
+import com.hashmapinc.server.common.data.id.DataModelId;
 import com.hashmapinc.server.common.data.id.DataModelObjectId;
-import com.hashmapinc.server.common.data.id.TenantId;
 
 import java.util.List;
 
 public interface DataModelObjectService {
     DataModelObject save(DataModelObject dataModelObject);
     DataModelObject findById(DataModelObjectId dataModelObjectId);
-    List<DataModelObject> findByTenantId(TenantId tenantId);
+    List<DataModelObject> findByDataModelId(DataModelId dataModelId);
     boolean deleteById(DataModelObjectId dataModelObjectId);
 }

@@ -40,8 +40,8 @@ public final class DataModelObjectEntity implements SearchTextEntity<DataModelOb
     @Column(name = ID_PROPERTY)
     private UUID id;
 
-    @Column(name = ModelConstants.DATA_MODEL_OBJECT_TENANT_ID_PROPERTY)
-    private UUID tenantId;
+    @Column(name = ModelConstants.DATA_MODEL_OBJECT_TYPE)
+    private String type;
 
     @Column(name = ModelConstants.DATA_MODEL_OBJECT_PARENT_ID)
     private UUID parentId;
@@ -69,8 +69,8 @@ public final class DataModelObjectEntity implements SearchTextEntity<DataModelOb
         if (dataModelObject.getId() != null) {
             this.setId(dataModelObject.getId().getId());
         }
-        if (dataModelObject.getTenantId() != null) {
-            this.tenantId = dataModelObject.getTenantId().getId();
+        if (dataModelObject.getType() != null) {
+            this.type = dataModelObject.getType();
         }
         if (dataModelObject.getDataModelId()!= null) {
             this.dataModelId = dataModelObject.getDataModelId().getId();
@@ -95,12 +95,12 @@ public final class DataModelObjectEntity implements SearchTextEntity<DataModelOb
         this.id = id;
     }
 
-    public UUID getTenantId() {
-        return tenantId;
+    public String getType() {
+        return type;
     }
 
-    public void setTenantId(UUID tenantId) {
-        this.tenantId = tenantId;
+    public void setType(String type) {
+        this.type = type;
     }
 
     public UUID getParentId() {
@@ -161,8 +161,8 @@ public final class DataModelObjectEntity implements SearchTextEntity<DataModelOb
     public DataModelObject toData() {
         DataModelObject dataModelObject = new DataModelObject(new DataModelObjectId(id));
         dataModelObject.setCreatedTime(UUIDs.unixTimestamp(id));
-        if (tenantId != null) {
-            dataModelObject.setTenantId(new TenantId(tenantId));
+        if (type != null) {
+            dataModelObject.setType(type);
         }
         if (dataModelId != null) {
             dataModelObject.setDataModelId(new DataModelId(dataModelId));

@@ -17,8 +17,8 @@ package com.hashmapinc.server.dao.datamodel;
 
 import com.datastax.driver.core.querybuilder.Select;
 import com.hashmapinc.server.common.data.DataModelObject.DataModelObject;
+import com.hashmapinc.server.common.data.id.DataModelId;
 import com.hashmapinc.server.common.data.id.DataModelObjectId;
-import com.hashmapinc.server.common.data.id.TenantId;
 import com.hashmapinc.server.dao.DaoUtil;
 import com.hashmapinc.server.dao.model.ModelConstants;
 import com.hashmapinc.server.dao.model.nosql.DataModelObjectEntity;
@@ -53,10 +53,10 @@ public class CassandraBaseDataModelObjectDao extends CassandraAbstractSearchText
     }
 
     @Override
-    public List<DataModelObject> findByTenantId(TenantId tenantId) {
+    public List<DataModelObject> findByDataModelId(DataModelId dataModelId) {
         Select select = select().from(ModelConstants.DATA_MODEL_OBJECT_CF).allowFiltering();
         Select.Where query = select.where();
-        query.and(eq(ModelConstants.DATA_MODEL_OBJECT_TENANT_ID_PROPERTY, tenantId.getId()));
+        query.and(eq(ModelConstants.DATA_MODEL_ID, dataModelId.getId()));
         List<DataModelObjectEntity> entities = findListByStatement(query);
         return DaoUtil.convertDataList(entities);
     }

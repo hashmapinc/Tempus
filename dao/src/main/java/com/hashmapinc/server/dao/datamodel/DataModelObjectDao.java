@@ -16,8 +16,8 @@
 package com.hashmapinc.server.dao.datamodel;
 
 import com.hashmapinc.server.common.data.DataModelObject.DataModelObject;
+import com.hashmapinc.server.common.data.id.DataModelId;
 import com.hashmapinc.server.common.data.id.DataModelObjectId;
-import com.hashmapinc.server.common.data.id.TenantId;
 
 import java.util.List;
 import java.util.UUID;
@@ -25,6 +25,6 @@ import java.util.UUID;
 public interface DataModelObjectDao {
     DataModelObject findById(DataModelObjectId id);
     DataModelObject save(DataModelObject dataModelObject);
-    List<DataModelObject> findByTenantId(TenantId tenantId);
+    List<DataModelObject> findByDataModelId(DataModelId dataModelId);
     boolean removeById(UUID id);
 }

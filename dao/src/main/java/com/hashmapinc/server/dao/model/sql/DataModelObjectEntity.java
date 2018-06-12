@@ -40,8 +40,8 @@ import javax.persistence.Table;
 @Table(name = ModelConstants.DATA_MODEL_OBJECT_TABLE)
 public final class DataModelObjectEntity extends BaseSqlEntity<DataModelObject> implements SearchTextEntity<DataModelObject> {
 
-    @Column(name = ModelConstants.DATA_MODEL_OBJECT_TENANT_ID_PROPERTY)
-    private String tenantId;
+    @Column(name = ModelConstants.DATA_MODEL_OBJECT_TYPE)
+    private String type;
 
     @Column(name = ModelConstants.DATA_MODEL_OBJECT_PARENT_ID)
     private String parentId;
@@ -70,8 +70,8 @@ public final class DataModelObjectEntity extends BaseSqlEntity<DataModelObject> 
         if (dataModelObject.getId() != null) {
             this.setId(dataModelObject.getId().getId());
         }
-        if (dataModelObject.getTenantId() != null) {
-            this.tenantId = UUIDConverter.fromTimeUUID(dataModelObject.getTenantId().getId());
+        if (dataModelObject.getType() != null) {
+            this.type = dataModelObject.getType();
         }
         if (dataModelObject.getDataModelId()!= null) {
             this.dataModelId = UUIDConverter.fromTimeUUID(dataModelObject.getDataModelId().getId());
@@ -104,8 +104,8 @@ public final class DataModelObjectEntity extends BaseSqlEntity<DataModelObject> 
     public DataModelObject toData() {
         DataModelObject dataModelObject = new DataModelObject(new DataModelObjectId(UUIDConverter.fromString(id)));
         dataModelObject.setCreatedTime(UUIDs.unixTimestamp(UUIDConverter.fromString(id)));
-        if (tenantId != null) {
-            dataModelObject.setTenantId(new TenantId(UUIDConverter.fromString(tenantId)));
+        if (type != null) {
+            dataModelObject.setType(type);
         }
         if (dataModelId != null) {
             dataModelObject.setDataModelId(new DataModelId(UUIDConverter.fromString(dataModelId)));
