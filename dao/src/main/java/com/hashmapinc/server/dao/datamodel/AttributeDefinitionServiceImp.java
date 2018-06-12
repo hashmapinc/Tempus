@@ -18,7 +18,9 @@ package com.hashmapinc.server.dao.datamodel;
 import com.hashmapinc.server.common.data.DataModelObject.AttributeDefinition;
 import com.hashmapinc.server.common.data.DataModelObject.DataModelObject;
 import com.hashmapinc.server.common.data.id.DataModelObjectId;
+import com.hashmapinc.server.common.data.kv.DataType;
 import com.hashmapinc.server.dao.exception.DataValidationException;
+import org.apache.commons.lang3.EnumUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -65,11 +67,14 @@ public class AttributeDefinitionServiceImp implements  AttributeDefinitionServic
         return attributeDefinitionDao.deleteById(id);
     }
 
-    private void validateAttributeDefinition(AttributeDefinition attributeDefinition){
+    private void validateAttributeDefinition(AttributeDefinition attributeDefinition) {
         if (StringUtils.isEmpty(attributeDefinition.getName())) {
             throw new DataValidationException("Attribute name should be specified!");
-        }
-        if (attributeDefinition.getDataModelObjectId() == null) {
+        } else if (StringUtils.isEmpty(attributeDefinition.getValue())) {
+            throw new DataValidationException("Attribute value should be specified!");
+        } else if (StringUtils.isEmpty(attributeDefinition.getValueType()) || !EnumUtils.isValidEnum(DataType.class, attributeDefinition.getValueType())) {
+            throw new DataValidationException("A Valid attribute value type should be specified!");
+        } else if (attributeDefinition.getDataModelObjectId() == null) {
             throw new DataValidationException("Attribute definition should be assigned to a data model object!");
         } else {
             DataModelObject dataModelObject = dataModelObjectDao.findById(attributeDefinition.getDataModelObjectId());

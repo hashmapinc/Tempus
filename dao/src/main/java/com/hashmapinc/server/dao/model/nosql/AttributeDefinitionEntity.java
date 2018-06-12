@@ -22,9 +22,11 @@ import com.hashmapinc.server.common.data.DataModelObject.AttributeDefinition;
 import com.hashmapinc.server.common.data.id.DataModelObjectId;
 import com.hashmapinc.server.dao.model.BaseEntity;
 import com.hashmapinc.server.dao.model.ModelConstants;
+import lombok.Data;
 
 import java.util.UUID;
 
+@Data
 @Table(name = ModelConstants.ATTRIBUTE_DEFINITION_COLUMN_FAMILY_NAME)
 public class AttributeDefinitionEntity implements BaseEntity<AttributeDefinition> {
 

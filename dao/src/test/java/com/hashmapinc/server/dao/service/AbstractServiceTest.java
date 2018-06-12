@@ -21,17 +21,45 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.TextNode;
 import com.hashmapinc.server.common.data.BaseData;
+import com.hashmapinc.server.common.data.EntityType;
+import com.hashmapinc.server.common.data.Event;
 import com.hashmapinc.server.common.data.cluster.NodeMetric;
 import com.hashmapinc.server.common.data.cluster.NodeStatus;
+import com.hashmapinc.server.common.data.computation.Computations;
 import com.hashmapinc.server.common.data.id.*;
 import com.hashmapinc.server.common.data.plugin.ComponentDescriptor;
+import com.hashmapinc.server.common.data.plugin.ComponentScope;
+import com.hashmapinc.server.common.data.plugin.ComponentType;
+import com.hashmapinc.server.common.data.plugin.PluginMetaData;
+import com.hashmapinc.server.common.data.rule.RuleMetaData;
 import com.hashmapinc.server.dao.TagMetaData.TagMetaDataService;
+import com.hashmapinc.server.dao.alarm.AlarmService;
+import com.hashmapinc.server.dao.asset.AssetService;
+import com.hashmapinc.server.dao.audit.AuditLogLevelFilter;
+import com.hashmapinc.server.dao.audit.AuditLogLevelMask;
 import com.hashmapinc.server.dao.cluster.NodeMetricService;
-import com.hashmapinc.server.dao.datamodel.DataModelService;
+import com.hashmapinc.server.dao.component.ComponentDescriptorService;
+import com.hashmapinc.server.dao.computations.ComputationsService;
+import com.hashmapinc.server.dao.customer.CustomerService;
+import com.hashmapinc.server.dao.dashboard.DashboardService;
+import com.hashmapinc.server.dao.datamodel.AttributeDefinitionService;
 import com.hashmapinc.server.dao.datamodel.DataModelObjectService;
-import com.hashmapinc.server.dao.theme.ThemeService;
+import com.hashmapinc.server.dao.datamodel.DataModelService;
+import com.hashmapinc.server.dao.depthSeries.DepthSeriesService;
+import com.hashmapinc.server.dao.device.DeviceCredentialsService;
+import com.hashmapinc.server.dao.device.DeviceService;
+import com.hashmapinc.server.dao.event.EventService;
 import com.hashmapinc.server.dao.logo.LogoService;
+import com.hashmapinc.server.dao.plugin.PluginService;
+import com.hashmapinc.server.dao.relation.RelationService;
+import com.hashmapinc.server.dao.rule.RuleService;
+import com.hashmapinc.server.dao.settings.UserSettingsService;
+import com.hashmapinc.server.dao.tenant.TenantService;
+import com.hashmapinc.server.dao.theme.ThemeService;
+import com.hashmapinc.server.dao.timeseries.TimeseriesService;
 import com.hashmapinc.server.dao.user.UserService;
+import com.hashmapinc.server.dao.widget.WidgetTypeService;
+import com.hashmapinc.server.dao.widget.WidgetsBundleService;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -41,33 +69,6 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.context.support.AnnotationConfigContextLoader;
-import com.hashmapinc.server.common.data.EntityType;
-import com.hashmapinc.server.common.data.Event;
-import com.hashmapinc.server.common.data.computation.Computations;
-import com.hashmapinc.server.common.data.plugin.ComponentScope;
-import com.hashmapinc.server.common.data.plugin.ComponentType;
-import com.hashmapinc.server.common.data.plugin.PluginMetaData;
-import com.hashmapinc.server.common.data.rule.RuleMetaData;
-import com.hashmapinc.server.dao.alarm.AlarmService;
-import com.hashmapinc.server.dao.asset.AssetService;
-import com.hashmapinc.server.dao.audit.AuditLogLevelFilter;
-import com.hashmapinc.server.dao.audit.AuditLogLevelMask;
-import com.hashmapinc.server.dao.component.ComponentDescriptorService;
-import com.hashmapinc.server.dao.computations.ComputationsService;
-import com.hashmapinc.server.dao.customer.CustomerService;
-import com.hashmapinc.server.dao.dashboard.DashboardService;
-import com.hashmapinc.server.dao.depthSeries.DepthSeriesService;
-import com.hashmapinc.server.dao.device.DeviceCredentialsService;
-import com.hashmapinc.server.dao.device.DeviceService;
-import com.hashmapinc.server.dao.event.EventService;
-import com.hashmapinc.server.dao.plugin.PluginService;
-import com.hashmapinc.server.dao.relation.RelationService;
-import com.hashmapinc.server.dao.rule.RuleService;
-import com.hashmapinc.server.dao.settings.UserSettingsService;
-import com.hashmapinc.server.dao.tenant.TenantService;
-import com.hashmapinc.server.dao.timeseries.TimeseriesService;
-import com.hashmapinc.server.dao.widget.WidgetTypeService;
-import com.hashmapinc.server.dao.widget.WidgetsBundleService;
 
 import java.io.IOException;
 import java.util.Comparator;
@@ -160,6 +161,9 @@ public abstract class AbstractServiceTest {
 
     @Autowired
     protected DataModelObjectService dataModelObjectService;
+
+    @Autowired
+    protected AttributeDefinitionService attributeDefinitionService;
 
     class IdComparator<D extends BaseData<? extends UUIDBased>> implements Comparator<D> {
         @Override
