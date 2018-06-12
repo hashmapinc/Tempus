@@ -13,17 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.hashmapinc.server.dao.datamodelobject;
+package com.hashmapinc.server.dao.sql.datamodel;
 
-import com.hashmapinc.server.common.data.DataModelObject.AttributeDefinition;
-import com.hashmapinc.server.common.data.id.DataModelObjectId;
+import com.hashmapinc.server.dao.model.sql.DataModelObjectEntity;
+import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.repository.query.Param;
 
 import java.util.List;
-import java.util.UUID;
 
-public interface AttributeDefinitionDao {
-    AttributeDefinition save(AttributeDefinition attributeDefinition);
-    AttributeDefinition findById(UUID id);
-    List<AttributeDefinition> findByDataModelObjectId(DataModelObjectId dataModelObjectId);
-    boolean deleteById(UUID id);
+public interface DataModelObjectRespository extends CrudRepository<DataModelObjectEntity, String> {
+    List<DataModelObjectEntity> findByTenantId(@Param("tenantId") String tenantId);
 }

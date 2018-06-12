@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.hashmapinc.server.dao.sql.DataModelObject;
+package com.hashmapinc.server.dao.sql.datamodel;
 
 import com.hashmapinc.server.common.data.DataModelObject.DataModelObject;
 import com.hashmapinc.server.common.data.UUIDConverter;
@@ -21,7 +21,7 @@ import com.hashmapinc.server.common.data.id.DataModelObjectId;
 import com.hashmapinc.server.common.data.id.TenantId;
 import com.hashmapinc.server.dao.DaoUtil;
 import com.hashmapinc.server.dao.model.sql.DataModelObjectEntity;
-import com.hashmapinc.server.dao.datamodelobject.DataModelObjectDao;
+import com.hashmapinc.server.dao.datamodel.DataModelObjectDao;
 import com.hashmapinc.server.dao.sql.JpaAbstractSearchTextDao;
 import com.hashmapinc.server.dao.util.SqlDao;
 import org.springframework.beans.factory.annotation.Autowired;

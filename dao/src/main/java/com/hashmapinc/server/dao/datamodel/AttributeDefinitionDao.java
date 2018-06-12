@@ -13,11 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.hashmapinc.server.dao.service.datamodelobject.sql;
+package com.hashmapinc.server.dao.datamodel;
 
-import com.hashmapinc.server.dao.service.DaoSqlTest;
-import com.hashmapinc.server.dao.service.datamodelobject.DataModelObjectServiceImpTest;
+import com.hashmapinc.server.common.data.DataModelObject.AttributeDefinition;
+import com.hashmapinc.server.common.data.id.DataModelObjectId;
 
-@DaoSqlTest
-public class DataModelObjectServiceSqlTest extends DataModelObjectServiceImpTest {
+import java.util.List;
+import java.util.UUID;
+
+public interface AttributeDefinitionDao {
+    AttributeDefinition save(AttributeDefinition attributeDefinition);
+    AttributeDefinition findById(UUID id);
+    List<AttributeDefinition> findByDataModelObjectId(DataModelObjectId dataModelObjectId);
+    boolean deleteById(UUID id);
 }

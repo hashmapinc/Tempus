@@ -13,19 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.hashmapinc.server.dao.service;
+package com.hashmapinc.server.dao.service.datamodel;
 
 import com.datastax.driver.core.utils.UUIDs;
 import com.hashmapinc.server.common.data.DataModel;
 import com.hashmapinc.server.common.data.Tenant;
 import com.hashmapinc.server.common.data.id.TenantId;
 import com.hashmapinc.server.dao.exception.DataValidationException;
+import com.hashmapinc.server.dao.service.AbstractServiceTest;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-public abstract class BaseDataModelServiceTest extends AbstractServiceTest{
+public abstract class BaseDataModelServiceTest extends AbstractServiceTest {
     private TenantId tenantId;
 
     @Before
