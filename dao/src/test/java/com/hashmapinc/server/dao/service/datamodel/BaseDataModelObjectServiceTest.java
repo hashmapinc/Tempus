@@ -34,7 +34,7 @@ import java.util.List;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-public abstract class DataModelObjectServiceImpTest extends AbstractServiceTest {
+public abstract class BaseDataModelObjectServiceTest extends AbstractServiceTest {
 
     private TenantId tenantId;
 

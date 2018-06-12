@@ -16,8 +16,8 @@
 package com.hashmapinc.server.dao.service.datamodel.sql;
 
 import com.hashmapinc.server.dao.service.DaoSqlTest;
-import com.hashmapinc.server.dao.service.datamodel.DataModelObjectServiceImpTest;
+import com.hashmapinc.server.dao.service.datamodel.BaseDataModelObjectServiceTest;
 
 @DaoSqlTest
-public class DataModelObjectServiceSqlTest extends DataModelObjectServiceImpTest {
+public class DataModelObjectServiceSqlTest extends BaseDataModelObjectServiceTest {
 }
