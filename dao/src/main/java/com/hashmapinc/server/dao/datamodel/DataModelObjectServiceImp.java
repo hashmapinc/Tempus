@@ -15,6 +15,7 @@
  */
 package com.hashmapinc.server.dao.datamodel;
 
+import com.hashmapinc.server.common.data.DataModel;
 import com.hashmapinc.server.common.data.DataModelObject.DataModelObject;
 import com.hashmapinc.server.common.data.Tenant;
 import com.hashmapinc.server.common.data.id.DataModelObjectId;
@@ -43,6 +44,9 @@ public class DataModelObjectServiceImp implements DataModelObjectService {
 
     @Autowired
     TenantDao tenantDao;
+
+    @Autowired
+    DataModelDao dataModelDao;
 
     @Override
     public DataModelObject save(DataModelObject dataModelObject) {
@@ -75,13 +79,16 @@ public class DataModelObjectServiceImp implements DataModelObjectService {
                 protected void validateDataImpl(DataModelObject dataModelObject) {
                     if (StringUtils.isEmpty(dataModelObject.getName())) {
                         throw new DataValidationException("Data Model object name should be specified!");
-                    }
-                    if (dataModelObject.getTenantId() == null || dataModelObject.getDataModelId() == null) {
+                    }else if (dataModelObject.getTenantId() == null || dataModelObject.getDataModelId() == null) {
                         throw new DataValidationException("Data Model object should be assigned to tenant and a data model!");
                     } else {
                         Tenant tenant = tenantDao.findById(dataModelObject.getTenantId().getId());
                         if (tenant == null) {
                             throw new DataValidationException("Data Model object is referencing to non-existent tenant!");
+                        }
+                        DataModel dataModel = dataModelDao.findById(dataModelObject.getDataModelId().getId());
+                        if(dataModel == null) {
+                            throw new DataValidationException("Data Model object is referencing to non-existent data model!");
                         }
                     }
                 }

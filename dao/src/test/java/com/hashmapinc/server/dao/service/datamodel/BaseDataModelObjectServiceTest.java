@@ -16,6 +16,7 @@
 package com.hashmapinc.server.dao.service.datamodel;
 
 import com.datastax.driver.core.utils.UUIDs;
+import com.hashmapinc.server.common.data.DataModel;
 import com.hashmapinc.server.common.data.DataModelObject.DataModelObject;
 import com.hashmapinc.server.common.data.Tenant;
 import com.hashmapinc.server.common.data.id.CustomerId;
@@ -37,6 +38,7 @@ import static org.junit.Assert.assertNotNull;
 public abstract class BaseDataModelObjectServiceTest extends AbstractServiceTest {
 
     private TenantId tenantId;
+    private DataModelId dataModelId;
 
     @Before
     public void before() {
@@ -45,6 +47,14 @@ public abstract class BaseDataModelObjectServiceTest extends AbstractServiceTest
         Tenant savedTenant = tenantService.saveTenant(tenant);
         Assert.assertNotNull(savedTenant);
         tenantId = savedTenant.getId();
+
+        DataModel dataModel = new DataModel();
+        dataModel.setName("Test Data Model");
+        dataModel.setLastUpdatedTs(System.currentTimeMillis());
+        dataModel.setTenantId(tenantId);
+        DataModel savedDataModel = dataModelService.saveDataModel(dataModel);
+        Assert.assertNotNull(savedDataModel);
+        dataModelId = savedDataModel.getId();
     }
 
     @After
@@ -58,7 +68,7 @@ public abstract class BaseDataModelObjectServiceTest extends AbstractServiceTest
         dataModelObject.setName("well");
         dataModelObject.setCustomerId(new CustomerId(UUIDs.timeBased()));
         dataModelObject.setTenantId(tenantId);
-        dataModelObject.setDataModelId(new DataModelId(UUIDs.timeBased()));
+        dataModelObject.setDataModelId(dataModelId);
         dataModelObject.setParentId(null);
 
         DataModelObject result = dataModelObjectService.save(dataModelObject);
@@ -71,7 +81,6 @@ public abstract class BaseDataModelObjectServiceTest extends AbstractServiceTest
     public void findAllModelObjectsForTenant() throws Exception {
 
         CustomerId customerId = new CustomerId(UUIDs.timeBased());
-        DataModelId dataModelId = new DataModelId(UUIDs.timeBased());
         DataModelObject dataModelObject = new DataModelObject();
 
         dataModelObject.setName("well-1");
@@ -100,7 +109,7 @@ public abstract class BaseDataModelObjectServiceTest extends AbstractServiceTest
         dataModelObject.setName("well");
         dataModelObject.setCustomerId(new CustomerId(UUIDs.timeBased()));
         dataModelObject.setTenantId(tenantId);
-        dataModelObject.setDataModelId(new DataModelId(UUIDs.timeBased()));
+        dataModelObject.setDataModelId(dataModelId);
         dataModelObject.setParentId(null);
 
         DataModelObject result = dataModelObjectService.save(dataModelObject);
@@ -115,6 +124,18 @@ public abstract class BaseDataModelObjectServiceTest extends AbstractServiceTest
     }
 
     @Test(expected = DataValidationException.class)
+    public void testSaveWithEmptyName() throws Exception {
+        DataModelObject dataModelObject = new DataModelObject();
+        dataModelObject.setName("");
+        dataModelObject.setCustomerId(new CustomerId(UUIDs.timeBased()));
+        dataModelObject.setTenantId(tenantId);
+        dataModelObject.setDataModelId(dataModelId);
+        dataModelObject.setParentId(null);
+
+        dataModelObjectService.save(dataModelObject);
+    }
+
+    @Test(expected = DataValidationException.class)
     public void testSaveWithNullDataModelId() throws Exception {
         DataModelObject dataModelObject = new DataModelObject();
         dataModelObject.setName("well");
@@ -123,7 +144,18 @@ public abstract class BaseDataModelObjectServiceTest extends AbstractServiceTest
         dataModelObject.setDataModelId(null);
         dataModelObject.setParentId(null);
 
-        DataModelObject result = dataModelObjectService.save(dataModelObject);
+        dataModelObjectService.save(dataModelObject);
+    }
+
+    @Test(expected = DataValidationException.class)
+    public void testSaveWithInvalidDataModelId() throws Exception {
+        DataModelObject dataModelObject = new DataModelObject();
+        dataModelObject.setName("well");
+        dataModelObject.setCustomerId(new CustomerId(UUIDs.timeBased()));
+        dataModelObject.setTenantId(tenantId);
+        dataModelObject.setDataModelId(new DataModelId(UUIDs.timeBased()));
+        dataModelObject.setParentId(null);
+        dataModelObjectService.save(dataModelObject);
     }
 
     @Test(expected = DataValidationException.class)
@@ -135,7 +167,7 @@ public abstract class BaseDataModelObjectServiceTest extends AbstractServiceTest
         // The tenantId does not exist.
 
         dataModelObject.setTenantId(new TenantId(UUIDs.timeBased()));
-        dataModelObject.setDataModelId(new DataModelId(UUIDs.timeBased()));
+        dataModelObject.setDataModelId(dataModelId);
         dataModelObject.setParentId(null);
 
         DataModelObject result = dataModelObjectService.save(dataModelObject);
