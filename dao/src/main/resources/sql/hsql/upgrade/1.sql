@@ -13,6 +13,5 @@
 -- See the License for the specific language governing permissions and
 -- limitations under the License.
 --
-ALTER TABLE tempus.customer ADD data_model_id timeuuid;
 
 ALTER TABLE application ADD state varchar(255) DEFAULT 'SUSPENDED';

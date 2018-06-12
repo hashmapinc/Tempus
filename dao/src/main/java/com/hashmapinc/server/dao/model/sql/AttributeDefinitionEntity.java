@@ -45,7 +45,7 @@ public class AttributeDefinitionEntity extends BaseSqlEntity<AttributeDefinition
     private String valueType;
 
     @Column(name = ModelConstants.ATTRIBUTE_DEFINITION_MODEL_OBJECT_ID)
-    private String modelObjectId;
+    private String dataModelObjectId;
 
     @Column(name = ModelConstants.ATTRIBUTE_DEFINITION_SOURCE)
     private String source;
@@ -59,7 +59,7 @@ public class AttributeDefinitionEntity extends BaseSqlEntity<AttributeDefinition
             this.setId(attributeDefinition.getId());
         }
         if (attributeDefinition.getDataModelObjectId() !=null ) {
-            this.modelObjectId = UUIDConverter.fromTimeUUID(attributeDefinition.getDataModelObjectId().getId());
+            this.dataModelObjectId = UUIDConverter.fromTimeUUID(attributeDefinition.getDataModelObjectId().getId());
         }
 
         this.name = attributeDefinition.getName();
@@ -86,8 +86,8 @@ public class AttributeDefinitionEntity extends BaseSqlEntity<AttributeDefinition
         if (valueType != null ){
             attributeDefinition.setValueType(valueType);
         }
-        if (modelObjectId != null ){
-            attributeDefinition.setDataModelObjectId(new DataModelObjectId(fromString(modelObjectId)));
+        if (dataModelObjectId != null ){
+            attributeDefinition.setDataModelObjectId(new DataModelObjectId(fromString(dataModelObjectId)));
         }
 
         return attributeDefinition;

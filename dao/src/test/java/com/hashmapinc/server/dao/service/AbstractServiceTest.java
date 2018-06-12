@@ -161,10 +161,6 @@ public abstract class AbstractServiceTest {
     @Autowired
     protected DataModelObjectService dataModelObjectService;
 
-    @Autowired
-    protected ModelObjectService modelObjectService;
-
-
     class IdComparator<D extends BaseData<? extends UUIDBased>> implements Comparator<D> {
         @Override
         public int compare(D o1, D o2) {
