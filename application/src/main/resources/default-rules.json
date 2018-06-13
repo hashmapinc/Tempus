@@ -26,7 +26,13 @@
   {
     "name": "Customer user can create an asset",
     "description": "Customer user can create Asset",
-    "target": "subject.authority == 'CUSTOMER_USER' && action == 'ASSET_CREATE'",
+    "target": "subject.authority == 'CUSTOMER_USER' && action == 'ASSET_WRITE'",
     "condition": "subject.id.id == resource.customerId.id"
+  },
+  {
+    "name": "User can view an asset",
+    "description": "User can view Asset",
+    "target": "subject.authority == 'USER' && action == 'ASSET_VIEW'",
+    "condition": "subject.customerId.id == resource.customerId.id && matcher.checkPermission(subject.permissions, resource.id, 'user:asset:read')"
   }
 ]
