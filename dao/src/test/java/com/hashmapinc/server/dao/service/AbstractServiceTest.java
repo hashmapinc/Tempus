@@ -27,7 +27,9 @@ import com.hashmapinc.server.common.data.id.*;
 import com.hashmapinc.server.common.data.plugin.ComponentDescriptor;
 import com.hashmapinc.server.dao.TagMetaData.TagMetaDataService;
 import com.hashmapinc.server.dao.cluster.NodeMetricService;
+import com.hashmapinc.server.dao.datamodel.DataModelService;
 import com.hashmapinc.server.dao.theme.ThemeService;
+import com.hashmapinc.server.dao.logo.LogoService;
 import com.hashmapinc.server.dao.user.UserService;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -96,6 +98,9 @@ public abstract class AbstractServiceTest {
     protected CustomerService customerService;
 
     @Autowired
+    protected DataModelService dataModelService;
+
+    @Autowired
     protected DeviceService deviceService;
 
     @Autowired
@@ -148,6 +153,9 @@ public abstract class AbstractServiceTest {
 
     @Autowired
     protected ThemeService themeService;
+
+    @Autowired
+    protected LogoService logoService;
 
 
 

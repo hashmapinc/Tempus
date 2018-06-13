@@ -25,7 +25,7 @@ import entityAliasesTemplate from '../entity/alias/entity-aliases.tpl.html';
 
 /*@ngInject*/
 export default function ImportExport($log, $translate, $q, $mdDialog, $document, $http, itembuffer, utils, types,
-                                     dashboardUtils, entityService, dashboardService, pluginService, ruleService,
+                                     dashboardUtils, entityService, dashboardService, adminService, pluginService, ruleService,
                                      widgetService, toast, attributeService,computationService, $window) {
 
 
@@ -45,7 +45,8 @@ export default function ImportExport($log, $translate, $q, $mdDialog, $document,
         importComputation: importComputation,
         exportExtension: exportExtension,
         importExtension: importExtension,
-        exportToPc: exportToPc
+        exportToPc: exportToPc,
+        importLogo:importLogo
     };
 
     return service;
@@ -238,6 +239,30 @@ export default function ImportExport($log, $translate, $q, $mdDialog, $document,
             }
         );
     }
+
+    function importLogo($event) {
+        var deferred = $q.defer();
+        openImportDialog($event, 'admin.import', 'admin.logo-file').then(
+            function success(importData) {
+                //return false;
+                adminService.uploadLogo(importData.file).then(
+                    function success(response) {
+
+                        deferred.resolve(response);
+
+                    },
+                    function fail() {
+                        deferred.reject();
+                    }
+                );
+            },
+            function fail() {
+                deferred.reject();
+            }
+        );
+        return deferred.promise;
+    }
+
 
     function importRule($event) {
         var deferred = $q.defer();

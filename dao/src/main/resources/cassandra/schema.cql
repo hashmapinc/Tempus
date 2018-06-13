@@ -161,6 +161,24 @@ CREATE TABLE IF NOT EXISTS tempus.device (
     PRIMARY KEY (id, tenant_id, customer_id, type)
 );
 
+CREATE TABLE IF NOT EXISTS tempus.data_model (
+    id timeuuid,
+    tenant_id timeuuid,
+    name text,
+    search_text text,
+    additional_info text,
+    last_update_ts bigint,
+    PRIMARY KEY (id, tenant_id)
+);
+
+CREATE MATERIALIZED VIEW IF NOT EXISTS tempus.data_model_by_tenant_and_name AS
+    SELECT *
+    from tempus.data_model
+    WHERE tenant_id IS NOT NULL AND name IS NOT NULL AND id IS NOT NULL
+    PRIMARY KEY ( tenant_id, name, id)
+    WITH CLUSTERING ORDER BY (name ASC, id DESC);
+
+
 CREATE MATERIALIZED VIEW IF NOT EXISTS tempus.device_by_tenant_and_name AS
     SELECT *
     from tempus.device
@@ -787,4 +805,25 @@ CREATE TABLE IF NOT EXISTS tempus.theme (
   value text,
   is_enabled boolean,
   PRIMARY KEY (id,name)
+);
+
+CREATE TABLE IF NOT EXISTS tempus.logo (
+    id uuid,
+    name text,
+    enabled boolean,
+    file blob,
+    PRIMARY KEY (id,name)
+ );
+
+
+CREATE TABLE IF NOT EXISTS tempus.data_model_object_cf (
+   id timeuuid,
+   name text,
+   description text,
+   data_model_id timeuuid,
+   parent_id timeuuid,
+   tenant_id timeuuid,
+   customer_id timeuuid,
+   search_text text,
+   PRIMARY KEY (id, tenant_id)
 );

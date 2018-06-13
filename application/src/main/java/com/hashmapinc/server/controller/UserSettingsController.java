@@ -18,6 +18,7 @@ package com.hashmapinc.server.controller;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.hashmapinc.server.common.data.Theme;
+import com.hashmapinc.server.common.data.Logo;
 import com.hashmapinc.server.common.data.User;
 import com.hashmapinc.server.common.data.UserSettings;
 import com.hashmapinc.server.common.data.id.CustomerId;
@@ -31,12 +32,18 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import com.hashmapinc.server.dao.settings.UserSettingsService;
+import com.hashmapinc.server.dao.logo.LogoService;
+import org.springframework.web.multipart.MultipartFile;
 import com.hashmapinc.server.dao.theme.ThemeService;
 import com.hashmapinc.server.exception.TempusException;
 import com.hashmapinc.server.service.mail.MailService;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+
 
 @Slf4j
 @RestController
@@ -51,6 +58,10 @@ public class UserSettingsController extends BaseController {
 
     @Autowired
     private ThemeService themeService;
+
+    @Autowired
+    private LogoService logoService;
+
 
     @PreAuthorize("hasAnyAuthority('TENANT_ADMIN', 'CUSTOMER_USER', 'SYS_ADMIN')")
     @RequestMapping(value = "/settings/{key}", method = RequestMethod.GET)
@@ -123,6 +134,42 @@ public class UserSettingsController extends BaseController {
         try {
             JsonObject request = new JsonParser().parse(value).getAsJsonObject();
             return themeService.updateThemeStatus(request.get("value").getAsString());
+        } catch (Exception e) {
+            throw handleException(e);
+        }
+    }
+
+    @PreAuthorize("hasAuthority('SYS_ADMIN')")
+    @RequestMapping(value = "/settings/uploadLogo", method = RequestMethod.POST)
+    public Logo uploadLogo(@RequestParam("file") MultipartFile file) throws TempusException {
+        try {
+
+            Logo l = new Logo();
+            l.setDisplay(true);
+            l.setName(file.getOriginalFilename());
+            l.setFile(file.getBytes());
+
+            return logoService.saveLogo(l);
+            // return null;
+        } catch (Exception e) {
+            throw handleException(e);
+        }
+    }
+
+    @RequestMapping(value = "/logo", method = RequestMethod.GET)
+    @ResponseStatus(value = HttpStatus.OK)
+    public Logo getLogo() throws TempusException  {
+        try {
+
+            List <Logo> logo = logoService.find();
+
+            if(logo.size() > 0) {
+
+                return logo.get(0);
+            }
+
+            return null;
+
         } catch (Exception e) {
             throw handleException(e);
         }

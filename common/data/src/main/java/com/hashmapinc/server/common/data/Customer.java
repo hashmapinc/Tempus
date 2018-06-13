@@ -19,6 +19,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonProperty.Access;
 import com.hashmapinc.server.common.data.id.CustomerId;
+import com.hashmapinc.server.common.data.id.DataModelId;
 import com.hashmapinc.server.common.data.id.TenantId;
 
 public class Customer extends ContactBased<CustomerId> implements HasName {
@@ -27,6 +28,7 @@ public class Customer extends ContactBased<CustomerId> implements HasName {
     
     private String title;
     private TenantId tenantId;
+    private DataModelId dataModelId;
 
     public Customer() {
         super();
@@ -39,11 +41,20 @@ public class Customer extends ContactBased<CustomerId> implements HasName {
     public Customer(Customer customer) {
         super(customer);
         this.tenantId = customer.getTenantId();
+        this.dataModelId = customer.getDataModelId();
         this.title = customer.getTitle();
     }
 
     public TenantId getTenantId() {
         return tenantId;
+    }
+
+    public DataModelId getDataModelId() {
+        return dataModelId;
+    }
+
+    public void setDataModelId(DataModelId dataModelId) {
+        this.dataModelId = dataModelId;
     }
 
     public void setTenantId(TenantId tenantId) {
@@ -88,6 +99,7 @@ public class Customer extends ContactBased<CustomerId> implements HasName {
         final int prime = 31;
         int result = super.hashCode();
         result = prime * result + ((tenantId == null) ? 0 : tenantId.hashCode());
+        result = prime * result + ((dataModelId == null) ? 0 : dataModelId.hashCode());
         result = prime * result + ((title == null) ? 0 : title.hashCode());
         return result;
     }
@@ -106,6 +118,11 @@ public class Customer extends ContactBased<CustomerId> implements HasName {
                 return false;
         } else if (!tenantId.equals(other.tenantId))
             return false;
+        if (dataModelId == null) {
+            if (other.dataModelId != null)
+                return false;
+        } else if (!dataModelId.equals(other.dataModelId))
+            return false;
         if (title == null) {
             if (other.title != null)
                 return false;
@@ -121,6 +138,8 @@ public class Customer extends ContactBased<CustomerId> implements HasName {
         builder.append(title);
         builder.append(", tenantId=");
         builder.append(tenantId);
+        builder.append(", dataModelId=");
+        builder.append(dataModelId);
         builder.append(", additionalInfo=");
         builder.append(getAdditionalInfo());
         builder.append(", country=");

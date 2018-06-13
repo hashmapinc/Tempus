@@ -110,6 +110,9 @@ export default angular.module('tempus.locale', [])
                     "change-logo":"Change Logo",
                     "current-theme":"Current theme",
                     "select-theme":"Select theme",
+                    "logo-file":"Logo file",
+                    "import":"Upload Logo",
+                    "logo-file-badRequest":"File is not an image type",
                     "bad-request": "Bad Request,Please Select A Theme."
 
                 },
@@ -556,6 +559,15 @@ export default angular.module('tempus.locale', [])
                     "select-state": "Select target state",
                     "state-controller": "State controller"
                 },
+
+                "dataModels": {
+                    "add": "Add Data Model",
+                    "name": "Title",
+                    "description" :"Description",
+                    "name-required":"This feild is required"
+
+                },
+
                 "application": {
                     "application": "Application",
                     "applications": "Applications",

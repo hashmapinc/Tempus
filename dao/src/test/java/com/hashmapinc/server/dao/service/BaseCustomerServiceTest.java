@@ -17,6 +17,7 @@ package com.hashmapinc.server.dao.service;
 
 import com.datastax.driver.core.utils.UUIDs;
 import com.hashmapinc.server.common.data.Customer;
+import com.hashmapinc.server.common.data.id.DataModelId;
 import com.hashmapinc.server.common.data.page.TextPageLink;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.After;
@@ -108,6 +109,15 @@ public abstract class BaseCustomerServiceTest extends AbstractServiceTest {
         customer.setTenantId(new TenantId(UUIDs.timeBased()));
         customerService.saveCustomer(customer);
     }
+
+    @Test(expected = DataValidationException.class)
+    public void testSaveCustomerWithInvalidDataModel() {
+        Customer customer = new Customer();
+        customer.setTitle("My customer");
+        customer.setDataModelId(new DataModelId(UUIDs.timeBased()));
+        customerService.saveCustomer(customer);
+    }
+
 
     @Test(expected = DataValidationException.class)
     public void testSaveCustomerWithInvalidEmail() {

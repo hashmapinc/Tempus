@@ -176,18 +176,24 @@ public class DefaultSystemDataLoaderService implements SystemDataLoaderService {
 
     public void loadSystemThemes() throws Exception {
 
-        log.info("Loading theme  data...");
-        Theme theme1 = new Theme();
-        theme1.setThemeName("Tempus Blue");
-        theme1.setThemeValue("themeBlue");
-        theme1.setThemeStatus(false);
-        themeService.saveTheme(theme1);
+        List<Theme> theme = themeService.findAll();
 
-        Theme theme2 = new Theme();
-        theme2.setThemeName("Tempus Dark");
-        theme2.setThemeValue("themeDark");
-        theme2.setThemeStatus(true);
-        themeService.saveTheme(theme2);
+        if(theme.size() < 2) {
+
+            
+            Theme theme1 = new Theme();
+            theme1.setThemeName("Tempus Blue");
+            theme1.setThemeValue("themeBlue");
+            theme1.setThemeStatus(false);
+            themeService.saveTheme(theme1);
+
+            Theme theme2 = new Theme();
+            theme2.setThemeName("Tempus Dark");
+            theme2.setThemeValue("themeDark");
+            theme2.setThemeStatus(true);
+            themeService.saveTheme(theme2);
+
+        }
 
 
     }

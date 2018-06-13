@@ -369,6 +369,23 @@ CREATE TABLE IF NOT EXISTS theme (
     is_enabled boolean
  );
 
+ CREATE TABLE IF NOT EXISTS logo (
+    id varchar (31) NOT NULL CONSTRAINT logo_pkey PRIMARY KEY,
+    name varchar,
+    enabled boolean,
+    file LONGVARBINARY
+ );
+
+ CREATE TABLE IF NOT EXISTS data_model (
+   id varchar (31) NOT NULL CONSTRAINT data_model_pkey PRIMARY KEY,
+   name varchar(255),
+   tenant_id varchar(31),
+   search_text varchar(255),
+   additional_info varchar,
+   last_update_ts bigint
+);
+
+
 
 
 CREATE TABLE IF NOT EXISTS installed_schema_versions(executed_scripts varchar(255) UNIQUE);
