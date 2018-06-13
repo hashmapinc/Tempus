@@ -13,10 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.hashmapinc.server.common.data;
+package com.hashmapinc.server.dao.sql.datamodel;
 
+import com.hashmapinc.server.dao.model.sql.DataModelObjectEntity;
+import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.repository.query.Param;
 
-public enum EntityType {
-    TENANT, CUSTOMER, USER, RULE, PLUGIN, DASHBOARD, ASSET, DEVICE, ALARM, APPLICATION, COMPUTATION, COMPUTATION_JOB, NODE_METRIC,THEME, LOGO,
-    DATA_MODEL_OBJECT, DATA_MODEL
+import java.util.List;
+
+public interface DataModelObjectRespository extends CrudRepository<DataModelObjectEntity, String> {
+    List<DataModelObjectEntity> findByDataModelId(@Param("dataModelId") String dataModelId);
 }

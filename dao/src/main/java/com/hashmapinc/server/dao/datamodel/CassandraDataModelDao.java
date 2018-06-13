@@ -16,7 +16,7 @@
 package com.hashmapinc.server.dao.datamodel;
 
 import com.datastax.driver.core.querybuilder.Select;
-import com.hashmapinc.server.common.data.DataModel;
+import com.hashmapinc.server.common.data.datamodel.DataModel;
 import com.hashmapinc.server.dao.DaoUtil;
 import com.hashmapinc.server.dao.model.ModelConstants;
 import com.hashmapinc.server.dao.model.nosql.DataModelEntity;

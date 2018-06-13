@@ -399,6 +399,17 @@ public class ModelConstants {
     public static final String COMPUTATION_JOB_TENANT_ID_PROPERTY = TENANT_ID_PROPERTY;
 
     /**
+     * Cassandra AttributeDefinition constants
+     */
+
+    public static final String ATTRIBUTE_DEFINITION_COLUMN_FAMILY_NAME = "attribute_definition";
+    public static final String ATTRIBUTE_DEFINITION_NAME = "name";
+    public static final String ATTRIBUTE_DEFINITION_VALUE = "attr_value";
+    public static final String ATTRIBUTE_DEFINITION_VALUE_TYPE = "value_type";
+    public static final String ATTRIBUTE_DEFINITION_MODEL_OBJECT_ID = "data_model_object_id";
+    public static final String ATTRIBUTE_DEFINITION_SOURCE = "source";
+
+    /**
      * Cassandra Node Metric Contants
      */
     public static final String NODE_METRIC_COLUMN_FAMILY_NAME = "node_metric";
@@ -470,6 +481,23 @@ public class ModelConstants {
     public static final String KEY_COLUMN = "key";
     public static final String TS_COLUMN = "ts";
     public static final String DS_COLUMN = "ds";
+
+    /**
+     * modelObject constants.
+     */
+
+    public static final String DATA_MODEL_OBJECT_TABLE = "data_model_object";
+    public static final String DATA_MODEL_OBJECT_NAME_PROPERTY = "name";
+    public static final String DATA_MODEL_OBJECT_DESCRIPTION = "description";
+    public static final String DATA_MODEL_OBJECT_TYPE = "type";
+    public static final String DATA_MODEL_OBJECT_PARENT_ID = "parent_id";
+    public static final String DATA_MODEL_ID = "data_model_id";
+
+    /**
+     * cassandra modelObject constants.
+     */
+
+    public static final String DATA_MODEL_OBJECT_CF = "data_model_object_cf";
 
     /**
      * theme constants.

@@ -18,7 +18,11 @@ import './data_models.scss';
 import addDataModel from './add-datamodel.tpl.html';
 
 /*@ngInject*/
+<<<<<<< HEAD
 export function AddDataModelController($scope, $mdDialog, saveItemFunction, helpLinks, $log, $state) {
+=======
+export function AddDataModelController($scope, $mdDialog, saveItemFunction, helpLinks) {
+>>>>>>> 24c069f87aca7d1fae9d37ae107d31dee0864e35
 
     var vm = this;
     vm.helpLinks = helpLinks;
@@ -32,6 +36,7 @@ export function AddDataModelController($scope, $mdDialog, saveItemFunction, help
     }
 
     function add() {
+
         saveItemFunction(vm.item).then(function success(item) {
             vm.item = item;
             $scope.theForm.$setPristine();
@@ -45,14 +50,15 @@ export function AddDataModelController($scope, $mdDialog, saveItemFunction, help
 
 
 /*@ngInject*/
-export function DataModelsController($scope, $log, $rootScope, $state, $stateParams, userService, deviceService, types, attributeService, $q, dashboardService, applicationService, entityService, tempusboardService, utils, $filter, dashboardUtils, $mdDialog, $document, $translate) {
-	var vm = this;
-    //vm.save = save;
+export function DataModelsController($scope, $rootScope, $state, $stateParams, userService, datamodelService, deviceService, types, attributeService, $q, dashboardService, applicationService, entityService, tempusboardService, utils, $filter, dashboardUtils, $mdDialog, $document, $translate) {
+
+    var vm = this;
 
     vm.openDataModelDialog = openDataModelDialog;
     vm.cancel = cancel;
     vm.saveDataModelFunc = saveDataModelFunc;
     vm.AddDataModelController = AddDataModelController;
+    vm.listDataModel = listDataModel;
 
 
     function openDataModelDialog($event) {
@@ -71,13 +77,31 @@ export function DataModelsController($scope, $log, $rootScope, $state, $statePar
     }
 
 
-    function saveDataModelFunc(dataModel) { $log.log(dataModel);
+    function saveDataModelFunc(item) {
+
         var deferred = $q.defer();
+        datamodelService.saveDataModel(item).then(function success(response) {
+            deferred.resolve(response.data);
+        }, function fail(response) {
+            deferred.reject(response.data);
+        });
         return deferred.promise;
+
     }
 
     function cancel() {
         $mdDialog.cancel();
+    }
+
+    function listDataModel() {
+
+        var deferred = $q.defer();
+        datamodelService.listDataModel().then(function success(response) {
+            deferred.resolve(response.data);
+        }, function fail(response) {
+            deferred.reject(response.data);
+        });
+        return deferred.promise;
     }
 
 }
