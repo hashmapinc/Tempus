@@ -18,6 +18,7 @@ import '../dashboard/dashboard.scss';
 import uiRouter from 'angular-ui-router';
 import tempusGrid from '../components/grid.directive';
 import tempusApiUser from '../api/user.service';
+import tempusApiDatamodel from '../api/datamodel.service';
 import tempusApiDevice from '../api/device.service';
 import tempusApiCustomer from '../api/customer.service';
 import tempusApiDashboard from '../api/dashboard.service';
@@ -39,6 +40,7 @@ export default angular.module('tempus.data_models', [
     tempusApiDevice,
     tempusApiCustomer,
     tempusApiDashboard,
+    tempusApiDatamodel,
     tempusApiWidget,
     tempusApiTempusboard,
     tempusWidgetConfig,
