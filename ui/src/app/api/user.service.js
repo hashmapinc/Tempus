@@ -308,8 +308,8 @@ function UserService($http, $q, $rootScope, adminService, dashboardService, logi
             validateJwtToken(doTokenRefresh).then(function success() {
                 var jwtToken = store.get('jwt_token');
                 currentUser = jwtHelper.decodeToken(jwtToken);
-                if (currentUser && currentUser.scopes && currentUser.scopes.length > 0) {
-                    currentUser.authority = currentUser.scopes[0];
+                if (currentUser && currentUser.authorities && currentUser.authorities.length > 0) {
+                    currentUser.authority = currentUser.authorities[0];
                 } else if (currentUser) {
                     currentUser.authority = "ANONYMOUS";
                 }

@@ -15,7 +15,7 @@
  */
 package com.hashmapinc.server.service.security.auth.jwt;
 
-import org.springframework.beans.factory.annotation.Autowired;
+/*import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContext;
@@ -67,4 +67,4 @@ public class JwtTokenAuthenticationProcessingFilter extends AbstractAuthenticati
         SecurityContextHolder.clearContext();
         failureHandler.onAuthenticationFailure(request, response, failed);
     }
-}
+}*/
