@@ -25,6 +25,7 @@ import org.springframework.stereotype.Component;
 import javax.annotation.PostConstruct;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Arrays;
@@ -56,7 +57,8 @@ public class DefaultAuthorizationRulesDefinition implements AuthorizationRulesDe
                 rulesArray = mapper.readValue(new File(rulesFilePath), AuthorizationRule[].class);
             } else {
                 log.info("[init] Custom rules file not found. Loading default rules");
-                rulesArray = mapper.readValue(getClass().getResourceAsStream(DEFAULT_RULES_FILE_NAME), AuthorizationRule[].class);
+                InputStream jsonStream = getClass().getClassLoader().getResourceAsStream(DEFAULT_RULES_FILE_NAME);
+                rulesArray = mapper.readValue(jsonStream, AuthorizationRule[].class);
             }
             this.rules = (rulesArray != null? Arrays.asList(rulesArray) : null);
             log.info("[init] rules loaded successfully.");

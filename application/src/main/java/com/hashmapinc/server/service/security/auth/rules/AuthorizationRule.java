@@ -20,8 +20,8 @@ import org.springframework.expression.Expression;
 
 @Data
 public class AuthorizationRule {
-    private final String name;
-    private final String description;
-    private final Expression target;
-    private final Expression condition;
+    private String name;
+    private String description;
+    private Expression target;
+    private Expression condition;
 }

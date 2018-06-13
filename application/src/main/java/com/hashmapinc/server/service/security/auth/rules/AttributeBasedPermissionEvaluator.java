@@ -28,7 +28,7 @@ import java.io.Serializable;
 public class AttributeBasedPermissionEvaluator implements PermissionEvaluator{
 
     @Autowired
-    RulesChecker rulesChecker;
+    private RulesChecker rulesChecker;
 
     @Override
     public boolean hasPermission(Authentication authentication , Object targetDomainObject, Object permission) {
@@ -41,5 +41,9 @@ public class AttributeBasedPermissionEvaluator implements PermissionEvaluator{
     @Override
     public boolean hasPermission(Authentication authentication, Serializable targetId, String targetType, Object permission) {
         return false;
+    }
+
+    public void setRulesChecker(RulesChecker rulesChecker) {
+        this.rulesChecker = rulesChecker;
     }
 }
