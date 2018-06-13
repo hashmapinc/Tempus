@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.hashmapinc.server.service.security.auth;
+/*package com.hashmapinc.server.service.security.auth;
 
 import com.hashmapinc.server.service.security.model.SecurityUser;
 import com.hashmapinc.server.service.security.model.token.RawAccessJwtToken;
@@ -29,4 +29,4 @@ public class RefreshAuthenticationToken extends AbstractJwtAuthenticationToken {
     public RefreshAuthenticationToken(SecurityUser securityUser) {
         super(securityUser);
     }
-}
+}*/

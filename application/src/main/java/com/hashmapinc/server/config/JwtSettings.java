@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+/*
 package com.hashmapinc.server.config;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -22,24 +23,32 @@ import com.hashmapinc.server.service.security.model.token.JwtToken;
 @Configuration
 @ConfigurationProperties(prefix = "security.jwt")
 public class JwtSettings {
-    /**
+    */
+/**
      * {@link JwtToken} will expire after this time.
-     */
+     *//*
+
     private Integer tokenExpirationTime;
 
-    /**
+    */
+/**
      * Token issuer.
-     */
+     *//*
+
     private String tokenIssuer;
 
-    /**
+    */
+/**
      * Key is used to sign {@link JwtToken}.
-     */
+     *//*
+
     private String tokenSigningKey;
 
-    /**
+    */
+/**
      * {@link JwtToken} can be refreshed during this timeframe.
-     */
+     *//*
+
     private Integer refreshTokenExpTime;
 
     public Integer getRefreshTokenExpTime() {
@@ -72,4 +81,4 @@ public class JwtSettings {
     public void setTokenSigningKey(String tokenSigningKey) {
         this.tokenSigningKey = tokenSigningKey;
     }
-}
+}*/

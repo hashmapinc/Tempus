@@ -15,17 +15,16 @@
  */
 package com.hashmapinc.server.service.security.auth.rest;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
-
 public class LoginRequest {
-    private String username;
     private String password;
+    private String username;
 
-    @JsonCreator
-    public LoginRequest(@JsonProperty("username") String username, @JsonProperty("password") String password) {
-        this.username = username;
+    public LoginRequest(String username, String password) {
         this.password = password;
+        this.username = username;
+    }
+
+    public LoginRequest() {
     }
 
     public String getUsername() {
@@ -34,5 +33,13 @@ public class LoginRequest {
 
     public String getPassword() {
         return password;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 }

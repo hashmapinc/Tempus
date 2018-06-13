@@ -44,7 +44,7 @@ import javax.naming.directory.InitialDirContext;
 import java.util.Hashtable;
 import java.util.UUID;
 
-@Component
+/*@Component
 @Slf4j
 public class RestAuthenticationProvider implements AuthenticationProvider {
 
@@ -168,4 +168,4 @@ public class RestAuthenticationProvider implements AuthenticationProvider {
     public boolean supports(Class<?> authentication) {
         return (UsernamePasswordAuthenticationToken.class.isAssignableFrom(authentication));
     }
-}
+}*/

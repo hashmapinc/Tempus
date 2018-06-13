@@ -31,11 +31,11 @@ import com.hashmapinc.server.common.data.security.UserCredentials;
 import com.hashmapinc.server.exception.TempusErrorCode;
 import com.hashmapinc.server.exception.TempusException;
 import com.hashmapinc.server.service.mail.MailService;
-import com.hashmapinc.server.service.security.auth.jwt.RefreshTokenRepository;
+/*import com.hashmapinc.server.service.security.auth.jwt.RefreshTokenRepository;*/
 import com.hashmapinc.server.service.security.model.SecurityUser;
 import com.hashmapinc.server.service.security.model.UserPrincipal;
-import com.hashmapinc.server.service.security.model.token.JwtToken;
-import com.hashmapinc.server.service.security.model.token.JwtTokenFactory;
+//import com.hashmapinc.server.service.security.model.token.JwtToken;
+//import com.hashmapinc.server.service.security.model.token.JwtTokenFactory;
 
 import javax.servlet.http.HttpServletRequest;
 import java.net.URI;
@@ -51,11 +51,11 @@ public class AuthController extends BaseController {
     @Autowired
     private BCryptPasswordEncoder passwordEncoder;
 
-    @Autowired
+    /*@Autowired
     private JwtTokenFactory tokenFactory;
 
     @Autowired
-    private RefreshTokenRepository refreshTokenRepository;
+    private RefreshTokenRepository refreshTokenRepository;*/
 
     @Autowired
     private MailService mailService;
@@ -177,13 +177,13 @@ public class AuthController extends BaseController {
                 log.info("Unable to send account activation email [{}]", e.getMessage());
             }
 
-            JwtToken accessToken = tokenFactory.createAccessJwtToken(securityUser);
-            JwtToken refreshToken = refreshTokenRepository.requestRefreshToken(securityUser);
+            /*JwtToken accessToken = tokenFactory.createAccessJwtToken(securityUser);
+            JwtToken refreshToken = refreshTokenRepository.requestRefreshToken(securityUser);*/
 
             ObjectMapper objectMapper = new ObjectMapper();
             ObjectNode tokenObject = objectMapper.createObjectNode();
-            tokenObject.put("token", accessToken.getToken());
-            tokenObject.put("refreshToken", refreshToken.getToken());
+            /*tokenObject.put("token", accessToken.getToken());
+            tokenObject.put("refreshToken", refreshToken.getToken());*/
             return tokenObject;
         } catch (Exception e) {
             throw handleException(e);
@@ -213,13 +213,13 @@ public class AuthController extends BaseController {
                 String email = user.getEmail();
                 mailService.sendPasswordWasResetEmail(loginUrl, email);
 
-                JwtToken accessToken = tokenFactory.createAccessJwtToken(securityUser);
-                JwtToken refreshToken = refreshTokenRepository.requestRefreshToken(securityUser);
+                /*JwtToken accessToken = tokenFactory.createAccessJwtToken(securityUser);
+                JwtToken refreshToken = refreshTokenRepository.requestRefreshToken(securityUser);*/
 
                 ObjectMapper objectMapper = new ObjectMapper();
                 ObjectNode tokenObject = objectMapper.createObjectNode();
-                tokenObject.put("token", accessToken.getToken());
-                tokenObject.put("refreshToken", refreshToken.getToken());
+                /*tokenObject.put("token", accessToken.getToken());
+                tokenObject.put("refreshToken", refreshToken.getToken());*/
                 return tokenObject;
             } else {
                 throw new TempusException("Invalid reset token!", TempusErrorCode.BAD_REQUEST_PARAMS);

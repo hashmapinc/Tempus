@@ -25,7 +25,7 @@ import com.hashmapinc.server.common.data.id.TenantId;
 import com.hashmapinc.server.common.data.page.TextPageLink;
 import com.hashmapinc.server.common.data.page.TimePageLink;
 import com.hashmapinc.server.common.data.security.Authority;
-import com.hashmapinc.server.service.security.auth.jwt.RefreshTokenRequest;
+/*import com.hashmapinc.server.service.security.auth.jwt.RefreshTokenRequest;*/
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Header;
 import io.jsonwebtoken.Jwt;
@@ -301,8 +301,9 @@ public abstract class AbstractControllerTest {
 
     protected void refreshToken() throws Exception {
         this.token = null;
-        JsonNode tokenInfo = readResponse(doPost("/api/auth/token", new RefreshTokenRequest(this.refreshToken)).andExpect(status().isOk()), JsonNode.class);
-        validateAndSetJwtToken(tokenInfo, this.username);
+        /*JsonNode tokenInfo = readResponse(doPost("/api/auth/token", new RefreshTokenRequest(this.refreshToken)).andExpect(status().isOk()), JsonNode.class);*/
+
+        validateAndSetJwtToken(null, this.username);
     }
 
     protected void validateAndSetJwtToken(JsonNode tokenInfo, String username) {
