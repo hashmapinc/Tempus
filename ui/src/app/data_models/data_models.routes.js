@@ -16,6 +16,7 @@
 /* eslint-disable import/no-unresolved, import/default */
 
 import dataModelsTemplate from './data_models.tpl.html';
+import dataModelTemplate from './data_model.tpl.html';
 
 /* eslint-enable import/no-unresolved, import/default */
 
@@ -44,6 +45,26 @@ export default function DataModelsRoutes($stateProvider, types) {
             ncyBreadcrumb: {
                 label: '{"icon": "data_models", "label": "data_model.data_models", "link": "/static/svg/data-models-icon.svg"}'
             }
-        });
-
+        })
+        .state('home.data_models.data_model', {
+            url: '/:datamodelId?state',
+            reloadOnSearch: false,
+            module: 'private',
+            auth: ['TENANT_ADMIN', 'CUSTOMER_USER'],
+            views: {
+                "content@home": {
+                    templateUrl: dataModelTemplate,
+                    controller: 'DataModelController',
+                    controllerAs: 'vm'
+                }
+            },
+            data: {
+                widgetEditMode: false,
+                searchEnabled: false,
+                pageTitle: 'data_model.data_models'
+            },
+            ncyBreadcrumb: {
+                label: '{"icon": "data_models", "label": "{{ vm.data_model.title }}", "translate": "false", "link": "/static/svg/data-models-icon.svg"}'
+            }
+        })
 }

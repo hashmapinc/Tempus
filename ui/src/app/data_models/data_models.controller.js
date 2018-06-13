@@ -18,7 +18,7 @@ import './data_models.scss';
 import addDataModel from './add-datamodel.tpl.html';
 
 /*@ngInject*/
-export function AddDataModelController($scope, $mdDialog, saveItemFunction, helpLinks, $log) {
+export function AddDataModelController($scope, $mdDialog, saveItemFunction, helpLinks, $log, $state) {
 
     var vm = this;
     vm.helpLinks = helpLinks;
@@ -36,6 +36,9 @@ export function AddDataModelController($scope, $mdDialog, saveItemFunction, help
             vm.item = item;
             $scope.theForm.$setPristine();
             $mdDialog.hide();
+
+            // go to the newly created data model
+            $state.go('home.data_models.data_model', { dashboardId: 123 });
         });
     }
 }

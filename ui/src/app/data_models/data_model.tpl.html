@@ -1,0 +1,74 @@
+<!--
+
+    Copyright © 2017-2018 Hashmap, Inc
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+        http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<md-content style="padding-top: 150px;" flex tb-expand-fullscreen="vm.widgetEditMode || vm.iframeMode || forceFullscreen"
+ expand-button-id="dashboard-expand-button" hide-expand-button="vm.widgetEditMode || vm.iframeMode || forceFullscreen" expand-tooltip-direction="bottom"
+ ng-if="vm.dashboard">
+	<section class="tb-dashboard-container tb-absolute-fill" ng-class="{ 'is-fullscreen': forceFullscreen, 'tb-dashboard-toolbar-opened': vm.toolbarOpened, 'tb-dashboard-toolbar-closed': !vm.toolbarOpened }">
+		<section ng-show="!$root.loading && vm.dashboardConfigurationError()" layout-align="center center" ng-style="{'color': vm.dashboard.configuration.settings.titleColor}"
+		 ng-class="{'tb-padded' : !vm.widgetEditMode}" style="text-transform: uppercase; display: flex; z-index: 1;" class="md-headline tb-absolute-fill">
+			<span translate>
+				dashboard.configuration-error
+			</span>
+		</section>
+		<section ng-if="!vm.widgetEditMode" class="tb-dashboard-title" layout="row" layout-align="center center" ng-style="{'color': vm.dashboard.configuration.settings.titleColor}">
+			<h3 ng-show="!vm.isEdit && vm.displayTitle()">{{ vm.dashboard.title }}</h3>
+			<md-input-container ng-show="vm.isEdit" class="md-block" style="height: 30px;">
+				<label translate ng-style="{'color': vm.dashboard.configuration.settings.titleColor}">dashboard.title</label>
+				<input class="tb-dashboard-title" ng-style="{'color': vm.dashboard.configuration.settings.titleColor}" required name="title"
+				 ng-model="vm.dashboard.title">
+			</md-input-container>
+		</section>
+		<div class="tb-absolute-fill tb-dashboard-layouts" layout="{{vm.forceDashboardMobileMode ? 'column' : 'row'}}" ng-class="{ 'tb-padded' : !vm.widgetEditMode && (vm.isEdit || vm.displayTitle()), 'tb-shrinked' : vm.isEditingWidget }">
+			<div ng-show="vm.layouts.main.show" id="tb-main-layout" ng-style="{width: vm.mainLayoutWidth(),
+                            height: vm.mainLayoutHeight()}">
+				<tb-dashboard-layout layout-ctx="vm.layouts.main.layoutCtx" dashboard-ctx="vm.dashboardCtx" is-edit="vm.isEdit" is-mobile="vm.forceDashboardMobileMode"
+				 widget-edit-mode="vm.widgetEditMode">
+				</tb-dashboard-layout>
+			</div>
+		</div>
+		<section layout="row" layout-wrap class="tb-footer-buttons md-fab" layout-align="start end">
+			<md-fab-speed-dial ng-disabled="$root.loading" ng-show="!vm.isAddingWidget && vm.isEdit && !vm.widgetEditMode" md-open="vm.addItemActionsOpen"
+			 class="md-scale" md-direction="up">
+				<md-fab-trigger>
+					<md-button ng-disabled="$root.loading" class="tb-btn-footer md-accent md-hue-2 md-fab" aria-label="{{ 'dashboard.add-widget' | translate }}">
+						<md-tooltip md-direction="top">
+							{{ 'dashboard.add-widget' | translate }}
+						</md-tooltip>
+						<ng-md-icon icon="add"></ng-md-icon>
+					</md-button>
+				</md-fab-trigger>
+			</md-fab-speed-dial>
+			<md-button ng-if="(vm.isTenantAdmin() || vm.isSystemAdmin() || vm.isCustomerUser()) && !forceFullscreen" ng-show="vm.isEdit && !vm.isAddingWidget && !$root.loading"
+			 ng-disabled="$root.loading" class="tb-btn-footer md-accent md-hue-2 md-fab" aria-label="{{ 'action.apply' | translate }}"
+			 ng-click="vm.saveDashboard()">
+				<md-tooltip md-direction="top">
+					{{ 'action.apply-changes' | translate }}
+				</md-tooltip>
+				<ng-md-icon icon="done"></ng-md-icon>
+			</md-button>
+			<md-button ng-show="!vm.isAddingWidget && !$root.loading" ng-if="(vm.isTenantAdmin() || vm.isSystemAdmin() || vm.isCustomerUser()) && !forceFullscreen"
+			 ng-disabled="$root.loading" class="tb-btn-footer md-accent md-hue-2 md-fab" aria-label="{{ 'action.edit-mode' | translate }}"
+			 ng-click="vm.toggleDashboardEditMode()">
+				<md-tooltip md-direction="top">
+					{{ (vm.isEdit ? 'action.decline-changes' : 'action.enter-edit-mode') | translate }}
+				</md-tooltip>
+				<ng-md-icon icon="{{vm.isEdit ? 'close' : 'edit'}}" options='{"easing": "circ-in-out", "duration": 375, "rotation": "none"}'></ng-md-icon>
+			</md-button>
+		</section>
+	</section>
+</md-content>
