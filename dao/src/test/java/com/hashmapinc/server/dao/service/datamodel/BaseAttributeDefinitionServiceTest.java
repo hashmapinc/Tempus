@@ -114,20 +114,6 @@ public abstract class BaseAttributeDefinitionServiceTest extends AbstractService
     }
 
     @Test
-    public void testSaveAttributeDefinitionWithInvalidValue() throws Exception {
-        expectedEx.expect(DataValidationException.class);
-        expectedEx.expectMessage("Attribute value should be specified!");
-
-        AttributeDefinition attributeDef = new AttributeDefinition();
-        attributeDef.setDataModelObjectId(dataModelObjectId);
-        attributeDef.setName("Version");
-        attributeDef.setValue("");
-        attributeDef.setValueType(DataType.STRING.name());
-
-        attributeDefinitionService.save(attributeDef);
-    }
-
-    @Test
     public void testSaveAttributeDefinitionWithoutValueType() throws Exception {
         expectedEx.expect(DataValidationException.class);
         expectedEx.expectMessage("A Valid attribute value type should be specified!");

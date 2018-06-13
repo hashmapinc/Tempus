@@ -70,8 +70,6 @@ public class AttributeDefinitionServiceImp implements  AttributeDefinitionServic
     private void validateAttributeDefinition(AttributeDefinition attributeDefinition) {
         if (StringUtils.isEmpty(attributeDefinition.getName())) {
             throw new DataValidationException("Attribute name should be specified!");
-        } else if (StringUtils.isEmpty(attributeDefinition.getValue())) {
-            throw new DataValidationException("Attribute value should be specified!");
         } else if (StringUtils.isEmpty(attributeDefinition.getValueType()) || !EnumUtils.isValidEnum(DataType.class, attributeDefinition.getValueType())) {
             throw new DataValidationException("A Valid attribute value type should be specified!");
         } else if (attributeDefinition.getDataModelObjectId() == null) {
