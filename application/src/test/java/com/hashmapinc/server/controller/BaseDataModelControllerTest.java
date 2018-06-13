@@ -15,7 +15,7 @@
  */
 package com.hashmapinc.server.controller;
 
-import com.hashmapinc.server.common.data.DataModel;
+import com.hashmapinc.server.common.data.datamodel.DataModel;
 import com.hashmapinc.server.common.data.Tenant;
 import com.hashmapinc.server.common.data.User;
 import com.hashmapinc.server.common.data.security.Authority;

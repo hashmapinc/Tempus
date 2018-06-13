@@ -15,7 +15,7 @@
  */
 package com.hashmapinc.server.dao.datamodel;
 
-import com.hashmapinc.server.common.data.DataModelObject.AttributeDefinition;
+import com.hashmapinc.server.common.data.datamodel.AttributeDefinition;
 import com.hashmapinc.server.common.data.id.DataModelObjectId;
 
 import java.util.List;

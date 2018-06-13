@@ -13,11 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.hashmapinc.server.common.data.DataModelObject;
+package com.hashmapinc.server.common.data.datamodel;
 
 import com.hashmapinc.server.common.data.id.DataModelObjectId;
 
-import java.beans.Transient;
 import java.io.Serializable;
 
 public class AttributeDefinition implements Serializable{

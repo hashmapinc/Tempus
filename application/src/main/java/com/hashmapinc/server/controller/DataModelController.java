@@ -15,7 +15,7 @@
  */
 package com.hashmapinc.server.controller;
 
-import com.hashmapinc.server.common.data.DataModel;
+import com.hashmapinc.server.common.data.datamodel.DataModel;
 import com.hashmapinc.server.common.data.EntityType;
 import com.hashmapinc.server.common.data.audit.ActionType;
 import com.hashmapinc.server.exception.TempusException;

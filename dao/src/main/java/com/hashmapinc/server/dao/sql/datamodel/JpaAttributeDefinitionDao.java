@@ -15,7 +15,7 @@
  */
 package com.hashmapinc.server.dao.sql.datamodel;
 
-import com.hashmapinc.server.common.data.DataModelObject.AttributeDefinition;
+import com.hashmapinc.server.common.data.datamodel.AttributeDefinition;
 import com.hashmapinc.server.common.data.UUIDConverter;
 import com.hashmapinc.server.common.data.id.DataModelObjectId;
 import com.hashmapinc.server.dao.DaoUtil;

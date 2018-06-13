@@ -13,8 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.hashmapinc.server.common.data;
+package com.hashmapinc.server.common.data.datamodel;
 
+import com.hashmapinc.server.common.data.HasName;
+import com.hashmapinc.server.common.data.SearchTextBasedWithAdditionalInfo;
 import com.hashmapinc.server.common.data.id.DataModelId;
 import com.hashmapinc.server.common.data.id.TenantId;
 import lombok.EqualsAndHashCode;

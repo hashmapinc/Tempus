@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.hashmapinc.server.common.data.DataModelObject;
+package com.hashmapinc.server.common.data.datamodel;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.hashmapinc.server.common.data.HasName;

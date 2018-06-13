@@ -16,7 +16,7 @@
 package com.hashmapinc.server.dao.service.datamodel;
 
 import com.datastax.driver.core.utils.UUIDs;
-import com.hashmapinc.server.common.data.DataModel;
+import com.hashmapinc.server.common.data.datamodel.DataModel;
 import com.hashmapinc.server.common.data.Tenant;
 import com.hashmapinc.server.common.data.id.TenantId;
 import com.hashmapinc.server.dao.exception.DataValidationException;
