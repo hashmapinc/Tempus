@@ -829,11 +829,10 @@ CREATE TABLE IF NOT EXISTS tempus.data_model_object_cf (
 );
 
 CREATE TABLE IF NOT EXISTS tempus.attribute_definition (
-    id timeuuid,
     name text,
     attr_value text,
     value_type text,
     data_model_object_id timeuuid,
     source text,
-    PRIMARY KEY (id, data_model_object_id)
+    PRIMARY KEY (name, data_model_object_id)
 );

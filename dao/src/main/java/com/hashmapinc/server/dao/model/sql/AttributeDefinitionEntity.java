@@ -18,34 +18,33 @@ package com.hashmapinc.server.dao.model.sql;
 import com.hashmapinc.server.common.data.DataModelObject.AttributeDefinition;
 import com.hashmapinc.server.common.data.UUIDConverter;
 import com.hashmapinc.server.common.data.id.DataModelObjectId;
-import com.hashmapinc.server.dao.model.BaseSqlEntity;
 import com.hashmapinc.server.dao.model.ModelConstants;
+import com.hashmapinc.server.dao.model.ToData;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 import static com.hashmapinc.server.common.data.UUIDConverter.fromString;
 
 @Data
-@EqualsAndHashCode(callSuper = true)
 @Entity
 @Table(name = ModelConstants.ATTRIBUTE_DEFINITION_COLUMN_FAMILY_NAME)
-public class AttributeDefinitionEntity extends BaseSqlEntity<AttributeDefinition>{
+@IdClass(AttributeDefinitionCompositeKey.class)
+public class AttributeDefinitionEntity implements ToData<AttributeDefinition> {
 
+    @Id
     @Column(name = ModelConstants.ATTRIBUTE_DEFINITION_NAME)
     private String name;
+
+    @Id
+    @Column(name = ModelConstants.ATTRIBUTE_DEFINITION_MODEL_OBJECT_ID)
+    private String dataModelObjectId;
 
     @Column(name = ModelConstants.ATTRIBUTE_DEFINITION_VALUE)
     private String value;
 
     @Column(name = ModelConstants.ATTRIBUTE_DEFINITION_VALUE_TYPE)
     private String valueType;
-
-    @Column(name = ModelConstants.ATTRIBUTE_DEFINITION_MODEL_OBJECT_ID)
-    private String dataModelObjectId;
 
     @Column(name = ModelConstants.ATTRIBUTE_DEFINITION_SOURCE)
     private String source;
@@ -55,9 +54,6 @@ public class AttributeDefinitionEntity extends BaseSqlEntity<AttributeDefinition
     }
 
     public AttributeDefinitionEntity(AttributeDefinition attributeDefinition){
-        if (attributeDefinition.getId() != null) {
-            this.setId(attributeDefinition.getId());
-        }
         if (attributeDefinition.getDataModelObjectId() !=null ) {
             this.dataModelObjectId = UUIDConverter.fromTimeUUID(attributeDefinition.getDataModelObjectId().getId());
         }
@@ -71,9 +67,6 @@ public class AttributeDefinitionEntity extends BaseSqlEntity<AttributeDefinition
     @Override
     public AttributeDefinition toData() {
         AttributeDefinition attributeDefinition = new AttributeDefinition();
-        if (id != null ){
-            attributeDefinition.setId(UUIDConverter.fromString(id));
-        }
         if (value != null ){
             attributeDefinition.setValue(value);
         }

@@ -15,48 +15,101 @@
  */
 package com.hashmapinc.server.dao.datamodel;
 
+import com.datastax.driver.core.BoundStatement;
+import com.datastax.driver.core.PreparedStatement;
+import com.datastax.driver.core.ResultSet;
+import com.datastax.driver.core.Row;
 import com.datastax.driver.core.querybuilder.Select;
 import com.hashmapinc.server.common.data.DataModelObject.AttributeDefinition;
 import com.hashmapinc.server.common.data.id.DataModelObjectId;
-import com.hashmapinc.server.dao.DaoUtil;
 import com.hashmapinc.server.dao.model.ModelConstants;
-import com.hashmapinc.server.dao.model.nosql.AttributeDefinitionEntity;
-import com.hashmapinc.server.dao.nosql.CassandraAbstractModelDao;
+import com.hashmapinc.server.dao.nosql.CassandraAbstractDao;
 import com.hashmapinc.server.dao.util.NoSqlDao;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
 import static com.datastax.driver.core.querybuilder.QueryBuilder.eq;
 import static com.datastax.driver.core.querybuilder.QueryBuilder.select;
 
+@Slf4j
 @Service
 @NoSqlDao
-public class CassandraBaseAttributeDefinitionDao extends CassandraAbstractModelDao<AttributeDefinitionEntity, AttributeDefinition> implements AttributeDefinitionDao{
+public class CassandraBaseAttributeDefinitionDao extends CassandraAbstractDao implements AttributeDefinitionDao{
+
+    private PreparedStatement saveStmt;
 
     @Override
-    protected Class getColumnFamilyClass() {
-        return AttributeDefinitionEntity.class;
+    public AttributeDefinition save(AttributeDefinition attributeDefinition) {
+        BoundStatement stmt = getSaveStmt().bind();
+        stmt.setUUID(0, attributeDefinition.getDataModelObjectId().getId());
+        stmt.setString(1, attributeDefinition.getName());
+        stmt.setString(2, attributeDefinition.getValue());
+        stmt.setString(3, attributeDefinition.getValueType());
+        stmt.setString(4, attributeDefinition.getSource());
+
+        executeWrite(stmt);
+
+        return attributeDefinition;
+    }
+
+    private PreparedStatement getSaveStmt() {
+        if (saveStmt == null) {
+            saveStmt = getSession().prepare("INSERT INTO " + ModelConstants.ATTRIBUTE_DEFINITION_COLUMN_FAMILY_NAME +
+                    "(" + ModelConstants.ATTRIBUTE_DEFINITION_MODEL_OBJECT_ID +
+                    "," + ModelConstants.ATTRIBUTE_DEFINITION_NAME +
+                    "," + ModelConstants.ATTRIBUTE_DEFINITION_VALUE +
+                    "," + ModelConstants.ATTRIBUTE_DEFINITION_VALUE_TYPE +
+                    "," + ModelConstants.ATTRIBUTE_DEFINITION_SOURCE +
+                    ")" +
+                    " VALUES(?, ?, ?, ?, ?)");
+        }
+        return saveStmt;
     }
 
     @Override
-    protected String getColumnFamilyName() {
-        return ModelConstants.ATTRIBUTE_DEFINITION_COLUMN_FAMILY_NAME;
+    public AttributeDefinition findByNameAndDataModelObjectId(String name, UUID id) {
+        Select select = select().from(ModelConstants.ATTRIBUTE_DEFINITION_COLUMN_FAMILY_NAME).allowFiltering();
+        Select.Where query = select.where();
+        query.and(eq(ModelConstants.ATTRIBUTE_DEFINITION_NAME, name))
+        .and(eq(ModelConstants.ATTRIBUTE_DEFINITION_MODEL_OBJECT_ID, id));
+        ResultSet resultSet = executeRead(select);
+        return convertResultToAttributeDefinitionList(resultSet).get(0);
     }
-
 
     @Override
     public List<AttributeDefinition> findByDataModelObjectId(DataModelObjectId dataModelObjectId) {
         Select select = select().from(ModelConstants.ATTRIBUTE_DEFINITION_COLUMN_FAMILY_NAME).allowFiltering();
         Select.Where query = select.where();
         query.and(eq(ModelConstants.ATTRIBUTE_DEFINITION_MODEL_OBJECT_ID, dataModelObjectId.getId()));
-        List<AttributeDefinitionEntity> entities = findListByStatement(query);
-        return DaoUtil.convertDataList(entities);
+        ResultSet resultSet = executeRead(select);
+        return convertResultToAttributeDefinitionList(resultSet);
     }
 
-    @Override
-    public boolean deleteById(UUID id) {
-        return super.removeById(id);
+    private List<AttributeDefinition> convertResultToAttributeDefinitionList(ResultSet resultSet) {
+        List<Row> rows = resultSet.all();
+        List<AttributeDefinition> entries = new ArrayList<>(rows.size());
+        if (!rows.isEmpty()) {
+            rows.forEach(row -> {
+                String name = row.getString(ModelConstants.ATTRIBUTE_DEFINITION_NAME);
+                UUID dataModelObjectId = row.getUUID(ModelConstants.ATTRIBUTE_DEFINITION_MODEL_OBJECT_ID);
+                String value = row.getString(ModelConstants.ATTRIBUTE_DEFINITION_VALUE);
+                String valueType = row.getString(ModelConstants.ATTRIBUTE_DEFINITION_VALUE_TYPE);
+                String source = row.getString(ModelConstants.ATTRIBUTE_DEFINITION_SOURCE);
+
+                AttributeDefinition attributeDefinition = new AttributeDefinition();
+                attributeDefinition.setName(name);
+                attributeDefinition.setDataModelObjectId(new DataModelObjectId(dataModelObjectId));
+                attributeDefinition.setSource(source);
+                attributeDefinition.setValue(value);
+                attributeDefinition.setValueType(valueType);
+
+                entries.add(attributeDefinition);
+            });
+        }
+        return entries;
     }
 }

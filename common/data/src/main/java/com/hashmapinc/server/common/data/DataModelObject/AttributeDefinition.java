@@ -17,11 +17,13 @@ package com.hashmapinc.server.common.data.DataModelObject;
 
 import com.hashmapinc.server.common.data.id.DataModelObjectId;
 
-import java.util.UUID;
+import java.beans.Transient;
+import java.io.Serializable;
 
-public class AttributeDefinition {
+public class AttributeDefinition implements Serializable{
 
-    private UUID id;
+    private static final long serialVersionUID = -4403266614883680756L;
+    
     private String name;
     private String value;
     private String valueType;
@@ -33,7 +35,6 @@ public class AttributeDefinition {
     }
 
     public AttributeDefinition(AttributeDefinition attributeDefinition){
-        this.id = attributeDefinition.id;
         this.dataModelObjectId = attributeDefinition.dataModelObjectId;
         this.name = attributeDefinition.name;
         this.source = attributeDefinition.source;
@@ -53,7 +54,6 @@ public class AttributeDefinition {
         if (source != null ? !source.equals(that.source) : that.source != null) return false;
         if (value != null ? !value.equals(that.value) : that.value != null) return false;
         if (valueType != null ? !valueType.equals(that.valueType) : that.valueType != null) return false;
-        if (id != null ? !id.equals(that.id) : that.id != null) return false;
         return true;
     }
 
@@ -61,20 +61,11 @@ public class AttributeDefinition {
     public int hashCode() {
         int result = super.hashCode();
         result = 31 * result + (name != null ? name.hashCode() : 0);
-        result = 31 * result + (id != null ? id.hashCode() : 0);
         result = 31 * result + (dataModelObjectId != null ? dataModelObjectId.hashCode() : 0);
         result = 31 * result + (source != null ? source.hashCode() : 0);
         result = 31 * result + (valueType != null ? valueType.hashCode() : 0);
         result = 31 * result + (value != null ? value.hashCode() : 0);
         return result;
-    }
-
-    public UUID getId() {
-        return id;
-    }
-
-    public void setId(UUID id) {
-        this.id = id;
     }
 
     public String getName() {

@@ -84,12 +84,11 @@ public abstract class BaseAttributeDefinitionServiceTest extends AbstractService
     public void after() {
         tenantService.deleteTenant(tenantId);
         dataModelObjectService.deleteById(dataModelObjectId);
-        attributeDefinitionService.deleteById(attributeDefinition.getId());
     }
 
     @Test
-    public void testFindById() throws Exception {
-        AttributeDefinition foundAttributeDefinitionById = attributeDefinitionService.findById(attributeDefinition.getId());
+    public void testFindByNameAndDataModelId() throws Exception {
+        AttributeDefinition foundAttributeDefinitionById = attributeDefinitionService.findByNameAndDataModelObjectId(attributeDefinition.getName(),attributeDefinition.getDataModelObjectId().getId());
         assertEquals(attributeDefinition.getName(), foundAttributeDefinitionById.getName());
     }
 

@@ -50,21 +50,15 @@ public class AttributeDefinitionServiceImp implements  AttributeDefinitionServic
     }
 
     @Override
-    public AttributeDefinition findById(UUID id) {
+    public AttributeDefinition findByNameAndDataModelObjectId(String name, UUID id) {
         validateId(id, INCORRECT_ATTRIBUTE_DEFINITION_ID);
-        return attributeDefinitionDao.findById(id);
+        return attributeDefinitionDao.findByNameAndDataModelObjectId(name, id);
     }
 
     @Override
     public List<AttributeDefinition> findByDataModelObjectId(DataModelObjectId dataModelObjectId) {
         validateId(dataModelObjectId, INCORRECT_ATTRIBUTE_DEFINITION_ID);
         return attributeDefinitionDao.findByDataModelObjectId(dataModelObjectId);
-    }
-
-    @Override
-    public boolean deleteById(UUID id) {
-        validateId(id, INCORRECT_ATTRIBUTE_DEFINITION_ID);
-        return attributeDefinitionDao.deleteById(id);
     }
 
     private void validateAttributeDefinition(AttributeDefinition attributeDefinition) {

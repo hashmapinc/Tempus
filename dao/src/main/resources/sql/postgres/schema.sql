@@ -406,12 +406,12 @@ CREATE TABLE IF NOT EXISTS data_model_object (
 );
 
 CREATE TABLE IF NOT EXISTS attribute_definition (
-    id varchar(31) NOT NULL CONSTRAINT attribute_definition_pkey PRIMARY KEY,
     name varchar(250),
     attr_value varchar,
     value_type varchar(100),
     data_model_object_id varchar(31),
-    source varchar(250)
+    source varchar(250),
+    CONSTRAINT attr_def_unq_key UNIQUE (name, data_model_object_id)
 );
 
 

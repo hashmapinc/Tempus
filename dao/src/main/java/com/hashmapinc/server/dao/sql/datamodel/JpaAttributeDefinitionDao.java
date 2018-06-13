@@ -21,10 +21,8 @@ import com.hashmapinc.server.common.data.id.DataModelObjectId;
 import com.hashmapinc.server.dao.DaoUtil;
 import com.hashmapinc.server.dao.datamodel.AttributeDefinitionDao;
 import com.hashmapinc.server.dao.model.sql.AttributeDefinitionEntity;
-import com.hashmapinc.server.dao.sql.JpaAbstractDao;
 import com.hashmapinc.server.dao.util.SqlDao;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -32,19 +30,22 @@ import java.util.UUID;
 
 @Service
 @SqlDao
-public class JpaAttributeDefinitionDao extends JpaAbstractDao<AttributeDefinitionEntity, AttributeDefinition> implements AttributeDefinitionDao{
+public class JpaAttributeDefinitionDao implements AttributeDefinitionDao{
 
     @Autowired
     AttributeDefinitionRepository attributeDefinitionRepository;
 
     @Override
-    protected Class<AttributeDefinitionEntity> getEntityClass() {
-        return AttributeDefinitionEntity.class;
+    public AttributeDefinition save(AttributeDefinition attributeDefinition) {
+        AttributeDefinitionEntity attributeDefinitionEntity = new AttributeDefinitionEntity(attributeDefinition);
+        AttributeDefinitionEntity retEntity = attributeDefinitionRepository.save(attributeDefinitionEntity);
+        return retEntity.toData();
     }
 
     @Override
-    protected CrudRepository<AttributeDefinitionEntity, String> getCrudRepository() {
-        return attributeDefinitionRepository;
+    public AttributeDefinition findByNameAndDataModelObjectId(String name, UUID id) {
+        AttributeDefinitionEntity retEntity = attributeDefinitionRepository.findByNameAndDataModelObjectId(name, UUIDConverter.fromTimeUUID(id));
+        return retEntity.toData();
     }
 
     @Override
@@ -53,8 +54,4 @@ public class JpaAttributeDefinitionDao extends JpaAbstractDao<AttributeDefinitio
         return DaoUtil.convertDataList(entities);
     }
 
-    @Override
-    public boolean deleteById(UUID id) {
-        return super.removeById(id);
-    }
 }
