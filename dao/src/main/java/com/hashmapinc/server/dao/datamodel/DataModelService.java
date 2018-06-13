@@ -15,7 +15,7 @@
  */
 package com.hashmapinc.server.dao.datamodel;
 
-import com.hashmapinc.server.common.data.DataModel;
+import com.hashmapinc.server.common.data.datamodel.DataModel;
 
 public interface DataModelService {
 

@@ -14,13 +14,4 @@
 -- limitations under the License.
 --
 
-<<<<<<< 774c7a72752d1fcbb15471f5a158661a08d459c0
-<<<<<<< 8dc458b5c00763d9907dcce094dd3441f0fcf3b9:dao/src/main/resources/cassandra/upgrade/3.cql
-ALTER TABLE tempus.customer ADD data_model_id timeuuid;
-
-=======
 ALTER TABLE application ADD state varchar(255) DEFAULT 'SUSPENDED';
->>>>>>> Commit for adding two seprate folders for HSql and postgres:dao/src/main/resources/sql/postgres/upgrade/1.sql
-=======
-ALTER TABLE application ADD state varchar(255) DEFAULT 'SUSPENDED';
->>>>>>> Commit for adding two seprate folders for HSql and postgres

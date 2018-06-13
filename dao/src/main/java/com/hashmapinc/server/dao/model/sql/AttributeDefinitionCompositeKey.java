@@ -13,11 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.hashmapinc.server.dao.service.sql;
+package com.hashmapinc.server.dao.model.sql;
 
-import com.hashmapinc.server.dao.service.BaseDataModelServiceTest;
-import com.hashmapinc.server.dao.service.DaoSqlTest;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-@DaoSqlTest
-public class DataModelServiceSqlTest extends BaseDataModelServiceTest {
+import javax.persistence.Transient;
+import java.io.Serializable;
+
+
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+public class AttributeDefinitionCompositeKey implements Serializable {
+    @Transient
+    private static final long serialVersionUID = -4089175869616037516L;
+
+    private String name;
+    private String dataModelObjectId;
 }

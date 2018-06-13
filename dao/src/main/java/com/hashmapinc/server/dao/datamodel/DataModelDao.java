@@ -15,7 +15,7 @@
  */
 package com.hashmapinc.server.dao.datamodel;
 
-import com.hashmapinc.server.common.data.DataModel;
+import com.hashmapinc.server.common.data.datamodel.DataModel;
 import com.hashmapinc.server.dao.Dao;
 
 import java.util.Optional;

@@ -13,10 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.hashmapinc.server.common.data;
+package com.hashmapinc.server.dao.datamodel;
 
+import com.hashmapinc.server.common.data.datamodel.AttributeDefinition;
+import com.hashmapinc.server.common.data.id.DataModelObjectId;
 
-public enum EntityType {
-    TENANT, CUSTOMER, USER, RULE, PLUGIN, DASHBOARD, ASSET, DEVICE, ALARM, APPLICATION, COMPUTATION, COMPUTATION_JOB, NODE_METRIC,THEME, LOGO,
-    DATA_MODEL_OBJECT, DATA_MODEL
+import java.util.List;
+import java.util.UUID;
+
+public interface AttributeDefinitionService {
+    AttributeDefinition save(AttributeDefinition attributeDefinition);
+    AttributeDefinition findByNameAndDataModelObjectId(String name, UUID id);
+    List<AttributeDefinition> findByDataModelObjectId(DataModelObjectId dataModelObjectId);
 }
