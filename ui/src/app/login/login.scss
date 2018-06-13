@@ -54,3 +54,20 @@ md-input-container.md-themeDark-theme > md-icon {
 md-input-container.md-themeBlue-theme > md-icon {
   color: white !important;
 }
+
+
+md-input-container.md-themeDark-theme label, md-input-container.md-themeDark-theme .md-placeholder {
+  color: rgba(255,255,255,0.5)!important;
+}
+
+md-input-container.md-themeDark-theme:not(.md-input-invalid).md-input-has-value label {
+  color: rgba(255,255,255,0.5)!important;
+}
+
+md-input-container.md-themeBlue-theme label, md-input-container.md-themeBlue-theme .md-placeholder {
+  color: rgba(255,255,255,0.5)!important;
+}
+
+md-input-container.md-themeBlue-theme:not(.md-input-invalid).md-input-has-value label {
+  color: rgba(255,255,255,0.5)!important;
+}
