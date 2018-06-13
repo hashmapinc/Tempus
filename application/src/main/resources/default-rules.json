@@ -1,0 +1,32 @@
+[
+  {
+    "name": "System Admin",
+    "description": "Admin can do all.",
+    "target": "subject.authority == 'SYS_ADMIN'",
+    "condition": "true"
+  },
+  {
+    "name": "Tenant Admin can perform operations on assets",
+    "description": "Tenant can READ/WRITE/DELETE/ASSIGN Assets",
+    "target": "subject.authority == 'TENANT_ADMIN' && action.startsWith('ASSET_')",
+    "condition": "subject.id.id == resource.tenantId.id"
+  },
+  {
+    "name": "Tenant Admin can perform operations on Devices",
+    "description": "Tenant Admin can READ/WRITE/DELETE Device",
+    "target": "subject.authority == 'TENANT_ADMIN' && action.startsWith('DEVICE_')",
+    "condition": "subject.id.id == resource.tenantId.id"
+  },
+  {
+    "name": "Customer user can view an asset",
+    "description": "Customer user can view Asset",
+    "target": "subject.authority == 'CUSTOMER_USER' && action == 'ASSET_VIEW'",
+    "condition": "subject.tenantId.id == resource.tenantId.id && subject.id.id == resource.customerId.id"
+  },
+  {
+    "name": "Customer user can create an asset",
+    "description": "Customer user can create Asset",
+    "target": "subject.authority == 'CUSTOMER_USER' && action == 'ASSET_CREATE'",
+    "condition": "subject.id.id == resource.customerId.id"
+  }
+]
