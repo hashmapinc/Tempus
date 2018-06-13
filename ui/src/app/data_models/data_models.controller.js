@@ -18,11 +18,7 @@ import './data_models.scss';
 import addDataModel from './add-datamodel.tpl.html';
 
 /*@ngInject*/
-<<<<<<< HEAD
-export function AddDataModelController($scope, $mdDialog, saveItemFunction, helpLinks, $log, $state) {
-=======
 export function AddDataModelController($scope, $mdDialog, saveItemFunction, helpLinks) {
->>>>>>> 24c069f87aca7d1fae9d37ae107d31dee0864e35
 
     var vm = this;
     vm.helpLinks = helpLinks;
