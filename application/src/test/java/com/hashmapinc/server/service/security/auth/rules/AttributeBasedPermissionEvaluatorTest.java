@@ -8,6 +8,7 @@ import com.hashmapinc.server.common.data.id.UserId;
 import com.hashmapinc.server.common.data.security.Authority;
 import com.hashmapinc.server.service.security.model.SecurityUser;
 import com.hashmapinc.server.service.security.model.UserPrincipal;
+import lombok.Builder;
 import lombok.Data;
 import org.junit.Assert;
 import org.junit.Before;
@@ -33,6 +34,8 @@ public class AttributeBasedPermissionEvaluatorTest {
     private AttributeBasedPermissionEvaluator evaluator;
 
     private SecurityUser admin;
+    private SecurityUser tenantAdmin;
+    private SecurityUser customer;
 
     @Before
     public void setup(){
@@ -40,17 +43,79 @@ public class AttributeBasedPermissionEvaluatorTest {
         this.admin.setEnabled(true);
         this.admin.setUserPrincipal(new UserPrincipal(UserPrincipal.Type.USER_NAME, "admin"));
         this.admin.setAuthority(Authority.SYS_ADMIN);
+
+        this.tenantAdmin = new SecurityUser(new UserId(UUIDs.timeBased()));
+        this.tenantAdmin.setEnabled(true);
+        this.tenantAdmin.setUserPrincipal(new UserPrincipal(UserPrincipal.Type.USER_NAME, "tenant_admin"));
+        this.tenantAdmin.setAuthority(Authority.TENANT_ADMIN);
+
+        this.customer = new SecurityUser(new UserId(UUIDs.timeBased()));
+        this.customer.setTenantId(this.tenantAdmin.getTenantId());
+        this.customer.setEnabled(true);
+        this.customer.setUserPrincipal(new UserPrincipal(UserPrincipal.Type.USER_NAME, "customer_user"));
+        this.customer.setAuthority(Authority.CUSTOMER_USER);
     }
 
     @Test
-    public void testSystemAdminAccess(){
+    public void testSystemAdminAccessAssets(){
         UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(admin, null);
-        boolean hasPermission = evaluator.hasPermission(authentication, new TestResource(), "ASSET_CREATE");
+        boolean hasPermission = evaluator.hasPermission(authentication, TestResource.builder().build(), "ASSET_CREATE");
 
         Assert.assertTrue(hasPermission);
     }
 
+    @Test
+    public void testTenantCanCreateAnAsset(){
+        UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(tenantAdmin, null);
+        boolean hasPermission = evaluator.hasPermission(authentication, TestResource.builder().tenantId(new TenantId(tenantAdmin.getId().getId())).build(), "ASSET_CREATE");
+
+        Assert.assertTrue(hasPermission);
+    }
+
+    @Test
+    public void testTenantCanViewAnAsset(){
+        UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(tenantAdmin, null);
+        boolean hasPermission = evaluator.hasPermission(authentication, TestResource.builder().tenantId(new TenantId(tenantAdmin.getId().getId())).build(), "ASSET_READ");
+
+        Assert.assertTrue(hasPermission);
+    }
+
+    @Test
+    public void testTenantCanUpdateAnAsset(){
+        UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(tenantAdmin, null);
+        boolean hasPermission = evaluator.hasPermission(authentication, TestResource.builder().tenantId(new TenantId(tenantAdmin.getId().getId())).build(), "ASSET_UPDATE");
+
+        Assert.assertTrue(hasPermission);
+    }
+
+    @Test
+    public void testTenantCanDeleteAnAsset(){
+        UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(tenantAdmin, null);
+        boolean hasPermission = evaluator.hasPermission(authentication, TestResource.builder().tenantId(new TenantId(tenantAdmin.getId().getId())).build(), "ASSET_DELETE");
+
+        Assert.assertTrue(hasPermission);
+    }
+
+    @Test
+    public void testTenantCanNotAccessResourceOfAnotherTenant(){
+        UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(tenantAdmin, null);
+        boolean hasPermission = evaluator.hasPermission(authentication, TestResource.builder().tenantId(new TenantId(UUIDs.timeBased())).build(), "ASSET_DELETE");
+
+        Assert.assertFalse(hasPermission);
+    }
+
+    @Test
+    public void testCustomerShouldNotBeAbleToDeleteAsset(){
+        UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(customer, null);
+        boolean hasPermission = evaluator.hasPermission(authentication,
+                TestResource.builder().tenantId(new TenantId(UUIDs.timeBased())).build(),
+                "ASSET_DELETE");
+
+        Assert.assertFalse(hasPermission);
+    }
+
     @Data
+    @Builder
     public static class TestResource{
         private AssetId id;
         private TenantId tenantId;
