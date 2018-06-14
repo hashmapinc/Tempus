@@ -1,12 +1,12 @@
 /**
  * Copyright © 2017-2018 Hashmap, Inc
- *
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,18 +16,21 @@
 package com.hashmapinc.server.dao.service.datamodel;
 
 import com.datastax.driver.core.utils.UUIDs;
+import com.hashmapinc.server.common.data.Tenant;
+import com.hashmapinc.server.common.data.datamodel.AttributeDefinition;
 import com.hashmapinc.server.common.data.datamodel.DataModel;
 import com.hashmapinc.server.common.data.datamodel.DataModelObject;
-import com.hashmapinc.server.common.data.Tenant;
 import com.hashmapinc.server.common.data.id.CustomerId;
 import com.hashmapinc.server.common.data.id.DataModelId;
 import com.hashmapinc.server.common.data.id.TenantId;
+import com.hashmapinc.server.common.data.kv.DataType;
 import com.hashmapinc.server.dao.exception.DataValidationException;
 import com.hashmapinc.server.dao.exception.IncorrectParameterException;
 import com.hashmapinc.server.dao.service.AbstractServiceTest;
 import org.junit.*;
 import org.junit.rules.ExpectedException;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
@@ -37,25 +40,16 @@ public abstract class BaseDataModelObjectServiceTest extends AbstractServiceTest
 
     private TenantId tenantId;
     private DataModelId dataModelId;
+    private DataModelObject dataModelObject;
 
     @Rule
     public ExpectedException expectedEx = ExpectedException.none();
 
     @Before
     public void before() {
-        Tenant tenant = new Tenant();
-        tenant.setTitle("My tenant");
-        Tenant savedTenant = tenantService.saveTenant(tenant);
-        Assert.assertNotNull(savedTenant);
-        tenantId = savedTenant.getId();
-
-        DataModel dataModel = new DataModel();
-        dataModel.setName("Test Data Model");
-        dataModel.setLastUpdatedTs(System.currentTimeMillis());
-        dataModel.setTenantId(tenantId);
-        DataModel savedDataModel = dataModelService.saveDataModel(dataModel);
-        Assert.assertNotNull(savedDataModel);
-        dataModelId = savedDataModel.getId();
+        createTenant();
+        createDataModel();
+        createDataModelObject();
     }
 
     @After
@@ -65,22 +59,14 @@ public abstract class BaseDataModelObjectServiceTest extends AbstractServiceTest
 
     @Test
     public void testCreateModelObject() throws Exception {
-        DataModelObject dataModelObject = new DataModelObject();
-        dataModelObject.setName("well");
-        dataModelObject.setCustomerId(new CustomerId(UUIDs.timeBased()));
-        dataModelObject.setType("well-type");
-        dataModelObject.setDataModelId(dataModelId);
-        dataModelObject.setParentId(null);
-
-        DataModelObject result = dataModelObjectService.save(dataModelObject);
-        DataModelObject result2 = dataModelObjectService.findById(result.getId());
-        assertNotNull(result2);
-        assertEquals(result.getName(), result2.getName());
+        DataModelObject result = dataModelObjectService.findById(dataModelObject.getId());
+        assertNotNull(result);
+        assertEquals(dataModelObject.getName(), result.getName());
+        assertEquals(1, dataModelObject.getAttributeDefinitions().size());
     }
 
     @Test
     public void testFindAllModelObjectsForDataModel() throws Exception {
-
         CustomerId customerId = new CustomerId(UUIDs.timeBased());
         DataModelObject dataModelObject = new DataModelObject();
 
@@ -91,29 +77,10 @@ public abstract class BaseDataModelObjectServiceTest extends AbstractServiceTest
 
         dataModelObjectService.save(dataModelObject);
 
-        dataModelObject.setName("well-2");
-        dataModelObject.setCustomerId(customerId);
-        dataModelObject.setDataModelId(dataModelId);
-        dataModelObject.setParentId(null);
-
-        dataModelObjectService.save(dataModelObject);
-
         List<DataModelObject> dataModelObjectList = dataModelObjectService.findByDataModelId(dataModelId);
         assertEquals(2, dataModelObjectList.size());
-    }
-
-    @Test
-    public void testDeleteModelObjectById() throws Exception {
-        DataModelObject dataModelObject = new DataModelObject();
-        dataModelObject.setName("well");
-        dataModelObject.setCustomerId(new CustomerId(UUIDs.timeBased()));
-        dataModelObject.setDataModelId(dataModelId);
-        dataModelObject.setParentId(null);
-
-        DataModelObject result = dataModelObjectService.save(dataModelObject);
-        boolean status = dataModelObjectService.deleteById(result.getId());
-
-        assertEquals(true, status);
+        assertEquals(1, dataModelObjectList.get(0).getAttributeDefinitions().size());
+        assertEquals(0, dataModelObjectList.get(1).getAttributeDefinitions().size());
     }
 
     @Test(expected = IncorrectParameterException.class)
@@ -122,7 +89,7 @@ public abstract class BaseDataModelObjectServiceTest extends AbstractServiceTest
     }
 
     @Test
-    public void testSaveWithEmptyName() throws Exception {
+    public void testSaveWithEmptyDataModelObjectName() throws Exception {
         expectedEx.expect(DataValidationException.class);
         expectedEx.expectMessage("Data Model object name should be specified!");
 
@@ -160,6 +127,91 @@ public abstract class BaseDataModelObjectServiceTest extends AbstractServiceTest
         dataModelObject.setDataModelId(new DataModelId(UUIDs.timeBased()));
         dataModelObject.setParentId(null);
         dataModelObjectService.save(dataModelObject);
+    }
+    @Test
+    public void testSaveAttributeDefinitionWithInvalidName() throws Exception {
+        expectedEx.expect(DataValidationException.class);
+        expectedEx.expectMessage("Attribute name should be specified!");
+
+        AttributeDefinition attributeDef = new AttributeDefinition();
+        attributeDef.setName(null);
+        attributeDef.setValue("1.0");
+        attributeDef.setValueType(DataType.STRING.name());
+
+        DataModelObject dataModelObject = getDataModelObjectWithOneAttributeDef(attributeDef);
+        dataModelObjectService.save(dataModelObject);
+    }
+
+    @Test
+    public void testSaveAttributeDefinitionWithoutValueType() throws Exception {
+        expectedEx.expect(DataValidationException.class);
+        expectedEx.expectMessage("A Valid attribute value type should be specified!");
+
+        AttributeDefinition attributeDef = new AttributeDefinition();
+        attributeDef.setName("Version");
+        attributeDef.setValue("1.0");
+
+        DataModelObject dataModelObject = getDataModelObjectWithOneAttributeDef(attributeDef);
+        dataModelObjectService.save(dataModelObject);
+    }
+
+    @Test
+    public void testSaveAttributeDefinitionWithInvalidValueType() throws Exception {
+        expectedEx.expect(DataValidationException.class);
+        expectedEx.expectMessage("A Valid attribute value type should be specified!");
+
+        AttributeDefinition attributeDef = new AttributeDefinition();
+        attributeDef.setName("Version");
+        attributeDef.setValue("1.0");
+        attributeDef.setValueType("invalid type");
+
+        DataModelObject dataModelObject = getDataModelObjectWithOneAttributeDef(attributeDef);
+        dataModelObjectService.save(dataModelObject);
+    }
+
+    private void createDataModelObject() {
+        AttributeDefinition attributeDef = new AttributeDefinition();
+        attributeDef.setName("Version");
+        attributeDef.setValue("1.0");
+        attributeDef.setValueType(DataType.STRING.name());
+
+        DataModelObject dataModelObj = getDataModelObjectWithOneAttributeDef(attributeDef);
+        dataModelObject = dataModelObjectService.save(dataModelObj);
+        Assert.assertNotNull(dataModelObject);
+        assertEquals(1, dataModelObject.getAttributeDefinitions().size());
+    }
+
+    private DataModelObject getDataModelObjectWithOneAttributeDef(AttributeDefinition attributeDefinition) {
+        List<AttributeDefinition> attributeDefinitions = new ArrayList<>();
+        attributeDefinitions.add(attributeDefinition);
+
+        DataModelObject dataModelObj = new DataModelObject();
+        dataModelObj.setName("well");
+        dataModelObj.setCustomerId(new CustomerId(UUIDs.timeBased()));
+        dataModelObj.setType("well-type");
+        dataModelObj.setDataModelId(dataModelId);
+        dataModelObj.setParentId(null);
+        dataModelObj.setAttributeDefinitions(attributeDefinitions);
+        return dataModelObj;
+    }
+
+    private void createDataModel() {
+        DataModel dataModel1 = new DataModel();
+        dataModel1.setName("Test Data Model");
+        dataModel1.setLastUpdatedTs(System.currentTimeMillis());
+        dataModel1.setTenantId(tenantId);
+        DataModel dataModel = dataModel1;
+        DataModel savedDataModel = dataModelService.saveDataModel(dataModel);
+        Assert.assertNotNull(savedDataModel);
+        dataModelId = savedDataModel.getId();
+    }
+
+    private void createTenant() {
+        Tenant tenant = new Tenant();
+        tenant.setTitle("My tenant");
+        Tenant savedTenant = tenantService.saveTenant(tenant);
+        Assert.assertNotNull(savedTenant);
+        tenantId = savedTenant.getId();
     }
 
 }
