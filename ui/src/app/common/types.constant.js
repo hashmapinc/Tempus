@@ -410,7 +410,7 @@ export default angular.module('tempus.types', [])
                 http: "HTTP",
                 mqtt: "MQTT",
                 opc: "OPC UA",
-                wits: "WITS"
+                wits: "WITS",
                 witsml: "WITSML"
             },
             extensionValueType: {
@@ -447,9 +447,9 @@ export default angular.module('tempus.types', [])
             },
             witsmlObjectTypes: {
               wellbore: "Wellbore",
-                logs: "Logs",
+                log: "Logs",
                 mudLogs: "Mudlogs",
-                messages: "Messages",
+                message: "Messages",
                 rig: "Rig",
                 trajectory: "Trajectory"
             },
