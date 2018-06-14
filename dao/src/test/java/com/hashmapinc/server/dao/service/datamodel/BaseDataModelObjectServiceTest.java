@@ -79,8 +79,6 @@ public abstract class BaseDataModelObjectServiceTest extends AbstractServiceTest
 
         List<DataModelObject> dataModelObjectList = dataModelObjectService.findByDataModelId(dataModelId);
         assertEquals(2, dataModelObjectList.size());
-        assertEquals(1, dataModelObjectList.get(0).getAttributeDefinitions().size());
-        assertEquals(0, dataModelObjectList.get(1).getAttributeDefinitions().size());
     }
 
     @Test(expected = IncorrectParameterException.class)
