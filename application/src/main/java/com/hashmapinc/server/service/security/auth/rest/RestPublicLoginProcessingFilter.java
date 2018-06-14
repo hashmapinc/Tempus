@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.hashmapinc.server.service.security.auth.rest;
+/*package com.hashmapinc.server.service.security.auth.rest;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hashmapinc.server.service.security.exception.AuthMethodNotSupportedException;
@@ -92,4 +92,4 @@ public class RestPublicLoginProcessingFilter extends AbstractAuthenticationProce
         SecurityContextHolder.clearContext();
         failureHandler.onAuthenticationFailure(request, response, failed);
     }
-}
+}*/

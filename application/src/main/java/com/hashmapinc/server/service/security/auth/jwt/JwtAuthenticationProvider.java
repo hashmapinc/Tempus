@@ -15,6 +15,7 @@
  */
 package com.hashmapinc.server.service.security.auth.jwt;
 
+/*
 import com.hashmapinc.server.service.security.model.token.JwtTokenFactory;
 import com.hashmapinc.server.service.security.model.token.RawAccessJwtToken;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,3 +49,4 @@ public class JwtAuthenticationProvider implements AuthenticationProvider {
         return (JwtAuthenticationToken.class.isAssignableFrom(authentication));
     }
 }
+*/

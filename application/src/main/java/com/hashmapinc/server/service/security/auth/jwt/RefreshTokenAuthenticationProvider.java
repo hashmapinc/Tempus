@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.hashmapinc.server.service.security.auth.jwt;
+/*package com.hashmapinc.server.service.security.auth.jwt;
 
 import com.hashmapinc.server.common.data.Customer;
 import com.hashmapinc.server.common.data.User;
@@ -127,4 +127,4 @@ public class RefreshTokenAuthenticationProvider implements AuthenticationProvide
     public boolean supports(Class<?> authentication) {
         return (RefreshAuthenticationToken.class.isAssignableFrom(authentication));
     }
-}
+}*/

@@ -13,26 +13,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-/*package com.hashmapinc.server.service.security.exception;
+package com.hashmapinc.server.service.security.auth.rest;
 
-import org.springframework.security.core.AuthenticationException;
-import com.hashmapinc.server.service.security.model.token.JwtToken;
+public class LoginResponseToken {
+    private String token;
+    private String refreshToken;
 
-public class JwtExpiredTokenException extends AuthenticationException {
-    private static final long serialVersionUID = -5959543783324224864L;
-
-    private JwtToken token;
-
-    public JwtExpiredTokenException(String msg) {
-        super(msg);
+    public LoginResponseToken(String token, String refreshToken) {
+        this.token = token;
+        this.refreshToken = refreshToken;
     }
 
-    public JwtExpiredTokenException(JwtToken token, String msg, Throwable t) {
-        super(msg, t);
+    public String getToken() {
+        return token;
+    }
+
+    public void setToken(String token) {
         this.token = token;
     }
 
-    public String token() {
-        return this.token.getToken();
+    public String getRefreshToken() {
+        return refreshToken;
     }
-}*/
+
+    public void setRefreshToken(String refreshToken) {
+        this.refreshToken = refreshToken;
+    }
+}

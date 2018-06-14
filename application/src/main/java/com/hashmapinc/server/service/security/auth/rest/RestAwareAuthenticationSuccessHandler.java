@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.hashmapinc.server.service.security.auth.rest;
+/*package com.hashmapinc.server.service.security.auth.rest;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -68,11 +68,11 @@ public class RestAwareAuthenticationSuccessHandler implements AuthenticationSucc
         clearAuthenticationAttributes(request);
     }
 
-    /**
+    *//**
      * Removes temporary authentication-related data which may have been stored
      * in the session during the authentication process..
      *
-     */
+     *//*
     protected final void clearAuthenticationAttributes(HttpServletRequest request) {
         HttpSession session = request.getSession(false);
 
@@ -82,4 +82,4 @@ public class RestAwareAuthenticationSuccessHandler implements AuthenticationSucc
 
         session.removeAttribute(WebAttributes.AUTHENTICATION_EXCEPTION);
     }
-}
+}*/

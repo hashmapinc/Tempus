@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.hashmapinc.server.service.security.auth.jwt;
+/*package com.hashmapinc.server.service.security.auth.jwt;
 
 import com.hashmapinc.server.service.security.model.SecurityUser;
 import com.hashmapinc.server.service.security.model.token.JwtToken;
@@ -35,4 +35,4 @@ public class RefreshTokenRepository {
         return tokenFactory.createRefreshToken(user);
     }
 
-}
+}*/
