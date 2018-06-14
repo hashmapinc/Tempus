@@ -41,7 +41,6 @@ export default function ExtensionFormWitsmlDirective($compile, $templateCache, $
             this.version = "v1311";
             this.objectTypes = [];
             this.wellStatus = "drilling";
-            this.mapping = []
         }
 
         var template = $templateCache.get(extensionFormWitsmlTemplate);
