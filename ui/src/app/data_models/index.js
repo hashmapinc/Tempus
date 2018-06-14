@@ -26,11 +26,12 @@ import tempusApiWidget from '../api/widget.service';
 import tempusApiTempusboard from '../api/tempusboard.service';
 import tempusWidgetConfig from '../components/widget/widget-config.directive';
 import dashboardStates from '../dashboard/states';
-import DataModelsDirective from './data_models.directive';
-
 
 import DataModelsRoutes from './data_models.routes';
-import {DataModelsController} from './data_models.controller';
+import DataModelsDirective from './data_models.directive';
+import DataModelViewerDirective from './data_model_viewer.directive';
+import { DataModelsController } from './data_models.controller';
+import {DataModelController} from './data_model.controller';
 
 
 export default angular.module('tempus.data_models', [
@@ -48,5 +49,7 @@ export default angular.module('tempus.data_models', [
 ])
     .config(DataModelsRoutes)
     .controller('DataModelsController', DataModelsController)
+    .controller('DataModelController', DataModelController)
     .directive('tbDataModels', DataModelsDirective)
+    .directive('dataModelViewer', DataModelViewerDirective)
     .name;

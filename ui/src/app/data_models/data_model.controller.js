@@ -14,14 +14,50 @@
  * limitations under the License.
  */
 /* eslint-disable import/no-unresolved, import/default, no-unused-vars */
+import vis from "vis";
 
 /*@ngInject*/
-export function DataModelController($scope, $log, $rootScope, $state, $stateParams, userService, deviceService, types, attributeService, $q, dashboardService, applicationService, entityService, tempusboardService, utils, $filter, dashboardUtils, $mdDialog, $document, $translate) {
+export function DataModelController($scope, $log, $mdDialog) {
 	var vm = this;
+    vm.isEdit = false; // keeps track of whether the model is being edited
+    vm.data_model = {title: "Dummy Data Model"};
 
-    vm.cancel = cancel;
-
-    function cancel() {
+    vm.cancel = function() {
         $mdDialog.cancel();
     }
+
+    vm.toggleDMEditMode = function() {
+        vm.isEdit = !vm.isEdit;
+    }
+
+    // do node stuff    
+    $scope.nodes = new vis.DataSet();
+    $scope.edges = new vis.DataSet();
+    $scope.network_data = {
+        nodes: $scope.nodes,
+        edges: $scope.edges
+    };
+    $scope.network_options = {
+        hierarchicalLayout: {
+            direction: "UD"
+        }
+
+    };
+
+    $scope.onNodeSelect = function (properties) {
+        var selected = $scope.task_nodes.get(properties.nodes[0]);
+        $log.debug(selected);
+    };
+
+    $scope.nodes.add([
+        { id: 1, label: 'Node 1' },
+        { id: 2, label: 'Node 2' },
+        { id: 3, label: 'Node 3' },
+        { id: 4, label: 'Node 4' },
+        { id: 5, label: 'Node 5' }]);
+
+    $scope.edges.add([
+        { id: 1, from: 1, to: 2 },
+        { id: 2, from: 3, to: 2 }
+    ]);
 }
