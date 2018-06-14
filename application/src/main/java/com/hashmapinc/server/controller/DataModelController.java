@@ -15,7 +15,6 @@
  */
 package com.hashmapinc.server.controller;
 
-import com.hashmapinc.server.common.data.UUIDConverter;
 import com.hashmapinc.server.common.data.datamodel.DataModel;
 import com.hashmapinc.server.common.data.EntityType;
 import com.hashmapinc.server.common.data.audit.ActionType;
@@ -25,7 +24,6 @@ import com.hashmapinc.server.common.data.id.DataModelObjectId;
 import com.hashmapinc.server.dao.model.ModelConstants;
 import com.hashmapinc.server.exception.TempusException;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.access.method.P;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -59,6 +57,29 @@ public class DataModelController extends BaseController {
     }
 
     @PreAuthorize("hasAnyAuthority('TENANT_ADMIN', 'CUSTOMER_USER')")
+    @RequestMapping(value = "data-model/{dataModelId}", method = RequestMethod.GET)
+    @ResponseBody
+    public DataModel fetchDataModelById(@PathVariable(DATA_MODEL_ID) String dataModelId) throws TempusException {
+        try{
+            checkParameter(DATA_MODEL_ID, dataModelId);
+            return dataModelService.findById(new DataModelId(toUUID(dataModelId)));
+        } catch (Exception e) {
+            throw handleException(e);
+        }
+    }
+
+    @PreAuthorize("hasAnyAuthority('TENANT_ADMIN', 'CUSTOMER_USER')")
+    @RequestMapping(value = "data-model", method = RequestMethod.GET)
+    @ResponseBody
+    public List<DataModel> fetchAllDataModelByTenantId() throws TempusException {
+        try{
+            return dataModelService.findByTenantId(getCurrentUser().getTenantId());
+        } catch (Exception e) {
+            throw handleException(e);
+        }
+    }
+
+    @PreAuthorize("hasAnyAuthority('TENANT_ADMIN', 'CUSTOMER_USER')")
     @RequestMapping(value = "/data-model/{dataModelId}/objects", method = RequestMethod.POST)
     @ResponseBody
     public DataModelObject saveDataModelObject(@RequestBody DataModelObject dataModelObject,
@@ -83,9 +104,9 @@ public class DataModelController extends BaseController {
     @PreAuthorize("hasAnyAuthority('TENANT_ADMIN', 'CUSTOMER_USER')")
     @RequestMapping(value = "/data-model/{dataModelId}/objects", method = RequestMethod.GET)
     @ResponseBody
-    public List<DataModelObject> fetchDataModelObjectsByModel(@PathVariable("dataModelId") String dataModelId) throws TempusException {
+    public List<DataModelObject> fetchDataModelObjectsByModel(@PathVariable(DATA_MODEL_ID) String dataModelId) throws TempusException {
         try {
-            checkParameter("dataModelId", dataModelId);
+            checkParameter(DATA_MODEL_ID, dataModelId);
             List<DataModelObject> dataModelObjects = dataModelObjectService.
                     findByDataModelId(new DataModelId(toUUID(dataModelId)));
             dataModelObjects = dataModelObjects.stream().filter(dataModelObject -> !dataModelObject.getId().equals(ModelConstants.NULL_UUID)).collect(Collectors.toList());

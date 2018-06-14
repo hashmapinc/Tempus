@@ -15,6 +15,7 @@
  */
 package com.hashmapinc.server.controller;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.hashmapinc.server.common.data.datamodel.DataModel;
 import com.hashmapinc.server.common.data.Tenant;
 import com.hashmapinc.server.common.data.User;
@@ -23,6 +24,8 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+
+import java.util.List;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -73,5 +76,29 @@ public class BaseDataModelControllerTest extends AbstractControllerTest {
         Assert.assertEquals(savedTenant.getId(), savedDataModel.getTenantId());
         Assert.assertEquals(dataModel.getName(), savedDataModel.getName());
         Assert.assertTrue(savedDataModel.getLastUpdatedTs() > 0);
+    }
+
+    @Test
+    public void testFetchDataModelById() throws Exception {
+        DataModel dataModel = new DataModel();
+        dataModel.setName("Drilling Data Model for fetch by id");
+        dataModel.setLastUpdatedTs(System.currentTimeMillis());
+        DataModel savedDataModel = doPost("/api/data-model", dataModel, DataModel.class);
+
+        DataModel fetchedDataModel = doGet("/api/data-model/" + savedDataModel.getId().toString(), DataModel.class);
+        Assert.assertEquals(savedDataModel.getName(), fetchedDataModel.getName());
+    }
+
+    @Test
+    public void testFetchDataModelByTenantId() throws Exception {
+        DataModel dataModel = new DataModel();
+        dataModel.setName("Drilling Data Model for fetch by tenant id");
+        dataModel.setLastUpdatedTs(System.currentTimeMillis());
+        DataModel savedDataModel = doPost("/api/data-model", dataModel, DataModel.class);
+
+        List<DataModel> fetchedDataModels = doGetTyped("/api/data-model", new TypeReference<List<DataModel>>(){});
+
+        Assert.assertEquals(1, fetchedDataModels.size());
+        Assert.assertEquals(savedDataModel.getName(), fetchedDataModels.get(0).getName());
     }
 }
