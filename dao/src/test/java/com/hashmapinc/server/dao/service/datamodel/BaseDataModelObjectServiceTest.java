@@ -70,7 +70,7 @@ public abstract class BaseDataModelObjectServiceTest extends AbstractServiceTest
         CustomerId customerId = new CustomerId(UUIDs.timeBased());
         DataModelObject dataModelObject = new DataModelObject();
 
-        dataModelObject.setName("well-1");
+        dataModelObject.setName("well-2");
         dataModelObject.setCustomerId(customerId);
         dataModelObject.setDataModelId(dataModelId);
         dataModelObject.setParentId(null);
@@ -106,7 +106,7 @@ public abstract class BaseDataModelObjectServiceTest extends AbstractServiceTest
         expectedEx.expectMessage("Data Model object should be assigned to a data model!");
 
         DataModelObject dataModelObject = new DataModelObject();
-        dataModelObject.setName("well");
+        dataModelObject.setName("well-3");
         dataModelObject.setCustomerId(new CustomerId(UUIDs.timeBased()));
         dataModelObject.setDataModelId(null);
         dataModelObject.setParentId(null);
@@ -120,12 +120,27 @@ public abstract class BaseDataModelObjectServiceTest extends AbstractServiceTest
         expectedEx.expectMessage("Data Model object is referencing to non-existent data model!");
 
         DataModelObject dataModelObject = new DataModelObject();
-        dataModelObject.setName("well");
+        dataModelObject.setName("well-4");
         dataModelObject.setCustomerId(new CustomerId(UUIDs.timeBased()));
         dataModelObject.setDataModelId(new DataModelId(UUIDs.timeBased()));
         dataModelObject.setParentId(null);
         dataModelObjectService.save(dataModelObject);
     }
+
+    @Test
+    public void testSaveWithAlreadyPresentDataModelObjectName() throws Exception {
+        expectedEx.expect(DataValidationException.class);
+        expectedEx.expectMessage("Data Model Object with such name already exists!");
+
+        DataModelObject dataModelObject = new DataModelObject();
+        dataModelObject.setName("well-1");
+        dataModelObject.setCustomerId(new CustomerId(UUIDs.timeBased()));
+        dataModelObject.setDataModelId(dataModelId);
+        dataModelObject.setParentId(null);
+        dataModelObjectService.save(dataModelObject);
+
+    }
+
     @Test
     public void testSaveAttributeDefinitionWithInvalidName() throws Exception {
         expectedEx.expect(DataValidationException.class);
@@ -137,6 +152,7 @@ public abstract class BaseDataModelObjectServiceTest extends AbstractServiceTest
         attributeDef.setValueType(DataType.STRING.name());
 
         DataModelObject dataModelObject = getDataModelObjectWithOneAttributeDef(attributeDef);
+        dataModelObject.setName("well-2");
         dataModelObjectService.save(dataModelObject);
     }
 
@@ -150,6 +166,7 @@ public abstract class BaseDataModelObjectServiceTest extends AbstractServiceTest
         attributeDef.setValue("1.0");
 
         DataModelObject dataModelObject = getDataModelObjectWithOneAttributeDef(attributeDef);
+        dataModelObject.setName("well-2");
         dataModelObjectService.save(dataModelObject);
     }
 
@@ -164,6 +181,7 @@ public abstract class BaseDataModelObjectServiceTest extends AbstractServiceTest
         attributeDef.setValueType("invalid type");
 
         DataModelObject dataModelObject = getDataModelObjectWithOneAttributeDef(attributeDef);
+        dataModelObject.setName("well-2");
         dataModelObjectService.save(dataModelObject);
     }
 
@@ -174,6 +192,7 @@ public abstract class BaseDataModelObjectServiceTest extends AbstractServiceTest
         attributeDef.setValueType(DataType.STRING.name());
 
         DataModelObject dataModelObj = getDataModelObjectWithOneAttributeDef(attributeDef);
+        dataModelObj.setName("well-1");
         dataModelObject = dataModelObjectService.save(dataModelObj);
         Assert.assertNotNull(dataModelObject);
         assertEquals(1, dataModelObject.getAttributeDefinitions().size());
@@ -184,7 +203,6 @@ public abstract class BaseDataModelObjectServiceTest extends AbstractServiceTest
         attributeDefinitions.add(attributeDefinition);
 
         DataModelObject dataModelObj = new DataModelObject();
-        dataModelObj.setName("well");
         dataModelObj.setCustomerId(new CustomerId(UUIDs.timeBased()));
         dataModelObj.setType("well-type");
         dataModelObj.setDataModelId(dataModelId);

@@ -103,11 +103,8 @@ public class BaseDataModelControllerTest extends AbstractControllerTest {
         dataModel.setName("Drilling Data Model for fetch by tenant id");
         dataModel.setLastUpdatedTs(System.currentTimeMillis());
         DataModel savedDataModel = doPost("/api/data-model", dataModel, DataModel.class);
-
         List<DataModel> fetchedDataModels = doGetTyped("/api/data-model", new TypeReference<List<DataModel>>(){});
-
-        Assert.assertEquals(1, fetchedDataModels.size());
-        Assert.assertEquals(savedDataModel.getName(), fetchedDataModels.get(0).getName());
+        Assert.assertEquals(2, fetchedDataModels.size());
     }
 
     @Test

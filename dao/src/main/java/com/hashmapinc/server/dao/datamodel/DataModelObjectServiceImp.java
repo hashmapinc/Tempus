@@ -96,12 +96,17 @@ public class DataModelObjectServiceImp implements DataModelObjectService {
                 protected void validateDataImpl(DataModelObject dataModelObject) {
                     if (StringUtils.isEmpty(dataModelObject.getName())) {
                         throw new DataValidationException("Data Model object name should be specified!");
-                    }else if (dataModelObject.getDataModelId() == null) {
+                    } else if (dataModelObject.getDataModelId() == null) {
                         throw new DataValidationException("Data Model object should be assigned to a data model!");
                     } else {
                         DataModel dataModel = dataModelDao.findById(dataModelObject.getDataModelId().getId());
                         if(dataModel == null) {
                             throw new DataValidationException("Data Model object is referencing to non-existent data model!");
+                        }
+
+                        DataModelObject foundDataModelObj = dataModelObjectDao.findByDataModeIdAndName(dataModelObject);
+                        if(foundDataModelObj != null){
+                            throw new DataValidationException("Data Model Object with such name already exists!");
                         }
                     }
                 }
