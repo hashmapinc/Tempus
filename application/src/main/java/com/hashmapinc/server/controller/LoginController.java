@@ -19,13 +19,13 @@ import com.hashmapinc.server.service.security.auth.rest.LoginRequest;
 import com.hashmapinc.server.service.security.auth.rest.LoginResponseToken;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.client.OAuth2RestOperations;
 import org.springframework.security.oauth2.client.OAuth2RestTemplate;
 import org.springframework.security.oauth2.client.token.grant.client.ClientCredentialsResourceDetails;
 import org.springframework.security.oauth2.client.token.grant.password.ResourceOwnerPasswordResourceDetails;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.Arrays;
 
 @RestController
 @RequestMapping("/api")
@@ -42,23 +42,11 @@ public class LoginController extends BaseController {
         userPasswordReq.setAccessTokenUri(apiResourceDetails.getAccessTokenUri());
         userPasswordReq.setClientId(apiResourceDetails.getClientId());
         userPasswordReq.setClientSecret(apiResourceDetails.getClientSecret());
-        userPasswordReq.setGrantType(apiResourceDetails.getGrantType());
-        userPasswordReq.setScope(Arrays.asList("server"));
+        userPasswordReq.setScope(apiResourceDetails.getScope());
         userPasswordReq.setUsername(loginRequest.getUsername());
         userPasswordReq.setPassword(loginRequest.getPassword());
 
-
-
-        //ResourceOwnerPasswordResourceDetails resource = new ResourceOwnerPasswordResourceDetails();
-
-//        resource.setAccessTokenUri("http://localhost:9002/uaa/oauth/token");
-//        resource.setClientId("tempus");
-//        resource.setClientSecret("tempus");
-//        resource.setGrantType("password");
-//        resource.setScope(Arrays.asList("server"));
-//        resource.setUsername("jetinder@hashmapinc.com");
-//        resource.setPassword("demo");
-
+        SecurityContextHolder.getContext().setAuthentication(new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
 
         OAuth2RestOperations oAuth2RestTemplate  = new OAuth2RestTemplate(userPasswordReq);
         LoginResponseToken loginResponseToken =  new LoginResponseToken(oAuth2RestTemplate.getAccessToken().getValue(), oAuth2RestTemplate.getAccessToken().getRefreshToken().getValue());

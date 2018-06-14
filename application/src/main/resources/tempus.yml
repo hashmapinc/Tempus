@@ -44,7 +44,7 @@ security:
       scope: ["server"]
     resource:
       resource-id: "${TEMPUS_RESOURCE_API_ID:tempus-resource-server-rest-api}"
-      tokenInfoUri: "${TOKEN_INFO_URI:http://localhost:9002/oauth/check_token}"
+      tokenInfoUri: "${TOKEN_INFO_URI:http://localhost:9002/uaa/oauth/check_token}"
 
 #security.jwt.tokenSigningKey: "${JWT_TOKEN_SIGNING_KEY:hashmapIncDefaultSigningKey}"
 
