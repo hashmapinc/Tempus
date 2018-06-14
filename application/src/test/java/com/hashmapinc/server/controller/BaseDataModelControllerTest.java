@@ -16,15 +16,18 @@
 package com.hashmapinc.server.controller;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.hashmapinc.server.common.data.datamodel.AttributeDefinition;
 import com.hashmapinc.server.common.data.datamodel.DataModel;
 import com.hashmapinc.server.common.data.Tenant;
 import com.hashmapinc.server.common.data.User;
+import com.hashmapinc.server.common.data.datamodel.DataModelObject;
 import com.hashmapinc.server.common.data.security.Authority;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -33,6 +36,8 @@ public class BaseDataModelControllerTest extends AbstractControllerTest {
 
     private Tenant savedTenant;
     private User tenantAdmin;
+    private DataModel defaultDataModel;
+    private DataModelObject defaultDataModelObj;
 
     @Before
     public void beforeTest() throws Exception {
@@ -51,6 +56,9 @@ public class BaseDataModelControllerTest extends AbstractControllerTest {
         tenantAdmin.setLastName("Downs");
 
         tenantAdmin = createUserAndLogin(tenantAdmin, "testPassword1");
+
+        createDataModel();
+        createDataModelObject();
     }
 
     @After
@@ -100,5 +108,71 @@ public class BaseDataModelControllerTest extends AbstractControllerTest {
 
         Assert.assertEquals(1, fetchedDataModels.size());
         Assert.assertEquals(savedDataModel.getName(), fetchedDataModels.get(0).getName());
+    }
+
+    @Test
+    public void testSaveDataModelObject() throws Exception {
+        DataModelObject dataModelObject = new DataModelObject();
+        dataModelObject.setName("Well");
+
+        AttributeDefinition ad = new AttributeDefinition();
+        ad.setValueType("STRING");
+        ad.setName("attr name");
+        List<AttributeDefinition> attributeDefinitions = new ArrayList<>();
+        attributeDefinitions.add(ad);
+        dataModelObject.setAttributeDefinitions(attributeDefinitions);
+
+        DataModelObject savedDataModelObj = doPost("/api/data-model/" + defaultDataModel.getId().toString() + "/objects", dataModelObject, DataModelObject.class);
+        Assert.assertNotNull(savedDataModelObj);
+        Assert.assertEquals(defaultDataModel.getId(), savedDataModelObj.getDataModelId());
+    }
+
+    @Test
+    public void testFetchDataModelObjectsByModel() throws Exception{
+
+        List<DataModelObject> foundDataModelObjs = doGetTyped("/api/data-model/" + defaultDataModel.getId().toString() + "/objects", new TypeReference<List<DataModelObject>>() {});
+        Assert.assertNotNull(foundDataModelObjs);
+        Assert.assertEquals(1, foundDataModelObjs.size());
+    }
+
+    @Test
+    public void testFetchDataModelObjectById() throws Exception{
+
+        DataModelObject foundDataModelObj = doGet("/api/data-model/objects/" + defaultDataModelObj.getId().toString(), DataModelObject.class);
+        Assert.assertNotNull(foundDataModelObj);
+        Assert.assertEquals(defaultDataModelObj.getName(), foundDataModelObj.getName());
+    }
+
+    private void createDataModel() throws Exception{
+        DataModel dataModel = new DataModel();
+        dataModel.setName("Default Drilling Data Model1");
+        dataModel.setLastUpdatedTs(System.currentTimeMillis());
+
+        DataModel savedDataModel = doPost("/api/data-model", dataModel, DataModel.class);
+
+        Assert.assertNotNull(savedDataModel);
+        Assert.assertNotNull(savedDataModel.getId());
+        Assert.assertTrue(savedDataModel.getCreatedTime() > 0);
+        Assert.assertEquals(savedTenant.getId(), savedDataModel.getTenantId());
+        Assert.assertEquals(dataModel.getName(), savedDataModel.getName());
+        Assert.assertTrue(savedDataModel.getLastUpdatedTs() > 0);
+        defaultDataModel = savedDataModel;
+    }
+
+    private void createDataModelObject() throws Exception{
+        DataModelObject dataModelObject = new DataModelObject();
+        dataModelObject.setName("Well2");
+
+        AttributeDefinition ad = new AttributeDefinition();
+        ad.setValueType("STRING");
+        ad.setName("attr name2");
+        List<AttributeDefinition> attributeDefinitions = new ArrayList<>();
+        attributeDefinitions.add(ad);
+        dataModelObject.setAttributeDefinitions(attributeDefinitions);
+
+        DataModelObject savedDataModelObj = doPost("/api/data-model/" + defaultDataModel.getId().toString() + "/objects", dataModelObject, DataModelObject.class);
+        Assert.assertNotNull(savedDataModelObj);
+        Assert.assertEquals(defaultDataModel.getId(), savedDataModelObj.getDataModelId());
+        defaultDataModelObj = savedDataModelObj;
     }
 }
