@@ -42,7 +42,6 @@ import com.hashmapinc.server.dao.component.ComponentDescriptorService;
 import com.hashmapinc.server.dao.computations.ComputationsService;
 import com.hashmapinc.server.dao.customer.CustomerService;
 import com.hashmapinc.server.dao.dashboard.DashboardService;
-import com.hashmapinc.server.dao.datamodel.AttributeDefinitionService;
 import com.hashmapinc.server.dao.datamodel.DataModelObjectService;
 import com.hashmapinc.server.dao.datamodel.DataModelService;
 import com.hashmapinc.server.dao.depthSeries.DepthSeriesService;
@@ -161,9 +160,6 @@ public abstract class AbstractServiceTest {
 
     @Autowired
     protected DataModelObjectService dataModelObjectService;
-
-    @Autowired
-    protected AttributeDefinitionService attributeDefinitionService;
 
     class IdComparator<D extends BaseData<? extends UUIDBased>> implements Comparator<D> {
         @Override
