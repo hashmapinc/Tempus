@@ -25,5 +25,4 @@ public interface DataModelObjectService {
     DataModelObject save(DataModelObject dataModelObject);
     DataModelObject findById(DataModelObjectId dataModelObjectId);
     List<DataModelObject> findByDataModelId(DataModelId dataModelId);
-    boolean deleteById(DataModelObjectId dataModelObjectId);
 }
