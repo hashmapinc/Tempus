@@ -53,7 +53,6 @@ import java.util.List;
 
 @Configuration
 @EnableWebSecurity
-@EnableGlobalMethodSecurity(prePostEnabled=true)
 @Order(SecurityProperties.ACCESS_OVERRIDE_ORDER)
 public class TempusSecurityConfiguration extends WebSecurityConfigurerAdapter {
 
