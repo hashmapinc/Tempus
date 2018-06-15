@@ -202,7 +202,7 @@ export default function AppConfig($provide,
 
 
     $mdThemingProvider.theme('themeBlue')
-        .primaryPalette('blue')
+        .primaryPalette('deep-purple')
         .accentPalette('tb-accent')
 
 
