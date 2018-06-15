@@ -18,6 +18,10 @@
 <md-content style="padding-top: 150px;" flex tb-expand-fullscreen="vm.widgetEditMode || vm.iframeMode || forceFullscreen"
  expand-button-id="dashboard-expand-button" hide-expand-button="vm.widgetEditMode || vm.iframeMode || forceFullscreen" expand-tooltip-direction="bottom">
 	<section class="tb-dashboard-container tb-absolute-fill" ng-class="{ 'is-fullscreen': forceFullscreen, 'tb-dashboard-toolbar-opened': vm.toolbarOpened, 'tb-dashboard-toolbar-closed': !vm.toolbarOpened }">
+		<div id="dataModelViewerContainer" style="
+							height: 100%;
+							width: 100%;">
+		</div>
 		<section class="tb-dashboard-title" layout="row" layout-align="center center" ng-style="{'color': vm.dashboard.configuration.settings.titleColor}">
 			<h3 ng-show="!vm.isEdit">{{ vm.dashboard.title }}</h3>
 			<md-input-container ng-show="vm.isEdit" class="md-block" style="height: 30px;">
@@ -26,8 +30,6 @@
 				 ng-model="vm.dashboard.title">
 			</md-input-container>
 		</section>
-
-		<data-model-viewer ng-model="network_data" options="network_options" on-select="onNodeSelect" id="previewNetwork"></data-model-viewer>
 
 		<section layout="row" layout-wrap class="tb-footer-buttons md-fab" layout-align="start end">
 			<md-fab-speed-dial ng-disabled="$root.loading" ng-show="vm.isEdit" md-open="vm.addItemActionsOpen"

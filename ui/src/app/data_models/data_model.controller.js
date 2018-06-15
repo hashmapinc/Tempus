@@ -15,6 +15,7 @@
  */
 /* eslint-disable import/no-unresolved, import/default, no-unused-vars */
 import vis from "vis";
+import 'vis/dist/vis-network.min.css';
 
 /*@ngInject*/
 export function DataModelController($scope, $log, $mdDialog) {
@@ -30,34 +31,35 @@ export function DataModelController($scope, $log, $mdDialog) {
         vm.isEdit = !vm.isEdit;
     }
 
-    // do node stuff    
-    $scope.nodes = new vis.DataSet();
-    $scope.edges = new vis.DataSet();
-    $scope.network_data = {
-        nodes: $scope.nodes,
-        edges: $scope.edges
-    };
-    $scope.network_options = {
-        hierarchicalLayout: {
-            direction: "UD"
-        }
-
-    };
-
-    $scope.onNodeSelect = function (properties) {
-        var selected = $scope.task_nodes.get(properties.nodes[0]);
-        $log.debug(selected);
-    };
-
-    $scope.nodes.add([
+    // create nodes and edges for dummy graph
+    var nodes = new vis.DataSet();
+    var edges = new vis.DataSet();
+    nodes.add([
         { id: 1, label: 'Node 1' },
         { id: 2, label: 'Node 2' },
         { id: 3, label: 'Node 3' },
         { id: 4, label: 'Node 4' },
         { id: 5, label: 'Node 5' }]);
-
-    $scope.edges.add([
+    edges.add([
         { id: 1, from: 1, to: 2 },
         { id: 2, from: 3, to: 2 }
     ]);
+
+    // Configure dummy graph data + options
+    var network_data = {
+        nodes: nodes,
+        edges: edges
+    };
+    var network_options = {
+        hierarchicalLayout: {
+            direction: "UD"
+        }
+    };
+
+    // build network, add select listener
+    var networkContainer = angular.element("#dataModelViewerContainer")[0];
+    var network = new vis.Network(networkContainer, network_data, network_options);
+    network.on('select', function (properties) {
+        $log.debug(properties);
+    });
 }

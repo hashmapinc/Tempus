@@ -29,7 +29,6 @@ import dashboardStates from '../dashboard/states';
 
 import DataModelsRoutes from './data_models.routes';
 import DataModelsDirective from './data_models.directive';
-import DataModelViewerDirective from './data_model_viewer.directive';
 import { DataModelsController } from './data_models.controller';
 import {DataModelController} from './data_model.controller';
 
@@ -51,5 +50,4 @@ export default angular.module('tempus.data_models', [
     .controller('DataModelsController', DataModelsController)
     .controller('DataModelController', DataModelController)
     .directive('tbDataModels', DataModelsDirective)
-    .directive('dataModelViewer', DataModelViewerDirective)
     .name;
