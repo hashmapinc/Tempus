@@ -13,21 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-@import "../../scss/constants";
+package com.hashmapinc.server.dao.sql.datamodel;
 
-.tb-home-links {
-    .md-headline {
-      font-size: 20px;
-      @media (min-width: $layout-breakpoint-xmd) {
-        font-size: 24px;
-      }
-    }
-}
+import com.hashmapinc.server.dao.model.sql.DataModelObjectEntity;
+import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.repository.query.Param;
 
-.themeDark{
-  background: #0c3483 !important;
-}
+import java.util.List;
 
-.themeBlue {
-  background: #673AB7 !important;
+public interface DataModelObjectRespository extends CrudRepository<DataModelObjectEntity, String> {
+    List<DataModelObjectEntity> findByDataModelId(@Param("dataModelId") String dataModelId);
 }

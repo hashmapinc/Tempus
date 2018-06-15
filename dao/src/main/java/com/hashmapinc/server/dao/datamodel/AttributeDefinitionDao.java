@@ -13,21 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-@import "../../scss/constants";
+package com.hashmapinc.server.dao.datamodel;
 
-.tb-home-links {
-    .md-headline {
-      font-size: 20px;
-      @media (min-width: $layout-breakpoint-xmd) {
-        font-size: 24px;
-      }
-    }
-}
+import com.hashmapinc.server.common.data.datamodel.AttributeDefinition;
+import com.hashmapinc.server.common.data.id.DataModelObjectId;
 
-.themeDark{
-  background: #0c3483 !important;
-}
+import java.util.List;
+import java.util.UUID;
 
-.themeBlue {
-  background: #673AB7 !important;
+public interface AttributeDefinitionDao {
+    AttributeDefinition save(AttributeDefinition attributeDefinition);
+    AttributeDefinition findByNameAndDataModelObjectId(String name, UUID id);
+    List<AttributeDefinition> findByDataModelObjectId(DataModelObjectId dataModelObjectId);
 }
