@@ -24,6 +24,7 @@ import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.JsonNodeType;
 import com.google.gson.*;
 import com.hashmapinc.server.common.data.kv.*;
 import com.hashmapinc.server.common.msg.core.*;
@@ -155,12 +156,29 @@ public class JsonConverter {
                 } catch (IOException ex) {
                     log.error(ex.getMessage());
                 }
-                result.add(new JsonDataEntry(valueEntry.getKey(), value));
+                if(!isUnitPresentInJson(valueEntry.getKey(), value, result)){
+                    result.add(new JsonDataEntry(valueEntry.getKey(), value));
+                }
             } else {
                 throw new JsonSyntaxException(CAN_T_PARSE_VALUE + element);
             }
         }
         return result;
+    }
+
+    private static boolean isUnitPresentInJson(String key, JsonNode value, List<KvEntry> result){
+        boolean unitPresent = false;
+        if (value.has("value") && value.has("unit")){
+            if(value.get("value").getNodeType() == JsonNodeType.BOOLEAN){
+                result.add(new BooleanDataEntry(key, value.get("unit").asText(), value.get("value").asBoolean()));
+            }else if(value.get("value").getNodeType() == JsonNodeType.STRING){
+                result.add(new StringDataEntry(key, value.get("unit").asText(), value.get("value").asText()));
+            }else if(value.get("value").getNodeType() == JsonNodeType.NUMBER){
+                parseNumericValue(result, key, value.get("unit").asText(), value.get("value"));
+            }
+            unitPresent = true;
+        }
+        return unitPresent;
     }
 
     private static void parseNumericValue(List<KvEntry> result, Entry<String, JsonElement> valueEntry, JsonPrimitive value) {
@@ -170,6 +188,19 @@ public class JsonConverter {
             try {
                 long longValue = Long.parseLong(value.getAsString());
                 result.add(new LongDataEntry(valueEntry.getKey(), longValue));
+            } catch (NumberFormatException e) {
+                throw new JsonSyntaxException("Big integer values are not supported!");
+            }
+        }
+    }
+
+    private static void parseNumericValue(List<KvEntry> result, String key, String unit, JsonNode value) {
+        if (value.asText().contains(".")) {
+            result.add(new DoubleDataEntry(key, unit, value.asDouble()));
+        } else {
+            try {
+                long longValue = value.asLong();
+                result.add(new LongDataEntry(key, longValue));
             } catch (NumberFormatException e) {
                 throw new JsonSyntaxException("Big integer values are not supported!");
             }

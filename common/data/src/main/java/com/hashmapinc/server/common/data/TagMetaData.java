@@ -35,8 +35,8 @@ public class TagMetaData {
         this.meanFrequency = 0.0;
         this.minFrequency = 0.0;
         this.medianFrequency = 0.0;
-        this.unit = "default unit";
-        this.source = "default source";
+        this.unit = "no unit";
+        this.source = "no source";
     }
 
     public String getEntityId() {
