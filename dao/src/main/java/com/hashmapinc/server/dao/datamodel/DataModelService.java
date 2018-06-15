@@ -16,9 +16,14 @@
 package com.hashmapinc.server.dao.datamodel;
 
 import com.hashmapinc.server.common.data.datamodel.DataModel;
+import com.hashmapinc.server.common.data.id.DataModelId;
+import com.hashmapinc.server.common.data.id.TenantId;
+
+import java.util.List;
 
 public interface DataModelService {
 
     DataModel saveDataModel(DataModel dataModel);
-
+    DataModel findById(DataModelId id);
+    List<DataModel> findByTenantId(TenantId tenantId);
 }

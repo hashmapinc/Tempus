@@ -26,5 +26,6 @@ public interface DataModelObjectDao {
     DataModelObject findById(DataModelObjectId id);
     DataModelObject save(DataModelObject dataModelObject);
     List<DataModelObject> findByDataModelId(DataModelId dataModelId);
+    DataModelObject findByDataModeIdAndName(DataModelObject dataModelObject);
     boolean removeById(UUID id);
 }

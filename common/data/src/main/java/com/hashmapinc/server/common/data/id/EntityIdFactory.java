@@ -67,6 +67,8 @@ public class EntityIdFactory {
                 return new NodeMetricId(uuid);
             case DATA_MODEL:
                 return new DataModelId(uuid);
+            case DATA_MODEL_OBJECT:
+                return new DataModelObjectId(uuid);
         }
         throw new IllegalArgumentException("EntityType " + type + " is not supported!");
     }

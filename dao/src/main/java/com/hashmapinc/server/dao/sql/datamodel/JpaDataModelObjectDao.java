@@ -59,6 +59,9 @@ public class JpaDataModelObjectDao extends JpaAbstractSearchTextDao<DataModelObj
         return DaoUtil.convertDataList(entities);
     }
 
-
-
+    @Override
+    public DataModelObject findByDataModeIdAndName(DataModelObject dataModelObject) {
+        return DaoUtil.getData(dataModelObjectRespository.findByDataModelIdAndName(UUIDConverter.fromTimeUUID(dataModelObject.getDataModelId().getId())
+                ,dataModelObject.getName()));
+    }
 }

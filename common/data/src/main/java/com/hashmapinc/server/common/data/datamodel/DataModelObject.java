@@ -20,6 +20,9 @@ import com.hashmapinc.server.common.data.HasName;
 import com.hashmapinc.server.common.data.SearchTextBased;
 import com.hashmapinc.server.common.data.id.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class DataModelObject extends SearchTextBased<DataModelObjectId> implements HasName {
     private String name;
     private JsonNode decription;
@@ -27,6 +30,7 @@ public class DataModelObject extends SearchTextBased<DataModelObjectId> implemen
     private String type;
     private DataModelObjectId parentId;
     private CustomerId customerId;
+    private List<AttributeDefinition> attributeDefinitions = new ArrayList<AttributeDefinition>();
 
     public DataModelObject() {
         super();
@@ -44,6 +48,7 @@ public class DataModelObject extends SearchTextBased<DataModelObjectId> implemen
         this.type = dataModelObject.type;
         this.parentId = dataModelObject.parentId;
         this.customerId = dataModelObject.customerId;
+        this.attributeDefinitions = dataModelObject.attributeDefinitions;
     }
 
     @Override
@@ -59,6 +64,7 @@ public class DataModelObject extends SearchTextBased<DataModelObjectId> implemen
          if (type != null ? !type.equals(that.type) : that.type != null) return false;
          if (parentId != null ? !parentId.equals(that.parentId) : that.parentId != null) return false;
          if (customerId != null ? !customerId.equals(that.customerId) : that.customerId != null) return false;
+         if (attributeDefinitions != null ? !attributeDefinitions.equals(that.attributeDefinitions) : that.attributeDefinitions != null) return false;
         return true;
     }
 
@@ -71,6 +77,7 @@ public class DataModelObject extends SearchTextBased<DataModelObjectId> implemen
         result = 31 * result + (type != null ? type.hashCode() : 0);
         result = 31 * result + (parentId != null ? parentId.hashCode() : 0);
         result = 31 * result + (customerId != null ? customerId.hashCode() : 0);
+        result = 31 * result + (attributeDefinitions != null ? attributeDefinitions.hashCode() : 0);
         return result;
     }
 
@@ -118,6 +125,14 @@ public class DataModelObject extends SearchTextBased<DataModelObjectId> implemen
         this.customerId = customerId;
     }
 
+    public List<AttributeDefinition> getAttributeDefinitions() {
+        return attributeDefinitions;
+    }
+
+    public void setAttributeDefinitions(List<AttributeDefinition> attributeDefinitions) {
+        this.attributeDefinitions = attributeDefinitions;
+    }
+
     @Override
     public String getName() {
         return name;
@@ -127,6 +142,5 @@ public class DataModelObject extends SearchTextBased<DataModelObjectId> implemen
     public String getSearchText() {
         return name;
     }
-
 
 }

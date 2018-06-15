@@ -15,18 +15,22 @@
  */
 package com.hashmapinc.server.dao.datamodel;
 
+import com.hashmapinc.server.common.data.datamodel.AttributeDefinition;
 import com.hashmapinc.server.common.data.datamodel.DataModel;
 import com.hashmapinc.server.common.data.datamodel.DataModelObject;
 import com.hashmapinc.server.common.data.id.DataModelId;
 import com.hashmapinc.server.common.data.id.DataModelObjectId;
+import com.hashmapinc.server.common.data.kv.DataType;
 import com.hashmapinc.server.dao.exception.DataValidationException;
 import com.hashmapinc.server.dao.service.DataValidator;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.EnumUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static com.hashmapinc.server.dao.service.Validator.validateId;
 
@@ -43,29 +47,47 @@ public class DataModelObjectServiceImp implements DataModelObjectService {
     @Autowired
     DataModelDao dataModelDao;
 
+    @Autowired
+    AttributeDefinitionDao attributeDefinitionDao;
+
     @Override
     public DataModelObject save(DataModelObject dataModelObject) {
         log.trace("Executing save for DataModel Object {}", dataModelObject);
         dataModelObjectDataValidator.validate(dataModelObject);
-        return dataModelObjectDao.save(dataModelObject);
+        DataModelObject savedDataModelObj = dataModelObjectDao.save(dataModelObject);
+
+        List<AttributeDefinition> savedAttributeDefs = dataModelObject.getAttributeDefinitions().stream().map(attributeDefinition -> {
+            attributeDefinition.setDataModelObjectId(savedDataModelObj.getId());
+            validateAttributeDefinition(attributeDefinition);
+            return attributeDefinitionDao.save(attributeDefinition);
+        }).collect(Collectors.toList());
+
+        savedDataModelObj.setAttributeDefinitions(savedAttributeDefs);
+        return savedDataModelObj;
     }
 
     @Override
     public DataModelObject findById(DataModelObjectId dataModelObjectId) {
         validateId(dataModelObjectId, INCORRECT_DATA_MODEL_OBJECT_ID + dataModelObjectId);
-        return dataModelObjectDao.findById(dataModelObjectId);
+        DataModelObject foundDataModelObj = dataModelObjectDao.findById(dataModelObjectId);
+        if(foundDataModelObj != null){
+            List<AttributeDefinition> attributeDefinitions = attributeDefinitionDao.findByDataModelObjectId(foundDataModelObj.getId());
+            foundDataModelObj.setAttributeDefinitions(attributeDefinitions);
+        }
+        return foundDataModelObj;
     }
 
     @Override
     public List<DataModelObject> findByDataModelId(DataModelId dataModelId) {
         validateId(dataModelId, INCORRECT_DATA_MODEL_ID + dataModelId);
-        return dataModelObjectDao.findByDataModelId(dataModelId);
-    }
-
-    @Override
-    public boolean deleteById(DataModelObjectId dataModelObjectId) {
-        validateId(dataModelObjectId, INCORRECT_DATA_MODEL_OBJECT_ID + dataModelObjectId);
-        return dataModelObjectDao.removeById(dataModelObjectId.getId());
+        List<DataModelObject> dataModelObjects = dataModelObjectDao.findByDataModelId(dataModelId);
+        dataModelObjects.stream().forEach(dataModelObject -> {
+            if(dataModelObject != null){
+                List<AttributeDefinition> attributeDefinitions = attributeDefinitionDao.findByDataModelObjectId(dataModelObject.getId());
+                dataModelObject.setAttributeDefinitions(attributeDefinitions);
+            }
+        });
+        return dataModelObjects;
     }
 
     private DataValidator<DataModelObject> dataModelObjectDataValidator =
@@ -74,14 +96,27 @@ public class DataModelObjectServiceImp implements DataModelObjectService {
                 protected void validateDataImpl(DataModelObject dataModelObject) {
                     if (StringUtils.isEmpty(dataModelObject.getName())) {
                         throw new DataValidationException("Data Model object name should be specified!");
-                    }else if (dataModelObject.getDataModelId() == null) {
+                    } else if (dataModelObject.getDataModelId() == null) {
                         throw new DataValidationException("Data Model object should be assigned to a data model!");
                     } else {
                         DataModel dataModel = dataModelDao.findById(dataModelObject.getDataModelId().getId());
                         if(dataModel == null) {
                             throw new DataValidationException("Data Model object is referencing to non-existent data model!");
                         }
+
+                        DataModelObject foundDataModelObj = dataModelObjectDao.findByDataModeIdAndName(dataModelObject);
+                        if(foundDataModelObj != null){
+                            throw new DataValidationException("Data Model Object with such name already exists!");
+                        }
                     }
                 }
             };
+
+    private void validateAttributeDefinition(AttributeDefinition attributeDefinition) {
+        if (StringUtils.isEmpty(attributeDefinition.getName())) {
+            throw new DataValidationException("Attribute name should be specified!");
+        } else if(StringUtils.isEmpty(attributeDefinition.getValueType()) || !EnumUtils.isValidEnum(DataType.class, attributeDefinition.getValueType())) {
+            throw new DataValidationException("A Valid attribute value type should be specified!");
+        }
+    }
 }
