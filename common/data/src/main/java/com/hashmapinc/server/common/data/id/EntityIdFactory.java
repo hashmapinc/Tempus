@@ -59,6 +59,10 @@ public class EntityIdFactory {
                 return new ComputationId(uuid);
             case COMPUTATION_JOB:
                 return new ComputationJobId(uuid);
+            case LOGO:
+                return new LogoId(uuid);
+            case THEME:
+                return new ThemeId(uuid);
             case NODE_METRIC:
                 return new NodeMetricId(uuid);
             case DATA_MODEL:
