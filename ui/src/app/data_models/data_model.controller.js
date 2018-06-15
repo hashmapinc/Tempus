@@ -67,6 +67,10 @@ export function DataModelController($scope, $log, $mdDialog) {
         // TODO: load the data model
         $log.debug("loading data model...");
 
+        // erase current data
+        $scope.nodes.clear();
+        $scope.edges.clear();
+
         // TODO: load this for real
         vm.datamodelTitle = "Dummy Data Model"; 
         var currId = $scope.nodes.length;
@@ -85,12 +89,13 @@ export function DataModelController($scope, $log, $mdDialog) {
     }
 
     function onDatamodelObjectSelect(properties) {
-        // TODO: handle object editing AND object reading
         $log.debug(properties);
 
         if (vm.isEdit) {
+            // TODO: handle object editing
             alert("editing selected datamodel object:" + properties);
         } else {
+            // TODO: handle object reading
             alert("viewing selected datamodel object:" + properties);
         }
     }
@@ -98,6 +103,13 @@ export function DataModelController($scope, $log, $mdDialog) {
     vm.addDatamodelObject = function() {
         // TODO: start the datamodel creation stepper
         $log.debug("adding data model object...");
+
+        var newNodeLabel = prompt("Label for new node:");
+        var id = $scope.nodes.length + 1;
+        $scope.nodes.add([{
+            id: id, 
+            label: newNodeLabel 
+        }]);
     };
 
     vm.acceptDatamodelEdit = function () {
