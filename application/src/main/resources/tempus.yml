@@ -365,3 +365,5 @@ audit_log:
     port: "${AUDIT_LOG_SINK_POST:9200}"
     user_name: "${AUDIT_LOG_SINK_USER_NAME:}"
     password: "${AUDIT_LOG_SINK_PASSWORD:}"
+
+authorization.rules.filePath: "default-rules.json"
