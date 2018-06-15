@@ -23,11 +23,11 @@
 							width: 100%;">
 		</div>
 		<section class="tb-dashboard-title" layout="row" layout-align="center center" ng-style="{'color': vm.dashboard.configuration.settings.titleColor}">
-			<h3 ng-show="!vm.isEdit">{{ vm.dashboard.title }}</h3>
+			<h3 ng-show="!vm.isEdit">{{ vm.datamodelTitle }}</h3>
 			<md-input-container ng-show="vm.isEdit" class="md-block" style="height: 30px;">
 				<label translate ng-style="{'color': vm.dashboard.configuration.settings.titleColor}">dashboard.title</label>
 				<input class="tb-dashboard-title" ng-style="{'color': vm.dashboard.configuration.settings.titleColor}" required name="title"
-				 ng-model="vm.dashboard.title">
+				 ng-model="vm.datamodelTitle">
 			</md-input-container>
 		</section>
 
@@ -35,9 +35,9 @@
 			<md-fab-speed-dial ng-disabled="$root.loading" ng-show="vm.isEdit" md-open="vm.addItemActionsOpen"
 			 class="md-scale" md-direction="up">
 				<md-fab-trigger>
-					<md-button ng-disabled="$root.loading" class="tb-btn-footer md-accent md-hue-2 md-fab" aria-label="{{ 'dashboard.add-widget' | translate }}">
+					<md-button ng-disabled="$root.loading" class="tb-btn-footer md-accent md-hue-2 md-fab" aria-label="Add new data model object" ng-click="vm.addDatamodelObject()">
 						<md-tooltip md-direction="top">
-							{{ 'dashboard.add-widget' | translate }}
+							Add new data model object
 						</md-tooltip>
 						<ng-md-icon icon="add"></ng-md-icon>
 					</md-button>
@@ -45,7 +45,7 @@
 			</md-fab-speed-dial>
 			<md-button ng-show="vm.isEdit"
 			 ng-disabled="$root.loading" class="tb-btn-footer md-accent md-hue-2 md-fab" aria-label="{{ 'action.apply' | translate }}"
-			 ng-click="vm.saveDashboard()">
+			 ng-click="vm.acceptDatamodelEdit()">
 				<md-tooltip md-direction="top">
 					{{ 'action.apply-changes' | translate }}
 				</md-tooltip>
@@ -53,7 +53,7 @@
 			</md-button>
 			<md-button 
 			 ng-disabled="$root.loading" class="tb-btn-footer md-accent md-hue-2 md-fab" aria-label="{{ 'action.edit-mode' | translate }}"
-			 ng-click="vm.toggleDMEditMode()">
+			 ng-click="vm.isEdit ? vm.cancelDatamodelEdit() : ''; vm.toggleDMEditMode();">
 				<md-tooltip md-direction="top">
 					{{ (vm.isEdit ? 'action.decline-changes' : 'action.enter-edit-mode') | translate }}
 				</md-tooltip>

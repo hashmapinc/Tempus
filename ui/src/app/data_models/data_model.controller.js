@@ -19,9 +19,32 @@ import 'vis/dist/vis-network.min.css';
 
 /*@ngInject*/
 export function DataModelController($scope, $log, $mdDialog) {
+    //=============================================================================
+    // Controller state and functionality
+    //=============================================================================
 	var vm = this;
     vm.isEdit = false; // keeps track of whether the model is being edited
-    vm.data_model = {title: "Dummy Data Model"};
+
+    // create nodes and edges and load the datamodel
+    $scope.nodes = new vis.DataSet();
+    $scope.edges = new vis.DataSet();
+    loadDatamodel();
+
+    // Configure graph data + options
+    var network_data = {
+        nodes: $scope.nodes,
+        edges: $scope.edges
+    };
+    var network_options = {
+        hierarchicalLayout: {
+            direction: "UD"
+        }
+    };
+
+    // build network, add assign event listeners
+    var networkContainer = angular.element("#dataModelViewerContainer")[0];
+    var network = new vis.Network(networkContainer, network_data, network_options);
+    network.on('selectNode', onDatamodelObjectSelect);
 
     vm.cancel = function() {
         $mdDialog.cancel();
@@ -30,36 +53,64 @@ export function DataModelController($scope, $log, $mdDialog) {
     vm.toggleDMEditMode = function() {
         vm.isEdit = !vm.isEdit;
     }
+    //=============================================================================
 
-    // create nodes and edges for dummy graph
-    var nodes = new vis.DataSet();
-    var edges = new vis.DataSet();
-    nodes.add([
-        { id: 1, label: 'Node 1' },
-        { id: 2, label: 'Node 2' },
-        { id: 3, label: 'Node 3' },
-        { id: 4, label: 'Node 4' },
-        { id: 5, label: 'Node 5' }]);
-    edges.add([
-        { id: 1, from: 1, to: 2 },
-        { id: 2, from: 3, to: 2 }
-    ]);
+    //=============================================================================
+    // Datamodel manipulation functionality
+    //=============================================================================
+    function saveDatamodel() {
+        // TODO: save the data model
+        $log.debug("saving data model...");
+    }
 
-    // Configure dummy graph data + options
-    var network_data = {
-        nodes: nodes,
-        edges: edges
-    };
-    var network_options = {
-        hierarchicalLayout: {
-            direction: "UD"
-        }
-    };
+    function loadDatamodel() {
+        // TODO: load the data model
+        $log.debug("loading data model...");
 
-    // build network, add select listener
-    var networkContainer = angular.element("#dataModelViewerContainer")[0];
-    var network = new vis.Network(networkContainer, network_data, network_options);
-    network.on('select', function (properties) {
+        // TODO: load this for real
+        vm.datamodelTitle = "Dummy Data Model"; 
+        var currId = $scope.nodes.length;
+        $scope.nodes.add([
+            { id: currId + 1, label: 'Node ' + (currId + 1) },
+            { id: currId + 2, label: 'Node ' + (currId + 2) },
+            { id: currId + 3, label: 'Node ' + (currId + 3) },
+            { id: currId + 4, label: 'Node ' + (currId + 4) },
+            { id: currId + 5, label: 'Node ' + (currId + 5) }
+        ]);
+        currId = $scope.edges.length;
+        $scope.edges.add([
+            { id: currId + 1, from: currId + 1, to: currId + 2 },
+            { id: currId + 2, from: currId + 3, to: currId + 2 }
+        ]);
+    }
+
+    function onDatamodelObjectSelect(properties) {
+        // TODO: handle object editing AND object reading
         $log.debug(properties);
-    });
+
+        if (vm.isEdit) {
+            alert("editing selected datamodel object:" + properties);
+        } else {
+            alert("viewing selected datamodel object:" + properties);
+        }
+    }
+
+    vm.addDatamodelObject = function() {
+        // TODO: start the datamodel creation stepper
+        $log.debug("adding data model object...");
+    };
+
+    vm.acceptDatamodelEdit = function () {
+        // save the datamodel and exit edit mode
+        $log.debug("accepting datamodel edit...");
+        saveDatamodel();
+        vm.toggleDMEditMode();
+    };
+
+    vm.cancelDatamodelEdit = function() {
+        // TODO: reload the graph and discard unsaved changes
+        $log.debug("canceling datamodel edit...");
+        loadDatamodel();
+    };
+    //=============================================================================
 }

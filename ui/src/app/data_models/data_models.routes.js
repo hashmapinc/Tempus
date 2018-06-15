@@ -64,7 +64,7 @@ export default function DataModelsRoutes($stateProvider, types) {
                 pageTitle: 'data_model.data_models'
             },
             ncyBreadcrumb: {
-                label: '{"icon": "data_models", "label": "{{ vm.data_model.title }}", "translate": "false", "link": "/static/svg/data-models-icon.svg"}'
+                label: '{"icon": "data_models", "label": "{{ vm.datamodelTitle }}", "translate": "false", "link": "/static/svg/data-models-icon.svg"}'
             }
         })
 }
