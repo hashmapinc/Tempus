@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-/*package com.hashmapinc.server.service.security.model.token;
+package com.hashmapinc.server.service.security.model.token;
 
 import io.jsonwebtoken.*;
 import org.slf4j.Logger;
@@ -35,13 +35,13 @@ public class RawAccessJwtToken implements JwtToken, Serializable {
         this.token = token;
     }
 
-    *//**
+    /**
      * Parses and validates JWT Token signature.
      *
      * @throws BadCredentialsException
      * @throws JwtExpiredTokenException
      *
-     *//*
+     */
     public Jws<Claims> parseClaims(String signingKey) {
         try {
             return Jwts.parser().setSigningKey(signingKey).parseClaimsJws(this.token);
@@ -58,4 +58,4 @@ public class RawAccessJwtToken implements JwtToken, Serializable {
     public String getToken() {
         return token;
     }
-}*/
+}

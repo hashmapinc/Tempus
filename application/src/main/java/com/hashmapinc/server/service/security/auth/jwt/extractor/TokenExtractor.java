@@ -13,11 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-/*
+
 package com.hashmapinc.server.service.security.auth.jwt.extractor;
 
 import javax.servlet.http.HttpServletRequest;
 
 public interface TokenExtractor {
     public String extract(HttpServletRequest request);
-}*/
+}

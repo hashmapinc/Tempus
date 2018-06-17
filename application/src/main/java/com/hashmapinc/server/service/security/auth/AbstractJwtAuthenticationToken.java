@@ -15,7 +15,7 @@
  */
 package com.hashmapinc.server.service.security.auth;
 
-/*import com.hashmapinc.server.service.security.model.SecurityUser;
+import com.hashmapinc.server.service.security.model.SecurityUser;
 import com.hashmapinc.server.service.security.model.token.RawAccessJwtToken;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 
@@ -63,4 +63,4 @@ public abstract class AbstractJwtAuthenticationToken extends AbstractAuthenticat
         super.eraseCredentials();
         this.rawAccessToken = null;
     }
-}*/
+}

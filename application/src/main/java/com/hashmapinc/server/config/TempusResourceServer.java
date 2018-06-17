@@ -17,19 +17,20 @@ package com.hashmapinc.server.config;
 
 import com.hashmapinc.server.dao.audit.AuditLogLevelFilter;
 import com.hashmapinc.server.exception.TempusErrorResponseHandler;
+import com.hashmapinc.server.service.security.auth.jwt.JwtTokenAuthenticationProcessingFilter;
+import com.hashmapinc.server.service.security.auth.jwt.extractor.TokenExtractor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.security.SecurityProperties;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.security.oauth2.resource.ResourceServerProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.annotation.Order;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.oauth2.client.token.grant.client.ClientCredentialsResourceDetails;
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableResourceServer;
 import org.springframework.security.oauth2.config.annotation.web.configuration.ResourceServerConfigurerAdapter;
-import org.springframework.security.oauth2.config.annotation.web.configurers.ResourceServerSecurityConfigurer;
-
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import java.util.HashMap;
 
 
@@ -46,14 +47,22 @@ public class TempusResourceServer extends ResourceServerConfigurerAdapter {
     public static final String TOKEN_BASED_AUTH_ENTRY_POINT = "/api/**";
     public static final String WS_TOKEN_BASED_AUTH_ENTRY_POINT = "/api/ws/**";
 
-    public static final String EXTERNAL_API_WRITE_ENDPOINTS = "/api/external/write/**";
 
+    @Autowired
+    private ClientCredentialsResourceDetails apiResourceDetails;
 
     @Autowired
     private TempusErrorResponseHandler restAccessDeniedHandler;
 
     @Autowired
     private ResourceServerProperties resourceServerProperties;
+
+    public static final String JWT_TOKEN_HEADER_PARAM = "X-Authorization";
+
+
+    @Autowired
+    @Qualifier("jwtHeaderTokenExtractor")
+    private TokenExtractor jwtHeaderTokenExtractor;
 
 
     //todo until code is cleaned up
@@ -68,6 +77,11 @@ public class TempusResourceServer extends ResourceServerConfigurerAdapter {
         return new AuditLogLevelFilter(new HashMap<>());
     }
 
+
+    @Bean
+    protected JwtTokenAuthenticationProcessingFilter buildJwtTokenAuthenticationProcessingFilter() {
+        return new JwtTokenAuthenticationProcessingFilter(jwtHeaderTokenExtractor, resourceServerProperties);
+    }
 
     @Override
     public void configure(HttpSecurity http) throws Exception {
@@ -93,7 +107,10 @@ public class TempusResourceServer extends ResourceServerConfigurerAdapter {
                 .antMatchers(WS_TOKEN_BASED_AUTH_ENTRY_POINT).authenticated() // Protected WebSocket API End-points
                 .antMatchers(TOKEN_BASED_AUTH_ENTRY_POINT).authenticated() // Protected API End-points
                 .and()
-                .exceptionHandling().accessDeniedHandler(restAccessDeniedHandler);
+                .exceptionHandling().accessDeniedHandler(restAccessDeniedHandler)
+                .and()
+                .addFilterBefore(buildJwtTokenAuthenticationProcessingFilter(), UsernamePasswordAuthenticationFilter.class);
+
     }
 
 }
