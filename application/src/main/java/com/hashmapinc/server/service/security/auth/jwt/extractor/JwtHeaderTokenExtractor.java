@@ -13,9 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-/*package com.hashmapinc.server.service.security.auth.jwt.extractor;
+package com.hashmapinc.server.service.security.auth.jwt.extractor;
 
-import com.hashmapinc.server.config.TempusSecurityConfiguration;
+import com.hashmapinc.server.config.TempusResourceServer;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.stereotype.Component;
@@ -28,9 +28,9 @@ public class JwtHeaderTokenExtractor implements TokenExtractor {
 
     @Override
     public String extract(HttpServletRequest request) {
-        String header = request.getHeader(TempusSecurityConfiguration.JWT_TOKEN_HEADER_PARAM);
+        String header = request.getHeader(TempusResourceServer.JWT_TOKEN_HEADER_PARAM);
         if (StringUtils.isBlank(header)) {
-            throw new AuthenticationServiceException("Authorization header cannot be blank!");
+            return null;
         }
 
         if (header.length() < HEADER_PREFIX.length()) {
@@ -39,4 +39,4 @@ public class JwtHeaderTokenExtractor implements TokenExtractor {
 
         return header.substring(HEADER_PREFIX.length(), header.length());
     }
-}*/
+}
