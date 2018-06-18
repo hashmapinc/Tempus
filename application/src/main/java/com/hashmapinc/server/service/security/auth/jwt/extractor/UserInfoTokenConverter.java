@@ -31,6 +31,7 @@ import org.springframework.util.StringUtils;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 @Component
 public class UserInfoTokenConverter implements UserAuthenticationConverter {
@@ -65,7 +66,7 @@ public class UserInfoTokenConverter implements UserAuthenticationConverter {
 
         SecurityUser securityUser = new SecurityUser();
         securityUser.setEmail((String)userName);
-        securityUser.setId(new UserId(UUIDConverter.fromString((String)id)));
+        securityUser.setId(new UserId(UUID.fromString((String) id)));
         securityUser.setTenantId(new TenantId(UUIDConverter.fromString((String)tenantId)));
         Object customerId = map.get("customer_id");
         if(!StringUtils.isEmpty(customerId)){
