@@ -16,9 +16,10 @@
 /* eslint-disable import/no-unresolved, import/default, no-unused-vars */
 import vis from "vis";
 import 'vis/dist/vis-network.min.css';
+import objectStepper from './datamodel-object-stepper.tpl.html';
 
 /*@ngInject*/
-export function DataModelController($scope, $log, $mdDialog) {
+export function DataModelController($scope, $log, $mdDialog, $document) {
     //=============================================================================
     // Controller state and functionality
     //=============================================================================
@@ -46,10 +47,6 @@ export function DataModelController($scope, $log, $mdDialog) {
     var network = new vis.Network(networkContainer, network_data, network_options);
     network.on('selectNode', onDatamodelObjectSelect);
 
-    vm.cancel = function() {
-        $mdDialog.cancel();
-    }
-
     vm.toggleDMEditMode = function() {
         vm.isEdit = !vm.isEdit;
     }
@@ -58,6 +55,11 @@ export function DataModelController($scope, $log, $mdDialog) {
     //=============================================================================
     // Datamodel manipulation functionality
     //=============================================================================
+    // allow dialog to close
+    $scope.close = function() {
+        $mdDialog.close();
+    };
+
     function saveDatamodel() {
         // TODO: save the data model
         $log.debug("saving data model...");
@@ -100,9 +102,20 @@ export function DataModelController($scope, $log, $mdDialog) {
         }
     }
 
-    vm.addDatamodelObject = function() {
+    vm.addDatamodelObject = function(ev) {
         // TODO: start the datamodel creation stepper
         $log.debug("adding data model object...");
+
+        $mdDialog.show({
+            controller: function(){ return vm},
+            controllerAs: 'vm',
+            templateUrl: objectStepper,
+            parent: angular.element($document[0].body),
+            fullscreen: true,
+            targetEvent: ev
+        }).then(function () {
+        }, function () {
+        });
 
         var newNodeLabel = prompt("Label for new node:");
         var id = $scope.nodes.length + 1;
