@@ -124,8 +124,8 @@ function UserService($http, $q, $rootScope, adminService, dashboardService, logi
     }
 
     function clearTokenData() {
-        store.remove('jwt_token');
-        store.remove('jwt_token_expiration');
+        store.remove('access_token');
+        store.remove('access_token_expiration');
         store.remove('refresh_token');
         store.remove('refresh_token_expiration');
     }
@@ -141,7 +141,7 @@ function UserService($http, $q, $rootScope, adminService, dashboardService, logi
                 $rootScope.$broadcast('unauthenticated', doLogout);
             }
         } else {
-            updateAndValidateToken(jwtToken, 'jwt_token', true);
+            updateAndValidateToken(jwtToken, 'access_token', true);
             updateAndValidateToken(refreshToken, 'refresh_token', true);
             if (notify) {
                 loadUser(false).then(function success() {
@@ -156,11 +156,11 @@ function UserService($http, $q, $rootScope, adminService, dashboardService, logi
     }
 
     function isAuthenticated() {
-        return store.get('jwt_token');
+        return store.get('access_token');
     }
 
     function getJwtToken() {
-        return store.get('jwt_token');
+        return store.get('access_token');
     }
 
     function logout() {
@@ -172,7 +172,7 @@ function UserService($http, $q, $rootScope, adminService, dashboardService, logi
     }
 
     function isJwtTokenValid() {
-        return isTokenValid('jwt_token');
+        return isTokenValid('access_token');
     }
 
     function isTokenValid(prefix) {
@@ -182,7 +182,7 @@ function UserService($http, $q, $rootScope, adminService, dashboardService, logi
 
     function validateJwtToken(doRefresh) {
         var deferred = $q.defer();
-        if (!isTokenValid('jwt_token')) {
+        if (!isTokenValid('access_token')) {
             if (doRefresh) {
                 refreshJwtToken().then(function success() {
                     deferred.resolve();
@@ -321,7 +321,7 @@ function UserService($http, $q, $rootScope, adminService, dashboardService, logi
 
         function procceedJwtTokenValidate() {
             validateJwtToken(doTokenRefresh).then(function success() {
-                var jwtToken = store.get('jwt_token');
+                var jwtToken = store.get('access_token');
                 currentUser = jwtHelper.decodeToken(jwtToken);
                 if (currentUser && currentUser.authorities && currentUser.authorities.length > 0) {
                     currentUser.authority = currentUser.authorities[0];
@@ -366,7 +366,7 @@ function UserService($http, $q, $rootScope, adminService, dashboardService, logi
                 loginService.publicLogin(locationSearch.publicId).then(function success(response) {
                     var token = response.data.token;
                     var refreshToken = response.data.refreshToken;
-                    updateAndValidateToken(token, 'jwt_token', false);
+                    updateAndValidateToken(token, 'access_token', false);
                     updateAndValidateToken(refreshToken, 'refresh_token', false);
                     procceedJwtTokenValidate();
                 }, function fail() {
@@ -390,17 +390,17 @@ function UserService($http, $q, $rootScope, adminService, dashboardService, logi
     }
 
     function updateAuthorizationHeader(headers) {
-        var jwtToken = store.get('jwt_token');
+        var jwtToken = store.get('access_token');
         if (jwtToken) {
-            headers['X-Authorization'] = 'Bearer ' + jwtToken;
+            headers['Authorization'] = 'Bearer ' + jwtToken;
         }
         return jwtToken;
     }
 
     function setAuthorizationRequestHeader(request) {
-        var jwtToken = store.get('jwt_token');
+        var jwtToken = store.get('access_token');
         if (jwtToken) {
-            request.setRequestHeader('X-Authorization', 'Bearer ' + jwtToken);
+            request.setRequestHeader('Authorization', 'Bearer ' + jwtToken);
         }
         return jwtToken;
     }
