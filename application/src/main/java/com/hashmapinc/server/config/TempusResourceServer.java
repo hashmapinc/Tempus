@@ -24,13 +24,16 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.security.oauth2.resource.ResourceServerProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.oauth2.client.token.grant.client.ClientCredentialsResourceDetails;
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableResourceServer;
 import org.springframework.security.oauth2.config.annotation.web.configuration.ResourceServerConfigurerAdapter;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.oauth2.config.annotation.web.configurers.ResourceServerSecurityConfigurer;
+import org.springframework.security.oauth2.provider.token.*;
+
 import java.util.HashMap;
 
 
@@ -64,6 +67,9 @@ public class TempusResourceServer extends ResourceServerConfigurerAdapter {
     @Qualifier("jwtHeaderTokenExtractor")
     private TokenExtractor jwtHeaderTokenExtractor;
 
+    @Autowired
+    private UserAuthenticationConverter userTokenConverter;
+
 
     //todo until code is cleaned up
     @Bean
@@ -81,6 +87,11 @@ public class TempusResourceServer extends ResourceServerConfigurerAdapter {
     @Bean
     protected JwtTokenAuthenticationProcessingFilter buildJwtTokenAuthenticationProcessingFilter() {
         return new JwtTokenAuthenticationProcessingFilter(jwtHeaderTokenExtractor, resourceServerProperties);
+    }
+
+    @Override
+    public void configure(ResourceServerSecurityConfigurer resources) throws Exception {
+        resources.resourceId(resourceServerProperties.getResourceId());
     }
 
     @Override
@@ -107,10 +118,27 @@ public class TempusResourceServer extends ResourceServerConfigurerAdapter {
                 .antMatchers(WS_TOKEN_BASED_AUTH_ENTRY_POINT).authenticated() // Protected WebSocket API End-points
                 .antMatchers(TOKEN_BASED_AUTH_ENTRY_POINT).authenticated() // Protected API End-points
                 .and()
-                .exceptionHandling().accessDeniedHandler(restAccessDeniedHandler)
-                .and()
-                .addFilterBefore(buildJwtTokenAuthenticationProcessingFilter(), UsernamePasswordAuthenticationFilter.class);
+                .exceptionHandling().accessDeniedHandler(restAccessDeniedHandler);
+                //.and()
+                //.addFilterBefore(buildJwtTokenAuthenticationProcessingFilter(), UsernamePasswordAuthenticationFilter.class);
 
+    }
+
+    @Bean
+    @Primary
+    protected ResourceServerTokenServices tokenServices(){
+        RemoteTokenServices services = new RemoteTokenServices();
+        services.setClientId(resourceServerProperties.getClientId());
+        services.setClientSecret(resourceServerProperties.getClientSecret());
+        services.setCheckTokenEndpointUrl(resourceServerProperties.getTokenInfoUri());
+        services.setAccessTokenConverter(tokenConverter());
+        return services;
+    }
+
+    private AccessTokenConverter tokenConverter() {
+        DefaultAccessTokenConverter tokenConverter = new DefaultAccessTokenConverter();
+        tokenConverter.setUserTokenConverter(userTokenConverter);
+        return tokenConverter;
     }
 
 }
