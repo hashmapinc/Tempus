@@ -27,7 +27,7 @@ import java.util.UUID;
 import static com.hashmapinc.server.dao.model.ModelConstants.ID_PROPERTY;
 
 @Table(name = ModelConstants.SPARK_COMPUTATIONS_META_DATA_PROPERTY)
-public class SparkComputationMetadataEntity extends ComputationMetadataEntity<SparkComputationMetadata>{
+public class SparkComputationMetadataEntity implements ComputationMetadataEntity<SparkComputationMetadata>{
     @PartitionKey(value = 0)
     @Column(name = ID_PROPERTY)
     private UUID id;

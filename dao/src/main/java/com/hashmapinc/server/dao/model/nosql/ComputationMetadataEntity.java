@@ -18,5 +18,5 @@ package com.hashmapinc.server.dao.model.nosql;
 import com.hashmapinc.server.common.data.computation.ComputationMetadata;
 import com.hashmapinc.server.dao.model.BaseEntity;
 
-public abstract class ComputationMetadataEntity<T extends ComputationMetadata> implements BaseEntity<T> {
+public interface ComputationMetadataEntity<T extends ComputationMetadata> extends BaseEntity<T> {
 }

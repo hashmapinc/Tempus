@@ -26,7 +26,7 @@ import java.util.UUID;
 import static com.hashmapinc.server.dao.model.ModelConstants.ID_PROPERTY;
 
 @Table(name = ModelConstants.KUBELESS_COMPUTATIONS_META_DATA_COLUMN_FAMILY)
-public class KubelessComputationMetadataEntity extends ComputationMetadataEntity<KubelessComputationMetadata> {
+public class KubelessComputationMetadataEntity implements ComputationMetadataEntity<KubelessComputationMetadata> {
 
     @PartitionKey(value = 0)
     @Column(name = ID_PROPERTY)

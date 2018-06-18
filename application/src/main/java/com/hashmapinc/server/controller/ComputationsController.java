@@ -65,10 +65,6 @@ public class ComputationsController extends BaseController {
 
     public static final String COMPUTATION_ID = "computationId";
 
-    private Gson gson = new Gson();
-
-    private Base64.Decoder decoder = getDecoder();
-
     @Value("${spark.jar_path}")
     private String uploadPath;
 

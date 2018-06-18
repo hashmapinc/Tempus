@@ -30,7 +30,7 @@ import lombok.EqualsAndHashCode;
         property = "type")
 @JsonSubTypes({
         @JsonSubTypes.Type(value = KubelessComputationMetadata.class, name = "KUBELESS"),
-        @JsonSubTypes.Type(value = KubelessComputationMetadata.class, name = "SPARK")
+        @JsonSubTypes.Type(value = SparkComputationMetadata.class, name = "SPARK")
 })
 public class ComputationMetadata extends BaseData<ComputationId> {
 
