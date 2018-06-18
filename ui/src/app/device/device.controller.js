@@ -72,7 +72,7 @@ export function DeviceController($rootScope,userService, deviceService, customer
     };
 
     $scope.query = {
-        order: 'key',
+        order: 'name',
         limit: 15,
         page: 1,
         search: null
@@ -376,6 +376,8 @@ export function DeviceController($rootScope,userService, deviceService, customer
                             return true;
                         }
                     });
+
+                    deviceSortList = $filter('orderBy')(deviceSortList, $scope.query.order);
                 }
 
                 var startIndex = $scope.query.limit * ($scope.query.page - 1);
@@ -394,7 +396,9 @@ export function DeviceController($rootScope,userService, deviceService, customer
 
 
     $scope.enterFilterMode = function() {
+
         $scope.query.search = '';
+        //loadTableData();
     }
 
     $scope.exitFilterMode = function() {
@@ -406,8 +410,8 @@ export function DeviceController($rootScope,userService, deviceService, customer
     $scope.resetFilter = function() {
 
         $scope.query = {
-            order: 'key',
-            limit: 15,
+            order: 'name',
+            limit: $scope.query.limit,
             page: 1,
             search: null
         };
@@ -418,6 +422,7 @@ export function DeviceController($rootScope,userService, deviceService, customer
     vm.loadTableData = loadTableData;
     $scope.$watch("query.search", function(newVal, prevVal) {
         if (!angular.equals(newVal, prevVal) && $scope.query.search != null) {
+
             loadTableData();
         }
     });
