@@ -365,6 +365,7 @@ export function DeviceController($rootScope,userService, deviceService, customer
             promise.then(function success(items) {
 
                 var deviceSortList = $filter('orderBy')(items.data, $scope.query.order);
+                var startIndex = $scope.query.limit * ($scope.query.page - 1);
 
 
                 if ($scope.query.search != null) {
@@ -376,11 +377,13 @@ export function DeviceController($rootScope,userService, deviceService, customer
                             return true;
                         }
                     });
-
+                    //$scope.query.page =1;
                     deviceSortList = $filter('orderBy')(deviceSortList, $scope.query.order);
+                    if ($scope.query.search != '') {startIndex =0;}
                 }
 
-                var startIndex = $scope.query.limit * ($scope.query.page - 1);
+
+
                 var devicePaginatedata = deviceSortList.slice(startIndex, startIndex + $scope.query.limit);
 
                 $scope.devices = {
