@@ -401,6 +401,13 @@ CREATE TABLE IF NOT EXISTS tag_metadata (
     median_frequency double precision,
     source varchar,
     CONSTRAINT tag_metadata_unq_key UNIQUE (entity_type, entity_id, key)
+
+CREATE TABLE IF NOT EXISTS schema_registry (
+    id varchar(31) NOT NULL CONSTRAINT schema_pkey PRIMARY KEY,
+    name varchar,
+    description varchar,
+    type varchar,
+    schema_txt varchar
 );
 
 CREATE TABLE IF NOT EXISTS installed_schema_versions(executed_scripts varchar(255) UNIQUE);

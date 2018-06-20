@@ -703,6 +703,14 @@ CREATE MATERIALIZED VIEW IF NOT EXISTS tempus.cmp_jobs_by_tenant_and_cmp_search_
     PRIMARY KEY (tenant_id, computation_id, search_text, id)
     WITH CLUSTERING ORDER BY ( search_text ASC, id DESC );
 
+CREATE TABLE IF NOT EXISTS tempus.schema_registry (
+    id uuid,
+    name text,
+    description text,
+    type text,
+    schema_txt text,
+    PRIMARY KEY (id)
+);
 
 CREATE TABLE IF NOT EXISTS tempus.installed_schema_versions (
     executed_scripts text,
