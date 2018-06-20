@@ -400,7 +400,7 @@ function Menu(userService, $state, $rootScope) {
                                         name: 'metadata.metadata',
                                         icon: 'metadata',
                                         link: '/static/svg/metadata-icon.svg',
-                                        state: 'metadata.metadata'
+                                        state: 'home.metadata'
                                     }
                                 ]
                             },
