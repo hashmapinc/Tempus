@@ -58,6 +58,7 @@ Contents
    admin/index
    reference/index
    development/index
+   gateway/index
 
 Indices and tables
 ==================
