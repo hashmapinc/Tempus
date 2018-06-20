@@ -28,6 +28,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import static com.hashmapinc.server.dao.model.ModelConstants.NULL_UUID;
+import static com.hashmapinc.server.dao.model.ModelConstants.NULL_UUID_STR;
+
 @Data
 public class IdentityUser {
     private UUID id;
@@ -47,8 +50,18 @@ public class IdentityUser {
         this.id = user.getUuidId();
         this.userName = user.getEmail();
         this.authorities = Arrays.asList(user.getAuthority().name());
-        this.tenantId = UUIDConverter.fromTimeUUID(user.getTenantId().getId());
-        this.customerId = UUIDConverter.fromTimeUUID(user.getCustomerId().getId());
+        if(user.getTenantId()!=null) {
+            this.tenantId = UUIDConverter.fromTimeUUID(user.getTenantId().getId());
+        } else {
+            this.tenantId = NULL_UUID_STR;
+        }
+
+        if(user.getCustomerId() !=null) {
+            this.customerId = UUIDConverter.fromTimeUUID(user.getCustomerId().getId());
+        } else {
+            this.customerId = NULL_UUID_STR;
+        }
+
         this.firstName = user.getFirstName();
         this.lastName = user.getLastName();
     }
