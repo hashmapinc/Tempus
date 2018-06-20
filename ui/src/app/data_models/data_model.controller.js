@@ -50,9 +50,6 @@ export function DataModelController($log, $mdDialog, $document) {
                 "forceDirection": "vertical",
                 "roundness": 1
             }
-        },
-        "layout": {
-            "improvedLayout": true
         }
     };
 
@@ -78,20 +75,20 @@ export function DataModelController($log, $mdDialog, $document) {
             name: "",
             desc: "",
             type: "",
-            parentId: null,
+            parent: null, // should be {name: parentName, id: parentId}
             currentAttribute: "",
             attributes: [] // array attributes
         }
     }
 
     // structure for a datamodel object
-    function createDatamodelObject(id, name, desc, obj_type, parentId, attributes) {
+    function createDatamodelObject(id, name, desc, obj_type, parent, attributes) {
         return {
             id: id,
             name: name,
             desc: desc,
             type: obj_type,
-            parentId: parentId,
+            parent: parent,
             attributes: attributes
         }
     }
@@ -119,11 +116,10 @@ export function DataModelController($log, $mdDialog, $document) {
 
         // TODO: load this for real
         vm.datamodelTitle = "Dummy Data Model";
-        vm.datamodelObjects = [
-            createDatamodelObject(1, "Rig", "A rig", "Asset", 3, ["location"]),
-            createDatamodelObject(2, "Well", "A rig", "Device", 1, ["location"]),
-            createDatamodelObject(3, "Vendor", "A rig", "Asset", null, [])
-        ];
+        var node_a = createDatamodelObject(3, "Vendor", "A rig", "Asset", null, []);
+        var node_b = createDatamodelObject(1, "Rig", "A rig", "Asset", node_a, ["location"]);
+        var node_c = createDatamodelObject(2, "Well", "A rig", "Device", node_b, ["location"]);
+        vm.datamodelObjects = [node_a, node_b, node_c];
     }
 
     // plot the current datamodel objects
@@ -141,10 +137,10 @@ export function DataModelController($log, $mdDialog, $document) {
                 label:      dmObj.name  
             });
 
-            if (dmObj.parentId) {
+            if (dmObj.parent) {
                 vm.edges.add({ 
                     id:     dmObj.id, 
-                    from:   dmObj.parentId, 
+                    from:   dmObj.parent.id, 
                     to:     dmObj.id
                 });
             }
@@ -201,7 +197,7 @@ export function DataModelController($log, $mdDialog, $document) {
                 vm.stepperData.name,
                 vm.stepperData.desc,
                 vm.stepperData.type,
-                vm.stepperData.parentId
+                vm.stepperData.parent
             )
         );
 
@@ -232,9 +228,9 @@ export function DataModelController($log, $mdDialog, $document) {
     };
 
     // discard changes and replot the datamodel
-    vm.cancelDatamodelEdit = function() {
+    vm.rejectDatamodelEdit = function() {
         // TODO: reload the graph and discard unsaved changes
-        $log.debug("canceling datamodel edit...");
+        $log.debug("rejecting datamodel edit...");
         loadDatamodel();
         plotDatamodel();
     };

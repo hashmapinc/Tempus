@@ -84,9 +84,9 @@
           <md-content class="md-padding">
             <md-input-container class="md-block">
               <label>Parent</label>
-              <md-select name="tempusType" ng-model="vm.stepperData.parentId">
-                <md-option>None</md-option>
-                <md-option ng-repeat="node in vm.datamodelObjects" ng-value="node.id">{{node.name}}</md-option>
+              <md-select name="tempusType" ng-model="vm.stepperData.parent">
+                <md-option ng-value="null">None</md-option>
+                <md-option ng-repeat="node in vm.datamodelObjects" ng-value="node">{{node.name}}</md-option>
               </md-select>
             </md-input-container>
           </md-content>
@@ -108,6 +108,11 @@
             <md-subheader class="md-no-sticky">Object Attributes</md-subheader>
             <md-list-item ng-repeat="attrib in vm.stepperData.attributes">
               <p> {{ attrib }} </p>
+            </md-list-item>
+
+            <md-subheader class="md-no-sticky">Relationships</md-subheader>
+            <md-list-item>
+              <p>Parent: {{vm.stepperData.parent ? vm.stepperData.parent.name : "None"}}</p>
             </md-list-item>
           </md-content>
         </md-tab>
