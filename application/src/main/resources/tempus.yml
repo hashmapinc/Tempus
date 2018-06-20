@@ -40,7 +40,7 @@ security:
       clientSecret: "${TEMPUS_CLIENT_SECRET:tempus}"
       accessTokenUri: "${ACCESS_TOKEN_URI:http://localhost:9002/uaa/oauth/token}"
       user-authorization-uri: "${AUTHORIZATION_URI:http://localhost:9002/uaa/oauth/authorize}"
-      grant-type: "${TEMPUS_CLIENT_GRANT_TYPE:password}"
+      #grant-type: "${TEMPUS_CLIENT_GRANT_TYPE:password}"
       scope: ["server"]
     resource:
       resource-id: "${TEMPUS_RESOURCE_API_ID:tempus-resource-server-rest-api}"
