@@ -32,7 +32,7 @@
           <md-content class="md-padding">
             <md-input-container class="md-block">
               <label>Object Name</label>
-              <input md-maxlength="256" required="" name="Object Name" ng-model="vm.newDatamodelObject.name">
+              <input md-maxlength="256" required="" name="Object Name" ng-model="vm.stepperData.name">
               <div ng-messages="objectStepper.name.$error">
                 <div ng-message="required">This is required.</div>
                 <div ng-message="md-maxlength">The description must be less than 256 characters long.</div>
@@ -41,7 +41,7 @@
 
             <md-input-container class="md-block">
               <label>Description</label>
-              <input md-maxlength="500" md-no-asterisk="" name="description" ng-model="vm.newDatamodelObject.desc">
+              <input md-maxlength="500" md-no-asterisk="" name="description" ng-model="vm.stepperData.desc">
               <div ng-messages="objectStepper.desc.$error">
                 <div ng-message="required">This is required.</div>
                 <div ng-message="md-maxlength">The description must be less than 500 characters long.</div>
@@ -50,7 +50,7 @@
 
             <md-input-container style="width:100%;">
               <label>Tempus Type</label>
-              <md-select name="tempusType" ng-model="vm.newDatamodelObject.type" required>
+              <md-select name="tempusType" ng-model="vm.stepperData.type" required>
                 <md-option value="Device">Device</md-option>
                 <md-option value="Asset">Asset</md-option>
               </md-select>
@@ -61,41 +61,52 @@
           </md-content>
         </md-tab>
 
-        <md-tab label="Attributes" ng-click="vm.stepperState = 1" ng-disabled="!vm.newDatamodelObject.name">
+        <md-tab label="Attributes" ng-click="vm.stepperState = 1" ng-disabled="!vm.stepperData.name || !vm.stepperData.type">
           <md-content class="md-padding">
-            <md-subheader class="md-no-sticky">Object Attributes</md-subheader>
-            <md-list-item ng-repeat="attrib in vm.newDatamodelObject.attributes">
+            <md-list-item ng-repeat="attrib in vm.stepperData.attributes">
               <p> {{ attrib }} </p>
             </md-list-item>
             
             <md-input-container class="md-block">
               <label>Attribute Name</label>
-              <input md-maxlength="256" md-no-asterisk="" name="attribute" ng-model="vm.newDatamodelObject.currentAttribute">
+              <input md-maxlength="256" md-no-asterisk="" name="attribute" ng-model="vm.stepperData.currentAttribute">
               <div ng-messages="objectStepper.attrib.$error">
                 <div ng-message="md-maxlength">The description must be less than 256 characters long.</div>
               </div>
             </md-input-container>
-            <md-button ng-click="vm.addDatamodelObjectAttribute()" ng-if="vm.newDatamodelObject.currentAttribute">
+            <md-button ng-click="vm.addDatamodelObjectAttribute()" ng-if="vm.stepperData.currentAttribute">
               Add
             </md-button>
           </md-content>
         </md-tab>
 
-        <md-tab label="Review" ng-click="vm.stepperState = 2" ng-disabled="!vm.newDatamodelObject.name">
+        <md-tab label="Relationships" ng-click="vm.stepperState = 2" ng-disabled="!vm.stepperData.name || !vm.stepperData.type">
+          <md-content class="md-padding">
+            <md-input-container class="md-block">
+              <label>Parent</label>
+              <md-select name="tempusType" ng-model="vm.stepperData.parentId">
+                <md-option>None</md-option>
+                <md-option ng-repeat="node in vm.datamodelObjects" ng-value="node.id">{{node.name}}</md-option>
+              </md-select>
+            </md-input-container>
+          </md-content>
+        </md-tab>
+
+        <md-tab label="Review" ng-click="vm.stepperState = 3" ng-disabled="!vm.stepperData.name || !vm.stepperData.type">
           <md-content class="md-padding">
             <md-subheader class="md-no-sticky">Datamodel Object</md-subheader>
             <md-list-item>
-              <p>Name: {{ vm.newDatamodelObject.name }} </p>
+              <p>Name: {{ vm.stepperData.name }} </p>
             </md-list-item>
             <md-list-item>
-              <p>Description: {{ vm.newDatamodelObject.desc }} </p>
+              <p>Description: {{ vm.stepperData.desc }} </p>
             </md-list-item>
             <md-list-item>
-              <p>Type: {{ vm.newDatamodelObject.type }} </p>
+              <p>Type: {{ vm.stepperData.type }} </p>
             </md-list-item>
 
             <md-subheader class="md-no-sticky">Object Attributes</md-subheader>
-            <md-list-item ng-repeat="attrib in vm.newDatamodelObject.attributes">
+            <md-list-item ng-repeat="attrib in vm.stepperData.attributes">
               <p> {{ attrib }} </p>
             </md-list-item>
           </md-content>
@@ -108,10 +119,10 @@
       <md-button ng-click="vm.stepperState = vm.stepperState - 1" ng-if="vm.stepperState > 0">
         Back
       </md-button>
-      <md-button ng-click="vm.stepperState = vm.stepperState + 1" style="margin-right:20px;" ng-if="2 > vm.stepperState" ng-disabled="!vm.newDatamodelObject.name || !vm.newDatamodelObject.type">
+      <md-button ng-click="vm.stepperState = vm.stepperState + 1" style="margin-right:20px;" ng-if="3 > vm.stepperState" ng-disabled="!vm.stepperData.name || !vm.stepperData.type">
          Next
       </md-button>
-      <md-button type="submit" style="margin-right:20px;" ng-if="2 === vm.stepperState">
+      <md-button type="submit" style="margin-right:20px;" ng-if="3 === vm.stepperState">
          Submit
       </md-button>
     </md-dialog-actions>
