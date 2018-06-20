@@ -15,16 +15,27 @@
  */
 package com.hashmapinc.server.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.hashmapinc.server.requests.ActivateUserRequest;
+import com.hashmapinc.server.requests.IdentityUser;
+import com.hashmapinc.server.requests.IdentityUserCredentials;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.oauth2.client.OAuth2RestOperations;
+import org.springframework.security.oauth2.client.OAuth2RestTemplate;
+import org.springframework.security.oauth2.client.token.grant.client.ClientCredentialsResourceDetails;
+import org.springframework.security.oauth2.client.token.grant.password.ResourceOwnerPasswordResourceDetails;
 import org.springframework.web.bind.annotation.*;
 import com.hashmapinc.server.common.data.User;
 import com.hashmapinc.server.common.data.security.UserCredentials;
@@ -34,6 +45,7 @@ import com.hashmapinc.server.service.mail.MailService;
 /*import com.hashmapinc.server.service.security.auth.jwt.RefreshTokenRepository;*/
 import com.hashmapinc.server.service.security.model.SecurityUser;
 import com.hashmapinc.server.service.security.model.UserPrincipal;
+import org.springframework.web.client.RestTemplate;
 //import com.hashmapinc.server.service.security.model.token.JwtToken;
 //import com.hashmapinc.server.service.security.model.token.JwtTokenFactory;
 
@@ -46,10 +58,17 @@ import java.net.URISyntaxException;
 @Slf4j
 public class AuthController extends BaseController {
 
-
+    public static final String IDENTITY_ENDPOINT = "http://localhost:9002/uaa/users";
 
     @Autowired
     private BCryptPasswordEncoder passwordEncoder;
+
+    @Autowired
+    @Qualifier("clientRestTemplate")
+    private RestTemplate restTemplate;
+
+    @Autowired
+    private ClientCredentialsResourceDetails apiResourceDetails;
 
     /*@Autowired
     private JwtTokenFactory tokenFactory;
@@ -90,28 +109,40 @@ public class AuthController extends BaseController {
             throw handleException(e);
         }
     }
-    
+
+
     @RequestMapping(value = "/noauth/activate", params = { "activateToken" }, method = RequestMethod.GET)
-    public ResponseEntity<String> checkActivateToken(
-            @RequestParam(value = "activateToken") String activateToken) {
+    public ResponseEntity<String> checkActivateToken(@RequestParam(value = "activateToken") String activateToken) throws JsonProcessingException, TempusException {
         HttpHeaders headers = new HttpHeaders();
         HttpStatus responseStatus;
-        UserCredentials userCredentials = userService.findUserCredentialsByActivateToken(activateToken);
-        if (userCredentials != null) {
-            String createURI = "/login/createPassword";
-            try {
-                URI location = new URI(createURI + "?activateToken=" + activateToken);
-                headers.setLocation(location);
-                responseStatus = HttpStatus.SEE_OTHER;
-            } catch (URISyntaxException e) {
-                log.error("Unable to create URI with address [{}]", createURI);
-                responseStatus = HttpStatus.BAD_REQUEST;
+
+        ResponseEntity<JsonNode> response = restTemplate.getForEntity(IDENTITY_ENDPOINT+"/activate", JsonNode.class);
+
+        if(response.getStatusCode().equals(HttpStatus.OK)) {
+            ObjectMapper mapper = new ObjectMapper();
+            JsonNode body = response.getBody();
+            UserCredentials userCredentials = mapper.treeToValue(body, IdentityUserCredentials.class).toUserCredentials();
+            if(userCredentials != null) {
+                String createURI = "/login/createPassword";
+                try {
+                    URI location = new URI(createURI + "?activateToken=" + activateToken);
+                    headers.setLocation(location);
+                    responseStatus = HttpStatus.SEE_OTHER;
+                } catch (URISyntaxException e) {
+                    log.error("Unable to create URI with address [{}]", createURI);
+                    responseStatus = HttpStatus.BAD_REQUEST;
+                }
+            } else {
+                responseStatus = HttpStatus.CONFLICT;
             }
         } else {
-            responseStatus = HttpStatus.CONFLICT;
+            throw new TempusException(response.getBody().asText(), TempusErrorCode.GENERAL);
         }
+
         return new ResponseEntity<>(headers, responseStatus);
     }
+
+
     
     @RequestMapping(value = "/noauth/resetPasswordByEmail", method = RequestMethod.POST)
     @ResponseStatus(value = HttpStatus.OK)
@@ -152,44 +183,68 @@ public class AuthController extends BaseController {
         }
         return new ResponseEntity<>(headers, responseStatus);
     }
-    
+
     @RequestMapping(value = "/noauth/activate", method = RequestMethod.POST)
     @ResponseStatus(value = HttpStatus.OK)
     @ResponseBody
     public JsonNode activateUser(
             @RequestBody JsonNode activateRequest,
-            HttpServletRequest request) throws TempusException {
+            HttpServletRequest request) throws TempusException, JsonProcessingException {
         try {
             String activateToken = activateRequest.get("activateToken").asText();
             String password = activateRequest.get("password").asText();
-            String encodedPassword = passwordEncoder.encode(password);
-            UserCredentials credentials = userService.activateUserCredentials(activateToken, encodedPassword);
-            User user = userService.findUserById(credentials.getUserId());
-            UserPrincipal principal = new UserPrincipal(UserPrincipal.Type.USER_NAME, user.getEmail());
-            SecurityUser securityUser = new SecurityUser(user, credentials.isEnabled(), principal);
-            String baseUrl = constructBaseUrl(request);
-            String loginUrl = String.format("%s/login", baseUrl);
-            String email = user.getEmail();
+            ActivateUserRequest activateUserRequest = ActivateUserRequest.builder().activateToken(activateToken).password(password).build();
 
-            try {
-                mailService.sendAccountActivatedEmail(loginUrl, email);
-            } catch (Exception e) {
-                log.info("Unable to send account activation email [{}]", e.getMessage());
+            ResponseEntity<JsonNode> userCredentialsResponse = restTemplate.postForEntity(IDENTITY_ENDPOINT+"/activate", activateUserRequest, JsonNode.class);
+
+            if(userCredentialsResponse.getStatusCode().equals(HttpStatus.OK)) {
+                ObjectMapper mapper = new ObjectMapper();
+                JsonNode body = userCredentialsResponse.getBody();
+                UserCredentials userCredentials = mapper.treeToValue(body, IdentityUserCredentials.class).toUserCredentials();
+
+                String userGetUrl = IDENTITY_ENDPOINT + "/" + userCredentials.getUserId().getId();
+                ResponseEntity<IdentityUser> userResponse = restTemplate.getForEntity(userGetUrl, IdentityUser.class);
+                if(userResponse.getStatusCode().equals(HttpStatus.OK)){
+                    IdentityUser identityUser = userResponse.getBody();
+                    String baseUrl = constructBaseUrl(request);
+                    String loginUrl = String.format("%s/login", baseUrl);
+                    String email = identityUser.getUserName();
+                    try {
+                        mailService.sendAccountActivatedEmail(loginUrl, email);
+                    } catch (Exception e) {
+                        log.info("Unable to send account activation email [{}]", e.getMessage());
+                    }
+                    OAuth2RestOperations oAuth2RestTemplate = getoAuth2RestOperations(password, identityUser);
+                    ObjectMapper objectMapper = new ObjectMapper();
+                    ObjectNode tokenObject = objectMapper.createObjectNode();
+                    tokenObject.put("token", oAuth2RestTemplate.getAccessToken().getValue());
+                    tokenObject.put("refreshToken", oAuth2RestTemplate.getAccessToken().getRefreshToken().getValue());
+                    return tokenObject;
+                } else {
+                    throw new TempusException("Error while retrieving user", TempusErrorCode.GENERAL);
+                }
+            } else {
+                throw new TempusException("Error while activating user", TempusErrorCode.GENERAL);
             }
-
-            /*JwtToken accessToken = tokenFactory.createAccessJwtToken(securityUser);
-            JwtToken refreshToken = refreshTokenRepository.requestRefreshToken(securityUser);*/
-
-            ObjectMapper objectMapper = new ObjectMapper();
-            ObjectNode tokenObject = objectMapper.createObjectNode();
-            /*tokenObject.put("token", accessToken.getToken());
-            tokenObject.put("refreshToken", refreshToken.getToken());*/
-            return tokenObject;
         } catch (Exception e) {
             throw handleException(e);
         }
     }
-    
+
+    private OAuth2RestOperations getoAuth2RestOperations(String password, IdentityUser identityUser) {
+        ResourceOwnerPasswordResourceDetails userPasswordReq = new ResourceOwnerPasswordResourceDetails();
+        userPasswordReq.setAccessTokenUri(apiResourceDetails.getAccessTokenUri());
+        userPasswordReq.setClientId(apiResourceDetails.getClientId());
+        userPasswordReq.setClientSecret(apiResourceDetails.getClientSecret());
+        userPasswordReq.setScope(apiResourceDetails.getScope());
+        userPasswordReq.setUsername(identityUser.getUserName());
+        userPasswordReq.setPassword(password);
+
+        SecurityContextHolder.getContext().setAuthentication(new UsernamePasswordAuthenticationToken(identityUser.getUserName(), password));
+
+        return new OAuth2RestTemplate(userPasswordReq);
+    }
+
     @RequestMapping(value = "/noauth/resetPassword", method = RequestMethod.POST)
     @ResponseStatus(value = HttpStatus.OK)
     @ResponseBody
