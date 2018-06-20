@@ -148,7 +148,7 @@
 
                                             <md-input-container flex="50" class="md-block" md-is-error="theForm['identityPassword_' + serverIndex].$touched && theForm['identityPassword_' + serverIndex].$invalid">
                                                 <label translate>extension.password</label>
-                                                <input required
+                                                <input type="password" required
                                                        name="identityPassword_{{serverIndex}}" ng-model="server.identity.password">
                                                 <div ng-messages="theForm['identityPassword_' + serverIndex].$error">
                                                     <div translate
