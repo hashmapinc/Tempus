@@ -54,16 +54,16 @@ function DatamodelService($http, $q, $rootScope, adminService, dashboardService,
         var deferred = $q.defer();
         var url = '/api/data-model';
         $http.post(url, dataModeldata).then(function success(response) {
-            deferred.resolve(response.data);
+            deferred.resolve(response);
         }, function fail(response) {
-            deferred.reject(response.data);
+            deferred.reject(response);
         });
         return deferred.promise;
     }
 
     function listDataModel() {
         var deferred = $q.defer();
-        var url = '/api/';
+        var url = '/api/data-model';
         $http.get(url).then(function success(response) {
             deferred.resolve(response.data);
         }, function fail(response) {
