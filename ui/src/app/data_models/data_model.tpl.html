@@ -54,7 +54,7 @@
 			</md-button>
 			<md-button 
 			 ng-disabled="$root.loading" class="tb-btn-footer md-accent md-hue-2 md-fab" aria-label="{{ 'action.edit-mode' | translate }}"
-			 ng-click="vm.isEdit ? vm.cancelDatamodelEdit() : ''; vm.toggleDMEditMode();">
+			 ng-click="vm.isEdit ? vm.rejectDatamodelEdit() : ''; vm.toggleDMEditMode();">
 				<md-tooltip md-direction="top">
 					{{ (vm.isEdit ? 'action.decline-changes' : 'action.enter-edit-mode') | translate }}
 				</md-tooltip>
