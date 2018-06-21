@@ -52,6 +52,8 @@ import org.springframework.web.client.RestTemplate;
 import javax.servlet.http.HttpServletRequest;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.HashMap;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api")
@@ -142,44 +144,56 @@ public class AuthController extends BaseController {
         return new ResponseEntity<>(headers, responseStatus);
     }
 
-
-    
     @RequestMapping(value = "/noauth/resetPasswordByEmail", method = RequestMethod.POST)
     @ResponseStatus(value = HttpStatus.OK)
     public void requestResetPasswordByEmail (
             @RequestBody JsonNode resetPasswordByEmailRequest,
             HttpServletRequest request) throws TempusException {
         try {
-            String email = resetPasswordByEmailRequest.get("email").asText();
-            UserCredentials userCredentials = userService.requestPasswordReset(email);
-            String baseUrl = constructBaseUrl(request);
-            String resetUrl = String.format("%s/api/noauth/resetPassword?resetToken=%s", baseUrl,
-                    userCredentials.getResetToken());
-            
-            mailService.sendResetPasswordEmail(resetUrl, email);
+
+            ResponseEntity<JsonNode> userCredentialsResponse = restTemplate.postForEntity(IDENTITY_ENDPOINT+"/resetPasswordByEmail", resetPasswordByEmailRequest, JsonNode.class);
+
+            if(userCredentialsResponse.getStatusCode().equals(HttpStatus.OK)) {
+                ObjectMapper mapper = new ObjectMapper();
+                JsonNode body = userCredentialsResponse.getBody();
+                UserCredentials userCredentials = mapper.treeToValue(body, IdentityUserCredentials.class).toUserCredentials();
+                String baseUrl = constructBaseUrl(request);
+
+
+                String resetUrl = String.format("%s/api/noauth/resetPassword?resetToken=%s", baseUrl,
+                        userCredentials.getResetToken());
+                mailService.sendResetPasswordEmail(resetUrl, resetPasswordByEmailRequest.get("email").asText());
+            } else {
+                throw new TempusException("Error while resetting password by email", TempusErrorCode.GENERAL);
+            }
         } catch (Exception e) {
             throw handleException(e);
         }
     }
-    
+
     @RequestMapping(value = "/noauth/resetPassword", params = { "resetToken" }, method = RequestMethod.GET)
     public ResponseEntity<String> checkResetToken(
-            @RequestParam(value = "resetToken") String resetToken) {
+            @RequestParam(value = "resetToken") String resetToken) throws TempusException {
         HttpHeaders headers = new HttpHeaders();
         HttpStatus responseStatus;
         String resetURI = "/login/resetPassword";
-        UserCredentials userCredentials = userService.findUserCredentialsByResetToken(resetToken);
-        if (userCredentials != null) {
-            try {
-                URI location = new URI(resetURI + "?resetToken=" + resetToken);
-                headers.setLocation(location);
-                responseStatus = HttpStatus.SEE_OTHER;
-            } catch (URISyntaxException e) {
-                log.error("Unable to create URI with address [{}]", resetURI);
-                responseStatus = HttpStatus.BAD_REQUEST;
+        ResponseEntity<IdentityUserCredentials> identityUserCredentialsResponse = restTemplate.getForEntity(IDENTITY_ENDPOINT+"/"+ resetToken+"/user-credentials", IdentityUserCredentials.class);
+        if(identityUserCredentialsResponse.getStatusCode().equals(HttpStatus.OK)) {
+            IdentityUserCredentials identityUserCredentials = identityUserCredentialsResponse.getBody();
+            if (identityUserCredentials != null) {
+                try {
+                    URI location = new URI(resetURI + "?resetToken=" + resetToken);
+                    headers.setLocation(location);
+                    responseStatus = HttpStatus.SEE_OTHER;
+                } catch (URISyntaxException e) {
+                    log.error("Unable to create URI with address [{}]", resetURI);
+                    responseStatus = HttpStatus.BAD_REQUEST;
+                }
+            } else {
+                responseStatus = HttpStatus.CONFLICT;
             }
         } else {
-            responseStatus = HttpStatus.CONFLICT;
+            throw new TempusException("Error while retrieving user credentials for a reset token ", TempusErrorCode.GENERAL);
         }
         return new ResponseEntity<>(headers, responseStatus);
     }
@@ -254,30 +268,48 @@ public class AuthController extends BaseController {
         try {
             String resetToken = resetPasswordRequest.get("resetToken").asText();
             String password = resetPasswordRequest.get("password").asText();
-            UserCredentials userCredentials = userService.findUserCredentialsByResetToken(resetToken);
-            if (userCredentials != null) {
-                String encodedPassword = passwordEncoder.encode(password);
-                userCredentials.setPassword(encodedPassword);
-                userCredentials.setResetToken(null);
-                userCredentials = userService.saveUserCredentials(userCredentials);
-                User user = userService.findUserById(userCredentials.getUserId());
-                UserPrincipal principal = new UserPrincipal(UserPrincipal.Type.USER_NAME, user.getEmail());
-                SecurityUser securityUser = new SecurityUser(user, userCredentials.isEnabled(), principal);
-                String baseUrl = constructBaseUrl(request);
-                String loginUrl = String.format("%s/login", baseUrl);
-                String email = user.getEmail();
-                mailService.sendPasswordWasResetEmail(loginUrl, email);
 
-                /*JwtToken accessToken = tokenFactory.createAccessJwtToken(securityUser);
-                JwtToken refreshToken = refreshTokenRepository.requestRefreshToken(securityUser);*/
+            ResponseEntity<IdentityUserCredentials> identityUserCredentialsResponse = restTemplate.getForEntity(IDENTITY_ENDPOINT+"/"+ resetToken+"/user-credentials", IdentityUserCredentials.class);
+            if(identityUserCredentialsResponse.getStatusCode().equals(HttpStatus.OK)) {
+                UserCredentials userCredentials = identityUserCredentialsResponse.getBody().toUserCredentials();
+                if(userCredentials !=null) {
+                    userCredentials.setPassword(password);
+                    userCredentials.setResetToken(null);
 
-                ObjectMapper objectMapper = new ObjectMapper();
-                ObjectNode tokenObject = objectMapper.createObjectNode();
-                /*tokenObject.put("token", accessToken.getToken());
-                tokenObject.put("refreshToken", refreshToken.getToken());*/
-                return tokenObject;
+                    ResponseEntity<JsonNode> updatedUserCredentialsResponse = restTemplate.postForEntity(IDENTITY_ENDPOINT+"/user-credentials", new IdentityUserCredentials(userCredentials), JsonNode.class);
+                    if(updatedUserCredentialsResponse.getStatusCode().equals(HttpStatus.OK)) {
+                        String userGetUrl = IDENTITY_ENDPOINT + "/" + userCredentials.getUserId().getId();
+                        ResponseEntity<IdentityUser> userResponse = restTemplate.getForEntity(userGetUrl, IdentityUser.class);
+                        if(userResponse.getStatusCode().equals(HttpStatus.OK)){
+                            IdentityUser identityUser = userResponse.getBody();
+                            String baseUrl = constructBaseUrl(request);
+                            String loginUrl = String.format("%s/login", baseUrl);
+                            String email = identityUser.getUserName();
+
+                            try {
+                                mailService.sendPasswordWasResetEmail(loginUrl, email);
+                            } catch (Exception e) {
+                                log.info("Unable to send password  email [{}]", e.getMessage());
+                            }
+
+                            OAuth2RestOperations oAuth2RestTemplate = getoAuth2RestOperations(password, identityUser);
+                            ObjectMapper objectMapper = new ObjectMapper();
+                            ObjectNode tokenObject = objectMapper.createObjectNode();
+                            tokenObject.put("token", oAuth2RestTemplate.getAccessToken().getValue());
+                            tokenObject.put("refreshToken", oAuth2RestTemplate.getAccessToken().getRefreshToken().getValue());
+                            return tokenObject;
+                        } else {
+                            throw new TempusException("Error retrieving user!", TempusErrorCode.GENERAL);
+                        }
+                    } else {
+                        throw new TempusException("Error updating password!", TempusErrorCode.GENERAL);
+                    }
+                } else {
+                    throw new TempusException("Invalid reset token!", TempusErrorCode.BAD_REQUEST_PARAMS);
+                }
+
             } else {
-                throw new TempusException("Invalid reset token!", TempusErrorCode.BAD_REQUEST_PARAMS);
+                throw new TempusException("Error retrieving user credentials from reset token", TempusErrorCode.GENERAL);
             }
         } catch (Exception e) {
             throw handleException(e);
