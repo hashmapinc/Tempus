@@ -18,6 +18,7 @@ package com.hashmapinc.server.service.user;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.hashmapinc.server.common.data.Customer;
 import com.hashmapinc.server.common.data.Tenant;
@@ -46,7 +47,6 @@ import com.hashmapinc.server.requests.CreateUserRequest;
 import com.hashmapinc.server.requests.IdentityUser;
 import com.hashmapinc.server.requests.IdentityUserCredentials;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -148,13 +148,13 @@ public class RestUserService extends AbstractEntityService implements UserServic
         log.trace("Executing save external user [{}]", user);
         userValidator.validate(user);
         User savedUser = userDao.save(user);
-        if(user.getId() == null) {
+        /*if(user.getId() == null) {
             UserCredentials userCredentials = new UserCredentials();
             userCredentials.setEnabled(true);
             userCredentials.setActivateToken(null);
             userCredentials.setUserId(new UserId(savedUser.getUuidId()));
             userCredentialsDao.save(userCredentials);
-        }
+        }*/
         return savedUser;
     }
 
@@ -237,16 +237,14 @@ public class RestUserService extends AbstractEntityService implements UserServic
     public UserCredentials requestPasswordReset(String email) {
         log.trace("Executing requestPasswordReset email [{}]", email);
         Validator.validateString(email, "Incorrect email " + email);
-        User user = userDao.findByEmail(email);
-        if (user == null) {
-            throw new IncorrectParameterException(String.format("Unable to find user by email [%s]", email));
+        ObjectNode request = mapper.createObjectNode();
+        request.put("email", email);
+        ResponseEntity<IdentityUserCredentials> response = restTemplate
+                .postForEntity(IDENTITY_ENDPOINT + "resetPasswordByEmail", request, IdentityUserCredentials.class);
+        if(response.getStatusCode().equals(HttpStatus.OK)){
+            return response.getBody().toUserCredentials();
         }
-        UserCredentials userCredentials = userCredentialsDao.findByUserId(user.getUuidId());
-        if (!userCredentials.isEnabled()) {
-            throw new IncorrectParameterException("Unable to reset password for inactive user");
-        }
-        userCredentials.setResetToken(RandomStringUtils.randomAlphanumeric(DEFAULT_TOKEN_LENGTH));
-        return saveUserCredentials(userCredentials);
+        return null;
     }
 
 
