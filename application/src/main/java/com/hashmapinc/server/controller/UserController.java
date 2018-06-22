@@ -122,8 +122,9 @@ public class UserController extends BaseController {
     }
 
     private User updateUser(@RequestBody User user) throws TempusException {
-        User savedUser;ResponseEntity<IdentityUser> response = restTemplate.exchange(IDENTITY_ENDPOINT + "/" +user.getId(),
+        ResponseEntity<IdentityUser> response = restTemplate.exchange(IDENTITY_ENDPOINT + "/" +user.getId(),
                 HttpMethod.PUT, new HttpEntity<>(new IdentityUser(user)), IdentityUser.class);
+        User savedUser;
         if(response.getStatusCode().equals(HttpStatus.OK)) {
             savedUser = response.getBody().toUser();
         }else{
@@ -135,7 +136,8 @@ public class UserController extends BaseController {
     private User createUser(@RequestBody User user, @RequestParam String activationType, HttpServletRequest request) throws TempusException, com.fasterxml.jackson.core.JsonProcessingException {
         boolean sendEmail = user.getId() == null && activationType.equals("mail");
         ObjectMapper mapper = new ObjectMapper();
-        User savedUser;CreateUserRequest userRequest = CreateUserRequest.builder().user(new IdentityUser(user)).activationType(activationType).build();
+        CreateUserRequest userRequest = CreateUserRequest.builder().user(new IdentityUser(user)).activationType(activationType).build();
+        User savedUser;
 
         ResponseEntity<JsonNode> response = restTemplate.postForEntity(IDENTITY_ENDPOINT, userRequest, JsonNode.class);
 

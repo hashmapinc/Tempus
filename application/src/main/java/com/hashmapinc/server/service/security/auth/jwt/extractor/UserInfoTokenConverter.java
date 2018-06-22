@@ -67,10 +67,10 @@ public class UserInfoTokenConverter implements UserAuthenticationConverter {
         SecurityUser securityUser = new SecurityUser();
         securityUser.setEmail((String)userName);
         securityUser.setId(new UserId(UUID.fromString((String) id)));
-        securityUser.setTenantId(new TenantId(UUIDConverter.fromString((String)tenantId)));
+        securityUser.setTenantId(new TenantId(UUID.fromString((String)tenantId)));
         Object customerId = map.get("customer_id");
         if(!StringUtils.isEmpty(customerId)){
-            securityUser.setCustomerId(new CustomerId(UUIDConverter.fromString((String)customerId)));
+            securityUser.setCustomerId(new CustomerId(UUID.fromString((String)customerId)));
         }
         securityUser.setEnabled(enabled != null ? (Boolean)enabled: false);
         securityUser.setFirstName(extractNullable("firstName", map));
