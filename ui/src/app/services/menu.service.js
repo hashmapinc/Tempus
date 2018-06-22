@@ -275,6 +275,14 @@ function Menu(userService, $state, $rootScope) {
                             link: '/static/svg/data-models-icon.svg'
                         },
                         {
+                            name: 'metadata.metadata',
+                            type: 'link',
+                            state: 'home.metadata',
+                            icon: 'metadata',
+                            link: '/static/svg/metadata-icon.svg'
+                        },
+
+                        {
                             name: 'dashboard.dashboards',
                             type: 'link',
                             state: 'home.dashboards',
@@ -384,7 +392,19 @@ function Menu(userService, $state, $rootScope) {
                                         state: 'home.auditLogs'
                                     }
                                 ]
-                            }];
+                            },
+                             {
+                                name: 'metadata.metadata',
+                                places: [
+                                    {
+                                        name: 'metadata.metadata',
+                                        icon: 'metadata',
+                                        link: '/static/svg/metadata-icon.svg',
+                                        state: 'home.metadata'
+                                    }
+                                ]
+                            },
+                           ];
 
                 } else if (authority === 'CUSTOMER_USER') {
                     sections = [
