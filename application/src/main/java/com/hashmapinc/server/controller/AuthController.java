@@ -105,7 +105,7 @@ public class AuthController extends BaseController {
             if (!passwordEncoder.matches(currentPassword, userCredentials.getPassword())) {
                 throw new TempusException("Current password doesn't match!", TempusErrorCode.BAD_REQUEST_PARAMS);
             }
-            userCredentials.setPassword(passwordEncoder.encode(newPassword));
+            userCredentials.setPassword(newPassword);
             userService.saveUserCredentials(userCredentials);
         } catch (Exception e) {
             throw handleException(e);
