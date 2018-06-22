@@ -116,6 +116,10 @@ export default angular.module('tempus.locale', [])
                     "bad-request": "Bad Request,Please Select A Theme."
 
                 },
+                "metadata" : {
+
+                    "metadata" : "MetaData"
+                },
                 "alarm": {
                     "alarm": "Alarm",
                     "alarms": "Alarms",
