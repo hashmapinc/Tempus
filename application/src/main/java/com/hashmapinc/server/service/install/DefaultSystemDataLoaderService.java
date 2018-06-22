@@ -19,11 +19,13 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.hashmapinc.server.common.data.*;
+import com.hashmapinc.server.common.data.id.CustomerId;
 import com.hashmapinc.server.common.data.id.TenantId;
 import com.hashmapinc.server.common.data.kv.AttributeKvEntry;
 import com.hashmapinc.server.common.data.kv.BaseAttributeKvEntry;
 import com.hashmapinc.server.common.data.kv.StringDataEntry;
 import com.hashmapinc.server.common.data.plugin.ComponentLifecycleState;
+import com.hashmapinc.server.common.data.plugin.PluginMetaData;
 import com.hashmapinc.server.common.data.rule.RuleMetaData;
 import com.hashmapinc.server.common.data.security.Authority;
 import com.hashmapinc.server.common.data.security.DeviceCredentials;
@@ -38,6 +40,7 @@ import com.hashmapinc.server.dao.device.DeviceService;
 import com.hashmapinc.server.dao.model.ModelConstants;
 import com.hashmapinc.server.dao.plugin.PluginService;
 import com.hashmapinc.server.dao.rule.RuleService;
+import com.hashmapinc.server.dao.settings.UserSettingsService;
 import com.hashmapinc.server.dao.tenant.TenantService;
 import com.hashmapinc.server.dao.theme.ThemeService;
 import com.hashmapinc.server.dao.user.UserService;
@@ -51,10 +54,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Profile;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-import com.hashmapinc.server.common.data.id.CustomerId;
-import com.hashmapinc.server.common.data.id.ThemeId;
-import com.hashmapinc.server.common.data.plugin.PluginMetaData;
-import com.hashmapinc.server.dao.settings.UserSettingsService;
 
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
@@ -83,9 +82,6 @@ public class DefaultSystemDataLoaderService implements SystemDataLoaderService {
 
     @Value("${install.data_dir}")
     private String dataDir;
-
-    @Autowired
-    private BCryptPasswordEncoder passwordEncoder;
 
     @Autowired
     private UserService userService;
@@ -326,7 +322,7 @@ public class DefaultSystemDataLoaderService implements SystemDataLoaderService {
         } else {
             user = userService.saveUser(user);
             UserCredentials userCredentials = userService.findUserCredentialsByUserId(user.getId());
-            userCredentials.setPassword(passwordEncoder.encode(password));
+            userCredentials.setPassword(password);
             userCredentials.setEnabled(true);
             userCredentials.setActivateToken(null);
             userService.saveUserCredentials(userCredentials);

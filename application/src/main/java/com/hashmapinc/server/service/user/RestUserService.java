@@ -15,6 +15,9 @@
  */
 package com.hashmapinc.server.service.user;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.hashmapinc.server.common.data.Customer;
 import com.hashmapinc.server.common.data.Tenant;
@@ -38,12 +41,17 @@ import com.hashmapinc.server.dao.tenant.TenantDao;
 import com.hashmapinc.server.dao.user.UserCredentialsDao;
 import com.hashmapinc.server.dao.user.UserDao;
 import com.hashmapinc.server.dao.user.UserService;
+import com.hashmapinc.server.requests.ActivateUserRequest;
+import com.hashmapinc.server.requests.CreateUserRequest;
 import com.hashmapinc.server.requests.IdentityUser;
+import com.hashmapinc.server.requests.IdentityUserCredentials;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -80,9 +88,12 @@ public class RestUserService extends AbstractEntityService implements UserServic
     @Autowired
     private CustomerDao customerDao;
 
+    private ObjectMapper mapper = new ObjectMapper();
+
 
     @Override
     public User findUserById(UserId userId) {
+        validateId(userId, INCORRECT_USER_ID + userId);
         ResponseEntity<IdentityUser> response = restTemplate.getForEntity(IDENTITY_ENDPOINT + userId.getId(), IdentityUser.class);
         if(response.getStatusCode().equals(HttpStatus.OK)){
             return response.getBody().toUser();
@@ -97,6 +108,7 @@ public class RestUserService extends AbstractEntityService implements UserServic
 
     @Override
     public User findUserByEmail(String email) {
+        Validator.validateString(email, "Incorrect email " + email);
         String encoded = Base64.getUrlEncoder().encodeToString(email.getBytes());
         ResponseEntity<IdentityUser> response = restTemplate.getForEntity(IDENTITY_ENDPOINT + "username/" + encoded, IdentityUser.class);
         if(response.getStatusCode().equals(HttpStatus.OK)){
@@ -109,16 +121,26 @@ public class RestUserService extends AbstractEntityService implements UserServic
     @Override
     public User saveUser(User user) {
         log.trace("Executing saveUser [{}]", user);
-        userValidator.validate(user);
-        User savedUser = userDao.save(user);
-        if (user.getId() == null) {
-            UserCredentials userCredentials = new UserCredentials();
-            userCredentials.setEnabled(false);
-            userCredentials.setActivateToken(RandomStringUtils.randomAlphanumeric(DEFAULT_TOKEN_LENGTH));
-            userCredentials.setUserId(new UserId(savedUser.getUuidId()));
-            userCredentialsDao.save(userCredentials);
+        if(user.getId() == null) {
+            CreateUserRequest userRequest = CreateUserRequest.builder().user(new IdentityUser(user)).activationType("link").build();
+            ResponseEntity<JsonNode> response = restTemplate.postForEntity(IDENTITY_ENDPOINT, userRequest, JsonNode.class);
+            if (response.getStatusCode().equals(HttpStatus.CREATED)) {
+                JsonNode body = response.getBody();
+                try {
+                    return mapper.treeToValue(body.get("user"), IdentityUser.class).toUser();
+                } catch (JsonProcessingException e) {
+                    log.error("Error while saving user ", e);
+                }
+
+            }
+        }else{
+            ResponseEntity<IdentityUser> response = restTemplate.exchange(IDENTITY_ENDPOINT + user.getId(),
+                    HttpMethod.PUT, new HttpEntity<>(new IdentityUser(user)), IdentityUser.class);
+            if(response.getStatusCode().equals(HttpStatus.OK)) {
+                return response.getBody().toUser();
+            }
         }
-        return savedUser;
+        return null;
     }
 
     @Override
@@ -140,28 +162,58 @@ public class RestUserService extends AbstractEntityService implements UserServic
     public UserCredentials findUserCredentialsByUserId(UserId userId) {
         log.trace("Executing findUserCredentialsByUserId [{}]", userId);
         validateId(userId, INCORRECT_USER_ID + userId);
-        return userCredentialsDao.findByUserId(userId.getId());
+
+        ResponseEntity<IdentityUserCredentials> response = restTemplate
+                .getForEntity(IDENTITY_ENDPOINT + userId.getId() + "/user-credentials", IdentityUserCredentials.class);
+        if(response.getStatusCode().equals(HttpStatus.OK)){
+            return response.getBody().toUserCredentials();
+        }
+
+        return null;
     }
 
     @Override
     public UserCredentials findUserCredentialsByActivateToken(String activateToken) {
         log.trace("Executing findUserCredentialsByActivateToken [{}]", activateToken);
         Validator.validateString(activateToken, "Incorrect activateToken " + activateToken);
-        return userCredentialsDao.findByActivateToken(activateToken);
+        ResponseEntity<IdentityUserCredentials> response = restTemplate
+                .getForEntity(IDENTITY_ENDPOINT + "activate/" + activateToken +"/user-credentials",
+                        IdentityUserCredentials.class);
+        if(response.getStatusCode().equals(HttpStatus.OK)){
+            return response.getBody().toUserCredentials();
+        }
+        return null;
     }
 
     @Override
     public UserCredentials findUserCredentialsByResetToken(String resetToken) {
         log.trace("Executing findUserCredentialsByResetToken [{}]", resetToken);
         Validator.validateString(resetToken, "Incorrect resetToken " + resetToken);
+        ResponseEntity<IdentityUserCredentials> response = restTemplate
+                .getForEntity(IDENTITY_ENDPOINT + "reset/"+ resetToken + "/user-credentials",
+                        IdentityUserCredentials.class);
+
+        if(response.getStatusCode().equals(HttpStatus.OK)){
+            return response.getBody().toUserCredentials();
+        }
+
         return userCredentialsDao.findByResetToken(resetToken);
     }
 
     @Override
     public UserCredentials saveUserCredentials(UserCredentials userCredentials) {
         log.trace("Executing saveUserCredentials [{}]", userCredentials);
-        userCredentialsValidator.validate(userCredentials);
-        return userCredentialsDao.save(userCredentials);
+        //userCredentialsValidator.validate(userCredentials);
+        ResponseEntity<IdentityUserCredentials> response = restTemplate
+                .exchange(IDENTITY_ENDPOINT + userCredentials.getId().getId() +"/user-credentials",
+                        HttpMethod.PUT,
+                        new HttpEntity<>(new IdentityUserCredentials(userCredentials)),
+                        IdentityUserCredentials.class);
+        if(response.getStatusCode().equals(HttpStatus.OK)){
+            return response.getBody().toUserCredentials();
+        }
+
+        return null;
     }
 
     @Override
@@ -169,18 +221,16 @@ public class RestUserService extends AbstractEntityService implements UserServic
         log.trace("Executing activateUserCredentials activateToken [{}], password [{}]", activateToken, password);
         Validator.validateString(activateToken, "Incorrect activateToken " + activateToken);
         Validator.validateString(password, "Incorrect password " + password);
-        UserCredentials userCredentials = userCredentialsDao.findByActivateToken(activateToken);
-        if (userCredentials == null) {
-            throw new IncorrectParameterException(String.format("Unable to find user credentials by activateToken [%s]", activateToken));
-        }
-        if (userCredentials.isEnabled()) {
-            throw new IncorrectParameterException("User credentials already activated");
-        }
-        userCredentials.setEnabled(true);
-        userCredentials.setActivateToken(null);
-        userCredentials.setPassword(password);
 
-        return saveUserCredentials(userCredentials);
+        ActivateUserRequest request = ActivateUserRequest.builder().activateToken(activateToken).password(password).build();
+        ResponseEntity<IdentityUserCredentials> response = restTemplate
+                .postForEntity(IDENTITY_ENDPOINT+"/activate", request, IdentityUserCredentials.class);
+
+        if(response.getStatusCode().equals(HttpStatus.OK)){
+            return response.getBody().toUserCredentials();
+        }
+
+        return null;
     }
 
     @Override
