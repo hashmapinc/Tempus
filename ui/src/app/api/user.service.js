@@ -319,10 +319,21 @@ function UserService($http, $q, $rootScope, adminService, dashboardService, logi
             }
         }
 
+        function copyUserDetailsFromToken(decodedUser) {
+            if(decodedUser){
+                currentUser = decodedUser;
+                currentUser.userId = decodedUser.id;
+                currentUser.tenantId = decodedUser.tenant_id;
+                currentUser.customerId = decodedUser.customer_id;
+                currentUser.isPublic = false;
+            }
+        }
+
         function procceedJwtTokenValidate() {
             validateJwtToken(doTokenRefresh).then(function success() {
                 var jwtToken = store.get('access_token');
-                currentUser = jwtHelper.decodeToken(jwtToken);
+                var decodedUser = jwtHelper.decodeToken(jwtToken);
+                copyUserDetailsFromToken(decodedUser);
                 if (currentUser && currentUser.authorities && currentUser.authorities.length > 0) {
                     currentUser.authority = currentUser.authorities[0];
                 } else if (currentUser) {

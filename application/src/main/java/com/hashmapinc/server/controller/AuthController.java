@@ -118,7 +118,7 @@ public class AuthController extends BaseController {
         HttpHeaders headers = new HttpHeaders();
         HttpStatus responseStatus;
 
-        ResponseEntity<JsonNode> response = restTemplate.getForEntity(IDENTITY_ENDPOINT+"/activate", JsonNode.class);
+        ResponseEntity<JsonNode> response = restTemplate.getForEntity(IDENTITY_ENDPOINT+ "/activate/" + activateToken +"/user-credentials", JsonNode.class);
 
         if(response.getStatusCode().equals(HttpStatus.OK)) {
             ObjectMapper mapper = new ObjectMapper();
@@ -177,7 +177,7 @@ public class AuthController extends BaseController {
         HttpHeaders headers = new HttpHeaders();
         HttpStatus responseStatus;
         String resetURI = "/login/resetPassword";
-        ResponseEntity<IdentityUserCredentials> identityUserCredentialsResponse = restTemplate.getForEntity(IDENTITY_ENDPOINT+"/"+ resetToken+"/user-credentials", IdentityUserCredentials.class);
+        ResponseEntity<IdentityUserCredentials> identityUserCredentialsResponse = restTemplate.getForEntity(IDENTITY_ENDPOINT+"/reset/"+ resetToken+"/user-credentials", IdentityUserCredentials.class);
         if(identityUserCredentialsResponse.getStatusCode().equals(HttpStatus.OK)) {
             IdentityUserCredentials identityUserCredentials = identityUserCredentialsResponse.getBody();
             if (identityUserCredentials != null) {

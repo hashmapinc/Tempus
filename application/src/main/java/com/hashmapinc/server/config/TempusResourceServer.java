@@ -17,10 +17,10 @@ package com.hashmapinc.server.config;
 
 import com.hashmapinc.server.dao.audit.AuditLogLevelFilter;
 import com.hashmapinc.server.exception.TempusErrorResponseHandler;
-import com.hashmapinc.server.service.security.auth.jwt.JwtTokenAuthenticationProcessingFilter;
 import com.hashmapinc.server.service.security.auth.jwt.extractor.TokenExtractor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.security.oauth2.resource.ResourceServerProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -33,6 +33,8 @@ import org.springframework.security.oauth2.config.annotation.web.configuration.E
 import org.springframework.security.oauth2.config.annotation.web.configuration.ResourceServerConfigurerAdapter;
 import org.springframework.security.oauth2.config.annotation.web.configurers.ResourceServerSecurityConfigurer;
 import org.springframework.security.oauth2.provider.token.*;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.filter.CorsFilter;
 
 import java.util.HashMap;
 
@@ -84,10 +86,10 @@ public class TempusResourceServer extends ResourceServerConfigurerAdapter {
     }
 
 
-    @Bean
+    /*@Bean
     protected JwtTokenAuthenticationProcessingFilter buildJwtTokenAuthenticationProcessingFilter() {
         return new JwtTokenAuthenticationProcessingFilter(jwtHeaderTokenExtractor, resourceServerProperties);
-    }
+    }*/
 
     @Override
     public void configure(ResourceServerSecurityConfigurer resources) throws Exception {
@@ -133,6 +135,18 @@ public class TempusResourceServer extends ResourceServerConfigurerAdapter {
         services.setCheckTokenEndpointUrl(resourceServerProperties.getTokenInfoUri());
         services.setAccessTokenConverter(tokenConverter());
         return services;
+    }
+
+    @Bean
+    @ConditionalOnMissingBean(CorsFilter.class)
+    public CorsFilter corsFilter(MvcCorsProperties mvcCorsProperties) {
+        if (mvcCorsProperties.getMappings().size() == 0) {
+            return new CorsFilter(new UrlBasedCorsConfigurationSource());
+        } else {
+            UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+            source.setCorsConfigurations(mvcCorsProperties.getMappings());
+            return new CorsFilter(source);
+        }
     }
 
     private AccessTokenConverter tokenConverter() {

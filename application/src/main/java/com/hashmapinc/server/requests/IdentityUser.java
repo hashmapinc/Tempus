@@ -15,7 +15,6 @@
  */
 package com.hashmapinc.server.requests;
 
-import com.hashmapinc.server.common.data.UUIDConverter;
 import com.hashmapinc.server.common.data.User;
 import com.hashmapinc.server.common.data.id.CustomerId;
 import com.hashmapinc.server.common.data.id.TenantId;
@@ -29,14 +28,13 @@ import java.util.Map;
 import java.util.UUID;
 
 import static com.hashmapinc.server.dao.model.ModelConstants.NULL_UUID;
-import static com.hashmapinc.server.dao.model.ModelConstants.NULL_UUID_STR;
 
 @Data
 public class IdentityUser {
     private UUID id;
     private String userName;
-    private String tenantId;
-    private String customerId;
+    private UUID tenantId;
+    private UUID customerId;
     private String firstName;
     private String lastName;
     private List<String> authorities;
@@ -50,16 +48,16 @@ public class IdentityUser {
         this.id = user.getUuidId();
         this.userName = user.getEmail();
         this.authorities = Arrays.asList(user.getAuthority().name());
-        if(user.getTenantId()!=null) {
-            this.tenantId = UUIDConverter.fromTimeUUID(user.getTenantId().getId());
+        if(user.getTenantId() != null) {
+            this.tenantId = user.getTenantId().getId();
         } else {
-            this.tenantId = NULL_UUID_STR;
+            this.tenantId = NULL_UUID;
         }
 
-        if(user.getCustomerId() !=null) {
-            this.customerId = UUIDConverter.fromTimeUUID(user.getCustomerId().getId());
+        if(user.getCustomerId() != null) {
+            this.customerId = user.getCustomerId().getId();
         } else {
-            this.customerId = NULL_UUID_STR;
+            this.customerId = NULL_UUID;
         }
 
         this.firstName = user.getFirstName();
@@ -72,8 +70,12 @@ public class IdentityUser {
         user.setEmail(userName);
         user.setFirstName(firstName);
         user.setLastName(lastName);
-        user.setTenantId(new TenantId(UUIDConverter.fromString(tenantId)));
-        user.setCustomerId(new CustomerId(UUIDConverter.fromString(customerId)));
+        if(tenantId != null) {
+            user.setTenantId(new TenantId(tenantId));
+        }
+        if(customerId != null) {
+            user.setCustomerId(new CustomerId(customerId));
+        }
         user.setAuthority(Authority.parse(authorities.get(0)));
         return user;
     }

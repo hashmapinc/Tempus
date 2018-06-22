@@ -13,10 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.hashmapinc.server.dao.user;
+package com.hashmapinc.server.service.user;
 
 import com.google.common.util.concurrent.ListenableFuture;
 import com.hashmapinc.server.common.data.Customer;
+import com.hashmapinc.server.common.data.Tenant;
 import com.hashmapinc.server.common.data.User;
 import com.hashmapinc.server.common.data.id.CustomerId;
 import com.hashmapinc.server.common.data.id.TenantId;
@@ -27,27 +28,41 @@ import com.hashmapinc.server.common.data.security.Authority;
 import com.hashmapinc.server.common.data.security.UserCredentials;
 import com.hashmapinc.server.dao.customer.CustomerDao;
 import com.hashmapinc.server.dao.entity.AbstractEntityService;
+import com.hashmapinc.server.dao.exception.DataValidationException;
 import com.hashmapinc.server.dao.exception.IncorrectParameterException;
 import com.hashmapinc.server.dao.model.ModelConstants;
 import com.hashmapinc.server.dao.service.DataValidator;
 import com.hashmapinc.server.dao.service.PaginatedRemover;
 import com.hashmapinc.server.dao.service.Validator;
 import com.hashmapinc.server.dao.tenant.TenantDao;
+import com.hashmapinc.server.dao.user.UserCredentialsDao;
+import com.hashmapinc.server.dao.user.UserDao;
+import com.hashmapinc.server.dao.user.UserService;
+import com.hashmapinc.server.requests.IdentityUser;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import com.hashmapinc.server.common.data.Tenant;
-import com.hashmapinc.server.dao.exception.DataValidationException;
+import org.springframework.web.client.RestTemplate;
 
+import java.util.Base64;
 import java.util.List;
 
-import static com.hashmapinc.server.dao.service.Validator.*;
+import static com.hashmapinc.server.dao.service.Validator.validateId;
 
-//@Service
 @Slf4j
-public class UserServiceImpl extends AbstractEntityService implements UserService {
+@Service
+public class RestUserService extends AbstractEntityService implements UserService{
+
+    public static final String IDENTITY_ENDPOINT = "http://localhost:9002/uaa/users/";
+
+    @Autowired
+    @Qualifier("clientRestTemplate")
+    private RestTemplate restTemplate;
 
     private static final int DEFAULT_TOKEN_LENGTH = 30;
     public static final String INCORRECT_USER_ID = "Incorrect userId ";
@@ -55,36 +70,41 @@ public class UserServiceImpl extends AbstractEntityService implements UserServic
 
     @Autowired
     private UserDao userDao;
-    
+
     @Autowired
     private UserCredentialsDao userCredentialsDao;
-    
+
     @Autowired
     private TenantDao tenantDao;
-    
+
     @Autowired
     private CustomerDao customerDao;
-    
-	@Override
-	public User findUserByEmail(String email) {
-	    log.trace("Executing findUserByEmail [{}]", email);
-		Validator.validateString(email, "Incorrect email " + email);
-		return userDao.findByEmail(email);
-	}
 
-	@Override
-	public User findUserById(UserId userId) {
-	    log.trace("Executing findUserById [{}]", userId);
-		validateId(userId, INCORRECT_USER_ID + userId);
-		return userDao.findById(userId.getId());
-	}
+
+    @Override
+    public User findUserById(UserId userId) {
+        ResponseEntity<IdentityUser> response = restTemplate.getForEntity(IDENTITY_ENDPOINT + userId.getId(), IdentityUser.class);
+        if(response.getStatusCode().equals(HttpStatus.OK)){
+            return response.getBody().toUser();
+        }
+        return null;
+    }
 
     @Override
     public ListenableFuture<User> findUserByIdAsync(UserId userId) {
-        log.trace("Executing findUserByIdAsync [{}]", userId);
-        validateId(userId, INCORRECT_USER_ID + userId);
-        return userDao.findByIdAsync(userId.getId());
+        return null;
     }
+
+    @Override
+    public User findUserByEmail(String email) {
+        String encoded = Base64.getUrlEncoder().encodeToString(email.getBytes());
+        ResponseEntity<IdentityUser> response = restTemplate.getForEntity(IDENTITY_ENDPOINT + "username/" + encoded, IdentityUser.class);
+        if(response.getStatusCode().equals(HttpStatus.OK)){
+            return response.getBody().toUser();
+        }
+        return null;
+    }
+
 
     @Override
     public User saveUser(User user) {
@@ -97,14 +117,14 @@ public class UserServiceImpl extends AbstractEntityService implements UserServic
             userCredentials.setActivateToken(RandomStringUtils.randomAlphanumeric(DEFAULT_TOKEN_LENGTH));
             userCredentials.setUserId(new UserId(savedUser.getUuidId()));
             userCredentialsDao.save(userCredentials);
-        }        
+        }
         return savedUser;
     }
 
     @Override
     public User saveExternalUser(User user){
-	    log.trace("Executing save external user [{}]", user);
-	    userValidator.validate(user);
+        log.trace("Executing save external user [{}]", user);
+        userValidator.validate(user);
         User savedUser = userDao.save(user);
         if(user.getId() == null) {
             UserCredentials userCredentials = new UserCredentials();
@@ -115,7 +135,7 @@ public class UserServiceImpl extends AbstractEntityService implements UserServic
         }
         return savedUser;
     }
-    
+
     @Override
     public UserCredentials findUserCredentialsByUserId(UserId userId) {
         log.trace("Executing findUserCredentialsByUserId [{}]", userId);
@@ -143,7 +163,7 @@ public class UserServiceImpl extends AbstractEntityService implements UserServic
         userCredentialsValidator.validate(userCredentials);
         return userCredentialsDao.save(userCredentials);
     }
-    
+
     @Override
     public UserCredentials activateUserCredentials(String activateToken, String password) {
         log.trace("Executing activateUserCredentials activateToken [{}], password [{}]", activateToken, password);
@@ -159,7 +179,7 @@ public class UserServiceImpl extends AbstractEntityService implements UserServic
         userCredentials.setEnabled(true);
         userCredentials.setActivateToken(null);
         userCredentials.setPassword(password);
-        
+
         return saveUserCredentials(userCredentials);
     }
 
@@ -221,7 +241,7 @@ public class UserServiceImpl extends AbstractEntityService implements UserServic
         log.trace("Executing deleteCustomerUsers, customerId [{}]", customerId);
         validateId(tenantId, INCORRECT_TENANT_ID + tenantId);
         validateId(customerId, "Incorrect customerId " + customerId);
-        new CustomerUsersRemover(tenantId).removeEntities(customerId);
+        new RestUserService.CustomerUsersRemover(tenantId).removeEntities(customerId);
     }
 
     private DataValidator<User> userValidator =
@@ -231,9 +251,9 @@ public class UserServiceImpl extends AbstractEntityService implements UserServic
                     if (StringUtils.isEmpty(user.getEmail())) {
                         throw new DataValidationException("User email should be specified!");
                     }
-                    
+
                     validateEmail(user.getEmail());
-                    
+
                     Authority authority = user.getAuthority();
                     if (authority == null) {
                         throw new DataValidationException("User authority isn't defined!");
@@ -248,12 +268,12 @@ public class UserServiceImpl extends AbstractEntityService implements UserServic
                         customerId = new CustomerId(ModelConstants.NULL_UUID);
                         user.setCustomerId(customerId);
                     }
-                    
+
                     switch (authority) {
                         case SYS_ADMIN:
                             if (!tenantId.getId().equals(ModelConstants.NULL_UUID)
                                     || !customerId.getId().equals(ModelConstants.NULL_UUID)) {
-                                    throw new DataValidationException("System administrator can't be assigned neither to tenant nor to customer!");
+                                throw new DataValidationException("System administrator can't be assigned neither to tenant nor to customer!");
                             }
                             break;
                         case TENANT_ADMIN:
@@ -265,14 +285,14 @@ public class UserServiceImpl extends AbstractEntityService implements UserServic
                             break;
                         case CUSTOMER_USER:
                             if (tenantId.getId().equals(ModelConstants.NULL_UUID)
-                                || customerId.getId().equals(ModelConstants.NULL_UUID) ) {
+                                    || customerId.getId().equals(ModelConstants.NULL_UUID) ) {
                                 throw new DataValidationException("Customer user should be assigned to customer!");
                             }
                             break;
                         default:
                             break;
                     }
-                    
+
                     User existentUserWithEmail = findUserByEmail(user.getEmail());
                     if (existentUserWithEmail != null && !isSameData(existentUserWithEmail, user)) {
                         throw new DataValidationException("User with email '" + user.getEmail() + "' "
@@ -292,17 +312,17 @@ public class UserServiceImpl extends AbstractEntityService implements UserServic
                             throw new DataValidationException("User can't be assigned to customer from different tenant!");
                         }
                     }
-                 }
-    };
-    
-    private DataValidator<UserCredentials> userCredentialsValidator = 
+                }
+            };
+
+    private DataValidator<UserCredentials> userCredentialsValidator =
             new DataValidator<UserCredentials>() {
-        
+
                 @Override
                 protected void validateCreate(UserCredentials userCredentials) {
                     throw new IncorrectParameterException("Creation of new user credentials is prohibited.");
                 }
-                
+
                 @Override
                 protected void validateDataImpl(UserCredentials userCredentials) {
                     if (userCredentials.getUserId() == null) {
@@ -326,26 +346,26 @@ public class UserServiceImpl extends AbstractEntityService implements UserServic
                         throw new DataValidationException("Can't assign user credentials to non-existent user!");
                     }
                 }
-    };
-    
+            };
+
     private PaginatedRemover<TenantId, User> tenantAdminsRemover =
             new PaginatedRemover<TenantId, User>() {
-        
-        @Override
-        protected List<User> findEntities(TenantId id, TextPageLink pageLink) {
-            return userDao.findTenantAdmins(id.getId(), pageLink);
-        }
 
-        @Override
-        protected void removeEntity(User entity) {
-            deleteUser(new UserId(entity.getUuidId()));
-        }
-    };
-    
+                @Override
+                protected List<User> findEntities(TenantId id, TextPageLink pageLink) {
+                    return userDao.findTenantAdmins(id.getId(), pageLink);
+                }
+
+                @Override
+                protected void removeEntity(User entity) {
+                    deleteUser(new UserId(entity.getUuidId()));
+                }
+            };
+
     private class CustomerUsersRemover extends PaginatedRemover<CustomerId, User> {
-        
+
         private TenantId tenantId;
-        
+
         CustomerUsersRemover(TenantId tenantId) {
             this.tenantId = tenantId;
         }
@@ -353,14 +373,13 @@ public class UserServiceImpl extends AbstractEntityService implements UserServic
         @Override
         protected List<User> findEntities(CustomerId id, TextPageLink pageLink) {
             return userDao.findCustomerUsers(tenantId.getId(), id.getId(), pageLink);
- 
+
         }
 
         @Override
         protected void removeEntity(User entity) {
             deleteUser(new UserId(entity.getUuidId()));
         }
-        
+
     }
-    
 }
