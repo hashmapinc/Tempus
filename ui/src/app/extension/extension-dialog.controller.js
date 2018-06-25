@@ -59,6 +59,11 @@ export default function ExtensionDialogController($scope, $mdDialog, $translate,
                 "servers": []
             };
         }
+        if (vm.extension.type === "WITSML") {
+            vm.extension.configuration = {
+                "servers": []
+            };
+        }
     };
 
     vm.cancel = cancel;
