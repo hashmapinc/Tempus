@@ -37,7 +37,7 @@ export function AddDataModelController($scope, $mdDialog, saveItemFunction, help
             vm.item = item;
             $scope.theForm.$setPristine();
             $mdDialog.hide();
-            $state.go('home.data_models.data_model', { dashboardId: vm.item.id.id });
+            $state.go('home.data_models.data_model', { 'datamodelId': vm.item.id.id });
         });
     }
 }
