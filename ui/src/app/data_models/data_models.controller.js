@@ -31,8 +31,8 @@ export function AddDataModelController($scope, $mdDialog, saveItemFunction, help
         $mdDialog.cancel();
     }
 
+    // add a new datamodel and redirect to the datamodel canvas
     function add() {
-
         saveItemFunction(vm.item).then(function success(item) {
             vm.item = item;
             $scope.theForm.$setPristine();
