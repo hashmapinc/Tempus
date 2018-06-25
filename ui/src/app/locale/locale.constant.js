@@ -389,6 +389,8 @@ export default angular.module('tempus.locale', [])
                     "manage-devices": "Manage devices",
                     "manage-dashboards": "Manage dashboards",
                     "title": "Title",
+                    "data-model": "Data Model",
+                    "data-model-creation-link": "Go To Data Model Creation Page",
                     "title-required": "Title is required.",
                     "description": "Description",
                     "details": "Details",
