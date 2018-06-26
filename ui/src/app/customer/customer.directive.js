@@ -20,34 +20,58 @@ import customerFieldsetTemplate from './customer-fieldset.tpl.html';
 /* eslint-enable import/no-unresolved, import/default */
 
 /*@ngInject*/
-export default function CustomerDirective($compile, $templateCache, $translate, toast, datamodelService, $log, $state, $mdDialog) {
+export default function CustomerDirective($compile, $templateCache, $translate, toast, datamodelService, $timeout, $state, $mdDialog) {
     var linker = function (scope, element) {
         var template = $templateCache.get(customerFieldsetTemplate);
         element.html(template);
 
         scope.isPublic = false;
+                       datamodelService.listDataModel().then(
+                            function success(dataModels) {
+                                var dataModelList = [];
+                                for (var i = 0; i < dataModels.length; i++ ){
+                                    var dataModel = {};
+                                    dataModel.key = dataModels[i].name;
+                                    dataModel.value = dataModels[i].id;
+                                    dataModelList.push(dataModel);
+                                }
 
-        datamodelService.listDataModel().then(
-            function success(dataModels) {
-                var dataModelList = [];
-                for (var i = 0; i < dataModels.length; i++ ){
-                    var dataModel = {};
-                    dataModel.key = dataModels[i].name;
-                    dataModel.value = dataModels[i].id;
-                    dataModelList.push(dataModel);
-                }
-                scope.dataModels = dataModelList;
-            },
-            function fail() {
-            }
-        );
+                                scope.dataModels = '';
+                                scope.dataModels = dataModelList;
 
-        scope.onCustomerIdCopied = function() {
+                            },
+                            function fail() {
+                            }
+                            );
+       scope.onCustomerIdCopied = function() {
             toast.showSuccess($translate.instant('customer.idCopiedMessage'), 750, angular.element(element).parent().parent(), 'bottom left');
         };
 
         scope.$watch('customer', function(newVal) {
+
             if (newVal) {
+
+                    if(!scope.isEdit) {
+                        datamodelService.listDataModel().then(
+                            function success(dataModels) {
+                                var dataModelList = [];
+                                for (var i = 0; i < dataModels.length; i++ ){
+                                    var dataModel = {};
+                                    dataModel.key = dataModels[i].name;
+                                    dataModel.value = dataModels[i].id;
+                                    dataModelList.push(dataModel);
+                                }
+
+                                scope.dataModels = '';
+                                $timeout( function(){ scope.dataModels = dataModelList; }, 500);
+
+                            },
+                            function fail() {
+                            }
+                            );
+                }
+
+
                 if (scope.customer.additionalInfo) {
                     scope.isPublic = scope.customer.additionalInfo.isPublic;
                 } else {
