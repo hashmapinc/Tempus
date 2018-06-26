@@ -25,7 +25,6 @@ export default function DataModelsDirective($compile, $templateCache) {
         var template = $templateCache.get(dataModelFieldsetTemplate);
         element.html(template);
 
-
         $compile(element.contents())(scope);
     }
     return {

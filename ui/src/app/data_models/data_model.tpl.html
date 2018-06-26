@@ -1,0 +1,65 @@
+<!--
+
+    Copyright © 2017-2018 Hashmap, Inc
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+        http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<md-content style="padding-top: 150px;" flex tb-expand-fullscreen="vm.widgetEditMode || vm.iframeMode || forceFullscreen"
+ expand-button-id="dashboard-expand-button" hide-expand-button="vm.widgetEditMode || vm.iframeMode || forceFullscreen" expand-tooltip-direction="bottom">
+	<section class="tb-dashboard-container tb-absolute-fill" ng-class="{ 'is-fullscreen': forceFullscreen, 'tb-dashboard-toolbar-opened': vm.toolbarOpened, 'tb-dashboard-toolbar-closed': !vm.toolbarOpened }">
+		<div id="dataModelViewerContainer" style="
+							height: 100%;
+							width: 100%;">
+		</div>
+
+		<section class="tb-dashboard-title" layout="row" layout-align="center center" ng-style="{'color': vm.dashboard.configuration.settings.titleColor}">
+			<h3 ng-show="!vm.isEdit">{{ vm.datamodelTitle }}</h3>
+			<md-input-container ng-show="vm.isEdit" class="md-block" style="height: 30px;">
+				<label translate ng-style="{'color': vm.dashboard.configuration.settings.titleColor}">dashboard.title</label>
+				<input class="tb-dashboard-title" ng-style="{'color': vm.dashboard.configuration.settings.titleColor}" required name="title"
+				 ng-model="vm.datamodelTitle">
+			</md-input-container>
+		</section>
+
+		<section layout="row" layout-wrap class="tb-footer-buttons md-fab" layout-align="start end">
+			<md-fab-speed-dial ng-disabled="$root.loading" ng-show="vm.isEdit" md-open="vm.addItemActionsOpen"
+			 class="md-scale" md-direction="up">
+				<md-fab-trigger>
+					<md-button ng-disabled="$root.loading" class="tb-btn-footer md-accent md-hue-2 md-fab" aria-label="Add new data model object" ng-click="vm.showDatamodelObjectStepper($event)">
+						<md-tooltip md-direction="top">
+							Add new data model object
+						</md-tooltip>
+						<ng-md-icon icon="add"></ng-md-icon>
+					</md-button>
+				</md-fab-trigger>
+			</md-fab-speed-dial>
+			<md-button ng-show="vm.isEdit"
+			 ng-disabled="$root.loading" class="tb-btn-footer md-accent md-hue-2 md-fab" aria-label="{{ 'action.apply' | translate }}"
+			 ng-click="vm.acceptDatamodelEdit()">
+				<md-tooltip md-direction="top">
+					{{ 'action.apply-changes' | translate }}
+				</md-tooltip>
+				<ng-md-icon icon="done"></ng-md-icon>
+			</md-button>
+			<md-button 
+			 ng-disabled="$root.loading" class="tb-btn-footer md-accent md-hue-2 md-fab" aria-label="{{ 'action.edit-mode' | translate }}"
+			 ng-click="vm.isEdit ? vm.rejectDatamodelEdit() : ''; vm.toggleDMEditMode();">
+				<md-tooltip md-direction="top">
+					{{ (vm.isEdit ? 'action.decline-changes' : 'action.enter-edit-mode') | translate }}
+				</md-tooltip>
+				<ng-md-icon icon="{{vm.isEdit ? 'close' : 'edit'}}" options='{"easing": "circ-in-out", "duration": 375, "rotation": "none"}'></ng-md-icon>
+			</md-button>
+		</section>
+	</section>
+</md-content>

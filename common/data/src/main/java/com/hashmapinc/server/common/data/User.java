@@ -22,6 +22,8 @@ import com.hashmapinc.server.common.data.id.TenantId;
 import com.hashmapinc.server.common.data.id.UserId;
 import com.hashmapinc.server.common.data.security.Authority;
 
+import java.util.Collection;
+
 @EqualsAndHashCode(callSuper = true)
 public class User extends SearchTextBasedWithAdditionalInfo<UserId> implements HasName {
 
@@ -31,6 +33,7 @@ public class User extends SearchTextBasedWithAdditionalInfo<UserId> implements H
     private CustomerId customerId;
     private String email;
     private Authority authority;
+    private Collection<String> permissions;
     private String firstName;
     private String lastName;
 
@@ -48,6 +51,7 @@ public class User extends SearchTextBasedWithAdditionalInfo<UserId> implements H
         this.customerId = user.getCustomerId();
         this.email = user.getEmail();
         this.authority = user.getAuthority();
+        this.permissions = user.getPermissions();
         this.firstName = user.getFirstName();
         this.lastName = user.getLastName();
     }
@@ -90,6 +94,14 @@ public class User extends SearchTextBasedWithAdditionalInfo<UserId> implements H
         this.authority = authority;
     }
 
+    public Collection<String> getPermissions() {
+        return permissions;
+    }
+
+    public void setPermissions(Collection<String> permissions) {
+        this.permissions = permissions;
+    }
+
     public String getFirstName() {
         return firstName;
     }
@@ -122,6 +134,8 @@ public class User extends SearchTextBasedWithAdditionalInfo<UserId> implements H
         builder.append(email);
         builder.append(", authority=");
         builder.append(authority);
+        builder.append(", permissions=");
+        builder.append(permissions);
         builder.append(", firstName=");
         builder.append(firstName);
         builder.append(", lastName=");

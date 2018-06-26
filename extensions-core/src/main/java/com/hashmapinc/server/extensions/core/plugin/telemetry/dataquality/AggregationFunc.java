@@ -82,7 +82,7 @@ public class AggregationFunc<T> {
     }
 
     public double calMax(String key){
-        double max = -1.0;
+        double max = -99999999.0;
 
         for (T entry: list) {
             if(entry instanceof TsKvEntry){

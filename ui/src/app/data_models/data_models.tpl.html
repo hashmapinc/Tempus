@@ -19,6 +19,80 @@
 	<div layout="row" class="row" style="width:100%; clear:both;">
 	</div>
 </section>
+<md-toolbar class="md-table-toolbar tb-device-toolbar md-default" ng-show="query.search != null">
+	<div class="md-toolbar-tools">
+		<md-button class="md-icon-button" aria-label="{{ 'action.search' | translate }}">
+			<md-icon aria-label="{{ 'action.search' | translate }}" class="material-icons">search</md-icon>
+			<md-tooltip md-direction="top">
+				{{ 'action.search' | translate }}
+			</md-tooltip>
+		</md-button>
+		<md-input-container flex>
+			<label>&nbsp;</label>
+			<input ng-model="query.search" placeholder="{{ 'common.enter-search' | translate }}"/>
+		</md-input-container>
+		<md-button class="md-icon-button" aria-label="{{ 'action.back' | translate }}" ng-click="exitFilterMode()">
+			<md-icon aria-label="{{ 'action.close' | translate }}" class="material-icons">close</md-icon>
+			<md-tooltip md-direction="top">
+				{{ 'action.close' | translate }}
+			</md-tooltip>
+		</md-button>
+	</div>
+</md-toolbar>
+<md-toolbar class="md-table-toolbar tb-device-toolbar md-default " ng-show="query.search === null">
+
+	<div class="md-toolbar-tools">
+		<span flex></span>
+		<md-button ng-show = "vm.devicesScope != 'customer_user'" class="md-icon-button" ng-click="vm.openDataModelDialog($event)">
+			<md-icon>add</md-icon>
+			<md-tooltip md-direction="top">
+				{{ 'action.add' | translate }}
+			</md-tooltip>
+		</md-button>
+		<md-button class="md-icon-button" ng-click="enterFilterMode()">
+			<md-icon>search</md-icon>
+			<md-tooltip md-direction="top">
+				{{ 'action.search' | translate }}
+			</md-tooltip>
+		</md-button>
+		<md-button  class="md-icon-button" ng-click="resetFilter()">
+			<md-icon>refresh</md-icon>
+			<md-tooltip md-direction="top">
+				{{ 'action.refresh' | translate }}
+			</md-tooltip>
+		</md-button>
+	</div>
+</md-toolbar>
+
+<md-table-container  class ="tb-device-container">
+	<table class="tb-device-table" md-table>
+		<thead md-head md-order="query.order" md-on-reorder="onReorder">
+		<tr md-row>
+			<th md-column md-order-by="name"><span translate>Name</span></th>
+			<th md-column><span translate>Description</span></th>
+			<th md-column><span translate>Assigned BU</span></th>
+			<th md-column><span translate>Last Modified</span></th>
+
+		</tr>
+		</thead>
+		<tbody md-body>
+		<tr md-row  ng-repeat="datamodel in datamodel.data">
+			<td md-cell><a href ng-click="deviceDetailFunc($event,device)">{{datamodel.name}}</a></td>
+			<td md-cell>{{datamodel.additionalInfo.description}}</td>
+			<td md-cell>NA</td>
+			<td md-cell>{{datamodel.lastUpdatedTs | date :  'yyyy-MM-dd HH:mm:ss'}}</td>
+		</tr>
+		<tr md-row ng-hide ="datamodel.count > 0">
+			<td md-cell colspan="4" style="text-align:center;">No Data Available</td>
+		</tr>
+
+		</tbody>
+	</table>
+</md-table-container>
+<md-table-pagination ng-show ="datamodel.count > 0" class ="tb-device-container"  md-limit="query.limit" md-limit-options="[5, 10, 15]"
+					 md-page="query.page" md-total="{{datamodel.count}}"
+					 md-on-paginate="onPaginate" md-page-select>
+</md-table-pagination>
 <section layout="row" layout-wrap class="tb-footer-buttons md-fab" layout-align="start end">
 	<md-button ng-disabled="$root.loading" ng-click="vm.openDataModelDialog($event)" class="tb-btn-footer md-accent md-hue-2 md-fab" aria-label="{{ 'add data model'}}">
 		<md-tooltip>
@@ -26,30 +100,4 @@
 		</md-tooltip>
 		<ng-md-icon icon="add"></ng-md-icon>
 	</md-button>
-
-	<!--<md-fab-speed-dial ng-disabled="$root.loading" ng-show="true" md-open=""-->
-	 <!--class="md-scale" md-direction="up">-->
-		<!--<md-fab-actions>-->
-			<!--<md-button ng-disabled="$root.loading" ng-click="" class="tb-btn-footer md-accent md-hue-2 md-fab" aria-label="{{ 'add data model'}}">-->
-				<!--<md-tooltip>-->
-					<!--{{ "add data model"}}-->
-				<!--</md-tooltip>-->
-				<!--<ng-md-icon icon="add"></ng-md-icon>-->
-			<!--</md-button>-->
-		<!--</md-fab-actions>-->
-		<!--<md-fab-actions>-->
-			<!--<md-button ng-disabled="$root.loading" class="tmd-accent md-hue-2 md-fab" ng-click="" aria-label="{{ 'action.create' | translate }}">-->
-				<!--<md-tooltip md-direction="top">-->
-					<!--{{ "create new data model" }}-->
-				<!--</md-tooltip>-->
-				<!--<ng-md-icon icon="insert_drive_file"></ng-md-icon>-->
-			<!--</md-button>-->
-			<!--<md-button ng-disabled="$root.loading" class="tmd-accent md-hue-2 md-fab" ng-click="" aria-label="{{ 'action.import' | translate }}">-->
-				<!--<md-tooltip md-direction="top">-->
-					<!--{{ "import data model" }}-->
-				<!--</md-tooltip>-->
-				<!--<ng-md-icon icon="file_upload"></ng-md-icon>-->
-			<!--</md-button>-->
-		<!--</md-fab-actions>-->
-	<!--</md-fab-speed-dial>-->
 </section>

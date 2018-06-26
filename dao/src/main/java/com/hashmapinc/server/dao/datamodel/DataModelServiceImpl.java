@@ -15,8 +15,10 @@
  */
 package com.hashmapinc.server.dao.datamodel;
 
-import com.hashmapinc.server.common.data.DataModel;
+import com.hashmapinc.server.common.data.datamodel.DataModel;
 import com.hashmapinc.server.common.data.Tenant;
+import com.hashmapinc.server.common.data.id.DataModelId;
+import com.hashmapinc.server.common.data.id.TenantId;
 import com.hashmapinc.server.dao.entity.AbstractEntityService;
 import com.hashmapinc.server.dao.exception.DataValidationException;
 import com.hashmapinc.server.dao.service.DataValidator;
@@ -26,10 +28,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
+import java.util.List;
+
+import static com.hashmapinc.server.dao.service.Validator.validateId;
+
 @Service
 @Slf4j
 public class DataModelServiceImpl extends AbstractEntityService implements DataModelService {
 
+    public static final String INCORRECT_DATA_MODEL_ID = "Incorrect dataModelId ";
 
     @Autowired
     private DataModelDao dataModelDao;
@@ -42,6 +49,19 @@ public class DataModelServiceImpl extends AbstractEntityService implements DataM
         log.trace("Executing saveDataModel [{}]", dataModel);
         dataModelValidator.validate(dataModel);
         return dataModelDao.save(dataModel);
+    }
+
+    @Override
+    public DataModel findById(DataModelId id) {
+        log.trace("Executing DataModelServiceImpl.findById [{}]", id);
+        validateId(id, INCORRECT_DATA_MODEL_ID + id);
+        return dataModelDao.findById(id.getId());
+    }
+
+    @Override
+    public List<DataModel> findByTenantId(TenantId tenantId) {
+        log.trace("Executing DataModelServiceImpl.findByTenantId [{}]", tenantId);
+        return dataModelDao.findByTenantId(tenantId.getId());
     }
 
     private DataValidator<DataModel> dataModelValidator = new DataValidator<DataModel>() {

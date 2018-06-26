@@ -50,6 +50,9 @@ public class UserInfoTokenConverter implements UserAuthenticationConverter {
         if(userAuthentication.getAuthorities() != null && !userAuthentication.getAuthorities().isEmpty()) {
             response.put("authorities", AuthorityUtils.authorityListToSet(userAuthentication.getAuthorities()));
         }
+        if(user.getPermissions() != null && !user.getPermissions().isEmpty()){
+            response.put("permissions", user.getPermissions());
+        }
 
         return response;
     }
@@ -80,6 +83,12 @@ public class UserInfoTokenConverter implements UserAuthenticationConverter {
             List<String> authority = (List<String>) authorities;
             if(!authority.isEmpty())
                 securityUser.setAuthority(Authority.parse(authority.get(0)));
+        }
+        Object permissions = map.get("permissions");
+        if(permissions != null){
+            List<String> permissionList = (List<String>) permissions;
+            if(!permissionList.isEmpty())
+                securityUser.setPermissions(permissionList);
         }
         return new JwtAuthenticationToken(securityUser);
     }

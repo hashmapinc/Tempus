@@ -1,0 +1,38 @@
+[
+  {
+    "name": "System Admin",
+    "description": "Admin can do all.",
+    "target": "subject.authority.name() == 'SYS_ADMIN'",
+    "condition": "true"
+  },
+  {
+    "name": "Tenant Admin can perform operations on assets",
+    "description": "Tenant can READ/WRITE/DELETE/ASSIGN Assets",
+    "target": "subject.authority.name() == 'TENANT_ADMIN' && action.startsWith('ASSET_')",
+    "condition": "subject.id.id == resource.tenantId.id"
+  },
+  {
+    "name": "Tenant Admin can perform operations on Devices",
+    "description": "Tenant Admin can READ/WRITE/DELETE Device",
+    "target": "subject.authority.name() == 'TENANT_ADMIN' && action.startsWith('DEVICE_')",
+    "condition": "subject.id.id == resource.tenantId.id"
+  },
+  {
+    "name": "Customer user can view an asset",
+    "description": "Customer user can view Asset",
+    "target": "subject.authority.name() == 'CUSTOMER_USER' && action == 'ASSET_VIEW'",
+    "condition": "subject.tenantId.id == resource.tenantId.id && subject.id.id == resource.customerId.id"
+  },
+  {
+    "name": "Customer user can create an asset",
+    "description": "Customer user can create Asset",
+    "target": "subject.authority.name() == 'CUSTOMER_USER' && action == 'ASSET_WRITE'",
+    "condition": "subject.id.id == resource.customerId.id"
+  },
+  {
+    "name": "User can view an asset",
+    "description": "User can view Asset",
+    "target": "subject.authority.name() == 'USER' && action == 'ASSET_VIEW'",
+    "condition": "subject.customerId.id == resource.customerId.id && matcher.checkPermission(subject.permissions, resource.id, 'user:asset:read')"
+  }
+]

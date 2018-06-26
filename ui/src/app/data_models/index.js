@@ -18,6 +18,7 @@ import '../dashboard/dashboard.scss';
 import uiRouter from 'angular-ui-router';
 import tempusGrid from '../components/grid.directive';
 import tempusApiUser from '../api/user.service';
+import tempusApiDatamodel from '../api/datamodel.service';
 import tempusApiDevice from '../api/device.service';
 import tempusApiCustomer from '../api/customer.service';
 import tempusApiDashboard from '../api/dashboard.service';
@@ -25,11 +26,11 @@ import tempusApiWidget from '../api/widget.service';
 import tempusApiTempusboard from '../api/tempusboard.service';
 import tempusWidgetConfig from '../components/widget/widget-config.directive';
 import dashboardStates from '../dashboard/states';
-import DataModelsDirective from './data_models.directive';
-
 
 import DataModelsRoutes from './data_models.routes';
-import {DataModelsController} from './data_models.controller';
+import DataModelsDirective from './data_models.directive';
+import { DataModelsController } from './data_models.controller';
+import {DataModelController} from './data_model.controller';
 
 
 export default angular.module('tempus.data_models', [
@@ -39,6 +40,7 @@ export default angular.module('tempus.data_models', [
     tempusApiDevice,
     tempusApiCustomer,
     tempusApiDashboard,
+    tempusApiDatamodel,
     tempusApiWidget,
     tempusApiTempusboard,
     tempusWidgetConfig,
@@ -46,5 +48,6 @@ export default angular.module('tempus.data_models', [
 ])
     .config(DataModelsRoutes)
     .controller('DataModelsController', DataModelsController)
+    .controller('DataModelController', DataModelController)
     .directive('tbDataModels', DataModelsDirective)
     .name;

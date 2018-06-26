@@ -53,7 +53,6 @@ import java.util.List;
 
 @Configuration
 @EnableWebSecurity
-@EnableGlobalMethodSecurity(prePostEnabled=true)
 @Order(SecurityProperties.ACCESS_OVERRIDE_ORDER)
 public class TempusSecurityConfiguration extends WebSecurityConfigurerAdapter {
 
@@ -179,6 +178,7 @@ public class TempusSecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .and()
                 .exceptionHandling().accessDeniedHandler(restAccessDeniedHandler)
                 .and()
+                .httpBasic().disable()
                 .addFilterBefore(buildRestLoginProcessingFilter(), UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(buildRestPublicLoginProcessingFilter(), UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(buildJwtTokenAuthenticationProcessingFilter(), UsernamePasswordAuthenticationFilter.class)

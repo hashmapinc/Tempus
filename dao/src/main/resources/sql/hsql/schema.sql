@@ -212,7 +212,6 @@ CREATE TABLE IF NOT EXISTS ts_kv (
     entity_id varchar(31) NOT NULL,
     key varchar(255) NOT NULL,
     ts bigint NOT NULL,
-    ts_diff bigint,
     bool_v boolean,
     str_v varchar(10000000),
     long_v bigint,
@@ -239,7 +238,6 @@ CREATE TABLE IF NOT EXISTS ds_kv (
     entity_id varchar(31) NOT NULL,
     key varchar(255) NOT NULL,
     ds double precision NOT NULL,
-    ds_diff double precision,
     bool_v boolean,
     str_v varchar(10000000),
     long_v bigint,
@@ -259,20 +257,6 @@ CREATE TABLE IF NOT EXISTS ds_kv_latest (
     dbl_v double precision,
     json_v varchar,
     CONSTRAINT ds_kv_latest_unq_key UNIQUE (entity_type, entity_id, key)
-);
-
-CREATE TABLE IF NOT EXISTS tag_metadata (
-    entity_type varchar(255) NOT NULL,
-    entity_id varchar(31) NOT NULL,
-    key varchar(255) NOT NULL,
-    unit varchar(255),
-    avg_frequency double precision,
-    max_frequency double precision,
-    min_frequency double precision,
-    mean_frequency double precision,
-    median_frequency double precision,
-    source varchar,
-    CONSTRAINT tag_metadata_unq_key UNIQUE (entity_type, entity_id, key)
 );
 
 CREATE TABLE IF NOT EXISTS user_credentials (
@@ -385,7 +369,38 @@ CREATE TABLE IF NOT EXISTS theme (
    last_update_ts bigint
 );
 
+CREATE TABLE IF NOT EXISTS data_model_object (
+    id varchar(31) NOT NULL CONSTRAINT data_model_object_pkey PRIMARY KEY,
+    name varchar(250),
+    description varchar,
+    data_model_id varchar(31),
+    parent_id varchar(31),
+    type varchar(250),
+    customer_id varchar(31),
+    search_text varchar(255)
+);
 
+CREATE TABLE IF NOT EXISTS attribute_definition (
+    name varchar(250),
+    attr_value varchar,
+    value_type varchar(100),
+    data_model_object_id varchar(31),
+    source varchar(250),
+    CONSTRAINT attr_def_unq_key UNIQUE (name, data_model_object_id)
+);
 
+CREATE TABLE IF NOT EXISTS tag_metadata (
+    entity_type varchar(255) NOT NULL,
+    entity_id varchar(31) NOT NULL,
+    key varchar(255) NOT NULL,
+    unit varchar(255),
+    avg_frequency double precision,
+    max_frequency double precision,
+    min_frequency double precision,
+    mean_frequency double precision,
+    median_frequency double precision,
+    source varchar,
+    CONSTRAINT tag_metadata_unq_key UNIQUE (entity_type, entity_id, key)
+);
 
 CREATE TABLE IF NOT EXISTS installed_schema_versions(executed_scripts varchar(255) UNIQUE);

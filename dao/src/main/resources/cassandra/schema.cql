@@ -445,7 +445,6 @@ CREATE TABLE IF NOT EXISTS tempus.ts_kv_cf (
     key text,
     partition bigint,
     ts bigint,
-    ts_diff bigint,
     bool_v boolean,
     str_v text,
     long_v bigint,
@@ -482,7 +481,6 @@ CREATE TABLE IF NOT EXISTS tempus.ds_kv_cf (
     key text,
     partition double,
     ds double,
-    ds_diff double,
     bool_v boolean,
     str_v text,
     long_v bigint,
@@ -510,20 +508,6 @@ CREATE TABLE IF NOT EXISTS tempus.ds_kv_latest_cf (
     long_v bigint,
     dbl_v double,
     json_v text,
-    PRIMARY KEY (( entity_type, entity_id ), key)
-) WITH compaction = { 'class' :  'LeveledCompactionStrategy'  };
-
-CREATE TABLE IF NOT EXISTS tempus.tag_metadata_cf (
-    entity_type text,
-    entity_id timeuuid,
-    key text,
-    unit text,
-    avg_frequency double,
-    max_frequency double,
-    min_frequency double,
-    mean_frequency double,
-    median_frequency double,
-    source text,
     PRIMARY KEY (( entity_type, entity_id ), key)
 ) WITH compaction = { 'class' :  'LeveledCompactionStrategy'  };
 
@@ -822,8 +806,31 @@ CREATE TABLE IF NOT EXISTS tempus.data_model_object_cf (
    description text,
    data_model_id timeuuid,
    parent_id timeuuid,
-   tenant_id timeuuid,
+   type text,
    customer_id timeuuid,
    search_text text,
-   PRIMARY KEY (id, tenant_id)
+   PRIMARY KEY (id, data_model_id)
 );
+
+CREATE TABLE IF NOT EXISTS tempus.attribute_definition (
+    name text,
+    attr_value text,
+    value_type text,
+    data_model_object_id timeuuid,
+    source text,
+    PRIMARY KEY (name, data_model_object_id)
+);
+
+CREATE TABLE IF NOT EXISTS tempus.tag_metadata_cf (
+    entity_type text,
+    entity_id timeuuid,
+    key text,
+    unit text,
+    avg_frequency double,
+    max_frequency double,
+    min_frequency double,
+    mean_frequency double,
+    median_frequency double,
+    source text,
+    PRIMARY KEY (( entity_type, entity_id ), key)
+) WITH compaction = { 'class' :  'LeveledCompactionStrategy'  };

@@ -15,9 +15,10 @@
  */
 package com.hashmapinc.server.dao.datamodel;
 
-import com.hashmapinc.server.common.data.DataModel;
+import com.hashmapinc.server.common.data.datamodel.DataModel;
 import com.hashmapinc.server.dao.Dao;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -41,5 +42,11 @@ public interface DataModelDao extends Dao<DataModel> {
      */
     Optional<DataModel> findDataModelByTenantIdAndName(UUID tenantId, String name);
 
-
+    /**
+     * Find data models by tenantId.
+     *
+     * @param tenantId the tenantId
+     * @return the list of DataModel objects
+     */
+    List<DataModel> findByTenantId(UUID tenantId);
 }

@@ -26,6 +26,7 @@ import com.hashmapinc.server.common.data.page.TextPageLink;
 import com.hashmapinc.server.common.data.plugin.ComponentDescriptor;
 import com.hashmapinc.server.dao.application.ApplicationService;
 import com.hashmapinc.server.dao.cluster.NodeMetricService;
+import com.hashmapinc.server.dao.datamodel.DataModelObjectService;
 import com.hashmapinc.server.dao.datamodel.DataModelService;
 import com.hashmapinc.server.dao.device.DeviceCredentialsService;
 import com.hashmapinc.server.dao.rule.RuleService;
@@ -101,6 +102,9 @@ public abstract class BaseController {
 
     @Autowired
     protected DataModelService dataModelService;
+
+    @Autowired
+    protected DataModelObjectService dataModelObjectService;
 
     @Autowired
     protected AlarmService alarmService;

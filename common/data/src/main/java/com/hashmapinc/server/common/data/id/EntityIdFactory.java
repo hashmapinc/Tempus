@@ -59,10 +59,16 @@ public class EntityIdFactory {
                 return new ComputationId(uuid);
             case COMPUTATION_JOB:
                 return new ComputationJobId(uuid);
+            case LOGO:
+                return new LogoId(uuid);
+            case THEME:
+                return new ThemeId(uuid);
             case NODE_METRIC:
                 return new NodeMetricId(uuid);
             case DATA_MODEL:
                 return new DataModelId(uuid);
+            case DATA_MODEL_OBJECT:
+                return new DataModelObjectId(uuid);
         }
         throw new IllegalArgumentException("EntityType " + type + " is not supported!");
     }
