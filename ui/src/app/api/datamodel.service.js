@@ -30,6 +30,7 @@ function DatamodelService($http, $q, $rootScope, adminService, dashboardService,
         clearDataModelData:clearDataModelData,
         getDataModelData:getDataModelData,
         saveDataModel:saveDataModel,
+        getDataModelById: getDataModelById,
         listDataModel:listDataModel
 
     }
@@ -57,6 +58,17 @@ function DatamodelService($http, $q, $rootScope, adminService, dashboardService,
             deferred.resolve(response);
         }, function fail(response) {
             deferred.reject(response);
+        });
+        return deferred.promise;
+    }
+
+    function getDataModelById(dataModelId) {
+        var deferred = $q.defer();
+        var url = '/api/data-model/' + dataModelId;
+        $http.get(url).then(function success(response) {
+            deferred.resolve(response.data);
+        }, function fail(response) {
+            deferred.reject(response.data);
         });
         return deferred.promise;
     }
