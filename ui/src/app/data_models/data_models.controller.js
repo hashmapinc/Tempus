@@ -53,7 +53,7 @@ export function DataModelsController($scope, datamodelService, $q, $filter, $mdD
     vm.AddDataModelController = AddDataModelController;
 
     var fetchDataModelFunction = function (pageLink, deviceType) {
-         return datamodelService.listDataModel();
+         return datamodelService.listDatamodels();
     };
 
     vm.listDataModel = fetchDataModelFunction;
@@ -86,7 +86,7 @@ export function DataModelsController($scope, datamodelService, $q, $filter, $mdD
 
     function saveDataModelFunc(item) {
         var deferred = $q.defer();
-        datamodelService.saveDataModel(item).then(function success(response) {
+        datamodelService.saveDatamodel(item).then(function success(response) {
             deferred.resolve(response.data);
         }, function fail(response) {
             deferred.reject(response.data);

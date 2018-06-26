@@ -22,35 +22,27 @@ export default angular.module('tempus.api.datamodel', [
     .name;
 
 /*@ngInject*/
-function DatamodelService($http, $q, $rootScope, adminService, dashboardService, toast, store) {
-
-
-    var service = {
-        setDataModelData:setDataModelData,
-        clearDataModelData:clearDataModelData,
-        getDataModelData:getDataModelData,
-        saveDataModel:saveDataModel,
-        listDataModel:listDataModel
-
+function DatamodelService($http, $q) {
+    return {
+        getDatamodel: getDatamodel,
+        saveDatamodel: saveDatamodel,
+        listDatamodels: listDatamodels
     }
 
-    return service;
-
-    function setDataModelData(dataModel) {
-        store.set('data_model', dataModel);
-        //var data = getDataModelData();
-
+    // loads the datamodel with ID = datamodelID
+    function getDatamodel(datamodelID) {
+        var deferred = $q.defer();
+        var url = '/api/data-model/' + datamodelID;
+        $http.get(url).then(function success(response) {
+            deferred.resolve(response.data);
+        }, function fail(response) {
+            deferred.reject(response.data);
+        });
+        return deferred.promise;
     }
 
-    function clearDataModelData() {
-        store.remove('data_model');
-    }
-
-    function getDataModelData() {
-        return store.get('data_model');
-    }
-
-    function saveDataModel(dataModeldata) {
+    // saves a datamodel in the backend
+    function saveDatamodel(dataModeldata) {
         var deferred = $q.defer();
         var url = '/api/data-model';
         $http.post(url, dataModeldata).then(function success(response) {
@@ -61,7 +53,8 @@ function DatamodelService($http, $q, $rootScope, adminService, dashboardService,
         return deferred.promise;
     }
 
-    function listDataModel() {
+    // gets all datamodels from the backend
+    function listDatamodels() {
         var deferred = $q.defer();
         var url = '/api/data-model';
         $http.get(url).then(function success(response) {
@@ -70,9 +63,5 @@ function DatamodelService($http, $q, $rootScope, adminService, dashboardService,
             deferred.reject(response.data);
         });
         return deferred.promise;
-
-
     }
-
-
 }

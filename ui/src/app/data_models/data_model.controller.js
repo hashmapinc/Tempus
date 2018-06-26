@@ -19,7 +19,7 @@ import 'vis/dist/vis-network.min.css';
 import objectStepper from './datamodel-object-stepper.tpl.html';
 
 /*@ngInject*/
-export function DataModelController($log, $mdDialog, $document) {
+export function DataModelController($log, $mdDialog, $document, datamodelService) {
     //=============================================================================
     // Main
     //=============================================================================
@@ -28,7 +28,7 @@ export function DataModelController($log, $mdDialog, $document) {
     vm.isEdit = false; // keeps track of whether the model is being edited
 
     // create the stepper
-    vm.stepperState = 1; // keeps track of the current stepper step (1-3)
+    vm.stepperState = 0; // keeps track of the current stepper step
     vm.stepperData = {}; // keeps track of the in-progress data model object and is bound to the stepper
     resetStepperState(); // instantiate the stepper model and structure the stepperData object
 
