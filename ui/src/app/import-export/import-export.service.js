@@ -46,7 +46,9 @@ export default function ImportExport($log, $translate, $q, $mdDialog, $document,
         exportExtension: exportExtension,
         importExtension: importExtension,
         exportToPc: exportToPc,
-        importLogo:importLogo
+        importLogo:importLogo,
+        exportAttribute:exportAttribute,
+        convertToCSV:convertToCSV
     };
 
     return service;
@@ -866,6 +868,62 @@ export default function ImportExport($log, $translate, $q, $mdDialog, $document,
         }
     }
 
+    function exportAttribute(data, headers, filename) {
+        if (!data) {
+            $log.error('No data');
+            return;
+        }
+
+        if (headers) {
+            data.unshift(headers);
+        }
+
+        if (!filename) {
+            filename = 'download.csv';
+        }
+
+         var jsonObject = angular.toJson(data);
+
+         var csv = convertToCSV(jsonObject);
+
+        var blob = new Blob([csv], {type: 'text/csv'});
+
+        // FOR IE:
+
+        if (window.navigator && window.navigator.msSaveOrOpenBlob) {
+            window.navigator.msSaveOrOpenBlob(blob, filename);
+        }
+        else{
+            var e = document.createEvent('MouseEvents'),
+                a = document.createElement('a');
+
+            a.download = filename;
+            a.href = window.URL.createObjectURL(blob);
+            a.dataset.downloadurl = ['text/csv', a.download, a.href].join(':');
+            e.initEvent('click', true, false, window,
+                0, 0, 0, 0, 0, false, false, false, false, 0, null);
+            a.dispatchEvent(e);
+        }
+    }
+
+
+    function convertToCSV(objArray) {
+        var array = typeof objArray != 'object' ? angular.fromJson(objArray) : objArray;
+        var str = '';
+
+        for (var i = 0; i < array.length; i++) {
+            var line = '';
+            for (var index in array[i]) {
+                if (line != '') line += ','
+
+                line += array[i][index];
+            }
+
+            str += line + '\r\n';
+        }
+
+        return str;
+    }
     function openImportDialog($event, importTitle, importFileLabel) {
         var deferred = $q.defer();
         $mdDialog.show({

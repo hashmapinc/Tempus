@@ -31,7 +31,7 @@ import AliasController from '../../api/alias-controller';
 /*@ngInject*/
 export default function AttributeTableDirective($compile, $templateCache, $rootScope, $q, $mdEditDialog, $mdDialog,
                                                 $mdUtil, $document, $translate, $filter, utils, types, dashboardUtils,
-                                                dashboardService, entityService, attributeService, widgetService, $log, $mdToast) {
+                                                dashboardService, entityService, attributeService, importExport, widgetService, $log, $mdToast) {
 
     var linker = function (scope, element, attrs) {
 
@@ -144,6 +144,29 @@ export default function AttributeTableDirective($compile, $templateCache, $rootS
 
         scope.onPaginate = function() {
             scope.getEntityAttributes(false, false);
+        }
+
+        scope.download = function($event) {
+
+            var headers = {
+                lastUpdateTs: 'Last Updated Date', // remove commas to avoid errors
+                key: "Key",
+                value: "Value"
+            };
+
+            var itemsFormatted = [];
+
+            scope.attributes.data.forEach((item) => {
+                itemsFormatted.push({
+                    lastUpdateTs: $filter('date')(item.lastUpdateTs, "yyyy-MM-dd HH:mm:ss"),
+                    key: item.key,
+                    value: item.value
+                    });
+            });
+
+            $log.log(itemsFormatted);
+            $event.stopPropagation();
+            importExport.exportAttribute(itemsFormatted, headers ,'');
         }
 
         scope.getEntityAttributes = function(forceUpdate, reset) {
