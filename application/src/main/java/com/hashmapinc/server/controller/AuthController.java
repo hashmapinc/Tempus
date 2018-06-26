@@ -25,6 +25,7 @@ import com.hashmapinc.server.requests.IdentityUserCredentials;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -60,7 +61,8 @@ import java.util.Map;
 @Slf4j
 public class AuthController extends BaseController {
 
-    public static final String IDENTITY_ENDPOINT = "http://localhost:9002/uaa/users";
+    @Value("${identity.url}")
+    private String identityUrl;
 
     @Autowired
     private BCryptPasswordEncoder passwordEncoder;
@@ -118,7 +120,7 @@ public class AuthController extends BaseController {
         HttpHeaders headers = new HttpHeaders();
         HttpStatus responseStatus;
 
-        ResponseEntity<JsonNode> response = restTemplate.getForEntity(IDENTITY_ENDPOINT+ "/activate/" + activateToken +"/user-credentials", JsonNode.class);
+        ResponseEntity<JsonNode> response = restTemplate.getForEntity(identityUrl + "/activate/" + activateToken +"/user-credentials", JsonNode.class);
 
         if(response.getStatusCode().equals(HttpStatus.OK)) {
             ObjectMapper mapper = new ObjectMapper();
@@ -151,7 +153,7 @@ public class AuthController extends BaseController {
             HttpServletRequest request) throws TempusException {
         try {
 
-            ResponseEntity<JsonNode> userCredentialsResponse = restTemplate.postForEntity(IDENTITY_ENDPOINT+"/resetPasswordByEmail", resetPasswordByEmailRequest, JsonNode.class);
+            ResponseEntity<JsonNode> userCredentialsResponse = restTemplate.postForEntity(identityUrl + "/resetPasswordByEmail", resetPasswordByEmailRequest, JsonNode.class);
 
             if(userCredentialsResponse.getStatusCode().equals(HttpStatus.OK)) {
                 ObjectMapper mapper = new ObjectMapper();
@@ -177,7 +179,7 @@ public class AuthController extends BaseController {
         HttpHeaders headers = new HttpHeaders();
         HttpStatus responseStatus;
         String resetURI = "/login/resetPassword";
-        ResponseEntity<IdentityUserCredentials> identityUserCredentialsResponse = restTemplate.getForEntity(IDENTITY_ENDPOINT+"/reset/"+ resetToken+"/user-credentials", IdentityUserCredentials.class);
+        ResponseEntity<IdentityUserCredentials> identityUserCredentialsResponse = restTemplate.getForEntity(identityUrl + "/reset/"+ resetToken+"/user-credentials", IdentityUserCredentials.class);
         if(identityUserCredentialsResponse.getStatusCode().equals(HttpStatus.OK)) {
             IdentityUserCredentials identityUserCredentials = identityUserCredentialsResponse.getBody();
             if (identityUserCredentials != null) {
@@ -209,14 +211,14 @@ public class AuthController extends BaseController {
             String password = activateRequest.get("password").asText();
             ActivateUserRequest activateUserRequest = ActivateUserRequest.builder().activateToken(activateToken).password(password).build();
 
-            ResponseEntity<JsonNode> userCredentialsResponse = restTemplate.postForEntity(IDENTITY_ENDPOINT+"/activate", activateUserRequest, JsonNode.class);
+            ResponseEntity<JsonNode> userCredentialsResponse = restTemplate.postForEntity(identityUrl + "/activate", activateUserRequest, JsonNode.class);
 
             if(userCredentialsResponse.getStatusCode().equals(HttpStatus.OK)) {
                 ObjectMapper mapper = new ObjectMapper();
                 JsonNode body = userCredentialsResponse.getBody();
                 UserCredentials userCredentials = mapper.treeToValue(body, IdentityUserCredentials.class).toUserCredentials();
 
-                String userGetUrl = IDENTITY_ENDPOINT + "/" + userCredentials.getUserId().getId();
+                String userGetUrl = identityUrl + "/" + userCredentials.getUserId().getId();
                 ResponseEntity<IdentityUser> userResponse = restTemplate.getForEntity(userGetUrl, IdentityUser.class);
                 if(userResponse.getStatusCode().equals(HttpStatus.OK)){
                     IdentityUser identityUser = userResponse.getBody();
@@ -269,16 +271,16 @@ public class AuthController extends BaseController {
             String resetToken = resetPasswordRequest.get("resetToken").asText();
             String password = resetPasswordRequest.get("password").asText();
 
-            ResponseEntity<IdentityUserCredentials> identityUserCredentialsResponse = restTemplate.getForEntity(IDENTITY_ENDPOINT+"/"+ resetToken+"/user-credentials", IdentityUserCredentials.class);
+            ResponseEntity<IdentityUserCredentials> identityUserCredentialsResponse = restTemplate.getForEntity(identityUrl + "/" + resetToken+"/user-credentials", IdentityUserCredentials.class);
             if(identityUserCredentialsResponse.getStatusCode().equals(HttpStatus.OK)) {
                 UserCredentials userCredentials = identityUserCredentialsResponse.getBody().toUserCredentials();
                 if(userCredentials !=null) {
                     userCredentials.setPassword(password);
                     userCredentials.setResetToken(null);
 
-                    ResponseEntity<JsonNode> updatedUserCredentialsResponse = restTemplate.postForEntity(IDENTITY_ENDPOINT+"/user-credentials", new IdentityUserCredentials(userCredentials), JsonNode.class);
+                    ResponseEntity<JsonNode> updatedUserCredentialsResponse = restTemplate.postForEntity(identityUrl +"/user-credentials", new IdentityUserCredentials(userCredentials), JsonNode.class);
                     if(updatedUserCredentialsResponse.getStatusCode().equals(HttpStatus.OK)) {
-                        String userGetUrl = IDENTITY_ENDPOINT + "/" + userCredentials.getUserId().getId();
+                        String userGetUrl = identityUrl + "/" + userCredentials.getUserId().getId();
                         ResponseEntity<IdentityUser> userResponse = restTemplate.getForEntity(userGetUrl, IdentityUser.class);
                         if(userResponse.getStatusCode().equals(HttpStatus.OK)){
                             IdentityUser identityUser = userResponse.getBody();

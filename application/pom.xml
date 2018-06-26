@@ -293,6 +293,10 @@
             <scope>system</scope>
             <systemPath>${java.home}/../lib/tools.jar</systemPath>
         </dependency>
+        <dependency>
+            <groupId>net.javacrumbs.future-converter</groupId>
+            <artifactId>future-converter-spring-guava</artifactId>
+        </dependency>
     </dependencies>
 
     <build>

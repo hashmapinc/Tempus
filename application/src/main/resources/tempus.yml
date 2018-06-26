@@ -46,6 +46,9 @@ security:
       resource-id: "${TEMPUS_RESOURCE_API_ID:tempus-resource-server-rest-api}"
       tokenInfoUri: "${TOKEN_INFO_URI:http://localhost:9002/uaa/oauth/check_token}"
 
+identity:
+  url: "${IDENTITY_SERVICE_URL:http://localhost:9002/uaa/users}"
+
 #security.jwt.tokenSigningKey: "${JWT_TOKEN_SIGNING_KEY:hashmapIncDefaultSigningKey}"
 
 ldap:

@@ -16,9 +16,13 @@
 package com.hashmapinc.server.service.user;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.google.common.base.Function;
+import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.hashmapinc.server.common.data.Customer;
 import com.hashmapinc.server.common.data.Tenant;
@@ -50,29 +54,38 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.AsyncRestTemplate;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponentsBuilder;
 
+import javax.annotation.Nullable;
+import javax.annotation.PostConstruct;
+import java.io.IOException;
 import java.util.Base64;
 import java.util.List;
+import java.util.UUID;
 
 import static com.hashmapinc.server.dao.service.Validator.validateId;
+import static net.javacrumbs.futureconverter.springguava.FutureConverter.toGuavaListenableFuture;
 
 @Slf4j
 @Service
 public class RestUserService extends AbstractEntityService implements UserService{
 
-    public static final String IDENTITY_ENDPOINT = "http://localhost:9002/uaa/users/";
+    @Value("${identity.url}")
+    private String identityUrl;
 
     @Autowired
     @Qualifier("clientRestTemplate")
     private RestTemplate restTemplate;
 
-    private static final int DEFAULT_TOKEN_LENGTH = 30;
     public static final String INCORRECT_USER_ID = "Incorrect userId ";
     public static final String INCORRECT_TENANT_ID = "Incorrect tenantId ";
 
@@ -90,11 +103,21 @@ public class RestUserService extends AbstractEntityService implements UserServic
 
     private ObjectMapper mapper = new ObjectMapper();
 
+    private AsyncRestTemplate asyncRestTemplate;
+
+    @PostConstruct
+    public void init(){
+        asyncRestTemplate = new AsyncRestTemplate(new SimpleClientHttpRequestFactory(), restTemplate);
+        SimpleModule module = new SimpleModule();
+        module.addDeserializer(User.class, new UserDeserializer());
+        mapper.registerModule(module);
+    }
+
 
     @Override
     public User findUserById(UserId userId) {
         validateId(userId, INCORRECT_USER_ID + userId);
-        ResponseEntity<IdentityUser> response = restTemplate.getForEntity(IDENTITY_ENDPOINT + userId.getId(), IdentityUser.class);
+        ResponseEntity<IdentityUser> response = restTemplate.getForEntity(identityUrl + "/" + userId.getId(), IdentityUser.class);
         if(response.getStatusCode().equals(HttpStatus.OK)){
             return response.getBody().toUser();
         }
@@ -103,14 +126,26 @@ public class RestUserService extends AbstractEntityService implements UserServic
 
     @Override
     public ListenableFuture<User> findUserByIdAsync(UserId userId) {
-        return null;
+        ListenableFuture<ResponseEntity<IdentityUser>> response = toGuavaListenableFuture(asyncRestTemplate
+                .getForEntity(identityUrl + "/" + userId.getId(), IdentityUser.class));
+        Function<ResponseEntity<IdentityUser>, User> userTransfomer = new Function<ResponseEntity<IdentityUser>, User>() {
+            @Nullable
+            @Override
+            public User apply(@Nullable ResponseEntity<IdentityUser> responseEntity) {
+                if(responseEntity != null && responseEntity.getStatusCode().equals(HttpStatus.OK)){
+                    return  responseEntity.getBody().toUser();
+                }
+                return null;
+            }
+        };
+        return Futures.transform(response, userTransfomer);
     }
 
     @Override
     public User findUserByEmail(String email) {
         Validator.validateString(email, "Incorrect email " + email);
         String encoded = Base64.getUrlEncoder().encodeToString(email.getBytes());
-        ResponseEntity<IdentityUser> response = restTemplate.getForEntity(IDENTITY_ENDPOINT + "username/" + encoded, IdentityUser.class);
+        ResponseEntity<IdentityUser> response = restTemplate.getForEntity(identityUrl + "/username/" + encoded, IdentityUser.class);
         if(response.getStatusCode().equals(HttpStatus.OK)){
             return response.getBody().toUser();
         }
@@ -123,7 +158,7 @@ public class RestUserService extends AbstractEntityService implements UserServic
         log.trace("Executing saveUser [{}]", user);
         if(user.getId() == null) {
             CreateUserRequest userRequest = CreateUserRequest.builder().user(new IdentityUser(user)).activationType("link").build();
-            ResponseEntity<JsonNode> response = restTemplate.postForEntity(IDENTITY_ENDPOINT, userRequest, JsonNode.class);
+            ResponseEntity<JsonNode> response = restTemplate.postForEntity(identityUrl, userRequest, JsonNode.class);
             if (response.getStatusCode().equals(HttpStatus.CREATED)) {
                 JsonNode body = response.getBody();
                 try {
@@ -134,7 +169,7 @@ public class RestUserService extends AbstractEntityService implements UserServic
 
             }
         }else{
-            ResponseEntity<IdentityUser> response = restTemplate.exchange(IDENTITY_ENDPOINT + user.getId(),
+            ResponseEntity<IdentityUser> response = restTemplate.exchange(identityUrl + "/" + user.getId(),
                     HttpMethod.PUT, new HttpEntity<>(new IdentityUser(user)), IdentityUser.class);
             if(response.getStatusCode().equals(HttpStatus.OK)) {
                 return response.getBody().toUser();
@@ -164,7 +199,7 @@ public class RestUserService extends AbstractEntityService implements UserServic
         validateId(userId, INCORRECT_USER_ID + userId);
 
         ResponseEntity<IdentityUserCredentials> response = restTemplate
-                .getForEntity(IDENTITY_ENDPOINT + userId.getId() + "/user-credentials", IdentityUserCredentials.class);
+                .getForEntity(identityUrl + "/" + userId.getId() + "/user-credentials", IdentityUserCredentials.class);
         if(response.getStatusCode().equals(HttpStatus.OK)){
             return response.getBody().toUserCredentials();
         }
@@ -177,7 +212,7 @@ public class RestUserService extends AbstractEntityService implements UserServic
         log.trace("Executing findUserCredentialsByActivateToken [{}]", activateToken);
         Validator.validateString(activateToken, "Incorrect activateToken " + activateToken);
         ResponseEntity<IdentityUserCredentials> response = restTemplate
-                .getForEntity(IDENTITY_ENDPOINT + "activate/" + activateToken +"/user-credentials",
+                .getForEntity(identityUrl + "/" + "activate/" + activateToken +"/user-credentials",
                         IdentityUserCredentials.class);
         if(response.getStatusCode().equals(HttpStatus.OK)){
             return response.getBody().toUserCredentials();
@@ -190,7 +225,7 @@ public class RestUserService extends AbstractEntityService implements UserServic
         log.trace("Executing findUserCredentialsByResetToken [{}]", resetToken);
         Validator.validateString(resetToken, "Incorrect resetToken " + resetToken);
         ResponseEntity<IdentityUserCredentials> response = restTemplate
-                .getForEntity(IDENTITY_ENDPOINT + "reset/"+ resetToken + "/user-credentials",
+                .getForEntity(identityUrl + "/reset/"+ resetToken + "/user-credentials",
                         IdentityUserCredentials.class);
 
         if(response.getStatusCode().equals(HttpStatus.OK)){
@@ -203,9 +238,9 @@ public class RestUserService extends AbstractEntityService implements UserServic
     @Override
     public UserCredentials saveUserCredentials(UserCredentials userCredentials) {
         log.trace("Executing saveUserCredentials [{}]", userCredentials);
-        //userCredentialsValidator.validate(userCredentials);
+        userCredentialsValidator.validate(userCredentials);
         ResponseEntity<IdentityUserCredentials> response = restTemplate
-                .exchange(IDENTITY_ENDPOINT + userCredentials.getId().getId() +"/user-credentials",
+                .exchange(identityUrl + "/" + userCredentials.getId().getId() +"/user-credentials",
                         HttpMethod.PUT,
                         new HttpEntity<>(new IdentityUserCredentials(userCredentials)),
                         IdentityUserCredentials.class);
@@ -224,7 +259,7 @@ public class RestUserService extends AbstractEntityService implements UserServic
 
         ActivateUserRequest request = ActivateUserRequest.builder().activateToken(activateToken).password(password).build();
         ResponseEntity<IdentityUserCredentials> response = restTemplate
-                .postForEntity(IDENTITY_ENDPOINT+"/activate", request, IdentityUserCredentials.class);
+                .postForEntity(identityUrl + "/activate", request, IdentityUserCredentials.class);
 
         if(response.getStatusCode().equals(HttpStatus.OK)){
             return response.getBody().toUserCredentials();
@@ -240,7 +275,7 @@ public class RestUserService extends AbstractEntityService implements UserServic
         ObjectNode request = mapper.createObjectNode();
         request.put("email", email);
         ResponseEntity<IdentityUserCredentials> response = restTemplate
-                .postForEntity(IDENTITY_ENDPOINT + "resetPasswordByEmail", request, IdentityUserCredentials.class);
+                .postForEntity(identityUrl + "/resetPasswordByEmail", request, IdentityUserCredentials.class);
         if(response.getStatusCode().equals(HttpStatus.OK)){
             return response.getBody().toUserCredentials();
         }
@@ -252,10 +287,8 @@ public class RestUserService extends AbstractEntityService implements UserServic
     public void deleteUser(UserId userId) {
         log.trace("Executing deleteUser [{}]", userId);
         validateId(userId, INCORRECT_USER_ID + userId);
-        UserCredentials userCredentials = userCredentialsDao.findByUserId(userId.getId());
-        userCredentialsDao.removeById(userCredentials.getUuidId());
+        restTemplate.delete(identityUrl + "/" + userId.getId());
         deleteEntityRelations(userId);
-        userDao.removeById(userId.getId());
     }
 
     @Override
@@ -263,8 +296,7 @@ public class RestUserService extends AbstractEntityService implements UserServic
         log.trace("Executing findTenantAdmins, tenantId [{}], pageLink [{}]", tenantId, pageLink);
         validateId(tenantId, INCORRECT_TENANT_ID + tenantId);
         Validator.validatePageLink(pageLink, "Incorrect page link " + pageLink);
-        List<User> users = userDao.findTenantAdmins(tenantId.getId(), pageLink);
-        return new TextPageData<>(users, pageLink);
+        return findUsers(tenantId, null, pageLink);
     }
 
     @Override
@@ -280,8 +312,7 @@ public class RestUserService extends AbstractEntityService implements UserServic
         validateId(tenantId, INCORRECT_TENANT_ID + tenantId);
         validateId(customerId, "Incorrect customerId " + customerId);
         Validator.validatePageLink(pageLink, "Incorrect page link " + pageLink);
-        List<User> users = userDao.findCustomerUsers(tenantId.getId(), customerId.getId(), pageLink);
-        return new TextPageData<>(users, pageLink);
+        return findUsers(tenantId, customerId, pageLink);
     }
 
     @Override
@@ -290,6 +321,33 @@ public class RestUserService extends AbstractEntityService implements UserServic
         validateId(tenantId, INCORRECT_TENANT_ID + tenantId);
         validateId(customerId, "Incorrect customerId " + customerId);
         new RestUserService.CustomerUsersRemover(tenantId).removeEntities(customerId);
+    }
+
+    private TextPageData<User> findUsers(TenantId tenantId, CustomerId customerId, TextPageLink pageLink){
+        UUID idOffset = pageLink.getIdOffset() != null ? pageLink.getIdOffset() : ModelConstants.NULL_UUID;
+        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(identityUrl + "/list")
+                .queryParam("tenantId", tenantId.getId())
+                .queryParam("limit", pageLink.getLimit())
+                .queryParam("idOffset", idOffset);
+        if(customerId != null){
+            builder.queryParam("customerId", customerId.getId());
+            builder.queryParam("authority", Authority.CUSTOMER_USER.name());
+        }else{
+            builder.queryParam("authority", Authority.TENANT_ADMIN.name());
+        }
+
+        ResponseEntity<String> response = restTemplate
+                .getForEntity(builder.build().encode().toUri(), String.class);
+        if(response.getStatusCode().equals(HttpStatus.OK)){
+            JavaType type = mapper.getTypeFactory().constructParametrizedType(TextPageData.class, TextPageData.class, User.class);
+            try {
+                return mapper.readValue(response.getBody(), type);
+            } catch (IOException e) {
+                log.error("Error while fetching users ", e);
+                return null;
+            }
+        }
+        return null;
     }
 
     private DataValidator<User> userValidator =
@@ -326,7 +384,7 @@ public class RestUserService extends AbstractEntityService implements UserServic
                             break;
                         case TENANT_ADMIN:
                             if (tenantId.getId().equals(ModelConstants.NULL_UUID)) {
-                                throw new DataValidationException("Tenant administrator should be assigned to tenant!");
+                                throw new DataValidationException("Tenant should be assigned to tenant!");
                             } else if (!customerId.getId().equals(ModelConstants.NULL_UUID)) {
                                 throw new DataValidationException("Tenant administrator can't be assigned to customer!");
                             }
@@ -385,10 +443,6 @@ public class RestUserService extends AbstractEntityService implements UserServic
                             throw new DataValidationException("Enabled user credentials can't have activate token!");
                         }
                     }
-                    UserCredentials existingUserCredentialsEntity = userCredentialsDao.findById(userCredentials.getId().getId());
-                    if (existingUserCredentialsEntity == null) {
-                        throw new DataValidationException("Unable to update non-existent user credentials!");
-                    }
                     User user = findUserById(userCredentials.getUserId());
                     if (user == null) {
                         throw new DataValidationException("Can't assign user credentials to non-existent user!");
@@ -401,7 +455,8 @@ public class RestUserService extends AbstractEntityService implements UserServic
 
                 @Override
                 protected List<User> findEntities(TenantId id, TextPageLink pageLink) {
-                    return userDao.findTenantAdmins(id.getId(), pageLink);
+                    TextPageData<User> users = findUsers(id, null, pageLink);
+                    return users != null ? users.getData() : null;
                 }
 
                 @Override
@@ -420,7 +475,8 @@ public class RestUserService extends AbstractEntityService implements UserServic
 
         @Override
         protected List<User> findEntities(CustomerId id, TextPageLink pageLink) {
-            return userDao.findCustomerUsers(tenantId.getId(), id.getId(), pageLink);
+            TextPageData<User> users = findUsers(tenantId, id, pageLink);
+            return users != null ? users.getData() : null;
 
         }
 

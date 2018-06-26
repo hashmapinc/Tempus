@@ -22,6 +22,7 @@ import com.hashmapinc.server.requests.IdentityUser;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
@@ -55,7 +56,10 @@ public class UserController extends BaseController {
     public static final String USER_ID = "userId";
     public static final String YOU_DON_T_HAVE_PERMISSION_TO_PERFORM_THIS_OPERATION = "You don't have permission to perform this operation!";
     public static final String ACTIVATE_URL_PATTERN = "%s/api/noauth/activate?activateToken=%s";
-    public static final String IDENTITY_ENDPOINT = "http://localhost:9002/uaa/users";
+
+    @Value("${identity.url}")
+    private String identityUrl;
+
     @Autowired
     private MailService mailService;
 
@@ -122,7 +126,7 @@ public class UserController extends BaseController {
     }
 
     private User updateUser(@RequestBody User user) throws TempusException {
-        ResponseEntity<IdentityUser> response = restTemplate.exchange(IDENTITY_ENDPOINT + "/" +user.getId(),
+        ResponseEntity<IdentityUser> response = restTemplate.exchange(identityUrl + "/" +user.getId(),
                 HttpMethod.PUT, new HttpEntity<>(new IdentityUser(user)), IdentityUser.class);
         User savedUser;
         if(response.getStatusCode().equals(HttpStatus.OK)) {
@@ -139,7 +143,7 @@ public class UserController extends BaseController {
         CreateUserRequest userRequest = CreateUserRequest.builder().user(new IdentityUser(user)).activationType(activationType).build();
         User savedUser;
 
-        ResponseEntity<JsonNode> response = restTemplate.postForEntity(IDENTITY_ENDPOINT, userRequest, JsonNode.class);
+        ResponseEntity<JsonNode> response = restTemplate.postForEntity(identityUrl, userRequest, JsonNode.class);
 
         if(response.getStatusCode().equals(HttpStatus.CREATED)){
             JsonNode body = response.getBody();
@@ -199,7 +203,7 @@ public class UserController extends BaseController {
                 throw new TempusException(YOU_DON_T_HAVE_PERMISSION_TO_PERFORM_THIS_OPERATION,
                         TempusErrorCode.PERMISSION_DENIED);
             }
-            String userGetUrl = IDENTITY_ENDPOINT + "/" + userId.getId();
+            String userGetUrl = identityUrl + "/" + userId.getId();
             ResponseEntity<IdentityUser> response = restTemplate.getForEntity(userGetUrl, IdentityUser.class);
             if(response.getStatusCode().equals(HttpStatus.OK)){
                 IdentityUser identityUser = response.getBody();
