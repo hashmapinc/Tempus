@@ -77,7 +77,7 @@
 		</thead>
 		<tbody md-body>
 		<tr md-row  ng-repeat="datamodel in datamodel.data">
-			<td md-cell><a href ng-click="deviceDetailFunc($event,device)">{{datamodel.name}}</a></td>
+			<td md-cell><a href ng-click="vm.openDatamodel(datamodel)">{{datamodel.name}}</a></td>
 			<td md-cell>{{datamodel.additionalInfo.description}}</td>
 			<td md-cell>NA</td>
 			<td md-cell>{{datamodel.lastUpdatedTs | date :  'yyyy-MM-dd HH:mm:ss'}}</td>
