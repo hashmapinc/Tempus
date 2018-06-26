@@ -19,7 +19,7 @@ import 'vis/dist/vis-network.min.css';
 import objectStepper from './datamodel-object-stepper.tpl.html';
 
 /*@ngInject*/
-export function DataModelController($log, $mdDialog, $document, datamodelService) {
+export function DataModelController($log, $mdDialog, $document, $stateParams, datamodelService) {
     //=============================================================================
     // Main
     //=============================================================================
@@ -108,14 +108,28 @@ export function DataModelController($log, $mdDialog, $document, datamodelService
     function saveDatamodel() {
         // TODO: save the data model
         $log.debug("saving data model...");
+        
+        /* 
+        datamodelService.saveDataModel(item).then(function success(response) {
+            deferred.resolve(response.data);
+        }, function fail(response) {
+            deferred.reject(response.data);
+        }); 
+        */
     }
 
     function loadDatamodel() {
         // TODO: load the data model
         $log.debug("loading data model...");
 
+        datamodelService.getDatamodel($stateParams.datamodelId).
+        then(function success(data) {
+            vm.datamodelTitle = data.name;
+        }, function fail(data) {
+            $log.error("Could not load datamodel:" + data);
+        });
+        
         // TODO: load this for real
-        vm.datamodelTitle = "Dummy Data Model";
         var node_a = createDatamodelObject(3, "Vendor", "A rig", "Asset", null, []);
         var node_b = createDatamodelObject(1, "Rig", "A rig", "Asset", node_a, ["location"]);
         var node_c = createDatamodelObject(2, "Well", "A rig", "Device", node_b, ["location"]);
@@ -211,17 +225,16 @@ export function DataModelController($log, $mdDialog, $document, datamodelService
     // add a datamodel object attribute to the stepper's current data
     vm.addDatamodelObjectAttribute = function () {
         $log.debug("adding data model object attribute...");
-
+        // add the attribute if it exists
         if (vm.stepperData.currentAttribute) {
-            vm.stepperData.attributes.push(vm.stepperData.currentAttribute); // add the attribute if it exists
+            vm.stepperData.attributes.push(vm.stepperData.currentAttribute); 
         }
-
-        vm.stepperData.currentAttribute = ""; // reset the current attribute
+        // reset the current attribute
+        vm.stepperData.currentAttribute = ""; 
     };
 
     // persist the datamodel and exit edit mode
     vm.acceptDatamodelEdit = function () {
-        // save the datamodel and exit edit mode
         $log.debug("accepting datamodel edit...");
         saveDatamodel();
         vm.toggleDMEditMode();
@@ -229,7 +242,6 @@ export function DataModelController($log, $mdDialog, $document, datamodelService
 
     // discard changes and replot the datamodel
     vm.rejectDatamodelEdit = function() {
-        // TODO: reload the graph and discard unsaved changes
         $log.debug("rejecting datamodel edit...");
         loadDatamodel();
         plotDatamodel();
