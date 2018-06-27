@@ -33,7 +33,7 @@ public class User extends SearchTextBasedWithAdditionalInfo<UserId> implements H
     private CustomerId customerId;
     private String email;
     private Authority authority;
-    private Collection<String> permissions;
+    private Collection<UserPermission> permissions;
     private String firstName;
     private String lastName;
 
@@ -94,11 +94,11 @@ public class User extends SearchTextBasedWithAdditionalInfo<UserId> implements H
         this.authority = authority;
     }
 
-    public Collection<String> getPermissions() {
+    public Collection<UserPermission> getPermissions() {
         return permissions;
     }
 
-    public void setPermissions(Collection<String> permissions) {
+    public void setPermissions(Collection<UserPermission> permissions) {
         this.permissions = permissions;
     }
 
@@ -135,7 +135,7 @@ public class User extends SearchTextBasedWithAdditionalInfo<UserId> implements H
         builder.append(", authority=");
         builder.append(authority);
         builder.append(", permissions=");
-        builder.append(permissions);
+        builder.append(permissions.toString());
         builder.append(", firstName=");
         builder.append(firstName);
         builder.append(", lastName=");
