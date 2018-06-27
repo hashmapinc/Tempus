@@ -13,12 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.hashmapinc.server.dao.service.nosql;
+package com.hashmapinc.server.dao;
 
-import com.hashmapinc.server.dao.service.BaseUserServiceTest;
-import com.hashmapinc.server.dao.service.BaseUserSettingsServiceTest;
-import com.hashmapinc.server.dao.service.DaoNoSqlTest;
+import com.hashmapinc.server.dao.user.UserService;
+import org.mockito.Mockito;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
+import org.springframework.test.context.ActiveProfiles;
 
-@DaoNoSqlTest
-public class UserSettingsServiceNoSqlTest extends BaseUserSettingsServiceTest {
+@ActiveProfiles("test")
+@Configuration
+public class UserServiceTestConfiguration {
+
+    @Bean
+    @Primary
+    public UserService userService(){
+        return Mockito.mock(UserService.class);
+    }
 }

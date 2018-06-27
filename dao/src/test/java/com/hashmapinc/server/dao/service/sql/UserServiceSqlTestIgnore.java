@@ -13,11 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.hashmapinc.server.dao.service.nosql;
+package com.hashmapinc.server.dao.service.sql;
 
 import com.hashmapinc.server.dao.service.BaseUserServiceTest;
-import com.hashmapinc.server.dao.service.DaoNoSqlTest;
+import com.hashmapinc.server.dao.service.DaoSqlTest;
+import org.junit.Ignore;
 
-@DaoNoSqlTest
-public class UserServiceNoSqlTest extends BaseUserServiceTest {
+@DaoSqlTest
+@Ignore
+public class UserServiceSqlTestIgnore extends BaseUserServiceTest {
 }
