@@ -24,9 +24,23 @@ export default angular.module('tempus.api.datamodel', [
 /*@ngInject*/
 function DatamodelService($http, $q) {
     return {
-        getDatamodel: getDatamodel,
-        saveDatamodel: saveDatamodel,
-        listDatamodels: listDatamodels
+        getDatamodel:           getDatamodel,
+        getDatamodelObjects:    getDatamodelObjects,
+        saveDatamodel:          saveDatamodel,
+        saveDatamodelObject:    saveDatamodelObject,
+        listDatamodels:         listDatamodels
+    }
+
+    // loads the datamodel objects for the datamodel with ID = datamodelID
+    function getDatamodelObjects(datamodelID) {
+        var deferred = $q.defer();
+        var url = '/api/data-model/' + datamodelID + '/objects';
+        $http.get(url).then(function success(response) {
+            deferred.resolve(response.data);
+        }, function fail(response) {
+            deferred.reject(response.data);
+        });
+        return deferred.promise;
     }
 
     // loads the datamodel with ID = datamodelID
@@ -37,6 +51,22 @@ function DatamodelService($http, $q) {
             deferred.resolve(response.data);
         }, function fail(response) {
             deferred.reject(response.data);
+        });
+        return deferred.promise;
+    }
+
+    /**
+     *  saves a datamodel object in the backend
+     *  @param datamodelObject - datamodel object to save
+     *  @param datamodelID - id of the datamodel to save datamodelObject to
+     */
+    function saveDatamodelObject(datamodelObject, datamodelID) {
+        var deferred = $q.defer();
+        var url = '/api/data-model/' + datamodelID + '/objects';
+        $http.post(url, datamodelObject).then(function success(response) {
+            deferred.resolve(response);
+        }, function fail(response) {
+            deferred.reject(response);
         });
         return deferred.promise;
     }

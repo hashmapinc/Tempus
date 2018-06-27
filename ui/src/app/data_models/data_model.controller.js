@@ -105,35 +105,74 @@ export function DataModelController($log, $mdDialog, $document, $stateParams, da
     //=============================================================================
     // Datamodel functionality
     //=============================================================================
+    // save the datamodel and datamodel objects
     function saveDatamodel() {
-        // TODO: save the data model
-        $log.debug("saving data model...");
+        $log.debug("saving data model and objects...");
         
-        /* 
-        datamodelService.saveDataModel(item).then(function success(response) {
-            deferred.resolve(response.data);
+        // save the datamodel
+        var datamodelToSave = {
+            id: {
+                id: $stateParams.datamodelId,
+                entityType: "DATA_MODEL"
+            },
+            name: vm.datamodelTitle
+        };
+        datamodelService.saveDatamodel(datamodelToSave).then(function success(response) {
+            $log.debug("successfully saved datamodel..." + response);
         }, function fail(response) {
-            deferred.reject(response.data);
-        }); 
-        */
+            $log.error("could not save datamodel..." + response);
+        });
+
+        // save the datamodel objects
+        vm.datamodelObjects.forEach(dmo => {
+            // create the saveable object
+            var toSave          = {};
+            toSave.dataModelId  = {id: $stateParams.datamodelId};
+            toSave.id           = {id: dmo.id, entityType: "DATA_MODEL_OBJECT"};
+            toSave.description  = dmo.desc;
+            toSave.name         = dmo.name;
+            toSave.type         = dmo.type;
+            if (dmo.parent) {
+                toSave.parentId = { id: dmo.parent.id };
+            }
+            if (dmo.attributes) {
+                toSave.attributeDefinitions = dmo.attributes.map(attr => {
+                    return {
+                        "dataModelObjectId" : dmo.id,
+                        "name"              : attr
+                    }
+                });
+            }
+
+            // save the datamodel object
+            datamodelService.saveDatamodelObject(toSave, $stateParams.datamodelId).then(function success(response) {
+                $log.debug("successfully saved datamodel object..." + response);
+            }, function fail(response) {
+                $log.error("could not save datamodel object..." + response);
+            });
+        });
     }
 
+    // load the data model
     function loadDatamodel() {
         // TODO: load the data model
         $log.debug("loading data model...");
 
+        // load datamodel
         datamodelService.getDatamodel($stateParams.datamodelId).
         then(function success(data) {
             vm.datamodelTitle = data.name;
         }, function fail(data) {
             $log.error("Could not load datamodel:" + data);
         });
-        
-        // TODO: load this for real
-        var node_a = createDatamodelObject(3, "Vendor", "A rig", "Asset", null, []);
-        var node_b = createDatamodelObject(1, "Rig", "A rig", "Asset", node_a, ["location"]);
-        var node_c = createDatamodelObject(2, "Well", "A rig", "Device", node_b, ["location"]);
-        vm.datamodelObjects = [node_a, node_b, node_c];
+
+        // load datamodel objects
+        datamodelService.getDatamodelObjects($stateParams.datamodelId).
+        then(function success(data) {
+            alert(data);
+        }, function fail(data) {
+            $log.error("Could not load datamodel objects:" + data);
+        });
     }
 
     // plot the current datamodel objects
@@ -144,18 +183,24 @@ export function DataModelController($log, $mdDialog, $document, $stateParams, da
         vm.nodes.clear();
         vm.edges.clear();
 
+        // create vis ID hashmap
+        var visIDs = {}, currId = 0;
+        vm.datamodelObjects.forEach(dmObj => {
+            visIDs[dmObj.id] = currId++;
+        });
+
         // plot the datamodel
         vm.datamodelObjects.forEach(dmObj => {
             vm.nodes.add({
-                id:         dmObj.id,
+                id:         visIDs[dmObj.id],
                 label:      dmObj.name  
             });
 
             if (dmObj.parent) {
                 vm.edges.add({ 
-                    id:     dmObj.id, 
-                    from:   dmObj.parent.id, 
-                    to:     dmObj.id
+                    id:     visIDs[dmObj.id], 
+                    from:   visIDs[dmObj.parent.id], 
+                    to:     visIDs[dmObj.id]
                 });
             }
         });
@@ -201,25 +246,35 @@ export function DataModelController($log, $mdDialog, $document, $stateParams, da
 
     // add the datamodel object to the object list and replot
     vm.addDatamodelObject = function() {
-        $log.debug("adding data model object...");
+        $log.debug("creating data model object...");
 
-        // add the datamodelObject
-        var id = vm.nodes.length + 1; // TODO: get a real ID here
-        vm.datamodelObjects.push(
-            createDatamodelObject(
-                id,
-                vm.stepperData.name,
-                vm.stepperData.desc,
-                vm.stepperData.type,
-                vm.stepperData.parent
-            )
-        );
+        // create the object to get an id
+        datamodelService.saveDatamodelObject(
+            {"name": vm.stepperData.name}, 
+            $stateParams.datamodelId
+        ).then(function success(response) {
+            $log.debug("successfully created datamodel object..." + response);
 
-        // plot the data
-        plotDatamodel();
+            // add the datamodelObject to the datamodelObjects array
+            vm.datamodelObjects.push(
+                createDatamodelObject(
+                    response.data.id.id,
+                    vm.stepperData.name,
+                    vm.stepperData.desc,
+                    vm.stepperData.type,
+                    vm.stepperData.parent,
+                    vm.stepperData.attributes
+                )
+            );
 
-        // hide the stepper and reset its state
-        vm.cancel();
+            // plot the data
+            plotDatamodel();
+
+            // hide the stepper and reset its state
+            vm.cancel();
+        }, function fail(response) {
+            $log.error("could not create datamodel object..." + response);
+        });
     };
 
     // add a datamodel object attribute to the stepper's current data
