@@ -127,7 +127,7 @@ export function DataModelController($log, $mdDialog, $document, $stateParams, da
         vm.datamodelObjects.forEach(dmo => {
             // create the saveable object
             var toSave          = {};
-            toSave.dataModelId  = {id: $stateParams.datamodelId};
+            toSave.dataModelId = { id: $stateParams.datamodelId, entityType: "DATA_MODEL"};
             toSave.id           = {id: dmo.id, entityType: "DATA_MODEL_OBJECT"};
             toSave.description  = dmo.desc;
             toSave.name         = dmo.name;
