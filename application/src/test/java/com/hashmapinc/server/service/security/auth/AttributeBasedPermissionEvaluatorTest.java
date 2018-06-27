@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.hashmapinc.server.service.security.auth.rules;
+package com.hashmapinc.server.service.security.auth;
 
 import com.datastax.driver.core.utils.UUIDs;
 import com.hashmapinc.server.common.data.id.AssetId;
@@ -42,7 +42,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 @RunWith(SpringRunner.class)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 @ContextConfiguration(classes = AttributeBasedPermissionEvaluatorTest.class, loader = SpringBootContextLoader.class)
-@ComponentScan({"com.hashmapinc.server.service.security.auth.rules"})
+@ComponentScan({"com.hashmapinc.server.service.security.auth"})
 public class AttributeBasedPermissionEvaluatorTest {
 
     @Autowired
