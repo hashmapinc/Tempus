@@ -34,7 +34,7 @@ export function DataModelController($log, $mdDialog, $document, $stateParams, da
 
     // load the datamodel
     vm.datamodelObjects = [];
-    loadDatamodel();
+    loadDatamodel(plotDatamodel); // load data, plot in the callback
 
     // Create the graph that will be plotted
     vm.nodes = new vis.DataSet();
@@ -57,9 +57,6 @@ export function DataModelController($log, $mdDialog, $document, $stateParams, da
     var networkContainer = angular.element("#dataModelViewerContainer")[0];
     var network = new vis.Network(networkContainer, network_data, network_options);
     network.on('selectNode', onDatamodelObjectSelect);
-
-    // plot the datamodel!
-    plotDatamodel();
     //=============================================================================
 
     // toggle between edit mode and view mode
@@ -153,8 +150,11 @@ export function DataModelController($log, $mdDialog, $document, $stateParams, da
         });
     }
 
-    // load the data model
-    function loadDatamodel() {
+    /**
+     * load the data model and call the callback when done
+     *  @param callback - function to call when data is successfully loaded
+     */
+    function loadDatamodel(callback) {
         // TODO: load the data model
         $log.debug("loading data model...");
 
@@ -169,7 +169,43 @@ export function DataModelController($log, $mdDialog, $document, $stateParams, da
         // load datamodel objects
         datamodelService.getDatamodelObjects($stateParams.datamodelId).
         then(function success(data) {
-            alert(data);
+            $log.info("successfully loaded datamodel objects:" + data);
+            
+            // process the objects
+            var idToIndex = {};         // hashmap to get arr index from id
+            vm.datamodelObjects = [];   // clear the datamodelObjects array
+            var currIndex = 0;          // keep track of current index
+            data.forEach(dmObject => {  // iterate and process each object
+                idToIndex[dmObject.id.id] = currIndex++; // increment after assignment
+                var parentId = dmObject.parentId ? dmObject.parentId.id : null; // get parent ID if it exists
+
+                // get attributes
+                var attributes = dmObject.attributeDefinitions.map(attribute => {
+                    return attribute.name;
+                });
+                
+                // push the new object
+                vm.datamodelObjects.push(createDatamodelObject(
+                    dmObject.id.id,
+                    dmObject.name,
+                    dmObject.description,
+                    dmObject.type,
+                    parentId,
+                    attributes
+                ));
+            });
+
+            // convert parent IDs to parent objects with the hashmap
+            vm.datamodelObjects.forEach(dmObject => {
+                // if hte parent exists as an ID string, convert it to the actual object
+                if (dmObject.parent) {
+                    dmObject.parent = vm.datamodelObjects[idToIndex[dmObject.parent]];
+                }
+            });
+
+            if (callback) {
+                callback();
+            }
         }, function fail(data) {
             $log.error("Could not load datamodel objects:" + data);
         });
@@ -184,7 +220,7 @@ export function DataModelController($log, $mdDialog, $document, $stateParams, da
         vm.edges.clear();
 
         // create vis ID hashmap
-        var visIDs = {}, currId = 0;
+        var visIDs = {}, currId = 1;
         vm.datamodelObjects.forEach(dmObj => {
             visIDs[dmObj.id] = currId++;
         });
@@ -298,8 +334,7 @@ export function DataModelController($log, $mdDialog, $document, $stateParams, da
     // discard changes and replot the datamodel
     vm.rejectDatamodelEdit = function() {
         $log.debug("rejecting datamodel edit...");
-        loadDatamodel();
-        plotDatamodel();
+        loadDatamodel(plotDatamodel); // load data and plot in the callback
     };
     //=============================================================================
 }
