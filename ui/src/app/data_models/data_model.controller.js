@@ -50,13 +50,24 @@ export function DataModelController($log, $mdDialog, $document, $stateParams, da
                 "forceDirection": "vertical",
                 "roundness": 1
             }
-        }
+        },
+        layout: {heirarchical: true}
     };
 
     // build the vis network and add assign event listeners
     var networkContainer = angular.element("#dataModelViewerContainer")[0];
     var network = new vis.Network(networkContainer, network_data, network_options);
     network.on('selectNode', onDatamodelObjectSelect);
+    network.on('dragEnd', function (params) {
+        params.nodes.forEach(nodeId => {
+            vm.nodes.update({ id: nodeId, allowedToMoveX: false, allowedToMoveY: false });
+        });
+    });
+    network.on('dragStart', function (params) {
+        params.nodes.forEach(nodeId => {
+            vm.nodes.update({ id: nodeId, allowedToMoveX: true, allowedToMoveY: true });
+        });
+    });
     //=============================================================================
 
     // toggle between edit mode and view mode
@@ -241,9 +252,15 @@ export function DataModelController($log, $mdDialog, $document, $stateParams, da
             }
         });
 
-        // fit the datamodel to the screen and redraw
-        network.fit();
-        network.redraw();
+        // center the view after the plotting is finished
+        network.once('afterDrawing', function (params) {
+            // focus the camera on the new nodes
+            var nodeIds = Array.from(vm.datamodelObjects.keys()).map(x => { return x + 1 });
+            network.fit({
+                nodes: nodeIds,
+                animation: true
+            })
+        });
     }
 
     function onDatamodelObjectSelect(properties) {
