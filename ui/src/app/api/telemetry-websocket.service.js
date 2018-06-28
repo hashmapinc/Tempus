@@ -24,7 +24,7 @@ const RECONNECT_INTERVAL = 2000;
 const WS_IDLE_TIMEOUT = 90000;
 
 const MAX_PUBLISH_COMMANDS = 10;
-const MILI_SEC_CONST = 60000;
+const MILLI_SEC_CONST = 60000;
 
 /*@ngInject*/
 function TelemetryWebsocketService($rootScope, $websocket, $timeout, $window, types, userService) {
@@ -112,7 +112,6 @@ function TelemetryWebsocketService($rootScope, $websocket, $timeout, $window, ty
 	
 	
         preparedWrapper.attrSubCmds = popCmds(cmdsWrapper.attrSubCmds, leftCount);
-        convertTsToUTC(preparedWrapper.attrSubCmds);
         leftCount -= preparedWrapper.attrSubCmds.length;
 
         preparedWrapper.dsSubCmds = popCmds(cmdsWrapper.dsSubCmds, leftCount);
@@ -125,7 +124,7 @@ function TelemetryWebsocketService($rootScope, $websocket, $timeout, $window, ty
 
     function convertTsToUTC(subCmds) {
         var date = new Date();
-        var utcDiff = date.getTimezoneOffset() * MILI_SEC_CONST;
+        var utcDiff = date.getTimezoneOffset() * MILLI_SEC_CONST;
         for(var i = 0 ; i < subCmds.length; i++){
             subCmds[i].startTs += utcDiff;
             if(subCmds[i].endTs)
