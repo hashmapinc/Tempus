@@ -146,6 +146,10 @@ function CustomerService($http, $q, types) {
     }
 
     function saveCustomer(customer) {
+
+        if(customer.dataModelId != null)
+            customer.dataModelId = angular.fromJson(customer.dataModelId);
+
         var deferred = $q.defer();
         var url = '/api/customer';
         $http.post(url, customer).then(function success(response) {
