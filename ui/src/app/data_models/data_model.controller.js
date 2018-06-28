@@ -44,14 +44,7 @@ export function DataModelController($log, $mdDialog, $document, $stateParams, da
         edges: vm.edges
     };
     var network_options = {
-        "edges": {
-            "smooth": {
-                "type": "cubicBezier",
-                "forceDirection": "vertical",
-                "roundness": 1
-            }
-        },
-        layout: {heirarchical: true}
+        layout: {hierarchical: true}
     };
 
     // build the vis network and add assign event listeners
@@ -232,7 +225,6 @@ export function DataModelController($log, $mdDialog, $document, $stateParams, da
                 id:         visIDs[dmObj.id],
                 label:      dmObj.name,
                 shape:      'square',
-                physics:    false
             });
 
             if (dmObj.parent) {
@@ -244,7 +236,7 @@ export function DataModelController($log, $mdDialog, $document, $stateParams, da
             }
         });
 
-        // center the view after the plotting is finished
+        // center the view after the drawing is finished
         network.once('afterDrawing', function (params) {
             // focus the camera on the new nodes
             var nodeIds = Array.from(vm.datamodelObjects.keys()).map(x => { return x + 1 });
@@ -253,6 +245,11 @@ export function DataModelController($log, $mdDialog, $document, $stateParams, da
                 animation: true
             });
         });
+
+        // turn off physics after the graph is finished settling
+        network.once('stabilized', function (params) {
+            network.setOptions({nodes: { physics: false }});
+        });
     }
 
     function onDatamodelObjectSelect(properties) {
@@ -260,10 +257,10 @@ export function DataModelController($log, $mdDialog, $document, $stateParams, da
 
         if (vm.isEdit) {
             // TODO: handle object editing
-            alert("editing selected datamodel object:" + properties);
+            alert("editing selected datamodel object:" + angular.toJson(properties));
         } else {
             // TODO: handle object reading
-            alert("viewing selected datamodel object:" + properties);
+            alert("viewing selected datamodel object:" + angular.toJson(properties));
         }
     }
 
