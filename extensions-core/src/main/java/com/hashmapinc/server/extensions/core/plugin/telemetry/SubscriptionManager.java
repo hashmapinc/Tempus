@@ -30,6 +30,9 @@ import com.hashmapinc.server.extensions.core.plugin.telemetry.handlers.Telemetry
 import java.util.*;
 import java.util.function.Function;
 
+import static com.hashmapinc.server.extensions.core.plugin.telemetry.handlers.TelemetryWebsocketMsgHandler.FAILED_TO_TIME_ZONE_ATTRIBUTE;
+import static com.hashmapinc.server.extensions.core.plugin.telemetry.handlers.TelemetryWebsocketMsgHandler.TIME_ZONE;
+
 
 @Slf4j
 public class SubscriptionManager {
@@ -193,7 +196,21 @@ public class SubscriptionManager {
                 List<TsKvEntry> subscriptionUpdate = f.apply(s);
                 if (!subscriptionUpdate.isEmpty()) {
                     log.debug("subscriptionId TS " + s.getSubscriptionId());
-                    ctx.loadAttribute(entityId, DataConstants.CLIENT_SCOPE, "TimeZone", getTimeZoneAttributeCallback(s, sessionId, subscriptionUpdate));
+                    if (type == SubscriptionType.ATTRIBUTES){
+                        long timeZoneDiff = 0;
+                        for (TsKvEntry entry: subscriptionUpdate) {
+                            if (entry.getKey().contentEquals(TIME_ZONE)) {
+                                timeZoneDiff = entry.getTs();
+                                break;
+                            }
+                        }
+                        if (timeZoneDiff != 0)
+                            websocketHandler.sendWsMsg(ctx, sessionId, new SubscriptionUpdate(s.getSubscriptionId(), subscriptionUpdate, timeZoneDiff));
+                        else
+                            ctx.loadAttribute(entityId, DataConstants.CLIENT_SCOPE, TIME_ZONE, getTimeZoneAttributeCallback(s, sessionId, subscriptionUpdate));
+                    }
+                    else
+                        ctx.loadAttribute(entityId, DataConstants.CLIENT_SCOPE, TIME_ZONE, getTimeZoneAttributeCallback(s, sessionId, subscriptionUpdate));
                 }
             });
         } else {
@@ -219,6 +236,10 @@ public class SubscriptionManager {
 
             @Override
             public void onFailure(PluginContext ctx, Exception e) {
+                log.error(FAILED_TO_TIME_ZONE_ATTRIBUTE, e);
+                SubscriptionUpdate update = new SubscriptionUpdate(s.getSubscriptionId(), SubscriptionErrorCode.INTERNAL_ERROR,
+                        FAILED_TO_TIME_ZONE_ATTRIBUTE);
+                websocketHandler.sendWsMsg(ctx, sessionId, update);
             }
         };
     }

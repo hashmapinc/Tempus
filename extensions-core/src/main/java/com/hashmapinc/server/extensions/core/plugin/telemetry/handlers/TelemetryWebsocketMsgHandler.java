@@ -45,9 +45,11 @@ public class TelemetryWebsocketMsgHandler extends DefaultWebsocketMsgHandler {
 
     private static final int UNKNOWN_SUBSCRIPTION_ID = 0;
     public static final int DEFAULT_LIMIT = 100;
+    public static final String TIME_ZONE = "TimeZone";
     public static final Aggregation DEFAULT_AGGREGATION = Aggregation.NONE;
     public static final DepthAggregation DEFAULT_DEPTH_AGGREGATION = DepthAggregation.NONE;
     public static final String FAILED_TO_FETCH_DATA = "Failed to fetch data!";
+    public static final String FAILED_TO_TIME_ZONE_ATTRIBUTE = "Failed to fetch TimeZone attribute!";
     public static final String FAILED_TO_FETCH_ATTRIBUTES = "Failed to fetch attributes!";
     public static final String SESSION_META_DATA_NOT_FOUND = "Session meta-data not found!";
 
@@ -117,29 +119,35 @@ public class TelemetryWebsocketMsgHandler extends DefaultWebsocketMsgHandler {
                     PluginCallback<List<AttributeKvEntry>> callback = new PluginCallback<List<AttributeKvEntry>>() {
                         @Override
                         public void onSuccess(PluginContext ctx, List<AttributeKvEntry> data) {
-                            List<TsKvEntry> attributesData = data.stream().map(d -> new BasicTsKvEntry(d.getLastUpdateTs(), d)).collect(Collectors.toList());
-                            sendWsMsg(ctx, sessionRef, new SubscriptionUpdate(cmd.getCmdId(), attributesData));
+                            ctx.loadAttribute(entityId, DataConstants.CLIENT_SCOPE, TIME_ZONE,new PluginCallback<Optional<AttributeKvEntry>>(){
+                                @Override
+                                public void onSuccess(PluginContext ctx, Optional<AttributeKvEntry> attributeKvEntry){
+                                    long timeZoneDiff = 0;
+                                    List<TsKvEntry> attributesData = data.stream().map(d -> new BasicTsKvEntry(d.getLastUpdateTs(), d)).collect(Collectors.toList());
+                                    if(attributeKvEntry.isPresent())
+                                        timeZoneDiff = attributeKvEntry.get().getLongValue().get();
 
-                            Map<String, Long> subState = new HashMap<>(keys.size());
-                            keys.forEach(key -> subState.put(key, 0L));
-                            attributesData.forEach(v -> subState.put(v.getKey(), v.getTs()));
+                                    sendWsMsg(ctx, sessionRef, new SubscriptionUpdate(cmd.getCmdId(), attributesData, timeZoneDiff));
 
-                            SubscriptionState<Long> sub = new SubscriptionState(sessionId, cmd.getCmdId(), entityId, SubscriptionType.ATTRIBUTES, false, subState,cmd.getScope());
-                            subscriptionManager.addLocalWsSubscription(ctx, sessionId, entityId, sub);
+                                    Map<String, Long> subState = new HashMap<>(keys.size());
+                                    keys.forEach(key -> subState.put(key, 0L));
+                                    attributesData.forEach(v -> subState.put(v.getKey(), v.getTs()));
+
+                                    SubscriptionState<Long> sub = new SubscriptionState(sessionId, cmd.getCmdId(), entityId, SubscriptionType.ATTRIBUTES, false, subState,cmd.getScope());
+                                    subscriptionManager.addLocalWsSubscription(ctx, sessionId, entityId, sub);
+                                }
+
+                                @Override
+                                public void onFailure(PluginContext ctx, Exception e){
+                                    handleAttributeFetchFailure(ctx, e, cmd, sessionRef);
+                                }
+                            });
+
                         }
 
                         @Override
                         public void onFailure(PluginContext ctx, Exception e) {
-                            log.error("Failed to fetch attributes!", e);
-                            SubscriptionUpdate update;
-                            if (UnauthorizedException.class.isInstance(e)) {
-                                update = new SubscriptionUpdate(cmd.getCmdId(), SubscriptionErrorCode.UNAUTHORIZED,
-                                        SubscriptionErrorCode.UNAUTHORIZED.getDefaultMsg());
-                            } else {
-                                update = new SubscriptionUpdate(cmd.getCmdId(), SubscriptionErrorCode.INTERNAL_ERROR,
-                                        "Failed to fetch attributes!");
-                            }
-                            sendWsMsg(ctx, sessionRef, update);
+                            handleAttributeFetchFailure(ctx, e, cmd, sessionRef);
                         }
                     };
 
@@ -152,22 +160,34 @@ public class TelemetryWebsocketMsgHandler extends DefaultWebsocketMsgHandler {
                     PluginCallback<List<AttributeKvEntry>> callback = new PluginCallback<List<AttributeKvEntry>>() {
                         @Override
                         public void onSuccess(PluginContext ctx, List<AttributeKvEntry> data) {
-                            List<TsKvEntry> attributesData = data.stream().map(d -> new BasicTsKvEntry(d.getLastUpdateTs(), d)).collect(Collectors.toList());
-                            sendWsMsg(ctx, sessionRef, new SubscriptionUpdate(cmd.getCmdId(), attributesData));
 
-                            Map<String, Long> subState = new HashMap<>(attributesData.size());
-                            attributesData.forEach(v -> subState.put(v.getKey(), v.getTs()));
+                            ctx.loadAttribute(entityId, DataConstants.CLIENT_SCOPE, TIME_ZONE,new PluginCallback<Optional<AttributeKvEntry>>(){
+                                @Override
+                                public void onSuccess(PluginContext ctx, Optional<AttributeKvEntry> attributeKvEntry){
+                                    long timeZoneDiff = 0;
+                                    List<TsKvEntry> attributesData = data.stream().map(d -> new BasicTsKvEntry(d.getLastUpdateTs(), d)).collect(Collectors.toList());
 
-                            SubscriptionState<Long> sub = new SubscriptionState(sessionId, cmd.getCmdId(), entityId, SubscriptionType.ATTRIBUTES, true, subState,cmd.getScope());
-                            subscriptionManager.addLocalWsSubscription(ctx, sessionId, entityId, sub);
+                                    if(attributeKvEntry.isPresent())
+                                        timeZoneDiff = attributeKvEntry.get().getLongValue().get();
+
+                                    sendWsMsg(ctx, sessionRef, new SubscriptionUpdate(cmd.getCmdId(), attributesData, timeZoneDiff));
+
+                                    Map<String, Long> subState = new HashMap<>(attributesData.size());
+                                    attributesData.forEach(v -> subState.put(v.getKey(), v.getTs()));
+                                    SubscriptionState<Long> sub = new SubscriptionState(sessionId, cmd.getCmdId(), entityId, SubscriptionType.ATTRIBUTES, true, subState,cmd.getScope());
+                                    subscriptionManager.addLocalWsSubscription(ctx, sessionId, entityId, sub);
+                                }
+
+                                @Override
+                                public void onFailure(PluginContext ctx, Exception e){
+                                    handleAttributeFetchFailure(ctx, e, cmd, sessionRef);
+                                }
+                            });
                         }
 
                         @Override
                         public void onFailure(PluginContext ctx, Exception e) {
-                            log.error("Failed to fetch attributes!", e);
-                            SubscriptionUpdate update = new SubscriptionUpdate(cmd.getCmdId(), SubscriptionErrorCode.INTERNAL_ERROR,
-                                    "Failed to fetch attributes!");
-                            sendWsMsg(ctx, sessionRef, update);
+                            handleAttributeFetchFailure(ctx, e, cmd, sessionRef);
                         }
                     };
 
@@ -179,6 +199,19 @@ public class TelemetryWebsocketMsgHandler extends DefaultWebsocketMsgHandler {
                 }
             }
         }
+    }
+
+    private void handleAttributeFetchFailure(PluginContext ctx, Exception e, AttributesSubscriptionCmd cmd, PluginWebsocketSessionRef sessionRef) {
+        log.error("Failed to fetch attributes!", e);
+        SubscriptionUpdate update;
+        if (UnauthorizedException.class.isInstance(e)) {
+            update = new SubscriptionUpdate(cmd.getCmdId(), SubscriptionErrorCode.UNAUTHORIZED,
+                    SubscriptionErrorCode.UNAUTHORIZED.getDefaultMsg());
+        } else {
+            update = new SubscriptionUpdate(cmd.getCmdId(), SubscriptionErrorCode.INTERNAL_ERROR,
+                    "Failed to fetch attributes!");
+        }
+        sendWsMsg(ctx, sessionRef, update);
     }
 
     private void handleWsAttributesSubscriptionByKeys(PluginContext ctx, PluginWebsocketSessionRef sessionRef,
@@ -263,12 +296,12 @@ public class TelemetryWebsocketMsgHandler extends DefaultWebsocketMsgHandler {
                 Optional<Set<String>> keysOptional = getKeys(cmd);
                 if (keysOptional.isPresent()) {
                     List<String> keys = new ArrayList<>(getKeys(cmd).orElse(Collections.emptySet()));
-                    ctx.loadAttribute(entityId, DataConstants.CLIENT_SCOPE, "TimeZone", getTimeZoneAttributeCallback(sessionRef, cmd, sessionId, entityId, keys));
+                    ctx.loadAttribute(entityId, DataConstants.CLIENT_SCOPE, TIME_ZONE, getTimeZoneAttributeCallback(sessionRef, cmd, sessionId, entityId, keys));
                 } else {
                     ctx.loadLatestTimeseries(entityId, new PluginCallback<List<TsKvEntry>>() {
                         @Override
                         public void onSuccess(PluginContext ctx, List<TsKvEntry> data) {
-                            ctx.loadAttribute(entityId, DataConstants.CLIENT_SCOPE, "TimeZone", getTimeZoneAttributeCallback(sessionRef, cmd, data));
+                            ctx.loadAttribute(entityId, DataConstants.CLIENT_SCOPE, TIME_ZONE, getTimeZoneAttributeCallback(sessionRef, cmd, data));
                             Map<String, Long> subState = new HashMap<>(data.size());
                             data.forEach(v -> subState.put(v.getKey(), v.getTs()));
                             SubscriptionState<Long> sub = new SubscriptionState(sessionId, cmd.getCmdId(), entityId, SubscriptionType.TIMESERIES, true, subState, cmd.getScope());
@@ -504,7 +537,7 @@ public class TelemetryWebsocketMsgHandler extends DefaultWebsocketMsgHandler {
         ctx.loadTimeseries(entityId, queries, new PluginCallback<List<TsKvEntry>>() {
             @Override
             public void onSuccess(PluginContext ctx, List<TsKvEntry> data) {
-                ctx.loadAttribute(entityId, DataConstants.CLIENT_SCOPE, "TimeZone", new PluginCallback<Optional<AttributeKvEntry>>() {
+                ctx.loadAttribute(entityId, DataConstants.CLIENT_SCOPE, TIME_ZONE, new PluginCallback<Optional<AttributeKvEntry>>() {
                     @Override
                     public void onSuccess(PluginContext ctx, Optional<AttributeKvEntry> attributeKvEntry) {
                         if (attributeKvEntry.isPresent()){
@@ -596,6 +629,10 @@ public class TelemetryWebsocketMsgHandler extends DefaultWebsocketMsgHandler {
 
             @Override
             public void onFailure(PluginContext ctx, Exception e) {
+                log.error(FAILED_TO_TIME_ZONE_ATTRIBUTE, e);
+                SubscriptionUpdate update = new SubscriptionUpdate(cmd.getCmdId(), SubscriptionErrorCode.INTERNAL_ERROR,
+                        FAILED_TO_TIME_ZONE_ATTRIBUTE);
+                sendWsMsg(ctx, sessionRef, update);
             }
         };
     }
@@ -622,6 +659,10 @@ public class TelemetryWebsocketMsgHandler extends DefaultWebsocketMsgHandler {
 
             @Override
             public void onFailure(PluginContext ctx, Exception e) {
+                log.error(FAILED_TO_TIME_ZONE_ATTRIBUTE, e);
+                SubscriptionUpdate update = new SubscriptionUpdate(cmd.getCmdId(), SubscriptionErrorCode.INTERNAL_ERROR,
+                        FAILED_TO_TIME_ZONE_ATTRIBUTE);
+                sendWsMsg(ctx, sessionRef, update);
             }
         };
     }
