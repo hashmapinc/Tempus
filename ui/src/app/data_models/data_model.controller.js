@@ -58,16 +58,6 @@ export function DataModelController($log, $mdDialog, $document, $stateParams, da
     var networkContainer = angular.element("#dataModelViewerContainer")[0];
     var network = new vis.Network(networkContainer, network_data, network_options);
     network.on('selectNode', onDatamodelObjectSelect);
-    network.on('dragEnd', function (params) {
-        params.nodes.forEach(nodeId => {
-            vm.nodes.update({ id: nodeId, allowedToMoveX: false, allowedToMoveY: false });
-        });
-    });
-    network.on('dragStart', function (params) {
-        params.nodes.forEach(nodeId => {
-            vm.nodes.update({ id: nodeId, allowedToMoveX: true, allowedToMoveY: true });
-        });
-    });
     //=============================================================================
 
     // toggle between edit mode and view mode
@@ -240,7 +230,9 @@ export function DataModelController($log, $mdDialog, $document, $stateParams, da
         vm.datamodelObjects.forEach(dmObj => {
             vm.nodes.add({
                 id:         visIDs[dmObj.id],
-                label:      dmObj.name  
+                label:      dmObj.name,
+                shape:      'square',
+                physics:    false
             });
 
             if (dmObj.parent) {
@@ -259,7 +251,7 @@ export function DataModelController($log, $mdDialog, $document, $stateParams, da
             network.fit({
                 nodes: nodeIds,
                 animation: true
-            })
+            });
         });
     }
 
