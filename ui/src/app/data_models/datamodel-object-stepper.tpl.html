@@ -15,12 +15,13 @@
     limitations under the License.
 
 -->
-<md-dialog aria-label="New Datamodel Object" style="min-width: 600px;">
+<md-dialog aria-label="New Datamodel Object" style="min-width: 600px;" tb-help="'datamodel_object_creation'" help-container-id="help-container">
   <form ng-submit="vm.addDatamodelObject()">
     <md-toolbar>
       <div class="md-toolbar-tools">
         <h2>New Datamodel Object</h2>
         <span flex></span>
+        <div id="help-container"></div>
         <md-button class="md-icon-button" ng-click="vm.cancel()">
           <ng-md-icon icon="close" aria-label="{{ 'dialog.close' | translate }}"></ng-md-icon>
         </md-button>
