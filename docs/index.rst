@@ -57,6 +57,7 @@ Contents
    security/index
    admin/index
    reference/index
+   datamodel/objectCreation.rst
    development/index
    gateway/index
 
