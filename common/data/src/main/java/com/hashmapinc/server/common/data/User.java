@@ -23,6 +23,7 @@ import com.hashmapinc.server.common.data.id.UserId;
 import com.hashmapinc.server.common.data.security.Authority;
 
 import java.util.Collection;
+import java.util.Collections;
 
 @EqualsAndHashCode(callSuper = true)
 public class User extends SearchTextBasedWithAdditionalInfo<UserId> implements HasName {
@@ -33,7 +34,7 @@ public class User extends SearchTextBasedWithAdditionalInfo<UserId> implements H
     private CustomerId customerId;
     private String email;
     private Authority authority;
-    private Collection<UserPermission> permissions;
+    private Collection<UserPermission> permissions = Collections.EMPTY_LIST;
     private String firstName;
     private String lastName;
 

@@ -15,12 +15,22 @@
  */
 package com.hashmapinc.server.service.security.auth;
 
-import com.hashmapinc.server.service.security.auth.rules.RulesChecker;
+import com.hashmapinc.server.common.data.EntityType;
+import com.hashmapinc.server.common.data.EnumUtil;
+import com.hashmapinc.server.common.data.TempusResource;
+import com.hashmapinc.server.common.data.UUIDConverter;
+import com.hashmapinc.server.common.data.id.AssetId;
+import com.hashmapinc.server.common.data.id.DeviceId;
+import com.hashmapinc.server.dao.asset.AssetService;
+import com.hashmapinc.server.dao.device.DeviceService;
+import com.hashmapinc.server.service.security.auth.permissions.PermissionChecker;
+import com.hashmapinc.server.service.security.model.SecurityUser;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.PermissionEvaluator;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
 import java.io.Serializable;
 
@@ -29,22 +39,57 @@ import java.io.Serializable;
 public class AttributeBasedPermissionEvaluator implements PermissionEvaluator{
 
     @Autowired
-    private RulesChecker rulesChecker;
+    private PermissionChecker permissionChecker;
+
+    @Autowired
+    private DeviceService deviceService;
+
+    @Autowired
+    private AssetService assetService;
 
     @Override
-    public boolean hasPermission(Authentication authentication , Object targetDomainObject, Object permission) {
-        Object user = authentication.getPrincipal();
-        log.debug("hasPersmission({}, {}, {})", user, targetDomainObject, permission);
-        return rulesChecker.check(user, targetDomainObject, permission);
+    public boolean hasPermission(Authentication authentication, Object targetDomainObject, Object action) {
+        log.debug("hasPersmission({}, {}, {})", authentication, targetDomainObject, action);
+
+        if(targetDomainObject == null)
+            throw new RuntimeException("Cannot evaluate attribute based permissions for null targetDomainObject");
+
+        if(!(targetDomainObject instanceof TempusResource))
+            throw new RuntimeException("Cannot evaluate attribute based permissions for type " + targetDomainObject.getClass().toString());
+
+        if(StringUtils.isEmpty(action))
+            throw new RuntimeException("Action cannot be empty");
+
+        String[] actionTokens = ((String) action).split("_");
+
+        if(actionTokens.length != 2)
+            throw new RuntimeException("Invalid action value");
+
+        SecurityUser user = (SecurityUser)authentication.getPrincipal();
+        TempusResource resource = (TempusResource) targetDomainObject;
+        String entityName = actionTokens[0];
+        String entityOperation = actionTokens[1];
+
+        if(!resource.getId().getEntityType().name().equalsIgnoreCase(entityName))
+            throw new RuntimeException("Incompatible resource and actions");
+
+        return permissionChecker.check(user, resource, entityOperation);
     }
 
-    //TODO: Implement this for Delete use case where we will fetch an object from targetId and check if user is Authorized
     @Override
-    public boolean hasPermission(Authentication authentication, Serializable targetId, String targetType, Object permission) {
-        return false;
+    public boolean hasPermission(Authentication authentication, Serializable entityId, String targetType, Object action) {
+        return hasPermission(authentication, fetchTargetDomainObject((String)entityId, targetType), action);
     }
 
-    public void setRulesChecker(RulesChecker rulesChecker) {
-        this.rulesChecker = rulesChecker;
+    private Object fetchTargetDomainObject(String entityId, String entityType) {
+
+        switch (new EnumUtil<>(EntityType.class).parse(entityType)) {
+            case DEVICE:
+                return deviceService.findDeviceById(new DeviceId(UUIDConverter.fromString(entityId)));
+            case ASSET:
+                return assetService.findAssetById(new AssetId(UUIDConverter.fromString(entityId)));
+            default:
+                return null;
+        }
     }
 }

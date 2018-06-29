@@ -32,7 +32,7 @@ public class UserPermission {
     private String permissionExpr;
     private Authority subject;
     private Collection<EntityType> resources;
-    private Collection<Action> actions;
+    private Collection<UserAction> userActions;
 
     public UserPermission(UserPermission permission){
         this(permission.permissionExpr);
@@ -52,46 +52,22 @@ public class UserPermission {
         if(expressionTokens.length != 3)
             throw new IllegalArgumentException("Invalid user permission expression !!");
 
-        this.subject = new Enum<>(Authority.class).parse(expressionTokens[0]);
+        this.subject = new EnumUtil<>(Authority.class).parse(expressionTokens[0]);
 
         if(expressionTokens[1].trim().equals("*"))
             this.resources = Arrays.asList(EntityType.values());
         else {
             ArrayList<EntityType> resources = new ArrayList<>();
-            resources.add(new Enum<>(EntityType.class).parse(expressionTokens[1]));
+            resources.add(new EnumUtil<>(EntityType.class).parse(expressionTokens[1]));
             this.resources = resources;
         }
 
         if(expressionTokens[2].trim().equals("*"))
-            this.actions = Arrays.asList(Action.values());
+            this.userActions = Arrays.asList(UserAction.values());
         else {
-            ArrayList<Action> actions = new ArrayList<>();
-            actions.add(new Enum<>(Action.class).parse(expressionTokens[2]));
-            this.actions = actions;
+            ArrayList<UserAction> userActions = new ArrayList<>();
+            userActions.add(new EnumUtil<>(UserAction.class).parse(expressionTokens[2]));
+            this.userActions = userActions;
         }
-    }
-}
-
-enum Action {
-    CREATE, READ, UPDATE, DELETE
-}
-
-class Enum<T extends java.lang.Enum> {
-    private final Class<T> typeParameterClass;
-
-    public Enum(Class<T> typeParameterClass){
-        this.typeParameterClass = typeParameterClass;
-    }
-
-    public T parse(String value){
-        T enumVal = null;
-        if (value != null && value.length() != 0) {
-            for (T current : typeParameterClass.getEnumConstants())
-                if (current.name().equalsIgnoreCase(value)) {
-                    enumVal = current;
-                    break;
-                }
-        }
-        return enumVal;
     }
 }

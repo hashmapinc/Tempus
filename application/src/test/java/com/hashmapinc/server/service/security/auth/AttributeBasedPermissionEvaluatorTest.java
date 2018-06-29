@@ -16,11 +16,14 @@
 package com.hashmapinc.server.service.security.auth;
 
 import com.datastax.driver.core.utils.UUIDs;
-import com.hashmapinc.server.common.data.id.AssetId;
-import com.hashmapinc.server.common.data.id.CustomerId;
-import com.hashmapinc.server.common.data.id.TenantId;
-import com.hashmapinc.server.common.data.id.UserId;
+import com.hashmapinc.server.common.data.TempusResource;
+import com.hashmapinc.server.common.data.UUIDConverter;
+import com.hashmapinc.server.common.data.UserPermission;
+import com.hashmapinc.server.common.data.asset.Asset;
+import com.hashmapinc.server.common.data.id.*;
 import com.hashmapinc.server.common.data.security.Authority;
+import com.hashmapinc.server.dao.asset.AssetService;
+import com.hashmapinc.server.dao.device.DeviceService;
 import com.hashmapinc.server.service.security.model.SecurityUser;
 import com.hashmapinc.server.service.security.model.UserPrincipal;
 import lombok.Builder;
@@ -29,16 +32,20 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootContextLoader;
-import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.*;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 
-@ActiveProfiles("test")
+import java.util.Arrays;
+
+@ActiveProfiles("permission-test")
 @RunWith(SpringRunner.class)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 @ContextConfiguration(classes = AttributeBasedPermissionEvaluatorTest.class, loader = SpringBootContextLoader.class)
@@ -48,33 +55,53 @@ public class AttributeBasedPermissionEvaluatorTest {
     @Autowired
     private AttributeBasedPermissionEvaluator evaluator;
 
+    @Autowired
+    private AssetService assetService;
+
+    @Autowired
+    private DeviceService deviceService;
+
     private SecurityUser admin;
     private SecurityUser tenantAdmin;
     private SecurityUser customer;
+    TestResource resource;
 
     @Before
     public void setup(){
+        MockitoAnnotations.initMocks(this);
+
         this.admin = new SecurityUser(new UserId(UUIDs.timeBased()));
         this.admin.setEnabled(true);
+        this.admin.setPermissions(Arrays.asList(new UserPermission[]{new UserPermission("SYS_ADMIN:*:*")}));
         this.admin.setUserPrincipal(new UserPrincipal(UserPrincipal.Type.USER_NAME, "admin"));
         this.admin.setAuthority(Authority.SYS_ADMIN);
 
         this.tenantAdmin = new SecurityUser(new UserId(UUIDs.timeBased()));
         this.tenantAdmin.setEnabled(true);
+        this.tenantAdmin.setPermissions(Arrays.asList(new UserPermission[]{new UserPermission("TENANT_ADMIN:*:*")}));
+        this.tenantAdmin.setTenantId(new TenantId(UUIDs.timeBased()));
         this.tenantAdmin.setUserPrincipal(new UserPrincipal(UserPrincipal.Type.USER_NAME, "tenant_admin"));
         this.tenantAdmin.setAuthority(Authority.TENANT_ADMIN);
 
         this.customer = new SecurityUser(new UserId(UUIDs.timeBased()));
         this.customer.setTenantId(this.tenantAdmin.getTenantId());
+        this.customer.setCustomerId(new CustomerId(UUIDs.timeBased()));
         this.customer.setEnabled(true);
+        this.customer.setPermissions(Arrays.asList(new UserPermission[]{new UserPermission("CUSTOMER_USER:ASSET:READ")}));
         this.customer.setUserPrincipal(new UserPrincipal(UserPrincipal.Type.USER_NAME, "customer_user"));
         this.customer.setAuthority(Authority.CUSTOMER_USER);
+
+        this.resource = TestResource.builder()
+                .id(new AssetId(UUIDs.timeBased()))
+                .tenantId(new TenantId(tenantAdmin.getTenantId().getId()))
+                .customerId(new CustomerId(customer.getCustomerId().getId()))
+                .build();
     }
 
     @Test
     public void testSystemAdminAccessAssets(){
         UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(admin, null);
-        boolean hasPermission = evaluator.hasPermission(authentication, TestResource.builder().build(), "ASSET_CREATE");
+        boolean hasPermission = evaluator.hasPermission(authentication, resource, "ASSET_CREATE");
 
         Assert.assertTrue(hasPermission);
     }
@@ -82,7 +109,7 @@ public class AttributeBasedPermissionEvaluatorTest {
     @Test
     public void testTenantCanCreateAnAsset(){
         UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(tenantAdmin, null);
-        boolean hasPermission = evaluator.hasPermission(authentication, TestResource.builder().tenantId(new TenantId(tenantAdmin.getId().getId())).build(), "ASSET_CREATE");
+        boolean hasPermission = evaluator.hasPermission(authentication, resource, "ASSET_CREATE");
 
         Assert.assertTrue(hasPermission);
     }
@@ -90,7 +117,7 @@ public class AttributeBasedPermissionEvaluatorTest {
     @Test
     public void testTenantCanViewAnAsset(){
         UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(tenantAdmin, null);
-        boolean hasPermission = evaluator.hasPermission(authentication, TestResource.builder().tenantId(new TenantId(tenantAdmin.getId().getId())).build(), "ASSET_READ");
+        boolean hasPermission = evaluator.hasPermission(authentication, resource, "ASSET_READ");
 
         Assert.assertTrue(hasPermission);
     }
@@ -98,7 +125,7 @@ public class AttributeBasedPermissionEvaluatorTest {
     @Test
     public void testTenantCanUpdateAnAsset(){
         UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(tenantAdmin, null);
-        boolean hasPermission = evaluator.hasPermission(authentication, TestResource.builder().tenantId(new TenantId(tenantAdmin.getId().getId())).build(), "ASSET_UPDATE");
+        boolean hasPermission = evaluator.hasPermission(authentication, resource, "ASSET_UPDATE");
 
         Assert.assertTrue(hasPermission);
     }
@@ -106,34 +133,94 @@ public class AttributeBasedPermissionEvaluatorTest {
     @Test
     public void testTenantCanDeleteAnAsset(){
         UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(tenantAdmin, null);
-        boolean hasPermission = evaluator.hasPermission(authentication, TestResource.builder().tenantId(new TenantId(tenantAdmin.getId().getId())).build(), "ASSET_DELETE");
+        boolean hasPermission = evaluator.hasPermission(authentication, resource, "ASSET_DELETE");
 
         Assert.assertTrue(hasPermission);
     }
 
     @Test
     public void testTenantCanNotAccessResourceOfAnotherTenant(){
+        TestResource otherTenantResource = TestResource.builder()
+                .id(new AssetId(UUIDs.timeBased()))
+                .tenantId(new TenantId(UUIDs.timeBased()))
+                .customerId(new CustomerId(UUIDs.timeBased()))
+                .build();
+
         UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(tenantAdmin, null);
-        boolean hasPermission = evaluator.hasPermission(authentication, TestResource.builder().tenantId(new TenantId(UUIDs.timeBased())).build(), "ASSET_DELETE");
+        boolean hasPermission = evaluator.hasPermission(authentication, otherTenantResource, "ASSET_DELETE");
 
         Assert.assertFalse(hasPermission);
     }
 
     @Test
+    public void testCustomerShouldBeAbleToReadAsset(){
+        UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(customer, null);
+        boolean hasPermission = evaluator.hasPermission(authentication, resource,"ASSET_READ");
+
+        Assert.assertTrue(hasPermission);
+    }
+
+    @Test
     public void testCustomerShouldNotBeAbleToDeleteAsset(){
         UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(customer, null);
-        boolean hasPermission = evaluator.hasPermission(authentication,
-                TestResource.builder().tenantId(new TenantId(UUIDs.timeBased())).build(),
-                "ASSET_DELETE");
+        boolean hasPermission = evaluator.hasPermission(authentication, resource,"ASSET_DELETE");
 
         Assert.assertFalse(hasPermission);
     }
 
+    @Test
+    public void testCustomerShouldBeAbleToReadAssetOfOtherCustomer(){
+        TestResource otherCustomerResource = TestResource.builder()
+                .id(new AssetId(UUIDs.timeBased()))
+                .tenantId(new TenantId(tenantAdmin.getTenantId().getId()))
+                .customerId(new CustomerId(UUIDs.timeBased()))
+                .build();
+
+        UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(customer, null);
+        boolean hasPermission = evaluator.hasPermission(authentication, otherCustomerResource,"ASSET_READ");
+
+        Assert.assertFalse(hasPermission);
+    }
+
+    @Test
+    public void testPermissionWhenDomainObjectIsNotAvailableForEvaluation(){
+        AssetId assetId = new AssetId(UUIDs.timeBased());
+        Asset mockAsset = new Asset(assetId);
+        mockAsset.setName("Test Asset");
+        mockAsset.setTenantId(this.tenantAdmin.getTenantId());
+        Mockito.when(assetService.findAssetById(assetId))
+                .thenReturn(mockAsset);
+
+        UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(this.tenantAdmin, null);
+
+        boolean hasPermission = evaluator.hasPermission(authentication, UUIDConverter.fromTimeUUID(assetId.getId()), "ASSET","ASSET_DELETE");
+
+        Assert.assertTrue(hasPermission);
+    }
+
     @Data
     @Builder
-    public static class TestResource{
-        private AssetId id;
+    public static class TestResource implements TempusResource {
+        private EntityId id;
         private TenantId tenantId;
         private CustomerId customerId;
+        private String type;
+    }
+}
+
+@Profile("permission-test")
+@Configuration
+class PermissionEvaluatorTestConfiguration {
+
+    @Bean
+    @Primary
+    public DeviceService deviceServiceImpl() {
+        return Mockito.mock(DeviceService.class);
+    }
+
+    @Bean
+    @Primary
+    public AssetService baseAssetService() {
+        return Mockito.mock(AssetService.class);
     }
 }
