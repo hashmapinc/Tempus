@@ -36,34 +36,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public abstract class BaseComponentDescriptorControllerTest extends AbstractControllerTest {
 
     private static final int AMOUNT_OF_DEFAULT_PLUGINS_DESCRIPTORS = 7;
-    private Tenant savedTenant;
-    private User tenantAdmin;
 
     @Before
     public void beforeTest() throws Exception {
-        loginSysAdmin();
-
-        Tenant tenant = new Tenant();
-        tenant.setTitle("My tenant");
-        savedTenant = doPost("/api/tenant", tenant, Tenant.class);
-        Assert.assertNotNull(savedTenant);
-
-        tenantAdmin = new User();
-        tenantAdmin.setAuthority(Authority.TENANT_ADMIN);
-        tenantAdmin.setTenantId(savedTenant.getId());
-        tenantAdmin.setEmail("tenant2@tempus.org");
-        tenantAdmin.setFirstName("Joe");
-        tenantAdmin.setLastName("Downs");
-
-        tenantAdmin = createUserAndLogin(tenantAdmin, "testPassword1");
-    }
-
-    @After
-    public void afterTest() throws Exception {
-        loginSysAdmin();
-
-        doDelete("/api/tenant/" + savedTenant.getId().getId().toString())
-                .andExpect(status().isOk());
+        loginTenantAdmin();
     }
 
     @Test

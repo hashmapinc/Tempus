@@ -1,0 +1,18 @@
+{
+  "request": {
+    "url": "/uaa/oauth/token",
+    "method": "POST",
+    "bodyPatterns" : [
+      {
+        "equalTo": "grant_type=refresh_token&refresh_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0ZW5hbnRfaWQiOiIxMzgxNDAwMC0xZGQyLTExYjItODA4MC04MDgwODA4MDgwODAiLCJsYXN0TmFtZSI6bnVsbCwidXNlcl9uYW1lIjoic3lzYWRtaW5AaGFzaG1hcGluYy5jb20iLCJjbGllbnRfaWQiOiJ0ZW1wdXMiLCJlbmFibGVkIjp0cnVlLCJhdXRob3JpdGllcyI6WyJTWVNfQURNSU4iXSwiZmlyc3ROYW1lIjpudWxsLCJzY29wZSI6WyJzZXJ2ZXIiXSwiYXRpIjoiZGIzMWY5ODAtYmZkOC00MjFjLWIyMWUtMDMxOTg0MjRkZTQ4IiwiaWQiOiIzNDE1ODYxMC03OTNhLTExZTgtYjE4OS1mOWNjYzg3ZWNlMGUiLCJjdXN0b21lcl9pZCI6IjEzODE0MDAwLTFkZDItMTFiMi04MDgwLTgwODA4MDgwODA4MCIsImV4cCI6MTU2NjE2NzEyOCwiaWF0IjoxNTMwMTY3MTI4LCJqdGkiOiJiYWNhMjc1Ni1iZmM3LTQ3ZGQtODIwMC01YzQzMDhkMGFjZDQifQ.ySvh3eFGQKRXdhuPG-YBUxwtxJZGgCXPvaKbxT99SXk"
+      }
+    ]
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-type": "application/json"
+    },
+    "body": "{\"access_token\":\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0ZW5hbnRfaWQiOm51bGwsImxhc3ROYW1lIjoiQWRtaW4iLCJ1c2VyX25hbWUiOiJzeXNhZG1pbkBoYXNobWFwaW5jLmNvbSIsImRlc2NyaXB0aW9uIjoiVGhpcyBpcyBhIGRlbW8gc3lzdGVtIGFkbWluIHVzZWQgZm9yIHRlc3RpbmciLCJjbGllbnRfaWQiOiJ0ZW1wdXMiLCJlbmFibGVkIjp0cnVlLCJhdXRob3JpdGllcyI6WyJTWVNfQURNSU4iXSwiZmlyc3ROYW1lIjoiU3lzdGVtIiwic2NvcGUiOlsic2VydmVyIl0sImlkIjoiNDc4MzA0ZDAtNzVmYi0xMWU4LTlkMDItMGQ5YTE4M2IzNDBjIiwiY3VzdG9tZXJfaWQiOm51bGwsImV4cCI6MTUzOTI2MDQzOCwiaWF0IjoxNTMwMjYwNDM4LCJqdGkiOiI2ZmNjZjBiNS1lOGEyLTQ3YjMtOWU3NS1iMmFjYjQ2OTA4NTkifQ.JFjGWUX0gY6Mns7kdaaHgrrbGCIEyQ0BRMaEl-rVTlw\",\"token_type\":\"bearer\",\"refresh_token\":\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0ZW5hbnRfaWQiOm51bGwsImxhc3ROYW1lIjoiQWRtaW4iLCJ1c2VyX25hbWUiOiJzeXNhZG1pbkBoYXNobWFwaW5jLmNvbSIsImRlc2NyaXB0aW9uIjoiVGhpcyBpcyBhIGRlbW8gc3lzdGVtIGFkbWluIHVzZWQgZm9yIHRlc3RpbmciLCJjbGllbnRfaWQiOiJ0ZW1wdXMiLCJlbmFibGVkIjp0cnVlLCJhdXRob3JpdGllcyI6WyJTWVNfQURNSU4iXSwiZmlyc3ROYW1lIjoiU3lzdGVtIiwic2NvcGUiOlsic2VydmVyIl0sImF0aSI6IjZmY2NmMGI1LWU4YTItNDdiMy05ZTc1LWIyYWNiNDY5MDg1OSIsImlkIjoiNDc4MzA0ZDAtNzVmYi0xMWU4LTlkMDItMGQ5YTE4M2IzNDBjIiwiY3VzdG9tZXJfaWQiOm51bGwsImV4cCI6MTU2NjE2NzEyOCwiaWF0IjoxNTMwMjYwNDM4LCJqdGkiOiJiYWNhMjc1Ni1iZmM3LTQ3ZGQtODIwMC01YzQzMDhkMGFjZDQifQ.QQ2pS-jUWudU-Zwr5dc2MwPDYAztA_QjFsUUKbd5BsI\",\"expires_in\":8999999,\"scope\":\"server\",\"iat\":1530260438,\"jti\":\"6fccf0b5-e8a2-47b3-9e75-b2acb4690859\"}"
+  }
+}

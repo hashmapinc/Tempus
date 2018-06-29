@@ -1,0 +1,9 @@
+{
+  "request": {
+    "urlPattern": "/uaa/users/.*",
+    "method": "DELETE"
+  },
+  "response": {
+    "status": 200
+  }
+}

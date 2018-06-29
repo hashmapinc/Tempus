@@ -15,17 +15,24 @@
  */
 package com.hashmapinc.server.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hashmapinc.server.common.data.BaseData;
 import com.hashmapinc.server.common.data.Customer;
+import com.hashmapinc.server.common.data.Tenant;
 import com.hashmapinc.server.common.data.User;
+import com.hashmapinc.server.common.data.id.CustomerId;
 import com.hashmapinc.server.common.data.id.TenantId;
+import com.hashmapinc.server.common.data.id.UUIDBased;
+import com.hashmapinc.server.common.data.page.TextPageData;
 import com.hashmapinc.server.common.data.page.TextPageLink;
 import com.hashmapinc.server.common.data.page.TimePageLink;
 import com.hashmapinc.server.common.data.security.Authority;
-/*import com.hashmapinc.server.service.security.auth.jwt.RefreshTokenRequest;*/
+import com.hashmapinc.server.service.mail.TestMailService;
+import com.hashmapinc.server.service.security.auth.jwt.RefreshTokenRequest;
+import com.hashmapinc.server.service.security.auth.rest.LoginRequest;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Header;
 import io.jsonwebtoken.Jwt;
@@ -67,10 +74,6 @@ import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilde
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.context.WebApplicationContext;
-import com.hashmapinc.server.common.data.Tenant;
-import com.hashmapinc.server.common.data.id.UUIDBased;
-import com.hashmapinc.server.service.mail.TestMailService;
-import com.hashmapinc.server.service.security.auth.rest.LoginRequest;
 
 import javax.naming.Context;
 import javax.naming.directory.*;
@@ -78,9 +81,16 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.*;
 
+import static com.github.tomakehurst.wiremock.client.WireMock.*;
+import static com.github.tomakehurst.wiremock.client.WireMock.get;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.request;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
 
 @ActiveProfiles("test")
@@ -127,7 +137,11 @@ public abstract class AbstractControllerTest {
     protected String refreshToken;
     protected String username;
 
-    private TenantId tenantId;
+    protected TenantId tenantId;
+    protected Tenant savedTenant;
+    protected User tenantAdmin;
+
+    protected Customer savedCustomer;
 
     @SuppressWarnings("rawtypes")
     private HttpMessageConverter mappingJackson2HttpMessageConverter;
@@ -179,28 +193,28 @@ public abstract class AbstractControllerTest {
             createLDAPEntry(CUSTOMER_USER_EMAIL, CUSTOMER_USER_PASSWORD);
         }
 
-
+        stubForFetchUsers();
         log.info("Logging in as admin");
         loginSysAdmin();
         log.info("Logged in as sysadmin");
 
-        Tenant tenant = new Tenant();
+        Tenant tenant = new Tenant(new TenantId(UUID.fromString("5cacabe0-7aa6-11e8-9e1e-6b7821276ffc")));
         tenant.setTitle(TEST_TENANT_NAME);
-        Tenant savedTenant = doPost("/api/tenant", tenant, Tenant.class);
+        savedTenant = doPost("/api/tenant", tenant, Tenant.class);
         Assert.assertNotNull(savedTenant);
         tenantId = savedTenant.getId();
 
-        User tenantAdmin = new User();
+        tenantAdmin = new User();
         tenantAdmin.setAuthority(Authority.TENANT_ADMIN);
         tenantAdmin.setTenantId(tenantId);
         tenantAdmin.setEmail(TENANT_ADMIN_EMAIL);
 
         createUserAndLogin(tenantAdmin, TENANT_ADMIN_PASSWORD);
 
-        Customer customer = new Customer();
+        Customer customer = new Customer(new CustomerId(UUID.fromString("0bd432e0-7ab7-11e8-8db9-cfa34d6288bd")));
         customer.setTitle("Customer");
         customer.setTenantId(tenantId);
-        Customer savedCustomer = doPost("/api/customer", customer, Customer.class);
+        savedCustomer = doPost("/api/customer", customer, Customer.class);
 
         User customerUser = new User();
         customerUser.setAuthority(Authority.CUSTOMER_USER);
@@ -228,6 +242,18 @@ public abstract class AbstractControllerTest {
         log.info("Executed teardown");
     }
 
+    private void stubForFetchUsers() throws JsonProcessingException {
+        ObjectMapper mapper = new ObjectMapper();
+        TextPageData<User> users = new TextPageData<>(Collections.emptyList(), new TextPageLink(100));
+        stubFor(
+                get(urlPathMatching("/uaa/users/list"))
+                        .willReturn(aResponse()
+                                .withStatus(200)
+                                .withHeader("Content-Type", "application/json")
+                                .withBody(mapper.writeValueAsString(users)))
+        );
+    }
+
     protected void loginSysAdmin() throws Exception {
         login(SYS_ADMIN_EMAIL, SYS_ADMIN_PASSWORD);
     }
@@ -242,6 +268,8 @@ public abstract class AbstractControllerTest {
 
     protected User createUserAndLogin(User user, String password) throws Exception {
         User savedUser = doPost("/api/user?activationType=mail", user, User.class);
+        savedUser.setTenantId(user.getTenantId());
+        savedUser.setCustomerId(user.getCustomerId());
         logout();
         doGet("/api/noauth/activate?activateToken={activateToken}", TestMailService.currentActivateToken)
                 .andExpect(status().isSeeOther())
@@ -301,9 +329,9 @@ public abstract class AbstractControllerTest {
 
     protected void refreshToken() throws Exception {
         this.token = null;
-        /*JsonNode tokenInfo = readResponse(doPost("/api/auth/token", new RefreshTokenRequest(this.refreshToken)).andExpect(status().isOk()), JsonNode.class);*/
+        JsonNode tokenInfo = readResponse(doPost("/api/auth/token", new RefreshTokenRequest(this.refreshToken)).andExpect(status().isOk()), JsonNode.class);
 
-        validateAndSetJwtToken(null, this.username);
+        validateAndSetJwtToken(tokenInfo, this.username);
     }
 
     protected void validateAndSetJwtToken(JsonNode tokenInfo, String username) {
@@ -327,7 +355,7 @@ public abstract class AbstractControllerTest {
         String withoutSignature = token.substring(0, i + 1);
         Jwt<Header, Claims> jwsClaims = Jwts.parser().parseClaimsJwt(withoutSignature);
         Claims claims = jwsClaims.getBody();
-        String subject = claims.getSubject();
+        String subject = claims.get("user_name", String.class);
         Assert.assertEquals(username, subject);
     }
 
@@ -339,7 +367,7 @@ public abstract class AbstractControllerTest {
 
     protected void setJwtToken(MockHttpServletRequestBuilder request) {
         if (this.token != null) {
-            //request.header(TempusSecurityConfiguration.JWT_TOKEN_HEADER_PARAM, "Bearer " + this.token);
+            request.header("Authorization", "Bearer " + this.token);
         }
     }
 

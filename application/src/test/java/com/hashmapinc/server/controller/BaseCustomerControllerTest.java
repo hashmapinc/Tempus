@@ -15,25 +15,20 @@
  */
 package com.hashmapinc.server.controller;
 
-import static org.hamcrest.Matchers.containsString;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.hashmapinc.server.common.data.Customer;
+import com.hashmapinc.server.common.data.page.TextPageData;
+import com.hashmapinc.server.common.data.page.TextPageLink;
+import org.apache.commons.lang3.RandomStringUtils;
+import org.junit.Assert;
+import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import com.hashmapinc.server.common.data.Customer;
-import com.hashmapinc.server.common.data.User;
-import com.hashmapinc.server.common.data.id.TenantId;
-import com.hashmapinc.server.common.data.page.TextPageData;
-import com.hashmapinc.server.common.data.page.TextPageLink;
-import com.hashmapinc.server.common.data.security.Authority;
-import org.apache.commons.lang3.RandomStringUtils;
-import com.hashmapinc.server.common.data.Tenant;
-import org.junit.Assert;
-import org.junit.Test;
-
-import com.fasterxml.jackson.core.type.TypeReference;
+import static org.hamcrest.Matchers.containsString;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 public abstract class BaseCustomerControllerTest extends AbstractControllerTest {
 
@@ -41,21 +36,7 @@ public abstract class BaseCustomerControllerTest extends AbstractControllerTest 
     
     @Test
     public void testSaveCustomer() throws Exception {
-        loginSysAdmin();
-
-        Tenant tenant = new Tenant();
-        tenant.setTitle("My tenant");
-        Tenant savedTenant = doPost("/api/tenant", tenant, Tenant.class);
-        Assert.assertNotNull(savedTenant);
-        
-        User tenantAdmin = new User();
-        tenantAdmin.setAuthority(Authority.TENANT_ADMIN);
-        tenantAdmin.setTenantId(savedTenant.getId());
-        tenantAdmin.setEmail("tenant2@tempus.org");
-        tenantAdmin.setFirstName("Joe");
-        tenantAdmin.setLastName("Downs");
-        
-        tenantAdmin = createUserAndLogin(tenantAdmin, "testPassword1");
+        loginTenantAdmin();
         
         Customer customer = new Customer();
         customer.setTitle("My customer");
@@ -66,37 +47,19 @@ public abstract class BaseCustomerControllerTest extends AbstractControllerTest 
         Assert.assertEquals(customer.getTitle(), savedCustomer.getTitle());
         savedCustomer.setTitle("My new customer");
         doPost("/api/customer", savedCustomer, Customer.class);
-        
-        Customer foundCustomer = doGet("/api/customer/"+savedCustomer.getId().getId().toString(), Customer.class); 
+
+        Customer foundCustomer = doGet("/api/customer/"+savedCustomer.getId().getId().toString(), Customer.class);
         Assert.assertEquals(foundCustomer.getTitle(), savedCustomer.getTitle());
         
         doDelete("/api/customer/"+savedCustomer.getId().getId().toString())
         .andExpect(status().isOk());
-        
-        loginSysAdmin();
-        
-        doDelete("/api/tenant/"+savedTenant.getId().getId().toString())
-        .andExpect(status().isOk());
+
     }
     
     @Test
     public void testFindCustomerById() throws Exception {
         
-        loginSysAdmin();
-
-        Tenant tenant = new Tenant();
-        tenant.setTitle("My tenant");
-        Tenant savedTenant = doPost("/api/tenant", tenant, Tenant.class);
-        Assert.assertNotNull(savedTenant);
-        
-        User tenantAdmin = new User();
-        tenantAdmin.setAuthority(Authority.TENANT_ADMIN);
-        tenantAdmin.setTenantId(savedTenant.getId());
-        tenantAdmin.setEmail("tenant2@tempus.org");
-        tenantAdmin.setFirstName("Joe");
-        tenantAdmin.setLastName("Downs");
-        
-        tenantAdmin = createUserAndLogin(tenantAdmin, "testPassword1");
+        loginTenantAdmin();
         
         Customer customer = new Customer();
         customer.setTitle("My customer");
@@ -108,31 +71,12 @@ public abstract class BaseCustomerControllerTest extends AbstractControllerTest 
         
         doDelete("/api/customer/"+savedCustomer.getId().getId().toString())
         .andExpect(status().isOk());
-        
-        loginSysAdmin();
-        
-        doDelete("/api/tenant/"+savedTenant.getId().getId().toString())
-        .andExpect(status().isOk());
     }
     
     @Test
     public void testDeleteCustomer() throws Exception {
         
-        loginSysAdmin();
-
-        Tenant tenant = new Tenant();
-        tenant.setTitle("My tenant");
-        Tenant savedTenant = doPost("/api/tenant", tenant, Tenant.class);
-        Assert.assertNotNull(savedTenant);
-        
-        User tenantAdmin = new User();
-        tenantAdmin.setAuthority(Authority.TENANT_ADMIN);
-        tenantAdmin.setTenantId(savedTenant.getId());
-        tenantAdmin.setEmail("tenant2@tempus.org");
-        tenantAdmin.setFirstName("Joe");
-        tenantAdmin.setLastName("Downs");
-        
-        tenantAdmin = createUserAndLogin(tenantAdmin, "testPassword1");
+        loginTenantAdmin();
         
         Customer customer = new Customer();
         customer.setTitle("My customer");
@@ -143,61 +87,23 @@ public abstract class BaseCustomerControllerTest extends AbstractControllerTest 
 
         doGet("/api/customer/"+savedCustomer.getId().getId().toString())
         .andExpect(status().isNotFound());
-        
-        loginSysAdmin();
-        
-        doDelete("/api/tenant/"+savedTenant.getId().getId().toString())
-        .andExpect(status().isOk());
     }
     
     @Test
     public void testSaveCustomerWithEmptyTitle() throws Exception {
         
-        loginSysAdmin();
-
-        Tenant tenant = new Tenant();
-        tenant.setTitle("My tenant");
-        Tenant savedTenant = doPost("/api/tenant", tenant, Tenant.class);
-        Assert.assertNotNull(savedTenant);
-        
-        User tenantAdmin = new User();
-        tenantAdmin.setAuthority(Authority.TENANT_ADMIN);
-        tenantAdmin.setTenantId(savedTenant.getId());
-        tenantAdmin.setEmail("tenant2@tempus.org");
-        tenantAdmin.setFirstName("Joe");
-        tenantAdmin.setLastName("Downs");
-        
-        tenantAdmin = createUserAndLogin(tenantAdmin, "testPassword1");
+        loginTenantAdmin();
         
         Customer customer = new Customer();
         doPost("/api/customer", customer)
         .andExpect(status().isBadRequest())
         .andExpect(statusReason(containsString("Customer title should be specified")));
-        
-        loginSysAdmin();
-        
-        doDelete("/api/tenant/"+savedTenant.getId().getId().toString())
-        .andExpect(status().isOk());
     }
     
     @Test
     public void testSaveCustomerWithInvalidEmail() throws Exception {
         
-        loginSysAdmin();
-
-        Tenant tenant = new Tenant();
-        tenant.setTitle("My tenant");
-        Tenant savedTenant = doPost("/api/tenant", tenant, Tenant.class);
-        Assert.assertNotNull(savedTenant);
-        
-        User tenantAdmin = new User();
-        tenantAdmin.setAuthority(Authority.TENANT_ADMIN);
-        tenantAdmin.setTenantId(savedTenant.getId());
-        tenantAdmin.setEmail("tenant2@tempus.org");
-        tenantAdmin.setFirstName("Joe");
-        tenantAdmin.setLastName("Downs");
-        
-        tenantAdmin = createUserAndLogin(tenantAdmin, "testPassword1");
+        loginTenantAdmin();
         
         Customer customer = new Customer();
         customer.setTitle("My customer");
@@ -205,32 +111,14 @@ public abstract class BaseCustomerControllerTest extends AbstractControllerTest 
         doPost("/api/customer", customer)
         .andExpect(status().isBadRequest())
         .andExpect(statusReason(containsString("Invalid email address format 'invalid@mail'")));
-        
-        loginSysAdmin();
-        
-        doDelete("/api/tenant/"+savedTenant.getId().getId().toString())
-        .andExpect(status().isOk());
     }
     
     @Test
     public void testFindCustomers() throws Exception {
-        loginSysAdmin();
+        loginTenantAdmin();
 
-        Tenant tenant = new Tenant();
-        tenant.setTitle("My tenant");
-        Tenant savedTenant = doPost("/api/tenant", tenant, Tenant.class);
-        Assert.assertNotNull(savedTenant);
-        
-        TenantId tenantId = savedTenant.getId();
-        
-        User tenantAdmin = new User();
-        tenantAdmin.setAuthority(Authority.TENANT_ADMIN);
-        tenantAdmin.setTenantId(tenantId);
-        tenantAdmin.setEmail("tenant2@tempus.org");
-        tenantAdmin.setFirstName("Joe");
-        tenantAdmin.setLastName("Downs");
-        
-        tenantAdmin = createUserAndLogin(tenantAdmin, "testPassword1");
+        doDelete("/api/customer/"+savedCustomer.getId().getId().toString())
+                .andExpect(status().isOk());
         
         List<Customer> customers = new ArrayList<>();
         for (int i=0;i<135;i++) {
@@ -255,33 +143,17 @@ public abstract class BaseCustomerControllerTest extends AbstractControllerTest 
         Collections.sort(loadedCustomers, idComparator);
         
         Assert.assertEquals(customers, loadedCustomers);
-        
-        loginSysAdmin();
-        
-        doDelete("/api/tenant/"+savedTenant.getId().getId().toString())
-        .andExpect(status().isOk());
+
+        for (Customer customer : loadedCustomers) {
+            doDelete("/api/customer/"+customer.getId().getId().toString())
+                    .andExpect(status().isOk());
+        }
     }
     
     @Test
     public void testFindCustomersByTitle() throws Exception {
         
-        loginSysAdmin();
-        
-        Tenant tenant = new Tenant();
-        tenant.setTitle("My tenant");
-        Tenant savedTenant = doPost("/api/tenant", tenant, Tenant.class);
-        Assert.assertNotNull(savedTenant);
-        
-        TenantId tenantId = savedTenant.getId();
-        
-        User tenantAdmin = new User();
-        tenantAdmin.setAuthority(Authority.TENANT_ADMIN);
-        tenantAdmin.setTenantId(tenantId);
-        tenantAdmin.setEmail("tenant2@tempus.org");
-        tenantAdmin.setFirstName("Joe");
-        tenantAdmin.setLastName("Downs");
-        
-        tenantAdmin = createUserAndLogin(tenantAdmin, "testPassword1");
+        loginTenantAdmin();
         
         String title1 = "Customer title 1";
         List<Customer> customersTitle1 = new ArrayList<>();
@@ -356,11 +228,6 @@ public abstract class BaseCustomerControllerTest extends AbstractControllerTest 
         pageData = doGetTypedWithPageLink("/api/customers?", new TypeReference<TextPageData<Customer>>(){}, pageLink);
         Assert.assertFalse(pageData.hasNext());
         Assert.assertEquals(0, pageData.getData().size());
-        
-        loginSysAdmin();
-        
-        doDelete("/api/tenant/"+savedTenant.getId().getId().toString())
-        .andExpect(status().isOk());
     }
     
 }

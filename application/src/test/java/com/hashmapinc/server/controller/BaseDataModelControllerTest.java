@@ -18,57 +18,42 @@ package com.hashmapinc.server.controller;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.hashmapinc.server.common.data.datamodel.AttributeDefinition;
 import com.hashmapinc.server.common.data.datamodel.DataModel;
-import com.hashmapinc.server.common.data.Tenant;
-import com.hashmapinc.server.common.data.User;
 import com.hashmapinc.server.common.data.datamodel.DataModelObject;
-import com.hashmapinc.server.common.data.security.Authority;
+import com.hashmapinc.server.dao.sql.datamodel.DataModelObjectRespository;
+import com.hashmapinc.server.dao.sql.datamodel.DataModelRepository;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
 public class BaseDataModelControllerTest extends AbstractControllerTest {
 
-    private Tenant savedTenant;
-    private User tenantAdmin;
     private DataModel defaultDataModel;
     private DataModelObject defaultDataModelObj;
 
+    @Autowired
+    private DataModelRepository dataModelRepository;
+
+    @Autowired
+    private DataModelObjectRespository dataModelObjectRespository;
+
     @Before
     public void beforeTest() throws Exception {
-        loginSysAdmin();
-
-        Tenant tenant = new Tenant();
-        tenant.setTitle("My tenant");
-        savedTenant = doPost("/api/tenant", tenant, Tenant.class);
-        Assert.assertNotNull(savedTenant);
-
-        tenantAdmin = new User();
-        tenantAdmin.setAuthority(Authority.TENANT_ADMIN);
-        tenantAdmin.setTenantId(savedTenant.getId());
-        tenantAdmin.setEmail("tenant2@tempus.org");
-        tenantAdmin.setFirstName("Joe");
-        tenantAdmin.setLastName("Downs");
-
-        tenantAdmin = createUserAndLogin(tenantAdmin, "testPassword1");
+        loginTenantAdmin();
 
         createDataModel();
         createDataModelObject();
     }
 
     @After
-    public void afterTest() throws Exception {
-        loginSysAdmin();
-
-        doDelete("/api/tenant/"+savedTenant.getId().getId().toString())
-                .andExpect(status().isOk());
+    public void afterTest(){
+        dataModelObjectRespository.deleteAll();
+        dataModelRepository.deleteAll();
     }
-
 
     @Test
     public void testSaveDataModel() throws Exception {
