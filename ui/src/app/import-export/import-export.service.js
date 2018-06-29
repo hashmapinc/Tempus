@@ -885,7 +885,6 @@ export default function ImportExport($log, $translate, $q, $mdDialog, $document,
          var jsonObject = angular.toJson(data);
 
          var csv = convertToCSV(jsonObject);
-
         var blob = new Blob([csv], {type: 'text/csv'});
 
         // FOR IE:
@@ -916,7 +915,17 @@ export default function ImportExport($log, $translate, $q, $mdDialog, $document,
             for (var index in array[i]) {
                 if (line != '') line += ','
 
-                line += array[i][index];
+                //var value = array[i][index];
+               // if(value.toString().indexOf("{") == 0) {
+
+                   var value = array[i][index] + "";
+                   line += '"' + value.replace(/"/g, '""') + '",';
+
+               /// } else {
+
+                   //  line += value;
+               // }
+
             }
 
             str += line + '\r\n';

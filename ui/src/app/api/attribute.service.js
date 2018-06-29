@@ -18,7 +18,7 @@ export default angular.module('tempus.api.attribute', [])
     .name;
 
 /*@ngInject*/
-function AttributeService($http, $q, $filter, types, telemetryWebsocketService) {
+function AttributeService($http, $q, $filter, types, telemetryWebsocketService, $log) {
 
     var entityAttributesSubscriptionMap = {};
 
@@ -30,10 +30,29 @@ function AttributeService($http, $q, $filter, types, telemetryWebsocketService) 
         subscribeForEntityAttributes: subscribeForEntityAttributes,
         unsubscribeForEntityAttributes: unsubscribeForEntityAttributes,
         saveEntityAttributes: saveEntityAttributes,
-        deleteEntityAttributes: deleteEntityAttributes
+        deleteEntityAttributes: deleteEntityAttributes,
+        downloadTelementryData:downloadTelementryData
     }
 
     return service;
+
+    function downloadTelementryData(entityType, entityId, attributeScope,startDate,endDate) {
+
+       $log.log(entityId);
+       var deferred = $q.defer();
+       var url = '/api/device/telementry';
+       url += '?deviceId=' + entityId;
+       url += '&startValue=' + startDate;
+       url += '&endValue=' + endDate;
+
+       $http.get(url, null).then(function success(response) {
+            deferred.resolve(response.data);
+       }, function fail(response) {
+            deferred.reject(response.data);
+       });
+        return deferred.promise;
+
+    }
 
     function getEntityKeys(entityType, entityId, query, type, config) {
         var deferred = $q.defer();
@@ -110,6 +129,7 @@ function AttributeService($http, $q, $filter, types, telemetryWebsocketService) 
         }
         var startIndex = query.limit * (query.page - 1);
         responseData.data = attributes.slice(startIndex, startIndex + query.limit);
+        responseData.fullData = attributes;
         successCallback(responseData, update, apply);
         if (deferred) {
             deferred.resolve();

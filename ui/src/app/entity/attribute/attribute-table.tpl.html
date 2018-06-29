@@ -24,17 +24,18 @@
                     {{scope.name | translate}}
                 </md-option>
             </md-select>
-            <md-button style="margin-left: 120%;margin-top: -50px;"ng-disabled="$root.loading" ng-click="download($event)"
-                       class="md-raised md-primary">Download
-            </md-button>
 
         </md-input-container>
 
     </section>
+
+
     <div class="md-whiteframe-z1" ng-class="{flex: mode==='widget'}">
+
         <md-toolbar class="md-table-toolbar md-default" ng-show="mode==='default'
                                                                  && !selectedAttributes.length
                                                                  && query.search === null">
+
             <div class="md-toolbar-tools">
                 <span translate>{{ attributeScope.name }}</span>
                 <span flex></span>
@@ -58,6 +59,8 @@
                 </md-button>
             </div>
         </md-toolbar>
+
+
         <md-toolbar class="md-table-toolbar md-default" ng-show="mode==='default'
                                                                  && !selectedAttributes.length
                                                                  && query.search != null">
@@ -80,6 +83,7 @@
                 </md-button>
             </div>
         </md-toolbar>
+
         <md-toolbar class="md-table-toolbar alternate" ng-show="mode==='default' && selectedAttributes.length">
             <div class="md-toolbar-tools">
                 <span translate="{{attributeScope === types.latestTelemetry
@@ -111,6 +115,7 @@
                 </md-button>
             </div>
         </md-toolbar>
+
         <md-toolbar class="md-table-toolbar alternate" ng-show="mode==='widget'">
             <div class="md-toolbar-tools">
                 <div flex layout="row" layout-align="start">
@@ -137,6 +142,11 @@
                 </md-button>
             </div>
         </md-toolbar>
+        <md-button style="margin-left: 530px;margin-top: 3px;"ng-disabled="$root.loading" ng-click="download($event,{attributeScope})"
+                   class="md-raised md-primary">Download
+        </md-button>
+
+
         <md-table-container ng-show="mode!='widget'">
             <table class="tb-attribute-table" md-table md-row-select multiple="" ng-model="selectedAttributes" md-progress="attributesDeferred.promise">
                 <thead md-head md-order="query.order" md-on-reorder="onReorder">

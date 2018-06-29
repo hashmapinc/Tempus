@@ -20,6 +20,8 @@ import './attribute-table.scss';
 
 import attributeTableTemplate from './attribute-table.tpl.html';
 import addAttributeDialogTemplate from './add-attribute-dialog.tpl.html';
+import telementryDialogTemplate from './telementry-download-dialog.tpl.html';
+import depthDialogTemplate from './depth-download.tpl.html';
 import addWidgetToDashboardDialogTemplate from './add-widget-to-dashboard-dialog.tpl.html';
 import editAttributeValueTemplate from './edit-attribute-value.tpl.html';
 
@@ -31,7 +33,7 @@ import AliasController from '../../api/alias-controller';
 /*@ngInject*/
 export default function AttributeTableDirective($compile, $templateCache, $rootScope, $q, $mdEditDialog, $mdDialog,
                                                 $mdUtil, $document, $translate, $filter, utils, types, dashboardUtils,
-                                                dashboardService, entityService, attributeService, importExport, widgetService, $log, $mdToast) {
+                                                dashboardService, entityService, attributeService, importExport, widgetService, $mdToast) {
 
     var linker = function (scope, element, attrs) {
 
@@ -146,28 +148,64 @@ export default function AttributeTableDirective($compile, $templateCache, $rootS
             scope.getEntityAttributes(false, false);
         }
 
-        scope.download = function($event) {
+        scope.download = function($event,type) {
 
             var headers = {
                 lastUpdateTs: 'Last Updated Date', // remove commas to avoid errors
                 key: "Key",
                 value: "Value"
             };
-
-            var itemsFormatted = [];
-
-            scope.attributes.data.forEach((item) => {
-                itemsFormatted.push({
-                    lastUpdateTs: $filter('date')(item.lastUpdateTs, "yyyy-MM-dd HH:mm:ss"),
-                    key: item.key,
-                    value: item.value
-                    });
-            });
-
-            $log.log(itemsFormatted);
             $event.stopPropagation();
-            importExport.exportAttribute(itemsFormatted, headers ,'');
+
+            if(type.attributeScope.value == "CLIENT_SCOPE" || type.attributeScope.value == "SERVER_SCOPE" || type.attributeScope.value == "SHARED_SCOPE") {
+                scope.downloadAttribute(headers);
+            } else if(type.attributeScope.value == "LATEST_TELEMETRY") {
+                scope.downloadTelementry(headers, $event);
+            } else if(type.attributeScope.value == "LATEST_DEPTH_SERIES") {
+                scope.downloadDepthSeries(headers, $event);
+            }
         }
+
+        scope.downloadAttribute = function(headers) {
+             var itemsFormatted = [];
+
+             scope.attributes.fullData.forEach((item) => {
+                 itemsFormatted.push({
+                     lastUpdateTs: $filter('date')(item.lastUpdateTs, "yyyy-MM-dd HH:mm:ss"),
+                     key: item.key,
+                     value: item.value
+                     });
+             });
+
+             importExport.exportAttribute(itemsFormatted, headers ,'attribute.csv');
+        }
+
+        scope.downloadTelementry = function(headers, $event) {
+
+                 $mdDialog.show({
+                     controller: 'AddAttributeDialogController',
+                     controllerAs: 'vm',
+                     templateUrl: telementryDialogTemplate,
+                     parent: angular.element($document[0].body),
+                     locals: {telementryData:scope.attributes.fullData, depthData:'', entityType: scope.entityType, entityId: scope.entityId, attributeScope: scope.attributeScope.value},
+                     fullscreen: true,
+                     targetEvent: $event
+                 });
+        }
+
+        scope.downloadDepthSeries = function(headers, $event) {
+
+                 $mdDialog.show({
+                     controller: 'AddAttributeDialogController',
+                     controllerAs: 'vm',
+                     templateUrl: depthDialogTemplate,
+                     parent: angular.element($document[0].body),
+                     locals: {telementryData:'', depthData:scope.attributes.fullData,entityType: scope.entityType, entityId: scope.entityId, attributeScope: scope.attributeScope.value},
+                     fullscreen: true,
+                     targetEvent: $event
+                 });
+         }
+
 
         scope.getEntityAttributes = function(forceUpdate, reset) {
             if (scope.attributesDeferred) {
