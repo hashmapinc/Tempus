@@ -15,15 +15,18 @@
  */
 package com.hashmapinc.server.mqtt;
 
+import com.github.tomakehurst.wiremock.junit.WireMockClassRule;
 import com.hashmapinc.server.dao.CustomCassandraCQLUnit;
 import org.cassandraunit.dataset.CQLDataSet;
 import org.cassandraunit.dataset.cql.ClassPathCQLDataSet;
 import org.junit.ClassRule;
 import org.junit.extensions.cpsuite.ClasspathSuite;
+import org.junit.rules.RuleChain;
+import org.junit.rules.TestRule;
 import org.junit.runner.RunWith;
+import org.springframework.cloud.contract.wiremock.WireMockSpring;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 @RunWith(ClasspathSuite.class)
@@ -31,8 +34,10 @@ import java.util.List;
         "com.hashmapinc.server.mqtt.*.nosql.*Test"})
 public class MqttNoSqlTestSuite {
 
-    @ClassRule
-    public static CustomCassandraCQLUnit cassandraUnit =
+    private static WireMockClassRule wiremock = new WireMockClassRule(
+            WireMockSpring.options().port(8888));
+
+    private static CustomCassandraCQLUnit cassandraUnit =
             new CustomCassandraCQLUnit(
                     getDataSetLists(),
                     "cassandra-test.yaml", 30000l);
@@ -45,4 +50,8 @@ public class MqttNoSqlTestSuite {
         dataSets.add(new ClassPathCQLDataSet("cassandra/upgrade/3.cql", false, false));
         return dataSets;
     }
+
+    @ClassRule
+    public static TestRule ruleChain = RuleChain.outerRule(wiremock)
+            .around(cassandraUnit);
 }
