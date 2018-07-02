@@ -27,6 +27,7 @@ import com.hashmapinc.server.service.security.auth.permissions.PermissionChecker
 import com.hashmapinc.server.service.security.model.SecurityUser;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.access.PermissionEvaluator;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
@@ -42,9 +43,11 @@ public class AttributeBasedPermissionEvaluator implements PermissionEvaluator{
     private PermissionChecker permissionChecker;
 
     @Autowired
+    @Lazy
     private DeviceService deviceService;
 
     @Autowired
+    @Lazy
     private AssetService assetService;
 
     @Override
