@@ -26,7 +26,7 @@ export default function CustomerDirective($compile, $templateCache, $translate, 
         element.html(template);
 
         scope.isPublic = false;
-                       datamodelService.listDataModel().then(
+                       datamodelService.listDatamodels().then(
                             function success(dataModels) {
                                 var dataModelList = [];
                                 for (var i = 0; i < dataModels.length; i++ ){
@@ -52,7 +52,7 @@ export default function CustomerDirective($compile, $templateCache, $translate, 
             if (newVal) {
 
                     if(!scope.isEdit) {
-                        datamodelService.listDataModel().then(
+                        datamodelService.listDatamodels().then(
                             function success(dataModels) {
                                 var dataModelList = [];
                                 for (var i = 0; i < dataModels.length; i++ ){
