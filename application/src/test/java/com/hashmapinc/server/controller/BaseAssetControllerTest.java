@@ -105,10 +105,9 @@ public abstract class BaseAssetControllerTest extends AbstractControllerTest {
                 new TypeReference<List<EntitySubtype>>(){});
 
         Assert.assertNotNull(assetTypes);
-        Assert.assertEquals(3, assetTypes.size());
-        Assert.assertEquals("typeA", assetTypes.get(0).getType());
-        Assert.assertEquals("typeB", assetTypes.get(1).getType());
-        Assert.assertEquals("typeC", assetTypes.get(2).getType());
+        Assert.assertTrue(assetTypes.stream().filter(a -> a.getType().equalsIgnoreCase("typeA")).count() == 1);
+        Assert.assertTrue(assetTypes.stream().filter(a -> a.getType().equalsIgnoreCase("typeB")).count() == 1);
+        Assert.assertTrue(assetTypes.stream().filter(a -> a.getType().equalsIgnoreCase("typeC")).count() == 1);
     }
 
     @Test

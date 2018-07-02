@@ -17,7 +17,18 @@ package com.hashmapinc.server.controller.sql;
 
 import com.hashmapinc.server.controller.BaseAuditLogControllerTest;
 import com.hashmapinc.server.dao.service.DaoSqlTest;
+import com.hashmapinc.server.dao.sql.audit.AuditLogRepository;
+import org.junit.After;
+import org.springframework.beans.factory.annotation.Autowired;
 
 @DaoSqlTest
 public class AuditLogControllerSqlTest extends BaseAuditLogControllerTest {
+
+    @Autowired
+    private AuditLogRepository repository;
+
+    @After
+    public void afterTest(){
+        repository.deleteAll();
+    }
 }

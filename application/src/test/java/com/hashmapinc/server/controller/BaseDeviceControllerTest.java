@@ -149,10 +149,9 @@ public abstract class BaseDeviceControllerTest extends AbstractControllerTest {
                 new TypeReference<List<EntitySubtype>>(){});
 
         Assert.assertNotNull(deviceTypes);
-        Assert.assertEquals(3, deviceTypes.size());
-        Assert.assertEquals("typeA", deviceTypes.get(0).getType());
-        Assert.assertEquals("typeB", deviceTypes.get(1).getType());
-        Assert.assertEquals("typeC", deviceTypes.get(2).getType());
+        Assert.assertTrue(deviceTypes.stream().filter(a -> a.getType().equalsIgnoreCase("typeA")).count() == 1);
+        Assert.assertTrue(deviceTypes.stream().filter(a -> a.getType().equalsIgnoreCase("typeB")).count() == 1);
+        Assert.assertTrue(deviceTypes.stream().filter(a -> a.getType().equalsIgnoreCase("typeC")).count() == 1);
     }
     
     @Test

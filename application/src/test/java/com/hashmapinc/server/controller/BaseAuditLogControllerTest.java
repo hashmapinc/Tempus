@@ -21,29 +21,18 @@ import com.hashmapinc.server.common.data.audit.AuditLog;
 import com.hashmapinc.server.common.data.page.TimePageData;
 import com.hashmapinc.server.common.data.page.TimePageLink;
 import com.hashmapinc.server.dao.model.ModelConstants;
-import com.hashmapinc.server.dao.sql.audit.AuditLogRepository;
-import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public abstract class BaseAuditLogControllerTest extends AbstractControllerTest {
 
-    @Autowired
-    private AuditLogRepository repository;
-
     @Before
     public void beforeTest() throws Exception {
         loginTenantAdmin();
-    }
-
-    @After
-    public void afterTest(){
-        repository.deleteAll();
     }
 
     @Test

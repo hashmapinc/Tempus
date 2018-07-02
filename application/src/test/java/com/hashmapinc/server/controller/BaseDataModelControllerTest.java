@@ -19,13 +19,9 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.hashmapinc.server.common.data.datamodel.AttributeDefinition;
 import com.hashmapinc.server.common.data.datamodel.DataModel;
 import com.hashmapinc.server.common.data.datamodel.DataModelObject;
-import com.hashmapinc.server.dao.sql.datamodel.DataModelObjectRespository;
-import com.hashmapinc.server.dao.sql.datamodel.DataModelRepository;
-import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,11 +31,6 @@ public class BaseDataModelControllerTest extends AbstractControllerTest {
     private DataModel defaultDataModel;
     private DataModelObject defaultDataModelObj;
 
-    @Autowired
-    private DataModelRepository dataModelRepository;
-
-    @Autowired
-    private DataModelObjectRespository dataModelObjectRespository;
 
     @Before
     public void beforeTest() throws Exception {
@@ -47,12 +38,6 @@ public class BaseDataModelControllerTest extends AbstractControllerTest {
 
         createDataModel();
         createDataModelObject();
-    }
-
-    @After
-    public void afterTest(){
-        dataModelObjectRespository.deleteAll();
-        dataModelRepository.deleteAll();
     }
 
     @Test

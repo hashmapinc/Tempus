@@ -32,7 +32,7 @@ import java.util.Arrays;
 public class MqttSqlTestSuite {
 
     private static WireMockClassRule wiremock = new WireMockClassRule(
-            WireMockSpring.options().port(8888));
+            WireMockSpring.options().port(9002));
 
     private static CustomSqlUnit sqlUnit = new CustomSqlUnit(
             Arrays.asList("sql/hsql/schema.sql", "sql/system-data.sql"),

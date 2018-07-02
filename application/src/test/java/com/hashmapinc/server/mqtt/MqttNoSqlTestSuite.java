@@ -35,7 +35,7 @@ import java.util.List;
 public class MqttNoSqlTestSuite {
 
     private static WireMockClassRule wiremock = new WireMockClassRule(
-            WireMockSpring.options().port(8888));
+            WireMockSpring.options().port(9002));
 
     private static CustomCassandraCQLUnit cassandraUnit =
             new CustomCassandraCQLUnit(

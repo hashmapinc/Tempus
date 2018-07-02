@@ -15,9 +15,11 @@
  */
 package com.hashmapinc.server.controller.nosql;
 
-import com.hashmapinc.server.dao.service.DaoNoSqlTest;
 import com.hashmapinc.server.controller.BaseAuditLogControllerTest;
+import com.hashmapinc.server.dao.service.DaoNoSqlTest;
+import org.junit.Ignore;
 
 @DaoNoSqlTest
+@Ignore
 public class AuditLogControllerNoSqlTest extends BaseAuditLogControllerTest {
 }
