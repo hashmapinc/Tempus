@@ -142,6 +142,7 @@ public abstract class AbstractControllerTest {
     protected User tenantAdmin;
 
     protected Customer savedCustomer;
+    protected User customerUser;
 
     @SuppressWarnings("rawtypes")
     private HttpMessageConverter mappingJackson2HttpMessageConverter;
@@ -209,20 +210,20 @@ public abstract class AbstractControllerTest {
         tenantAdmin.setTenantId(tenantId);
         tenantAdmin.setEmail(TENANT_ADMIN_EMAIL);
 
-        createUserAndLogin(tenantAdmin, TENANT_ADMIN_PASSWORD);
+        tenantAdmin = createUserAndLogin(tenantAdmin, TENANT_ADMIN_PASSWORD);
 
         Customer customer = new Customer(new CustomerId(UUID.fromString("0bd432e0-7ab7-11e8-8db9-cfa34d6288bd")));
         customer.setTitle("Customer");
         customer.setTenantId(tenantId);
         savedCustomer = doPost("/api/customer", customer, Customer.class);
 
-        User customerUser = new User();
+        customerUser = new User();
         customerUser.setAuthority(Authority.CUSTOMER_USER);
         customerUser.setTenantId(tenantId);
         customerUser.setCustomerId(savedCustomer.getId());
         customerUser.setEmail(CUSTOMER_USER_EMAIL);
 
-        createUserAndLogin(customerUser, CUSTOMER_USER_PASSWORD);
+        customerUser = createUserAndLogin(customerUser, CUSTOMER_USER_PASSWORD);
 
         logout();
         log.info("Executed setup");

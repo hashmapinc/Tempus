@@ -17,33 +17,38 @@ package com.hashmapinc.server.controller;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.hashmapinc.server.common.data.Device;
-import com.hashmapinc.server.common.data.User;
+import com.hashmapinc.server.common.data.audit.AuditLog;
+import com.hashmapinc.server.common.data.page.TimePageData;
+import com.hashmapinc.server.common.data.page.TimePageLink;
+import com.hashmapinc.server.dao.model.ModelConstants;
+import com.hashmapinc.server.dao.sql.audit.AuditLogRepository;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import com.hashmapinc.server.common.data.Tenant;
-import com.hashmapinc.server.common.data.audit.AuditLog;
-import com.hashmapinc.server.common.data.page.TimePageData;
-import com.hashmapinc.server.common.data.page.TimePageLink;
-import com.hashmapinc.server.common.data.security.Authority;
-import com.hashmapinc.server.dao.model.ModelConstants;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
 public abstract class BaseAuditLogControllerTest extends AbstractControllerTest {
+
+    @Autowired
+    private AuditLogRepository repository;
 
     @Before
     public void beforeTest() throws Exception {
         loginTenantAdmin();
     }
 
+    @After
+    public void afterTest(){
+        repository.deleteAll();
+    }
+
     @Test
     public void testAuditLogs() throws Exception {
-        for (int i = 0; i < 178; i++) {
+        for (int i = 0; i < 78; i++) {
             Device device = new Device();
             device.setName("Device" + i);
             device.setType("default");
@@ -63,7 +68,7 @@ public abstract class BaseAuditLogControllerTest extends AbstractControllerTest 
             }
         } while (pageData.hasNext());
 
-        Assert.assertEquals(178, loadedAuditLogs.size());
+        Assert.assertEquals(80, loadedAuditLogs.size());
 
         loadedAuditLogs = new ArrayList<>();
         pageLink = new TimePageLink(23);
@@ -77,7 +82,7 @@ public abstract class BaseAuditLogControllerTest extends AbstractControllerTest 
             }
         } while (pageData.hasNext());
 
-        Assert.assertEquals(178, loadedAuditLogs.size());
+        Assert.assertEquals(78, loadedAuditLogs.size());
 
         loadedAuditLogs = new ArrayList<>();
         pageLink = new TimePageLink(23);
@@ -91,7 +96,7 @@ public abstract class BaseAuditLogControllerTest extends AbstractControllerTest 
             }
         } while (pageData.hasNext());
 
-        Assert.assertEquals(178, loadedAuditLogs.size());
+        Assert.assertEquals(80, loadedAuditLogs.size());
     }
 
     @Test

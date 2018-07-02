@@ -4,7 +4,7 @@
     "method": "POST",
     "bodyPatterns" : [
       {
-        "equalTo": "token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0ZW5hbnRfaWQiOm51bGwsImxhc3ROYW1lIjoiQWRtaW4iLCJ1c2VyX25hbWUiOiJzeXNhZG1pbkBoYXNobWFwaW5jLmNvbSIsImRlc2NyaXB0aW9uIjoiVGhpcyBpcyBhIGRlbW8gc3lzdGVtIGFkbWluIHVzZWQgZm9yIHRlc3RpbmciLCJjbGllbnRfaWQiOiJ0ZW1wdXMiLCJlbmFibGVkIjp0cnVlLCJhdXRob3JpdGllcyI6WyJTWVNfQURNSU4iXSwiZmlyc3ROYW1lIjoiU3lzdGVtIiwic2NvcGUiOlsic2VydmVyIl0sImlkIjoiNDc4MzA0ZDAtNzVmYi0xMWU4LTlkMDItMGQ5YTE4M2IzNDBjIiwiY3VzdG9tZXJfaWQiOm51bGwsImV4cCI6MTUzOTI2MDQzOCwiaWF0IjoxNTMwMjYwNDM4LCJqdGkiOiI2ZmNjZjBiNS1lOGEyLTQ3YjMtOWU3NS1iMmFjYjQ2OTA4NTkifQ.JFjGWUX0gY6Mns7kdaaHgrrbGCIEyQ0BRMaEl-rVTlw"
+        "equalTo": "token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0ZW5hbnRfaWQiOiIxMzgxNDAwMC0xZGQyLTExYjItODA4MC04MDgwODA4MDgwODAiLCJsYXN0TmFtZSI6IkFkbWluIiwidXNlcl9uYW1lIjoic3lzYWRtaW5AaGFzaG1hcGluYy5jb20iLCJkZXNjcmlwdGlvbiI6IlRoaXMgaXMgYSBkZW1vIHN5c3RlbSBhZG1pbiB1c2VkIGZvciB0ZXN0aW5nIiwiY2xpZW50X2lkIjoidGVtcHVzIiwiZW5hYmxlZCI6dHJ1ZSwiYXV0aG9yaXRpZXMiOlsiU1lTX0FETUlOIl0sImZpcnN0TmFtZSI6IlN5c3RlbSIsInNjb3BlIjpbInNlcnZlciJdLCJpZCI6IjU5ZWFiODgwLTQ2MTItMTFlNy04MDgwLTgwODA4MDgwODA4MCIsImN1c3RvbWVyX2lkIjoiMTM4MTQwMDAtMWRkMi0xMWIyLTgwODAtODA4MDgwODA4MDgwIiwiZXhwIjoxNTM5Mjc0OTU4LCJpYXQiOjE1MzAyNzQ5NTgsImp0aSI6IjFmMTIwNDJmLTk1OTgtNDIxMy1hNDNmLTI5YjczM2ZmYjA2MSJ9.9xfkHEbttLl98o4aUTZgKB0IgtyjCPDRe4deVV_LGP0"
       }
     ]
   },
@@ -13,6 +13,6 @@
     "headers": {
       "Content-type": "application/json"
     },
-    "body": "{\"tenant_id\":\"13814000-1dd2-11b2-8080-808080808080\",\"lastName\":null,\"user_name\":\"sysadmin@hashmapinc.com\",\"active\":true,\"authorities\":[\"SYS_ADMIN\"],\"enabled\":true,\"client_id\":\"tempus\",\"firstName\":null,\"scope\":[\"server\"],\"id\":\"34158610-793a-11e8-b189-f9ccc87ece0e\",\"exp\":1539260438,\"customer_id\":\"13814000-1dd2-11b2-8080-808080808080\",\"iat\":1530167128,\"jti\":\"6fccf0b5-e8a2-47b3-9e75-b2acb4690859\"}"
+    "body": "{\"tenant_id\":\"13814000-1dd2-11b2-8080-808080808080\",\"lastName\":null,\"user_name\":\"sysadmin@hashmapinc.com\",\"active\":true,\"authorities\":[\"SYS_ADMIN\"],\"enabled\":true,\"client_id\":\"tempus\",\"firstName\":null,\"scope\":[\"server\"],\"id\":\"59eab880-4612-11e7-8080-808080808080\",\"exp\":1539260438,\"customer_id\":\"13814000-1dd2-11b2-8080-808080808080\",\"iat\":1530167128,\"jti\":\"6fccf0b5-e8a2-47b3-9e75-b2acb4690859\"}"
   }
 }
