@@ -79,6 +79,7 @@ import tempusApiComputation from './api/computation.service';
 import tempusApiComputationJob from './api/computation-job.service';
 import tempusTempusboard from './tempusboard';
 import tempusDataModels from './data_models';
+import tempusSchema from './schema';
 import tempusApplications from './applications';
 import tempusMetadata from './metadata';
 import tempusApiAuditLog from './api/audit-log.service';
@@ -153,6 +154,7 @@ angular.module('tempus', [
     tempusMetadata,
     tempusApplications,
     tempusApiAuditLog,
+    tempusSchema,
     uiRouter])
     .config(AppConfig)
     .factory('globalInterceptor', GlobalInterceptor)
