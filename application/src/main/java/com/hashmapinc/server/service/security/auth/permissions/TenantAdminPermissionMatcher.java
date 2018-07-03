@@ -24,12 +24,10 @@ import org.springframework.stereotype.Component;
 public class TenantAdminPermissionMatcher extends AbstractPermissionMatcher {
 
     @Override
-    public boolean hasAccessToResource(TempusResource resource, UserPermission permission, User user) {
-        return resource.getTenantId().equals(user.getTenantId());
-    }
-
-    @Override
-    public boolean hasPermissionToAct(String action, UserPermission permission) {
-        return true;
+    public boolean hasAccessToResource(TempusResource resource, String resourceType, UserPermission permission, User user) {
+        if(resource.getTenantId() == null) // While creating the resource, tenant_id is not available
+            return super.hasAccessToResource(resource, resourceType, permission, user);
+        else
+            return super.hasAccessToResource(resource, resourceType, permission, user) && resource.getTenantId().equals(user.getTenantId());
     }
 }

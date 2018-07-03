@@ -18,7 +18,6 @@ package com.hashmapinc.server.service.security.auth;
 import com.hashmapinc.server.common.data.EntityType;
 import com.hashmapinc.server.common.data.EnumUtil;
 import com.hashmapinc.server.common.data.TempusResource;
-import com.hashmapinc.server.common.data.UUIDConverter;
 import com.hashmapinc.server.common.data.id.AssetId;
 import com.hashmapinc.server.common.data.id.DeviceId;
 import com.hashmapinc.server.dao.asset.AssetService;
@@ -34,6 +33,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
 import java.io.Serializable;
+import java.util.UUID;
 
 @Slf4j
 @Component
@@ -54,29 +54,30 @@ public class AttributeBasedPermissionEvaluator implements PermissionEvaluator{
     public boolean hasPermission(Authentication authentication, Object targetDomainObject, Object action) {
         log.debug("hasPersmission({}, {}, {})", authentication, targetDomainObject, action);
 
-        if(targetDomainObject == null)
-            throw new RuntimeException("Cannot evaluate attribute based permissions for null targetDomainObject");
-
-        if(!(targetDomainObject instanceof TempusResource))
-            throw new RuntimeException("Cannot evaluate attribute based permissions for type " + targetDomainObject.getClass().toString());
-
-        if(StringUtils.isEmpty(action))
-            throw new RuntimeException("Action cannot be empty");
-
+        if (targetDomainObject == null) {
+            log.info("Cannot evaluate attribute based permissions for null targetDomainObject");
+            return false;
+        }
+        if (!(targetDomainObject instanceof TempusResource)) {
+            log.info("Cannot evaluate attribute based permissions for type " + targetDomainObject.getClass().toString());
+            return false;
+        }
+        if (StringUtils.isEmpty(action)) {
+            log.info("Action cannot be empty while authorizing");
+            return false;
+        }
         String[] actionTokens = ((String) action).split("_");
 
-        if(actionTokens.length != 2)
-            throw new RuntimeException("Invalid action value");
-
-        SecurityUser user = (SecurityUser)authentication.getPrincipal();
+        if (actionTokens.length != 2) {
+            log.info("Invalid action value while authorizing");
+            return false;
+        }
+        SecurityUser user = (SecurityUser) authentication.getPrincipal();
         TempusResource resource = (TempusResource) targetDomainObject;
-        String entityName = actionTokens[0];
-        String entityOperation = actionTokens[1];
+        String resourceType = actionTokens[0];
+        String operation = actionTokens[1];
 
-        if(!resource.getId().getEntityType().name().equalsIgnoreCase(entityName))
-            throw new RuntimeException("Incompatible resource and actions");
-
-        return permissionChecker.check(user, resource, entityOperation);
+        return permissionChecker.check(user, resource, resourceType, operation);
     }
 
     @Override
@@ -88,9 +89,9 @@ public class AttributeBasedPermissionEvaluator implements PermissionEvaluator{
 
         switch (new EnumUtil<>(EntityType.class).parse(entityType)) {
             case DEVICE:
-                return deviceService.findDeviceById(new DeviceId(UUIDConverter.fromString(entityId)));
+                return deviceService.findDeviceById(new DeviceId(UUID.fromString(entityId)));
             case ASSET:
-                return assetService.findAssetById(new AssetId(UUIDConverter.fromString(entityId)));
+                return assetService.findAssetById(new AssetId(UUID.fromString(entityId)));
             default:
                 return null;
         }

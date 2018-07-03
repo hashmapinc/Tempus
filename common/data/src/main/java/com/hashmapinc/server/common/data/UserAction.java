@@ -16,5 +16,5 @@
 package com.hashmapinc.server.common.data;
 
 public enum UserAction {
-    CREATE, READ, UPDATE, DELETE
+    CREATE, READ, UPDATE, DELETE, ASSIGN
 }

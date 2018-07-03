@@ -256,7 +256,12 @@ public class DefaultSystemDataLoaderService implements SystemDataLoaderService {
         customerA = customerService.saveCustomer(customerA);
 
 
-        List<UserPermission> customerPermissions = Arrays.asList(new UserPermission(CUSTOMER_USER_DEFAULT_ASSET_PERMISSION), new UserPermission(CUSTOMER_USER_DEFAULT_DEVICE_PERMISSION));
+        List<UserPermission> customerPermissions = Arrays.asList(
+                new UserPermission(CUSTOMER_USER_DEFAULT_ASSET_READ_PERMISSION),
+                new UserPermission(CUSTOMER_USER_DEFAULT_ASSET_UPDATE_PERMISSION),
+                new UserPermission(CUSTOMER_USER_DEFAULT_DEVICE_READ_PERMISSION),
+                new UserPermission(CUSTOMER_USER_DEFAULT_DEVICE_UPDATE_PERMISSION)
+        );
         createUser(Authority.CUSTOMER_USER, customerPermissions, demoTenant.getId(), customerA.getId(), "bob.jones@hashmapinc.com", "driller", false);
 
         List<AttributeKvEntry> attributesTank123 = new ArrayList<>();

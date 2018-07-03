@@ -24,7 +24,10 @@ import org.springframework.stereotype.Component;
 public class CustomerUserPermissionMatcher extends AbstractPermissionMatcher {
 
     @Override
-    public boolean hasAccessToResource(TempusResource resource, UserPermission permission, User user) {
-        return resource.getCustomerId().equals(user.getCustomerId());
+    public boolean hasAccessToResource(TempusResource resource, String resourceType, UserPermission permission, User user) {
+        if(resource.getCustomerId() == null) // While creating the resource, customer_id is not available
+            return super.hasAccessToResource(resource, resourceType, permission, user);
+        else
+            return super.hasAccessToResource(resource, resourceType, permission, user) && resource.getCustomerId().equals(user.getCustomerId());
     }
 }

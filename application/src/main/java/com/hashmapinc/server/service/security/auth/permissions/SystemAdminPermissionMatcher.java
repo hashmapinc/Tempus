@@ -15,20 +15,8 @@
  */
 package com.hashmapinc.server.service.security.auth.permissions;
 
-import com.hashmapinc.server.common.data.TempusResource;
-import com.hashmapinc.server.common.data.User;
-import com.hashmapinc.server.common.data.UserPermission;
 import org.springframework.stereotype.Component;
 
 @Component
 public class SystemAdminPermissionMatcher extends AbstractPermissionMatcher {
-    @Override
-    public boolean hasAccessToResource(TempusResource resource, UserPermission permission, User user) {
-        return true;
-    }
-
-    @Override
-    public boolean hasPermissionToAct(String action, UserPermission permission) {
-        return true;
-    }
 }

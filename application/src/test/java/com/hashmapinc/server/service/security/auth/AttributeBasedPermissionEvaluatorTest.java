@@ -193,7 +193,7 @@ public class AttributeBasedPermissionEvaluatorTest {
 
         UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(this.tenantAdmin, null);
 
-        boolean hasPermission = evaluator.hasPermission(authentication, UUIDConverter.fromTimeUUID(assetId.getId()), "ASSET","ASSET_DELETE");
+        boolean hasPermission = evaluator.hasPermission(authentication, assetId.getId().toString(), "ASSET","ASSET_DELETE");
 
         Assert.assertTrue(hasPermission);
     }

@@ -47,12 +47,12 @@ public class PermissionChecker {
         }
     }
 
-    public boolean check(User user, TempusResource resource, String action) {
+    public boolean check(User user, TempusResource resource, String resourceType, String action) {
 
         for (UserPermission permission : user.getPermissions()) {
             PermissionMatcher matcher = getPermissionMatcher(permission.getSubject());
-            boolean hasAccessToResource = matcher.hasAccessToResource(resource, permission, user);
-            boolean hasPermissionToAct = matcher.hasPermissionToAct(action, permission);
+            boolean hasAccessToResource = matcher.hasAccessToResource(resource, resourceType, permission, user);
+            boolean hasPermissionToAct = matcher.hasPermissionToAct(resource, action, permission);
             if (matcher != null && hasAccessToResource && hasPermissionToAct)
                 return true;
         }

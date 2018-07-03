@@ -15,9 +15,7 @@
  */
 package com.hashmapinc.server.service.security.auth.permissions;
 
-import com.hashmapinc.server.common.data.TempusResource;
-import com.hashmapinc.server.common.data.User;
-import com.hashmapinc.server.common.data.UserPermission;
+import com.hashmapinc.server.common.data.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -30,12 +28,15 @@ import java.util.stream.Collectors;
 public abstract class AbstractPermissionMatcher implements PermissionMatcher {
 
     @Override
-    public boolean hasAccessToResource(TempusResource resource, UserPermission permission, User user) {
-        return permission.getResources().stream().map(r -> r.name()).collect(Collectors.toList()).contains(resource.getId().getEntityType().name());
+    public boolean hasAccessToResource(TempusResource resource, String resourceType, UserPermission permission, User user) {
+        return permission.getResources().stream().map(r -> r.name()).collect(Collectors.toList()).contains(resourceType);
     }
 
     @Override
-    public boolean hasPermissionToAct(String action, UserPermission permission) {
+    public boolean hasPermissionToAct(TempusResource resource, String action, UserPermission permission) {
+        if (new EnumUtil<>(UserAction.class).parse(action).equals(UserAction.UPDATE) && resource.getId() == null)
+            return false;
+
         return permission.getUserActions().stream().map(a -> a.name()).collect(Collectors.toList()).contains(action);
     }
 }

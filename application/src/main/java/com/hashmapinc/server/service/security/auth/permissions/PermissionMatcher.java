@@ -20,6 +20,6 @@ import com.hashmapinc.server.common.data.User;
 import com.hashmapinc.server.common.data.UserPermission;
 
 public interface PermissionMatcher {
-    boolean hasAccessToResource(TempusResource resource, UserPermission permission, User user);
-    boolean hasPermissionToAct(String action, UserPermission permission);
+    boolean hasAccessToResource(TempusResource resource, String resourceType, UserPermission permission, User user);
+    boolean hasPermissionToAct(TempusResource resource, String action, UserPermission permission);
 }
