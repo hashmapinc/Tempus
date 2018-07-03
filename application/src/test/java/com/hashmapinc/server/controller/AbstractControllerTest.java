@@ -90,8 +90,7 @@ import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppC
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 @Configuration
 @ComponentScan({"com.hashmapinc.server"})
-@WebAppConfiguration
-@SpringBootTest
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 @Slf4j
 public abstract class AbstractControllerTest {
 
@@ -100,7 +99,6 @@ public abstract class AbstractControllerTest {
 
     @Value("${ldap.authentication-server}")
     protected String ldapURL;
-
 
     protected static final String TEST_TENANT_NAME = "TEST TENANT";
 
