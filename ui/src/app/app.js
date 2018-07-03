@@ -80,6 +80,7 @@ import tempusApiComputationJob from './api/computation-job.service';
 import tempusTempusboard from './tempusboard';
 import tempusDataModels from './data_models';
 import tempusApplications from './applications';
+import tempusMetadata from './metadata';
 import tempusApiAuditLog from './api/audit-log.service';
 
 import 'typeface-roboto';
@@ -149,6 +150,7 @@ angular.module('tempus', [
     tempusApiComputationJob,
     tempusTempusboard,
     tempusDataModels,
+    tempusMetadata,
     tempusApplications,
     tempusApiAuditLog,
     uiRouter])

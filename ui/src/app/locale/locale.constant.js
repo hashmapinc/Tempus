@@ -116,6 +116,10 @@ export default angular.module('tempus.locale', [])
                     "bad-request": "Bad Request,Please Select A Theme."
 
                 },
+                "metadata" : {
+
+                    "metadata" : "MetaData"
+                },
                 "alarm": {
                     "alarm": "Alarm",
                     "alarms": "Alarms",
@@ -389,6 +393,8 @@ export default angular.module('tempus.locale', [])
                     "manage-devices": "Manage devices",
                     "manage-dashboards": "Manage dashboards",
                     "title": "Title",
+                    "data-model": "Data Model",
+                    "data-model-creation-link": "Go To Data Model Creation Page",
                     "title-required": "Title is required.",
                     "description": "Description",
                     "details": "Details",
@@ -1084,7 +1090,13 @@ export default angular.module('tempus.locale', [])
                     "wits-device-type": "Device type",
                     "wits-record-specifications-location": "Record Specification location*",
                     "wits-channel-specifications-location": "Channel Specification location*",
-
+                    "witsml-server":"Servers",
+                    "witsml-add-server": "Add server",
+                    "witsml-high-frquency-in-millis": "High Frequency in millis (Logs, Mudlogs, Trajectory, Messages)",
+                    "witsml-low-frquency-in-seconds": "Low Frequency in seconds (Well, Wellbore, Rig)",
+                    "witsml-version": "WITSML Version",
+                    "witsml-status": "Well Status",
+                    "witsml-object-types": "Object Types",
                     "sync": {
                         "status": "Status",
                         "sync": "Sync",

@@ -31,34 +31,46 @@ export function AddDataModelController($scope, $mdDialog, saveItemFunction, help
         $mdDialog.cancel();
     }
 
+    // add a new datamodel and redirect to the datamodel canvas
     function add() {
-
         saveItemFunction(vm.item).then(function success(item) {
             vm.item = item;
             $scope.theForm.$setPristine();
             $mdDialog.hide();
-
-            // go to the newly created data model
-            $state.go('home.data_models.data_model', { dashboardId: 123 });
+            $state.go('home.data_models.data_model', { 'datamodelId': vm.item.id.id });
         });
     }
 }
 
 
 /*@ngInject*/
-export function DataModelsController($scope, $rootScope, $state, $stateParams, userService, datamodelService, deviceService, types, attributeService, $q, dashboardService, applicationService, entityService, tempusboardService, utils, $filter, dashboardUtils, $mdDialog, $document, $translate) {
-
+export function DataModelsController($scope, datamodelService, $q, $filter, $mdDialog, $document, $state) {
     var vm = this;
 
     vm.openDataModelDialog = openDataModelDialog;
     vm.cancel = cancel;
     vm.saveDataModelFunc = saveDataModelFunc;
     vm.AddDataModelController = AddDataModelController;
-    vm.listDataModel = listDataModel;
 
+    var fetchDataModelFunction = function (pageLink, deviceType) {
+         return datamodelService.listDatamodels();
+    };
+
+    vm.listDataModel = fetchDataModelFunction;
+
+    $scope.datamodel = {
+        count: 0,
+        data: []
+    };
+
+    $scope.query = {
+        order: 'name',
+        limit: 15,
+        page: 1,
+        search: null
+    };
 
     function openDataModelDialog($event) {
-
         $mdDialog.show({
             controller: vm.AddDataModelController,
             controllerAs: 'vm',
@@ -72,32 +84,85 @@ export function DataModelsController($scope, $rootScope, $state, $stateParams, u
         });
     }
 
-
     function saveDataModelFunc(item) {
-
         var deferred = $q.defer();
-        datamodelService.saveDataModel(item).then(function success(response) {
+        datamodelService.saveDatamodel(item).then(function success(response) {
             deferred.resolve(response.data);
         }, function fail(response) {
             deferred.reject(response.data);
         });
         return deferred.promise;
-
     }
 
     function cancel() {
         $mdDialog.cancel();
     }
 
-    function listDataModel() {
-
-        var deferred = $q.defer();
-        datamodelService.listDataModel().then(function success(response) {
-            deferred.resolve(response.data);
-        }, function fail(response) {
-            deferred.reject(response.data);
-        });
-        return deferred.promise;
+    loadDataModel();
+    function loadDataModel() {
+         var promise = vm.listDataModel();
+         if(promise) {
+             promise.then(function success(items) {
+                 var dataModelSortList = $filter('orderBy')(items, $scope.query.order);
+                 var startIndex = $scope.query.limit * ($scope.query.page - 1);
+                 if ($scope.query.search != null) {
+                    dataModelSortList = $filter('filter')(items, function(data) {
+                        if ($scope.query.search) {
+                            return data.name.toLowerCase().indexOf($scope.query.search.toLowerCase()) > -1;
+                        } else {
+                            return true;
+                        }
+                    });
+                    //$scope.query.page =1;
+                    dataModelSortList = $filter('orderBy')(dataModelSortList, $scope.query.order);
+                    if ($scope.query.search != '') {startIndex =0;}
+                }
+                var dataModelPaginatedata = dataModelSortList.slice(startIndex, startIndex + $scope.query.limit);
+                $scope.datamodel = {
+                    count: items.length,
+                    data: dataModelPaginatedata
+                };
+                },
+            )
+        }
     }
 
+
+    $scope.enterFilterMode = function() {
+        $scope.query.search = '';
+    }
+
+    $scope.exitFilterMode = function() {
+        $scope.query.search = null;
+        loadDataModel();
+    }
+
+    $scope.resetFilter = function() {
+        $scope.query = {
+            order: 'name',
+            limit: $scope.query.limit,
+            page: 1,
+            search: null
+        };
+        loadDataModel();
+    }
+
+
+    $scope.$watch("query.search", function(newVal, prevVal) {
+        if (!angular.equals(newVal, prevVal) && $scope.query.search != null) {
+            loadDataModel();
+        }
+    });
+
+    $scope.onReorder = function() {
+        loadDataModel();
+    }
+
+    $scope.onPaginate = function() {
+        loadDataModel();
+    }
+
+    vm.openDatamodel = function(datamodel) {
+        $state.go('home.data_models.data_model', { 'datamodelId': datamodel.id.id });
+    }
 }

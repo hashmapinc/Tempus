@@ -22,57 +22,76 @@ export default angular.module('tempus.api.datamodel', [
     .name;
 
 /*@ngInject*/
-function DatamodelService($http, $q, $rootScope, adminService, dashboardService, toast, store) {
-
-
-    var service = {
-        setDataModelData:setDataModelData,
-        clearDataModelData:clearDataModelData,
-        getDataModelData:getDataModelData,
-        saveDataModel:saveDataModel,
-        listDataModel:listDataModel
-
+function DatamodelService($http, $q) {
+    return {
+        getDatamodel:           getDatamodel,
+        getDatamodelObjects:    getDatamodelObjects,
+        saveDatamodel:          saveDatamodel,
+        saveDatamodelObject:    saveDatamodelObject,
+        listDatamodels:         listDatamodels
     }
 
-    return service;
-
-    function setDataModelData(dataModel) {
-        store.set('data_model', dataModel);
-        //var data = getDataModelData();
-
-    }
-
-    function clearDataModelData() {
-        store.remove('data_model');
-    }
-
-    function getDataModelData() {
-        return store.get('data_model');
-    }
-
-    function saveDataModel(dataModeldata) {
+    // loads the datamodel objects for the datamodel with ID = datamodelID
+    function getDatamodelObjects(datamodelID) {
         var deferred = $q.defer();
-        var url = '/api/data-model';
-        $http.post(url, dataModeldata).then(function success(response) {
-            deferred.resolve(response.data);
-        }, function fail(response) {
-            deferred.reject(response.data);
-        });
-        return deferred.promise;
-    }
-
-    function listDataModel() {
-        var deferred = $q.defer();
-        var url = '/api/';
+        var url = '/api/data-model/' + datamodelID + '/objects';
         $http.get(url).then(function success(response) {
             deferred.resolve(response.data);
         }, function fail(response) {
             deferred.reject(response.data);
         });
         return deferred.promise;
-
-
     }
 
+    // loads the datamodel with ID = datamodelID
+    function getDatamodel(datamodelID) {
+        var deferred = $q.defer();
+        var url = '/api/data-model/' + datamodelID;
+        $http.get(url).then(function success(response) {
+            deferred.resolve(response.data);
+        }, function fail(response) {
+            deferred.reject(response.data);
+        });
+        return deferred.promise;
+    }
 
+    /**
+     *  saves a datamodel object in the backend
+     *  @param datamodelObject - datamodel object to save
+     *  @param datamodelID - id of the datamodel to save datamodelObject to
+     */
+    function saveDatamodelObject(datamodelObject, datamodelID) {
+        var deferred = $q.defer();
+        var url = '/api/data-model/' + datamodelID + '/objects';
+        $http.post(url, datamodelObject).then(function success(response) {
+            deferred.resolve(response);
+        }, function fail(response) {
+            deferred.reject(response);
+        });
+        return deferred.promise;
+    }
+
+    // saves a datamodel in the backend
+    function saveDatamodel(dataModeldata) {
+        var deferred = $q.defer();
+        var url = '/api/data-model';
+        $http.post(url, dataModeldata).then(function success(response) {
+            deferred.resolve(response);
+        }, function fail(response) {
+            deferred.reject(response);
+        });
+        return deferred.promise;
+    }
+
+    // gets all datamodels from the backend
+    function listDatamodels() {
+        var deferred = $q.defer();
+        var url = '/api/data-model';
+        $http.get(url).then(function success(response) {
+            deferred.resolve(response.data);
+        }, function fail(response) {
+            deferred.reject(response.data);
+        });
+        return deferred.promise;
+    }
 }

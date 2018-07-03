@@ -27,13 +27,11 @@ import tempusApiTempusboard from '../api/tempusboard.service';
 import tempusWidgetConfig from '../components/widget/widget-config.directive';
 import dashboardStates from '../dashboard/states';
 
-import DataModelsRoutes from './data_models.routes';
-import DataModelsDirective from './data_models.directive';
-import {DataModelsController} from './data_models.controller';
-import {DataModelController} from './data_model.controller';
+import MetadataRoutes from './metadata.routes';
+import {MetadataController} from './metadata.controller';
 
 
-export default angular.module('tempus.data_models', [
+export default angular.module('tempus.metadata', [
     uiRouter,
     tempusGrid,
     tempusApiUser,
@@ -46,8 +44,6 @@ export default angular.module('tempus.data_models', [
     tempusWidgetConfig,
     dashboardStates
 ])
-    .config(DataModelsRoutes)
-    .controller('DataModelsController', DataModelsController)
-    .controller('DataModelController', DataModelController)
-    .directive('tbDataModels', DataModelsDirective)
+    .config(MetadataRoutes)
+    .controller('MetadataController', MetadataController)
     .name;

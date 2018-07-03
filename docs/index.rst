@@ -57,7 +57,9 @@ Contents
    security/index
    admin/index
    reference/index
+   datamodel/objectCreation
    development/index
+   gateway/index
 
 Indices and tables
 ==================
