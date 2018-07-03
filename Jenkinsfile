@@ -10,6 +10,7 @@ mvn clean'''
     }
     stage('Build') {
       steps {
+        sh 'mvn validate'
         sh 'mvn -Dmaven.test.failure.ignore=true install'
       }
     }
