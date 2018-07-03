@@ -177,7 +177,6 @@ public abstract class BaseAssetControllerTest extends AbstractControllerTest {
     }
 
     @Test
-    @Ignore //TODO: FIX THIS
     public void testAssignAssetToCustomerFromDifferentTenant() throws Exception {
         loginSysAdmin();
 
@@ -192,14 +191,14 @@ public abstract class BaseAssetControllerTest extends AbstractControllerTest {
         tenantAdmin2.setEmail("tenant3@tempus.org");
         tenantAdmin2.setFirstName("Joe");
         tenantAdmin2.setLastName("Downs");
-
-        tenantAdmin2 = createUserAndLogin(tenantAdmin2, "testPassword1");
+        stubUser(tenantAdmin2, "testPassword1");
+        createUserAndLogin(tenantAdmin2, "testPassword1");
 
         Customer customer = new Customer();
         customer.setTitle("Different customer");
         Customer savedCustomer = doPost("/api/customer", customer, Customer.class);
 
-        login(tenantAdmin.getEmail(), "testPassword1");
+        loginTenantAdmin();
 
         Asset asset = new Asset();
         asset.setName("My asset");

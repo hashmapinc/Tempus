@@ -15,8 +15,29 @@
  */
 package com.hashmapinc.server.controller;
 
-import static org.hamcrest.Matchers.containsString;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import com.datastax.driver.core.utils.UUIDs;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.google.gson.JsonParser;
+import com.hashmapinc.server.common.data.*;
+import com.hashmapinc.server.common.data.id.CustomerId;
+import com.hashmapinc.server.common.data.id.DeviceCredentialsId;
+import com.hashmapinc.server.common.data.id.DeviceId;
+import com.hashmapinc.server.common.data.kv.*;
+import com.hashmapinc.server.common.data.page.TextPageData;
+import com.hashmapinc.server.common.data.page.TextPageLink;
+import com.hashmapinc.server.common.data.security.Authority;
+import com.hashmapinc.server.common.data.security.DeviceCredentials;
+import com.hashmapinc.server.common.data.security.DeviceCredentialsType;
+import com.hashmapinc.server.dao.attributes.AttributesService;
+import com.hashmapinc.server.dao.depthSeries.DepthSeriesService;
+import com.hashmapinc.server.dao.model.ModelConstants;
+import com.hashmapinc.server.dao.timeseries.TimeseriesService;
+import org.apache.commons.lang3.RandomStringUtils;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.web.servlet.ResultActions;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -24,30 +45,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.google.gson.JsonParser;
-import com.datastax.driver.core.utils.UUIDs;
-import com.hashmapinc.server.common.data.*;
-import com.hashmapinc.server.common.data.id.DeviceId;
-import com.hashmapinc.server.common.data.kv.*;
-import com.hashmapinc.server.common.data.page.TextPageData;
-import com.hashmapinc.server.common.data.page.TextPageLink;
-import com.hashmapinc.server.common.data.security.Authority;
-import com.hashmapinc.server.common.data.security.DeviceCredentials;
-import com.hashmapinc.server.dao.attributes.AttributesService;
-import com.hashmapinc.server.dao.depthSeries.DepthSeriesService;
-import com.hashmapinc.server.dao.model.ModelConstants;
-import org.apache.commons.lang3.RandomStringUtils;
-import org.junit.*;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.web.servlet.ResultActions;
-import com.hashmapinc.server.common.data.*;
-import com.hashmapinc.server.common.data.id.CustomerId;
-import com.hashmapinc.server.common.data.id.DeviceCredentialsId;
-import com.hashmapinc.server.common.data.kv.*;
-import com.hashmapinc.server.common.data.security.DeviceCredentialsType;
-
-import com.hashmapinc.server.dao.timeseries.TimeseriesService;
+import static org.hamcrest.Matchers.containsString;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 public abstract class BaseDeviceControllerTest extends AbstractControllerTest {
     
@@ -225,7 +224,6 @@ public abstract class BaseDeviceControllerTest extends AbstractControllerTest {
     }
     
     @Test
-    @Ignore //TODO: FIX THIS
     public void testAssignDeviceToCustomerFromDifferentTenant() throws Exception {
         loginSysAdmin();
         
@@ -240,14 +238,15 @@ public abstract class BaseDeviceControllerTest extends AbstractControllerTest {
         tenantAdmin2.setEmail("tenant3@tempus.org");
         tenantAdmin2.setFirstName("Joe");
         tenantAdmin2.setLastName("Downs");
-        
-        tenantAdmin2 = createUserAndLogin(tenantAdmin2, "testPassword1");
+
+        stubUser(tenantAdmin2, "testPassword1");
+        createUserAndLogin(tenantAdmin2, "testPassword1");
         
         Customer customer = new Customer();
         customer.setTitle("Different customer");
         Customer savedCustomer = doPost("/api/customer", customer, Customer.class);
 
-        login(tenantAdmin.getEmail(), "testPassword1");
+        loginTenantAdmin();
         
         Device device = new Device();
         device.setName("My device");

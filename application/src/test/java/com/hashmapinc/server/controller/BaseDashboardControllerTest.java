@@ -247,7 +247,6 @@ public abstract class BaseDashboardControllerTest extends AbstractControllerTest
     }
     
     @Test
-    @Ignore //TODO: FIX THIS
     public void testAssignDashboardToCustomerFromDifferentTenant() throws Exception {
         loginSysAdmin();
         
@@ -262,14 +261,15 @@ public abstract class BaseDashboardControllerTest extends AbstractControllerTest
         tenantAdmin2.setEmail("tenant3@tempus.org");
         tenantAdmin2.setFirstName("Joe");
         tenantAdmin2.setLastName("Downs");
-        
+
+        stubUser(tenantAdmin2, "testPassword1");
         tenantAdmin2 = createUserAndLogin(tenantAdmin2, "testPassword1");
         
         Customer customer = new Customer();
         customer.setTitle("Different customer");
         Customer savedCustomer = doPost("/api/customer", customer, Customer.class);
 
-        login(tenantAdmin.getEmail(), "testPassword1");
+        loginTenantAdmin();
         
         Dashboard dashboard = new Dashboard();
         dashboard.setTitle("My dashboard");

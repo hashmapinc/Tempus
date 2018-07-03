@@ -216,7 +216,6 @@ public class BaseApplicationControllerTest extends AbstractControllerTest {
     }
 
     @Test
-    @Ignore //TODO:FIX THIS
     public void testAssignApplicationToCustomerFromDifferentTenant() throws Exception {
         loginSysAdmin();
 
@@ -232,6 +231,8 @@ public class BaseApplicationControllerTest extends AbstractControllerTest {
         tenantAdmin2.setFirstName("Joe");
         tenantAdmin2.setLastName("Downs");
 
+        stubUser(tenantAdmin2, "testPassword1");
+
         if(ldapEnabled) {
             createLDAPEntry(tenantAdmin2.getEmail(), "testPassword1");
         }
@@ -241,7 +242,7 @@ public class BaseApplicationControllerTest extends AbstractControllerTest {
         customer.setTitle("Different customer");
         Customer savedCustomer = doPost("/api/customer", customer, Customer.class);
 
-        login(tenantAdmin.getEmail(), "testPassword1");
+        loginTenantAdmin();
 
         Application application = new Application();
         application.setName("My application");
