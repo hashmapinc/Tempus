@@ -19,7 +19,7 @@
 	<div layout="row" class="row" style="width:100%; clear:both;">
 	</div>
 </section>
-<md-toolbar class="md-table-toolbar tb-device-toolbar md-default" ng-show="query.search != null">
+<md-toolbar style="margin-top: 2%;" class="md-table-toolbar tb-device-toolbar md-default" ng-show="query.search != null">
 	<div class="md-toolbar-tools">
 		<md-button class="md-icon-button" aria-label="{{ 'action.search' | translate }}">
 			<md-icon aria-label="{{ 'action.search' | translate }}" class="material-icons">search</md-icon>
@@ -39,7 +39,7 @@
 		</md-button>
 	</div>
 </md-toolbar>
-<md-toolbar class="md-table-toolbar tb-device-toolbar md-default " ng-show="query.search === null">
+<md-toolbar style="margin-top: 2%;" class="md-table-toolbar tb-device-toolbar md-default " ng-show="query.search === null">
 
 	<div class="md-toolbar-tools">
 		<span flex></span>
@@ -77,7 +77,7 @@
 		</thead>
 		<tbody md-body>
 		<tr md-row  ng-repeat="datamodel in datamodel.data">
-			<td md-cell><a href ng-click="deviceDetailFunc($event,device)">{{datamodel.name}}</a></td>
+			<td md-cell><a href ng-click="vm.openDatamodel(datamodel)">{{datamodel.name}}</a></td>
 			<td md-cell>{{datamodel.additionalInfo.description}}</td>
 			<td md-cell>NA</td>
 			<td md-cell>{{datamodel.lastUpdatedTs | date :  'yyyy-MM-dd HH:mm:ss'}}</td>
