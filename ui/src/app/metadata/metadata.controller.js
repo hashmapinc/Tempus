@@ -90,7 +90,7 @@ export function MetadataController($scope, $rootScope, $state, $stateParams, use
     function listDataModel() {
 
         var deferred = $q.defer();
-        datamodelService.listDataModel().then(function success(response) {
+        datamodelService.listDatamodels().then(function success(response) {
             deferred.resolve(response.data);
         }, function fail(response) {
             deferred.reject(response.data);
