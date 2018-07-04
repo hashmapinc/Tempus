@@ -60,7 +60,11 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
+
+import static com.hashmapinc.server.common.data.DataConstants.*;
 
 @Service
 @Profile("install")
@@ -138,9 +142,9 @@ public class DefaultSystemDataLoaderService implements SystemDataLoaderService {
     @Override
     public void createSysAdmin() {
         if(isLdapEnabled) {
-            adminUser = createUser(Authority.SYS_ADMIN, null, null, adminEmail, null, true);
+            adminUser = createUser(Authority.SYS_ADMIN, Arrays.asList(SYS_ADMIN_DEFAULT_PERMISSION),null, null, adminEmail, null, true);
         } else {
-            adminUser = createUser(Authority.SYS_ADMIN, null, null, adminEmail, "sysadmin", false);
+            adminUser = createUser(Authority.SYS_ADMIN, Arrays.asList(SYS_ADMIN_DEFAULT_PERMISSION),null, null, adminEmail, "sysadmin", false);
         }
     }
 
@@ -244,7 +248,7 @@ public class DefaultSystemDataLoaderService implements SystemDataLoaderService {
         demoTenant.setRegion("Global");
         demoTenant.setTitle("DemoTenant");
         demoTenant = tenantService.saveTenant(demoTenant);
-        createUser(Authority.TENANT_ADMIN, demoTenant.getId(), null, "demo@hashmapinc.com", "tenant", false);
+        createUser(Authority.TENANT_ADMIN, Arrays.asList(TENANT_ADMIN_DEFAULT_PERMISSION), demoTenant.getId(), null, "demo@hashmapinc.com", "tenant", false);
 
         Customer customerA = new Customer();
         customerA.setTenantId(demoTenant.getId());
@@ -252,7 +256,13 @@ public class DefaultSystemDataLoaderService implements SystemDataLoaderService {
         customerA = customerService.saveCustomer(customerA);
 
 
-        createUser(Authority.CUSTOMER_USER, demoTenant.getId(), customerA.getId(), "bob.jones@hashmapinc.com", "driller", false);
+        List<String> customerPermissions = Arrays.asList(
+                CUSTOMER_USER_DEFAULT_ASSET_READ_PERMISSION,
+                CUSTOMER_USER_DEFAULT_ASSET_UPDATE_PERMISSION,
+                CUSTOMER_USER_DEFAULT_DEVICE_READ_PERMISSION,
+                CUSTOMER_USER_DEFAULT_DEVICE_UPDATE_PERMISSION
+        );
+        createUser(Authority.CUSTOMER_USER, customerPermissions, demoTenant.getId(), customerA.getId(), "bob.jones@hashmapinc.com", "driller", false);
 
         List<AttributeKvEntry> attributesTank123 = new ArrayList<>();
         attributesTank123.add(new BaseAttributeKvEntry(new StringDataEntry("latitude", "52.330732"), DateTime.now().getMillis()));
@@ -307,6 +317,7 @@ public class DefaultSystemDataLoaderService implements SystemDataLoaderService {
     }
 
     private User createUser(Authority authority,
+                            Collection<String> permissions,
                             TenantId tenantId,
                             CustomerId customerId,
                             String email,
@@ -314,6 +325,7 @@ public class DefaultSystemDataLoaderService implements SystemDataLoaderService {
                             boolean isExternalUser) {
         User user = new User();
         user.setAuthority(authority);
+        user.setPermissions(permissions);
         user.setEmail(email);
         user.setTenantId(tenantId);
         user.setCustomerId(customerId);
@@ -356,7 +368,7 @@ public class DefaultSystemDataLoaderService implements SystemDataLoaderService {
         device = deviceService.saveDevice(device);
 
         if (attributes != null){
-            attributeService.save(device.getId(), DataConstants.SERVER_SCOPE, attributes);
+            attributeService.save(device.getId(), SERVER_SCOPE, attributes);
         }
 
         DeviceCredentials deviceCredentials = deviceCredentialsService.findDeviceCredentialsByDeviceId(device.getId());

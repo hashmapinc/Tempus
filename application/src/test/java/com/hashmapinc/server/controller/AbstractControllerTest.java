@@ -94,6 +94,7 @@ import java.util.*;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static com.github.tomakehurst.wiremock.client.WireMock.get;
+import static com.hashmapinc.server.common.data.DataConstants.*;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
@@ -220,6 +221,7 @@ public abstract class AbstractControllerTest {
 
         tenantAdmin = new User();
         tenantAdmin.setAuthority(Authority.TENANT_ADMIN);
+        tenantAdmin.setPermissions(Arrays.asList(TENANT_ADMIN_DEFAULT_PERMISSION));
         tenantAdmin.setTenantId(tenantId);
         tenantAdmin.setEmail(TENANT_ADMIN_EMAIL);
 
@@ -234,6 +236,12 @@ public abstract class AbstractControllerTest {
 
         customerUser = new User();
         customerUser.setAuthority(Authority.CUSTOMER_USER);
+        customerUser.setPermissions(Arrays.asList(
+                CUSTOMER_USER_DEFAULT_ASSET_READ_PERMISSION,
+                CUSTOMER_USER_DEFAULT_ASSET_UPDATE_PERMISSION,
+                CUSTOMER_USER_DEFAULT_DEVICE_READ_PERMISSION,
+                CUSTOMER_USER_DEFAULT_DEVICE_UPDATE_PERMISSION)
+        );
         customerUser.setTenantId(tenantId);
         customerUser.setCustomerId(savedCustomer.getId());
         customerUser.setEmail(CUSTOMER_USER_EMAIL);
@@ -428,6 +436,7 @@ public abstract class AbstractControllerTest {
         response.put("customer_id", user.getCustomerId().getId());
         response.put("scope", Arrays.asList("server"));
         response.put("authorities", Arrays.asList(user.getAuthority().name()));
+        response.put("permissions", user.getPermissions());
         response.put("enabled", true);
         response.put("active", true);
         response.put("firstName", user.getFirstName());

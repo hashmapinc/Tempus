@@ -16,13 +16,14 @@
 package com.hashmapinc.server.common.data;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.EqualsAndHashCode;
 import com.hashmapinc.server.common.data.id.CustomerId;
 import com.hashmapinc.server.common.data.id.TenantId;
 import com.hashmapinc.server.common.data.id.UserId;
 import com.hashmapinc.server.common.data.security.Authority;
+import lombok.EqualsAndHashCode;
 
 import java.util.Collection;
+import java.util.Collections;
 
 @EqualsAndHashCode(callSuper = true)
 public class User extends SearchTextBasedWithAdditionalInfo<UserId> implements HasName {
@@ -33,7 +34,7 @@ public class User extends SearchTextBasedWithAdditionalInfo<UserId> implements H
     private CustomerId customerId;
     private String email;
     private Authority authority;
-    private Collection<String> permissions;
+    private Collection<String> permissions = Collections.EMPTY_LIST;
     private String firstName;
     private String lastName;
 

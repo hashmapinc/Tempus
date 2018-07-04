@@ -15,7 +15,6 @@
  */
 package com.hashmapinc.server.service.security.auth.jwt.extractor;
 
-import com.hashmapinc.server.common.data.UUIDConverter;
 import com.hashmapinc.server.common.data.id.CustomerId;
 import com.hashmapinc.server.common.data.id.TenantId;
 import com.hashmapinc.server.common.data.id.UserId;
@@ -86,7 +85,7 @@ public class UserInfoTokenConverter implements UserAuthenticationConverter {
         }
         Object permissions = map.get("permissions");
         if(permissions != null){
-            List<String> permissionList = (List<String>) permissions;
+            List<String> permissionList = ((List<String>)permissions);
             if(!permissionList.isEmpty())
                 securityUser.setPermissions(permissionList);
         }
