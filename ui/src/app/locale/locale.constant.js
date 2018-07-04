@@ -302,7 +302,14 @@ export default angular.module('tempus.locale', [])
                     "add-to-dashboard": "Add to dashboard",
                     "add-widget-to-dashboard": "Add widget to dashboard",
                     "selected-attributes": "{ count, select, 1 {1 attribute} other {# attributes} } selected",
-                    "selected-telemetry": "{ count, select, 1 {1 telemetry unit} other {# telemetry units} } selected"
+                    "selected-telemetry": "{ count, select, 1 {1 telemetry unit} other {# telemetry units} } selected",
+                    "download-telementry":"Download Latest Telementry",
+                    "download-button":"Download",
+                    "date-validate":"Please Enter Correct Date",
+                    "download-depth":"Download Latest Depth",
+                    "start-required":"Start is required",
+                    "end-required":"End is required"
+
                 },
                 "audit-log": {
                     "audit": "Audit",
