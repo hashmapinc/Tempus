@@ -29,6 +29,7 @@ Following WITSML properties can be configure:
 * **version** - WITSML version (currently two versions are supported, 1.3.1.1 & 1.4.1.1)
 * **objectTypes** - type of objects to be fetch
 * **wellStatus** - status of well to be fetch
+* **wellIdTobeScan** - scanning witsml objects for single well id (Default is empty i.e. to scan all wells and related witsml objects)
 
 Here is the sample configuration:
 
