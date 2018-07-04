@@ -29,7 +29,7 @@ import dashboardStates from '../dashboard/states';
 
 import DataModelsRoutes from './data_models.routes';
 import DataModelsDirective from './data_models.directive';
-import { DataModelsController } from './data_models.controller';
+import {DataModelsController} from './data_models.controller';
 import {DataModelController} from './data_model.controller';
 
 
