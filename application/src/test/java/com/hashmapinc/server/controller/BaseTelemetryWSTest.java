@@ -15,16 +15,8 @@
  */
 package com.hashmapinc.server.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hashmapinc.server.common.data.Device;
-import com.hashmapinc.server.common.data.Tenant;
-import com.hashmapinc.server.common.data.User;
-import com.hashmapinc.server.common.data.plugin.PluginMetaData;
-import com.hashmapinc.server.common.data.rule.RuleMetaData;
-import com.hashmapinc.server.common.data.security.Authority;
 import com.hashmapinc.server.common.data.security.DeviceCredentials;
-import com.hashmapinc.server.dao.plugin.PluginService;
-import com.hashmapinc.server.extensions.core.plugin.telemetry.TelemetryStoragePlugin;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.paho.client.mqttv3.*;
 import org.glassfish.tyrus.client.ClientManager;
@@ -32,11 +24,9 @@ import org.glassfish.tyrus.client.ClientProperties;
 import org.glassfish.tyrus.container.jdk.client.JdkClientContainer;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
-import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 
 import javax.websocket.*;
@@ -46,23 +36,18 @@ import java.util.concurrent.TimeUnit;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @Slf4j
 public abstract class BaseTelemetryWSTest extends AbstractControllerTest{
 
-    private Tenant savedTenant;
-    private User tenantAdmin;
     private CountDownLatch messageLatch;
     private Device savedDevice;
     private long timeZoneOffset = 19800000L;
     private long telemetryTs = 1451649600512L;
-    private String URL = "";
     private MqttAsyncClient mqttAsyncClient;
     private String accessToken;
+    private String URL_FORMAT = "ws://localhost:%d/api/ws/plugins/";
 
-    @Autowired
-    private PluginService pluginService;
     @Value("${server.port}")
     protected int port;
 
@@ -70,57 +55,12 @@ public abstract class BaseTelemetryWSTest extends AbstractControllerTest{
     private static ClientEndpointConfig cec = null;
     private static ClientManager client = null;
     private static final String MQTT_URL = "tcp://localhost:1883";
-    private static final ObjectMapper mapper = new ObjectMapper();
+
 
     @Before
     public void before() throws Exception{
 
-        URL = "ws://localhost:" + port + "/api/ws/plugins/";
-        loginSysAdmin();
-
-        Tenant tenant = new Tenant();
-        tenant.setTitle("My tenant");
-        savedTenant = doPost("/api/tenant", tenant, Tenant.class);
-        Assert.assertNotNull(savedTenant);
-
-        tenantAdmin = new User();
-        tenantAdmin.setAuthority(Authority.TENANT_ADMIN);
-        tenantAdmin.setTenantId(savedTenant.getId());
-        tenantAdmin.setEmail("tenant2@tempus.org");
-        tenantAdmin.setFirstName("Joe");
-        tenantAdmin.setLastName("Downs");
-
-        tenantAdmin = createUserAndLogin(tenantAdmin, "testPassword1");
-
-        if(pluginService.findPluginByApiToken("telemetry") == null) {
-            PluginMetaData tenantPlugin = new PluginMetaData();
-            tenantPlugin.setName("Telemetry plugin");
-            tenantPlugin.setApiToken("telemetry");
-            tenantPlugin.setConfiguration(mapper.readTree("{}"));
-            tenantPlugin.setClazz(TelemetryStoragePlugin.class.getName());
-            tenantPlugin = doPost("/api/plugin", tenantPlugin, PluginMetaData.class);
-            Assert.assertNotNull(tenantPlugin);
-
-            doPost("/api/plugin/" + tenantPlugin.getId().getId().toString() + "/activate").andExpect(status().isOk());
-
-            RuleMetaData rule = new RuleMetaData();
-            doPost("/api/rule", rule).andExpect(status().isBadRequest());
-            rule.setName("My Rule");
-            doPost("/api/rule", rule).andExpect(status().isBadRequest());
-            rule.setPluginToken(tenantPlugin.getApiToken());
-            doPost("/api/rule", rule).andExpect(status().isBadRequest());
-            rule.setFilters(mapper.readTree("[{\"clazz\":\"com.hashmapinc.server.extensions.core.filter.MsgTypeFilter\", " +
-                    "\"name\":\"TelemetryFilter\", " +
-                    "\"configuration\": {\"messageTypes\":[\"POST_TELEMETRY\",\"POST_ATTRIBUTES\",\"GET_ATTRIBUTES\"]}}]"));
-            doPost("/api/rule", rule).andExpect(status().isBadRequest());
-            rule.setAction(mapper.readTree("{\"clazz\":\"com.hashmapinc.server.extensions.core.action.telemetry.TelemetryPluginAction\", \"name\":\"TelemetryMsgConverterAction\", \"configuration\":{\"timeUnit\":\"DAYS\", \"ttlValue\":1, \"qualityTimeWindow\":60000, \"qualityDepthWindow\":3000}}"));
-
-            RuleMetaData savedRule = doPost("/api/rule", rule, RuleMetaData.class);
-            Assert.assertNotNull(savedRule);
-            Assert.assertNotNull(savedRule.getId());
-
-            doPost("/api/rule/" + savedRule.getId().getId().toString() + "/activate").andExpect(status().isOk());
-        }
+        loginTenantAdmin();
 
         Device device = new Device();
         device.setName("My device");
@@ -137,15 +77,6 @@ public abstract class BaseTelemetryWSTest extends AbstractControllerTest{
         assertNotNull(accessToken);
 
         setupWebsocketClient();
-    }
-
-    @After
-    public void afterTest() throws Exception {
-        loginSysAdmin();
-
-        doDelete("/api/tenant/" + savedTenant.getId().getId().toString())
-                .andExpect(status().isOk());
-
     }
 
     private static void setupWebsocketClient() {
@@ -169,7 +100,8 @@ public abstract class BaseTelemetryWSTest extends AbstractControllerTest{
         publishTimeZoneAndTimesries();
         messageLatch = new CountDownLatch(1);
         try {
-            client.connectToServer(new ClientTestEndpoint(), cec, new URI(URL + "telemetry?token=" + this.token));
+            String url = String.format(URL_FORMAT, port);
+            client.connectToServer(new ClientTestEndpoint(), cec, new URI(url + "telemetry?token=" + this.token));
         }
         catch (Exception e) {
             e.printStackTrace();
@@ -221,7 +153,7 @@ public abstract class BaseTelemetryWSTest extends AbstractControllerTest{
         MqttMessage message = new MqttMessage();
 
         JSONObject attributeJson = new JSONObject();
-        attributeJson.put("TimeZone", timeZoneOffset);
+        attributeJson.put("zone_offset_in_millis", timeZoneOffset);
         message.setPayload(attributeJson.toString().getBytes());
 
         mqttAsyncClient.publish("v1/devices/me/attributes", message);

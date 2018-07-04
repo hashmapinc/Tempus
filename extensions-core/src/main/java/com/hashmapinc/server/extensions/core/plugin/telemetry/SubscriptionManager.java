@@ -30,8 +30,8 @@ import com.hashmapinc.server.extensions.core.plugin.telemetry.handlers.Telemetry
 import java.util.*;
 import java.util.function.Function;
 
-import static com.hashmapinc.server.extensions.core.plugin.telemetry.handlers.TelemetryWebsocketMsgHandler.FAILED_TO_TIME_ZONE_ATTRIBUTE;
-import static com.hashmapinc.server.extensions.core.plugin.telemetry.handlers.TelemetryWebsocketMsgHandler.TIME_ZONE;
+import static com.hashmapinc.server.extensions.core.plugin.telemetry.handlers.TelemetryWebsocketMsgHandler.FAILED_TO_FETCH_TIME_ZONE_ATTRIBUTE;
+import static com.hashmapinc.server.extensions.core.plugin.telemetry.handlers.TelemetryWebsocketMsgHandler.TIME_ZONE_OFFSET;
 
 
 @Slf4j
@@ -199,7 +199,7 @@ public class SubscriptionManager {
                     if (type == SubscriptionType.ATTRIBUTES){
                         long timeZoneDiff = 0;
                         for (TsKvEntry entry: subscriptionUpdate) {
-                            if (entry.getKey().contentEquals(TIME_ZONE)) {
+                            if (entry.getKey().contentEquals(TIME_ZONE_OFFSET)) {
                                 timeZoneDiff = entry.getTs();
                                 break;
                             }
@@ -207,10 +207,10 @@ public class SubscriptionManager {
                         if (timeZoneDiff != 0)
                             websocketHandler.sendWsMsg(ctx, sessionId, new SubscriptionUpdate(s.getSubscriptionId(), subscriptionUpdate, timeZoneDiff));
                         else
-                            ctx.loadAttribute(entityId, DataConstants.CLIENT_SCOPE, TIME_ZONE, getTimeZoneAttributeCallback(s, sessionId, subscriptionUpdate));
+                            ctx.loadAttribute(entityId, DataConstants.CLIENT_SCOPE, TIME_ZONE_OFFSET, getTimeZoneAttributeCallback(s, sessionId, subscriptionUpdate));
                     }
                     else
-                        ctx.loadAttribute(entityId, DataConstants.CLIENT_SCOPE, TIME_ZONE, getTimeZoneAttributeCallback(s, sessionId, subscriptionUpdate));
+                        ctx.loadAttribute(entityId, DataConstants.CLIENT_SCOPE, TIME_ZONE_OFFSET, getTimeZoneAttributeCallback(s, sessionId, subscriptionUpdate));
                 }
             });
         } else {
@@ -236,9 +236,9 @@ public class SubscriptionManager {
 
             @Override
             public void onFailure(PluginContext ctx, Exception e) {
-                log.error(FAILED_TO_TIME_ZONE_ATTRIBUTE, e);
+                log.error(FAILED_TO_FETCH_TIME_ZONE_ATTRIBUTE, e);
                 SubscriptionUpdate update = new SubscriptionUpdate(s.getSubscriptionId(), SubscriptionErrorCode.INTERNAL_ERROR,
-                        FAILED_TO_TIME_ZONE_ATTRIBUTE);
+                        FAILED_TO_FETCH_TIME_ZONE_ATTRIBUTE);
                 websocketHandler.sendWsMsg(ctx, sessionId, update);
             }
         };
