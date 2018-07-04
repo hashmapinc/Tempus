@@ -17,8 +17,6 @@ package com.hashmapinc.server.service.security.auth;
 
 import com.datastax.driver.core.utils.UUIDs;
 import com.hashmapinc.server.common.data.TempusResource;
-import com.hashmapinc.server.common.data.UUIDConverter;
-import com.hashmapinc.server.common.data.UserPermission;
 import com.hashmapinc.server.common.data.asset.Asset;
 import com.hashmapinc.server.common.data.id.*;
 import com.hashmapinc.server.common.data.security.Authority;
@@ -44,6 +42,8 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.Arrays;
+
+import static com.hashmapinc.server.common.data.DataConstants.*;
 
 @ActiveProfiles("permission-test")
 @RunWith(SpringRunner.class)
@@ -72,13 +72,13 @@ public class AttributeBasedPermissionEvaluatorTest {
 
         this.admin = new SecurityUser(new UserId(UUIDs.timeBased()));
         this.admin.setEnabled(true);
-        this.admin.setPermissions(Arrays.asList(new UserPermission[]{new UserPermission("SYS_ADMIN:*:*")}));
+        this.admin.setPermissions(Arrays.asList(SYS_ADMIN_DEFAULT_PERMISSION));
         this.admin.setUserPrincipal(new UserPrincipal(UserPrincipal.Type.USER_NAME, "admin"));
         this.admin.setAuthority(Authority.SYS_ADMIN);
 
         this.tenantAdmin = new SecurityUser(new UserId(UUIDs.timeBased()));
         this.tenantAdmin.setEnabled(true);
-        this.tenantAdmin.setPermissions(Arrays.asList(new UserPermission[]{new UserPermission("TENANT_ADMIN:*:*")}));
+        this.tenantAdmin.setPermissions(Arrays.asList(TENANT_ADMIN_DEFAULT_PERMISSION));
         this.tenantAdmin.setTenantId(new TenantId(UUIDs.timeBased()));
         this.tenantAdmin.setUserPrincipal(new UserPrincipal(UserPrincipal.Type.USER_NAME, "tenant_admin"));
         this.tenantAdmin.setAuthority(Authority.TENANT_ADMIN);
@@ -87,7 +87,7 @@ public class AttributeBasedPermissionEvaluatorTest {
         this.customer.setTenantId(this.tenantAdmin.getTenantId());
         this.customer.setCustomerId(new CustomerId(UUIDs.timeBased()));
         this.customer.setEnabled(true);
-        this.customer.setPermissions(Arrays.asList(new UserPermission[]{new UserPermission("CUSTOMER_USER:ASSET:READ")}));
+        this.customer.setPermissions(Arrays.asList(CUSTOMER_USER_DEFAULT_ASSET_READ_PERMISSION));
         this.customer.setUserPrincipal(new UserPrincipal(UserPrincipal.Type.USER_NAME, "customer_user"));
         this.customer.setAuthority(Authority.CUSTOMER_USER);
 

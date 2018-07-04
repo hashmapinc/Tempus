@@ -226,9 +226,7 @@ public class AssetController extends BaseController {
         }
     }
 
-//    @PreAuthorize("hasAuthority('TENANT_ADMIN')")
-    // TODO: Why do we need this???  create new action ASSET_READ_TENANT
-    @PostAuthorize("hasPermission(returnObject, 'ASSET_CREATE')")
+    @PreAuthorize("hasAuthority('TENANT_ADMIN')")
     @RequestMapping(value = "/tenant/assets", params = {"assetName"}, method = RequestMethod.GET)
     @ResponseBody
     public Asset getTenantAsset(
@@ -320,7 +318,6 @@ public class AssetController extends BaseController {
     }
 
     @PreAuthorize("hasAnyAuthority('TENANT_ADMIN', 'CUSTOMER_USER')")
-    // TODO: how to handle this ???
     @RequestMapping(value = "/asset/types", method = RequestMethod.GET)
     @ResponseBody
     public List<EntitySubtype> getAssetTypes() throws TempusException {

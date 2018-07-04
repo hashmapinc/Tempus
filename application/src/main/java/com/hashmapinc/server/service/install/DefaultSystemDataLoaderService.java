@@ -142,9 +142,9 @@ public class DefaultSystemDataLoaderService implements SystemDataLoaderService {
     @Override
     public void createSysAdmin() {
         if(isLdapEnabled) {
-            adminUser = createUser(Authority.SYS_ADMIN, Arrays.asList(new UserPermission(SYS_ADMIN_DEFAULT_PERMISSION)),null, null, adminEmail, null, true);
+            adminUser = createUser(Authority.SYS_ADMIN, Arrays.asList(SYS_ADMIN_DEFAULT_PERMISSION),null, null, adminEmail, null, true);
         } else {
-            adminUser = createUser(Authority.SYS_ADMIN, Arrays.asList(new UserPermission(SYS_ADMIN_DEFAULT_PERMISSION)),null, null, adminEmail, "sysadmin", false);
+            adminUser = createUser(Authority.SYS_ADMIN, Arrays.asList(SYS_ADMIN_DEFAULT_PERMISSION),null, null, adminEmail, "sysadmin", false);
         }
     }
 
@@ -248,7 +248,7 @@ public class DefaultSystemDataLoaderService implements SystemDataLoaderService {
         demoTenant.setRegion("Global");
         demoTenant.setTitle("DemoTenant");
         demoTenant = tenantService.saveTenant(demoTenant);
-        createUser(Authority.TENANT_ADMIN, Arrays.asList(new UserPermission(TENANT_ADMIN_DEFAULT_PERMISSION)), demoTenant.getId(), null, "demo@hashmapinc.com", "tenant", false);
+        createUser(Authority.TENANT_ADMIN, Arrays.asList(TENANT_ADMIN_DEFAULT_PERMISSION), demoTenant.getId(), null, "demo@hashmapinc.com", "tenant", false);
 
         Customer customerA = new Customer();
         customerA.setTenantId(demoTenant.getId());
@@ -256,11 +256,11 @@ public class DefaultSystemDataLoaderService implements SystemDataLoaderService {
         customerA = customerService.saveCustomer(customerA);
 
 
-        List<UserPermission> customerPermissions = Arrays.asList(
-                new UserPermission(CUSTOMER_USER_DEFAULT_ASSET_READ_PERMISSION),
-                new UserPermission(CUSTOMER_USER_DEFAULT_ASSET_UPDATE_PERMISSION),
-                new UserPermission(CUSTOMER_USER_DEFAULT_DEVICE_READ_PERMISSION),
-                new UserPermission(CUSTOMER_USER_DEFAULT_DEVICE_UPDATE_PERMISSION)
+        List<String> customerPermissions = Arrays.asList(
+                CUSTOMER_USER_DEFAULT_ASSET_READ_PERMISSION,
+                CUSTOMER_USER_DEFAULT_ASSET_UPDATE_PERMISSION,
+                CUSTOMER_USER_DEFAULT_DEVICE_READ_PERMISSION,
+                CUSTOMER_USER_DEFAULT_DEVICE_UPDATE_PERMISSION
         );
         createUser(Authority.CUSTOMER_USER, customerPermissions, demoTenant.getId(), customerA.getId(), "bob.jones@hashmapinc.com", "driller", false);
 
@@ -317,7 +317,7 @@ public class DefaultSystemDataLoaderService implements SystemDataLoaderService {
     }
 
     private User createUser(Authority authority,
-                            Collection<UserPermission> permissions,
+                            Collection<String> permissions,
                             TenantId tenantId,
                             CustomerId customerId,
                             String email,

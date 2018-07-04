@@ -16,9 +16,9 @@
 package com.hashmapinc.server.service.security.auth.permissions;
 
 import com.hashmapinc.server.common.data.TempusResource;
-import com.hashmapinc.server.common.data.User;
 import com.hashmapinc.server.common.data.UserPermission;
 import com.hashmapinc.server.common.data.security.Authority;
+import com.hashmapinc.server.service.security.model.SecurityUser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -47,9 +47,9 @@ public class PermissionChecker {
         }
     }
 
-    public boolean check(User user, TempusResource resource, String resourceType, String action) {
+    public boolean check(SecurityUser user, TempusResource resource, String resourceType, String action) {
 
-        for (UserPermission permission : user.getPermissions()) {
+        for (UserPermission permission : user.getUserPermissions()) {
             PermissionMatcher matcher = getPermissionMatcher(permission.getSubject());
             boolean hasAccessToResource = matcher.hasAccessToResource(resource, resourceType, permission, user);
             boolean hasPermissionToAct = matcher.hasPermissionToAct(resource, action, permission);

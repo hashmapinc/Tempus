@@ -16,18 +16,13 @@
 package com.hashmapinc.server.requests;
 
 import com.hashmapinc.server.common.data.User;
-import com.hashmapinc.server.common.data.UserPermission;
 import com.hashmapinc.server.common.data.id.CustomerId;
 import com.hashmapinc.server.common.data.id.TenantId;
 import com.hashmapinc.server.common.data.id.UserId;
 import com.hashmapinc.server.common.data.security.Authority;
 import lombok.Data;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-import java.util.stream.Collectors;
+import java.util.*;
 
 import static com.hashmapinc.server.dao.model.ModelConstants.NULL_UUID;
 
@@ -40,7 +35,7 @@ public class IdentityUser {
     private String firstName;
     private String lastName;
     private List<String> authorities;
-    private List<String> permissions;
+    private Collection<String> permissions;
     private String clientId;
     private Map<String, String> additionalDetails;
     private boolean enabled;
@@ -51,7 +46,7 @@ public class IdentityUser {
         this.id = user.getUuidId();
         this.userName = user.getEmail();
         this.authorities = Arrays.asList(user.getAuthority().name());
-        this.permissions = user.getPermissions().stream().map(p -> p.getPermissionExpr()).collect(Collectors.toList());
+        this.permissions = user.getPermissions();
         if(user.getTenantId() != null) {
             this.tenantId = user.getTenantId().getId();
         } else {
@@ -81,9 +76,7 @@ public class IdentityUser {
             user.setCustomerId(new CustomerId(customerId));
         }
         user.setAuthority(Authority.parse(authorities.get(0)));
-        if(permissions != null) {
-            user.setPermissions(permissions.stream().map(s -> new UserPermission(s)).collect(Collectors.toList()));
-        }
+        user.setPermissions(permissions);
         return user;
     }
 }

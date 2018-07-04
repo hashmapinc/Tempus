@@ -16,11 +16,11 @@
 package com.hashmapinc.server.common.data;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.EqualsAndHashCode;
 import com.hashmapinc.server.common.data.id.CustomerId;
 import com.hashmapinc.server.common.data.id.TenantId;
 import com.hashmapinc.server.common.data.id.UserId;
 import com.hashmapinc.server.common.data.security.Authority;
+import lombok.EqualsAndHashCode;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -34,7 +34,7 @@ public class User extends SearchTextBasedWithAdditionalInfo<UserId> implements H
     private CustomerId customerId;
     private String email;
     private Authority authority;
-    private Collection<UserPermission> permissions = Collections.EMPTY_LIST;
+    private Collection<String> permissions = Collections.EMPTY_LIST;
     private String firstName;
     private String lastName;
 
@@ -95,11 +95,11 @@ public class User extends SearchTextBasedWithAdditionalInfo<UserId> implements H
         this.authority = authority;
     }
 
-    public Collection<UserPermission> getPermissions() {
+    public Collection<String> getPermissions() {
         return permissions;
     }
 
-    public void setPermissions(Collection<UserPermission> permissions) {
+    public void setPermissions(Collection<String> permissions) {
         this.permissions = permissions;
     }
 
@@ -136,7 +136,7 @@ public class User extends SearchTextBasedWithAdditionalInfo<UserId> implements H
         builder.append(", authority=");
         builder.append(authority);
         builder.append(", permissions=");
-        builder.append(permissions.toString());
+        builder.append(permissions);
         builder.append(", firstName=");
         builder.append(firstName);
         builder.append(", lastName=");
