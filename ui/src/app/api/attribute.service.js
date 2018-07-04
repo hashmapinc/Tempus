@@ -18,7 +18,7 @@ export default angular.module('tempus.api.attribute', [])
     .name;
 
 /*@ngInject*/
-function AttributeService($http, $q, $filter, types, telemetryWebsocketService, $log) {
+function AttributeService($http, $q, $filter, types, telemetryWebsocketService) {
 
     var entityAttributesSubscriptionMap = {};
 
@@ -38,7 +38,7 @@ function AttributeService($http, $q, $filter, types, telemetryWebsocketService, 
 
     function downloadTelementryData(entityType, entityId, attributeScope,startDate,endDate) {
 
-       $log.log(entityId);
+
        var deferred = $q.defer();
        var url = '/api/device/telementry';
        url += '?deviceId=' + entityId;
