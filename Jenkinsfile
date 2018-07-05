@@ -15,9 +15,9 @@ echo M2_HOME = ${M2_HOME}
 mvn clean'''
           }
         }
-        stage('') {
+        stage('error') {
           steps {
-            sh 'echo $WORKSPACE'
+            sh 'ls $WORKSPACE/docker'
           }
         }
       }
