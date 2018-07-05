@@ -7,10 +7,19 @@ pipeline {
   }
   stages {
     stage('Initialize') {
-      steps {
-        sh '''echo PATH = ${PATH}
+      parallel {
+        stage('Initialize') {
+          steps {
+            sh '''echo PATH = ${PATH}
 echo M2_HOME = ${M2_HOME}
 mvn clean'''
+          }
+        }
+        stage('') {
+          steps {
+            sh 'echo $WORKSPACE'
+          }
+        }
       }
     }
     stage('Build') {
@@ -31,6 +40,7 @@ mvn clean'''
         withCredentials(bindings: [usernamePassword(credentialsId: 'docker_hub', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
           sh 'sudo docker login -u $USERNAME -p $PASSWORD'
         }
+
         sh 'sudo docker build /docker/tb/ -t hashmapinc/tempus:dev'
         sh 'sudo docker push hashmapinc/tempus:dev'
       }
