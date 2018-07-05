@@ -17,15 +17,12 @@ mvn clean'''
         }
         stage('docker login') {
           steps {
-            sh '''node(\'<MY_UNIX_SLAVE>\') {
-withCredentials([[$class: \'UsernamePasswordMultiBinding\', credentialsId: \'<CREDENTIAL_ID>\',
-usernameVariable: \'USERNAME\', passwordVariable: \'PASSWORD\']]) {
+            sh '''withCredentials([usernamePassword(credentialsId: \'docker_hub\', usernameVariable: \'USERNAME\', passwordVariable: \'PASSWORD\')]) {
+  sh \'echo $PASSWORD\'
 
+  echo USERNAME
 
-
-
-sh \'echo uname=$USERNAME pwd=$PASSWORD\'
- }
+  echo "username is $USERNAME"
 }'''
             }
           }
