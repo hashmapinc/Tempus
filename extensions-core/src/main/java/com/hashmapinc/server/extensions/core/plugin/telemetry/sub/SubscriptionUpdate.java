@@ -40,6 +40,19 @@ public class SubscriptionUpdate {
         }
     }
 
+    public SubscriptionUpdate(int subscriptionId, List<TsKvEntry> data, Long timeZoneDiff) {
+        super();
+        this.subscriptionId = subscriptionId;
+        this.data = new TreeMap<>();
+        for (TsKvEntry tsEntry : data) {
+            List<Object> values = this.data.computeIfAbsent(tsEntry.getKey(), k -> new ArrayList<>());
+            Object[] value = new Object[2];
+            value[0] = tsEntry.getTs() + timeZoneDiff;
+            value[1] = tsEntry.getValueAsString();
+            values.add(value);
+        }
+    }
+
     public SubscriptionUpdate(int subscriptionId, Map<String, List<Object>> data) {
         super();
         this.subscriptionId = subscriptionId;
