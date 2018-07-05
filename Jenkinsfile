@@ -7,10 +7,19 @@ pipeline {
   }
   stages {
     stage('Initialize') {
-      steps {
-        sh '''echo PATH = ${PATH}
+      parallel {
+        stage('Initialize') {
+          steps {
+            sh '''echo PATH = ${PATH}
 echo M2_HOME = ${M2_HOME}
 mvn clean'''
+          }
+        }
+        stage('docker login') {
+          steps {
+            sh 'docker login -u $docker_hub_USER -p $docker_hub_USER_PASSWORD'
+          }
+        }
       }
     }
     stage('Build') {
