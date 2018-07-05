@@ -17,6 +17,7 @@ import 'brace/ext/language_tools';
 import 'brace/mode/json';
 import 'brace/theme/github';
 import './extension-form.scss';
+import timezoneList from 'timezone-list';
 
 /* eslint-disable angular/log */
 
@@ -38,6 +39,7 @@ export default function ExtensionFormWitsDirective($compile, $templateCache, $tr
             this.timeChannelNumbers = "6",
             this.attributesChannelNumbers="1",
             this.depthChannelNumbers = "8",
+            this.timezone,
             this.records = {},
             this.channels = {}
         }
@@ -47,6 +49,7 @@ export default function ExtensionFormWitsDirective($compile, $templateCache, $tr
 
         scope.types = types;
         scope.theForm = scope.$parent.theForm;
+        scope.timezoneList = timezoneList.getTimezones();
 
 
         if (!scope.configuration.servers.length) {
@@ -113,6 +116,7 @@ export default function ExtensionFormWitsDirective($compile, $templateCache, $tr
             link: linker,
             scope: {
                 configuration: "=",
+                timezoneList: "@",
                 isAdd: "="
             }
         }
