@@ -17,7 +17,7 @@ mvn clean'''
         }
         stage('docker login') {
           steps {
-            sh 'docker login -u $docker_hub_USER -p $docker_hub_USER_PASSWORD'
+            sh 'sudo docker login -u $docker_hub_USER -p $docker_hub_USER_PASSWORD'
           }
         }
       }
