@@ -24,6 +24,7 @@ const RECONNECT_INTERVAL = 2000;
 const WS_IDLE_TIMEOUT = 90000;
 
 const MAX_PUBLISH_COMMANDS = 10;
+const MILLI_SEC_CONST = 60000;
 
 /*@ngInject*/
 function TelemetryWebsocketService($rootScope, $websocket, $timeout, $window, types, userService) {
@@ -100,22 +101,35 @@ function TelemetryWebsocketService($rootScope, $websocket, $timeout, $window, ty
     function preparePublishCommands() {
         var preparedWrapper = {};
         var leftCount = MAX_PUBLISH_COMMANDS;
+
         preparedWrapper.tsSubCmds = popCmds(cmdsWrapper.tsSubCmds, leftCount);
+        convertTsToUTC(preparedWrapper.tsSubCmds);
         leftCount -= preparedWrapper.tsSubCmds.length;
+
         preparedWrapper.historyCmds = popCmds(cmdsWrapper.historyCmds, leftCount);
+        convertTsToUTC(preparedWrapper.historyCmds);
         leftCount -= preparedWrapper.historyCmds.length;
 	
 	
         preparedWrapper.attrSubCmds = popCmds(cmdsWrapper.attrSubCmds, leftCount);
-	
-	preparedWrapper.dsSubCmds = popCmds(cmdsWrapper.dsSubCmds, leftCount);
+        leftCount -= preparedWrapper.attrSubCmds.length;
+
+        preparedWrapper.dsSubCmds = popCmds(cmdsWrapper.dsSubCmds, leftCount);
         leftCount -= preparedWrapper.dsSubCmds.length;
-	
-	preparedWrapper.depthHistoryCmds = popCmds(cmdsWrapper.depthHistoryCmds, leftCount);
-        leftCount -= preparedWrapper.depthHistoryCmds.length;
-	
+
+        preparedWrapper.depthHistoryCmds = popCmds(cmdsWrapper.depthHistoryCmds, leftCount);
 	
         return preparedWrapper;
+    }
+
+    function convertTsToUTC(subCmds) {
+        var date = new Date();
+        var utcDiff = date.getTimezoneOffset() * MILLI_SEC_CONST;
+        for(var i = 0 ; i < subCmds.length; i++){
+            subCmds[i].startTs += utcDiff;
+            if(subCmds[i].endTs)
+                subCmds[i].endTs += utcDiff;
+        }
     }
 
     function popCmds(cmds, leftCount) {
@@ -132,6 +146,9 @@ function TelemetryWebsocketService($rootScope, $websocket, $timeout, $window, ty
     }
 
     function onOpen () {
+
+
+
         isOpening = false;
         isOpened = true;
         if (reconnectTimer) {

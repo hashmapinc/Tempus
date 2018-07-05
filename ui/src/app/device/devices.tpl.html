@@ -17,7 +17,7 @@
 -->
 <section layout="row" layout-align="center center" style="margin-left: 80%;">
     <label class="tb-small" translate>Grid View</label>
-    <md-switch class="device-switch" ng-model="tableView" aria-label="predefined-switcher" style="
+    <md-switch ng-change ="resetFilter();"class="device-switch" ng-model="tableView" aria-label="predefined-switcher" style="
     margin-left: 4px;
     margin-right: -5px;
 ">
@@ -74,12 +74,12 @@
     <table class="tb-device-table" md-table>
         <thead md-head md-order="query.order" md-on-reorder="onReorder">
         <tr md-row>
-            <th md-column md-order-by="name"><span translate>Name</span></th>
-            <th md-column md-order-by="type"><span translate>Type</span></th>
-            <th md-column><span translate>Description</span></th>
-            <th md-column><span translate>Status</span></th>
-            <th md-column><span translate>Age</span></th>
-            <th md-column><span translate>Last Time Received</span></th>
+            <th md-column md-order-by="name"><span translate>device.name</span></th>
+            <th md-column md-order-by="type"><span translate>device.device-type</span></th>
+            <th md-column><span translate>device.description</span></th>
+            <th md-column><span translate>device.status</span></th>
+            <th md-column><span translate>device.age</span></th>
+            <th md-column><span translate>device.lastTimeRecived</span></th>
 
         </tr>
         </thead>

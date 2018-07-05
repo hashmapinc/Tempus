@@ -302,7 +302,14 @@ export default angular.module('tempus.locale', [])
                     "add-to-dashboard": "Add to dashboard",
                     "add-widget-to-dashboard": "Add widget to dashboard",
                     "selected-attributes": "{ count, select, 1 {1 attribute} other {# attributes} } selected",
-                    "selected-telemetry": "{ count, select, 1 {1 telemetry unit} other {# telemetry units} } selected"
+                    "selected-telemetry": "{ count, select, 1 {1 telemetry unit} other {# telemetry units} } selected",
+                    "download-telementry":"Download Latest Telementry",
+                    "download-button":"Download",
+                    "date-validate":"Please Enter Correct Date",
+                    "download-depth":"Download Latest Depth",
+                    "start-required":"Start is required",
+                    "end-required":"End is required"
+
                 },
                 "audit-log": {
                     "audit": "Audit",
@@ -766,6 +773,7 @@ export default angular.module('tempus.locale', [])
                     "configure-alias": "Configure '{{alias}}' alias",
                     "no-devices-matching": "No devices matching '{{entity}}' were found.",
                     "alias": "Alias",
+                    "age": "Age",
                     "alias-required": "Device alias is required.",
                     "remove-alias": "Remove device alias",
                     "add-alias": "Add device alias",
@@ -842,7 +850,9 @@ export default angular.module('tempus.locale', [])
                     "is-gateway": "Is gateway",
                     "public": "Public",
                     "device-public": "Device is public",
-                    "select-device": "Select device"
+                    "select-device": "Select device",
+                    "status": "Status",
+                    "lastTimeRecived" :"Last Time Received"
                 },
                 "dialog": {
                     "close": "Close dialog"

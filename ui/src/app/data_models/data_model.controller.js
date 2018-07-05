@@ -124,13 +124,14 @@ export function DataModelController($log, $mdDialog, $document, $stateParams, da
             toSave.name         = dmo.name;
             toSave.type         = dmo.type;
             if (dmo.parent) {
-                toSave.parentId = { id: dmo.parent.id };
+                toSave.parentId = { id: dmo.parent.id, entityType: "DATA_MODEL_OBJECT"};
             }
             if (dmo.attributes) {
                 toSave.attributeDefinitions = dmo.attributes.map(attr => {
                     return {
-                        "dataModelObjectId" : dmo.id,
-                        "name"              : attr
+                        "dataModelObjectId" : toSave.id,
+                        "name"              : attr,
+                        "valueType"         : "STRING"
                     }
                 });
             }
