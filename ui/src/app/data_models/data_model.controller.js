@@ -130,7 +130,8 @@ export function DataModelController($log, $mdDialog, $document, $stateParams, da
                 toSave.attributeDefinitions = dmo.attributes.map(attr => {
                     return {
                         "dataModelObjectId" : toSave.id,
-                        "name"              : attr
+                        "name"              : attr,
+                        "valueType"         : "STRING"
                     }
                 });
             }
