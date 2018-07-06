@@ -19,6 +19,12 @@ mvn clean'''
         sh 'mvn -Dmaven.test.failure.ignore=true install'
       }
     }
+    stage('SonarQube analysis') {
+      withSonarQubeEnv('SonarCloud') {
+        // requires SonarQube Scanner for Maven 3.2+
+        sh 'mvn org.sonarsource.scanner.maven:sonar-maven-plugin:3.2:sonar'
+      }
+    }
     stage('Report and Archive') {
       steps {
         junit '**/target/surefire-reports/**/*.xml'
