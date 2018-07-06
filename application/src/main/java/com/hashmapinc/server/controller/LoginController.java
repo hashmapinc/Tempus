@@ -16,6 +16,7 @@
 package com.hashmapinc.server.controller;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.hashmapinc.server.exception.TempusException;
 import com.hashmapinc.server.service.security.auth.jwt.RefreshTokenRequest;
 import com.hashmapinc.server.service.security.auth.rest.LoginRequest;
 import com.hashmapinc.server.service.security.auth.rest.LoginResponseToken;
@@ -47,39 +48,47 @@ public class LoginController extends BaseController {
 
     @RequestMapping(value = "/auth/login", method = RequestMethod.POST)
     @ResponseBody
-    public LoginResponseToken loginUser(@RequestBody LoginRequest loginRequest){
-        ResourceOwnerPasswordResourceDetails userPasswordReq = new ResourceOwnerPasswordResourceDetails();
-        userPasswordReq.setAccessTokenUri(apiResourceDetails.getAccessTokenUri());
-        userPasswordReq.setClientId(apiResourceDetails.getClientId());
-        userPasswordReq.setClientSecret(apiResourceDetails.getClientSecret());
-        userPasswordReq.setScope(apiResourceDetails.getScope());
-        userPasswordReq.setUsername(loginRequest.getUsername());
-        userPasswordReq.setPassword(loginRequest.getPassword());
+    public LoginResponseToken loginUser(@RequestBody LoginRequest loginRequest) throws TempusException {
+        try {
+            ResourceOwnerPasswordResourceDetails userPasswordReq = new ResourceOwnerPasswordResourceDetails();
+            userPasswordReq.setAccessTokenUri(apiResourceDetails.getAccessTokenUri());
+            userPasswordReq.setClientId(apiResourceDetails.getClientId());
+            userPasswordReq.setClientSecret(apiResourceDetails.getClientSecret());
+            userPasswordReq.setScope(apiResourceDetails.getScope());
+            userPasswordReq.setUsername(loginRequest.getUsername());
+            userPasswordReq.setPassword(loginRequest.getPassword());
 
-        SecurityContextHolder.getContext().setAuthentication(new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
+            SecurityContextHolder.getContext().setAuthentication(new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
 
-        OAuth2RestOperations oAuth2RestTemplate  = new OAuth2RestTemplate(userPasswordReq);
-        LoginResponseToken loginResponseToken =  new LoginResponseToken(oAuth2RestTemplate.getAccessToken().getValue(), oAuth2RestTemplate.getAccessToken().getRefreshToken().getValue());
-        return loginResponseToken;
+            OAuth2RestOperations oAuth2RestTemplate = new OAuth2RestTemplate(userPasswordReq);
+            LoginResponseToken loginResponseToken = new LoginResponseToken(oAuth2RestTemplate.getAccessToken().getValue(), oAuth2RestTemplate.getAccessToken().getRefreshToken().getValue());
+            return loginResponseToken;
+        }catch (Exception e){
+            throw handleException(e);
+        }
 
     }
 
     @RequestMapping(value = "/auth/token", method = RequestMethod.POST)
     @ResponseBody
-    public LoginResponseToken refreshToken(@RequestBody RefreshTokenRequest refreshTokenRequest){
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+    public LoginResponseToken refreshToken(@RequestBody RefreshTokenRequest refreshTokenRequest) throws TempusException {
+        try {
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
 
-        MultiValueMap<String, String> requestParams = new LinkedMultiValueMap<>();
-        requestParams.add("grant_type", "refresh_token");
-        requestParams.add("refresh_token", refreshTokenRequest.getRefreshToken());
-        HttpEntity<MultiValueMap<String, String>> postRequest = new HttpEntity<>(requestParams, headers);
-        ResponseEntity<JsonNode> responseEntity =
-                restTemplate.postForEntity(apiResourceDetails.getAccessTokenUri(), postRequest, JsonNode.class);
-        if (responseEntity.getStatusCode().equals(HttpStatus.OK)){
-            JsonNode body = responseEntity.getBody();
-            return new LoginResponseToken(body.get("access_token").asText(), body.get("refresh_token").asText());
+            MultiValueMap<String, String> requestParams = new LinkedMultiValueMap<>();
+            requestParams.add("grant_type", "refresh_token");
+            requestParams.add("refresh_token", refreshTokenRequest.getRefreshToken());
+            HttpEntity<MultiValueMap<String, String>> postRequest = new HttpEntity<>(requestParams, headers);
+            ResponseEntity<JsonNode> responseEntity =
+                    restTemplate.postForEntity(apiResourceDetails.getAccessTokenUri(), postRequest, JsonNode.class);
+            if (responseEntity.getStatusCode().equals(HttpStatus.OK)) {
+                JsonNode body = responseEntity.getBody();
+                return new LoginResponseToken(body.get("access_token").asText(), body.get("refresh_token").asText());
+            }
+            return null;
+        }catch (Exception e){
+            throw handleException(e);
         }
-        return null;
     }
 }
