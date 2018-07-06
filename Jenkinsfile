@@ -7,16 +7,25 @@ pipeline {
   }
   stages {
     stage('Initialize') {
-      steps {
-        sh '''echo PATH = ${PATH}
+      parallel {
+        stage('Initialize') {
+          steps {
+            sh '''echo PATH = ${PATH}
 echo M2_HOME = ${M2_HOME}
 mvn clean'''
+          }
+        }
+        stage('') {
+          steps {
+            sh 'echo env.CHANGE_ID'
+          }
+        }
       }
     }
     stage('Build') {
       steps {
         sh 'mvn validate'
-        sh 'mvn -Dmaven.test.failure.ignore=true org.jacoco:jacoco-maven-plugin:prepare-agent package sonar:sonar'
+        sh 'mvn -Dmaven.test.failure.ignore=trueÂ org.jacoco:jacoco-maven-plugin:prepare-agent package sonar:sonar'
       }
     }
     stage('Report and Archive') {
