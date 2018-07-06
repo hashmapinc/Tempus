@@ -20,7 +20,7 @@ import schemaTemplate from './schema.tpl.html';
 /* eslint-enable import/no-unresolved, import/default */
 
 /*@ngInject*/
-export default function DataModelsRoutes($stateProvider, types) {
+export default function SchemaRoutes($stateProvider, types) {
     $stateProvider
         .state('home.schemas', {
             url: '/schema',

@@ -16,9 +16,11 @@
 /* eslint-disable import/no-unresolved, import/default, no-unused-vars */
 
 /*@ngInject*/
-export function SchemaController($window) {
+import {AddDataModelController} from "../data_models/data_models.controller";
+
+export function SchemaController($scope, $window) {
 
     var vm = this;
 
-    $window.alert("hello");
+    /*$window.alert("hello");*/
 }
