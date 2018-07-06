@@ -773,6 +773,7 @@ export default angular.module('tempus.locale', [])
                     "configure-alias": "Configure '{{alias}}' alias",
                     "no-devices-matching": "No devices matching '{{entity}}' were found.",
                     "alias": "Alias",
+                    "age": "Age",
                     "alias-required": "Device alias is required.",
                     "remove-alias": "Remove device alias",
                     "add-alias": "Add device alias",
@@ -849,7 +850,9 @@ export default angular.module('tempus.locale', [])
                     "is-gateway": "Is gateway",
                     "public": "Public",
                     "device-public": "Device is public",
-                    "select-device": "Select device"
+                    "select-device": "Select device",
+                    "status": "Status",
+                    "lastTimeRecived" :"Last Time Received"
                 },
                 "dialog": {
                     "close": "Close dialog"
