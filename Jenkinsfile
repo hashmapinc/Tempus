@@ -16,7 +16,7 @@ mvn clean'''
     stage('Build') {
       steps {
         sh 'mvn validate'
-        sh 'mvn -Dmaven.test.failure.ignore=true install'
+        sh 'mvn -Dmaven.test.failure.ignore=true org.jacoco:jacoco-maven-plugin:prepare-agent package sonar:sonar'
       }
     }
     stage('Report and Archive') {
