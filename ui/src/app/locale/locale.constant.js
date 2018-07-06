@@ -1107,7 +1107,7 @@ export default angular.module('tempus.locale', [])
                     "witsml-version": "WITSML Version",
                     "witsml-status": "Well Status",
                     "witsml-object-types": "Object Types",
-                    "witsml-well-id": "Well Id To Be Scan",
+                    "witsml-well-id": "Well Id To Be Scanned",
                     "sync": {
                         "status": "Status",
                         "sync": "Sync",
