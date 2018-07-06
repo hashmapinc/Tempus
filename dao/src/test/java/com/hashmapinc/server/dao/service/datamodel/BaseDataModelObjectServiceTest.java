@@ -128,20 +128,6 @@ public abstract class BaseDataModelObjectServiceTest extends AbstractServiceTest
     }
 
     @Test
-    public void testSaveWithAlreadyPresentDataModelObjectName() throws Exception {
-        expectedEx.expect(DataValidationException.class);
-        expectedEx.expectMessage("Data Model Object with such name already exists!");
-
-        DataModelObject dataModelObject = new DataModelObject();
-        dataModelObject.setName("well-1");
-        dataModelObject.setCustomerId(new CustomerId(UUIDs.timeBased()));
-        dataModelObject.setDataModelId(dataModelId);
-        dataModelObject.setParentId(null);
-        dataModelObjectService.save(dataModelObject);
-
-    }
-
-    @Test
     public void testSaveAttributeDefinitionWithInvalidName() throws Exception {
         expectedEx.expect(DataValidationException.class);
         expectedEx.expectMessage("Attribute name should be specified!");

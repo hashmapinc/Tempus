@@ -103,11 +103,6 @@ public class DataModelObjectServiceImp implements DataModelObjectService {
                         if(dataModel == null) {
                             throw new DataValidationException("Data Model object is referencing to non-existent data model!");
                         }
-
-                        DataModelObject foundDataModelObj = dataModelObjectDao.findByDataModeIdAndName(dataModelObject);
-                        if(foundDataModelObj != null){
-                            throw new DataValidationException("Data Model Object with such name already exists!");
-                        }
                     }
                 }
             };

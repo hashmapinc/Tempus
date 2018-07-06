@@ -341,6 +341,18 @@
                 <version>${project.version}</version>
             </dependency>
             <dependency>
+                <groupId>org.glassfish.tyrus</groupId>
+                <artifactId>tyrus-client</artifactId>
+                <version>1.13</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.glassfish.tyrus</groupId>
+                <artifactId>tyrus-container-jdk-client</artifactId>
+                <version>1.12</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
                 <groupId>com.hashmapinc.extensions</groupId>
                 <artifactId>extension-rabbitmq</artifactId>
                 <classifier>extension</classifier>
