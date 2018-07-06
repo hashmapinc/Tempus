@@ -27,13 +27,17 @@ mvn clean'''
     }
     stage('Publish Image') {
       steps {
-        sh 'cp $WORKSPACE/application/target/tempus.deb $WORKSPACE/docker/tb/tempus.deb'
+        sh '''cp $WORKSPACE/application/target/tempus.deb $WORKSPACE/docker/tb/tempus.deb
+cp $WORKSPACE/application/target/tempus.deb $WORKSPACE/docker/cassandra-setup/tempus.deb'''
         withCredentials(bindings: [usernamePassword(credentialsId: 'docker_hub', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
           sh 'sudo docker login -u $USERNAME -p $PASSWORD'
         }
 
-        sh 'sudo docker build $WORKSPACE/docker/tb/ -t hashmapinc/tempus:dev'
-        sh 'sudo docker push hashmapinc/tempus:dev'
+        sh '''sudo docker build $WORKSPACE/docker/tb/ -t hashmapinc/tempus:dev
+sudo docker build $WORKSPACE/docker/cassandra-setup/ -t hashmapinc/cassandra-setup:dev'''
+        sh '''sudo docker push hashmapinc/tempus:dev
+sudo docker push hashmapinc/cassandra-setup:dev
+'''
       }
     }
   }
