@@ -1014,6 +1014,7 @@ export default angular.module('tempus.locale', [])
                     "add-map": "Add mapping element",
                     "timeseries": "Timeseries",
                     "add-timeseries": "Add timeseries",
+                    "timezone": "Time Zone",
                     "field-required": "Field is required",
                     "brokers": "Brokers",
                     "add-broker": "Add broker",
