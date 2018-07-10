@@ -40,6 +40,10 @@ import com.hashmapinc.server.common.msg.cluster.ClusterEventMsg;
 import com.hashmapinc.server.extensions.spark.computation.action.SparkComputationRequest;
 import com.hashmapinc.server.extensions.spark.computation.model.Batch;
 import com.hashmapinc.server.extensions.spark.computation.model.SparkComputationStatus;
+import org.apache.commons.lang.StringUtils;
+import org.springframework.http.*;
+import org.springframework.web.client.RestClientException;
+import org.springframework.web.client.RestTemplate;
 import scala.concurrent.duration.Duration;
 
 import java.io.IOException;
