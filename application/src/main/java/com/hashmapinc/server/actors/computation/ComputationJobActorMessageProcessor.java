@@ -25,6 +25,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hashmap.tempus.models.ArgType;
 import com.hashmapinc.server.exception.TempusApplicationException;
 import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
@@ -163,11 +164,12 @@ public class ComputationJobActorMessageProcessor extends ComponentMsgProcessor<C
 
     private void buildBaseUrl(){
         JsonNode configuration = job.getArgParameters();
-        logger.info("Configuration is : " + configuration.asText());
+        logger.info("Configuration is : " + configuration.toString());
+        String host = (configuration.get("host") != null)?configuration.get("host").asText():systemContext.getLivyHost();
+        int port = (configuration.get("port") != null)?configuration.get("port").asInt():systemContext.getLivyPort();
         this.baseUrl = String.format(
                 BASE_URL_TEMPLATE,
-                configuration.get("host").asText("localhost"),
-                configuration.get("port").asInt(8080));
+                host, port);
         logger.info("[{}] Base url for computation is [{}]", entityId, baseUrl);
     }
 

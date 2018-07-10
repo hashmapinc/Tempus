@@ -182,6 +182,12 @@ public class ActorSystemContext {
     @Value("${actors.computation.location}")
     @Getter private String computationLocation;
 
+    @Value("${spark.livy_host}")
+    @Getter private String livyHost;
+
+    @Value("${spark.livy_port}")
+    @Getter private int livyPort;
+
     @Getter @Setter private ActorSystem actorSystem;
 
     @Getter @Setter private ActorRef appActor;
