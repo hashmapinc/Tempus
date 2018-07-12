@@ -182,15 +182,7 @@ public class RestUserService extends AbstractEntityService implements UserServic
     public User saveExternalUser(User user){
         log.trace("Executing save external user [{}]", user);
         userValidator.validate(user);
-        User savedUser = userDao.save(user);
-        /*if(user.getId() == null) {
-            UserCredentials userCredentials = new UserCredentials();
-            userCredentials.setEnabled(true);
-            userCredentials.setActivateToken(null);
-            userCredentials.setUserId(new UserId(savedUser.getUuidId()));
-            userCredentialsDao.save(userCredentials);
-        }*/
-        return savedUser;
+        return userDao.save(user);
     }
 
     @Override
