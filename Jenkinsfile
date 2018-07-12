@@ -26,6 +26,9 @@ mvn clean'''
       }
     }
     stage('Publish Image') {
+      when {
+        branch 'dev'
+      }
       steps {
         sh '''cp $WORKSPACE/application/target/tempus.deb $WORKSPACE/docker/tb/tempus.deb
 cp $WORKSPACE/application/target/tempus.deb $WORKSPACE/docker/cassandra-setup/tempus.deb'''
