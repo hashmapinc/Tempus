@@ -52,7 +52,7 @@ public class AttributeBasedPermissionEvaluator implements PermissionEvaluator{
 
     @Override
     public boolean hasPermission(Authentication authentication, Object targetDomainObject, Object action) {
-        log.debug("hasPersmission({}, {}, {})", authentication, targetDomainObject, action);
+        log.debug("hasPermission({}, {}, {})", authentication, targetDomainObject, action);
 
         if (targetDomainObject == null) {
             log.info("Cannot evaluate attribute based permissions for null targetDomainObject");
