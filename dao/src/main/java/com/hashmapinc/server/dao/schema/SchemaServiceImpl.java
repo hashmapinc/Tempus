@@ -23,6 +23,9 @@ import com.hashmapinc.server.dao.service.Validator;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.Optional;
+
 import static com.hashmapinc.server.dao.service.Validator.validateId;
 
 @Service
@@ -41,10 +44,10 @@ public class SchemaServiceImpl extends AbstractEntityService implements SchemaSe
     }
 
     @Override
-    public Schema findSchemaBySchemaId(SchemaId schemaId) {
-        log.trace("Executing findSchemaByTenantId [{}]", schemaId);
+    public Schema findSchemaById(SchemaId schemaId) {
+        log.trace("Executing findSchemaById [{}]", schemaId);
         validateId(schemaId, INCORRECT_SCHEMA_ID + schemaId);
-        return  schemaDao.findSchemaBySchemaId(schemaId.getId());
+        return  schemaDao.findSchemaById(schemaId);
     }
 
     @Override
@@ -60,7 +63,7 @@ public class SchemaServiceImpl extends AbstractEntityService implements SchemaSe
 
         log.trace("Executing deleteSchema [{}]", schemaId);
         Validator.validateId(schemaId, INCORRECT_SCHEMA_ID + schemaId);
-        Schema schema = findSchemaBySchemaId(schemaId);
+        Schema schema = findSchemaById(schemaId);
         if (schema == null) {
             throw new IncorrectParameterException("Unable to delete non-existent schema.");
         }

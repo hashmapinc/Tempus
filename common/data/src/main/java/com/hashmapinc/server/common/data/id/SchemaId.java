@@ -23,7 +23,6 @@ import com.hashmapinc.server.common.data.EntityType;
 import java.util.UUID;
 
 public final class SchemaId extends UUIDBased implements EntityId {
-
     private static final long serialVersionUID = 1L;
 
     @JsonCreator
@@ -38,6 +37,6 @@ public final class SchemaId extends UUIDBased implements EntityId {
     @JsonIgnore
     @Override
     public EntityType getEntityType() {
-        return EntityType.NODE_METRIC;
+        return EntityType.SCHEMA;
     }
 }

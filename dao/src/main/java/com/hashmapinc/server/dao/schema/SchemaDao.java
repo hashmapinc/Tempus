@@ -15,8 +15,11 @@
  */
 package com.hashmapinc.server.dao.schema;
 
+import com.hashmapinc.server.common.data.id.SchemaId;
 import com.hashmapinc.server.common.data.schema.Schema;
 import com.hashmapinc.server.dao.Dao;
+
+import java.util.Optional;
 import java.util.UUID;
 
 /**
@@ -38,7 +41,7 @@ public interface SchemaDao extends Dao<Schema> {
      * @param schemaID the schema id
      * @return the schema object
      */
-    Schema findSchemaBySchemaId(UUID schemaID);
+    Schema findSchemaById(SchemaId schemaID);
 
     /**
      * Find schema by name.
@@ -47,5 +50,7 @@ public interface SchemaDao extends Dao<Schema> {
      * @return the schema object
      */
     Schema findSchemaByName(String name);
+
+    boolean removeById(UUID id);
 
 }

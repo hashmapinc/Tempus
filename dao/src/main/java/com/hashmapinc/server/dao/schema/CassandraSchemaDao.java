@@ -19,6 +19,7 @@ package com.hashmapinc.server.dao.schema;
 
 import com.datastax.driver.core.querybuilder.Select;
 import com.datastax.driver.core.querybuilder.Select.Where;
+import com.hashmapinc.server.common.data.id.SchemaId;
 import com.hashmapinc.server.common.data.schema.Schema;
 import com.hashmapinc.server.dao.DaoUtil;
 import com.hashmapinc.server.dao.model.ModelConstants;
@@ -51,7 +52,7 @@ public class CassandraSchemaDao extends CassandraAbstractModelDao<SchemaEntity,S
     }
 
     @Override
-    public Schema findSchemaBySchemaId(UUID id) {
+    public Schema findSchemaById(SchemaId id) {
         Select select = select().from(ModelConstants.SCHEMA_REGISTRY_COLUMN_FAMILY_NAME).allowFiltering();
         Where query = select.where();
         query.and(eq(ModelConstants.ID_PROPERTY,id));

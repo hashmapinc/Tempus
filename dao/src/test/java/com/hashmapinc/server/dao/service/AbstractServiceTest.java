@@ -32,6 +32,8 @@ import com.hashmapinc.server.common.data.plugin.ComponentScope;
 import com.hashmapinc.server.common.data.plugin.ComponentType;
 import com.hashmapinc.server.common.data.plugin.PluginMetaData;
 import com.hashmapinc.server.common.data.rule.RuleMetaData;
+import com.hashmapinc.server.common.data.schema.Schema;
+import com.hashmapinc.server.common.data.schema.SchemaType;
 import com.hashmapinc.server.dao.TagMetaData.TagMetaDataService;
 import com.hashmapinc.server.dao.alarm.AlarmService;
 import com.hashmapinc.server.dao.asset.AssetService;
@@ -52,6 +54,7 @@ import com.hashmapinc.server.dao.logo.LogoService;
 import com.hashmapinc.server.dao.plugin.PluginService;
 import com.hashmapinc.server.dao.relation.RelationService;
 import com.hashmapinc.server.dao.rule.RuleService;
+import com.hashmapinc.server.dao.schema.SchemaService;
 import com.hashmapinc.server.dao.settings.UserSettingsService;
 import com.hashmapinc.server.dao.tenant.TenantService;
 import com.hashmapinc.server.dao.theme.ThemeService;
@@ -161,6 +164,9 @@ public abstract class AbstractServiceTest {
     @Autowired
     protected DataModelObjectService dataModelObjectService;
 
+    @Autowired
+    protected SchemaService schemaService;
+
     class IdComparator<D extends BaseData<? extends UUIDBased>> implements Comparator<D> {
         @Override
         public int compare(D o1, D o2) {
@@ -223,6 +229,14 @@ public abstract class AbstractServiceTest {
         return nodeMetric;
     }
 
+    protected Schema generateSchema(String name, String descripiton, SchemaType type, String text) throws IOException {
+        Schema schema = new Schema();
+        schema.setName(name);
+        schema.setDescription(descripiton);
+        schema.setType(type);
+        schema.setSchema_txt(text);
+        return schema;
+    }
     protected Computations generateComputation(TenantId tenantId) throws IOException {
         String jsonString = "{\"title\":\"computationsTest\",\"property\":\"window\"}";
         ObjectMapper mapper = new ObjectMapper();

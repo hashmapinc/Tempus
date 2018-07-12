@@ -24,12 +24,14 @@ import com.hashmapinc.server.common.data.computation.ComputationJob;
 import com.hashmapinc.server.common.data.id.*;
 import com.hashmapinc.server.common.data.page.TextPageLink;
 import com.hashmapinc.server.common.data.plugin.ComponentDescriptor;
+import com.hashmapinc.server.common.data.schema.Schema;
 import com.hashmapinc.server.dao.application.ApplicationService;
 import com.hashmapinc.server.dao.cluster.NodeMetricService;
 import com.hashmapinc.server.dao.datamodel.DataModelObjectService;
 import com.hashmapinc.server.dao.datamodel.DataModelService;
 import com.hashmapinc.server.dao.device.DeviceCredentialsService;
 import com.hashmapinc.server.dao.rule.RuleService;
+import com.hashmapinc.server.dao.schema.SchemaService;
 import com.hashmapinc.server.dao.user.UserService;
 import com.hashmapinc.server.service.component.ComponentDiscoveryService;
 import com.hashmapinc.server.service.security.model.SecurityUser;
@@ -148,6 +150,9 @@ public abstract class BaseController {
 
     @Autowired
     protected AuditLogService auditLogService;
+
+    @Autowired
+    protected SchemaService schemaService;
 
     @Autowired
     protected NodeMetricService nodeMetricService;
@@ -598,6 +603,18 @@ public abstract class BaseController {
         }
         return rule;
     }
+
+    Schema checkSchemaId(SchemaId schemaId) throws TempusException {
+        try {
+            validateId(schemaId, "Incorrect schemaId " + schemaId);
+            Schema schema = schemaService.findSchemaBySchemaId(schemaId);
+            checkNotNull(schema);
+            return schema;
+        } catch (Exception e) {
+            throw handleException(e, false);
+        }
+    }
+
 
     protected String constructBaseUrl(HttpServletRequest request) {
         String scheme = request.getScheme();

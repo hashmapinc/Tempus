@@ -18,6 +18,8 @@ package com.hashmapinc.server.dao.schema;
 import com.hashmapinc.server.common.data.schema.Schema;
 import com.hashmapinc.server.common.data.id.SchemaId;
 
+import java.util.Optional;
+
 /**
  * The interface Schema service.
  */
@@ -37,7 +39,7 @@ public interface SchemaService {
      * @param schemaId the schema id
      * @return the schema
      */
-    Schema findSchemaBySchemaId(SchemaId schemaId);
+    Schema findSchemaById(SchemaId schemaId);
 
     /**
      * Save schema schema.

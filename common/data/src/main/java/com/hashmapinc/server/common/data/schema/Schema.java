@@ -16,8 +16,6 @@
 package com.hashmapinc.server.common.data.schema;
 
 import com.hashmapinc.server.common.data.BaseData;
-import com.hashmapinc.server.common.data.cluster.NodeStatus;
-import com.hashmapinc.server.common.data.id.NodeMetricId;
 import com.hashmapinc.server.common.data.id.SchemaId;
 import lombok.EqualsAndHashCode;
 
@@ -39,7 +37,6 @@ public class Schema extends BaseData<SchemaId> {
     }
 
     public Schema(Schema schema) {
-
         super(schema);
         this.name = schema.name;
         this.description = schema.description;
