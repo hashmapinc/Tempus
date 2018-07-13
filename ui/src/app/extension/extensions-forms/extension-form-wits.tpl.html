@@ -95,6 +95,16 @@
                                             <input required name="attributes_channels_{{serverIndex}}" ng-model="server.attributesChannelNumbers">
                                         </md-input-container>
                                     </div>
+                                    <div>
+                                        <md-input-container class="md-block tb-container-for-select">
+                                            <label translate>extension.timezone</label>
+                                            <md-select required name="timezone_{{serverIndex}}" ng-model="server.timezone">
+                                                <md-option ng-value="timezone" ng-repeat="timezone in timezoneList">
+                                                    <span ng-bind="::timezone"></span>
+                                                </md-option>
+                                            </md-select>
+                                        </md-input-container>
+                                    </div>
                                     <section flex layout="column">
                                         <div class="tb-container" ng-class="{'ng-invalid':!server.records.file}">
                                             <span ng-init='fieldsToFill = {"fileName":"fileName", "file":"file"}'></span>

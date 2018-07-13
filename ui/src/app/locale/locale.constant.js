@@ -1014,6 +1014,7 @@ export default angular.module('tempus.locale', [])
                     "add-map": "Add mapping element",
                     "timeseries": "Timeseries",
                     "add-timeseries": "Add timeseries",
+                    "timezone": "Time Zone",
                     "field-required": "Field is required",
                     "brokers": "Brokers",
                     "add-broker": "Add broker",
@@ -1107,6 +1108,7 @@ export default angular.module('tempus.locale', [])
                     "witsml-version": "WITSML Version",
                     "witsml-status": "Well Status",
                     "witsml-object-types": "Object Types",
+                    "witsml-well-id": "Well Id To Be Scanned",
                     "sync": {
                         "status": "Status",
                         "sync": "Sync",

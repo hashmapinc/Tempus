@@ -124,6 +124,10 @@ module.exports = {
                     'img?minimize'
                 ]
             },
+            {
+                test: /\.json$/,
+                loaders: ['json-loader']
+            }
         ],
     },
     'html-minifier-loader': {
