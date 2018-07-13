@@ -1,0 +1,18 @@
+{
+  "request": {
+    "url": "/uaa/oauth/token",
+    "method": "POST",
+    "bodyPatterns" : [
+      {
+        "equalTo": "grant_type=password&username=sysadmin%40hashmapinc.com&password=sysadmin&scope=server"
+      }
+    ]
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-type": "application/json"
+    },
+    "body": "{\"access_token\":\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0ZW5hbnRfaWQiOiIxMzgxNDAwMC0xZGQyLTExYjItODA4MC04MDgwODA4MDgwODAiLCJsYXN0TmFtZSI6IkFkbWluIiwidXNlcl9uYW1lIjoic3lzYWRtaW5AaGFzaG1hcGluYy5jb20iLCJkZXNjcmlwdGlvbiI6IlRoaXMgaXMgYSBkZW1vIHN5c3RlbSBhZG1pbiB1c2VkIGZvciB0ZXN0aW5nIiwiY2xpZW50X2lkIjoidGVtcHVzIiwiZW5hYmxlZCI6dHJ1ZSwiYXV0aG9yaXRpZXMiOlsiU1lTX0FETUlOIl0sImZpcnN0TmFtZSI6IlN5c3RlbSIsInNjb3BlIjpbInNlcnZlciJdLCJpZCI6IjU5ZWFiODgwLTQ2MTItMTFlNy04MDgwLTgwODA4MDgwODA4MCIsImN1c3RvbWVyX2lkIjoiMTM4MTQwMDAtMWRkMi0xMWIyLTgwODAtODA4MDgwODA4MDgwIiwiZXhwIjoxNTM5Mjc0Njk5LCJpYXQiOjE1MzAyNzQ2OTksImp0aSI6IjM2MGFlNTFmLWM4YjMtNDBiYy04NWI0LTZhZDdiN2ViZWI3OSJ9.mHr49w4-xn3hamsXkP0QgHOIxuekSn01HO-p7ddmcy0\",\"token_type\":\"bearer\",\"refresh_token\":\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0ZW5hbnRfaWQiOiIxMzgxNDAwMC0xZGQyLTExYjItODA4MC04MDgwODA4MDgwODAiLCJsYXN0TmFtZSI6IkFkbWluIiwidXNlcl9uYW1lIjoic3lzYWRtaW5AaGFzaG1hcGluYy5jb20iLCJkZXNjcmlwdGlvbiI6IlRoaXMgaXMgYSBkZW1vIHN5c3RlbSBhZG1pbiB1c2VkIGZvciB0ZXN0aW5nIiwiY2xpZW50X2lkIjoidGVtcHVzIiwiZW5hYmxlZCI6dHJ1ZSwiYXV0aG9yaXRpZXMiOlsiU1lTX0FETUlOIl0sImZpcnN0TmFtZSI6IlN5c3RlbSIsInNjb3BlIjpbInNlcnZlciJdLCJhdGkiOiIzNjBhZTUxZi1jOGIzLTQwYmMtODViNC02YWQ3YjdlYmViNzkiLCJpZCI6IjU5ZWFiODgwLTQ2MTItMTFlNy04MDgwLTgwODA4MDgwODA4MCIsImN1c3RvbWVyX2lkIjoiMTM4MTQwMDAtMWRkMi0xMWIyLTgwODAtODA4MDgwODA4MDgwIiwiZXhwIjoxNTY2Mjc0Njk5LCJpYXQiOjE1MzAyNzQ2OTksImp0aSI6ImVhMzY3NzUwLTBkZGMtNDMxMy05ZWNmLTE4NmMyYmY2MWZiNCJ9.542JkVdbyihwO9kyeGKN-fG3kGdMOjOgqpgOYPAb3pU\"}"
+  }
+}

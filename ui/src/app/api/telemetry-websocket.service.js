@@ -355,7 +355,7 @@ function TelemetryWebsocketService($rootScope, $websocket, $timeout, $window, ty
     }
 
     function openSocket(token) {
-        dataStream = $websocket(telemetryUri + '?token=' + token);
+        dataStream = $websocket(telemetryUri + '?access_token=' + token);
         dataStream.onError(onError);
         dataStream.onOpen(onOpen);
         dataStream.onClose(onClose);

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.hashmapinc.server.service.security.model.token;
+/*package com.hashmapinc.server.service.security.model.token;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.jsonwebtoken.Claims;
@@ -35,4 +35,4 @@ public final class AccessJwtToken implements JwtToken {
     public Claims getClaims() {
         return claims;
     }
-}
+}*/

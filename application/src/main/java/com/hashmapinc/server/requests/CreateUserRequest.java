@@ -13,22 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.hashmapinc.server.service.security.auth.rest;
+package com.hashmapinc.server.requests;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Builder;
+import lombok.Data;
 
-public class PublicLoginRequest {
-
-    private String publicId;
-
-    @JsonCreator
-    public PublicLoginRequest(@JsonProperty("publicId") String publicId) {
-        this.publicId = publicId;
-   }
-
-    public String getPublicId() {
-        return publicId;
-    }
-
+@Data
+@Builder
+public class CreateUserRequest {
+    private IdentityUser user;
+    private String activationType;
 }

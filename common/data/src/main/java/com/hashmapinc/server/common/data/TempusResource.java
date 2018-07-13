@@ -13,11 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.hashmapinc.server.dao.service.nosql;
+package com.hashmapinc.server.common.data;
 
-import com.hashmapinc.server.dao.service.BaseUserServiceTest;
-import com.hashmapinc.server.dao.service.DaoNoSqlTest;
+import com.hashmapinc.server.common.data.id.CustomerId;
+import com.hashmapinc.server.common.data.id.EntityId;
+import com.hashmapinc.server.common.data.id.TenantId;
 
-@DaoNoSqlTest
-public class UserServiceNoSqlTest extends BaseUserServiceTest {
+public interface TempusResource {
+    TenantId getTenantId();
+    String getType();
+    EntityId getId();
+    CustomerId getCustomerId();
 }

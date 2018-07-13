@@ -48,7 +48,6 @@ public abstract class AbstractMqttTelemetryIntegrationTest extends AbstractContr
     private String accessToken;
     private Device savedGatewayDevice;
     private String gatewayAccessToken;
-    private TenantId tenantId;
     @Autowired
     private DeviceService deviceService;
 
@@ -75,7 +74,6 @@ public abstract class AbstractMqttTelemetryIntegrationTest extends AbstractContr
         JsonNode additionalInfo = mapper.readTree("{\"gateway\":true}");
         gatewayDevice.setAdditionalInfo(additionalInfo);
         savedGatewayDevice = doPost("/api/device", gatewayDevice, Device.class);
-        tenantId = savedGatewayDevice.getTenantId();
 
         DeviceCredentials gatewayDeviceCredentials =
                 doGet("/api/device/" + savedGatewayDevice.getId().getId().toString() + "/credentials", DeviceCredentials.class);

@@ -45,7 +45,7 @@ import java.util.List;
 
 import static com.hashmapinc.server.dao.service.Validator.*;
 
-@Service
+//@Service
 @Slf4j
 public class UserServiceImpl extends AbstractEntityService implements UserService {
 

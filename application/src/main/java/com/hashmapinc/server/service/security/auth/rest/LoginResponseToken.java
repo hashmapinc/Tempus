@@ -13,20 +13,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.hashmapinc.server.service.security.auth;
+package com.hashmapinc.server.service.security.auth.rest;
 
-import com.hashmapinc.server.service.security.model.SecurityUser;
-import com.hashmapinc.server.service.security.model.token.RawAccessJwtToken;
+public class LoginResponseToken {
+    private String token;
+    private String refreshToken;
 
-public class RefreshAuthenticationToken extends AbstractJwtAuthenticationToken {
-
-    private static final long serialVersionUID = -1311042791508924523L;
-
-    public RefreshAuthenticationToken(RawAccessJwtToken unsafeToken) {
-        super(unsafeToken);
+    public LoginResponseToken(String token, String refreshToken) {
+        this.token = token;
+        this.refreshToken = refreshToken;
     }
 
-    public RefreshAuthenticationToken(SecurityUser securityUser) {
-        super(securityUser);
+    public String getToken() {
+        return token;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
+    }
+
+    public String getRefreshToken() {
+        return refreshToken;
+    }
+
+    public void setRefreshToken(String refreshToken) {
+        this.refreshToken = refreshToken;
     }
 }

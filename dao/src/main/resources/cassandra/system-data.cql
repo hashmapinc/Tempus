@@ -18,18 +18,18 @@
 
 /** System admin **/
 INSERT INTO tempus.user ( id, tenant_id, customer_id, email, search_text, authority )
-VALUES ( minTimeuuid ( '2016-11-01 01:01:01+0000' ), minTimeuuid ( 0 ), minTimeuuid ( 0 ), 'sysadmin@hashmapinc.com',
+VALUES ( minTimeuuid ( '2017-05-31 15:03:49+0000' ), minTimeuuid ( 0 ), minTimeuuid ( 0 ), 'sysadmin@hashmapinc.com',
 'sysadmin@hashmapinc.com', 'SYS_ADMIN' );
 
 INSERT INTO tempus.user_credentials ( id, user_id, enabled, password )
-VALUES ( now ( ), minTimeuuid ( '2016-11-01 01:01:01+0000' ), true,
+VALUES ( now ( ), minTimeuuid ( '2017-05-31 15:03:49+0000' ), true,
 '$2a$10$5JTB8/hxWc9WAy62nCGSxeefl3KWmipA9nFpVdDa0/xfIseeBB4Bu' );
 
 /** System settings **/
 INSERT INTO tempus.user_settings ( id, key, json_value, user_id )
 VALUES ( now ( ), 'general', '{
 	"baseUrl": "http://localhost:8080"
-}', minTimeuuid ( '2016-11-01 01:01:01+0000' ) );
+}', minTimeuuid ( '2017-05-31 15:03:49+0000' ) );
 
 INSERT INTO tempus.user_settings ( id, key, json_value, user_id )
 VALUES ( now ( ), 'mail', '{
@@ -41,7 +41,7 @@ VALUES ( now ( ), 'mail', '{
 	"enableTls": "false",
 	"username": "",
 	"password": ""
-}',minTimeuuid ( '2016-11-01 01:01:01+0000' ) );
+}',minTimeuuid ( '2017-05-31 15:03:49+0000' ) );
 
 /** System widgets library **/
 INSERT INTO "tempus"."widgets_bundle" ( "id", "tenant_id", "alias", "search_text", "title" )

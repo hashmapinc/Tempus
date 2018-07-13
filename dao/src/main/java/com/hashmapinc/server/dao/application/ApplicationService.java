@@ -70,4 +70,6 @@ public interface ApplicationService {
 
     void suspendApplicationById(ApplicationId applicationId);
 
+    void deleteApplicationByTenantId(TenantId tenantId);
+
 }

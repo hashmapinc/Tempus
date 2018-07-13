@@ -17,10 +17,12 @@ package com.hashmapinc.server.controller.sql;
 
 import com.hashmapinc.server.dao.service.DaoSqlTest;
 import com.hashmapinc.server.controller.BaseUserControllerTest;
+import org.junit.Ignore;
 
 /**
  * Created by Valerii Sosliuk on 6/28/2017.
  */
 @DaoSqlTest
+@Ignore
 public class UserControllerSqlTest extends BaseUserControllerTest {
 }

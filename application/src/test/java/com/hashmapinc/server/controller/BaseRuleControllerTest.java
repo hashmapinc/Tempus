@@ -47,8 +47,6 @@ public abstract class BaseRuleControllerTest extends AbstractControllerTest {
     private IdComparator<RuleMetaData> idComparator = new IdComparator<>();
 
     private static final ObjectMapper mapper = new ObjectMapper();
-    private Tenant savedTenant;
-    private User tenantAdmin;
     private PluginMetaData sysPlugin;
     private PluginMetaData tenantPlugin;
 
@@ -66,19 +64,7 @@ public abstract class BaseRuleControllerTest extends AbstractControllerTest {
         sysPlugin.setClazz(TelemetryStoragePlugin.class.getName());
         sysPlugin = doPost("/api/plugin", sysPlugin, PluginMetaData.class);
 
-        Tenant tenant = new Tenant();
-        tenant.setTitle("My tenant");
-        savedTenant = doPost("/api/tenant", tenant, Tenant.class);
-        Assert.assertNotNull(savedTenant);
-
-        tenantAdmin = new User();
-        tenantAdmin.setAuthority(Authority.TENANT_ADMIN);
-        tenantAdmin.setTenantId(savedTenant.getId());
-        tenantAdmin.setEmail("tenant2@tempus.org");
-        tenantAdmin.setFirstName("Joe");
-        tenantAdmin.setLastName("Downs");
-
-        tenantAdmin = createUserAndLogin(tenantAdmin, "testPassword1");
+        loginTenantAdmin();
 
         tenantPlugin = new PluginMetaData();
         tenantPlugin.setName("My plugin");
@@ -91,9 +77,6 @@ public abstract class BaseRuleControllerTest extends AbstractControllerTest {
     @After
     public void afterTest() throws Exception {
         loginSysAdmin();
-
-        doDelete("/api/tenant/" + savedTenant.getId().getId().toString())
-                .andExpect(status().isOk());
 
         doDelete("/api/plugin/" + sysPlugin.getId().getId()).andExpect(status().isOk());
     }
