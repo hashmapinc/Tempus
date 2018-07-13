@@ -42,9 +42,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class BaseComputationJobControllerTest extends AbstractControllerTest {
     private IdComparator<Application> idComparator = new IdComparator<>();
 
-    private Tenant savedTenant;
     private Computations savedComputations;
-    private User tenantAdmin;
 
     private PluginMetaData sysPlugin;
     private PluginMetaData tenantPlugin;
@@ -56,25 +54,7 @@ public class BaseComputationJobControllerTest extends AbstractControllerTest {
 
     @Before
     public void beforeTest() throws Exception {
-        loginSysAdmin();
-
-        Tenant tenant = new Tenant();
-        tenant.setTitle("My tenant");
-        savedTenant = doPost("/api/tenant", tenant, Tenant.class);
-        Assert.assertNotNull(savedTenant);
-
-        tenantAdmin = new User();
-        tenantAdmin.setAuthority(Authority.TENANT_ADMIN);
-        tenantAdmin.setTenantId(savedTenant.getId());
-        tenantAdmin.setEmail("tenant2@tempus.org");
-        tenantAdmin.setFirstName("Joe");
-        tenantAdmin.setLastName("Downs");
-
-        if(ldapEnabled) {
-            createLDAPEntry(tenantAdmin.getEmail(), "testPassword1");
-        }
-        tenantAdmin = createUserAndLogin(tenantAdmin, "testPassword1");
-
+        loginTenantAdmin();
 
         sysPlugin = new PluginMetaData();
         sysPlugin.setName("Sys plugin");
@@ -102,15 +82,7 @@ public class BaseComputationJobControllerTest extends AbstractControllerTest {
         computations.setArgsType("ArgsType");
         savedComputations = computationsService.save(computations);
     }
-    @After
-    public void afterTest() throws Exception {
-        loginSysAdmin();
-        if(ldapEnabled) {
-            deleteLDAPEntry(tenantAdmin.getEmail());
-        }
-        doDelete("/api/tenant/"+savedTenant.getId().getId().toString())
-                .andExpect(status().isOk());
-    }
+
 
     @Test
     public void testDeleteComputationJobAndUpdateApplication() throws Exception {

@@ -38,34 +38,9 @@ public abstract class BaseWidgetsBundleControllerTest extends AbstractController
 
     private IdComparator<WidgetsBundle> idComparator = new IdComparator<>();
 
-    private Tenant savedTenant;
-    private User tenantAdmin;
-
     @Before
     public void beforeTest() throws Exception {
-        loginSysAdmin();
-
-        Tenant tenant = new Tenant();
-        tenant.setTitle("My tenant");
-        savedTenant = doPost("/api/tenant", tenant, Tenant.class);
-        Assert.assertNotNull(savedTenant);
-
-        tenantAdmin = new User();
-        tenantAdmin.setAuthority(Authority.TENANT_ADMIN);
-        tenantAdmin.setTenantId(savedTenant.getId());
-        tenantAdmin.setEmail("tenant2@tempus.org");
-        tenantAdmin.setFirstName("Joe");
-        tenantAdmin.setLastName("Downs");
-
-        tenantAdmin = createUserAndLogin(tenantAdmin, "testPassword1");
-    }
-
-    @After
-    public void afterTest() throws Exception {
-        loginSysAdmin();
-
-        doDelete("/api/tenant/"+savedTenant.getId().getId().toString())
-                .andExpect(status().isOk());
+        loginTenantAdmin();
     }
 
     @Test
@@ -133,8 +108,6 @@ public abstract class BaseWidgetsBundleControllerTest extends AbstractController
 
     @Test
     public void testFindTenantWidgetsBundlesByPageLink() throws Exception {
-
-        login(tenantAdmin.getEmail(), "testPassword1");
 
         List<WidgetsBundle> sysWidgetsBundles = doGetTyped("/api/widgetsBundles?",
                 new TypeReference<List<WidgetsBundle>>(){});
@@ -228,8 +201,6 @@ public abstract class BaseWidgetsBundleControllerTest extends AbstractController
     @Test
     public void testFindTenantWidgetsBundles() throws Exception {
 
-        login(tenantAdmin.getEmail(), "testPassword1");
-
         List<WidgetsBundle> sysWidgetsBundles = doGetTyped("/api/widgetsBundles?",
                 new TypeReference<List<WidgetsBundle>>(){});
 
@@ -273,7 +244,7 @@ public abstract class BaseWidgetsBundleControllerTest extends AbstractController
         List<WidgetsBundle> widgetsBundles = new ArrayList<>();
         widgetsBundles.addAll(systemWidgetsBundles);
 
-        login(tenantAdmin.getEmail(), "testPassword1");
+        loginTenantAdmin();
 
         for (int i=0;i<127;i++) {
             WidgetsBundle widgetsBundle = new WidgetsBundle();

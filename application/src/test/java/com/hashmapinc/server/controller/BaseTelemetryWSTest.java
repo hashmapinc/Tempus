@@ -95,13 +95,13 @@ public abstract class BaseTelemetryWSTest extends AbstractControllerTest{
 
 
     @Test
-    public void TestTimeZoneAddedToDeviceTelemetry() throws Exception {
+    public void testTimeZoneIsAddedToDeviceTelemetry() throws Exception {
 
         publishTimeZoneAndTimesries();
         messageLatch = new CountDownLatch(1);
         try {
             String url = String.format(URL_FORMAT, port);
-            client.connectToServer(new ClientTestEndpoint(), cec, new URI(url + "telemetry?token=" + this.token));
+            client.connectToServer(new ClientTestEndpoint(), cec, new URI(url + "telemetry?access_token=" + this.token));
         }
         catch (Exception e) {
             e.printStackTrace();

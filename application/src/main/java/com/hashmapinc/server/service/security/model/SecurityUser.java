@@ -16,6 +16,7 @@
 package com.hashmapinc.server.service.security.model;
 
 import com.hashmapinc.server.common.data.User;
+import com.hashmapinc.server.common.data.UserPermission;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import com.hashmapinc.server.common.data.id.UserId;
@@ -29,6 +30,7 @@ public class SecurityUser extends User {
     private static final long serialVersionUID = -797397440703066079L;
 
     private Collection<GrantedAuthority> authorities;
+    private Collection<UserPermission> userPermissions;
     private boolean enabled;
     private UserPrincipal userPrincipal;
 
@@ -44,6 +46,13 @@ public class SecurityUser extends User {
         super(user);
         this.enabled = enabled;
         this.userPrincipal = userPrincipal;
+    }
+
+    public Collection<UserPermission> getUserPermissions(){
+        if (userPermissions == null) {
+            userPermissions = this.getPermissions().stream().map(p -> new UserPermission(p)).collect(Collectors.toList());
+        }
+        return userPermissions;
     }
 
     public Collection<GrantedAuthority> getAuthorities() {

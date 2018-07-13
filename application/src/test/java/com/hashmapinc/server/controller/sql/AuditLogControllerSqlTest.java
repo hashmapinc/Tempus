@@ -20,4 +20,5 @@ import com.hashmapinc.server.dao.service.DaoSqlTest;
 
 @DaoSqlTest
 public class AuditLogControllerSqlTest extends BaseAuditLogControllerTest {
+
 }

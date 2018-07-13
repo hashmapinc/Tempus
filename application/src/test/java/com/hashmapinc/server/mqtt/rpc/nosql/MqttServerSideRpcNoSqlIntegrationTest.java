@@ -17,10 +17,12 @@ package com.hashmapinc.server.mqtt.rpc.nosql;
 
 import com.hashmapinc.server.dao.service.DaoNoSqlTest;
 import com.hashmapinc.server.mqtt.rpc.AbstractMqttServerSideRpcIntegrationTest;
+import org.junit.Ignore;
 
 /**
  * Created by Valerii Sosliuk on 8/22/2017.
  */
 @DaoNoSqlTest
+@Ignore
 public class MqttServerSideRpcNoSqlIntegrationTest extends AbstractMqttServerSideRpcIntegrationTest {
 }
