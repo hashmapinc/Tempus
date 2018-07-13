@@ -21,7 +21,7 @@ import ruleCard from './rule-card.tpl.html';
 /* eslint-enable import/no-unresolved, import/default */
 
 /*@ngInject*/
-export default function RuleController(applicationService, ruleService, userService, importExport, $state, $stateParams, $filter, $translate, types) {
+export default function RuleController(ruleService, userService, importExport, $state, $stateParams, $filter, $translate, types) {
 
     var ruleActionsList = [
         {
@@ -141,12 +141,7 @@ export default function RuleController(applicationService, ruleService, userServ
     vm.exportRule = exportRule;
 
     function deleteRuleTitle(rule) {
-        if(angular.isDefined(rule.rulesAppname)){
-            return  $translate.instant('rule.delete-rule-app-warning', {ruleAppWarning: rule.rulesAppname});
-        }
-        else {
-            return $translate.instant('rule.delete-rule-title', {ruleName: rule.name});
-        }
+        return $translate.instant('rule.delete-rule-title', {ruleName: rule.name});
     }
 
     function deleteRuleText() {
@@ -154,12 +149,7 @@ export default function RuleController(applicationService, ruleService, userServ
     }
 
     function deleteRulesTitle(selectedCount) {
-        if(angular.isNumber(selectedCount) ){
-            return $translate.instant('rule.delete-rules-title', {count: selectedCount}, 'messageformat');
-        }
-        else {
-            return $translate.instant('rule.delete-rules-app-warning', {count: selectedCount}, 'messageformat');
-        }
+        return $translate.instant('rule.delete-rules-title', {count: selectedCount}, 'messageformat');
     }
 
     function deleteRulesActionTitle(selectedCount) {
