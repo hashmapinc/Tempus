@@ -27,24 +27,24 @@ import com.hashmapinc.server.common.msg.plugin.ComponentLifecycleMsg;
 
 public class ComputationJobActor extends ComponentActor<ComputationJobId, ComputationJobActorMessageProcessor> {
 
-    private final LoggingAdapter logger = Logging.getLogger(getContext().system(), this);
+    private final LoggingAdapter log = Logging.getLogger(getContext().system(), this);
 
     public ComputationJobActor(ActorSystemContext systemContext, TenantId tenantId,
                                Computations computation, ComputationJobId computationJobId) {
         super(systemContext, tenantId, computationJobId);
         setProcessor(new ComputationJobActorMessageProcessor(tenantId, computationJobId, systemContext,
-                logger, context().parent(), context().self(), computation));
+                log, context().parent(), context().self(), computation));
     }
 
     @Override
     public void onReceive(Object msg) throws Exception {
-        logger.debug("[{}] Received message: {}", tenantId, msg);
+        log.debug("[{}] Received message: {}", tenantId, msg);
         if(msg instanceof ComponentLifecycleMsg){
             onComponentLifecycleMsg((ComponentLifecycleMsg)msg);
         }else if(msg instanceof ComputationJobTerminationMsg) {
             context().stop(self());
         }else {
-            logger.warning("[{}] Unknown message: {}!", tenantId, msg);
+            log.warning("[{}] Unknown message: {}!", tenantId, msg);
         }
     }
 

@@ -89,13 +89,13 @@ public class DefaultMailService implements MailService {
     }
     
     private JavaMailSenderImpl createMailSender(JsonNode jsonConfig) {
-        JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
-        mailSender.setHost(jsonConfig.get("smtpHost").asText());
-        mailSender.setPort(parsePort(jsonConfig.get("smtpPort").asText()));
-        mailSender.setUsername(jsonConfig.get("username").asText());
-        mailSender.setPassword(jsonConfig.get("password").asText());
-        mailSender.setJavaMailProperties(createJavaMailProperties(jsonConfig));
-        return mailSender;
+        JavaMailSenderImpl javaMailSender = new JavaMailSenderImpl();
+        javaMailSender.setHost(jsonConfig.get("smtpHost").asText());
+        javaMailSender.setPort(parsePort(jsonConfig.get("smtpPort").asText()));
+        javaMailSender.setUsername(jsonConfig.get("username").asText());
+        javaMailSender.setPassword(jsonConfig.get("password").asText());
+        javaMailSender.setJavaMailProperties(createJavaMailProperties(jsonConfig));
+        return javaMailSender;
     }
 
     private Properties createJavaMailProperties(JsonNode jsonConfig) {
@@ -126,16 +126,16 @@ public class DefaultMailService implements MailService {
     @Override
     public void sendTestMail(JsonNode jsonConfig, String email) throws TempusException {
         JavaMailSenderImpl testMailSender = createMailSender(jsonConfig);
-        String mailFrom = jsonConfig.get("mailFrom").asText();
+        String from = jsonConfig.get("mailFrom").asText();
         String subject = messages.getMessage("test.message.subject", null, Locale.US);
         
-        Map<String, Object> model = new HashMap<String, Object>();
+        Map<String, Object> model = new HashMap<>();
         model.put(TARGET_EMAIL, email);
         
         String message = VelocityEngineUtils.mergeTemplateIntoString(this.engine,
                 "test.vm", UTF_8, model);
         
-        sendMail(testMailSender, mailFrom, email, subject, message); 
+        sendMail(testMailSender, from, email, subject, message);
     }
 
     @Override
@@ -143,7 +143,7 @@ public class DefaultMailService implements MailService {
         
         String subject = messages.getMessage("activation.subject", null, Locale.US);
         
-        Map<String, Object> model = new HashMap<String, Object>();
+        Map<String, Object> model = new HashMap<>();
         model.put("activationLink", activationLink);
         model.put(TARGET_EMAIL, email);
         
@@ -158,7 +158,7 @@ public class DefaultMailService implements MailService {
         
         String subject = messages.getMessage("account.activated.subject", null, Locale.US);
         
-        Map<String, Object> model = new HashMap<String, Object>();
+        Map<String, Object> model = new HashMap<>();
         model.put("loginLink", loginLink);
         model.put(TARGET_EMAIL, email);
         
@@ -173,7 +173,7 @@ public class DefaultMailService implements MailService {
         
         String subject = messages.getMessage("reset.password.subject", null, Locale.US);
         
-        Map<String, Object> model = new HashMap<String, Object>();
+        Map<String, Object> model = new HashMap<>();
         model.put("passwordResetLink", passwordResetLink);
         model.put(TARGET_EMAIL, email);
         
@@ -188,7 +188,7 @@ public class DefaultMailService implements MailService {
         
         String subject = messages.getMessage("password.was.reset.subject", null, Locale.US);
         
-        Map<String, Object> model = new HashMap<String, Object>();
+        Map<String, Object> model = new HashMap<>();
         model.put("loginLink", loginLink);
         model.put(TARGET_EMAIL, email);
         

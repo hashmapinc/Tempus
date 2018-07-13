@@ -55,7 +55,7 @@ public class ComputationJobActorMessageProcessor extends ComponentMsgProcessor<C
     private Cancellable schedule;
     private final Computations computation;
     private SparkComputationStatus status;
-    private ObjectMapper mapper = new ObjectMapper();
+    private ObjectMapper objectMapper = new ObjectMapper();
     private final ActorRef self;
     private final ActorRef parent;
 
@@ -65,7 +65,7 @@ public class ComputationJobActorMessageProcessor extends ComponentMsgProcessor<C
         this.computation = computation;
         this.self = self;
         this.parent = parent;
-        mapper.setSerializationInclusion(JsonInclude.Include.NON_DEFAULT);
+        objectMapper.setSerializationInclusion(JsonInclude.Include.NON_DEFAULT);
     }
 
     @Override
@@ -209,7 +209,7 @@ public class ComputationJobActorMessageProcessor extends ComponentMsgProcessor<C
         builder.className(computation.getMainClass());
         builder.args(args());
         SparkComputationRequest sparkComputationRequest = builder.build();
-        return mapper.writeValueAsString(sparkComputationRequest);
+        return objectMapper.writeValueAsString(sparkComputationRequest);
     }
 
     private String[] args() throws IOException {
@@ -233,7 +233,8 @@ public class ComputationJobActorMessageProcessor extends ComponentMsgProcessor<C
 
     private void stopJobOnServer(){
         if(job.getJobId() != null){
-            String url = String.format(this.baseUrl + BATCH_STATE_URI, job.getJobId());
+            final String format = this.baseUrl + BATCH_STATE_URI;
+            String url = String.format(format, job.getJobId());
             try{
                 ResponseEntity<String> response = new RestTemplate().exchange(
                         url, HttpMethod.DELETE, new HttpEntity<>(headers), String.class);
@@ -265,7 +266,8 @@ public class ComputationJobActorMessageProcessor extends ComponentMsgProcessor<C
 
     private void checkJobStatus(){
         if(job.getJobId() != null){
-            String url = String.format(this.baseUrl + BATCH_STATE_URI, job.getJobId());
+            final String format = this.baseUrl + BATCH_STATE_URI;
+            String url = String.format(format, job.getJobId());
             try {
                 ResponseEntity<Batch> response = new RestTemplate().exchange(
                         url, HttpMethod.GET, new HttpEntity<>(headers), Batch.class);

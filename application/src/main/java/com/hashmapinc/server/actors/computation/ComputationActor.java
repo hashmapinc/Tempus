@@ -97,32 +97,40 @@ public class ComputationActor extends ContextAwareActor {
 
     private void onComponentLifecycleMsg(ComponentLifecycleMsg msg) {
         if(msg.getComputationJobId().isPresent()){
-            ActorRef target;
-            ComputationJobId jobId = msg.getComputationJobId().get();
-            if(msg.getEvent() == ComponentLifecycleEvent.DELETED){
-                target = computationJobActors.get(jobId);
-                if(target != null){
-                    computationJobActors.remove(jobId);
-                    target.tell(msg, ActorRef.noSender());
-                    logger.debug("Suspended computation job {}", jobId);
-                }
-            }else{
-                ComputationJob job = systemContext.getComputationJobService().findComputationJobById(jobId);
-                if(job != null){
-                    computationJobActors.putIfAbsent(jobId, getOrCreateComputationJobActor(jobId));
-                    target = computationJobActors.get(jobId);
-                    target.tell(msg, ActorRef.noSender());
-                }
-            }
+            handleComponentLifecycleMsgForExistingComputation(msg);
         }else {
-            if(msg.getEvent() != ComponentLifecycleEvent.DELETED){
-                if(computationJobActors.isEmpty()){
-                    init();
-                }
-                computationJobActors.forEach((k, v) -> v.tell(msg, ActorRef.noSender()));
-            }else{
-                computationJobActors.forEach((k, v) -> v.tell(msg, ActorRef.noSender()));
-                context().stop(self());
+            handleComponentLifecycleMsgForNonExistingComputation(msg);
+        }
+    }
+
+    private void handleComponentLifecycleMsgForNonExistingComputation(ComponentLifecycleMsg msg) {
+        if(msg.getEvent() != ComponentLifecycleEvent.DELETED){
+            if(computationJobActors.isEmpty()){
+                init();
+            }
+            computationJobActors.forEach((k, v) -> v.tell(msg, ActorRef.noSender()));
+        }else{
+            computationJobActors.forEach((k, v) -> v.tell(msg, ActorRef.noSender()));
+            context().stop(self());
+        }
+    }
+
+    private void handleComponentLifecycleMsgForExistingComputation(ComponentLifecycleMsg msg) {
+        ComputationJobId jobId = msg.getComputationJobId().get();
+        ActorRef target;
+        if(msg.getEvent() == ComponentLifecycleEvent.DELETED){
+            target = computationJobActors.get(jobId);
+            if(target != null){
+                computationJobActors.remove(jobId);
+                target.tell(msg, ActorRef.noSender());
+                logger.debug("Suspended computation job {}", jobId);
+            }
+        }else{
+            ComputationJob job = systemContext.getComputationJobService().findComputationJobById(jobId);
+            if(job != null){
+                computationJobActors.putIfAbsent(jobId, getOrCreateComputationJobActor(jobId));
+                target = computationJobActors.get(jobId);
+                target.tell(msg, ActorRef.noSender());
             }
         }
     }

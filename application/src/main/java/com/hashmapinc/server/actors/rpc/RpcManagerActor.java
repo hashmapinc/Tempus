@@ -90,11 +90,8 @@ public class RpcManagerActor extends ContextAwareActor {
             session.actor.tell(msg, ActorRef.noSender());
         } else {
             log.debug("{} Storing msg to pending queue", address);
-            Queue<ClusterAPIProtos.ToRpcServerMessage> queue = pendingMsgs.get(address);
-            if (queue == null) {
-                queue = new LinkedList<>();
-                pendingMsgs.put(address, queue);
-            }
+            Queue<ClusterAPIProtos.ToRpcServerMessage> queue = pendingMsgs.computeIfAbsent(address, k -> new LinkedList<>());
+            pendingMsgs.put(address, queue);
             queue.add(msg.getMsg());
         }
     }

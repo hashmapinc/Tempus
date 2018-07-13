@@ -293,7 +293,7 @@ class RuleActorMessageProcessor extends ComponentMsgProcessor<RuleId> {
         logger.info("[{}] Going to process onSuspend rule.", entityId);
         this.state = ComponentLifecycleState.SUSPENDED;
         if (filters != null) {
-            filters.forEach(f -> f.suspend());
+            filters.forEach(RuleLifecycleComponent::suspend);
         }
         if (processor != null) {
             processor.suspend();
@@ -336,7 +336,7 @@ class RuleActorMessageProcessor extends ComponentMsgProcessor<RuleId> {
 
     private void stopFilters() {
         if (filters != null) {
-            filters.forEach(f -> f.stop());
+            filters.forEach(RuleLifecycleComponent::stop);
         }
     }
 }

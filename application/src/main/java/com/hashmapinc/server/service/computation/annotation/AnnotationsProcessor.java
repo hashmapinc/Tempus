@@ -98,8 +98,7 @@ public class AnnotationsProcessor {
 
     private SparkActionRequestType buildModelFromAnnotations(String clazzString) throws ClassNotFoundException {
         Class<?> clazz = classLoader.loadClass(clazzString);
-        SparkActionRequestType model = request(clazz);
-        return model;
+        return request(clazz);
     }
 
     private SparkActionType action(Class<?> clazz){

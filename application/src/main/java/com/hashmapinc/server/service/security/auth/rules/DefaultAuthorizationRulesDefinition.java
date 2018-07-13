@@ -26,7 +26,6 @@ import javax.annotation.PostConstruct;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
@@ -35,7 +34,7 @@ import java.util.List;
 @Component
 public class DefaultAuthorizationRulesDefinition implements AuthorizationRulesDefinition{
 
-    private static String DEFAULT_RULES_FILE_NAME = "default-rules.json";
+    private static final String DEFAULT_RULES_FILE_NAME = "default-rules.json";
 
     @Value("${authorization.rules.filePath}")
     private String rulesFilePath;
@@ -52,7 +51,7 @@ public class DefaultAuthorizationRulesDefinition implements AuthorizationRulesDe
             AuthorizationRule[] rulesArray;
             log.debug("[init] Checking rules file at: {}", rulesFilePath);
             if(rulesFilePath != null && !rulesFilePath.isEmpty()
-                    && Files.exists(Paths.get(rulesFilePath))) {
+                    && Paths.get(rulesFilePath).toFile().exists()) {
                 log.info("[init] Loading rules from custom file: {}", rulesFilePath);
                 rulesArray = mapper.readValue(new File(rulesFilePath), AuthorizationRule[].class);
             } else {

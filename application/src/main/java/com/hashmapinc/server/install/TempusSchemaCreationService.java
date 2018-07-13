@@ -15,6 +15,7 @@
  */
 package com.hashmapinc.server.install;
 
+import com.hashmapinc.server.service.install.DatabaseSchemaService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -22,9 +23,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
-import com.hashmapinc.server.service.install.DatabaseSchemaService;
 
-import java.nio.file.Files;
 import java.nio.file.Paths;
 
 @Service
@@ -57,7 +56,7 @@ public class TempusSchemaCreationService {
         if (this.dataDir == null) {
             throw new RuntimeException("'install.data_dir' property should specified!");
         }
-        if (!Files.isDirectory(Paths.get(this.dataDir))) {
+        if (!Paths.get(this.dataDir).toFile().isDirectory()) {
             throw new RuntimeException("'install.data_dir' property value is not a valid directory!");
         }
 

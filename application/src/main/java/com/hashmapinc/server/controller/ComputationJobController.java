@@ -36,6 +36,9 @@ import static com.hashmapinc.server.exception.TempusErrorCode.ITEM_NOT_FOUND;
 @RequestMapping("/api")
 public class ComputationJobController extends BaseController{
 
+    public static final String COMPUTATION_ID = "ComputationId ";
+    public static final String NOT_FOUND_SUFFIX = " wasn't found!";
+
     @PreAuthorize("hasAuthority('TENANT_ADMIN')")
     @RequestMapping(value = "/computations/{computationid}/jobs", method = RequestMethod.POST)
     @ResponseBody
@@ -43,7 +46,7 @@ public class ComputationJobController extends BaseController{
                                              @RequestBody ComputationJob source) throws TempusException {
         ComputationJob computationJob = null;
         if(!validateComputationId(strComputationId)){
-            throw new TempusException("ComputationId " + strComputationId + " wasn't found! ",ITEM_NOT_FOUND);
+            throw new TempusException(COMPUTATION_ID + strComputationId + " wasn't found! ",ITEM_NOT_FOUND);
         }
         try {
             boolean created = source.getId() == null;
@@ -94,7 +97,7 @@ public class ComputationJobController extends BaseController{
                                   @PathVariable("computationId") String strComputationId) throws TempusException {
         checkParameter("computationJobId", strComputationJobId);
         if(!validateComputationId(strComputationId)){
-            throw new TempusException("ComputationId " + strComputationId + " wasn't found!",ITEM_NOT_FOUND);
+            throw new TempusException(COMPUTATION_ID + strComputationId + NOT_FOUND_SUFFIX,ITEM_NOT_FOUND);
         }
         try {
             ComputationJobId computationJobId = new ComputationJobId(toUUID(strComputationJobId));
@@ -112,7 +115,7 @@ public class ComputationJobController extends BaseController{
         checkParameter("strComputationJobId", strComputationJobId);
         checkParameter("strComputationId", strComputationId);
         if(!validateComputationId(strComputationId)){
-            throw new TempusException("ComputationId " + strComputationId + " wasn't found!",ITEM_NOT_FOUND);
+            throw new TempusException(COMPUTATION_ID + strComputationId + NOT_FOUND_SUFFIX,ITEM_NOT_FOUND);
         }
         try {
             ComputationJobId computationJobId = new ComputationJobId(toUUID(strComputationJobId));
@@ -141,7 +144,7 @@ public class ComputationJobController extends BaseController{
         checkParameter("strComputationJobId", strComputationJobId);
         checkParameter("strComputationId", strComputationId);
         if(!validateComputationId(strComputationId)){
-            throw new TempusException("ComputationId " + strComputationId + " wasn't found!",ITEM_NOT_FOUND);
+            throw new TempusException(COMPUTATION_ID + strComputationId + NOT_FOUND_SUFFIX,ITEM_NOT_FOUND);
         }
         try {
             ComputationJobId computationJobId = new ComputationJobId(toUUID(strComputationJobId));
@@ -168,21 +171,21 @@ public class ComputationJobController extends BaseController{
     public List<ComputationJob> getComputationJobs(@PathVariable("computationId") String strComputationId) throws TempusException {
         checkParameter("computationId", strComputationId);
         if(!validateComputationId(strComputationId)){
-            throw new TempusException("ComputationId " + strComputationId + " wasn't found!",ITEM_NOT_FOUND);
+            throw new TempusException(COMPUTATION_ID + strComputationId + NOT_FOUND_SUFFIX,ITEM_NOT_FOUND);
         }
         try {
             ComputationId computationId = new ComputationId(toUUID(strComputationId));
-            List<ComputationJob> computationJobs = computationJobService.findByComputationId(computationId);
-            return computationJobs;
+            return computationJobService.findByComputationId(computationId);
             } catch (Exception e) {
             throw handleException(e);
         }
     }
 
     private boolean validateComputationId(String computationId){
-        if(computationsService.findById(new ComputationId(toUUID(computationId))) == null){
-            return false;
-        }
-        return true;
+        return isComputationExists(computationId);
+    }
+
+    private boolean isComputationExists(String computationId) {
+        return computationsService.findById(new ComputationId(toUUID(computationId))) != null;
     }
 }

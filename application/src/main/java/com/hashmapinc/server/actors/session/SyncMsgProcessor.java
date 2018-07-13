@@ -74,13 +74,11 @@ class SyncMsgProcessor extends AbstractSessionActorMsgProcessor {
     public void processClusterEvent(ActorContext context, ClusterEventMsg msg) {
         if (pendingResponse) {
             Optional<ServerAddress> newTargetServer = forwardToAppActorIfAdressChanged(context, pendingMsg, currentTargetServer);
-            if (logger.isDebugEnabled()) {
-                if (!newTargetServer.equals(currentTargetServer)) {
-                    if (newTargetServer.isPresent()) {
-                        logger.debug("[{}] Forwarded msg to new server: {}", sessionId, newTargetServer.get());
-                    } else {
-                        logger.debug("[{}] Forwarded msg to local server.", sessionId);
-                    }
+            if (logger.isDebugEnabled() && !newTargetServer.equals(currentTargetServer)) {
+                if (newTargetServer.isPresent()) {
+                    logger.debug("[{}] Forwarded msg to new server: {}", sessionId, newTargetServer.get());
+                } else {
+                    logger.debug("[{}] Forwarded msg to local server.", sessionId);
                 }
             }
             currentTargetServer = newTargetServer;
