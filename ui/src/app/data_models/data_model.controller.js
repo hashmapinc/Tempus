@@ -19,7 +19,7 @@ import 'vis/dist/vis-network.min.css';
 import objectStepper from './datamodel-object-stepper.tpl.html';
 
 /*@ngInject*/
-export function DataModelController($log, $mdDialog, $document, $stateParams, datamodelService) {
+export function DataModelController($log, $mdDialog, $document, $stateParams, $timeout, datamodelService) {
     //=============================================================================
     // Main
     //=============================================================================
@@ -28,9 +28,10 @@ export function DataModelController($log, $mdDialog, $document, $stateParams, da
     vm.isEdit = false; // keeps track of whether the model is being edited
 
     // create the stepper
-    vm.stepperState = 0; // keeps track of the current stepper step
-    vm.stepperData = {}; // keeps track of the in-progress data model object and is bound to the stepper
-    resetStepperState(); // instantiate the stepper model and structure the stepperData object
+    vm.stepperIsVisible = false;// keeps track of the visibility of the stepper
+    vm.stepperState = 0;        // keeps track of the current stepper step
+    vm.stepperData = {};        // keeps track of the in-progress data model object and is bound to the stepper
+    resetStepperState();        // instantiate the stepper model and structure the stepperData object
 
     // load the datamodel
     vm.datamodelObjects = [];
@@ -67,7 +68,7 @@ export function DataModelController($log, $mdDialog, $document, $stateParams, da
 
     // reset the stepper state and clear its current form data
     function resetStepperState() {
-        vm.stepperState = 1; // keeps track of the current stepper step (1-3)
+        vm.stepperState = 0; // keeps track of the current stepper step (0-3)
         vm.stepperData = { // keeps track of the in-progress data model object and is bound to the stepper
             id: null,
             name: "",
@@ -289,10 +290,36 @@ export function DataModelController($log, $mdDialog, $document, $stateParams, da
             targetEvent: targetEvent
         }).then(
         function () {
+            // the stepper has been hidden
+            vm.stepperIsVisible = false;
         }, 
         function () {
         });
+
+        vm.stepperIsVisible = true; // the stepper is now visible
     };
+
+    // listen for datamodel stepper enter keypresses
+    vm.onStepperEnter = function() {
+        $timeout(function() {
+            // handle object info tab
+            if (vm.stepperState === 0) {
+                angular.element('#stepperNext').click();
+
+                // handle attributes tab
+            } else if (vm.stepperState === 1) {
+                vm.stepperData.currentAttribute.length === 0 ? angular.element('#stepperNext').click() : angular.element('#stepperAddAttrButton').click();
+
+                // handle relationships tab
+            } else if (vm.stepperState === 2) {
+                angular.element('#stepperNext').click();
+
+                // handle review tab
+            } else if (vm.stepperState === 3) {
+                angular.element('#stepperSubmit').click();
+            }
+        });
+    } 
 
     // add the datamodel object to the object list and replot
     vm.addDatamodelObject = function() {
