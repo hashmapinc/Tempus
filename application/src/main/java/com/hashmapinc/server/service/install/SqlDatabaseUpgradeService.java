@@ -89,7 +89,7 @@ public class SqlDatabaseUpgradeService implements DatabaseUpgradeService {
                     if (dashboardsDump != null) {
                         SqlDbHelper.loadTable(conn, DASHBOARD,
                                 new String[]{ID, TENANT_ID, TITLE, SEARCH_TEXT, CONFIGURATION}, dashboardsDump, true);
-                        DatabaseHelper.upgradeTo40_assignDashboards(dashboardsDump, dashboardService, true);
+                        DatabaseHelper.upgradeTo40AssignDashboards(dashboardsDump, dashboardService, true);
                         Files.deleteIfExists(dashboardsDump);
                     }
                     log.info("Dashboards restored.");

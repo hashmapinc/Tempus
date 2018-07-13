@@ -46,6 +46,8 @@ import static com.hashmapinc.server.dao.model.ModelConstants.NULL_UUID;
 @Slf4j
 public class ApplicationController extends BaseController {
 
+    public static final String APPLICATION_ID = "applicationId";
+
     @PreAuthorize("hasAuthority('TENANT_ADMIN')")
     @RequestMapping(value = "/application", method = RequestMethod.POST)
     @ResponseBody
@@ -72,8 +74,8 @@ public class ApplicationController extends BaseController {
     @PreAuthorize("hasAnyAuthority('TENANT_ADMIN', 'CUSTOMER_USER')")
     @RequestMapping(value = "/application/{applicationId}", method = RequestMethod.GET)
     @ResponseBody
-    public Application getApplicationById(@PathVariable("applicationId") String strApplicationId) throws TempusException {
-        checkParameter("applicationId", strApplicationId);
+    public Application getApplicationById(@PathVariable(APPLICATION_ID) String strApplicationId) throws TempusException {
+        checkParameter(APPLICATION_ID, strApplicationId);
         try {
             ApplicationId applicationId = new ApplicationId(toUUID(strApplicationId));
             return checkApplicationId(applicationId);
@@ -85,8 +87,8 @@ public class ApplicationController extends BaseController {
     @PreAuthorize("hasAuthority('TENANT_ADMIN')")
     @RequestMapping(value = "/application/{applicationId}", method = RequestMethod.DELETE)
     @ResponseStatus(value = HttpStatus.OK)
-    public void deleteApplication(@PathVariable("applicationId") String strApplicationId) throws TempusException {
-        checkParameter("applicationId", strApplicationId);
+    public void deleteApplication(@PathVariable(APPLICATION_ID) String strApplicationId) throws TempusException {
+        checkParameter(APPLICATION_ID, strApplicationId);
         try {
             ApplicationId applicationId = new ApplicationId(toUUID(strApplicationId));
             Application application = checkApplicationId(applicationId);
@@ -186,9 +188,9 @@ public class ApplicationController extends BaseController {
     @RequestMapping(value = "/customer/{customerId}/application/{applicationId}", method = RequestMethod.POST)
     @ResponseBody
     public Application assignApplicationToCustomer(@PathVariable("customerId") String strCustomerId,
-                                         @PathVariable("applicationId") String strApplicationId) throws TempusException {
+                                         @PathVariable(APPLICATION_ID) String strApplicationId) throws TempusException {
         checkParameter("customerId", strCustomerId);
-        checkParameter("applicationId", strApplicationId);
+        checkParameter(APPLICATION_ID, strApplicationId);
         try {
             CustomerId customerId = new CustomerId(toUUID(strCustomerId));
             checkCustomerId(customerId);
@@ -205,8 +207,8 @@ public class ApplicationController extends BaseController {
     @PreAuthorize("hasAuthority('TENANT_ADMIN')")
     @RequestMapping(value = "/customer/application/{applicationId}", method = RequestMethod.DELETE)
     @ResponseBody
-    public Application unassignApplicationFromCustomer(@PathVariable("applicationId") String strApplicationId) throws TempusException {
-        checkParameter("applicationId", strApplicationId);
+    public Application unassignApplicationFromCustomer(@PathVariable(APPLICATION_ID) String strApplicationId) throws TempusException {
+        checkParameter(APPLICATION_ID, strApplicationId);
         try {
             ApplicationId applicationId = new ApplicationId(toUUID(strApplicationId));
             Application application = checkApplicationId(applicationId);
@@ -225,11 +227,11 @@ public class ApplicationController extends BaseController {
     public Application assignDashboardToApplication(
             @PathVariable("dashboardType") String dashboardType,
             @PathVariable("dashboardId") String strDashboardId,
-            @PathVariable("applicationId") String strApplicationId) throws TempusException {
+            @PathVariable(APPLICATION_ID) String strApplicationId) throws TempusException {
 
         checkParameter("dashboardType", dashboardType);
         checkParameter("dashboardId", strDashboardId);
-        checkParameter("applicationId", strApplicationId);
+        checkParameter(APPLICATION_ID, strApplicationId);
         try {
             DashboardId dashboardId =  new DashboardId(toUUID(strDashboardId));
             checkDashboardId(dashboardId);
@@ -246,8 +248,8 @@ public class ApplicationController extends BaseController {
     @PreAuthorize("hasAuthority('TENANT_ADMIN')")
     @RequestMapping(value = "/dashboard/{dashboardType}/application/{applicationId}", method = RequestMethod.DELETE)
     @ResponseBody
-    public Application unassignDashboardFromApplication(@PathVariable("dashboardType") String dashboardType, @PathVariable("applicationId") String strApplicationId) throws TempusException {
-        checkParameter("applicationId", strApplicationId);
+    public Application unassignDashboardFromApplication(@PathVariable("dashboardType") String dashboardType, @PathVariable(APPLICATION_ID) String strApplicationId) throws TempusException {
+        checkParameter(APPLICATION_ID, strApplicationId);
         checkParameter("dashboardType", dashboardType);
         try {
             ApplicationId applicationId = new ApplicationId(toUUID(strApplicationId));
@@ -274,7 +276,7 @@ public class ApplicationController extends BaseController {
     @PreAuthorize("hasAuthority('TENANT_ADMIN')")
     @RequestMapping(value = "/app/assignRules", method = RequestMethod.POST,consumes = "application/json")
     public Application assignRulesToApplication(@RequestBody ApplicationFieldsWrapper applicationFieldsWrapper) throws TempusException {
-        checkParameter("applicationId", applicationFieldsWrapper.getApplicationId());
+        checkParameter(APPLICATION_ID, applicationFieldsWrapper.getApplicationId());
         try {
             ApplicationId applicationId = new ApplicationId(toUUID(applicationFieldsWrapper.getApplicationId()));
             checkApplicationId(applicationId);
@@ -296,7 +298,7 @@ public class ApplicationController extends BaseController {
     @PreAuthorize("hasAuthority('TENANT_ADMIN')")
     @RequestMapping(value = "/app/unassignRules", method = RequestMethod.POST,consumes = "application/json")
     public Application unassignRulesToApplication(@RequestBody ApplicationFieldsWrapper applicationFieldsWrapper) throws TempusException {
-        checkParameter("applicationId", applicationFieldsWrapper.getApplicationId());
+        checkParameter(APPLICATION_ID, applicationFieldsWrapper.getApplicationId());
         try {
             ApplicationId applicationId = new ApplicationId(toUUID(applicationFieldsWrapper.getApplicationId()));
             checkApplicationId(applicationId);
@@ -311,7 +313,7 @@ public class ApplicationController extends BaseController {
     @PreAuthorize("hasAuthority('TENANT_ADMIN')")
     @RequestMapping(value = "/app/assignComputationJobs", method = RequestMethod.POST,consumes = "application/json")
     public Application assignComputationsJobToApplication(@RequestBody ApplicationFieldsWrapper applicationFieldsWrapper) throws TempusException {
-        checkParameter("applicationId", applicationFieldsWrapper.getApplicationId());
+        checkParameter(APPLICATION_ID, applicationFieldsWrapper.getApplicationId());
         try {
             ApplicationId applicationId = new ApplicationId(toUUID(applicationFieldsWrapper.getApplicationId()));
             checkApplicationId(applicationId);
@@ -333,7 +335,7 @@ public class ApplicationController extends BaseController {
     @PreAuthorize("hasAuthority('TENANT_ADMIN')")
     @RequestMapping(value = "/app/unassignComputationJobs", method = RequestMethod.POST,consumes = "application/json")
     public Application unassignComputationsJobToApplication(@RequestBody ApplicationFieldsWrapper applicationFieldsWrapper) throws TempusException {
-        checkParameter("applicationId", applicationFieldsWrapper.getApplicationId());
+        checkParameter(APPLICATION_ID, applicationFieldsWrapper.getApplicationId());
         try {
             ApplicationId applicationId = new ApplicationId(toUUID(applicationFieldsWrapper.getApplicationId()));
             checkApplicationId(applicationId);
@@ -347,8 +349,8 @@ public class ApplicationController extends BaseController {
     @PreAuthorize("hasAuthority('TENANT_ADMIN')")
     @RequestMapping(value = "/application/{applicationId}/activate", method = RequestMethod.POST)
     @ResponseStatus(value = HttpStatus.OK)
-    public void activateApplicationById(@PathVariable("applicationId") String strApplicationId) throws TempusException {
-        checkParameter("applicationId", strApplicationId);
+    public void activateApplicationById(@PathVariable(APPLICATION_ID) String strApplicationId) throws TempusException {
+        checkParameter(APPLICATION_ID, strApplicationId);
         try {
             ApplicationId applicationId = new ApplicationId(toUUID(strApplicationId));
             Application application =  checkApplicationId(applicationId);
@@ -373,52 +375,70 @@ public class ApplicationController extends BaseController {
         Map<RuleId, RuleMetaData> activatedRules = new HashMap<>();
         Map<ComputationJobId, ComputationJob> activatedComputations = new HashMap<>();
         try {
-            if(application.getRules().size() > 1 || !Iterables.getOnlyElement(application.getRules()).getId().equals(NULL_UUID)) {
-                for(RuleId ruleId: application.getRules()) {
-                    RuleMetaData rule = checkRule(ruleService.findRuleById(ruleId));
-                    if(!rule.getState().equals(ComponentLifecycleState.ACTIVE)) {
-                        ruleService.activateRuleById(ruleId);
-                        actorService.onRuleStateChange(rule.getTenantId(), rule.getId(), ComponentLifecycleEvent.ACTIVATED);
-                        activatedRules.put(ruleId, rule);
-                    }
-                }
+            final boolean activateRules = application.getRules().size() > 1
+                    || !Iterables.getOnlyElement(application.getRules()).getId().equals(NULL_UUID);
+
+            if(activateRules) {
+                activateRulesForApplication(application, activatedRules);
             }
 
-            if(application.getComputationJobIdSet().size() >1 || !Iterables.getOnlyElement(application.getComputationJobIdSet()).getId().equals(NULL_UUID)) {
-                for(ComputationJobId computationJobId: application.getComputationJobIdSet()) {
-                    ComputationJob computationJob = checkComputationJob(computationJobService.findComputationJobById(computationJobId));
-                    if(!computationJob.getState().equals(ComponentLifecycleState.ACTIVE)) {
-                        computationJobService.activateComputationJobById(computationJobId);
-                        actorService.onComputationJobStateChange(computationJob.getTenantId(), computationJob.getComputationId(), computationJob.getId(), ComponentLifecycleEvent.ACTIVATED);
-                        activatedComputations.put(computationJob.getId(), computationJob);
-                    }
-                }
+            final boolean activateComputations = application.getComputationJobIdSet().size() > 1
+                    || !Iterables.getOnlyElement(application.getComputationJobIdSet()).getId().equals(NULL_UUID);
+
+            if(activateComputations) {
+                activateComputationsForApplication(application, activatedComputations);
             }
 
             applicationService.activateApplicationById(application.getId());
         } catch (Exception e) {
-            if(!activatedRules.isEmpty()) {
-                for(Map.Entry<RuleId, RuleMetaData> entry: activatedRules.entrySet()){
-                    ruleService.suspendRuleById(entry.getKey());
-                    actorService.onRuleStateChange(entry.getValue().getTenantId(), entry.getKey(), ComponentLifecycleEvent.SUSPENDED);
-                }
-            }
-
-            if(!activatedComputations.isEmpty()) {
-                for(Map.Entry<ComputationJobId, ComputationJob> entry: activatedComputations.entrySet()){
-                    computationJobService.suspendComputationJobById(entry.getKey());
-                    actorService.onComputationJobStateChange(entry.getValue().getTenantId(), entry.getValue().getComputationId(), entry.getValue().getId(), ComponentLifecycleEvent.SUSPENDED);
-                }
-            }
+            handleFailureInActivateApplication(activatedRules, activatedComputations);
             throw e;
+        }
+    }
+
+    private void activateComputationsForApplication(Application application, Map<ComputationJobId, ComputationJob> activatedComputations) throws TempusException {
+        for(ComputationJobId computationJobId: application.getComputationJobIdSet()) {
+            ComputationJob computationJob = checkComputationJob(computationJobService.findComputationJobById(computationJobId));
+            if(!computationJob.getState().equals(ComponentLifecycleState.ACTIVE)) {
+                computationJobService.activateComputationJobById(computationJobId);
+                actorService.onComputationJobStateChange(computationJob.getTenantId(), computationJob.getComputationId(), computationJob.getId(), ComponentLifecycleEvent.ACTIVATED);
+                activatedComputations.put(computationJob.getId(), computationJob);
+            }
+        }
+    }
+
+    private void activateRulesForApplication(Application application, Map<RuleId, RuleMetaData> activatedRules) throws TempusException {
+        for(RuleId ruleId: application.getRules()) {
+            RuleMetaData rule = checkRule(ruleService.findRuleById(ruleId));
+            if(!rule.getState().equals(ComponentLifecycleState.ACTIVE)) {
+                ruleService.activateRuleById(ruleId);
+                actorService.onRuleStateChange(rule.getTenantId(), rule.getId(), ComponentLifecycleEvent.ACTIVATED);
+                activatedRules.put(ruleId, rule);
+            }
+        }
+    }
+
+    private void handleFailureInActivateApplication(Map<RuleId, RuleMetaData> activatedRules, Map<ComputationJobId, ComputationJob> activatedComputations) {
+        if(!activatedRules.isEmpty()) {
+            for(Map.Entry<RuleId, RuleMetaData> entry: activatedRules.entrySet()){
+                ruleService.suspendRuleById(entry.getKey());
+                actorService.onRuleStateChange(entry.getValue().getTenantId(), entry.getKey(), ComponentLifecycleEvent.SUSPENDED);
+            }
+        }
+
+        if(!activatedComputations.isEmpty()) {
+            for(Map.Entry<ComputationJobId, ComputationJob> entry: activatedComputations.entrySet()){
+                computationJobService.suspendComputationJobById(entry.getKey());
+                actorService.onComputationJobStateChange(entry.getValue().getTenantId(), entry.getValue().getComputationId(), entry.getValue().getId(), ComponentLifecycleEvent.SUSPENDED);
+            }
         }
     }
 
     @PreAuthorize("hasAnyAuthority('SYS_ADMIN', 'TENANT_ADMIN')")
     @RequestMapping(value = "/application/{applicationId}/suspend", method = RequestMethod.POST)
     @ResponseStatus(value = HttpStatus.OK)
-    public void suspendApplicationById(@PathVariable("applicationId") String strApplicationId) throws TempusException {
-        checkParameter("applicationId", strApplicationId);
+    public void suspendApplicationById(@PathVariable(APPLICATION_ID) String strApplicationId) throws TempusException {
+        checkParameter(APPLICATION_ID, strApplicationId);
         try {
             ApplicationId applicationId = new ApplicationId(toUUID(strApplicationId));
             Application application =  checkApplicationId(applicationId);

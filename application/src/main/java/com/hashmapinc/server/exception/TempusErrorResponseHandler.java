@@ -76,9 +76,9 @@ public class TempusErrorResponseHandler implements AccessDeniedHandler {
         }
     }
 
-    private void handleTempusException(TempusException TempusException, HttpServletResponse response) throws IOException {
+    private void handleTempusException(TempusException tempusException, HttpServletResponse response) throws IOException {
 
-        TempusErrorCode errorCode = TempusException.getErrorCode();
+        TempusErrorCode errorCode = tempusException.getErrorCode();
         HttpStatus status;
 
         switch (errorCode) {
@@ -106,7 +106,7 @@ public class TempusErrorResponseHandler implements AccessDeniedHandler {
         }
 
         response.setStatus(status.value());
-        mapper.writeValue(response.getWriter(), TempusErrorResponse.of(TempusException.getMessage(), errorCode, status));
+        mapper.writeValue(response.getWriter(), TempusErrorResponse.of(tempusException.getMessage(), errorCode, status));
     }
 
     private void handleAccessDeniedException(HttpServletResponse response) throws IOException {

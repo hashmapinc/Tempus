@@ -100,9 +100,10 @@ public class SqlDatabaseSchemaService implements DatabaseSchemaService {
 
 
             List<String> executedUpgrades = new ArrayList<>();
-            ResultSet rs = stmt.executeQuery("select " + ModelConstants.INSTALLED_SCRIPTS_COLUMN + " from " + ModelConstants.INSTALLED_SCHEMA_VERSIONS);
-            while (rs.next()) {
-                executedUpgrades.add(rs.getString(ModelConstants.INSTALLED_SCRIPTS_COLUMN));
+            try (ResultSet rs = stmt.executeQuery("select " + ModelConstants.INSTALLED_SCRIPTS_COLUMN + " from " + ModelConstants.INSTALLED_SCHEMA_VERSIONS)) {
+                while (rs.next()) {
+                    executedUpgrades.add(rs.getString(ModelConstants.INSTALLED_SCRIPTS_COLUMN));
+                }
             }
 
             try (Stream<Path> filesStream = Files.list(upgradeScriptsDirectory)) {
@@ -112,7 +113,7 @@ public class SqlDatabaseSchemaService implements DatabaseSchemaService {
                     String scriptFileName = i.toString() + ".sql";
                     if (!executedUpgrades.contains(scriptFileName)) {
                         String upgradeQueries = new String(Files.readAllBytes(upgradeScriptsDirectory.resolve(scriptFileName)), Charset.forName("UTF-8"));
-                        System.out.println(upgradeQueries);
+                        log.info(upgradeQueries);
                         stmt.execute(upgradeQueries);
                         stmt.execute("insert into " + ModelConstants.INSTALLED_SCHEMA_VERSIONS + " values('" + scriptFileName + "'" + ")");
                     }

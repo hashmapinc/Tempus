@@ -221,7 +221,7 @@ public class DeviceActorMessageProcessor extends AbstractContextAwareMsgProcesso
             } else {
                 if (DataConstants.SHARED_SCOPE.equals(msg.getScope())) {
                     List<AttributeKvEntry> attributes = new ArrayList<>(msg.getValues());
-                    if (attributes.size() > 0) {
+                    if (!attributes.isEmpty()) {
                         notification = new AttributesUpdateNotification(BasicAttributeKVMsg.fromShared(attributes));
                     } else {
                         logger.debug("[{}] No public server side attributes changed!", deviceId);
@@ -246,7 +246,7 @@ public class DeviceActorMessageProcessor extends AbstractContextAwareMsgProcesso
             ToDeviceMsg notification = null;
             List<TsKvEntry> tsKvEntries = new ArrayList<>(msg.getValues());
 
-            if (tsKvEntries.size() > 0) {
+            if (!tsKvEntries.isEmpty()) {
                 notification = new TelemetryUpdateNotification(BasicTelemetryKVMsg.createTelemetyKVMsg(tsKvEntries));
             } else {
                 logger.debug("[{}] No telemetry changed!", deviceId);

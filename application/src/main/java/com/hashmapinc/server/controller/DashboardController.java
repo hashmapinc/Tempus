@@ -40,6 +40,7 @@ import java.util.Set;
 public class DashboardController extends BaseController {
 
     public static final String DASHBOARD_ID = "dashboardId";
+    public static final String CUSTOMER_ID = "customerId";
 
     @PreAuthorize("hasAnyAuthority('SYS_ADMIN', 'TENANT_ADMIN', 'CUSTOMER_USER')")
     @RequestMapping(value = "/dashboard/serverTime", method = RequestMethod.GET)
@@ -137,9 +138,9 @@ public class DashboardController extends BaseController {
     @PreAuthorize("hasAuthority('TENANT_ADMIN')")
     @RequestMapping(value = "/customer/{customerId}/dashboard/{dashboardId}", method = RequestMethod.POST)
     @ResponseBody
-    public Dashboard assignDashboardToCustomer(@PathVariable("customerId") String strCustomerId,
+    public Dashboard assignDashboardToCustomer(@PathVariable(CUSTOMER_ID) String strCustomerId,
                                                @PathVariable(DASHBOARD_ID) String strDashboardId) throws TempusException {
-        checkParameter("customerId", strCustomerId);
+        checkParameter(CUSTOMER_ID, strCustomerId);
         checkParameter(DASHBOARD_ID, strDashboardId);
         try {
             CustomerId customerId = new CustomerId(toUUID(strCustomerId));
@@ -169,9 +170,9 @@ public class DashboardController extends BaseController {
     @PreAuthorize("hasAnyAuthority('TENANT_ADMIN','CUSTOMER_USER')")
     @RequestMapping(value = "/customer/{customerId}/dashboard/{dashboardId}", method = RequestMethod.DELETE)
     @ResponseBody
-    public Dashboard unassignDashboardFromCustomer(@PathVariable("customerId") String strCustomerId,
+    public Dashboard unassignDashboardFromCustomer(@PathVariable(CUSTOMER_ID) String strCustomerId,
                                                    @PathVariable(DASHBOARD_ID) String strDashboardId) throws TempusException {
-        checkParameter("customerId", strCustomerId);
+        checkParameter(CUSTOMER_ID, strCustomerId);
         checkParameter(DASHBOARD_ID, strDashboardId);
         try {
             CustomerId customerId = new CustomerId(toUUID(strCustomerId));
@@ -206,29 +207,11 @@ public class DashboardController extends BaseController {
             DashboardId dashboardId = new DashboardId(toUUID(strDashboardId));
             Dashboard dashboard = checkDashboardId(dashboardId);
 
-            Set<CustomerId> customerIds = new HashSet<>();
-            if (strCustomerIds != null) {
-                for (String strCustomerId : strCustomerIds) {
-                    customerIds.add(new CustomerId(toUUID(strCustomerId)));
-                }
-            }
+            Set<CustomerId> customerIds = getCustomerIds(strCustomerIds);
 
-            Set<CustomerId> addedCustomerIds = new HashSet<>();
-            Set<CustomerId> removedCustomerIds = new HashSet<>();
-            for (CustomerId customerId : customerIds) {
-                if (!dashboard.isAssignedToCustomer(customerId)) {
-                    addedCustomerIds.add(customerId);
-                }
-            }
+            Set<CustomerId> addedCustomerIds = getNewlyAddedCustomerIds(dashboard, customerIds);
 
-            Set<ShortCustomerInfo> assignedCustomers = dashboard.getAssignedCustomers();
-            if (assignedCustomers != null) {
-                for (ShortCustomerInfo customerInfo : assignedCustomers) {
-                    if (!customerIds.contains(customerInfo.getCustomerId())) {
-                        removedCustomerIds.add(customerInfo.getCustomerId());
-                    }
-                }
-            }
+            Set<CustomerId> removedCustomerIds = getRemovedCustomerIds(dashboard, customerIds);
 
             if (addedCustomerIds.isEmpty() && removedCustomerIds.isEmpty()) {
                 return dashboard;
@@ -259,6 +242,40 @@ public class DashboardController extends BaseController {
 
             throw handleException(e);
         }
+    }
+
+    private Set<CustomerId> getRemovedCustomerIds(Dashboard dashboard, Set<CustomerId> customerIds) {
+        Set<CustomerId> removedCustomerIds = new HashSet<>();
+        Set<ShortCustomerInfo> assignedCustomers = dashboard.getAssignedCustomers();
+        if (assignedCustomers != null) {
+            for (ShortCustomerInfo customerInfo : assignedCustomers) {
+                if (!customerIds.contains(customerInfo.getCustomerId())) {
+                    removedCustomerIds.add(customerInfo.getCustomerId());
+                }
+            }
+        }
+        return removedCustomerIds;
+    }
+
+    private Set<CustomerId> getNewlyAddedCustomerIds(Dashboard dashboard, Set<CustomerId> customerIds) {
+        Set<CustomerId> addedCustomerIds = new HashSet<>();
+
+        for (CustomerId customerId : customerIds) {
+            if (!dashboard.isAssignedToCustomer(customerId)) {
+                addedCustomerIds.add(customerId);
+            }
+        }
+        return addedCustomerIds;
+    }
+
+    private Set<CustomerId> getCustomerIds(@RequestBody String[] strCustomerIds) {
+        Set<CustomerId> customerIds = new HashSet<>();
+        if (strCustomerIds != null) {
+            for (String strCustomerId : strCustomerIds) {
+                customerIds.add(new CustomerId(toUUID(strCustomerId)));
+            }
+        }
+        return customerIds;
     }
 
     @PreAuthorize("hasAuthority('TENANT_ADMIN')")
@@ -441,13 +458,13 @@ public class DashboardController extends BaseController {
     @RequestMapping(value = "/customer/{customerId}/dashboards", params = { "limit" }, method = RequestMethod.GET)
     @ResponseBody
     public TimePageData<DashboardInfo> getCustomerDashboards(
-            @PathVariable("customerId") String strCustomerId,
+            @PathVariable(CUSTOMER_ID) String strCustomerId,
             @RequestParam int limit,
             @RequestParam(required = false) Long startTime,
             @RequestParam(required = false) Long endTime,
             @RequestParam(required = false, defaultValue = "false") boolean ascOrder,
             @RequestParam(required = false) String offset) throws TempusException {
-        checkParameter("customerId", strCustomerId);
+        checkParameter(CUSTOMER_ID, strCustomerId);
         try {
             TenantId tenantId = getCurrentUser().getTenantId();
             CustomerId customerId = new CustomerId(toUUID(strCustomerId));

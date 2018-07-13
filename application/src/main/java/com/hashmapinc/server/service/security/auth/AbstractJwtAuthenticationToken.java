@@ -17,8 +17,10 @@ package com.hashmapinc.server.service.security.auth;
 
 import com.hashmapinc.server.service.security.model.SecurityUser;
 import com.hashmapinc.server.service.security.model.token.RawAccessJwtToken;
+import lombok.EqualsAndHashCode;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 
+@EqualsAndHashCode
 public abstract class AbstractJwtAuthenticationToken extends AbstractAuthenticationToken {
 
     private static final long serialVersionUID = -6212297506742428406L;

@@ -69,7 +69,7 @@ public class CassandraDbHelper {
             try (CSVPrinter csvPrinter = new CSVPrinter(Files.newBufferedWriter(tmp), CSV_DUMP_FORMAT)) {
                 csvParser.forEach(record -> {
                     List<String> newRecord = new ArrayList<>();
-                    record.forEach(val -> newRecord.add(val));
+                    record.forEach(newRecord::add);
                     newRecord.add(toAppend);
                     try {
                         csvPrinter.printRecord(newRecord);
@@ -131,15 +131,15 @@ public class CassandraDbHelper {
                 if (row.isNull(index)) {
                     return null;
                 } else if (type == DataType.cdouble()) {
-                    str = new Double(row.getDouble(index)).toString();
+                    str = Double.toString(row.getDouble(index));
                 } else if (type == DataType.cint()) {
-                    str = new Integer(row.getInt(index)).toString();
+                    str = Integer.toString(row.getInt(index));
                 } else if (type == DataType.uuid()) {
                     str = row.getUUID(index).toString();
                 } else if (type == DataType.timeuuid()) {
                     str = row.getUUID(index).toString();
                 } else if (type == DataType.cfloat()) {
-                    str = new Float(row.getFloat(index)).toString();
+                    str = Float.toString(row.getFloat(index));
                 } else if (type == DataType.timestamp()) {
                     str = ""+row.getTimestamp(index).getTime();
                 } else {
@@ -162,9 +162,7 @@ public class CassandraDbHelper {
         }
         insertStatementBuilder.deleteCharAt(insertStatementBuilder.length() - 1);
         insertStatementBuilder.append(") VALUES (");
-        for (String column : columns) {
-            insertStatementBuilder.append("?").append(",");
-        }
+        Arrays.stream(columns).forEach(column -> insertStatementBuilder.append("?").append(","));
         insertStatementBuilder.deleteCharAt(insertStatementBuilder.length() - 1);
         insertStatementBuilder.append(")");
         return insertStatementBuilder.toString();

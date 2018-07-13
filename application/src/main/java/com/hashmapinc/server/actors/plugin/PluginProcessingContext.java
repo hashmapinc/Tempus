@@ -590,7 +590,7 @@ public final class PluginProcessingContext implements PluginContext {
                 ActionType.RPC_CALL,
                 e,
                 rpcErrorStr,
-                new Boolean(oneWay),
+                Boolean.valueOf(oneWay),
                 method,
                 params);
     }
@@ -605,7 +605,7 @@ public final class PluginProcessingContext implements PluginContext {
         ListenableFuture<List<AttributeKvEntry>> future = Futures.transform(Futures.successfulAsList(futures),
                 (Function<? super List<List<AttributeKvEntry>>, ? extends List<AttributeKvEntry>>) input -> {
                     List<AttributeKvEntry> result = new ArrayList<>();
-                    input.forEach(r -> result.addAll(r));
+                    input.forEach(result::addAll);
                     return result;
                 }, executor);
         Futures.addCallback(future, getCallback(callback, v -> v), executor);

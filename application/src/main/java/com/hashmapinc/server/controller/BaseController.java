@@ -500,19 +500,19 @@ public abstract class BaseController {
         checkNotNull(dashboard);
         checkTenantId(dashboard.getTenantId());
         SecurityUser authUser = getCurrentUser();
-        if (authUser.getAuthority() == Authority.CUSTOMER_USER) {
-            if (!dashboard.isAssignedToCustomer(authUser.getCustomerId())) {
+        final boolean isDashboardAssignedToCurrentCustomer = authUser.getAuthority() == Authority.CUSTOMER_USER
+                && !dashboard.isAssignedToCustomer(authUser.getCustomerId());
+
+        if (isDashboardAssignedToCurrentCustomer) {
                 throw new TempusException(YOU_DON_T_HAVE_PERMISSION_TO_PERFORM_THIS_OPERATION,
                         TempusErrorCode.PERMISSION_DENIED);
-            }
         }
     }
 
     ComponentDescriptor checkComponentDescriptorByClazz(String clazz) throws TempusException {
         try {
             log.debug("[{}] Lookup component descriptor", clazz);
-            ComponentDescriptor componentDescriptor = checkNotNull(componentDescriptorService.getComponent(clazz));
-            return componentDescriptor;
+            return checkNotNull(componentDescriptorService.getComponent(clazz));
         } catch (Exception e) {
             throw handleException(e, false);
         }
@@ -559,11 +559,11 @@ public abstract class BaseController {
         checkNotNull(computationJob);
         SecurityUser authUser = getCurrentUser();
         TenantId tenantId = computationJob.getTenantId();
-        validateId(tenantId, "Incorrect tenantId " + tenantId);
+        validateId(tenantId, INCORRECT_TENANT_ID + tenantId);
         if (authUser.getAuthority() != Authority.SYS_ADMIN) {
             if (authUser.getTenantId() == null ||
                     !tenantId.getId().equals(ModelConstants.NULL_UUID) && !authUser.getTenantId().equals(tenantId)) {
-                throw new TempusException("You don't have permission to perform this operation!",
+                throw new TempusException(YOU_DON_T_HAVE_PERMISSION_TO_PERFORM_THIS_OPERATION,
                         TempusErrorCode.PERMISSION_DENIED);
 
             } else if (tenantId.getId().equals(ModelConstants.NULL_UUID)) {
@@ -588,13 +588,14 @@ public abstract class BaseController {
         SecurityUser authUser = getCurrentUser();
         TenantId tenantId = rule.getTenantId();
         validateId(tenantId, INCORRECT_TENANT_ID + tenantId);
-        if (authUser.getAuthority() != Authority.SYS_ADMIN) {
-            if (authUser.getTenantId() == null ||
-                    !tenantId.getId().equals(ModelConstants.NULL_UUID) && !authUser.getTenantId().equals(tenantId)) {
+
+        final boolean ruleNotBelongsToCurrentTenant = authUser.getTenantId() == null ||
+                !tenantId.getId().equals(ModelConstants.NULL_UUID) && !authUser.getTenantId().equals(tenantId);
+
+        if (authUser.getAuthority() != Authority.SYS_ADMIN && ruleNotBelongsToCurrentTenant) {
                 throw new TempusException(YOU_DON_T_HAVE_PERMISSION_TO_PERFORM_THIS_OPERATION,
                         TempusErrorCode.PERMISSION_DENIED);
 
-            }
         }
         return rule;
     }
@@ -609,14 +610,14 @@ public abstract class BaseController {
             try {
                 serverPort = request.getIntHeader("x-forwarded-port");
             } catch (NumberFormatException e) {
+                log.trace(e.getMessage());
             }
         }
 
-        String baseUrl = String.format("%s://%s:%d",
+        return String.format("%s://%s:%d",
                 scheme,
                 request.getServerName(),
                 serverPort);
-        return baseUrl;
     }
 
     protected <I extends UUIDBased & EntityId> I emptyId(EntityType entityType) {
