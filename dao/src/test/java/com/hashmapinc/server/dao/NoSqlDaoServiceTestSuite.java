@@ -34,19 +34,22 @@ public class NoSqlDaoServiceTestSuite {
 
     @ClassRule
     public static CustomCassandraCQLUnit cassandraUnit =
-            new CustomCassandraCQLUnit(
-                    getDataSetLists(),
-                    "cassandra-test.yaml", 30000L);
-    private static List<CQLDataSet> getDataSetLists(){
+            new CustomCassandraCQLUnit(getDataSets(),
+                    getUpgradeDataSets(),
+                    "cassandra-test.yaml", 30000l);
+
+    private static List<CQLDataSet> getDataSets(){
         List<CQLDataSet> dataSets = new ArrayList<>();
         dataSets.add(new ClassPathCQLDataSet("cassandra/schema.cql", false, false));
         dataSets.add(new ClassPathCQLDataSet("cassandra/system-data.cql", false, false));
-        dataSets.add(new ClassPathCQLDataSet("cassandra/system-test.cql", false, false));
-        dataSets.addAll(Arrays.asList(
-                new ClassPathCQLDataSet("cassandra/upgrade/1.cql", false, false),
-                new ClassPathCQLDataSet("cassandra/upgrade/2.cql", false, false),
-                new ClassPathCQLDataSet("cassandra/upgrade/3.cql", false, false)
-        ));
+        return dataSets;
+    }
+
+    private static List<CustomCassandraCQLUnit.NamedDataset> getUpgradeDataSets(){
+        List<CustomCassandraCQLUnit.NamedDataset> dataSets = new ArrayList<>();
+        dataSets.add(new CustomCassandraCQLUnit.NamedDataset("1.cql", new ClassPathCQLDataSet("cassandra/upgrade/1.cql", false, false)));
+        dataSets.add(new CustomCassandraCQLUnit.NamedDataset("2.cql", new ClassPathCQLDataSet("cassandra/upgrade/2.cql", false, false)));
+        dataSets.add(new CustomCassandraCQLUnit.NamedDataset("3.cql", new ClassPathCQLDataSet("cassandra/upgrade/3.cql", false, false)));
         return dataSets;
     }
 

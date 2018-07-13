@@ -53,7 +53,7 @@ export default function AppRun($rootScope, $window, $injector, $location, $log, 
             promise.then(function success(theme) {
                  $rootScope.theme = theme.themeValue;
                  $rootScope.themeName = theme.themeName;
-                },
+                }
             )
         }
     }

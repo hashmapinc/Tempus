@@ -18,18 +18,18 @@
 
 /** System admin **/
 INSERT INTO tb_user ( id, tenant_id, customer_id, email, search_text, authority )
-VALUES ( '1e746125a797660a91992ebcb67fe33', '1b21dd2138140008080808080808080', '1b21dd2138140008080808080808080', 'sysadmin@hashmapinc.com',
+VALUES ( '1e7461259eab8808080808080808080', '1b21dd2138140008080808080808080', '1b21dd2138140008080808080808080', 'sysadmin@hashmapinc.com',
          'sysadmin@hashmapinc.com', 'SYS_ADMIN' );
 
 INSERT INTO user_credentials ( id, user_id, enabled, password )
-VALUES ( '1e7461261441950a91992ebcb67fe33', '1e746125a797660a91992ebcb67fe33', true,
+VALUES ( '1e7461259eab8808080808080808080', '1e7461259eab8808080808080808080', true,
          '$2a$10$5JTB8/hxWc9WAy62nCGSxeefl3KWmipA9nFpVdDa0/xfIseeBB4Bu' );
 
 /** System settings **/
 INSERT INTO user_settings ( id, key, json_value, user_id )
 VALUES ( '1e746126a2266e4a91992ebcb67fe33', 'general', '{
 	"baseUrl": "http://localhost:8080"
-}',  '1e746125a797660a91992ebcb67fe33' );
+}',  '1e7461259eab8808080808080808080' );
 
 INSERT INTO user_settings ( id, key, json_value, user_id )
 VALUES ( '1e746126eaaefa6a91992ebcb67fe33', 'mail', '{
@@ -41,7 +41,7 @@ VALUES ( '1e746126eaaefa6a91992ebcb67fe33', 'mail', '{
 	"enableTls": "false",
 	"username": "",
 	"password": ""
-}', '1e746125a797660a91992ebcb67fe33' );
+}', '1e7461259eab8808080808080808080' );
 
 /** System plugins and rules **/
 INSERT INTO plugin ( id, tenant_id, name, state, search_text, api_token, plugin_class, public_access, configuration )

@@ -15,8 +15,29 @@
  */
 package com.hashmapinc.server.controller;
 
-import static org.hamcrest.Matchers.containsString;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import com.datastax.driver.core.utils.UUIDs;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.google.gson.JsonParser;
+import com.hashmapinc.server.common.data.*;
+import com.hashmapinc.server.common.data.id.CustomerId;
+import com.hashmapinc.server.common.data.id.DeviceCredentialsId;
+import com.hashmapinc.server.common.data.id.DeviceId;
+import com.hashmapinc.server.common.data.kv.*;
+import com.hashmapinc.server.common.data.page.TextPageData;
+import com.hashmapinc.server.common.data.page.TextPageLink;
+import com.hashmapinc.server.common.data.security.Authority;
+import com.hashmapinc.server.common.data.security.DeviceCredentials;
+import com.hashmapinc.server.common.data.security.DeviceCredentialsType;
+import com.hashmapinc.server.dao.attributes.AttributesService;
+import com.hashmapinc.server.dao.depthSeries.DepthSeriesService;
+import com.hashmapinc.server.dao.model.ModelConstants;
+import com.hashmapinc.server.dao.timeseries.TimeseriesService;
+import org.apache.commons.lang3.RandomStringUtils;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.web.servlet.ResultActions;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -24,42 +45,13 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.google.gson.JsonParser;
-import com.datastax.driver.core.utils.UUIDs;
-import com.hashmapinc.server.common.data.*;
-import com.hashmapinc.server.common.data.id.DeviceId;
-import com.hashmapinc.server.common.data.kv.*;
-import com.hashmapinc.server.common.data.page.TextPageData;
-import com.hashmapinc.server.common.data.page.TextPageLink;
-import com.hashmapinc.server.common.data.security.Authority;
-import com.hashmapinc.server.common.data.security.DeviceCredentials;
-import com.hashmapinc.server.dao.attributes.AttributesService;
-import com.hashmapinc.server.dao.depthSeries.DepthSeriesService;
-import com.hashmapinc.server.dao.model.ModelConstants;
-import org.apache.commons.lang3.RandomStringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.web.servlet.ResultActions;
-import com.hashmapinc.server.common.data.*;
-import com.hashmapinc.server.common.data.id.CustomerId;
-import com.hashmapinc.server.common.data.id.DeviceCredentialsId;
-import com.hashmapinc.server.common.data.kv.*;
-import com.hashmapinc.server.common.data.security.DeviceCredentialsType;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-
-import com.hashmapinc.server.dao.timeseries.TimeseriesService;
+import static org.hamcrest.Matchers.containsString;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 public abstract class BaseDeviceControllerTest extends AbstractControllerTest {
     
     private IdComparator<Device> idComparator = new IdComparator<>();
     
-    private Tenant savedTenant;
-    private User tenantAdmin;
-
-
     private String STRING_KEY_FOR_TS_DS_OR_AS = "stringKey";
     private String LONG_KEY_FOR_TS_DS_OR_AS = "longKey";
     private String DOUBLE_KEY_FOR_TS_DS_OR_AS = "doubleKey";
@@ -85,29 +77,7 @@ public abstract class BaseDeviceControllerTest extends AbstractControllerTest {
 
     @Before
     public void beforeTest() throws Exception {
-        loginSysAdmin();
-        
-        Tenant tenant = new Tenant();
-        tenant.setTitle("My tenant");
-        savedTenant = doPost("/api/tenant", tenant, Tenant.class);
-        Assert.assertNotNull(savedTenant);
-        
-        tenantAdmin = new User();
-        tenantAdmin.setAuthority(Authority.TENANT_ADMIN);
-        tenantAdmin.setTenantId(savedTenant.getId());
-        tenantAdmin.setEmail("tenant2@tempus.org");
-        tenantAdmin.setFirstName("Joe");
-        tenantAdmin.setLastName("Downs");
-        
-        tenantAdmin = createUserAndLogin(tenantAdmin, "testPassword1");
-    }
-    
-    @After
-    public void afterTest() throws Exception {
-        loginSysAdmin();
-        
-        doDelete("/api/tenant/"+savedTenant.getId().getId().toString())
-        .andExpect(status().isOk());
+        loginTenantAdmin();
     }
     
     @Test
@@ -178,10 +148,9 @@ public abstract class BaseDeviceControllerTest extends AbstractControllerTest {
                 new TypeReference<List<EntitySubtype>>(){});
 
         Assert.assertNotNull(deviceTypes);
-        Assert.assertEquals(3, deviceTypes.size());
-        Assert.assertEquals("typeA", deviceTypes.get(0).getType());
-        Assert.assertEquals("typeB", deviceTypes.get(1).getType());
-        Assert.assertEquals("typeC", deviceTypes.get(2).getType());
+        Assert.assertTrue(deviceTypes.stream().filter(a -> a.getType().equalsIgnoreCase("typeA")).count() == 1);
+        Assert.assertTrue(deviceTypes.stream().filter(a -> a.getType().equalsIgnoreCase("typeB")).count() == 1);
+        Assert.assertTrue(deviceTypes.stream().filter(a -> a.getType().equalsIgnoreCase("typeC")).count() == 1);
     }
     
     @Test
@@ -269,14 +238,15 @@ public abstract class BaseDeviceControllerTest extends AbstractControllerTest {
         tenantAdmin2.setEmail("tenant3@tempus.org");
         tenantAdmin2.setFirstName("Joe");
         tenantAdmin2.setLastName("Downs");
-        
-        tenantAdmin2 = createUserAndLogin(tenantAdmin2, "testPassword1");
+
+        stubUser(tenantAdmin2, "testPassword1");
+        createUserAndLogin(tenantAdmin2, "testPassword1");
         
         Customer customer = new Customer();
         customer.setTitle("Different customer");
         Customer savedCustomer = doPost("/api/customer", customer, Customer.class);
 
-        login(tenantAdmin.getEmail(), "testPassword1");
+        loginTenantAdmin();
         
         Device device = new Device();
         device.setName("My device");

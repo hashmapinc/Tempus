@@ -15,6 +15,7 @@
  */
 package com.hashmapinc.server.common.data.asset;
 
+import com.hashmapinc.server.common.data.TempusResource;
 import lombok.EqualsAndHashCode;
 import com.hashmapinc.server.common.data.HasName;
 import com.hashmapinc.server.common.data.SearchTextBasedWithAdditionalInfo;
@@ -23,7 +24,7 @@ import com.hashmapinc.server.common.data.id.CustomerId;
 import com.hashmapinc.server.common.data.id.TenantId;
 
 @EqualsAndHashCode(callSuper = true)
-public class Asset extends SearchTextBasedWithAdditionalInfo<AssetId> implements HasName {
+public class Asset extends SearchTextBasedWithAdditionalInfo<AssetId> implements HasName, TempusResource {
 
     private static final long serialVersionUID = 2807343040519543363L;
 

@@ -44,8 +44,6 @@ public abstract class AbstractMqttServerSideRpcIntegrationTest extends AbstractC
     private static final String MQTT_URL = "tcp://localhost:1883";
     private static final Long TIME_TO_HANDLE_REQUEST = 500L;
 
-    private Tenant savedTenant;
-    private User tenantAdmin;
     private Long asyncContextTimeoutToUseRpcPlugin;
 
 
@@ -55,27 +53,7 @@ public abstract class AbstractMqttServerSideRpcIntegrationTest extends AbstractC
 
         asyncContextTimeoutToUseRpcPlugin = getAsyncContextTimeoutToUseRpcPlugin();
 
-        Tenant tenant = new Tenant();
-        tenant.setTitle("My tenant");
-        savedTenant = doPost("/api/tenant", tenant, Tenant.class);
-        Assert.assertNotNull(savedTenant);
-
-        tenantAdmin = new User();
-        tenantAdmin.setAuthority(Authority.TENANT_ADMIN);
-        tenantAdmin.setTenantId(savedTenant.getId());
-        tenantAdmin.setEmail("tenant2@tempus.org");
-        tenantAdmin.setFirstName("Joe");
-        tenantAdmin.setLastName("Downs");
-
-        createUserAndLogin(tenantAdmin, "testPassword1");
-    }
-
-    @After
-    public void afterTest() throws Exception {
-        loginSysAdmin();
-        if (savedTenant != null) {
-            doDelete("/api/tenant/" + savedTenant.getId().getId().toString()).andExpect(status().isOk());
-        }
+        loginTenantAdmin();
     }
 
     @Test

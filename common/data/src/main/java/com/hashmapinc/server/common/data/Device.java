@@ -21,7 +21,7 @@ import com.hashmapinc.server.common.data.id.CustomerId;
 import com.hashmapinc.server.common.data.id.TenantId;
 
 @EqualsAndHashCode(callSuper = true)
-public class Device extends SearchTextBasedWithAdditionalInfo<DeviceId> implements HasName {
+public class Device extends SearchTextBasedWithAdditionalInfo<DeviceId> implements HasName, TempusResource {
 
     private static final long serialVersionUID = 2807343040519543363L;
 

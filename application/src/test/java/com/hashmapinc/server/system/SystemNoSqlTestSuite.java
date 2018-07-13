@@ -15,15 +15,18 @@
  */
 package com.hashmapinc.server.system;
 
+import com.github.tomakehurst.wiremock.junit.WireMockClassRule;
+import com.hashmapinc.server.dao.CustomCassandraCQLUnit;
 import org.cassandraunit.dataset.CQLDataSet;
 import org.cassandraunit.dataset.cql.ClassPathCQLDataSet;
 import org.junit.ClassRule;
 import org.junit.extensions.cpsuite.ClasspathSuite;
+import org.junit.rules.RuleChain;
+import org.junit.rules.TestRule;
 import org.junit.runner.RunWith;
-import com.hashmapinc.server.dao.CustomCassandraCQLUnit;
+import org.springframework.cloud.contract.wiremock.WireMockSpring;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 
@@ -31,12 +34,15 @@ import java.util.List;
 @ClasspathSuite.ClassnameFilters({"com.hashmapinc.server.system.*NoSqlTest"})
 public class SystemNoSqlTestSuite {
 
-    @ClassRule
-    public static CustomCassandraCQLUnit cassandraUnit =
-            new CustomCassandraCQLUnit(getDataSetLists(),
+    private static WireMockClassRule wiremock = new WireMockClassRule(
+            WireMockSpring.options().port(9002));
+
+    private static CustomCassandraCQLUnit cassandraUnit =
+            new CustomCassandraCQLUnit(getDataSets(),
+                    getUpgradeDataSets(),
                     "cassandra-test.yaml", 30000l);
 
-    private static List<CQLDataSet> getDataSetLists(){
+    private static List<CQLDataSet> getDataSets(){
         List<CQLDataSet> dataSets = new ArrayList<>();
         dataSets.add(new ClassPathCQLDataSet("cassandra/schema.cql", false, false));
         dataSets.add(new ClassPathCQLDataSet("cassandra/system-data.cql", false, false));
@@ -47,7 +53,19 @@ public class SystemNoSqlTestSuite {
         return dataSets;
     }
 
+    private static List<CustomCassandraCQLUnit.NamedDataset> getUpgradeDataSets(){
+        List<CustomCassandraCQLUnit.NamedDataset> dataSets = new ArrayList<>();
+        dataSets.add(new CustomCassandraCQLUnit.NamedDataset("1.cql", new ClassPathCQLDataSet("cassandra/upgrade/1.cql", false, false)));
+        dataSets.add(new CustomCassandraCQLUnit.NamedDataset("2.cql", new ClassPathCQLDataSet("cassandra/upgrade/2.cql", false, false)));
+        dataSets.add(new CustomCassandraCQLUnit.NamedDataset("3.cql", new ClassPathCQLDataSet("cassandra/upgrade/3.cql", false, false)));
+        return dataSets;
+    }
+
     private static Integer stripExtensionFromName(String fileName) {
         return Integer.parseInt(fileName.substring(0, fileName.indexOf(".cql")));
     }
+
+    @ClassRule
+    public static TestRule ruleChain = RuleChain.outerRule(wiremock)
+            .around(cassandraUnit);
 }

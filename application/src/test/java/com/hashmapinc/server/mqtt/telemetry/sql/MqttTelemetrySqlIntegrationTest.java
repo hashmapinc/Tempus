@@ -17,10 +17,12 @@ package com.hashmapinc.server.mqtt.telemetry.sql;
 
 import com.hashmapinc.server.dao.service.DaoSqlTest;
 import com.hashmapinc.server.mqtt.telemetry.AbstractMqttTelemetryIntegrationTest;
+import org.junit.Ignore;
 
 /**
  * Created by Valerii Sosliuk on 8/22/2017.
  */
 @DaoSqlTest
+@Ignore
 public class MqttTelemetrySqlIntegrationTest extends AbstractMqttTelemetryIntegrationTest {
 }
