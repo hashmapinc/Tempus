@@ -15,6 +15,11 @@
  */
 package com.hashmapinc.server.dao;
 
+import com.datastax.driver.core.ResultSet;
+import com.datastax.driver.core.Row;
+import com.hashmapinc.server.dao.model.ModelConstants;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 import org.cassandraunit.BaseCassandraUnit;
 import org.cassandraunit.CQLDataLoader;
 import org.cassandraunit.dataset.CQLDataSet;
@@ -23,42 +28,50 @@ import org.cassandraunit.utils.EmbeddedCassandraServerHelper;
 import com.datastax.driver.core.Cluster;
 import com.datastax.driver.core.Session;
 
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+
+import static com.hashmapinc.server.dao.model.ModelConstants.tempus_KEYSPACE;
 
 public class CustomCassandraCQLUnit extends BaseCassandraUnit {
     private List<CQLDataSet> dataSets;
+    private List<NamedDataset> upgrades;
 
     public Session session;
     public Cluster cluster;
 
-    public CustomCassandraCQLUnit(List<CQLDataSet> dataSets) {
+    public CustomCassandraCQLUnit(List<CQLDataSet> dataSets, List<NamedDataset> upgrades) {
         this.dataSets = dataSets;
+        this.upgrades = upgrades;
     }
 
-    public CustomCassandraCQLUnit(List<CQLDataSet> dataSets, int readTimeoutMillis) {
-        this.dataSets = dataSets;
+    public CustomCassandraCQLUnit(List<CQLDataSet> dataSets, List<NamedDataset> upgrades, int readTimeoutMillis) {
+        this(dataSets, upgrades);
         this.readTimeoutMillis = readTimeoutMillis;
     }
 
-    public CustomCassandraCQLUnit(List<CQLDataSet> dataSets, String configurationFileName) {
-        this(dataSets);
+    public CustomCassandraCQLUnit(List<CQLDataSet> dataSets, List<NamedDataset> upgrades, String configurationFileName) {
+        this(dataSets, upgrades);
         this.configurationFileName = configurationFileName;
     }
 
-    public CustomCassandraCQLUnit(List<CQLDataSet> dataSets, String configurationFileName, int readTimeoutMillis) {
-        this(dataSets);
+    public CustomCassandraCQLUnit(List<CQLDataSet> dataSets, List<NamedDataset> upgrades, String configurationFileName, int readTimeoutMillis) {
+        this(dataSets, upgrades);
         this.configurationFileName = configurationFileName;
         this.readTimeoutMillis = readTimeoutMillis;
     }
 
-    public CustomCassandraCQLUnit(List<CQLDataSet> dataSets, String configurationFileName, long startUpTimeoutMillis) {
+    public CustomCassandraCQLUnit(List<CQLDataSet> dataSets, List<NamedDataset> upgrades, String configurationFileName, long startUpTimeoutMillis) {
         super(startUpTimeoutMillis);
+        this.upgrades = upgrades;
         this.dataSets = dataSets;
         this.configurationFileName = configurationFileName;
     }
 
-    public CustomCassandraCQLUnit(List<CQLDataSet> dataSets, String configurationFileName, long startUpTimeoutMillis, int readTimeoutMillis) {
+    public CustomCassandraCQLUnit(List<CQLDataSet> dataSets, List<NamedDataset> upgrades, String configurationFileName, long startUpTimeoutMillis, int readTimeoutMillis) {
         super(startUpTimeoutMillis);
+        this.upgrades = upgrades;
         this.dataSets = dataSets;
         this.configurationFileName = configurationFileName;
         this.readTimeoutMillis = readTimeoutMillis;
@@ -72,7 +85,22 @@ public class CustomCassandraCQLUnit extends BaseCassandraUnit {
                 .build();
         session = cluster.connect();
         CQLDataLoader dataLoader = new CQLDataLoader(session);
+
         dataSets.forEach(dataLoader::load);
+        ResultSet resultSet = session.execute("select "+ ModelConstants.INSTALLED_SCRIPTS_COLUMN+" from " +tempus_KEYSPACE +"." + ModelConstants.INSTALLED_SCHEMA_VERSIONS+";");
+        Iterator<Row> rowIterator = resultSet.iterator();
+
+        List<String> executedUpgrades = new ArrayList<>();
+
+        while(rowIterator.hasNext()) {
+            Row row = rowIterator.next();
+            executedUpgrades.add(row.getString(ModelConstants.INSTALLED_SCRIPTS_COLUMN));
+        }
+        upgrades.stream().filter(n -> !executedUpgrades.contains(n.getName()))
+                .forEach(c -> {
+                    dataLoader.load(c.getDataSet());
+                    session.execute("insert into " + tempus_KEYSPACE + "." + ModelConstants.INSTALLED_SCHEMA_VERSIONS + "(" + ModelConstants.INSTALLED_SCRIPTS_COLUMN + ")" + " values('" + c.getName() + "'" + ")");
+                });
         session = dataLoader.getSession();
     }
 
@@ -93,5 +121,12 @@ public class CustomCassandraCQLUnit extends BaseCassandraUnit {
 
     public Cluster getCluster() {
         return cluster;
+    }
+
+    @Data
+    @AllArgsConstructor
+    public static class NamedDataset{
+        private final String name;
+        private final CQLDataSet dataSet;
     }
 }

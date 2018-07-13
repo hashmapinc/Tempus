@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.hashmapinc.server.service.security.auth.jwt.extractor;
+/*package com.hashmapinc.server.service.security.auth.jwt.extractor;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.authentication.AuthenticationServiceException;
@@ -40,4 +40,4 @@ public class JwtQueryTokenExtractor implements TokenExtractor {
 
         return token;
     }
-}
+}*/

@@ -19,6 +19,7 @@ import com.google.common.util.concurrent.ListenableFuture;
 import com.hashmapinc.server.common.data.id.TenantId;
 import com.hashmapinc.server.common.data.page.TextPageData;
 import com.hashmapinc.server.common.data.page.TextPageLink;
+import com.hashmapinc.server.dao.application.ApplicationService;
 import com.hashmapinc.server.dao.customer.CustomerService;
 import com.hashmapinc.server.dao.dashboard.DashboardService;
 import com.hashmapinc.server.dao.device.DeviceService;
@@ -76,6 +77,9 @@ public class TenantServiceImpl extends AbstractEntityService implements TenantSe
     @Autowired
     private PluginService pluginService;
 
+    @Autowired
+    private ApplicationService applicationService;
+
     @Override
     public Tenant findTenantById(TenantId tenantId) {
         log.trace("Executing findTenantById [{}]", tenantId);
@@ -110,6 +114,7 @@ public class TenantServiceImpl extends AbstractEntityService implements TenantSe
         userService.deleteTenantAdmins(tenantId);
         ruleService.deleteRulesByTenantId(tenantId);
         pluginService.deletePluginsByTenantId(tenantId);
+        applicationService.deleteApplicationByTenantId(tenantId);
         tenantDao.removeById(tenantId.getId());
         deleteEntityRelations(tenantId);
     }

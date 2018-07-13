@@ -15,14 +15,19 @@
  */
 package com.hashmapinc.server.dao.service;
 
+import com.datastax.driver.core.utils.UUIDs;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.hashmapinc.server.common.data.UUIDConverter;
 import com.hashmapinc.server.common.data.User;
 import com.hashmapinc.server.common.data.UserSettings;
+import com.hashmapinc.server.common.data.id.UserId;
+import com.hashmapinc.server.common.data.security.Authority;
+import com.hashmapinc.server.dao.exception.DataValidationException;
+import com.hashmapinc.server.dao.settings.UserSettingsDao;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import com.hashmapinc.server.dao.exception.DataValidationException;
 import org.springframework.beans.factory.annotation.Autowired;
 
 public abstract class BaseUserSettingsServiceTest extends AbstractServiceTest {
@@ -31,7 +36,10 @@ public abstract class BaseUserSettingsServiceTest extends AbstractServiceTest {
 
     @Before
     public void before() {
-        this.admin = userService.findUserByEmail("sysadmin@hashmapinc.com");
+        admin = new User();
+        admin.setId(new UserId(UUIDConverter.fromString("1e7461259eab8808080808080808080")));
+        admin.setEmail("sysadmin@hashmapinc.com");
+        admin.setAuthority(Authority.SYS_ADMIN);
     }
 
     @Test
@@ -53,7 +61,7 @@ public abstract class BaseUserSettingsServiceTest extends AbstractServiceTest {
     }
     
     @Test
-    public void testSaveAdminSettings() throws Exception {
+    public void testSaveAdminSettings() {
         UserSettings userSettings = userSettingsService.findUserSettingsByKeyAndUserId("general", admin.getId());
         JsonNode json = userSettings.getJsonValue();
         ((ObjectNode) json).put("baseUrl", "http://myhost.org");
@@ -79,7 +87,7 @@ public abstract class BaseUserSettingsServiceTest extends AbstractServiceTest {
     }
     
     @Test(expected = DataValidationException.class)
-    public void testSaveAdminSettingsWithNewJsonStructure() throws Exception {
+    public void testSaveAdminSettingsWithNewJsonStructure() {
         UserSettings userSettings = userSettingsService.findUserSettingsByKeyAndUserId("mail", admin.getId());
         JsonNode json = userSettings.getJsonValue();
         ((ObjectNode) json).put("newKey", "my new value");
@@ -88,7 +96,7 @@ public abstract class BaseUserSettingsServiceTest extends AbstractServiceTest {
     }
     
     @Test(expected = DataValidationException.class)
-    public void testSaveAdminSettingsWithNonTextValue() throws Exception {
+    public void testSaveAdminSettingsWithNonTextValue() {
         UserSettings userSettings = userSettingsService.findUserSettingsByKeyAndUserId("mail", admin.getId());
         JsonNode json = userSettings.getJsonValue();
         ((ObjectNode) json).put("timeout", 10000L);

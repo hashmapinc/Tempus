@@ -13,11 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.hashmapinc.server.dao.service.sql;
+package com.hashmapinc.server.requests;
 
-import com.hashmapinc.server.dao.service.BaseUserServiceTest;
-import com.hashmapinc.server.dao.service.DaoSqlTest;
+import lombok.Builder;
+import lombok.Data;
 
-@DaoSqlTest
-public class UserServiceSqlTest extends BaseUserServiceTest {
+@Data
+@Builder
+public class ActivateUserRequest {
+    private String activateToken;
+    private String password;
 }
