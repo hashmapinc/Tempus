@@ -46,6 +46,10 @@ public class SystemNoSqlTestSuite {
         List<CQLDataSet> dataSets = new ArrayList<>();
         dataSets.add(new ClassPathCQLDataSet("cassandra/schema.cql", false, false));
         dataSets.add(new ClassPathCQLDataSet("cassandra/system-data.cql", false, false));
+        //dataSets.addAll(Arrays.asList(
+         //   new ClassPathCQLDataSet("cassandra/upgrade/1.cql", false, false),
+         //   new ClassPathCQLDataSet("cassandra/upgrade/2.cql", false, false),
+          //  new ClassPathCQLDataSet("cassandra/upgrade/3.cql", false, false)));
         return dataSets;
     }
 
