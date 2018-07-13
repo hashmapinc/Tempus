@@ -18,10 +18,9 @@
 //import AliasController from '../api/alias-controller';
 
 import './tempusboard.scss';
-import AliasController from '../api/alias-controller';
 
 /*@ngInject*/
-export function TempusboardController($scope, $log, $state, $stateParams, userService, deviceService, types, attributeService, $q, dashboardService, applicationService, entityService, tempusboardService, utils, $filter, dashboardUtils) {
+export function TempusboardController($scope, $log, $state, $stateParams, userService, deviceService, types, attributeService, $q, dashboardService, entityService, tempusboardService) {
 	var vm = this;
 
     if(angular.isDefined($stateParams.customerId)){
@@ -68,33 +67,6 @@ export function TempusboardController($scope, $log, $state, $stateParams, userSe
 	vm.assetSelected = function(device){
         vm.selectedDevice = device
         vm.widgetsSet = [];
-        applicationService.getApplicationsByDeviceType(device.type.toLowerCase())
-            .then(function success(applications) {
-                applications.forEach(function(application){
-                    if(application.isValid){
-                         dashboardService.getDashboard(application.miniDashboardId.id)
-                        .then(function success(dashboard) {
-                            vm.deviceSelected = true;
-                            vm.dashboard = dashboardUtils.validateAndUpdateDashboard(dashboard);
-                            vm.dashboardConfiguration = vm.dashboard.configuration;
-                            vm.dashboardCtx.dashboard = vm.dashboard;
-                            vm.dashboardCtx.dashboardTimewindow = vm.dashboardConfiguration.timewindow;
-                            vm.dashboardCtx.dashboardDepthwindow = vm.dashboardConfiguration.depthwindow;
-                            vm.dashboardCtx.aliasController = new AliasController($scope, $q, $filter, utils,
-                        types, entityService, vm.dashboardCtx.stateController, vm.dashboardConfiguration.entityAliases, vm.selectedDevice);
-                          vm.timeseriesWidgetTypes = vm.dashboard.configuration.widgets;
-                          var widgetObj = {'widget': vm.dashboard.configuration.widgets, 'name': application.name, 'dashboard': 'dashboards/'+application.dashboardId.id};
-                          vm.widgetsSet.push(widgetObj);
-
-                        }, function fail() {
-                            vm.configurationError = true;
-                        });
-                    }
-                })                
-               
-            }, function fail() {
-                vm.configurationError = true;
-            });
 	}
 
 	var pageLink = {limit: 100};
