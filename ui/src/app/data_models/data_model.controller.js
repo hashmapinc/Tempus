@@ -44,7 +44,14 @@ export function DataModelController($log, $mdDialog, $document, $stateParams, da
         edges: vm.edges
     };
     var network_options = {
-        layout: {hierarchical: true}
+        layout: {
+            hierarchical: {
+                enabled: true,
+                nodeSpacing: 100,
+                direction: "UD",
+                sortMethod: "directed"
+            }
+        }
     };
 
     // build the vis network and add assign event listeners
