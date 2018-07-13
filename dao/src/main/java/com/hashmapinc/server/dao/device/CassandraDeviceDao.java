@@ -157,7 +157,7 @@ public class CassandraDeviceDao extends CassandraAbstractSearchTextDao<DeviceEnt
                 Result<EntitySubtypeEntity> result = cluster.getMapper(EntitySubtypeEntity.class).map(resultSet);
                 if (result != null) {
                     List<EntitySubtype> entitySubtypes = new ArrayList<>();
-                    result.all().forEach((entitySubtypeEntity) ->
+                    result.all().forEach(entitySubtypeEntity ->
                         entitySubtypes.add(entitySubtypeEntity.toEntitySubtype())
                     );
                     return entitySubtypes;

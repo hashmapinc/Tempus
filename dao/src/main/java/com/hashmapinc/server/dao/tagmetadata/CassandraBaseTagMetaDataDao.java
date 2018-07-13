@@ -14,14 +14,13 @@
  * limitations under the License.
  */
 
-package com.hashmapinc.server.dao.TagMetaData;
+package com.hashmapinc.server.dao.tagmetadata;
 
 import com.datastax.driver.core.BoundStatement;
 import com.datastax.driver.core.PreparedStatement;
 import com.datastax.driver.core.Row;
 import com.datastax.driver.core.Session;
 import com.google.common.util.concurrent.ListenableFuture;
-import com.hashmapinc.server.common.data.EntityType;
 import com.hashmapinc.server.common.data.TagMetaData;
 import com.hashmapinc.server.common.data.id.EntityId;
 import com.hashmapinc.server.dao.model.ModelConstants;
@@ -59,8 +58,6 @@ public class CassandraBaseTagMetaDataDao extends CassandraAbstractAsyncDao imple
     @Value("${cassandra.query.ts_key_value_partitioning}")
     private String partitioning;
 
-    private TsPartitionDate tsFormat;
-
     private PreparedStatement latestInsertStmts;
     private PreparedStatement findLatestStmt;
     private PreparedStatement findLatestAllStmt;
@@ -75,7 +72,7 @@ public class CassandraBaseTagMetaDataDao extends CassandraAbstractAsyncDao imple
         if (!isInstall()) {
             Optional<TsPartitionDate> partition = TsPartitionDate.parse(partitioning);
             if (partition.isPresent()) {
-                tsFormat = partition.get();
+                TsPartitionDate tsFormat = partition.get();
             } else {
                 log.warn("Incorrect configuration of partitioning {}", partitioning);
                 throw new RuntimeException("Failed to parse partitioning property: " + partitioning + "!");

@@ -60,7 +60,7 @@ public class BaseAttributesService implements AttributesService {
     @Override
     public ListenableFuture<List<Void>> save(EntityId entityId, String scope, List<AttributeKvEntry> attributes) {
         validate(entityId, scope);
-        attributes.forEach(attribute -> validate(attribute));
+        attributes.forEach(BaseAttributesService::validate);
         List<ListenableFuture<Void>> futures = Lists.newArrayListWithExpectedSize(attributes.size());
         for (AttributeKvEntry attribute : attributes) {
             futures.add(attributesDao.save(entityId, scope, attribute));

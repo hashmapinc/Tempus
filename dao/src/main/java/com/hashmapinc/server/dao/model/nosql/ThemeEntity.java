@@ -16,7 +16,6 @@
 
 
 package com.hashmapinc.server.dao.model.nosql;
-import com.datastax.driver.core.utils.UUIDs;
 import com.datastax.driver.mapping.annotations.PartitionKey;
 import com.hashmapinc.server.common.data.Theme;
 import com.hashmapinc.server.common.data.id.ThemeId;
@@ -48,7 +47,7 @@ public class ThemeEntity implements BaseEntity<Theme> {
     private String value;
 
     @Column(name = ModelConstants.THEME_IS_ENABLED_PROPERTY)
-    private boolean is_enabled;
+    private boolean isEnabled;
 
     public ThemeEntity() {
         super();
@@ -61,7 +60,7 @@ public class ThemeEntity implements BaseEntity<Theme> {
 
         this.name = theme.getThemeName();
         this.value = theme.getThemeValue();
-        this.is_enabled = theme.getThemeStatus();
+        this.isEnabled = theme.getThemeStatus();
     }
 
 
@@ -89,12 +88,12 @@ public class ThemeEntity implements BaseEntity<Theme> {
         this.value = value;
     }
 
-    public boolean isIs_enabled() {
-        return is_enabled;
+    public boolean isEnabled() {
+        return isEnabled;
     }
 
-    public void setIs_enabled(boolean is_enabled) {
-        this.is_enabled = is_enabled;
+    public void setEnabled(boolean enabled) {
+        this.isEnabled = enabled;
     }
 
 
@@ -103,7 +102,7 @@ public class ThemeEntity implements BaseEntity<Theme> {
         Theme theme  = new Theme(new ThemeId(getId()));
         theme.setThemeName(name);
         theme.setThemeValue(value);
-        theme.setThemeStatus(is_enabled);
+        theme.setThemeStatus(isEnabled);
         return theme;
     }
 

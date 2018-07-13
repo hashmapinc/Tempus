@@ -143,7 +143,7 @@ public class CassandraBaseTimeseriesDao extends CassandraAbstractAsyncDao implem
                 @Nullable
                 @Override
                 public List<TsKvEntry> apply(@Nullable List<Optional<TsKvEntry>> input) {
-                    return input == null ? Collections.emptyList() : input.stream().filter(v -> v.isPresent()).map(v -> v.get()).collect(Collectors.toList());
+                    return input == null ? Collections.emptyList() : input.stream().filter(Optional::isPresent).map(Optional::get).collect(Collectors.toList());
                 }
             }, readResultsProcessingExecutor);
         }

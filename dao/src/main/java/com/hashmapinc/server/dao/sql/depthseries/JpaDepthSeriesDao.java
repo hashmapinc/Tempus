@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.hashmapinc.server.dao.sql.depthSeries;
+package com.hashmapinc.server.dao.sql.depthseries;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
@@ -33,9 +33,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Component;
 import com.hashmapinc.server.common.data.UUIDConverter;
-import com.hashmapinc.server.common.data.kv.*;
-import com.hashmapinc.server.dao.model.sql.*;
-import com.hashmapinc.server.dao.depthSeries.DepthSeriesDao;
+import com.hashmapinc.server.dao.depthseries.DepthSeriesDao;
 
 import javax.annotation.Nullable;
 import java.util.*;
@@ -202,7 +200,7 @@ public class JpaDepthSeriesDao extends JpaAbstractDaoListeningExecutorService im
                 entityId.getEntityType(),
                 UUIDConverter.fromTimeUUID(entityId.getId()),key);
         DsKvEntry result;
-        if (entries.size() > 0) {
+        if (!entries.isEmpty()) {
             result = DaoUtil.getData(entries.get(0));
         } else {
             result = new BasicDsKvEntry(0.0, new StringDataEntry(key, null));

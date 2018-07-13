@@ -17,7 +17,6 @@ package com.hashmapinc.server.dao.sql.settings;
 
 import com.hashmapinc.server.common.data.UUIDConverter;
 import com.hashmapinc.server.common.data.UserSettings;
-import com.hashmapinc.server.common.data.id.UserId;
 import com.hashmapinc.server.dao.DaoUtil;
 import com.hashmapinc.server.dao.model.sql.UserSettingsEntity;
 import com.hashmapinc.server.dao.settings.UserSettingsDao;

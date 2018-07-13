@@ -124,7 +124,7 @@ public class BaseAlarmService extends AbstractEntityService implements AlarmServ
         if (alarm.isPropagate()) {
             EntityRelationsQuery query = new EntityRelationsQuery();
             query.setParameters(new RelationsSearchParameters(alarm.getOriginator(), EntitySearchDirection.TO, Integer.MAX_VALUE));
-            List<EntityId> parentEntities = relationService.findByQuery(query).get().stream().map(r -> r.getFrom()).collect(Collectors.toList());
+            List<EntityId> parentEntities = relationService.findByQuery(query).get().stream().map(EntityRelation::getFrom).collect(Collectors.toList());
             for (EntityId parentId : parentEntities) {
                 createAlarmRelation(parentId, alarm.getId(), alarm.getStatus(), true);
             }

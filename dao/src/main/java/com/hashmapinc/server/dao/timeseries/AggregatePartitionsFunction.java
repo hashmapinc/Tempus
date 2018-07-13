@@ -132,10 +132,8 @@ public class AggregatePartitionsFunction implements com.google.common.base.Funct
                             if (sValue == null || curSValue.compareTo(sValue) < 0) {
                                 sValue = curSValue;
                             }
-                        } else if (curJValue != null) {
-                            if (jValue == null || curJValue.toString().compareTo(jValue.toString()) < 0) {
+                        } else if (curJValue != null && (jValue == null || curJValue.toString().compareTo(jValue.toString()) < 0)) {
                                 jValue = curJValue;
-                            }
                         }
                     } else if (aggregation == Aggregation.MAX) {
                         if (curDValue != null) {
@@ -148,10 +146,8 @@ public class AggregatePartitionsFunction implements com.google.common.base.Funct
                             if (sValue == null || curSValue.compareTo(sValue) > 0) {
                                 sValue = curSValue;
                             }
-                        } else if (curJValue != null) {
-                            if (jValue == null || curJValue.toString().compareTo(jValue.toString()) > 0) {
+                        } else if (curJValue != null && (jValue == null || curJValue.toString().compareTo(jValue.toString()) > 0)) {
                                 jValue = curJValue;
-                            }
                         }
                     }
                 }

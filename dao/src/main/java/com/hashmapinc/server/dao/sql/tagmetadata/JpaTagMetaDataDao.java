@@ -14,19 +14,18 @@
  * limitations under the License.
  */
 
-package com.hashmapinc.server.dao.sql.TagMetaData;
+package com.hashmapinc.server.dao.sql.tagmetadata;
 
 import com.google.common.collect.Lists;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.ListeningExecutorService;
 import com.google.common.util.concurrent.MoreExecutors;
-import com.hashmapinc.server.common.data.EntityType;
 import com.hashmapinc.server.common.data.TagMetaData;
 import com.hashmapinc.server.common.data.UUIDConverter;
 import com.hashmapinc.server.common.data.id.EntityId;
 import com.hashmapinc.server.dao.DaoUtil;
-import com.hashmapinc.server.dao.TagMetaData.TagMetaDataDao;
+import com.hashmapinc.server.dao.tagmetadata.TagMetaDataDao;
 import com.hashmapinc.server.dao.model.sql.TagMetaDataCompositeKey;
 import com.hashmapinc.server.dao.model.sql.TagMetaDataEntity;
 import com.hashmapinc.server.dao.sql.JpaAbstractDaoListeningExecutorService;

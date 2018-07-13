@@ -14,10 +14,9 @@
  * limitations under the License.
  */
 
-package com.hashmapinc.server.dao.TagMetaData;
+package com.hashmapinc.server.dao.tagmetadata;
 
 import com.google.common.util.concurrent.ListenableFuture;
-import com.hashmapinc.server.common.data.EntityType;
 import com.hashmapinc.server.common.data.TagMetaData;
 import com.hashmapinc.server.common.data.id.EntityId;
 

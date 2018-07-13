@@ -138,7 +138,7 @@ public class CassandraAssetDao extends CassandraAbstractSearchTextDao<AssetEntit
         Select.Where query = select.where();
         query.and(eq(ModelConstants.ASSET_TENANT_ID_PROPERTY, tenantId));
         query.and(eq(ModelConstants.ASSET_NAME_PROPERTY, assetName));
-        AssetEntity assetEntity = (AssetEntity) findOneByStatement(query);
+        AssetEntity assetEntity = findOneByStatement(query);
         return Optional.ofNullable(DaoUtil.getData(assetEntity));
     }
 
@@ -157,7 +157,7 @@ public class CassandraAssetDao extends CassandraAbstractSearchTextDao<AssetEntit
                 Result<EntitySubtypeEntity> result = cluster.getMapper(EntitySubtypeEntity.class).map(resultSet);
                 if (result != null) {
                     List<EntitySubtype> entitySubtypes = new ArrayList<>();
-                    result.all().forEach((entitySubtypeEntity) ->
+                    result.all().forEach(entitySubtypeEntity ->
                             entitySubtypes.add(entitySubtypeEntity.toEntitySubtype())
                     );
                     return entitySubtypes;

@@ -200,9 +200,8 @@ public class BaseRelationService implements RelationService {
     private List<Boolean> getBooleans(List<List<EntityRelation>> relations, Cache cache, boolean isRemove) {
         List<Boolean> results = new ArrayList<>();
         for (List<EntityRelation> relationList : relations) {
-            relationList.stream().forEach(relation -> {
-                checkFromDeleteSync(cache, results, relation, isRemove);
-            });
+            relationList.stream().forEach(relation ->
+                checkFromDeleteSync(cache, results, relation, isRemove));
         }
         return results;
     }
@@ -251,9 +250,8 @@ public class BaseRelationService implements RelationService {
     private List<ListenableFuture<Boolean>> getListenableFutures(List<List<EntityRelation>> relations, Cache cache, boolean isRemove) {
         List<ListenableFuture<Boolean>> results = new ArrayList<>();
         for (List<EntityRelation> relationList : relations) {
-            relationList.stream().forEach(relation -> {
-                checkFromDeleteAsync(cache, results, relation, isRemove);
-            });
+            relationList.stream().forEach(relation ->
+                checkFromDeleteAsync(cache, results, relation, isRemove));
         }
         return results;
     }
@@ -306,12 +304,16 @@ public class BaseRelationService implements RelationService {
         validate(from);
         validateTypeGroup(typeGroup);
         ListenableFuture<List<EntityRelation>> relations = relationDao.findAllByFrom(from, typeGroup);
+        return getListListenableFuture(relations);
+    }
+
+    private ListenableFuture<List<EntityRelationInfo>> getListListenableFuture(ListenableFuture<List<EntityRelation>> relations) {
         ListenableFuture<List<EntityRelationInfo>> relationsInfo = Futures.transform(relations,
-                (AsyncFunction<List<EntityRelation>, List<EntityRelationInfo>>) relations1 -> {
+                                                                                     (AsyncFunction<List<EntityRelation>, List<EntityRelationInfo>>) relations1 -> {
                     List<ListenableFuture<EntityRelationInfo>> futures = new ArrayList<>();
                     relations1.stream().forEach(relation ->
                             futures.add(fetchRelationInfoAsync(relation,
-                                    relation2 -> relation2.getTo(),
+                                                               EntityRelation::getTo,
                                     (EntityRelationInfo relationInfo, String entityName) -> relationInfo.setToName(entityName)))
                     );
                     return Futures.successfulAsList(futures);
@@ -367,7 +369,7 @@ public class BaseRelationService implements RelationService {
                     List<ListenableFuture<EntityRelationInfo>> futures = new ArrayList<>();
                     relations1.stream().forEach(relation ->
                             futures.add(fetchRelationInfoAsync(relation,
-                                    relation2 -> relation2.getFrom(),
+                                                               EntityRelation::getFrom,
                                     (EntityRelationInfo relationInfo, String entityName) -> relationInfo.setFromName(entityName)))
                     );
                     return Futures.successfulAsList(futures);
@@ -566,7 +568,7 @@ public class BaseRelationService implements RelationService {
         }
         //TODO: try to remove this blocking operation
         List<Set<EntityRelation>> relations = Futures.successfulAsList(futures).get();
-        relations.forEach(r -> r.forEach(d -> children.add(d)));
+        relations.forEach(r -> r.forEach(children::add));
         return Futures.immediateFuture(children);
     }
 

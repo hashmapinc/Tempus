@@ -44,7 +44,7 @@ public class LogoServiceImpl extends AbstractEntityService implements LogoServic
     public Logo saveLogo(Logo logo) {
         List <Logo> logoOld = find();
 
-        if(logoOld.size() > 0) {
+        if(!logoOld.isEmpty()) {
 
             logoDao.removeById(logoOld.get(0).getUuidId());
         }
