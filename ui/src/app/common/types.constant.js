@@ -297,7 +297,6 @@ export default angular.module('tempus.types', [])
                 user: "USER",
                 dashboard: "DASHBOARD",
                 alarm: "ALARM",
-                application:"APPLICATION",
                 computation:"COMPUTATION",
                 computationJob:"COMPUTATION_JOB"
 
@@ -359,12 +358,6 @@ export default angular.module('tempus.types', [])
                     typePlural: 'entity.type-alarms',
                     list: 'entity.list-of-alarms',
                     nameStartsWith: 'entity.alarm-name-starts-with'
-                },
-                "APPLICATION": {
-                    type: 'entity.type-application',
-                    typePlural: 'entity.type-applications',
-                    list: 'entity.list-of-applications',
-                    nameStartsWith: 'entity.application-name-starts-with'
                 },
                 "COMPUTATION": {
                     type: 'entity.type-computation',

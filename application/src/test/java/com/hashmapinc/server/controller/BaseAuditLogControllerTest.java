@@ -17,58 +17,27 @@ package com.hashmapinc.server.controller;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.hashmapinc.server.common.data.Device;
-import com.hashmapinc.server.common.data.User;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-import com.hashmapinc.server.common.data.Tenant;
 import com.hashmapinc.server.common.data.audit.AuditLog;
 import com.hashmapinc.server.common.data.page.TimePageData;
 import com.hashmapinc.server.common.data.page.TimePageLink;
-import com.hashmapinc.server.common.data.security.Authority;
 import com.hashmapinc.server.dao.model.ModelConstants;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
 public abstract class BaseAuditLogControllerTest extends AbstractControllerTest {
-
-    private Tenant savedTenant;
-    private User tenantAdmin;
 
     @Before
     public void beforeTest() throws Exception {
-        loginSysAdmin();
-
-        Tenant tenant = new Tenant();
-        tenant.setTitle("My tenant");
-        savedTenant = doPost("/api/tenant", tenant, Tenant.class);
-        Assert.assertNotNull(savedTenant);
-
-        tenantAdmin = new User();
-        tenantAdmin.setAuthority(Authority.TENANT_ADMIN);
-        tenantAdmin.setTenantId(savedTenant.getId());
-        tenantAdmin.setEmail("tenant2@tempus.org");
-        tenantAdmin.setFirstName("Joe");
-        tenantAdmin.setLastName("Downs");
-
-        tenantAdmin = createUserAndLogin(tenantAdmin, "testPassword1");
-    }
-
-    @After
-    public void afterTest() throws Exception {
-        loginSysAdmin();
-
-        doDelete("/api/tenant/" + savedTenant.getId().getId().toString())
-                .andExpect(status().isOk());
+        loginTenantAdmin();
     }
 
     @Test
     public void testAuditLogs() throws Exception {
-        for (int i = 0; i < 178; i++) {
+        for (int i = 0; i < 78; i++) {
             Device device = new Device();
             device.setName("Device" + i);
             device.setType("default");
@@ -88,7 +57,7 @@ public abstract class BaseAuditLogControllerTest extends AbstractControllerTest 
             }
         } while (pageData.hasNext());
 
-        Assert.assertEquals(178, loadedAuditLogs.size());
+        Assert.assertEquals(80, loadedAuditLogs.size());
 
         loadedAuditLogs = new ArrayList<>();
         pageLink = new TimePageLink(23);
@@ -102,7 +71,7 @@ public abstract class BaseAuditLogControllerTest extends AbstractControllerTest 
             }
         } while (pageData.hasNext());
 
-        Assert.assertEquals(178, loadedAuditLogs.size());
+        Assert.assertEquals(78, loadedAuditLogs.size());
 
         loadedAuditLogs = new ArrayList<>();
         pageLink = new TimePageLink(23);
@@ -116,7 +85,7 @@ public abstract class BaseAuditLogControllerTest extends AbstractControllerTest 
             }
         } while (pageData.hasNext());
 
-        Assert.assertEquals(178, loadedAuditLogs.size());
+        Assert.assertEquals(80, loadedAuditLogs.size());
     }
 
     @Test

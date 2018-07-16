@@ -16,23 +16,18 @@
 package com.hashmapinc.server.dao.application;
 
 import com.google.common.collect.Iterables;
-import com.hashmapinc.server.common.data.Customer;
-import com.hashmapinc.server.common.data.computation.ComputationJob;
-import com.hashmapinc.server.common.data.id.*;
-import com.hashmapinc.server.common.data.page.TextPageLink;
-import com.hashmapinc.server.dao.customer.CustomerDao;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 import com.hashmapinc.server.common.data.Application;
+import com.hashmapinc.server.common.data.Customer;
 import com.hashmapinc.server.common.data.Dashboard;
 import com.hashmapinc.server.common.data.Tenant;
+import com.hashmapinc.server.common.data.computation.ComputationJob;
 import com.hashmapinc.server.common.data.id.*;
 import com.hashmapinc.server.common.data.page.TextPageData;
+import com.hashmapinc.server.common.data.page.TextPageLink;
 import com.hashmapinc.server.common.data.plugin.ComponentLifecycleState;
 import com.hashmapinc.server.common.data.rule.RuleMetaData;
 import com.hashmapinc.server.dao.computations.ComputationJobDao;
+import com.hashmapinc.server.dao.customer.CustomerDao;
 import com.hashmapinc.server.dao.dashboard.DashboardDao;
 import com.hashmapinc.server.dao.entity.AbstractEntityService;
 import com.hashmapinc.server.dao.exception.DataValidationException;
@@ -40,16 +35,22 @@ import com.hashmapinc.server.dao.exception.DatabaseException;
 import com.hashmapinc.server.dao.exception.IncorrectParameterException;
 import com.hashmapinc.server.dao.rule.RuleDao;
 import com.hashmapinc.server.dao.service.DataValidator;
+import com.hashmapinc.server.dao.service.PaginatedRemover;
 import com.hashmapinc.server.dao.service.Validator;
 import com.hashmapinc.server.dao.tenant.TenantDao;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static com.hashmapinc.server.dao.model.ModelConstants.NULL_UUID;
-import static com.hashmapinc.server.dao.service.Validator.validateId;
-import static com.hashmapinc.server.dao.service.Validator.validateIds;
-import static com.hashmapinc.server.dao.service.Validator.validatePageLink;
+import static com.hashmapinc.server.dao.service.Validator.*;
 
 @Service
 @Slf4j
@@ -293,6 +294,14 @@ public class ApplicationServiceImpl extends AbstractEntityService implements App
         updateLifeCycleState(applicationId, ComponentLifecycleState.SUSPENDED);
     }
 
+    @Override
+    public void deleteApplicationByTenantId(TenantId tenantId) {
+        log.trace("Executing deleteApplicationByTenantId [{}]", tenantId);
+        validateId(tenantId, "Incorrect tenantId " + tenantId);
+
+        tenantApplicationRemover.removeEntities(tenantId);
+    }
+
     private void updateLifeCycleState(ApplicationId applicationId, ComponentLifecycleState state) {
         Validator.validateId(applicationId, "Incorrect application id for state change request.");
         Application application = applicationDao.findById(applicationId.getId());
@@ -404,6 +413,20 @@ public class ApplicationServiceImpl extends AbstractEntityService implements App
                         isValid = false;
                     }
                     application.setIsValid(isValid);
+                }
+            };
+
+    private PaginatedRemover<TenantId, Application> tenantApplicationRemover =
+            new PaginatedRemover<TenantId, Application>() {
+
+                @Override
+                protected List<Application> findEntities(TenantId id, TextPageLink pageLink) {
+                    return applicationDao.findApplicationsByTenantId(id.getId(), pageLink);
+                }
+
+                @Override
+                protected void removeEntity(Application entity) {
+                    deleteApplication(new ApplicationId(entity.getUuidId()));
                 }
             };
 }

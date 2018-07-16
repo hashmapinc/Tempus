@@ -53,11 +53,11 @@ public abstract class BaseUserSettingsControllerTest extends AbstractControllerT
     public void testSaveUserSettingsByCustomerUser() throws Exception {
         loginCustomerUser();
         UserSettings userSettings = new UserSettings();
-        userSettings.setKey("deviceTypes");
+        userSettings.setKey("assignedDeviceTypes");
         userSettings.setJsonValue(mapper.readTree("{\"deviceType\":\"DT_A\"}"));
         doPost("/api/settings", userSettings).andExpect(status().isOk());
 
-        doGet("/api/settings/deviceTypes")
+        doGet("/api/settings/assignedDeviceTypes")
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(contentType))
                 .andExpect(jsonPath("$.jsonValue.deviceType", is("DT_A")));

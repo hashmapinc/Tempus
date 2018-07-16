@@ -17,8 +17,24 @@ package com.hashmapinc.server.controller.sql;
 
 import com.hashmapinc.server.controller.BaseDataModelControllerTest;
 import com.hashmapinc.server.dao.service.DaoSqlTest;
+import com.hashmapinc.server.dao.sql.datamodel.DataModelObjectRespository;
+import com.hashmapinc.server.dao.sql.datamodel.DataModelRepository;
+import org.junit.After;
+import org.springframework.beans.factory.annotation.Autowired;
 
 @DaoSqlTest
 public class DataModelControllerSqlTest extends BaseDataModelControllerTest {
+
+    @Autowired
+    private DataModelRepository dataModelRepository;
+
+    @Autowired
+    private DataModelObjectRespository dataModelObjectRespository;
+
+    @After
+    public void afterTest(){
+        dataModelObjectRespository.deleteAll();
+        dataModelRepository.deleteAll();
+    }
 
 }

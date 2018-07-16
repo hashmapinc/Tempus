@@ -212,13 +212,6 @@ function Menu(userService, $state, $rootScope) {
                             icon: 'home'
                         },
                         {
-                            name: 'Applications',
-                            type: 'link',
-                            state: 'home.applications',
-                            icon: 'dashboards',
-                            link: '/static/svg/applicationslightgray.svg'
-                        },
-                        {
                             name: 'Tempusboard',
                             type: 'link',
                             state: 'home.tempusboard',

@@ -1,0 +1,18 @@
+{
+  "request": {
+    "url" : "/uaa/oauth/check_token",
+    "method": "POST",
+    "bodyPatterns" : [
+      {
+        "equalTo": "token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0ZW5hbnRfaWQiOiIxMzgxNDAwMC0xZGQyLTExYjItODA4MC04MDgwODA4MDgwODAiLCJsYXN0TmFtZSI6IkFkbWluIiwidXNlcl9uYW1lIjoic3lzYWRtaW5AaGFzaG1hcGluYy5jb20iLCJkZXNjcmlwdGlvbiI6IlRoaXMgaXMgYSBkZW1vIHN5c3RlbSBhZG1pbiB1c2VkIGZvciB0ZXN0aW5nIiwiY2xpZW50X2lkIjoidGVtcHVzIiwiZW5hYmxlZCI6dHJ1ZSwiYXV0aG9yaXRpZXMiOlsiU1lTX0FETUlOIl0sImZpcnN0TmFtZSI6IlN5c3RlbSIsInNjb3BlIjpbInNlcnZlciJdLCJpZCI6IjU5ZWFiODgwLTQ2MTItMTFlNy04MDgwLTgwODA4MDgwODA4MCIsImN1c3RvbWVyX2lkIjoiMTM4MTQwMDAtMWRkMi0xMWIyLTgwODAtODA4MDgwODA4MDgwIiwiZXhwIjoxNTM5Mjc0Njk5LCJpYXQiOjE1MzAyNzQ2OTksImp0aSI6IjM2MGFlNTFmLWM4YjMtNDBiYy04NWI0LTZhZDdiN2ViZWI3OSJ9.mHr49w4-xn3hamsXkP0QgHOIxuekSn01HO-p7ddmcy0"
+      }
+    ]
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-type": "application/json"
+    },
+    "body": "{\"tenant_id\":\"13814000-1dd2-11b2-8080-808080808080\",\"lastName\":null,\"user_name\":\"sysadmin@hashmapinc.com\",\"active\":true,\"authorities\":[\"SYS_ADMIN\"],\"enabled\":true,\"client_id\":\"tempus\",\"firstName\":null,\"scope\":[\"server\"],\"id\":\"59eab880-4612-11e7-8080-808080808080\",\"exp\":1539167128,\"customer_id\":\"13814000-1dd2-11b2-8080-808080808080\",\"iat\":1530167128,\"jti\":\"db31f980-bfd8-421c-b21e-03198424de48\"}"
+  }
+}
