@@ -27,6 +27,7 @@ import com.hashmapinc.server.dao.model.ModelConstants;
 import com.hashmapinc.server.dao.util.NoSqlDao;
 import com.hashmapinc.server.service.install.cql.CQLStatementsParser;
 
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -86,7 +87,7 @@ public class CassandraDatabaseSchemaService implements DatabaseSchemaService {
         }
     }
 
-    private void loadCql(Path cql) throws Exception {
+    private void loadCql(Path cql) throws IOException {
         List<String> statements = new CQLStatementsParser(cql).getStatements();
         statements.forEach(statement -> cluster.getSession().execute(statement));
     }

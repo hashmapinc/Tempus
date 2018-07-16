@@ -16,6 +16,7 @@
 package com.hashmapinc.server.service.install;
 
 import com.datastax.driver.core.KeyspaceMetadata;
+import com.hashmapinc.server.common.msg.exception.TempusRuntimeException;
 import com.hashmapinc.server.dao.cassandra.CassandraCluster;
 import com.hashmapinc.server.dao.cassandra.CassandraInstallCluster;
 import com.hashmapinc.server.service.install.cql.CassandraDbHelper;
@@ -28,6 +29,7 @@ import com.hashmapinc.server.dao.dashboard.DashboardService;
 import com.hashmapinc.server.dao.util.NoSqlDao;
 import com.hashmapinc.server.service.install.cql.CQLStatementsParser;
 
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -69,7 +71,7 @@ public class CassandraDatabaseUpgradeService implements DatabaseUpgradeService {
                 upgradeDatabaseFromV131();
                 break;
             default:
-                throw new RuntimeException("Unable to upgrade Cassandra database, unsupported fromVersion: " + fromVersion);
+                throw new TempusRuntimeException("Unable to upgrade Cassandra database, unsupported fromVersion: " + fromVersion);
         }
 
     }
@@ -198,7 +200,7 @@ public class CassandraDatabaseUpgradeService implements DatabaseUpgradeService {
         log.info("Relations restored.");
     }
 
-    private void loadCql(Path cql) throws Exception {
+    private void loadCql(Path cql) throws IOException {
         List<String> statements = new CQLStatementsParser(cql).getStatements();
         statements.forEach(statement -> installCluster.getSession().execute(statement));
     }

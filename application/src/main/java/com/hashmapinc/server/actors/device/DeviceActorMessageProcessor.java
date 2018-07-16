@@ -26,6 +26,7 @@ import com.hashmapinc.server.actors.shared.AbstractContextAwareMsgProcessor;
 import com.hashmapinc.server.common.data.id.SessionId;
 import com.hashmapinc.server.common.data.kv.TsKvEntry;
 import com.hashmapinc.server.common.msg.core.*;
+import com.hashmapinc.server.common.msg.exception.TempusRuntimeException;
 import com.hashmapinc.server.common.msg.session.MsgType;
 import com.hashmapinc.server.extensions.api.device.*;
 import com.hashmapinc.server.extensions.api.plugins.msg.TimeoutMsg;
@@ -411,7 +412,7 @@ public class DeviceActorMessageProcessor extends AbstractContextAwareMsgProcesso
             return systemContext.getAttributesService().findAll(this.deviceId, scope).get();
         } catch (InterruptedException | ExecutionException e) {
             logger.warning("[{}] Failed to fetch attributes for scope: {}", deviceId, scope);
-            throw new RuntimeException(e);
+            throw new TempusRuntimeException(e);
         }
     }
 
@@ -420,7 +421,7 @@ public class DeviceActorMessageProcessor extends AbstractContextAwareMsgProcesso
              return systemContext.getTsService().findAllLatest(this.deviceId).get();
         } catch (InterruptedException | ExecutionException e) {
             logger.warning("[{}] Failed to fetch latestTelemetry", deviceId);
-            throw new RuntimeException(e);
+            throw new TempusRuntimeException(e);
         }
     }
 

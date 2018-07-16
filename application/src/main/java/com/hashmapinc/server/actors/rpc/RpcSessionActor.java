@@ -23,16 +23,14 @@ import com.hashmapinc.server.actors.cluster.DecrementRpcSessionCountMsg;
 import com.hashmapinc.server.actors.cluster.IncrementRpcSessionCountMsg;
 import com.hashmapinc.server.actors.service.ContextAwareActor;
 import com.hashmapinc.server.actors.service.ContextBasedCreator;
+import com.hashmapinc.server.common.msg.cluster.ServerAddress;
 import com.hashmapinc.server.gen.cluster.ClusterAPIProtos;
 import com.hashmapinc.server.gen.cluster.ClusterRpcServiceGrpc;
+import com.hashmapinc.server.service.cluster.rpc.GrpcSession;
 import com.hashmapinc.server.service.cluster.rpc.GrpcSessionListener;
 import io.grpc.Channel;
 import io.grpc.ManagedChannelBuilder;
 import io.grpc.stub.StreamObserver;
-import com.hashmapinc.server.common.msg.cluster.ServerAddress;
-import com.hashmapinc.server.service.cluster.rpc.GrpcSession;
-
-import java.util.UUID;
 
 
 public class RpcSessionActor extends ContextAwareActor {
@@ -40,7 +38,6 @@ public class RpcSessionActor extends ContextAwareActor {
     private final LoggingAdapter log = Logging.getLogger(getContext().system(), this);
 
     private GrpcSession session;
-    private GrpcSessionListener listener;
 
     private final ActorRef nodeMetricActor;
 
@@ -78,7 +75,7 @@ public class RpcSessionActor extends ContextAwareActor {
     private void initSession(RpcSessionCreateRequestMsg msg) {
         log.info("[{}] Initializing session", context().self());
         ServerAddress remoteServer = msg.getRemoteAddress();
-        listener = new BasicRpcSessionListener(systemContext, context().parent(), context().self());
+        GrpcSessionListener listener = new BasicRpcSessionListener(systemContext, context().parent(), context().self());
         if (msg.getRemoteAddress() == null) {
             // Server session
             session = new GrpcSession(listener);

@@ -15,6 +15,7 @@
  */
 package com.hashmapinc.server.install;
 
+import com.hashmapinc.server.common.msg.exception.TempusRuntimeException;
 import com.hashmapinc.server.service.install.DatabaseSchemaService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,10 +55,10 @@ public class TempusSchemaCreationService {
         log.info("Starting Tempus Installation...");
 
         if (this.dataDir == null) {
-            throw new RuntimeException("'install.data_dir' property should specified!");
+            throw new TempusRuntimeException("'install.data_dir' property should specified!");
         }
         if (!Paths.get(this.dataDir).toFile().isDirectory()) {
-            throw new RuntimeException("'install.data_dir' property value is not a valid directory!");
+            throw new TempusRuntimeException("'install.data_dir' property value is not a valid directory!");
         }
 
         log.info("Installing DataBase schema...");

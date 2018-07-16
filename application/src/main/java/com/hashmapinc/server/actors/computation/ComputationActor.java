@@ -32,6 +32,8 @@ import com.hashmapinc.server.common.data.plugin.ComponentLifecycleState;
 import com.hashmapinc.server.actors.service.DefaultActorService;
 import com.hashmapinc.server.common.data.page.PageDataIterable;
 import com.hashmapinc.server.common.msg.plugin.ComponentLifecycleMsg;
+import com.hashmapinc.server.exception.TempusApplicationException;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -51,11 +53,11 @@ public class ComputationActor extends ContextAwareActor {
     }
 
     @Override
-    public void preStart() throws Exception {
+    public void preStart() throws TempusApplicationException {
         start();
     }
 
-    private void start() throws Exception{
+    private void start() throws TempusApplicationException {
         logger.info("[{}][{}] Starting computation actor.", computationId, tenantId);
         computation = systemContext.getComputationsService().findById(computationId);
         if(computation == null){

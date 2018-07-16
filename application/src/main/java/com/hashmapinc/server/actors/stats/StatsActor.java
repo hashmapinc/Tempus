@@ -47,7 +47,7 @@ public class StatsActor extends ContextAwareActor {
         }
     }
 
-    public void onStatsPersistMsg(StatsPersistMsg msg) throws Exception {
+    public void onStatsPersistMsg(StatsPersistMsg msg) {
         Event event = new Event();
         event.setEntityId(msg.getEntityId());
         event.setTenantId(msg.getTenantId());

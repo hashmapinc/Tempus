@@ -32,6 +32,7 @@ import com.hashmapinc.server.common.data.security.DeviceCredentials;
 import com.hashmapinc.server.common.data.security.UserCredentials;
 import com.hashmapinc.server.common.data.widget.WidgetType;
 import com.hashmapinc.server.common.data.widget.WidgetsBundle;
+import com.hashmapinc.server.common.msg.exception.TempusRuntimeException;
 import com.hashmapinc.server.dao.attributes.AttributesService;
 import com.hashmapinc.server.dao.customer.CustomerService;
 import com.hashmapinc.server.dao.dashboard.DashboardService;
@@ -55,6 +56,7 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -218,13 +220,13 @@ public class DefaultSystemDataLoaderService implements SystemDataLoaderService {
                                             widgetTypeService.saveWidgetType(widgetType);
                                         } catch (Exception e) {
                                             log.error("Unable to load widget type from json: [{}]", path.toString());
-                                            throw new RuntimeException("Unable to load widget type from json", e);
+                                            throw new TempusRuntimeException("Unable to load widget type from json", e);
                                         }
                                     }
                             );
                         } catch (Exception e) {
                             log.error("Unable to load widgets bundle from json: [{}]", path.toString());
-                            throw new RuntimeException("Unable to load widgets bundle from json", e);
+                            throw new TempusRuntimeException("Unable to load widgets bundle from json", e);
                         }
                     }
             );
@@ -272,10 +274,10 @@ public class DefaultSystemDataLoaderService implements SystemDataLoaderService {
         attributesTank456.add(new BaseAttributeKvEntry(new StringDataEntry("latitude", "52.317932"), DateTime.now().getMillis()));
         attributesTank456.add(new BaseAttributeKvEntry(new StringDataEntry("longitude", "-113.993608"), DateTime.now().getMillis()));
 
-        createDevice(demoTenant.getId(), customerA.getId(), "WaterTank", "Tank 123", "Test_Token_Tank123", null, false, attributesTank123);
-        createDevice(demoTenant.getId(), customerA.getId(), "WaterTank", "Tank 456", "Test_Token_Tank456", null, false, attributesTank456);
-        createDevice(demoTenant.getId(), customerA.getId(), "Gateway", "Spark Analytics Gateway", "GATEWAY_ACCESS_TOKEN", null, true, null);
-        createDevice(demoTenant.getId(), customerA.getId(), "Gateway", "Device Gateway", "DEVICE_GATEWAY_TOKEN", null, true, null);
+        createDevice(new DeviceUser(demoTenant.getId(), customerA.getId(), "Test_Token_Tank123"), "WaterTank", "Tank 123", null, false, attributesTank123);
+        createDevice(new DeviceUser(demoTenant.getId(), customerA.getId(), "Test_Token_Tank456"), "WaterTank", "Tank 456", null, false, attributesTank456);
+        createDevice(new DeviceUser(demoTenant.getId(), customerA.getId(), "GATEWAY_ACCESS_TOKEN"), "Gateway", "Spark Analytics Gateway", null, true, null);
+        createDevice(new DeviceUser(demoTenant.getId(), customerA.getId(), "DEVICE_GATEWAY_TOKEN"), "Gateway", "Device Gateway", null, true, null);
 
         Customer customerB = new Customer();
         customerB.setTenantId(demoTenant.getId());
@@ -285,11 +287,6 @@ public class DefaultSystemDataLoaderService implements SystemDataLoaderService {
         customerC.setTenantId(demoTenant.getId());
         customerC.setTitle("Customer C");
         customerC = customerService.saveCustomer(customerC);
-      //  createUser(Authority.CUSTOMER_USER, demoTenant.getId(), customerA.getId(), "customer@tempus.org", CUSTOMER_CRED, false);
-      //  createUser(Authority.CUSTOMER_USER, demoTenant.getId(), customerA.getId(), "customerA@tempus.org", CUSTOMER_CRED, false);
-     //  createUser(Authority.CUSTOMER_USER, demoTenant.getId(), customerB.getId(), "customerB@tempus.org", CUSTOMER_CRED, false);
-      //  createUser(Authority.CUSTOMER_USER, demoTenant.getId(), customerC.getId(), "customerC@tempus.org", CUSTOMER_CRED, false);
-
         createDevice(demoTenant.getId(), customerA.getId(), DEFAULT_DEVICE_TYPE, "Test Device A1", "A1_TEST_TOKEN", null);
         createDevice(demoTenant.getId(), customerA.getId(), DEFAULT_DEVICE_TYPE, "Test Device A2", "A2_TEST_TOKEN", null);
         createDevice(demoTenant.getId(), customerA.getId(), DEFAULT_DEVICE_TYPE, "Test Device A3", "A3_TEST_TOKEN", null);
@@ -342,17 +339,14 @@ public class DefaultSystemDataLoaderService implements SystemDataLoaderService {
         return user;
     }
 
-    private Device createDevice(TenantId tenantId,
-                                CustomerId customerId,
-                                String type,
+    private Device createDevice(DeviceUser deviceUser, String type,
                                 String name,
-                                String accessToken,
                                 String description,
                                 Boolean isGateway,
                                 List<AttributeKvEntry> attributes) {
         Device device = new Device();
-        device.setTenantId(tenantId);
-        device.setCustomerId(customerId);
+        device.setTenantId(deviceUser.getTenantId());
+        device.setCustomerId(deviceUser.getCustomerId());
         device.setType(type);
         device.setName(name);
         if (isGateway || description != null){
@@ -372,7 +366,7 @@ public class DefaultSystemDataLoaderService implements SystemDataLoaderService {
         }
 
         DeviceCredentials deviceCredentials = deviceCredentialsService.findDeviceCredentialsByDeviceId(device.getId());
-        deviceCredentials.setCredentialsId(accessToken);
+        deviceCredentials.setCredentialsId(deviceUser.getAccessToken());
         deviceCredentialsService.updateDeviceCredentials(deviceCredentials);
         return device;
     }
@@ -383,10 +377,10 @@ public class DefaultSystemDataLoaderService implements SystemDataLoaderService {
                                 String name,
                                 String accessToken,
                                 String description) {
-        return createDevice(tenantId, customerId, type, name, accessToken, description, false, null);
+        return createDevice(new DeviceUser(tenantId, customerId, accessToken), type, name, description, false, null);
     }
 
-    private void loadPlugins(Path pluginsDir, TenantId tenantId) throws Exception{
+    private void loadPlugins(Path pluginsDir, TenantId tenantId) throws IOException {
         try (DirectoryStream<Path> dirStream = Files.newDirectoryStream(pluginsDir, path -> path.toString().endsWith(JSON_EXT))) {
             dirStream.forEach(
                     path -> {
@@ -403,14 +397,14 @@ public class DefaultSystemDataLoaderService implements SystemDataLoaderService {
                             }
                         } catch (Exception e) {
                             log.error("Unable to load plugin from json: [{}]", path.toString());
-                            throw new RuntimeException("Unable to load plugin from json", e);
+                            throw new TempusRuntimeException("Unable to load plugin from json", e);
                         }
                     }
             );
         }
     }
 
-    private void loadRules(Path rulesDir, TenantId tenantId) throws Exception {
+    private void loadRules(Path rulesDir, TenantId tenantId) throws IOException {
         try (DirectoryStream<Path> dirStream = Files.newDirectoryStream(rulesDir, path -> path.toString().endsWith(JSON_EXT))) {
             dirStream.forEach(
                     path -> {
@@ -427,14 +421,14 @@ public class DefaultSystemDataLoaderService implements SystemDataLoaderService {
                             }
                         } catch (Exception e) {
                             log.error("Unable to load rule from json: [{}]", path.toString());
-                            throw new RuntimeException("Unable to load rule from json", e);
+                            throw new TempusRuntimeException("Unable to load rule from json", e);
                         }
                     }
             );
         }
     }
 
-    private void loadDashboards(Path dashboardsDir, TenantId tenantId, CustomerId customerId) throws Exception {
+    private void loadDashboards(Path dashboardsDir, TenantId tenantId, CustomerId customerId) throws IOException {
         try (DirectoryStream<Path> dirStream = Files.newDirectoryStream(dashboardsDir, path -> path.toString().endsWith(JSON_EXT))) {
             dirStream.forEach(
                     path -> {
@@ -448,10 +442,34 @@ public class DefaultSystemDataLoaderService implements SystemDataLoaderService {
                             }
                         } catch (Exception e) {
                             log.error("Unable to load dashboard from json: [{}]", path.toString());
-                            throw new RuntimeException("Unable to load dashboard from json", e);
+                            throw new TempusRuntimeException("Unable to load dashboard from json", e);
                         }
                     }
             );
+        }
+    }
+
+    private static class DeviceUser {
+        private final TenantId tenantId;
+        private final CustomerId customerId;
+        private final String accessToken;
+
+        private DeviceUser(TenantId tenantId, CustomerId customerId, String accessToken) {
+            this.tenantId = tenantId;
+            this.customerId = customerId;
+            this.accessToken = accessToken;
+        }
+
+        public TenantId getTenantId() {
+            return tenantId;
+        }
+
+        public CustomerId getCustomerId() {
+            return customerId;
+        }
+
+        public String getAccessToken() {
+            return accessToken;
         }
     }
 }

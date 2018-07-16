@@ -21,12 +21,12 @@ import akka.actor.Scheduler;
 import akka.event.LoggingAdapter;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.hashmapinc.server.extensions.api.component.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
 import com.hashmapinc.server.actors.ActorSystemContext;
 import com.hashmapinc.server.common.data.plugin.ComponentDescriptor;
 import com.hashmapinc.server.common.data.plugin.ComponentType;
+import com.hashmapinc.server.extensions.api.component.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 import scala.concurrent.ExecutionContextExecutor;
 import scala.concurrent.duration.Duration;
 
@@ -76,7 +76,7 @@ public abstract class AbstractContextAwareMsgProcessor {
         getScheduler().scheduleOnce(Duration.create(delayInMs, TimeUnit.MILLISECONDS), target, msg, getSystemDispatcher(), null);
     }
 
-    protected <T extends ConfigurableComponent> T initComponent(JsonNode componentNode) throws Exception {
+    protected <T extends ConfigurableComponent> T initComponent(JsonNode componentNode) throws IOException, InstantiationException, IllegalAccessException, ClassNotFoundException {
         ComponentConfiguration configuration = new ComponentConfiguration(
                 componentNode.get("clazz").asText(),
                 componentNode.get("name").asText(),
@@ -89,12 +89,12 @@ public abstract class AbstractContextAwareMsgProcessor {
     }
 
     protected <T extends ConfigurableComponent> T initComponent(ComponentDescriptor componentDefinition, ComponentConfiguration configuration)
-            throws Exception {
+            throws ClassNotFoundException, IOException, InstantiationException, IllegalAccessException {
         return initComponent(componentDefinition.getClazz(), componentDefinition.getType(), configuration.getConfiguration());
     }
 
     protected <T extends ConfigurableComponent> T initComponent(String clazz, ComponentType type, String configuration)
-            throws Exception {
+            throws ClassNotFoundException, IllegalAccessException, InstantiationException, IOException {
         Class<?> componentClazz = Class.forName(clazz);
         T component = (T) (componentClazz.newInstance());
         Class<?> configurationClazz;
@@ -118,7 +118,7 @@ public abstract class AbstractContextAwareMsgProcessor {
         return component;
     }
 
-    public <C> C decode(String configuration, Class<C> configurationClazz) throws IOException, RuntimeException {
+    public <C> C decode(String configuration, Class<C> configurationClazz) throws IOException {
         logger.info("Initializing using configuration: {}", configuration);
         return mapper.readValue(configuration, configurationClazz);
     }

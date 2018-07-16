@@ -52,6 +52,9 @@ public class JwtTokenAuthenticationProcessingFilter implements Filter{
 
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
+        /*
+        * EMPTY
+        * */
     }
 
     @Override
@@ -69,7 +72,7 @@ public class JwtTokenAuthenticationProcessingFilter implements Filter{
 
             HttpHeaders headers = new HttpHeaders();
             headers.set("Authorization", getAuthorizationHeader(resourceServerProperties.getClientId(), resourceServerProperties.getClientSecret()));
-            Map map = (new RestTemplate()).exchange(resourceServerProperties.getTokenInfoUri(), HttpMethod.POST, new HttpEntity<>(formData, headers), new HashMap<String, Object>().getClass()).getBody();
+            Map map = (new RestTemplate()).exchange(resourceServerProperties.getTokenInfoUri(), HttpMethod.POST, new HttpEntity<>(formData, headers), HashMap.class).getBody();
 
             //todo more information needs to go it.
             SecurityUser securityUser = new SecurityUser();
@@ -83,7 +86,9 @@ public class JwtTokenAuthenticationProcessingFilter implements Filter{
 
     @Override
     public void destroy() {
-
+        /*
+         * EMPTY
+         * */
     }
 
     private String getAuthorizationHeader(String clientId, String clientSecret) {

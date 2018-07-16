@@ -13,14 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.hashmapinc.server.service.security.exception;
+package com.hashmapinc.server.common.msg.exception;
 
-import org.springframework.security.authentication.AuthenticationServiceException;
+public class TempusRuntimeException extends RuntimeException{
+    public TempusRuntimeException(String exception){
+        super(exception);
+    }
 
-public class AuthMethodNotSupportedException extends AuthenticationServiceException {
-    private static final long serialVersionUID = 3705043083010304496L;
+    public TempusRuntimeException(String var1, Throwable var2) {
+        super(var1, var2);
+    }
 
-    public AuthMethodNotSupportedException(String msg) {
-        super(msg);
+    public TempusRuntimeException(Throwable var1) {
+        super(var1);
+    }
+
+    protected TempusRuntimeException(String var1, Throwable var2, boolean var3, boolean var4) {
+        super(var1, var2, var3, var4);
     }
 }
