@@ -64,7 +64,7 @@ public class PluginActor extends ComponentActor<PluginId, PluginActorMessageProc
             context().parent().tell(msg, ActorRef.noSender());
             context().stop(self());
         } else if (msg instanceof TimeoutMsg) {
-            onTimeoutMsg(context(), (TimeoutMsg) msg);
+            onTimeoutMsg((TimeoutMsg) msg);
         } else if (msg instanceof StatsPersistTick) {
             onStatsPersistTick(id);
         } else {
@@ -80,8 +80,8 @@ public class PluginActor extends ComponentActor<PluginId, PluginActorMessageProc
         }
     }
 
-    private void onTimeoutMsg(ActorContext context, TimeoutMsg msg) {
-        processor.onTimeoutMsg(context, msg);
+    private void onTimeoutMsg(TimeoutMsg msg) {
+        processor.onTimeoutMsg(msg);
     }
 
     private void onRpcResponse(ToPluginRpcResponseDeviceMsg msg) {

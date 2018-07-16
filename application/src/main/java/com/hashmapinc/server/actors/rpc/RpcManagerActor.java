@@ -170,7 +170,7 @@ public class RpcManagerActor extends ContextAwareActor {
     private ActorRef createSessionActor(RpcSessionCreateRequestMsg msg) {
         log.debug("[{}] Creating session actor.", msg.getMsgUid());
         ActorRef actor = context().actorOf(
-                Props.create(new RpcSessionActor.ActorCreator(systemContext, msg.getMsgUid(), nodeMetricActor)).withDispatcher(DefaultActorService.RPC_DISPATCHER_NAME));
+                Props.create(new RpcSessionActor.ActorCreator(systemContext, nodeMetricActor)).withDispatcher(DefaultActorService.RPC_DISPATCHER_NAME));
         actor.tell(msg, context().self());
         return actor;
     }

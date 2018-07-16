@@ -15,21 +15,21 @@
  */
 package com.hashmapinc.server.service.computation.classloader;
 
+import com.hashmapinc.server.service.computation.classloader.exception.CompilationException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
-import com.hashmapinc.server.service.computation.classloader.exception.CompilationException;
+
+import javax.tools.*;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.lang.reflect.Method;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.jar.JarFile;
-import javax.tools.*;
 
 @Slf4j
 public class RuntimeJavaCompiler {
@@ -72,7 +72,7 @@ public class RuntimeJavaCompiler {
         }
     }
 
-    private void initClassPath() throws IOException, URISyntaxException, CompilationException {
+    private void initClassPath() throws IOException, CompilationException {
         if(!classPathInitialized) {
             Set<File> classPaths = new HashSet<>();
             appendExistingClasspath(classPaths);

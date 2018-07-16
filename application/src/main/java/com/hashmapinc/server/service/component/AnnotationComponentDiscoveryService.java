@@ -50,6 +50,7 @@ import static java.util.stream.Collectors.toList;
 @Slf4j
 public class AnnotationComponentDiscoveryService implements ComponentDiscoveryService {
 
+    public static final String COMPONENT_WILL_BE_UPDATED_TO = "Component {} will be updated to {}";
     @Value("${plugins.scan_packages}")
     private String[] scanPackages;
 
@@ -122,15 +123,14 @@ public class AnnotationComponentDiscoveryService implements ComponentDiscoverySe
             ComponentDescriptor persistedComponent = componentDescriptorService.findByClazz(clazzName);
             if (persistedComponent == null) {
                 log.error("Persisting new component: {}", scannedComponent);
-                scannedComponent = componentDescriptorService.saveComponent(scannedComponent);
+                 componentDescriptorService.saveComponent(scannedComponent);
             } else if (scannedComponent.equals(persistedComponent)) {
                 log.error("Component is already persisted: {}", persistedComponent);
-                scannedComponent = persistedComponent;
             } else {
-                log.error("Component {} will be updated to {}", persistedComponent, scannedComponent);
+                log.error(COMPONENT_WILL_BE_UPDATED_TO, persistedComponent, scannedComponent);
                 componentDescriptorService.deleteByClazz(persistedComponent.getClazz());
                 scannedComponent.setId(persistedComponent.getId());
-                scannedComponent = componentDescriptorService.saveComponent(scannedComponent);
+                componentDescriptorService.saveComponent(scannedComponent);
             }
               scannedComponent = scanAndPersistComponent(def, type);
             result.add(scannedComponent);
@@ -211,7 +211,7 @@ public class AnnotationComponentDiscoveryService implements ComponentDiscoverySe
             log.info("Component is already persisted: {}", persistedComponent);
             scannedComponent = persistedComponent;
         } else {
-            log.info("Component {} will be updated to {}", persistedComponent, scannedComponent);
+            log.info(COMPONENT_WILL_BE_UPDATED_TO, persistedComponent, scannedComponent);
             componentDescriptorService.deleteByClazz(persistedComponent.getClazz());
             scannedComponent.setId(persistedComponent.getId());
             scannedComponent = componentDescriptorService.saveComponent(scannedComponent);
@@ -290,7 +290,7 @@ public class AnnotationComponentDiscoveryService implements ComponentDiscoverySe
                 log.debug("Already persisted component found {}", persistedComponent);
                 descriptor = persistedComponent;
             }else {
-                log.info("Component {} will be updated to {}", persistedComponent, descriptor);
+                log.info(COMPONENT_WILL_BE_UPDATED_TO, persistedComponent, descriptor);
                 componentDescriptorService.deleteByClazz(persistedComponent.getClazz());
                 descriptor.setId(persistedComponent.getId());
                 descriptor = componentDescriptorService.saveComponent(descriptor);

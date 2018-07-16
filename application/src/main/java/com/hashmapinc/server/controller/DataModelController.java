@@ -109,7 +109,7 @@ public class DataModelController extends BaseController {
             checkParameter(DATA_MODEL_ID, dataModelId);
             List<DataModelObject> dataModelObjects = dataModelObjectService.
                     findByDataModelId(new DataModelId(toUUID(dataModelId)));
-            dataModelObjects = dataModelObjects.stream().filter(dataModelObject -> !dataModelObject.getId().equals(ModelConstants.NULL_UUID)).collect(Collectors.toList());
+            dataModelObjects = dataModelObjects.stream().filter(dataModelObject -> !dataModelObject.getId().getId().equals(ModelConstants.NULL_UUID)).collect(Collectors.toList());
             return dataModelObjects;
         } catch (Exception e) {
             throw handleException(e);

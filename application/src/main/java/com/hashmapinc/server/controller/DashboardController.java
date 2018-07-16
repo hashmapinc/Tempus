@@ -45,7 +45,7 @@ public class DashboardController extends BaseController {
     @PreAuthorize("hasAnyAuthority('SYS_ADMIN', 'TENANT_ADMIN', 'CUSTOMER_USER')")
     @RequestMapping(value = "/dashboard/serverTime", method = RequestMethod.GET)
     @ResponseBody
-    public long getServerTime() throws TempusException {
+    public long getServerTime() {
         return System.currentTimeMillis();
     }
 

@@ -60,14 +60,12 @@ public class ClusterGrpcService extends ClusterRpcServiceGrpc.ClusterRpcServiceI
 
     private Server server;
 
-    private ServerInstance instance;
-
     private ConcurrentMap<UUID, RpcSessionCreationFuture> pendingSessionMap = new ConcurrentHashMap<>();
 
     public void init(RpcMsgListener listener) {
         this.listener = listener;
         log.info("Initializing RPC service!");
-        instance = instanceService.getSelf();
+        ServerInstance instance = instanceService.getSelf();
         server = ServerBuilder.forPort(instance.getPort()).addService(this).build();
         log.info("Going to start RPC server using port: {}", instance.getPort());
         try {

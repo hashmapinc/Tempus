@@ -124,13 +124,13 @@ public class ComputationJobActorMessageProcessor extends ComponentMsgProcessor<C
     public void onStop(ActorContext context) throws Exception {
         logger.info("[{}] Going to process onStop computation job.", entityId);
         onStop();
-        scheduleMsgWithDelay(context, new ComputationJobTerminationMsg(entityId), systemContext.getComputationActorTerminationDelay(), parent);
-        scheduleMsgWithDelay(context, new ComputationJobTerminationMsg(entityId), systemContext.getComputationActorTerminationDelay(), self);
+        scheduleMsgWithDelay(new ComputationJobTerminationMsg(entityId), systemContext.getComputationActorTerminationDelay(), parent);
+        scheduleMsgWithDelay(new ComputationJobTerminationMsg(entityId), systemContext.getComputationActorTerminationDelay(), self);
     }
 
     @Override
     public void onClusterEventMsg(ClusterEventMsg msg) throws Exception {
-
+        logger.info("onClusterEventMsg"); // No implementation
     }
 
     private void initComponent(){
@@ -212,7 +212,7 @@ public class ComputationJobActorMessageProcessor extends ComponentMsgProcessor<C
         return objectMapper.writeValueAsString(sparkComputationRequest);
     }
 
-    private String[] args() throws IOException {
+    private String[] args() {
         JsonNode conf = job.getArgParameters();
         String argsFormat = computation.getArgsformat();
         List<String> args = new ArrayList<>();

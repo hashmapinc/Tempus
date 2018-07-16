@@ -97,7 +97,8 @@ public class ComputationActor extends ContextAwareActor {
 
     private void onComponentLifecycleMsg(ComponentLifecycleMsg msg) {
         if(msg.getComputationJobId().isPresent()){
-            handleComponentLifecycleMsgForExistingComputation(msg);
+            msg.getComputationJobId().ifPresent(computationJobId ->
+                    handleComponentLifecycleMsgForExistingComputation(msg, computationJobId));
         }else {
             handleComponentLifecycleMsgForNonExistingComputation(msg);
         }
@@ -115,8 +116,7 @@ public class ComputationActor extends ContextAwareActor {
         }
     }
 
-    private void handleComponentLifecycleMsgForExistingComputation(ComponentLifecycleMsg msg) {
-        ComputationJobId jobId = msg.getComputationJobId().get();
+    private void handleComponentLifecycleMsgForExistingComputation(ComponentLifecycleMsg msg, ComputationJobId jobId) {
         ActorRef target;
         if(msg.getEvent() == ComponentLifecycleEvent.DELETED){
             target = computationJobActors.get(jobId);

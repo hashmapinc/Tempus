@@ -43,24 +43,18 @@ import com.hashmapinc.server.common.data.security.UserCredentials;
 import com.hashmapinc.server.exception.TempusErrorCode;
 import com.hashmapinc.server.exception.TempusException;
 import com.hashmapinc.server.service.mail.MailService;
-/*import com.hashmapinc.server.service.security.auth.jwt.RefreshTokenRepository;*/
 import com.hashmapinc.server.service.security.model.SecurityUser;
-import com.hashmapinc.server.service.security.model.UserPrincipal;
 import org.springframework.web.client.RestTemplate;
-//import com.hashmapinc.server.service.security.model.token.JwtToken;
-//import com.hashmapinc.server.service.security.model.token.JwtTokenFactory;
-
 import javax.servlet.http.HttpServletRequest;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.HashMap;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/api")
 @Slf4j
 public class AuthController extends BaseController {
 
+    public static final String USER_CREDENTIALS_RESOURCE = "/user-credentials";
     @Value("${identity.url}")
     private String identityUrl;
 
@@ -73,12 +67,6 @@ public class AuthController extends BaseController {
 
     @Autowired
     private ClientCredentialsResourceDetails apiResourceDetails;
-
-    /*@Autowired
-    private JwtTokenFactory tokenFactory;
-
-    @Autowired
-    private RefreshTokenRepository refreshTokenRepository;*/
 
     @Autowired
     private MailService mailService;
@@ -120,7 +108,7 @@ public class AuthController extends BaseController {
         HttpHeaders headers = new HttpHeaders();
         HttpStatus responseStatus;
 
-        ResponseEntity<JsonNode> response = restTemplate.getForEntity(identityUrl + "/activate/" + activateToken +"/user-credentials", JsonNode.class);
+        ResponseEntity<JsonNode> response = restTemplate.getForEntity(identityUrl + "/activate/" + activateToken + USER_CREDENTIALS_RESOURCE, JsonNode.class);
 
         if(response.getStatusCode().equals(HttpStatus.OK)) {
             ObjectMapper mapper = new ObjectMapper();
@@ -179,7 +167,7 @@ public class AuthController extends BaseController {
         HttpHeaders headers = new HttpHeaders();
         HttpStatus responseStatus;
         String resetURI = "/login/resetPassword";
-        ResponseEntity<IdentityUserCredentials> identityUserCredentialsResponse = restTemplate.getForEntity(identityUrl + "/reset/"+ resetToken+"/user-credentials", IdentityUserCredentials.class);
+        ResponseEntity<IdentityUserCredentials> identityUserCredentialsResponse = restTemplate.getForEntity(identityUrl + "/reset/"+ resetToken+ USER_CREDENTIALS_RESOURCE, IdentityUserCredentials.class);
         if(identityUserCredentialsResponse.getStatusCode().equals(HttpStatus.OK)) {
             IdentityUserCredentials identityUserCredentials = identityUserCredentialsResponse.getBody();
             if (identityUserCredentials != null) {
@@ -225,11 +213,7 @@ public class AuthController extends BaseController {
                     String baseUrl = constructBaseUrl(request);
                     String loginUrl = String.format("%s/login", baseUrl);
                     String email = identityUser.getUserName();
-                    try {
-                        mailService.sendAccountActivatedEmail(loginUrl, email);
-                    } catch (Exception e) {
-                        log.info("Unable to send account activation email [{}]", e.getMessage());
-                    }
+                    sendAccountActivatedEmail(loginUrl, email);
                     OAuth2RestOperations oAuth2RestTemplate = getoAuth2RestOperations(password, identityUser);
                     ObjectMapper objectMapper = new ObjectMapper();
                     ObjectNode tokenObject = objectMapper.createObjectNode();
@@ -244,6 +228,14 @@ public class AuthController extends BaseController {
             }
         } catch (Exception e) {
             throw handleException(e);
+        }
+    }
+
+    private void sendAccountActivatedEmail(String loginUrl, String email) {
+        try {
+            mailService.sendAccountActivatedEmail(loginUrl, email);
+        } catch (Exception e) {
+            log.info("Unable to send account activation email [{}]", e.getMessage());
         }
     }
 
@@ -271,14 +263,14 @@ public class AuthController extends BaseController {
             String resetToken = resetPasswordRequest.get("resetToken").asText();
             String password = resetPasswordRequest.get("password").asText();
 
-            ResponseEntity<IdentityUserCredentials> identityUserCredentialsResponse = restTemplate.getForEntity(identityUrl + "/" + resetToken+"/user-credentials", IdentityUserCredentials.class);
+            ResponseEntity<IdentityUserCredentials> identityUserCredentialsResponse = restTemplate.getForEntity(identityUrl + "/" + resetToken+ USER_CREDENTIALS_RESOURCE, IdentityUserCredentials.class);
             if(identityUserCredentialsResponse.getStatusCode().equals(HttpStatus.OK)) {
                 UserCredentials userCredentials = identityUserCredentialsResponse.getBody().toUserCredentials();
                 if(userCredentials !=null) {
                     userCredentials.setPassword(password);
                     userCredentials.setResetToken(null);
 
-                    ResponseEntity<JsonNode> updatedUserCredentialsResponse = restTemplate.postForEntity(identityUrl +"/user-credentials", new IdentityUserCredentials(userCredentials), JsonNode.class);
+                    ResponseEntity<JsonNode> updatedUserCredentialsResponse = restTemplate.postForEntity(identityUrl + USER_CREDENTIALS_RESOURCE, new IdentityUserCredentials(userCredentials), JsonNode.class);
                     if(updatedUserCredentialsResponse.getStatusCode().equals(HttpStatus.OK)) {
                         String userGetUrl = identityUrl + "/" + userCredentials.getUserId().getId();
                         ResponseEntity<IdentityUser> userResponse = restTemplate.getForEntity(userGetUrl, IdentityUser.class);
@@ -288,11 +280,7 @@ public class AuthController extends BaseController {
                             String loginUrl = String.format("%s/login", baseUrl);
                             String email = identityUser.getUserName();
 
-                            try {
-                                mailService.sendPasswordWasResetEmail(loginUrl, email);
-                            } catch (Exception e) {
-                                log.info("Unable to send password  email [{}]", e.getMessage());
-                            }
+                            sendPasswordWasResetEmail(loginUrl, email);
 
                             OAuth2RestOperations oAuth2RestTemplate = getoAuth2RestOperations(password, identityUser);
                             ObjectMapper objectMapper = new ObjectMapper();
@@ -315,6 +303,14 @@ public class AuthController extends BaseController {
             }
         } catch (Exception e) {
             throw handleException(e);
+        }
+    }
+
+    private void sendPasswordWasResetEmail(String loginUrl, String email) {
+        try {
+            mailService.sendPasswordWasResetEmail(loginUrl, email);
+        } catch (Exception e) {
+            log.info("Unable to send password  email [{}]", e.getMessage());
         }
     }
 

@@ -48,8 +48,6 @@ public class SqlDatabaseSchemaService implements DatabaseSchemaService {
     private static final String SQL_DIR_POSTGRES = "sql/postgres";
     private static final String UPGRADE_DIR = "upgrade";
     protected static final  String SCHEMA_SQL = "schema.sql";
-    //private static final String SCHEMA_HSQLDB_SQL = "schemaH.sql";
-    //private static final String SCHEMA_POSTGRES_SQL = "schemaP.sql";
 
     @Value("${install.data_dir}")
     private String dataDir;
@@ -73,17 +71,11 @@ public class SqlDatabaseSchemaService implements DatabaseSchemaService {
 
 
         if(postgresConn != -1) {
-
             SQL_DIR = SQL_DIR_POSTGRES;
-
-            //schemaFiles = schemaFile;
         }
 
         if(hsqldbConn != -1) {
-
-
             SQL_DIR = SQL_DIR_HSQL;
-            //schemaFiles = schemaFile;
         }
 
 

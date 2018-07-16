@@ -39,6 +39,7 @@ import org.springframework.web.bind.annotation.*;
 @Slf4j
 public class LoginController extends BaseController {
 
+    public static final String REFRESH_TOKEN = "refresh_token";
     @Autowired
     private ClientCredentialsResourceDetails apiResourceDetails;
 
@@ -61,8 +62,7 @@ public class LoginController extends BaseController {
             SecurityContextHolder.getContext().setAuthentication(new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
 
             OAuth2RestOperations oAuth2RestTemplate = new OAuth2RestTemplate(userPasswordReq);
-            LoginResponseToken loginResponseToken = new LoginResponseToken(oAuth2RestTemplate.getAccessToken().getValue(), oAuth2RestTemplate.getAccessToken().getRefreshToken().getValue());
-            return loginResponseToken;
+            return new LoginResponseToken(oAuth2RestTemplate.getAccessToken().getValue(), oAuth2RestTemplate.getAccessToken().getRefreshToken().getValue());
         }catch (Exception e){
             throw handleException(e);
         }
@@ -77,14 +77,14 @@ public class LoginController extends BaseController {
             headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
 
             MultiValueMap<String, String> requestParams = new LinkedMultiValueMap<>();
-            requestParams.add("grant_type", "refresh_token");
-            requestParams.add("refresh_token", refreshTokenRequest.getRefreshToken());
+            requestParams.add("grant_type", REFRESH_TOKEN);
+            requestParams.add(REFRESH_TOKEN, refreshTokenRequest.getRefreshToken());
             HttpEntity<MultiValueMap<String, String>> postRequest = new HttpEntity<>(requestParams, headers);
             ResponseEntity<JsonNode> responseEntity =
                     restTemplate.postForEntity(apiResourceDetails.getAccessTokenUri(), postRequest, JsonNode.class);
             if (responseEntity.getStatusCode().equals(HttpStatus.OK)) {
                 JsonNode body = responseEntity.getBody();
-                return new LoginResponseToken(body.get("access_token").asText(), body.get("refresh_token").asText());
+                return new LoginResponseToken(body.get("access_token").asText(), body.get(REFRESH_TOKEN).asText());
             }
             return null;
         }catch (Exception e){

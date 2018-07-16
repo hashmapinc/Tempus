@@ -209,7 +209,7 @@ public class DeviceActorMessageProcessor extends AbstractContextAwareMsgProcesso
         processSessionStateMsgs(msg);
     }
 
-    void processAttributesUpdate(ActorContext context, DeviceAttributesEventNotificationMsg msg) {
+    void processAttributesUpdate(DeviceAttributesEventNotificationMsg msg) {
         refreshAttributes(msg);
         if (attributeSubscriptions.size() > 0) {
             ToDeviceMsg notification = null;
@@ -240,7 +240,7 @@ public class DeviceActorMessageProcessor extends AbstractContextAwareMsgProcesso
         }
     }
 
-    void processTelemetryUpdate(ActorContext context, DeviceTelemetryEventNotificationMsg msg) {
+    void processTelemetryUpdate(DeviceTelemetryEventNotificationMsg msg) {
         refreshTelemetry(msg);
         if (telemetrySubscriptions.size() > 0) {
             ToDeviceMsg notification = null;
@@ -341,7 +341,7 @@ public class DeviceActorMessageProcessor extends AbstractContextAwareMsgProcesso
         );
     }
 
-    void onRulesProcessedMsg(ActorContext context, RulesProcessedMsg msg) {
+    void onRulesProcessedMsg(RulesProcessedMsg msg) {
         ChainProcessingContext ctx = msg.getCtx();
         ToDeviceActorMsg inMsg = ctx.getInMsg();
         SessionId sid = inMsg.getSessionId();
@@ -425,9 +425,7 @@ public class DeviceActorMessageProcessor extends AbstractContextAwareMsgProcesso
     }
 
     public void processCredentialsUpdate() {
-        sessions.forEach((k, v) -> {
-            sendMsgToSessionActor(new BasicToDeviceSessionActorMsg(new SessionCloseNotification(), k), v.getServer());
-        });
+        sessions.forEach((k, v) -> sendMsgToSessionActor(new BasicToDeviceSessionActorMsg(new SessionCloseNotification(), k), v.getServer()));
         attributeSubscriptions.clear();
         telemetrySubscriptions.clear();
         rpcSubscriptions.clear();

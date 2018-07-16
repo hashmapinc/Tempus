@@ -25,16 +25,15 @@ import org.apache.commons.csv.CSVRecord;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by igor on 2/27/18.
  */
 @Slf4j
 public class SqlDbHelper {
+    private SqlDbHelper() {
+    }
 
     public static Path dumpTableIfExists(Connection conn, String tableName,
                                          String[] columns, String[] defaultValues, String dumpPrefix) throws Exception {
@@ -159,9 +158,7 @@ public class SqlDbHelper {
         }
         insertStatementBuilder.deleteCharAt(insertStatementBuilder.length() - 1);
         insertStatementBuilder.append(") VALUES (");
-        for (String column : columns) {
-            insertStatementBuilder.append("?").append(",");
-        }
+        Arrays.stream(columns).forEach(column -> insertStatementBuilder.append("?").append(","));
         insertStatementBuilder.deleteCharAt(insertStatementBuilder.length() - 1);
         insertStatementBuilder.append(")");
         return insertStatementBuilder.toString();
