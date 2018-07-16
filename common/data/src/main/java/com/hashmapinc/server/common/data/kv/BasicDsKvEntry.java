@@ -27,8 +27,8 @@ public class BasicDsKvEntry implements DsKvEntry{
     private final KvEntry kv;
     private double dsDiff;
 
-    public BasicDsKvEntry(Double Ds, KvEntry kv) {
-        this.ds = Ds;
+    public BasicDsKvEntry(Double ds, KvEntry kv) {
+        this.ds = ds;
         this.kv = kv;
     }
 

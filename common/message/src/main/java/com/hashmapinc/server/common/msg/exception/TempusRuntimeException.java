@@ -13,12 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.hashmapinc.server.common.data;
+package com.hashmapinc.server.common.msg.exception;
 
-public class CacheConstants {
-    public static final String DEVICE_CREDENTIALS_CACHE = "deviceCredentials";
-    public static final String RELATIONS_CACHE = "relations";
-    public static final String DEVICE_CACHE = "devices";
+public class TempusRuntimeException extends RuntimeException{
+    public TempusRuntimeException(String exception){
+        super(exception);
+    }
 
-    private CacheConstants(){}
+    public TempusRuntimeException(String var1, Throwable var2) {
+        super(var1, var2);
+    }
+
+    public TempusRuntimeException(Throwable var1) {
+        super(var1);
+    }
+
+    protected TempusRuntimeException(String var1, Throwable var2, boolean var3, boolean var4) {
+        super(var1, var2, var3, var4);
+    }
 }

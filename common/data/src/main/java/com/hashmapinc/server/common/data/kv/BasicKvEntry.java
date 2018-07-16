@@ -24,20 +24,19 @@ public abstract class BasicKvEntry implements KvEntry {
 
     private final String key;
 
-    private Optional<String> unit;
+    private String unit;
 
     protected BasicKvEntry(String key) {
         this.key = key;
-        this.unit = Optional.empty();
     }
 
     protected BasicKvEntry(String key, String unit) {
         this.key = key;
-        this.unit = Optional.of(unit);
+        this.unit = unit;
     }
 
     public Optional<String> getUnit() {
-        return unit;
+        return Optional.ofNullable(unit);
     }
 
     @Override
