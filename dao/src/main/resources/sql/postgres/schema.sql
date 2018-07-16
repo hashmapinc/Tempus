@@ -308,33 +308,6 @@ CREATE TABLE IF NOT EXISTS widgets_bundle (
     title varchar(255)
 );
 
-CREATE TABLE IF NOT EXISTS application (
-    id varchar(31) NOT NULL CONSTRAINT application_pkey PRIMARY KEY,
-    customer_id varchar(31),
-    tenant_id varchar(31),
-    mini_dashboard_id varchar(31),
-    search_text varchar(255),
-    dashboard_id varchar(31),
-    is_valid boolean,
-    name varchar(255),
-    description varchar(255)
-);
-
-CREATE TABLE IF NOT EXISTS application_device_types(
-    application_id varchar(31),
-    device_type varchar(255)
-);
-
-CREATE TABLE IF NOT EXISTS application_associated_rules(
-    application_id varchar(31),
-    application_rule_id varchar(31)
-);
-
-CREATE TABLE IF NOT EXISTS application_associated_computation_jobs(
-    application_id varchar(31),
-    application_computation_job_id varchar(31)
-);
-
 CREATE TABLE IF NOT EXISTS node_metric (
     id varchar (31) NOT NULL CONSTRAINT node_metric_pkey PRIMARY KEY,
     host varchar NOT NULL,

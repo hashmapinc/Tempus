@@ -365,7 +365,6 @@ audit_log:
       "user": "${AUDIT_LOG_MASK_USER:W}"
       "rule": "${AUDIT_LOG_MASK_RULE:W}"
       "plugin": "${AUDIT_LOG_MASK_PLUGIN:W}"
-      "application": "${AUDIT_LOG_MASK_PLUGIN:W}"
       "computation": "${AUDIT_LOG_MASK_PLUGIN:W}"
       "computation_job": "${AUDIT_LOG_MASK_PLUGIN:W}"
   sink:

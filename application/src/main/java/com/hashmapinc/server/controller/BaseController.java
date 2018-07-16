@@ -24,7 +24,6 @@ import com.hashmapinc.server.common.data.computation.ComputationJob;
 import com.hashmapinc.server.common.data.id.*;
 import com.hashmapinc.server.common.data.page.TextPageLink;
 import com.hashmapinc.server.common.data.plugin.ComponentDescriptor;
-import com.hashmapinc.server.dao.application.ApplicationService;
 import com.hashmapinc.server.dao.cluster.NodeMetricService;
 import com.hashmapinc.server.dao.datamodel.DataModelObjectService;
 import com.hashmapinc.server.dao.datamodel.DataModelService;
@@ -135,9 +134,6 @@ public abstract class BaseController {
 
     @Autowired
     protected RelationService relationService;
-
-    @Autowired
-    protected ApplicationService applicationService;
 
     @Autowired
     protected ComputationJobService computationJobService;
@@ -354,18 +350,6 @@ public abstract class BaseController {
             throw handleException(e, false);
         }
     }
-
-    Application checkApplicationId(ApplicationId applicationId) throws TempusException {
-        try{
-            validateId(applicationId, "Incorrect applicationId " + applicationId);
-            Application application = applicationService.findApplicationById(applicationId);
-            checkNotNull(application);
-            return application;
-        } catch (Exception e) {
-            throw handleException(e, false);
-        }
-    }
-
 
     Device checkDeviceId(DeviceId deviceId) throws TempusException {
         try {
