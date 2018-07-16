@@ -138,7 +138,7 @@ public class PluginActorMessageProcessor extends ComponentMsgProcessor<PluginId>
     }
 
 
-    public void onTimeoutMsg(ActorContext context, TimeoutMsg<?> msg) {
+    public void onTimeoutMsg(TimeoutMsg<?> msg) {
         if (state == ComponentLifecycleState.ACTIVE) {
             pluginImpl.process(trustedCtx, msg);
         }

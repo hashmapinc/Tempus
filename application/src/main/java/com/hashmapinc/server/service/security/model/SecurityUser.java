@@ -17,20 +17,22 @@ package com.hashmapinc.server.service.security.model;
 
 import com.hashmapinc.server.common.data.User;
 import com.hashmapinc.server.common.data.UserPermission;
+import com.hashmapinc.server.common.data.id.UserId;
+import lombok.EqualsAndHashCode;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import com.hashmapinc.server.common.data.id.UserId;
 
 import java.util.Collection;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+@EqualsAndHashCode
 public class SecurityUser extends User {
 
     private static final long serialVersionUID = -797397440703066079L;
 
     private Collection<GrantedAuthority> authorities;
-    private Collection<UserPermission> userPermissions;
+    private transient Collection<UserPermission> userPermissions;
     private boolean enabled;
     private UserPrincipal userPrincipal;
 
@@ -50,7 +52,7 @@ public class SecurityUser extends User {
 
     public Collection<UserPermission> getUserPermissions(){
         if (userPermissions == null) {
-            userPermissions = this.getPermissions().stream().map(p -> new UserPermission(p)).collect(Collectors.toList());
+            userPermissions = this.getPermissions().stream().map(UserPermission::new).collect(Collectors.toList());
         }
         return userPermissions;
     }

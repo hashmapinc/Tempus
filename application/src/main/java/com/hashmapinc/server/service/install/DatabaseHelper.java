@@ -39,6 +39,9 @@ import java.util.*;
 @Slf4j
 public class DatabaseHelper {
 
+    private DatabaseHelper() {
+    }
+
     public static final CSVFormat CSV_DUMP_FORMAT = CSVFormat.DEFAULT.withNullString("\\N");
 
     public static final String DEVICE = "device";

@@ -31,6 +31,9 @@ import static com.hashmapinc.server.service.install.DatabaseHelper.CSV_DUMP_FORM
 
 public class CassandraDbHelper {
 
+    private CassandraDbHelper() {
+    }
+
     public static Path dumpCfIfExists(KeyspaceMetadata ks, Session session, String cfName,
                                       String[] columns, String[] defaultValues, String dumpPrefix) throws Exception {
         return dumpCfIfExists(ks, session, cfName, columns, defaultValues, dumpPrefix, false);

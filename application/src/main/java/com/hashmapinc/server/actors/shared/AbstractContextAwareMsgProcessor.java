@@ -27,7 +27,6 @@ import lombok.Data;
 import com.hashmapinc.server.actors.ActorSystemContext;
 import com.hashmapinc.server.common.data.plugin.ComponentDescriptor;
 import com.hashmapinc.server.common.data.plugin.ComponentType;
-import com.hashmapinc.server.extensions.api.component.*;
 import scala.concurrent.ExecutionContextExecutor;
 import scala.concurrent.duration.Duration;
 
@@ -59,20 +58,20 @@ public abstract class AbstractContextAwareMsgProcessor {
     }
 
     protected void schedulePeriodicMsgWithDelay(ActorContext ctx, Object msg, long delayInMs, long periodInMs) {
-        schedulePeriodicMsgWithDelay(ctx, msg, delayInMs, periodInMs, ctx.self());
+        schedulePeriodicMsgWithDelay(msg, delayInMs, periodInMs, ctx.self());
     }
 
-    protected void schedulePeriodicMsgWithDelay(ActorContext ctx, Object msg, long delayInMs, long periodInMs, ActorRef target) {
+    protected void schedulePeriodicMsgWithDelay(Object msg, long delayInMs, long periodInMs, ActorRef target) {
         logger.debug("Scheduling periodic msg {} every {} ms with delay {} ms", msg, periodInMs, delayInMs);
         getScheduler().schedule(Duration.create(delayInMs, TimeUnit.MILLISECONDS), Duration.create(periodInMs, TimeUnit.MILLISECONDS), target, msg, getSystemDispatcher(), null);
     }
 
 
     protected void scheduleMsgWithDelay(ActorContext ctx, Object msg, long delayInMs) {
-        scheduleMsgWithDelay(ctx, msg, delayInMs, ctx.self());
+        scheduleMsgWithDelay(msg, delayInMs, ctx.self());
     }
 
-    protected void scheduleMsgWithDelay(ActorContext ctx, Object msg, long delayInMs, ActorRef target) {
+    protected void scheduleMsgWithDelay(Object msg, long delayInMs, ActorRef target) {
         logger.debug("Scheduling msg {} with delay {} ms", msg, delayInMs);
         getScheduler().scheduleOnce(Duration.create(delayInMs, TimeUnit.MILLISECONDS), target, msg, getSystemDispatcher(), null);
     }

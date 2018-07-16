@@ -17,7 +17,6 @@ package com.hashmapinc.server.exception;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hashmapinc.server.service.security.exception.AuthMethodNotSupportedException;
-/*import com.hashmapinc.server.service.security.exception.JwtExpiredTokenException;*/
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -121,9 +120,7 @@ public class TempusErrorResponseHandler implements AccessDeniedHandler {
         response.setStatus(HttpStatus.UNAUTHORIZED.value());
         if (authenticationException instanceof BadCredentialsException) {
             mapper.writeValue(response.getWriter(), TempusErrorResponse.of("Invalid username or password", TempusErrorCode.AUTHENTICATION, HttpStatus.UNAUTHORIZED));
-        }/* else if (authenticationException instanceof JwtExpiredTokenException) {
-            mapper.writeValue(response.getWriter(), TempusErrorResponse.of("Token has expired", TempusErrorCode.JWT_TOKEN_EXPIRED, HttpStatus.UNAUTHORIZED));
-        }*/ else if (authenticationException instanceof AuthMethodNotSupportedException) {
+        } else if (authenticationException instanceof AuthMethodNotSupportedException) {
             mapper.writeValue(response.getWriter(), TempusErrorResponse.of(authenticationException.getMessage(), TempusErrorCode.AUTHENTICATION, HttpStatus.UNAUTHORIZED));
         }
         mapper.writeValue(response.getWriter(), TempusErrorResponse.of("Authentication failed", TempusErrorCode.AUTHENTICATION, HttpStatus.UNAUTHORIZED));

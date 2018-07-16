@@ -34,17 +34,14 @@ import java.util.concurrent.ExecutionException;
 
 public class RuleProcessingContext implements RuleContext {
 
-    private final TimeseriesService tsService;
     private final EventService eventService;
     private final AlarmService alarmService;
     private final RuleId ruleId;
     private TenantId tenantId;
-    private CustomerId customerId;
     private DeviceId deviceId;
     private DeviceMetaData deviceMetaData;
 
     RuleProcessingContext(ActorSystemContext systemContext, RuleId ruleId) {
-        this.tsService = systemContext.getTsService();
         this.eventService = systemContext.getEventService();
         this.alarmService = systemContext.getAlarmService();
         this.ruleId = ruleId;
@@ -52,7 +49,6 @@ public class RuleProcessingContext implements RuleContext {
 
     void update(ToDeviceActorMsg toDeviceActorMsg, DeviceMetaData deviceMetaData) {
         this.tenantId = toDeviceActorMsg.getTenantId();
-        this.customerId = toDeviceActorMsg.getCustomerId();
         this.deviceId = toDeviceActorMsg.getDeviceId();
         this.deviceMetaData = deviceMetaData;
     }

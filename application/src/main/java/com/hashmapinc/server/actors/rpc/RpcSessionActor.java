@@ -39,15 +39,13 @@ public class RpcSessionActor extends ContextAwareActor {
 
     private final LoggingAdapter log = Logging.getLogger(getContext().system(), this);
 
-    private final UUID sessionId;
     private GrpcSession session;
     private GrpcSessionListener listener;
 
     private final ActorRef nodeMetricActor;
 
-    public RpcSessionActor(ActorSystemContext systemContext, UUID sessionId, ActorRef nodeMetricActor) {
+    public RpcSessionActor(ActorSystemContext systemContext, ActorRef nodeMetricActor) {
         super(systemContext);
-        this.sessionId = sessionId;
         this.nodeMetricActor = nodeMetricActor;
     }
 
@@ -106,19 +104,16 @@ public class RpcSessionActor extends ContextAwareActor {
     public static class ActorCreator extends ContextBasedCreator<RpcSessionActor> {
         private static final long serialVersionUID = 1L;
 
-        private final UUID sessionId;
-
         private final ActorRef nodeMetricActor;
 
-        public ActorCreator(ActorSystemContext context, UUID sessionId, ActorRef nodeMetricActor) {
+        public ActorCreator(ActorSystemContext context, ActorRef nodeMetricActor) {
             super(context);
-            this.sessionId = sessionId;
             this.nodeMetricActor = nodeMetricActor;
         }
 
         @Override
         public RpcSessionActor create() throws Exception {
-            return new RpcSessionActor(context, sessionId, nodeMetricActor);
+            return new RpcSessionActor(context, nodeMetricActor);
         }
     }
 

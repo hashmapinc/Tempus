@@ -24,7 +24,6 @@ import com.hashmapinc.server.common.msg.session.ctrl.SessionCloseMsg;
 import com.hashmapinc.server.common.msg.session.ex.SessionException;
 import com.hashmapinc.server.common.msg.cluster.ServerAddress;
 import com.hashmapinc.server.common.msg.device.ToDeviceActorMsg;
-import com.hashmapinc.server.common.msg.session.*;
 
 import akka.actor.ActorContext;
 import akka.event.LoggingAdapter;
@@ -46,7 +45,7 @@ class SyncMsgProcessor extends AbstractSessionActorMsgProcessor {
         pendingMsg = toDeviceMsg(msg);
         pendingResponse = true;
         currentTargetServer = forwardToAppActor(ctx, pendingMsg);
-        scheduleMsgWithDelay(ctx, new SessionTimeoutMsg(sessionId), getTimeout(systemContext, msg.getSessionMsg().getSessionContext()), ctx.parent());
+        scheduleMsgWithDelay(new SessionTimeoutMsg(sessionId), getTimeout(systemContext, msg.getSessionMsg().getSessionContext()), ctx.parent());
     }
 
     public void processTimeoutMsg(ActorContext context, SessionTimeoutMsg msg) {

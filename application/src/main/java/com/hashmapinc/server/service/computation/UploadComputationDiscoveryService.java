@@ -59,7 +59,7 @@ public class UploadComputationDiscoveryService implements ComputationDiscoverySe
         Path j = file.toPath();
         try{
             if(isJar(j)){
-                AnnotationsProcessor processor = new AnnotationsProcessor(j, compiler);
+                AnnotationsProcessor processor = new AnnotationsProcessor(j);
                 List<ComputationRequestCompiled> c = processor.processAnnotations();
                 if(c != null && !c.isEmpty()) {
                     for (ComputationRequestCompiled computationRequestCompiled : c) {
