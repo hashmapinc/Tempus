@@ -84,91 +84,13 @@ public class TelemetryRestMsgHandler extends DefaultRestMsgHandler {
             handleHttpGetKeysMethod(ctx, msg, feature, scope, entityId);
         } else if (method.equals("values")) {
             handleHttpGetValuesMethod(ctx, msg, request, feature, scope, entityId);
-            /*if (feature == TelemetryFeature.TIMESERIES) {
-                log.error("HMDC inside telemetry values ");
-                String keysStr = request.getParameter("keys");
-                List<String> keys = Arrays.asList(keysStr.split(","));
-
-                Optional<Long> startTs = request.getLongParamValue("startTs");
-                Optional<Long> endTs = request.getLongParamValue("endTs");
-                Optional<Long> interval = request.getLongParamValue("interval");
-                Optional<Integer> limit = request.getIntParamValue("limit");
-
-                if (startTs.isPresent() || endTs.isPresent() || interval.isPresent() || limit.isPresent()) {
-                    if (!startTs.isPresent() || !endTs.isPresent() || !interval.isPresent()) {
-                        msg.getResponseHolder().setResult(new ResponseEntity<>(HttpStatus.BAD_REQUEST));
-                        return;
-                    }
-                    Aggregation agg = Aggregation.valueOf(request.getParameter("agg", Aggregation.NONE.name()));
-
-                    List<TsKvQuery> queries = keys.stream().map(key -> new BaseTsKvQuery(key, startTs.get(), endTs.get(), interval.get(), limit.orElse(TelemetryWebsocketMsgHandler.DEFAULT_LIMIT), agg))
-                            .collect(Collectors.toList());
-                    ctx.loadTimeseries(entityId, queries, getTsKvListCallback(msg));
-                } else {
-                    ctx.loadLatestTimeseries(entityId, keys, getTsKvListCallback(msg));
-                }
-            } else if(feature == TelemetryFeature.DEPTHSERIES){
-                String keysStr = request.getParameter("keys");
-                List<String> keys = Arrays.asList(keysStr.split(","));
-
-                Optional<Double> startDs = request.getDoubleParamValue("startDs");
-                Optional<Double> endDs = request.getDoubleParamValue("endDs");
-                Optional<Double> interval = request.getDoubleParamValue("interval");
-                Optional<Integer> limit = request.getIntParamValue("limit");
-
-                if (startDs.isPresent() || endDs.isPresent() || interval.isPresent() || limit.isPresent()) {
-                    if (!startDs.isPresent() || !endDs.isPresent() || !interval.isPresent()) {
-                        msg.getResponseHolder().setResult(new ResponseEntity<>(HttpStatus.BAD_REQUEST));
-                        return;
-                    }
-                    DepthAggregation agg = DepthAggregation.valueOf(request.getParameter("agg", Aggregation.NONE.name()));
-
-                    List<DsKvQuery> queries = keys.stream().map(key -> new BaseDsKvQuery(key, startDs.get(), endDs.get(), interval.get(), limit.orElse(TelemetryWebsocketMsgHandler.DEFAULT_LIMIT), agg))
-                            .collect(Collectors.toList());
-                    ctx.loadDepthSeries(entityId, queries, getDsKvListCallback(msg));
-                } else {
-
-                    ctx.loadLatestDepthSeries(entityId, keys, getDsKvListCallback(msg));
-                }
-            }
-
-            else if (feature == TelemetryFeature.ATTRIBUTES) {
-                String keys = request.getParameter("keys", "");
-        */
         }
-        /*
-                PluginCallback<List<AttributeKvEntry>> callback = getAttributeValuesPluginCallback(msg);
-                if (!StringUtils.isEmpty(scope)) {
-                    if (!StringUtils.isEmpty(keys)) {
-                        List<String> keyList = Arrays.asList(keys.split(","));
-                        ctx.loadAttributes(entityId, scope, keyList, callback);
-                    } else {
-                        ctx.loadAttributes(entityId, scope, callback);
-                    }
-                } else {
-                    if (!StringUtils.isEmpty(keys)) {
-                        List<String> keyList = Arrays.asList(keys.split(","));
-                        ctx.loadAttributes(entityId, Arrays.asList(DataConstants.allScopes()), keyList, callback);
-                    } else {
-                        ctx.loadAttributes(entityId, Arrays.asList(DataConstants.allScopes()), callback);
-                    }
-                }
-            });
-        } else if (feature == TelemetryFeature.ATTRIBUTES) {
-            PluginCallback<List<AttributeKvEntry>> callback = getAttributeKeysPluginCallback(msg);
-            if (!StringUtils.isEmpty(scope)) {
-                ctx.loadAttributes(entityId, scope, callback);
-            } else {
-                ctx.loadAttributes(entityId, Arrays.asList(DataConstants.allScopes()), callback);
-            }
-        }*/
     }
 
     private void handleHttpGetKeysMethod(PluginContext ctx, PluginRestMsg msg, TelemetryFeature feature, String scope, EntityId entityId) {
 
 
         if (feature == TelemetryFeature.TIMESERIES) {
-            log.debug("HMDC inside telemetry keys ");
             ctx.loadLatestTimeseries(entityId, new PluginCallback<List<TsKvEntry>>() {
                 @Override
                 public void onSuccess(PluginContext ctx, List<TsKvEntry> value) {
@@ -196,7 +118,6 @@ public class TelemetryRestMsgHandler extends DefaultRestMsgHandler {
             });
         }
         else if (feature == TelemetryFeature.ATTRIBUTES) {
-            log.debug("HMDC inside Attributes keys ");
             PluginCallback<List<AttributeKvEntry>> callback = getAttributeKeysPluginCallback(msg);
             if (!StringUtils.isEmpty(scope)) {
                 ctx.loadAttributes(entityId, scope, callback);
@@ -211,7 +132,6 @@ public class TelemetryRestMsgHandler extends DefaultRestMsgHandler {
                                            String scope, EntityId entityId) throws ServletException {
 
         if (feature == TelemetryFeature.TIMESERIES) {
-            log.debug("HMDC inside telemetry values ");
             String keysStr = request.getParameter("keys");
             List<String> keys = Arrays.asList(keysStr.split(","));
 
@@ -231,7 +151,6 @@ public class TelemetryRestMsgHandler extends DefaultRestMsgHandler {
                         .collect(Collectors.toList());
                 ctx.loadTimeseries(entityId, queries, getTsKvListCallback(msg));
             } else {
-                log.debug("HMDC inside telemetry values ");
                 ctx.loadLatestTimeseries(entityId, keys, getTsKvListCallback(msg));
             }
         } else if(feature == TelemetryFeature.DEPTHSERIES){
@@ -260,7 +179,6 @@ public class TelemetryRestMsgHandler extends DefaultRestMsgHandler {
         }
         else if (feature == TelemetryFeature.ATTRIBUTES) {
             String keys = request.getParameter("keys", "");
-            log.debug("HMDC inside attriibute values ");
 
             List<String> keyList = null;
             if (!StringUtils.isEmpty(keys)) {

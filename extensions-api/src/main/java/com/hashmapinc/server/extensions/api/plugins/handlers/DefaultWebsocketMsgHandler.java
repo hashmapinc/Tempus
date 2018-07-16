@@ -16,13 +16,13 @@
 package com.hashmapinc.server.extensions.api.plugins.handlers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.hashmapinc.server.extensions.api.plugins.ws.msg.*;
-import lombok.extern.slf4j.Slf4j;
+import com.hashmapinc.server.common.msg.exception.TempusRuntimeException;
 import com.hashmapinc.server.extensions.api.plugins.PluginContext;
 import com.hashmapinc.server.extensions.api.plugins.ws.PluginWebsocketSessionRef;
 import com.hashmapinc.server.extensions.api.plugins.ws.SessionEvent;
 import com.hashmapinc.server.extensions.api.plugins.ws.WsSessionMetaData;
 import com.hashmapinc.server.extensions.api.plugins.ws.msg.*;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -50,12 +50,12 @@ public class DefaultWebsocketMsgHandler implements WebsocketMsgHandler {
         } else if (wsMsg instanceof TextPluginWebSocketMsg || wsMsg instanceof BinaryPluginWebSocketMsg) {
             handleWebSocketMsg(ctx, sessionRef, wsMsg);
         } else if (wsMsg instanceof PongPluginWebsocketMsg) {
-            handleWebSocketPongEvent(ctx, sessionRef);
+            handleWebSocketPongEvent(sessionRef);
         }
     }
 
     protected void handleWebSocketMsg(PluginContext ctx, PluginWebsocketSessionRef sessionRef, PluginWebsocketMsg<?> wsMsg) {
-        throw new RuntimeException("Web-sockets are not supported by current plugin!");
+        throw new TempusRuntimeException("Web-sockets are not supported by current plugin!");
     }
 
     protected void cleanupWebSocketSession(PluginContext ctx, String sessionId) {
@@ -80,7 +80,7 @@ public class DefaultWebsocketMsgHandler implements WebsocketMsgHandler {
         }
     }
 
-    protected void handleWebSocketPongEvent(PluginContext ctx, PluginWebsocketSessionRef sessionRef) {
+    protected void handleWebSocketPongEvent(PluginWebsocketSessionRef sessionRef) {
         String sessionId = sessionRef.getSessionId();
         WsSessionMetaData sessionMD = wsSessionsMap.get(sessionId);
         if (sessionMD != null) {

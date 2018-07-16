@@ -33,34 +33,22 @@ public abstract class AbstractPlugin<T> implements Plugin<T> {
 
     @Override
     public void process(PluginContext ctx, PluginWebsocketMsg<?> wsMsg) {
-        WebsocketMsgHandler websocketMsgHandler = getWebsocketMsgHandler();
-        if(websocketMsgHandler != null)
-            websocketMsgHandler.process(ctx, wsMsg);
-        //getWebsocketMsgHandler().process(ctx, wsMsg);
+        getWebsocketMsgHandler().process(ctx, wsMsg);
     }
 
     @Override
     public void process(PluginContext ctx, PluginRestMsg msg) {
-        RestMsgHandler restMsgHandler = getRestMsgHandler();
-        if(restMsgHandler != null)
-            restMsgHandler.process(ctx, msg);
-        //getRestMsgHandler().process(ctx, msg);
+        getRestMsgHandler().process(ctx, msg);
     }
 
     @Override
     public void process(PluginContext ctx, TenantId tenantId, RuleId ruleId, RuleToPluginMsg<?> msg) throws RuleException {
-        RuleMsgHandler ruleMsgHandler = getRuleMsgHandler();
-        if(ruleMsgHandler != null)
-            ruleMsgHandler.process(ctx, tenantId, ruleId, msg);
-        //getRuleMsgHandler().process(ctx, tenantId, ruleId, msg);
+        getRuleMsgHandler().process(ctx, tenantId, ruleId, msg);
     }
 
     @Override
     public void process(PluginContext ctx, RpcMsg msg) {
-        RpcMsgHandler rpcMsgHandler = getRpcMsgHandler();
-        if(rpcMsgHandler != null)
-            rpcMsgHandler.process(ctx, msg);
-        //getRpcMsgHandler().process(ctx, msg);
+        getRpcMsgHandler().process(ctx, msg);
     }
 
     @Override
