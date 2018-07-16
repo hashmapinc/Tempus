@@ -19,6 +19,7 @@ import com.hashmapinc.server.common.data.id.CustomerId;
 import com.hashmapinc.server.common.data.id.TenantId;
 import com.hashmapinc.server.common.data.id.UserId;
 import com.hashmapinc.server.common.data.security.Authority;
+import com.hashmapinc.server.common.msg.exception.TempusRuntimeException;
 import com.hashmapinc.server.service.security.auth.JwtAuthenticationToken;
 import com.hashmapinc.server.service.security.model.SecurityUser;
 import org.springframework.security.core.Authentication;
@@ -63,7 +64,7 @@ public class UserInfoTokenConverter implements UserAuthenticationConverter {
         Object tenantId = map.get("tenant_id");
         Object enabled = map.get("enabled");
         if(StringUtils.isEmpty(userName) || StringUtils.isEmpty(id) || StringUtils.isEmpty(tenantId)){
-            throw new RuntimeException("Invalid details");
+            throw new TempusRuntimeException("Invalid details");
         }
 
         SecurityUser securityUser = new SecurityUser();

@@ -19,6 +19,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Charsets;
 import com.google.common.io.Resources;
 import com.hashmapinc.server.common.data.plugin.ComponentDescriptor;
+import com.hashmapinc.server.common.msg.exception.TempusRuntimeException;
 import com.hashmapinc.server.extensions.api.component.Filter;
 import com.hashmapinc.server.extensions.api.component.Processor;
 import lombok.extern.slf4j.Slf4j;
@@ -110,7 +111,7 @@ public class AnnotationComponentDiscoveryService implements ComponentDiscoverySe
                         descriptorResourceName = persistComponentOfTypePlugin(def, scannedComponent, clazz);
                         break;
                     default:
-                        throw new RuntimeException(type + " is not supported yet!");
+                        throw new TempusRuntimeException(type + " is not supported yet!");
                 }
                 scannedComponent.setConfigurationDescriptor(mapper.readTree(
                         Resources.toString(Resources.getResource(descriptorResourceName), Charsets.UTF_8)));
@@ -118,7 +119,7 @@ public class AnnotationComponentDiscoveryService implements ComponentDiscoverySe
                 log.info("Processing scanned component: {}", scannedComponent);
             } catch (Exception e) {
                 log.error("Can't initialize component {}, due to {}", def.getBeanClassName(), e.getMessage(), e);
-                throw new RuntimeException(e);
+                throw new TempusRuntimeException(e);
             }
             ComponentDescriptor persistedComponent = componentDescriptorService.findByClazz(clazzName);
             if (persistedComponent == null) {
@@ -151,7 +152,7 @@ public class AnnotationComponentDiscoveryService implements ComponentDiscoverySe
                     });
             if (actionComponent.getType() != ComponentType.ACTION) {
                 log.error("Plugin {} action {} has wrong component type!", def.getBeanClassName(), actionClazz.getName(), actionComponent.getType());
-                throw new RuntimeException("Plugin " + def.getBeanClassName() + "action " + actionClazz.getName() + " has wrong component type!");
+                throw new TempusRuntimeException("Plugin " + def.getBeanClassName() + "action " + actionClazz.getName() + " has wrong component type!");
             }
         }
         scannedComponent.setActions(Arrays.stream(pluginAnnotation.actions()).map(Class::getName).collect(Collectors.joining(",")));
@@ -193,7 +194,7 @@ public class AnnotationComponentDiscoveryService implements ComponentDiscoverySe
                     descriptorResourceName = persistComponentOfTypePlugin(def, scannedComponent, clazz);
                     break;
                 default:
-                    throw new RuntimeException(type + " is not supported yet!");
+                    throw new TempusRuntimeException(type + " is not supported yet!");
             }
             scannedComponent.setConfigurationDescriptor(mapper.readTree(
                     Resources.toString(Resources.getResource(descriptorResourceName), Charsets.UTF_8)));
@@ -201,7 +202,7 @@ public class AnnotationComponentDiscoveryService implements ComponentDiscoverySe
             log.info("Processing scanned component: {}", scannedComponent);
         } catch (Exception e) {
             log.error("Can't initialize component {}, due to {}", def.getBeanClassName(), e.getMessage(), e);
-            throw new RuntimeException(e);
+            throw new TempusRuntimeException(e);
         }
         ComponentDescriptor persistedComponent = componentDescriptorService.findByClazz(clazzName);
         if (persistedComponent == null) {

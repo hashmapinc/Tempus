@@ -58,7 +58,7 @@ public class DatabaseHelper {
 
     public static final ObjectMapper objectMapper = new ObjectMapper();
 
-    public static void upgradeTo40AssignDashboards(Path dashboardsDump, DashboardService dashboardService, boolean sql) throws Exception {
+    public static void upgradeTo40AssignDashboards(Path dashboardsDump, DashboardService dashboardService, boolean sql) throws IOException {
         JavaType assignedCustomersType =
                 objectMapper.getTypeFactory().constructCollectionType(HashSet.class, ShortCustomerInfo.class);
         try (CSVParser csvParser = new CSVParser(Files.newBufferedReader(dashboardsDump), CSV_DUMP_FORMAT.withFirstRecordAsHeader())) {

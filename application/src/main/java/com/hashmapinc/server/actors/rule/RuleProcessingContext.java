@@ -17,17 +17,19 @@ package com.hashmapinc.server.actors.rule;
 
 import com.google.common.util.concurrent.ListenableFuture;
 import com.hashmapinc.server.actors.ActorSystemContext;
-import com.hashmapinc.server.common.data.alarm.Alarm;
-import com.hashmapinc.server.common.data.id.*;
-import com.hashmapinc.server.dao.event.EventService;
-import com.hashmapinc.server.extensions.api.rules.RuleContext;
 import com.hashmapinc.server.common.data.Event;
+import com.hashmapinc.server.common.data.alarm.Alarm;
 import com.hashmapinc.server.common.data.alarm.AlarmId;
-import com.hashmapinc.server.common.data.id.*;
-import com.hashmapinc.server.dao.alarm.AlarmService;
-import com.hashmapinc.server.dao.timeseries.TimeseriesService;
+import com.hashmapinc.server.common.data.id.DeviceId;
+import com.hashmapinc.server.common.data.id.EntityId;
+import com.hashmapinc.server.common.data.id.RuleId;
+import com.hashmapinc.server.common.data.id.TenantId;
 import com.hashmapinc.server.common.msg.device.ToDeviceActorMsg;
+import com.hashmapinc.server.common.msg.exception.TempusRuntimeException;
+import com.hashmapinc.server.dao.alarm.AlarmService;
+import com.hashmapinc.server.dao.event.EventService;
 import com.hashmapinc.server.extensions.api.device.DeviceMetaData;
+import com.hashmapinc.server.extensions.api.rules.RuleContext;
 
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
@@ -90,7 +92,7 @@ public class RuleProcessingContext implements RuleContext {
         try {
             return Optional.ofNullable(alarmService.findLatestByOriginatorAndType(tenantId, originator, alarmType).get());
         } catch (InterruptedException | ExecutionException e) {
-            throw new RuntimeException("Failed to lookup alarm!", e);
+            throw new TempusRuntimeException("Failed to lookup alarm!", e);
         }
     }
 

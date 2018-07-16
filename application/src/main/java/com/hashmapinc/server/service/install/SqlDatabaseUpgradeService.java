@@ -15,6 +15,7 @@
  */
 package com.hashmapinc.server.service.install;
 
+import com.hashmapinc.server.common.msg.exception.TempusRuntimeException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -96,7 +97,7 @@ public class SqlDatabaseUpgradeService implements DatabaseUpgradeService {
                 }
                 break;
             default:
-                throw new RuntimeException("Unable to upgrade SQL database, unsupported fromVersion: " + fromVersion);
+                throw new TempusRuntimeException("Unable to upgrade SQL database, unsupported fromVersion: " + fromVersion);
         }
     }
 }

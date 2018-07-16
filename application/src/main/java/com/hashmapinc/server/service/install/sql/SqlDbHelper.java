@@ -22,6 +22,7 @@ import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVPrinter;
 import org.apache.commons.csv.CSVRecord;
 
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.sql.*;
@@ -36,12 +37,12 @@ public class SqlDbHelper {
     }
 
     public static Path dumpTableIfExists(Connection conn, String tableName,
-                                         String[] columns, String[] defaultValues, String dumpPrefix) throws Exception {
+                                         String[] columns, String[] defaultValues, String dumpPrefix) throws IOException, SQLException {
         return dumpTableIfExists(conn, tableName, columns, defaultValues, dumpPrefix, false);
     }
 
     public static Path dumpTableIfExists(Connection conn, String tableName,
-                                         String[] columns, String[] defaultValues, String dumpPrefix, boolean printHeader) throws Exception {
+                                         String[] columns, String[] defaultValues, String dumpPrefix, boolean printHeader) throws IOException, SQLException {
 
         if (tableExists(conn, tableName)) {
             Path dumpFile = Files.createTempFile(dumpPrefix, null);
@@ -80,11 +81,11 @@ public class SqlDbHelper {
         }
     }
 
-    public static void loadTable(Connection conn, String tableName, String[] columns, Path sourceFile) throws Exception {
+    public static void loadTable(Connection conn, String tableName, String[] columns, Path sourceFile) throws IOException, SQLException {
         loadTable(conn, tableName, columns, sourceFile, false);
     }
 
-    public static void loadTable(Connection conn, String tableName, String[] columns, Path sourceFile, boolean parseHeader) throws Exception {
+    public static void loadTable(Connection conn, String tableName, String[] columns, Path sourceFile, boolean parseHeader) throws SQLException, IOException {
         CSVFormat csvFormat = DatabaseHelper.CSV_DUMP_FORMAT;
         if (parseHeader) {
             csvFormat = csvFormat.withFirstRecordAsHeader();
@@ -108,7 +109,7 @@ public class SqlDbHelper {
     }
 
     private static void dumpRow(ResultSet res, Map<String, Integer> columnIndexMap, String[] columns,
-                                String[] defaultValues, CSVPrinter csvPrinter) throws Exception {
+                                String[] defaultValues, CSVPrinter csvPrinter) throws IOException {
         List<String> record = new ArrayList<>();
         for (int i=0;i<columns.length;i++) {
             String column = columns[i];

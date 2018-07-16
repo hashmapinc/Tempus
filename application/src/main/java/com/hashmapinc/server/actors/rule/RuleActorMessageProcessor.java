@@ -15,32 +15,31 @@
  */
 package com.hashmapinc.server.actors.rule;
 
-import java.util.*;
-
+import akka.actor.ActorContext;
+import akka.actor.ActorRef;
+import akka.event.LoggingAdapter;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.hashmapinc.server.actors.ActorSystemContext;
 import com.hashmapinc.server.actors.plugin.RuleToPluginMsgWrapper;
+import com.hashmapinc.server.actors.shared.ComponentMsgProcessor;
 import com.hashmapinc.server.common.data.id.PluginId;
 import com.hashmapinc.server.common.data.id.RuleId;
 import com.hashmapinc.server.common.data.id.TenantId;
 import com.hashmapinc.server.common.data.plugin.ComponentLifecycleState;
+import com.hashmapinc.server.common.data.plugin.PluginMetaData;
 import com.hashmapinc.server.common.data.rule.RuleMetaData;
 import com.hashmapinc.server.common.msg.cluster.ClusterEventMsg;
 import com.hashmapinc.server.common.msg.core.RuleEngineError;
+import com.hashmapinc.server.common.msg.device.ToDeviceActorMsg;
+import com.hashmapinc.server.common.msg.exception.TempusRuntimeException;
 import com.hashmapinc.server.common.msg.session.ToDeviceMsg;
 import com.hashmapinc.server.extensions.api.plugins.PluginAction;
 import com.hashmapinc.server.extensions.api.plugins.msg.PluginToRuleMsg;
 import com.hashmapinc.server.extensions.api.plugins.msg.RuleToPluginMsg;
 import com.hashmapinc.server.extensions.api.rules.*;
 import org.springframework.util.StringUtils;
-import com.hashmapinc.server.actors.shared.ComponentMsgProcessor;
-import com.hashmapinc.server.common.data.plugin.PluginMetaData;
-import com.hashmapinc.server.common.msg.device.ToDeviceActorMsg;
-import com.hashmapinc.server.extensions.api.rules.*;
 
-import akka.actor.ActorContext;
-import akka.actor.ActorRef;
-import akka.event.LoggingAdapter;
+import java.util.*;
 
 class RuleActorMessageProcessor extends ComponentMsgProcessor<RuleId> {
 
@@ -89,7 +88,7 @@ class RuleActorMessageProcessor extends ComponentMsgProcessor<RuleId> {
     private void initComponent() throws RuleException {
         try {
             if (!ruleMd.getFilters().isArray()) {
-                throw new RuntimeException("Filters are not array!");
+                throw new TempusRuntimeException("Filters are not array!");
             }
             fetchPluginInfo();
             initFilters();

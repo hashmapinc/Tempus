@@ -16,12 +16,12 @@
 package com.hashmapinc.server.exception;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.hashmapinc.server.service.security.exception.AuthMethodNotSupportedException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.access.AccessDeniedHandler;
@@ -120,7 +120,7 @@ public class TempusErrorResponseHandler implements AccessDeniedHandler {
         response.setStatus(HttpStatus.UNAUTHORIZED.value());
         if (authenticationException instanceof BadCredentialsException) {
             mapper.writeValue(response.getWriter(), TempusErrorResponse.of("Invalid username or password", TempusErrorCode.AUTHENTICATION, HttpStatus.UNAUTHORIZED));
-        } else if (authenticationException instanceof AuthMethodNotSupportedException) {
+        } else if (authenticationException instanceof AuthenticationServiceException) {
             mapper.writeValue(response.getWriter(), TempusErrorResponse.of(authenticationException.getMessage(), TempusErrorCode.AUTHENTICATION, HttpStatus.UNAUTHORIZED));
         }
         mapper.writeValue(response.getWriter(), TempusErrorResponse.of("Authentication failed", TempusErrorCode.AUTHENTICATION, HttpStatus.UNAUTHORIZED));
