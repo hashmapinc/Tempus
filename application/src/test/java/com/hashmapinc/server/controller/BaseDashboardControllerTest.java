@@ -180,7 +180,7 @@ public abstract class BaseDashboardControllerTest extends AbstractControllerTest
         doGet("/api/dashboard/"+savedDashboard.getId().getId().toString())
                 .andExpect(status().isNotFound());
 
-        Thread.sleep(10000);
+        Thread.sleep(10000); //NOSONAR Added for test
 
         Application foundApplication = doGet("/api/application/" + savedApplication.getId().getId().toString(), Application.class);
         Assert.assertFalse(foundApplication.getIsValid());
