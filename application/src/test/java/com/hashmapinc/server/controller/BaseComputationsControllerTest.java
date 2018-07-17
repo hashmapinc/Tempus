@@ -79,7 +79,7 @@ public class BaseComputationsControllerTest extends AbstractControllerTest {
 
 
     @Test
-    public void testDeleteComputationAndUpdateApplication() throws Exception {
+    public void testDeleteComputation() throws Exception {
         ComputationJob computationJob = new ComputationJob();
         computationJob.setName("Computation Job");
         computationJob.setJobId("0123");
