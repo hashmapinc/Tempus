@@ -44,7 +44,7 @@ export function AddMetadataController($scope, $mdDialog, saveItemFunction, helpL
 }
 
 /*@ngInject*/
-export function MetadataController($scope, $rootScope, $state, $stateParams, userService, datamodelService, deviceService, types, attributeService, $q, dashboardService, entityService, tempusboardService, utils, $filter, dashboardUtils, $mdDialog, $document, $translate) {
+export function MetadataController($scope, $rootScope, $state, $stateParams, userService, datamodelService, deviceService, types, attributeService, $q, dashboardService, entityService, utils, $filter, dashboardUtils, $mdDialog, $document, $translate) {
 
     var vm = this;
 

@@ -212,13 +212,6 @@ function Menu(userService, $state, $rootScope) {
                             icon: 'home'
                         },
                         {
-                            name: 'Tempusboard',
-                            type: 'link',
-                            state: 'home.tempusboard',
-                            icon: 'dashboards',
-                            link: '/static/svg/tempusboardlightgray.svg'
-                        },
-                        {
                             name: 'plugin.plugins',
                             type: 'link',
                             state: 'home.plugins',
@@ -345,13 +338,12 @@ function Menu(userService, $state, $rootScope) {
                                 ]
                             },
                             {
-                                name: 'Tempusboard',
+                                name: 'audit-log.audit',
                                 places: [
                                     {
-                                        name: 'Tempusboard',
-                                        icon: 'dashboard',
-                                        state: 'home.tempusboard',
-                                        link: '/static/svg/tempusboardlightgray.svg'
+                                        name: 'audit-log.audit-logs',
+                                        icon: 'track_changes',
+                                        state: 'home.auditLogs'
                                     }
                                 ]
                             },
@@ -384,16 +376,6 @@ function Menu(userService, $state, $rootScope) {
                                 ]
                             },
                             {
-                                name: 'audit-log.audit',
-                                places: [
-                                    {
-                                        name: 'audit-log.audit-logs',
-                                        icon: 'track_changes',
-                                        state: 'home.auditLogs'
-                                    }
-                                ]
-                            },
-                             {
                                 name: 'metadata.metadata',
                                 places: [
                                     {
@@ -403,7 +385,7 @@ function Menu(userService, $state, $rootScope) {
                                         state: 'home.metadata'
                                     }
                                 ]
-                            },
+                            }
                            ];
 
                 } else if (authority === 'CUSTOMER_USER') {
@@ -413,13 +395,6 @@ function Menu(userService, $state, $rootScope) {
                             type: 'link',
                             state: 'home.links',
                             icon: 'home'
-                        },
-                        {
-                            name: 'Tempusboard',
-                            type: 'link',
-                            icon: 'dashboard',
-                            state: 'home.tempusboard',
-                            link: '/static/svg/tempusboardlightgray.svg'
                         },
                         {
                             name: 'device.devices',
@@ -467,17 +442,6 @@ function Menu(userService, $state, $rootScope) {
                                         icon: 'dashboard',
                                         state: 'home.dashboards',
                                         link: '/static/svg/dashboardlightgray.svg'
-                                    }
-                                ]
-                            },
-                            {
-                                name: 'tempusboard.view-tempusboard',
-                                places: [
-                                    {
-                                        name: 'Tempusboard',
-                                        icon: 'dashboard',
-                                        state: 'home.tempusboard',
-                                        link: '/static/svg/tempusboardlightgray.svg'
                                     }
                                 ]
                             }
