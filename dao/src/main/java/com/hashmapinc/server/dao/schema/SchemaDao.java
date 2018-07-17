@@ -34,14 +34,6 @@ public interface SchemaDao extends Dao<Schema> {
      * @return saved schema object
      */
     Schema save(Schema schema);
-    
-    /**
-     * Find schema by schema id.
-     *
-     * @param schemaID the schema id
-     * @return the schema object
-     */
-    Schema findSchemaById(SchemaId schemaID);
 
     /**
      * Find schema by name.

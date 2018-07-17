@@ -48,16 +48,6 @@ public class JpaSchemaDao extends JpaAbstractDao<SchemaEntity, Schema> implement
     }
 
     @Override
-    public Schema findSchemaById(SchemaId schemaId) {
-        Schema schema = DaoUtil.getData(schemaRepository.findSchemaById(schemaId));
-        if (schema != null) {
-            return schema;
-        } else {
-            return null;
-        }
-    }
-
-    @Override
     public Schema findSchemaByName(String name) {
         Schema schema = DaoUtil.getData(schemaRepository.findSchemaByName(name));
         if (schema != null) {

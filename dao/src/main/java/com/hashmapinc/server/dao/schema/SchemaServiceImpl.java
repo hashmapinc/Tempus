@@ -47,7 +47,7 @@ public class SchemaServiceImpl extends AbstractEntityService implements SchemaSe
     public Schema findSchemaById(SchemaId schemaId) {
         log.trace("Executing findSchemaById [{}]", schemaId);
         validateId(schemaId, INCORRECT_SCHEMA_ID + schemaId);
-        return  schemaDao.findSchemaById(schemaId);
+        return  schemaDao.findById(schemaId.getId());
     }
 
     @Override
