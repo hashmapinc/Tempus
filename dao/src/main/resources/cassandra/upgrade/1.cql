@@ -14,4 +14,5 @@
 -- limitations under the License.
 --
 
-ALTER TABLE tempus.application ADD state text;
+ALTER TABLE tempus.ds_kv_cf ADD ds_diff double;
+ALTER TABLE tempus.ts_kv_cf ADD ts_diff bigint;

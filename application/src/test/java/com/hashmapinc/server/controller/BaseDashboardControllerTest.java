@@ -20,7 +20,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 
 import java.io.IOException;
-import java.util.*;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -30,13 +29,10 @@ import java.util.List;
 import com.datastax.driver.core.utils.UUIDs;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hashmapinc.server.common.data.*;
-import com.hashmapinc.server.common.data.computation.ComputationJob;
 import com.hashmapinc.server.common.data.page.TextPageLink;
-import com.hashmapinc.server.exception.TempusException;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import com.hashmapinc.server.common.data.*;
 import com.hashmapinc.server.common.data.computation.Computations;
 import com.hashmapinc.server.common.data.id.ComputationId;
 import com.hashmapinc.server.common.data.id.CustomerId;
@@ -130,61 +126,6 @@ public abstract class BaseDashboardControllerTest extends AbstractControllerTest
         Assert.assertEquals(savedDashboard, foundDashboard);
     }
 
-    @Test
-    public void testDeleteDashboardAndUpdateApplication() throws Exception {
-        Dashboard dashboard = new Dashboard();
-        dashboard.setTitle("My dashboard");
-        Dashboard savedDashboard = doPost("/api/dashboard", dashboard, Dashboard.class);
-
-        Application application = new Application();
-        application.setName("My Application");
-        application.setDeviceTypes(mapper.readTree("{\"deviceTypes\":[{\"name\":\"DT1\"}]}"));
-        application.setAdditionalInfo(mapper.readTree("{\n" +
-                "\" additionalInfo\": {\n" +
-                "\"description\": \"string\"\n" +
-                "}\n" +
-                "}"));
-
-        Application savedApplication = doPost("/api/application", application, Application.class);
-
-
-        Computations savedComputations = saveComputation();
-        ComputationJob computationJob1 = new ComputationJob();
-        computationJob1.setName("Computation Job 1");
-        computationJob1.setJobId("0123");
-        ComputationJob savedComputationJob1 = doPost("/api/computations/"+savedComputations.getId().getId().toString()+"/jobs", computationJob1, ComputationJob.class);
-        ApplicationFieldsWrapper applicationComputationJosWrapper = new ApplicationFieldsWrapper();
-        applicationComputationJosWrapper.setApplicationId(savedApplication.getId().getId().toString());
-        applicationComputationJosWrapper.setFields(new HashSet<>(Arrays.asList(savedComputationJob1.getId().toString())));
-        doPostWithDifferentResponse("/api/app/assignComputationJobs", applicationComputationJosWrapper, Application.class);
-
-
-        RuleMetaData rule = createRuleMetaData(tenantPlugin);
-        RuleMetaData savedRule = doPost("/api/rule", rule, RuleMetaData.class);
-        RuleMetaData foundRule = doGet("/api/rule/" + savedRule.getId().getId().toString(), RuleMetaData.class);
-        Assert.assertNotNull(foundRule);
-        ApplicationFieldsWrapper applicationRulesWrapper = new ApplicationFieldsWrapper();
-        applicationRulesWrapper.setApplicationId(savedApplication.getId().getId().toString());
-        applicationRulesWrapper.setFields(new HashSet<>(Arrays.asList(savedRule.getId().getId().toString())));
-        doPostWithDifferentResponse("/api/app/assignRules", applicationRulesWrapper, Application.class);
-
-        String dashboardType = "mini";
-        Application assignedApplication = doPost("/api/dashboard/"+dashboardType+"/"+savedDashboard.getId().getId().toString()
-                +"/application/"+savedApplication.getId().getId().toString(), Application.class);
-        Assert.assertEquals(savedDashboard.getId(), assignedApplication.getMiniDashboardId());
-        Assert.assertTrue(assignedApplication.getIsValid());
-
-        doDelete("/api/dashboard/"+savedDashboard.getId().getId().toString())
-                .andExpect(status().isOk());
-
-        doGet("/api/dashboard/"+savedDashboard.getId().getId().toString())
-                .andExpect(status().isNotFound());
-
-        Thread.sleep(10000);
-
-        Application foundApplication = doGet("/api/application/" + savedApplication.getId().getId().toString(), Application.class);
-        Assert.assertFalse(foundApplication.getIsValid());
-    }
 
     @Test
     public void testDeleteDashboard() throws Exception {
