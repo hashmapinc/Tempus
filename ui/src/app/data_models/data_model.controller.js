@@ -279,7 +279,7 @@ export function DataModelController($log, $mdDialog, $document, $stateParams, $t
 
     // handle the selection of a visjs node
     function onDatamodelObjectSelect(properties) {
-        $log.debug(properties);
+        network.unselectAll();
 
         // get the node that was selected
         var nodeId = properties.nodes[0];
