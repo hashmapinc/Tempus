@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.hashmapinc.server.transport.mqtt.sparkplugB;
+package com.hashmapinc.server.transport.mqtt.sparkplug;
 
 import com.cirruslink.sparkplug.message.SparkplugBPayloadDecoder;
 import com.cirruslink.sparkplug.message.model.MetaData;
@@ -23,7 +23,7 @@ import com.cirruslink.sparkplug.message.model.SparkplugBPayload;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import com.hashmapinc.server.transport.mqtt.sparkplugB.data.SparkPlugDecodedMsg;
+import com.hashmapinc.server.transport.mqtt.sparkplug.data.SparkPlugDecodedMsg;
 import io.netty.buffer.ByteBuf;
 import io.netty.handler.codec.mqtt.MqttPublishMessage;
 import lombok.extern.slf4j.Slf4j;
@@ -33,8 +33,8 @@ import com.hashmapinc.server.transport.mqtt.session.GatewaySessionCtx;
 
 import java.util.*;
 
-import static com.hashmapinc.server.transport.mqtt.sparkplugB.SparkPlugMsgTypes.DBIRTH;
-import static com.hashmapinc.server.transport.mqtt.sparkplugB.SparkPlugMsgTypes.DDATA;
+import static com.hashmapinc.server.transport.mqtt.sparkplug.SparkPlugMsgTypes.DBIRTH;
+import static com.hashmapinc.server.transport.mqtt.sparkplug.SparkPlugMsgTypes.DDATA;
 
 @Slf4j
 public class SparkPlugDecodeService extends SparkPlugUtils {
@@ -54,7 +54,8 @@ public class SparkPlugDecodeService extends SparkPlugUtils {
         }
         else if(topicName.contains(DDATA)){
             String device = extractDeviceName(topicName);
-            if(deviceMap.containsKey(device) && deviceMap.get(device) == true) {
+            final Boolean gotDevice = deviceMap.get(device);
+            if(deviceMap.containsKey(device) && gotDevice) {
                 convertToPostTelemetry(ctx, inbound);
             }
         }
@@ -79,8 +80,7 @@ public class SparkPlugDecodeService extends SparkPlugUtils {
     private SparkplugBPayload extractSparkPlugBPayload(ByteBuf inboundPayload) throws Exception{
         byte[] payloadByteArray = createByteArray(inboundPayload);
         SparkplugBPayloadDecoder decoder = new SparkplugBPayloadDecoder();
-        SparkplugBPayload sparkplugBPayload = decoder.buildFromByteArray(payloadByteArray);
-        return sparkplugBPayload;
+        return decoder.buildFromByteArray(payloadByteArray);
     }
 
     private byte[] createByteArray(ByteBuf inboundPayload){
@@ -92,7 +92,7 @@ public class SparkPlugDecodeService extends SparkPlugUtils {
         return payload;
     }
 
-    private List<KvEntry> extractKvEntryFromSparkPlugBPayload(SparkplugBPayload sparkplugBPayload) throws Exception{
+    private List<KvEntry> extractKvEntryFromSparkPlugBPayload(SparkplugBPayload sparkplugBPayload) {
         List<Metric> metricList = sparkplugBPayload.getMetrics();
         List<KvEntry> kvEntryList = new ArrayList<>();
         for (Metric metric : metricList) {
@@ -139,9 +139,7 @@ public class SparkPlugDecodeService extends SparkPlugUtils {
     }
 
     public void updateDeviceMapState(){
-        deviceMap.forEach((k, v) -> {
-            deviceMap.put(k, false);
-        });
+        deviceMap.forEach((k, v) -> deviceMap.put(k, false));
     }
 
 }

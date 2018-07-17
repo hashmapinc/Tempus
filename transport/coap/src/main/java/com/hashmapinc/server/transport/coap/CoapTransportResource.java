@@ -105,10 +105,8 @@ public class CoapTransportResource extends CoapResource {
             msgType = unsubscribe ? MsgType.UNSUBSCRIBE_ATTRIBUTES_REQUEST : MsgType.SUBSCRIBE_ATTRIBUTES_REQUEST;
         }
         Optional<SessionId> sessionId = processRequest(exchange, msgType);
-        if (sessionId.isPresent()) {
-            if (exchange.getRequestOptions().getObserve() == 1) {
-                exchange.respond(ResponseCode.VALID);
-            }
+        if (sessionId.isPresent() && exchange.getRequestOptions().getObserve() == 1) {
+            exchange.respond(ResponseCode.VALID);
         }
     }
 

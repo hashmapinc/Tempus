@@ -26,6 +26,7 @@ import com.hashmapinc.server.common.data.id.SessionId;
 import com.hashmapinc.server.common.data.kv.BaseAttributeKvEntry;
 import com.hashmapinc.server.common.data.relation.EntityRelation;
 import com.hashmapinc.server.common.msg.core.*;
+import com.hashmapinc.server.common.msg.exception.TempusRuntimeException;
 import com.hashmapinc.server.common.msg.session.BasicAdaptorToSessionActorMsg;
 import com.hashmapinc.server.common.msg.session.BasicToDeviceActorSessionMsg;
 import com.hashmapinc.server.common.msg.session.ctrl.SessionCloseMsg;
@@ -34,7 +35,7 @@ import com.hashmapinc.server.common.transport.adaptor.JsonConverter;
 import com.hashmapinc.server.common.transport.auth.DeviceAuthService;
 import com.hashmapinc.server.dao.device.DeviceService;
 import com.hashmapinc.server.dao.relation.RelationService;
-import com.hashmapinc.server.transport.mqtt.sparkplugB.data.SparkPlugDecodedMsg;
+import com.hashmapinc.server.transport.mqtt.sparkplug.data.SparkPlugDecodedMsg;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.mqtt.MqttMessage;
 import io.netty.handler.codec.mqtt.MqttPublishMessage;
@@ -180,9 +181,9 @@ public class GatewaySessionCtx {
         }
     }
 
-    public void onSparkPlugDecodedMsg(SparkPlugDecodedMsg sparkPlugDecodedMsg, String topic, String deviceName) throws AdaptorException {
+    public void onSparkPlugDecodedMsg(SparkPlugDecodedMsg sparkPlugDecodedMsg, String topic, String deviceName) {
         int requestId = sparkPlugDecodedMsg.getRequestId();
-        deviceName = checkSparkPlugDeviceConnected(deviceName, topic);
+        checkSparkPlugDeviceConnected(deviceName, topic);
         List<KvEntry> kvEntryList = sparkPlugDecodedMsg.getKvEntryList();
         Long ts = sparkPlugDecodedMsg.getTs();
         BasicTelemetryUploadRequest request = new BasicTelemetryUploadRequest(requestId);
@@ -202,7 +203,7 @@ public class GatewaySessionCtx {
             for (Map.Entry<String, JsonElement> deviceEntry : jsonObj.entrySet()) {
                 String deviceName = checkDeviceConnected(deviceEntry.getKey());
                 if (!deviceEntry.getValue().isJsonArray()) {
-                    throw new JsonSyntaxException("Can't parse value: " + json);
+                    throw new JsonSyntaxException(CAN_T_PARSE_VALUE+ json);
                 }
                 BasicDepthTelemetryUploadRequest request = new BasicDepthTelemetryUploadRequest(requestId);
                 JsonArray deviceData = deviceEntry.getValue().getAsJsonArray();
@@ -214,7 +215,7 @@ public class GatewaySessionCtx {
                         new BasicAdaptorToSessionActorMsg(deviceSessionCtx, request)));
             }
         } else {
-            throw new JsonSyntaxException("Can't parse value: " + json);
+            throw new JsonSyntaxException(CAN_T_PARSE_VALUE + json);
         }
     }
 
@@ -307,17 +308,17 @@ public class GatewaySessionCtx {
 
     private String checkDeviceName(String deviceName) {
         if (StringUtils.isEmpty(deviceName)) {
-            throw new RuntimeException("Device name is empty!");
+            throw new TempusRuntimeException("Device name is empty!");
         } else {
             return deviceName;
         }
     }
 
-    private String getDeviceName(JsonElement json) throws AdaptorException {
+    private String getDeviceName(JsonElement json) {
         return json.getAsJsonObject().get(DEVICE_PROPERTY).getAsString();
     }
 
-    private String getDeviceType(JsonElement json) throws AdaptorException {
+    private String getDeviceType(JsonElement json) {
         JsonElement type = json.getAsJsonObject().get("type");
         return type == null ? DEFAULT_DEVICE_TYPE : type.getAsString();
     }
