@@ -142,15 +142,11 @@ public class MqttSslHandlerProvider {
                                        String authType) throws CertificateException {
             DeviceCredentials deviceCredentials = null;
             for (X509Certificate cert : chain) {
-                try {
-                    String strCert = SslUtil.getX509CertificateString(cert);
-                    String sha3Hash = EncryptionUtil.getSha3Hash(strCert);
-                    deviceCredentials = deviceCredentialsService.findDeviceCredentialsByCredentialsId(sha3Hash);
-                    if (deviceCredentials != null && strCert.equals(deviceCredentials.getCredentialsValue())) {
-                        break;
-                    }
-                } catch (IOException e) {
-                    log.error(e.getMessage(), e);
+                String strCert = SslUtil.getX509CertificateString(cert);
+                String sha3Hash = EncryptionUtil.getSha3Hash(strCert);
+                deviceCredentials = deviceCredentialsService.findDeviceCredentialsByCredentialsId(sha3Hash);
+                if (deviceCredentials != null && strCert.equals(deviceCredentials.getCredentialsValue())) {
+                    break;
                 }
             }
             if (deviceCredentials == null) {
