@@ -1,22 +1,24 @@
 pipeline {
   agent {
-    node {
-      label 'tempus'
+    docker {
+      image 'hashmapinc/tempusbuild:latest'
+      args '-u root -v /var/run/docker.sock:/var/run/docker.sock'
     }
 
   }
   stages {
     stage('Initialize') {
       steps {
+        sh 'echo $USER'
         sh '''echo PATH = ${PATH}
 echo M2_HOME = ${M2_HOME}
-mvn clean'''
+mvn clean
+mvn validate'''
       }
     }
     stage('Build') {
       steps {
-        sh 'mvn validate'
-        sh 'mvn -Dmaven.test.failure.ignore=true install'
+        sh 'mvn -Dmaven.test.failure.ignore=true -Dlicense.skip=true install'
       }
     }
     stage('Report and Archive') {
@@ -43,5 +45,12 @@ sudo docker push hashmapinc/cassandra-setup:dev
 '''
       }
     }
+  }
+  post {
+    always {
+      sh 'chmod -R 777 .'
+
+    }
+
   }
 }
