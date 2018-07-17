@@ -27,7 +27,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @EqualsAndHashCode
-public class SecurityUser extends User {
+public class SecurityUser extends User { //NOSONAR
 
     private static final long serialVersionUID = -797397440703066079L;
 

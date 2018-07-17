@@ -47,6 +47,7 @@ import com.hashmapinc.server.dao.theme.ThemeService;
 import com.hashmapinc.server.dao.user.UserService;
 import com.hashmapinc.server.dao.widget.WidgetTypeService;
 import com.hashmapinc.server.dao.widget.WidgetsBundleService;
+import com.hashmapinc.server.exception.TempusApplicationException;
 import lombok.extern.slf4j.Slf4j;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -151,7 +152,7 @@ public class DefaultSystemDataLoaderService implements SystemDataLoaderService {
     }
 
     @Override
-    public void createAdminSettings() throws Exception {
+    public void createAdminSettings() throws TempusApplicationException {
         UserSettings generalSettings = new UserSettings();
         generalSettings.setKey("general");
         ObjectNode node = objectMapper.createObjectNode();
@@ -176,7 +177,7 @@ public class DefaultSystemDataLoaderService implements SystemDataLoaderService {
         userSettingsService.saveUserSettings(mailSettings);
     }
 
-    public void loadSystemThemes() throws Exception {
+    public void loadSystemThemes() throws TempusApplicationException {
 
         List<Theme> theme = themeService.findAll();
 
@@ -201,7 +202,7 @@ public class DefaultSystemDataLoaderService implements SystemDataLoaderService {
     }
 
     @Override
-    public void loadSystemWidgets() throws Exception {
+    public void loadSystemWidgets() throws TempusApplicationException {
         Path widgetBundlesDir = Paths.get(dataDir, JSON_DIR, SYSTEM_DIR, WIDGET_BUNDLES_DIR);
         try (DirectoryStream<Path> dirStream = Files.newDirectoryStream(widgetBundlesDir, path -> path.toString().endsWith(JSON_EXT))) {
             dirStream.forEach(
@@ -230,22 +231,32 @@ public class DefaultSystemDataLoaderService implements SystemDataLoaderService {
                         }
                     }
             );
+        } catch (IOException e) {
+            throw new TempusApplicationException(e);
         }
     }
 
     @Override
-    public void loadSystemPlugins() throws Exception {
-        loadPlugins(Paths.get(dataDir, JSON_DIR, SYSTEM_DIR, PLUGINS_DIR), null);
+    public void loadSystemPlugins() throws TempusApplicationException {
+        try {
+            loadPlugins(Paths.get(dataDir, JSON_DIR, SYSTEM_DIR, PLUGINS_DIR), null);
+        } catch (IOException e) {
+            throw new TempusApplicationException(e);
+        }
     }
 
 
     @Override
-    public void loadSystemRules() throws Exception {
-        loadRules(Paths.get(dataDir, JSON_DIR, SYSTEM_DIR, RULES_DIR), null);
+    public void loadSystemRules() throws TempusApplicationException {
+        try {
+            loadRules(Paths.get(dataDir, JSON_DIR, SYSTEM_DIR, RULES_DIR), null);
+        } catch (IOException e) {
+            throw new TempusApplicationException(e);
+        }
     }
 
     @Override
-    public void loadDemoData() throws Exception {
+    public void loadDemoData() throws TempusApplicationException {
         Tenant demoTenant = new Tenant();
         demoTenant.setRegion("Global");
         demoTenant.setTitle("DemoTenant");
@@ -300,13 +311,17 @@ public class DefaultSystemDataLoaderService implements SystemDataLoaderService {
                 "Raspberry Pi GPIO control sample application");
 
 
-        loadPlugins(Paths.get(dataDir, JSON_DIR, DEMO_DIR, PLUGINS_DIR), demoTenant.getId());
-        loadRules(Paths.get(dataDir, JSON_DIR, DEMO_DIR, RULES_DIR), demoTenant.getId());
-        loadDashboards(Paths.get(dataDir, JSON_DIR, DEMO_DIR, DASHBOARDS_DIR), demoTenant.getId(), null);
+        try {
+            loadPlugins(Paths.get(dataDir, JSON_DIR, DEMO_DIR, PLUGINS_DIR), demoTenant.getId());
+            loadRules(Paths.get(dataDir, JSON_DIR, DEMO_DIR, RULES_DIR), demoTenant.getId());
+            loadDashboards(Paths.get(dataDir, JSON_DIR, DEMO_DIR, DASHBOARDS_DIR), demoTenant.getId(), null);
+        } catch (IOException e) {
+            throw new TempusApplicationException(e);
+        }
     }
 
     @Override
-    public void deleteSystemWidgetBundle(String bundleAlias) throws Exception {
+    public void deleteSystemWidgetBundle(String bundleAlias) throws TempusApplicationException {
         WidgetsBundle widgetsBundle = widgetsBundleService.findWidgetsBundleByTenantIdAndAlias(new TenantId(ModelConstants.NULL_UUID), bundleAlias);
         if (widgetsBundle != null) {
             widgetsBundleService.deleteWidgetsBundle(widgetsBundle.getId());

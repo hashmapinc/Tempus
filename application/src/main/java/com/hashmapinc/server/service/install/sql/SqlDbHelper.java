@@ -52,7 +52,8 @@ public class SqlDbHelper {
                 csvFormat = csvFormat.withHeader(columns);
             }
             try (CSVPrinter csvPrinter = new CSVPrinter(Files.newBufferedWriter(dumpFile), csvFormat)) {
-                try (PreparedStatement stmt = conn.prepareStatement("SELECT * FROM " + tableName)) {
+                final String query = String.format("SELECT * FROM %s", tableName);
+                try (PreparedStatement stmt = conn.prepareStatement(query)) {
                     try (ResultSet tableRes = stmt.executeQuery()) {
                         ResultSetMetaData resMetaData = tableRes.getMetaData();
                         Map<String, Integer> columnIndexMap = new HashMap<>();
@@ -74,7 +75,8 @@ public class SqlDbHelper {
 
     private static boolean tableExists(Connection conn, String tableName) {
         try (Statement stmt = conn.createStatement()) {
-            stmt.executeQuery("select * from " + tableName + " where 1=0");
+            final String query = String.format("SELECT * FROM %s where 1=0", tableName);
+            stmt.executeQuery(query);
             return true;
         } catch (Exception e) {
             return false;

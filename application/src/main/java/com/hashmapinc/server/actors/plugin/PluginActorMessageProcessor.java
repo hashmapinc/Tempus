@@ -25,6 +25,7 @@ import com.hashmapinc.server.common.data.id.TenantId;
 import com.hashmapinc.server.common.data.plugin.ComponentLifecycleState;
 import com.hashmapinc.server.common.data.plugin.ComponentType;
 import com.hashmapinc.server.common.msg.cluster.ClusterEventMsg;
+import com.hashmapinc.server.exception.TempusApplicationException;
 import com.hashmapinc.server.extensions.api.plugins.PluginInitializationException;
 import com.hashmapinc.server.extensions.api.plugins.msg.TimeoutMsg;
 import com.hashmapinc.server.extensions.api.plugins.rpc.PluginRpcMsg;
@@ -55,7 +56,7 @@ public class PluginActorMessageProcessor extends ComponentMsgProcessor<PluginId>
     }
 
     @Override
-    public void start() throws Exception {
+    public void start() throws TempusApplicationException {
         logger.info("[{}] Going to start plugin actor.", entityId);
         pluginMd = systemContext.getPluginService().findPluginById(entityId);
         if (pluginMd == null) {
@@ -74,7 +75,7 @@ public class PluginActorMessageProcessor extends ComponentMsgProcessor<PluginId>
     }
 
     @Override
-    public void stop() throws Exception {
+    public void stop() throws TempusApplicationException {
         onStop();
     }
 
@@ -171,7 +172,7 @@ public class PluginActorMessageProcessor extends ComponentMsgProcessor<PluginId>
     }
 
     @Override
-    public void onUpdate(ActorContext context) throws Exception {
+    public void onUpdate(ActorContext context) throws TempusApplicationException {
         PluginMetaData oldPluginMd = pluginMd;
         pluginMd = systemContext.getPluginService().findPluginById(entityId);
         boolean requiresRestart = false;
@@ -209,7 +210,7 @@ public class PluginActorMessageProcessor extends ComponentMsgProcessor<PluginId>
     }
 
     @Override
-    public void onActivate(ActorContext context) throws Exception {
+    public void onActivate(ActorContext context) throws TempusApplicationException {
         logger.info("[{}] Going to process onActivate plugin.", entityId);
         this.state = ComponentLifecycleState.ACTIVE;
         if (pluginImpl != null) {
