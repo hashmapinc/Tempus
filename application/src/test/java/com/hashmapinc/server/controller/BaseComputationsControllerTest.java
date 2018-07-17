@@ -89,6 +89,7 @@ public class BaseComputationsControllerTest extends AbstractControllerTest {
 
         doDelete("/api/computations/"+savedComputations.getId().getId().toString()).andExpect(status().isOk());
         doGet("/api/computations/"+savedComputations.getId().getId().toString()).andExpect(status().isNotFound());
+
     }
 
 }
