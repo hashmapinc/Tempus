@@ -1377,6 +1377,10 @@ export default angular.module('tempus.locale', [])
                 "user": {
                     "user": "User",
                     "users": "Users",
+                    "usersgroups": "Add Groups",
+                    "userspolicy": "Add Policy",
+                    "usersadd": "Add Users",
+                    "creategroup":"Create Group",
                     "customer-users": "Business Unit Users",
                     "tenant-admins": "Tenant Admins",
                     "sys-admin": "System administrator",
@@ -1414,7 +1418,9 @@ export default angular.module('tempus.locale', [])
                     "activation-link-text": "In order to activate user use the following <a href='{{activationLink}}' target='_blank'>activation link</a> :",
                     "copy-activation-link": "Copy activation link",
                     "activation-link-copied-message": "User activation link has been copied to clipboard",
-                    "details": "Details"
+                    "details": "Details",
+                    "name": "Name",
+                    "name-required" : "Name is required"
                 },
                 "value": {
                     "type": "Value type",

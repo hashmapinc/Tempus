@@ -16,6 +16,8 @@
 /* eslint-disable import/no-unresolved, import/default */
 
 import usersTemplate from '../user/users.tpl.html';
+import userTemplate from '../user/user.tpl.html';
+import userGroupTemplate from '../user/usergroup.tpl.html';
 
 /* eslint-enable import/no-unresolved, import/default */
 
@@ -64,6 +66,49 @@ export default function UserRoutes($stateProvider) {
             ncyBreadcrumb: {
                 label: '{"icon": "account_circle", "label": "user.customer-users"}'
             }
+        })
+        .state('home.customers.user', {
+            url: '/:customerId/user',
+            params: {'topIndex': 0},
+            module: 'private',
+            auth: ['TENANT_ADMIN'],
+            views: {
+                "content@home": {
+                    templateUrl: userTemplate,
+                    controllerAs: 'vm',
+                    controller: 'UserActionListController'
+                }
+            },
+            data: {
+                usersType: 'customer',
+                searchEnabled: true,
+                pageTitle: 'user.users'
+            },
+            ncyBreadcrumb: {
+                label: '{"icon": "account_circle", "label": "user.users"}'
+            }
+        })
+        .state('home.customers.usergroups', {
+            url: '/:customerId/usergroups',
+            params: {'topIndex': 0},
+            module: 'private',
+            auth: ['TENANT_ADMIN'],
+            views: {
+                "content@home": {
+                    templateUrl: userGroupTemplate,
+                    controllerAs: 'vm',
+                    controller: 'UserGroupController'
+                }
+            },
+            data: {
+                usersType: 'customer',
+                searchEnabled: true,
+                pageTitle: 'user.users'
+            },
+            ncyBreadcrumb: {
+                label: '{"icon": "account_circle", "label": "user.users"}'
+            }
         });
+
 
 }
