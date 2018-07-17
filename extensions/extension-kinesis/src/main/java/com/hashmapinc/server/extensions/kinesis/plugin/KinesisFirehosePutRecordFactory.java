@@ -37,13 +37,11 @@ public class KinesisFirehosePutRecordFactory {
         KinesisFirehoseActionPayload payload = msg.getPayload();
 
 
-        //String msgs = new String(payload.getMsgBody())+"\n";
 
         Record deliveryStreamRecord = new Record().withData(ByteBuffer.wrap(payload.getMsgBody().getBytes()));
         return new PutRecordRequest()
                 .withRecord(deliveryStreamRecord)
                 .withDeliveryStreamName(payload.getStream());
-               // .withPartitionKey(msg.getUid().toString())
 
 
 
