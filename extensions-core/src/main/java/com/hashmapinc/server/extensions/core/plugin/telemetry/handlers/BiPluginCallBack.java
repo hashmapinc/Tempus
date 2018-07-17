@@ -67,8 +67,8 @@ public abstract class BiPluginCallBack<V1, V2> {
         };
     }
 
-    abstract public void onSuccess(PluginContext ctx, V1 v1, V2 v2);
+    public abstract void onSuccess(PluginContext ctx, V1 v1, V2 v2);
 
-    abstract public void onFailure(PluginContext ctx, Exception e);
+    public abstract void onFailure(PluginContext ctx, Exception e);
 
 }

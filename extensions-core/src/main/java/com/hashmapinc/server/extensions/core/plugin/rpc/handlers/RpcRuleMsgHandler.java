@@ -19,6 +19,7 @@ import com.hashmapinc.server.common.data.id.DeviceId;
 import com.hashmapinc.server.common.data.id.EntityId;
 import com.hashmapinc.server.common.data.id.RuleId;
 import com.hashmapinc.server.common.data.id.TenantId;
+import com.hashmapinc.server.common.msg.exception.TempusRuntimeException;
 import com.hashmapinc.server.extensions.api.plugins.PluginContext;
 import com.hashmapinc.server.extensions.api.plugins.msg.RuleToPluginMsg;
 import lombok.extern.slf4j.Slf4j;
@@ -47,13 +48,13 @@ public class RpcRuleMsgHandler implements RuleMsgHandler {
     @Override
     public void process(PluginContext ctx, TenantId tenantId, RuleId ruleId, RuleToPluginMsg<?> msg) throws RuleException {
         if (msg instanceof ServerSideRpcCallRuleToPluginActionMsg) {
-            handle(ctx, tenantId, ruleId, ((ServerSideRpcCallRuleToPluginActionMsg) msg).getPayload());
+            handle(ctx, tenantId, ((ServerSideRpcCallRuleToPluginActionMsg) msg).getPayload());
         } else {
-            throw new RuntimeException("Not supported msg: " + msg + "!");
+            throw new TempusRuntimeException("Not supported msg: " + msg + "!");
         }
     }
 
-    private void handle(final PluginContext ctx, TenantId tenantId, RuleId ruleId, ServerSideRpcCallActionMsg msg) {
+    private void handle(final PluginContext ctx, TenantId tenantId, ServerSideRpcCallActionMsg msg) {
         DeviceId deviceId = new DeviceId(UUID.fromString(msg.getDeviceId()));
         ctx.checkAccess(deviceId, new PluginCallback<Void>() {
             @Override

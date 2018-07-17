@@ -18,6 +18,7 @@ package com.hashmapinc.server.extensions.core.plugin.time;
 import com.hashmapinc.server.common.data.id.RuleId;
 import com.hashmapinc.server.common.data.id.TenantId;
 import com.hashmapinc.server.common.msg.core.ToServerRpcResponseMsg;
+import com.hashmapinc.server.common.msg.exception.TempusRuntimeException;
 import com.hashmapinc.server.extensions.api.component.Plugin;
 import com.hashmapinc.server.extensions.api.plugins.PluginContext;
 import com.hashmapinc.server.extensions.api.plugins.handlers.RuleMsgHandler;
@@ -56,7 +57,7 @@ public class TimePlugin extends AbstractPlugin<TimePluginConfiguration> implemen
             ToServerRpcResponseMsg response = new ToServerRpcResponseMsg(request.getRequestId(), "{\"time\":" + reply + "}");
             ctx.reply(new RpcResponsePluginToRuleMsg(msg.getUid(), tenantId, ruleId, response));
         } else {
-            throw new RuntimeException("Not supported msg type: " + msg.getPayload().getClass() + "!");
+            throw new TempusRuntimeException("Not supported msg type: " + msg.getPayload().getClass() + "!");
         }
     }
 

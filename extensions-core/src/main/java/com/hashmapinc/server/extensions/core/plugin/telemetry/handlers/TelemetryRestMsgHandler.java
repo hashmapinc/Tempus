@@ -42,7 +42,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
 import com.hashmapinc.server.common.data.DataConstants;
-import com.hashmapinc.server.common.data.kv.*;
 import com.hashmapinc.server.extensions.api.plugins.PluginCallback;
 
 import javax.servlet.ServletException;
@@ -94,7 +93,7 @@ public class TelemetryRestMsgHandler extends DefaultRestMsgHandler {
             ctx.loadLatestTimeseries(entityId, new PluginCallback<List<TsKvEntry>>() {
                 @Override
                 public void onSuccess(PluginContext ctx, List<TsKvEntry> value) {
-                    List<String> keys = value.stream().map(tsKv -> tsKv.getKey()).collect(Collectors.toList());
+                    List<String> keys = value.stream().map(KvEntry::getKey).collect(Collectors.toList());
                     msg.getResponseHolder().setResult(new ResponseEntity<>(keys, HttpStatus.OK));
                 }
 
@@ -107,7 +106,7 @@ public class TelemetryRestMsgHandler extends DefaultRestMsgHandler {
             ctx.loadLatestDepthSeries(entityId, new PluginCallback<List<DsKvEntry>>() {
                 @Override
                 public void onSuccess(PluginContext ctx, List<DsKvEntry> value) {
-                    List<String> keys = value.stream().map(dsKv -> dsKv.getKey()).collect(Collectors.toList());
+                    List<String> keys = value.stream().map(KvEntry::getKey).collect(Collectors.toList());
                     msg.getResponseHolder().setResult(new ResponseEntity<>(keys, HttpStatus.OK));
                 }
 
@@ -132,112 +131,24 @@ public class TelemetryRestMsgHandler extends DefaultRestMsgHandler {
                                            String scope, EntityId entityId) throws ServletException {
 
         if (feature == TelemetryFeature.TIMESERIES) {
-            String keysStr = request.getParameter("keys");
-            List<String> keys = Arrays.asList(keysStr.split(","));
-
-            Optional<Long> startTs = request.getLongParamValue("startTs");
-            Optional<Long> endTs = request.getLongParamValue("endTs");
-            Optional<Long> interval = request.getLongParamValue("interval");
-            Optional<Integer> limit = request.getIntParamValue("limit");
-
-            if (startTs.isPresent() || endTs.isPresent() || interval.isPresent() || limit.isPresent()) {
-                if (!startTs.isPresent() || !endTs.isPresent() || !interval.isPresent()) {
-                    msg.getResponseHolder().setResult(new ResponseEntity<>(HttpStatus.BAD_REQUEST));
-                    return;
-                }
-                Aggregation agg = Aggregation.valueOf(request.getParameter("agg", Aggregation.NONE.name()));
-
-                List<TsKvQuery> queries = keys.stream().map(key -> new BaseTsKvQuery(key, startTs.get(), endTs.get(), interval.get(), limit.orElse(TelemetryWebsocketMsgHandler.DEFAULT_LIMIT), agg))
-                        .collect(Collectors.toList());
-                ctx.loadTimeseries(entityId, queries, getTsKvListCallback(msg));
-            } else {
-                ctx.loadLatestTimeseries(entityId, keys, getTsKvListCallback(msg));
-            }
+            handleHttpGetTimeseriesValues(ctx, msg, request, entityId);
         } else if(feature == TelemetryFeature.DEPTHSERIES){
-            String keysStr = request.getParameter("keys");
-            List<String> keys = Arrays.asList(keysStr.split(","));
-
-            Optional<Double> startDs = request.getDoubleParamValue("startDs");
-            Optional<Double> endDs = request.getDoubleParamValue("endDs");
-            Optional<Double> interval = request.getDoubleParamValue("interval");
-            Optional<Integer> limit = request.getIntParamValue("limit");
-
-            if (startDs.isPresent() || endDs.isPresent() || interval.isPresent() || limit.isPresent()) {
-                if (!startDs.isPresent() || !endDs.isPresent() || !interval.isPresent()) {
-                    msg.getResponseHolder().setResult(new ResponseEntity<>(HttpStatus.BAD_REQUEST));
-                    return;
-                }
-                DepthAggregation agg = DepthAggregation.valueOf(request.getParameter("agg", Aggregation.NONE.name()));
-
-                List<DsKvQuery> queries = keys.stream().map(key -> new BaseDsKvQuery(key, startDs.get(), endDs.get(), interval.get(), limit.orElse(TelemetryWebsocketMsgHandler.DEFAULT_LIMIT), agg))
-                        .collect(Collectors.toList());
-                ctx.loadDepthSeries(entityId, queries, getDsKvListCallback(msg));
-            } else {
-
-                ctx.loadLatestDepthSeries(entityId, keys, getDsKvListCallback(msg));
-            }
+            handleHttpGetDepthseriesValues(ctx, msg, request, entityId);
         }
         else if (feature == TelemetryFeature.ATTRIBUTES) {
-            String keys = request.getParameter("keys", "");
-
-            List<String> keyList = null;
-            if (!StringUtils.isEmpty(keys)) {
-                keyList = Arrays.asList(keys.split(","));
-            }
-
-            PluginCallback<List<AttributeKvEntry>> callback = getAttributeValuesPluginCallback(msg, scope, entityId, keyList);
-            if (!StringUtils.isEmpty(scope)) {
-                if (keyList != null && !keyList.isEmpty()) {
-                    ctx.loadAttributes(entityId, scope, keyList, callback);
-                } else {
-                    ctx.loadAttributes(entityId, scope, callback);
-                }
-            } else {
-                if (keyList != null && !keyList.isEmpty()) {
-                    ctx.loadAttributes(entityId, Arrays.asList(DataConstants.allScopes()), keyList, callback);
-                } else {
-                    ctx.loadAttributes(entityId, Arrays.asList(DataConstants.allScopes()), callback);
-                }
-            }
+            handleHttpGetAttributesValues(ctx, msg, request, scope, entityId);
         }
 
     }
 
-    private void handleHttpGetTimeseriesValues(PluginContext ctx, PluginRestMsg msg, RestRequest request, EntityId entityId) throws ServletException {
-        String keysStr = request.getParameter("keys");
-        List<String> keys = Arrays.asList(keysStr.split(","));
-
-        Optional<Long> startTs = request.getLongParamValue("startTs");
-        Optional<Long> endTs = request.getLongParamValue("endTs");
-        Optional<Long> interval = request.getLongParamValue("interval");
-        Optional<Integer> limit = request.getIntParamValue("limit");
-
-        // If some of these params are specified, they all must be
-        if (startTs.isPresent() || endTs.isPresent() || interval.isPresent() || limit.isPresent()) {
-            if (!startTs.isPresent() || !endTs.isPresent() || !interval.isPresent() || interval.get() < 0) {
-                msg.getResponseHolder().setResult(new ResponseEntity<>(HttpStatus.BAD_REQUEST));
-                return;
-            }
-
-            // If interval is 0, convert this to a NONE aggregation, which is probably what the user really wanted
-            Aggregation agg = (interval.isPresent() && interval.get() == 0) ? Aggregation.valueOf(Aggregation.NONE.name()) :
-                    Aggregation.valueOf(request.getParameter("agg", Aggregation.NONE.name()));
-
-            List<TsKvQuery> queries = keys.stream().map(key -> new BaseTsKvQuery(key, startTs.get(), endTs.get(), interval.get(), limit.orElse(TelemetryWebsocketMsgHandler.DEFAULT_LIMIT), agg))
-                    .collect(Collectors.toList());
-            ctx.loadTimeseries(entityId, queries, getTsKvListCallback(msg));
-        } else {
-            ctx.loadLatestTimeseries(entityId, keys, getTsKvListCallback(msg));
-        }
-    }
-
-    private void handleHttpGetAttributesValues(PluginContext ctx, PluginRestMsg msg,
-                                               RestRequest request, String scope, EntityId entityId) throws ServletException {
+    private void handleHttpGetAttributesValues(PluginContext ctx, PluginRestMsg msg, RestRequest request, String scope, EntityId entityId) throws ServletException {
         String keys = request.getParameter("keys", "");
+
         List<String> keyList = null;
         if (!StringUtils.isEmpty(keys)) {
             keyList = Arrays.asList(keys.split(","));
         }
+
         PluginCallback<List<AttributeKvEntry>> callback = getAttributeValuesPluginCallback(msg, scope, entityId, keyList);
         if (!StringUtils.isEmpty(scope)) {
             if (keyList != null && !keyList.isEmpty()) {
@@ -251,6 +162,55 @@ public class TelemetryRestMsgHandler extends DefaultRestMsgHandler {
             } else {
                 ctx.loadAttributes(entityId, Arrays.asList(DataConstants.allScopes()), callback);
             }
+        }
+    }
+
+    private void handleHttpGetDepthseriesValues(PluginContext ctx, PluginRestMsg msg, RestRequest request, EntityId entityId) throws ServletException {
+        String keysStr = request.getParameter("keys");
+        List<String> keys = Arrays.asList(keysStr.split(","));
+
+        Optional<Double> startDs = request.getDoubleParamValue("startDs");
+        Optional<Double> endDs = request.getDoubleParamValue("endDs");
+        Optional<Double> interval = request.getDoubleParamValue("interval");
+        Optional<Integer> limit = request.getIntParamValue("limit");
+
+        if (startDs.isPresent() || endDs.isPresent() || interval.isPresent() || limit.isPresent()) {
+            if (!startDs.isPresent() || !endDs.isPresent() || !interval.isPresent()) {
+                msg.getResponseHolder().setResult(new ResponseEntity<>(HttpStatus.BAD_REQUEST));
+                return;
+            }
+            DepthAggregation agg = DepthAggregation.valueOf(request.getParameter("agg", Aggregation.NONE.name()));
+
+            List<DsKvQuery> queries = keys.stream().map(key -> new BaseDsKvQuery(key, startDs.get(), endDs.get(), interval.get(), limit.orElse(TelemetryWebsocketMsgHandler.DEFAULT_LIMIT), agg))
+                    .collect(Collectors.toList());
+            ctx.loadDepthSeries(entityId, queries, getDsKvListCallback(msg));
+        } else {
+
+            ctx.loadLatestDepthSeries(entityId, keys, getDsKvListCallback(msg));
+        }
+    }
+
+    private void handleHttpGetTimeseriesValues(PluginContext ctx, PluginRestMsg msg, RestRequest request, EntityId entityId) throws ServletException {
+        String keysStr = request.getParameter("keys");
+        List<String> keys = Arrays.asList(keysStr.split(","));
+
+        Optional<Long> startTs = request.getLongParamValue("startTs");
+        Optional<Long> endTs = request.getLongParamValue("endTs");
+        Optional<Long> interval = request.getLongParamValue("interval");
+        Optional<Integer> limit = request.getIntParamValue("limit");
+
+        if (startTs.isPresent() || endTs.isPresent() || interval.isPresent() || limit.isPresent()) {
+            if (!startTs.isPresent() || !endTs.isPresent() || !interval.isPresent()) {
+                msg.getResponseHolder().setResult(new ResponseEntity<>(HttpStatus.BAD_REQUEST));
+                return;
+            }
+            Aggregation agg = Aggregation.valueOf(request.getParameter("agg", Aggregation.NONE.name()));
+
+            List<TsKvQuery> queries = keys.stream().map(key -> new BaseTsKvQuery(key, startTs.get(), endTs.get(), interval.get(), limit.orElse(TelemetryWebsocketMsgHandler.DEFAULT_LIMIT), agg))
+                    .collect(Collectors.toList());
+            ctx.loadTimeseries(entityId, queries, getTsKvListCallback(msg));
+        } else {
+            ctx.loadLatestTimeseries(entityId, keys, getTsKvListCallback(msg));
         }
     }
 
@@ -533,9 +493,9 @@ public class TelemetryRestMsgHandler extends DefaultRestMsgHandler {
     }
     private void handleError(Exception e, PluginRestMsg msg, HttpStatus defaultErrorStatus) {
         ResponseEntity responseEntity;
-        if (e != null && e instanceof ToErrorResponseEntity) {
+        if (e instanceof ToErrorResponseEntity) {
             responseEntity = ((ToErrorResponseEntity) e).toErrorResponseEntity();
-        } else if (e != null && e instanceof IllegalArgumentException) {
+        } else if (e instanceof IllegalArgumentException) {
             responseEntity = new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         } else {
             responseEntity = new ResponseEntity<>(defaultErrorStatus);

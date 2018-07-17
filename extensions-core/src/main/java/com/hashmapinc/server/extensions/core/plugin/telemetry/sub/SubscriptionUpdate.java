@@ -82,9 +82,9 @@ public class SubscriptionUpdate {
         if (data == null) {
             return Collections.emptyMap();
         } else {
-            return data.entrySet().stream().collect(Collectors.toMap(e -> e.getKey(), e -> {
-                List<Object> data = e.getValue();
-                Object[] latest = (Object[]) data.get(data.size() - 1);
+            return data.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> {
+                List<Object> dataList = e.getValue();
+                Object[] latest = (Object[]) dataList.get(dataList.size() - 1);
                 return (long) latest[0];
             }));
         }

@@ -17,12 +17,6 @@ package com.hashmapinc.server.extensions.core.processor;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.hashmapinc.server.extensions.api.rules.RuleContext;
-import com.hashmapinc.server.extensions.core.filter.NashornJsEvaluator;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.velocity.Template;
-import org.apache.velocity.VelocityContext;
-import org.springframework.util.StringUtils;
 import com.hashmapinc.server.common.data.alarm.Alarm;
 import com.hashmapinc.server.common.data.alarm.AlarmSeverity;
 import com.hashmapinc.server.common.data.alarm.AlarmStatus;
@@ -31,12 +25,19 @@ import com.hashmapinc.server.common.msg.core.DepthTelemetryUploadRequest;
 import com.hashmapinc.server.common.msg.core.TelemetryUploadRequest;
 import com.hashmapinc.server.common.msg.core.UpdateAttributesRequest;
 import com.hashmapinc.server.common.msg.device.ToDeviceActorMsg;
+import com.hashmapinc.server.common.msg.exception.TempusRuntimeException;
 import com.hashmapinc.server.common.msg.session.FromDeviceMsg;
 import com.hashmapinc.server.extensions.api.component.Processor;
+import com.hashmapinc.server.extensions.api.rules.RuleContext;
 import com.hashmapinc.server.extensions.api.rules.RuleException;
 import com.hashmapinc.server.extensions.api.rules.RuleProcessingMetaData;
 import com.hashmapinc.server.extensions.api.rules.RuleProcessor;
+import com.hashmapinc.server.extensions.core.filter.NashornJsEvaluator;
 import com.hashmapinc.server.extensions.core.utils.VelocityUtils;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.velocity.Template;
+import org.apache.velocity.VelocityContext;
+import org.springframework.util.StringUtils;
 
 import javax.script.Bindings;
 import javax.script.ScriptException;
@@ -78,7 +79,7 @@ public class AlarmProcessor implements RuleProcessor<AlarmProcessorConfiguration
             initEvaluators();
         } catch (Exception e) {
             log.error("Failed to create templates based on provided configuration!", e);
-            throw new RuntimeException("Failed to create templates based on provided configuration!", e);
+            throw new TempusRuntimeException("Failed to create templates based on provided configuration!", e);
         }
     }
 
@@ -231,6 +232,9 @@ public class AlarmProcessor implements RuleProcessor<AlarmProcessorConfiguration
                     for (List<KvEntry> entries : depthTelemetryMsg.getData().values()) {
                         bindings = NashornJsEvaluator.toBindings(bindings, entries);
                     }
+                    break;
+                default :
+                    log.info("{} MsgType not supported", msg.getMsgType());
                     break;
             }
         }

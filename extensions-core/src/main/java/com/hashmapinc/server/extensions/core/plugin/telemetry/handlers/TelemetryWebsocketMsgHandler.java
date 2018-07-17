@@ -51,7 +51,9 @@ public class TelemetryWebsocketMsgHandler extends DefaultWebsocketMsgHandler {
     public static final String FAILED_TO_FETCH_DATA = "Failed to fetch data!";
     public static final String FAILED_TO_FETCH_TIME_ZONE_ATTRIBUTE = "Failed to fetch zone_offset_in_millis attribute!";
     public static final String FAILED_TO_FETCH_ATTRIBUTES = "Failed to fetch attributes!";
-    public static final String SESSION_META_DATA_NOT_FOUND = "Session meta-data not found!";
+    public static final String PROCESSING = "[{}] Processing: {}";
+    public static final String SESSION_META_DATA_NOT_FOUND = "[{}] Session meta data not found. ";
+    public static final String DEVICE_ID_IS_EMPTY = "Device id is empty!";
 
     private final SubscriptionManager subscriptionManager;
 
@@ -104,7 +106,7 @@ public class TelemetryWebsocketMsgHandler extends DefaultWebsocketMsgHandler {
 
     private void handleWsAttributesSubscriptionCmd(PluginContext ctx, PluginWebsocketSessionRef sessionRef, AttributesSubscriptionCmd cmd) {
         String sessionId = sessionRef.getSessionId();
-        log.debug("[{}] Processing: {}", sessionId, cmd);
+        log.debug(PROCESSING, sessionId, cmd);
 
         if (validateSessionMetadata(ctx, sessionRef, cmd, sessionId)) {
             if (cmd.isUnsubscribe()) {
@@ -115,136 +117,25 @@ public class TelemetryWebsocketMsgHandler extends DefaultWebsocketMsgHandler {
                 Optional<Set<String>> keysOptional = getKeys(cmd);
                 if (keysOptional.isPresent()) {
                     List<String> keys = new ArrayList<>(keysOptional.get());
-
-                    PluginCallback<List<AttributeKvEntry>> callback = new PluginCallback<List<AttributeKvEntry>>() {
-                        @Override
-                        public void onSuccess(PluginContext ctx, List<AttributeKvEntry> data) {
-                            ctx.loadAttribute(entityId, DataConstants.CLIENT_SCOPE, TIME_ZONE_OFFSET,new PluginCallback<Optional<AttributeKvEntry>>(){
-                                @Override
-                                public void onSuccess(PluginContext ctx, Optional<AttributeKvEntry> attributeKvEntry){
-                                    long timeZoneDiff = 0;
-                                    List<TsKvEntry> attributesData = data.stream().map(d -> new BasicTsKvEntry(d.getLastUpdateTs(), d)).collect(Collectors.toList());
-                                    if(attributeKvEntry.isPresent())
-                                        timeZoneDiff = attributeKvEntry.get().getLongValue().get();
-
-                                    sendWsMsg(ctx, sessionRef, new SubscriptionUpdate(cmd.getCmdId(), attributesData, timeZoneDiff));
-
-                                    Map<String, Long> subState = new HashMap<>(keys.size());
-                                    keys.forEach(key -> subState.put(key, 0L));
-                                    attributesData.forEach(v -> subState.put(v.getKey(), v.getTs()));
-
-                                    SubscriptionState<Long> sub = new SubscriptionState(sessionId, cmd.getCmdId(), entityId, SubscriptionType.ATTRIBUTES, false, subState,cmd.getScope());
-                                    subscriptionManager.addLocalWsSubscription(ctx, sessionId, entityId, sub);
-                                }
-
-                                @Override
-                                public void onFailure(PluginContext ctx, Exception e){
-                                    handleAttributeFetchFailure(ctx, e, cmd, sessionRef);
-                                }
-                            });
-
-                        }
-
-                        @Override
-                        public void onFailure(PluginContext ctx, Exception e) {
-                            handleAttributeFetchFailure(ctx, e, cmd, sessionRef);
-                        }
-                    };
-
-                    if (StringUtils.isEmpty(cmd.getScope())) {
-                        ctx.loadAttributes(entityId, Arrays.asList(DataConstants.allScopes()), keys, callback);
-                    } else {
-                        ctx.loadAttributes(entityId, cmd.getScope(), keys, callback);
-                    }
+                    handleWsAttributesSubscriptionByKeys(ctx, sessionRef, cmd, sessionId, entityId, keys);
                 } else {
-                    PluginCallback<List<AttributeKvEntry>> callback = new PluginCallback<List<AttributeKvEntry>>() {
-                        @Override
-                        public void onSuccess(PluginContext ctx, List<AttributeKvEntry> data) {
-
-                            ctx.loadAttribute(entityId, DataConstants.CLIENT_SCOPE, TIME_ZONE_OFFSET,new PluginCallback<Optional<AttributeKvEntry>>(){
-                                @Override
-                                public void onSuccess(PluginContext ctx, Optional<AttributeKvEntry> attributeKvEntry){
-                                    long timeZoneDiff = 0;
-                                    List<TsKvEntry> attributesData = data.stream().map(d -> new BasicTsKvEntry(d.getLastUpdateTs(), d)).collect(Collectors.toList());
-
-                                    if(attributeKvEntry.isPresent())
-                                        timeZoneDiff = attributeKvEntry.get().getLongValue().get();
-
-                                    sendWsMsg(ctx, sessionRef, new SubscriptionUpdate(cmd.getCmdId(), attributesData, timeZoneDiff));
-
-                                    Map<String, Long> subState = new HashMap<>(attributesData.size());
-                                    attributesData.forEach(v -> subState.put(v.getKey(), v.getTs()));
-                                    SubscriptionState<Long> sub = new SubscriptionState(sessionId, cmd.getCmdId(), entityId, SubscriptionType.ATTRIBUTES, true, subState,cmd.getScope());
-                                    subscriptionManager.addLocalWsSubscription(ctx, sessionId, entityId, sub);
-                                }
-
-                                @Override
-                                public void onFailure(PluginContext ctx, Exception e){
-                                    handleAttributeFetchFailure(ctx, e, cmd, sessionRef);
-                                }
-                            });
-                        }
-
-                        @Override
-                        public void onFailure(PluginContext ctx, Exception e) {
-                            handleAttributeFetchFailure(ctx, e, cmd, sessionRef);
-                        }
-                    };
-
-                    if (StringUtils.isEmpty(cmd.getScope())) {
-                        ctx.loadAttributes(entityId, Arrays.asList(DataConstants.allScopes()), callback);
-                    } else {
-                        ctx.loadAttributes(entityId, cmd.getScope(), callback);
-                    }
+                    handleWsAttributesSubscription(ctx, sessionRef, cmd, sessionId, entityId);
                 }
             }
         }
     }
 
-    private void handleAttributeFetchFailure(PluginContext ctx, Exception e, AttributesSubscriptionCmd cmd, PluginWebsocketSessionRef sessionRef) {
-        log.error("Failed to fetch attributes!", e);
-        SubscriptionUpdate update;
-        if (UnauthorizedException.class.isInstance(e)) {
-            update = new SubscriptionUpdate(cmd.getCmdId(), SubscriptionErrorCode.UNAUTHORIZED,
-                    SubscriptionErrorCode.UNAUTHORIZED.getDefaultMsg());
+    private void handleWsAttributesSubscription(PluginContext ctx, PluginWebsocketSessionRef sessionRef, AttributesSubscriptionCmd cmd, String sessionId, EntityId entityId) {
+        PluginCallback<List<AttributeKvEntry>> callback = getTimeZoneCallbackAllAttributeKeys(sessionRef, cmd, sessionId, entityId);
+        if (StringUtils.isEmpty(cmd.getScope())) {
+            ctx.loadAttributes(entityId, Arrays.asList(DataConstants.allScopes()), callback);
         } else {
-            update = new SubscriptionUpdate(cmd.getCmdId(), SubscriptionErrorCode.INTERNAL_ERROR,
-                    "Failed to fetch attributes!");
+            ctx.loadAttributes(entityId, cmd.getScope(), callback);
         }
-        sendWsMsg(ctx, sessionRef, update);
     }
 
-    private void handleWsAttributesSubscriptionByKeys(PluginContext ctx, PluginWebsocketSessionRef sessionRef,
-                                                      AttributesSubscriptionCmd cmd, String sessionId, EntityId entityId,
-                                                      List<String> keys) {
-        PluginCallback<List<AttributeKvEntry>> callback = new PluginCallback<List<AttributeKvEntry>>() {
-            @Override
-            public void onSuccess(PluginContext ctx, List<AttributeKvEntry> data) {
-                List<TsKvEntry> attributesData = data.stream().map(d -> new BasicTsKvEntry(d.getLastUpdateTs(), d)).collect(Collectors.toList());
-                sendWsMsg(ctx, sessionRef, new SubscriptionUpdate(cmd.getCmdId(), attributesData));
-
-                Map<String, Long> subState = new HashMap<>(keys.size());
-                keys.forEach(key -> subState.put(key, 0L));
-                attributesData.forEach(v -> subState.put(v.getKey(), v.getTs()));
-
-                SubscriptionState sub = new SubscriptionState(sessionId, cmd.getCmdId(), entityId, SubscriptionType.ATTRIBUTES, false, subState, cmd.getScope());
-                subscriptionManager.addLocalWsSubscription(ctx, sessionId, entityId, sub);
-            }
-
-            @Override
-            public void onFailure(PluginContext ctx, Exception e) {
-                log.error(FAILED_TO_FETCH_ATTRIBUTES, e);
-                SubscriptionUpdate update;
-                if (UnauthorizedException.class.isInstance(e)) {
-                    update = new SubscriptionUpdate(cmd.getCmdId(), SubscriptionErrorCode.UNAUTHORIZED,
-                            SubscriptionErrorCode.UNAUTHORIZED.getDefaultMsg());
-                } else {
-                    update = new SubscriptionUpdate(cmd.getCmdId(), SubscriptionErrorCode.INTERNAL_ERROR,
-                            FAILED_TO_FETCH_ATTRIBUTES);
-                }
-                sendWsMsg(ctx, sessionRef, update);
-            }
-        };
+    private void handleWsAttributesSubscriptionByKeys(PluginContext ctx, PluginWebsocketSessionRef sessionRef, AttributesSubscriptionCmd cmd, String sessionId, EntityId entityId, List<String> keys) {
+        PluginCallback<List<AttributeKvEntry>> callback = getTimeZoneCallbackAttributeKeys(sessionRef, cmd, sessionId, entityId, keys);
 
         if (StringUtils.isEmpty(cmd.getScope())) {
             ctx.loadAttributes(entityId, Arrays.asList(DataConstants.allScopes()), keys, callback);
@@ -253,40 +144,95 @@ public class TelemetryWebsocketMsgHandler extends DefaultWebsocketMsgHandler {
         }
     }
 
-    private void handleWsAttributesSubscription(PluginContext ctx, PluginWebsocketSessionRef sessionRef,
-                                                AttributesSubscriptionCmd cmd, String sessionId, EntityId entityId) {
-        PluginCallback<List<AttributeKvEntry>> callback = new PluginCallback<List<AttributeKvEntry>>() {
+    private PluginCallback<List<AttributeKvEntry>> getTimeZoneCallbackAllAttributeKeys(PluginWebsocketSessionRef sessionRef, AttributesSubscriptionCmd cmd, String sessionId, EntityId entityId) {
+        return new PluginCallback<List<AttributeKvEntry>>() {
             @Override
             public void onSuccess(PluginContext ctx, List<AttributeKvEntry> data) {
-                List<TsKvEntry> attributesData = data.stream().map(d -> new BasicTsKvEntry(d.getLastUpdateTs(), d)).collect(Collectors.toList());
-                sendWsMsg(ctx, sessionRef, new SubscriptionUpdate(cmd.getCmdId(), attributesData));
 
-                Map<String, Long> subState = new HashMap<>(attributesData.size());
-                attributesData.forEach(v -> subState.put(v.getKey(), v.getTs()));
+                ctx.loadAttribute(entityId, DataConstants.CLIENT_SCOPE, TIME_ZONE_OFFSET,new PluginCallback<Optional<AttributeKvEntry>>(){
+                    @Override
+                    public void onSuccess(PluginContext ctx, Optional<AttributeKvEntry> attributeKvEntry){
+                        long timeZoneDiff = 0;
+                        List<TsKvEntry> attributesData = data.stream().map(d -> new BasicTsKvEntry(d.getLastUpdateTs(), d)).collect(Collectors.toList());
 
-                SubscriptionState sub = new SubscriptionState(sessionId, cmd.getCmdId(), entityId, SubscriptionType.ATTRIBUTES, true, subState, cmd.getScope());
-                subscriptionManager.addLocalWsSubscription(ctx, sessionId, entityId, sub);
+                        if(attributeKvEntry.isPresent())
+                            timeZoneDiff = attributeKvEntry.get().getLongValue().get();
+
+                        sendWsMsg(ctx, sessionRef, new SubscriptionUpdate(cmd.getCmdId(), attributesData, timeZoneDiff));
+
+                        Map<String, Long> subState = new HashMap<>(attributesData.size());
+                        attributesData.forEach(v -> subState.put(v.getKey(), v.getTs()));
+                        SubscriptionState<Long> sub = new SubscriptionState(sessionId, cmd.getCmdId(), entityId, SubscriptionType.ATTRIBUTES, true, subState,cmd.getScope());
+                        subscriptionManager.addLocalWsSubscription(ctx, sessionId, entityId, sub);
+                    }
+
+                    @Override
+                    public void onFailure(PluginContext ctx, Exception e){
+                        handleAttributeFetchFailure(ctx, e, cmd, sessionRef);
+                    }
+                });
             }
 
             @Override
             public void onFailure(PluginContext ctx, Exception e) {
-                log.error(FAILED_TO_FETCH_ATTRIBUTES, e);
-                SubscriptionUpdate update = new SubscriptionUpdate(cmd.getCmdId(), SubscriptionErrorCode.INTERNAL_ERROR,
-                        FAILED_TO_FETCH_ATTRIBUTES);
-                sendWsMsg(ctx, sessionRef, update);
+                handleAttributeFetchFailure(ctx, e, cmd, sessionRef);
             }
         };
+    }
 
-        if (StringUtils.isEmpty(cmd.getScope())) {
-            ctx.loadAttributes(entityId, Arrays.asList(DataConstants.allScopes()), callback);
+    private PluginCallback<List<AttributeKvEntry>> getTimeZoneCallbackAttributeKeys(PluginWebsocketSessionRef sessionRef, AttributesSubscriptionCmd cmd, String sessionId, EntityId entityId, List<String> keys) {
+        return new PluginCallback<List<AttributeKvEntry>>() {
+            @Override
+            public void onSuccess(PluginContext ctx, List<AttributeKvEntry> data) {
+                ctx.loadAttribute(entityId, DataConstants.CLIENT_SCOPE, TIME_ZONE_OFFSET,new PluginCallback<Optional<AttributeKvEntry>>(){
+                    @Override
+                    public void onSuccess(PluginContext ctx, Optional<AttributeKvEntry> attributeKvEntry){
+                        long timeZoneDiff = 0;
+                        List<TsKvEntry> attributesData = data.stream().map(d -> new BasicTsKvEntry(d.getLastUpdateTs(), d)).collect(Collectors.toList());
+                        if(attributeKvEntry.isPresent())
+                            timeZoneDiff = attributeKvEntry.get().getLongValue().get();
+
+                        sendWsMsg(ctx, sessionRef, new SubscriptionUpdate(cmd.getCmdId(), attributesData, timeZoneDiff));
+
+                        Map<String, Long> subState = new HashMap<>(keys.size());
+                        keys.forEach(key -> subState.put(key, 0L));
+                        attributesData.forEach(v -> subState.put(v.getKey(), v.getTs()));
+
+                        SubscriptionState<Long> sub = new SubscriptionState(sessionId, cmd.getCmdId(), entityId, SubscriptionType.ATTRIBUTES, false, subState,cmd.getScope());
+                        subscriptionManager.addLocalWsSubscription(ctx, sessionId, entityId, sub);
+                    }
+
+                    @Override
+                    public void onFailure(PluginContext ctx, Exception e){
+                        handleAttributeFetchFailure(ctx, e, cmd, sessionRef);
+                    }
+                });
+
+            }
+
+            @Override
+            public void onFailure(PluginContext ctx, Exception e) {
+                handleAttributeFetchFailure(ctx, e, cmd, sessionRef);
+            }
+        };
+    }
+
+    private void handleAttributeFetchFailure(PluginContext ctx, Exception e, AttributesSubscriptionCmd cmd, PluginWebsocketSessionRef sessionRef) {
+        log.error(FAILED_TO_FETCH_ATTRIBUTES, e);
+        SubscriptionUpdate update;
+        if (UnauthorizedException.class.isInstance(e)) {
+            update = new SubscriptionUpdate(cmd.getCmdId(), SubscriptionErrorCode.UNAUTHORIZED,
+                    SubscriptionErrorCode.UNAUTHORIZED.getDefaultMsg());
         } else {
-            ctx.loadAttributes(entityId, cmd.getScope(), callback);
+            update = new SubscriptionUpdate(cmd.getCmdId(), SubscriptionErrorCode.INTERNAL_ERROR,
+                    FAILED_TO_FETCH_ATTRIBUTES);
         }
+        sendWsMsg(ctx, sessionRef, update);
     }
 
     private void handleWsTimeseriesSubscriptionCmd(PluginContext ctx, PluginWebsocketSessionRef sessionRef, TimeseriesSubscriptionCmd cmd) {
         String sessionId = sessionRef.getSessionId();
-        log.debug("[{}] Processing: {}", sessionId, cmd);
+        log.debug(PROCESSING, sessionId, cmd);
 
         if (validateSessionMetadata(ctx, sessionRef, cmd, sessionId)) {
             if (cmd.isUnsubscribe()) {
@@ -316,7 +262,7 @@ public class TelemetryWebsocketMsgHandler extends DefaultWebsocketMsgHandler {
                                         SubscriptionErrorCode.UNAUTHORIZED.getDefaultMsg());
                             } else {
                                 update = new SubscriptionUpdate(cmd.getCmdId(), SubscriptionErrorCode.INTERNAL_ERROR,
-                                        "Failed to fetch data!");
+                                        FAILED_TO_FETCH_DATA);
                             }
                             sendWsMsg(ctx, sessionRef, update);
                         }
@@ -328,7 +274,7 @@ public class TelemetryWebsocketMsgHandler extends DefaultWebsocketMsgHandler {
 
     private void handleWsDepthSeriesSubscriptionCmd(PluginContext ctx, PluginWebsocketSessionRef sessionRef, DepthSeriesSubscriptionCmd cmd) {
         String sessionId = sessionRef.getSessionId();
-        log.debug("[{}] Processing: {}", sessionId, cmd);
+        log.debug(PROCESSING, sessionId, cmd);
 
         if (validateSessionMetadata(ctx, sessionRef, cmd, sessionId)) {
             if (cmd.isUnsubscribe()) {
@@ -338,20 +284,7 @@ public class TelemetryWebsocketMsgHandler extends DefaultWebsocketMsgHandler {
                 Optional<Set<String>> keysOptional = getKeys(cmd);
                 if (keysOptional.isPresent()) {
                     log.debug(" optional present");
-                    Double startDs;
-                    if (cmd.getDepthWindow() > 0) {
-                        List<String> keys = new ArrayList<>(getKeys(cmd).orElse(Collections.emptySet()));
-                        log.debug("[{}] fetching depthseries data for last {}  for keys: ({}) for device : {}", sessionId, cmd.getDepthWindow(), cmd.getKeys(), entityId);
-                        startDs = cmd.getStartDs();
-                        Double endDs = cmd.getStartDs() + cmd.getDepthWindow();
-                        List<DsKvQuery> queries = keys.stream().map(key -> new BaseDsKvQuery(key, startDs, endDs, cmd.getInterval(), getLimit(cmd.getLimit()), getDepthAggregation(cmd.getAgg()))).collect(Collectors.toList());
-                        ctx.loadDepthSeries(entityId, queries, getSubscriptionCallback(sessionRef, cmd, sessionId, entityId, startDs, keys));
-                    } else {
-                        List<String> keys = new ArrayList<>(getKeys(cmd).orElse(Collections.emptySet()));
-                        startDs = 0.0;
-                        log.debug("[{}] fetching latest depth series data for keys: ({}) for device : {}", sessionId, cmd.getKeys(), entityId);
-                        ctx.loadLatestDepthSeries(entityId, keys, getSubscriptionCallback(sessionRef, cmd, sessionId, entityId, startDs, keys));
-                    }
+                    loadDepthseriesForKeys(ctx, sessionRef, cmd, sessionId, entityId);
                 } else {
                     ctx.loadLatestDepthSeries(entityId, new PluginCallback<List<DsKvEntry>>() {
                         @Override
@@ -374,13 +307,30 @@ public class TelemetryWebsocketMsgHandler extends DefaultWebsocketMsgHandler {
                                         SubscriptionErrorCode.UNAUTHORIZED.getDefaultMsg());
                             } else {
                                 update = new DepthSubscriptionUpdate(cmd.getCmdId(), SubscriptionErrorCode.INTERNAL_ERROR,
-                                        "Failed to fetch data!");
+                                        FAILED_TO_FETCH_DATA);
                             }
                             sendWsMsg(ctx, sessionRef, update);
                         }
                     });
                 }
             }
+        }
+    }
+
+    private void loadDepthseriesForKeys(PluginContext ctx, PluginWebsocketSessionRef sessionRef, DepthSeriesSubscriptionCmd cmd, String sessionId, EntityId entityId) {
+        Double startDs;
+        if (cmd.getDepthWindow() > 0) {
+            List<String> keys = new ArrayList<>(getKeys(cmd).orElse(Collections.emptySet()));
+            log.debug("[{}] fetching depthseries data for last {}  for keys: ({}) for device : {}", sessionId, cmd.getDepthWindow(), cmd.getKeys(), entityId);
+            startDs = cmd.getStartDs();
+            Double endDs = cmd.getStartDs() + cmd.getDepthWindow();
+            List<DsKvQuery> queries = keys.stream().map(key -> new BaseDsKvQuery(key, startDs, endDs, cmd.getInterval(), getLimit(cmd.getLimit()), getDepthAggregation(cmd.getAgg()))).collect(Collectors.toList());
+            ctx.loadDepthSeries(entityId, queries, getSubscriptionCallback(sessionRef, cmd, sessionId, entityId, startDs, keys));
+        } else {
+            List<String> keys = new ArrayList<>(getKeys(cmd).orElse(Collections.emptySet()));
+            startDs = 0.0;
+            log.debug("[{}] fetching latest depth series data for keys: ({}) for device : {}", sessionId, cmd.getKeys(), entityId);
+            ctx.loadLatestDepthSeries(entityId, keys, getSubscriptionCallback(sessionRef, cmd, sessionId, entityId, startDs, keys));
         }
     }
 
@@ -500,9 +450,9 @@ public class TelemetryWebsocketMsgHandler extends DefaultWebsocketMsgHandler {
 
             @Override
             public void onFailure(PluginContext ctx, Exception e) {
-                log.debug("Failed to fetch data!", e);
+                log.debug(FAILED_TO_FETCH_DATA, e);
                 DepthSubscriptionUpdate update = new DepthSubscriptionUpdate(cmd.getCmdId(), SubscriptionErrorCode.INTERNAL_ERROR,
-                        "Failed to fetch data!");
+                        FAILED_TO_FETCH_DATA);
                 sendWsMsg(ctx, sessionRef, update);
             }
         };
@@ -512,7 +462,7 @@ public class TelemetryWebsocketMsgHandler extends DefaultWebsocketMsgHandler {
         String sessionId = sessionRef.getSessionId();
         WsSessionMetaData sessionMD = wsSessionsMap.get(sessionId);
         if (sessionMD == null) {
-            log.warn("[{}] Session meta data not found. ", sessionId);
+            log.warn(SESSION_META_DATA_NOT_FOUND, sessionId);
             SubscriptionUpdate update = new SubscriptionUpdate(cmd.getCmdId(), SubscriptionErrorCode.INTERNAL_ERROR,
                     SESSION_META_DATA_NOT_FOUND);
             sendWsMsg(ctx, sessionRef, update);
@@ -520,7 +470,7 @@ public class TelemetryWebsocketMsgHandler extends DefaultWebsocketMsgHandler {
         }
         if (cmd.getEntityId() == null || cmd.getEntityId().isEmpty() || cmd.getEntityType() == null || cmd.getEntityType().isEmpty()) {
             SubscriptionUpdate update = new SubscriptionUpdate(cmd.getCmdId(), SubscriptionErrorCode.BAD_REQUEST,
-                    "Device id is empty!");
+                    DEVICE_ID_IS_EMPTY);
             sendWsMsg(ctx, sessionRef, update);
             return;
         }
@@ -549,7 +499,7 @@ public class TelemetryWebsocketMsgHandler extends DefaultWebsocketMsgHandler {
 
                     @Override
                     public void onFailure(PluginContext ctx, Exception e) {
-
+                        log.info(FAILED_TO_FETCH_TIME_ZONE_ATTRIBUTE + " Exception e: ", e);
                     }
                 });
             }
@@ -573,7 +523,7 @@ public class TelemetryWebsocketMsgHandler extends DefaultWebsocketMsgHandler {
         String sessionId = sessionRef.getSessionId();
         WsSessionMetaData sessionMD = wsSessionsMap.get(sessionId);
         if (sessionMD == null) {
-            log.warn("[{}] Session meta data not found. ", sessionId);
+            log.warn(SESSION_META_DATA_NOT_FOUND, sessionId);
             DepthSubscriptionUpdate update = new DepthSubscriptionUpdate(cmd.getCmdId(), SubscriptionErrorCode.INTERNAL_ERROR,
                     "Session meta-data not found!");
             sendWsMsg(ctx, sessionRef, update);
@@ -581,7 +531,7 @@ public class TelemetryWebsocketMsgHandler extends DefaultWebsocketMsgHandler {
         }
         if (cmd.getEntityId() == null || cmd.getEntityId().isEmpty() || cmd.getEntityType() == null || cmd.getEntityType().isEmpty()) {
             DepthSubscriptionUpdate update = new DepthSubscriptionUpdate(cmd.getCmdId(), SubscriptionErrorCode.BAD_REQUEST,
-                    "Device id is empty!");
+                    DEVICE_ID_IS_EMPTY);
             sendWsMsg(ctx, sessionRef, update);
             return;
         }
@@ -609,7 +559,7 @@ public class TelemetryWebsocketMsgHandler extends DefaultWebsocketMsgHandler {
                             SubscriptionErrorCode.UNAUTHORIZED.getDefaultMsg());
                 } else {
                     update = new DepthSubscriptionUpdate(cmd.getCmdId(), SubscriptionErrorCode.INTERNAL_ERROR,
-                            "Failed to fetch data!");
+                            FAILED_TO_FETCH_DATA);
                 }
                 sendWsMsg(ctx, sessionRef, update);
             }
@@ -682,7 +632,7 @@ public class TelemetryWebsocketMsgHandler extends DefaultWebsocketMsgHandler {
     private boolean validateSessionMetadata(PluginContext ctx, PluginWebsocketSessionRef sessionRef, SubscriptionCmd cmd, String sessionId) {
         WsSessionMetaData sessionMD = wsSessionsMap.get(sessionId);
         if (sessionMD == null) {
-            log.warn("[{}] Session meta data not found. ", sessionId);
+            log.warn(SESSION_META_DATA_NOT_FOUND, sessionId);
             SubscriptionUpdate update = new SubscriptionUpdate(cmd.getCmdId(), SubscriptionErrorCode.INTERNAL_ERROR,
                     SESSION_META_DATA_NOT_FOUND);
             sendWsMsg(ctx, sessionRef, update);
@@ -703,7 +653,7 @@ public class TelemetryWebsocketMsgHandler extends DefaultWebsocketMsgHandler {
     private boolean validateSubscriptionCmd(PluginContext ctx, PluginWebsocketSessionRef sessionRef, SubscriptionCmd cmd) {
         if (cmd.getEntityId() == null || cmd.getEntityId().isEmpty()) {
             SubscriptionUpdate update = new SubscriptionUpdate(cmd.getCmdId(), SubscriptionErrorCode.BAD_REQUEST,
-                    "Device id is empty!");
+                    DEVICE_ID_IS_EMPTY);
             sendWsMsg(ctx, sessionRef, update);
             return false;
         }
