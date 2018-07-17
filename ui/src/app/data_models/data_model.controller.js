@@ -250,9 +250,9 @@ export function DataModelController($log, $mdDialog, $document, $stateParams, $t
     function plotDatamodel() {
         // add new edges if necessary to the edges list
         vm.edges.clear();
+        var currEdgeId = 1;
         vm.nodes.forEach(node => {
             var dmo = node.datamodelObject;
-            var currEdgeId = 1;
             if (dmo.parent_id) {
                 vm.edges.add({
                     id: currEdgeId++,
