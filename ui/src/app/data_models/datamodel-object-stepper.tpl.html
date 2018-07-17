@@ -31,7 +31,7 @@
       <md-tabs md-dynamic-height md-stretch-tabs="always" md-border-bottom md-selected="vm.stepperState">
         <md-tab label="Object Information" ng-click="vm.stepperState = 0">
           <md-content class="md-padding">
-            <md-input-container class="md-block">
+            <md-input-container class="md-block" ng-keypress="$event.keyCode === 13 && vm.onStepperEnter();">
               <label>Object Name</label>
               <input md-maxlength="256" required="" name="Object Name" ng-model="vm.stepperData.name">
               <div ng-messages="objectStepper.name.$error">
@@ -40,7 +40,7 @@
               </div>
             </md-input-container>
 
-            <md-input-container class="md-block">
+            <md-input-container class="md-block" ng-keypress="$event.keyCode === 13 && vm.onStepperEnter();">
               <label>Description</label>
               <input md-maxlength="500" md-no-asterisk="" name="description" ng-model="vm.stepperData.desc">
               <div ng-messages="objectStepper.desc.$error">
@@ -49,7 +49,7 @@
               </div>
             </md-input-container>
 
-            <md-input-container style="width:100%;">
+            <md-input-container style="width:100%;" ng-keypress="$event.keyCode === 13 && vm.onStepperEnter();">
               <label>Tempus Type</label>
               <md-select name="tempusType" ng-model="vm.stepperData.type" required>
                 <md-option value="Device">Device</md-option>
@@ -68,14 +68,15 @@
               <p> {{ attrib }} </p>
             </md-list-item>
             
-            <md-input-container class="md-block">
+            <md-input-container class="md-block" ng-keypress="$event.keyCode === 13 && vm.onStepperEnter();">
               <label>Attribute Name</label>
-              <input md-maxlength="256" md-no-asterisk="" name="attribute" ng-model="vm.stepperData.currentAttribute">
+              <input md-maxlength="256" md-no-asterisk="" name="attribute" ng-model="vm.stepperData.currentAttribute" ng-keypress="$event.keyCode === 13 && alert('c')">
               <div ng-messages="objectStepper.attrib.$error">
                 <div ng-message="md-maxlength">The description must be less than 256 characters long.</div>
               </div>
             </md-input-container>
-            <md-button ng-click="vm.addDatamodelObjectAttribute()" ng-if="vm.stepperData.currentAttribute">
+
+            <md-button id="stepperAddAttrButton" ng-click="vm.addDatamodelObjectAttribute()" ng-if="vm.stepperData.currentAttribute">
               Add
             </md-button>
           </md-content>
@@ -83,7 +84,7 @@
 
         <md-tab label="Relationships" ng-click="vm.stepperState = 2" ng-disabled="!vm.stepperData.name || !vm.stepperData.type">
           <md-content class="md-padding">
-            <md-input-container class="md-block">
+            <md-input-container class="md-block" ng-keypress="$event.keyCode === 13 && vm.onStepperEnter();">
               <label>Parent</label>
               <md-select name="tempusType" ng-model="vm.stepperData.parent">
                 <md-option ng-value="null">None</md-option>
@@ -122,13 +123,13 @@
 
     <md-dialog-actions layout="row">
       <span flex></span>
-      <md-button ng-click="vm.stepperState = vm.stepperState - 1" ng-if="vm.stepperState > 0">
+      <md-button ng-click="vm.stepperState = vm.stepperState - 1" ng-if="vm.stepperState > 0" id="stepperBack">
         Back
       </md-button>
-      <md-button ng-click="vm.stepperState = vm.stepperState + 1" style="margin-right:20px;" ng-if="3 > vm.stepperState" ng-disabled="!vm.stepperData.name || !vm.stepperData.type">
+      <md-button ng-click="vm.stepperState = vm.stepperState + 1" style="margin-right:20px;" ng-if="3 > vm.stepperState" ng-disabled="!vm.stepperData.name || !vm.stepperData.type" id="stepperNext">
          Next
       </md-button>
-      <md-button type="submit" style="margin-right:20px;" ng-if="3 === vm.stepperState">
+      <md-button type="submit" style="margin-right:20px;" ng-if="3 === vm.stepperState" id="stepperSubmit">
          Submit
       </md-button>
     </md-dialog-actions>
