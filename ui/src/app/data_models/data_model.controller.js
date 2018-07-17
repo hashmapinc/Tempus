@@ -154,8 +154,8 @@ export function DataModelController($log, $mdDialog, $document, $stateParams, $t
             toSave.description  = dmo.desc;
             toSave.name         = dmo.name;
             toSave.type         = dmo.type;
-            if (dmo.parent) {
-                toSave.parentId = { id: dmo.parent.id, entityType: "DATA_MODEL_OBJECT"};
+            if (dmo.parent_id) {
+                toSave.parentId = { id: dmo.parent_id, entityType: "DATA_MODEL_OBJECT"};
             }
             if (dmo.attributes) {
                 toSave.attributeDefinitions = dmo.attributes.map(attr => {
@@ -203,7 +203,7 @@ export function DataModelController($log, $mdDialog, $document, $stateParams, $t
             var datamodelObjects = [];  // array of processed dm objects
             vm.visIDs = {};             // clear the hashmap
             var currId = 1;             // keeps track of current visjs ID
-            data.forEach(dmo => {  // iterate and process each object
+            data.forEach(dmo => {       // iterate and process each object
                 // record object ID into hashmap
                 vm.visIDs[dmo.id.id] = currId++;
 
@@ -226,7 +226,7 @@ export function DataModelController($log, $mdDialog, $document, $stateParams, $t
                 ));
             });
 
-            // add the objects to the nodes and edges arrays
+            // add the objects to the nodes array
             var currEdgeId = 1; // current ID of an edge
             datamodelObjects.forEach(dmo => {
                 vm.nodes.add({
@@ -235,14 +235,6 @@ export function DataModelController($log, $mdDialog, $document, $stateParams, $t
                     group: dmo.type,
                     datamodelObject: dmo
                 });
-
-                if (dmo.parent_id) {
-                    vm.edges.add({
-                        id: currEdgeId++,
-                        from: vm.visIDs[dmo.parent_id],
-                        to: vm.visIDs[dmo.id]
-                    });
-                }
             });
 
             plotDatamodel();
@@ -256,6 +248,20 @@ export function DataModelController($log, $mdDialog, $document, $stateParams, $t
      * plot the datamodel
      */
     function plotDatamodel() {
+        // add new edges if necessary to the edges list
+        vm.edges.clear();
+        vm.nodes.forEach(node => {
+            var dmo = node.datamodelObject;
+            var currEdgeId = 1;
+            if (dmo.parent_id) {
+                vm.edges.add({
+                    id: currEdgeId++,
+                    from: vm.visIDs[dmo.parent_id],
+                    to: vm.visIDs[dmo.id]
+                });
+            }
+        });
+
         // center the view after the drawing is finished
         network.once('afterDrawing', function (params) {
             // focus the camera on the new nodes
@@ -313,19 +319,19 @@ export function DataModelController($log, $mdDialog, $document, $stateParams, $t
             if(!nodeToEdit.datamodelObject) {
                 return;
             }
-            var dmObj = nodeToEdit.datamodelObject;
-            vm.stepperData.id = dmObj.id;
-            vm.stepperData.name = dmObj.name;
-            vm.stepperData.desc = dmObj.desc;
-            vm.stepperData.type = dmObj.type;
-            vm.stepperData.attribute = dmObj.attribute;
+            var dmo = nodeToEdit.datamodelObject;
+            vm.stepperData.id = dmo.id;
+            vm.stepperData.name = dmo.name;
+            vm.stepperData.desc = dmo.desc;
+            vm.stepperData.type = dmo.type;
+            vm.stepperData.attribute = dmo.attribute;
             vm.stepperState = 3; // go straight to review page
 
             // get parent if it exists
             vm.stepperData.parent = null;
 
-            if(dmObj.parent_id) {
-                var parentNode = vm.nodes.get(vm.visIDs[dmObj.parent_id]);
+            if(dmo.parent_id) {
+                var parentNode = vm.nodes.get(vm.visIDs[dmo.parent_id]);
                 vm.stepperData.parent = parentNode.datamodelObject;
             }
         }
@@ -377,7 +383,7 @@ export function DataModelController($log, $mdDialog, $document, $stateParams, $t
             var nodeId = vm.visIDs[vm.stepperData.id];
             var node = vm.nodes.get(nodeId);
 
-            // update the object in the node
+            // update the node
             node.datamodelObject = createDatamodelObject(
                 vm.stepperData.id,
                 vm.stepperData.name,
@@ -386,6 +392,11 @@ export function DataModelController($log, $mdDialog, $document, $stateParams, $t
                 vm.stepperData.parent ? vm.stepperData.parent.id : null, // parent ID if it exists
                 vm.stepperData.attributes
             );
+            node.label = vm.stepperData.name;
+            node.group = vm.stepperData.type;
+
+            // merge the node changes back into nodes
+            vm.nodes.update(node);
 
             // plot the data
             plotDatamodel();
@@ -423,15 +434,6 @@ export function DataModelController($log, $mdDialog, $document, $stateParams, $t
                     group: dmo.type,
                     datamodelObject: dmo
                 });
-
-                // add a new edge if necessary to the edges list
-                if (dmo.parent_id) {
-                    vm.edges.add({
-                        id: vm.edges.length + 1,
-                        from: vm.visIDs[dmo.parent_id],
-                        to: vm.visIDs[dmo.id]
-                    });
-                }
 
                 // plot the data
                 plotDatamodel();
