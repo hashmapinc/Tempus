@@ -17,6 +17,7 @@ package com.hashmapinc.server.extensions.kinesis.plugin;
 
 
 import com.amazonaws.services.kinesisfirehose.AmazonKinesisFirehoseAsync;
+import com.hashmapinc.server.common.msg.exception.TempusRuntimeException;
 import com.hashmapinc.server.extensions.api.plugins.PluginContext;
 import com.hashmapinc.server.extensions.api.component.Plugin;
 import com.hashmapinc.server.extensions.api.plugins.AbstractPlugin;
@@ -64,7 +65,7 @@ public class KinesisPlugin extends AbstractPlugin<KinesisPluginConfiguration> {
             this.firehoseKinesis.shutdown();
         } catch (Exception e) {
             log.error("Failed to shutdown Kinesis client during destroy()", e);
-            throw new RuntimeException(e);
+            throw new TempusRuntimeException(e);
         }
     }
 
