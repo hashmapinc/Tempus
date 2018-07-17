@@ -578,10 +578,6 @@ export default angular.module('tempus.locale', [])
                     "name-required":"This feild is required"
 
                 },
-                "tempusboard": {
-                    "tempusboards": "Tempusboard",
-                    "view-tempusboard": "View Tempusboard",
-                },
                 "datakey": {
                     "settings": "Settings",
                     "advanced": "Advanced",
