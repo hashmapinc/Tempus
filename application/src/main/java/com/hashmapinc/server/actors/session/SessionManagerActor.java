@@ -154,7 +154,7 @@ public class SessionManagerActor extends ContextAwareActor {
         ActorRef sessionActor = sessionActors.remove(sessionIdStr);
         if (sessionActor != null) {
             log.debug("[{}] Removed session actor.", sessionIdStr);
-            //TODO: onSubscriptionUpdate device actor about session close;
+            //TODO: onSubscriptionUpdate device actor about session close
         } else {
             log.debug("[{}] Session actor was already removed.", sessionIdStr);
         }

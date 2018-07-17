@@ -19,6 +19,7 @@ import com.datastax.driver.core.KeyspaceMetadata;
 import com.hashmapinc.server.common.msg.exception.TempusRuntimeException;
 import com.hashmapinc.server.dao.cassandra.CassandraCluster;
 import com.hashmapinc.server.dao.cassandra.CassandraInstallCluster;
+import com.hashmapinc.server.exception.TempusApplicationException;
 import com.hashmapinc.server.service.install.cql.CassandraDbHelper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -58,25 +59,29 @@ public class CassandraDatabaseUpgradeService implements DatabaseUpgradeService {
     private DashboardService dashboardService;
 
     @Override
-    public void upgradeDatabase(String fromVersion) throws Exception {
+    public void upgradeDatabase(String fromVersion) throws TempusApplicationException {
 
-        switch (fromVersion) {
-            case "1.2.3":
-                log.info("Upgrading Cassandara DataBase from version {} to 1.3.0 ...", fromVersion);
-                upgradeDatabaseFromV123();
-                break;
-            case "1.3.0":
-                break;
-            case "1.3.1":
-                upgradeDatabaseFromV131();
-                break;
-            default:
-                throw new TempusRuntimeException("Unable to upgrade Cassandra database, unsupported fromVersion: " + fromVersion);
+        try {
+            switch (fromVersion) {
+                case "1.2.3":
+                    log.info("Upgrading Cassandara DataBase from version {} to 1.3.0 ...", fromVersion);
+                    upgradeDatabaseFromV123();
+                    break;
+                case "1.3.0":
+                    break;
+                case "1.3.1":
+                    upgradeDatabaseFromV131();
+                    break;
+                default:
+                    throw new TempusRuntimeException("Unable to upgrade Cassandra database, unsupported fromVersion: " + fromVersion);
+            }
+        } catch (IOException e) {
+            throw new TempusApplicationException(e);
         }
 
     }
 
-    private void upgradeDatabaseFromV131() throws Exception {
+    private void upgradeDatabaseFromV131() throws IOException {
         KeyspaceMetadata ks;
         Path schemaUpdateFile;
         cluster.getSession();
@@ -106,7 +111,7 @@ public class CassandraDatabaseUpgradeService implements DatabaseUpgradeService {
         log.info("Dashboards restored.");
     }
 
-    private void upgradeDatabaseFromV123() throws Exception {
+    private void upgradeDatabaseFromV123() throws IOException {
         //Dump devices, assets and relations
 
         cluster.getSession();
