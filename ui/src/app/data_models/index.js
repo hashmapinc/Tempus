@@ -23,7 +23,6 @@ import tempusApiDevice from '../api/device.service';
 import tempusApiCustomer from '../api/customer.service';
 import tempusApiDashboard from '../api/dashboard.service';
 import tempusApiWidget from '../api/widget.service';
-import tempusApiTempusboard from '../api/tempusboard.service';
 import tempusWidgetConfig from '../components/widget/widget-config.directive';
 import dashboardStates from '../dashboard/states';
 
@@ -42,7 +41,6 @@ export default angular.module('tempus.data_models', [
     tempusApiDashboard,
     tempusApiDatamodel,
     tempusApiWidget,
-    tempusApiTempusboard,
     tempusWidgetConfig,
     dashboardStates
 ])
