@@ -51,6 +51,4 @@ public interface SchemaDao extends Dao<Schema> {
      */
     Schema findSchemaByName(String name);
 
-    boolean removeById(UUID id);
-
 }

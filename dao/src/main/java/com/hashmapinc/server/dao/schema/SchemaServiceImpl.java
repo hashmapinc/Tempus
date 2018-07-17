@@ -63,7 +63,7 @@ public class SchemaServiceImpl extends AbstractEntityService implements SchemaSe
 
         log.trace("Executing deleteSchema [{}]", schemaId);
         Validator.validateId(schemaId, INCORRECT_SCHEMA_ID + schemaId);
-        Schema schema = findSchemaById(schemaId);
+        Schema schema = schemaDao.findById(schemaId.getId());
         if (schema == null) {
             throw new IncorrectParameterException("Unable to delete non-existent schema.");
         }

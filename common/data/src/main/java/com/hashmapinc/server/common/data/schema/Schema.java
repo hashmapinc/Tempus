@@ -16,11 +16,12 @@
 package com.hashmapinc.server.common.data.schema;
 
 import com.hashmapinc.server.common.data.BaseData;
+import com.hashmapinc.server.common.data.HasName;
 import com.hashmapinc.server.common.data.id.SchemaId;
 import lombok.EqualsAndHashCode;
 
 @EqualsAndHashCode(callSuper = true)
-public class Schema extends BaseData<SchemaId> {
+public class Schema extends BaseData<SchemaId> implements HasName {
 
     private String name;
     private String description;
@@ -44,6 +45,7 @@ public class Schema extends BaseData<SchemaId> {
         this.schema_txt = schema.schema_txt;
     }
 
+    @Override
     public String getName() {
         return name;
     }

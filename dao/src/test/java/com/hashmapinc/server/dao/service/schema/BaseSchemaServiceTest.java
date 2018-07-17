@@ -35,15 +35,16 @@ public class BaseSchemaServiceTest extends AbstractServiceTest {
     private String body = "Sensor: $name.  Temp: $value";
     private SchemaId id = null;
 
-    //@After
-   // public final void tearDown() {
-    //    schemaService.deleteSchema(id);
-    //}
+    @After
+    public final void tearDown() {
+        schemaService.deleteSchema(id);
+    }
 
     @Test
     public void saveSchemaTest() throws Exception {
         Schema savedSchema = schemaService.saveSchema(generateSchema(name,description,type,body));
-        Assert.assertNotNull(savedSchema.getId());
+        id = savedSchema.getId();
+        Assert.assertNotNull(id);
     }
 
 

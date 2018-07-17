@@ -607,7 +607,7 @@ public abstract class BaseController {
     Schema checkSchemaId(SchemaId schemaId) throws TempusException {
         try {
             validateId(schemaId, "Incorrect schemaId " + schemaId);
-            Schema schema = schemaService.findSchemaBySchemaId(schemaId);
+            Schema schema = schemaService.findSchemaById(schemaId);
             checkNotNull(schema);
             return schema;
         } catch (Exception e) {
