@@ -103,10 +103,10 @@ export default function UserRoutes($stateProvider) {
             data: {
                 usersType: 'customer',
                 searchEnabled: true,
-                pageTitle: 'user.users'
+                pageTitle: 'user.groups'
             },
             ncyBreadcrumb: {
-                label: '{"icon": "account_circle", "label": "user.users"}'
+                label: '{"icon": "account_circle", "label": "user.groups"}'
             }
         });
 

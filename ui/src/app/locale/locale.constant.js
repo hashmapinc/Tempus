@@ -1378,6 +1378,7 @@ export default angular.module('tempus.locale', [])
                     "user": "User",
                     "users": "Users",
                     "usersgroups": "Add Groups",
+                    "groups" : "Groups",
                     "userspolicy": "Add Policy",
                     "usersadd": "Add Users",
                     "creategroup":"Create Group",
