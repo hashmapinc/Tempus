@@ -13,17 +13,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.hashmapinc.server.transport.mqtt.sparkplugB;
+package com.hashmapinc.server.transport.mqtt.sparkplug.data;
 
-public class SparkPlugMsgTypes {
-    public static final String DBIRTH = "DBIRTH";
-    public static final String DDATA = "DDATA";
-    public static final String DDEATH = "DDEATH";
-    public static final String DCMD = "DCMD";
-    public static final String NBIRTH = "NBIRTH";
-    public static final String NDEATH = "NDEATH";
-    public static final String NDATA = "NDATA";
-    public static final String NCMD = "NCMD";
+public class SparkPlugMetaData {
+    private String msgType;
+    private int seq;
 
-    private SparkPlugMsgTypes(){}
+    public SparkPlugMetaData(String msgType, int seq){
+        this.msgType = msgType;
+        this.seq = seq;
+    }
+
+    public String getMsgType() {
+        return msgType;
+    }
+
+    public void setMsgType(String msgType) {
+        this.msgType = msgType;
+    }
+
+    public int getSeq() {
+        return seq;
+    }
+
+    public void setSeq(int seq) {
+        this.seq = seq;
+    }
 }

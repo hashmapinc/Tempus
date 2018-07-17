@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.hashmapinc.server.transport.mqtt.sparkplugB;
+package com.hashmapinc.server.transport.mqtt.sparkplug;
 
 import com.cirruslink.sparkplug.SparkplugException;
 import com.cirruslink.sparkplug.message.SparkplugBPayloadEncoder;
@@ -34,6 +34,8 @@ import java.util.List;
 
 @Slf4j
 public class SparkPlugEncodeService {
+    private SparkPlugEncodeService() {
+    }
 
     public static byte[] createSparkPlugPayload(DeviceSessionCtx ctx, TelemetryKVMsg payload){
         List<TsKvEntry> tsKvEntries = payload.getDeviceTelemetry();
@@ -106,7 +108,7 @@ public class SparkPlugEncodeService {
         try {
             deathBytes = new SparkplugBPayloadEncoder().getBytes(deathPayload.createPayload());
         }catch (Exception e){
-
+            log.trace("Error while reading bytes for SparkplugBPayload");
         }
         return deathBytes;
     }

@@ -43,9 +43,6 @@ import javax.annotation.PreDestroy;
 @Slf4j
 public class MqttTransportService {
 
-    private static final String V1 = "v1";
-    private static final String DEVICE = "device";
-
     @Autowired(required = false)
     private ApplicationContext appContext;
 
@@ -82,20 +79,18 @@ public class MqttTransportService {
     private Integer workerGroupThreadCount;
 
 
-    private MqttTransportAdaptor adaptor;
-
     private Channel serverChannel;
     private EventLoopGroup bossGroup;
     private EventLoopGroup workerGroup;
 
     @PostConstruct
-    public void init() throws Exception {
+    public void init() throws InterruptedException {
         log.info("Setting resource leak detector level to {}", leakDetectorLevel);
         ResourceLeakDetector.setLevel(ResourceLeakDetector.Level.valueOf(leakDetectorLevel.toUpperCase()));
 
         log.info("Starting MQTT transport...");
         log.info("Lookup MQTT transport adaptor {}", adaptorName);
-        this.adaptor = (MqttTransportAdaptor) appContext.getBean(adaptorName);
+        MqttTransportAdaptor adaptor = (MqttTransportAdaptor) appContext.getBean(adaptorName);
 
         log.info("Starting MQTT transport server");
         bossGroup = new NioEventLoopGroup(bossGroupThreadCount);
