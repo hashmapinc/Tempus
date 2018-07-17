@@ -239,12 +239,6 @@ public class DefaultActorService implements ActorService {
     }
 
     @Override
-    public void onDashboardStateChange(TenantId tenantId, DashboardId dashboardId, ComponentLifecycleEvent event) {
-        log.trace("[{}] Processing onDashboardStateChange event: {}", dashboardId, event);
-        appActor.tell(ComponentLifecycleMsg.forDashboard(tenantId, dashboardId, event) , ActorRef.noSender());
-    }
-
-    @Override
     public void onComputationJobStateChange(TenantId tenantId, ComputationId computationId, ComputationJobId computationJobId, ComponentLifecycleEvent state) {
         log.trace("[{}] Processing onComputationJobStateChange event: {}", computationJobId, state);
         broadcast(ComponentLifecycleMsg.forComputationJob(tenantId, computationId, computationJobId, state));

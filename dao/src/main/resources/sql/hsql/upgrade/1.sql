@@ -14,4 +14,5 @@
 -- limitations under the License.
 --
 
-ALTER TABLE application ADD state varchar(255) DEFAULT 'SUSPENDED';
+ALTER TABLE ts_kv ADD ts_diff bigint;
+ALTER TABLE ds_kv ADD ds_diff double precision;

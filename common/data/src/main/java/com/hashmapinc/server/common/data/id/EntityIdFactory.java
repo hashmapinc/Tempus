@@ -53,8 +53,6 @@ public class EntityIdFactory {
                 return new AssetId(uuid);
             case ALARM:
                 return new AlarmId(uuid);
-            case APPLICATION:
-                return new ApplicationId(uuid);
             case COMPUTATION:
                 return new ComputationId(uuid);
             case COMPUTATION_JOB:
