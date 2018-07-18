@@ -161,6 +161,24 @@ CREATE TABLE IF NOT EXISTS tempus.device (
     PRIMARY KEY (id, tenant_id, customer_id, type)
 );
 
+CREATE TABLE IF NOT EXISTS tempus.data_model (
+    id timeuuid,
+    tenant_id timeuuid,
+    name text,
+    search_text text,
+    additional_info text,
+    last_update_ts bigint,
+    PRIMARY KEY (id, tenant_id)
+);
+
+CREATE MATERIALIZED VIEW IF NOT EXISTS tempus.data_model_by_tenant_and_name AS
+    SELECT *
+    from tempus.data_model
+    WHERE tenant_id IS NOT NULL AND name IS NOT NULL AND id IS NOT NULL
+    PRIMARY KEY ( tenant_id, name, id)
+    WITH CLUSTERING ORDER BY (name ASC, id DESC);
+
+
 CREATE MATERIALIZED VIEW IF NOT EXISTS tempus.device_by_tenant_and_name AS
     SELECT *
     from tempus.device
@@ -195,50 +213,6 @@ CREATE MATERIALIZED VIEW IF NOT EXISTS tempus.device_by_customer_by_type_and_sea
     WHERE tenant_id IS NOT NULL AND customer_id IS NOT NULL AND type IS NOT NULL AND search_text IS NOT NULL AND id IS NOT NULL
     PRIMARY KEY ( customer_id, tenant_id, type, search_text, id )
     WITH CLUSTERING ORDER BY ( tenant_id DESC, type ASC, search_text ASC, id DESC );
-
-CREATE TABLE IF NOT EXISTS tempus.application (
-    id timeuuid,
-    tenant_id timeuuid,
-    customer_id timeuuid,
-    mini_dashboard_id timeuuid,
-    dashboard_id timeuuid,
-    search_text text,
-    name text,
-    is_valid boolean,
-    description text,
-    application_computation_jobs set<timeuuid>,
-    application_rules set<timeuuid>,
-    application_device_types set<text>,
-    PRIMARY KEY (id, tenant_id, customer_id)
-);
-
-CREATE MATERIALIZED VIEW IF NOT EXISTS tempus.application_by_tenant_and_search_text AS
-    SELECT *
-    from tempus.application
-    WHERE tenant_id IS NOT NULL AND customer_id IS NOT NULL AND search_text IS NOT NULL AND id IS NOT NULL
-    PRIMARY KEY ( tenant_id, search_text, id, customer_id )
-    WITH CLUSTERING ORDER BY ( search_text ASC, id DESC, customer_id DESC);
-
-CREATE MATERIALIZED VIEW IF NOT EXISTS tempus.application_by_tenant_and_name AS
-    SELECT *
-    from tempus.application
-    WHERE tenant_id IS NOT NULL AND customer_id IS NOT NULL AND name IS NOT NULL AND id IS NOT NULL
-    PRIMARY KEY ( tenant_id, name, id, customer_id)
-    WITH CLUSTERING ORDER BY ( name ASC, id DESC, customer_id DESC);
-
-CREATE MATERIALIZED VIEW IF NOT EXISTS tempus.application_by_dashboard AS
-    SELECT *
-    from tempus.application
-    WHERE tenant_id IS NOT NULL AND dashboard_id IS NOT NULL AND id IS NOT NULL AND customer_id IS NOT NULL
-    PRIMARY KEY ( tenant_id, dashboard_id, customer_id, id)
-    WITH CLUSTERING ORDER BY (id DESC, dashboard_id DESC);
-
-CREATE MATERIALIZED VIEW IF NOT EXISTS tempus.application_by_mini_dashboard AS
-    SELECT *
-    from tempus.application
-    WHERE tenant_id IS NOT NULL AND mini_dashboard_id IS NOT NULL AND id IS NOT NULL AND customer_id IS NOT NULL
-    PRIMARY KEY ( tenant_id, mini_dashboard_id, customer_id, id)
-    WITH CLUSTERING ORDER BY (id DESC, mini_dashboard_id DESC);
 
 CREATE TABLE IF NOT EXISTS tempus.device_credentials (
 	id timeuuid PRIMARY KEY,
@@ -427,7 +401,6 @@ CREATE TABLE IF NOT EXISTS tempus.ts_kv_cf (
     key text,
     partition bigint,
     ts bigint,
-    ts_diff bigint,
     bool_v boolean,
     str_v text,
     long_v bigint,
@@ -464,7 +437,6 @@ CREATE TABLE IF NOT EXISTS tempus.ds_kv_cf (
     key text,
     partition double,
     ds double,
-    ds_diff double,
     bool_v boolean,
     str_v text,
     long_v bigint,
@@ -492,20 +464,6 @@ CREATE TABLE IF NOT EXISTS tempus.ds_kv_latest_cf (
     long_v bigint,
     dbl_v double,
     json_v text,
-    PRIMARY KEY (( entity_type, entity_id ), key)
-) WITH compaction = { 'class' :  'LeveledCompactionStrategy'  };
-
-CREATE TABLE IF NOT EXISTS tempus.tag_metadata_cf (
-    entity_type text,
-    entity_id timeuuid,
-    key text,
-    unit text,
-    avg_frequency double,
-    max_frequency double,
-    min_frequency double,
-    mean_frequency double,
-    median_frequency double,
-    source text,
     PRIMARY KEY (( entity_type, entity_id ), key)
 ) WITH compaction = { 'class' :  'LeveledCompactionStrategy'  };
 
@@ -788,3 +746,47 @@ CREATE TABLE IF NOT EXISTS tempus.theme (
   is_enabled boolean,
   PRIMARY KEY (id,name)
 );
+
+CREATE TABLE IF NOT EXISTS tempus.logo (
+    id uuid,
+    name text,
+    enabled boolean,
+    file blob,
+    PRIMARY KEY (id,name)
+ );
+
+
+CREATE TABLE IF NOT EXISTS tempus.data_model_object_cf (
+   id timeuuid,
+   name text,
+   description text,
+   data_model_id timeuuid,
+   parent_id timeuuid,
+   type text,
+   customer_id timeuuid,
+   search_text text,
+   PRIMARY KEY (id, data_model_id)
+);
+
+CREATE TABLE IF NOT EXISTS tempus.attribute_definition (
+    name text,
+    attr_value text,
+    value_type text,
+    data_model_object_id timeuuid,
+    source text,
+    PRIMARY KEY (name, data_model_object_id)
+);
+
+CREATE TABLE IF NOT EXISTS tempus.tag_metadata_cf (
+    entity_type text,
+    entity_id timeuuid,
+    key text,
+    unit text,
+    avg_frequency double,
+    max_frequency double,
+    min_frequency double,
+    mean_frequency double,
+    median_frequency double,
+    source text,
+    PRIMARY KEY (( entity_type, entity_id ), key)
+) WITH compaction = { 'class' :  'LeveledCompactionStrategy'  };

@@ -44,6 +44,15 @@
 			<label translate>customer.description</label>
 			<textarea ng-model="customer.additionalInfo.description" rows="2"></textarea>
 		</md-input-container>
-		<tb-contact contact="customer" the-form="theForm" is-edit="isEdit"></tb-contact>
+		<md-input-container>
+			<label translate>customer.data-model</label>
+			<md-select  ng-disabled="!isEdit"  name="dataModelId" ng-model="customer.dataModelId">
+				<md-option ng-repeat="dataModel in dataModels" ng-selected="customer.dataModelId.id === dataModel.value.id"
+					   ng-value={{dataModel.value}}>
+					{{dataModel.key}}
+				</md-option>
+				<md-option ng-click="createNewDataModel()" translate>customer.data-model-creation-link</md-option>
+			</md-select>
+		</md-input-container>
 	</fieldset>
 </md-content>

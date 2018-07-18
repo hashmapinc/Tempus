@@ -27,8 +27,12 @@ import java.util.Arrays;
 @Slf4j
 @SpringBootConfiguration
 @ComponentScan({"com.hashmapinc.server.install",
+        "com.hashmapinc.server.exception",
+        "com.hashmapinc.server.config",
         "com.hashmapinc.server.service.component",
         "com.hashmapinc.server.service.install",
+        "com.hashmapinc.server.service.user",
+        "com.hashmapinc.server.service.security",
         "com.hashmapinc.server.dao"})
 public class TempusInstallApplication {
 

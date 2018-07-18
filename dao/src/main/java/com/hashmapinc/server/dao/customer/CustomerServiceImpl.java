@@ -19,7 +19,10 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.hashmapinc.server.common.data.Customer;
+import com.hashmapinc.server.common.data.datamodel.DataModel;
+import com.hashmapinc.server.common.data.id.DataModelId;
 import com.hashmapinc.server.common.data.page.TextPageLink;
+import com.hashmapinc.server.dao.datamodel.DataModelDao;
 import com.hashmapinc.server.dao.user.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -44,6 +47,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
+import static com.hashmapinc.server.dao.model.ModelConstants.NULL_UUID;
 import static com.hashmapinc.server.dao.service.Validator.validateId;
 
 @Service
@@ -62,6 +66,9 @@ public class CustomerServiceImpl extends AbstractEntityService implements Custom
 
     @Autowired
     private TenantDao tenantDao;
+
+    @Autowired
+    private DataModelDao dataModelDao;
 
     @Autowired
     private AssetService assetService;
@@ -194,6 +201,14 @@ public class CustomerServiceImpl extends AbstractEntityService implements Custom
                         Tenant tenant = tenantDao.findById(customer.getTenantId().getId());
                         if (tenant == null) {
                             throw new DataValidationException("Customer is referencing to non-existent tenant!");
+                        }
+                    }
+                    if(customer.getDataModelId() == null) {
+                        customer.setDataModelId(new DataModelId(NULL_UUID));
+                    } else if(!customer.getDataModelId().getId().equals(NULL_UUID)) {
+                        DataModel dataModel = dataModelDao.findById(customer.getDataModelId().getId());
+                        if(dataModel == null) {
+                            throw new DataValidationException("Customer is referencing to non-existent data model!");
                         }
                     }
                 }

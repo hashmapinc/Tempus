@@ -297,7 +297,6 @@ export default angular.module('tempus.types', [])
                 user: "USER",
                 dashboard: "DASHBOARD",
                 alarm: "ALARM",
-                application:"APPLICATION",
                 computation:"COMPUTATION",
                 computationJob:"COMPUTATION_JOB"
 
@@ -360,12 +359,6 @@ export default angular.module('tempus.types', [])
                     list: 'entity.list-of-alarms',
                     nameStartsWith: 'entity.alarm-name-starts-with'
                 },
-                "APPLICATION": {
-                    type: 'entity.type-application',
-                    typePlural: 'entity.type-applications',
-                    list: 'entity.list-of-applications',
-                    nameStartsWith: 'entity.application-name-starts-with'
-                },
                 "COMPUTATION": {
                     type: 'entity.type-computation',
                     typePlural: 'entity.type-computations',
@@ -410,7 +403,8 @@ export default angular.module('tempus.types', [])
                 http: "HTTP",
                 mqtt: "MQTT",
                 opc: "OPC UA",
-                wits: "WITS"
+                wits: "WITS",
+                witsml: "WITSML"
             },
             extensionValueType: {
                 string: 'value.string',
@@ -439,6 +433,22 @@ export default angular.module('tempus.types', [])
                     value: "cert.PEM",
                     name: "extension.pem"
                 }
+            },
+            witsmlVersions: {
+              v1411: "1.4.1.1",
+              v1311: "1.3.1.1"
+            },
+            witsmlObjectTypes: {
+              wellbore: "Wellbore",
+                log: "Logs",
+                mudLogs: "Mudlogs",
+                message: "Messages",
+                rig: "Rig",
+                trajectory: "Trajectory"
+            },
+            witsmlWellStatus: {
+                active: "Active",
+                drilling: "Drilling"
             },
             extensionOpcSecurityTypes: {
                 Basic128Rsa15: "Basic128Rsa15",

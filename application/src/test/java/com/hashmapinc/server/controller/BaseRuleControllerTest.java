@@ -28,14 +28,12 @@ import com.hashmapinc.server.common.data.page.TextPageData;
 import com.hashmapinc.server.common.data.page.TextPageLink;
 import com.hashmapinc.server.common.data.plugin.PluginMetaData;
 import com.hashmapinc.server.common.data.rule.RuleMetaData;
-import com.hashmapinc.server.common.data.security.Authority;
 import com.hashmapinc.server.extensions.core.plugin.telemetry.TelemetryStoragePlugin;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import com.hashmapinc.server.common.data.*;
 import com.hashmapinc.server.dao.computations.ComputationsService;
 
 import java.io.IOException;
@@ -49,8 +47,6 @@ public abstract class BaseRuleControllerTest extends AbstractControllerTest {
     private IdComparator<RuleMetaData> idComparator = new IdComparator<>();
 
     private static final ObjectMapper mapper = new ObjectMapper();
-    private Tenant savedTenant;
-    private User tenantAdmin;
     private PluginMetaData sysPlugin;
     private PluginMetaData tenantPlugin;
 
@@ -68,19 +64,7 @@ public abstract class BaseRuleControllerTest extends AbstractControllerTest {
         sysPlugin.setClazz(TelemetryStoragePlugin.class.getName());
         sysPlugin = doPost("/api/plugin", sysPlugin, PluginMetaData.class);
 
-        Tenant tenant = new Tenant();
-        tenant.setTitle("My tenant");
-        savedTenant = doPost("/api/tenant", tenant, Tenant.class);
-        Assert.assertNotNull(savedTenant);
-
-        tenantAdmin = new User();
-        tenantAdmin.setAuthority(Authority.TENANT_ADMIN);
-        tenantAdmin.setTenantId(savedTenant.getId());
-        tenantAdmin.setEmail("tenant2@tempus.org");
-        tenantAdmin.setFirstName("Joe");
-        tenantAdmin.setLastName("Downs");
-
-        tenantAdmin = createUserAndLogin(tenantAdmin, "testPassword1");
+        loginTenantAdmin();
 
         tenantPlugin = new PluginMetaData();
         tenantPlugin.setName("My plugin");
@@ -93,9 +77,6 @@ public abstract class BaseRuleControllerTest extends AbstractControllerTest {
     @After
     public void afterTest() throws Exception {
         loginSysAdmin();
-
-        doDelete("/api/tenant/" + savedTenant.getId().getId().toString())
-                .andExpect(status().isOk());
 
         doDelete("/api/plugin/" + sysPlugin.getId().getId()).andExpect(status().isOk());
     }
@@ -119,60 +100,6 @@ public abstract class BaseRuleControllerTest extends AbstractControllerTest {
         Assert.assertNotNull(savedRule.getId());
         Assert.assertTrue(savedRule.getCreatedTime() > 0);
         Assert.assertEquals(savedTenant.getId(), savedRule.getTenantId());
-    }
-
-    @Test
-    public void testDeleteRuleAndUpdateApplication() throws Exception {
-        RuleMetaData rule = createRuleMetaData(tenantPlugin);
-        RuleMetaData savedRule = doPost("/api/rule", rule, RuleMetaData.class);
-        RuleMetaData foundRule = doGet("/api/rule/" + savedRule.getId().getId().toString(), RuleMetaData.class);
-        Assert.assertNotNull(foundRule);
-
-        Application application = new Application();
-        application.setName("My Application");
-        application.setDeviceTypes(mapper.readTree("{\"deviceTypes\":[{\"name\":\"DT1\"}]}"));
-        application.setAdditionalInfo(mapper.readTree("{\n" +
-                "\" additionalInfo\": {\n" +
-                "\"description\": \"string\"\n" +
-                "}\n" +
-                "}"));
-
-        Application savedApplication = doPost("/api/application", application, Application.class);
-
-
-        Dashboard dashboard = new Dashboard();
-        dashboard.setTitle("My Dashboard");
-        Dashboard savedDashboard = doPost("/api/dashboard", dashboard, Dashboard.class);
-        String dashboardType = "mini";
-        doPost("/api/dashboard/"+dashboardType+"/"+savedDashboard.getId().getId().toString()
-                +"/application/"+savedApplication.getId().getId().toString(), Application.class);
-
-
-        Computations savedComputations = saveComputation();
-        ComputationJob computationJob1 = new ComputationJob();
-        computationJob1.setName("Computation Job 1");
-        computationJob1.setJobId("0123");
-        ComputationJob savedComputationJob1 = doPost("/api/computations/"+savedComputations.getId().getId().toString()+"/jobs", computationJob1, ComputationJob.class);
-        ApplicationFieldsWrapper applicationComputationJosWrapper = new ApplicationFieldsWrapper();
-        applicationComputationJosWrapper.setApplicationId(savedApplication.getId().getId().toString());
-        applicationComputationJosWrapper.setFields(new HashSet<>(Arrays.asList(savedComputationJob1.getId().toString())));
-        doPostWithDifferentResponse("/api/app/assignComputationJobs", applicationComputationJosWrapper, Application.class);
-
-        ApplicationFieldsWrapper applicationRulesWrapper = new ApplicationFieldsWrapper();
-        applicationRulesWrapper.setApplicationId(savedApplication.getId().getId().toString());
-        applicationRulesWrapper.setFields(new HashSet<>(Arrays.asList(savedRule.getId().getId().toString())));
-
-        Application assignedApplication = doPostWithDifferentResponse("/api/app/assignRules", applicationRulesWrapper, Application.class);
-        Assert.assertEquals(new HashSet<>(Arrays.asList(savedRule.getId())), assignedApplication.getRules());
-        Assert.assertTrue(assignedApplication.getIsValid());
-
-        doDelete("/api/rule/"+savedRule.getId().getId().toString()).andExpect(status().isOk());
-        doGet("/api/rule/"+savedRule.getId().getId().toString()).andExpect(status().isNotFound());
-
-        Thread.sleep(10000);
-
-        Application foundApplication = doGet("/api/application/" + savedApplication.getId().getId().toString(), Application.class);
-        Assert.assertFalse(foundApplication.getIsValid());
     }
 
 

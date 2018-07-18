@@ -1,0 +1,137 @@
+<!--
+
+    Copyright © 2017-2018 Hashmap, Inc
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+        http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<md-dialog aria-label="New Datamodel Object" style="min-width: 600px;" tb-help="'datamodel_object_creation'" help-container-id="help-container">
+  <form ng-submit="vm.addDatamodelObject()">
+    <md-toolbar>
+      <div class="md-toolbar-tools">
+        <h2>New Datamodel Object</h2>
+        <span flex></span>
+        <div id="help-container"></div>
+        <md-button class="md-icon-button" ng-click="vm.cancel()">
+          <ng-md-icon icon="close" aria-label="{{ 'dialog.close' | translate }}"></ng-md-icon>
+        </md-button>
+      </div>
+    </md-toolbar>
+    <md-dialog-content>
+      <md-tabs md-dynamic-height md-stretch-tabs="always" md-border-bottom md-selected="vm.stepperState">
+        <md-tab label="Object Information" ng-click="vm.stepperState = 0">
+          <md-content class="md-padding">
+            <md-input-container class="md-block" ng-keypress="$event.keyCode === 13 && vm.onStepperEnter();">
+              <label>Object Name</label>
+              <input md-maxlength="256" required="" name="Object Name" ng-model="vm.stepperData.name">
+              <div ng-messages="objectStepper.name.$error">
+                <div ng-message="required">This is required.</div>
+                <div ng-message="md-maxlength">The description must be less than 256 characters long.</div>
+              </div>
+            </md-input-container>
+
+            <md-input-container class="md-block" ng-keypress="$event.keyCode === 13 && vm.onStepperEnter();">
+              <label>Description</label>
+              <input md-maxlength="500" md-no-asterisk="" name="description" ng-model="vm.stepperData.desc">
+              <div ng-messages="objectStepper.desc.$error">
+                <div ng-message="required">This is required.</div>
+                <div ng-message="md-maxlength">The description must be less than 500 characters long.</div>
+              </div>
+            </md-input-container>
+
+            <md-input-container style="width:100%;" ng-keypress="$event.keyCode === 13 && vm.onStepperEnter();">
+              <label>Tempus Type</label>
+              <md-select name="tempusType" ng-model="vm.stepperData.type" required>
+                <md-option value="Device">Device</md-option>
+                <md-option value="Asset">Asset</md-option>
+              </md-select>
+              <div class="errors" ng-messages="myForm.favoriteColor.$error">
+                <div ng-message="required">Required</div>
+              </div>
+            </md-input-container>
+          </md-content>
+        </md-tab>
+
+        <md-tab label="Attributes" ng-click="vm.stepperState = 1" ng-disabled="!vm.stepperData.name || !vm.stepperData.type">
+          <md-content class="md-padding">
+            <md-list-item ng-repeat="attrib in vm.stepperData.attributes">
+              <p> {{ attrib }} </p>
+            </md-list-item>
+            
+            <md-input-container class="md-block" ng-keypress="$event.keyCode === 13 && vm.onStepperEnter();">
+              <label>Attribute Name</label>
+              <input md-maxlength="256" md-no-asterisk="" name="attribute" ng-model="vm.stepperData.currentAttribute" ng-keypress="$event.keyCode === 13 && alert('c')">
+              <div ng-messages="objectStepper.attrib.$error">
+                <div ng-message="md-maxlength">The description must be less than 256 characters long.</div>
+              </div>
+            </md-input-container>
+
+            <md-button id="stepperAddAttrButton" ng-click="vm.addDatamodelObjectAttribute()" ng-if="vm.stepperData.currentAttribute">
+              Add
+            </md-button>
+          </md-content>
+        </md-tab>
+
+        <md-tab label="Relationships" ng-click="vm.stepperState = 2" ng-disabled="!vm.stepperData.name || !vm.stepperData.type">
+          <md-content class="md-padding">
+            <md-input-container class="md-block" ng-keypress="$event.keyCode === 13 && vm.onStepperEnter();">
+              <label>Parent</label>
+              <md-select name="tempusType" ng-model="vm.stepperData.parent">
+                <md-option ng-value="null">None</md-option>
+                <md-option ng-repeat="node in vm.datamodelObjects" ng-value="node">{{node.name}}</md-option>
+              </md-select>
+            </md-input-container>
+          </md-content>
+        </md-tab>
+
+        <md-tab label="Review" ng-click="vm.stepperState = 3" ng-disabled="!vm.stepperData.name || !vm.stepperData.type">
+          <md-content class="md-padding">
+            <md-subheader class="md-no-sticky">Datamodel Object</md-subheader>
+            <md-list-item>
+              <p>Name: {{ vm.stepperData.name }} </p>
+            </md-list-item>
+            <md-list-item>
+              <p>Description: {{ vm.stepperData.desc }} </p>
+            </md-list-item>
+            <md-list-item>
+              <p>Type: {{ vm.stepperData.type }} </p>
+            </md-list-item>
+
+            <md-subheader class="md-no-sticky">Object Attributes</md-subheader>
+            <md-list-item ng-repeat="attrib in vm.stepperData.attributes">
+              <p> {{ attrib }} </p>
+            </md-list-item>
+
+            <md-subheader class="md-no-sticky">Relationships</md-subheader>
+            <md-list-item>
+              <p>Parent: {{vm.stepperData.parent ? vm.stepperData.parent.name : "None"}}</p>
+            </md-list-item>
+          </md-content>
+        </md-tab>
+      </md-tabs>
+    </md-dialog-content>
+
+    <md-dialog-actions layout="row">
+      <span flex></span>
+      <md-button ng-click="vm.stepperState = vm.stepperState - 1" ng-if="vm.stepperState > 0" id="stepperBack">
+        Back
+      </md-button>
+      <md-button ng-click="vm.stepperState = vm.stepperState + 1" style="margin-right:20px;" ng-if="3 > vm.stepperState" ng-disabled="!vm.stepperData.name || !vm.stepperData.type" id="stepperNext">
+         Next
+      </md-button>
+      <md-button type="submit" style="margin-right:20px;" ng-if="3 === vm.stepperState" id="stepperSubmit">
+         Submit
+      </md-button>
+    </md-dialog-actions>
+  </form>
+</md-dialog>

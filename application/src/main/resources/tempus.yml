@@ -32,6 +32,25 @@ server:
     # Alias that identifies the key in the key store
     key-alias: "${SSL_KEY_ALIAS:tomcat}"
 
+
+security:
+  oauth2:
+    client:
+      clientId: "${TEMPUS_CLIENT_ID:tempus}"
+      clientSecret: "${TEMPUS_CLIENT_SECRET:tempus}"
+      accessTokenUri: "${ACCESS_TOKEN_URI:${IDENTITY_BASE_URL:http://localhost:9002/uaa}/oauth/token}"
+      user-authorization-uri: "${AUTHORIZATION_URI:${IDENTITY_BASE_URL:http://localhost:9002/uaa}/oauth/authorize}"
+      #grant-type: "${TEMPUS_CLIENT_GRANT_TYPE:password}"
+      scope: ["server"]
+    resource:
+      resource-id: "${TEMPUS_RESOURCE_API_ID:tempus-resource-server-rest-api}"
+      tokenInfoUri: "${TOKEN_INFO_URI:${IDENTITY_BASE_URL:http://localhost:9002/uaa}/oauth/check_token}"
+
+identity:
+  url: "${IDENTITY_SERVICE_URL:${IDENTITY_BASE_URL:http://localhost:9002/uaa}/users}"
+
+#security.jwt.tokenSigningKey: "${JWT_TOKEN_SIGNING_KEY:hashmapIncDefaultSigningKey}"
+
 ldap:
   authentication-enabled: "${LDAP_AUTHENTICATION_ENABLED:false}"
   authentication-server: "${LDAP_AUTH_SERVER:ldap://openldap:389}"
@@ -346,7 +365,6 @@ audit_log:
       "user": "${AUDIT_LOG_MASK_USER:W}"
       "rule": "${AUDIT_LOG_MASK_RULE:W}"
       "plugin": "${AUDIT_LOG_MASK_PLUGIN:W}"
-      "application": "${AUDIT_LOG_MASK_PLUGIN:W}"
       "computation": "${AUDIT_LOG_MASK_PLUGIN:W}"
       "computation_job": "${AUDIT_LOG_MASK_PLUGIN:W}"
   sink:

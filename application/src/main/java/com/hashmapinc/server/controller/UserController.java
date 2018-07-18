@@ -15,10 +15,20 @@
  */
 package com.hashmapinc.server.controller;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.hashmapinc.server.requests.CreateUserRequest;
+import com.hashmapinc.server.requests.IdentityUser;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import com.hashmapinc.server.common.data.EntityType;
 import com.hashmapinc.server.common.data.User;
@@ -34,6 +44,7 @@ import com.hashmapinc.server.exception.TempusErrorCode;
 import com.hashmapinc.server.exception.TempusException;
 import com.hashmapinc.server.service.mail.MailService;
 import com.hashmapinc.server.service.security.model.SecurityUser;
+import org.springframework.web.client.RestTemplate;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -45,8 +56,16 @@ public class UserController extends BaseController {
     public static final String USER_ID = "userId";
     public static final String YOU_DON_T_HAVE_PERMISSION_TO_PERFORM_THIS_OPERATION = "You don't have permission to perform this operation!";
     public static final String ACTIVATE_URL_PATTERN = "%s/api/noauth/activate?activateToken=%s";
+
+    @Value("${identity.url}")
+    private String identityUrl;
+
     @Autowired
     private MailService mailService;
+
+    @Autowired
+    @Qualifier("clientRestTemplate")
+    private RestTemplate restTemplate;
 
     @PreAuthorize("hasAnyAuthority('SYS_ADMIN', 'TENANT_ADMIN', 'CUSTOMER_USER')")
     @RequestMapping(value = "/user/{userId}", method = RequestMethod.GET)
@@ -80,29 +99,16 @@ public class UserController extends BaseController {
                 throw new TempusException(YOU_DON_T_HAVE_PERMISSION_TO_PERFORM_THIS_OPERATION,
                         TempusErrorCode.PERMISSION_DENIED);
             }
-            boolean sendEmail = user.getId() == null && activationType.equals("mail");
-            boolean isNewExternal = user.getId() == null && activationType.equals("external");
+            //boolean sendEmail = user.getId() == null && activationType.equals("mail");
+            //boolean isNewExternal = user.getId() == null && activationType.equals("external");
             if (getCurrentUser().getAuthority() == Authority.TENANT_ADMIN) {
                 user.setTenantId(getCurrentUser().getTenantId());
             }
             User savedUser;
-            if (sendEmail) {
-                savedUser = checkNotNull(userService.saveUser(user));
-                UserCredentials userCredentials = userService.findUserCredentialsByUserId(savedUser.getId());
-                String baseUrl = constructBaseUrl(request);
-                String activateUrl = String.format(ACTIVATE_URL_PATTERN, baseUrl,
-                        userCredentials.getActivateToken());
-                String email = savedUser.getEmail();
-                try {
-                    mailService.sendActivationEmail(activateUrl, email);
-                } catch (TempusException e) {
-                    userService.deleteUser(savedUser.getId());
-                    throw e;
-                }
-            } else if(isNewExternal) {
-                savedUser = userService.saveExternalUser(user);
-            } else {
-                savedUser = checkNotNull(userService.saveUser(user));
+            if(user.getId() == null){
+                savedUser = createUser(user, activationType, request);
+            }else{
+                savedUser = updateUser(user);
             }
 
             logEntityAction(savedUser.getId(), savedUser,
@@ -117,6 +123,48 @@ public class UserController extends BaseController {
 
             throw handleException(e);
         }
+    }
+
+    private User updateUser(@RequestBody User user) throws TempusException {
+        ResponseEntity<IdentityUser> response = restTemplate.exchange(identityUrl + "/" +user.getId(),
+                HttpMethod.PUT, new HttpEntity<>(new IdentityUser(user)), IdentityUser.class);
+        User savedUser;
+        if(response.getStatusCode().equals(HttpStatus.OK)) {
+            savedUser = response.getBody().toUser();
+        }else{
+            throw new TempusException(response.getBody().toString(), TempusErrorCode.GENERAL);
+        }
+        return savedUser;
+    }
+
+    private User createUser(@RequestBody User user, @RequestParam String activationType, HttpServletRequest request) throws TempusException, com.fasterxml.jackson.core.JsonProcessingException {
+        boolean sendEmail = user.getId() == null && activationType.equals("mail");
+        ObjectMapper mapper = new ObjectMapper();
+        CreateUserRequest userRequest = CreateUserRequest.builder().user(new IdentityUser(user)).activationType(activationType).build();
+        User savedUser;
+
+        ResponseEntity<JsonNode> response = restTemplate.postForEntity(identityUrl, userRequest, JsonNode.class);
+
+        if(response.getStatusCode().equals(HttpStatus.CREATED)){
+            JsonNode body = response.getBody();
+            savedUser = checkNotNull(mapper.treeToValue(body.get("user"), IdentityUser.class).toUser());
+
+            if (sendEmail) {
+                String baseUrl = constructBaseUrl(request);
+                String activateUrl = String.format(ACTIVATE_URL_PATTERN, baseUrl,
+                        response.getBody().get("activationToken").asText());
+                String email = savedUser.getEmail();
+                try {
+                    mailService.sendActivationEmail(activateUrl, email);
+                } catch (TempusException e) {
+                    userService.deleteUser(savedUser.getId());
+                    throw e;
+                }
+            }
+        }else{
+            throw new TempusException(response.getBody().asText(), TempusErrorCode.GENERAL);
+        }
+        return savedUser;
     }
 
     @PreAuthorize("hasAnyAuthority('SYS_ADMIN', 'TENANT_ADMIN')")
@@ -155,15 +203,23 @@ public class UserController extends BaseController {
                 throw new TempusException(YOU_DON_T_HAVE_PERMISSION_TO_PERFORM_THIS_OPERATION,
                         TempusErrorCode.PERMISSION_DENIED);
             }
-            User user = checkUserId(userId);
-            UserCredentials userCredentials = userService.findUserCredentialsByUserId(user.getId());
-            if (!userCredentials.isEnabled()) {
-                String baseUrl = constructBaseUrl(request);
-                String activateUrl = String.format(ACTIVATE_URL_PATTERN, baseUrl,
-                        userCredentials.getActivateToken());
-                return activateUrl;
-            } else {
-                throw new TempusException("User is already active!", TempusErrorCode.BAD_REQUEST_PARAMS);
+            String userGetUrl = identityUrl + "/" + userId.getId();
+            ResponseEntity<IdentityUser> response = restTemplate.getForEntity(userGetUrl, IdentityUser.class);
+            if(response.getStatusCode().equals(HttpStatus.OK)){
+                IdentityUser identityUser = response.getBody();
+                if (!identityUser.isEnabled()) {
+                    String baseUrl = constructBaseUrl(request);
+                    String activationToken = restTemplate.getForObject(userGetUrl + "/activation-token", String.class);
+                    if(!StringUtils.isEmpty(activationToken)){
+                        return String.format(ACTIVATE_URL_PATTERN, baseUrl, activationToken);
+                    }else{
+                        throw new TempusException("Error while getting Activation token", TempusErrorCode.GENERAL);
+                    }
+                } else {
+                    throw new TempusException("User is already active!", TempusErrorCode.BAD_REQUEST_PARAMS);
+                }
+            }else{
+                throw new TempusException("Error while getting user", TempusErrorCode.GENERAL);
             }
         } catch (Exception e) {
             throw handleException(e);

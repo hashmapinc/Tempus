@@ -16,8 +16,9 @@
 package com.hashmapinc.server.dao.service.nosql;
 
 import com.hashmapinc.server.dao.service.BaseUserServiceTest;
+import com.hashmapinc.server.dao.service.BaseUserSettingsServiceTest;
 import com.hashmapinc.server.dao.service.DaoNoSqlTest;
 
 @DaoNoSqlTest
-public class UserSettingsServiceNoSqlTest extends BaseUserServiceTest {
+public class UserSettingsServiceNoSqlTest extends BaseUserSettingsServiceTest {
 }

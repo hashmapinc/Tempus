@@ -76,6 +76,7 @@ public class TenantServiceImpl extends AbstractEntityService implements TenantSe
     @Autowired
     private PluginService pluginService;
 
+
     @Override
     public Tenant findTenantById(TenantId tenantId) {
         log.trace("Executing findTenantById [{}]", tenantId);

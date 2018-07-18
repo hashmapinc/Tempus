@@ -23,14 +23,15 @@ import com.hashmapinc.server.extensions.core.plugin.telemetry.sub.*;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import com.hashmapinc.server.common.data.DataConstants;
-import com.hashmapinc.server.common.data.kv.*;
 import com.hashmapinc.server.common.msg.cluster.ServerAddress;
 import com.hashmapinc.server.extensions.api.plugins.PluginCallback;
 import com.hashmapinc.server.extensions.core.plugin.telemetry.handlers.TelemetryWebsocketMsgHandler;
-import com.hashmapinc.server.extensions.core.plugin.telemetry.sub.*;
 
 import java.util.*;
 import java.util.function.Function;
+
+import static com.hashmapinc.server.extensions.core.plugin.telemetry.handlers.TelemetryWebsocketMsgHandler.FAILED_TO_FETCH_TIME_ZONE_ATTRIBUTE;
+import static com.hashmapinc.server.extensions.core.plugin.telemetry.handlers.TelemetryWebsocketMsgHandler.TIME_ZONE_OFFSET;
 
 
 @Slf4j
@@ -57,13 +58,6 @@ public class SubscriptionManager {
         } else {
             log.trace("[{}] Registering local subscription [{}] for device [{}]", sessionId, sub.getSubscriptionId(), entityId);
             subscription = new Subscription(sub, true);
-            /*if(sub.getType() == SubscriptionType.DEPTHSERIES) {
-                depthSubscriptionState = (DepthSubscriptionState) sub;
-                subscription = new DepthSubscription(sub,true,depthSubscriptionState);
-            }
-            else {
-                subscription = new Subscription(sub, true);
-            }*/
         }
         registerSubscription(sessionId, entityId, subscription);
     }
@@ -198,24 +192,56 @@ public class SubscriptionManager {
         Set<Subscription> deviceSubscriptions = subscriptionsByEntityId.get(entityId);
         if (deviceSubscriptions != null) {
             deviceSubscriptions.stream().filter(s -> type == s.getType()).forEach(s -> {
-                log.debug("\n Inside foreach " + s);
                 String sessionId = s.getWsSessionId();
                 List<TsKvEntry> subscriptionUpdate = f.apply(s);
                 if (!subscriptionUpdate.isEmpty()) {
                     log.debug("subscriptionId TS " + s.getSubscriptionId());
-                    SubscriptionUpdate update = new SubscriptionUpdate(s.getSubscriptionId(), subscriptionUpdate);
-                    if (s.isLocal()) {
-                        updateSubscriptionState(sessionId, s, update);
-                        log.debug("on local update for ts "+update);
-                        websocketHandler.sendWsMsg(ctx, sessionId, update);
-                    } else {
-                        rpcHandler.onSubscriptionUpdate(ctx, s.getServer(), sessionId, update);
+                    if (type == SubscriptionType.ATTRIBUTES){
+                        long timeZoneDiff = 0;
+                        for (TsKvEntry entry: subscriptionUpdate) {
+                            if (entry.getKey().contentEquals(TIME_ZONE_OFFSET)) {
+                                timeZoneDiff = entry.getTs();
+                                break;
+                            }
+                        }
+                        if (timeZoneDiff != 0)
+                            websocketHandler.sendWsMsg(ctx, sessionId, new SubscriptionUpdate(s.getSubscriptionId(), subscriptionUpdate, timeZoneDiff));
+                        else
+                            ctx.loadAttribute(entityId, DataConstants.CLIENT_SCOPE, TIME_ZONE_OFFSET, getTimeZoneAttributeCallback(s, sessionId, subscriptionUpdate));
                     }
+                    else
+                        ctx.loadAttribute(entityId, DataConstants.CLIENT_SCOPE, TIME_ZONE_OFFSET, getTimeZoneAttributeCallback(s, sessionId, subscriptionUpdate));
                 }
             });
         } else {
             log.debug("[{}] No device subscriptions to process!", entityId);
         }
+    }
+
+    private PluginCallback<Optional<AttributeKvEntry>> getTimeZoneAttributeCallback(final Subscription s, final String sessionId, List<TsKvEntry> data) {
+        return new PluginCallback<Optional<AttributeKvEntry>>() {
+            @Override
+            public void onSuccess(PluginContext ctx, Optional<AttributeKvEntry> attributeKvEntry) {
+                if (s.isLocal()) {
+                    if (attributeKvEntry.isPresent()) {
+                        websocketHandler.sendWsMsg(ctx, sessionId, new SubscriptionUpdate(s.getSubscriptionId(), data, attributeKvEntry.get().getLongValue().get()));
+                    } else {
+                        websocketHandler.sendWsMsg(ctx, sessionId, new SubscriptionUpdate(s.getSubscriptionId(), data));
+                    }
+                } else {
+                    SubscriptionUpdate update = new SubscriptionUpdate(s.getSubscriptionId(), data);
+                    rpcHandler.onSubscriptionUpdate(ctx, s.getServer(), sessionId, update);
+                }
+            }
+
+            @Override
+            public void onFailure(PluginContext ctx, Exception e) {
+                log.error(FAILED_TO_FETCH_TIME_ZONE_ATTRIBUTE, e);
+                SubscriptionUpdate update = new SubscriptionUpdate(s.getSubscriptionId(), SubscriptionErrorCode.INTERNAL_ERROR,
+                        FAILED_TO_FETCH_TIME_ZONE_ATTRIBUTE);
+                websocketHandler.sendWsMsg(ctx, sessionId, update);
+            }
+        };
     }
 
     public void onLocalSubscriptionUpdateForDepth(PluginContext ctx, EntityId entityId, SubscriptionType type, Function<Subscription<Double>, List<DsKvEntry>> f) {

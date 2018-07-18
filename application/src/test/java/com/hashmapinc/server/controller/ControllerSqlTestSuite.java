@@ -15,10 +15,14 @@
  */
 package com.hashmapinc.server.controller;
 
+import com.github.tomakehurst.wiremock.junit.WireMockClassRule;
+import com.hashmapinc.server.dao.CustomSqlUnit;
 import org.junit.ClassRule;
 import org.junit.extensions.cpsuite.ClasspathSuite;
+import org.junit.rules.RuleChain;
+import org.junit.rules.TestRule;
 import org.junit.runner.RunWith;
-import com.hashmapinc.server.dao.CustomSqlUnit;
+import org.springframework.cloud.contract.wiremock.WireMockSpring;
 
 import java.util.Arrays;
 
@@ -28,11 +32,16 @@ import java.util.Arrays;
         })
 public class ControllerSqlTestSuite {
 
-    @ClassRule
-    public static CustomSqlUnit sqlUnit = new CustomSqlUnit(
-            Arrays.asList("sql/schema.sql", "sql/system-data.sql"),
+    private static WireMockClassRule wiremock = new WireMockClassRule(
+            WireMockSpring.options().port(9002));
+
+    private static CustomSqlUnit sqlUnit = new CustomSqlUnit(
+            Arrays.asList("sql/hsql/schema.sql", "sql/system-data.sql"),
             "sql/drop-all-tables.sql",
             "sql-test.properties",
-            Arrays.asList("sql/upgrade/1.sql", "sql/upgrade/2.sql", "sql/upgrade/3.sql")
-    );
+            Arrays.asList("sql/hsql/upgrade/1.sql" , "sql/hsql/upgrade/2.sql", "sql/hsql/upgrade/3.sql"));
+
+    @ClassRule
+    public static TestRule ruleChain = RuleChain.outerRule(wiremock)
+            .around(sqlUnit);
 }

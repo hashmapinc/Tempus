@@ -16,6 +16,8 @@
 package com.hashmapinc.server.common.data;
 
 
+import com.hashmapinc.server.common.data.security.Authority;
+
 public class DataConstants {
 
     public static final String SYSTEM = "SYSTEM";
@@ -38,4 +40,11 @@ public class DataConstants {
 
     public static final String ONEWAY = "ONEWAY";
     public static final String TWOWAY = "TWOWAY";
+
+    public static final String SYS_ADMIN_DEFAULT_PERMISSION = Authority.SYS_ADMIN.name() + ":*:*";
+    public static final String TENANT_ADMIN_DEFAULT_PERMISSION = Authority.TENANT_ADMIN.name() + ":*:*";
+    public static final String CUSTOMER_USER_DEFAULT_ASSET_READ_PERMISSION = Authority.CUSTOMER_USER.name() + ":" + EntityType.ASSET.name() + ":READ";
+    public static final String CUSTOMER_USER_DEFAULT_ASSET_UPDATE_PERMISSION = Authority.CUSTOMER_USER.name() + ":" + EntityType.ASSET.name() + ":UPDATE";
+    public static final String CUSTOMER_USER_DEFAULT_DEVICE_READ_PERMISSION = Authority.CUSTOMER_USER.name() + ":" + EntityType.DEVICE.name() + ":READ";
+    public static final String CUSTOMER_USER_DEFAULT_DEVICE_UPDATE_PERMISSION = Authority.CUSTOMER_USER.name() + ":" + EntityType.DEVICE.name() + ":UPDATE";
 }

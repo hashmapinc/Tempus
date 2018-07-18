@@ -19,9 +19,11 @@ import com.hashmapinc.server.common.data.computation.KubelessComputationMetadata
 import com.hashmapinc.server.dao.model.ModelConstants;
 import com.hashmapinc.server.dao.model.nosql.KubelessComputationMetadataEntity;
 import com.hashmapinc.server.dao.nosql.CassandraAbstractModelDao;
+import com.hashmapinc.server.dao.util.NoSqlDao;
 import org.springframework.stereotype.Service;
 
 @Service
+@NoSqlDao
 public class CassandraKubelessComputationMdRepo extends CassandraAbstractModelDao<KubelessComputationMetadataEntity, KubelessComputationMetadata> {
     @Override
     protected Class<KubelessComputationMetadataEntity> getColumnFamilyClass() {

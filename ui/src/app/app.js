@@ -77,8 +77,8 @@ import tempusApiUiConfiguration from './api/ui-configuration.service';
 import tempusClusterInfo from './api/cluster-info.service';
 import tempusApiComputation from './api/computation.service';
 import tempusApiComputationJob from './api/computation-job.service';
-import tempusTempusboard from './tempusboard';
-import tempusApplications from './applications';
+import tempusDataModels from './data_models';
+import tempusMetadata from './metadata';
 import tempusApiAuditLog from './api/audit-log.service';
 
 import 'typeface-roboto';
@@ -146,8 +146,8 @@ angular.module('tempus', [
     tempusClusterInfo,
     tempusApiComputation,
     tempusApiComputationJob,
-    tempusTempusboard,
-    tempusApplications,
+    tempusDataModels,
+    tempusMetadata,
     tempusApiAuditLog,
     uiRouter])
     .config(AppConfig)

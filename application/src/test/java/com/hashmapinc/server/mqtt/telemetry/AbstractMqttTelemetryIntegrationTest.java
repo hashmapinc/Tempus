@@ -16,6 +16,7 @@
 package com.hashmapinc.server.mqtt.telemetry;
 
 import com.cirruslink.sparkplug.message.SparkplugBPayloadEncoder;
+import com.cirruslink.sparkplug.message.model.MetaData;
 import com.cirruslink.sparkplug.message.model.Metric;
 import com.cirruslink.sparkplug.message.model.SparkplugBPayload;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -38,7 +39,6 @@ import static com.cirruslink.sparkplug.message.model.MetricDataType.String;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-
 @Slf4j
 public abstract class AbstractMqttTelemetryIntegrationTest extends AbstractControllerTest {
 
@@ -48,7 +48,6 @@ public abstract class AbstractMqttTelemetryIntegrationTest extends AbstractContr
     private String accessToken;
     private Device savedGatewayDevice;
     private String gatewayAccessToken;
-    private TenantId tenantId;
     @Autowired
     private DeviceService deviceService;
 
@@ -75,7 +74,6 @@ public abstract class AbstractMqttTelemetryIntegrationTest extends AbstractContr
         JsonNode additionalInfo = mapper.readTree("{\"gateway\":true}");
         gatewayDevice.setAdditionalInfo(additionalInfo);
         savedGatewayDevice = doPost("/api/device", gatewayDevice, Device.class);
-        tenantId = savedGatewayDevice.getTenantId();
 
         DeviceCredentials gatewayDeviceCredentials =
                 doGet("/api/device/" + savedGatewayDevice.getId().getId().toString() + "/credentials", DeviceCredentials.class);
@@ -116,6 +114,37 @@ public abstract class AbstractMqttTelemetryIntegrationTest extends AbstractContr
         assertEquals("true", values.get("key2").get(0).get("value"));
         assertEquals("3.0", values.get("key3").get(0).get("value"));
         assertEquals("4", values.get("key4").get(0).get("value"));
+    }
+
+    @Test
+    public void testPushMqttWithMetaDataJson() throws Exception {
+        String clientId = MqttAsyncClient.generateClientId();
+        MqttAsyncClient client = new MqttAsyncClient(MQTT_URL, clientId);
+
+        MqttConnectOptions options = new MqttConnectOptions();
+        options.setUserName(accessToken);
+        client.connect(options);
+        Thread.sleep(3000);
+        MqttMessage message = new MqttMessage();
+        message.setPayload("{\"values\":{\"humidity\":{\"unit\":\"%\",\"value\":15.616},\"viscosity\":{\"unit\":\"cgs\",\"value\":0.158}},\"ts\":1526804557313}".getBytes());
+        client.publish("v1/devices/me/telemetry", message);
+
+        String deviceId = savedDevice.getId().getId().toString();
+
+        Thread.sleep(1000);
+        List<String> actualKeys = doGetAsync("/api/plugins/telemetry/DEVICE/" + deviceId +  "/keys/timeseries", List.class);
+        Set<String> actualKeySet = new HashSet<>(actualKeys);
+
+        List<String> expectedKeys = Arrays.asList("humidity", "viscosity");
+        Set<String> expectedKeySet = new HashSet<>(expectedKeys);
+
+        assertEquals(expectedKeySet, actualKeySet);
+
+        String getTelemetryValuesUrl = "/api/plugins/telemetry/DEVICE/" + deviceId +  "/values/timeseries?keys=" + java.lang.String.join(",", actualKeySet);
+        Map<String, List<Map<String, String>>> values = doGetAsync(getTelemetryValuesUrl, Map.class);
+
+        assertEquals("15.616", values.get("humidity").get(0).get("value"));
+        assertEquals("0.158", values.get("viscosity").get(0).get("value"));
     }
 
     @Test
@@ -160,6 +189,16 @@ public abstract class AbstractMqttTelemetryIntegrationTest extends AbstractContr
         try {
             List<Metric> metrics = new ArrayList<Metric>();
             metrics.add(new Metric.MetricBuilder("key1", String, "value1").createMetric());
+            //Setting meta data unit
+            MetaData metaData = new MetaData.MetaDataBuilder()
+                    .contentType("json")
+                    .size(12L)
+                    .seq(0L)
+                    .fileName("none")
+                    .fileType("none")
+                    .md5("none")
+                    .description("{\"unit\":\"unit\"}").createMetaData();
+            metrics.get(0).setMetaData(metaData);
             metrics.add(new Metric.MetricBuilder("key2", String, "value2").createMetric());
             SparkplugBPayload payload = new SparkplugBPayload(
                     new Date(),

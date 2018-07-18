@@ -34,8 +34,6 @@ import org.springframework.web.multipart.MultipartFile;
 import com.hashmapinc.server.common.data.id.TenantId;
 import com.hashmapinc.server.common.data.page.TextPageData;
 import com.hashmapinc.server.common.data.security.Authority;
-import com.hashmapinc.server.dao.computations.ComputationJobService;
-import com.hashmapinc.server.dao.computations.ComputationsService;
 import com.hashmapinc.server.dao.model.ModelConstants;
 import com.hashmapinc.server.exception.TempusErrorCode;
 import com.hashmapinc.server.exception.TempusException;
@@ -70,12 +68,6 @@ public class ComputationsController extends BaseController {
 
     @Autowired
     private ComputationDiscoveryService computationDiscoveryService;
-
-    @Autowired
-    private ComputationsService computationsService;
-
-    @Autowired
-    private ComputationJobService computationJobService;
 
     @PreAuthorize("hasAuthority('TENANT_ADMIN')")
     @RequestMapping(value = "/computations/upload", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)

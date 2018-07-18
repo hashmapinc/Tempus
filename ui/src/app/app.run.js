@@ -31,6 +31,9 @@ export default function AppRun($rootScope, $window, $injector, $location, $log, 
     var forbiddenDialog = null;
 
     $rootScope.iframeMode = false;
+    $rootScope.logo = '';
+    $rootScope.fileType = '';
+
 
     if (frame) {
         $rootScope.iframeMode = true;
@@ -42,6 +45,7 @@ export default function AppRun($rootScope, $window, $injector, $location, $log, 
     }
     getdefaultTheme();
     initWatchers();
+    getLogo();
 
     function getdefaultTheme() {
         var promise =  userService.getActivetheme();
@@ -49,10 +53,27 @@ export default function AppRun($rootScope, $window, $injector, $location, $log, 
             promise.then(function success(theme) {
                  $rootScope.theme = theme.themeValue;
                  $rootScope.themeName = theme.themeName;
+                }
+            )
+        }
+    }
+
+    function getLogo() {
+        var promise =  userService.getLogo();
+        if(promise) {
+            promise.then(function success(logo) {
+
+                    if(logo != '') {
+                        $rootScope.logo = logo.file;
+                        $rootScope.fileType = angular.lowercase(logo.name.substr(logo.name.lastIndexOf('.')+1));
+
+                    }
+
                 },
             )
         }
     }
+
 
     function initWatchers() {
         $rootScope.unauthenticatedHandle = $rootScope.$on('unauthenticated', function (event, doLogout) {

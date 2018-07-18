@@ -39,40 +39,16 @@ public abstract class BaseWidgetTypeControllerTest extends AbstractControllerTes
 
     private IdComparator<WidgetType> idComparator = new IdComparator<>();
 
-    private Tenant savedTenant;
     private WidgetsBundle savedWidgetsBundle;
-    private User tenantAdmin;
 
     @Before
     public void beforeTest() throws Exception {
-        loginSysAdmin();
-
-        Tenant tenant = new Tenant();
-        tenant.setTitle("My tenant");
-        savedTenant = doPost("/api/tenant", tenant, Tenant.class);
-        Assert.assertNotNull(savedTenant);
-
-        tenantAdmin = new User();
-        tenantAdmin.setAuthority(Authority.TENANT_ADMIN);
-        tenantAdmin.setTenantId(savedTenant.getId());
-        tenantAdmin.setEmail("tenant2@tempus.org");
-        tenantAdmin.setFirstName("Joe");
-        tenantAdmin.setLastName("Downs");
-
-        tenantAdmin = createUserAndLogin(tenantAdmin, "testPassword1");
+        loginTenantAdmin();
 
         WidgetsBundle widgetsBundle = new WidgetsBundle();
         widgetsBundle.setTitle("My widgets bundle");
         savedWidgetsBundle = doPost("/api/widgetsBundle", widgetsBundle, WidgetsBundle.class);
 
-    }
-
-    @After
-    public void afterTest() throws Exception {
-        loginSysAdmin();
-
-        doDelete("/api/tenant/"+savedTenant.getId().getId().toString())
-                .andExpect(status().isOk());
     }
 
     @Test

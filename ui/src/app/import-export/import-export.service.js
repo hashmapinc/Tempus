@@ -25,7 +25,7 @@ import entityAliasesTemplate from '../entity/alias/entity-aliases.tpl.html';
 
 /*@ngInject*/
 export default function ImportExport($log, $translate, $q, $mdDialog, $document, $http, itembuffer, utils, types,
-                                     dashboardUtils, entityService, dashboardService, pluginService, ruleService,
+                                     dashboardUtils, entityService, dashboardService, adminService, pluginService, ruleService,
                                      widgetService, toast, attributeService,computationService, $window) {
 
 
@@ -45,7 +45,10 @@ export default function ImportExport($log, $translate, $q, $mdDialog, $document,
         importComputation: importComputation,
         exportExtension: exportExtension,
         importExtension: importExtension,
-        exportToPc: exportToPc
+        exportToPc: exportToPc,
+        importLogo:importLogo,
+        exportAttribute:exportAttribute,
+        convertToCSV:convertToCSV
     };
 
     return service;
@@ -238,6 +241,30 @@ export default function ImportExport($log, $translate, $q, $mdDialog, $document,
             }
         );
     }
+
+    function importLogo($event) {
+        var deferred = $q.defer();
+        openImportDialog($event, 'admin.import', 'admin.logo-file').then(
+            function success(importData) {
+                //return false;
+                adminService.uploadLogo(importData.file).then(
+                    function success(response) {
+
+                        deferred.resolve(response);
+
+                    },
+                    function fail() {
+                        deferred.reject();
+                    }
+                );
+            },
+            function fail() {
+                deferred.reject();
+            }
+        );
+        return deferred.promise;
+    }
+
 
     function importRule($event) {
         var deferred = $q.defer();
@@ -841,6 +868,71 @@ export default function ImportExport($log, $translate, $q, $mdDialog, $document,
         }
     }
 
+    function exportAttribute(data, headers, filename) {
+        if (!data) {
+            $log.error('No data');
+            return;
+        }
+
+        if (headers) {
+            data.unshift(headers);
+        }
+
+        if (!filename) {
+            filename = 'download.csv';
+        }
+
+         var jsonObject = angular.toJson(data);
+
+         var csv = convertToCSV(jsonObject);
+        var blob = new Blob([csv], {type: 'text/csv'});
+
+        // FOR IE:
+
+        if (window.navigator && window.navigator.msSaveOrOpenBlob) {
+            window.navigator.msSaveOrOpenBlob(blob, filename);
+        }
+        else{
+            var e = document.createEvent('MouseEvents'),
+                a = document.createElement('a');
+
+            a.download = filename;
+            a.href = window.URL.createObjectURL(blob);
+            a.dataset.downloadurl = ['text/csv', a.download, a.href].join(':');
+            e.initEvent('click', true, false, window,
+                0, 0, 0, 0, 0, false, false, false, false, 0, null);
+            a.dispatchEvent(e);
+        }
+    }
+
+
+    function convertToCSV(objArray) {
+        var array = typeof objArray != 'object' ? angular.fromJson(objArray) : objArray;
+        var str = '';
+
+        for (var i = 0; i < array.length; i++) {
+            var line = '';
+            for (var index in array[i]) {
+                if (line != '') line += ','
+
+                //var value = array[i][index];
+               // if(value.toString().indexOf("{") == 0) {
+
+                   var value = array[i][index] + "";
+                   line += '"' + value.replace(/"/g, '""') + '",';
+
+               /// } else {
+
+                   //  line += value;
+               // }
+
+            }
+
+            str += line + '\r\n';
+        }
+
+        return str;
+    }
     function openImportDialog($event, importTitle, importFileLabel) {
         var deferred = $q.defer();
         $mdDialog.show({

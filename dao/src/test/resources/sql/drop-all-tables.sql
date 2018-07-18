@@ -21,13 +21,11 @@ DROP TABLE IF EXISTS ds_kv_latest;
 DROP TABLE IF EXISTS user_credentials;
 DROP TABLE IF EXISTS widget_type;
 DROP TABLE IF EXISTS widgets_bundle;
-DROP TABLE IF EXISTS application;
-DROP TABLE IF EXISTS application_device_types;
-DROP TABLE IF EXISTS application_associated_rules;
-DROP TABLE IF EXISTS application_associated_computation_jobs;
 DROP TABLE IF EXISTS computations;
 DROP TABLE IF EXISTS computation_job;
 DROP TABLE IF EXISTS installed_schema_versions;
 DROP TABLE IF EXISTS node_metric;
 DROP TABLE IF EXISTS theme;
-
+DROP TABLE IF EXISTS logo;
+DROP TABLE IF EXISTS data_model_object;
+DROP TABLE IF EXISTS attribute_definition;

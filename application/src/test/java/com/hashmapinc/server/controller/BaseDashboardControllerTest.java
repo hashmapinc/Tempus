@@ -20,7 +20,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 
 import java.io.IOException;
-import java.util.*;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -34,10 +33,9 @@ import com.hashmapinc.server.common.data.computation.ComputationJob;
 import com.hashmapinc.server.common.data.computation.ComputationType;
 import com.hashmapinc.server.common.data.computation.SparkComputationMetadata;
 import com.hashmapinc.server.common.data.page.TextPageLink;
-import com.hashmapinc.server.exception.TempusException;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.junit.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import com.hashmapinc.server.common.data.*;
 import com.hashmapinc.server.common.data.computation.Computations;
 import com.hashmapinc.server.common.data.id.ComputationId;
 import com.hashmapinc.server.common.data.id.CustomerId;
@@ -51,10 +49,6 @@ import com.hashmapinc.server.common.data.page.TimePageLink;
 
 import com.hashmapinc.server.common.data.security.Authority;
 import com.hashmapinc.server.dao.computations.ComputationsService;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.hashmapinc.server.extensions.core.plugin.telemetry.TelemetryStoragePlugin;
@@ -63,8 +57,6 @@ public abstract class BaseDashboardControllerTest extends AbstractControllerTest
     
     private IdComparator<DashboardInfo> idComparator = new IdComparator<>();
     private static final ObjectMapper mapper = new ObjectMapper();
-    private Tenant savedTenant;
-    private User tenantAdmin;
     private PluginMetaData tenantPlugin;
 
     @Autowired
@@ -72,21 +64,7 @@ public abstract class BaseDashboardControllerTest extends AbstractControllerTest
     
     @Before
     public void beforeTest() throws Exception {
-        loginSysAdmin();
-        
-        Tenant tenant = new Tenant();
-        tenant.setTitle("My tenant");
-        savedTenant = doPost("/api/tenant", tenant, Tenant.class);
-        Assert.assertNotNull(savedTenant);
-        
-        tenantAdmin = new User();
-        tenantAdmin.setAuthority(Authority.TENANT_ADMIN);
-        tenantAdmin.setTenantId(savedTenant.getId());
-        tenantAdmin.setEmail("tenant2@tempus.org");
-        tenantAdmin.setFirstName("Joe");
-        tenantAdmin.setLastName("Downs");
-        
-        tenantAdmin = createUserAndLogin(tenantAdmin, "testPassword1");
+        loginTenantAdmin();
 
         tenantPlugin = new PluginMetaData();
         tenantPlugin.setName("My plugin");
@@ -96,15 +74,7 @@ public abstract class BaseDashboardControllerTest extends AbstractControllerTest
         tenantPlugin = doPost("/api/plugin", tenantPlugin, PluginMetaData.class);
 
     }
-    
-    @After
-    public void afterTest() throws Exception {
-        loginSysAdmin();
-        
-        doDelete("/api/tenant/"+savedTenant.getId().getId().toString())
-        .andExpect(status().isOk());
-    }
-    
+
     @Test
     public void testSaveDashboard() throws Exception {
         Dashboard dashboard = new Dashboard();
@@ -124,34 +94,10 @@ public abstract class BaseDashboardControllerTest extends AbstractControllerTest
         Assert.assertEquals(foundDashboard.getTitle(), savedDashboard.getTitle());
     }
 
-   private Customer createCustomer() throws Exception {
-       Customer customer = new Customer();
-       customer.setTitle("Customer");
-       customer.setTenantId(savedTenant.getId());
-       return customer;
-   }
-
-   private Customer saveCustomer(Customer customer) throws Exception {
-       Customer savedCustomer = doPost("/api/customer", customer, Customer.class);
-       return savedCustomer;
-   }
-
-   private User createCustomerUser(Customer Customer) throws Exception {
-       User customerUser = new User();
-       customerUser.setAuthority(Authority.CUSTOMER_USER);
-       customerUser.setTenantId(savedTenant.getId());
-       customerUser.setCustomerId(Customer.getId());
-       customerUser.setEmail("customer@tempus.org");
-       return customerUser;
-   }
-
     @Test
     public void testSaveDashboardByCustomer() throws Exception {
 
-        Customer customer = createCustomer();
-        Customer savedCustomer = saveCustomer(customer);
-        User customerUser = createCustomerUser(savedCustomer);
-        createUserAndLogin(customerUser, "testPassword1");
+        loginCustomerUser();
 
         Dashboard dashboard = new Dashboard();
         dashboard.setTitle("My dashboard");
@@ -171,15 +117,6 @@ public abstract class BaseDashboardControllerTest extends AbstractControllerTest
         Dashboard foundDashboard = doGet("/api/dashboard/" + savedDashboard.getId().getId().toString(), Dashboard.class);
         Assert.assertEquals(foundDashboard.getTitle(), savedDashboard.getTitle());
 
-        deleteSavedCustomer(savedCustomer);
-
-    }
-
-    private void deleteSavedCustomer(Customer savedCustomer) throws  Exception {
-        logout();
-        login(tenantAdmin.getEmail(), "testPassword1");
-        doDelete("/api/customer/"+savedCustomer.getId().getId().toString())
-                .andExpect(status().isOk());
     }
     
     @Test
@@ -192,61 +129,6 @@ public abstract class BaseDashboardControllerTest extends AbstractControllerTest
         Assert.assertEquals(savedDashboard, foundDashboard);
     }
 
-    @Test
-    public void testDeleteDashboardAndUpdateApplication() throws Exception {
-        Dashboard dashboard = new Dashboard();
-        dashboard.setTitle("My dashboard");
-        Dashboard savedDashboard = doPost("/api/dashboard", dashboard, Dashboard.class);
-
-        Application application = new Application();
-        application.setName("My Application");
-        application.setDeviceTypes(mapper.readTree("{\"deviceTypes\":[{\"name\":\"DT1\"}]}"));
-        application.setAdditionalInfo(mapper.readTree("{\n" +
-                "\" additionalInfo\": {\n" +
-                "\"description\": \"string\"\n" +
-                "}\n" +
-                "}"));
-
-        Application savedApplication = doPost("/api/application", application, Application.class);
-
-
-        Computations savedComputations = saveComputation();
-        ComputationJob computationJob1 = new ComputationJob();
-        computationJob1.setName("Computation Job 1");
-        computationJob1.setJobId("0123");
-        ComputationJob savedComputationJob1 = doPost("/api/computations/"+savedComputations.getId().getId().toString()+"/jobs", computationJob1, ComputationJob.class);
-        ApplicationFieldsWrapper applicationComputationJosWrapper = new ApplicationFieldsWrapper();
-        applicationComputationJosWrapper.setApplicationId(savedApplication.getId().getId().toString());
-        applicationComputationJosWrapper.setFields(new HashSet<>(Arrays.asList(savedComputationJob1.getId().toString())));
-        doPostWithDifferentResponse("/api/app/assignComputationJobs", applicationComputationJosWrapper, Application.class);
-
-
-        RuleMetaData rule = createRuleMetaData(tenantPlugin);
-        RuleMetaData savedRule = doPost("/api/rule", rule, RuleMetaData.class);
-        RuleMetaData foundRule = doGet("/api/rule/" + savedRule.getId().getId().toString(), RuleMetaData.class);
-        Assert.assertNotNull(foundRule);
-        ApplicationFieldsWrapper applicationRulesWrapper = new ApplicationFieldsWrapper();
-        applicationRulesWrapper.setApplicationId(savedApplication.getId().getId().toString());
-        applicationRulesWrapper.setFields(new HashSet<>(Arrays.asList(savedRule.getId().getId().toString())));
-        doPostWithDifferentResponse("/api/app/assignRules", applicationRulesWrapper, Application.class);
-
-        String dashboardType = "mini";
-        Application assignedApplication = doPost("/api/dashboard/"+dashboardType+"/"+savedDashboard.getId().getId().toString()
-                +"/application/"+savedApplication.getId().getId().toString(), Application.class);
-        Assert.assertEquals(savedDashboard.getId(), assignedApplication.getMiniDashboardId());
-        Assert.assertTrue(assignedApplication.getIsValid());
-
-        doDelete("/api/dashboard/"+savedDashboard.getId().getId().toString())
-                .andExpect(status().isOk());
-
-        doGet("/api/dashboard/"+savedDashboard.getId().getId().toString())
-                .andExpect(status().isNotFound());
-
-        Thread.sleep(10000);
-
-        Application foundApplication = doGet("/api/application/" + savedApplication.getId().getId().toString(), Application.class);
-        Assert.assertFalse(foundApplication.getIsValid());
-    }
 
     @Test
     public void testDeleteDashboard() throws Exception {
@@ -323,14 +205,15 @@ public abstract class BaseDashboardControllerTest extends AbstractControllerTest
         tenantAdmin2.setEmail("tenant3@tempus.org");
         tenantAdmin2.setFirstName("Joe");
         tenantAdmin2.setLastName("Downs");
-        
+
+        stubUser(tenantAdmin2, "testPassword1");
         tenantAdmin2 = createUserAndLogin(tenantAdmin2, "testPassword1");
         
         Customer customer = new Customer();
         customer.setTitle("Different customer");
         Customer savedCustomer = doPost("/api/customer", customer, Customer.class);
 
-        login(tenantAdmin.getEmail(), "testPassword1");
+        loginTenantAdmin();
         
         Dashboard dashboard = new Dashboard();
         dashboard.setTitle("My dashboard");

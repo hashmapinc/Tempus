@@ -212,20 +212,6 @@ function Menu(userService, $state, $rootScope) {
                             icon: 'home'
                         },
                         {
-                            name: 'Applications',
-                            type: 'link',
-                            state: 'home.applications',
-                            icon: 'dashboards',
-                            link: '/static/svg/applicationslightgray.svg'
-                        },
-                        {
-                            name: 'Tempusboard',
-                            type: 'link',
-                            state: 'home.tempusboard',
-                            icon: 'dashboards',
-                            link: '/static/svg/tempusboardlightgray.svg'
-                        },
-                        {
                             name: 'plugin.plugins',
                             type: 'link',
                             state: 'home.plugins',
@@ -274,6 +260,14 @@ function Menu(userService, $state, $rootScope) {
                             icon: 'data_models',
                             link: '/static/svg/data-models-icon.svg'
                         },
+                        {
+                            name: 'metadata.metadata',
+                            type: 'link',
+                            state: 'home.metadata',
+                            icon: 'metadata',
+                            link: '/static/svg/metadata-icon.svg'
+                        },
+
                         {
                             name: 'dashboard.dashboards',
                             type: 'link',
@@ -337,13 +331,12 @@ function Menu(userService, $state, $rootScope) {
                                 ]
                             },
                             {
-                                name: 'Tempusboard',
+                                name: 'audit-log.audit',
                                 places: [
                                     {
-                                        name: 'Tempusboard',
-                                        icon: 'dashboard',
-                                        state: 'home.tempusboard',
-                                        link: '/static/svg/tempusboardlightgray.svg'
+                                        name: 'audit-log.audit-logs',
+                                        icon: 'track_changes',
+                                        state: 'home.auditLogs'
                                     }
                                 ]
                             },
@@ -376,15 +369,17 @@ function Menu(userService, $state, $rootScope) {
                                 ]
                             },
                             {
-                                name: 'audit-log.audit',
+                                name: 'metadata.metadata',
                                 places: [
                                     {
-                                        name: 'audit-log.audit-logs',
-                                        icon: 'track_changes',
-                                        state: 'home.auditLogs'
+                                        name: 'metadata.metadata',
+                                        icon: 'metadata',
+                                        link: '/static/svg/metadata-icon.svg',
+                                        state: 'home.metadata'
                                     }
                                 ]
-                            }];
+                            }
+                           ];
 
                 } else if (authority === 'CUSTOMER_USER') {
                     sections = [
@@ -393,13 +388,6 @@ function Menu(userService, $state, $rootScope) {
                             type: 'link',
                             state: 'home.links',
                             icon: 'home'
-                        },
-                        {
-                            name: 'Tempusboard',
-                            type: 'link',
-                            icon: 'dashboard',
-                            state: 'home.tempusboard',
-                            link: '/static/svg/tempusboardlightgray.svg'
                         },
                         {
                             name: 'device.devices',
@@ -447,17 +435,6 @@ function Menu(userService, $state, $rootScope) {
                                         icon: 'dashboard',
                                         state: 'home.dashboards',
                                         link: '/static/svg/dashboardlightgray.svg'
-                                    }
-                                ]
-                            },
-                            {
-                                name: 'tempusboard.view-tempusboard',
-                                places: [
-                                    {
-                                        name: 'Tempusboard',
-                                        icon: 'dashboard',
-                                        state: 'home.tempusboard',
-                                        link: '/static/svg/tempusboardlightgray.svg'
                                     }
                                 ]
                             }

@@ -25,10 +25,7 @@ import com.hashmapinc.server.common.data.page.TextPageData;
 import com.hashmapinc.server.common.data.page.TextPageLink;
 import com.hashmapinc.server.common.data.security.Authority;
 import org.apache.commons.lang3.RandomStringUtils;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.*;
 import com.hashmapinc.server.common.data.Tenant;
 import com.hashmapinc.server.common.data.id.CustomerId;
 import com.hashmapinc.server.dao.model.ModelConstants;
@@ -45,34 +42,9 @@ public abstract class BaseAssetControllerTest extends AbstractControllerTest {
 
     private IdComparator<Asset> idComparator = new IdComparator<>();
 
-    private Tenant savedTenant;
-    private User tenantAdmin;
-
     @Before
     public void beforeTest() throws Exception {
-        loginSysAdmin();
-
-        Tenant tenant = new Tenant();
-        tenant.setTitle("My tenant");
-        savedTenant = doPost("/api/tenant", tenant, Tenant.class);
-        Assert.assertNotNull(savedTenant);
-
-        tenantAdmin = new User();
-        tenantAdmin.setAuthority(Authority.TENANT_ADMIN);
-        tenantAdmin.setTenantId(savedTenant.getId());
-        tenantAdmin.setEmail("tenant2@tempus.org");
-        tenantAdmin.setFirstName("Joe");
-        tenantAdmin.setLastName("Downs");
-
-        tenantAdmin = createUserAndLogin(tenantAdmin, "testPassword1");
-    }
-
-    @After
-    public void afterTest() throws Exception {
-        loginSysAdmin();
-
-        doDelete("/api/tenant/"+savedTenant.getId().getId().toString())
-                .andExpect(status().isOk());
+        loginTenantAdmin();
     }
 
     @Test
@@ -133,10 +105,9 @@ public abstract class BaseAssetControllerTest extends AbstractControllerTest {
                 new TypeReference<List<EntitySubtype>>(){});
 
         Assert.assertNotNull(assetTypes);
-        Assert.assertEquals(3, assetTypes.size());
-        Assert.assertEquals("typeA", assetTypes.get(0).getType());
-        Assert.assertEquals("typeB", assetTypes.get(1).getType());
-        Assert.assertEquals("typeC", assetTypes.get(2).getType());
+        Assert.assertTrue(assetTypes.stream().filter(a -> a.getType().equalsIgnoreCase("typeA")).count() == 1);
+        Assert.assertTrue(assetTypes.stream().filter(a -> a.getType().equalsIgnoreCase("typeB")).count() == 1);
+        Assert.assertTrue(assetTypes.stream().filter(a -> a.getType().equalsIgnoreCase("typeC")).count() == 1);
     }
 
     @Test
@@ -177,10 +148,6 @@ public abstract class BaseAssetControllerTest extends AbstractControllerTest {
         asset.setName("My asset");
         asset.setType("default");
         Asset savedAsset = doPost("/api/asset", asset, Asset.class);
-
-        Customer customer = new Customer();
-        customer.setTitle("My customer");
-        Customer savedCustomer = doPost("/api/customer", customer, Customer.class);
 
         Asset assignedAsset = doPost("/api/customer/" + savedCustomer.getId().getId().toString()
                 + "/asset/" + savedAsset.getId().getId().toString(), Asset.class);
@@ -224,14 +191,14 @@ public abstract class BaseAssetControllerTest extends AbstractControllerTest {
         tenantAdmin2.setEmail("tenant3@tempus.org");
         tenantAdmin2.setFirstName("Joe");
         tenantAdmin2.setLastName("Downs");
-
-        tenantAdmin2 = createUserAndLogin(tenantAdmin2, "testPassword1");
+        stubUser(tenantAdmin2, "testPassword1");
+        createUserAndLogin(tenantAdmin2, "testPassword1");
 
         Customer customer = new Customer();
         customer.setTitle("Different customer");
         Customer savedCustomer = doPost("/api/customer", customer, Customer.class);
 
-        login(tenantAdmin.getEmail(), "testPassword1");
+        loginTenantAdmin();
 
         Asset asset = new Asset();
         asset.setName("My asset");
@@ -441,10 +408,7 @@ public abstract class BaseAssetControllerTest extends AbstractControllerTest {
 
     @Test
     public void testFindCustomerAssets() throws Exception {
-        Customer customer = new Customer();
-        customer.setTitle("Test customer");
-        customer = doPost("/api/customer", customer, Customer.class);
-        CustomerId customerId = customer.getId();
+        CustomerId customerId = savedCustomer.getId();
 
         List<Asset> assets = new ArrayList<>();
         for (int i=0;i<128;i++) {
@@ -476,10 +440,7 @@ public abstract class BaseAssetControllerTest extends AbstractControllerTest {
 
     @Test
     public void testFindCustomerAssetsByName() throws Exception {
-        Customer customer = new Customer();
-        customer.setTitle("Test customer");
-        customer = doPost("/api/customer", customer, Customer.class);
-        CustomerId customerId = customer.getId();
+        CustomerId customerId = savedCustomer.getId();
 
         String title1 = "Asset title 1";
         List<Asset> assetsTitle1 = new ArrayList<>();
@@ -566,10 +527,7 @@ public abstract class BaseAssetControllerTest extends AbstractControllerTest {
 
     @Test
     public void testFindCustomerAssetsByType() throws Exception {
-        Customer customer = new Customer();
-        customer.setTitle("Test customer");
-        customer = doPost("/api/customer", customer, Customer.class);
-        CustomerId customerId = customer.getId();
+        CustomerId customerId = savedCustomer.getId();
 
         String title1 = "Asset title 1";
         String type1 = "typeC";

@@ -1,0 +1,221 @@
+<!--
+
+    Copyright © 2017-2018 Hashmap, Inc
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+        http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<md-card class="extension-form extension-witsml">
+    <md-card-title>
+        <md-card-title-text>
+            <span translate class="md-headline">extension.configuration</span>
+        </md-card-title-text>
+    </md-card-title>
+    <md-card-content>
+        <v-accordion id="witsml-server-configs-accordion" class="vAccordion--default" onexpand="expandValidation(index, id)" oncollapse="collapseValidation(index, id)">
+            <v-pane id="witsml-servers-pane" expanded="true">
+                <v-pane-header>
+                    {{ 'extension.witsml-server' | translate }}
+                </v-pane-header>
+                <v-pane-content>
+                    <div ng-if="configuration.servers.length === 0">
+                        <span translate layout-align="center center" class="tb-prompt">extension.witsml-add-server-prompt</span>
+                    </div>
+                    <div ng-if="configuration.servers.length > 0">
+                        <ol class="list-group">
+                            <li class="list-group-item" ng-repeat="(serverIndex, server) in configuration.servers">
+                                <md-button aria-label="{{ 'action.remove' | translate }}"
+                                           class="md-icon-button"
+                                           ng-click="removeItem(server, configuration.servers)"
+                                           ng-hide="configuration.servers.length < 2">
+                                    <ng-md-icon icon="close" aria-label="{{ 'action.remove' | translate }}"></ng-md-icon>
+                                    <md-tooltip md-direction="top">
+                                        {{ 'action.remove' | translate }}
+                                    </md-tooltip>
+                                </md-button>
+                                <md-card>
+                                    <md-card-content>
+                                        <div layout="row">
+                                            <md-input-container flex="50" class="md-block">
+                                                <label translate>extension.host</label>
+                                                <input required name="host_{{serverIndex}}" ng-model="server.host">
+                                                <div ng-messages="theForm['host_' + serverIndex].$error">
+                                                    <div translate ng-message="required">extension.field-required</div>
+                                                </div>
+                                            </md-input-container>
+
+                                            <md-input-container flex="50" class="md-block">
+                                                <label translate>extension.port</label>
+                                                <input type="number"
+                                                       required
+                                                       name="port_{{serverIndex}}"
+                                                       ng-model="server.port"
+                                                       min="1"
+                                                       max="65535"
+                                                >
+                                                <div ng-messages="theForm['port_' + serverIndex].$error">
+                                                    <div translate
+                                                         ng-message="required"
+                                                    >extension.field-required</div>
+                                                    <div translate
+                                                         ng-message="min"
+                                                    >extension.port-range</div>
+                                                    <div translate
+                                                         ng-message="max"
+                                                    >extension.port-range</div>
+                                                </div>
+                                            </md-input-container>
+                                        </div>
+                                        <div layout="row">
+
+                                            <md-input-container flex="50" class="md-block">
+                                                <label translate>extension.witsml-low-frquency-in-seconds</label>
+                                                <input type="number"
+                                                       required
+                                                       name="lowFrequencyInSeconds_{{serverIndex}}"
+                                                       ng-model="server.lowFrequencyInSeconds">
+                                                <div ng-messages="theForm['lowFrequencyInSeconds_' + serverIndex].$error">
+                                                    <div translate
+                                                         ng-message="required"
+                                                    >extension.field-required</div>
+                                                </div>
+                                            </md-input-container>
+                                            <md-input-container flex="50" class="md-block">
+                                                <label translate>extension.witsml-high-frquency-in-millis</label>
+                                                <input type="number"
+                                                       required
+                                                       name="highFrequencyInMillis_{{serverIndex}}"
+                                                       ng-model="server.highFrequencyInMillis">
+                                                <div ng-messages="theForm['highFrequencyInMillis_' + serverIndex].$error">
+                                                    <div translate
+                                                         ng-message="required"
+                                                    >extension.field-required</div>
+                                                </div>
+                                            </md-input-container>
+                                        </div>
+                                        <div layout="row">
+                                            <md-input-container flex="50" class="md-block">
+                                                <label translate>extension.timeout</label>
+                                                <input type="number"
+                                                       required name="timeoutInMillis_{{serverIndex}}"
+                                                       ng-model="server.timeoutInMillis"
+                                                >
+                                                <div ng-messages="theForm['timeoutInMillis_' + serverIndex].$error">
+                                                    <div translate
+                                                         ng-message="required"
+                                                    >extension.field-required</div>
+                                                </div>
+                                            </md-input-container>
+                                            <md-input-container flex="50" class="md-block tb-container-for-select">
+                                                <label translate>extension.witsml-status</label>
+                                                <md-select required
+                                                           name="wellStatus_{{serverIndex}}"
+                                                           ng-model="server.wellStatus">
+                                                    <md-option ng-value="statusType"
+                                                               ng-repeat="(statusType, statusValue) in types.witsmlWellStatus"
+                                                    ><span ng-bind="::statusValue"></span></md-option>
+                                                </md-select>
+                                                <div ng-messages="theForm['wellStatus_' + serverIndex].$error">
+                                                    <div translate
+                                                         ng-message="required"
+                                                    >extension.field-required</div>
+                                                </div>
+                                            </md-input-container>
+                                        </div>
+                                        <div layout="row">
+                                            <md-input-container flex="50" class="md-block" md-is-error="theForm['identityUsername_' + serverIndex].$touched && theForm['identityUsername_' + serverIndex].$invalid">
+                                                <label translate>extension.username</label>
+                                                <input required
+                                                       name="identityUsername_{{serverIndex}}"
+                                                       ng-model="server.identity.username"
+                                                >
+                                                <div ng-messages="theForm['identityUsername_' + serverIndex].$error">
+                                                    <div translate
+                                                         ng-message="required"
+                                                    >extension.field-required</div>
+                                                </div>
+                                            </md-input-container>
+
+                                            <md-input-container flex="50" class="md-block" md-is-error="theForm['identityPassword_' + serverIndex].$touched && theForm['identityPassword_' + serverIndex].$invalid">
+                                                <label translate>extension.password</label>
+                                                <input type="password" required
+                                                       name="identityPassword_{{serverIndex}}" ng-model="server.identity.password">
+                                                <div ng-messages="theForm['identityPassword_' + serverIndex].$error">
+                                                    <div translate
+                                                         ng-message="required"
+                                                    >extension.field-required</div>
+                                                </div>
+                                            </md-input-container>
+                                        </div>
+                                        <div layout="row">
+                                            <md-input-container flex="40" class="md-block tb-container-for-select">
+                                                <label translate>extension.witsml-version</label>
+                                                <md-select required
+                                                           name="version_{{serverIndex}}"
+                                                           ng-model="server.version">
+                                                    <md-option ng-value="version"
+                                                               ng-repeat="(version, versionValue) in types.witsmlVersions"
+                                                    ><span ng-bind="::versionValue"></span></md-option>
+                                                </md-select>
+                                                <div ng-messages="theForm['version_' + serverIndex].$error">
+                                                    <div translate
+                                                         ng-message="required"
+                                                    >extension.field-required</div>
+                                                </div>
+                                            </md-input-container>
+                                            <md-input-container flex="60" class="md-block tb-container-for-select">
+                                                <label translate>extension.witsml-object-types</label>
+                                                <md-select required
+                                                           multiple="true"
+                                                           name="objectTypes_{{serverIndex}}"
+                                                           ng-model="server.objectTypes">
+                                                    <md-option ng-value="objectType"
+                                                               ng-repeat="(objectType, objectTypeValue) in types.witsmlObjectTypes"
+                                                    ><span ng-bind="::objectTypeValue"></span></md-option>
+                                                </md-select>
+                                                <div ng-messages="theForm['objectTypes_' + serverIndex].$error">
+                                                    <div translate
+                                                         ng-message="required"
+                                                    >extension.field-required</div>
+                                                </div>
+                                            </md-input-container>
+                                        </div>
+                                        <div layout="row">
+                                            <md-input-container flex="100" class="md-block">
+                                                <label translate>extension.witsml-well-id</label>
+                                                <input name="wellIdToBeScan_{{serverIndex}}"
+                                                       ng-model="server.wellIdToBeScan"
+                                                >
+                                            </md-input-container>
+                                        </div>
+                                    </md-card-content>
+                                </md-card>
+                            </li>
+                        </ol>
+                        <div flex
+                             layout="row"
+                             layout-align="start center">
+                            <md-button class="md-primary md-raised"
+                                       ng-click="addServer(configuration.servers)"
+                                       aria-label="{{ 'action.add' | translate }}">
+                                <md-icon class="material-icons">add</md-icon>
+                                <span translate>extension.witsml-add-server</span>
+                            </md-button>
+                        </div>
+                    </div>
+                </v-pane-content>
+            </v-pane>
+        </v-accordion>
+        <!--{{config}}-->
+    </md-card-content>
+</md-card>

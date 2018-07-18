@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.hashmapinc.server.service.security.model.token;
+/*package com.hashmapinc.server.service.security.model.token;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
@@ -56,9 +56,9 @@ public class JwtTokenFactory {
         this.settings = settings;
     }
 
-    /**
+    *//**
      * Factory method for issuing new JWT Tokens.
-     */
+     *//*
     public AccessJwtToken createAccessJwtToken(SecurityUser securityUser) {
         if (StringUtils.isBlank(securityUser.getEmail()))
             throw new IllegalArgumentException("Cannot create JWT Token without username/email");
@@ -168,4 +168,4 @@ public class JwtTokenFactory {
         return securityUser;
     }
 
-}
+}*/

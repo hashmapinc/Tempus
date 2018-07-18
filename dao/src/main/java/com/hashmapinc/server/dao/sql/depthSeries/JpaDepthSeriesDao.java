@@ -202,7 +202,7 @@ public class JpaDepthSeriesDao extends JpaAbstractDaoListeningExecutorService im
                 entityId.getEntityType(),
                 UUIDConverter.fromTimeUUID(entityId.getId()),key);
         DsKvEntry result;
-        if (entries.get(0) != null) {
+        if (entries.size() > 0) {
             result = DaoUtil.getData(entries.get(0));
         } else {
             result = new BasicDsKvEntry(0.0, new StringDataEntry(key, null));
