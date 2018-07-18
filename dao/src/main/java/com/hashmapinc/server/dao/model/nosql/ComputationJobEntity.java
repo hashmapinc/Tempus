@@ -65,7 +65,7 @@ public class ComputationJobEntity implements SearchTextEntity<ComputationJob> {
 
     @Override
     public String getSearchTextSource() {
-        return jobName;
+        return getJobName();
     }
 
     public ComputationJobEntity() {
@@ -107,7 +107,11 @@ public class ComputationJobEntity implements SearchTextEntity<ComputationJob> {
         if (o == null || getClass() != o.getClass()) return false;
         if (!super.equals(o)) return false;
 
-        ComputationJobEntity that = (ComputationJobEntity) o;
+        return checkObjEquality((ComputationJobEntity) o);
+    }
+
+    private boolean checkObjEquality(ComputationJobEntity o) {
+        ComputationJobEntity that = o;
         if (jobName != null ? !jobName.equals(that.jobName) : that.jobName != null) return false;
         if (searchText != null ? !searchText.equals(that.searchText) : that.searchText != null) return false;
         if (argParameters != null ? !argParameters.equals(that.argParameters) : that.argParameters != null) return false;

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.hashmapinc.server.dao.timeseries;
+package com.hashmapinc.server.dao.depthseries;
 
 import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Row;
@@ -31,7 +31,7 @@ import java.util.Optional;
  * Created by ashvayka on 20.02.17.
  */
 @Slf4j
-public class AggregatePartitionsFunction implements com.google.common.base.Function<List<ResultSet>, Optional<TsKvEntry>> {
+public class AggregatePartitionsFunction implements com.google.common.base.Function<List<ResultSet>, Optional<DsKvEntry>> {
 
     private static final int LONG_CNT_POS = 0;
     private static final int DOUBLE_CNT_POS = 1;
@@ -44,20 +44,20 @@ public class AggregatePartitionsFunction implements com.google.common.base.Funct
     private static final int STR_POS = 8;
     private static final int JSON_POS = 9;
 
-    private final Aggregation aggregation;
+    private final DepthAggregation depthAggregation;
     private final String key;
-    private final long ts;
+    private final Double ds;
 
-    public AggregatePartitionsFunction(Aggregation aggregation, String key, long ts) {
-        this.aggregation = aggregation;
+    public AggregatePartitionsFunction(DepthAggregation depthAggregation, String key, Double ds) {
+        this.depthAggregation = depthAggregation;
         this.key = key;
-        this.ts = ts;
+        this.ds = ds;
     }
 
     @Override
-    public Optional<TsKvEntry> apply(@Nullable List<ResultSet> rsList) {
+    public Optional<DsKvEntry> apply(@Nullable List<ResultSet> rsList) {
         try {
-            log.trace("[{}][{}][{}] Going to aggregate data", key, ts, aggregation);
+            log.trace("[{}][{}][{}] Going to aggregate data", key, ds, depthAggregation);
             if (rsList == null || rsList.isEmpty()) {
                 return Optional.empty();
             }
@@ -66,12 +66,12 @@ public class AggregatePartitionsFunction implements com.google.common.base.Funct
 
             for (ResultSet rs : rsList) {
                 for (Row row : rs.all()) {
-                    processResultSetRow(row, aggResult);
+                   processResultSetRow(row,aggResult);
                 }
             }
             return processAggregationResult(aggResult);
         }catch (Exception e){
-            log.error("[{}][{}][{}] Failed to aggregate data", key, ts, aggregation, e);
+            log.error("[{}][{}][{}] Failed to aggregate data", key, ds, depthAggregation, e);
             return Optional.empty();
         }
     }
@@ -111,19 +111,51 @@ public class AggregatePartitionsFunction implements com.google.common.base.Funct
             aggResult.dataType = DataType.JSON;
             curCount = jsonCount;
             curJValue = getJsonValue(row);
-        }
-        else {
+        } else {
             return;
         }
 
-        if (aggregation == Aggregation.COUNT) {
+        if (depthAggregation == DepthAggregation.COUNT) {
             aggResult.count += curCount;
-        } else if (aggregation == Aggregation.AVG || aggregation == Aggregation.SUM) {
+        } else if (depthAggregation == DepthAggregation.AVG || depthAggregation == DepthAggregation.SUM) {
             processAvgOrSumAggregation(aggResult, curCount, curLValue, curDValue);
-        } else if (aggregation == Aggregation.MIN) {
+        } else if (depthAggregation == DepthAggregation.MIN) {
             processMinAggregation(aggResult, curLValue, curDValue, curBValue, curSValue, curJValue);
-        } else if (aggregation == Aggregation.MAX) {
+        } else if (depthAggregation == DepthAggregation.MAX) {
             processMaxAggregation(aggResult, curLValue, curDValue, curBValue, curSValue, curJValue);
+        }
+
+    }
+
+    private void processMaxAggregation(AggregationResult aggResult, Long curLValue, Double curDValue, Boolean curBValue, String curSValue, JsonNode curJValue) {
+        if (curDValue != null) {
+            aggResult.dValue = aggResult.dValue == null ? curDValue : Math.max(aggResult.dValue, curDValue);
+        } else if (curLValue != null) {
+            aggResult.lValue = aggResult.lValue == null ? curLValue : Math.max(aggResult.lValue, curLValue);
+        } else if (curBValue != null) {
+            aggResult.bValue = aggResult.bValue == null ? curBValue : aggResult.bValue || curBValue;
+        } else if (curSValue != null) {
+            if (aggResult.sValue == null || curSValue.compareTo(aggResult.sValue) > 0) {
+                aggResult.sValue = curSValue;
+            }
+        } else if (curJValue != null && (aggResult.jValue == null || curJValue.toString().compareTo(aggResult.jValue.toString()) > 0)) {
+            aggResult.jValue = curJValue;
+        }
+    }
+
+    private void processMinAggregation(AggregationResult aggResult, Long curLValue, Double curDValue, Boolean curBValue, String curSValue, JsonNode curJValue) {
+        if (curDValue != null) {
+            aggResult.dValue = aggResult.dValue == null ? curDValue : Math.min(aggResult.dValue, curDValue);
+        } else if (curLValue != null) {
+            aggResult.lValue = aggResult.lValue == null ? curLValue : Math.min(aggResult.lValue, curLValue);
+        } else if (curBValue != null) {
+            aggResult.bValue = aggResult.bValue == null ? curBValue : aggResult.bValue && curBValue;
+        } else if (curSValue != null) {
+            if (aggResult.sValue == null || curSValue.compareTo(aggResult.sValue) < 0) {
+                aggResult.sValue = curSValue;
+            }
+        } else if (curJValue != null && (aggResult.jValue == null || curJValue.toString().compareTo(aggResult.jValue.toString()) < 0)) {
+            aggResult.jValue = curJValue;
         }
     }
 
@@ -136,103 +168,65 @@ public class AggregatePartitionsFunction implements com.google.common.base.Funct
         }
     }
 
-    private void processMinAggregation(AggregationResult aggResult, Long curLValue, Double curDValue, Boolean curBValue, String curSValue, JsonNode curJValue) {
-        if (curDValue != null) {
-            aggResult.dValue = aggResult.dValue == null ? curDValue : Math.min(aggResult.dValue, curDValue);
-        } else if (curLValue != null) {
-            aggResult.lValue = aggResult.lValue == null ? curLValue : Math.min(aggResult.lValue, curLValue);
-        } else if (curBValue != null) {
-            aggResult.bValue = aggResult.bValue == null ? curBValue : aggResult.bValue && curBValue;
-        } else if (curSValue != null && (aggResult.sValue == null || curSValue.compareTo(aggResult.sValue) < 0)) {
-            aggResult.sValue = curSValue;
-        } else if (curJValue != null && (aggResult.jValue == null || curJValue.toString().compareTo(aggResult.jValue.toString()) < 0)) {
-            aggResult.jValue = curJValue;
-        }
-    }
+    private Optional<DsKvEntry> processAggregationResult(AggregationResult aggResult) {
+        Optional<DsKvEntry> result;
 
-    private void processMaxAggregation(AggregationResult aggResult, Long curLValue, Double curDValue, Boolean curBValue, String curSValue, JsonNode curJValue) {
-        if (curDValue != null) {
-            aggResult.dValue = aggResult.dValue == null ? curDValue : Math.max(aggResult.dValue, curDValue);
-        } else if (curLValue != null) {
-            aggResult.lValue = aggResult.lValue == null ? curLValue : Math.max(aggResult.lValue, curLValue);
-        } else if (curBValue != null) {
-            aggResult.bValue = aggResult.bValue == null ? curBValue : aggResult.bValue || curBValue;
-        } else if (curSValue != null && (aggResult.sValue == null || curSValue.compareTo(aggResult.sValue) > 0)) {
-            aggResult.sValue = curSValue;
-        } else if (curJValue != null && (aggResult.jValue == null || curJValue.toString().compareTo(aggResult.jValue.toString()) > 0)) {
-            aggResult.jValue = curJValue;
-        }
-    }
-
-    private Boolean getBooleanValue(Row row) {
-        if (aggregation == Aggregation.MIN || aggregation == Aggregation.MAX) {
-            return row.getBool(BOOL_POS);
-        } else {
-            return null; //NOSONAR, null is used for further comparison
-        }
-    }
-
-    private String getStringValue(Row row) {
-        if (aggregation == Aggregation.MIN || aggregation == Aggregation.MAX) {
-            return row.getString(STR_POS);
-        } else {
-            return null;
-        }
-    }
-
-    private Long getLongValue(Row row) {
-        if (aggregation == Aggregation.MIN || aggregation == Aggregation.MAX
-                || aggregation == Aggregation.SUM || aggregation == Aggregation.AVG) {
-            return row.getLong(LONG_POS);
-        } else {
-            return null;
-        }
-    }
-
-    private Double getDoubleValue(Row row) {
-        if (aggregation == Aggregation.MIN || aggregation == Aggregation.MAX
-                || aggregation == Aggregation.SUM || aggregation == Aggregation.AVG) {
-            return row.getDouble(DOUBLE_POS);
-        } else {
-            return null;
-        }
-    }
-
-    private Optional<TsKvEntry> processAggregationResult(AggregationResult aggResult) {
-        Optional<TsKvEntry> result;
         if (aggResult.dataType == null) {
             result = Optional.empty();
-        } else if (aggregation == Aggregation.COUNT) {
-            result = Optional.of(new BasicTsKvEntry(ts, new LongDataEntry(key, aggResult.count)));
-        } else if (aggregation == Aggregation.AVG || aggregation == Aggregation.SUM) {
+        } else if (depthAggregation == DepthAggregation.COUNT) {
+            result = Optional.of(new BasicDsKvEntry(ds, new LongDataEntry(key, (long) aggResult.count)));
+        } else if (depthAggregation == DepthAggregation.AVG || depthAggregation == DepthAggregation.SUM) {
             result = processAvgOrSumResult(aggResult);
-        } else if (aggregation == Aggregation.MIN || aggregation == Aggregation.MAX) {
-            result = processMinOrMaxResult(aggResult);
-        } else if (aggResult.dataType == DataType.JSON) {
-            return Optional.of(new BasicTsKvEntry(ts, new JsonDataEntry(key, aggResult.jValue)));
-        }
-        else {
+        } else if (depthAggregation == DepthAggregation.MIN || depthAggregation == DepthAggregation.MAX) {
+           result = processMinOrMaxResult(aggResult);
+        } else {
             result = Optional.empty();
         }
+
         if (!result.isPresent()) {
-            log.trace("[{}][{}][{}] Aggregated data is empty.", key, ts, aggregation);
+            log.trace("[{}][{}][{}] Aggregated data is empty.", key, ds, depthAggregation);
         }
         return result;
     }
 
-    private Optional<TsKvEntry> processAvgOrSumResult(AggregationResult aggResult) {
+    private Optional<DsKvEntry> processAvgOrSumResult(AggregationResult aggResult) {
         if (aggResult.count == 0 || (aggResult.dataType == DataType.DOUBLE && aggResult.dValue == null) || (aggResult.dataType == DataType.LONG && aggResult.lValue == null)) {
             return Optional.empty();
         } else if (aggResult.dataType == DataType.DOUBLE) {
-            return Optional.of(new BasicTsKvEntry(ts, new DoubleDataEntry(key, aggregation == Aggregation.SUM ? aggResult.dValue : (aggResult.dValue / aggResult.count))));
+            return Optional.of(new BasicDsKvEntry(ds, new DoubleDataEntry(key, depthAggregation == DepthAggregation.SUM ? aggResult.dValue : (aggResult.dValue / aggResult.count))));
         } else if (aggResult.dataType == DataType.LONG) {
-            return Optional.of(new BasicTsKvEntry(ts, new LongDataEntry(key, aggregation == Aggregation.SUM ? aggResult.lValue : (aggResult.lValue / aggResult.count))));
+            return Optional.of(new BasicDsKvEntry(ds, new LongDataEntry(key, depthAggregation == DepthAggregation.SUM ? aggResult.lValue : (aggResult.lValue / aggResult.count))));
         }
         return Optional.empty();
     }
 
+    private Optional<DsKvEntry> processMinOrMaxResult(AggregationResult aggResult) {
+        if (aggResult.dataType == DataType.DOUBLE) {
+            return Optional.of(new BasicDsKvEntry(ds, new DoubleDataEntry(key, aggResult.dValue)));
+        } else if (aggResult.dataType == DataType.LONG) {
+            return Optional.of(new BasicDsKvEntry(ds, new LongDataEntry(key, aggResult.lValue)));
+        } else if (aggResult.dataType == DataType.STRING) {
+            return Optional.of(new BasicDsKvEntry(ds, new StringDataEntry(key, aggResult.sValue)));
+        } else if (aggResult.dataType == DataType.BOOLEAN){
+            return Optional.of(new BasicDsKvEntry(ds, new BooleanDataEntry(key, aggResult.bValue)));
+        } else if (aggResult.dataType == DataType.JSON) {
+            return Optional.of(new BasicDsKvEntry(ds, new JsonDataEntry(key, aggResult.jValue)));
+        }
+        return Optional.empty();
+    }
+
+
+
+        private Boolean getBooleanValue(Row row) {
+        if (depthAggregation == DepthAggregation.MIN || depthAggregation == DepthAggregation.MAX) {
+            return row.getBool(BOOL_POS);
+        } else {
+            return false;
+        }
+    }
+
     private JsonNode getJsonValue(Row row) {
-        if (aggregation == Aggregation.MIN || aggregation == Aggregation.MAX) {
+        if (depthAggregation == DepthAggregation.MIN || depthAggregation == DepthAggregation.MAX) {
             ObjectMapper mapper = new ObjectMapper();
             try {
                 return mapper.readTree(row.getString(JSON_POS));
@@ -245,15 +239,29 @@ public class AggregatePartitionsFunction implements com.google.common.base.Funct
         }
     }
 
-    private Optional<TsKvEntry> processMinOrMaxResult(AggregationResult aggResult) {
-        if (aggResult.dataType == DataType.DOUBLE) {
-            return Optional.of(new BasicTsKvEntry(ts, new DoubleDataEntry(key, aggResult.dValue)));
-        } else if (aggResult.dataType == DataType.LONG) {
-            return Optional.of(new BasicTsKvEntry(ts, new LongDataEntry(key, aggResult.lValue)));
-        } else if (aggResult.dataType == DataType.STRING) {
-            return Optional.of(new BasicTsKvEntry(ts, new StringDataEntry(key, aggResult.sValue)));
+    private String getStringValue(Row row) {
+        if (depthAggregation == DepthAggregation.MIN || depthAggregation == DepthAggregation.MAX) {
+            return row.getString(STR_POS);
         } else {
-            return Optional.of(new BasicTsKvEntry(ts, new BooleanDataEntry(key, aggResult.bValue)));
+            return null;
+        }
+    }
+
+    private Long getLongValue(Row row) {
+        if (depthAggregation == DepthAggregation.MIN || depthAggregation == DepthAggregation.MAX
+                || depthAggregation == DepthAggregation.SUM || depthAggregation == DepthAggregation.AVG) {
+            return row.getLong(LONG_POS);
+        } else {
+            return null;
+        }
+    }
+
+    private Double getDoubleValue(Row row) {
+        if (depthAggregation == DepthAggregation.MIN || depthAggregation == DepthAggregation.MAX
+                || depthAggregation == DepthAggregation.SUM || depthAggregation == DepthAggregation.AVG) {
+            return row.getDouble(DOUBLE_POS);
+        } else {
+            return null;
         }
     }
 

@@ -25,19 +25,15 @@ import com.hashmapinc.server.common.data.TagMetaData;
 import com.hashmapinc.server.common.data.id.EntityId;
 import com.hashmapinc.server.dao.model.ModelConstants;
 import com.hashmapinc.server.dao.nosql.CassandraAbstractAsyncDao;
-import com.hashmapinc.server.dao.timeseries.TsPartitionDate;
 import com.hashmapinc.server.dao.util.NoSqlDao;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 import static com.hashmapinc.server.dao.model.ModelConstants.*;
@@ -52,32 +48,13 @@ public class CassandraBaseTagMetaDataDao extends CassandraAbstractAsyncDao imple
     public static final String SELECT_PREFIX = "SELECT ";
     public static final String EQUALS_PARAM = " = ? ";
 
-    @Autowired
-    private Environment environment;
-
-    @Value("${cassandra.query.ts_key_value_partitioning}")
-    private String partitioning;
-
     private PreparedStatement latestInsertStmts;
     private PreparedStatement findLatestStmt;
     private PreparedStatement findLatestAllStmt;
 
-    private boolean isInstall() {
-        return environment.acceptsProfiles("install");
-    }
-
     @PostConstruct
     public void init() {
         super.startExecutor();
-        if (!isInstall()) {
-            Optional<TsPartitionDate> partition = TsPartitionDate.parse(partitioning);
-            if (partition.isPresent()) {
-                TsPartitionDate tsFormat = partition.get();
-            } else {
-                log.warn("Incorrect configuration of partitioning {}", partitioning);
-                throw new RuntimeException("Failed to parse partitioning property: " + partitioning + "!");
-            }
-        }
     }
 
     @PreDestroy
@@ -169,7 +146,7 @@ public class CassandraBaseTagMetaDataDao extends CassandraAbstractAsyncDao imple
             }
             return tagMetaDataList;
         }
-        return null;
+        return Collections.emptyList();
     }
 
     private TagMetaData convertToTagMetaDataEntity(EntityId entityId, String key, Row row){

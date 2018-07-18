@@ -103,17 +103,13 @@ public class JpaTimeseriesDao extends JpaAbstractDaoListeningExecutorService imp
                 .stream()
                 .map(query -> findAllAsync(entityId, query))
                 .collect(Collectors.toList());
-        return Futures.transform(Futures.allAsList(futures), new Function<List<List<TsKvEntry>>, List<TsKvEntry>>() {
-            @Nullable
-            @Override
-            public List<TsKvEntry> apply(@Nullable List<List<TsKvEntry>> results) {
+        return Futures.transform(Futures.allAsList(futures),(@Nullable List<List<TsKvEntry>> results)->{
                 if (results == null || results.isEmpty()) {
                     return null;
                 }
                 return results.stream()
                         .flatMap(List::stream)
                         .collect(Collectors.toList());
-            }
         }, service);
     }
 
@@ -131,10 +127,7 @@ public class JpaTimeseriesDao extends JpaAbstractDaoListeningExecutorService imp
                 stepTs = endTs;
             }
             ListenableFuture<List<Optional<TsKvEntry>>> future = Futures.allAsList(futures);
-            return Futures.transform(future, new Function<List<Optional<TsKvEntry>>, List<TsKvEntry>>() {
-                @Nullable
-                @Override
-                public List<TsKvEntry> apply(@Nullable List<Optional<TsKvEntry>> results) {
+            return Futures.transform(future,(@Nullable List<Optional<TsKvEntry>> results)->{
                     if (results == null || results.isEmpty()) {
                         return null;
                     }
@@ -142,7 +135,6 @@ public class JpaTimeseriesDao extends JpaAbstractDaoListeningExecutorService imp
                             .filter(Optional::isPresent)
                             .map(Optional::get)
                             .collect(Collectors.toList());
-                }
             }, service);
         }
     }
@@ -208,18 +200,15 @@ public class JpaTimeseriesDao extends JpaAbstractDaoListeningExecutorService imp
                 listenableFuture.set(tsKvEntity);
             }
         });
-        return Futures.transform(listenableFuture, new Function<TsKvEntity, Optional<TsKvEntry>>() {
-            @Override
-            public Optional<TsKvEntry> apply(@Nullable TsKvEntity entity) {
-                if (entity != null && entity.isNotEmpty()) {
-                    entity.setEntityId(entityIdStr);
-                    entity.setEntityType(entityId.getEntityType());
-                    entity.setKey(key);
-                    entity.setTs(ts);
-                    return Optional.of(DaoUtil.getData(entity));
-                } else {
-                    return Optional.empty();
-                }
+        return Futures.transform(listenableFuture, (Function<TsKvEntity, Optional<TsKvEntry>>) entity1 -> {
+            if (entity1 != null && entity1.isNotEmpty()) {
+                entity1.setEntityId(entityIdStr);
+                entity1.setEntityType(entityId.getEntityType());
+                entity1.setKey(key);
+                entity1.setTs(ts);
+                return Optional.of(DaoUtil.getData(entity1));
+            } else {
+                return Optional.empty();
             }
         });
     }

@@ -18,6 +18,7 @@ package com.hashmapinc.server.dao.model;
 import com.datastax.driver.core.utils.UUIDs;
 import com.hashmapinc.server.common.data.kv.Aggregation;
 import com.hashmapinc.server.common.data.kv.DepthAggregation;
+import com.hashmapinc.server.common.msg.exception.TempusRunTimeException;
 import org.apache.commons.lang3.ArrayUtils;
 import com.hashmapinc.server.common.data.UUIDConverter;
 
@@ -59,7 +60,8 @@ public class ModelConstants {
 
     public static final String INSTALLED_SCHEMA_VERSIONS = "installed_schema_versions";
     public static final String INSTALLED_SCRIPTS_COLUMN = "executed_scripts";
-    public static final String tempus_KEYSPACE = "tempus";
+    public static final String TEMPUS_KEYSPACE = "tempus";
+
 
     /**
      * Cassandra user constants.
@@ -523,11 +525,11 @@ public class ModelConstants {
     protected static final String[] COUNT_AGGREGATION_COLUMNS = new String[]{count(LONG_VALUE_COLUMN), count(DOUBLE_VALUE_COLUMN), count(BOOLEAN_VALUE_COLUMN), count(STRING_VALUE_COLUMN), count(JSON_VALUE_COLUMN)};
 
     protected static final String[] MIN_AGGREGATION_COLUMNS = ArrayUtils.addAll(COUNT_AGGREGATION_COLUMNS,
-            new String[]{min(LONG_VALUE_COLUMN), min(DOUBLE_VALUE_COLUMN), min(BOOLEAN_VALUE_COLUMN), min(STRING_VALUE_COLUMN), min(JSON_VALUE_COLUMN)});
+                                                                                min(LONG_VALUE_COLUMN), min(DOUBLE_VALUE_COLUMN), min(BOOLEAN_VALUE_COLUMN), min(STRING_VALUE_COLUMN), min(JSON_VALUE_COLUMN));
     protected static final String[] MAX_AGGREGATION_COLUMNS = ArrayUtils.addAll(COUNT_AGGREGATION_COLUMNS,
-            new String[]{max(LONG_VALUE_COLUMN), max(DOUBLE_VALUE_COLUMN), max(BOOLEAN_VALUE_COLUMN), max(STRING_VALUE_COLUMN), min(JSON_VALUE_COLUMN)});
+                                                                                max(LONG_VALUE_COLUMN), max(DOUBLE_VALUE_COLUMN), max(BOOLEAN_VALUE_COLUMN), max(STRING_VALUE_COLUMN), min(JSON_VALUE_COLUMN));
     protected static final String[] SUM_AGGREGATION_COLUMNS = ArrayUtils.addAll(COUNT_AGGREGATION_COLUMNS,
-            new String[]{sum(LONG_VALUE_COLUMN), sum(DOUBLE_VALUE_COLUMN)});
+                                                                                sum(LONG_VALUE_COLUMN), sum(DOUBLE_VALUE_COLUMN));
     protected static final String[] AVG_AGGREGATION_COLUMNS = SUM_AGGREGATION_COLUMNS;
 
     public static String min(String s) {
@@ -561,7 +563,7 @@ public class ModelConstants {
             case AVG:
                 return AVG_AGGREGATION_COLUMNS;
             default:
-                throw new RuntimeException("Aggregation type: " + aggregation + " is not supported!");
+                throw new TempusRunTimeException("Aggregation type: " + aggregation + " is not supported!");
         }
     }
 
@@ -580,7 +582,7 @@ public class ModelConstants {
             case AVG:
                 return AVG_AGGREGATION_COLUMNS;
             default:
-                throw new RuntimeException("Aggregation type: " + aggregation + " is not supported!");
+                throw new TempusRunTimeException("Aggregation type: " + aggregation + " is not supported!");
         }
     }
 }

@@ -18,6 +18,7 @@ package com.hashmapinc.server.dao.audit.sink;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.hashmapinc.server.common.data.id.TenantId;
+import com.hashmapinc.server.common.msg.exception.TempusRunTimeException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpEntity;
@@ -91,7 +92,7 @@ public class ElasticsearchAuditLogSink implements AuditLogSink {
             this.restClient = builder.build();
         } catch (Exception e) {
             log.error("Sink init failed!", e);
-            throw new RuntimeException(e.getMessage(), e);
+            throw new TempusRunTimeException(e.getMessage(), e);
         }
     }
 
