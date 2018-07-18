@@ -17,7 +17,9 @@ package com.hashmapinc.kubeless.models.triggers;
 
 import com.google.gson.annotations.SerializedName;
 import com.hashmapinc.kubeless.models.V1beta1AbstractTypeList;
+import lombok.EqualsAndHashCode;
 
+@EqualsAndHashCode
 public class V1beta1CronJobTriggerList extends V1beta1AbstractTypeList<V1beta1CronJobTrigger>{
 
     @SerializedName("kind")

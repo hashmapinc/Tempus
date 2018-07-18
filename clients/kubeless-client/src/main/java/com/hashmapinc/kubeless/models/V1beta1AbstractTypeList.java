@@ -28,7 +28,7 @@ public abstract class V1beta1AbstractTypeList<T extends V1beta1AbstractType> {
     private String apiVersion = "kubeless.io/v1beta1";
 
     @SerializedName("items")
-    private List<T> items = new ArrayList<T>();
+    private List<T> items = new ArrayList<>();
 
     @SerializedName("metadata")
     private V1ListMeta metadata = null;

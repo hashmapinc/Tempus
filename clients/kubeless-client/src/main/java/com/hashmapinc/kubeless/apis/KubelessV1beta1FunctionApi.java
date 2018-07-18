@@ -61,8 +61,8 @@ public class KubelessV1beta1FunctionApi {
     }
 
     public Call createFunctionCall(V1beta1Function function) throws ApiException {
-        String namespace = function.getMetadata().getNamespace();
-        if(!this.namespace.equals(namespace)){
+        String currentNamespace = function.getMetadata().getNamespace();
+        if(!this.namespace.equals(currentNamespace)){
             function.getMetadata().namespace(this.namespace);
         }
         return apiClient.buildCall(kubelessFunctionsUri, "POST", null, null, function,
