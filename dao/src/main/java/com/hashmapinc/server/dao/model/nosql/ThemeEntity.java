@@ -88,11 +88,11 @@ public class ThemeEntity implements BaseEntity<Theme> {
         this.value = value;
     }
 
-    public boolean isEnabled() {
+    public boolean getIsEnabled() {
         return isEnabled;
     }
 
-    public void setEnabled(boolean enabled) {
+    public void setIsEnabled(boolean enabled) {
         this.isEnabled = enabled;
     }
 
