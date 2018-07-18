@@ -38,7 +38,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static com.hashmapinc.server.dao.model.ModelConstants.tempus_KEYSPACE;
+import static com.hashmapinc.server.dao.model.ModelConstants.TEMPUS_KEYSPACE;
 
 @Service
 @NoSqlDao
@@ -66,10 +66,10 @@ public class CassandraDatabaseSchemaService implements DatabaseSchemaService {
 
             log.info("Installing pending upgrades ...");
 
-            Path upgradeScriptsDirectory = Paths.get(this.dataDir, CASSANDRA_DIR, UPGRADE_DIR);
-            List<String> executedUpgrades = new ArrayList<>();
-            ResultSet resultSet = cluster.getSession().execute("select "+ModelConstants.INSTALLED_SCRIPTS_COLUMN+" from " +tempus_KEYSPACE +"." + ModelConstants.INSTALLED_SCHEMA_VERSIONS+";");
-            Iterator<Row> rowIterator = resultSet.iterator();
+        Path upgradeScriptsDirectory = Paths.get(this.dataDir, CASSANDRA_DIR, UPGRADE_DIR);
+        List<String> executedUpgrades = new ArrayList<>();
+        ResultSet resultSet = cluster.getSession().execute("select "+ModelConstants.INSTALLED_SCRIPTS_COLUMN+" from " + TEMPUS_KEYSPACE +"." + ModelConstants.INSTALLED_SCHEMA_VERSIONS+";");
+        Iterator<Row> rowIterator = resultSet.iterator();
 
             while(rowIterator.hasNext()) {
                 Row row = rowIterator.next();
@@ -83,7 +83,7 @@ public class CassandraDatabaseSchemaService implements DatabaseSchemaService {
                     String scriptFileName = i.toString() + ".cql";
                     if (!executedUpgrades.contains(scriptFileName)) {
                         loadCql(upgradeScriptsDirectory.resolve(scriptFileName));
-                        cluster.getSession().execute("insert into " + tempus_KEYSPACE + "." + ModelConstants.INSTALLED_SCHEMA_VERSIONS + "(" + ModelConstants.INSTALLED_SCRIPTS_COLUMN + ")" + " values('" + scriptFileName + "'" + ")");
+                        cluster.getSession().execute("insert into " + TEMPUS_KEYSPACE + "." + ModelConstants.INSTALLED_SCHEMA_VERSIONS + "(" + ModelConstants.INSTALLED_SCRIPTS_COLUMN + ")" + " values('" + scriptFileName + "'" + ")");
                     }
                 }
             }

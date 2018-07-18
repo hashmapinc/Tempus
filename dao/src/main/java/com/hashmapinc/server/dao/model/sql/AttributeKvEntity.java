@@ -67,7 +67,7 @@ public class AttributeKvEntity implements ToData<AttributeKvEntry>, Serializable
 
     @Type(type = "json")
     @Column(name = ModelConstants.JSON_VALUE_COLUMN)
-    private transient JsonNode jsonValue;
+    private JsonNode jsonValue;
 
     @Column(name = ModelConstants.LAST_UPDATE_TS_COLUMN)
     private Long lastUpdateTs;

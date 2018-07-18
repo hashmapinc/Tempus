@@ -32,7 +32,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import static com.hashmapinc.server.dao.model.ModelConstants.tempus_KEYSPACE;
+import static com.hashmapinc.server.dao.model.ModelConstants.TEMPUS_KEYSPACE;
+
 
 public class CustomCassandraCQLUnit extends BaseCassandraUnit {
     private List<CQLDataSet> dataSets;
@@ -87,7 +88,7 @@ public class CustomCassandraCQLUnit extends BaseCassandraUnit {
         CQLDataLoader dataLoader = new CQLDataLoader(session);
 
         dataSets.forEach(dataLoader::load);
-        ResultSet resultSet = session.execute("select "+ ModelConstants.INSTALLED_SCRIPTS_COLUMN+" from " +tempus_KEYSPACE +"." + ModelConstants.INSTALLED_SCHEMA_VERSIONS+";");
+        ResultSet resultSet = session.execute("select "+ ModelConstants.INSTALLED_SCRIPTS_COLUMN+" from " +TEMPUS_KEYSPACE +"." + ModelConstants.INSTALLED_SCHEMA_VERSIONS+";");
         Iterator<Row> rowIterator = resultSet.iterator();
 
         List<String> executedUpgrades = new ArrayList<>();
@@ -99,7 +100,7 @@ public class CustomCassandraCQLUnit extends BaseCassandraUnit {
         upgrades.stream().filter(n -> !executedUpgrades.contains(n.getName()))
                 .forEach(c -> {
                     dataLoader.load(c.getDataSet());
-                    session.execute("insert into " + tempus_KEYSPACE + "." + ModelConstants.INSTALLED_SCHEMA_VERSIONS + "(" + ModelConstants.INSTALLED_SCRIPTS_COLUMN + ")" + " values('" + c.getName() + "'" + ")");
+                    session.execute("insert into " + TEMPUS_KEYSPACE + "." + ModelConstants.INSTALLED_SCHEMA_VERSIONS + "(" + ModelConstants.INSTALLED_SCRIPTS_COLUMN + ")" + " values('" + c.getName() + "'" + ")");
                 });
         session = dataLoader.getSession();
     }

@@ -29,7 +29,7 @@ import com.hashmapinc.server.common.data.security.Authority;
 import com.hashmapinc.server.common.data.security.DeviceCredentials;
 import com.hashmapinc.server.common.data.security.DeviceCredentialsType;
 import com.hashmapinc.server.dao.attributes.AttributesService;
-import com.hashmapinc.server.dao.depthSeries.DepthSeriesService;
+import com.hashmapinc.server.dao.depthseries.DepthSeriesService;
 import com.hashmapinc.server.dao.model.ModelConstants;
 import com.hashmapinc.server.dao.timeseries.TimeseriesService;
 import org.apache.commons.lang3.RandomStringUtils;
