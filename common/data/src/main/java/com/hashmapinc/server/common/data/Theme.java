@@ -24,7 +24,7 @@ public class Theme extends BaseData<ThemeId> {
 
     private String name;
     private String value;
-    private boolean isEnabled;
+    private boolean enabled;
 
     public Theme() {
         super();
@@ -38,7 +38,7 @@ public class Theme extends BaseData<ThemeId> {
         super(theme);
         this.name = theme.name;
         this.value = theme.value;
-        this.isEnabled = theme.isEnabled;
+        this.enabled = theme.enabled;
     }
 
 
@@ -60,11 +60,11 @@ public class Theme extends BaseData<ThemeId> {
     }
 
     public boolean getThemeStatus() {
-        return isEnabled;
+        return enabled;
     }
 
-    public void setThemeStatus(boolean isEnabled) {
-        this.isEnabled = isEnabled;
+    public void setThemeStatus(boolean enabled) {
+        this.enabled = enabled;
     }
 
     @Override
@@ -72,7 +72,7 @@ public class Theme extends BaseData<ThemeId> {
         return "theme{" +
                 "name=" + name +
                 ", value=" + value +
-                ", is_enabled=" + isEnabled +
+                ", is_enabled=" + enabled +
                 '}';
     }
 

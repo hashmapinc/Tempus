@@ -43,7 +43,7 @@ public class ThemeEntity extends BaseSqlEntity<Theme>implements BaseEntity<Theme
 
 
     @Column(name = ModelConstants.IS_ENABLED)
-    private boolean isEnabled;
+    private boolean enabled;
 
 
     public ThemeEntity() {
@@ -57,7 +57,7 @@ public class ThemeEntity extends BaseSqlEntity<Theme>implements BaseEntity<Theme
 
         this.name = theme.getThemeName();
         this.value = theme.getThemeValue();
-        this.isEnabled = theme.getThemeStatus();
+        this.enabled = theme.getThemeStatus();
     }
 
     @Override
@@ -65,7 +65,7 @@ public class ThemeEntity extends BaseSqlEntity<Theme>implements BaseEntity<Theme
         Theme theme = new Theme(new ThemeId(getId()));
         theme.setThemeName(name);
         theme.setThemeValue(value);
-        theme.setThemeStatus(isEnabled);
+        theme.setThemeStatus(enabled);
         return theme;
     }
 
