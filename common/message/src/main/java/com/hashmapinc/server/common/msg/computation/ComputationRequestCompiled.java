@@ -24,7 +24,7 @@ public class ComputationRequestCompiled implements ComputationMsg{
     private final String[] args;
 
     private final String name;
-    private final JsonNode configurationDescriptor;
+    private final transient JsonNode configurationDescriptor;
     private final String mainClazz;
     private final String argsType;
 

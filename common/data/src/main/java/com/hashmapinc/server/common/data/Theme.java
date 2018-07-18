@@ -15,16 +15,16 @@
  */
 
 package com.hashmapinc.server.common.data;
-import com.hashmapinc.server.common.data.BaseData;
+
 import com.hashmapinc.server.common.data.id.ThemeId;
 import lombok.EqualsAndHashCode;
 
-
+@EqualsAndHashCode(callSuper = true)
 public class Theme extends BaseData<ThemeId> {
 
     private String name;
     private String value;
-    private boolean is_enabled;
+    private boolean isEnabled;
 
     public Theme() {
         super();
@@ -38,7 +38,7 @@ public class Theme extends BaseData<ThemeId> {
         super(theme);
         this.name = theme.name;
         this.value = theme.value;
-        this.is_enabled = theme.is_enabled;
+        this.isEnabled = theme.isEnabled;
     }
 
 
@@ -60,11 +60,11 @@ public class Theme extends BaseData<ThemeId> {
     }
 
     public boolean getThemeStatus() {
-        return is_enabled;
+        return isEnabled;
     }
 
-    public void setThemeStatus(boolean is_enabled) {
-        this.is_enabled = is_enabled;
+    public void setThemeStatus(boolean isEnabled) {
+        this.isEnabled = isEnabled;
     }
 
     @Override
@@ -72,7 +72,7 @@ public class Theme extends BaseData<ThemeId> {
         return "theme{" +
                 "name=" + name +
                 ", value=" + value +
-                ", is_enabled=" + is_enabled +
+                ", is_enabled=" + isEnabled +
                 '}';
     }
 

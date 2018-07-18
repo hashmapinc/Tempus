@@ -28,7 +28,7 @@ public class Computations extends SearchTextBased<ComputationId> implements HasN
     private TenantId tenantId;
     private String jarName;
     private String mainClass;
-    private JsonNode jsonDescriptor;
+    private transient JsonNode jsonDescriptor;
     private String argsformat;
     private String argsType;
 
@@ -58,7 +58,11 @@ public class Computations extends SearchTextBased<ComputationId> implements HasN
         if (o == null || getClass() != o.getClass()) return false;
         if (!super.equals(o)) return false;
 
-        Computations that = (Computations) o;
+        return checkObjEquality((Computations) o);
+    }
+
+    private boolean checkObjEquality(Computations o) {
+        Computations that = o;
         if (name != null ? !name.equals(that.name) : that.name != null) return false;
         if (jarPath != null ? !jarPath.equals(that.jarPath) : that.jarPath != null) return false;
         if (jarName != null ? !jarName.equals(that.jarName) : that.jarName != null) return false;
@@ -66,8 +70,7 @@ public class Computations extends SearchTextBased<ComputationId> implements HasN
         if (argsformat != null ? !argsformat.equals(that.argsformat) : that.argsformat != null) return false;
         if (jsonDescriptor != null ? !jsonDescriptor.equals(that.jsonDescriptor) : that.jsonDescriptor != null) return false;
         if (mainClass != null ? !mainClass.equals(that.mainClass) : that.mainClass != null) return false;
-        if (argsType != null ? !argsType.equals(that.argsType) : that.argsType != null) return false;
-        return true;
+        return  (argsType != null ? argsType.equals(that.argsType) : that.argsType == null);
     }
 
     @Override
@@ -151,6 +154,6 @@ public class Computations extends SearchTextBased<ComputationId> implements HasN
     }
     @Override
     public String getSearchText() {
-        return name;
+        return getName();
     }
 }

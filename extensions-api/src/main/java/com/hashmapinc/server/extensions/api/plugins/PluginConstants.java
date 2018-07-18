@@ -17,5 +17,6 @@ package com.hashmapinc.server.extensions.api.plugins;
 
 
 public class PluginConstants {
+    private PluginConstants(){}
     public static final String PLUGIN_URL_PREFIX = "/api/plugins";
 }

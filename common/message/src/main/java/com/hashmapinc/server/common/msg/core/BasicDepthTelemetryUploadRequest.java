@@ -42,12 +42,15 @@ public class BasicDepthTelemetryUploadRequest extends BasicRequest implements De
 
     //  telemetry ds
     public void addDs(double ds, KvEntry entry) {
-        List<KvEntry> tsEntries = data.get(ds);
-        if (tsEntries == null) {
-            tsEntries = new ArrayList<>();
-            data.put(ds, tsEntries);
+        List<KvEntry> dsEntries;
+        if(data.get(ds) != null){
+            dsEntries = data.get(ds);
         }
-        tsEntries.add(entry);
+        else {
+            dsEntries = new ArrayList<>();
+            data.put(ds, dsEntries);
+        }
+        dsEntries.add(entry);
     }
 
     @Override

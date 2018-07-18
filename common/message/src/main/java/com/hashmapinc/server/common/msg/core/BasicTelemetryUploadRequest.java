@@ -39,8 +39,10 @@ public class BasicTelemetryUploadRequest extends BasicRequest implements Telemet
     }
 
     public void add(long ts, KvEntry entry) {
-        List<KvEntry> tsEntries = data.get(ts);
-        if (tsEntries == null) {
+        List<KvEntry> tsEntries;
+        if(data.get(ts) != null) {
+            tsEntries = data.get(ts);
+        } else {
             tsEntries = new ArrayList<>();
             data.put(ts, tsEntries);
         }

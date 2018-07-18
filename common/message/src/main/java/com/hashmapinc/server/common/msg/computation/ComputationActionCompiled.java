@@ -24,7 +24,7 @@ public class ComputationActionCompiled implements ComputationMsg{
     private final String actionClazz;
     private final String descriptor;
     private final String name;
-    private final JsonNode configurationDescriptor;
+    private final transient JsonNode configurationDescriptor;
 
     public ComputationActionCompiled(String actionClazz,
                                      String descriptor,

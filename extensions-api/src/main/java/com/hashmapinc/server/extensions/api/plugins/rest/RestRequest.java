@@ -69,15 +69,15 @@ public class RestRequest {
     }
 
     public Optional<Long> getLongParamValue(String paramName) {
-        return getParamValue(paramName, s -> Long.valueOf(s));
+        return getParamValue(paramName, Long::valueOf);
     }
 
     public Optional<Double> getDoubleParamValue(String paramName) {
-        return getParamValue(paramName, s -> Double.valueOf(s));
+        return getParamValue(paramName, Double::valueOf);
     }
 
     public Optional<Integer> getIntParamValue(String paramName) {
-        return getParamValue(paramName, s -> Integer.valueOf(s));
+        return getParamValue(paramName, Integer::valueOf);
     }
 
     public <T> Optional<T> getParamValue(String paramName, Function<String, T> function) {

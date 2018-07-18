@@ -83,7 +83,7 @@ public final class DataModelObjectEntity extends BaseSqlEntity<DataModelObject> 
             this.customerId = UUIDConverter.fromTimeUUID(dataModelObject.getCustomerId().getId());
         }
         this.name = dataModelObject.getName();
-        this.description = dataModelObject.getDecription();
+        this.description = dataModelObject.getDescription();
     }
 
     @Override
@@ -117,7 +117,7 @@ public final class DataModelObjectEntity extends BaseSqlEntity<DataModelObject> 
             dataModelObject.setParentId(new DataModelObjectId(UUIDConverter.fromString(parentId)));
         }
         dataModelObject.setName(name);
-        dataModelObject.setDecription(description);
+        dataModelObject.setDescription(description);
         return dataModelObject;
     }
 

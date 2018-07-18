@@ -382,7 +382,8 @@ public class MqttTransportHandler extends ChannelInboundHandlerAdapter implement
             processor.process(sessionCloseMsg);
             if (gatewaySessionCtx != null) {
                 gatewaySessionCtx.onGatewayDisconnect();
-                sparkPlugDecodeService.updateDeviceMapState();
+                if (sparkPlugDecodeService != null)
+                    sparkPlugDecodeService.updateDeviceMapState();
             }
         }
     }

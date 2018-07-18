@@ -17,41 +17,34 @@ package com.hashmapinc.server.extensions.core.utils;
 
 import com.hashmapinc.server.common.data.kv.AttributeKvEntry;
 import com.hashmapinc.server.common.data.kv.BasicDsKvEntry;
+import com.hashmapinc.server.common.data.kv.BasicTsKvEntry;
 import com.hashmapinc.server.common.data.kv.StringDataEntry;
 import com.hashmapinc.server.common.msg.core.DepthTelemetryUploadRequest;
 import com.hashmapinc.server.common.msg.core.TelemetryUploadRequest;
 import com.hashmapinc.server.common.msg.session.FromDeviceMsg;
 import com.hashmapinc.server.extensions.api.device.DeviceAttributes;
+import com.hashmapinc.server.extensions.api.device.DeviceMetaData;
 import com.hashmapinc.server.extensions.api.rules.RuleProcessingMetaData;
 import com.hashmapinc.server.extensions.core.filter.NashornJsEvaluator;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
-import org.apache.velocity.tools.view.ViewContextTool;
 import org.apache.velocity.runtime.RuntimeServices;
 import org.apache.velocity.runtime.RuntimeSingleton;
 import org.apache.velocity.runtime.parser.ParseException;
 import org.apache.velocity.runtime.parser.node.SimpleNode;
 import org.apache.velocity.tools.generic.DateTool;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import com.hashmapinc.server.common.data.kv.BasicTsKvEntry;
-import com.hashmapinc.server.extensions.api.device.DeviceMetaData;
 
 import java.io.StringReader;
 import java.io.StringWriter;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
-import java.util.Set;
-import java.util.HashSet;
 
 
 @Slf4j
 public class VelocityUtils {
 
-    private static Logger logger = LoggerFactory.getLogger(VelocityUtils.class);
+    private VelocityUtils(){}
 
     public static Template create(String source, String templateName) throws ParseException {
         RuntimeServices runtimeServices = RuntimeSingleton.getRuntimeServices();
@@ -72,7 +65,7 @@ public class VelocityUtils {
 
     public static VelocityContext createContext(RuleProcessingMetaData metadata) {
         VelocityContext context = new VelocityContext();
-        metadata.getValues().forEach((k, v) -> context.put(k, v));
+        metadata.getValues().forEach(context::put);
         return context;
     }
 
@@ -106,53 +99,23 @@ public class VelocityUtils {
         return context;
     }
 
-    private static ViewContextTool getContext(VelocityContext context) {
-    	java.util.Map<String, Object> map=new java.util.HashMap<String, Object>();
-    	String[] keys = (String[])context.internalGetKeys();
-    	if (keys!=null) {
-    		for (int i=0; i<keys.length; i++) {
-    			map.put(keys[i], context.internalGet(keys[i]));
-    		}
-    	}
-        org.apache.velocity.tools.generic.ValueParser vp=new org.apache.velocity.tools.generic.ValueParser(map);
-        ViewContextTool vct = new ViewContextTool();
-        vct.configure(vp);
-        return vct;
-    }
-
-    private static ViewContextTool getContext(TelemetryUploadRequest payload) {
-    	java.util.Map<String, Object> map=new java.util.HashMap<String, Object>();
-        payload.getData().forEach((k, vList) -> {
-            vList.forEach(v -> {
-                //map.put(v.getKey(), new BasicTsKvEntry(k, v));
-                map.put(v.getKey(), v);
-            });
-        });
-        org.apache.velocity.tools.generic.ValueParser vp=new org.apache.velocity.tools.generic.ValueParser(map);
-        ViewContextTool vct = new ViewContextTool();
-        vct.configure(vp);
-        return vct;
-    }
-
     private static void pushDsEntries(VelocityContext context, DepthTelemetryUploadRequest payload) {
     	Set<BasicDsKvEntry> allKeys = new HashSet<>();
-        payload.getData().forEach((k, vList) -> {
+        payload.getData().forEach((k, vList) ->
             allKeys.addAll(vList.stream().map(v -> {
                 context.put(v.getKey(), new BasicDsKvEntry(k, v));
                 return new BasicDsKvEntry(k, v);
-            }).collect(Collectors.toSet()));
-        });
+            }).collect(Collectors.toSet())));
         context.put("tags", allKeys);
     }
     
     private static void pushTsEntries(VelocityContext context, TelemetryUploadRequest payload) {
         Set<BasicTsKvEntry> allKeys = new HashSet<>();
-        payload.getData().forEach((k, vList) -> {
+        payload.getData().forEach((k, vList) ->
             allKeys.addAll(vList.stream().map(v -> {
                 context.put(v.getKey(), new BasicTsKvEntry(k, v));
                 return new BasicTsKvEntry(k, v);
-            }).collect(Collectors.toSet()));
-        });
+            }).collect(Collectors.toSet())));
         context.put("tags", allKeys);
     }
 

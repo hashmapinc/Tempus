@@ -19,13 +19,15 @@ package com.hashmapinc.server.common.data.kv;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.JsonObject;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
 import java.util.Objects;
 import java.util.Optional;
 
+@Slf4j
 public class JsonDataEntry extends BasicKvEntry{
-    private final JsonNode value;
+    private final transient JsonNode value;
 
     public JsonDataEntry(String key, JsonNode value) {
         super(key);
@@ -39,7 +41,7 @@ public class JsonDataEntry extends BasicKvEntry{
         try {
             jsonNode= mapper.readTree(value.toString());
         } catch (IOException ex) {
-
+            log.error("Exception in parsing JsonDataEntry: ", ex);
         }
         this.value=jsonNode;
     }
