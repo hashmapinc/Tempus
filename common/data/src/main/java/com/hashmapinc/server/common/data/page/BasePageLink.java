@@ -21,7 +21,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
 import java.io.Serializable;
-import java.util.Arrays;
 import java.util.UUID;
 
 @RequiredArgsConstructor

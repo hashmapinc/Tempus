@@ -19,19 +19,18 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.hashmapinc.server.common.data.id.EntityId;
-import com.hashmapinc.server.common.data.kv.*;
-import com.hashmapinc.server.extensions.api.plugins.PluginContext;
-import com.hashmapinc.server.extensions.api.plugins.handlers.RpcMsgHandler;
-import com.hashmapinc.server.extensions.core.plugin.telemetry.sub.*;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import com.hashmapinc.server.common.data.id.EntityIdFactory;
 import com.hashmapinc.server.common.data.kv.*;
 import com.hashmapinc.server.common.msg.cluster.ServerAddress;
+import com.hashmapinc.server.common.msg.exception.TempusRuntimeException;
+import com.hashmapinc.server.extensions.api.plugins.PluginContext;
+import com.hashmapinc.server.extensions.api.plugins.handlers.RpcMsgHandler;
 import com.hashmapinc.server.extensions.api.plugins.rpc.RpcMsg;
 import com.hashmapinc.server.extensions.core.plugin.telemetry.SubscriptionManager;
 import com.hashmapinc.server.extensions.core.plugin.telemetry.gen.TelemetryPluginProtos.*;
 import com.hashmapinc.server.extensions.core.plugin.telemetry.sub.*;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
 import java.util.*;
@@ -72,7 +71,7 @@ public class TelemetryRpcMsgHandler implements RpcMsgHandler {
                 processSubscriptionClose(ctx, msg);
                 break;
             default:
-                throw new RuntimeException("Unknown command id: " + msg.getMsgClazz());
+                throw new TempusRuntimeException("Unknown command id: " + msg.getMsgClazz());
         }
     }
 
@@ -81,7 +80,7 @@ public class TelemetryRpcMsgHandler implements RpcMsgHandler {
         try {
             proto = SubscriptionUpdateProto.parseFrom(msg.getMsgData());
         } catch (InvalidProtocolBufferException e) {
-            throw new RuntimeException(e);
+            throw new TempusRuntimeException(e);
         }
         subscriptionManager.onRemoteSubscriptionUpdate(ctx, proto.getSessionId(), convert(proto));
     }
@@ -91,7 +90,7 @@ public class TelemetryRpcMsgHandler implements RpcMsgHandler {
         try {
             proto = AttributeUpdateProto.parseFrom(msg.getMsgData());
         } catch (InvalidProtocolBufferException e) {
-            throw new RuntimeException(e);
+            throw new TempusRuntimeException(e);
         }
         subscriptionManager.onAttributesUpdateFromServer(ctx, EntityIdFactory.getByTypeAndId(proto.getEntityType(), proto.getEntityId()), proto.getScope(),
                 proto.getDataList().stream().map(this::toAttribute).collect(Collectors.toList()));
@@ -102,7 +101,7 @@ public class TelemetryRpcMsgHandler implements RpcMsgHandler {
         try {
             proto = TimeseriesUpdateProto.parseFrom(msg.getMsgData());
         } catch (InvalidProtocolBufferException e) {
-            throw new RuntimeException(e);
+            throw new TempusRuntimeException(e);
         }
         subscriptionManager.onTimeseriesUpdateFromServer(ctx, EntityIdFactory.getByTypeAndId(proto.getEntityType(), proto.getEntityId()),
                 proto.getDataList().stream().map(this::toTimeseries).collect(Collectors.toList()));
@@ -113,7 +112,7 @@ public class TelemetryRpcMsgHandler implements RpcMsgHandler {
         try {
             proto = SubscriptionProto.parseFrom(msg.getMsgData());
         } catch (InvalidProtocolBufferException e) {
-            throw new RuntimeException(e);
+            throw new TempusRuntimeException(e);
         }
         Map<String, Long> statesMap = proto.getKeyStatesList().stream().collect(Collectors.toMap(SubscriptionKetStateProto::getKey, SubscriptionKetStateProto::getTs));
         Subscription subscription = new Subscription(
@@ -155,7 +154,7 @@ public class TelemetryRpcMsgHandler implements RpcMsgHandler {
         try {
             proto = SessionCloseProto.parseFrom(msg.getMsgData());
         } catch (InvalidProtocolBufferException e) {
-            throw new RuntimeException(e);
+            throw new TempusRuntimeException(e);
         }
         subscriptionManager.cleanupRemoteWsSessionSubscriptions(ctx, proto.getSessionId());
     }
@@ -165,7 +164,7 @@ public class TelemetryRpcMsgHandler implements RpcMsgHandler {
         try {
             proto = SubscriptionCloseProto.parseFrom(msg.getMsgData());
         } catch (InvalidProtocolBufferException e) {
-            throw new RuntimeException(e);
+            throw new TempusRuntimeException(e);
         }
         subscriptionManager.removeSubscription(ctx, proto.getSessionId(), proto.getSubscriptionId());
     }

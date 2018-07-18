@@ -13,18 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.hashmapinc.server.extensions.api.plugins.ws.msg;
+package com.hashmapinc.server.common.msg.exception;
 
-import com.hashmapinc.server.extensions.api.plugins.ws.PluginWebsocketSessionRef;
+public class TempusRuntimeException extends RuntimeException{
+    public TempusRuntimeException(String exception){
+        super(exception);
+    }
 
-import java.nio.ByteBuffer;
+    public TempusRuntimeException(String var1, Throwable var2) {
+        super(var1, var2);
+    }
 
-public class EmptyPluginWebsocketMsg extends AbstractPluginWebSocketMsg<ByteBuffer> {
+    public TempusRuntimeException(Throwable var1) {
+        super(var1);
+    }
 
-    private static final long serialVersionUID = 1L;
-    private static final ByteBuffer EMPTY = ByteBuffer.wrap(new byte[0]);
-
-    protected EmptyPluginWebsocketMsg(PluginWebsocketSessionRef sessionRef) {
-        super(sessionRef, EMPTY);
+    protected TempusRuntimeException(String var1, Throwable var2, boolean var3, boolean var4) {
+        super(var1, var2, var3, var4);
     }
 }

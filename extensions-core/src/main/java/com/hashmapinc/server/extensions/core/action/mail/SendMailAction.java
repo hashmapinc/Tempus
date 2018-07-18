@@ -15,6 +15,10 @@
  */
 package com.hashmapinc.server.extensions.core.action.mail;
 
+import com.hashmapinc.server.common.msg.device.ToDeviceActorMsg;
+import com.hashmapinc.server.common.msg.exception.TempusRuntimeException;
+import com.hashmapinc.server.common.msg.session.ToDeviceMsg;
+import com.hashmapinc.server.extensions.api.component.Action;
 import com.hashmapinc.server.extensions.api.plugins.PluginAction;
 import com.hashmapinc.server.extensions.api.plugins.msg.PluginToRuleMsg;
 import com.hashmapinc.server.extensions.api.plugins.msg.ResponsePluginToRuleMsg;
@@ -22,15 +26,12 @@ import com.hashmapinc.server.extensions.api.plugins.msg.RuleToPluginMsg;
 import com.hashmapinc.server.extensions.api.rules.RuleContext;
 import com.hashmapinc.server.extensions.api.rules.RuleProcessingMetaData;
 import com.hashmapinc.server.extensions.api.rules.SimpleRuleLifecycleComponent;
+import com.hashmapinc.server.extensions.core.utils.VelocityUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.runtime.parser.ParseException;
 import org.springframework.util.StringUtils;
-import com.hashmapinc.server.common.msg.device.ToDeviceActorMsg;
-import com.hashmapinc.server.common.msg.session.ToDeviceMsg;
-import com.hashmapinc.server.extensions.api.component.Action;
-import com.hashmapinc.server.extensions.core.utils.VelocityUtils;
 
 import java.util.Optional;
 
@@ -59,7 +60,7 @@ public class SendMailAction extends SimpleRuleLifecycleComponent implements Plug
             bodyTemplate = toTemplate(configuration.getBodyTemplate(), "Body Template");
         } catch (ParseException e) {
             log.error("Failed to create templates based on provided configuration!", e);
-            throw new RuntimeException("Failed to create templates based on provided configuration!", e);
+            throw new TempusRuntimeException("Failed to create templates based on provided configuration!", e);
         }
     }
 

@@ -62,16 +62,16 @@ public class StringDataEntry extends BasicKvEntry {
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), value);
+        return Objects.hash(super.hashCode(), getValueAsString());
     }
 
     @Override
     public String toString() {
-        return "StringDataEntry{" + "value='" + value + '\'' + "} " + super.toString();
+        return "StringDataEntry{" + "value='" + getValueAsString() + '\'' + "} " + super.toString();
     }
     
     @Override
     public String getValueAsString() {
-        return value;
+        return (String) getValue();
     }
 }

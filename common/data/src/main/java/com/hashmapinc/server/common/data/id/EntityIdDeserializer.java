@@ -16,7 +16,6 @@
 package com.hashmapinc.server.common.data.id;
 
 import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.ObjectCodec;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
@@ -30,7 +29,7 @@ import java.io.IOException;
 public class EntityIdDeserializer extends JsonDeserializer<EntityId> {
 
     @Override
-    public EntityId deserialize(JsonParser jsonParser, DeserializationContext ctx) throws IOException, JsonProcessingException {
+    public EntityId deserialize(JsonParser jsonParser, DeserializationContext ctx) throws IOException {
         ObjectCodec oc = jsonParser.getCodec();
         ObjectNode node = oc.readTree(jsonParser);
         if (node.has("entityType") && node.has("id")) {

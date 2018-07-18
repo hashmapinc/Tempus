@@ -15,12 +15,9 @@
  */
 package com.hashmapinc.server.extensions.core.plugin.mail;
 
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.mail.javamail.JavaMailSenderImpl;
-import org.springframework.mail.javamail.MimeMessageHelper;
-import org.springframework.util.StringUtils;
 import com.hashmapinc.server.common.data.id.RuleId;
 import com.hashmapinc.server.common.data.id.TenantId;
+import com.hashmapinc.server.common.msg.exception.TempusRuntimeException;
 import com.hashmapinc.server.extensions.api.component.Plugin;
 import com.hashmapinc.server.extensions.api.plugins.AbstractPlugin;
 import com.hashmapinc.server.extensions.api.plugins.PluginContext;
@@ -29,6 +26,10 @@ import com.hashmapinc.server.extensions.api.plugins.msg.RuleToPluginMsg;
 import com.hashmapinc.server.extensions.api.rules.RuleException;
 import com.hashmapinc.server.extensions.core.action.mail.SendMailAction;
 import com.hashmapinc.server.extensions.core.action.mail.SendMailActionMsg;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.mail.javamail.JavaMailSenderImpl;
+import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.util.StringUtils;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
@@ -43,6 +44,7 @@ public class MailPlugin extends AbstractPlugin<MailPluginConfiguration> implemen
 
     //TODO: Add logic to close this executor on shutdown.
     private static final ExecutorService executor = Executors.newSingleThreadExecutor();
+    public static final String SPLIT_STR = "\\s*,\\s*";
 
     private MailPluginConfiguration configuration;
     private JavaMailSenderImpl mailSender;
@@ -96,7 +98,7 @@ public class MailPlugin extends AbstractPlugin<MailPluginConfiguration> implemen
                 }
             });
         } else {
-            throw new RuntimeException("Not supported msg type: " + msg.getPayload().getClass() + "!");
+            throw new TempusRuntimeException("Not supported msg type: " + msg.getPayload().getClass() + "!");
         }
     }
 
@@ -105,12 +107,12 @@ public class MailPlugin extends AbstractPlugin<MailPluginConfiguration> implemen
         MimeMessage mailMsg = mailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(mailMsg, "UTF-8");
         helper.setFrom(msg.getFrom());
-        helper.setTo(msg.getTo().split("\\s*,\\s*"));
+        helper.setTo(msg.getTo().split(SPLIT_STR));
         if (!StringUtils.isEmpty(msg.getCc())) {
-            helper.setCc(msg.getCc().split("\\s*,\\s*"));
+            helper.setCc(msg.getCc().split(SPLIT_STR));
         }
         if (!StringUtils.isEmpty(msg.getBcc())) {
-            helper.setBcc(msg.getBcc().split("\\s*,\\s*"));
+            helper.setBcc(msg.getBcc().split(SPLIT_STR));
         }
         helper.setSubject(msg.getSubject());
         helper.setText(msg.getBody());

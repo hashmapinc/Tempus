@@ -48,5 +48,6 @@ public class PassThroughAction extends SimpleRuleLifecycleComponent implements P
 
     @Override
     public void init(EmptyComponentConfiguration emptyComponentConfiguration) {
+        // Nothing to do here
     }
 }

@@ -15,16 +15,7 @@
  */
 package com.hashmapinc.server.extensions.core.plugin.rpc.handlers;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.hashmapinc.server.extensions.core.plugin.rpc.cmd.RpcRequest;
-import lombok.RequiredArgsConstructor;
-import lombok.Setter;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.util.StringUtils;
-import org.springframework.web.context.request.async.DeferredResult;
 import com.hashmapinc.server.common.data.DataConstants;
 import com.hashmapinc.server.common.data.id.DeviceId;
 import com.hashmapinc.server.common.data.id.TenantId;
@@ -40,6 +31,14 @@ import com.hashmapinc.server.extensions.api.plugins.rest.PluginRestMsg;
 import com.hashmapinc.server.extensions.api.plugins.rest.RestRequest;
 import com.hashmapinc.server.extensions.core.plugin.rpc.LocalRequestMetaData;
 import com.hashmapinc.server.extensions.core.plugin.rpc.RpcManager;
+import com.hashmapinc.server.extensions.core.plugin.rpc.cmd.RpcRequest;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.util.StringUtils;
+import org.springframework.web.context.request.async.DeferredResult;
 
 import javax.servlet.ServletException;
 import java.io.IOException;
@@ -89,7 +88,7 @@ public class RpcRestMsgHandler extends DefaultRestMsgHandler {
         }
     }
 
-    private boolean handleDeviceRPCRequest(PluginContext ctx, final PluginRestMsg msg, TenantId tenantId, DeviceId deviceId, RpcRequest cmd, boolean oneWay) throws JsonProcessingException {
+    private boolean handleDeviceRPCRequest(PluginContext ctx, final PluginRestMsg msg, TenantId tenantId, DeviceId deviceId, RpcRequest cmd, boolean oneWay) {
         long timeout = System.currentTimeMillis() + (cmd.getTimeout() != null ? cmd.getTimeout() : defaultTimeout);
         ToDeviceRpcRequestBody body = new ToDeviceRpcRequestBody(cmd.getMethodName(), cmd.getRequestData());
         ctx.checkAccess(deviceId, new PluginCallback<Void>() {

@@ -27,7 +27,7 @@ public class ComputationJob extends SearchTextBased<ComputationJobId> implements
 
     private TenantId tenantId;
     private ComputationId computationId;
-    private JsonNode argParameters;
+    private transient JsonNode argParameters;
     private String name;
     private ComponentLifecycleState state;
     private String jobId;
@@ -61,8 +61,7 @@ public class ComputationJob extends SearchTextBased<ComputationJobId> implements
         if (computationId != null ? !computationId.equals(that.computationId) : that.computationId != null) return false;
         if (tenantId != null ? !tenantId.equals(that.tenantId) : that.tenantId != null) return false;
         if (name != null ? !name.equals(that.name) : that.name != null) return false;
-        if (jobId != null ? !jobId.equals(that.jobId) : that.jobId != null) return false;
-        return true;
+        return (jobId != null ? jobId.equals(that.jobId) : that.jobId == null);
     }
 
     @Override
@@ -127,6 +126,6 @@ public class ComputationJob extends SearchTextBased<ComputationJobId> implements
     }
     @Override
     public String getSearchText() {
-        return name;
+        return getName();
     }
 }

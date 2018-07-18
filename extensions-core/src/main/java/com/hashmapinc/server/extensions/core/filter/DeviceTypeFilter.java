@@ -36,7 +36,7 @@ public class DeviceTypeFilter extends SimpleRuleLifecycleComponent implements Ru
     @Override
     public void init(DeviceTypeFilterConfiguration configuration) {
         deviceTypes = Arrays.stream(configuration.getDeviceTypes())
-                .map(m -> m.getName())
+                .map(DeviceTypeFilterConfiguration.DeviceTypeName::getName)
                 .collect(Collectors.toSet());
     }
 
