@@ -26,7 +26,7 @@ import com.hashmapinc.server.common.data.page.TextPageData;
 import com.hashmapinc.server.common.data.page.TextPageLink;
 import com.hashmapinc.server.common.data.page.TimePageLink;
 import com.hashmapinc.server.common.data.relation.RelationTypeGroup;
-import com.hashmapinc.server.common.msg.exception.TempusRunTimeException;
+import com.hashmapinc.server.common.msg.exception.TempusRuntimeException;
 import com.hashmapinc.server.dao.customer.CustomerDao;
 import com.hashmapinc.server.dao.entity.AbstractEntityService;
 import com.hashmapinc.server.dao.service.DataValidator;
@@ -119,7 +119,7 @@ public class DashboardServiceImpl extends AbstractEntityService implements Dashb
                 createRelation(new EntityRelation(customerId, dashboardId, EntityRelation.CONTAINS_TYPE, RelationTypeGroup.DASHBOARD));
             } catch (ExecutionException | InterruptedException e) {
                 log.warn("[{}] Failed to create dashboard relation. Customer Id: [{}]", dashboardId, customerId);
-                throw new TempusRunTimeException(e);
+                throw new TempusRuntimeException(e);
             }
             return saveDashboard(dashboard);
         } else {
@@ -139,7 +139,7 @@ public class DashboardServiceImpl extends AbstractEntityService implements Dashb
                 deleteRelation(new EntityRelation(customerId, dashboardId, EntityRelation.CONTAINS_TYPE, RelationTypeGroup.DASHBOARD));
             } catch (ExecutionException | InterruptedException e) {
                 log.warn("[{}] Failed to delete dashboard relation. Customer Id: [{}]", dashboardId, customerId);
-                throw new TempusRunTimeException(e);
+                throw new TempusRuntimeException(e);
             }
             return saveDashboard(dashboard);
         } else {
@@ -269,7 +269,7 @@ public class DashboardServiceImpl extends AbstractEntityService implements Dashb
                 return dashboardInfoDao.findDashboardsByTenantIdAndCustomerId(customer.getTenantId().getId(), customer.getId().getId(), pageLink).get();
             } catch (InterruptedException | ExecutionException e) {
                 log.warn("Failed to get dashboards by tenantId [{}] and customerId [{}].", customer.getTenantId().getId(), customer.getId().getId());
-                throw new TempusRunTimeException(e);
+                throw new TempusRuntimeException(e);
             }
         }
 
@@ -294,7 +294,7 @@ public class DashboardServiceImpl extends AbstractEntityService implements Dashb
                 return dashboardInfoDao.findDashboardsByTenantIdAndCustomerId(customer.getTenantId().getId(), customer.getId().getId(), pageLink).get();
             } catch (InterruptedException | ExecutionException e) {
                 log.warn("Failed to get dashboards by tenantId [{}] and customerId [{}].", customer.getTenantId().getId(), customer.getId().getId());
-                throw new TempusRunTimeException(e);
+                throw new TempusRuntimeException(e);
             }
         }
 

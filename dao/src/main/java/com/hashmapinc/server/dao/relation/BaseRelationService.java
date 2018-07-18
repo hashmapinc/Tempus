@@ -21,7 +21,7 @@ import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.hashmapinc.server.common.data.id.EntityId;
 import com.hashmapinc.server.common.data.relation.*;
-import com.hashmapinc.server.common.msg.exception.TempusRunTimeException;
+import com.hashmapinc.server.common.msg.exception.TempusRuntimeException;
 import com.hashmapinc.server.dao.entity.EntityService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -71,7 +71,7 @@ public class BaseRelationService implements RelationService {
         try {
             return getRelationAsync(from, to, relationType, typeGroup).get();
         } catch (InterruptedException | ExecutionException e) {
-            throw new TempusRunTimeException(e);
+            throw new TempusRuntimeException(e);
         }
     }
 
@@ -286,7 +286,7 @@ public class BaseRelationService implements RelationService {
         try {
             return findByFromAsync(from, typeGroup).get();
         } catch (InterruptedException | ExecutionException e) {
-            throw new TempusRunTimeException(e);
+            throw new TempusRuntimeException(e);
         }
     }
 
@@ -326,7 +326,7 @@ public class BaseRelationService implements RelationService {
         try {
             return findByFromAndTypeAsync(from, relationType, typeGroup).get();
         } catch (InterruptedException | ExecutionException e) {
-            throw new TempusRunTimeException(e);
+            throw new TempusRuntimeException(e);
         }
     }
 
@@ -345,7 +345,7 @@ public class BaseRelationService implements RelationService {
         try {
             return findByToAsync(to, typeGroup).get();
         } catch (InterruptedException | ExecutionException e) {
-            throw new TempusRunTimeException(e);
+            throw new TempusRuntimeException(e);
         }
     }
 
@@ -393,7 +393,7 @@ public class BaseRelationService implements RelationService {
         try {
             return findByToAndTypeAsync(to, relationType, typeGroup).get();
         } catch (InterruptedException | ExecutionException e) {
-            throw new TempusRunTimeException(e);
+            throw new TempusRuntimeException(e);
         }
     }
 
@@ -434,7 +434,7 @@ public class BaseRelationService implements RelationService {
             });
         } catch (Exception e) {
             log.warn("Failed to query relations: [{}]", query, e);
-            throw new TempusRunTimeException(e);
+            throw new TempusRuntimeException(e);
         }
     }
 

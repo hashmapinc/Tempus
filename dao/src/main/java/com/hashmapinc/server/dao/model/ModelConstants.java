@@ -18,7 +18,7 @@ package com.hashmapinc.server.dao.model;
 import com.datastax.driver.core.utils.UUIDs;
 import com.hashmapinc.server.common.data.kv.Aggregation;
 import com.hashmapinc.server.common.data.kv.DepthAggregation;
-import com.hashmapinc.server.common.msg.exception.TempusRunTimeException;
+import com.hashmapinc.server.common.msg.exception.TempusRuntimeException;
 import org.apache.commons.lang3.ArrayUtils;
 import com.hashmapinc.server.common.data.UUIDConverter;
 
@@ -563,7 +563,7 @@ public class ModelConstants {
             case AVG:
                 return AVG_AGGREGATION_COLUMNS;
             default:
-                throw new TempusRunTimeException("Aggregation type: " + aggregation + " is not supported!");
+                throw new TempusRuntimeException("Aggregation type: " + aggregation + " is not supported!");
         }
     }
 
@@ -582,7 +582,7 @@ public class ModelConstants {
             case AVG:
                 return AVG_AGGREGATION_COLUMNS;
             default:
-                throw new TempusRunTimeException("Aggregation type: " + aggregation + " is not supported!");
+                throw new TempusRuntimeException("Aggregation type: " + aggregation + " is not supported!");
         }
     }
 }

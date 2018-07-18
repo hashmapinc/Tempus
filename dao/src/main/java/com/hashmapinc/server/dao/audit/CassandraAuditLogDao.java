@@ -23,7 +23,7 @@ import com.datastax.driver.core.querybuilder.QueryBuilder;
 import com.datastax.driver.core.querybuilder.Select;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
-import com.hashmapinc.server.common.msg.exception.TempusRunTimeException;
+import com.hashmapinc.server.common.msg.exception.TempusRuntimeException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -102,7 +102,7 @@ public class CassandraAuditLogDao extends CassandraAbstractSearchTimeDao<AuditLo
                 tsFormat = partition.get();
             } else {
                 log.warn("Incorrect configuration of partitioning {}", partitioning);
-                throw new TempusRunTimeException("Failed to parse partitioning property: " + partitioning + "!");
+                throw new TempusRuntimeException("Failed to parse partitioning property: " + partitioning + "!");
             }
         }
         readResultsProcessingExecutor = Executors.newCachedThreadPool();

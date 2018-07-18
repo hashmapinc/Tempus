@@ -27,7 +27,7 @@ import com.hashmapinc.server.common.data.page.TimePageLink;
 import com.hashmapinc.server.common.data.relation.EntityRelation;
 import com.hashmapinc.server.common.data.relation.EntityRelationsQuery;
 import com.hashmapinc.server.common.data.relation.RelationTypeGroup;
-import com.hashmapinc.server.common.msg.exception.TempusRunTimeException;
+import com.hashmapinc.server.common.msg.exception.TempusRuntimeException;
 import com.hashmapinc.server.dao.entity.AbstractEntityService;
 import com.hashmapinc.server.dao.entity.EntityService;
 import com.hashmapinc.server.dao.service.DataValidator;
@@ -105,7 +105,7 @@ public class BaseAlarmService extends AbstractEntityService implements AlarmServ
                 return updateAlarm(alarm).get();
             }
         } catch (ExecutionException | InterruptedException e) {
-            throw new TempusRunTimeException(e);
+            throw new TempusRuntimeException(e);
         }
     }
 
@@ -155,7 +155,7 @@ public class BaseAlarmService extends AbstractEntityService implements AlarmServ
                 createAlarmRelations(result);
             } catch (InterruptedException | ExecutionException e) {
                 log.warn("Failed to update alarm relations [{}]", result, e);
-                throw new TempusRunTimeException(e);
+                throw new TempusRuntimeException(e);
             }
         } else if (oldStatus != newStatus) {
             updateRelations(oldAlarm, oldStatus, newStatus);
@@ -261,7 +261,7 @@ public class BaseAlarmService extends AbstractEntityService implements AlarmServ
             } catch (ExecutionException | InterruptedException e) {
                 log.warn("Failed to find highest alarm severity. EntityId: [{}], AlarmSearchStatus: [{}], AlarmStatus: [{}]",
                         entityId, alarmSearchStatus, alarmStatus);
-                throw new TempusRunTimeException(e);
+                throw new TempusRuntimeException(e);
             }
             hasNext = alarms.size() == nextPageLink.getLimit();
             if (hasNext) {
@@ -329,7 +329,7 @@ public class BaseAlarmService extends AbstractEntityService implements AlarmServ
             }
         } catch (ExecutionException | InterruptedException e) {
             log.warn("[{}] Failed to update relations. Old status: [{}], New status: [{}]", alarm.getId(), oldStatus, newStatus);
-            throw new TempusRunTimeException(e);
+            throw new TempusRuntimeException(e);
         }
     }
 
@@ -343,7 +343,7 @@ public class BaseAlarmService extends AbstractEntityService implements AlarmServ
             createRelation(new EntityRelation(entityId, alarmId, ALARM_RELATION_PREFIX + status.getAckSearchStatus().name(), RelationTypeGroup.ALARM));
         } catch (ExecutionException | InterruptedException e) {
             log.warn("[{}] Failed to create relation. Status: [{}]", alarmId, status);
-            throw new TempusRunTimeException(e);
+            throw new TempusRuntimeException(e);
         }
     }
 
@@ -354,7 +354,7 @@ public class BaseAlarmService extends AbstractEntityService implements AlarmServ
             deleteRelation(new EntityRelation(entityId, alarmId, ALARM_RELATION_PREFIX + status.getAckSearchStatus().name(), RelationTypeGroup.ALARM));
         } catch (ExecutionException | InterruptedException e) {
             log.warn("[{}] Failed to delete relation. Status: [{}]", alarmId, status);
-            throw new TempusRunTimeException(e);
+            throw new TempusRuntimeException(e);
         }
     }
 

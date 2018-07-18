@@ -27,7 +27,7 @@ import com.google.common.util.concurrent.ListenableFuture;
 import com.hashmapinc.server.common.data.DeviceDataSet;
 import com.hashmapinc.server.common.data.kv.*;
 import com.hashmapinc.server.common.data.kv.DataType;
-import com.hashmapinc.server.common.msg.exception.TempusRunTimeException;
+import com.hashmapinc.server.common.msg.exception.TempusRuntimeException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -97,7 +97,7 @@ public class CassandraBaseTimeseriesDao extends CassandraAbstractAsyncDao implem
                 tsFormat = partition.get();
             } else {
                 log.warn("Incorrect configuration of partitioning {}", partitioning);
-                throw new TempusRunTimeException("Failed to parse partitioning property: " + partitioning + "!");
+                throw new TempusRuntimeException("Failed to parse partitioning property: " + partitioning + "!");
             }
         }
     }
@@ -619,7 +619,7 @@ public class CassandraBaseTimeseriesDao extends CassandraAbstractAsyncDao implem
             case JSON:
                 return JSON_VALUE_COLUMN;
             default:
-                throw new TempusRunTimeException("Not implemented!");
+                throw new TempusRuntimeException("Not implemented!");
         }
     }
 

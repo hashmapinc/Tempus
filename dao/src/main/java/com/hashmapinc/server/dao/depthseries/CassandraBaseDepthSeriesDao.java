@@ -27,7 +27,7 @@ import com.google.common.util.concurrent.ListenableFuture;
 import com.hashmapinc.server.common.data.DeviceDataSet;
 import com.hashmapinc.server.common.data.id.EntityId;
 import com.hashmapinc.server.common.data.kv.*;
-import com.hashmapinc.server.common.msg.exception.TempusRunTimeException;
+import com.hashmapinc.server.common.msg.exception.TempusRuntimeException;
 import com.hashmapinc.server.dao.model.ModelConstants;
 import com.hashmapinc.server.dao.nosql.CassandraAbstractAsyncDao;
 import com.hashmapinc.server.dao.timeseries.TsPartitionDate;
@@ -223,7 +223,7 @@ public class CassandraBaseDepthSeriesDao extends CassandraAbstractAsyncDao imple
                     futures.add(executeAsyncRead(stmt));
                 }
                 return Futures.allAsList(futures);
-            } catch (TempusRunTimeException e) {
+            } catch (TempusRuntimeException e) {
                 log.error("Failed to fetch data", e);
                 throw e;
             }
@@ -603,7 +603,7 @@ public class CassandraBaseDepthSeriesDao extends CassandraAbstractAsyncDao imple
             case JSON:
                 return ModelConstants.JSON_VALUE_COLUMN;
             default:
-                throw new TempusRunTimeException("Not implemented!");
+                throw new TempusRuntimeException("Not implemented!");
         }
     }
 
