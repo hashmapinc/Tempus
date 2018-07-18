@@ -36,7 +36,7 @@
 			<md-fab-speed-dial ng-disabled="$root.loading" ng-show="vm.isEdit" md-open="vm.addItemActionsOpen"
 			 class="md-scale" md-direction="up">
 				<md-fab-trigger>
-					<md-button ng-disabled="$root.loading" class="tb-btn-footer md-accent md-hue-2 md-fab" aria-label="Add new data model object" ng-click="vm.showDatamodelObjectStepper($event)">
+					<md-button ng-disabled="$root.loading" class="tb-btn-footer md-accent md-hue-2 md-fab" aria-label="Add new data model object" ng-click="vm.showDatamodelObjectStepper($event, null)">
 						<md-tooltip md-direction="top">
 							Add new data model object
 						</md-tooltip>
