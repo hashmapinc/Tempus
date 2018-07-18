@@ -23,5 +23,5 @@ import java.io.Serializable;
 @Data
 public class AttributeKey implements Serializable {
     private final String scope;
-    private final String attributeKey;
+    private final String key;
 }

@@ -16,17 +16,17 @@
 package com.hashmapinc.server.extensions.core.processor;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.hashmapinc.server.common.data.DataConstants;
+import com.hashmapinc.server.common.data.Event;
+import com.hashmapinc.server.common.msg.device.ToDeviceActorMsg;
+import com.hashmapinc.server.common.msg.exception.TempusRuntimeException;
 import com.hashmapinc.server.extensions.api.component.Processor;
 import com.hashmapinc.server.extensions.api.rules.*;
+import com.hashmapinc.server.extensions.core.utils.VelocityUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.runtime.parser.ParseException;
-import com.hashmapinc.server.common.data.DataConstants;
-import com.hashmapinc.server.common.data.Event;
-import com.hashmapinc.server.common.msg.device.ToDeviceActorMsg;
-import com.hashmapinc.server.extensions.api.rules.*;
-import com.hashmapinc.server.extensions.core.utils.VelocityUtils;
 
 import java.util.Optional;
 
@@ -39,19 +39,17 @@ public class AlarmDeduplicationProcessor extends SimpleRuleLifecycleComponent
 
     public static final String IS_NEW_ALARM = "isNewAlarm";
     private ObjectMapper mapper = new ObjectMapper();
-    private AlarmDeduplicationProcessorConfiguration configuration;
     private Template alarmIdTemplate;
     private Template alarmBodyTemplate;
 
     @Override
     public void init(AlarmDeduplicationProcessorConfiguration configuration) {
-        this.configuration = configuration;
         try {
             this.alarmIdTemplate = VelocityUtils.create(configuration.getAlarmIdTemplate(), "Alarm Id Template");
             this.alarmBodyTemplate = VelocityUtils.create(configuration.getAlarmBodyTemplate(), "Alarm Body Template");
         } catch (ParseException e) {
             log.error("Failed to create templates based on provided configuration!", e);
-            throw new RuntimeException("Failed to create templates based on provided configuration!", e);
+            throw new TempusRuntimeException("Failed to create templates based on provided configuration!", e);
         }
     }
 

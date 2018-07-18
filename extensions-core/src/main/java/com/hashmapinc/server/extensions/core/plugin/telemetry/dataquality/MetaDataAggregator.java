@@ -35,7 +35,7 @@ public class MetaDataAggregator {
     private double depthAggregationPeriod;
     private PluginContext ctx;
     private EntityId entityId;
-    private final int limit = 10000;
+    private static final int LIMIT = 10000;
 
     public MetaDataAggregator(PluginContext ctx, EntityId entityId){
         this.ctx = ctx;
@@ -55,7 +55,7 @@ public class MetaDataAggregator {
         for (KvEntry entry: kvEntries){
             keys.add(entry.getKey());
         }
-        List<TsKvQuery> queries = keys.stream().map(key -> new BaseTsKvQuery(key,endTs - aggregationPeriod, endTs, aggregationPeriod, limit, Aggregation.NONE)).collect(Collectors.toList());
+        List<TsKvQuery> queries = keys.stream().map(key -> new BaseTsKvQuery(key,endTs - aggregationPeriod, endTs, aggregationPeriod, LIMIT, Aggregation.NONE)).collect(Collectors.toList());
         ctx.loadTimeseries(entityId, queries, new PluginCallback<List<TsKvEntry>>() {
             @Override
             public void onSuccess(PluginContext ctx, List<TsKvEntry> data) {
@@ -78,7 +78,7 @@ public class MetaDataAggregator {
         for (KvEntry entry: kvEntries){
             keys.add(entry.getKey());
         }
-        List<DsKvQuery> queries = keys.stream().map(key -> new BaseDsKvQuery(key,endDs - depthAggregationPeriod, endDs, depthAggregationPeriod, limit, DepthAggregation.NONE)).collect(Collectors.toList());
+        List<DsKvQuery> queries = keys.stream().map(key -> new BaseDsKvQuery(key,endDs - depthAggregationPeriod, endDs, depthAggregationPeriod, LIMIT, DepthAggregation.NONE)).collect(Collectors.toList());
         ctx.loadDepthSeries(entityId, queries, new PluginCallback<List<DsKvEntry>>() {
             @Override
             public void onSuccess(PluginContext ctx, List<DsKvEntry> data) {

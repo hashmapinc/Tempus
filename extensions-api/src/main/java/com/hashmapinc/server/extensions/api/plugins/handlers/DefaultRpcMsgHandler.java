@@ -15,6 +15,7 @@
  */
 package com.hashmapinc.server.extensions.api.plugins.handlers;
 
+import com.hashmapinc.server.common.msg.exception.TempusRuntimeException;
 import com.hashmapinc.server.extensions.api.plugins.PluginContext;
 import com.hashmapinc.server.extensions.api.plugins.rpc.RpcMsg;
 
@@ -23,6 +24,6 @@ public class DefaultRpcMsgHandler implements RpcMsgHandler {
 
     @Override
     public void process(PluginContext ctx, RpcMsg msg) {
-        throw new RuntimeException("Not registered msg type: " + msg.getMsgClazz() + "!");
+        throw new TempusRuntimeException("Not registered msg type: " + msg.getMsgClazz() + "!");
     }
 }

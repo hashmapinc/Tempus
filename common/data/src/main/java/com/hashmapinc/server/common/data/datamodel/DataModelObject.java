@@ -25,12 +25,12 @@ import java.util.List;
 
 public class DataModelObject extends SearchTextBased<DataModelObjectId> implements HasName {
     private String name;
-    private JsonNode decription;
+    private transient JsonNode description;
     private DataModelId dataModelId;
     private String type;
     private DataModelObjectId parentId;
     private CustomerId customerId;
-    private List<AttributeDefinition> attributeDefinitions = new ArrayList<AttributeDefinition>();
+    private List<AttributeDefinition> attributeDefinitions = new ArrayList<>();
 
     public DataModelObject() {
         super();
@@ -43,7 +43,7 @@ public class DataModelObject extends SearchTextBased<DataModelObjectId> implemen
     public DataModelObject(DataModelObject dataModelObject) {
         super(dataModelObject);
         this.name = dataModelObject.name;
-        this.decription = dataModelObject.decription;
+        this.description = dataModelObject.description;
         this.dataModelId = dataModelObject.dataModelId;
         this.type = dataModelObject.type;
         this.parentId = dataModelObject.parentId;
@@ -57,22 +57,25 @@ public class DataModelObject extends SearchTextBased<DataModelObjectId> implemen
         if (o == null || getClass() != o.getClass()) return false;
         if (!super.equals(o)) return false;
 
-        DataModelObject that = (DataModelObject) o;
-         if (name != null ? !name.equals(that.name) : that.name != null) return false;
-         if (decription != null ? !decription.equals(that.decription) : that.decription != null) return false;
-         if (dataModelId != null ? !dataModelId.equals(that.dataModelId) : that.dataModelId != null) return false;
-         if (type != null ? !type.equals(that.type) : that.type != null) return false;
-         if (parentId != null ? !parentId.equals(that.parentId) : that.parentId != null) return false;
-         if (customerId != null ? !customerId.equals(that.customerId) : that.customerId != null) return false;
-         if (attributeDefinitions != null ? !attributeDefinitions.equals(that.attributeDefinitions) : that.attributeDefinitions != null) return false;
-        return true;
+        return checkObjEquality((DataModelObject) o);
+    }
+
+    private boolean checkObjEquality(DataModelObject o) {
+        DataModelObject that = o;
+        if (name != null ? !name.equals(that.name) : that.name != null) return false;
+        if (description != null ? !description.equals(that.description) : that.description != null) return false;
+        if (dataModelId != null ? !dataModelId.equals(that.dataModelId) : that.dataModelId != null) return false;
+        if (type != null ? !type.equals(that.type) : that.type != null) return false;
+        if (parentId != null ? !parentId.equals(that.parentId) : that.parentId != null) return false;
+        if (customerId != null ? !customerId.equals(that.customerId) : that.customerId != null) return false;
+        return (attributeDefinitions != null ? attributeDefinitions.equals(that.attributeDefinitions) : that.attributeDefinitions == null);
     }
 
     @Override
     public int hashCode() {
         int result = super.hashCode();
         result = 31 * result + (name != null ? name.hashCode() : 0);
-        result = 31 * result + (decription != null ? decription.hashCode() : 0);
+        result = 31 * result + (description != null ? description.hashCode() : 0);
         result = 31 * result + (dataModelId != null ? dataModelId.hashCode() : 0);
         result = 31 * result + (type != null ? type.hashCode() : 0);
         result = 31 * result + (parentId != null ? parentId.hashCode() : 0);
@@ -85,12 +88,12 @@ public class DataModelObject extends SearchTextBased<DataModelObjectId> implemen
         this.name = name;
     }
 
-    public JsonNode getDecription() {
-        return decription;
+    public JsonNode getDescription() {
+        return description;
     }
 
-    public void setDecription(JsonNode decription) {
-        this.decription = decription;
+    public void setDescription(JsonNode description) {
+        this.description = description;
     }
 
     public DataModelId getDataModelId() {
@@ -140,7 +143,7 @@ public class DataModelObject extends SearchTextBased<DataModelObjectId> implemen
 
     @Override
     public String getSearchText() {
-        return name;
+        return getName();
     }
 
 }

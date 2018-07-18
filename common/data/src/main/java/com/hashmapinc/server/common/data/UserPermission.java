@@ -20,7 +20,6 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 
@@ -57,17 +56,14 @@ public class UserPermission {
         if(expressionTokens[1].trim().equals("*"))
             this.resources = Arrays.asList(EntityType.values());
         else {
-            ArrayList<EntityType> resources = new ArrayList<>();
-            resources.add(new EnumUtil<>(EntityType.class).parse(expressionTokens[1]));
-            this.resources = resources;
+            this.resources = Arrays.asList(new EnumUtil<>(EntityType.class).parse(expressionTokens[1]));
         }
 
         if(expressionTokens[2].trim().equals("*"))
             this.userActions = Arrays.asList(UserAction.values());
         else {
-            ArrayList<UserAction> userActions = new ArrayList<>();
-            userActions.add(new EnumUtil<>(UserAction.class).parse(expressionTokens[2]));
-            this.userActions = userActions;
+            this.userActions = Arrays.asList(new EnumUtil<>(UserAction.class).parse(expressionTokens[2]));
         }
     }
+
 }

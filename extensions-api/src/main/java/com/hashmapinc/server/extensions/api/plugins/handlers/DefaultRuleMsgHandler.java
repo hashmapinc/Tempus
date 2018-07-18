@@ -17,12 +17,12 @@ package com.hashmapinc.server.extensions.api.plugins.handlers;
 
 import com.hashmapinc.server.common.data.id.RuleId;
 import com.hashmapinc.server.common.data.id.TenantId;
+import com.hashmapinc.server.common.msg.exception.TempusRuntimeException;
 import com.hashmapinc.server.common.msg.session.MsgType;
 import com.hashmapinc.server.extensions.api.plugins.PluginContext;
 import com.hashmapinc.server.extensions.api.plugins.msg.*;
-import lombok.extern.slf4j.Slf4j;
-import com.hashmapinc.server.extensions.api.plugins.msg.*;
 import com.hashmapinc.server.extensions.api.rules.RuleException;
+import lombok.extern.slf4j.Slf4j;
 
 
 @Slf4j
@@ -61,7 +61,7 @@ public class DefaultRuleMsgHandler implements RuleMsgHandler {
     }
 
     private void msgTypeNotSupported(MsgType msgType) {
-        throw new RuntimeException("Not supported msg type: " + msgType + "!");
+        throw new TempusRuntimeException("Not supported msg type: " + msgType + "!");
     }
 
 }
