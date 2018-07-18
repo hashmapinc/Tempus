@@ -117,7 +117,6 @@ public class DashboardController extends BaseController {
             DashboardId dashboardId = new DashboardId(toUUID(strDashboardId));
             Dashboard dashboard = checkDashboardId(dashboardId);
             dashboardService.deleteDashboard(dashboardId);
-            actorService.onDashboardStateChange(getTenantId(), dashboardId, ComponentLifecycleEvent.DELETED);
 
             logEntityAction(dashboardId, dashboard,
                             null,

@@ -26,7 +26,7 @@ public class DashboardInfo extends SearchTextBased<DashboardId> implements HasNa
 
     private TenantId tenantId;
     private String title;
-    private Set<ShortCustomerInfo> assignedCustomers;
+    private transient Set<ShortCustomerInfo> assignedCustomers;
 
     public DashboardInfo() {
         super();

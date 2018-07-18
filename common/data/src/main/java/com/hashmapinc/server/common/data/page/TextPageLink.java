@@ -67,7 +67,7 @@ public class TextPageLink extends BasePageLink implements Serializable {
             int i = chars.length - 1;
             while (i >= 0 && ++chars[i--] == Character.MIN_VALUE) ;
             if (i == -1 && (chars.length == 0 || chars[0] == Character.MIN_VALUE)) {
-                char buf[] = Arrays.copyOf(input.toCharArray(), input.length() + 1);
+                char[] buf = Arrays.copyOf(input.toCharArray(), input.length() + 1);
                 buf[buf.length - 1] = Character.MIN_VALUE;
                 return new String(buf);
             }

@@ -13,28 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.hashmapinc.server.common.data;
+package com.hashmapinc.server.common.msg.exception;
 
-import java.util.Set;
-
-public class ApplicationFieldsWrapper {
-    private String applicationId;
-    private Set<String> fields;
-
-    public Set<String> getFields() {
-        return fields;
+public class TempusRuntimeException extends RuntimeException{
+    public TempusRuntimeException(String exception){
+        super(exception);
     }
 
-    public void setFields(Set<String> fields) {
-        this.fields = fields;
+    public TempusRuntimeException(String var1, Throwable var2) {
+        super(var1, var2);
     }
 
-    public String getApplicationId() {
-        return applicationId;
+    public TempusRuntimeException(Throwable var1) {
+        super(var1);
     }
 
-    public void setApplicationId(String applicationId) {
-        this.applicationId = applicationId;
+    protected TempusRuntimeException(String var1, Throwable var2, boolean var3, boolean var4) {
+        super(var1, var2, var3, var4);
     }
-
 }

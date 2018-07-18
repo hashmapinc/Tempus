@@ -26,17 +26,21 @@ import com.hashmapinc.server.extensions.core.action.dummy.PassThroughAction;
 public class PassThroughPlugin extends AbstractPlugin<EmptyComponentConfiguration> implements RuleMsgHandler {
     @Override
     public void resume(PluginContext pluginContext) {
+        // Nothing to do here
     }
 
     @Override
     public void suspend(PluginContext pluginContext) {
+        // Nothing to do here
     }
 
     @Override
     public void stop(PluginContext pluginContext) {
+        // Nothing to do here
     }
 
     @Override
     public void init(EmptyComponentConfiguration emptyComponentConfiguration) {
+        // Nothing to do here
     }
 }

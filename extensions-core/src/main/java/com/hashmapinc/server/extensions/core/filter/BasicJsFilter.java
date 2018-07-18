@@ -16,6 +16,7 @@
 package com.hashmapinc.server.extensions.core.filter;
 
 import com.hashmapinc.server.common.msg.device.ToDeviceActorMsg;
+import com.hashmapinc.server.common.msg.exception.TempusRuntimeException;
 import com.hashmapinc.server.extensions.api.rules.RuleContext;
 import com.hashmapinc.server.extensions.api.rules.RuleFilter;
 import lombok.extern.slf4j.Slf4j;
@@ -41,7 +42,7 @@ public abstract class BasicJsFilter implements RuleFilter<JsFilterConfiguration>
             return doFilter(ctx, msg);
         } catch (ScriptException e) {
             log.warn("RuleFilter evaluation exception: {}", e.getMessage(), e);
-            throw new RuntimeException(e);
+            throw new TempusRuntimeException(e);
         }
     }
 

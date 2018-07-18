@@ -52,8 +52,8 @@ public class AttributeDefinition implements Serializable{
         if (dataModelObjectId != null ? !dataModelObjectId.equals(that.dataModelObjectId) : that.dataModelObjectId != null) return false;
         if (source != null ? !source.equals(that.source) : that.source != null) return false;
         if (value != null ? !value.equals(that.value) : that.value != null) return false;
-        if (valueType != null ? !valueType.equals(that.valueType) : that.valueType != null) return false;
-        return true;
+        return (valueType != null ? valueType.equals(that.valueType) : that.valueType == null);
+
     }
 
     @Override

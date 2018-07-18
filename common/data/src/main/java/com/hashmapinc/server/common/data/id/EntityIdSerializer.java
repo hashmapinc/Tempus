@@ -16,7 +16,6 @@
 package com.hashmapinc.server.common.data.id;
 
 import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
 
@@ -28,7 +27,7 @@ import java.io.IOException;
 public class EntityIdSerializer extends JsonSerializer<EntityId> {
 
     @Override
-    public void serialize(EntityId value, JsonGenerator gen, SerializerProvider serializers) throws IOException, JsonProcessingException {
+    public void serialize(EntityId value, JsonGenerator gen, SerializerProvider serializers) throws IOException {
         gen.writeStartObject();
         gen.writeStringField("entityType", value.getEntityType().name());
         gen.writeStringField("id", value.getId().toString());
