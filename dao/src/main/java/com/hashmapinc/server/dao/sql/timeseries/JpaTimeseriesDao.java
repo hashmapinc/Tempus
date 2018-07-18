@@ -200,13 +200,13 @@ public class JpaTimeseriesDao extends JpaAbstractDaoListeningExecutorService imp
                 listenableFuture.set(tsKvEntity);
             }
         });
-        return Futures.transform(listenableFuture, (Function<TsKvEntity, Optional<TsKvEntry>>) entity1 -> {
-            if (entity1 != null && entity1.isNotEmpty()) {
-                entity1.setEntityId(entityIdStr);
-                entity1.setEntityType(entityId.getEntityType());
-                entity1.setKey(key);
-                entity1.setTs(ts);
-                return Optional.of(DaoUtil.getData(entity1));
+        return Futures.transform(listenableFuture, (Function<TsKvEntity, Optional<TsKvEntry>>) e -> {
+            if (e != null && e.isNotEmpty()) {
+                e.setEntityId(entityIdStr);
+                e.setEntityType(entityId.getEntityType());
+                e.setKey(key);
+                e.setTs(ts);
+                return Optional.of(DaoUtil.getData(e));
             } else {
                 return Optional.empty();
             }

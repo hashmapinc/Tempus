@@ -160,13 +160,14 @@ public class JpaDepthSeriesDao extends JpaAbstractDaoListeningExecutorService im
                 listenableFuture.set(dsKvEntity);
             }
         });
-        return Futures.transform(listenableFuture, (Function<DsKvEntity, Optional<DsKvEntry>>) entity1 -> {
-            if (entity1 != null && entity1.isNotEmpty()) {
-                entity1.setEntityId(entityIdStr);
-                entity1.setEntityType(entityId.getEntityType());
-                entity1.setKey(key);
-                entity1.setDs(ds);
-                return Optional.of(DaoUtil.getData(entity1));
+
+        return Futures.transform(listenableFuture, (Function<DsKvEntity, Optional<DsKvEntry>>) e -> {
+            if (e != null && e.isNotEmpty()) {
+                e.setEntityId(entityIdStr);
+                e.setEntityType(entityId.getEntityType());
+                e.setKey(key);
+                e.setDs(ds);
+                return Optional.of(DaoUtil.getData(e));
             } else {
                 return Optional.empty();
             }

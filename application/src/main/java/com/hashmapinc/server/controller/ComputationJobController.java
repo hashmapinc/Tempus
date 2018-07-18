@@ -37,7 +37,7 @@ import static com.hashmapinc.server.exception.TempusErrorCode.ITEM_NOT_FOUND;
 public class ComputationJobController extends BaseController{
 
     public static final String COMPUTATION_ID = "ComputationId ";
-    public static final String NOT_FOUND_SUFFIX = " wasn't found!";
+    public static final String NOT_FOUND_SUFFIX = " wasn't found! ";
 
     @PreAuthorize("hasAuthority('TENANT_ADMIN')")
     @RequestMapping(value = "/computations/{computationid}/jobs", method = RequestMethod.POST)
@@ -46,7 +46,7 @@ public class ComputationJobController extends BaseController{
                                              @RequestBody ComputationJob source) throws TempusException {
         ComputationJob computationJob = null;
         if(!validateComputationId(strComputationId)){
-            throw new TempusException(COMPUTATION_ID + strComputationId + " wasn't found! ",ITEM_NOT_FOUND);
+            throw new TempusException(COMPUTATION_ID + strComputationId + NOT_FOUND_SUFFIX, ITEM_NOT_FOUND);
         }
         try {
             boolean created = source.getId() == null;

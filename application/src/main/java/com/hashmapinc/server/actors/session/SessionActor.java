@@ -131,7 +131,7 @@ public class SessionActor extends ContextAwareActor {
             if (sessionMsg.getSessionContext().getSessionType() == SessionType.SYNC) {
                 processor = new SyncMsgProcessor(systemContext, logger, sessionId);
             } else {
-                processor = new ASyncMsgProcessor(systemContext, logger, sessionId);
+                processor = new AsyncMsgProcessor(systemContext, logger, sessionId);
             }
         }
     }

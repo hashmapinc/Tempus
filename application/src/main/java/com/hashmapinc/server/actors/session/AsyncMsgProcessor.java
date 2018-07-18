@@ -32,7 +32,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-class ASyncMsgProcessor extends AbstractSessionActorMsgProcessor {
+class AsyncMsgProcessor extends AbstractSessionActorMsgProcessor {
 
     private boolean firstMsg = true;
     private Map<Integer, ToDeviceActorMsg> pendingMap = new HashMap<>();
@@ -41,7 +41,7 @@ class ASyncMsgProcessor extends AbstractSessionActorMsgProcessor {
     private boolean subscribedToTelemetryUpdates;
     private boolean subscribedToRpcCommands;
 
-    public ASyncMsgProcessor(ActorSystemContext ctx, LoggingAdapter logger, SessionId sessionId) {
+    public AsyncMsgProcessor(ActorSystemContext ctx, LoggingAdapter logger, SessionId sessionId) {
         super(ctx, logger, sessionId);
     }
 
@@ -130,7 +130,7 @@ class ASyncMsgProcessor extends AbstractSessionActorMsgProcessor {
         final boolean isEligibleSubscriber = subscribedToAttributeUpdates || subscribedToRpcCommands
                 || subscribedToTelemetryUpdates;
 
-        if (pendingMap.size() > 0 || isEligibleSubscriber) {
+        if (!pendingMap.isEmpty() || isEligibleSubscriber) {
             Optional<ServerAddress> newTargetServer = systemContext.getRoutingService().resolveById(getDeviceId());
 
             if (!newTargetServer.equals(currentTargetServer)) {

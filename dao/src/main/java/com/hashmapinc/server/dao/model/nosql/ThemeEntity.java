@@ -47,7 +47,7 @@ public class ThemeEntity implements BaseEntity<Theme> {
     private String value;
 
     @Column(name = ModelConstants.THEME_IS_ENABLED_PROPERTY)
-    private boolean isEnabled;
+    private boolean enabled;
 
     public ThemeEntity() {
         super();
@@ -60,7 +60,7 @@ public class ThemeEntity implements BaseEntity<Theme> {
 
         this.name = theme.getThemeName();
         this.value = theme.getThemeValue();
-        this.isEnabled = theme.getThemeStatus();
+        this.enabled = theme.getThemeStatus();
     }
 
 
@@ -88,21 +88,20 @@ public class ThemeEntity implements BaseEntity<Theme> {
         this.value = value;
     }
 
-    public boolean getIsEnabled() {
-        return isEnabled;
+    public boolean isEnabled() {
+        return enabled;
     }
 
-    public void setIsEnabled(boolean enabled) {
-        this.isEnabled = enabled;
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
     }
-
 
     @Override
     public Theme toData() {
         Theme theme  = new Theme(new ThemeId(getId()));
         theme.setThemeName(name);
         theme.setThemeValue(value);
-        theme.setThemeStatus(isEnabled);
+        theme.setThemeStatus(enabled);
         return theme;
     }
 
