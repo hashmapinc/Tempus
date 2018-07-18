@@ -54,8 +54,7 @@ public class SparkPlugDecodeService extends SparkPlugUtils {
         }
         else if(topicName.contains(DDATA)){
             String device = extractDeviceName(topicName);
-            final Boolean gotDevice = deviceMap.get(device);
-            if(deviceMap.containsKey(device) && gotDevice) {
+            if(deviceMap.containsKey(device) && deviceMap.get(device)) {
                 convertToPostTelemetry(ctx, inbound);
             }
         }
