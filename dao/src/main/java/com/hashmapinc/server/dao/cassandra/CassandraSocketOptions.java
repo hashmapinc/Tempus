@@ -47,7 +47,7 @@ public class CassandraSocketOptions {
     @Value("${cassandra.socket.send_buffer_size}")
     private Integer sendBufferSize;
 
-    private SocketOptions opts;
+    private SocketOptions opts;     //NOSONAR
 
     @PostConstruct
     public void initOpts() {

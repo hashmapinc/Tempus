@@ -30,13 +30,12 @@ import com.hashmapinc.server.common.data.kv.*;
 import com.hashmapinc.server.common.msg.exception.TempusRuntimeException;
 import com.hashmapinc.server.dao.model.ModelConstants;
 import com.hashmapinc.server.dao.nosql.CassandraAbstractAsyncDao;
-import com.hashmapinc.server.dao.timeseries.TsPartitionDate;
+import com.hashmapinc.server.dao.timeseries.SimpleListenableFuture;
 import com.hashmapinc.server.dao.util.NoSqlDao;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
-import com.hashmapinc.server.dao.timeseries.SimpleListenableFuture;
 
 import javax.annotation.Nullable;
 import javax.annotation.PostConstruct;
@@ -54,13 +53,12 @@ public class CassandraBaseDepthSeriesDao extends CassandraAbstractAsyncDao imple
     private static final Double MIN_AGGREGATION_STEP_MS = 0.1;
     public static final String INSERT_INTO = "INSERT INTO ";
     public static final String SELECT = "SELECT ";
+    private static final String EQUAL_PLACEHOLDER = " = ? ";
     public static final String GENERATED_QUERY_FOR_ENTITY_TYPE_AND_ENTITY_ID = "Generated query [{}] for entityType {} and entityId {}";
 
     @Autowired
     private Environment environment;
 
-
-    private TsPartitionDate tsFormat;
 
     private PreparedStatement partitionInsertStmt;
     private PreparedStatement partitionInsertTtlStmt;
@@ -80,7 +78,6 @@ public class CassandraBaseDepthSeriesDao extends CassandraAbstractAsyncDao imple
         super.startExecutor();
         if (!isInstall()) {
             getFetchStmt(DepthAggregation.NONE);
-            log.debug("HMDC inside init. ");
         }
     }
 
@@ -410,34 +407,23 @@ public class CassandraBaseDepthSeriesDao extends CassandraAbstractAsyncDao imple
     }
 
     public static KvEntry toKvEntry(Row row, String key) {
-        KvEntry kvEntry = null;
-        String strV = row.get(ModelConstants.STRING_VALUE_COLUMN, String.class);
-        if (strV != null) {
-            kvEntry = new StringDataEntry(key, strV);
-        } else {
-            Long longV = row.get(ModelConstants.LONG_VALUE_COLUMN, Long.class);
-            if (longV != null) {
-                kvEntry = new LongDataEntry(key, longV);
-            } else {
-                Double doubleV = row.get(ModelConstants.DOUBLE_VALUE_COLUMN, Double.class);
-                if (doubleV != null) {
-                    kvEntry = new DoubleDataEntry(key, doubleV);
-                } else {
-                    Boolean boolV = row.get(ModelConstants.BOOLEAN_VALUE_COLUMN, Boolean.class);
-                    if (boolV != null) {
-                        kvEntry = new BooleanDataEntry(key, boolV);
-                    } else {
-                        JsonNode jsonV = row.get(ModelConstants.JSON_VALUE_COLUMN, JsonNode.class);
-                        if (jsonV != null) {
-                            kvEntry = new JsonDataEntry(key, jsonV);
-                        } else {
-                            log.warn("All values in key-value row are nullable ");
-                        }
-                    }
-                }
-            }
+        if (row.get(ModelConstants.STRING_VALUE_COLUMN, String.class) != null) {
+            return new StringDataEntry(key, row.get(ModelConstants.STRING_VALUE_COLUMN, String.class));
         }
-        return kvEntry;
+        if (row.get(ModelConstants.LONG_VALUE_COLUMN, Long.class) != null) {
+            return new LongDataEntry(key, row.get(ModelConstants.LONG_VALUE_COLUMN, Long.class));
+        }
+        if (row.get(ModelConstants.DOUBLE_VALUE_COLUMN, Double.class) != null) {
+            return new DoubleDataEntry(key, row.get(ModelConstants.DOUBLE_VALUE_COLUMN, Double.class));
+        }
+        if (row.get(ModelConstants.BOOLEAN_VALUE_COLUMN, Boolean.class) != null) {
+            return new BooleanDataEntry(key, row.get(ModelConstants.BOOLEAN_VALUE_COLUMN, Boolean.class));
+        }
+        if (row.get(ModelConstants.JSON_VALUE_COLUMN, JsonNode.class) != null) {
+            return new JsonDataEntry(key, row.get(ModelConstants.JSON_VALUE_COLUMN, JsonNode.class));
+        }
+        log.warn("All values in key-value row are nullable ");
+        return null;
     }
 
     /**
@@ -499,17 +485,16 @@ public class CassandraBaseDepthSeriesDao extends CassandraAbstractAsyncDao imple
                 } else {
                     fetchStmts[type.ordinal()] = getSession().prepare(SELECT +
                             String.join(", ", ModelConstants.getFetchColumnNames(type)) + " FROM " + ModelConstants.DS_KV_CF
-                            + " WHERE " + ModelConstants.ENTITY_TYPE_COLUMN + " = ? "
-                            + "AND " + ModelConstants.ENTITY_ID_COLUMN + " = ? "
-                            + "AND " + ModelConstants.KEY_COLUMN + " = ? "
-                            + "AND " + ModelConstants.PARTITION_COLUMN + " = ? "
+                            + " WHERE " + ModelConstants.ENTITY_TYPE_COLUMN + EQUAL_PLACEHOLDER
+                            + "AND " + ModelConstants.ENTITY_ID_COLUMN + EQUAL_PLACEHOLDER
+                            + "AND " + ModelConstants.KEY_COLUMN + EQUAL_PLACEHOLDER
+                            + "AND " + ModelConstants.PARTITION_COLUMN + EQUAL_PLACEHOLDER
                             + "AND " + ModelConstants.DS_COLUMN + " > ? "
                             + "AND " + ModelConstants.DS_COLUMN + " <= ?"
                             + (type == DepthAggregation.NONE ? " ORDER BY " + ModelConstants.DS_COLUMN + " DESC LIMIT ?" : ""));
                 }
             }
         }
-        log.debug("HMDC Out of fetch null ");
         return fetchStmts[aggType.ordinal()];
     }
 
@@ -566,9 +551,9 @@ public class CassandraBaseDepthSeriesDao extends CassandraAbstractAsyncDao imple
                     ModelConstants.DOUBLE_VALUE_COLUMN + "," +
                     ModelConstants.JSON_VALUE_COLUMN + " " +
                     "FROM " + ModelConstants.DS_KV_LATEST_CF + " " +
-                    "WHERE " + ModelConstants.ENTITY_TYPE_COLUMN + " = ? " +
-                    "AND " + ModelConstants.ENTITY_ID_COLUMN + " = ? " +
-                    "AND " + ModelConstants.KEY_COLUMN + " = ? ");
+                    "WHERE " + ModelConstants.ENTITY_TYPE_COLUMN + EQUAL_PLACEHOLDER +
+                    "AND " + ModelConstants.ENTITY_ID_COLUMN + EQUAL_PLACEHOLDER +
+                    "AND " + ModelConstants.KEY_COLUMN + EQUAL_PLACEHOLDER);
         }
         return findLatestStmt;
     }
@@ -584,8 +569,8 @@ public class CassandraBaseDepthSeriesDao extends CassandraAbstractAsyncDao imple
                     ModelConstants.DOUBLE_VALUE_COLUMN + "," +
                     ModelConstants.JSON_VALUE_COLUMN + " " +
                     "FROM " + ModelConstants.DS_KV_LATEST_CF + " " +
-                    "WHERE " + ModelConstants.ENTITY_TYPE_COLUMN + " = ? " +
-                    "AND " + ModelConstants.ENTITY_ID_COLUMN + " = ? ");
+                    "WHERE " + ModelConstants.ENTITY_TYPE_COLUMN + EQUAL_PLACEHOLDER +
+                    "AND " + ModelConstants.ENTITY_ID_COLUMN + EQUAL_PLACEHOLDER);
         }
         return findAllLatestStmt;
     }

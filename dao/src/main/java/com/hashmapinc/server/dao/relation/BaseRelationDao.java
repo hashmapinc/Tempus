@@ -125,7 +125,7 @@ public class BaseRelationDao extends CassandraAbstractAsyncDao implements Relati
                 .setString(3, to.getEntityType().name())
                 .set(4, typeGroup, relationTypeGroupCodec)
                 .setString(5, relationType);
-        return getFuture(executeAsyncRead(stmt), rs -> rs != null ? rs.one() != null : false);
+        return getFuture(executeAsyncRead(stmt), rs -> rs != null && rs.one() != null);
     }
 
     @Override
@@ -347,7 +347,7 @@ public class BaseRelationDao extends CassandraAbstractAsyncDao implements Relati
     }
 
     private ListenableFuture<Boolean> getBooleanListenableFuture(ResultSetFuture rsFuture) {
-        return getFuture(rsFuture, rs -> rs != null ? rs.wasApplied() : false);
+        return getFuture(rsFuture, rs -> rs != null && rs.wasApplied());
     }
 
     private List<EntityRelation> getEntityRelations(ResultSet rs) {

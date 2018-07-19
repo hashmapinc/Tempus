@@ -20,10 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.stereotype.Component;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import com.hashmapinc.server.exception.TempusException;
 
 import java.util.HashMap;
@@ -47,7 +44,7 @@ public class ConfigurationController extends BaseController {
         this.ui = ui;
     }
 
-    @RequestMapping(value = "/configurations", method = RequestMethod.GET)
+    @GetMapping(value = "/configurations")
     @ResponseBody
     public Map<String, String> getUiConfiguration() throws TempusException {
         if (!ui.isEmpty()) {

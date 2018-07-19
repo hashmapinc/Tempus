@@ -34,7 +34,7 @@ public class TenantController extends BaseController {
     private TenantService tenantService;
 
     @PreAuthorize("hasAnyAuthority('SYS_ADMIN', 'TENANT_ADMIN')")
-    @RequestMapping(value = "/tenant/{tenantId}", method = RequestMethod.GET)
+    @GetMapping(value = "/tenant/{tenantId}")
     @ResponseBody
     public Tenant getTenantById(@PathVariable("tenantId") String strTenantId) throws TempusException {
         checkParameter("tenantId", strTenantId);
@@ -48,7 +48,7 @@ public class TenantController extends BaseController {
     }
 
     @PreAuthorize("hasAuthority('SYS_ADMIN')")
-    @RequestMapping(value = "/tenant", method = RequestMethod.POST)
+    @PostMapping(value = "/tenant")
     @ResponseBody 
     public Tenant saveTenant(@RequestBody Tenant tenant) throws TempusException {
         try {
@@ -59,7 +59,7 @@ public class TenantController extends BaseController {
     }
 
     @PreAuthorize("hasAuthority('SYS_ADMIN')")
-    @RequestMapping(value = "/tenant/{tenantId}", method = RequestMethod.DELETE)
+    @DeleteMapping(value = "/tenant/{tenantId}")
     @ResponseStatus(value = HttpStatus.OK)
     public void deleteTenant(@PathVariable("tenantId") String strTenantId) throws TempusException {
         checkParameter("tenantId", strTenantId);
@@ -72,7 +72,7 @@ public class TenantController extends BaseController {
     }
 
     @PreAuthorize("hasAuthority('SYS_ADMIN')")
-    @RequestMapping(value = "/tenants", params = { "limit" }, method = RequestMethod.GET)
+    @GetMapping(value = "/tenants", params = { "limit" })
     @ResponseBody
     public TextPageData<Tenant> getTenants(@RequestParam int limit,
                                            @RequestParam(required = false) String textSearch,

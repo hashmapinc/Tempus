@@ -29,9 +29,9 @@ import java.util.Collection;
 public class UserPermission {
 
     private String permissionExpr;
-    private Authority subject;
-    private Collection<EntityType> resources;
-    private Collection<UserAction> userActions;
+    private Authority subject;      //NOSONAR
+    private Collection<EntityType> resources;   //NOSONAR
+    private Collection<UserAction> userActions; //NOSONAR
 
     public UserPermission(UserPermission permission){
         this(permission.permissionExpr);

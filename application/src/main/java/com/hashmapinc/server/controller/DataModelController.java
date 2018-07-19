@@ -38,7 +38,7 @@ public class DataModelController extends BaseController {
     public static final String DATA_MODEL_ID = "dataModelId";
 
     @PreAuthorize("hasAuthority('TENANT_ADMIN')")
-    @RequestMapping(value = "/data-model", method = RequestMethod.POST)
+    @PostMapping(value = "/data-model")
     @ResponseBody
     public DataModel saveDataModel(@RequestBody DataModel dataModel) throws TempusException {
         dataModel.setTenantId(getCurrentUser().getTenantId());
@@ -57,7 +57,7 @@ public class DataModelController extends BaseController {
     }
 
     @PreAuthorize("hasAnyAuthority('TENANT_ADMIN', 'CUSTOMER_USER')")
-    @RequestMapping(value = "data-model/{dataModelId}", method = RequestMethod.GET)
+    @GetMapping(value = "data-model/{dataModelId}")
     @ResponseBody
     public DataModel fetchDataModelById(@PathVariable(DATA_MODEL_ID) String dataModelId) throws TempusException {
         try{
@@ -69,7 +69,7 @@ public class DataModelController extends BaseController {
     }
 
     @PreAuthorize("hasAnyAuthority('TENANT_ADMIN', 'CUSTOMER_USER')")
-    @RequestMapping(value = "data-model", method = RequestMethod.GET)
+    @GetMapping(value = "data-model")
     @ResponseBody
     public List<DataModel> fetchAllDataModelByTenantId() throws TempusException {
         try{
@@ -80,7 +80,7 @@ public class DataModelController extends BaseController {
     }
 
     @PreAuthorize("hasAnyAuthority('TENANT_ADMIN', 'CUSTOMER_USER')")
-    @RequestMapping(value = "/data-model/{dataModelId}/objects", method = RequestMethod.POST)
+    @PostMapping(value = "/data-model/{dataModelId}/objects")
     @ResponseBody
     public DataModelObject saveDataModelObject(@RequestBody DataModelObject dataModelObject,
                                                @PathVariable String dataModelId) throws TempusException {
@@ -102,7 +102,7 @@ public class DataModelController extends BaseController {
     }
 
     @PreAuthorize("hasAnyAuthority('TENANT_ADMIN', 'CUSTOMER_USER')")
-    @RequestMapping(value = "/data-model/{dataModelId}/objects", method = RequestMethod.GET)
+    @GetMapping(value = "/data-model/{dataModelId}/objects")
     @ResponseBody
     public List<DataModelObject> fetchDataModelObjectsByModel(@PathVariable(DATA_MODEL_ID) String dataModelId) throws TempusException {
         try {
@@ -117,7 +117,7 @@ public class DataModelController extends BaseController {
     }
 
     @PreAuthorize("hasAnyAuthority('TENANT_ADMIN', 'CUSTOMER_USER')")
-    @RequestMapping(value = "/data-model/objects/{objectId}", method = RequestMethod.GET)
+    @GetMapping(value = "/data-model/objects/{objectId}")
     @ResponseBody
     public DataModelObject fetchDataModelObjectById(@PathVariable("objectId") String objectId)
             throws TempusException {

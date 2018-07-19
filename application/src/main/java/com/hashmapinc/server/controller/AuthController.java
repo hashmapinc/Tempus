@@ -83,7 +83,7 @@ public class AuthController extends BaseController {
     }
 
     @PreAuthorize("isAuthenticated()")
-    @RequestMapping(value = "/auth/changePassword", method = RequestMethod.POST)
+    @PostMapping(value = "/auth/changePassword")
     @ResponseStatus(value = HttpStatus.OK)
     public void changePassword (
             @RequestBody JsonNode changePasswordRequest) throws TempusException {
@@ -103,7 +103,7 @@ public class AuthController extends BaseController {
     }
 
 
-    @RequestMapping(value = "/noauth/activate", params = { "activateToken" }, method = RequestMethod.GET)
+    @GetMapping(value = "/noauth/activate", params = { "activateToken" })
     public ResponseEntity<String> checkActivateToken(@RequestParam(value = "activateToken") String activateToken) throws JsonProcessingException, TempusException {
         HttpHeaders headers = new HttpHeaders();
         HttpStatus responseStatus;
@@ -134,7 +134,7 @@ public class AuthController extends BaseController {
         return new ResponseEntity<>(headers, responseStatus);
     }
 
-    @RequestMapping(value = "/noauth/resetPasswordByEmail", method = RequestMethod.POST)
+    @PostMapping(value = "/noauth/resetPasswordByEmail")
     @ResponseStatus(value = HttpStatus.OK)
     public void requestResetPasswordByEmail (
             @RequestBody JsonNode resetPasswordByEmailRequest,
@@ -161,7 +161,7 @@ public class AuthController extends BaseController {
         }
     }
 
-    @RequestMapping(value = "/noauth/resetPassword", params = { "resetToken" }, method = RequestMethod.GET)
+    @GetMapping(value = "/noauth/resetPassword", params = { "resetToken" })
     public ResponseEntity<String> checkResetToken(
             @RequestParam(value = "resetToken") String resetToken) throws TempusException {
         HttpHeaders headers = new HttpHeaders();
@@ -188,7 +188,7 @@ public class AuthController extends BaseController {
         return new ResponseEntity<>(headers, responseStatus);
     }
 
-    @RequestMapping(value = "/noauth/activate", method = RequestMethod.POST)
+    @PostMapping(value = "/noauth/activate")
     @ResponseStatus(value = HttpStatus.OK)
     @ResponseBody
     public JsonNode activateUser(
@@ -253,7 +253,7 @@ public class AuthController extends BaseController {
         return new OAuth2RestTemplate(userPasswordReq);
     }
 
-    @RequestMapping(value = "/noauth/resetPassword", method = RequestMethod.POST)
+    @PostMapping(value = "/noauth/resetPassword")
     @ResponseStatus(value = HttpStatus.OK)
     @ResponseBody
     public JsonNode resetPassword(

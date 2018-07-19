@@ -47,7 +47,7 @@ public class LoginController extends BaseController {
     @Qualifier("clientRestTemplate")
     OAuth2RestTemplate restTemplate;
 
-    @RequestMapping(value = "/auth/login", method = RequestMethod.POST)
+    @PostMapping(value = "/auth/login")
     @ResponseBody
     public LoginResponseToken loginUser(@RequestBody LoginRequest loginRequest) throws TempusException {
         try {
@@ -69,7 +69,7 @@ public class LoginController extends BaseController {
 
     }
 
-    @RequestMapping(value = "/auth/token", method = RequestMethod.POST)
+    @PostMapping(value = "/auth/token")
     @ResponseBody
     public LoginResponseToken refreshToken(@RequestBody RefreshTokenRequest refreshTokenRequest) throws TempusException {
         try {

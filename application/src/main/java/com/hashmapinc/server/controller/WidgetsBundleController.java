@@ -34,7 +34,7 @@ import java.util.List;
 public class WidgetsBundleController extends BaseController {
 
     @PreAuthorize("hasAnyAuthority('SYS_ADMIN', 'TENANT_ADMIN', 'CUSTOMER_USER')")
-    @RequestMapping(value = "/widgetsBundle/{widgetsBundleId}", method = RequestMethod.GET)
+    @GetMapping(value = "/widgetsBundle/{widgetsBundleId}")
     @ResponseBody
     public WidgetsBundle getWidgetsBundleById(@PathVariable("widgetsBundleId") String strWidgetsBundleId) throws TempusException {
         checkParameter("widgetsBundleId", strWidgetsBundleId);
@@ -47,7 +47,7 @@ public class WidgetsBundleController extends BaseController {
     }
 
     @PreAuthorize("hasAnyAuthority('SYS_ADMIN', 'TENANT_ADMIN')")
-    @RequestMapping(value = "/widgetsBundle", method = RequestMethod.POST)
+    @PostMapping(value = "/widgetsBundle")
     @ResponseBody
     public WidgetsBundle saveWidgetsBundle(@RequestBody WidgetsBundle widgetsBundle) throws TempusException {
         try {
@@ -63,7 +63,7 @@ public class WidgetsBundleController extends BaseController {
     }
 
     @PreAuthorize("hasAnyAuthority('SYS_ADMIN', 'TENANT_ADMIN')")
-    @RequestMapping(value = "/widgetsBundle/{widgetsBundleId}", method = RequestMethod.DELETE)
+    @DeleteMapping(value = "/widgetsBundle/{widgetsBundleId}")
     @ResponseStatus(value = HttpStatus.OK)
     public void deleteWidgetsBundle(@PathVariable("widgetsBundleId") String strWidgetsBundleId) throws TempusException {
         checkParameter("widgetsBundleId", strWidgetsBundleId);
@@ -77,7 +77,7 @@ public class WidgetsBundleController extends BaseController {
     }
 
     @PreAuthorize("hasAnyAuthority('SYS_ADMIN', 'TENANT_ADMIN', 'CUSTOMER_USER')")
-    @RequestMapping(value = "/widgetsBundles", params = { "limit" }, method = RequestMethod.GET)
+    @GetMapping(value = "/widgetsBundles", params = { "limit" })
     @ResponseBody
     public TextPageData<WidgetsBundle> getWidgetsBundles(
             @RequestParam int limit,
@@ -98,7 +98,7 @@ public class WidgetsBundleController extends BaseController {
     }
 
     @PreAuthorize("hasAnyAuthority('SYS_ADMIN', 'TENANT_ADMIN', 'CUSTOMER_USER')")
-    @RequestMapping(value = "/widgetsBundles", method = RequestMethod.GET)
+    @GetMapping(value = "/widgetsBundles")
     @ResponseBody
     public List<WidgetsBundle> getWidgetsBundles() throws TempusException {
         try {

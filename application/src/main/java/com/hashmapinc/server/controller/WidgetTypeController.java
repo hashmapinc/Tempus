@@ -32,7 +32,7 @@ import java.util.List;
 public class WidgetTypeController extends BaseController {
 
     @PreAuthorize("hasAnyAuthority('SYS_ADMIN', 'TENANT_ADMIN')")
-    @RequestMapping(value = "/widgetType/{widgetTypeId}", method = RequestMethod.GET)
+    @GetMapping(value = "/widgetType/{widgetTypeId}")
     @ResponseBody
     public WidgetType getWidgetTypeById(@PathVariable("widgetTypeId") String strWidgetTypeId) throws TempusException {
         checkParameter("widgetTypeId", strWidgetTypeId);
@@ -45,7 +45,7 @@ public class WidgetTypeController extends BaseController {
     }
 
     @PreAuthorize("hasAnyAuthority('SYS_ADMIN', 'TENANT_ADMIN')")
-    @RequestMapping(value = "/widgetType", method = RequestMethod.POST)
+    @PostMapping(value = "/widgetType")
     @ResponseBody
     public WidgetType saveWidgetType(@RequestBody WidgetType widgetType) throws TempusException {
         try {
@@ -61,7 +61,7 @@ public class WidgetTypeController extends BaseController {
     }
 
     @PreAuthorize("hasAnyAuthority('SYS_ADMIN', 'TENANT_ADMIN')")
-    @RequestMapping(value = "/widgetType/{widgetTypeId}", method = RequestMethod.DELETE)
+    @DeleteMapping(value = "/widgetType/{widgetTypeId}")
     @ResponseStatus(value = HttpStatus.OK)
     public void deleteWidgetType(@PathVariable("widgetTypeId") String strWidgetTypeId) throws TempusException {
         checkParameter("widgetTypeId", strWidgetTypeId);
@@ -75,7 +75,7 @@ public class WidgetTypeController extends BaseController {
     }
 
     @PreAuthorize("hasAnyAuthority('SYS_ADMIN', 'TENANT_ADMIN', 'CUSTOMER_USER')")
-    @RequestMapping(value = "/widgetTypes", params = { "isSystem", "bundleAlias"}, method = RequestMethod.GET)
+    @GetMapping(value = "/widgetTypes", params = { "isSystem", "bundleAlias"})
     @ResponseBody
     public List<WidgetType> getBundleWidgetTypes(
             @RequestParam boolean isSystem,
@@ -94,7 +94,7 @@ public class WidgetTypeController extends BaseController {
     }
 
     @PreAuthorize("hasAnyAuthority('SYS_ADMIN', 'TENANT_ADMIN', 'CUSTOMER_USER')")
-    @RequestMapping(value = "/widgetType", params = { "isSystem", "bundleAlias", "alias" }, method = RequestMethod.GET)
+    @GetMapping(value = "/widgetType", params = { "isSystem", "bundleAlias", "alias" })
     @ResponseBody
     public WidgetType getWidgetType(
             @RequestParam boolean isSystem,

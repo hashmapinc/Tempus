@@ -56,7 +56,7 @@ public class UserSettingsController extends BaseController {
 
 
     @PreAuthorize("hasAnyAuthority('TENANT_ADMIN', 'CUSTOMER_USER', 'SYS_ADMIN')")
-    @RequestMapping(value = "/settings/{key}", method = RequestMethod.GET)
+    @GetMapping(value = "/settings/{key}")
     @ResponseBody
     public UserSettings getUserSettings(@PathVariable("key") String key) throws TempusException {
         try {
@@ -68,7 +68,7 @@ public class UserSettingsController extends BaseController {
     }
 
     @PreAuthorize("hasAnyAuthority('TENANT_ADMIN', 'CUSTOMER_USER', 'SYS_ADMIN')")
-    @RequestMapping(value = "/settings", method = RequestMethod.POST)
+    @PostMapping(value = "/settings")
     @ResponseBody 
     public UserSettings saveUserSettings(@RequestBody UserSettings userSettings) throws TempusException {
         try {
@@ -85,7 +85,7 @@ public class UserSettingsController extends BaseController {
     }
 
     @PreAuthorize("hasAuthority('SYS_ADMIN')")
-    @RequestMapping(value = "/settings/testMail", method = RequestMethod.POST)
+    @PostMapping(value = "/settings/testMail")
     public void sendTestMail(@RequestBody UserSettings userSettings) throws TempusException {
         try {
             userSettings = checkNotNull(userSettings);
@@ -99,7 +99,7 @@ public class UserSettingsController extends BaseController {
     }
 
     @PreAuthorize("hasAuthority('SYS_ADMIN')")
-    @RequestMapping(value = "/settings/themes", method = RequestMethod.GET)
+    @GetMapping(value = "/settings/themes")
     public List<Theme> getThemes() throws TempusException  {
         try {
             return themeService.findAll();
@@ -110,7 +110,7 @@ public class UserSettingsController extends BaseController {
 
 
 
-    @RequestMapping(value = "/theming", method = RequestMethod.GET)
+    @GetMapping(value = "/theming")
     @ResponseStatus(value = HttpStatus.OK)
     public Theme getEnabledTheme() throws TempusException  {
         try {
@@ -121,7 +121,7 @@ public class UserSettingsController extends BaseController {
     }
 
     @PreAuthorize("hasAuthority('SYS_ADMIN')")
-    @RequestMapping(value = "/settings/theme", method = RequestMethod.POST)
+    @PostMapping(value = "/settings/theme")
     public Theme updateTheme(@RequestBody String value) throws TempusException {
         try {
             JsonObject request = new JsonParser().parse(value).getAsJsonObject();
@@ -132,7 +132,7 @@ public class UserSettingsController extends BaseController {
     }
 
     @PreAuthorize("hasAuthority('SYS_ADMIN')")
-    @RequestMapping(value = "/settings/uploadLogo", method = RequestMethod.POST)
+    @PostMapping(value = "/settings/uploadLogo")
     public Logo uploadLogo(@RequestParam("file") MultipartFile file) throws TempusException {
         try {
 
@@ -147,7 +147,7 @@ public class UserSettingsController extends BaseController {
         }
     }
 
-    @RequestMapping(value = "/logo", method = RequestMethod.GET)
+    @GetMapping(value = "/logo")
     @ResponseStatus(value = HttpStatus.OK)
     public Logo getLogo() throws TempusException  {
         try {

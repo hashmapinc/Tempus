@@ -15,11 +15,11 @@
  */
 package com.hashmapinc.server.service.cluster.rpc;
 
+import com.hashmapinc.server.common.msg.cluster.ServerAddress;
 import com.hashmapinc.server.gen.cluster.ClusterAPIProtos;
 import io.grpc.stub.StreamObserver;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
-import com.hashmapinc.server.common.msg.cluster.ServerAddress;
 
 import java.io.Closeable;
 import java.util.UUID;
@@ -31,7 +31,7 @@ public final class GrpcSession implements Closeable {
     private final UUID sessionId;
     private final boolean client;
     private final GrpcSessionListener listener;
-    private StreamObserver<ClusterAPIProtos.ToRpcServerMessage> inputStream;
+    private StreamObserver<ClusterAPIProtos.ToRpcServerMessage> inputStream; // NOSONAR
     private StreamObserver<ClusterAPIProtos.ToRpcServerMessage> outputStream;
 
     private boolean connected;

@@ -22,17 +22,16 @@ import akka.event.LoggingAdapter;
 import com.hashmapinc.server.actors.ActorSystemContext;
 import com.hashmapinc.server.actors.service.ContextAwareActor;
 import com.hashmapinc.server.actors.service.ContextBasedCreator;
+import com.hashmapinc.server.actors.service.DefaultActorService;
 import com.hashmapinc.server.common.data.computation.ComputationJob;
 import com.hashmapinc.server.common.data.computation.Computations;
 import com.hashmapinc.server.common.data.id.ComputationId;
 import com.hashmapinc.server.common.data.id.ComputationJobId;
 import com.hashmapinc.server.common.data.id.TenantId;
+import com.hashmapinc.server.common.data.page.PageDataIterable;
 import com.hashmapinc.server.common.data.plugin.ComponentLifecycleEvent;
 import com.hashmapinc.server.common.data.plugin.ComponentLifecycleState;
-import com.hashmapinc.server.actors.service.DefaultActorService;
-import com.hashmapinc.server.common.data.page.PageDataIterable;
 import com.hashmapinc.server.common.msg.plugin.ComponentLifecycleMsg;
-import com.hashmapinc.server.exception.TempusApplicationException;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -53,11 +52,11 @@ public class ComputationActor extends ContextAwareActor {
     }
 
     @Override
-    public void preStart() throws TempusApplicationException {
+    public void preStart(){
         start();
     }
 
-    private void start() throws TempusApplicationException {
+    private void start(){
         logger.info("[{}][{}] Starting computation actor.", computationId, tenantId);
         computation = systemContext.getComputationsService().findById(computationId);
         if(computation == null){

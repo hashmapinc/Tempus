@@ -52,16 +52,12 @@ public class DataModelObject extends SearchTextBased<DataModelObjectId> implemen
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(Object o) { //NOSONAR
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         if (!super.equals(o)) return false;
 
-        return checkObjEquality((DataModelObject) o);
-    }
-
-    private boolean checkObjEquality(DataModelObject o) {
-        DataModelObject that = o;
+        DataModelObject that = (DataModelObject) o;
         if (name != null ? !name.equals(that.name) : that.name != null) return false;
         if (description != null ? !description.equals(that.description) : that.description != null) return false;
         if (dataModelId != null ? !dataModelId.equals(that.dataModelId) : that.dataModelId != null) return false;
