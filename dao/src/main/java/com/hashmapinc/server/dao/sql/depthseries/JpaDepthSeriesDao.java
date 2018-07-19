@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.hashmapinc.server.dao.sql.depthSeries;
+package com.hashmapinc.server.dao.sql.depthseries;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
@@ -33,9 +33,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Component;
 import com.hashmapinc.server.common.data.UUIDConverter;
-import com.hashmapinc.server.common.data.kv.*;
-import com.hashmapinc.server.dao.model.sql.*;
-import com.hashmapinc.server.dao.depthSeries.DepthSeriesDao;
+import com.hashmapinc.server.dao.depthseries.DepthSeriesDao;
 
 import javax.annotation.Nullable;
 import java.util.*;
@@ -63,17 +61,14 @@ public class JpaDepthSeriesDao extends JpaAbstractDaoListeningExecutorService im
                 .stream()
                 .map(query -> findAllAsync(entityId, query))
                 .collect(Collectors.toList());
-        return Futures.transform(Futures.allAsList(futures), new Function<List<List<DsKvEntry>>, List<DsKvEntry>>() {
-            @Nullable
-            @Override
-            public List<DsKvEntry> apply(@Nullable List<List<DsKvEntry>> results) {
+        return Futures.transform(Futures.allAsList(futures), (@Nullable List<List<DsKvEntry>> results)->{
                 if (results == null || results.isEmpty()) {
                     return null;
                 }
                 return results.stream()
                         .flatMap(List::stream)
                         .collect(Collectors.toList());
-            }
+
         }, service);
     }
 
@@ -91,10 +86,7 @@ public class JpaDepthSeriesDao extends JpaAbstractDaoListeningExecutorService im
                 stepDs = endDs;
             }
             ListenableFuture<List<Optional<DsKvEntry>>> future = Futures.allAsList(futures);
-            return Futures.transform(future, new Function<List<Optional<DsKvEntry>>, List<DsKvEntry>>() {
-                @Nullable
-                @Override
-                public List<DsKvEntry> apply(@Nullable List<Optional<DsKvEntry>> results) {
+            return Futures.transform(future,(@Nullable List<Optional<DsKvEntry>> results)->{
                     if (results == null || results.isEmpty()) {
                         return null;
                     }
@@ -102,7 +94,7 @@ public class JpaDepthSeriesDao extends JpaAbstractDaoListeningExecutorService im
                             .filter(Optional::isPresent)
                             .map(Optional::get)
                             .collect(Collectors.toList());
-                }
+
             }, service);
         }
     }
@@ -168,18 +160,16 @@ public class JpaDepthSeriesDao extends JpaAbstractDaoListeningExecutorService im
                 listenableFuture.set(dsKvEntity);
             }
         });
-        return Futures.transform(listenableFuture, new Function<DsKvEntity, Optional<DsKvEntry>>() {
-            @Override
-            public Optional<DsKvEntry> apply(@Nullable DsKvEntity entity) {
-                if (entity != null && entity.isNotEmpty()) {
-                    entity.setEntityId(entityIdStr);
-                    entity.setEntityType(entityId.getEntityType());
-                    entity.setKey(key);
-                    entity.setDs(ds);
-                    return Optional.of(DaoUtil.getData(entity));
-                } else {
-                    return Optional.empty();
-                }
+
+        return Futures.transform(listenableFuture, (Function<DsKvEntity, Optional<DsKvEntry>>) e -> {
+            if (e != null && e.isNotEmpty()) {
+                e.setEntityId(entityIdStr);
+                e.setEntityType(entityId.getEntityType());
+                e.setKey(key);
+                e.setDs(ds);
+                return Optional.of(DaoUtil.getData(e));
+            } else {
+                return Optional.empty();
             }
         });
     }
@@ -202,7 +192,7 @@ public class JpaDepthSeriesDao extends JpaAbstractDaoListeningExecutorService im
                 entityId.getEntityType(),
                 UUIDConverter.fromTimeUUID(entityId.getId()),key);
         DsKvEntry result;
-        if (entries.size() > 0) {
+        if (!entries.isEmpty()) {
             result = DaoUtil.getData(entries.get(0));
         } else {
             result = new BasicDsKvEntry(0.0, new StringDataEntry(key, null));

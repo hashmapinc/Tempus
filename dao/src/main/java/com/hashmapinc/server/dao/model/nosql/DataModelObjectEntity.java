@@ -145,7 +145,7 @@ public final class DataModelObjectEntity implements SearchTextEntity<DataModelOb
 
     @Override
     public String getSearchTextSource() {
-        return name;
+        return getName();
     }
 
     @Override

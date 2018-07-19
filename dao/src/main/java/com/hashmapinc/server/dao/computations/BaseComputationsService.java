@@ -40,8 +40,7 @@ public class BaseComputationsService extends AbstractEntityService implements Co
 
     @Override
     public Computations findByName(String name) {
-        Computations computations = computationsDao.findByName(name);
-        return computations;
+        return computationsDao.findByName(name);
     }
 
     @Override

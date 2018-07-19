@@ -75,11 +75,6 @@ public class NodeMetricServiceImpl extends AbstractEntityService implements Node
             log.debug("NodeMetricServiceImpl rpcSessionCount [{}]", rpcSessionCount);
             rpcSessionCount--;
             nodeMetric.get().setRpcSessionCount(rpcSessionCount);
-            /*if (rpcSessionCount < 0) {
-                nodeMetric.get().setRpcSessionCount(0);
-            } else {
-                nodeMetric.get().setRpcSessionCount(rpcSessionCount);
-            }*/
             return nodeMetricDao.save(nodeMetric.get());
         }
         return null;
@@ -105,11 +100,6 @@ public class NodeMetricServiceImpl extends AbstractEntityService implements Node
             log.debug("NodeMetricServiceImpl deviceSessionCount [{}]", deviceSessionCount);
             deviceSessionCount--;
             nodeMetric.get().setDeviceSessionCount(deviceSessionCount);
-            /*if (deviceSessionCount < 0) {
-                nodeMetric.get().setDeviceSessionCount(0);
-            } else {
-                nodeMetric.get().setDeviceSessionCount(deviceSessionCount);
-            }*/
             return nodeMetricDao.save(nodeMetric.get());
         }
         return null;

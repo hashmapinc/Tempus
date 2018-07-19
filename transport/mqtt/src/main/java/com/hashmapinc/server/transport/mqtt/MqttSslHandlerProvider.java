@@ -16,6 +16,7 @@
 package com.hashmapinc.server.transport.mqtt;
 
 import com.google.common.io.Resources;
+import com.hashmapinc.server.common.msg.exception.TempusRuntimeException;
 import com.hashmapinc.server.dao.device.DeviceCredentialsService;
 import io.netty.handler.ssl.SslHandler;
 import lombok.extern.slf4j.Slf4j;
@@ -100,11 +101,11 @@ public class MqttSslHandlerProvider {
             return new SslHandler(sslEngine);
         } catch (Exception e) {
             log.error("Unable to set up SSL context. Reason: " + e.getMessage(), e);
-            throw new RuntimeException("Failed to get SSL handler", e);
+            throw new TempusRuntimeException("Failed to get SSL handler", e);
         }
     }
 
-    private TrustManager getX509TrustManager(TrustManagerFactory tmf) throws Exception {
+    private TrustManager getX509TrustManager(TrustManagerFactory tmf) {
         X509TrustManager x509Tm = null;
         for (TrustManager tm : tmf.getTrustManagers()) {
             if (tm instanceof X509TrustManager) {
@@ -141,15 +142,11 @@ public class MqttSslHandlerProvider {
                                        String authType) throws CertificateException {
             DeviceCredentials deviceCredentials = null;
             for (X509Certificate cert : chain) {
-                try {
-                    String strCert = SslUtil.getX509CertificateString(cert);
-                    String sha3Hash = EncryptionUtil.getSha3Hash(strCert);
-                    deviceCredentials = deviceCredentialsService.findDeviceCredentialsByCredentialsId(sha3Hash);
-                    if (deviceCredentials != null && strCert.equals(deviceCredentials.getCredentialsValue())) {
-                        break;
-                    }
-                } catch (IOException e) {
-                    log.error(e.getMessage(), e);
+                String strCert = SslUtil.getX509CertificateString(cert);
+                String sha3Hash = EncryptionUtil.getSha3Hash(strCert);
+                deviceCredentials = deviceCredentialsService.findDeviceCredentialsByCredentialsId(sha3Hash);
+                if (deviceCredentials != null && strCert.equals(deviceCredentials.getCredentialsValue())) {
+                    break;
                 }
             }
             if (deviceCredentials == null) {

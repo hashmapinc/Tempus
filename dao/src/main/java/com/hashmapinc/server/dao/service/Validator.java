@@ -25,6 +25,9 @@ import java.util.UUID;
 
 public class Validator {
 
+    private Validator() {
+    }
+
     /**
      * This method validate <code>EntityId</code> entity id. If entity id is invalid than throw
      * <code>IncorrectParameterException</code> exception

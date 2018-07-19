@@ -61,7 +61,7 @@ public class RestClient implements ClientHttpRequestInterceptor {
     }
 
     public Optional<Device> findDevice(String name) {
-        Map<String, String> params = new HashMap<String, String>();
+        Map<String, String> params = new HashMap<>();
         params.put("deviceName", name);
         try {
             ResponseEntity<Device> deviceEntity = restTemplate.getForEntity(baseURL + "/api/tenant/devices?deviceName={deviceName}", Device.class, params);
@@ -76,7 +76,7 @@ public class RestClient implements ClientHttpRequestInterceptor {
     }
 
     public Optional<Customer> findCustomer(String title) {
-        Map<String, String> params = new HashMap<String, String>();
+        Map<String, String> params = new HashMap<>();
         params.put("customerTitle", title);
         try {
             ResponseEntity<Customer> customerEntity = restTemplate.getForEntity(baseURL + "/api/tenant/customers?customerTitle={customerTitle}", Customer.class, params);
@@ -91,7 +91,7 @@ public class RestClient implements ClientHttpRequestInterceptor {
     }
 
     public Optional<Asset> findAsset(String name) {
-        Map<String, String> params = new HashMap<String, String>();
+        Map<String, String> params = new HashMap<>();
         params.put("assetName", name);
         try {
             ResponseEntity<Asset> assetEntity = restTemplate.getForEntity(baseURL + "/api/tenant/assets?assetName={assetName}", Asset.class, params);

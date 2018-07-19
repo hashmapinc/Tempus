@@ -240,13 +240,10 @@ public class DeviceServiceImpl extends AbstractEntityService implements DeviceSe
             return Futures.successfulAsList(futures);
         });
 
-        devices = Futures.transform(devices, new Function<List<Device>, List<Device>>() {
-            @Nullable
-            @Override
-            public List<Device> apply(@Nullable List<Device> deviceList) {
-                return deviceList == null ? Collections.emptyList() : deviceList.stream().filter(device -> query.getDeviceTypes().contains(device.getType())).collect(Collectors.toList());
-            }
-        });
+        devices = Futures.transform(devices,(@Nullable List<Device> deviceList) ->
+                 deviceList == null ? Collections.emptyList() : deviceList.stream().filter(device -> query.getDeviceTypes().contains(device.getType())).collect(Collectors.toList())
+
+        );
 
         return devices;
     }

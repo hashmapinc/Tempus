@@ -59,7 +59,7 @@ public class SqsDemoClient {
                 sqs.deleteMessage(deleteMessageRequest);
             });
             try {
-                Thread.sleep(1000);
+                Thread.sleep(1000); //NOSONAR : Added for test
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
                 e.printStackTrace();

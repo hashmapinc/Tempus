@@ -127,11 +127,11 @@ public class SessionActor extends ContextAwareActor {
 
     private void initProcessor(ToDeviceActorSessionMsg msg) {
         if (processor == null) {
-            SessionMsg sessionMsg = (SessionMsg) msg.getSessionMsg();
+            SessionMsg sessionMsg = msg.getSessionMsg();
             if (sessionMsg.getSessionContext().getSessionType() == SessionType.SYNC) {
                 processor = new SyncMsgProcessor(systemContext, logger, sessionId);
             } else {
-                processor = new ASyncMsgProcessor(systemContext, logger, sessionId);
+                processor = new AsyncMsgProcessor(systemContext, logger, sessionId);
             }
         }
     }

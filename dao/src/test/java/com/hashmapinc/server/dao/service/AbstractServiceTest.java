@@ -32,8 +32,11 @@ import com.hashmapinc.server.common.data.plugin.ComponentScope;
 import com.hashmapinc.server.common.data.plugin.ComponentType;
 import com.hashmapinc.server.common.data.plugin.PluginMetaData;
 import com.hashmapinc.server.common.data.rule.RuleMetaData;
-import com.hashmapinc.server.dao.TagMetaData.TagMetaDataService;
+
 import com.hashmapinc.server.dao.UserServiceTestConfiguration;
+
+import com.hashmapinc.server.dao.tagmetadata.TagMetaDataService;
+
 import com.hashmapinc.server.dao.alarm.AlarmService;
 import com.hashmapinc.server.dao.asset.AssetService;
 import com.hashmapinc.server.dao.audit.AuditLogLevelFilter;
@@ -45,7 +48,7 @@ import com.hashmapinc.server.dao.customer.CustomerService;
 import com.hashmapinc.server.dao.dashboard.DashboardService;
 import com.hashmapinc.server.dao.datamodel.DataModelObjectService;
 import com.hashmapinc.server.dao.datamodel.DataModelService;
-import com.hashmapinc.server.dao.depthSeries.DepthSeriesService;
+import com.hashmapinc.server.dao.depthseries.DepthSeriesService;
 import com.hashmapinc.server.dao.device.DeviceCredentialsService;
 import com.hashmapinc.server.dao.device.DeviceService;
 import com.hashmapinc.server.dao.event.EventService;

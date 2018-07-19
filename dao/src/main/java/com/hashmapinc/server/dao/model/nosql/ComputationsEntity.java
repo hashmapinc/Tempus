@@ -194,7 +194,11 @@ public class ComputationsEntity implements SearchTextEntity<Computations> {
         if (o == null || getClass() != o.getClass()) return false;
         if (!super.equals(o)) return false;
 
-        ComputationsEntity that = (ComputationsEntity) o;
+        return checkObjEquality((ComputationsEntity) o);
+    }
+
+    private boolean checkObjEquality(ComputationsEntity o) {
+        ComputationsEntity that = o;
         if (name != null ? !name.equals(that.name) : that.name != null) return false;
         if (searchText != null ? !searchText.equals(that.searchText) : that.searchText != null) return false;
         if (jarPath != null ? !jarPath.equals(that.jarPath) : that.jarPath != null) return false;

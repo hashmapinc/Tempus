@@ -55,7 +55,7 @@ public class PluginApiController extends BaseController {
             HttpServletRequest request)
             throws TempusException {
         log.debug("[{}] Going to process requst uri: {}", pluginToken, requestEntity.getUrl());
-        DeferredResult<ResponseEntity> result = new DeferredResult<ResponseEntity>();
+        DeferredResult<ResponseEntity> result = new DeferredResult<>();
         PluginMetaData pluginMd = pluginService.findPluginByApiToken(pluginToken);
         if (pluginMd == null) {
             result.setErrorResult(new PluginNotFoundException("Plugin with token: " + pluginToken + " not found!"));

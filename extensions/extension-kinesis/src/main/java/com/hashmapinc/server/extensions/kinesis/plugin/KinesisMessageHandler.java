@@ -61,7 +61,6 @@ public class KinesisMessageHandler implements RuleMsgHandler {
             }
             if (msg instanceof KinesisFirehoseActionMsg) {
                 sendMessageToKinesisFirehose(ctx, tenantId, ruleId, msg);
-                return;
             }
         }else{
             throw new RuleException("Unsupported message type " + msg.getClass().getName() + "!");

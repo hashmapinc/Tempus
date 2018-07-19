@@ -26,6 +26,9 @@ import java.io.IOException;
  */
 public class JacksonUtil {
 
+    private JacksonUtil() {
+    }
+
     public static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
     public static <T> T fromString(String string, Class<T> clazz) {

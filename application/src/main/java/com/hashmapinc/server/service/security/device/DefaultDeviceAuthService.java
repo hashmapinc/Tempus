@@ -49,7 +49,7 @@ public class DefaultDeviceAuthService implements DeviceAuthService {
                 switch (credentials.getCredentialsType()) {
                     case ACCESS_TOKEN:
                         // Credentials ID matches Credentials value in this
-                        // primitive case;
+                        //NOSONAR primitive case;
                         return DeviceAuthResult.of(credentials.getDeviceId());
                     case X509_CERTIFICATE:
                         return DeviceAuthResult.of(credentials.getDeviceId());

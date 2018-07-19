@@ -13,21 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.hashmapinc.server.actors.rule;
 
-import com.hashmapinc.server.actors.ActorSystemContext;
-import com.hashmapinc.server.actors.shared.AbstractContextAwareMsgProcessor;
-import com.hashmapinc.server.common.data.id.RuleId;
+package com.hashmapinc.server.dao.tagmetadata;
 
-import akka.event.LoggingAdapter;
+import com.google.common.util.concurrent.ListenableFuture;
+import com.hashmapinc.server.common.data.TagMetaData;
+import com.hashmapinc.server.common.data.id.EntityId;
 
-public class RuleContextAwareMsgProcessor extends AbstractContextAwareMsgProcessor {
+import java.util.List;
 
-    private final RuleId ruleId;
-    
-    protected RuleContextAwareMsgProcessor(ActorSystemContext systemContext, LoggingAdapter logger, RuleId ruleId) {
-        super(systemContext, logger);
-        this.ruleId = ruleId;
-    }
-
+public interface TagMetaDataDao {
+    ListenableFuture<Void> save(TagMetaData tagMetaData);
+    ListenableFuture<TagMetaData> getByEntityIdAndKey(EntityId entityId, String key);
+    ListenableFuture<List<TagMetaData>> getAllByEntityId(EntityId entityId);
 }

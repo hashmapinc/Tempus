@@ -18,12 +18,12 @@ package com.hashmapinc.server.dao.audit;
 import com.hashmapinc.server.common.data.EntityType;
 import com.hashmapinc.server.common.data.audit.ActionType;
 
-import java.util.HashMap;
+import java.util.EnumMap;
 import java.util.Map;
 
 public class AuditLogLevelFilter {
 
-    private Map<EntityType, AuditLogLevelMask> entityTypeMask = new HashMap<>();
+    private Map<EntityType, AuditLogLevelMask> entityTypeMask = new EnumMap<>(EntityType.class);
 
     public AuditLogLevelFilter(Map<String, String> mask) {
         entityTypeMask.clear();

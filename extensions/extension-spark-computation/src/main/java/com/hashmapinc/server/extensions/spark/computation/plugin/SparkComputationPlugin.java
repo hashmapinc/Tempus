@@ -29,14 +29,12 @@ import com.hashmapinc.server.extensions.spark.computation.action.SampleSparkAppA
 public class SparkComputationPlugin extends AbstractPlugin<SparkComputationPluginConfiguration> {
 
     private static final String BASE_URL_TEMPLATE = "http://%s:%d/";
-    private SparkComputationPluginConfiguration configuration;
     private SparkComputationMessageHandler handler;
     private HttpHeaders headers = new HttpHeaders();
     private String baseUrl;
 
     @Override
     public void init(SparkComputationPluginConfiguration configuration) {
-        this.configuration = configuration;
         this.baseUrl = String.format(
                 BASE_URL_TEMPLATE,
                 configuration.getHost(),

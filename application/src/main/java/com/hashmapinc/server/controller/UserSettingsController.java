@@ -17,32 +17,24 @@ package com.hashmapinc.server.controller;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import com.hashmapinc.server.common.data.Theme;
 import com.hashmapinc.server.common.data.Logo;
-import com.hashmapinc.server.common.data.User;
+import com.hashmapinc.server.common.data.Theme;
 import com.hashmapinc.server.common.data.UserSettings;
-import com.hashmapinc.server.common.data.id.CustomerId;
-import com.hashmapinc.server.common.data.id.TenantId;
 import com.hashmapinc.server.common.data.id.UserId;
-import com.hashmapinc.server.common.data.page.TextPageLink;
 import com.hashmapinc.server.common.data.security.Authority;
+import com.hashmapinc.server.dao.logo.LogoService;
+import com.hashmapinc.server.dao.settings.UserSettingsService;
+import com.hashmapinc.server.dao.theme.ThemeService;
+import com.hashmapinc.server.exception.TempusException;
+import com.hashmapinc.server.service.mail.MailService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import com.hashmapinc.server.dao.settings.UserSettingsService;
-import com.hashmapinc.server.dao.logo.LogoService;
 import org.springframework.web.multipart.MultipartFile;
-import com.hashmapinc.server.dao.theme.ThemeService;
-import com.hashmapinc.server.exception.TempusException;
-import com.hashmapinc.server.service.mail.MailService;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.List;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
 
 
 @Slf4j
@@ -150,7 +142,6 @@ public class UserSettingsController extends BaseController {
             l.setFile(file.getBytes());
 
             return logoService.saveLogo(l);
-            // return null;
         } catch (Exception e) {
             throw handleException(e);
         }
@@ -163,7 +154,7 @@ public class UserSettingsController extends BaseController {
 
             List <Logo> logo = logoService.find();
 
-            if(logo.size() > 0) {
+            if(!logo.isEmpty()) {
 
                 return logo.get(0);
             }

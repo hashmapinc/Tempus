@@ -29,7 +29,7 @@ import com.hashmapinc.server.common.msg.session.SessionType;
 import com.hashmapinc.server.common.transport.SessionMsgProcessor;
 import com.hashmapinc.server.common.transport.adaptor.AdaptorException;
 import com.hashmapinc.server.common.transport.session.DeviceAwareSessionContext;
-import com.hashmapinc.server.transport.mqtt.sparkplugB.data.SparkPlugMetaData;
+import com.hashmapinc.server.transport.mqtt.sparkplug.data.SparkPlugMetaData;
 import java.util.concurrent.atomic.AtomicInteger;
 
 
@@ -39,7 +39,7 @@ public class DeviceSessionCtx extends DeviceAwareSessionContext {
     private final MqttTransportAdaptor adaptor;
     private final MqttSessionId sessionId;
     private ChannelHandlerContext channel;
-    private volatile boolean allowAttributeResponses;
+    private volatile boolean allowAttributeResponses; //NOSONAR
     private AtomicInteger msgIdSeq = new AtomicInteger(0);
     private SparkPlugMetaData sparkPlugMetaData;
 
@@ -59,7 +59,7 @@ public class DeviceSessionCtx extends DeviceAwareSessionContext {
         try {
             adaptor.convertToAdaptorMsg(this, msg).ifPresent(this::pushToNetwork);
         } catch (AdaptorException e) {
-            //TODO: close channel with disconnect;
+            //TODO: close channel with disconnect
             logAndWrap(e);
         }
     }

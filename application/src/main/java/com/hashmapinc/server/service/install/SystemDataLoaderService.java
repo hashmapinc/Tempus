@@ -15,22 +15,24 @@
  */
 package com.hashmapinc.server.service.install;
 
+import com.hashmapinc.server.exception.TempusApplicationException;
+
 public interface SystemDataLoaderService {
 
-    void createSysAdmin() throws Exception;
+    void createSysAdmin() throws TempusApplicationException;
 
-    void createAdminSettings() throws Exception;
+    void createAdminSettings() throws TempusApplicationException;
 
-    void loadSystemWidgets() throws Exception;
+    void loadSystemWidgets() throws TempusApplicationException;
 
-    void loadSystemPlugins() throws Exception;
+    void loadSystemPlugins() throws TempusApplicationException;
 
-    void loadSystemRules() throws Exception;
+    void loadSystemRules() throws TempusApplicationException;
 
-    void loadSystemThemes() throws Exception;
+    void loadSystemThemes() throws TempusApplicationException;
 
-    void loadDemoData() throws Exception;
+    void loadDemoData() throws TempusApplicationException;
 
-    void deleteSystemWidgetBundle(String bundleAlias) throws Exception;
+    void deleteSystemWidgetBundle(String bundleAlias) throws TempusApplicationException;
 
 }

@@ -155,7 +155,7 @@ public class BaseRelationDao extends CassandraAbstractAsyncDao implements Relati
     }
 
     private BoundStatement getSaveRelationStatement(EntityRelation relation) {
-        BoundStatement stmt = getSaveStmt().bind()
+        return getSaveStmt().bind()
                 .setUUID(0, relation.getFrom().getId())
                 .setString(1, relation.getFrom().getEntityType().name())
                 .setUUID(2, relation.getTo().getId())
@@ -163,7 +163,6 @@ public class BaseRelationDao extends CassandraAbstractAsyncDao implements Relati
                 .set(4, relation.getTypeGroup(), relationTypeGroupCodec)
                 .setString(5, relation.getType())
                 .set(6, relation.getAdditionalInfo(), JsonNode.class);
-        return stmt;
     }
 
     @Override
@@ -191,14 +190,13 @@ public class BaseRelationDao extends CassandraAbstractAsyncDao implements Relati
     }
 
     private BoundStatement getDeleteRelationStatement(EntityId from, EntityId to, String relationType, RelationTypeGroup typeGroup) {
-        BoundStatement stmt = getDeleteStmt().bind()
+        return getDeleteStmt().bind()
                 .setUUID(0, from.getId())
                 .setString(1, from.getEntityType().name())
                 .setUUID(2, to.getId())
                 .setString(3, to.getEntityType().name())
                 .set(4, typeGroup, relationTypeGroupCodec)
                 .setString(5, relationType);
-        return stmt;
     }
 
     @Override
@@ -345,7 +343,7 @@ public class BaseRelationDao extends CassandraAbstractAsyncDao implements Relati
 
     private ListenableFuture<List<EntityRelation>> executeAsyncRead(EntityId from, BoundStatement stmt) {
         log.debug("Generated query [{}] for entity {}", stmt, from);
-        return getFuture(executeAsyncRead(stmt), rs -> getEntityRelations(rs));
+        return getFuture(executeAsyncRead(stmt), this::getEntityRelations);
     }
 
     private ListenableFuture<Boolean> getBooleanListenableFuture(ResultSetFuture rsFuture) {
@@ -356,9 +354,8 @@ public class BaseRelationDao extends CassandraAbstractAsyncDao implements Relati
         List<Row> rows = rs.all();
         List<EntityRelation> entries = new ArrayList<>(rows.size());
         if (!rows.isEmpty()) {
-            rows.forEach(row -> {
-                entries.add(getEntityRelation(row));
-            });
+            rows.forEach(row ->
+                entries.add(getEntityRelation(row)));
         }
         return entries;
     }

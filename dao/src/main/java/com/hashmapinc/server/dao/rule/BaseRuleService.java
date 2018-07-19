@@ -116,7 +116,6 @@ public class BaseRuleService extends AbstractEntityService implements RuleServic
             throw new IncorrectParameterException(type.name() + " is required!");
         }
         String clazz = getIfValid(type.name(), json, "clazz", JsonNode::isTextual, JsonNode::asText);
-        String name = getIfValid(type.name(), json, "name", JsonNode::isTextual, JsonNode::asText);
         JsonNode configuration = getIfValid(type.name(), json, "configuration", JsonNode::isObject, node -> node);
         ComponentDescriptor descriptor = componentDescriptorService.findByClazz(clazz);
         if (descriptor == null) {

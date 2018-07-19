@@ -15,8 +15,10 @@
  */
 package com.hashmapinc.server.service.install;
 
+import com.hashmapinc.server.exception.TempusApplicationException;
+
 public interface DatabaseSchemaService {
 
-    void createDatabaseSchema() throws Exception;
+    void createDatabaseSchema() throws TempusApplicationException;
 
 }

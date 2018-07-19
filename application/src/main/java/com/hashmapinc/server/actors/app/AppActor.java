@@ -17,12 +17,10 @@ package com.hashmapinc.server.actors.app;
 
 import akka.Done;
 import akka.actor.*;
-import akka.actor.SupervisorStrategy.Directive;
 import akka.event.Logging;
 import akka.event.LoggingAdapter;
-import akka.japi.Function;
-import com.hashmapinc.server.actors.plugin.PluginTerminationMsg;
 import com.hashmapinc.server.actors.ActorSystemContext;
+import com.hashmapinc.server.actors.plugin.PluginTerminationMsg;
 import com.hashmapinc.server.actors.service.ContextAwareActor;
 import com.hashmapinc.server.actors.service.ContextBasedCreator;
 import com.hashmapinc.server.actors.service.DefaultActorService;
@@ -247,15 +245,12 @@ public class AppActor extends ContextAwareActor {
         }
     }
 
-    private final SupervisorStrategy strategy = new OneForOneStrategy(3, Duration.create("1 minute"), new Function<Throwable, Directive>() {
-        @Override
-        public Directive apply(Throwable t) {
-            logger.error(t, "Unknown failure");
-            if (t instanceof RuntimeException) {
-                return SupervisorStrategy.restart();
-            } else {
-                return SupervisorStrategy.stop();
-            }
+    private final SupervisorStrategy strategy = new OneForOneStrategy(3, Duration.create("1 minute"), t -> {
+        logger.error(t, "Unknown failure");
+        if (t instanceof RuntimeException) {
+            return SupervisorStrategy.restart();
+        } else {
+            return SupervisorStrategy.stop();
         }
     });
 }

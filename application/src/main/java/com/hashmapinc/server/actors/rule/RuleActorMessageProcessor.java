@@ -15,32 +15,33 @@
  */
 package com.hashmapinc.server.actors.rule;
 
-import java.util.*;
-
+import akka.actor.ActorContext;
+import akka.actor.ActorRef;
+import akka.event.LoggingAdapter;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.hashmapinc.server.actors.ActorSystemContext;
 import com.hashmapinc.server.actors.plugin.RuleToPluginMsgWrapper;
+import com.hashmapinc.server.actors.shared.ComponentMsgProcessor;
 import com.hashmapinc.server.common.data.id.PluginId;
 import com.hashmapinc.server.common.data.id.RuleId;
 import com.hashmapinc.server.common.data.id.TenantId;
 import com.hashmapinc.server.common.data.plugin.ComponentLifecycleState;
+import com.hashmapinc.server.common.data.plugin.PluginMetaData;
 import com.hashmapinc.server.common.data.rule.RuleMetaData;
 import com.hashmapinc.server.common.msg.cluster.ClusterEventMsg;
 import com.hashmapinc.server.common.msg.core.RuleEngineError;
+import com.hashmapinc.server.common.msg.device.ToDeviceActorMsg;
+import com.hashmapinc.server.common.msg.exception.TempusRuntimeException;
 import com.hashmapinc.server.common.msg.session.ToDeviceMsg;
+import com.hashmapinc.server.exception.TempusApplicationException;
 import com.hashmapinc.server.extensions.api.plugins.PluginAction;
 import com.hashmapinc.server.extensions.api.plugins.msg.PluginToRuleMsg;
 import com.hashmapinc.server.extensions.api.plugins.msg.RuleToPluginMsg;
 import com.hashmapinc.server.extensions.api.rules.*;
 import org.springframework.util.StringUtils;
-import com.hashmapinc.server.actors.shared.ComponentMsgProcessor;
-import com.hashmapinc.server.common.data.plugin.PluginMetaData;
-import com.hashmapinc.server.common.msg.device.ToDeviceActorMsg;
-import com.hashmapinc.server.extensions.api.rules.*;
 
-import akka.actor.ActorContext;
-import akka.actor.ActorRef;
-import akka.event.LoggingAdapter;
+import java.io.IOException;
+import java.util.*;
 
 class RuleActorMessageProcessor extends ComponentMsgProcessor<RuleId> {
 
@@ -63,16 +64,20 @@ class RuleActorMessageProcessor extends ComponentMsgProcessor<RuleId> {
     }
 
     @Override
-    public void start() throws Exception {
+    public void start() throws TempusApplicationException {
         logger.info("[{}][{}] Starting rule actor.", entityId, tenantId);
         ruleMd = systemContext.getRuleService().findRuleById(entityId);
         if (ruleMd == null) {
-            throw new RuleInitializationException("Rule not found!");
+            throw new TempusApplicationException(new RuleInitializationException("Rule not found!"));
         }
         state = ruleMd.getState();
         if (state == ComponentLifecycleState.ACTIVE) {
             logger.info("[{}] Rule is active. Going to initialize rule components.", entityId);
-            initComponent();
+            try {
+                initComponent();
+            } catch (RuleException e) {
+                throw new TempusApplicationException(e);
+            }
         } else {
             logger.info("[{}] Rule is suspended. Skipping rule components initialization.", entityId);
         }
@@ -81,7 +86,7 @@ class RuleActorMessageProcessor extends ComponentMsgProcessor<RuleId> {
     }
 
     @Override
-    public void stop() throws Exception {
+    public void stop() throws TempusApplicationException {
         onStop();
     }
 
@@ -89,7 +94,7 @@ class RuleActorMessageProcessor extends ComponentMsgProcessor<RuleId> {
     private void initComponent() throws RuleException {
         try {
             if (!ruleMd.getFilters().isArray()) {
-                throw new RuntimeException("Filters are not array!");
+                throw new TempusRuntimeException("Filters are not array!");
             }
             fetchPluginInfo();
             initFilters();
@@ -108,19 +113,19 @@ class RuleActorMessageProcessor extends ComponentMsgProcessor<RuleId> {
         }
     }
 
-    private void initAction() throws Exception {
+    private void initAction() throws ClassNotFoundException, InstantiationException, IllegalAccessException, IOException {
         if (ruleMd.getAction() != null && !ruleMd.getAction().isNull()) {
             action = initComponent(ruleMd.getAction());
         }
     }
 
-    private void initProcessor() throws Exception {
+    private void initProcessor() throws ClassNotFoundException, InstantiationException, IllegalAccessException, IOException {
         if (ruleMd.getProcessor() != null && !ruleMd.getProcessor().isNull()) {
             processor = initComponent(ruleMd.getProcessor());
         }
     }
 
-    private void initFilters() throws Exception {
+    private void initFilters() throws ClassNotFoundException, InstantiationException, IllegalAccessException, IOException {
         filters = new ArrayList<>(ruleMd.getFilters().size());
         for (int i = 0; i < ruleMd.getFilters().size(); i++) {
             filters.add(initComponent(ruleMd.getFilters().get(i)));
@@ -231,7 +236,7 @@ class RuleActorMessageProcessor extends ComponentMsgProcessor<RuleId> {
     }
 
     @Override
-    public void onUpdate(ActorContext context) throws RuleException {
+    public void onUpdate(ActorContext context) throws TempusApplicationException {
         RuleMetaData oldRuleMd = ruleMd;
         ruleMd = systemContext.getRuleService().findRuleById(entityId);
         logger.info("[{}] Rule configuration was updated from {} to {}.", entityId, oldRuleMd, ruleMd);
@@ -254,22 +259,22 @@ class RuleActorMessageProcessor extends ComponentMsgProcessor<RuleId> {
                 initAction();
             }
         } catch (RuntimeException e) {
-            throw new RuleInitializationException("Unknown runtime exception!", e);
+            throw new TempusApplicationException(new RuleInitializationException("Unknown runtime exception!", e));
         } catch (InstantiationException e) {
-            throw new RuleInitializationException("No default constructor for rule implementation!", e);
+            throw new TempusApplicationException(new RuleInitializationException("No default constructor for rule implementation!", e));
         } catch (IllegalAccessException e) {
-            throw new RuleInitializationException("Illegal Access Exception during rule initialization!", e);
+            throw new TempusApplicationException(new RuleInitializationException("Illegal Access Exception during rule initialization!", e));
         } catch (ClassNotFoundException e) {
-            throw new RuleInitializationException("Rule Class not found!", e);
+            throw new TempusApplicationException(new RuleInitializationException("Rule Class not found!", e));
         } catch (JsonProcessingException e) {
-            throw new RuleInitializationException("Rule configuration is invalid!", e);
+            throw new TempusApplicationException(new RuleInitializationException("Rule configuration is invalid!", e));
         } catch (Exception e) {
-            throw new RuleInitializationException(e.getMessage(), e);
+            throw new TempusApplicationException(new RuleInitializationException(e.getMessage(), e));
         }
     }
 
     @Override
-    public void onActivate(ActorContext context) throws Exception {
+    public void onActivate(ActorContext context) throws TempusApplicationException {
         logger.info("[{}] Going to process onActivate rule.", entityId);
         this.state = ComponentLifecycleState.ACTIVE;
         if (filters != null) {
@@ -277,7 +282,11 @@ class RuleActorMessageProcessor extends ComponentMsgProcessor<RuleId> {
             if (processor != null) {
                 processor.resume();
             } else {
-                initProcessor();
+                try {
+                    initProcessor();
+                } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | IOException e) {
+                    throw new TempusApplicationException(e);
+                }
             }
             if (action != null) {
                 action.resume();
@@ -293,7 +302,7 @@ class RuleActorMessageProcessor extends ComponentMsgProcessor<RuleId> {
         logger.info("[{}] Going to process onSuspend rule.", entityId);
         this.state = ComponentLifecycleState.SUSPENDED;
         if (filters != null) {
-            filters.forEach(f -> f.suspend());
+            filters.forEach(RuleLifecycleComponent::suspend);
         }
         if (processor != null) {
             processor.suspend();
@@ -318,7 +327,7 @@ class RuleActorMessageProcessor extends ComponentMsgProcessor<RuleId> {
     }
 
     @Override
-    public void onClusterEventMsg(ClusterEventMsg msg) throws Exception {
+    public void onClusterEventMsg(ClusterEventMsg msg) throws TempusApplicationException {
         //Do nothing
     }
 
@@ -336,7 +345,7 @@ class RuleActorMessageProcessor extends ComponentMsgProcessor<RuleId> {
 
     private void stopFilters() {
         if (filters != null) {
-            filters.forEach(f -> f.stop());
+            filters.forEach(RuleLifecycleComponent::stop);
         }
     }
 }

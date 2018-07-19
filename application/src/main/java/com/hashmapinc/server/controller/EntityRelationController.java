@@ -17,6 +17,7 @@ package com.hashmapinc.server.controller;
 
 import com.hashmapinc.server.common.data.relation.EntityRelationInfo;
 import com.hashmapinc.server.common.data.relation.RelationTypeGroup;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -29,7 +30,7 @@ import com.hashmapinc.server.exception.TempusException;
 
 import java.util.List;
 
-
+@Slf4j
 @RestController
 @RequestMapping("/api")
 public class EntityRelationController extends BaseController {
@@ -273,7 +274,9 @@ public class EntityRelationController extends BaseController {
         if (strRelationTypeGroup != null && strRelationTypeGroup.trim().length()>0) {
             try {
                 result = RelationTypeGroup.valueOf(strRelationTypeGroup);
-            } catch (IllegalArgumentException e) { }
+            } catch (IllegalArgumentException e) {
+                log.trace("Error while parsing {}", strRelationTypeGroup);
+            }
         }
         return result;
     }

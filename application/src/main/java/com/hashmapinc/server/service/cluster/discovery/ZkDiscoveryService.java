@@ -16,6 +16,7 @@
 package com.hashmapinc.server.service.cluster.discovery;
 
 import com.google.protobuf.InvalidProtocolBufferException;
+import com.hashmapinc.server.common.msg.exception.TempusRuntimeException;
 import com.hashmapinc.server.gen.discovery.ServerInstanceProtos;
 import com.hashmapinc.server.utils.MiscUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -93,7 +94,7 @@ public class ZkDiscoveryService implements DiscoveryService, PathChildrenCacheLi
         } catch (Exception e) {
             log.error("Failed to connect to ZK: {}", e.getMessage(), e);
             CloseableUtils.closeQuietly(client);
-            throw new RuntimeException(e);
+            throw new TempusRuntimeException(e);
         }
     }
 
@@ -115,7 +116,7 @@ public class ZkDiscoveryService implements DiscoveryService, PathChildrenCacheLi
             log.info("[{}:{}] Created ZK node for current instance: {}", self.getHost(), self.getPort(), nodePath);
         } catch (Exception e) {
             log.error("Failed to create ZK node", e);
-            throw new RuntimeException(e);
+            throw new TempusRuntimeException(e);
         }
     }
 
@@ -127,7 +128,7 @@ public class ZkDiscoveryService implements DiscoveryService, PathChildrenCacheLi
             }
         } catch (Exception e) {
             log.error("Failed to delete ZK node {}", nodePath, e);
-            throw new RuntimeException(e);
+            throw new TempusRuntimeException(e);
         }
     }
 
@@ -145,7 +146,7 @@ public class ZkDiscoveryService implements DiscoveryService, PathChildrenCacheLi
                         return new ServerInstance(ServerInstanceProtos.ServerInfo.parseFrom(cd.getData()));
                     } catch (InvalidProtocolBufferException e) {
                         log.error("Failed to decode ZK node", e);
-                        throw new RuntimeException(e);
+                        throw new TempusRuntimeException(e);
                     }
                 })
                 .collect(Collectors.toList());

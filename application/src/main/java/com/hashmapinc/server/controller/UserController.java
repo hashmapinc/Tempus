@@ -99,8 +99,6 @@ public class UserController extends BaseController {
                 throw new TempusException(YOU_DON_T_HAVE_PERMISSION_TO_PERFORM_THIS_OPERATION,
                         TempusErrorCode.PERMISSION_DENIED);
             }
-            //boolean sendEmail = user.getId() == null && activationType.equals("mail");
-            //boolean isNewExternal = user.getId() == null && activationType.equals("external");
             if (getCurrentUser().getAuthority() == Authority.TENANT_ADMIN) {
                 user.setTenantId(getCurrentUser().getTenantId());
             }

@@ -67,7 +67,7 @@ public abstract class DaoUtil {
         if(iterable instanceof List) {
             return (List<E>) iterable;
         }
-        ArrayList<E> list = new ArrayList<E>();
+        ArrayList<E> list = new ArrayList<>();
         if(iterable != null) {
             for(E e: iterable) {
                 list.add(e);

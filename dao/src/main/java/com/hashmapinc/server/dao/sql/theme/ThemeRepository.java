@@ -25,7 +25,7 @@ import org.springframework.data.repository.query.Param;
 @SqlDao
 public interface ThemeRepository extends CrudRepository<ThemeEntity, String> {
 
-    @Query("SELECT th FROM ThemeEntity th WHERE th.is_enabled = 'true'")
+    @Query("SELECT th FROM ThemeEntity th WHERE th.enabled = 'true'")
     ThemeEntity  findEnabledTheme();
 
 //    @Query("SELECT th FROM ThemeEntity th WHERE th.value = :value")

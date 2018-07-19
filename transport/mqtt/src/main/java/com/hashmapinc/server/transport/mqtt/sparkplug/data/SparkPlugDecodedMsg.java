@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.hashmapinc.server.transport.mqtt.sparkplugB.data;
+package com.hashmapinc.server.transport.mqtt.sparkplug.data;
 
 import com.hashmapinc.server.common.data.kv.KvEntry;
 

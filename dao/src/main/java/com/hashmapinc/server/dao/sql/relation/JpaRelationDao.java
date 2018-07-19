@@ -164,9 +164,9 @@ public class JpaRelationDao extends JpaAbstractDaoListeningExecutorService imple
 
     @Override
     public boolean deleteOutboundRelations(EntityId entity) {
-        boolean relationExistsBeforeDelete = relationRepository
+        boolean relationExistsBeforeDelete = !relationRepository
                 .findAllByFromIdAndFromType(UUIDConverter.fromTimeUUID(entity.getId()), entity.getEntityType().name())
-                .size() > 0;
+                .isEmpty();
         relationRepository.deleteByFromIdAndFromType(UUIDConverter.fromTimeUUID(entity.getId()), entity.getEntityType().name());
         return relationExistsBeforeDelete;
     }
@@ -175,9 +175,9 @@ public class JpaRelationDao extends JpaAbstractDaoListeningExecutorService imple
     public ListenableFuture<Boolean> deleteOutboundRelationsAsync(EntityId entity) {
         return service.submit(
                 () -> {
-                    boolean relationExistsBeforeDelete = relationRepository
+                    boolean relationExistsBeforeDelete = !relationRepository
                             .findAllByFromIdAndFromType(UUIDConverter.fromTimeUUID(entity.getId()), entity.getEntityType().name())
-                            .size() > 0;
+                            .isEmpty();
                     relationRepository.deleteByFromIdAndFromType(UUIDConverter.fromTimeUUID(entity.getId()), entity.getEntityType().name());
                     return relationExistsBeforeDelete;
                 });

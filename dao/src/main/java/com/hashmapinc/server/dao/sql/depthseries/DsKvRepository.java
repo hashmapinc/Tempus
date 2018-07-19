@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.hashmapinc.server.dao.sql.depthSeries;
+package com.hashmapinc.server.dao.sql.depthseries;
 
 import com.hashmapinc.server.common.data.EntityType;
 import com.hashmapinc.server.dao.model.sql.DsKvCompositeKey;

@@ -126,7 +126,6 @@ public abstract class BaseDashboardControllerTest extends AbstractControllerTest
         Assert.assertEquals(savedDashboard, foundDashboard);
     }
 
-
     @Test
     public void testDeleteDashboard() throws Exception {
         Dashboard dashboard = new Dashboard();

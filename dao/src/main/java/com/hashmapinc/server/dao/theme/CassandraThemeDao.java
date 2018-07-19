@@ -24,9 +24,6 @@ import com.hashmapinc.server.dao.util.NoSqlDao;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import com.datastax.driver.core.querybuilder.Select;
-
-import java.util.Optional;
-import com.datastax.driver.core.querybuilder.Select.Where;
 import static com.datastax.driver.core.querybuilder.QueryBuilder.select;
 import static com.datastax.driver.core.querybuilder.QueryBuilder.eq;
 
