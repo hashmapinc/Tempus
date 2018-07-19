@@ -75,7 +75,7 @@ public class UserInfoTokenConverter implements UserAuthenticationConverter {
         if(!StringUtils.isEmpty(customerId)){
             securityUser.setCustomerId(new CustomerId(UUID.fromString((String)customerId)));
         }
-        securityUser.setEnabled(enabled != null ? (Boolean)enabled: false);
+        securityUser.setEnabled(enabled != null && (Boolean)enabled);
         securityUser.setFirstName(extractNullable("firstName", map));
         securityUser.setLastName(extractNullable("lastName", map));
         Object authorities = map.get("authorities");

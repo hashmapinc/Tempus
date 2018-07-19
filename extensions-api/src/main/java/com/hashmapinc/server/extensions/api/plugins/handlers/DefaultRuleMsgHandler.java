@@ -44,19 +44,19 @@ public class DefaultRuleMsgHandler implements RuleMsgHandler {
         //TODO: handle subscriptions to attribute updates.
     }
 
-    protected void handleGetAttributesRequest(PluginContext ctx, TenantId tenantId, RuleId ruleId, GetAttributesRequestRuleToPluginMsg msg) {
+    protected void handleGetAttributesRequest(PluginContext ctx, TenantId tenantId, RuleId ruleId, GetAttributesRequestRuleToPluginMsg msg) {//NOSONAR
         msgTypeNotSupported(msg.getPayload().getMsgType());
     }
 
-    protected void handleUpdateAttributesRequest(PluginContext ctx, TenantId tenantId, RuleId ruleId, UpdateAttributesRequestRuleToPluginMsg msg) {
+    protected void handleUpdateAttributesRequest(PluginContext ctx, TenantId tenantId, RuleId ruleId, UpdateAttributesRequestRuleToPluginMsg msg) {//NOSONAR
         msgTypeNotSupported(msg.getPayload().getMsgType());
     }
 
-    protected void handleTelemetryUploadRequest(PluginContext ctx, TenantId tenantId, RuleId ruleId, TelemetryUploadRequestRuleToPluginMsg msg) {
+    protected void handleTelemetryUploadRequest(PluginContext ctx, TenantId tenantId, RuleId ruleId, TelemetryUploadRequestRuleToPluginMsg msg) {//NOSONAR
         msgTypeNotSupported(msg.getPayload().getMsgType());
     }
 
-    protected void handleDepthTelemetryUploadRequest(PluginContext ctx, TenantId tenantId, RuleId ruleId, DepthTelemetryUploadRequestRuleToPluginMsg msg) {
+    protected void handleDepthTelemetryUploadRequest(PluginContext ctx, TenantId tenantId, RuleId ruleId, DepthTelemetryUploadRequestRuleToPluginMsg msg) {//NOSONAR
         msgTypeNotSupported(msg.getPayload().getMsgType());
     }
 

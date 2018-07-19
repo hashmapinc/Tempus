@@ -145,7 +145,7 @@ public class AggregatePartitionsFunction implements com.google.common.base.Funct
             aggResult.bValue = aggResult.bValue == null ? curBValue : aggResult.bValue && curBValue;
         } else if (curSValue != null && (aggResult.sValue == null || curSValue.compareTo(aggResult.sValue) < 0)) {
             aggResult.sValue = curSValue;
-        } else if (curJValue != null && (aggResult.jValue == null || curJValue.toString().compareTo(aggResult.jValue.toString()) < 0)) {
+        } else if (curJValue != null) {
             aggResult.jValue = curJValue;
         }
     }
@@ -159,7 +159,7 @@ public class AggregatePartitionsFunction implements com.google.common.base.Funct
             aggResult.bValue = aggResult.bValue == null ? curBValue : aggResult.bValue || curBValue;
         } else if (curSValue != null && (aggResult.sValue == null || curSValue.compareTo(aggResult.sValue) > 0)) {
             aggResult.sValue = curSValue;
-        } else if (curJValue != null && (aggResult.jValue == null || curJValue.toString().compareTo(aggResult.jValue.toString()) > 0)) {
+        } else if (curJValue != null) {
             aggResult.jValue = curJValue;
         }
     }

@@ -175,7 +175,7 @@ public abstract class BaseRelationServiceTest extends AbstractServiceTest {
         saveRelation(relationB2);
 
         // Data propagation to views is async
-        Thread.sleep(3000);
+        Thread.sleep(3000);     //NOSONAR
 
         List<EntityRelation> relations = relationService.findByTo(childA, RelationTypeGroup.COMMON);
         Assert.assertEquals(2, relations.size());

@@ -15,18 +15,18 @@
  */
 package com.hashmapinc.server.controller;
 
+import com.hashmapinc.server.common.data.id.EntityId;
+import com.hashmapinc.server.common.data.id.EntityIdFactory;
+import com.hashmapinc.server.common.data.relation.EntityRelation;
 import com.hashmapinc.server.common.data.relation.EntityRelationInfo;
+import com.hashmapinc.server.common.data.relation.EntityRelationsQuery;
 import com.hashmapinc.server.common.data.relation.RelationTypeGroup;
+import com.hashmapinc.server.exception.TempusErrorCode;
+import com.hashmapinc.server.exception.TempusException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import com.hashmapinc.server.common.data.id.EntityId;
-import com.hashmapinc.server.common.data.id.EntityIdFactory;
-import com.hashmapinc.server.common.data.relation.EntityRelation;
-import com.hashmapinc.server.common.data.relation.EntityRelationsQuery;
-import com.hashmapinc.server.exception.TempusErrorCode;
-import com.hashmapinc.server.exception.TempusException;
 
 import java.util.List;
 
@@ -42,7 +42,7 @@ public class EntityRelationController extends BaseController {
     public static final String TO_ID = "toId";
 
     @PreAuthorize("hasAnyAuthority('SYS_ADMIN', 'TENANT_ADMIN', 'CUSTOMER_USER')")
-    @RequestMapping(value = "/relation", method = RequestMethod.POST)
+    @PostMapping(value = "/relation")
     @ResponseStatus(value = HttpStatus.OK)
     public void saveRelation(@RequestBody EntityRelation relation) throws TempusException {
         try {
@@ -59,7 +59,7 @@ public class EntityRelationController extends BaseController {
     }
 
     @PreAuthorize("hasAnyAuthority('SYS_ADMIN', 'TENANT_ADMIN', 'CUSTOMER_USER')")
-    @RequestMapping(value = "/relation", method = RequestMethod.DELETE, params = {FROM_ID, FROM_TYPE, RELATION_TYPE, TO_ID, TO_TYPE})
+    @DeleteMapping(value = "/relation", params = {FROM_ID, FROM_TYPE, RELATION_TYPE, TO_ID, TO_TYPE})
     @ResponseStatus(value = HttpStatus.OK)
     public void deleteRelation(@RequestParam(FROM_ID) String strFromId,
                                @RequestParam(FROM_TYPE) String strFromType,
@@ -87,7 +87,7 @@ public class EntityRelationController extends BaseController {
     }
 
     @PreAuthorize("hasAnyAuthority('SYS_ADMIN','TENANT_ADMIN', 'CUSTOMER_USER')")
-    @RequestMapping(value = "/relations", method = RequestMethod.DELETE, params = {"id", "type"})
+    @DeleteMapping(value = "/relations", params = {"id", "type"})
     @ResponseStatus(value = HttpStatus.OK)
     public void deleteRelations(@RequestParam("entityId") String strId,
                                 @RequestParam("entityType") String strType) throws TempusException {
@@ -103,7 +103,7 @@ public class EntityRelationController extends BaseController {
     }
 
     @PreAuthorize("hasAnyAuthority('SYS_ADMIN', 'TENANT_ADMIN', 'CUSTOMER_USER')")
-    @RequestMapping(value = "/relation", method = RequestMethod.GET, params = {FROM_ID, FROM_TYPE, RELATION_TYPE, TO_ID, TO_TYPE})
+    @GetMapping(value = "/relation", params = {FROM_ID, FROM_TYPE, RELATION_TYPE, TO_ID, TO_TYPE})
     @ResponseBody
     public EntityRelation getRelation(@RequestParam(FROM_ID) String strFromId,
                                       @RequestParam(FROM_TYPE) String strFromType,
@@ -128,7 +128,7 @@ public class EntityRelationController extends BaseController {
     }
 
     @PreAuthorize("hasAnyAuthority('SYS_ADMIN', 'TENANT_ADMIN', 'CUSTOMER_USER')")
-    @RequestMapping(value = "/relations", method = RequestMethod.GET, params = {FROM_ID, FROM_TYPE})
+    @GetMapping(value = "/relations", params = {FROM_ID, FROM_TYPE})
     @ResponseBody
     public List<EntityRelation> findByFrom(@RequestParam(FROM_ID) String strFromId,
                                            @RequestParam(FROM_TYPE) String strFromType,
@@ -146,7 +146,7 @@ public class EntityRelationController extends BaseController {
     }
 
     @PreAuthorize("hasAnyAuthority('SYS_ADMIN', 'TENANT_ADMIN', 'CUSTOMER_USER')")
-    @RequestMapping(value = "/relations/info", method = RequestMethod.GET, params = {FROM_ID, FROM_TYPE})
+    @GetMapping(value = "/relations/info", params = {FROM_ID, FROM_TYPE})
     @ResponseBody
     public List<EntityRelationInfo> findInfoByFrom(@RequestParam(FROM_ID) String strFromId,
                                                    @RequestParam(FROM_TYPE) String strFromType,
@@ -164,7 +164,7 @@ public class EntityRelationController extends BaseController {
     }
 
     @PreAuthorize("hasAnyAuthority('SYS_ADMIN', 'TENANT_ADMIN', 'CUSTOMER_USER')")
-    @RequestMapping(value = "/relations", method = RequestMethod.GET, params = {FROM_ID, FROM_TYPE, RELATION_TYPE})
+    @GetMapping(value = "/relations", params = {FROM_ID, FROM_TYPE, RELATION_TYPE})
     @ResponseBody
     public List<EntityRelation> findByFrom(@RequestParam(FROM_ID) String strFromId,
                                            @RequestParam(FROM_TYPE) String strFromType,
@@ -184,7 +184,7 @@ public class EntityRelationController extends BaseController {
     }
 
     @PreAuthorize("hasAnyAuthority('SYS_ADMIN', 'TENANT_ADMIN', 'CUSTOMER_USER')")
-    @RequestMapping(value = "/relations", method = RequestMethod.GET, params = {TO_ID, TO_TYPE})
+    @GetMapping(value = "/relations", params = {TO_ID, TO_TYPE})
     @ResponseBody
     public List<EntityRelation> findByTo(@RequestParam(TO_ID) String strToId,
                                          @RequestParam(TO_TYPE) String strToType,
@@ -202,7 +202,7 @@ public class EntityRelationController extends BaseController {
     }
 
     @PreAuthorize("hasAnyAuthority('SYS_ADMIN', 'TENANT_ADMIN', 'CUSTOMER_USER')")
-    @RequestMapping(value = "/relations/info", method = RequestMethod.GET, params = {TO_ID, TO_TYPE})
+    @GetMapping(value = "/relations/info", params = {TO_ID, TO_TYPE})
     @ResponseBody
     public List<EntityRelationInfo> findInfoByTo(@RequestParam(TO_ID) String strToId,
                                                    @RequestParam(TO_TYPE) String strToType,
@@ -220,7 +220,7 @@ public class EntityRelationController extends BaseController {
     }
 
     @PreAuthorize("hasAnyAuthority('SYS_ADMIN', 'TENANT_ADMIN', 'CUSTOMER_USER')")
-    @RequestMapping(value = "/relations", method = RequestMethod.GET, params = {TO_ID, TO_TYPE, RELATION_TYPE})
+    @GetMapping(value = "/relations", params = {TO_ID, TO_TYPE, RELATION_TYPE})
     @ResponseBody
     public List<EntityRelation> findByTo(@RequestParam(TO_ID) String strToId,
                                          @RequestParam(TO_TYPE) String strToType,
@@ -240,7 +240,7 @@ public class EntityRelationController extends BaseController {
     }
 
     @PreAuthorize("hasAnyAuthority('SYS_ADMIN', 'TENANT_ADMIN', 'CUSTOMER_USER')")
-    @RequestMapping(value = "/relations", method = RequestMethod.POST)
+    @PostMapping(value = "/relations")
     @ResponseBody
     public List<EntityRelation> findByQuery(@RequestBody EntityRelationsQuery query) throws TempusException {
         checkNotNull(query);
@@ -255,7 +255,7 @@ public class EntityRelationController extends BaseController {
     }
 
     @PreAuthorize("hasAnyAuthority('SYS_ADMIN', 'TENANT_ADMIN', 'CUSTOMER_USER')")
-    @RequestMapping(value = "/relations/info", method = RequestMethod.POST)
+    @PostMapping(value = "/relations/info")
     @ResponseBody
     public List<EntityRelationInfo> findInfoByQuery(@RequestBody EntityRelationsQuery query) throws TempusException {
         checkNotNull(query);

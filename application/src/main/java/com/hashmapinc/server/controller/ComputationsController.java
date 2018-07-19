@@ -65,7 +65,7 @@ public class ComputationsController extends BaseController {
     private ComputationDiscoveryService computationDiscoveryService;
 
     @PreAuthorize("hasAuthority('TENANT_ADMIN')")
-    @RequestMapping(value = "/computations/upload", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/computations/upload", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     public Computations upload(@RequestParam("file") MultipartFile file) throws TempusException {
 
@@ -96,7 +96,7 @@ public class ComputationsController extends BaseController {
     }
 
     @PreAuthorize("hasAuthority('TENANT_ADMIN')")
-    @RequestMapping(value = "/computations/{computationId}", method = RequestMethod.DELETE)
+    @DeleteMapping(value = "/computations/{computationId}")
     @ResponseBody
     public void delete(@PathVariable(COMPUTATION_ID) String strComputationId) throws TempusException, IOException {
 
@@ -126,7 +126,7 @@ public class ComputationsController extends BaseController {
     }
 
     @PreAuthorize("hasAuthority('TENANT_ADMIN')")
-    @RequestMapping(value = "/computations", params = {"limit"}, method = RequestMethod.GET)
+    @GetMapping(value = "/computations", params = {"limit"})
     @ResponseBody
     public TextPageData<Computations> getTenantComputations(
             @RequestParam int limit,
@@ -143,7 +143,7 @@ public class ComputationsController extends BaseController {
     }
 
     @PreAuthorize("hasAnyAuthority('SYS_ADMIN', 'TENANT_ADMIN')")
-    @RequestMapping(value = "/computations", method = RequestMethod.GET)
+    @GetMapping(value = "/computations")
     @ResponseBody
     public List<Computations> getComputations() throws TempusException {
         try {
@@ -159,7 +159,7 @@ public class ComputationsController extends BaseController {
     }
 
     @PreAuthorize("hasAnyAuthority('SYS_ADMIN', 'TENANT_ADMIN')")
-    @RequestMapping(value = "/computations/{computationId}", method = RequestMethod.GET)
+    @GetMapping(value = "/computations/{computationId}")
     @ResponseBody
     public Computations getComputation(@PathVariable(COMPUTATION_ID) String strComputationId) throws TempusException {
 

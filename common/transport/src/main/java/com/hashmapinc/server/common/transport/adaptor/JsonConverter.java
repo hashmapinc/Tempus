@@ -41,11 +41,11 @@ public class JsonConverter {
 
     private JsonConverter() {}
 
-    public static TelemetryUploadRequest convertToTelemetry(JsonElement jsonObject) throws JsonSyntaxException {
+    public static TelemetryUploadRequest convertToTelemetry(JsonElement jsonObject) {
         return convertToTelemetry(jsonObject, BasicRequest.DEFAULT_REQUEST_ID);
     }
 
-    public static TelemetryUploadRequest convertToTelemetry(JsonElement jsonObject, int requestId) throws JsonSyntaxException {
+    public static TelemetryUploadRequest convertToTelemetry(JsonElement jsonObject, int requestId) {
         BasicTelemetryUploadRequest request = new BasicTelemetryUploadRequest(requestId);
         long systemTs = System.currentTimeMillis();
         if (jsonObject.isJsonObject()) {
@@ -65,7 +65,7 @@ public class JsonConverter {
     }
 
     //  test telemetry depth.
-    public static DepthTelemetryUploadRequest convertToTelemetryDepth(JsonElement jsonObject, int requestId) throws JsonSyntaxException {
+    public static DepthTelemetryUploadRequest convertToTelemetryDepth(JsonElement jsonObject, int requestId) {
         BasicDepthTelemetryUploadRequest request = new BasicDepthTelemetryUploadRequest(requestId);
         if (jsonObject.isJsonObject()) {
             parseObject(request, jsonObject);
@@ -84,7 +84,7 @@ public class JsonConverter {
         return request;
     }
 
-    public static ToServerRpcRequestMsg convertToServerRpcRequest(JsonElement json, int requestId) throws JsonSyntaxException {
+    public static ToServerRpcRequestMsg convertToServerRpcRequest(JsonElement json, int requestId) {
         JsonObject object = json.getAsJsonObject();
         return new ToServerRpcRequestMsg(requestId, object.get("method").getAsString(), GSON.toJson(object.get("params")));
     }

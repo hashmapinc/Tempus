@@ -45,7 +45,7 @@ public class HostRequestIntervalRegistryTest {
     @Test
     public void expiredIntervalsCleaned() throws InterruptedException {
         registry.tick("aaa");
-        Thread.sleep(150L);
+        Thread.sleep(150L);     //NOSONAR
         registry.tick("bbb");
         registry.clean();
         assertEquals(1L, registry.tick("aaa"));

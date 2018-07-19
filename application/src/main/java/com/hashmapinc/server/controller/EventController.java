@@ -15,19 +15,18 @@
  */
 package com.hashmapinc.server.controller;
 
+import com.hashmapinc.server.common.data.Event;
 import com.hashmapinc.server.common.data.id.EntityIdFactory;
 import com.hashmapinc.server.common.data.id.TenantId;
+import com.hashmapinc.server.common.data.page.TimePageData;
 import com.hashmapinc.server.common.data.page.TimePageLink;
 import com.hashmapinc.server.dao.event.EventService;
 import com.hashmapinc.server.dao.model.ModelConstants;
+import com.hashmapinc.server.exception.TempusErrorCode;
+import com.hashmapinc.server.exception.TempusException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import com.hashmapinc.server.common.data.Event;
-import com.hashmapinc.server.common.data.id.*;
-import com.hashmapinc.server.common.data.page.TimePageData;
-import com.hashmapinc.server.exception.TempusErrorCode;
-import com.hashmapinc.server.exception.TempusException;
 
 @RestController
 @RequestMapping("/api")
@@ -37,7 +36,7 @@ public class EventController extends BaseController {
     private EventService eventService;
 
     @PreAuthorize("hasAnyAuthority('SYS_ADMIN', 'TENANT_ADMIN', 'CUSTOMER_USER')")
-    @RequestMapping(value = "/events/{entityType}/{entityId}/{eventType}", method = RequestMethod.GET)
+    @GetMapping(value = "/events/{entityType}/{entityId}/{eventType}")
     @ResponseBody
     public TimePageData<Event> getEvents(
             @PathVariable("entityType") String strEntityType,
@@ -67,7 +66,7 @@ public class EventController extends BaseController {
     }
 
     @PreAuthorize("hasAnyAuthority('SYS_ADMIN', 'TENANT_ADMIN', 'CUSTOMER_USER')")
-    @RequestMapping(value = "/events/{entityType}/{entityId}", method = RequestMethod.GET)
+    @GetMapping(value = "/events/{entityType}/{entityId}")
     @ResponseBody
     public TimePageData<Event> getEvents(
             @PathVariable("entityType") String strEntityType,

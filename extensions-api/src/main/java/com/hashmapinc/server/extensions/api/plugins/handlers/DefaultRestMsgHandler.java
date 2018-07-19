@@ -16,11 +16,11 @@
 package com.hashmapinc.server.extensions.api.plugins.handlers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.hashmapinc.server.extensions.api.plugins.PluginContext;
+import com.hashmapinc.server.extensions.api.plugins.rest.PluginRestMsg;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpMethod;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
-import com.hashmapinc.server.extensions.api.plugins.PluginContext;
-import com.hashmapinc.server.extensions.api.plugins.rest.PluginRestMsg;
 
 import javax.servlet.ServletException;
 
@@ -55,15 +55,15 @@ public class DefaultRestMsgHandler implements RestMsgHandler {
         }
     }
 
-    protected void handleHttpGetRequest(PluginContext ctx, PluginRestMsg msg) throws ServletException {
+    protected void handleHttpGetRequest(PluginContext ctx, PluginRestMsg msg) throws ServletException { //NOSONAR
         msg.getResponseHolder().setErrorResult(new HttpRequestMethodNotSupportedException(HttpMethod.GET.name()));
     }
 
-    protected void handleHttpPostRequest(PluginContext ctx, PluginRestMsg msg) throws ServletException {
+    protected void handleHttpPostRequest(PluginContext ctx, PluginRestMsg msg) throws ServletException { //NOSONAR
         msg.getResponseHolder().setErrorResult(new HttpRequestMethodNotSupportedException(HttpMethod.POST.name()));
     }
 
-    protected void handleHttpDeleteRequest(PluginContext ctx, PluginRestMsg msg) throws ServletException {
+    protected void handleHttpDeleteRequest(PluginContext ctx, PluginRestMsg msg) throws ServletException { //NOSONAR
         msg.getResponseHolder().setErrorResult(new HttpRequestMethodNotSupportedException(HttpMethod.DELETE.name()));
     }
 

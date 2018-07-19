@@ -18,6 +18,8 @@ package com.hashmapinc.server.controller;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.hashmapinc.server.common.data.*;
 import com.hashmapinc.server.common.data.audit.ActionType;
+import com.hashmapinc.server.common.data.device.DeviceSearchQuery;
+import com.hashmapinc.server.common.data.id.CustomerId;
 import com.hashmapinc.server.common.data.id.DeviceId;
 import com.hashmapinc.server.common.data.id.TenantId;
 import com.hashmapinc.server.common.data.page.TextPageData;
@@ -27,6 +29,10 @@ import com.hashmapinc.server.common.data.security.DeviceCredentials;
 import com.hashmapinc.server.dao.attributes.AttributesService;
 import com.hashmapinc.server.dao.depthseries.DepthSeriesService;
 import com.hashmapinc.server.dao.exception.IncorrectParameterException;
+import com.hashmapinc.server.dao.model.ModelConstants;
+import com.hashmapinc.server.dao.timeseries.TimeseriesService;
+import com.hashmapinc.server.exception.TempusErrorCode;
+import com.hashmapinc.server.exception.TempusException;
 import com.hashmapinc.server.service.security.model.SecurityUser;
 import com.opencsv.CSVWriter;
 import lombok.extern.slf4j.Slf4j;
@@ -34,12 +40,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import com.hashmapinc.server.common.data.device.DeviceSearchQuery;
-import com.hashmapinc.server.common.data.id.CustomerId;
-import com.hashmapinc.server.dao.model.ModelConstants;
-import com.hashmapinc.server.dao.timeseries.TimeseriesService;
-import com.hashmapinc.server.exception.TempusErrorCode;
-import com.hashmapinc.server.exception.TempusException;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -64,7 +64,7 @@ public class DeviceController extends BaseController {
     protected AttributesService attributesService;
 
     @PreAuthorize("hasAnyAuthority('TENANT_ADMIN', 'CUSTOMER_USER')")
-    @RequestMapping(value = "/device/{deviceId}", method = RequestMethod.GET)
+    @GetMapping(value = "/device/{deviceId}")
     @ResponseBody
     public Device getDeviceById(@PathVariable(DEVICE_ID) String strDeviceId) throws TempusException {
         checkParameter(DEVICE_ID, strDeviceId);
@@ -77,7 +77,7 @@ public class DeviceController extends BaseController {
     }
 
     @PreAuthorize("hasAnyAuthority('TENANT_ADMIN', 'CUSTOMER_USER')")
-    @RequestMapping(value = "/device", method = RequestMethod.POST)
+    @PostMapping(value = "/device")
     @ResponseBody
     public Device saveDevice(@RequestBody Device device) throws TempusException {
         try {
@@ -113,7 +113,7 @@ public class DeviceController extends BaseController {
     }
 
     @PreAuthorize("hasAuthority('TENANT_ADMIN')")
-    @RequestMapping(value = "/device/{deviceId}", method = RequestMethod.DELETE)
+    @DeleteMapping(value = "/device/{deviceId}")
     @ResponseStatus(value = HttpStatus.OK)
     public void deleteDevice(@PathVariable(DEVICE_ID) String strDeviceId) throws TempusException {
         checkParameter(DEVICE_ID, strDeviceId);
@@ -136,7 +136,7 @@ public class DeviceController extends BaseController {
     }
 
     @PreAuthorize("hasAuthority('TENANT_ADMIN')")
-    @RequestMapping(value = "/customer/{customerId}/device/{deviceId}", method = RequestMethod.POST)
+    @PostMapping(value = "/customer/{customerId}/device/{deviceId}")
     @ResponseBody
     public Device assignDeviceToCustomer(@PathVariable("customerId") String strCustomerId,
                                          @PathVariable(DEVICE_ID) String strDeviceId) throws TempusException {
@@ -165,7 +165,7 @@ public class DeviceController extends BaseController {
     }
 
     @PreAuthorize("hasAuthority('TENANT_ADMIN')")
-    @RequestMapping(value = "/customer/device/{deviceId}", method = RequestMethod.DELETE)
+    @DeleteMapping(value = "/customer/device/{deviceId}")
     @ResponseBody
     public Device unassignDeviceFromCustomer(@PathVariable(DEVICE_ID) String strDeviceId) throws TempusException {
         checkParameter(DEVICE_ID, strDeviceId);
@@ -193,7 +193,7 @@ public class DeviceController extends BaseController {
     }
 
     @PreAuthorize("hasAuthority('TENANT_ADMIN')")
-    @RequestMapping(value = "/customer/public/device/{deviceId}", method = RequestMethod.POST)
+    @PostMapping(value = "/customer/public/device/{deviceId}")
     @ResponseBody
     public Device assignDeviceToPublicCustomer(@PathVariable(DEVICE_ID) String strDeviceId) throws TempusException {
         checkParameter(DEVICE_ID, strDeviceId);
@@ -217,7 +217,7 @@ public class DeviceController extends BaseController {
     }
 
     @PreAuthorize("hasAnyAuthority('TENANT_ADMIN', 'CUSTOMER_USER')")
-    @RequestMapping(value = "/device/{deviceId}/credentials", method = RequestMethod.GET)
+    @GetMapping(value = "/device/{deviceId}/credentials")
     @ResponseBody
     public DeviceCredentials getDeviceCredentialsByDeviceId(@PathVariable(DEVICE_ID) String strDeviceId) throws TempusException {
         checkParameter(DEVICE_ID, strDeviceId);
@@ -238,7 +238,7 @@ public class DeviceController extends BaseController {
     }
 
     @PreAuthorize("hasAuthority('TENANT_ADMIN')")
-    @RequestMapping(value = "/device/credentials", method = RequestMethod.POST)
+    @PostMapping(value = "/device/credentials")
     @ResponseBody
     public DeviceCredentials saveDeviceCredentials(@RequestBody DeviceCredentials deviceCredentials) throws TempusException {
         checkNotNull(deviceCredentials);
@@ -259,7 +259,7 @@ public class DeviceController extends BaseController {
     }
 
     @PreAuthorize("hasAuthority('TENANT_ADMIN')")
-    @RequestMapping(value = "/tenant/devices", params = {"limit"}, method = RequestMethod.GET)
+    @GetMapping(value = "/tenant/devices", params = {"limit"})
     @ResponseBody
     public TextPageData<Device> getTenantDevices(
             @RequestParam int limit,
@@ -281,7 +281,7 @@ public class DeviceController extends BaseController {
     }
 
     @PreAuthorize("hasAuthority('TENANT_ADMIN')")
-    @RequestMapping(value = "/tenant/devices", params = {"deviceName"}, method = RequestMethod.GET)
+    @GetMapping(value = "/tenant/devices", params = {"deviceName"})
     @ResponseBody
     public Device getTenantDevice(
             @RequestParam String deviceName) throws TempusException {
@@ -294,7 +294,7 @@ public class DeviceController extends BaseController {
     }
 
     @PreAuthorize("hasAnyAuthority('TENANT_ADMIN', 'CUSTOMER_USER')")
-    @RequestMapping(value = "/customer/{customerId}/devices", params = {"limit"}, method = RequestMethod.GET)
+    @GetMapping(value = "/customer/{customerId}/devices", params = {"limit"})
     @ResponseBody
     public TextPageData<Device> getCustomerDevices(
             @PathVariable("customerId") String strCustomerId,
@@ -320,7 +320,7 @@ public class DeviceController extends BaseController {
     }
 
     @PreAuthorize("hasAnyAuthority('TENANT_ADMIN', 'CUSTOMER_USER')")
-    @RequestMapping(value = "/devices", params = {"deviceIds"}, method = RequestMethod.GET)
+    @GetMapping(value = "/devices", params = {"deviceIds"})
     @ResponseBody
     public List<Device> getDevicesByIds(
             @RequestParam("deviceIds") String[] strDeviceIds) throws TempusException {
@@ -346,7 +346,7 @@ public class DeviceController extends BaseController {
     }
 
     @PreAuthorize("hasAnyAuthority('TENANT_ADMIN', 'CUSTOMER_USER')")
-    @RequestMapping(value = "/download/deviceAttributesData", method = RequestMethod.GET)
+    @GetMapping(value = "/download/deviceAttributesData")
     @ResponseBody
     public void downloadAttributesDataAsCsv(HttpServletResponse response, @RequestParam("deviceId") String strDeviceId) throws IOException {
         String csvFileName = "device_attributes_data.csv";
@@ -371,7 +371,7 @@ public class DeviceController extends BaseController {
     }
 
     @PreAuthorize("hasAnyAuthority('TENANT_ADMIN', 'CUSTOMER_USER')")
-    @RequestMapping(value = "/download/deviceSeriesData", method = RequestMethod.GET)
+    @GetMapping(value = "/download/deviceSeriesData")
     @ResponseBody
     public void downloadTimeSeriesOrDepthSeriesDataAsCSV(HttpServletResponse response,
                             @RequestParam("deviceId") String strDeviceId,
@@ -407,7 +407,7 @@ public class DeviceController extends BaseController {
 
 
     @PreAuthorize("hasAnyAuthority('TENANT_ADMIN', 'CUSTOMER_USER')")
-    @RequestMapping(value = "/devices", method = RequestMethod.POST)
+    @PostMapping(value = "/devices")
     @ResponseBody
     public List<Device> findByQuery(@RequestBody DeviceSearchQuery query) throws TempusException {
         checkNotNull(query);
@@ -431,7 +431,7 @@ public class DeviceController extends BaseController {
     }
 
     @PreAuthorize("hasAnyAuthority('TENANT_ADMIN', 'CUSTOMER_USER')")
-    @RequestMapping(value = "/device/types", method = RequestMethod.GET)
+    @GetMapping(value = "/device/types")
     @ResponseBody
     public List<EntitySubtype> getDeviceTypes() throws TempusException {
         try {

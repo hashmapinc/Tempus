@@ -126,7 +126,7 @@ public class CassandraAuditLogDao extends CassandraAbstractSearchTimeDao<AuditLo
 
         long partition = toPartitionTs(LocalDate.now().atStartOfDay().toInstant(ZoneOffset.UTC).toEpochMilli());
         BoundStatement stmt = getSaveByTenantStmt().bind();
-        stmt = setSaveStmtVariables(stmt, auditLog, partition);
+        setSaveStmtVariables(stmt, auditLog, partition);
         return getFuture(executeAsyncWrite(stmt), rs -> null);
     }
 
@@ -135,7 +135,7 @@ public class CassandraAuditLogDao extends CassandraAbstractSearchTimeDao<AuditLo
         log.debug("Save saveByTenantIdAndEntityId [{}] ", auditLog);
 
         BoundStatement stmt = getSaveByTenantIdAndEntityIdStmt().bind();
-        stmt = setSaveStmtVariables(stmt, auditLog, -1);
+        setSaveStmtVariables(stmt, auditLog, -1);
         return getFuture(executeAsyncWrite(stmt), rs -> null);
     }
 
@@ -144,7 +144,7 @@ public class CassandraAuditLogDao extends CassandraAbstractSearchTimeDao<AuditLo
         log.debug("Save saveByTenantIdAndCustomerId [{}] ", auditLog);
 
         BoundStatement stmt = getSaveByTenantIdAndCustomerIdStmt().bind();
-        stmt = setSaveStmtVariables(stmt, auditLog, -1);
+        setSaveStmtVariables(stmt, auditLog, -1);
         return getFuture(executeAsyncWrite(stmt), rs -> null);
     }
 
@@ -153,7 +153,7 @@ public class CassandraAuditLogDao extends CassandraAbstractSearchTimeDao<AuditLo
         log.debug("Save saveByTenantIdAndUserId [{}] ", auditLog);
 
         BoundStatement stmt = getSaveByTenantIdAndUserIdStmt().bind();
-        stmt = setSaveStmtVariables(stmt, auditLog, -1);
+        setSaveStmtVariables(stmt, auditLog, -1);
         return getFuture(executeAsyncWrite(stmt), rs -> null);
     }
 

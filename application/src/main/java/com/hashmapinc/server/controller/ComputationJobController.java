@@ -40,7 +40,7 @@ public class ComputationJobController extends BaseController{
     public static final String NOT_FOUND_SUFFIX = " wasn't found! ";
 
     @PreAuthorize("hasAuthority('TENANT_ADMIN')")
-    @RequestMapping(value = "/computations/{computationid}/jobs", method = RequestMethod.POST)
+    @PostMapping(value = "/computations/{computationid}/jobs")
     @ResponseBody
     public ComputationJob saveComputationJob(@PathVariable("computationid") String strComputationId,
                                              @RequestBody ComputationJob source) throws TempusException {
@@ -70,7 +70,7 @@ public class ComputationJobController extends BaseController{
     }
 
     @PreAuthorize("hasAnyAuthority('SYS_ADMIN', 'TENANT_ADMIN')")
-    @RequestMapping(value = "/computations/jobs/{computationJobId}", method = RequestMethod.DELETE)
+    @DeleteMapping(value = "/computations/jobs/{computationJobId}")
     @ResponseStatus(value = HttpStatus.OK)
     public void deleteComputationJob(@PathVariable("computationJobId") String strComputationJobId) throws TempusException {
         checkParameter("computationJobId", strComputationJobId);
@@ -91,7 +91,7 @@ public class ComputationJobController extends BaseController{
     }
 
     @PreAuthorize("hasAnyAuthority('SYS_ADMIN', 'TENANT_ADMIN')")
-    @RequestMapping(value = "/computations/{computationId}/jobs/{computationJobId}", method = RequestMethod.GET)
+    @GetMapping(value = "/computations/{computationId}/jobs/{computationJobId}")
     @ResponseStatus(value = HttpStatus.OK)
     public ComputationJob getComputationJob(@PathVariable("computationJobId") String strComputationJobId,
                                   @PathVariable("computationId") String strComputationId) throws TempusException {
@@ -108,7 +108,7 @@ public class ComputationJobController extends BaseController{
     }
 
     @PreAuthorize("hasAnyAuthority('SYS_ADMIN', 'TENANT_ADMIN')")
-    @RequestMapping(value = "/computations/{computationId}/jobs/{computationJodId}/activate", method = RequestMethod.POST)
+    @PostMapping(value = "/computations/{computationId}/jobs/{computationJodId}/activate")
     @ResponseStatus(value = HttpStatus.OK)
     public void activateCompuationJobById(@PathVariable("computationJodId") String strComputationJobId,
                                    @PathVariable("computationId") String strComputationId) throws TempusException {
@@ -137,7 +137,7 @@ public class ComputationJobController extends BaseController{
     }
 
     @PreAuthorize("hasAnyAuthority('SYS_ADMIN', 'TENANT_ADMIN')")
-    @RequestMapping(value = "/computations/{computationId}/jobs/{computationJodId}/suspend", method = RequestMethod.POST)
+    @PostMapping(value = "/computations/{computationId}/jobs/{computationJodId}/suspend")
     @ResponseStatus(value = HttpStatus.OK)
     public void suspendComputationJobById(@PathVariable("computationJodId") String strComputationJobId,
                                   @PathVariable("computationId") String strComputationId) throws TempusException {
@@ -166,7 +166,7 @@ public class ComputationJobController extends BaseController{
     }
 
     @PreAuthorize("hasAnyAuthority('SYS_ADMIN', 'TENANT_ADMIN')")
-    @RequestMapping(value = "/computations/{computationId}/jobs", method = RequestMethod.GET)
+    @GetMapping(value = "/computations/{computationId}/jobs")
     @ResponseStatus(value = HttpStatus.OK)
     public List<ComputationJob> getComputationJobs(@PathVariable("computationId") String strComputationId) throws TempusException {
         checkParameter("computationId", strComputationId);
