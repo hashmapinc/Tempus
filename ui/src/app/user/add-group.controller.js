@@ -20,7 +20,7 @@
 
 
 /*@ngInject*/
-export default function AddGroupModelController($scope, $mdDialog, saveItemFunction, helpLinks, $state) {
+export default function AddGroupModelController($scope, $mdDialog, saveItemFunction, helpLinks, customerId, $log) {
 
     var vm = this;
     vm.helpLinks = helpLinks;
@@ -34,12 +34,11 @@ export default function AddGroupModelController($scope, $mdDialog, saveItemFunct
     }
 
     // add a new datamodel and redirect to the datamodel canvas
-    function add() {
+    function add() { $log.log(customerId);
         saveItemFunction(vm.item).then(function success(item) {
             vm.item = item;
             $scope.theForm.$setPristine();
             $mdDialog.hide();
-            $state.go('home.data_models.data_model', { 'datamodelId': vm.item.id.id });
         });
     }
 }

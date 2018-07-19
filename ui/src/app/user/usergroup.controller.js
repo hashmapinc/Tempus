@@ -24,12 +24,11 @@
 
 /*@ngInject*/
 
-//import addDataModel from './add-group.tpl.html';
+import addDataModel from './add-group.tpl.html';
 
 /*@ngInject*/
 
-
-export default function UserGroupController($state, $stateParams, $log) {
+export default function UserGroupController($state, $stateParams, $log, $mdDialog, $document) {
 
    // var tenantId = $stateParams.tenantId;
     var customerId = $stateParams.customerId;
@@ -39,22 +38,22 @@ export default function UserGroupController($state, $stateParams, $log) {
     var vm = this;
     vm.addUserGroup = addUserGroup;
     vm.customerId = customerId;
-    //vm.AddGroupModelController = "AddGroupModelController";
+    vm.AddGroupModelController = "AddGroupModelController";
 
 
     function addUserGroup($event,id) {
       $log.log(id);
-//        $mdDialog.show({
-//            controller: vm.AddGroupModelController,
-//            controllerAs: 'vm',
-//            templateUrl: addDataModel,
-//            parent: angular.element($document[0].body),
-//            locals: {saveItemFunction: vm.saveDataModelFunc},
-//            fullscreen: true,
-//            targetEvent: $event
-//        }).then(function () {
-//        }, function () {
-//        });
+        $mdDialog.show({
+            controller: vm.AddGroupModelController,
+            controllerAs: 'vm',
+            templateUrl: addDataModel,
+            parent: angular.element($document[0].body),
+            locals: {saveItemFunction: vm.saveDataModelFunc, customerId: id},
+            fullscreen: true,
+            targetEvent: $event
+        }).then(function () {
+        }, function () {
+        });
     }
 
 
