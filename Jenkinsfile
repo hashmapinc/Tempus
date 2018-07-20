@@ -18,7 +18,7 @@ mvn validate'''
     }
     stage('Build') {
       steps {
-        sh 'mvn -Dmaven.test.failure.ignore=true -Dlicense.skip=true package'
+        sh 'mvn -Dmaven.test.failure.ignore=true -Dlicense.skip=true -DskipITs install'
       }
     }
     stage('Integration Tests'){
