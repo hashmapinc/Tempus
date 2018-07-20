@@ -29,13 +29,14 @@ import com.hashmapinc.server.common.data.id.ComputationJobId;
 import com.hashmapinc.server.common.data.id.TenantId;
 import com.hashmapinc.server.common.data.plugin.ComponentLifecycleState;
 import com.hashmapinc.server.common.msg.cluster.ClusterEventMsg;
+import com.hashmapinc.server.exception.TempusApplicationException;
 import org.springframework.http.HttpHeaders;
 
 public class KubelessComputationJobActorMessageProcessor extends ComponentMsgProcessor<ComputationJobId> {
     private ComputationJob job;
     private final Computations computation;
     private HttpHeaders headers = new HttpHeaders();
-    private ObjectMapper mapper = new ObjectMapper();
+    private ObjectMapper objectMapper = new ObjectMapper();
     private final ActorRef self;
     private final ActorRef parent;
 
@@ -45,11 +46,11 @@ public class KubelessComputationJobActorMessageProcessor extends ComponentMsgPro
         this.computation = computation;
         this.self = self;
         this.parent = parent;
-        mapper.setSerializationInclusion(JsonInclude.Include.NON_DEFAULT);
+        objectMapper.setSerializationInclusion(JsonInclude.Include.NON_DEFAULT);
     }
 
     @Override
-    public void start() throws Exception {
+    public void start() throws TempusApplicationException {
         logger.info("[{}] Going to start kubeless computation actor.", entityId);
         job = systemContext.getComputationJobService().findComputationJobById(entityId);
         if (job == null) {
@@ -67,17 +68,17 @@ public class KubelessComputationJobActorMessageProcessor extends ComponentMsgPro
     }
 
     @Override
-    public void stop() throws Exception {
-
+    public void stop() throws TempusApplicationException {
+        logger.info("stop is not implemented");
     }
 
     @Override
-    public void onCreated(ActorContext context) throws Exception {
+    public void onCreated(ActorContext context) throws TempusApplicationException {
         logger.info("[{}] Going to process onCreated kubeless computation job.", entityId);
     }
 
     @Override
-    public void onUpdate(ActorContext context) throws Exception {
+    public void onUpdate(ActorContext context) throws TempusApplicationException {
         ComputationJob oldJob = job;
         job = systemContext.getComputationJobService().findComputationJobById(entityId);
         logger.info("[{}] Computation configuration was updated from {} to {}.", entityId, oldJob, job);
@@ -89,26 +90,26 @@ public class KubelessComputationJobActorMessageProcessor extends ComponentMsgPro
     }
 
     @Override
-    public void onActivate(ActorContext context) throws Exception {
+    public void onActivate(ActorContext context) throws TempusApplicationException {
         logger.info("[{}] Going to process onActivate computation job.", entityId);
         start();
     }
 
     @Override
-    public void onSuspend(ActorContext context) throws Exception {
+    public void onSuspend(ActorContext context) throws TempusApplicationException {
         logger.info("[{}] Going to process onSuspend computation job.", entityId);
     }
 
     @Override
-    public void onStop(ActorContext context) throws Exception {
+    public void onStop(ActorContext context) throws TempusApplicationException {
         logger.info("[{}] Going to process onStop computation job.", entityId);
-        scheduleMsgWithDelay(context, new ComputationJobTerminationMsg(entityId), systemContext.getComputationActorTerminationDelay(), parent);
-        scheduleMsgWithDelay(context, new ComputationJobTerminationMsg(entityId), systemContext.getComputationActorTerminationDelay(), self);
+        scheduleMsgWithDelay(new ComputationJobTerminationMsg(entityId), systemContext.getComputationActorTerminationDelay(), parent);
+        scheduleMsgWithDelay(new ComputationJobTerminationMsg(entityId), systemContext.getComputationActorTerminationDelay(), self);
     }
 
     @Override
-    public void onClusterEventMsg(ClusterEventMsg msg) throws Exception {
-
+    public void onClusterEventMsg(ClusterEventMsg msg) throws TempusApplicationException {
+        logger.info("onClusterEventMsg is not implemented");
     }
 
     private void initComponent(){
@@ -129,7 +130,7 @@ public class KubelessComputationJobActorMessageProcessor extends ComponentMsgPro
     }
 
     private void postJob(){
-
+        logger.info("postJob is not implemented");
     }
 
     private void suspendJob(){
