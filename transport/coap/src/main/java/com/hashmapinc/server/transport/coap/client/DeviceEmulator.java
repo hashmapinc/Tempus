@@ -88,7 +88,7 @@ public class DeviceEmulator {
                 log.info("Response: {}, {}", telemetryResponse.getCode(), telemetryResponse.getResponseText());
             }
 
-            private void sendObserveRequest(CoapClient client) throws JsonProcessingException {
+            private void sendObserveRequest(CoapClient client) {
                 client.observe(new CoapHandler() {
                     @Override
                     public void onLoad(CoapResponse coapResponse) {
@@ -96,7 +96,7 @@ public class DeviceEmulator {
                         try {
                             JsonNode node = mapper.readTree(coapResponse.getResponseText());
                             int requestId = node.get("id").asInt();
-                            String method = node.get("method").asText();
+                            // To get method use :  node.get("method").asText()
                             ObjectNode params = (ObjectNode) node.get("params");
                             ObjectNode response = mapper.createObjectNode();
                             response.put("id", requestId);
@@ -151,9 +151,9 @@ public class DeviceEmulator {
         executor.shutdownNow();
     }
 
-    public static void main(String args[]) {
+    public static void main(String[] args) {
         if (args.length != 4) {
-            System.out.println("Usage: java -jar " + DeviceEmulator.class.getSimpleName() + ".jar host port device_token keys");
+            log.info("Usage: java -jar " + DeviceEmulator.class.getSimpleName() + ".jar host port device_token keys");
         }
         final DeviceEmulator emulator = new DeviceEmulator(args[0], Integer.parseInt(args[1]), args[2], args[3]);
         emulator.start();

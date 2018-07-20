@@ -15,11 +15,11 @@
  */
 
 package com.hashmapinc.server.common.data;
-import com.hashmapinc.server.common.data.BaseData;
+
 import com.hashmapinc.server.common.data.id.LogoId;
 import lombok.EqualsAndHashCode;
 
-
+@EqualsAndHashCode(callSuper = true)
 public class Logo extends BaseData<LogoId> {
 
     private boolean display;
@@ -41,7 +41,6 @@ public class Logo extends BaseData<LogoId> {
         this.display = logo.display;
         this.name = logo.name;
     }
-
 
     public boolean isDisplay() {
         return display;

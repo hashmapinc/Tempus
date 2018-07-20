@@ -51,10 +51,12 @@ public class PermissionChecker {
 
         for (UserPermission permission : user.getUserPermissions()) {
             PermissionMatcher matcher = getPermissionMatcher(permission.getSubject());
-            boolean hasAccessToResource = matcher.hasAccessToResource(resource, resourceType, permission, user);
-            boolean hasPermissionToAct = matcher.hasPermissionToAct(resource, action, permission);
-            if (matcher != null && hasAccessToResource && hasPermissionToAct)
-                return true;
+            if (matcher != null){
+                boolean hasAccessToResource = matcher.hasAccessToResource(resource, resourceType, permission, user);
+                boolean hasPermissionToAct = matcher.hasPermissionToAct(resource, action, permission);
+                if (hasAccessToResource && hasPermissionToAct)
+                    return true;
+            }
         }
         return false;
     }

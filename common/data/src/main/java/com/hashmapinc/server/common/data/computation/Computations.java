@@ -15,10 +15,9 @@
  */
 package com.hashmapinc.server.common.data.computation;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import com.hashmapinc.server.common.data.HasName;
 import com.hashmapinc.server.common.data.SearchTextBased;
 import com.hashmapinc.server.common.data.id.ComputationId;
-import com.hashmapinc.server.common.data.HasName;
 import com.hashmapinc.server.common.data.id.TenantId;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -53,6 +52,6 @@ public class Computations extends SearchTextBased<ComputationId> implements HasN
     }
     @Override
     public String getSearchText() {
-        return name;
+        return getName();
     }
 }

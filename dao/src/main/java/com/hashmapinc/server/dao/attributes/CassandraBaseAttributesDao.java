@@ -79,7 +79,7 @@ public class CassandraBaseAttributesDao extends CassandraAbstractAsyncDao implem
         attributeKeys.forEach(attributeKey -> entries.add(find(entityId, attributeType, attributeKey)));
         return Futures.transform(Futures.allAsList(entries), (Function<List<Optional<AttributeKvEntry>>, ? extends List<AttributeKvEntry>>) input -> {
             List<AttributeKvEntry> result = new ArrayList<>();
-            input.stream().filter(opt -> opt.isPresent()).forEach(opt -> result.add(opt.get()));
+            input.stream().filter(Optional::isPresent).forEach(opt -> result.add(opt.get()));
             return result;
         }, readResultsProcessingExecutor);
     }
@@ -92,8 +92,7 @@ public class CassandraBaseAttributesDao extends CassandraAbstractAsyncDao implem
                 .and(eq(ModelConstants.ENTITY_ID_COLUMN, entityId.getId()))
                 .and(eq(ModelConstants.ATTRIBUTE_TYPE_COLUMN, attributeType));
         log.trace("Generated query [{}] for entityId {} and attributeType {}", select, entityId, attributeType);
-        return Futures.transform(executeAsyncRead(select), (Function<? super ResultSet, ? extends List<AttributeKvEntry>>) input ->
-                        convertResultToAttributesKvEntryList(input)
+        return Futures.transform(executeAsyncRead(select), (Function<? super ResultSet, ? extends List<AttributeKvEntry>>) this::convertResultToAttributesKvEntryList
                 , readResultsProcessingExecutor);
     }
 

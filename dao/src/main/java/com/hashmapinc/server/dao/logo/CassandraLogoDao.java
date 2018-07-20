@@ -13,12 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
 package com.hashmapinc.server.dao.logo;
 
-import com.datastax.driver.core.querybuilder.Select;
-import com.datastax.driver.core.querybuilder.Select.Where;
 import com.hashmapinc.server.common.data.Logo;
 import com.hashmapinc.server.dao.DaoUtil;
 import com.hashmapinc.server.dao.model.ModelConstants;
@@ -27,9 +23,11 @@ import com.hashmapinc.server.dao.nosql.CassandraAbstractModelDao;
 import com.hashmapinc.server.dao.util.NoSqlDao;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import com.datastax.driver.core.querybuilder.Select;
 
-import static com.datastax.driver.core.querybuilder.QueryBuilder.eq;
+import com.datastax.driver.core.querybuilder.Select.Where;
 import static com.datastax.driver.core.querybuilder.QueryBuilder.select;
+import static com.datastax.driver.core.querybuilder.QueryBuilder.eq;
 
 @Component
 @Slf4j

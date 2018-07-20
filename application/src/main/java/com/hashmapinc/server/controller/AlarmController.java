@@ -36,7 +36,7 @@ public class AlarmController extends BaseController {
     public static final String ALARM_ID = "alarmId";
 
     @PreAuthorize("hasAnyAuthority('SYS_ADMIN', 'TENANT_ADMIN', 'CUSTOMER_USER')")
-    @RequestMapping(value = "/alarm/{alarmId}", method = RequestMethod.GET)
+    @GetMapping(value = "/alarm/{alarmId}")
     @ResponseBody
     public Alarm getAlarmById(@PathVariable(ALARM_ID) String strAlarmId) throws TempusException {
         checkParameter(ALARM_ID, strAlarmId);
@@ -50,7 +50,7 @@ public class AlarmController extends BaseController {
     }
 
     @PreAuthorize("hasAnyAuthority('SYS_ADMIN', 'TENANT_ADMIN', 'CUSTOMER_USER')")
-    @RequestMapping(value = "/alarm/info/{alarmId}", method = RequestMethod.GET)
+    @GetMapping(value = "/alarm/info/{alarmId}")
     @ResponseBody
     public AlarmInfo getAlarmInfoById(@PathVariable(ALARM_ID) String strAlarmId) throws TempusException {
         checkParameter(ALARM_ID, strAlarmId);
@@ -63,7 +63,7 @@ public class AlarmController extends BaseController {
     }
 
     @PreAuthorize("hasAnyAuthority('SYS_ADMIN', 'TENANT_ADMIN', 'CUSTOMER_USER')")
-    @RequestMapping(value = "/alarm", method = RequestMethod.POST)
+    @PostMapping(value = "/alarm")
     @ResponseBody
     public Alarm saveAlarm(@RequestBody Alarm alarm) throws TempusException {
         try {
@@ -75,7 +75,7 @@ public class AlarmController extends BaseController {
     }
 
     @PreAuthorize("hasAnyAuthority('SYS_ADMIN', 'TENANT_ADMIN', 'CUSTOMER_USER')")
-    @RequestMapping(value = "/alarm/{alarmId}/ack", method = RequestMethod.POST)
+    @PostMapping(value = "/alarm/{alarmId}/ack")
     @ResponseStatus(value = HttpStatus.OK)
     public void ackAlarm(@PathVariable(ALARM_ID) String strAlarmId) throws TempusException {
         checkParameter(ALARM_ID, strAlarmId);
@@ -89,7 +89,7 @@ public class AlarmController extends BaseController {
     }
 
     @PreAuthorize("hasAnyAuthority('SYS_ADMIN', 'TENANT_ADMIN', 'CUSTOMER_USER')")
-    @RequestMapping(value = "/alarm/{alarmId}/clear", method = RequestMethod.POST)
+    @PostMapping(value = "/alarm/{alarmId}/clear")
     @ResponseStatus(value = HttpStatus.OK)
     public void clearAlarm(@PathVariable(ALARM_ID) String strAlarmId) throws TempusException {
         checkParameter(ALARM_ID, strAlarmId);
@@ -103,7 +103,7 @@ public class AlarmController extends BaseController {
     }
 
     @PreAuthorize("hasAnyAuthority('SYS_ADMIN', 'TENANT_ADMIN', 'CUSTOMER_USER')")
-    @RequestMapping(value = "/alarm/{entityType}/{entityId}", method = RequestMethod.GET)
+    @GetMapping(value = "/alarm/{entityType}/{entityId}")
     @ResponseBody
     public TimePageData<AlarmInfo> getAlarms(
             @PathVariable("entityType") String strEntityType,
@@ -136,7 +136,7 @@ public class AlarmController extends BaseController {
     }
 
     @PreAuthorize("hasAnyAuthority('SYS_ADMIN', 'TENANT_ADMIN', 'CUSTOMER_USER')")
-    @RequestMapping(value = "/alarm/highestSeverity/{entityType}/{entityId}", method = RequestMethod.GET)
+    @GetMapping(value = "/alarm/highestSeverity/{entityType}/{entityId}")
     @ResponseBody
     public AlarmSeverity getHighestAlarmSeverity(
             @PathVariable("entityType") String strEntityType,

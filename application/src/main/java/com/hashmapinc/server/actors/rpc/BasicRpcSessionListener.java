@@ -31,7 +31,6 @@ import com.hashmapinc.server.common.msg.cluster.ServerAddress;
 import com.hashmapinc.server.common.msg.core.ToDeviceSessionActorMsg;
 import com.hashmapinc.server.common.msg.device.ToDeviceActorMsg;
 import com.hashmapinc.server.extensions.api.device.ToDeviceActorNotificationMsg;
-import com.hashmapinc.server.extensions.api.plugins.msg.*;
 import com.hashmapinc.server.extensions.api.plugins.rpc.RpcMsg;
 import com.hashmapinc.server.gen.cluster.ClusterAPIProtos;
 import com.hashmapinc.server.service.cluster.rpc.GrpcSession;
@@ -45,13 +44,11 @@ import java.util.UUID;
 public class BasicRpcSessionListener implements GrpcSessionListener {
 
     public static final String SESSION_RECEIVED_SESSION_ACTOR_MSG = "{} session [{}] received session actor msg {}";
-    private final ActorSystemContext context;
     private final ActorService service;
     private final ActorRef manager;
     private final ActorRef self;
 
     public BasicRpcSessionListener(ActorSystemContext context, ActorRef manager, ActorRef self) {
-        this.context = context;
         this.service = context.getActorService();
         this.manager = manager;
         this.self = self;
@@ -106,7 +103,7 @@ public class BasicRpcSessionListener implements GrpcSessionListener {
     @Override
     public void onFromDeviceRpcResponseRpcMsg(GrpcSession session, ClusterAPIProtos.ToPluginRpcResponseRpcMessage msg) {
         log.trace(SESSION_RECEIVED_SESSION_ACTOR_MSG, getType(session), session.getRemoteServer(), msg);
-        service.onMsg(deserialize(session.getRemoteServer(), msg));
+        service.onMsg(deserialize(msg));
     }
 
     @Override
@@ -152,7 +149,7 @@ public class BasicRpcSessionListener implements GrpcSessionListener {
         return new ToDeviceRpcRequestPluginMsg(serverAddress, pluginId, pluginTenantId, request);
     }
 
-    private static ToPluginRpcResponseDeviceMsg deserialize(ServerAddress serverAddress, ClusterAPIProtos.ToPluginRpcResponseRpcMessage msg) {
+    private static ToPluginRpcResponseDeviceMsg deserialize(ClusterAPIProtos.ToPluginRpcResponseRpcMessage msg) {
         ClusterAPIProtos.PluginAddress address = msg.getAddress();
         TenantId pluginTenantId = new TenantId(toUUID(address.getTenantId()));
         PluginId pluginId = new PluginId(toUUID(address.getPluginId()));

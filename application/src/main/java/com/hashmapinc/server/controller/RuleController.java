@@ -39,7 +39,7 @@ public class RuleController extends BaseController {
     public static final String RULE_ID = "ruleId";
 
     @PreAuthorize("hasAnyAuthority('SYS_ADMIN', 'TENANT_ADMIN')")
-    @RequestMapping(value = "/rule/{ruleId}", method = RequestMethod.GET)
+    @GetMapping(value = "/rule/{ruleId}")
     @ResponseBody
     public RuleMetaData getRuleById(@PathVariable(RULE_ID) String strRuleId) throws TempusException {
         checkParameter(RULE_ID, strRuleId);
@@ -53,7 +53,7 @@ public class RuleController extends BaseController {
 
 
     @PreAuthorize("hasAnyAuthority('SYS_ADMIN', 'TENANT_ADMIN')")
-    @RequestMapping(value = "/rule/token/{pluginToken}", method = RequestMethod.GET)
+    @GetMapping(value = "/rule/token/{pluginToken}")
     @ResponseBody
     public List<RuleMetaData> getRulesByPluginToken(@PathVariable("pluginToken") String pluginToken) throws TempusException {
         checkParameter("pluginToken", pluginToken);
@@ -66,7 +66,7 @@ public class RuleController extends BaseController {
     }
 
     @PreAuthorize("hasAnyAuthority('SYS_ADMIN', 'TENANT_ADMIN')")
-    @RequestMapping(value = "/rule", method = RequestMethod.POST)
+    @PostMapping(value = "/rule")
     @ResponseBody
     public RuleMetaData saveRule(@RequestBody RuleMetaData source) throws TempusException {
         try {
@@ -91,7 +91,7 @@ public class RuleController extends BaseController {
     }
 
     @PreAuthorize("hasAnyAuthority('SYS_ADMIN', 'TENANT_ADMIN')")
-    @RequestMapping(value = "/rule/{ruleId}/activate", method = RequestMethod.POST)
+    @PostMapping(value = "/rule/{ruleId}/activate")
     @ResponseStatus(value = HttpStatus.OK)
     public void activateRuleById(@PathVariable(RULE_ID) String strRuleId) throws TempusException {
         checkParameter(RULE_ID, strRuleId);
@@ -117,7 +117,7 @@ public class RuleController extends BaseController {
     }
 
     @PreAuthorize("hasAnyAuthority('SYS_ADMIN', 'TENANT_ADMIN')")
-    @RequestMapping(value = "/rule/{ruleId}/suspend", method = RequestMethod.POST)
+    @PostMapping(value = "/rule/{ruleId}/suspend")
     @ResponseStatus(value = HttpStatus.OK)
     public void suspendRuleById(@PathVariable(RULE_ID) String strRuleId) throws TempusException {
         checkParameter(RULE_ID, strRuleId);
@@ -143,7 +143,7 @@ public class RuleController extends BaseController {
     }
 
     @PreAuthorize("hasAuthority('SYS_ADMIN')")
-    @RequestMapping(value = "/rule/system", params = {"limit"}, method = RequestMethod.GET)
+    @GetMapping(value = "/rule/system", params = {"limit"})
     @ResponseBody
     public TextPageData<RuleMetaData> getSystemRules(
             @RequestParam int limit,
@@ -159,7 +159,7 @@ public class RuleController extends BaseController {
     }
 
     @PreAuthorize("hasAuthority('SYS_ADMIN')")
-    @RequestMapping(value = "/rule/tenant/{tenantId}", params = {"limit"}, method = RequestMethod.GET)
+    @GetMapping(value = "/rule/tenant/{tenantId}", params = {"limit"})
     @ResponseBody
     public TextPageData<RuleMetaData> getTenantRules(
             @PathVariable("tenantId") String strTenantId,
@@ -178,7 +178,7 @@ public class RuleController extends BaseController {
     }
 
     @PreAuthorize("hasAnyAuthority('SYS_ADMIN', 'TENANT_ADMIN')")
-    @RequestMapping(value = "/rules", method = RequestMethod.GET)
+    @GetMapping(value = "/rules")
     @ResponseBody
     public List<RuleMetaData> getRules() throws TempusException {
         try {
@@ -194,7 +194,7 @@ public class RuleController extends BaseController {
     }
 
     @PreAuthorize("hasAuthority('TENANT_ADMIN')")
-    @RequestMapping(value = "/rule", params = {"limit"}, method = RequestMethod.GET)
+    @GetMapping(value = "/rule", params = {"limit"})
     @ResponseBody
     public TextPageData<RuleMetaData> getTenantRules(
             @RequestParam int limit,
@@ -211,7 +211,7 @@ public class RuleController extends BaseController {
     }
 
     @PreAuthorize("hasAnyAuthority('SYS_ADMIN', 'TENANT_ADMIN')")
-    @RequestMapping(value = "/rule/{ruleId}", method = RequestMethod.DELETE)
+    @DeleteMapping(value = "/rule/{ruleId}")
     @ResponseStatus(value = HttpStatus.OK)
     public void deleteRule(@PathVariable(RULE_ID) String strRuleId) throws TempusException {
         checkParameter(RULE_ID, strRuleId);

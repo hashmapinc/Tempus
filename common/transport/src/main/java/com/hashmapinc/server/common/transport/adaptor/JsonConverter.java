@@ -15,13 +15,6 @@
  */
 package com.hashmapinc.server.common.transport.adaptor;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map.Entry;
-import java.util.function.Consumer;
-import java.util.stream.Collectors;
-
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.JsonNodeType;
@@ -30,21 +23,29 @@ import com.hashmapinc.server.common.data.kv.*;
 import com.hashmapinc.server.common.msg.core.*;
 import com.hashmapinc.server.common.msg.kv.AttributesKVMsg;
 import lombok.extern.slf4j.Slf4j;
-import com.hashmapinc.server.common.msg.core.*;
 
-import com.hashmapinc.server.common.data.kv.*;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map.Entry;
+import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 @Slf4j
 public class JsonConverter {
 
     private static final Gson GSON = new Gson();
     public static final String CAN_T_PARSE_VALUE = "Can't parse value: ";
+    public static final String VALUES = "values";
+    public static final String VALUE = "value";
 
-    public static TelemetryUploadRequest convertToTelemetry(JsonElement jsonObject) throws JsonSyntaxException {
+    private JsonConverter() {}
+
+    public static TelemetryUploadRequest convertToTelemetry(JsonElement jsonObject) {
         return convertToTelemetry(jsonObject, BasicRequest.DEFAULT_REQUEST_ID);
     }
 
-    public static TelemetryUploadRequest convertToTelemetry(JsonElement jsonObject, int requestId) throws JsonSyntaxException {
+    public static TelemetryUploadRequest convertToTelemetry(JsonElement jsonObject, int requestId) {
         BasicTelemetryUploadRequest request = new BasicTelemetryUploadRequest(requestId);
         long systemTs = System.currentTimeMillis();
         if (jsonObject.isJsonObject()) {
@@ -64,11 +65,8 @@ public class JsonConverter {
     }
 
     //  test telemetry depth.
-    public static DepthTelemetryUploadRequest convertToTelemetryDepth(JsonElement jsonObject, int requestId) throws JsonSyntaxException {
+    public static DepthTelemetryUploadRequest convertToTelemetryDepth(JsonElement jsonObject, int requestId) {
         BasicDepthTelemetryUploadRequest request = new BasicDepthTelemetryUploadRequest(requestId);
-        log.debug("\n\n  request class: " + request.getClass() + "\n\n");
-        log.debug("\n\n  request val " + request + "\n\n");
-        //long systemTs = System.currentTimeMillis();
         if (jsonObject.isJsonObject()) {
             parseObject(request, jsonObject);
         }
@@ -77,23 +75,23 @@ public class JsonConverter {
                 if (je.isJsonObject()) {
                     parseObject(request,je.getAsJsonObject());
                 } else {
-                    throw new JsonSyntaxException("Can't parse value: " + je);
+                    throw new JsonSyntaxException(CAN_T_PARSE_VALUE + je);
                 }
             });
         } else {
-            throw new JsonSyntaxException("Can't parse value: " + jsonObject);
+            throw new JsonSyntaxException(CAN_T_PARSE_VALUE + jsonObject);
         }
         return request;
     }
 
-    public static ToServerRpcRequestMsg convertToServerRpcRequest(JsonElement json, int requestId) throws JsonSyntaxException {
+    public static ToServerRpcRequestMsg convertToServerRpcRequest(JsonElement json, int requestId) {
         JsonObject object = json.getAsJsonObject();
         return new ToServerRpcRequestMsg(requestId, object.get("method").getAsString(), GSON.toJson(object.get("params")));
     }
 
     private static void parseObject(BasicTelemetryUploadRequest request, long systemTs, JsonElement jsonObject) {
         JsonObject jo = jsonObject.getAsJsonObject();
-        if (jo.has("ts") && jo.has("values")) {
+        if (jo.has("ts") && jo.has(VALUES)) {
             parseWithTs(request, jo);
         } else {
             parseWithoutTs(request, systemTs, jo);
@@ -103,10 +101,8 @@ public class JsonConverter {
     //  telemetry ds
     private static void parseObject(BasicDepthTelemetryUploadRequest request, JsonElement jsonObject) {
         JsonObject jo = jsonObject.getAsJsonObject();
-        if (jo.has("ds") && jo.has("values")) {
+        if (jo.has("ds") && jo.has(VALUES)) {
             parseWithDepth(request, jo);
-        } else {
-
         }
     }
 
@@ -118,7 +114,7 @@ public class JsonConverter {
 
     public static void parseWithTs(BasicTelemetryUploadRequest request, JsonObject jo) {
         long ts = jo.get("ts").getAsLong();
-        JsonObject valuesObject = jo.get("values").getAsJsonObject();
+        JsonObject valuesObject = jo.get(VALUES).getAsJsonObject();
         for (KvEntry entry : parseValues(valuesObject)) {
             request.add(ts, entry);
         }
@@ -127,7 +123,7 @@ public class JsonConverter {
     //  telemetry DS
     public static void parseWithDepth(BasicDepthTelemetryUploadRequest request, JsonObject jo) {
         Double ds = jo.get("ds").getAsDouble();
-        JsonObject valuesObject = jo.get("values").getAsJsonObject();
+        JsonObject valuesObject = jo.get(VALUES).getAsJsonObject();
         for (KvEntry entry : parseValues(valuesObject)) {
             request.addDs(ds, entry);
         }
@@ -139,25 +135,17 @@ public class JsonConverter {
             JsonElement element = valueEntry.getValue();
             if (element.isJsonPrimitive()) {
                 JsonPrimitive value = element.getAsJsonPrimitive();
-                if (value.isString()) {
-                    result.add(new StringDataEntry(valueEntry.getKey(), value.getAsString()));
-                } else if (value.isBoolean()) {
-                    result.add(new BooleanDataEntry(valueEntry.getKey(), value.getAsBoolean()));
-                } else if (value.isNumber()) {
-                    parseNumericValue(result, valueEntry, value);
-                } else {
-                    throw new JsonSyntaxException(CAN_T_PARSE_VALUE + value);
-                }
+                createResultForJsonPrimitive(result, valueEntry, value);
             } else if (element.isJsonObject() || element.isJsonArray()) {
                 ObjectMapper mapper = new ObjectMapper();
-                JsonNode value = null;
+                JsonNode value;
                 try {
                     value = mapper.readTree(element.toString());
+                    if(!isUnitPresentInJson(valueEntry.getKey(), value, result)){
+                        result.add(new JsonDataEntry(valueEntry.getKey(), value));
+                    }
                 } catch (IOException ex) {
                     log.error(ex.getMessage());
-                }
-                if(!isUnitPresentInJson(valueEntry.getKey(), value, result)){
-                    result.add(new JsonDataEntry(valueEntry.getKey(), value));
                 }
             } else {
                 throw new JsonSyntaxException(CAN_T_PARSE_VALUE + element);
@@ -166,15 +154,27 @@ public class JsonConverter {
         return result;
     }
 
+    private static void createResultForJsonPrimitive(List<KvEntry> result, Entry<String, JsonElement> valueEntry, JsonPrimitive value) {
+        if (value.isString()) {
+            result.add(new StringDataEntry(valueEntry.getKey(), value.getAsString()));
+        } else if (value.isBoolean()) {
+            result.add(new BooleanDataEntry(valueEntry.getKey(), value.getAsBoolean()));
+        } else if (value.isNumber()) {
+            parseNumericValue(result, valueEntry, value);
+        } else {
+            throw new JsonSyntaxException(CAN_T_PARSE_VALUE + value);
+        }
+    }
+
     private static boolean isUnitPresentInJson(String key, JsonNode value, List<KvEntry> result){
         boolean unitPresent = false;
-        if (value.has("value") && value.has("unit")){
-            if(value.get("value").getNodeType() == JsonNodeType.BOOLEAN){
-                result.add(new BooleanDataEntry(key, value.get("unit").asText(), value.get("value").asBoolean()));
-            }else if(value.get("value").getNodeType() == JsonNodeType.STRING){
-                result.add(new StringDataEntry(key, value.get("unit").asText(), value.get("value").asText()));
-            }else if(value.get("value").getNodeType() == JsonNodeType.NUMBER){
-                parseNumericValue(result, key, value.get("unit").asText(), value.get("value"));
+        if (value.has(VALUE) && value.has("unit")){
+            if(value.get(VALUE).getNodeType() == JsonNodeType.BOOLEAN){
+                result.add(new BooleanDataEntry(key, value.get("unit").asText(), value.get(VALUE).asBoolean()));
+            }else if(value.get(VALUE).getNodeType() == JsonNodeType.STRING){
+                result.add(new StringDataEntry(key, value.get("unit").asText(), value.get(VALUE).asText()));
+            }else if(value.get(VALUE).getNodeType() == JsonNodeType.NUMBER){
+                parseNumericValue(result, key, value.get("unit").asText(), value.get(VALUE));
             }
             unitPresent = true;
         }
@@ -248,9 +248,8 @@ public class JsonConverter {
     }
 
     private static Consumer<AttributeKey> addToObject(JsonArray result) {
-        return key -> {
-            result.add(key.getAttributeKey());
-        };
+        return key -> result.add(key.getKey());
+
     }
 
     private static Consumer<AttributeKvEntry> addToObject(JsonObject result) {

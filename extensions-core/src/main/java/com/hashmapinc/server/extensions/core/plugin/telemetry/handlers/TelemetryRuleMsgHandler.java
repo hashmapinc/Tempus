@@ -31,7 +31,6 @@ import com.hashmapinc.server.extensions.core.plugin.telemetry.dataquality.MetaDa
 import com.hashmapinc.server.extensions.core.plugin.telemetry.sub.Subscription;
 import com.hashmapinc.server.extensions.core.plugin.telemetry.sub.SubscriptionType;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.time.StopWatch;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -90,24 +89,7 @@ public class TelemetryRuleMsgHandler extends DefaultRuleMsgHandler {
                 @Override
                 public void onSuccess(PluginContext ctx, List<TsKvEntry> data) {
                     List<TsKvEntry> tsKvEntries = new ArrayList<>();
-                    if(data.isEmpty()){
-                        for (KvEntry kv : kvEntries) {
-                            BasicTsKvEntry basicTsKvEntry = new BasicTsKvEntry(entry.getKey(), kv);
-                            basicTsKvEntry.setTsDiff(0);
-                            tsKvEntries.add(basicTsKvEntry);
-                        }
-                    }else {
-                        for (TsKvEntry tsKvEntry : data) {
-                            for (KvEntry kv : kvEntries) {
-                                if (kv.getKey().contentEquals(tsKvEntry.getKey())) {
-                                    Long tsDiff = entry.getKey() - tsKvEntry.getTs();
-                                    BasicTsKvEntry basicTsKvEntry = new BasicTsKvEntry(entry.getKey(), kv);
-                                    basicTsKvEntry.setTsDiff(tsDiff);
-                                    tsKvEntries.add(basicTsKvEntry);
-                                }
-                            }
-                        }
-                    }
+                    setTsDiffTsKvList(data, tsKvEntries, kvEntries, entry);
                     ctx.saveTsData(msg.getTenantId(), msg.getDeviceId(), tsKvEntries, msg.getTtl(), new PluginCallback<Void>() {
                         @Override
                         public void onSuccess(PluginContext ctx, Void data) {
@@ -135,6 +117,27 @@ public class TelemetryRuleMsgHandler extends DefaultRuleMsgHandler {
         }
     }
 
+    private void setTsDiffTsKvList(List<TsKvEntry> data, List<TsKvEntry> tsKvEntries, List<KvEntry> kvEntries, Map.Entry<Long, List<KvEntry>> entry) {
+        if(data.isEmpty()){
+            for (KvEntry kv : kvEntries) {
+                BasicTsKvEntry basicTsKvEntry = new BasicTsKvEntry(entry.getKey(), kv);
+                basicTsKvEntry.setTsDiff(0);
+                tsKvEntries.add(basicTsKvEntry);
+            }
+        }else {
+            for (TsKvEntry tsKvEntry : data) {
+                for (KvEntry kv : kvEntries) {
+                    if (kv.getKey().contentEquals(tsKvEntry.getKey())) {
+                        Long tsDiff = entry.getKey() - tsKvEntry.getTs();
+                        BasicTsKvEntry basicTsKvEntry = new BasicTsKvEntry(entry.getKey(), kv);
+                        basicTsKvEntry.setTsDiff(tsDiff);
+                        tsKvEntries.add(basicTsKvEntry);
+                    }
+                }
+            }
+        }
+    }
+
     private List<TsKvEntry> prepareSubscriptionUpdate(TelemetryUploadRequest request, Subscription s) {
         List<TsKvEntry> subscriptionUpdate = new ArrayList<>();
         for (Map.Entry<Long, List<KvEntry>> entry : request.getData().entrySet()) {
@@ -156,25 +159,7 @@ public class TelemetryRuleMsgHandler extends DefaultRuleMsgHandler {
                 @Override
                 public void onSuccess(PluginContext ctx, List<DsKvEntry> data) {
                     List<DsKvEntry> dsKvEntries = new ArrayList<>();
-                    if(data.isEmpty()){
-                        for (KvEntry kv : kvEntries) {
-                            BasicDsKvEntry basicDsKvEntry = new BasicDsKvEntry(entry.getKey(), kv);
-                            basicDsKvEntry.setDsDiff(0.0);
-                            dsKvEntries.add(basicDsKvEntry);
-                        }
-                    }else {
-                        for (DsKvEntry dsKvEntry : data) {
-                            for (KvEntry kv : kvEntries) {
-                                if (kv.getKey().contentEquals(dsKvEntry.getKey())) {
-                                    Double dsDiff = entry.getKey() - dsKvEntry.getDs();
-                                    BasicDsKvEntry basicDsKvEntry = new BasicDsKvEntry(entry.getKey(), kv);
-                                    basicDsKvEntry.setDsDiff(dsDiff);
-                                    dsKvEntries.add(basicDsKvEntry);
-                                }
-                            }
-                        }
-                    }
-
+                    setDsDiffDsKvList(data, dsKvEntries, kvEntries, entry);
                     ctx.saveDsData(msg.getDeviceId(), dsKvEntries, msg.getTtl(), new PluginCallback<Void>() {
                         @Override
                         public void onSuccess(PluginContext ctx, Void data) {
@@ -202,8 +187,29 @@ public class TelemetryRuleMsgHandler extends DefaultRuleMsgHandler {
         }
     }
 
+    private void setDsDiffDsKvList(List<DsKvEntry> data, List<DsKvEntry> dsKvEntries, List<KvEntry> kvEntries, Map.Entry<Double, List<KvEntry>> entry) {
+        if(data.isEmpty()){
+            for (KvEntry kv : kvEntries) {
+                BasicDsKvEntry basicDsKvEntry = new BasicDsKvEntry(entry.getKey(), kv);
+                basicDsKvEntry.setDsDiff(0.0);
+                dsKvEntries.add(basicDsKvEntry);
+            }
+        }else {
+            for (DsKvEntry dsKvEntry : data) {
+                for (KvEntry kv : kvEntries) {
+                    if (kv.getKey().contentEquals(dsKvEntry.getKey())) {
+                        Double dsDiff = entry.getKey() - dsKvEntry.getDs();
+                        BasicDsKvEntry basicDsKvEntry = new BasicDsKvEntry(entry.getKey(), kv);
+                        basicDsKvEntry.setDsDiff(dsDiff);
+                        dsKvEntries.add(basicDsKvEntry);
+                    }
+                }
+            }
+        }
+    }
+
     private List<DsKvEntry> prepareSubscriptionUpdate(DepthTelemetryUploadRequest request, Subscription s){
-        List<DsKvEntry> subscriptionUpdate = new ArrayList<DsKvEntry>();
+        List<DsKvEntry> subscriptionUpdate = new ArrayList<>();
         for (Map.Entry<Double, List<KvEntry>> entry : request.getData().entrySet()) {
             for (KvEntry kv : entry.getValue()) {
                 if (s.isAllKeys() || s.getKeyStates().containsKey((kv.getKey()))) {

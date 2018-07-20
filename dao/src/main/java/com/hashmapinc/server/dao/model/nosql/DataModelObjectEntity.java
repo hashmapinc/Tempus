@@ -82,7 +82,7 @@ public final class DataModelObjectEntity implements SearchTextEntity<DataModelOb
             this.customerId = dataModelObject.getParentId().getId();
         }
         this.name = dataModelObject.getName();
-        this.description = dataModelObject.getDecription();
+        this.description = dataModelObject.getDescription();
     }
 
     @Override
@@ -145,7 +145,7 @@ public final class DataModelObjectEntity implements SearchTextEntity<DataModelOb
 
     @Override
     public String getSearchTextSource() {
-        return name;
+        return getName();
     }
 
     @Override
@@ -174,7 +174,7 @@ public final class DataModelObjectEntity implements SearchTextEntity<DataModelOb
             dataModelObject.setParentId(new DataModelObjectId(parentId));
         }
         dataModelObject.setName(name);
-        dataModelObject.setDecription(description);
+        dataModelObject.setDescription(description);
         return dataModelObject;
     }
 

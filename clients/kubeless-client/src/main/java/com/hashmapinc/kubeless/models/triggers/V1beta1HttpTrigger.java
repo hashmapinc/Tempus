@@ -17,7 +17,9 @@ package com.hashmapinc.kubeless.models.triggers;
 
 import com.google.gson.annotations.SerializedName;
 import com.hashmapinc.kubeless.models.V1beta1AbstractType;
+import lombok.EqualsAndHashCode;
 
+@EqualsAndHashCode
 public class V1beta1HttpTrigger extends V1beta1AbstractType<V1beta1HttpTriggerSpec> {
 
     @SerializedName("kind")

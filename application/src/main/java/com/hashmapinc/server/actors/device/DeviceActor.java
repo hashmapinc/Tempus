@@ -50,14 +50,14 @@ public class DeviceActor extends ContextAwareActor {
         if (msg instanceof RuleChainDeviceMsg) {
             processor.process(context(), (RuleChainDeviceMsg) msg);
         } else if (msg instanceof RulesProcessedMsg) {
-            processor.onRulesProcessedMsg(context(), (RulesProcessedMsg) msg);
+            processor.onRulesProcessedMsg((RulesProcessedMsg) msg);
         } else if (msg instanceof ToDeviceActorMsg) {
             processor.process(context(), (ToDeviceActorMsg) msg);
         } else if (msg instanceof ToDeviceActorNotificationMsg) {
             if (msg instanceof DeviceAttributesEventNotificationMsg) {
-                processor.processAttributesUpdate(context(), (DeviceAttributesEventNotificationMsg) msg);
+                processor.processAttributesUpdate((DeviceAttributesEventNotificationMsg) msg);
             }else if (msg instanceof DeviceTelemetryEventNotificationMsg) {
-                processor.processTelemetryUpdate(context(), (DeviceTelemetryEventNotificationMsg) msg);
+                processor.processTelemetryUpdate((DeviceTelemetryEventNotificationMsg) msg);
             }else if (msg instanceof ToDeviceRpcRequestPluginMsg) {
                 processor.processRpcRequest(context(), (ToDeviceRpcRequestPluginMsg) msg);
             } else if (msg instanceof DeviceCredentialsUpdateNotificationMsg){

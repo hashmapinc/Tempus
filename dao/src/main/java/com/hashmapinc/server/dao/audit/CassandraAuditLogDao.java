@@ -21,9 +21,9 @@ import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.ResultSetFuture;
 import com.datastax.driver.core.querybuilder.QueryBuilder;
 import com.datastax.driver.core.querybuilder.Select;
-import com.google.common.base.Function;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
+import com.hashmapinc.server.common.msg.exception.TempusRuntimeException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -41,7 +41,6 @@ import com.hashmapinc.server.dao.nosql.CassandraAbstractSearchTimeDao;
 import com.hashmapinc.server.dao.timeseries.TsPartitionDate;
 import com.hashmapinc.server.dao.util.NoSqlDao;
 
-import javax.annotation.Nullable;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import java.time.Instant;
@@ -103,7 +102,7 @@ public class CassandraAuditLogDao extends CassandraAbstractSearchTimeDao<AuditLo
                 tsFormat = partition.get();
             } else {
                 log.warn("Incorrect configuration of partitioning {}", partitioning);
-                throw new RuntimeException("Failed to parse partitioning property: " + partitioning + "!");
+                throw new TempusRuntimeException("Failed to parse partitioning property: " + partitioning + "!");
             }
         }
         readResultsProcessingExecutor = Executors.newCachedThreadPool();
@@ -117,13 +116,8 @@ public class CassandraAuditLogDao extends CassandraAbstractSearchTimeDao<AuditLo
     }
 
     private <T> ListenableFuture<T> getFuture(ResultSetFuture future, java.util.function.Function<ResultSet, T> transformer) {
-        return Futures.transform(future, new Function<ResultSet, T>() {
-            @Nullable
-            @Override
-            public T apply(@Nullable ResultSet input) {
-                return transformer.apply(input);
-            }
-        }, readResultsProcessingExecutor);
+        return Futures.transform(future, transformer::apply
+       , readResultsProcessingExecutor);
     }
 
     @Override
@@ -132,7 +126,7 @@ public class CassandraAuditLogDao extends CassandraAbstractSearchTimeDao<AuditLo
 
         long partition = toPartitionTs(LocalDate.now().atStartOfDay().toInstant(ZoneOffset.UTC).toEpochMilli());
         BoundStatement stmt = getSaveByTenantStmt().bind();
-        stmt = setSaveStmtVariables(stmt, auditLog, partition);
+        setSaveStmtVariables(stmt, auditLog, partition);
         return getFuture(executeAsyncWrite(stmt), rs -> null);
     }
 
@@ -141,7 +135,7 @@ public class CassandraAuditLogDao extends CassandraAbstractSearchTimeDao<AuditLo
         log.debug("Save saveByTenantIdAndEntityId [{}] ", auditLog);
 
         BoundStatement stmt = getSaveByTenantIdAndEntityIdStmt().bind();
-        stmt = setSaveStmtVariables(stmt, auditLog, -1);
+        setSaveStmtVariables(stmt, auditLog, -1);
         return getFuture(executeAsyncWrite(stmt), rs -> null);
     }
 
@@ -150,7 +144,7 @@ public class CassandraAuditLogDao extends CassandraAbstractSearchTimeDao<AuditLo
         log.debug("Save saveByTenantIdAndCustomerId [{}] ", auditLog);
 
         BoundStatement stmt = getSaveByTenantIdAndCustomerIdStmt().bind();
-        stmt = setSaveStmtVariables(stmt, auditLog, -1);
+        setSaveStmtVariables(stmt, auditLog, -1);
         return getFuture(executeAsyncWrite(stmt), rs -> null);
     }
 
@@ -159,7 +153,7 @@ public class CassandraAuditLogDao extends CassandraAbstractSearchTimeDao<AuditLo
         log.debug("Save saveByTenantIdAndUserId [{}] ", auditLog);
 
         BoundStatement stmt = getSaveByTenantIdAndUserIdStmt().bind();
-        stmt = setSaveStmtVariables(stmt, auditLog, -1);
+        setSaveStmtVariables(stmt, auditLog, -1);
         return getFuture(executeAsyncWrite(stmt), rs -> null);
     }
 

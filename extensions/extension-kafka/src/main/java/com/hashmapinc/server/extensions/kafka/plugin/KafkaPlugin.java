@@ -15,6 +15,7 @@
  */
 package com.hashmapinc.server.extensions.kafka.plugin;
 
+import com.hashmapinc.server.common.msg.exception.TempusRuntimeException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.Producer;
@@ -58,7 +59,7 @@ public class KafkaPlugin extends AbstractPlugin<KafkaPluginConfiguration> {
             this.handler = new KafkaMsgHandler(producer);
         } catch (Exception e) {
             log.error("Failed to start kafka producer", e);
-            throw new RuntimeException(e);
+            throw new TempusRuntimeException(e);
         }
     }
 
@@ -68,7 +69,7 @@ public class KafkaPlugin extends AbstractPlugin<KafkaPluginConfiguration> {
             this.producer.close();
         } catch (Exception e) {
             log.error("Failed to close producer during destroy()", e);
-            throw new RuntimeException(e);
+            throw new TempusRuntimeException(e);
         }
     }
 

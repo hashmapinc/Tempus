@@ -15,39 +15,35 @@
  */
 package com.hashmapinc.server.actors.tenant;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-
+import akka.actor.ActorRef;
+import akka.actor.Props;
+import akka.event.Logging;
+import akka.event.LoggingAdapter;
 import com.hashmapinc.server.actors.ActorSystemContext;
 import com.hashmapinc.server.actors.device.DeviceActor;
 import com.hashmapinc.server.actors.plugin.PluginTerminationMsg;
 import com.hashmapinc.server.actors.rule.ComplexRuleActorChain;
+import com.hashmapinc.server.actors.rule.RuleActorChain;
 import com.hashmapinc.server.actors.service.ContextAwareActor;
 import com.hashmapinc.server.actors.service.ContextBasedCreator;
 import com.hashmapinc.server.actors.service.DefaultActorService;
 import com.hashmapinc.server.actors.shared.computation.TenantComputationManager;
 import com.hashmapinc.server.actors.shared.plugin.PluginManager;
+import com.hashmapinc.server.actors.shared.plugin.TenantPluginManager;
 import com.hashmapinc.server.actors.shared.rule.RuleManager;
 import com.hashmapinc.server.actors.shared.rule.TenantRuleManager;
 import com.hashmapinc.server.common.data.computation.ComputationType;
-import com.hashmapinc.server.common.data.id.DeviceId;
-import com.hashmapinc.server.common.data.id.PluginId;
-import com.hashmapinc.server.common.data.id.RuleId;
-import com.hashmapinc.server.common.data.id.TenantId;
+import com.hashmapinc.server.common.data.id.*;
 import com.hashmapinc.server.common.msg.cluster.ClusterEventMsg;
+import com.hashmapinc.server.common.msg.device.ToDeviceActorMsg;
+import com.hashmapinc.server.common.msg.plugin.ComponentLifecycleMsg;
 import com.hashmapinc.server.extensions.api.device.ToDeviceActorNotificationMsg;
 import com.hashmapinc.server.extensions.api.plugins.msg.ToPluginActorMsg;
 import com.hashmapinc.server.extensions.api.rules.ToRuleActorMsg;
-import com.hashmapinc.server.actors.rule.RuleActorChain;
-import com.hashmapinc.server.actors.shared.plugin.TenantPluginManager;
-import com.hashmapinc.server.common.msg.device.ToDeviceActorMsg;
 
-import akka.actor.ActorRef;
-import akka.actor.Props;
-import akka.event.Logging;
-import akka.event.LoggingAdapter;
-import com.hashmapinc.server.common.msg.plugin.ComponentLifecycleMsg;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
 
 public class TenantActor extends ContextAwareActor {
 
@@ -141,27 +137,37 @@ public class TenantActor extends ContextAwareActor {
     }
 
     private void onComponentLifecycleMsg(ComponentLifecycleMsg msg) {
-        Optional<PluginId> pluginId = msg.getPluginId();
-        Optional<RuleId> ruleId = msg.getRuleId();
-        if (pluginId.isPresent()) {
-            ActorRef pluginActor = pluginManager.getOrCreatePluginActor(this.context(), pluginId.get());
-            pluginActor.tell(msg, ActorRef.noSender());
+        if (msg.getPluginId().isPresent()) {
+            msg.getPluginId().ifPresent(pluginId -> onComponentLifecycleMsgForPlugin(msg, pluginId));
         } else if (msg.getRuleId().isPresent()) {
-            ActorRef target;
-            Optional<ActorRef> ref = ruleManager.update(this.context(), ruleId.get(), msg.getEvent());
-            if (ref.isPresent()) {
-                target = ref.get();
-            } else {
-                logger.debug("Failed to find actor for rule: [{}]", ruleId);
-                return;
-            }
-            target.tell(msg, ActorRef.noSender());
+            msg.getRuleId().ifPresent(ruleId -> onComponentLifecycleMsgForRule(msg, ruleId));
         } else if(msg.getComputationId().isPresent()){
-            ActorRef computationActor = computationManager.getOrCreateComputationActor(this.context(), msg.getComputationId().get(), ComputationType.SPARK);
-            computationActor.tell(msg, ActorRef.noSender());
+            msg.getComputationId().ifPresent(computationId -> onComponentLifecycleMsgForComputation(msg, computationId));
         }else {
             logger.debug("[{}] Invalid component lifecycle msg.", tenantId);
         }
+    }
+
+    private void onComponentLifecycleMsgForComputation(ComponentLifecycleMsg msg, ComputationId computationId) {
+        ActorRef computationActor = computationManager.getOrCreateComputationActor(this.context(), computationId, ComputationType.SPARK);
+        computationActor.tell(msg, ActorRef.noSender());
+    }
+
+    private void onComponentLifecycleMsgForRule(ComponentLifecycleMsg msg, RuleId ruleId) {
+        ActorRef target;
+        Optional<ActorRef> ref = ruleManager.update(this.context(), ruleId, msg.getEvent());
+        if (ref.isPresent()) {
+            target = ref.get();
+        } else {
+            logger.debug("Failed to find actor for rule: [{}]", ruleId);
+            return;
+        }
+        target.tell(msg, ActorRef.noSender());
+    }
+
+    private void onComponentLifecycleMsgForPlugin(ComponentLifecycleMsg msg, PluginId pluginId) {
+        ActorRef pluginActor = pluginManager.getOrCreatePluginActor(this.context(), pluginId);
+        pluginActor.tell(msg, ActorRef.noSender());
     }
 
     private void onPluginTerminated(PluginTerminationMsg msg) {

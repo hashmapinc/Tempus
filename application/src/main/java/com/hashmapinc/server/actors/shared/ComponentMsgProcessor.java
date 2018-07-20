@@ -21,6 +21,7 @@ import com.hashmapinc.server.actors.ActorSystemContext;
 import com.hashmapinc.server.actors.stats.StatsPersistTick;
 import com.hashmapinc.server.common.data.id.TenantId;
 import com.hashmapinc.server.common.msg.cluster.ClusterEventMsg;
+import com.hashmapinc.server.exception.TempusApplicationException;
 
 public abstract class ComponentMsgProcessor<T> extends AbstractContextAwareMsgProcessor {
 
@@ -33,21 +34,21 @@ public abstract class ComponentMsgProcessor<T> extends AbstractContextAwareMsgPr
         this.entityId = id;
     }
 
-    public abstract void start() throws Exception;
+    public abstract void start() throws TempusApplicationException;
 
-    public abstract void stop() throws Exception;
+    public abstract void stop() throws TempusApplicationException;
 
-    public abstract void onCreated(ActorContext context) throws Exception;
+    public abstract void onCreated(ActorContext context) throws TempusApplicationException;
 
-    public abstract void onUpdate(ActorContext context) throws Exception;
+    public abstract void onUpdate(ActorContext context) throws TempusApplicationException;
 
-    public abstract void onActivate(ActorContext context) throws Exception;
+    public abstract void onActivate(ActorContext context) throws TempusApplicationException;
 
-    public abstract void onSuspend(ActorContext context) throws Exception;
+    public abstract void onSuspend(ActorContext context) throws TempusApplicationException;
 
-    public abstract void onStop(ActorContext context) throws Exception;
+    public abstract void onStop(ActorContext context) throws TempusApplicationException;
 
-    public abstract void onClusterEventMsg(ClusterEventMsg msg) throws Exception;
+    public abstract void onClusterEventMsg(ClusterEventMsg msg) throws TempusApplicationException;
 
     public void scheduleStatsPersistTick(ActorContext context, long statsPersistFrequency) {
         schedulePeriodicMsgWithDelay(context, new StatsPersistTick(), statsPersistFrequency, statsPersistFrequency);

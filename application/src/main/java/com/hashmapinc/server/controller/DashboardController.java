@@ -17,20 +17,18 @@ package com.hashmapinc.server.controller;
 
 import com.hashmapinc.server.common.data.*;
 import com.hashmapinc.server.common.data.audit.ActionType;
+import com.hashmapinc.server.common.data.id.CustomerId;
 import com.hashmapinc.server.common.data.id.DashboardId;
 import com.hashmapinc.server.common.data.id.TenantId;
 import com.hashmapinc.server.common.data.page.TextPageData;
 import com.hashmapinc.server.common.data.page.TextPageLink;
+import com.hashmapinc.server.common.data.page.TimePageData;
 import com.hashmapinc.server.common.data.page.TimePageLink;
-import com.hashmapinc.server.common.data.plugin.ComponentLifecycleEvent;
 import com.hashmapinc.server.common.data.security.Authority;
+import com.hashmapinc.server.exception.TempusException;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import com.hashmapinc.server.common.data.*;
-import com.hashmapinc.server.common.data.id.CustomerId;
-import com.hashmapinc.server.common.data.page.TimePageData;
-import com.hashmapinc.server.exception.TempusException;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -40,16 +38,17 @@ import java.util.Set;
 public class DashboardController extends BaseController {
 
     public static final String DASHBOARD_ID = "dashboardId";
+    public static final String CUSTOMER_ID = "customerId";
 
     @PreAuthorize("hasAnyAuthority('SYS_ADMIN', 'TENANT_ADMIN', 'CUSTOMER_USER')")
-    @RequestMapping(value = "/dashboard/serverTime", method = RequestMethod.GET)
+    @GetMapping(value = "/dashboard/serverTime")
     @ResponseBody
-    public long getServerTime() throws TempusException {
+    public long getServerTime() {
         return System.currentTimeMillis();
     }
 
     @PreAuthorize("hasAnyAuthority('SYS_ADMIN', 'TENANT_ADMIN', 'CUSTOMER_USER')")
-    @RequestMapping(value = "/dashboard/info/{dashboardId}", method = RequestMethod.GET)
+    @GetMapping(value = "/dashboard/info/{dashboardId}")
     @ResponseBody
     public DashboardInfo getDashboardInfoById(@PathVariable(DASHBOARD_ID) String strDashboardId) throws TempusException {
         checkParameter(DASHBOARD_ID, strDashboardId);
@@ -62,7 +61,7 @@ public class DashboardController extends BaseController {
     }
 
     @PreAuthorize("hasAnyAuthority('TENANT_ADMIN', 'CUSTOMER_USER')")
-    @RequestMapping(value = "/dashboard/{dashboardId}", method = RequestMethod.GET)
+    @GetMapping(value = "/dashboard/{dashboardId}")
     @ResponseBody
     public Dashboard getDashboardById(@PathVariable(DASHBOARD_ID) String strDashboardId) throws TempusException {
         checkParameter(DASHBOARD_ID, strDashboardId);
@@ -75,7 +74,7 @@ public class DashboardController extends BaseController {
     }
 
     @PreAuthorize("hasAnyAuthority('TENANT_ADMIN' , 'CUSTOMER_USER')")
-    @RequestMapping(value = "/dashboard", method = RequestMethod.POST)
+    @PostMapping(value = "/dashboard")
     @ResponseBody
     public Dashboard saveDashboard(@RequestBody Dashboard dashboard) throws TempusException {
         try {
@@ -109,7 +108,7 @@ public class DashboardController extends BaseController {
 
 
     @PreAuthorize("hasAnyAuthority('TENANT_ADMIN')")
-    @RequestMapping(value = "/dashboard/{dashboardId}", method = RequestMethod.DELETE)
+    @DeleteMapping(value = "/dashboard/{dashboardId}")
     @ResponseStatus(value = HttpStatus.OK)
     public void deleteDashboard(@PathVariable(DASHBOARD_ID) String strDashboardId) throws TempusException {
         checkParameter(DASHBOARD_ID, strDashboardId);
@@ -134,11 +133,11 @@ public class DashboardController extends BaseController {
     }
 
     @PreAuthorize("hasAuthority('TENANT_ADMIN')")
-    @RequestMapping(value = "/customer/{customerId}/dashboard/{dashboardId}", method = RequestMethod.POST)
+    @PostMapping(value = "/customer/{customerId}/dashboard/{dashboardId}")
     @ResponseBody
-    public Dashboard assignDashboardToCustomer(@PathVariable("customerId") String strCustomerId,
+    public Dashboard assignDashboardToCustomer(@PathVariable(CUSTOMER_ID) String strCustomerId,
                                                @PathVariable(DASHBOARD_ID) String strDashboardId) throws TempusException {
-        checkParameter("customerId", strCustomerId);
+        checkParameter(CUSTOMER_ID, strCustomerId);
         checkParameter(DASHBOARD_ID, strDashboardId);
         try {
             CustomerId customerId = new CustomerId(toUUID(strCustomerId));
@@ -166,11 +165,11 @@ public class DashboardController extends BaseController {
     }
 
     @PreAuthorize("hasAnyAuthority('TENANT_ADMIN','CUSTOMER_USER')")
-    @RequestMapping(value = "/customer/{customerId}/dashboard/{dashboardId}", method = RequestMethod.DELETE)
+    @DeleteMapping(value = "/customer/{customerId}/dashboard/{dashboardId}")
     @ResponseBody
-    public Dashboard unassignDashboardFromCustomer(@PathVariable("customerId") String strCustomerId,
+    public Dashboard unassignDashboardFromCustomer(@PathVariable(CUSTOMER_ID) String strCustomerId,
                                                    @PathVariable(DASHBOARD_ID) String strDashboardId) throws TempusException {
-        checkParameter("customerId", strCustomerId);
+        checkParameter(CUSTOMER_ID, strCustomerId);
         checkParameter(DASHBOARD_ID, strDashboardId);
         try {
             CustomerId customerId = new CustomerId(toUUID(strCustomerId));
@@ -196,7 +195,7 @@ public class DashboardController extends BaseController {
     }
 
     @PreAuthorize("hasAnyAuthority('TENANT_ADMIN')")
-    @RequestMapping(value = "/dashboard/{dashboardId}/customers", method = RequestMethod.POST)
+    @PostMapping(value = "/dashboard/{dashboardId}/customers")
     @ResponseBody
     public Dashboard updateDashboardCustomers(@PathVariable(DASHBOARD_ID) String strDashboardId,
                                               @RequestBody String[] strCustomerIds) throws TempusException {
@@ -205,29 +204,11 @@ public class DashboardController extends BaseController {
             DashboardId dashboardId = new DashboardId(toUUID(strDashboardId));
             Dashboard dashboard = checkDashboardId(dashboardId);
 
-            Set<CustomerId> customerIds = new HashSet<>();
-            if (strCustomerIds != null) {
-                for (String strCustomerId : strCustomerIds) {
-                    customerIds.add(new CustomerId(toUUID(strCustomerId)));
-                }
-            }
+            Set<CustomerId> customerIds = getCustomerIds(strCustomerIds);
 
-            Set<CustomerId> addedCustomerIds = new HashSet<>();
-            Set<CustomerId> removedCustomerIds = new HashSet<>();
-            for (CustomerId customerId : customerIds) {
-                if (!dashboard.isAssignedToCustomer(customerId)) {
-                    addedCustomerIds.add(customerId);
-                }
-            }
+            Set<CustomerId> addedCustomerIds = getNewlyAddedCustomerIds(dashboard, customerIds);
 
-            Set<ShortCustomerInfo> assignedCustomers = dashboard.getAssignedCustomers();
-            if (assignedCustomers != null) {
-                for (ShortCustomerInfo customerInfo : assignedCustomers) {
-                    if (!customerIds.contains(customerInfo.getCustomerId())) {
-                        removedCustomerIds.add(customerInfo.getCustomerId());
-                    }
-                }
-            }
+            Set<CustomerId> removedCustomerIds = getRemovedCustomerIds(dashboard, customerIds);
 
             if (addedCustomerIds.isEmpty() && removedCustomerIds.isEmpty()) {
                 return dashboard;
@@ -260,8 +241,42 @@ public class DashboardController extends BaseController {
         }
     }
 
+    private Set<CustomerId> getRemovedCustomerIds(Dashboard dashboard, Set<CustomerId> customerIds) {
+        Set<CustomerId> removedCustomerIds = new HashSet<>();
+        Set<ShortCustomerInfo> assignedCustomers = dashboard.getAssignedCustomers();
+        if (assignedCustomers != null) {
+            for (ShortCustomerInfo customerInfo : assignedCustomers) {
+                if (!customerIds.contains(customerInfo.getCustomerId())) {
+                    removedCustomerIds.add(customerInfo.getCustomerId());
+                }
+            }
+        }
+        return removedCustomerIds;
+    }
+
+    private Set<CustomerId> getNewlyAddedCustomerIds(Dashboard dashboard, Set<CustomerId> customerIds) {
+        Set<CustomerId> addedCustomerIds = new HashSet<>();
+
+        for (CustomerId customerId : customerIds) {
+            if (!dashboard.isAssignedToCustomer(customerId)) {
+                addedCustomerIds.add(customerId);
+            }
+        }
+        return addedCustomerIds;
+    }
+
+    private Set<CustomerId> getCustomerIds(@RequestBody String[] strCustomerIds) {
+        Set<CustomerId> customerIds = new HashSet<>();
+        if (strCustomerIds != null) {
+            for (String strCustomerId : strCustomerIds) {
+                customerIds.add(new CustomerId(toUUID(strCustomerId)));
+            }
+        }
+        return customerIds;
+    }
+
     @PreAuthorize("hasAuthority('TENANT_ADMIN')")
-    @RequestMapping(value = "/dashboard/{dashboardId}/customers/add", method = RequestMethod.POST)
+    @PostMapping(value = "/dashboard/{dashboardId}/customers/add")
     @ResponseBody
     public Dashboard addDashboardCustomers(@PathVariable(DASHBOARD_ID) String strDashboardId,
                                            @RequestBody String[] strCustomerIds) throws TempusException {
@@ -304,7 +319,7 @@ public class DashboardController extends BaseController {
     }
 
     @PreAuthorize("hasAnyAuthority('TENANT_ADMIN')")
-    @RequestMapping(value = "/dashboard/{dashboardId}/customers/remove", method = RequestMethod.POST)
+    @PostMapping(value = "/dashboard/{dashboardId}/customers/remove")
     @ResponseBody
     public Dashboard removeDashboardCustomers(@PathVariable(DASHBOARD_ID) String strDashboardId,
                                               @RequestBody String[] strCustomerIds) throws TempusException {
@@ -348,7 +363,7 @@ public class DashboardController extends BaseController {
     }
 
     @PreAuthorize("hasAuthority('TENANT_ADMIN')")
-    @RequestMapping(value = "/customer/public/dashboard/{dashboardId}", method = RequestMethod.POST)
+    @PostMapping(value = "/customer/public/dashboard/{dashboardId}")
     @ResponseBody
     public Dashboard assignDashboardToPublicCustomer(@PathVariable(DASHBOARD_ID) String strDashboardId) throws TempusException {
         checkParameter(DASHBOARD_ID, strDashboardId);
@@ -374,7 +389,7 @@ public class DashboardController extends BaseController {
     }
 
     @PreAuthorize("hasAuthority('TENANT_ADMIN')")
-    @RequestMapping(value = "/customer/public/dashboard/{dashboardId}", method = RequestMethod.DELETE)
+    @DeleteMapping(value = "/customer/public/dashboard/{dashboardId}")
     @ResponseBody
     public Dashboard unassignDashboardFromPublicCustomer(@PathVariable(DASHBOARD_ID) String strDashboardId) throws TempusException {
         checkParameter(DASHBOARD_ID, strDashboardId);
@@ -401,7 +416,7 @@ public class DashboardController extends BaseController {
     }
 
     @PreAuthorize("hasAuthority('SYS_ADMIN')")
-    @RequestMapping(value = "/tenant/{tenantId}/dashboards", params = { "limit" }, method = RequestMethod.GET)
+    @GetMapping(value = "/tenant/{tenantId}/dashboards", params = { "limit" })
     @ResponseBody
     public TextPageData<DashboardInfo> getTenantDashboards(
             @PathVariable("tenantId") String strTenantId,
@@ -420,7 +435,7 @@ public class DashboardController extends BaseController {
     }
 
     @PreAuthorize("hasAuthority('TENANT_ADMIN')")
-    @RequestMapping(value = "/tenant/dashboards", params = { "limit" }, method = RequestMethod.GET)
+    @GetMapping(value = "/tenant/dashboards", params = { "limit" })
     @ResponseBody
     public TextPageData<DashboardInfo> getTenantDashboards(
             @RequestParam int limit,
@@ -437,16 +452,16 @@ public class DashboardController extends BaseController {
     }
 
     @PreAuthorize("hasAnyAuthority('TENANT_ADMIN', 'CUSTOMER_USER')")
-    @RequestMapping(value = "/customer/{customerId}/dashboards", params = { "limit" }, method = RequestMethod.GET)
+    @GetMapping(value = "/customer/{customerId}/dashboards", params = { "limit" })
     @ResponseBody
     public TimePageData<DashboardInfo> getCustomerDashboards(
-            @PathVariable("customerId") String strCustomerId,
+            @PathVariable(CUSTOMER_ID) String strCustomerId,
             @RequestParam int limit,
             @RequestParam(required = false) Long startTime,
             @RequestParam(required = false) Long endTime,
             @RequestParam(required = false, defaultValue = "false") boolean ascOrder,
             @RequestParam(required = false) String offset) throws TempusException {
-        checkParameter("customerId", strCustomerId);
+        checkParameter(CUSTOMER_ID, strCustomerId);
         try {
             TenantId tenantId = getCurrentUser().getTenantId();
             CustomerId customerId = new CustomerId(toUUID(strCustomerId));

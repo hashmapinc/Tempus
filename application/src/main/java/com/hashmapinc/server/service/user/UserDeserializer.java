@@ -16,7 +16,6 @@
 package com.hashmapinc.server.service.user;
 
 import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.ObjectCodec;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
@@ -27,7 +26,7 @@ import java.io.IOException;
 
 public class UserDeserializer extends JsonDeserializer<User> {
     @Override
-    public User deserialize(JsonParser jp, DeserializationContext deserializationContext) throws IOException, JsonProcessingException {
+    public User deserialize(JsonParser jp, DeserializationContext deserializationContext) throws IOException {
         ObjectCodec oc = jp.getCodec();
         IdentityUser identityUser = oc.readValue(jp, IdentityUser.class);
         return identityUser.toUser();

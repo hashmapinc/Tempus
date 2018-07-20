@@ -29,7 +29,7 @@ public abstract class AbstractPermissionMatcher implements PermissionMatcher {
 
     @Override
     public boolean hasAccessToResource(TempusResource resource, String resourceType, UserPermission permission, User user) {
-        return permission.getResources().stream().map(r -> r.name()).collect(Collectors.toList()).contains(resourceType);
+        return permission.getResources().stream().map(Enum::name).collect(Collectors.toList()).contains(resourceType);
     }
 
     @Override
@@ -37,6 +37,6 @@ public abstract class AbstractPermissionMatcher implements PermissionMatcher {
         if (new EnumUtil<>(UserAction.class).parse(action).equals(UserAction.UPDATE) && resource.getId() == null)
             return false;
 
-        return permission.getUserActions().stream().map(a -> a.name()).collect(Collectors.toList()).contains(action);
+        return permission.getUserActions().stream().map(Enum::name).collect(Collectors.toList()).contains(action);
     }
 }

@@ -33,7 +33,7 @@ import com.hashmapinc.server.dao.relation.RelationService;
 import com.hashmapinc.server.transport.mqtt.adaptors.MqttTransportAdaptor;
 import com.hashmapinc.server.transport.mqtt.session.DeviceSessionCtx;
 import com.hashmapinc.server.transport.mqtt.session.GatewaySessionCtx;
-import com.hashmapinc.server.transport.mqtt.sparkplugB.SparkPlugMsgTypes;
+import com.hashmapinc.server.transport.mqtt.sparkplug.SparkPlugMsgTypes;
 import com.hashmapinc.server.transport.mqtt.util.SslUtil;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
@@ -45,9 +45,9 @@ import io.netty.util.concurrent.Future;
 import io.netty.util.concurrent.GenericFutureListener;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.StringUtils;
-import com.hashmapinc.server.transport.mqtt.sparkplugB.data.SparkPlugMetaData;
-import com.hashmapinc.server.transport.mqtt.sparkplugB.SparkPlugDecodeService;
-import com.hashmapinc.server.transport.mqtt.sparkplugB.SparkPlugUtils;
+import com.hashmapinc.server.transport.mqtt.sparkplug.data.SparkPlugMetaData;
+import com.hashmapinc.server.transport.mqtt.sparkplug.SparkPlugDecodeService;
+import com.hashmapinc.server.transport.mqtt.sparkplug.SparkPlugUtils;
 import javax.net.ssl.SSLPeerUnverifiedException;
 import javax.security.cert.X509Certificate;
 import java.net.InetSocketAddress;
@@ -65,6 +65,7 @@ import static io.netty.handler.codec.mqtt.MqttQoS.*;
 public class MqttTransportHandler extends ChannelInboundHandlerAdapter implements GenericFutureListener<Future<? super Void>> {
 
     public static final MqttQoS MAX_SUPPORTED_QOS_LVL = AT_LEAST_ONCE;
+    public static final String TOPIC = "topic";
 
     private final DeviceSessionCtx deviceSessionCtx;
     private final String sessionId;
@@ -75,9 +76,8 @@ public class MqttTransportHandler extends ChannelInboundHandlerAdapter implement
     private final RelationService relationService;
     private final QuotaService quotaService;
     private final SslHandler sslHandler;
-    private final String sparkPlugNameSpace = "spBv1.0";
+    private static final String SPARK_PLUG_NAME_SPACE = "spBv1.0";
     private volatile boolean connected;
-    private volatile InetSocketAddress address;
     private volatile GatewaySessionCtx gatewaySessionCtx;
     private SparkPlugDecodeService sparkPlugDecodeService;
     private SparkPlugUtils sparkPlugUtils;
@@ -104,7 +104,7 @@ public class MqttTransportHandler extends ChannelInboundHandlerAdapter implement
     }
 
     private void processMqttMsg(ChannelHandlerContext ctx, MqttMessage msg) {
-        address = (InetSocketAddress) ctx.channel().remoteAddress();
+        InetSocketAddress address = (InetSocketAddress) ctx.channel().remoteAddress();
         if (msg.fixedHeader() == null) {
             log.info("[{}:{}] Invalid message received", address.getHostName(), address.getPort());
             processDisconnect(ctx);
@@ -114,7 +114,6 @@ public class MqttTransportHandler extends ChannelInboundHandlerAdapter implement
         if (quotaService.isQuotaExceeded(address.getHostName())) {
             log.warn("MQTT Quota exceeded for [{}:{}] . Disconnect", address.getHostName(), address.getPort());
             processDisconnect(ctx);
-            return;
         }
         else {
             deviceSessionCtx.setChannel(ctx);
@@ -141,6 +140,7 @@ public class MqttTransportHandler extends ChannelInboundHandlerAdapter implement
                         processDisconnect(ctx);
                     }
                     break;
+                default: break;
             }
         }
 
@@ -159,7 +159,7 @@ public class MqttTransportHandler extends ChannelInboundHandlerAdapter implement
                 gatewaySessionCtx.setChannel(ctx);
                 handleMqttPublishMsg(topicName, msgId, mqttMsg);
             }
-        }else if(topicName.startsWith(sparkPlugNameSpace)){
+        }else if(topicName.startsWith(SPARK_PLUG_NAME_SPACE)){
             if (gatewaySessionCtx != null) {
                 gatewaySessionCtx.setChannel(ctx);
                 sparkPlugDecodeService.processSparkPlugbPostTelemetry(gatewaySessionCtx, mqttMsg);
@@ -244,23 +244,8 @@ public class MqttTransportHandler extends ChannelInboundHandlerAdapter implement
                     AdaptorToSessionActorMsg msg = adaptor.convertToActorMsg(deviceSessionCtx, MsgType.SUBSCRIBE_ATTRIBUTES_REQUEST, mqttMsg);
                     processor.process(new BasicToDeviceActorSessionMsg(deviceSessionCtx.getDevice(), msg));
                     grantedQoSList.add(getMinSupportedQos(reqQoS));
-                } else if (topicName.startsWith(sparkPlugNameSpace)) {
-                    if(topicName.contains(SparkPlugMsgTypes.DDEATH)) {
-                        AdaptorToSessionActorMsg msg = adaptor.convertToActorMsg(deviceSessionCtx, SPARKPLUG_DEATH_SUBSCRIBE, mqttMsg);
-                        String topic = processAndGetSparkPlugSubscriptionTopic(topicName);
-                        String addInfoTopic = deviceSessionCtx.getDevice().getAdditionalInfo().get("topic").asText();
-                        if (addInfoTopic.contentEquals(topic))
-                            processor.process(new BasicToDeviceActorSessionMsg(deviceSessionCtx.getDevice(), msg));
-                        grantedQoSList.add(getMinSupportedQos(reqQoS));
-                    }
-                    else {
-                        AdaptorToSessionActorMsg msg = adaptor.convertToActorMsg(deviceSessionCtx, SUBSCRIBE_SPARKPLUG_TELEMETRY_REQUEST, mqttMsg);
-                        String topic = processAndGetSparkPlugSubscriptionTopic(topicName);
-                        String addInfoTopic = deviceSessionCtx.getDevice().getAdditionalInfo().get("topic").asText();
-                        if (addInfoTopic.contentEquals(topic))
-                            processor.process(new BasicToDeviceActorSessionMsg(deviceSessionCtx.getDevice(), msg));
-                        grantedQoSList.add(getMinSupportedQos(reqQoS));
-                    }
+                } else if (topicName.startsWith(SPARK_PLUG_NAME_SPACE)) {
+                    handleSubscriberForTopicSparkPlugNameSpace(mqttMsg, grantedQoSList, topicName, reqQoS);
                 } else if (topicName.equals(DEVICE_RPC_REQUESTS_SUB_TOPIC)) {
                     AdaptorToSessionActorMsg msg = adaptor.convertToActorMsg(deviceSessionCtx, SUBSCRIBE_RPC_COMMANDS_REQUEST, mqttMsg);
                     processor.process(new BasicToDeviceActorSessionMsg(deviceSessionCtx.getDevice(), msg));
@@ -282,6 +267,25 @@ public class MqttTransportHandler extends ChannelInboundHandlerAdapter implement
             }
         }
         ctx.writeAndFlush(createSubAckMessage(mqttMsg.variableHeader().messageId(), grantedQoSList));
+    }
+
+    private void handleSubscriberForTopicSparkPlugNameSpace(MqttSubscribeMessage mqttMsg, List<Integer> grantedQoSList, String topicName, MqttQoS reqQoS) throws AdaptorException {
+        if(topicName.contains(SparkPlugMsgTypes.DDEATH)) {
+            AdaptorToSessionActorMsg msg = adaptor.convertToActorMsg(deviceSessionCtx, SPARKPLUG_DEATH_SUBSCRIBE, mqttMsg);
+            String topic = processAndGetSparkPlugSubscriptionTopic(topicName);
+            String addInfoTopic = deviceSessionCtx.getDevice().getAdditionalInfo().get(TOPIC).asText();
+            if (addInfoTopic.contentEquals(topic))
+                processor.process(new BasicToDeviceActorSessionMsg(deviceSessionCtx.getDevice(), msg));
+            grantedQoSList.add(getMinSupportedQos(reqQoS));
+        }
+        else {
+            AdaptorToSessionActorMsg msg = adaptor.convertToActorMsg(deviceSessionCtx, SUBSCRIBE_SPARKPLUG_TELEMETRY_REQUEST, mqttMsg);
+            String topic = processAndGetSparkPlugSubscriptionTopic(topicName);
+            String addInfoTopic = deviceSessionCtx.getDevice().getAdditionalInfo().get(TOPIC).asText();
+            if (addInfoTopic.contentEquals(topic))
+                processor.process(new BasicToDeviceActorSessionMsg(deviceSessionCtx.getDevice(), msg));
+            grantedQoSList.add(getMinSupportedQos(reqQoS));
+        }
     }
 
     private void processUnsubscribe(ChannelHandlerContext ctx, MqttUnsubscribeMessage mqttMsg) {
@@ -378,7 +382,8 @@ public class MqttTransportHandler extends ChannelInboundHandlerAdapter implement
             processor.process(sessionCloseMsg);
             if (gatewaySessionCtx != null) {
                 gatewaySessionCtx.onGatewayDisconnect();
-                sparkPlugDecodeService.updateDeviceMapState();
+                if (sparkPlugDecodeService != null)
+                    sparkPlugDecodeService.updateDeviceMapState();
             }
         }
     }
@@ -442,16 +447,16 @@ public class MqttTransportHandler extends ChannelInboundHandlerAdapter implement
         JsonNode infoNode = device.getAdditionalInfo();
         if (infoNode != null) {
             JsonNode gatewayNode = infoNode.get("gateway");
-            JsonNode topic = infoNode.get("topic");
+            JsonNode topic = infoNode.get(TOPIC);
             if (gatewayNode != null && gatewayNode.asBoolean()) {
                 gatewaySessionCtx = new GatewaySessionCtx(processor, deviceService, authService, relationService, deviceSessionCtx);
-                if((msg.payload().willTopic() != null) && msg.payload().willTopic().startsWith(sparkPlugNameSpace)){
+                if((msg.payload().willTopic() != null) && msg.payload().willTopic().startsWith(SPARK_PLUG_NAME_SPACE)){
                     sparkPlugDecodeService = new SparkPlugDecodeService();
                 }
             }
 
             if((msg.payload().willTopic() != null) &&
-                    msg.payload().willTopic().startsWith(sparkPlugNameSpace) && topic != null) {
+                    msg.payload().willTopic().startsWith(SPARK_PLUG_NAME_SPACE) && topic != null) {
                 sparkPlugUtils = new SparkPlugUtils();
             }
         }
@@ -462,8 +467,7 @@ public class MqttTransportHandler extends ChannelInboundHandlerAdapter implement
             String msgType = sparkPlugUtils.extractMsgType(topicName);
             SparkPlugMetaData sparkPlugMetaData = new SparkPlugMetaData(msgType, 0);
             deviceSessionCtx.setSparkPlugMetaData(sparkPlugMetaData);
-            String topic = sparkPlugUtils.extractTopicWithoutMsgType(topicName);
-            return topic;
+            return sparkPlugUtils.extractTopicWithoutMsgType(topicName);
         }
         return "";
     }

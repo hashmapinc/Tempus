@@ -15,7 +15,10 @@
  */
 package com.hashmapinc.server.extensions.core.plugin.telemetry.dataquality;
 
-import com.hashmapinc.server.common.data.kv.*;
+import com.hashmapinc.server.common.data.kv.BasicDsKvEntry;
+import com.hashmapinc.server.common.data.kv.BasicTsKvEntry;
+import com.hashmapinc.server.common.data.kv.DsKvEntry;
+import com.hashmapinc.server.common.data.kv.TsKvEntry;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
@@ -61,23 +64,33 @@ public class AggregationFunc<T> {
 
         for (T entry: list) {
             if(entry instanceof TsKvEntry){
-                BasicTsKvEntry basicTsKvEntry = ((BasicTsKvEntry)entry);
-                if(basicTsKvEntry.getKey().contentEquals(key)){
-                    long diff = basicTsKvEntry.getTsDiff();
-                    if (diff < min)
-                        min = diff;
-                }
+                min = getMinTsKv(key, min, (BasicTsKvEntry) entry);
             }
             else if(entry instanceof DsKvEntry){
-                BasicDsKvEntry basicDsKvEntry = ((BasicDsKvEntry)entry);
-                if(basicDsKvEntry.getKey().contentEquals(key)){
-                    double diff = basicDsKvEntry.getDsDiff();
-                    if (diff < min)
-                        min = diff;
-                }
+                min = getMinDsKv(key, min, (BasicDsKvEntry) entry);
             }
         }
 
+        return min;
+    }
+
+    private double getMinDsKv(String key, double min, BasicDsKvEntry entry) {
+        BasicDsKvEntry basicDsKvEntry = entry;
+        if(basicDsKvEntry.getKey().contentEquals(key)){
+            double diff = basicDsKvEntry.getDsDiff();
+            if (diff < min)
+                min = diff;
+        }
+        return min;
+    }
+
+    private double getMinTsKv(String key, double min, BasicTsKvEntry entry) {
+        BasicTsKvEntry basicTsKvEntry = entry;
+        if(basicTsKvEntry.getKey().contentEquals(key)){
+            long diff = basicTsKvEntry.getTsDiff();
+            if (diff < min)
+                min = diff;
+        }
         return min;
     }
 
@@ -86,23 +99,33 @@ public class AggregationFunc<T> {
 
         for (T entry: list) {
             if(entry instanceof TsKvEntry){
-                BasicTsKvEntry basicTsKvEntry = ((BasicTsKvEntry)entry);
-                if(basicTsKvEntry.getKey().contentEquals(key)){
-                    long diff = basicTsKvEntry.getTsDiff();
-                    if (diff > max)
-                        max = diff;
-                }
+                max = getMaxTsKv(key, max, (BasicTsKvEntry) entry);
             }
             else if(entry instanceof DsKvEntry){
-                BasicDsKvEntry basicDsKvEntry = ((BasicDsKvEntry)entry);
-                if(basicDsKvEntry.getKey().contentEquals(key)){
-                    double diff = basicDsKvEntry.getDsDiff();
-                    if (diff > max)
-                        max = diff;
-                }
+                max = getMaxDsKv(key, max, (BasicDsKvEntry) entry);
             }
         }
 
+        return max;
+    }
+
+    private double getMaxDsKv(String key, double max, BasicDsKvEntry entry) {
+        BasicDsKvEntry basicDsKvEntry = entry;
+        if(basicDsKvEntry.getKey().contentEquals(key)){
+            double diff = basicDsKvEntry.getDsDiff();
+            if (diff > max)
+                max = diff;
+        }
+        return max;
+    }
+
+    private double getMaxTsKv(String key, double max, BasicTsKvEntry entry) {
+        BasicTsKvEntry basicTsKvEntry = entry;
+        if(basicTsKvEntry.getKey().contentEquals(key)){
+            long diff = basicTsKvEntry.getTsDiff();
+            if (diff > max)
+                max = diff;
+        }
         return max;
     }
 

@@ -24,6 +24,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hashmap.tempus.models.ArgType;
 import com.hashmapinc.server.common.data.computation.SparkComputationMetadata;
+import com.hashmapinc.server.exception.TempusApplicationException;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.http.*;
 import org.springframework.web.client.RestClientException;
@@ -56,7 +57,7 @@ public class SparkComputationJobActorMessageProcessor extends ComponentMsgProces
     private Cancellable schedule;
     private final Computations computation;
     private SparkComputationStatus status;
-    private ObjectMapper mapper = new ObjectMapper();
+    private ObjectMapper objectMapper = new ObjectMapper();
     private final ActorRef self;
     private final ActorRef parent;
 
@@ -66,11 +67,11 @@ public class SparkComputationJobActorMessageProcessor extends ComponentMsgProces
         this.computation = computation;
         this.self = self;
         this.parent = parent;
-        mapper.setSerializationInclusion(JsonInclude.Include.NON_DEFAULT);
+        objectMapper.setSerializationInclusion(JsonInclude.Include.NON_DEFAULT);
     }
 
     @Override
-    public void start() throws Exception {
+    public void start() throws TempusApplicationException {
         logger.info("[{}] Going to start plugin actor.", entityId);
         job = systemContext.getComputationJobService().findComputationJobById(entityId);
         if (job == null) {
@@ -88,17 +89,17 @@ public class SparkComputationJobActorMessageProcessor extends ComponentMsgProces
     }
 
     @Override
-    public void stop() throws Exception {
+    public void stop() throws TempusApplicationException {
         onStop();
     }
 
     @Override
-    public void onCreated(ActorContext context) throws Exception {
+    public void onCreated(ActorContext context) throws TempusApplicationException {
         logger.info("[{}] Going to process onCreated computation job.", entityId);
     }
 
     @Override
-    public void onUpdate(ActorContext context) throws Exception {
+    public void onUpdate(ActorContext context) throws TempusApplicationException {
         ComputationJob oldJob = job;
         job = systemContext.getComputationJobService().findComputationJobById(entityId);
         logger.info("[{}] Computation configuration was updated from {} to {}.", entityId, oldJob, job);
@@ -110,28 +111,28 @@ public class SparkComputationJobActorMessageProcessor extends ComponentMsgProces
     }
 
     @Override
-    public void onActivate(ActorContext context) throws Exception {
+    public void onActivate(ActorContext context) throws TempusApplicationException {
         logger.info("[{}] Going to process onActivate computation job.", entityId);
         start();
     }
 
     @Override
-    public void onSuspend(ActorContext context) throws Exception {
+    public void onSuspend(ActorContext context) throws TempusApplicationException {
         logger.info("[{}] Going to process onSuspend computation job.", entityId);
         onStop();
     }
 
     @Override
-    public void onStop(ActorContext context) throws Exception {
+    public void onStop(ActorContext context) throws TempusApplicationException {
         logger.info("[{}] Going to process onStop computation job.", entityId);
         onStop();
-        scheduleMsgWithDelay(context, new ComputationJobTerminationMsg(entityId), systemContext.getComputationActorTerminationDelay(), parent);
-        scheduleMsgWithDelay(context, new ComputationJobTerminationMsg(entityId), systemContext.getComputationActorTerminationDelay(), self);
+        scheduleMsgWithDelay(new ComputationJobTerminationMsg(entityId), systemContext.getComputationActorTerminationDelay(), parent);
+        scheduleMsgWithDelay(new ComputationJobTerminationMsg(entityId), systemContext.getComputationActorTerminationDelay(), self);
     }
 
     @Override
-    public void onClusterEventMsg(ClusterEventMsg msg) throws Exception {
-
+    public void onClusterEventMsg(ClusterEventMsg msg) throws TempusApplicationException {
+        logger.info("onClusterEventMsg"); // No implementation
     }
 
     private void initComponent(){
@@ -211,10 +212,10 @@ public class SparkComputationJobActorMessageProcessor extends ComponentMsgProces
         builder.className(md.getMainClass());
         builder.args(args());
         SparkComputationRequest sparkComputationRequest = builder.build();
-        return mapper.writeValueAsString(sparkComputationRequest);
+        return objectMapper.writeValueAsString(sparkComputationRequest);
     }
 
-    private String[] args() throws IOException {
+    private String[] args() {
         JsonNode conf = job.getArgParameters();
         SparkComputationMetadata md = (SparkComputationMetadata) computation.getComputationMetadata();
         String argsFormat = md.getArgsformat();
@@ -236,7 +237,8 @@ public class SparkComputationJobActorMessageProcessor extends ComponentMsgProces
 
     private void stopJobOnServer(){
         if(job.getJobId() != null){
-            String url = String.format(this.baseUrl + BATCH_STATE_URI, job.getJobId());
+            final String format = this.baseUrl + BATCH_STATE_URI;
+            String url = String.format(format, job.getJobId());
             try{
                 ResponseEntity<String> response = new RestTemplate().exchange(
                         url, HttpMethod.DELETE, new HttpEntity<>(headers), String.class);
@@ -268,7 +270,8 @@ public class SparkComputationJobActorMessageProcessor extends ComponentMsgProces
 
     private void checkJobStatus(){
         if(job.getJobId() != null){
-            String url = String.format(this.baseUrl + BATCH_STATE_URI, job.getJobId());
+            final String format = this.baseUrl + BATCH_STATE_URI;
+            String url = String.format(format, job.getJobId());
             try {
                 ResponseEntity<Batch> response = new RestTemplate().exchange(
                         url, HttpMethod.GET, new HttpEntity<>(headers), Batch.class);

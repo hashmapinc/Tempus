@@ -17,7 +17,6 @@
 
 package com.hashmapinc.server.dao.model.nosql;
 
-import com.datastax.driver.core.utils.UUIDs;
 import com.datastax.driver.mapping.annotations.PartitionKey;
 import com.hashmapinc.server.common.data.Logo;
 import com.hashmapinc.server.common.data.id.LogoId;

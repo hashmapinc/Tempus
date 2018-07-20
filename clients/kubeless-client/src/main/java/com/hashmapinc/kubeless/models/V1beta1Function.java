@@ -16,7 +16,9 @@
 package com.hashmapinc.kubeless.models;
 
 import com.google.gson.annotations.SerializedName;
+import lombok.EqualsAndHashCode;
 
+@EqualsAndHashCode
 public class V1beta1Function extends V1beta1AbstractType<V1beta1FunctionSpec>{
 
     @SerializedName("kind")

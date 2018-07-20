@@ -238,7 +238,7 @@ public class DefaultActorServiceTest {
         when(tsService.findAllLatest(deviceId)).thenReturn(Futures.immediateFuture(Collections.emptyList()));
 
         initActorSystem();
-        Thread.sleep(1000);
+        Thread.sleep(1000); //NOSONAR Added for test
         actorService.process(new BasicToDeviceActorSessionMsg(device, msg));
 
         Set<String> keys = new HashSet<>();

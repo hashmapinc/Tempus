@@ -19,10 +19,7 @@ import com.hashmapinc.server.common.data.cluster.NodeMetric;
 import com.hashmapinc.server.exception.TempusException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -32,7 +29,7 @@ import java.util.List;
 public class NodeMetricController extends BaseController {
 
     @PreAuthorize("hasAuthority('SYS_ADMIN')")
-    @RequestMapping(value = "/nodes", method = RequestMethod.GET)
+    @GetMapping(value = "/nodes")
     @ResponseBody
     public List<NodeMetric> getNodeMetric() throws TempusException {
         try {

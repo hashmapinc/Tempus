@@ -21,6 +21,7 @@ import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.hashmapinc.server.common.data.id.EntityId;
 import com.hashmapinc.server.common.data.relation.*;
+import com.hashmapinc.server.common.msg.exception.TempusRuntimeException;
 import com.hashmapinc.server.dao.entity.EntityService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +32,6 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
-import com.hashmapinc.server.common.data.relation.*;
 import com.hashmapinc.server.dao.exception.DataValidationException;
 
 import javax.annotation.Nullable;
@@ -71,7 +71,7 @@ public class BaseRelationService implements RelationService {
         try {
             return getRelationAsync(from, to, relationType, typeGroup).get();
         } catch (InterruptedException | ExecutionException e) {
-            throw new RuntimeException(e);
+            throw new TempusRuntimeException(e);
         }
     }
 
@@ -200,9 +200,8 @@ public class BaseRelationService implements RelationService {
     private List<Boolean> getBooleans(List<List<EntityRelation>> relations, Cache cache, boolean isRemove) {
         List<Boolean> results = new ArrayList<>();
         for (List<EntityRelation> relationList : relations) {
-            relationList.stream().forEach(relation -> {
-                checkFromDeleteSync(cache, results, relation, isRemove);
-            });
+            relationList.stream().forEach(relation ->
+                checkFromDeleteSync(cache, results, relation, isRemove));
         }
         return results;
     }
@@ -251,9 +250,8 @@ public class BaseRelationService implements RelationService {
     private List<ListenableFuture<Boolean>> getListenableFutures(List<List<EntityRelation>> relations, Cache cache, boolean isRemove) {
         List<ListenableFuture<Boolean>> results = new ArrayList<>();
         for (List<EntityRelation> relationList : relations) {
-            relationList.stream().forEach(relation -> {
-                checkFromDeleteAsync(cache, results, relation, isRemove);
-            });
+            relationList.stream().forEach(relation ->
+                checkFromDeleteAsync(cache, results, relation, isRemove));
         }
         return results;
     }
@@ -288,7 +286,7 @@ public class BaseRelationService implements RelationService {
         try {
             return findByFromAsync(from, typeGroup).get();
         } catch (InterruptedException | ExecutionException e) {
-            throw new RuntimeException(e);
+            throw new TempusRuntimeException(e);
         }
     }
 
@@ -306,17 +304,20 @@ public class BaseRelationService implements RelationService {
         validate(from);
         validateTypeGroup(typeGroup);
         ListenableFuture<List<EntityRelation>> relations = relationDao.findAllByFrom(from, typeGroup);
-        ListenableFuture<List<EntityRelationInfo>> relationsInfo = Futures.transform(relations,
-                (AsyncFunction<List<EntityRelation>, List<EntityRelationInfo>>) relations1 -> {
+        return getListListenableFuture(relations);
+    }
+
+    private ListenableFuture<List<EntityRelationInfo>> getListListenableFuture(ListenableFuture<List<EntityRelation>> relations) {
+        return Futures.transform(relations,
+                                 (AsyncFunction<List<EntityRelation>, List<EntityRelationInfo>>) relations1 -> {
                     List<ListenableFuture<EntityRelationInfo>> futures = new ArrayList<>();
                     relations1.stream().forEach(relation ->
                             futures.add(fetchRelationInfoAsync(relation,
-                                    relation2 -> relation2.getTo(),
+                                                               EntityRelation::getTo,
                                     (EntityRelationInfo relationInfo, String entityName) -> relationInfo.setToName(entityName)))
                     );
                     return Futures.successfulAsList(futures);
                 });
-        return relationsInfo;
     }
 
     @Cacheable(cacheNames = RELATIONS_CACHE, key = "{#from, #relationType, #typeGroup}")
@@ -325,7 +326,7 @@ public class BaseRelationService implements RelationService {
         try {
             return findByFromAndTypeAsync(from, relationType, typeGroup).get();
         } catch (InterruptedException | ExecutionException e) {
-            throw new RuntimeException(e);
+            throw new TempusRuntimeException(e);
         }
     }
 
@@ -344,7 +345,7 @@ public class BaseRelationService implements RelationService {
         try {
             return findByToAsync(to, typeGroup).get();
         } catch (InterruptedException | ExecutionException e) {
-            throw new RuntimeException(e);
+            throw new TempusRuntimeException(e);
         }
     }
 
@@ -362,30 +363,28 @@ public class BaseRelationService implements RelationService {
         validate(to);
         validateTypeGroup(typeGroup);
         ListenableFuture<List<EntityRelation>> relations = relationDao.findAllByTo(to, typeGroup);
-        ListenableFuture<List<EntityRelationInfo>> relationsInfo = Futures.transform(relations,
+        return Futures.transform(relations,
                 (AsyncFunction<List<EntityRelation>, List<EntityRelationInfo>>) relations1 -> {
                     List<ListenableFuture<EntityRelationInfo>> futures = new ArrayList<>();
                     relations1.stream().forEach(relation ->
                             futures.add(fetchRelationInfoAsync(relation,
-                                    relation2 -> relation2.getFrom(),
+                                                               EntityRelation::getFrom,
                                     (EntityRelationInfo relationInfo, String entityName) -> relationInfo.setFromName(entityName)))
                     );
                     return Futures.successfulAsList(futures);
                 });
-        return relationsInfo;
     }
 
     private ListenableFuture<EntityRelationInfo> fetchRelationInfoAsync(EntityRelation relation,
                                                                         Function<EntityRelation, EntityId> entityIdGetter,
                                                                         BiConsumer<EntityRelationInfo, String> entityNameSetter) {
         ListenableFuture<String> entityName = entityService.fetchEntityNameAsync(entityIdGetter.apply(relation));
-        ListenableFuture<EntityRelationInfo> entityRelationInfo =
-                Futures.transform(entityName, (Function<String, EntityRelationInfo>) entityName1 -> {
+
+        return Futures.transform(entityName, (Function<String, EntityRelationInfo>) entityName1 -> {
                     EntityRelationInfo entityRelationInfo1 = new EntityRelationInfo(relation);
                     entityNameSetter.accept(entityRelationInfo1, entityName1);
                     return entityRelationInfo1;
                 });
-        return entityRelationInfo;
     }
 
     @Cacheable(cacheNames = RELATIONS_CACHE, key = "{#to, #relationType, #typeGroup}")
@@ -394,7 +393,7 @@ public class BaseRelationService implements RelationService {
         try {
             return findByToAndTypeAsync(to, relationType, typeGroup).get();
         } catch (InterruptedException | ExecutionException e) {
-            throw new RuntimeException(e);
+            throw new TempusRuntimeException(e);
         }
     }
 
@@ -435,7 +434,7 @@ public class BaseRelationService implements RelationService {
             });
         } catch (Exception e) {
             log.warn("Failed to query relations: [{}]", query, e);
-            throw new RuntimeException(e);
+            throw new TempusRuntimeException(e);
         }
     }
 
@@ -444,7 +443,7 @@ public class BaseRelationService implements RelationService {
         log.trace("Executing findInfoByQuery [{}]", query);
         ListenableFuture<List<EntityRelation>> relations = findByQuery(query);
         EntitySearchDirection direction = query.getParameters().getDirection();
-        ListenableFuture<List<EntityRelationInfo>> relationsInfo = Futures.transform(relations,
+        return Futures.transform(relations,
                 (AsyncFunction<List<EntityRelation>, List<EntityRelationInfo>>) relations1 -> {
                     List<ListenableFuture<EntityRelationInfo>> futures = new ArrayList<>();
                     relations1.stream().forEach(relation ->
@@ -460,7 +459,7 @@ public class BaseRelationService implements RelationService {
                     );
                     return Futures.successfulAsList(futures);
                 });
-        return relationsInfo;
+
     }
 
     protected void validate(EntityRelation relation) {
@@ -500,17 +499,14 @@ public class BaseRelationService implements RelationService {
     }
 
     private Function<List<Boolean>, Boolean> getListToBooleanFunction() {
-        return new Function<List<Boolean>, Boolean>() {
-            @Nullable
-            @Override
-            public Boolean apply(@Nullable List<Boolean> results) {
+        return (@Nullable List<Boolean> results)-> {
                 for (Boolean result : results) {
                     if (result == null || !result) {
                         return false;
                     }
                 }
                 return true;
-            }
+
         };
     }
 
@@ -566,7 +562,7 @@ public class BaseRelationService implements RelationService {
         }
         //TODO: try to remove this blocking operation
         List<Set<EntityRelation>> relations = Futures.successfulAsList(futures).get();
-        relations.forEach(r -> r.forEach(d -> children.add(d)));
+        relations.forEach(r -> r.forEach(children::add));
         return Futures.immediateFuture(children);
     }
 

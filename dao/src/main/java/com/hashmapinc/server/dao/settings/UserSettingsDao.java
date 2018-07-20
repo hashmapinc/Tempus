@@ -16,7 +16,6 @@
 package com.hashmapinc.server.dao.settings;
 
 import com.hashmapinc.server.common.data.UserSettings;
-import com.hashmapinc.server.common.data.id.UserId;
 import com.hashmapinc.server.dao.Dao;
 
 import java.util.UUID;

@@ -141,7 +141,7 @@ public class ConsistentClusterRoutingService implements ClusterRoutingService, D
 
     private void logCircle() {
         log.trace("Consistent Hash Circle Start");
-        circle.entrySet().forEach((e) -> log.debug("{} -> {}", e.getKey(), e.getValue().getServerAddress()));
+        circle.forEach((key, value) -> log.debug("{} -> {}", key, value.getServerAddress()));
         log.trace("Consistent Hash Circle End");
     }
 

@@ -15,6 +15,7 @@
  */
 package com.hashmapinc.server.install;
 
+import com.hashmapinc.server.common.msg.exception.TempusRuntimeException;
 import com.hashmapinc.server.service.component.ComponentDiscoveryService;
 import com.hashmapinc.server.service.install.SystemDataLoaderService;
 import lombok.extern.slf4j.Slf4j;
@@ -99,7 +100,7 @@ public class TempusInstallService {
 
                         break;
                     default:
-                        throw new RuntimeException("Unable to upgrade Tempus, unsupported fromVersion: " + upgradeFromVersion);
+                        throw new TempusRuntimeException("Unable to upgrade Tempus, unsupported fromVersion: " + upgradeFromVersion);
 
                 }
                 log.info("Upgrade finished successfully!");
@@ -109,10 +110,10 @@ public class TempusInstallService {
                 log.info("Starting Tempus Installation...");
 
                 if (this.dataDir == null) {
-                    throw new RuntimeException("'install.data_dir' property should specified!");
+                    throw new TempusRuntimeException("'install.data_dir' property should specified!");
                 }
                 if (!Paths.get(this.dataDir).toFile().isDirectory()) {
-                    throw new RuntimeException("'install.data_dir' property value is not a valid directory!");
+                    throw new TempusRuntimeException("'install.data_dir' property value is not a valid directory!");
                 }
 
                 log.info("Installing DataBase schema...");

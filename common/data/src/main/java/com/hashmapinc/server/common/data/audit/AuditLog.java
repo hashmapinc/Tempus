@@ -33,7 +33,7 @@ public class AuditLog extends BaseData<AuditLogId> {
     private UserId userId;
     private String userName;
     private ActionType actionType;
-    private JsonNode actionData;
+    private transient JsonNode actionData;
     private ActionStatus actionStatus;
     private String actionFailureDetails;
 

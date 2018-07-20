@@ -18,6 +18,7 @@ package com.hashmapinc.server.service.install;
 import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Row;
 import com.hashmapinc.server.dao.cassandra.CassandraInstallCluster;
+import com.hashmapinc.server.exception.TempusApplicationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -27,6 +28,7 @@ import com.hashmapinc.server.dao.model.ModelConstants;
 import com.hashmapinc.server.dao.util.NoSqlDao;
 import com.hashmapinc.server.service.install.cql.CQLStatementsParser;
 
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -36,7 +38,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static com.hashmapinc.server.dao.model.ModelConstants.tempus_KEYSPACE;
+import static com.hashmapinc.server.dao.model.ModelConstants.TEMPUS_KEYSPACE;
 
 @Service
 @NoSqlDao
@@ -55,38 +57,42 @@ public class CassandraDatabaseSchemaService implements DatabaseSchemaService {
     private CassandraInstallCluster cluster;
 
     @Override
-    public void createDatabaseSchema() throws Exception {
+    public void createDatabaseSchema() throws TempusApplicationException {
         log.info("Installing Cassandra DataBase schema...");
 
-        Path schemaFile = Paths.get(this.dataDir, CASSANDRA_DIR, SCHEMA_CQL);
-        loadCql(schemaFile);
+        try {
+            Path schemaFile = Paths.get(this.dataDir, CASSANDRA_DIR, SCHEMA_CQL);
+            loadCql(schemaFile);
 
-        log.info("Installing pending upgrades ...");
+            log.info("Installing pending upgrades ...");
 
         Path upgradeScriptsDirectory = Paths.get(this.dataDir, CASSANDRA_DIR, UPGRADE_DIR);
         List<String> executedUpgrades = new ArrayList<>();
-        ResultSet resultSet = cluster.getSession().execute("select "+ModelConstants.INSTALLED_SCRIPTS_COLUMN+" from " +tempus_KEYSPACE +"." + ModelConstants.INSTALLED_SCHEMA_VERSIONS+";");
+        ResultSet resultSet = cluster.getSession().execute("select "+ModelConstants.INSTALLED_SCRIPTS_COLUMN+" from " + TEMPUS_KEYSPACE +"." + ModelConstants.INSTALLED_SCHEMA_VERSIONS+";");
         Iterator<Row> rowIterator = resultSet.iterator();
 
-        while(rowIterator.hasNext()) {
-            Row row = rowIterator.next();
-            executedUpgrades.add(row.getString(ModelConstants.INSTALLED_SCRIPTS_COLUMN));
-        }
+            while(rowIterator.hasNext()) {
+                Row row = rowIterator.next();
+                executedUpgrades.add(row.getString(ModelConstants.INSTALLED_SCRIPTS_COLUMN));
+            }
 
-        try (Stream<Path> filesStream = Files.list(upgradeScriptsDirectory)) {
-            List<Integer> sortedScriptsIndexes = filesStream.map(a -> stripExtensionFromName(a.getFileName().toString())).sorted().collect(Collectors.toList());
+            try (Stream<Path> filesStream = Files.list(upgradeScriptsDirectory)) {
+                List<Integer> sortedScriptsIndexes = filesStream.map(a -> stripExtensionFromName(a.getFileName().toString())).sorted().collect(Collectors.toList());
 
-            for (Integer i : sortedScriptsIndexes) {
-                String scriptFileName = i.toString() + ".cql";
-                if (!executedUpgrades.contains(scriptFileName)) {
-                    loadCql(upgradeScriptsDirectory.resolve(scriptFileName));
-                    cluster.getSession().execute("insert into " + tempus_KEYSPACE + "." + ModelConstants.INSTALLED_SCHEMA_VERSIONS + "(" + ModelConstants.INSTALLED_SCRIPTS_COLUMN + ")" + " values('" + scriptFileName + "'" + ")");
+                for (Integer i : sortedScriptsIndexes) {
+                    String scriptFileName = i.toString() + ".cql";
+                    if (!executedUpgrades.contains(scriptFileName)) {
+                        loadCql(upgradeScriptsDirectory.resolve(scriptFileName));
+                        cluster.getSession().execute("insert into " + TEMPUS_KEYSPACE + "." + ModelConstants.INSTALLED_SCHEMA_VERSIONS + "(" + ModelConstants.INSTALLED_SCRIPTS_COLUMN + ")" + " values('" + scriptFileName + "'" + ")");
+                    }
                 }
             }
+        } catch (IOException e) {
+            throw new TempusApplicationException(e);
         }
     }
 
-    private void loadCql(Path cql) throws Exception {
+    private void loadCql(Path cql) throws IOException {
         List<String> statements = new CQLStatementsParser(cql).getStatements();
         statements.forEach(statement -> cluster.getSession().execute(statement));
     }

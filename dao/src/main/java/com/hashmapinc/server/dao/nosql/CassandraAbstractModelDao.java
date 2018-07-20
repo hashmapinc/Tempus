@@ -73,10 +73,7 @@ public abstract class CassandraAbstractModelDao<E extends BaseEntity<D>, D> exte
         if (statement != null) {
             statement.setConsistencyLevel(cluster.getDefaultReadConsistencyLevel());
             ResultSetFuture resultSetFuture = getSession().executeAsync(statement);
-            return Futures.transform(resultSetFuture, new Function<ResultSet, List<D>>() {
-                @Nullable
-                @Override
-                public List<D> apply(@Nullable ResultSet resultSet) {
+            return Futures.transform(resultSetFuture, (@Nullable ResultSet resultSet)->{
                     Result<E> result = getMapper().map(resultSet);
                     if (result != null) {
                         List<E> entities = result.all();
@@ -84,7 +81,6 @@ public abstract class CassandraAbstractModelDao<E extends BaseEntity<D>, D> exte
                     } else {
                         return Collections.emptyList();
                     }
-                }
             });
         }
         return Futures.immediateFuture(Collections.emptyList());
@@ -107,10 +103,7 @@ public abstract class CassandraAbstractModelDao<E extends BaseEntity<D>, D> exte
         if (statement != null) {
             statement.setConsistencyLevel(cluster.getDefaultReadConsistencyLevel());
             ResultSetFuture resultSetFuture = getSession().executeAsync(statement);
-            return Futures.transform(resultSetFuture, new Function<ResultSet, D>() {
-                @Nullable
-                @Override
-                public D apply(@Nullable ResultSet resultSet) {
+            return Futures.transform(resultSetFuture,(@Nullable ResultSet resultSet)->{
                     Result<E> result = getMapper().map(resultSet);
                     if (result != null) {
                         E entity = result.one();
@@ -118,7 +111,6 @@ public abstract class CassandraAbstractModelDao<E extends BaseEntity<D>, D> exte
                     } else {
                         return null;
                     }
-                }
             });
         }
         return Futures.immediateFuture(null);
@@ -192,12 +184,7 @@ public abstract class CassandraAbstractModelDao<E extends BaseEntity<D>, D> exte
     }
 
     protected static <T> Function<BaseEntity<T>, T> toDataFunction() {
-        return new Function<BaseEntity<T>, T>() {
-            @Nullable
-            @Override
-            public T apply(@Nullable BaseEntity<T> entity) {
-                return entity != null ? entity.toData() : null;
-            }
-        };
+        return (@Nullable BaseEntity<T> entity)-> entity != null ? entity.toData() : null;
+
     }
 }

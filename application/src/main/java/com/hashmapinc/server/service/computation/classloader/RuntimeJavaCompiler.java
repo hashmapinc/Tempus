@@ -15,21 +15,21 @@
  */
 package com.hashmapinc.server.service.computation.classloader;
 
+import com.hashmapinc.server.service.computation.classloader.exception.CompilationException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
-import com.hashmapinc.server.service.computation.classloader.exception.CompilationException;
+
+import javax.tools.*;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.lang.reflect.Method;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.jar.JarFile;
-import javax.tools.*;
 
 @Slf4j
 public class RuntimeJavaCompiler {
@@ -62,17 +62,17 @@ public class RuntimeJavaCompiler {
 
     private void initFileManager(){
         if(fileManager == null) {
-            StandardJavaFileManager fileManager = compiler.getStandardFileManager(null, null, null);
+            StandardJavaFileManager standardFileManager = compiler.getStandardFileManager(null, null, null);
             try {
-                fileManager.setLocation(StandardLocation.CLASS_OUTPUT, Arrays.asList(tempDir));
-                this.fileManager = fileManager;
+                standardFileManager.setLocation(StandardLocation.CLASS_OUTPUT, Arrays.asList(tempDir));
+                this.fileManager = standardFileManager;
             } catch (Exception e) {
                 log.error("Error while setting class path", e);
             }
         }
     }
 
-    private void initClassPath() throws IOException, URISyntaxException, CompilationException {
+    private void initClassPath() throws IOException, CompilationException {
         if(!classPathInitialized) {
             Set<File> classPaths = new HashSet<>();
             appendExistingClasspath(classPaths);
@@ -96,9 +96,9 @@ public class RuntimeJavaCompiler {
 
     private void addClassDirectoryToClassPath(URLClassLoader loader) throws CompilationException {
         try {
-            Method method = URLClassLoader.class.getDeclaredMethod("addURL", new Class[]{URL.class});
+            Method method = URLClassLoader.class.getDeclaredMethod("addURL", URL.class);
             method.setAccessible(true);
-            method.invoke(loader, new Object[]{tempDir.toURI().toURL()});
+            method.invoke(loader, tempDir.toURI().toURL());
         } catch (Exception e) {
             throw new CompilationException("Error while adding temporary directory on classpath", e);
         }
@@ -143,7 +143,7 @@ public class RuntimeJavaCompiler {
     }
 
     private File createSourceFile(String qualifiedClassName, String sourceCode) throws IOException {
-        int dotPos = qualifiedClassName.lastIndexOf(".");
+        int dotPos = qualifiedClassName.lastIndexOf('.');
         String packageName = dotPos == -1 ? "" : qualifiedClassName.substring(0, dotPos);
         String className = dotPos == -1 ? qualifiedClassName : qualifiedClassName.substring(dotPos + 1);
         File packageDir = new File(tempDir.getPath() + File.separator + packageName.replace(".", File.separator));

@@ -54,6 +54,7 @@ public class GatewayDeviceSessionCtx extends DeviceAwareSessionContext {
     private static final Charset UTF8 = Charset.forName("UTF-8");
     private static final ByteBufAllocator ALLOCATOR = new UnpooledByteBufAllocator(false);
     public static final String DEVICE_PROPERTY = "device";
+    public static final String VALUES = "values";
 
     private GatewaySessionCtx parent;
     private final MqttSessionId sessionId;
@@ -157,11 +158,11 @@ public class GatewayDeviceSessionCtx extends DeviceAwareSessionContext {
             addValueToJson(result, "value", kvList.get(0));
         } else {
             JsonObject values;
-            if (result.has("values")) {
-                values = result.get("values").getAsJsonObject();
+            if (result.has(VALUES)) {
+                values = result.get(VALUES).getAsJsonObject();
             } else {
                 values = new JsonObject();
-                result.add("values", values);
+                result.add(VALUES, values);
             }
             kvList.forEach(value -> addValueToJson(values, value.getKey(), value));
         }

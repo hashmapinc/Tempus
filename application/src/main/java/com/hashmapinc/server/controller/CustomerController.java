@@ -38,7 +38,7 @@ public class CustomerController extends BaseController {
     public static final String IS_PUBLIC = "isPublic";
 
     @PreAuthorize("hasAnyAuthority('TENANT_ADMIN', 'CUSTOMER_USER')")
-    @RequestMapping(value = "/customer/{customerId}", method = RequestMethod.GET)
+    @GetMapping(value = "/customer/{customerId}")
     @ResponseBody
     public Customer getCustomerById(@PathVariable(CUSTOMER_ID) String strCustomerId) throws TempusException {
         checkParameter(CUSTOMER_ID, strCustomerId);
@@ -51,7 +51,7 @@ public class CustomerController extends BaseController {
     }
 
     @PreAuthorize("hasAnyAuthority('TENANT_ADMIN', 'CUSTOMER_USER')")
-    @RequestMapping(value = "/customer/{customerId}/shortInfo", method = RequestMethod.GET)
+    @GetMapping(value = "/customer/{customerId}/shortInfo")
     @ResponseBody
     public JsonNode getShortCustomerInfoById(@PathVariable(CUSTOMER_ID) String strCustomerId) throws TempusException {
         checkParameter(CUSTOMER_ID, strCustomerId);
@@ -69,7 +69,7 @@ public class CustomerController extends BaseController {
     }
 
     @PreAuthorize("hasAnyAuthority('TENANT_ADMIN', 'CUSTOMER_USER')")
-    @RequestMapping(value = "/customer/{customerId}/title", method = RequestMethod.GET, produces = "application/text")
+    @GetMapping(value = "/customer/{customerId}/title", produces = "application/text")
     @ResponseBody
     public String getCustomerTitleById(@PathVariable(CUSTOMER_ID) String strCustomerId) throws TempusException {
         checkParameter(CUSTOMER_ID, strCustomerId);
@@ -83,7 +83,7 @@ public class CustomerController extends BaseController {
     }
 
     @PreAuthorize("hasAuthority('TENANT_ADMIN')")
-    @RequestMapping(value = "/customer", method = RequestMethod.POST)
+    @PostMapping(value = "/customer")
     @ResponseBody
     public Customer saveCustomer(@RequestBody Customer customer) throws TempusException {
         try {
@@ -105,7 +105,7 @@ public class CustomerController extends BaseController {
     }
 
     @PreAuthorize("hasAuthority('TENANT_ADMIN')")
-    @RequestMapping(value = "/customer/{customerId}", method = RequestMethod.DELETE)
+    @DeleteMapping(value = "/customer/{customerId}")
     @ResponseStatus(value = HttpStatus.OK)
     public void deleteCustomer(@PathVariable(CUSTOMER_ID) String strCustomerId) throws TempusException {
         checkParameter(CUSTOMER_ID, strCustomerId);
@@ -130,7 +130,7 @@ public class CustomerController extends BaseController {
     }
 
     @PreAuthorize("hasAuthority('TENANT_ADMIN')")
-    @RequestMapping(value = "/customers", params = {"limit"}, method = RequestMethod.GET)
+    @GetMapping(value = "/customers", params = {"limit"})
     @ResponseBody
     public TextPageData<Customer> getCustomers(@RequestParam int limit,
                                                @RequestParam(required = false) String textSearch,
@@ -146,7 +146,7 @@ public class CustomerController extends BaseController {
     }
 
     @PreAuthorize("hasAuthority('TENANT_ADMIN')")
-    @RequestMapping(value = "/tenant/customers", params = {"customerTitle"}, method = RequestMethod.GET)
+    @GetMapping(value = "/tenant/customers", params = {"customerTitle"})
     @ResponseBody
     public Customer getTenantCustomer(
             @RequestParam String customerTitle) throws TempusException {
