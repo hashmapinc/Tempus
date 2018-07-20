@@ -333,6 +333,18 @@
                     <includes>
                         <include>**/*TestSuite.java</include>
                     </includes>
+                    <excludes>
+                        <exclude>**/*IntegrationTestSuite.java</exclude>
+                    </excludes>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-failsafe-plugin</artifactId>
+                <configuration>
+                    <systemPropertyVariables>
+                        <spring.config.name>tempus</spring.config.name>
+                    </systemPropertyVariables>
                 </configuration>
             </plugin>
             <plugin>
