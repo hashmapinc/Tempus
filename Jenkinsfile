@@ -18,10 +18,10 @@ mvn validate'''
     }
     stage('Build') {
       steps {
-        sh 'mvn -Dmaven.test.failure.ignore=true -Dlicense.skip=true -DskipITs install'
+        sh 'mvn -Dmaven.test.failure.ignore=true -DskipITs install'
       }
     }
-    stage('Integration Tests'){
+    stage('Integration Tests') {
       steps {
         sh 'mvn failsafe:integration-test'
         sh 'mvn failsafe:verify'
