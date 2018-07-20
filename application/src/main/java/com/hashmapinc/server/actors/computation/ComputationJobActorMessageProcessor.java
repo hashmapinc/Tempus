@@ -23,12 +23,6 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hashmap.tempus.models.ArgType;
-import com.hashmapinc.server.exception.TempusApplicationException;
-import org.apache.commons.lang.StringUtils;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.*;
-import org.springframework.web.client.RestClientException;
-import org.springframework.web.client.RestTemplate;
 import com.hashmapinc.server.actors.ActorSystemContext;
 import com.hashmapinc.server.actors.shared.ComponentMsgProcessor;
 import com.hashmapinc.server.common.data.computation.ComputationJob;
@@ -75,7 +69,7 @@ public class ComputationJobActorMessageProcessor extends ComponentMsgProcessor<C
     }
 
     @Override
-    public void start() throws TempusApplicationException {
+    public void start() {
         logger.info("[{}] Going to start plugin actor.", entityId);
         job = systemContext.getComputationJobService().findComputationJobById(entityId);
         if (job == null) {
@@ -93,17 +87,17 @@ public class ComputationJobActorMessageProcessor extends ComponentMsgProcessor<C
     }
 
     @Override
-    public void stop() throws TempusApplicationException {
+    public void stop() {
         onStop();
     }
 
     @Override
-    public void onCreated(ActorContext context) throws TempusApplicationException {
+    public void onCreated(ActorContext context) {
         logger.info("[{}] Going to process onCreated computation job.", entityId);
     }
 
     @Override
-    public void onUpdate(ActorContext context) throws TempusApplicationException {
+    public void onUpdate(ActorContext context) {
         ComputationJob oldJob = job;
         job = systemContext.getComputationJobService().findComputationJobById(entityId);
         logger.info("[{}] Computation configuration was updated from {} to {}.", entityId, oldJob, job);
@@ -115,19 +109,19 @@ public class ComputationJobActorMessageProcessor extends ComponentMsgProcessor<C
     }
 
     @Override
-    public void onActivate(ActorContext context) throws TempusApplicationException {
+    public void onActivate(ActorContext context) {
         logger.info("[{}] Going to process onActivate computation job.", entityId);
         start();
     }
 
     @Override
-    public void onSuspend(ActorContext context) throws TempusApplicationException {
+    public void onSuspend(ActorContext context) {
         logger.info("[{}] Going to process onSuspend computation job.", entityId);
         onStop();
     }
 
     @Override
-    public void onStop(ActorContext context) throws TempusApplicationException {
+    public void onStop(ActorContext context) {
         logger.info("[{}] Going to process onStop computation job.", entityId);
         onStop();
         scheduleMsgWithDelay(new ComputationJobTerminationMsg(entityId), systemContext.getComputationActorTerminationDelay(), parent);
@@ -135,7 +129,7 @@ public class ComputationJobActorMessageProcessor extends ComponentMsgProcessor<C
     }
 
     @Override
-    public void onClusterEventMsg(ClusterEventMsg msg) throws TempusApplicationException {
+    public void onClusterEventMsg(ClusterEventMsg msg) {
         logger.info("onClusterEventMsg"); // No implementation
     }
 
