@@ -14,7 +14,7 @@ pipeline {
 echo M2_HOME = ${M2_HOME}
 mvn clean
 mvn validate'''
-        slackSend(message: 'Build Started for Branch: '+BRANCH_NAME+' for: '+CHANGE_AUTHOR+' on: '+BUILD_TAG, color: 'Green', channel: 'Tempus', botUser: true)
+        slackSend(message: 'Build Started for Branch: '+BRANCH_NAME+' for: '+env.CHANGE_AUTHOR+' on: '+env.BUILD_TAG, color: 'Green', channel: 'Tempus', botUser: true)
       }
     }
     stage('Build') {
