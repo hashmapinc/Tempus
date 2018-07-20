@@ -292,6 +292,7 @@
                             <exclude>**/*.env</exclude>
                             <exclude>**/*.deb</exclude>
                             <exclude>**/.helmignore</exclude>
+                            <exclude>**/.m2/*</exclude>
                         </excludes>
                         <mapping>
                             <proto>JAVADOC_STYLE</proto>
