@@ -16,22 +16,16 @@
 package com.hashmapinc.server.controller;
 
 import com.datastax.driver.core.utils.UUIDs;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hashmapinc.server.common.data.computation.ComputationJob;
 import com.hashmapinc.server.common.data.computation.ComputationType;
 import com.hashmapinc.server.common.data.computation.Computations;
 import com.hashmapinc.server.common.data.computation.SparkComputationMetadata;
 import com.hashmapinc.server.common.data.id.ComputationId;
+import com.hashmapinc.server.dao.computations.ComputationsService;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import com.hashmapinc.server.common.data.plugin.PluginMetaData;
-import com.hashmapinc.server.common.data.rule.RuleMetaData;
-import com.hashmapinc.server.dao.computations.ComputationsService;
-import com.hashmapinc.server.extensions.core.plugin.telemetry.TelemetryStoragePlugin;
-
-import java.io.IOException;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -40,10 +34,6 @@ public class BaseComputationsControllerTest extends AbstractControllerTest {
 
     private Computations savedComputations;
 
-    private PluginMetaData sysPlugin;
-    private PluginMetaData tenantPlugin;
-    private static final ObjectMapper mapper = new ObjectMapper();
-
     @Autowired
     ComputationsService computationsService;
 
@@ -51,21 +41,6 @@ public class BaseComputationsControllerTest extends AbstractControllerTest {
     @Before
     public void beforeTest() throws Exception {
         loginTenantAdmin();
-
-
-        sysPlugin = new PluginMetaData();
-        sysPlugin.setName("Sys plugin");
-        sysPlugin.setApiToken("sysplugin");
-        sysPlugin.setConfiguration(mapper.readTree("{}"));
-        sysPlugin.setClazz(TelemetryStoragePlugin.class.getName());
-        sysPlugin = doPost("/api/plugin", sysPlugin, PluginMetaData.class);
-
-        tenantPlugin = new PluginMetaData();
-        tenantPlugin.setName("My plugin");
-        tenantPlugin.setApiToken("myplugin");
-        tenantPlugin.setConfiguration(mapper.readTree("{}"));
-        tenantPlugin.setClazz(TelemetryStoragePlugin.class.getName());
-        tenantPlugin = doPost("/api/plugin", tenantPlugin, PluginMetaData.class);
 
         Computations computations = new Computations();
         ComputationId computationId = new ComputationId(UUIDs.timeBased());
