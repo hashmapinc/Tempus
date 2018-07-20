@@ -16,6 +16,7 @@
 package com.hashmapinc.server.service.cluster.rpc;
 
 import com.google.protobuf.ByteString;
+import com.hashmapinc.server.common.msg.exception.TempusRuntimeException;
 import com.hashmapinc.server.extensions.api.plugins.msg.ToDeviceRpcRequestPluginMsg;
 import com.hashmapinc.server.service.cluster.discovery.ServerInstance;
 import io.grpc.Server;
@@ -60,21 +61,19 @@ public class ClusterGrpcService extends ClusterRpcServiceGrpc.ClusterRpcServiceI
 
     private Server server;
 
-    private ServerInstance instance;
-
     private ConcurrentMap<UUID, RpcSessionCreationFuture> pendingSessionMap = new ConcurrentHashMap<>();
 
     public void init(RpcMsgListener listener) {
         this.listener = listener;
         log.info("Initializing RPC service!");
-        instance = instanceService.getSelf();
+        ServerInstance instance = instanceService.getSelf();
         server = ServerBuilder.forPort(instance.getPort()).addService(this).build();
         log.info("Going to start RPC server using port: {}", instance.getPort());
         try {
             server.start();
         } catch (IOException e) {
             log.error("Failed to start RPC server!", e);
-            throw new RuntimeException("Failed to start RPC server!");
+            throw new TempusRuntimeException("Failed to start RPC server!");
         }
         log.info("RPC service initialized!");
     }
@@ -178,7 +177,7 @@ public class ClusterGrpcService extends ClusterRpcServiceGrpc.ClusterRpcServiceI
             return observer;
         } catch (Exception e) {
             log.info("Failed to process session.", e);
-            throw new RuntimeException(e);
+            throw new TempusRuntimeException(e);
         }
     }
 

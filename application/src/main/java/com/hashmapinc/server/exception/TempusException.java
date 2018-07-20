@@ -19,10 +19,11 @@ public class TempusException extends Exception {
 
     private static final long serialVersionUID = 1L;
 
-    private TempusErrorCode errorCode;
+    private final TempusErrorCode errorCode;
 
     public TempusException() {
         super();
+        errorCode = null;
     }
 
     public TempusException(TempusErrorCode errorCode) {

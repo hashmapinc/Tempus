@@ -13,18 +13,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.hashmapinc.server.transport.mqtt.sparkplug.data;
 
-package com.hashmapinc.server.dao.TagMetaData;
+public class SparkPlugMetaData {
+    private String msgType;
+    private int seq;
 
-import com.google.common.util.concurrent.ListenableFuture;
-import com.hashmapinc.server.common.data.EntityType;
-import com.hashmapinc.server.common.data.TagMetaData;
-import com.hashmapinc.server.common.data.id.EntityId;
+    public SparkPlugMetaData(String msgType, int seq){
+        this.msgType = msgType;
+        this.seq = seq;
+    }
 
-import java.util.List;
+    public String getMsgType() {
+        return msgType;
+    }
 
-public interface TagMetaDataDao {
-    ListenableFuture<Void> save(TagMetaData tagMetaData);
-    ListenableFuture<TagMetaData> getByEntityIdAndKey(EntityId entityId, String key);
-    ListenableFuture<List<TagMetaData>> getAllByEntityId(EntityId entityId);
+    public void setMsgType(String msgType) {
+        this.msgType = msgType;
+    }
+
+    public int getSeq() {
+        return seq;
+    }
+
+    public void setSeq(int seq) {
+        this.seq = seq;
+    }
 }

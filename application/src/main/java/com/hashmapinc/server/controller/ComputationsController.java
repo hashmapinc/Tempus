@@ -18,9 +18,18 @@ package com.hashmapinc.server.controller;
 import com.hashmapinc.server.common.data.EntityType;
 import com.hashmapinc.server.common.data.audit.ActionType;
 import com.hashmapinc.server.common.data.computation.ComputationJob;
+import com.hashmapinc.server.common.data.computation.Computations;
 import com.hashmapinc.server.common.data.id.ComputationId;
+import com.hashmapinc.server.common.data.id.TenantId;
+import com.hashmapinc.server.common.data.page.TextPageData;
 import com.hashmapinc.server.common.data.page.TextPageLink;
 import com.hashmapinc.server.common.data.plugin.ComponentLifecycleEvent;
+import com.hashmapinc.server.common.data.security.Authority;
+import com.hashmapinc.server.dao.model.ModelConstants;
+import com.hashmapinc.server.exception.TempusErrorCode;
+import com.hashmapinc.server.exception.TempusException;
+import com.hashmapinc.server.service.computation.ComputationDiscoveryService;
+import com.hashmapinc.server.service.security.model.SecurityUser;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -28,15 +37,6 @@ import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import com.hashmapinc.server.common.data.computation.Computations;
-import com.hashmapinc.server.common.data.id.TenantId;
-import com.hashmapinc.server.common.data.page.TextPageData;
-import com.hashmapinc.server.common.data.security.Authority;
-import com.hashmapinc.server.dao.model.ModelConstants;
-import com.hashmapinc.server.exception.TempusErrorCode;
-import com.hashmapinc.server.exception.TempusException;
-import com.hashmapinc.server.service.computation.ComputationDiscoveryService;
-import com.hashmapinc.server.service.security.model.SecurityUser;
 
 import java.io.File;
 import java.io.IOException;
@@ -65,7 +65,7 @@ public class ComputationsController extends BaseController {
     private ComputationDiscoveryService computationDiscoveryService;
 
     @PreAuthorize("hasAuthority('TENANT_ADMIN')")
-    @RequestMapping(value = "/computations/upload", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/computations/upload", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     public Computations upload(@RequestParam("file") MultipartFile file) throws TempusException {
 
@@ -96,7 +96,7 @@ public class ComputationsController extends BaseController {
     }
 
     @PreAuthorize("hasAuthority('TENANT_ADMIN')")
-    @RequestMapping(value = "/computations/{computationId}", method = RequestMethod.DELETE)
+    @DeleteMapping(value = "/computations/{computationId}")
     @ResponseBody
     public void delete(@PathVariable(COMPUTATION_ID) String strComputationId) throws TempusException, IOException {
 
@@ -126,7 +126,7 @@ public class ComputationsController extends BaseController {
     }
 
     @PreAuthorize("hasAuthority('TENANT_ADMIN')")
-    @RequestMapping(value = "/computations", params = {"limit"}, method = RequestMethod.GET)
+    @GetMapping(value = "/computations", params = {"limit"})
     @ResponseBody
     public TextPageData<Computations> getTenantComputations(
             @RequestParam int limit,
@@ -143,7 +143,7 @@ public class ComputationsController extends BaseController {
     }
 
     @PreAuthorize("hasAnyAuthority('SYS_ADMIN', 'TENANT_ADMIN')")
-    @RequestMapping(value = "/computations", method = RequestMethod.GET)
+    @GetMapping(value = "/computations")
     @ResponseBody
     public List<Computations> getComputations() throws TempusException {
         try {
@@ -159,7 +159,7 @@ public class ComputationsController extends BaseController {
     }
 
     @PreAuthorize("hasAnyAuthority('SYS_ADMIN', 'TENANT_ADMIN')")
-    @RequestMapping(value = "/computations/{computationId}", method = RequestMethod.GET)
+    @GetMapping(value = "/computations/{computationId}")
     @ResponseBody
     public Computations getComputation(@PathVariable(COMPUTATION_ID) String strComputationId) throws TempusException {
 

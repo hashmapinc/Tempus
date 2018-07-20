@@ -15,6 +15,7 @@
  */
 package com.hashmapinc.server.extensions.rabbitmq.plugin;
 
+import com.hashmapinc.server.common.msg.exception.TempusRuntimeException;
 import com.hashmapinc.server.extensions.api.plugins.PluginContext;
 import com.hashmapinc.server.extensions.api.plugins.handlers.RuleMsgHandler;
 import com.hashmapinc.server.extensions.rabbitmq.action.RabbitMqPluginAction;
@@ -51,11 +52,9 @@ public class RabbitMqPlugin extends AbstractPlugin<RabbitMqPluginConfiguration> 
         set(configuration.getAutomaticRecoveryEnabled(), factory::setAutomaticRecoveryEnabled);
         set(configuration.getConnectionTimeout(), factory::setConnectionTimeout);
         set(configuration.getHandshakeTimeout(), factory::setHandshakeTimeout);
-        set(configuration.getClientProperties(), props -> {
-            factory.setClientProperties(props.stream().collect(Collectors.toMap(
-                    RabbitMqPluginConfiguration.RabbitMqPluginProperties::getKey,
-                    RabbitMqPluginConfiguration.RabbitMqPluginProperties::getValue)));
-        });
+        set(configuration.getClientProperties(), props -> factory.setClientProperties(props.stream().collect(Collectors.toMap(
+                RabbitMqPluginConfiguration.RabbitMqPluginProperties::getKey,
+                RabbitMqPluginConfiguration.RabbitMqPluginProperties::getValue))));
 
         init();
     }
@@ -71,7 +70,7 @@ public class RabbitMqPlugin extends AbstractPlugin<RabbitMqPluginConfiguration> 
             this.connection = factory.newConnection();
             this.handler = new RabbitMqMsgHandler(connection.createChannel());
         } catch (IOException | TimeoutException e) {
-            throw new RuntimeException(e);
+            throw new TempusRuntimeException(e);
         }
     }
 

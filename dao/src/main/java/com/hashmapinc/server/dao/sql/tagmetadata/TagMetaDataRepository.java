@@ -13,26 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-/*package com.hashmapinc.server.service.security.model.token;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import io.jsonwebtoken.Claims;
+package com.hashmapinc.server.dao.sql.tagmetadata;
 
-public final class AccessJwtToken implements JwtToken {
-    private final String rawToken;
-    @JsonIgnore
-    private transient Claims claims;
+import com.hashmapinc.server.common.data.EntityType;
+import com.hashmapinc.server.dao.model.sql.TagMetaDataCompositeKey;
+import com.hashmapinc.server.dao.model.sql.TagMetaDataEntity;
+import org.springframework.data.repository.CrudRepository;
 
-    protected AccessJwtToken(final String token, Claims claims) {
-        this.rawToken = token;
-        this.claims = claims;
-    }
+import java.util.List;
 
-    public String getToken() {
-        return this.rawToken;
-    }
-
-    public Claims getClaims() {
-        return claims;
-    }
-}*/
+public interface TagMetaDataRepository extends CrudRepository<TagMetaDataEntity, TagMetaDataCompositeKey> {
+    List<TagMetaDataEntity> findAllByEntityIdAndEntityType(String entityId, EntityType entityType);
+}

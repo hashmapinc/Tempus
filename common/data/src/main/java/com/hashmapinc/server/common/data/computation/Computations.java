@@ -16,9 +16,9 @@
 package com.hashmapinc.server.common.data.computation;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.hashmapinc.server.common.data.HasName;
 import com.hashmapinc.server.common.data.SearchTextBased;
 import com.hashmapinc.server.common.data.id.ComputationId;
-import com.hashmapinc.server.common.data.HasName;
 import com.hashmapinc.server.common.data.id.TenantId;
 
 public class Computations extends SearchTextBased<ComputationId> implements HasName {
@@ -53,16 +53,12 @@ public class Computations extends SearchTextBased<ComputationId> implements HasN
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(Object o) { // NOSONAR
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         if (!super.equals(o)) return false;
 
-        return checkObjEquality((Computations) o);
-    }
-
-    private boolean checkObjEquality(Computations o) {
-        Computations that = o;
+        Computations that = (Computations) o;
         if (name != null ? !name.equals(that.name) : that.name != null) return false;
         if (jarPath != null ? !jarPath.equals(that.jarPath) : that.jarPath != null) return false;
         if (jarName != null ? !jarName.equals(that.jarName) : that.jarName != null) return false;

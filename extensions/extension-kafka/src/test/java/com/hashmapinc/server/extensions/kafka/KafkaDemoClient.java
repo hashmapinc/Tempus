@@ -65,7 +65,7 @@ public class KafkaDemoClient {
               MessageAndMetadata<String, String> messageAndMetadata = it.next();
               System.out.println(String.format("Kafka message [%s]", messageAndMetadata.message()));
           }
-          Thread.sleep(100);
+          Thread.sleep(100); //NOSONAR
         } while (true);
     }
 

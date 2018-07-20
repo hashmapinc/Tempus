@@ -22,6 +22,7 @@ import com.google.common.util.concurrent.AbstractFuture;
  */
 public class SimpleListenableFuture<V> extends AbstractFuture<V> {
 
+    @Override
     public boolean set(V value) {
         return super.set(value);
     }

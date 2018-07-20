@@ -33,7 +33,6 @@ import org.springframework.http.*;
 import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
-import com.hashmapinc.server.common.data.kv.*;
 import com.hashmapinc.server.extensions.api.plugins.PluginCallback;
 import com.hashmapinc.server.extensions.api.rules.RuleException;
 import com.hashmapinc.server.extensions.spark.computation.action.SparkComputationActionPayload;
@@ -49,7 +48,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class SparkComputationMessageHandler implements RuleMsgHandler {
 
     private static final String SPARK_COMPUTATION = "COMPUTATION_%s_%s";
-    private static final String batchStateURI = "batches/%d";
+    private static final String BATCH_STATE_URI = "batches/";
     private final String baseUrl;
     private final HttpHeaders headers;
     private volatile Map<String, String> sparkAppsForTenant = new ConcurrentHashMap<>();
@@ -113,7 +112,7 @@ public class SparkComputationMessageHandler implements RuleMsgHandler {
     }
 
     private SparkComputationStatus fetchSparkJobStatus(int batchId){
-        String url = String.format(this.baseUrl + batchStateURI, batchId);
+        String url = String.format("%s%s%d", this.baseUrl, BATCH_STATE_URI, batchId);
         try {
             ResponseEntity<Batch> response = new RestTemplate().exchange(
                     url, HttpMethod.GET, new HttpEntity<>(headers), Batch.class);

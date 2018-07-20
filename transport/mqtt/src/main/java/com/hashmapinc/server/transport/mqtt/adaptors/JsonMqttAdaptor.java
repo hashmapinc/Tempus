@@ -41,12 +41,9 @@ import io.netty.handler.codec.mqtt.MqttPublishVariableHeader;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import com.hashmapinc.server.transport.mqtt.MqttTransportHandler;
-import com.hashmapinc.server.transport.mqtt.sparkplugB.SparkPlugEncodeService;
+import com.hashmapinc.server.transport.mqtt.sparkplug.SparkPlugEncodeService;
 import java.nio.charset.Charset;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 
 @Component("JsonMqttAdaptor")
@@ -92,10 +89,10 @@ public class JsonMqttAdaptor implements MqttTransportAdaptor {
                 msg = new RpcUnsubscribeMsg();
                 break;
             case GET_ATTRIBUTES_REQUEST:
-                msg = convertToGetAttributesRequest(ctx, (MqttPublishMessage) inbound);
+                msg = convertToGetAttributesRequest((MqttPublishMessage) inbound);
                 break;
             case TO_DEVICE_RPC_RESPONSE:
-                msg = convertToRpcCommandResponse(ctx, (MqttPublishMessage) inbound);
+                msg = convertToRpcCommandResponse((MqttPublishMessage) inbound);
                 break;
             case TO_SERVER_RPC_REQUEST:
                 msg = convertToServerRpcRequest(ctx, (MqttPublishMessage) inbound);
@@ -180,7 +177,7 @@ public class JsonMqttAdaptor implements MqttTransportAdaptor {
                     if (response.isSuccess() && responseData.isPresent()) {
                         result = createMqttPublishMsg(ctx,
                                 MqttTopics.DEVICE_ATTRIBUTES_RESPONSE_TOPIC_PREFIX + requestId,
-                                response.getData().get(), true);
+                                response.getData().get(), true); //NOSONAR
                     } else {
                         if (responseError.isPresent()) {
                             throw new AdaptorException(responseError.get());
@@ -243,7 +240,7 @@ public class JsonMqttAdaptor implements MqttTransportAdaptor {
         return newTopic.toString();
     }
 
-    private FromDeviceMsg convertToGetAttributesRequest(DeviceSessionCtx ctx, MqttPublishMessage inbound) throws AdaptorException {
+    private FromDeviceMsg convertToGetAttributesRequest(MqttPublishMessage inbound) throws AdaptorException {
         String topicName = inbound.variableHeader().topicName();
         try {
             Integer requestId = Integer.valueOf(topicName.substring(MqttTopics.DEVICE_ATTRIBUTES_REQUEST_TOPIC_PREFIX.length()));
@@ -262,7 +259,7 @@ public class JsonMqttAdaptor implements MqttTransportAdaptor {
         }
     }
 
-    private FromDeviceMsg convertToRpcCommandResponse(DeviceSessionCtx ctx, MqttPublishMessage inbound) throws AdaptorException {
+    private FromDeviceMsg convertToRpcCommandResponse(MqttPublishMessage inbound) throws AdaptorException {
         String topicName = inbound.variableHeader().topicName();
         try {
             Integer requestId = Integer.valueOf(topicName.substring(MqttTopics.DEVICE_RPC_RESPONSE_TOPIC.length()));
@@ -281,7 +278,7 @@ public class JsonMqttAdaptor implements MqttTransportAdaptor {
         if (element != null) {
             return new HashSet<>(Arrays.asList(element.getAsString().split(",")));
         } else {
-            return null;
+            return Collections.emptySet();
         }
     }
 

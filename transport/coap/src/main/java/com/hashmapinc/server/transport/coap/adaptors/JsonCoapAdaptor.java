@@ -29,7 +29,6 @@ import org.eclipse.californium.core.coap.CoAP.ResponseCode;
 import org.eclipse.californium.core.coap.Request;
 import org.eclipse.californium.core.coap.Response;
 import org.springframework.util.StringUtils;
-import com.hashmapinc.server.common.msg.core.*;
 import com.hashmapinc.server.common.msg.session.AdaptorToSessionActorMsg;
 import com.hashmapinc.server.common.msg.session.BasicAdaptorToSessionActorMsg;
 import com.hashmapinc.server.common.msg.session.FromDeviceMsg;
@@ -59,7 +58,7 @@ public class JsonCoapAdaptor implements CoapTransportAdaptor {
                 msg = convertToUpdateAttributesRequest(ctx, inbound);
                 break;
             case GET_ATTRIBUTES_REQUEST:
-                msg = convertToGetAttributesRequest(ctx, inbound);
+                msg = convertToGetAttributesRequest(inbound);
                 break;
             case SUBSCRIBE_RPC_COMMANDS_REQUEST:
                 msg = new RpcSubscribeMsg();
@@ -116,26 +115,25 @@ public class JsonCoapAdaptor implements CoapTransportAdaptor {
             case TO_DEVICE_RPC_REQUEST:
                 return Optional.of(convertToDeviceRpcRequest(ctx, (ToDeviceRpcRequestMsg) msg));
             case TO_SERVER_RPC_RESPONSE:
-                return Optional.of(convertToServerRpcResponse(ctx, (ToServerRpcResponseMsg) msg));
+                return Optional.of(convertToServerRpcResponse((ToServerRpcResponseMsg) msg));
             case RULE_ENGINE_ERROR:
-                return Optional.of(convertToRuleEngineErrorResponse(ctx, (RuleEngineErrorMsg) msg));
+                return Optional.of(convertToRuleEngineErrorResponse((RuleEngineErrorMsg) msg));
             default:
                 log.warn("[{}] Unsupported msg type: {}!", source.getSessionId(), msg.getMsgType());
                 throw new AdaptorException(new IllegalArgumentException("Unsupported msg type: " + msg.getMsgType() + "!"));
         }
     }
 
-    private Response convertToRuleEngineErrorResponse(CoapSessionCtx ctx, RuleEngineErrorMsg msg) {
+    private Response convertToRuleEngineErrorResponse(RuleEngineErrorMsg msg) {
         ResponseCode status = ResponseCode.INTERNAL_SERVER_ERROR;
-        switch (msg.getError()) {
-            case PLUGIN_TIMEOUT:
-                status = ResponseCode.GATEWAY_TIMEOUT;
-                break;
-            default:
-                if (msg.getInMsgType() == MsgType.TO_SERVER_RPC_REQUEST) {
-                    status = ResponseCode.BAD_REQUEST;
-                }
-                break;
+        if (msg.getError() == RuleEngineError.PLUGIN_TIMEOUT) {
+            status = ResponseCode.GATEWAY_TIMEOUT;
+
+        } else {
+            if (msg.getInMsgType() == MsgType.TO_SERVER_RPC_REQUEST) {
+                status = ResponseCode.BAD_REQUEST;
+            }
+
         }
         Response response = new Response(status);
         response.setPayload(JsonConverter.toErrorJson(msg.getErrorMsg()).toString());
@@ -166,18 +164,18 @@ public class JsonCoapAdaptor implements CoapTransportAdaptor {
         }
     }
 
-    private FromDeviceMsg convertToGetAttributesRequest(SessionContext ctx, Request inbound) throws AdaptorException {
+    private FromDeviceMsg convertToGetAttributesRequest(Request inbound) {
         List<String> queryElements = inbound.getOptions().getUriQuery();
-        if (queryElements != null && queryElements.size() > 0) {
-            Set<String> clientKeys = toKeys(ctx, queryElements, "clientKeys");
-            Set<String> sharedKeys = toKeys(ctx, queryElements, "sharedKeys");
+        if (queryElements != null && !queryElements.isEmpty()) {
+            Set<String> clientKeys = toKeys(queryElements, "clientKeys");
+            Set<String> sharedKeys = toKeys(queryElements, "sharedKeys");
             return new BasicGetAttributesRequest(0, clientKeys, sharedKeys);
         } else {
             return new BasicGetAttributesRequest(0);
         }
     }
 
-    private Set<String> toKeys(SessionContext ctx, List<String> queryElements, String attributeName) throws AdaptorException {
+    private Set<String> toKeys(List<String> queryElements, String attributeName) {
         String keys = null;
         for (String queryElement : queryElements) {
             String[] queryItem = queryElement.split("=");
@@ -188,7 +186,7 @@ public class JsonCoapAdaptor implements CoapTransportAdaptor {
         if (keys != null && !StringUtils.isEmpty(keys)) {
             return new HashSet<>(Arrays.asList(keys.split(",")));
         } else {
-            return null;
+            return Collections.emptySet();
         }
     }
 
@@ -223,7 +221,7 @@ public class JsonCoapAdaptor implements CoapTransportAdaptor {
         return payload;
     }
 
-    private Response convertToServerRpcResponse(SessionContext ctx, ToServerRpcResponseMsg msg) {
+    private Response convertToServerRpcResponse(ToServerRpcResponseMsg msg) {
         if (msg.isSuccess()) {
             Response response = new Response(ResponseCode.CONTENT);
             JsonElement result = JsonConverter.toJson(msg);

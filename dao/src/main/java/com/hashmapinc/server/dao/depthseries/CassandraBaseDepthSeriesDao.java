@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.hashmapinc.server.dao.depthSeries;
+package com.hashmapinc.server.dao.depthseries;
 
 import com.datastax.driver.core.*;
 import com.datastax.driver.core.querybuilder.QueryBuilder;
@@ -27,23 +27,19 @@ import com.google.common.util.concurrent.ListenableFuture;
 import com.hashmapinc.server.common.data.DeviceDataSet;
 import com.hashmapinc.server.common.data.id.EntityId;
 import com.hashmapinc.server.common.data.kv.*;
+import com.hashmapinc.server.common.msg.exception.TempusRuntimeException;
 import com.hashmapinc.server.dao.model.ModelConstants;
 import com.hashmapinc.server.dao.nosql.CassandraAbstractAsyncDao;
-import com.hashmapinc.server.dao.timeseries.TsPartitionDate;
+import com.hashmapinc.server.dao.timeseries.SimpleListenableFuture;
 import com.hashmapinc.server.dao.util.NoSqlDao;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
-import com.hashmapinc.server.common.data.kv.*;
-import com.hashmapinc.server.dao.timeseries.SimpleListenableFuture;
 
 import javax.annotation.Nullable;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -55,14 +51,14 @@ import static com.datastax.driver.core.querybuilder.QueryBuilder.eq;
 public class CassandraBaseDepthSeriesDao extends CassandraAbstractAsyncDao implements DepthSeriesDao {
 
     private static final Double MIN_AGGREGATION_STEP_MS = 0.1;
+    public static final String INSERT_INTO = "INSERT INTO ";
+    public static final String SELECT = "SELECT ";
+    private static final String EQUAL_PLACEHOLDER = " = ? ";
+    public static final String GENERATED_QUERY_FOR_ENTITY_TYPE_AND_ENTITY_ID = "Generated query [{}] for entityType {} and entityId {}";
 
     @Autowired
     private Environment environment;
 
-    /*@Value("${cassandra.query.ts_key_value_partitioning}")
-    private String partitioning;*/
-
-    private TsPartitionDate tsFormat;
 
     private PreparedStatement partitionInsertStmt;
     private PreparedStatement partitionInsertTtlStmt;
@@ -82,14 +78,6 @@ public class CassandraBaseDepthSeriesDao extends CassandraAbstractAsyncDao imple
         super.startExecutor();
         if (!isInstall()) {
             getFetchStmt(DepthAggregation.NONE);
-            log.debug("HMDC inside init. ");
-            /*Optional<TsPartitionDate> partition = TsPartitionDate.parse(partitioning);
-            if (partition.isPresent()) {
-                tsFormat = partition.get();
-            } else {
-                log.warn("Incorrect configuration of partitioning {}", partitioning);
-                throw new RuntimeException("Failed to parse partitioning property: " + partitioning + "!");
-            }*/
         }
     }
 
@@ -101,17 +89,14 @@ public class CassandraBaseDepthSeriesDao extends CassandraAbstractAsyncDao imple
     @Override
     public ListenableFuture<List<DsKvEntry>> findAllAsync(EntityId entityId, List<DsKvQuery> queries) {
         List<ListenableFuture<List<DsKvEntry>>> futures = queries.stream().map(query -> findAllAsync(entityId, query)).collect(Collectors.toList());
-        return Futures.transform(Futures.allAsList(futures), new Function<List<List<DsKvEntry>>, List<DsKvEntry>>() {
-            @Nullable
-            @Override
-            public List<DsKvEntry> apply(@Nullable List<List<DsKvEntry>> results) {
+        return Futures.transform(Futures.allAsList(futures),(@Nullable List<List<DsKvEntry>> results)->{
                 if (results == null || results.isEmpty()) {
                     return null;
                 }
                 return results.stream()
                         .flatMap(List::stream)
                         .collect(Collectors.toList());
-            }
+
         }, readResultsProcessingExecutor);
     }
 
@@ -132,15 +117,11 @@ public class CassandraBaseDepthSeriesDao extends CassandraAbstractAsyncDao imple
                 stepDs = endDs;
             }
             ListenableFuture<List<Optional<DsKvEntry>>> future = Futures.allAsList(futures);
-            return Futures.transform(future, new Function<List<Optional<DsKvEntry>>, List<DsKvEntry>>() {
-                @Nullable
-                @Override
-                public List<DsKvEntry> apply(@Nullable List<Optional<DsKvEntry>> input) {
+            return Futures.transform(future,(@Nullable List<Optional<DsKvEntry>> input)->{
                     if(input != null)
-                        return input.stream().filter(v -> v.isPresent()).map(v -> v.get()).collect(Collectors.toList());
+                        return input.stream().filter(Optional::isPresent).map(Optional::get).collect(Collectors.toList());
                     else
                         return Collections.emptyList();
-                }
             }, readResultsProcessingExecutor);
         }
     }
@@ -168,11 +149,6 @@ public class CassandraBaseDepthSeriesDao extends CassandraAbstractAsyncDao imple
         }, readResultsProcessingExecutor);
 
         return resultFuture;
-    }
-
-    private long toPartitionTs(long ts) {
-        LocalDateTime time = LocalDateTime.ofInstant(Instant.ofEpochMilli(ts), ZoneOffset.UTC);
-        return tsFormat.truncatedTo(time).toInstant(ZoneOffset.UTC).toEpochMilli();
     }
 
     private void findAllAsyncSequentiallyWithLimit(final DsKvQueryCursor cursor, final SimpleListenableFuture<List<DsKvEntry>> resultFuture) {
@@ -240,11 +216,11 @@ public class CassandraBaseDepthSeriesDao extends CassandraAbstractAsyncDao imple
                     stmt.setDouble(3, partition);
                     stmt.setDouble(4, startDs);
                     stmt.setDouble(5, endDs);
-                    log.debug("Generated query [{}] for entityType {} and entityId {}", stmt, entityId.getEntityType(), entityId.getId());
+                    log.debug(GENERATED_QUERY_FOR_ENTITY_TYPE_AND_ENTITY_ID, stmt, entityId.getEntityType(), entityId.getId());
                     futures.add(executeAsyncRead(stmt));
                 }
                 return Futures.allAsList(futures);
-            } catch (Throwable e) {
+            } catch (TempusRuntimeException e) {
                 log.error("Failed to fetch data", e);
                 throw e;
             }
@@ -257,7 +233,7 @@ public class CassandraBaseDepthSeriesDao extends CassandraAbstractAsyncDao imple
         stmt.setString(0, entityId.getEntityType().name());
         stmt.setUUID(1, entityId.getId());
         stmt.setString(2, key);
-        log.debug("Generated query [{}] for entityType {} and entityId {}", stmt, entityId.getEntityType(), entityId.getId());
+        log.debug(GENERATED_QUERY_FOR_ENTITY_TYPE_AND_ENTITY_ID, stmt, entityId.getEntityType(), entityId.getId());
         return getFuture(executeAsyncRead(stmt), rs -> convertResultToDsKvEntry(key, rs.one()));
     }
 
@@ -266,7 +242,7 @@ public class CassandraBaseDepthSeriesDao extends CassandraAbstractAsyncDao imple
         BoundStatement stmt = getFindAllLatestStmt().bind();
         stmt.setString(0, entityId.getEntityType().name());
         stmt.setUUID(1, entityId.getId());
-        log.debug("Generated query [{}] for entityType {} and entityId {}", stmt, entityId.getEntityType(), entityId.getId());
+        log.debug(GENERATED_QUERY_FOR_ENTITY_TYPE_AND_ENTITY_ID, stmt, entityId.getEntityType(), entityId.getId());
         return getFuture(executeAsyncRead(stmt), rs -> convertResultToDsKvEntryListForLatest(rs.all()));
     }
 
@@ -431,34 +407,23 @@ public class CassandraBaseDepthSeriesDao extends CassandraAbstractAsyncDao imple
     }
 
     public static KvEntry toKvEntry(Row row, String key) {
-        KvEntry kvEntry = null;
-        String strV = row.get(ModelConstants.STRING_VALUE_COLUMN, String.class);
-        if (strV != null) {
-            kvEntry = new StringDataEntry(key, strV);
-        } else {
-            Long longV = row.get(ModelConstants.LONG_VALUE_COLUMN, Long.class);
-            if (longV != null) {
-                kvEntry = new LongDataEntry(key, longV);
-            } else {
-                Double doubleV = row.get(ModelConstants.DOUBLE_VALUE_COLUMN, Double.class);
-                if (doubleV != null) {
-                    kvEntry = new DoubleDataEntry(key, doubleV);
-                } else {
-                    Boolean boolV = row.get(ModelConstants.BOOLEAN_VALUE_COLUMN, Boolean.class);
-                    if (boolV != null) {
-                        kvEntry = new BooleanDataEntry(key, boolV);
-                    } else {
-                        JsonNode jsonV = row.get(ModelConstants.JSON_VALUE_COLUMN, JsonNode.class);
-                        if (jsonV != null) {
-                            kvEntry = new JsonDataEntry(key, jsonV);
-                        } else {
-                            log.warn("All values in key-value row are nullable ");
-                        }
-                    }
-                }
-            }
+        if (row.get(ModelConstants.STRING_VALUE_COLUMN, String.class) != null) {
+            return new StringDataEntry(key, row.get(ModelConstants.STRING_VALUE_COLUMN, String.class));
         }
-        return kvEntry;
+        if (row.get(ModelConstants.LONG_VALUE_COLUMN, Long.class) != null) {
+            return new LongDataEntry(key, row.get(ModelConstants.LONG_VALUE_COLUMN, Long.class));
+        }
+        if (row.get(ModelConstants.DOUBLE_VALUE_COLUMN, Double.class) != null) {
+            return new DoubleDataEntry(key, row.get(ModelConstants.DOUBLE_VALUE_COLUMN, Double.class));
+        }
+        if (row.get(ModelConstants.BOOLEAN_VALUE_COLUMN, Boolean.class) != null) {
+            return new BooleanDataEntry(key, row.get(ModelConstants.BOOLEAN_VALUE_COLUMN, Boolean.class));
+        }
+        if (row.get(ModelConstants.JSON_VALUE_COLUMN, JsonNode.class) != null) {
+            return new JsonDataEntry(key, row.get(ModelConstants.JSON_VALUE_COLUMN, JsonNode.class));
+        }
+        log.warn("All values in key-value row are nullable ");
+        return null;
     }
 
     /**
@@ -477,7 +442,7 @@ public class CassandraBaseDepthSeriesDao extends CassandraAbstractAsyncDao imple
         if (saveStmts == null) {
             saveStmts = new PreparedStatement[com.hashmapinc.server.common.data.kv.DataType.values().length];
             for (com.hashmapinc.server.common.data.kv.DataType type : com.hashmapinc.server.common.data.kv.DataType.values()) {
-                saveStmts[type.ordinal()] = getSession().prepare("INSERT INTO " + ModelConstants.DS_KV_CF +
+                saveStmts[type.ordinal()] = getSession().prepare(INSERT_INTO + ModelConstants.DS_KV_CF +
                         "(" + ModelConstants.ENTITY_TYPE_COLUMN +
                         "," + ModelConstants.ENTITY_ID_COLUMN +
                         "," + ModelConstants.KEY_COLUMN +
@@ -495,7 +460,7 @@ public class CassandraBaseDepthSeriesDao extends CassandraAbstractAsyncDao imple
         if (saveTtlStmts == null) {
             saveTtlStmts = new PreparedStatement[com.hashmapinc.server.common.data.kv.DataType.values().length];
             for (com.hashmapinc.server.common.data.kv.DataType type : com.hashmapinc.server.common.data.kv.DataType.values()) {
-                saveTtlStmts[type.ordinal()] = getSession().prepare("INSERT INTO " + ModelConstants.DS_KV_CF +
+                saveTtlStmts[type.ordinal()] = getSession().prepare(INSERT_INTO + ModelConstants.DS_KV_CF +
                         "(" + ModelConstants.ENTITY_TYPE_COLUMN +
                         "," + ModelConstants.ENTITY_ID_COLUMN +
                         "," + ModelConstants.KEY_COLUMN +
@@ -511,7 +476,6 @@ public class CassandraBaseDepthSeriesDao extends CassandraAbstractAsyncDao imple
 
     private PreparedStatement getFetchStmt(DepthAggregation aggType) {
         if (fetchStmts == null) {
-            log.debug("HMDC Here I am fetch null");
             fetchStmts = new PreparedStatement[DepthAggregation.values().length];
             for (DepthAggregation type : DepthAggregation.values()) {
                 if (type == DepthAggregation.SUM && fetchStmts[DepthAggregation.AVG.ordinal()] != null) {
@@ -519,20 +483,18 @@ public class CassandraBaseDepthSeriesDao extends CassandraAbstractAsyncDao imple
                 } else if (type == DepthAggregation.AVG && fetchStmts[DepthAggregation.SUM.ordinal()] != null) {
                     fetchStmts[type.ordinal()] = fetchStmts[DepthAggregation.SUM.ordinal()];
                 } else {
-                    log.debug("HMDC here Iam else ");
-                    fetchStmts[type.ordinal()] = getSession().prepare("SELECT " +
+                    fetchStmts[type.ordinal()] = getSession().prepare(SELECT +
                             String.join(", ", ModelConstants.getFetchColumnNames(type)) + " FROM " + ModelConstants.DS_KV_CF
-                            + " WHERE " + ModelConstants.ENTITY_TYPE_COLUMN + " = ? "
-                            + "AND " + ModelConstants.ENTITY_ID_COLUMN + " = ? "
-                            + "AND " + ModelConstants.KEY_COLUMN + " = ? "
-                            + "AND " + ModelConstants.PARTITION_COLUMN + " = ? "
+                            + " WHERE " + ModelConstants.ENTITY_TYPE_COLUMN + EQUAL_PLACEHOLDER
+                            + "AND " + ModelConstants.ENTITY_ID_COLUMN + EQUAL_PLACEHOLDER
+                            + "AND " + ModelConstants.KEY_COLUMN + EQUAL_PLACEHOLDER
+                            + "AND " + ModelConstants.PARTITION_COLUMN + EQUAL_PLACEHOLDER
                             + "AND " + ModelConstants.DS_COLUMN + " > ? "
                             + "AND " + ModelConstants.DS_COLUMN + " <= ?"
                             + (type == DepthAggregation.NONE ? " ORDER BY " + ModelConstants.DS_COLUMN + " DESC LIMIT ?" : ""));
                 }
             }
         }
-        log.debug("HMDC Out of fetch null ");
         return fetchStmts[aggType.ordinal()];
     }
 
@@ -540,7 +502,7 @@ public class CassandraBaseDepthSeriesDao extends CassandraAbstractAsyncDao imple
         if (latestInsertStmts == null) {
             latestInsertStmts = new PreparedStatement[com.hashmapinc.server.common.data.kv.DataType.values().length];
             for (com.hashmapinc.server.common.data.kv.DataType type : com.hashmapinc.server.common.data.kv.DataType.values()) {
-                latestInsertStmts[type.ordinal()] = getSession().prepare("INSERT INTO " + ModelConstants.DS_KV_LATEST_CF +
+                latestInsertStmts[type.ordinal()] = getSession().prepare(INSERT_INTO + ModelConstants.DS_KV_LATEST_CF +
                         "(" + ModelConstants.ENTITY_TYPE_COLUMN +
                         "," + ModelConstants.ENTITY_ID_COLUMN +
                         "," + ModelConstants.KEY_COLUMN +
@@ -555,7 +517,7 @@ public class CassandraBaseDepthSeriesDao extends CassandraAbstractAsyncDao imple
 
     private PreparedStatement getPartitionInsertStmt() {
         if (partitionInsertStmt == null) {
-            partitionInsertStmt = getSession().prepare("INSERT INTO " + ModelConstants.DS_KV_PARTITIONS_CF +
+            partitionInsertStmt = getSession().prepare(INSERT_INTO + ModelConstants.DS_KV_PARTITIONS_CF +
                     "(" + ModelConstants.ENTITY_TYPE_COLUMN +
                     "," + ModelConstants.ENTITY_ID_COLUMN +
                     "," + ModelConstants.PARTITION_COLUMN +
@@ -567,7 +529,7 @@ public class CassandraBaseDepthSeriesDao extends CassandraAbstractAsyncDao imple
 
     private PreparedStatement getPartitionInsertTtlStmt() {
         if (partitionInsertTtlStmt == null) {
-            partitionInsertTtlStmt = getSession().prepare("INSERT INTO " + ModelConstants.DS_KV_PARTITIONS_CF +
+            partitionInsertTtlStmt = getSession().prepare(INSERT_INTO + ModelConstants.DS_KV_PARTITIONS_CF +
                     "(" + ModelConstants.ENTITY_TYPE_COLUMN +
                     "," + ModelConstants.ENTITY_ID_COLUMN +
                     "," + ModelConstants.PARTITION_COLUMN +
@@ -580,7 +542,7 @@ public class CassandraBaseDepthSeriesDao extends CassandraAbstractAsyncDao imple
 
     private PreparedStatement getFindLatestStmt() {
         if (findLatestStmt == null) {
-            findLatestStmt = getSession().prepare("SELECT " +
+            findLatestStmt = getSession().prepare(SELECT +
                     ModelConstants.KEY_COLUMN + "," +
                     ModelConstants.DS_COLUMN + "," +
                     ModelConstants.STRING_VALUE_COLUMN + "," +
@@ -589,16 +551,16 @@ public class CassandraBaseDepthSeriesDao extends CassandraAbstractAsyncDao imple
                     ModelConstants.DOUBLE_VALUE_COLUMN + "," +
                     ModelConstants.JSON_VALUE_COLUMN + " " +
                     "FROM " + ModelConstants.DS_KV_LATEST_CF + " " +
-                    "WHERE " + ModelConstants.ENTITY_TYPE_COLUMN + " = ? " +
-                    "AND " + ModelConstants.ENTITY_ID_COLUMN + " = ? " +
-                    "AND " + ModelConstants.KEY_COLUMN + " = ? ");
+                    "WHERE " + ModelConstants.ENTITY_TYPE_COLUMN + EQUAL_PLACEHOLDER +
+                    "AND " + ModelConstants.ENTITY_ID_COLUMN + EQUAL_PLACEHOLDER +
+                    "AND " + ModelConstants.KEY_COLUMN + EQUAL_PLACEHOLDER);
         }
         return findLatestStmt;
     }
 
     private PreparedStatement getFindAllLatestStmt() {
         if (findAllLatestStmt == null) {
-            findAllLatestStmt = getSession().prepare("SELECT " +
+            findAllLatestStmt = getSession().prepare(SELECT +
                     ModelConstants.KEY_COLUMN + "," +
                     ModelConstants.DS_COLUMN + "," +
                     ModelConstants.STRING_VALUE_COLUMN + "," +
@@ -607,8 +569,8 @@ public class CassandraBaseDepthSeriesDao extends CassandraAbstractAsyncDao imple
                     ModelConstants.DOUBLE_VALUE_COLUMN + "," +
                     ModelConstants.JSON_VALUE_COLUMN + " " +
                     "FROM " + ModelConstants.DS_KV_LATEST_CF + " " +
-                    "WHERE " + ModelConstants.ENTITY_TYPE_COLUMN + " = ? " +
-                    "AND " + ModelConstants.ENTITY_ID_COLUMN + " = ? ");
+                    "WHERE " + ModelConstants.ENTITY_TYPE_COLUMN + EQUAL_PLACEHOLDER +
+                    "AND " + ModelConstants.ENTITY_ID_COLUMN + EQUAL_PLACEHOLDER);
         }
         return findAllLatestStmt;
     }
@@ -626,7 +588,7 @@ public class CassandraBaseDepthSeriesDao extends CassandraAbstractAsyncDao imple
             case JSON:
                 return ModelConstants.JSON_VALUE_COLUMN;
             default:
-                throw new RuntimeException("Not implemented!");
+                throw new TempusRuntimeException("Not implemented!");
         }
     }
 

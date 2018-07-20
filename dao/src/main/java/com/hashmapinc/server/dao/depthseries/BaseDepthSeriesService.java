@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.hashmapinc.server.dao.depthSeries;
+package com.hashmapinc.server.dao.depthseries;
 
 import com.google.common.collect.Lists;
 import com.google.common.util.concurrent.Futures;
@@ -46,7 +46,7 @@ public class BaseDepthSeriesService implements DepthSeriesService {
     @Override
     public ListenableFuture<List<DsKvEntry>> findAll(EntityId entityId, List<DsKvQuery> queries) {
         validate(entityId);
-        queries.forEach(query -> validate(query));
+        queries.forEach(BaseDepthSeriesService::validate);
         return depthSeriesDao.findAllAsync(entityId, queries);
     }
 

@@ -25,17 +25,18 @@ import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.hashmapinc.server.common.data.DeviceDataSet;
+import com.hashmapinc.server.common.data.id.EntityId;
 import com.hashmapinc.server.common.data.kv.*;
 import com.hashmapinc.server.common.data.kv.DataType;
+import com.hashmapinc.server.common.msg.exception.TempusRuntimeException;
+import com.hashmapinc.server.dao.model.ModelConstants;
+import com.hashmapinc.server.dao.nosql.CassandraAbstractAsyncDao;
+import com.hashmapinc.server.dao.util.NoSqlDao;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
-import com.hashmapinc.server.common.data.id.EntityId;
-import com.hashmapinc.server.dao.model.ModelConstants;
-import com.hashmapinc.server.dao.nosql.CassandraAbstractAsyncDao;
-import com.hashmapinc.server.dao.util.NoSqlDao;
 
 import javax.annotation.Nullable;
 import javax.annotation.PostConstruct;
@@ -44,10 +45,6 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.*;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static com.datastax.driver.core.querybuilder.QueryBuilder.eq;
@@ -96,7 +93,7 @@ public class CassandraBaseTimeseriesDao extends CassandraAbstractAsyncDao implem
                 tsFormat = partition.get();
             } else {
                 log.warn("Incorrect configuration of partitioning {}", partitioning);
-                throw new RuntimeException("Failed to parse partitioning property: " + partitioning + "!");
+                throw new TempusRuntimeException("Failed to parse partitioning property: " + partitioning + "!");
             }
         }
     }
@@ -109,17 +106,13 @@ public class CassandraBaseTimeseriesDao extends CassandraAbstractAsyncDao implem
     @Override
     public ListenableFuture<List<TsKvEntry>> findAllAsync(EntityId entityId, List<TsKvQuery> queries) {
         List<ListenableFuture<List<TsKvEntry>>> futures = queries.stream().map(query -> findAllAsync(entityId, query)).collect(Collectors.toList());
-        return Futures.transform(Futures.allAsList(futures), new Function<List<List<TsKvEntry>>, List<TsKvEntry>>() {
-            @Nullable
-            @Override
-            public List<TsKvEntry> apply(@Nullable List<List<TsKvEntry>> results) {
+        return Futures.transform(Futures.allAsList(futures), (@Nullable List<List<TsKvEntry>> results)->{
                 if (results == null || results.isEmpty()) {
                     return null;
                 }
                 return results.stream()
                         .flatMap(List::stream)
                         .collect(Collectors.toList());
-            }
         }, readResultsProcessingExecutor);
     }
 
@@ -139,13 +132,9 @@ public class CassandraBaseTimeseriesDao extends CassandraAbstractAsyncDao implem
                 stepTs = endTs;
             }
             ListenableFuture<List<Optional<TsKvEntry>>> future = Futures.allAsList(futures);
-            return Futures.transform(future, new Function<List<Optional<TsKvEntry>>, List<TsKvEntry>>() {
-                @Nullable
-                @Override
-                public List<TsKvEntry> apply(@Nullable List<Optional<TsKvEntry>> input) {
-                    return input == null ? Collections.emptyList() : input.stream().filter(v -> v.isPresent()).map(v -> v.get()).collect(Collectors.toList());
-                }
-            }, readResultsProcessingExecutor);
+            return Futures.transform(future,(@Nullable List<Optional<TsKvEntry>> input)->
+                     input == null ? Collections.emptyList() : input.stream().filter(Optional::isPresent).map(Optional::get).collect(Collectors.toList())
+                    , readResultsProcessingExecutor);
         }
     }
 
@@ -314,7 +303,7 @@ public class CassandraBaseTimeseriesDao extends CassandraAbstractAsyncDao implem
                     futures.add(executeAsyncRead(stmt));
                 }
                 return Futures.allAsList(futures);
-            } catch (Throwable e) {
+            } catch (RuntimeException e) {
                 log.error("Failed to fetch data", e);
                 throw e;
             }
@@ -426,34 +415,23 @@ public class CassandraBaseTimeseriesDao extends CassandraAbstractAsyncDao implem
     }
 
     public static KvEntry toKvEntry(Row row, String key) {
-        KvEntry kvEntry = null;
-        String strV = row.get(STRING_VALUE_COLUMN, String.class);
-        if (strV != null) {
-            kvEntry = new StringDataEntry(key, strV);
-        } else {
-            Long longV = row.get(LONG_VALUE_COLUMN, Long.class);
-            if (longV != null) {
-                kvEntry = new LongDataEntry(key, longV);
-            } else {
-                Double doubleV = row.get(DOUBLE_VALUE_COLUMN, Double.class);
-                if (doubleV != null) {
-                    kvEntry = new DoubleDataEntry(key, doubleV);
-                } else {
-                    Boolean boolV = row.get(BOOLEAN_VALUE_COLUMN, Boolean.class);
-                    if (boolV != null) {
-                        kvEntry = new BooleanDataEntry(key, boolV);
-                    } else {
-                        JsonNode jsonV = row.get(JSON_VALUE_COLUMN, JsonNode.class);
-                        if (jsonV != null) {
-                            kvEntry = new JsonDataEntry(key, jsonV);
-                        } else {
-                            log.warn("All values in key-value row are nullable ");
-                        }
-                    }
-                }
-            }
+        if (row.get(STRING_VALUE_COLUMN, String.class) != null) {
+            return new StringDataEntry(key, row.get(STRING_VALUE_COLUMN, String.class));
         }
-        return kvEntry;
+        if (row.get(LONG_VALUE_COLUMN, Long.class) != null) {
+            return new LongDataEntry(key, row.get(LONG_VALUE_COLUMN, Long.class));
+        }
+        if (row.get(DOUBLE_VALUE_COLUMN, Double.class) != null) {
+            return new DoubleDataEntry(key, row.get(DOUBLE_VALUE_COLUMN, Double.class));
+        }
+        if (row.get(BOOLEAN_VALUE_COLUMN, Boolean.class) != null) {
+            return new BooleanDataEntry(key, row.get(BOOLEAN_VALUE_COLUMN, Boolean.class));
+        }
+        if (row.get(JSON_VALUE_COLUMN, JsonNode.class) != null) {
+            return new JsonDataEntry(key, row.get(JSON_VALUE_COLUMN, JsonNode.class));
+        }
+        log.warn("All values in key-value row are nullable ");
+        return null;
     }
 
     /**
@@ -626,7 +604,7 @@ public class CassandraBaseTimeseriesDao extends CassandraAbstractAsyncDao implem
             case JSON:
                 return JSON_VALUE_COLUMN;
             default:
-                throw new RuntimeException("Not implemented!");
+                throw new TempusRuntimeException("Not implemented!");
         }
     }
 

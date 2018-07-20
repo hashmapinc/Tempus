@@ -21,13 +21,12 @@ import akka.actor.Scheduler;
 import akka.event.LoggingAdapter;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.hashmapinc.server.extensions.api.component.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
 import com.hashmapinc.server.actors.ActorSystemContext;
 import com.hashmapinc.server.common.data.plugin.ComponentDescriptor;
 import com.hashmapinc.server.common.data.plugin.ComponentType;
 import com.hashmapinc.server.extensions.api.component.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 import scala.concurrent.ExecutionContextExecutor;
 import scala.concurrent.duration.Duration;
 
@@ -59,25 +58,25 @@ public abstract class AbstractContextAwareMsgProcessor {
     }
 
     protected void schedulePeriodicMsgWithDelay(ActorContext ctx, Object msg, long delayInMs, long periodInMs) {
-        schedulePeriodicMsgWithDelay(ctx, msg, delayInMs, periodInMs, ctx.self());
+        schedulePeriodicMsgWithDelay(msg, delayInMs, periodInMs, ctx.self());
     }
 
-    protected void schedulePeriodicMsgWithDelay(ActorContext ctx, Object msg, long delayInMs, long periodInMs, ActorRef target) {
+    protected void schedulePeriodicMsgWithDelay(Object msg, long delayInMs, long periodInMs, ActorRef target) {
         logger.debug("Scheduling periodic msg {} every {} ms with delay {} ms", msg, periodInMs, delayInMs);
         getScheduler().schedule(Duration.create(delayInMs, TimeUnit.MILLISECONDS), Duration.create(periodInMs, TimeUnit.MILLISECONDS), target, msg, getSystemDispatcher(), null);
     }
 
 
     protected void scheduleMsgWithDelay(ActorContext ctx, Object msg, long delayInMs) {
-        scheduleMsgWithDelay(ctx, msg, delayInMs, ctx.self());
+        scheduleMsgWithDelay(msg, delayInMs, ctx.self());
     }
 
-    protected void scheduleMsgWithDelay(ActorContext ctx, Object msg, long delayInMs, ActorRef target) {
+    protected void scheduleMsgWithDelay(Object msg, long delayInMs, ActorRef target) {
         logger.debug("Scheduling msg {} with delay {} ms", msg, delayInMs);
         getScheduler().scheduleOnce(Duration.create(delayInMs, TimeUnit.MILLISECONDS), target, msg, getSystemDispatcher(), null);
     }
 
-    protected <T extends ConfigurableComponent> T initComponent(JsonNode componentNode) throws Exception {
+    protected <T extends ConfigurableComponent> T initComponent(JsonNode componentNode) throws IOException, InstantiationException, IllegalAccessException, ClassNotFoundException {
         ComponentConfiguration configuration = new ComponentConfiguration(
                 componentNode.get("clazz").asText(),
                 componentNode.get("name").asText(),
@@ -90,12 +89,12 @@ public abstract class AbstractContextAwareMsgProcessor {
     }
 
     protected <T extends ConfigurableComponent> T initComponent(ComponentDescriptor componentDefinition, ComponentConfiguration configuration)
-            throws Exception {
+            throws ClassNotFoundException, IOException, InstantiationException, IllegalAccessException {
         return initComponent(componentDefinition.getClazz(), componentDefinition.getType(), configuration.getConfiguration());
     }
 
     protected <T extends ConfigurableComponent> T initComponent(String clazz, ComponentType type, String configuration)
-            throws Exception {
+            throws ClassNotFoundException, IllegalAccessException, InstantiationException, IOException {
         Class<?> componentClazz = Class.forName(clazz);
         T component = (T) (componentClazz.newInstance());
         Class<?> configurationClazz;
@@ -119,7 +118,7 @@ public abstract class AbstractContextAwareMsgProcessor {
         return component;
     }
 
-    public <C> C decode(String configuration, Class<C> configurationClazz) throws IOException, RuntimeException {
+    public <C> C decode(String configuration, Class<C> configurationClazz) throws IOException {
         logger.info("Initializing using configuration: {}", configuration);
         return mapper.readValue(configuration, configurationClazz);
     }

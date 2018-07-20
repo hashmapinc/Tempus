@@ -15,9 +15,6 @@
  */
 package com.hashmapinc.server.actors.plugin;
 
-import akka.actor.ActorRef;
-
-
 public interface TimeoutScheduler {
 
     void scheduleMsgWithDelay(Object msg, long delayInMs);

@@ -15,9 +15,7 @@
  */
 package com.hashmapinc.server.actors.plugin;
 
-import akka.actor.ActorContext;
 import akka.actor.ActorRef;
-import com.hashmapinc.server.extensions.api.plugins.msg.TimeoutMsg;
 import com.hashmapinc.server.actors.ActorSystemContext;
 import com.hashmapinc.server.actors.service.ComponentActor;
 import com.hashmapinc.server.actors.service.ContextBasedCreator;
@@ -26,6 +24,7 @@ import com.hashmapinc.server.common.data.id.PluginId;
 import com.hashmapinc.server.common.data.id.TenantId;
 import com.hashmapinc.server.common.msg.cluster.ClusterEventMsg;
 import com.hashmapinc.server.common.msg.plugin.ComponentLifecycleMsg;
+import com.hashmapinc.server.extensions.api.plugins.msg.TimeoutMsg;
 import com.hashmapinc.server.extensions.api.plugins.msg.ToPluginRpcResponseDeviceMsg;
 import com.hashmapinc.server.extensions.api.plugins.rest.PluginRestMsg;
 import com.hashmapinc.server.extensions.api.plugins.rpc.PluginRpcMsg;
@@ -64,7 +63,7 @@ public class PluginActor extends ComponentActor<PluginId, PluginActorMessageProc
             context().parent().tell(msg, ActorRef.noSender());
             context().stop(self());
         } else if (msg instanceof TimeoutMsg) {
-            onTimeoutMsg(context(), (TimeoutMsg) msg);
+            onTimeoutMsg((TimeoutMsg) msg);
         } else if (msg instanceof StatsPersistTick) {
             onStatsPersistTick(id);
         } else {
@@ -80,8 +79,8 @@ public class PluginActor extends ComponentActor<PluginId, PluginActorMessageProc
         }
     }
 
-    private void onTimeoutMsg(ActorContext context, TimeoutMsg msg) {
-        processor.onTimeoutMsg(context, msg);
+    private void onTimeoutMsg(TimeoutMsg msg) {
+        processor.onTimeoutMsg(msg);
     }
 
     private void onRpcResponse(ToPluginRpcResponseDeviceMsg msg) {

@@ -47,6 +47,7 @@ import static com.hashmapinc.server.dao.model.ModelConstants.NULL_UUID_STR;
 public class JpaBasePluginDao extends JpaAbstractSearchTextDao<PluginMetaDataEntity, PluginMetaData> implements PluginDao {
 
     public static final String SEARCH_RESULT = "Search result: [{}]";
+    public static final String SEARCH_RESULT_FOR_PLUGIN_ENTITY = "Search result: [{}] for plugin entity [{}]";
     @Autowired
     private PluginMetaDataRepository pluginMetaDataRepository;
 
@@ -65,7 +66,7 @@ public class JpaBasePluginDao extends JpaAbstractSearchTextDao<PluginMetaDataEnt
         log.debug("Search plugin meta-data entity by id [{}]", pluginId);
         PluginMetaData pluginMetaData = super.findById(pluginId.getId());
         if (log.isTraceEnabled()) {
-            log.trace("Search result: [{}] for plugin entity [{}]", pluginMetaData != null, pluginMetaData);
+            log.trace(SEARCH_RESULT_FOR_PLUGIN_ENTITY, pluginMetaData != null, pluginMetaData);
         } else {
             log.debug(SEARCH_RESULT, pluginMetaData != null);
         }
@@ -77,7 +78,7 @@ public class JpaBasePluginDao extends JpaAbstractSearchTextDao<PluginMetaDataEnt
         log.debug("Search plugin meta-data entity by api token [{}]", apiToken);
         PluginMetaDataEntity entity = pluginMetaDataRepository.findByApiToken(apiToken);
         if (log.isTraceEnabled()) {
-            log.trace("Search result: [{}] for plugin entity [{}]", entity != null, entity);
+            log.trace(SEARCH_RESULT_FOR_PLUGIN_ENTITY, entity != null, entity);
         } else {
             log.debug(SEARCH_RESULT, entity != null);
         }
@@ -136,9 +137,9 @@ public class JpaBasePluginDao extends JpaAbstractSearchTextDao<PluginMetaDataEnt
         PluginMetaDataEntity pluginEntity = pluginMetaDataRepository.findByPluginClass(pluginClazz);
         PluginMetaData pluginMetaData = DaoUtil.getData(pluginEntity);
         if (log.isTraceEnabled()) {
-            log.trace("Search result: [{}] for plugin entity [{}]", pluginMetaData != null, pluginMetaData);
+            log.trace(SEARCH_RESULT_FOR_PLUGIN_ENTITY, pluginMetaData != null, pluginMetaData);
         } else {
-            log.debug("Search result: [{}]", pluginMetaData != null);
+            log.debug(SEARCH_RESULT, pluginMetaData != null);
         }
         return pluginMetaData;
     }

@@ -21,13 +21,13 @@ import com.hashmapinc.server.common.data.computation.Computations;
 import com.hashmapinc.server.common.data.id.ComputationId;
 import com.hashmapinc.server.common.data.id.TenantId;
 import com.hashmapinc.server.dao.model.BaseSqlEntity;
+import com.hashmapinc.server.dao.model.ModelConstants;
+import com.hashmapinc.server.dao.model.SearchTextEntity;
 import com.hashmapinc.server.dao.util.mapping.JsonStringType;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
-import com.hashmapinc.server.dao.model.ModelConstants;
-import com.hashmapinc.server.dao.model.SearchTextEntity;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -119,7 +119,7 @@ public class ComputationsEntity extends BaseSqlEntity<Computations> implements S
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(Object o) { // NOSONAR
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         if (!super.equals(o)) return false;
@@ -134,9 +134,7 @@ public class ComputationsEntity extends BaseSqlEntity<Computations> implements S
         if (jsonDescriptor != null ? !jsonDescriptor.equals(that.jsonDescriptor) : that.jsonDescriptor != null) return false;
         if (tenantId != null ? !tenantId.equals(that.tenantId) : that.tenantId != null) return false;
         if (argsFormat != null ? !argsFormat.equals(that.argsFormat) : that.argsFormat != null) return false;
-        if (argsType != null ? !argsType.equals(that.argsType) : that.argsType != null) return false;
-
-        return true;
+        return argsType != null ? argsType.equals(that.argsType) : that.argsType == null;
     }
 
     @Override

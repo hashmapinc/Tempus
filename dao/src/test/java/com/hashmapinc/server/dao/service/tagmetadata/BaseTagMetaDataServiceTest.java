@@ -38,7 +38,7 @@ public abstract class BaseTagMetaDataServiceTest extends AbstractServiceTest{
         String key = "tag";
         TagMetaData tagMetaData = createTagMetaData(key);
         tagMetaDataService.saveTagMetaData(tagMetaData);
-        Thread.sleep(2000);
+        Thread.sleep(2000);     //NOSONAR
         TagMetaData result = tagMetaDataService.getTagMetaDataByEntityIdAndKey(deviceId, key).get();
         assertNotNull(result);
         assertEquals(key, result.getKey());
@@ -58,7 +58,7 @@ public abstract class BaseTagMetaDataServiceTest extends AbstractServiceTest{
         tagMetaData = createTagMetaData(key);
         tagMetaDataService.saveTagMetaData(tagMetaData);
 
-        Thread.sleep(4000);
+        Thread.sleep(4000);     //NOSONAR
 
         List<TagMetaData> tagMetaDataList = tagMetaDataService.getAllTagMetaDataByEntityId(deviceId).get();
         assertNotNull(tagMetaDataList);

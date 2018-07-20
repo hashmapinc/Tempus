@@ -98,7 +98,6 @@ public abstract class BaseRuleControllerTest extends AbstractControllerTest {
         Assert.assertEquals(savedTenant.getId(), savedRule.getTenantId());
     }
 
-
     @Test
     public void testDeleteRule() throws Exception {
         RuleMetaData rule = createRuleMetaData(tenantPlugin);

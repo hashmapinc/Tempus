@@ -308,14 +308,8 @@ public class UserServiceImpl extends AbstractEntityService implements UserServic
                     if (userCredentials.getUserId() == null) {
                         throw new DataValidationException("User credentials should be assigned to user!");
                     }
-                    if (userCredentials.isEnabled()) {
-                        //activated ldap users can have no password
-                        /*if (StringUtils.isEmpty(userCredentials.getPassword())) {
-                            throw new DataValidationException("Enabled user credentials should have password!");
-                        }*/
-                        if (StringUtils.isNotEmpty(userCredentials.getActivateToken())) {
-                            throw new DataValidationException("Enabled user credentials can't have activate token!");
-                        }
+                    if (userCredentials.isEnabled() && StringUtils.isNotEmpty(userCredentials.getActivateToken())) {
+                        throw new DataValidationException("Enabled user credentials can't have activate token!");
                     }
                     UserCredentials existingUserCredentialsEntity = userCredentialsDao.findById(userCredentials.getId().getId());
                     if (existingUserCredentialsEntity == null) {

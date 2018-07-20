@@ -21,6 +21,7 @@ import com.hashmapinc.server.service.security.model.SecurityUser;
 import com.hashmapinc.server.exception.TempusErrorCode;
 import com.hashmapinc.server.exception.TempusException;
 import com.hashmapinc.server.controller.plugin.PluginWebSocketHandler;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatus;
@@ -38,6 +39,7 @@ import org.springframework.web.socket.server.support.HttpSessionHandshakeInterce
 
 @Configuration
 @EnableWebSocket
+@Slf4j
 public class WebSocketConfiguration implements WebSocketConfigurer {
 
     public static final String WS_PLUGIN_PREFIX = "/api/ws/plugins/";
@@ -63,7 +65,9 @@ public class WebSocketConfiguration implements WebSocketConfigurer {
                         SecurityUser user = null;
                         try {
                             user = getCurrentUser();
-                        } catch (TempusException ex) {}
+                        } catch (TempusException ex) {
+                            log.trace("User not found while registering websocket handlers");
+                        }
                         if (user == null) {
                             response.setStatusCode(HttpStatus.UNAUTHORIZED);
                             return false;

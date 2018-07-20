@@ -16,6 +16,7 @@
 package com.hashmapinc.server.service.install.cql;
 
 import com.datastax.driver.core.*;
+import com.hashmapinc.server.common.msg.exception.TempusRuntimeException;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVPrinter;
@@ -31,13 +32,16 @@ import static com.hashmapinc.server.service.install.DatabaseHelper.CSV_DUMP_FORM
 
 public class CassandraDbHelper {
 
+    private CassandraDbHelper() {
+    }
+
     public static Path dumpCfIfExists(KeyspaceMetadata ks, Session session, String cfName,
-                                      String[] columns, String[] defaultValues, String dumpPrefix) throws Exception {
+                                      String[] columns, String[] defaultValues, String dumpPrefix) throws IOException {
         return dumpCfIfExists(ks, session, cfName, columns, defaultValues, dumpPrefix, false);
     }
 
     public static Path dumpCfIfExists(KeyspaceMetadata ks, Session session, String cfName,
-                                      String[] columns, String[] defaultValues, String dumpPrefix, boolean printHeader) throws Exception {
+                                      String[] columns, String[] defaultValues, String dumpPrefix, boolean printHeader) throws IOException {
         if (ks.getTable(cfName) != null) {
             Path dumpFile = Files.createTempFile(dumpPrefix, null);
             Files.deleteIfExists(dumpFile);
@@ -63,18 +67,18 @@ public class CassandraDbHelper {
         }
     }
 
-    public static void appendToEndOfLine(Path targetDumpFile, String toAppend) throws Exception {
+    public static void appendToEndOfLine(Path targetDumpFile, String toAppend) throws IOException {
         Path tmp = Files.createTempFile(null, null);
         try (CSVParser csvParser = new CSVParser(Files.newBufferedReader(targetDumpFile), CSV_DUMP_FORMAT)) {
             try (CSVPrinter csvPrinter = new CSVPrinter(Files.newBufferedWriter(tmp), CSV_DUMP_FORMAT)) {
                 csvParser.forEach(record -> {
                     List<String> newRecord = new ArrayList<>();
-                    record.forEach(val -> newRecord.add(val));
+                    record.forEach(newRecord::add);
                     newRecord.add(toAppend);
                     try {
                         csvPrinter.printRecord(newRecord);
                     } catch (IOException e) {
-                        throw new RuntimeException("Error appending to EOL", e);
+                        throw new TempusRuntimeException("Error appending to EOL", e);
                     }
                 });
             }
@@ -82,11 +86,11 @@ public class CassandraDbHelper {
         Files.move(tmp, targetDumpFile, StandardCopyOption.REPLACE_EXISTING);
     }
 
-    public static void loadCf(KeyspaceMetadata ks, Session session, String cfName, String[] columns, Path sourceFile) throws Exception {
+    public static void loadCf(KeyspaceMetadata ks, Session session, String cfName, String[] columns, Path sourceFile) throws IOException {
         loadCf(ks, session, cfName, columns, sourceFile, false);
     }
 
-    public static void loadCf(KeyspaceMetadata ks, Session session, String cfName, String[] columns, Path sourceFile, boolean parseHeader) throws Exception {
+    public static void loadCf(KeyspaceMetadata ks, Session session, String cfName, String[] columns, Path sourceFile, boolean parseHeader) throws IOException {
         TableMetadata tableMetadata = ks.getTable(cfName);
         PreparedStatement prepared = session.prepare(createInsertStatement(cfName, columns));
         CSVFormat csvFormat = CSV_DUMP_FORMAT;
@@ -107,7 +111,7 @@ public class CassandraDbHelper {
     }
 
 
-    private static void dumpRow(Row row, String[] columns, String[] defaultValues, CSVPrinter csvPrinter) throws Exception {
+    private static void dumpRow(Row row, String[] columns, String[] defaultValues, CSVPrinter csvPrinter) throws IOException {
         List<String> record = new ArrayList<>();
         for (int i=0;i<columns.length;i++) {
             String column = columns[i];
@@ -131,15 +135,15 @@ public class CassandraDbHelper {
                 if (row.isNull(index)) {
                     return null;
                 } else if (type == DataType.cdouble()) {
-                    str = new Double(row.getDouble(index)).toString();
+                    str = Double.toString(row.getDouble(index));
                 } else if (type == DataType.cint()) {
-                    str = new Integer(row.getInt(index)).toString();
+                    str = Integer.toString(row.getInt(index));
                 } else if (type == DataType.uuid()) {
                     str = row.getUUID(index).toString();
                 } else if (type == DataType.timeuuid()) {
                     str = row.getUUID(index).toString();
                 } else if (type == DataType.cfloat()) {
-                    str = new Float(row.getFloat(index)).toString();
+                    str = Float.toString(row.getFloat(index));
                 } else if (type == DataType.timestamp()) {
                     str = ""+row.getTimestamp(index).getTime();
                 } else {
@@ -162,9 +166,7 @@ public class CassandraDbHelper {
         }
         insertStatementBuilder.deleteCharAt(insertStatementBuilder.length() - 1);
         insertStatementBuilder.append(") VALUES (");
-        for (String column : columns) {
-            insertStatementBuilder.append("?").append(",");
-        }
+        Arrays.stream(columns).forEach(column -> insertStatementBuilder.append("?").append(","));
         insertStatementBuilder.deleteCharAt(insertStatementBuilder.length() - 1);
         insertStatementBuilder.append(")");
         return insertStatementBuilder.toString();

@@ -13,18 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.hashmapinc.server.exception;
 
-package com.hashmapinc.server.dao.TagMetaData;
+public class TempusApplicationException extends Exception {
+    private static final long serialVersionUID = 2610477518423283253L;
 
-import com.google.common.util.concurrent.ListenableFuture;
-import com.hashmapinc.server.common.data.EntityType;
-import com.hashmapinc.server.common.data.TagMetaData;
-import com.hashmapinc.server.common.data.id.EntityId;
+    public TempusApplicationException(String message) {
+        super(message);
+    }
 
-import java.util.List;
+    public TempusApplicationException(String message, Throwable cause) {
+        super(message, cause);
+    }
 
-public interface TagMetaDataService {
-    ListenableFuture<List<Void>> saveTagMetaData(TagMetaData tagMetaData);
-    ListenableFuture<TagMetaData> getTagMetaDataByEntityIdAndKey(EntityId entityId, String key);
-    ListenableFuture<List<TagMetaData>> getAllTagMetaDataByEntityId(EntityId entityId);
+    public TempusApplicationException(Throwable cause) {
+        super(cause);
+    }
 }

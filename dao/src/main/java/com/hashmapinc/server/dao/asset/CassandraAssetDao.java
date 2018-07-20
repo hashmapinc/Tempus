@@ -21,7 +21,6 @@ import com.datastax.driver.core.Statement;
 import com.datastax.driver.core.querybuilder.QueryBuilder;
 import com.datastax.driver.core.querybuilder.Select;
 import com.datastax.driver.mapping.Result;
-import com.google.common.base.Function;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.hashmapinc.server.common.data.EntitySubtype;
@@ -138,7 +137,7 @@ public class CassandraAssetDao extends CassandraAbstractSearchTextDao<AssetEntit
         Select.Where query = select.where();
         query.and(eq(ModelConstants.ASSET_TENANT_ID_PROPERTY, tenantId));
         query.and(eq(ModelConstants.ASSET_NAME_PROPERTY, assetName));
-        AssetEntity assetEntity = (AssetEntity) findOneByStatement(query);
+        AssetEntity assetEntity = findOneByStatement(query);
         return Optional.ofNullable(DaoUtil.getData(assetEntity));
     }
 
@@ -150,21 +149,17 @@ public class CassandraAssetDao extends CassandraAbstractSearchTextDao<AssetEntit
         query.and(eq(ModelConstants.ENTITY_SUBTYPE_ENTITY_TYPE_PROPERTY, EntityType.ASSET));
         query.setConsistencyLevel(cluster.getDefaultReadConsistencyLevel());
         ResultSetFuture resultSetFuture = getSession().executeAsync(query);
-        return Futures.transform(resultSetFuture, new Function<ResultSet, List<EntitySubtype>>() {
-            @Nullable
-            @Override
-            public List<EntitySubtype> apply(@Nullable ResultSet resultSet) {
+        return Futures.transform(resultSetFuture,(@Nullable ResultSet resultSet)->{
                 Result<EntitySubtypeEntity> result = cluster.getMapper(EntitySubtypeEntity.class).map(resultSet);
                 if (result != null) {
                     List<EntitySubtype> entitySubtypes = new ArrayList<>();
-                    result.all().forEach((entitySubtypeEntity) ->
+                    result.all().forEach(entitySubtypeEntity ->
                             entitySubtypes.add(entitySubtypeEntity.toEntitySubtype())
                     );
                     return entitySubtypes;
                 } else {
                     return Collections.emptyList();
                 }
-            }
         });
     }
 

@@ -17,9 +17,7 @@ package com.hashmapinc.server.config;
 
 import com.hashmapinc.server.dao.audit.AuditLogLevelFilter;
 import com.hashmapinc.server.exception.TempusErrorResponseHandler;
-import com.hashmapinc.server.service.security.auth.jwt.extractor.TokenExtractor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.security.oauth2.resource.ResourceServerProperties;
 import org.springframework.context.annotation.Bean;
@@ -37,8 +35,6 @@ import org.springframework.security.oauth2.provider.token.*;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
 
-import java.util.HashMap;
-
 
 @Configuration
 @EnableResourceServer
@@ -47,9 +43,8 @@ public class TempusResourceServer extends ResourceServerConfigurerAdapter {
     public static final String WEBJARS_ENTRY_POINT = "/webjars/**";
     public static final String DEVICE_API_ENTRY_POINT = "/api/v1/**";
     public static final String FORM_BASED_LOGIN_ENTRY_POINT = "/api/auth/login";
-    //public static final String PUBLIC_LOGIN_ENTRY_POINT = "/api/auth/login/public";
     public static final String TOKEN_REFRESH_ENTRY_POINT = "/api/auth/token";
-    protected static final String[] NON_TOKEN_BASED_AUTH_ENTRY_POINTS = new String[] {"/index.html", "/static/**", "/api/noauth/**", "/api/logo/**", "/api/theming/**", "/webjars/**"};
+    protected static final String[] NON_TOKEN_BASED_AUTH_ENTRY_POINTS = new String[] {"/index.html", "/static/**", "/api/noauth/**", "/api/logo/**", "/api/theming/**", WEBJARS_ENTRY_POINT};
     public static final String TOKEN_BASED_AUTH_ENTRY_POINT = "/api/**";
     public static final String WS_TOKEN_BASED_AUTH_ENTRY_POINT = "/api/ws/**";
 
@@ -80,12 +75,6 @@ public class TempusResourceServer extends ResourceServerConfigurerAdapter {
     public AuditLogLevelFilter auditLogLevelFilter(AuditLogLevelProperties auditLogLevelProperties) {
         return new AuditLogLevelFilter(auditLogLevelProperties.getMask());
     }
-
-
-    /*@Bean
-    protected JwtTokenAuthenticationProcessingFilter buildJwtTokenAuthenticationProcessingFilter() {
-        return new JwtTokenAuthenticationProcessingFilter(jwtHeaderTokenExtractor, resourceServerProperties);
-    }*/
 
     @Override
     public void configure(ResourceServerSecurityConfigurer resources) throws Exception {

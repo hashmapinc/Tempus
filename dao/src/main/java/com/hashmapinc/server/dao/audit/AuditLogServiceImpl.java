@@ -62,6 +62,8 @@ public class AuditLogServiceImpl implements AuditLogService {
     private static final String INCORRECT_TENANT_ID = "Incorrect tenantId ";
     private static final int INSERTS_PER_ENTRY = 3;
 
+    private static final String ENTITY_ID = "entityId";
+
     @Autowired
     private AuditLogLevelFilter auditLogLevelFilter;
 
@@ -123,7 +125,9 @@ public class AuditLogServiceImpl implements AuditLogService {
             } else {
                 try {
                     entityName = entityService.fetchEntityNameAsync(entityId).get();
-                } catch (Exception ex) {}
+                } catch (Exception ex) {
+                    log.warn("Exception : {}", ex.getMessage());
+                }
             }
             if (e != null) {
                 actionStatus = ActionStatus.FAILURE;
@@ -163,17 +167,17 @@ public class AuditLogServiceImpl implements AuditLogService {
                 if (entityId.getEntityType() == EntityType.DASHBOARD) {
                     entityNode.put("configuration", "");
                 }
-                actionData.set("entity", entityNode);
+                actionData.set(ENTITY_ID, entityNode);
                 break;
             case DELETED:
             case ACTIVATED:
             case SUSPENDED:
             case CREDENTIALS_READ:
                 String strEntityId = extractParameter(String.class, additionalInfo);
-                actionData.put("entityId", strEntityId);
+                actionData.put(ENTITY_ID, strEntityId);
                 break;
             case ATTRIBUTES_UPDATED:
-                actionData.put("entityId", entityId.toString());
+                actionData.put(ENTITY_ID, entityId.toString());
                 String scope = extractParameter(String.class, 0, additionalInfo);
                 List<AttributeKvEntry> attributes = extractParameter(List.class, 1, additionalInfo);
                 actionData.put("scope", scope);
@@ -187,7 +191,7 @@ public class AuditLogServiceImpl implements AuditLogService {
                 break;
             case ATTRIBUTES_DELETED:
             case ATTRIBUTES_READ:
-                actionData.put("entityId", entityId.toString());
+                actionData.put(ENTITY_ID, entityId.toString());
                 scope = extractParameter(String.class, 0, additionalInfo);
                 actionData.put("scope", scope);
                 List<String> keys = extractParameter(List.class, 1, additionalInfo);
@@ -197,7 +201,7 @@ public class AuditLogServiceImpl implements AuditLogService {
                 }
                 break;
             case RPC_CALL:
-                actionData.put("entityId", entityId.toString());
+                actionData.put(ENTITY_ID, entityId.toString());
                 Boolean oneWay = extractParameter(Boolean.class, 1, additionalInfo);
                 String method = extractParameter(String.class, 2, additionalInfo);
                 String params = extractParameter(String.class, 3, additionalInfo);
@@ -206,7 +210,7 @@ public class AuditLogServiceImpl implements AuditLogService {
                 actionData.put("params", params);
                 break;
             case CREDENTIALS_UPDATED:
-                actionData.put("entityId", entityId.toString());
+                actionData.put(ENTITY_ID, entityId.toString());
                 DeviceCredentials deviceCredentials = extractParameter(DeviceCredentials.class, additionalInfo);
                 actionData.set("credentials", objectMapper.valueToTree(deviceCredentials));
                 break;
@@ -214,7 +218,7 @@ public class AuditLogServiceImpl implements AuditLogService {
                 strEntityId = extractParameter(String.class, 0, additionalInfo);
                 String strCustomerId = extractParameter(String.class, 1, additionalInfo);
                 String strCustomerName = extractParameter(String.class, 2, additionalInfo);
-                actionData.put("entityId", strEntityId);
+                actionData.put(ENTITY_ID, strEntityId);
                 actionData.put("assignedCustomerId", strCustomerId);
                 actionData.put("assignedCustomerName", strCustomerName);
                 break;
@@ -222,7 +226,7 @@ public class AuditLogServiceImpl implements AuditLogService {
                 strEntityId = extractParameter(String.class, 0, additionalInfo);
                 strCustomerId = extractParameter(String.class, 1, additionalInfo);
                 strCustomerName = extractParameter(String.class, 2, additionalInfo);
-                actionData.put("entityId", strEntityId);
+                actionData.put(ENTITY_ID, strEntityId);
                 actionData.put("unassignedCustomerId", strCustomerId);
                 actionData.put("unassignedCustomerName", strCustomerName);
                 break;

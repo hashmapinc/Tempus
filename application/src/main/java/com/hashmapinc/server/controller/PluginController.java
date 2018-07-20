@@ -39,7 +39,7 @@ public class PluginController extends BaseController {
     public static final String PLUGIN_ID = "pluginId";
 
     @PreAuthorize("hasAnyAuthority('SYS_ADMIN', 'TENANT_ADMIN')")
-    @RequestMapping(value = "/plugin/{pluginId}", method = RequestMethod.GET)
+    @GetMapping(value = "/plugin/{pluginId}")
     @ResponseBody
     public PluginMetaData getPluginById(@PathVariable(PLUGIN_ID) String strPluginId) throws TempusException {
         checkParameter(PLUGIN_ID, strPluginId);
@@ -52,7 +52,7 @@ public class PluginController extends BaseController {
     }
 
     @PreAuthorize("hasAnyAuthority('SYS_ADMIN', 'TENANT_ADMIN')")
-    @RequestMapping(value = "/plugin/token/{pluginToken}", method = RequestMethod.GET)
+    @GetMapping(value = "/plugin/token/{pluginToken}")
     @ResponseBody
     public PluginMetaData getPluginByToken(@PathVariable("pluginToken") String pluginToken) throws TempusException {
         checkParameter("pluginToken", pluginToken);
@@ -64,7 +64,7 @@ public class PluginController extends BaseController {
     }
 
     @PreAuthorize("hasAnyAuthority('SYS_ADMIN', 'TENANT_ADMIN')")
-    @RequestMapping(value = "/plugin", method = RequestMethod.POST)
+    @PostMapping(value = "/plugin")
     @ResponseBody
     public PluginMetaData savePlugin(@RequestBody PluginMetaData source) throws TempusException {
         try {
@@ -89,7 +89,7 @@ public class PluginController extends BaseController {
     }
 
     @PreAuthorize("hasAnyAuthority('SYS_ADMIN', 'TENANT_ADMIN')")
-    @RequestMapping(value = "/plugin/{pluginId}/activate", method = RequestMethod.POST)
+    @PostMapping(value = "/plugin/{pluginId}/activate")
     @ResponseStatus(value = HttpStatus.OK)
     public void activatePluginById(@PathVariable(PLUGIN_ID) String strPluginId) throws TempusException {
         checkParameter(PLUGIN_ID, strPluginId);
@@ -115,7 +115,7 @@ public class PluginController extends BaseController {
     }
 
     @PreAuthorize("hasAnyAuthority('SYS_ADMIN', 'TENANT_ADMIN')")
-    @RequestMapping(value = "/plugin/{pluginId}/suspend", method = RequestMethod.POST)
+    @PostMapping(value = "/plugin/{pluginId}/suspend")
     @ResponseStatus(value = HttpStatus.OK)
     public void suspendPluginById(@PathVariable(PLUGIN_ID) String strPluginId) throws TempusException {
         checkParameter(PLUGIN_ID, strPluginId);
@@ -141,7 +141,7 @@ public class PluginController extends BaseController {
     }
 
     @PreAuthorize("hasAuthority('SYS_ADMIN')")
-    @RequestMapping(value = "/plugin/system", params = {"limit"}, method = RequestMethod.GET)
+    @GetMapping(value = "/plugin/system", params = {"limit"})
     @ResponseBody
     public TextPageData<PluginMetaData> getSystemPlugins(
             @RequestParam int limit,
@@ -157,7 +157,7 @@ public class PluginController extends BaseController {
     }
 
     @PreAuthorize("hasAuthority('SYS_ADMIN')")
-    @RequestMapping(value = "/plugin/tenant/{tenantId}", params = {"limit"}, method = RequestMethod.GET)
+    @GetMapping(value = "/plugin/tenant/{tenantId}", params = {"limit"})
     @ResponseBody
     public TextPageData<PluginMetaData> getTenantPlugins(
             @PathVariable("tenantId") String strTenantId,
@@ -176,7 +176,7 @@ public class PluginController extends BaseController {
     }
 
     @PreAuthorize("hasAnyAuthority('SYS_ADMIN', 'TENANT_ADMIN')")
-    @RequestMapping(value = "/plugins", method = RequestMethod.GET)
+    @GetMapping(value = "/plugins")
     @ResponseBody
     public List<PluginMetaData> getPlugins() throws TempusException {
         try {
@@ -196,7 +196,7 @@ public class PluginController extends BaseController {
     }
 
     @PreAuthorize("hasAuthority('TENANT_ADMIN')")
-    @RequestMapping(value = "/plugin", params = {"limit"}, method = RequestMethod.GET)
+    @GetMapping(value = "/plugin", params = {"limit"})
     @ResponseBody
     public TextPageData<PluginMetaData> getTenantPlugins(
             @RequestParam int limit,
@@ -213,7 +213,7 @@ public class PluginController extends BaseController {
     }
 
     @PreAuthorize("hasAnyAuthority('SYS_ADMIN', 'TENANT_ADMIN')")
-    @RequestMapping(value = "/plugin/{pluginId}", method = RequestMethod.DELETE)
+    @DeleteMapping(value = "/plugin/{pluginId}")
     @ResponseStatus(value = HttpStatus.OK)
     public void deletePlugin(@PathVariable(PLUGIN_ID) String strPluginId) throws TempusException {
         checkParameter(PLUGIN_ID, strPluginId);

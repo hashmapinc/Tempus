@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.hashmapinc.server.dao.depthSeries;
+package com.hashmapinc.server.dao.depthseries;
 
 import com.google.common.util.concurrent.ListenableFuture;
 import com.hashmapinc.server.common.data.DeviceDataSet;
@@ -21,21 +21,21 @@ import com.hashmapinc.server.common.data.id.EntityId;
 import com.hashmapinc.server.common.data.kv.DsKvEntry;
 import com.hashmapinc.server.common.data.kv.DsKvQuery;
 
+import java.util.Collection;
 import java.util.List;
 
-public interface DepthSeriesDao {
 
-    ListenableFuture<List<DsKvEntry>> findAllAsync(EntityId entityId, List<DsKvQuery> queries);
+public interface DepthSeriesService {
 
-    ListenableFuture<DsKvEntry> findLatest(EntityId entityId, String key);
+    ListenableFuture<List<DsKvEntry>> findAll(EntityId entityId, List<DsKvQuery> queries);
+
+    ListenableFuture<List<DsKvEntry>> findLatest(EntityId entityId, Collection<String> keys);
 
     ListenableFuture<List<DsKvEntry>> findAllLatest(EntityId entityId);
 
-    ListenableFuture<Void> save(EntityId entityId, DsKvEntry dsKvEntry, long ttl);
+    ListenableFuture<List<Void>> save(EntityId entityId, DsKvEntry tsKvEntry);
 
-    ListenableFuture<Void> savePartition(EntityId entityId, Double dsKvEntryDs, String key, long ttl);
-
-    ListenableFuture<Void> saveLatest(EntityId entityId, DsKvEntry DsKvEntry);
+    ListenableFuture<List<Void>> save(EntityId entityId, List<DsKvEntry> dsKvEntry, long ttl);
 
     DeviceDataSet findAllBetweenDepths(EntityId entityId, Double startDs, Double endDs);
 }

@@ -69,10 +69,8 @@ public class SubscriptionManager {
             ServerAddress address = server.get();
             log.trace("[{}] Forwarding subscription [{}] for device [{}] to [{}]", sessionId, sub.getSubscriptionId(), entityId, address);
             subscription = new Subscription(sub, true, address);
-            //rpcHandler.onNewSubscription(ctx, address, sessionId, subscription);
         } else {
             log.trace("[{}] Registering local subscription [{}] for device [{}]", sessionId, sub.getSubscriptionId(), entityId);
-            //subscription = new Subscription(sub, true,(DepthSubscriptionState) sub);
             subscription = new Subscription(sub, true);
         }
         registerSubscription(sessionId, entityId, subscription);
@@ -260,7 +258,7 @@ public class SubscriptionManager {
                         updateDepthSubscriptionState(sessionId, s, update);
                         websocketHandler.sendWsMsg(ctx, sessionId, update);
                     } else {
-                        //rpcHandler.onSubscriptionUpdate(ctx, s.getServer(), sessionId, update);
+                        log.debug("Subscription not local");
                     }
                 }
             });

@@ -15,11 +15,11 @@
  */
 package com.hashmapinc.server.controller;
 
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.*;
 import com.hashmapinc.server.common.data.plugin.ComponentDescriptor;
 import com.hashmapinc.server.common.data.plugin.ComponentType;
 import com.hashmapinc.server.exception.TempusException;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -28,7 +28,7 @@ import java.util.List;
 public class ComponentDescriptorController extends BaseController {
 
     @PreAuthorize("hasAnyAuthority('SYS_ADMIN','TENANT_ADMIN')")
-    @RequestMapping(value = "/component/{componentDescriptorClazz:.+}", method = RequestMethod.GET)
+    @GetMapping(value = "/component/{componentDescriptorClazz:.+}")
     @ResponseBody
     public ComponentDescriptor getComponentDescriptorByClazz(@PathVariable("componentDescriptorClazz") String strComponentDescriptorClazz) throws TempusException {
         checkParameter("strComponentDescriptorClazz", strComponentDescriptorClazz);
@@ -40,7 +40,7 @@ public class ComponentDescriptorController extends BaseController {
     }
 
     @PreAuthorize("hasAnyAuthority('SYS_ADMIN','TENANT_ADMIN')")
-    @RequestMapping(value = "/components/{componentType}", method = RequestMethod.GET)
+    @GetMapping(value = "/components/{componentType}")
     @ResponseBody
     public List<ComponentDescriptor> getComponentDescriptorsByType(@PathVariable("componentType") String strComponentType) throws TempusException {
         checkParameter("componentType", strComponentType);
@@ -52,7 +52,7 @@ public class ComponentDescriptorController extends BaseController {
     }
 
     @PreAuthorize("hasAnyAuthority('SYS_ADMIN','TENANT_ADMIN')")
-    @RequestMapping(value = "/components/actions/{pluginClazz:.+}", method = RequestMethod.GET)
+    @GetMapping(value = "/components/actions/{pluginClazz:.+}")
     @ResponseBody
     public List<ComponentDescriptor> getPluginActionsByPluginClazz(@PathVariable("pluginClazz") String pluginClazz) throws TempusException {
         checkParameter("pluginClazz", pluginClazz);

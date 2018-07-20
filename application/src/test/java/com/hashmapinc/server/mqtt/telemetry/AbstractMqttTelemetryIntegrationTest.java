@@ -91,14 +91,14 @@ public abstract class AbstractMqttTelemetryIntegrationTest extends AbstractContr
         MqttConnectOptions options = new MqttConnectOptions();
         options.setUserName(accessToken);
         client.connect(options);
-        Thread.sleep(3000);
+        Thread.sleep(3000); //NOSONAR
         MqttMessage message = new MqttMessage();
         message.setPayload("{\"key1\":\"value1\", \"key2\":true, \"key3\": 3.0, \"key4\": 4}".getBytes());
         client.publish("v1/devices/me/telemetry", message);
 
         String deviceId = savedDevice.getId().getId().toString();
 
-        Thread.sleep(1000);
+        Thread.sleep(1000); //NOSONAR Added for test
         List<String> actualKeys = doGetAsync("/api/plugins/telemetry/DEVICE/" + deviceId +  "/keys/timeseries", List.class);
         Set<String> actualKeySet = new HashSet<>(actualKeys);
 
@@ -124,14 +124,14 @@ public abstract class AbstractMqttTelemetryIntegrationTest extends AbstractContr
         MqttConnectOptions options = new MqttConnectOptions();
         options.setUserName(accessToken);
         client.connect(options);
-        Thread.sleep(3000);
+        Thread.sleep(3000); //NOSONAR Added for test
         MqttMessage message = new MqttMessage();
         message.setPayload("{\"values\":{\"humidity\":{\"unit\":\"%\",\"value\":15.616},\"viscosity\":{\"unit\":\"cgs\",\"value\":0.158}},\"ts\":1526804557313}".getBytes());
         client.publish("v1/devices/me/telemetry", message);
 
         String deviceId = savedDevice.getId().getId().toString();
 
-        Thread.sleep(1000);
+        Thread.sleep(1000); //NOSONAR Added for test
         List<String> actualKeys = doGetAsync("/api/plugins/telemetry/DEVICE/" + deviceId +  "/keys/timeseries", List.class);
         Set<String> actualKeySet = new HashSet<>(actualKeys);
 
@@ -160,15 +160,15 @@ public abstract class AbstractMqttTelemetryIntegrationTest extends AbstractContr
         options.setUserName(gatewayAccessToken);
         options.setWill("spBv1.0/hashmap/DDEATH/tempus device", deathBytes, 0, false);
         client.connect(options);
-        Thread.sleep(3000);
+        Thread.sleep(3000); //NOSONAR Added for test
         byte[] sparkPlugMsgByeArray = createSparkPlugMsg();
 
         client.publish("spBv1.0/hashmap/DBIRTH/tempus device/SparkplugBdevice", sparkPlugMsgByeArray, 0, false);
 
-        Thread.sleep(10000);
+        Thread.sleep(10000); //NOSONAR Added for test
         Device device = deviceService.findDeviceByTenantIdAndName(tenantId,"SparkplugBdevice");
         String deviceId = device.getId().getId().toString();
-        Thread.sleep(1000);
+        Thread.sleep(1000); //NOSONAR Added for test
         List<String> actualKeys = doGetAsync("/api/plugins/telemetry/DEVICE/" + deviceId +  "/keys/timeseries", List.class);
         Set<String> actualKeySet = new HashSet<>(actualKeys);
 

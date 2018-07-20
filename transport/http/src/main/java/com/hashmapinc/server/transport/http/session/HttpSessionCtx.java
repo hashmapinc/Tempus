@@ -83,15 +83,13 @@ public class HttpSessionCtx extends DeviceAwareSessionContext {
 
     private void reply(RuleEngineErrorMsg msg) {
         HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
-        switch (msg.getError()) {
-            case PLUGIN_TIMEOUT:
-                status = HttpStatus.REQUEST_TIMEOUT;
-                break;
-            default:
-                if (msg.getInMsgType() == MsgType.TO_SERVER_RPC_REQUEST) {
-                    status = HttpStatus.BAD_REQUEST;
-                }
-                break;
+        if (msg.getError() == RuleEngineError.PLUGIN_TIMEOUT) {
+            status = HttpStatus.REQUEST_TIMEOUT;
+
+        } else {
+            if (msg.getInMsgType() == MsgType.TO_SERVER_RPC_REQUEST) {
+                status = HttpStatus.BAD_REQUEST;
+            }
         }
         responseWriter.setResult(new ResponseEntity<>(JsonConverter.toErrorJson(msg.getErrorMsg()).toString(), status));
     }

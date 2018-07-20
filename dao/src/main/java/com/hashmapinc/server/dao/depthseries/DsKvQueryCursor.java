@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.hashmapinc.server.dao.depthSeries;
+package com.hashmapinc.server.dao.depthseries;
 
 import lombok.Getter;
 import com.hashmapinc.server.common.data.kv.DsKvEntry;

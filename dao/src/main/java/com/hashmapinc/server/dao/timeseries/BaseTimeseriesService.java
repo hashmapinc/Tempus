@@ -46,7 +46,7 @@ public class BaseTimeseriesService implements TimeseriesService {
     @Override
     public ListenableFuture<List<TsKvEntry>> findAll(EntityId entityId, List<TsKvQuery> queries) {
         validate(entityId);
-        queries.forEach(query -> validate(query));
+        queries.forEach(BaseTimeseriesService::validate);
         return timeseriesDao.findAllAsync(entityId, queries);
     }
 

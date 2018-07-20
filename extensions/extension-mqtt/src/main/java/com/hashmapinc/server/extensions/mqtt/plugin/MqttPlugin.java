@@ -15,6 +15,7 @@
  */
 package com.hashmapinc.server.extensions.mqtt.plugin;
 
+import com.hashmapinc.server.common.msg.exception.TempusRuntimeException;
 import com.hashmapinc.server.extensions.api.component.Plugin;
 import com.hashmapinc.server.extensions.api.plugins.PluginContext;
 import com.hashmapinc.server.extensions.api.plugins.handlers.RuleMsgHandler;
@@ -59,7 +60,7 @@ public class MqttPlugin extends AbstractPlugin<MqttPluginConfiguration> {
             mqttClient = new MqttAsyncClient("tcp://" + configuration.getHost() + ":" + configuration.getPort(), clientId);
         } catch (Exception e) {
             log.error("Failed to create mqtt client", e);
-            throw new RuntimeException(e);
+            throw new TempusRuntimeException(e);
         }
         connect();
     }
@@ -104,7 +105,7 @@ public class MqttPlugin extends AbstractPlugin<MqttPluginConfiguration> {
             this.mqttClient.disconnect();
         } catch (MqttException e) {
             log.error("Failed to close mqtt client connection during destroy()", e);
-            throw new RuntimeException(e);
+            throw new TempusRuntimeException(e);
         }
     }
 
