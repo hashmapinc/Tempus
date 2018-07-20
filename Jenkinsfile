@@ -14,6 +14,7 @@ pipeline {
 echo M2_HOME = ${M2_HOME}
 mvn clean
 mvn validate'''
+        slackSend(message: 'Started Build', color: 'Green', channel: 'Tempus', botUser: true)
       }
     }
     stage('Build') {
@@ -49,6 +50,11 @@ sudo docker build $WORKSPACE/docker/cassandra-setup/ -t hashmapinc/cassandra-set
         sh '''sudo docker push hashmapinc/tempus:dev
 sudo docker push hashmapinc/cassandra-setup:dev
 '''
+      }
+    }
+    stage('Success Message') {
+      steps {
+        slackSend(message: 'Build Completed', channel: 'Tempus', color: 'Green')
       }
     }
   }
