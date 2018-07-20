@@ -2,7 +2,7 @@ pipeline {
   agent {
     docker {
       image 'hashmapinc/tempusbuild:latest'
-      args '-u root -v /var/run/docker.sock:/var/run/docker.sock'
+      args '-u root -v /var/run/docker.sock:/var/run/docker.sock -v /home/ubuntu/.m2:/root/.m2 -v /home/ubuntu/.npm:/root/.npm -v /home/ubuntu/.gradle:/root/.gradle'
     }
 
   }
@@ -18,12 +18,18 @@ mvn validate'''
     }
     stage('Build') {
       steps {
-        sh 'mvn -Dmaven.test.failure.ignore=true -Dlicense.skip=true install'
+        sh 'mvn -Dmaven.test.failure.ignore=true -Dlicense.skip=true package'
+      }
+    }
+    stage('Integration Tests'){
+      steps {
+        sh 'mvn failsafe:integration-test'
+        sh 'mvn failsafe:verify'
       }
     }
     stage('Report and Archive') {
       steps {
-        junit '**/target/surefire-reports/**/*.xml'
+        junit '**/target/surefire-reports/**/*.xml,**/target/failsafe-reports/**/*.xml'
         archiveArtifacts 'application/target/*.jar,application/target/*.deb,application/target/*.zip,application/target/*.rpm'
       }
     }
