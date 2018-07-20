@@ -72,7 +72,7 @@ public class AuthController extends BaseController {
     private MailService mailService;
 
     @PreAuthorize("isAuthenticated()")
-    @RequestMapping(value = "/auth/user", method = RequestMethod.GET)
+    @GetMapping(value = "/auth/user")
     public @ResponseBody User getUser() throws TempusException {
         try {
             SecurityUser securityUser = getCurrentUser();
