@@ -51,10 +51,8 @@ public class PageDataIterable<T extends SearchTextBased<? extends UUIDBased>> im
                     fetch(new TextPageLink(fetchSize));
                     initialized = true;
                 }
-                if(currentIdx == currentItems.size()){
-                    if(hasNextPack){
+                if(currentIdx == currentItems.size() && hasNextPack){
                         fetch(nextPackLink);
-                    }
                 }
                 return currentIdx < currentItems.size();
             }

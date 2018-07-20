@@ -32,11 +32,11 @@ public final class PluginCallbackMessage<V> {
     private final Exception e;
 
     public static <V> PluginCallbackMessage<V> onSuccess(PluginCallback<V> callback, V data) {
-        return new PluginCallbackMessage<V>(true, callback, data, null);
+        return new PluginCallbackMessage<>(true, callback, data, null);
     }
 
     public static <V> PluginCallbackMessage<V> onError(PluginCallback<V> callback, Exception e) {
-        return new PluginCallbackMessage<V>(false, callback, null, e);
+        return new PluginCallbackMessage<>(false, callback, null, e);
     }
 
     private PluginCallbackMessage(boolean success, PluginCallback<V> callback, V v, Exception e) {

@@ -15,9 +15,9 @@
  */
 package com.hashmapinc.server.actors.session;
 
-import java.util.*;
-
 import akka.actor.*;
+import akka.event.Logging;
+import akka.event.LoggingAdapter;
 import com.hashmapinc.server.actors.ActorSystemContext;
 import com.hashmapinc.server.actors.service.ContextAwareActor;
 import com.hashmapinc.server.actors.service.ContextBasedCreator;
@@ -29,16 +29,17 @@ import com.hashmapinc.server.common.msg.cluster.ClusterEventMsg;
 import com.hashmapinc.server.common.msg.core.BasicToDeviceSessionActorMsg;
 import com.hashmapinc.server.common.msg.core.SparkPlugSubscribeTerminateMsg;
 import com.hashmapinc.server.common.msg.core.ToDeviceSessionActorMsg;
-
-import akka.event.Logging;
-import akka.event.LoggingAdapter;
 import com.hashmapinc.server.common.msg.session.BasicToDeviceActorSessionMsg;
 import com.hashmapinc.server.common.msg.session.MsgType;
 import com.hashmapinc.server.common.msg.session.SessionCtrlMsg;
 import com.hashmapinc.server.common.msg.session.ToDeviceMsg;
 import com.hashmapinc.server.common.msg.session.ctrl.SessionCloseMsg;
-import com.hashmapinc.server.transport.http.session.HttpSessionId;
 import com.hashmapinc.server.transport.mqtt.session.MqttSessionId;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class SessionManagerActor extends ContextAwareActor {
 
@@ -100,22 +101,26 @@ public class SessionManagerActor extends ContextAwareActor {
     private void checkForSparkPlugSubscription(SessionCtrlMsg msg, String sessionIdStr){
         boolean sparkPlugSubscribeTermination = false;
         if(msg instanceof SessionCloseMsg){
-            SessionCloseMsg sessionCloseMsg = (SessionCloseMsg) msg;
-            if(sessionCloseMsg.getDeviceId() != null) {
-                String deviceId = sessionCloseMsg.getDeviceId().toString();
-                if (deviceSessionInfoMap.containsKey(deviceId)) {
-                    List<DeviceSessionInfo> deviceSessionInfoList = deviceSessionInfoMap.get(deviceId);
-                    for (DeviceSessionInfo deviceSessionInfo : deviceSessionInfoList) {
-                        if ((deviceSessionInfo.getDeviceSessionId().contentEquals(sessionIdStr))
-                                && deviceSessionInfo.getMsgType() == MsgType.POST_TELEMETRY_REQUEST) {
-                            sparkPlugSubscribeTermination = true;
-                        }
+            handleSessionCloseMsg((SessionCloseMsg) msg, sessionIdStr, sparkPlugSubscribeTermination);
+        }
+    }
+
+    private void handleSessionCloseMsg(SessionCloseMsg msg, String sessionIdStr, boolean sparkPlugSubscribeTermination) {
+        SessionCloseMsg sessionCloseMsg = msg;
+        if(sessionCloseMsg.getDeviceId() != null) {
+            String deviceId = sessionCloseMsg.getDeviceId().toString();
+            if (deviceSessionInfoMap.containsKey(deviceId)) {
+                List<DeviceSessionInfo> deviceSessionInfoList = deviceSessionInfoMap.get(deviceId);
+                for (DeviceSessionInfo deviceSessionInfo : deviceSessionInfoList) {
+                    if ((deviceSessionInfo.getDeviceSessionId().contentEquals(sessionIdStr))
+                            && deviceSessionInfo.getMsgType() == MsgType.POST_TELEMETRY_REQUEST) {
+                        sparkPlugSubscribeTermination = true;
                     }
-                    if (sparkPlugSubscribeTermination) {
-                        sendSparkPlugSubscribeTerminateToSessionActor(deviceSessionInfoList);
-                    }
-                    removeDeviceSessionInfoList(deviceId);
                 }
+                if (sparkPlugSubscribeTermination) {
+                    sendSparkPlugSubscribeTerminateToSessionActor(deviceSessionInfoList);
+                }
+                removeDeviceSessionInfoList(deviceId);
             }
         }
     }
@@ -149,7 +154,7 @@ public class SessionManagerActor extends ContextAwareActor {
         ActorRef sessionActor = sessionActors.remove(sessionIdStr);
         if (sessionActor != null) {
             log.debug("[{}] Removed session actor.", sessionIdStr);
-            //TODO: onSubscriptionUpdate device actor about session close;
+            //TODO: onSubscriptionUpdate device actor about session close
         } else {
             log.debug("[{}] Session actor was already removed.", sessionIdStr);
         }
@@ -197,16 +202,15 @@ public class SessionManagerActor extends ContextAwareActor {
 
     private ActorRef getOrCreateSessionActor(SessionId sessionId) {
         String sessionIdStr = sessionId.toUidStr();
-        ActorRef sessionActor = sessionActors.get(sessionIdStr);
-        if (sessionActor == null) {
-            log.debug("[{}] Creating session actor.", sessionIdStr);
-            sessionActor = context().actorOf(
-                    Props.create(new SessionActor.ActorCreator(systemContext, sessionId, nodeMetricActor)).withDispatcher(DefaultActorService.SESSION_DISPATCHER_NAME),
-                    sessionIdStr);
-            sessionActors.put(sessionIdStr, sessionActor);
-            log.debug("[{}] Created session actor.", sessionIdStr);
-        }
+        ActorRef sessionActor  = sessionActors.computeIfAbsent(sessionIdStr, k -> createSessionActor(sessionId, sessionIdStr));
+        sessionActors.put(sessionIdStr, sessionActor);
         return sessionActor;
+    }
+
+    private ActorRef createSessionActor(SessionId sessionId, String sessionIdStr) {
+        return context().actorOf(
+                Props.create(new SessionActor.ActorCreator(systemContext, sessionId, nodeMetricActor)).withDispatcher(DefaultActorService.SESSION_DISPATCHER_NAME),
+                sessionIdStr);
     }
 
     private void onTermination(Terminated message) {

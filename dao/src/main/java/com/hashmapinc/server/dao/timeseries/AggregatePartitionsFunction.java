@@ -21,7 +21,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hashmapinc.server.common.data.kv.*;
 import lombok.extern.slf4j.Slf4j;
-import com.hashmapinc.server.common.data.kv.*;
 
 import javax.annotation.Nullable;
 import java.io.IOException;
@@ -63,126 +62,14 @@ public class AggregatePartitionsFunction implements com.google.common.base.Funct
                 return Optional.empty();
             }
 
-            Boolean bValue = null;
-            String sValue = null;
-            Double dValue = null;
-            Long lValue = null;
-            JsonNode jValue = null;
-            DataType dataType = null;
-            long count = 0;
+            AggregationResult aggResult = new AggregationResult();
 
             for (ResultSet rs : rsList) {
                 for (Row row : rs.all()) {
-                    long curCount;
-
-
-                    Long curLValue = null;
-                    Double curDValue = null;
-                    Boolean curBValue = null;
-                    String curSValue = null;
-                    JsonNode curJValue = null;
-
-                    long longCount = row.getLong(LONG_CNT_POS);
-                    long doubleCount = row.getLong(DOUBLE_CNT_POS);
-                    long boolCount = row.getLong(BOOL_CNT_POS);
-                    long strCount = row.getLong(STR_CNT_POS);
-                    long jsonCount = row.getLong(JSON_CNT_POS);
-
-                    if (longCount > 0) {
-                        dataType = DataType.LONG;
-                        curCount = longCount;
-                        curLValue = getLongValue(row);
-                    } else if (doubleCount > 0) {
-                        dataType = DataType.DOUBLE;
-                        curCount = doubleCount;
-                        curDValue = getDoubleValue(row);
-                    } else if (boolCount > 0) {
-                        dataType = DataType.BOOLEAN;
-                        curCount = boolCount;
-                        curBValue = getBooleanValue(row);
-                    } else if (strCount > 0) {
-                        dataType = DataType.STRING;
-                        curCount = strCount;
-                        curSValue = getStringValue(row);
-                    } else if (jsonCount > 0) {
-                        dataType = DataType.JSON;
-                        curCount = jsonCount;
-                        curJValue = getJsonValue(row);
-                    } else {
-                        continue;
-                    }
-
-                    if (aggregation == Aggregation.COUNT) {
-                        count += curCount;
-                    } else if (aggregation == Aggregation.AVG || aggregation == Aggregation.SUM) {
-                        count += curCount;
-                        if (curDValue != null) {
-                            dValue = dValue == null ? curDValue : dValue + curDValue;
-                        } else if (curLValue != null) {
-                            lValue = lValue == null ? curLValue : lValue + curLValue;
-                        }
-                    } else if (aggregation == Aggregation.MIN) {
-                        if (curDValue != null) {
-                            dValue = dValue == null ? curDValue : Math.min(dValue, curDValue);
-                        } else if (curLValue != null) {
-                            lValue = lValue == null ? curLValue : Math.min(lValue, curLValue);
-                        } else if (curBValue != null) {
-                            bValue = bValue == null ? curBValue : bValue && curBValue;
-                        } else if (curSValue != null) {
-                            if (sValue == null || curSValue.compareTo(sValue) < 0) {
-                                sValue = curSValue;
-                            }
-                        } else if (curJValue != null) {
-                            if (jValue == null || curJValue.toString().compareTo(jValue.toString()) < 0) {
-                                jValue = curJValue;
-                            }
-                        }
-                    } else if (aggregation == Aggregation.MAX) {
-                        if (curDValue != null) {
-                            dValue = dValue == null ? curDValue : Math.max(dValue, curDValue);
-                        } else if (curLValue != null) {
-                            lValue = lValue == null ? curLValue : Math.max(lValue, curLValue);
-                        } else if (curBValue != null) {
-                            bValue = bValue == null ? curBValue : bValue || curBValue;
-                        } else if (curSValue != null) {
-                            if (sValue == null || curSValue.compareTo(sValue) > 0) {
-                                sValue = curSValue;
-                            }
-                        } else if (curJValue != null) {
-                            if (jValue == null || curJValue.toString().compareTo(jValue.toString()) > 0) {
-                                jValue = curJValue;
-                            }
-                        }
-                    }
+                    processResultSetRow(row, aggResult);
                 }
             }
-            if (dataType == null) {
-                return Optional.empty();
-            } else if (aggregation == Aggregation.COUNT) {
-                return Optional.of(new BasicTsKvEntry(ts, new LongDataEntry(key, (long) count)));
-            } else if (aggregation == Aggregation.AVG || aggregation == Aggregation.SUM) {
-                if (count == 0 || (dataType == DataType.DOUBLE && dValue == null) || (dataType == DataType.LONG && lValue == null)) {
-                    return Optional.empty();
-                } else if (dataType == DataType.DOUBLE) {
-                    return Optional.of(new BasicTsKvEntry(ts, new DoubleDataEntry(key, aggregation == Aggregation.SUM ? dValue : (dValue / count))));
-                } else if (dataType == DataType.LONG) {
-                    return Optional.of(new BasicTsKvEntry(ts, new LongDataEntry(key, aggregation == Aggregation.SUM ? lValue : (lValue / count))));
-                }
-            } else if (aggregation == Aggregation.MIN || aggregation == Aggregation.MAX) {
-                if (dataType == DataType.DOUBLE) {
-                    return Optional.of(new BasicTsKvEntry(ts, new DoubleDataEntry(key, dValue)));
-                } else if (dataType == DataType.LONG) {
-                    return Optional.of(new BasicTsKvEntry(ts, new LongDataEntry(key, lValue)));
-                } else if (dataType == DataType.STRING) {
-                    return Optional.of(new BasicTsKvEntry(ts, new StringDataEntry(key, sValue)));
-                } else if (dataType == DataType.BOOLEAN) {
-                    return Optional.of(new BasicTsKvEntry(ts, new BooleanDataEntry(key, bValue)));
-                } else if (dataType == DataType.JSON) {
-                    return Optional.of(new BasicTsKvEntry(ts, new JsonDataEntry(key, jValue)));
-                }
-            }
-            log.trace("[{}][{}][{}] Aggregated data is empty.", key, ts, aggregation);
-            return Optional.empty();
+            return processAggregationResult(aggResult);
         }catch (Exception e){
             log.error("[{}][{}][{}] Failed to aggregate data", key, ts, aggregation, e);
             return Optional.empty();
@@ -196,11 +83,13 @@ public class AggregatePartitionsFunction implements com.google.common.base.Funct
         Double curDValue = null;
         Boolean curBValue = null;
         String curSValue = null;
+        JsonNode curJValue = null;
 
         long longCount = row.getLong(LONG_CNT_POS);
         long doubleCount = row.getLong(DOUBLE_CNT_POS);
         long boolCount = row.getLong(BOOL_CNT_POS);
         long strCount = row.getLong(STR_CNT_POS);
+        long jsonCount = row.getLong(JSON_CNT_POS);
 
         if (longCount > 0) {
             aggResult.dataType = DataType.LONG;
@@ -218,7 +107,12 @@ public class AggregatePartitionsFunction implements com.google.common.base.Funct
             aggResult.dataType = DataType.STRING;
             curCount = strCount;
             curSValue = getStringValue(row);
-        } else {
+        } else if (jsonCount > 0) {
+            aggResult.dataType = DataType.JSON;
+            curCount = jsonCount;
+            curJValue = getJsonValue(row);
+        }
+        else {
             return;
         }
 
@@ -227,9 +121,9 @@ public class AggregatePartitionsFunction implements com.google.common.base.Funct
         } else if (aggregation == Aggregation.AVG || aggregation == Aggregation.SUM) {
             processAvgOrSumAggregation(aggResult, curCount, curLValue, curDValue);
         } else if (aggregation == Aggregation.MIN) {
-            processMinAggregation(aggResult, curLValue, curDValue, curBValue, curSValue);
+            processMinAggregation(aggResult, curLValue, curDValue, curBValue, curSValue, curJValue);
         } else if (aggregation == Aggregation.MAX) {
-            processMaxAggregation(aggResult, curLValue, curDValue, curBValue, curSValue);
+            processMaxAggregation(aggResult, curLValue, curDValue, curBValue, curSValue, curJValue);
         }
     }
 
@@ -242,7 +136,7 @@ public class AggregatePartitionsFunction implements com.google.common.base.Funct
         }
     }
 
-    private void processMinAggregation(AggregationResult aggResult, Long curLValue, Double curDValue, Boolean curBValue, String curSValue) {
+    private void processMinAggregation(AggregationResult aggResult, Long curLValue, Double curDValue, Boolean curBValue, String curSValue, JsonNode curJValue) {
         if (curDValue != null) {
             aggResult.dValue = aggResult.dValue == null ? curDValue : Math.min(aggResult.dValue, curDValue);
         } else if (curLValue != null) {
@@ -251,10 +145,12 @@ public class AggregatePartitionsFunction implements com.google.common.base.Funct
             aggResult.bValue = aggResult.bValue == null ? curBValue : aggResult.bValue && curBValue;
         } else if (curSValue != null && (aggResult.sValue == null || curSValue.compareTo(aggResult.sValue) < 0)) {
             aggResult.sValue = curSValue;
+        } else if (curJValue != null) {
+            aggResult.jValue = curJValue;
         }
     }
 
-    private void processMaxAggregation(AggregationResult aggResult, Long curLValue, Double curDValue, Boolean curBValue, String curSValue) {
+    private void processMaxAggregation(AggregationResult aggResult, Long curLValue, Double curDValue, Boolean curBValue, String curSValue, JsonNode curJValue) {
         if (curDValue != null) {
             aggResult.dValue = aggResult.dValue == null ? curDValue : Math.max(aggResult.dValue, curDValue);
         } else if (curLValue != null) {
@@ -263,6 +159,8 @@ public class AggregatePartitionsFunction implements com.google.common.base.Funct
             aggResult.bValue = aggResult.bValue == null ? curBValue : aggResult.bValue || curBValue;
         } else if (curSValue != null && (aggResult.sValue == null || curSValue.compareTo(aggResult.sValue) > 0)) {
             aggResult.sValue = curSValue;
+        } else if (curJValue != null) {
+            aggResult.jValue = curJValue;
         }
     }
 
@@ -271,20 +169,6 @@ public class AggregatePartitionsFunction implements com.google.common.base.Funct
             return row.getBool(BOOL_POS);
         } else {
             return null; //NOSONAR, null is used for further comparison
-        }
-    }
-
-    private JsonNode getJsonValue(Row row) {
-        if (aggregation == Aggregation.MIN || aggregation == Aggregation.MAX) {
-            ObjectMapper mapper = new ObjectMapper();
-            try {
-                return mapper.readTree(row.getString(JSON_POS));
-            } catch (IOException ex) {
-                log.error(ex.getMessage(),ex);
-                return null;
-            }
-        } else {
-            return null;
         }
     }
 
@@ -324,7 +208,10 @@ public class AggregatePartitionsFunction implements com.google.common.base.Funct
             result = processAvgOrSumResult(aggResult);
         } else if (aggregation == Aggregation.MIN || aggregation == Aggregation.MAX) {
             result = processMinOrMaxResult(aggResult);
-        } else {
+        } else if (aggResult.dataType == DataType.JSON) {
+            return Optional.of(new BasicTsKvEntry(ts, new JsonDataEntry(key, aggResult.jValue)));
+        }
+        else {
             result = Optional.empty();
         }
         if (!result.isPresent()) {
@@ -342,6 +229,20 @@ public class AggregatePartitionsFunction implements com.google.common.base.Funct
             return Optional.of(new BasicTsKvEntry(ts, new LongDataEntry(key, aggregation == Aggregation.SUM ? aggResult.lValue : (aggResult.lValue / aggResult.count))));
         }
         return Optional.empty();
+    }
+
+    private JsonNode getJsonValue(Row row) {
+        if (aggregation == Aggregation.MIN || aggregation == Aggregation.MAX) {
+            ObjectMapper mapper = new ObjectMapper();
+            try {
+                return mapper.readTree(row.getString(JSON_POS));
+            } catch (IOException ex) {
+                log.error(ex.getMessage(),ex);
+                return null;
+            }
+        } else {
+            return null;
+        }
     }
 
     private Optional<TsKvEntry> processMinOrMaxResult(AggregationResult aggResult) {
@@ -362,6 +263,8 @@ public class AggregatePartitionsFunction implements com.google.common.base.Funct
         String sValue = null;
         Double dValue = null;
         Long lValue = null;
+        JsonNode jValue = null;
         long count = 0;
     }
+
 }

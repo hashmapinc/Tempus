@@ -21,14 +21,11 @@ import com.hashmapinc.server.common.data.computation.ComputationJob;
 import com.hashmapinc.server.common.data.id.ComputationId;
 import com.hashmapinc.server.common.data.id.ComputationJobId;
 import com.hashmapinc.server.common.data.plugin.ComponentLifecycleEvent;
+import com.hashmapinc.server.exception.TempusException;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import com.hashmapinc.server.dao.computations.ComputationJobService;
-import com.hashmapinc.server.dao.computations.ComputationsService;
-import com.hashmapinc.server.exception.TempusException;
 
 import java.util.List;
 
@@ -39,20 +36,17 @@ import static com.hashmapinc.server.exception.TempusErrorCode.ITEM_NOT_FOUND;
 @RequestMapping("/api")
 public class ComputationJobController extends BaseController{
 
-    @Autowired
-    ComputationJobService computationJobService;
-
-    @Autowired
-    ComputationsService computationsService;
+    public static final String COMPUTATION_ID = "ComputationId ";
+    public static final String NOT_FOUND_SUFFIX = " wasn't found! ";
 
     @PreAuthorize("hasAuthority('TENANT_ADMIN')")
-    @RequestMapping(value = "/computations/{computationid}/jobs", method = RequestMethod.POST)
+    @PostMapping(value = "/computations/{computationid}/jobs")
     @ResponseBody
     public ComputationJob saveComputationJob(@PathVariable("computationid") String strComputationId,
                                              @RequestBody ComputationJob source) throws TempusException {
         ComputationJob computationJob = null;
         if(!validateComputationId(strComputationId)){
-            throw new TempusException("ComputationId " + strComputationId + " wasn't found! ",ITEM_NOT_FOUND);
+            throw new TempusException(COMPUTATION_ID + strComputationId + NOT_FOUND_SUFFIX, ITEM_NOT_FOUND);
         }
         try {
             boolean created = source.getId() == null;
@@ -76,7 +70,7 @@ public class ComputationJobController extends BaseController{
     }
 
     @PreAuthorize("hasAnyAuthority('SYS_ADMIN', 'TENANT_ADMIN')")
-    @RequestMapping(value = "/computations/jobs/{computationJobId}", method = RequestMethod.DELETE)
+    @DeleteMapping(value = "/computations/jobs/{computationJobId}")
     @ResponseStatus(value = HttpStatus.OK)
     public void deleteComputationJob(@PathVariable("computationJobId") String strComputationJobId) throws TempusException {
         checkParameter("computationJobId", strComputationJobId);
@@ -97,13 +91,13 @@ public class ComputationJobController extends BaseController{
     }
 
     @PreAuthorize("hasAnyAuthority('SYS_ADMIN', 'TENANT_ADMIN')")
-    @RequestMapping(value = "/computations/{computationId}/jobs/{computationJobId}", method = RequestMethod.GET)
+    @GetMapping(value = "/computations/{computationId}/jobs/{computationJobId}")
     @ResponseStatus(value = HttpStatus.OK)
     public ComputationJob getComputationJob(@PathVariable("computationJobId") String strComputationJobId,
                                   @PathVariable("computationId") String strComputationId) throws TempusException {
         checkParameter("computationJobId", strComputationJobId);
         if(!validateComputationId(strComputationId)){
-            throw new TempusException("ComputationId " + strComputationId + " wasn't found!",ITEM_NOT_FOUND);
+            throw new TempusException(COMPUTATION_ID + strComputationId + NOT_FOUND_SUFFIX,ITEM_NOT_FOUND);
         }
         try {
             ComputationJobId computationJobId = new ComputationJobId(toUUID(strComputationJobId));
@@ -114,14 +108,14 @@ public class ComputationJobController extends BaseController{
     }
 
     @PreAuthorize("hasAnyAuthority('SYS_ADMIN', 'TENANT_ADMIN')")
-    @RequestMapping(value = "/computations/{computationId}/jobs/{computationJodId}/activate", method = RequestMethod.POST)
+    @PostMapping(value = "/computations/{computationId}/jobs/{computationJodId}/activate")
     @ResponseStatus(value = HttpStatus.OK)
     public void activateCompuationJobById(@PathVariable("computationJodId") String strComputationJobId,
                                    @PathVariable("computationId") String strComputationId) throws TempusException {
         checkParameter("strComputationJobId", strComputationJobId);
         checkParameter("strComputationId", strComputationId);
         if(!validateComputationId(strComputationId)){
-            throw new TempusException("ComputationId " + strComputationId + " wasn't found!",ITEM_NOT_FOUND);
+            throw new TempusException(COMPUTATION_ID + strComputationId + NOT_FOUND_SUFFIX,ITEM_NOT_FOUND);
         }
         try {
             ComputationJobId computationJobId = new ComputationJobId(toUUID(strComputationJobId));
@@ -143,14 +137,14 @@ public class ComputationJobController extends BaseController{
     }
 
     @PreAuthorize("hasAnyAuthority('SYS_ADMIN', 'TENANT_ADMIN')")
-    @RequestMapping(value = "/computations/{computationId}/jobs/{computationJodId}/suspend", method = RequestMethod.POST)
+    @PostMapping(value = "/computations/{computationId}/jobs/{computationJodId}/suspend")
     @ResponseStatus(value = HttpStatus.OK)
     public void suspendComputationJobById(@PathVariable("computationJodId") String strComputationJobId,
                                   @PathVariable("computationId") String strComputationId) throws TempusException {
         checkParameter("strComputationJobId", strComputationJobId);
         checkParameter("strComputationId", strComputationId);
         if(!validateComputationId(strComputationId)){
-            throw new TempusException("ComputationId " + strComputationId + " wasn't found!",ITEM_NOT_FOUND);
+            throw new TempusException(COMPUTATION_ID + strComputationId + NOT_FOUND_SUFFIX,ITEM_NOT_FOUND);
         }
         try {
             ComputationJobId computationJobId = new ComputationJobId(toUUID(strComputationJobId));
@@ -172,26 +166,26 @@ public class ComputationJobController extends BaseController{
     }
 
     @PreAuthorize("hasAnyAuthority('SYS_ADMIN', 'TENANT_ADMIN')")
-    @RequestMapping(value = "/computations/{computationId}/jobs", method = RequestMethod.GET)
+    @GetMapping(value = "/computations/{computationId}/jobs")
     @ResponseStatus(value = HttpStatus.OK)
     public List<ComputationJob> getComputationJobs(@PathVariable("computationId") String strComputationId) throws TempusException {
         checkParameter("computationId", strComputationId);
         if(!validateComputationId(strComputationId)){
-            throw new TempusException("ComputationId " + strComputationId + " wasn't found!",ITEM_NOT_FOUND);
+            throw new TempusException(COMPUTATION_ID + strComputationId + NOT_FOUND_SUFFIX,ITEM_NOT_FOUND);
         }
         try {
             ComputationId computationId = new ComputationId(toUUID(strComputationId));
-            List<ComputationJob> computationJobs = computationJobService.findByComputationId(computationId);
-            return computationJobs;
+            return computationJobService.findByComputationId(computationId);
             } catch (Exception e) {
             throw handleException(e);
         }
     }
 
     private boolean validateComputationId(String computationId){
-        if(computationsService.findById(new ComputationId(toUUID(computationId))) == null){
-            return false;
-        }
-        return true;
+        return isComputationExists(computationId);
+    }
+
+    private boolean isComputationExists(String computationId) {
+        return computationsService.findById(new ComputationId(toUUID(computationId))) != null;
     }
 }

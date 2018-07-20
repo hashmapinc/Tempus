@@ -38,7 +38,7 @@ public class MethodNameFilter extends SimpleRuleLifecycleComponent implements Ru
     @Override
     public void init(MethodNameFilterConfiguration configuration) {
         methods = Arrays.stream(configuration.getMethodNames())
-                .map(m -> m.getName())
+                .map(MethodNameFilterConfiguration.MethodName::getName)
                 .collect(Collectors.toSet());
     }
 

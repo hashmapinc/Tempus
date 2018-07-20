@@ -16,6 +16,7 @@
 package com.hashmapinc.server.common.msg.core;
 
 import com.hashmapinc.server.common.msg.session.MsgType;
+import com.hashmapinc.server.common.msg.exception.TempusRuntimeException;
 import lombok.Data;
 import com.hashmapinc.server.common.msg.session.ToDeviceMsg;
 
@@ -53,7 +54,7 @@ public class RuleEngineErrorMsg implements ToDeviceMsg {
             case PLUGIN_TIMEOUT:
                 return "Timeout during processing of message by plugin!";
             default:
-                throw new RuntimeException("Error " + error + " is not supported!");
+                throw new TempusRuntimeException("Error " + error + " is not supported!");
         }
     }
 }

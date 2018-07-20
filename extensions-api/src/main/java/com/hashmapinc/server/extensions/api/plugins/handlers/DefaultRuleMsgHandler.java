@@ -17,12 +17,12 @@ package com.hashmapinc.server.extensions.api.plugins.handlers;
 
 import com.hashmapinc.server.common.data.id.RuleId;
 import com.hashmapinc.server.common.data.id.TenantId;
+import com.hashmapinc.server.common.msg.exception.TempusRuntimeException;
 import com.hashmapinc.server.common.msg.session.MsgType;
 import com.hashmapinc.server.extensions.api.plugins.PluginContext;
 import com.hashmapinc.server.extensions.api.plugins.msg.*;
-import lombok.extern.slf4j.Slf4j;
-import com.hashmapinc.server.extensions.api.plugins.msg.*;
 import com.hashmapinc.server.extensions.api.rules.RuleException;
+import lombok.extern.slf4j.Slf4j;
 
 
 @Slf4j
@@ -44,24 +44,24 @@ public class DefaultRuleMsgHandler implements RuleMsgHandler {
         //TODO: handle subscriptions to attribute updates.
     }
 
-    protected void handleGetAttributesRequest(PluginContext ctx, TenantId tenantId, RuleId ruleId, GetAttributesRequestRuleToPluginMsg msg) {
+    protected void handleGetAttributesRequest(PluginContext ctx, TenantId tenantId, RuleId ruleId, GetAttributesRequestRuleToPluginMsg msg) {//NOSONAR
         msgTypeNotSupported(msg.getPayload().getMsgType());
     }
 
-    protected void handleUpdateAttributesRequest(PluginContext ctx, TenantId tenantId, RuleId ruleId, UpdateAttributesRequestRuleToPluginMsg msg) {
+    protected void handleUpdateAttributesRequest(PluginContext ctx, TenantId tenantId, RuleId ruleId, UpdateAttributesRequestRuleToPluginMsg msg) {//NOSONAR
         msgTypeNotSupported(msg.getPayload().getMsgType());
     }
 
-    protected void handleTelemetryUploadRequest(PluginContext ctx, TenantId tenantId, RuleId ruleId, TelemetryUploadRequestRuleToPluginMsg msg) {
+    protected void handleTelemetryUploadRequest(PluginContext ctx, TenantId tenantId, RuleId ruleId, TelemetryUploadRequestRuleToPluginMsg msg) {//NOSONAR
         msgTypeNotSupported(msg.getPayload().getMsgType());
     }
 
-    protected void handleDepthTelemetryUploadRequest(PluginContext ctx, TenantId tenantId, RuleId ruleId, DepthTelemetryUploadRequestRuleToPluginMsg msg) {
+    protected void handleDepthTelemetryUploadRequest(PluginContext ctx, TenantId tenantId, RuleId ruleId, DepthTelemetryUploadRequestRuleToPluginMsg msg) {//NOSONAR
         msgTypeNotSupported(msg.getPayload().getMsgType());
     }
 
     private void msgTypeNotSupported(MsgType msgType) {
-        throw new RuntimeException("Not supported msg type: " + msgType + "!");
+        throw new TempusRuntimeException("Not supported msg type: " + msgType + "!");
     }
 
 }

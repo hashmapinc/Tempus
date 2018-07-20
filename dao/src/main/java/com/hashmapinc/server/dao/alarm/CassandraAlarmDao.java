@@ -64,6 +64,7 @@ public class CassandraAlarmDao extends CassandraAbstractModelDao<AlarmEntity, Al
         return ModelConstants.ALARM_COLUMN_FAMILY_NAME;
     }
 
+    @Override
     protected boolean isDeleteOnSave() {
         return false;
     }

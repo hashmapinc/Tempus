@@ -16,20 +16,5 @@
 package com.hashmapinc.server.common.data.cluster;
 
 public enum NodeStatus {
-    UP("UP"),
-    DOWN("DOWN");
-
-    private String nodeStatus;
-
-    public String getNodeStatus() {
-        return this.nodeStatus;
-    }
-
-    public void setNodeStatus(String nodeStatus) {
-        this.nodeStatus = nodeStatus;
-    }
-
-    private NodeStatus(String nodeStatus) {
-        this.nodeStatus = nodeStatus;
-    }
+    UP, DOWN
 }

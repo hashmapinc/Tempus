@@ -18,6 +18,7 @@ package com.hashmapinc.server.dao.model;
 import com.datastax.driver.core.utils.UUIDs;
 import com.hashmapinc.server.common.data.kv.Aggregation;
 import com.hashmapinc.server.common.data.kv.DepthAggregation;
+import com.hashmapinc.server.common.msg.exception.TempusRuntimeException;
 import org.apache.commons.lang3.ArrayUtils;
 import com.hashmapinc.server.common.data.UUIDConverter;
 
@@ -59,7 +60,8 @@ public class ModelConstants {
 
     public static final String INSTALLED_SCHEMA_VERSIONS = "installed_schema_versions";
     public static final String INSTALLED_SCRIPTS_COLUMN = "executed_scripts";
-    public static final String tempus_KEYSPACE = "tempus";
+    public static final String TEMPUS_KEYSPACE = "tempus";
+
 
     /**
      * Cassandra user constants.
@@ -168,33 +170,6 @@ public class ModelConstants {
     public static final String TAG_METADATA_MEAN_FREQUENCY = "mean_frequency";
     public static final String TAG_METADATA_MEDIAN_FREQUENCY = "median_frequency";
     public static final String TAG_METADATA_SOURCE = "source";
-
-    /**
-     * Application constants
-     */
-    public static final String APPLICATION_TABLE_NAME = "application";
-    public static final String APPLICATION_DASHBOARD_ID_PROPERTY = "dashboard_id";
-    public static final String APPLICATION_MINI_DASHBOARD_ID_PROPERTY = "mini_dashboard_id";
-    public static final String APPLICATION_NAME = "name";
-    public static final String APPLICATION_IS_VALID = "is_valid";
-    public static final String APPLICATION_STATE_PROPERTY = "state";
-    public static final String APPLICATION_DESCRIPTION = "description";
-    public static final String APPLICATION_DEVICE_TYPES_TABLE = "application_device_types";
-    public static final String APPLICATION_RULES_ASSOCIATION_TABLE = "application_associated_rules";
-    public static final String APPLICATION_COMPUTATION_JOBS_ASSOCIATION_TABLE = "application_associated_computation_jobs";
-    public static final String APPLICATION_RULE_ID_COLUMN= "application_rule_id";
-    public static final String APPLICATION_COMPUTATION_JOB_ID_COLUMN= "application_computation_job_id";
-    public static final String APPLICATION_ID_COLUMN = "application_id";
-    public static final String APPLICATION_DEVICE_TYPES = "device_type";
-    public static final String APPLICATION_TENANT_ID_PROPERTY = TENANT_ID_PROPERTY;
-    public static final String APPLICATION_CUSTOMER_ID_PROPERTY = CUSTOMER_ID_PROPERTY;
-    public static final String APPLICATION_RULES_COLUMN = "application_rules";
-    public static final String APPLICATION_COMPUTATION_JOBS_COLUMN = "application_computation_jobs";
-    public static final String APPLICATION_DEVICE_TYPES_COLUMN = "application_device_types";
-    public static final String APPLICATION_BY_TENANT_AND_DASHBOARD_COLUMN_FAMILY= "application_by_dashboard";
-    public static final String APPLICATION_BY_TENANT_AND_MINI_DASHBOARD_COLUMN_FAMILY= "application_by_mini_dashboard";
-    public static final String APPLICATION_BY_TENANT_AND_SEARCH_TEXT_COLUMN_FAMILY_NAME = "application_by_tenant_and_search_text";
-    public static final String APPLICATION_BY_TENANT_AND_NAME_VIEW_NAME = "application_by_tenant_and_name";
 
     /**
      * Computations Constants
@@ -563,17 +538,17 @@ public class ModelConstants {
     public static final String DOUBLE_VALUE_COLUMN = "dbl_v";
     public static final String JSON_VALUE_COLUMN = "json_v";
 
-    public static final String[] NONE_AGGREGATION_COLUMNS = new String[]{LONG_VALUE_COLUMN, DOUBLE_VALUE_COLUMN, BOOLEAN_VALUE_COLUMN, STRING_VALUE_COLUMN, JSON_VALUE_COLUMN, KEY_COLUMN, TS_COLUMN, TS_DIFF};
-    public static final String[] NONE_DS_AGGREGATION_COLUMNS = new String[]{LONG_VALUE_COLUMN, DOUBLE_VALUE_COLUMN, BOOLEAN_VALUE_COLUMN, STRING_VALUE_COLUMN, JSON_VALUE_COLUMN, KEY_COLUMN, DS_COLUMN, DS_DIFF};
+    protected static final String[] NONE_AGGREGATION_COLUMNS = new String[]{LONG_VALUE_COLUMN, DOUBLE_VALUE_COLUMN, BOOLEAN_VALUE_COLUMN, STRING_VALUE_COLUMN, JSON_VALUE_COLUMN, KEY_COLUMN, TS_COLUMN, TS_DIFF};
+    protected static final String[] NONE_DS_AGGREGATION_COLUMNS = new String[]{LONG_VALUE_COLUMN, DOUBLE_VALUE_COLUMN, BOOLEAN_VALUE_COLUMN, STRING_VALUE_COLUMN, JSON_VALUE_COLUMN, KEY_COLUMN, DS_COLUMN, DS_DIFF};
 
     protected static final String[] COUNT_AGGREGATION_COLUMNS = new String[]{count(LONG_VALUE_COLUMN), count(DOUBLE_VALUE_COLUMN), count(BOOLEAN_VALUE_COLUMN), count(STRING_VALUE_COLUMN), count(JSON_VALUE_COLUMN)};
 
     protected static final String[] MIN_AGGREGATION_COLUMNS = ArrayUtils.addAll(COUNT_AGGREGATION_COLUMNS,
-            new String[]{min(LONG_VALUE_COLUMN), min(DOUBLE_VALUE_COLUMN), min(BOOLEAN_VALUE_COLUMN), min(STRING_VALUE_COLUMN), min(JSON_VALUE_COLUMN)});
+                                                                                min(LONG_VALUE_COLUMN), min(DOUBLE_VALUE_COLUMN), min(BOOLEAN_VALUE_COLUMN), min(STRING_VALUE_COLUMN), min(JSON_VALUE_COLUMN));
     protected static final String[] MAX_AGGREGATION_COLUMNS = ArrayUtils.addAll(COUNT_AGGREGATION_COLUMNS,
-            new String[]{max(LONG_VALUE_COLUMN), max(DOUBLE_VALUE_COLUMN), max(BOOLEAN_VALUE_COLUMN), max(STRING_VALUE_COLUMN), min(JSON_VALUE_COLUMN)});
+                                                                                max(LONG_VALUE_COLUMN), max(DOUBLE_VALUE_COLUMN), max(BOOLEAN_VALUE_COLUMN), max(STRING_VALUE_COLUMN), min(JSON_VALUE_COLUMN));
     protected static final String[] SUM_AGGREGATION_COLUMNS = ArrayUtils.addAll(COUNT_AGGREGATION_COLUMNS,
-            new String[]{sum(LONG_VALUE_COLUMN), sum(DOUBLE_VALUE_COLUMN)});
+                                                                                sum(LONG_VALUE_COLUMN), sum(DOUBLE_VALUE_COLUMN));
     protected static final String[] AVG_AGGREGATION_COLUMNS = SUM_AGGREGATION_COLUMNS;
 
     public static String min(String s) {
@@ -607,7 +582,7 @@ public class ModelConstants {
             case AVG:
                 return AVG_AGGREGATION_COLUMNS;
             default:
-                throw new RuntimeException("Aggregation type: " + aggregation + " is not supported!");
+                throw new TempusRuntimeException("Aggregation type: " + aggregation + " is not supported!");
         }
     }
 
@@ -626,7 +601,7 @@ public class ModelConstants {
             case AVG:
                 return AVG_AGGREGATION_COLUMNS;
             default:
-                throw new RuntimeException("Aggregation type: " + aggregation + " is not supported!");
+                throw new TempusRuntimeException("Aggregation type: " + aggregation + " is not supported!");
         }
     }
 }

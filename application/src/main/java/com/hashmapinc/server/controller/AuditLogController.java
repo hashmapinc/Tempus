@@ -33,7 +33,7 @@ import java.util.UUID;
 public class AuditLogController extends BaseController {
 
     @PreAuthorize("hasAuthority('TENANT_ADMIN')")
-    @RequestMapping(value = "/audit/logs/customer/{customerId}", params = {"limit"}, method = RequestMethod.GET)
+    @GetMapping(value = "/audit/logs/customer/{customerId}", params = {"limit"})
     @ResponseBody
     public TimePageData<AuditLog> getAuditLogsByCustomerId(
             @PathVariable("customerId") String strCustomerId,
@@ -53,7 +53,7 @@ public class AuditLogController extends BaseController {
     }
 
     @PreAuthorize("hasAuthority('TENANT_ADMIN')")
-    @RequestMapping(value = "/audit/logs/user/{userId}", params = {"limit"}, method = RequestMethod.GET)
+    @GetMapping(value = "/audit/logs/user/{userId}", params = {"limit"})
     @ResponseBody
     public TimePageData<AuditLog> getAuditLogsByUserId(
             @PathVariable("userId") String strUserId,
@@ -73,7 +73,7 @@ public class AuditLogController extends BaseController {
     }
 
     @PreAuthorize("hasAuthority('TENANT_ADMIN')")
-    @RequestMapping(value = "/audit/logs/entity/{entityType}/{entityId}", params = {"limit"}, method = RequestMethod.GET)
+    @GetMapping(value = "/audit/logs/entity/{entityType}/{entityId}", params = {"limit"})
     @ResponseBody
     public TimePageData<AuditLog> getAuditLogsByEntityId(
             @PathVariable("entityType") String strEntityType,
@@ -95,7 +95,7 @@ public class AuditLogController extends BaseController {
     }
 
     @PreAuthorize("hasAuthority('TENANT_ADMIN')")
-    @RequestMapping(value = "/audit/logs", params = {"limit"}, method = RequestMethod.GET)
+    @GetMapping(value = "/audit/logs", params = {"limit"})
     @ResponseBody
     public TimePageData<AuditLog> getAuditLogs(
             @RequestParam int limit,

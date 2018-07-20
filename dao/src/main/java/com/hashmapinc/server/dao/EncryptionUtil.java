@@ -40,7 +40,6 @@ public class EncryptionUtil {
         md.update(dataBytes, 0, dataBytes.length);
         byte[] hashedBytes = new byte[256 / 8];
         md.doFinal(hashedBytes, 0);
-        String sha3Hash = ByteUtils.toHexString(hashedBytes);
-        return sha3Hash;
+       return ByteUtils.toHexString(hashedBytes);
     }
 }

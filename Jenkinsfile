@@ -1,27 +1,36 @@
 pipeline {
   agent {
-    node {
-      label 'tempus'
+    docker {
+      image 'hashmapinc/tempusbuild:latest'
+      args '-u root -v /var/run/docker.sock:/var/run/docker.sock -v /home/ubuntu/.m2:/root/.m2 -v /home/ubuntu/.npm:/root/.npm -v /home/ubuntu/.gradle:/root/.gradle'
     }
 
   }
   stages {
     stage('Initialize') {
       steps {
+        sh 'echo $USER'
         sh '''echo PATH = ${PATH}
 echo M2_HOME = ${M2_HOME}
-mvn clean'''
+mvn clean
+mvn validate'''
+        slackSend(message: 'Build Started for Branch: '+env.BRANCH_NAME+' for: '+env.CHANGE_AUTHOR+' on: '+env.BUILD_TAG, color: 'Green', channel: 'Tempus', botUser: true)
       }
     }
     stage('Build') {
       steps {
-        sh 'mvn validate'
-        sh 'mvn -Dmaven.test.failure.ignore=true install'
+        sh 'mvn -Dmaven.test.failure.ignore=true -DskipITs install'
+      }
+    }
+    stage('Integration Tests') {
+      steps {
+        sh 'mvn failsafe:integration-test'
+        sh 'mvn failsafe:verify'
       }
     }
     stage('Report and Archive') {
       steps {
-        junit '**/target/surefire-reports/**/*.xml'
+        junit '**/target/surefire-reports/**/*.xml,**/target/failsafe-reports/**/*.xml'
         archiveArtifacts 'application/target/*.jar,application/target/*.deb,application/target/*.zip,application/target/*.rpm'
       }
     }
@@ -43,5 +52,17 @@ sudo docker push hashmapinc/cassandra-setup:dev
 '''
       }
     }
+    stage('Success Message') {
+      steps {
+        slackSend(message: 'Build Completed for Branch: '+env.BRANCH_NAME+' for: '+env.CHANGE_AUTHOR+' on: '+env.BUILD_TAG, channel: 'Tempus', color: 'Green')
+      }
+    }
+  }
+  post {
+    always {
+      sh 'chmod -R 777 .'
+
+    }
+
   }
 }

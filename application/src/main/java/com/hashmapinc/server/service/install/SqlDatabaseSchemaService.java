@@ -17,20 +17,19 @@ package com.hashmapinc.server.service.install;
 
 import com.hashmapinc.server.dao.model.ModelConstants;
 import com.hashmapinc.server.dao.util.SqlDao;
+import com.hashmapinc.server.exception.TempusApplicationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.sql.Connection;
-import java.sql.DriverManager;
+import java.sql.*;
 
-import java.sql.ResultSet;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -44,12 +43,10 @@ import java.util.stream.Stream;
 public class SqlDatabaseSchemaService implements DatabaseSchemaService {
 
     private static final String SQL_DIR_HSQL = "sql/hsql";
-    private static  String SQL_DIR = "";
+    private static  String SQL_DIR = ""; //NOSONAR
     private static final String SQL_DIR_POSTGRES = "sql/postgres";
     private static final String UPGRADE_DIR = "upgrade";
     protected static final  String SCHEMA_SQL = "schema.sql";
-    //private static final String SCHEMA_HSQLDB_SQL = "schemaH.sql";
-    //private static final String SCHEMA_POSTGRES_SQL = "schemaP.sql";
 
     @Value("${install.data_dir}")
     private String dataDir;
@@ -64,7 +61,7 @@ public class SqlDatabaseSchemaService implements DatabaseSchemaService {
     private String dbPassword;
 
     @Override
-    public void createDatabaseSchema() throws Exception {
+    public void createDatabaseSchema() throws TempusApplicationException {
 
         log.info("Installing SQL DataBase schema...");
         int hsqldbConn = dbUrl.indexOf("hsqldb");
@@ -73,17 +70,11 @@ public class SqlDatabaseSchemaService implements DatabaseSchemaService {
 
 
         if(postgresConn != -1) {
-
-            SQL_DIR = SQL_DIR_POSTGRES;
-
-            //schemaFiles = schemaFile;
+            SQL_DIR = SQL_DIR_POSTGRES; //NOSONAR
         }
 
         if(hsqldbConn != -1) {
-
-
-            SQL_DIR = SQL_DIR_HSQL;
-            //schemaFiles = schemaFile;
+            SQL_DIR = SQL_DIR_HSQL; //NOSONAR
         }
 
 
@@ -91,38 +82,42 @@ public class SqlDatabaseSchemaService implements DatabaseSchemaService {
         Path upgradeScriptsDirectory = Paths.get(this.dataDir, SQL_DIR, UPGRADE_DIR);
 
 
-        try (Connection conn = DriverManager.getConnection(dbUrl, dbUserName, dbPassword);
-             Statement stmt = conn.createStatement()) {
+        try {
+            try (Connection conn = DriverManager.getConnection(dbUrl, dbUserName, dbPassword);
+                 Statement stmt = conn.createStatement()) {
 
-            String sql = new String(Files.readAllBytes(schemaFile), Charset.forName("UTF-8"));
+                String sql = new String(Files.readAllBytes(schemaFile), Charset.forName("UTF-8"));
 
-            stmt.execute(sql);
+                stmt.execute(sql); //NOSONAR Ignoring as we are reading queries from file
 
 
-            List<String> executedUpgrades = new ArrayList<>();
-            ResultSet rs = stmt.executeQuery("select " + ModelConstants.INSTALLED_SCRIPTS_COLUMN + " from " + ModelConstants.INSTALLED_SCHEMA_VERSIONS);
-            while (rs.next()) {
-                executedUpgrades.add(rs.getString(ModelConstants.INSTALLED_SCRIPTS_COLUMN));
-            }
-
-            try (Stream<Path> filesStream = Files.list(upgradeScriptsDirectory)) {
-                List<Integer> sortedScriptsIndexes = filesStream.map(a -> stripExtensionFromName(a.getFileName().toString())).sorted().collect(Collectors.toList());
-
-                for (Integer i : sortedScriptsIndexes) {
-                    String scriptFileName = i.toString() + ".sql";
-                    if (!executedUpgrades.contains(scriptFileName)) {
-                        String upgradeQueries = new String(Files.readAllBytes(upgradeScriptsDirectory.resolve(scriptFileName)), Charset.forName("UTF-8"));
-                        System.out.println(upgradeQueries);
-                        stmt.execute(upgradeQueries);
-                        stmt.execute("insert into " + ModelConstants.INSTALLED_SCHEMA_VERSIONS + " values('" + scriptFileName + "'" + ")");
+                List<String> executedUpgrades = new ArrayList<>();
+                try (ResultSet rs = stmt.executeQuery("select " + ModelConstants.INSTALLED_SCRIPTS_COLUMN + " from " + ModelConstants.INSTALLED_SCHEMA_VERSIONS)) {
+                    while (rs.next()) {
+                        executedUpgrades.add(rs.getString(ModelConstants.INSTALLED_SCRIPTS_COLUMN));
                     }
                 }
 
-                stmt.execute(sql); //NOSONAR, ignoring because method used to load initial tempus database schema
+                try (Stream<Path> filesStream = Files.list(upgradeScriptsDirectory)) {
+                    List<Integer> sortedScriptsIndexes = filesStream.map(a -> stripExtensionFromName(a.getFileName().toString())).sorted().collect(Collectors.toList());
+
+                    for (Integer i : sortedScriptsIndexes) {
+                        String scriptFileName = i.toString() + ".sql";
+                        if (!executedUpgrades.contains(scriptFileName)) {
+                            String upgradeQueries = new String(Files.readAllBytes(upgradeScriptsDirectory.resolve(scriptFileName)), Charset.forName("UTF-8"));
+                            log.info(upgradeQueries);
+                            stmt.execute(upgradeQueries); //NOSONAR Ignoring as we are reading queries from file
+                            stmt.execute("insert into " + ModelConstants.INSTALLED_SCHEMA_VERSIONS + " values('" + scriptFileName + "'" + ")");
+                        }
+                    }
+
+                    stmt.execute(sql); //NOSONAR, ignoring because method used to load initial tempus database schema
+                }
+
             }
-
+        } catch (SQLException | IOException e) {
+            throw new TempusApplicationException(e);
         }
-
     }
 
     private Integer stripExtensionFromName(String fileName) {

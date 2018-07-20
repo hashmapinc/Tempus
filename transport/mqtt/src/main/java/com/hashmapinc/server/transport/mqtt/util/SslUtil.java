@@ -15,11 +15,10 @@
  */
 package com.hashmapinc.server.transport.mqtt.util;
 
+import com.hashmapinc.server.dao.EncryptionUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.Base64Utils;
-import com.hashmapinc.server.dao.EncryptionUtil;
 
-import java.io.IOException;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 
@@ -31,13 +30,13 @@ public class SslUtil {
     }
 
     public static String getX509CertificateString(X509Certificate cert)
-            throws CertificateEncodingException, IOException {
+            throws CertificateEncodingException {
         Base64Utils.encodeToString(cert.getEncoded());
         return EncryptionUtil.trimNewLines(Base64Utils.encodeToString(cert.getEncoded()));
     }
 
     public static String getX509CertificateString(javax.security.cert.X509Certificate cert)
-            throws javax.security.cert.CertificateEncodingException, IOException {
+            throws javax.security.cert.CertificateEncodingException {
         Base64Utils.encodeToString(cert.getEncoded());
         return EncryptionUtil.trimNewLines(Base64Utils.encodeToString(cert.getEncoded()));
     }

@@ -15,39 +15,15 @@
  */
 package com.hashmapinc.server.controller;
 
-import com.google.common.util.concurrent.ListenableFuture;
 import com.hashmapinc.server.common.data.*;
 import com.hashmapinc.server.common.data.audit.ActionType;
-import com.hashmapinc.server.common.data.device.DeviceSearchQuery;
-import com.hashmapinc.server.common.data.id.CustomerId;
-import com.hashmapinc.server.common.data.id.DeviceId;
 import com.hashmapinc.server.common.data.id.SchemaId;
-import com.hashmapinc.server.common.data.id.TenantId;
-import com.hashmapinc.server.common.data.page.TextPageData;
-import com.hashmapinc.server.common.data.page.TextPageLink;
 import com.hashmapinc.server.common.data.schema.Schema;
-import com.hashmapinc.server.common.data.security.Authority;
-import com.hashmapinc.server.common.data.security.DeviceCredentials;
-import com.hashmapinc.server.dao.attributes.AttributesService;
-import com.hashmapinc.server.dao.depthSeries.DepthSeriesService;
-import com.hashmapinc.server.dao.exception.IncorrectParameterException;
-import com.hashmapinc.server.dao.model.ModelConstants;
-import com.hashmapinc.server.dao.timeseries.TimeseriesService;
-import com.hashmapinc.server.exception.TempusErrorCode;
 import com.hashmapinc.server.exception.TempusException;
-import com.hashmapinc.server.service.security.model.SecurityUser;
-import com.opencsv.CSVWriter;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api")

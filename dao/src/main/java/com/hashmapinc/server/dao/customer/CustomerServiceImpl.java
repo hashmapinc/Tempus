@@ -148,7 +148,7 @@ public class CustomerServiceImpl extends AbstractEntityService implements Custom
     @Override
     public TextPageData<Customer> findCustomersByTenantId(TenantId tenantId, TextPageLink pageLink) {
         log.trace("Executing findCustomersByTenantId, tenantId [{}], pageLink [{}]", tenantId, pageLink);
-        Validator.validateId(tenantId, "Incorrect tenantId " + tenantId);
+        Validator.validateId(tenantId, INCORRECT_TENANT_ID + tenantId);
         Validator.validatePageLink(pageLink, "Incorrect page link " + pageLink);
         List<Customer> customers = customerDao.findCustomersByTenantId(tenantId.getId(), pageLink);
         return new TextPageData<>(customers, pageLink);
@@ -157,7 +157,7 @@ public class CustomerServiceImpl extends AbstractEntityService implements Custom
     @Override
     public void deleteCustomersByTenantId(TenantId tenantId) {
         log.trace("Executing deleteCustomersByTenantId, tenantId [{}]", tenantId);
-        Validator.validateId(tenantId, "Incorrect tenantId " + tenantId);
+        Validator.validateId(tenantId, INCORRECT_TENANT_ID + tenantId);
         customersByTenantRemover.removeEntities(tenantId);
     }
 

@@ -50,7 +50,7 @@ public class AssetController extends BaseController {
     public static final String ASSET_ID = "assetId";
 
     @PostAuthorize("hasPermission(returnObject, 'ASSET_READ')")
-    @RequestMapping(value = "/asset/{assetId}", method = RequestMethod.GET)
+    @GetMapping(value = "/asset/{assetId}")
     @ResponseBody
     public Asset getAssetById(@PathVariable(ASSET_ID) String strAssetId) throws TempusException {
         checkParameter(ASSET_ID, strAssetId);
@@ -63,7 +63,7 @@ public class AssetController extends BaseController {
     }
 
     @PreAuthorize("hasPermission(#asset, 'ASSET_CREATE') or hasPermission(#asset, 'ASSET_UPDATE')")
-    @RequestMapping(value = "/asset", method = RequestMethod.POST)
+    @PostMapping(value = "/asset")
     @ResponseBody
     public Asset saveAsset(@RequestBody Asset asset) throws TempusException {
         try {
@@ -92,7 +92,7 @@ public class AssetController extends BaseController {
     }
 
     @PreAuthorize("hasPermission(#strAssetId, 'ASSET', 'ASSET_DELETE')")
-    @RequestMapping(value = "/asset/{assetId}", method = RequestMethod.DELETE)
+    @DeleteMapping(value = "/asset/{assetId}")
     @ResponseStatus(value = HttpStatus.OK)
     public void deleteAsset(@PathVariable(ASSET_ID) String strAssetId) throws TempusException {
         checkParameter(ASSET_ID, strAssetId);
@@ -115,7 +115,7 @@ public class AssetController extends BaseController {
     }
 
     @PreAuthorize("hasPermission(#strAssetId, 'ASSET', 'ASSET_ASSIGN')")
-    @RequestMapping(value = "/customer/{customerId}/asset/{assetId}", method = RequestMethod.POST)
+    @PostMapping(value = "/customer/{customerId}/asset/{assetId}")
     @ResponseBody
     public Asset assignAssetToCustomer(@PathVariable("customerId") String strCustomerId,
                                        @PathVariable(ASSET_ID) String strAssetId) throws TempusException {
@@ -146,7 +146,7 @@ public class AssetController extends BaseController {
     }
 
     @PreAuthorize("hasPermission(#strAssetId, 'ASSET', 'ASSET_ASSIGN')")
-    @RequestMapping(value = "/customer/asset/{assetId}", method = RequestMethod.DELETE)
+    @DeleteMapping(value = "/customer/asset/{assetId}")
     @ResponseBody
     public Asset unassignAssetFromCustomer(@PathVariable(ASSET_ID) String strAssetId) throws TempusException {
         checkParameter(ASSET_ID, strAssetId);
@@ -177,7 +177,7 @@ public class AssetController extends BaseController {
     }
 
     @PreAuthorize("hasPermission(#strAssetId, 'ASSET', 'ASSET_ASSIGN')")
-    @RequestMapping(value = "/customer/public/asset/{assetId}", method = RequestMethod.POST)
+    @PostMapping(value = "/customer/public/asset/{assetId}")
     @ResponseBody
     public Asset assignAssetToPublicCustomer(@PathVariable(ASSET_ID) String strAssetId) throws TempusException {
         checkParameter(ASSET_ID, strAssetId);
@@ -205,7 +205,7 @@ public class AssetController extends BaseController {
     @PreAuthorize("hasAuthority('TENANT_ADMIN')")
     // TODO return type should be collection of Asset. Create new action ASSET_READ_TENANT
 //    @PostFilter("hasPermission(filterObject, 'ASSET_CREATE')")
-    @RequestMapping(value = "/tenant/assets", params = {"limit"}, method = RequestMethod.GET)
+    @GetMapping(value = "/tenant/assets", params = {"limit"})
     @ResponseBody
     public TextPageData<Asset> getTenantAssets(
             @RequestParam int limit,
@@ -227,7 +227,7 @@ public class AssetController extends BaseController {
     }
 
     @PreAuthorize("hasAuthority('TENANT_ADMIN')")
-    @RequestMapping(value = "/tenant/assets", params = {"assetName"}, method = RequestMethod.GET)
+    @GetMapping(value = "/tenant/assets", params = {"assetName"})
     @ResponseBody
     public Asset getTenantAsset(
             @RequestParam String assetName) throws TempusException {
@@ -242,7 +242,7 @@ public class AssetController extends BaseController {
     @PreAuthorize("hasAnyAuthority('TENANT_ADMIN', 'CUSTOMER_USER')")
 //    @PostFilter("hasPermission(filterObject, 'ASSET_READ')")
     // TODO return type should be collection of Asset.
-    @RequestMapping(value = "/customer/{customerId}/assets", params = {"limit"}, method = RequestMethod.GET)
+    @GetMapping(value = "/customer/{customerId}/assets", params = {"limit"})
     @ResponseBody
     public TextPageData<Asset> getCustomerAssets(
             @PathVariable("customerId") String strCustomerId,
@@ -268,7 +268,7 @@ public class AssetController extends BaseController {
     }
 
     @PostFilter("hasPermission(filterObject, 'ASSET_READ')")
-    @RequestMapping(value = "/assets", params = {"assetIds"}, method = RequestMethod.GET)
+    @GetMapping(value = "/assets", params = {"assetIds"})
     @ResponseBody
     public List<Asset> getAssetsByIds(
             @RequestParam("assetIds") String[] strAssetIds) throws TempusException {
@@ -294,7 +294,7 @@ public class AssetController extends BaseController {
     }
 
     @PostFilter("hasPermission(filterObject, 'ASSET_READ')")
-    @RequestMapping(value = "/assets", method = RequestMethod.POST)
+    @PostMapping(value = "/assets")
     @ResponseBody
     public List<Asset> findByQuery(@RequestBody AssetSearchQuery query) throws TempusException {
         checkNotNull(query);
@@ -318,7 +318,7 @@ public class AssetController extends BaseController {
     }
 
     @PreAuthorize("hasAnyAuthority('TENANT_ADMIN', 'CUSTOMER_USER')")
-    @RequestMapping(value = "/asset/types", method = RequestMethod.GET)
+    @GetMapping(value = "/asset/types")
     @ResponseBody
     public List<EntitySubtype> getAssetTypes() throws TempusException {
         try {

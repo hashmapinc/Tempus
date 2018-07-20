@@ -16,9 +16,9 @@
 package com.hashmapinc.server.common.data.computation;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.hashmapinc.server.common.data.HasName;
 import com.hashmapinc.server.common.data.SearchTextBased;
 import com.hashmapinc.server.common.data.id.ComputationId;
-import com.hashmapinc.server.common.data.HasName;
 import com.hashmapinc.server.common.data.id.TenantId;
 
 public class Computations extends SearchTextBased<ComputationId> implements HasName {
@@ -28,7 +28,7 @@ public class Computations extends SearchTextBased<ComputationId> implements HasN
     private TenantId tenantId;
     private String jarName;
     private String mainClass;
-    private JsonNode jsonDescriptor;
+    private transient JsonNode jsonDescriptor;
     private String argsformat;
     private String argsType;
 
@@ -53,7 +53,7 @@ public class Computations extends SearchTextBased<ComputationId> implements HasN
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(Object o) { // NOSONAR
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         if (!super.equals(o)) return false;
@@ -66,8 +66,7 @@ public class Computations extends SearchTextBased<ComputationId> implements HasN
         if (argsformat != null ? !argsformat.equals(that.argsformat) : that.argsformat != null) return false;
         if (jsonDescriptor != null ? !jsonDescriptor.equals(that.jsonDescriptor) : that.jsonDescriptor != null) return false;
         if (mainClass != null ? !mainClass.equals(that.mainClass) : that.mainClass != null) return false;
-        if (argsType != null ? !argsType.equals(that.argsType) : that.argsType != null) return false;
-        return true;
+        return  (argsType != null ? argsType.equals(that.argsType) : that.argsType == null);
     }
 
     @Override
@@ -151,6 +150,6 @@ public class Computations extends SearchTextBased<ComputationId> implements HasN
     }
     @Override
     public String getSearchText() {
-        return name;
+        return getName();
     }
 }

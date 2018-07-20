@@ -129,7 +129,7 @@ public class PluginWebSocketHandler extends TextWebSocketHandler implements Plug
         }
     }
 
-    private PluginWebsocketSessionRef toRef(WebSocketSession session) throws IOException {
+    private PluginWebsocketSessionRef toRef(WebSocketSession session) {
         URI sessionUri = session.getUri();
         String path = sessionUri.getPath();
         path = path.substring(WebSocketConfiguration.WS_PLUGIN_PREFIX.length());

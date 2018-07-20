@@ -15,8 +15,10 @@
  */
 package com.hashmapinc.server.service.install;
 
+import com.hashmapinc.server.exception.TempusApplicationException;
+
 public interface DatabaseUpgradeService {
 
-    void upgradeDatabase(String fromVersion) throws Exception;
+    void upgradeDatabase(String fromVersion) throws TempusApplicationException;
 
 }

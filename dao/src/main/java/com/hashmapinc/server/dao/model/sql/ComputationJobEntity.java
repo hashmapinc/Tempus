@@ -117,9 +117,7 @@ public class ComputationJobEntity extends BaseSqlEntity<ComputationJob> implemen
         if (argParameters != null ? !argParameters.equals(that.argParameters) : that.argParameters != null) return false;
         if (computationId != null ? !computationId.equals(that.computationId) : that.computationId != null) return false;
         if (tenantId != null ? !tenantId.equals(that.tenantId) : that.tenantId != null) return false;
-        if (jobId != null ? !jobId.equals(that.jobId) : that.jobId != null) return false;
-
-        return true;
+        return jobId != null ? jobId.equals(that.jobId) : that.jobId == null;
     }
 
     @Override

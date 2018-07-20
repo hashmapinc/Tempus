@@ -15,21 +15,22 @@
  */
 package com.hashmapinc.server.extensions.core.action.template;
 
-import com.hashmapinc.server.extensions.api.plugins.msg.ResponsePluginToRuleMsg;
-import com.hashmapinc.server.extensions.api.plugins.msg.RuleToPluginMsg;
-import com.hashmapinc.server.extensions.api.rules.RuleContext;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.velocity.Template;
-import org.apache.velocity.VelocityContext;
-import org.apache.velocity.runtime.parser.ParseException;
 import com.hashmapinc.server.common.msg.device.ToDeviceActorMsg;
+import com.hashmapinc.server.common.msg.exception.TempusRuntimeException;
 import com.hashmapinc.server.common.msg.session.FromDeviceRequestMsg;
 import com.hashmapinc.server.common.msg.session.ToDeviceMsg;
 import com.hashmapinc.server.extensions.api.plugins.PluginAction;
 import com.hashmapinc.server.extensions.api.plugins.msg.PluginToRuleMsg;
+import com.hashmapinc.server.extensions.api.plugins.msg.ResponsePluginToRuleMsg;
+import com.hashmapinc.server.extensions.api.plugins.msg.RuleToPluginMsg;
+import com.hashmapinc.server.extensions.api.rules.RuleContext;
 import com.hashmapinc.server.extensions.api.rules.RuleProcessingMetaData;
 import com.hashmapinc.server.extensions.api.rules.SimpleRuleLifecycleComponent;
 import com.hashmapinc.server.extensions.core.utils.VelocityUtils;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.velocity.Template;
+import org.apache.velocity.VelocityContext;
+import org.apache.velocity.runtime.parser.ParseException;
 
 import java.util.Optional;
 
@@ -45,7 +46,7 @@ public abstract class AbstractTemplatePluginAction<T extends TemplateActionConfi
         try {
             this.template = VelocityUtils.create(configuration.getTemplate(), "Template");
         } catch (ParseException e) {
-            throw new RuntimeException(e.getMessage(), e);
+            throw new TempusRuntimeException(e.getMessage(), e);
         }
     }
 
@@ -74,7 +75,7 @@ public abstract class AbstractTemplatePluginAction<T extends TemplateActionConfi
         return VelocityUtils.merge(template, context);
     }
 
-    abstract protected Optional<RuleToPluginMsg> buildRuleToPluginMsg(RuleContext ctx,
+    protected abstract Optional<RuleToPluginMsg> buildRuleToPluginMsg(RuleContext ctx,
                                                                          ToDeviceActorMsg msg,
                                                                          FromDeviceRequestMsg payload);
 

@@ -28,17 +28,13 @@ public class RuleActorMetaData {
     private final int weight;
     private final ActorRef actorRef;
 
-    public static final Comparator<RuleActorMetaData> RULE_ACTOR_MD_COMPARATOR = new Comparator<RuleActorMetaData>() {
-
-        @Override
-        public int compare(RuleActorMetaData r1, RuleActorMetaData r2) {
-            if (r1.isSystemRule() && !r2.isSystemRule()) {
-                return 1;
-            } else if (!r1.isSystemRule() && r2.isSystemRule()) {
-                return -1;
-            } else {
-                return Integer.compare(r2.getWeight(), r1.getWeight());
-            }
+    public static final Comparator<RuleActorMetaData> RULE_ACTOR_MD_COMPARATOR = (r1, r2) -> {
+        if (r1.isSystemRule() && !r2.isSystemRule()) {
+            return 1;
+        } else if (!r1.isSystemRule() && r2.isSystemRule()) {
+            return -1;
+        } else {
+            return Integer.compare(r2.getWeight(), r1.getWeight());
         }
     };
 

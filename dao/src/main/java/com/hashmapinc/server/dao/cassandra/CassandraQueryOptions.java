@@ -38,7 +38,7 @@ public class CassandraQueryOptions {
     @Value("${cassandra.query.write_consistency_level}")
     private String writeConsistencyLevel;
 
-    private QueryOptions opts;
+    private QueryOptions opts;      //NOSONAR
 
     private ConsistencyLevel defaultReadConsistencyLevel;
     private ConsistencyLevel defaultWriteConsistencyLevel;

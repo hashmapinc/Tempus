@@ -23,8 +23,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.hashmapinc.server.common.data.plugin.ComponentLifecycleEvent;
 import com.hashmapinc.server.controller.plugin.PluginWebSocketMsgEndpoint;
-import com.hashmapinc.server.dao.TagMetaData.TagMetaDataService;
-import com.hashmapinc.server.dao.application.ApplicationService;
+import com.hashmapinc.server.dao.tagmetadata.TagMetaDataService;
 import com.hashmapinc.server.dao.attributes.AttributesService;
 import com.hashmapinc.server.dao.cluster.NodeMetricService;
 import com.hashmapinc.server.dao.event.EventService;
@@ -55,7 +54,7 @@ import com.hashmapinc.server.dao.plugin.PluginService;
 import com.hashmapinc.server.dao.relation.RelationService;
 import com.hashmapinc.server.dao.rule.RuleService;
 import com.hashmapinc.server.dao.tenant.TenantService;
-import com.hashmapinc.server.dao.depthSeries.DepthSeriesService;
+import com.hashmapinc.server.dao.depthseries.DepthSeriesService;
 import com.hashmapinc.server.dao.timeseries.TimeseriesService;
 import com.hashmapinc.server.service.cluster.routing.ClusterRoutingService;
 import com.hashmapinc.server.service.cluster.rpc.ClusterRpcService;
@@ -122,9 +121,6 @@ public class ActorSystemContext {
 
     @Autowired
     @Getter private AlarmService alarmService;
-
-    @Autowired
-    @Getter private ApplicationService applicationService;
 
     @Autowired
     @Getter private ComputationsService computationsService;

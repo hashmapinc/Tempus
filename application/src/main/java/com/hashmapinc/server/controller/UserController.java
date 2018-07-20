@@ -17,19 +17,6 @@ package com.hashmapinc.server.controller;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.hashmapinc.server.requests.CreateUserRequest;
-import com.hashmapinc.server.requests.IdentityUser;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.util.StringUtils;
-import org.springframework.web.bind.annotation.*;
 import com.hashmapinc.server.common.data.EntityType;
 import com.hashmapinc.server.common.data.User;
 import com.hashmapinc.server.common.data.audit.ActionType;
@@ -42,8 +29,21 @@ import com.hashmapinc.server.common.data.security.Authority;
 import com.hashmapinc.server.common.data.security.UserCredentials;
 import com.hashmapinc.server.exception.TempusErrorCode;
 import com.hashmapinc.server.exception.TempusException;
+import com.hashmapinc.server.requests.CreateUserRequest;
+import com.hashmapinc.server.requests.IdentityUser;
 import com.hashmapinc.server.service.mail.MailService;
 import com.hashmapinc.server.service.security.model.SecurityUser;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.util.StringUtils;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
 import javax.servlet.http.HttpServletRequest;
@@ -68,7 +68,7 @@ public class UserController extends BaseController {
     private RestTemplate restTemplate;
 
     @PreAuthorize("hasAnyAuthority('SYS_ADMIN', 'TENANT_ADMIN', 'CUSTOMER_USER')")
-    @RequestMapping(value = "/user/{userId}", method = RequestMethod.GET)
+    @GetMapping(value = "/user/{userId}")
     @ResponseBody
     public User getUserById(@PathVariable(USER_ID) String strUserId) throws TempusException {
         checkParameter(USER_ID, strUserId);
@@ -86,7 +86,7 @@ public class UserController extends BaseController {
     }
 
     @PreAuthorize("hasAnyAuthority('SYS_ADMIN', 'TENANT_ADMIN', 'CUSTOMER_USER')")
-    @RequestMapping(value = "/user", method = RequestMethod.POST)
+    @PostMapping(value = "/user")
     @ResponseBody
     public User saveUser(@RequestBody User user,
                          @RequestParam String activationType,
@@ -99,8 +99,6 @@ public class UserController extends BaseController {
                 throw new TempusException(YOU_DON_T_HAVE_PERMISSION_TO_PERFORM_THIS_OPERATION,
                         TempusErrorCode.PERMISSION_DENIED);
             }
-            //boolean sendEmail = user.getId() == null && activationType.equals("mail");
-            //boolean isNewExternal = user.getId() == null && activationType.equals("external");
             if (getCurrentUser().getAuthority() == Authority.TENANT_ADMIN) {
                 user.setTenantId(getCurrentUser().getTenantId());
             }
@@ -168,7 +166,7 @@ public class UserController extends BaseController {
     }
 
     @PreAuthorize("hasAnyAuthority('SYS_ADMIN', 'TENANT_ADMIN')")
-    @RequestMapping(value = "/user/sendActivationMail", method = RequestMethod.POST)
+    @PostMapping(value = "/user/sendActivationMail")
     @ResponseStatus(value = HttpStatus.OK)
     public void sendActivationEmail(
             @RequestParam(value = "email") String email,
@@ -190,7 +188,7 @@ public class UserController extends BaseController {
     }
 
     @PreAuthorize("hasAnyAuthority('SYS_ADMIN', 'TENANT_ADMIN')")
-    @RequestMapping(value = "/user/{userId}/activationLink", method = RequestMethod.GET, produces = "text/plain")
+    @GetMapping(value = "/user/{userId}/activationLink")
     @ResponseBody
     public String getActivationLink(
             @PathVariable(USER_ID) String strUserId,
@@ -227,7 +225,7 @@ public class UserController extends BaseController {
     }
 
     @PreAuthorize("hasAnyAuthority('SYS_ADMIN', 'TENANT_ADMIN')")
-    @RequestMapping(value = "/user/{userId}", method = RequestMethod.DELETE)
+    @DeleteMapping(value = "/user/{userId}")
     @ResponseStatus(value = HttpStatus.OK)
     public void deleteUser(@PathVariable(USER_ID) String strUserId) throws TempusException {
         checkParameter(USER_ID, strUserId);
@@ -250,7 +248,7 @@ public class UserController extends BaseController {
     }
 
     @PreAuthorize("hasAuthority('SYS_ADMIN')")
-    @RequestMapping(value = "/tenant/{tenantId}/users", params = { "limit" }, method = RequestMethod.GET)
+    @GetMapping(value = "/tenant/{tenantId}/users", params = { "limit" })
     @ResponseBody
     public TextPageData<User> getTenantAdmins(
             @PathVariable("tenantId") String strTenantId,
@@ -269,7 +267,7 @@ public class UserController extends BaseController {
     }
 
     @PreAuthorize("hasAuthority('TENANT_ADMIN')")
-    @RequestMapping(value = "/customer/{customerId}/users", params = { "limit" }, method = RequestMethod.GET)
+    @GetMapping(value = "/customer/{customerId}/users", params = { "limit" })
     @ResponseBody
     public TextPageData<User> getCustomerUsers(
             @PathVariable("customerId") String strCustomerId,

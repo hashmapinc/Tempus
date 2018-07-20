@@ -26,6 +26,7 @@ import com.hashmapinc.server.actors.shared.AbstractContextAwareMsgProcessor;
 import com.hashmapinc.server.common.data.id.SessionId;
 import com.hashmapinc.server.common.data.kv.TsKvEntry;
 import com.hashmapinc.server.common.msg.core.*;
+import com.hashmapinc.server.common.msg.exception.TempusRuntimeException;
 import com.hashmapinc.server.common.msg.session.MsgType;
 import com.hashmapinc.server.extensions.api.device.*;
 import com.hashmapinc.server.extensions.api.plugins.msg.TimeoutMsg;
@@ -209,7 +210,7 @@ public class DeviceActorMessageProcessor extends AbstractContextAwareMsgProcesso
         processSessionStateMsgs(msg);
     }
 
-    void processAttributesUpdate(ActorContext context, DeviceAttributesEventNotificationMsg msg) {
+    void processAttributesUpdate(DeviceAttributesEventNotificationMsg msg) {
         refreshAttributes(msg);
         if (attributeSubscriptions.size() > 0) {
             ToDeviceMsg notification = null;
@@ -221,7 +222,7 @@ public class DeviceActorMessageProcessor extends AbstractContextAwareMsgProcesso
             } else {
                 if (DataConstants.SHARED_SCOPE.equals(msg.getScope())) {
                     List<AttributeKvEntry> attributes = new ArrayList<>(msg.getValues());
-                    if (attributes.size() > 0) {
+                    if (!attributes.isEmpty()) {
                         notification = new AttributesUpdateNotification(BasicAttributeKVMsg.fromShared(attributes));
                     } else {
                         logger.debug("[{}] No public server side attributes changed!", deviceId);
@@ -240,13 +241,13 @@ public class DeviceActorMessageProcessor extends AbstractContextAwareMsgProcesso
         }
     }
 
-    void processTelemetryUpdate(ActorContext context, DeviceTelemetryEventNotificationMsg msg) {
+    void processTelemetryUpdate(DeviceTelemetryEventNotificationMsg msg) {
         refreshTelemetry(msg);
         if (telemetrySubscriptions.size() > 0) {
             ToDeviceMsg notification = null;
             List<TsKvEntry> tsKvEntries = new ArrayList<>(msg.getValues());
 
-            if (tsKvEntries.size() > 0) {
+            if (!tsKvEntries.isEmpty()) {
                 notification = new TelemetryUpdateNotification(BasicTelemetryKVMsg.createTelemetyKVMsg(tsKvEntries));
             } else {
                 logger.debug("[{}] No telemetry changed!", deviceId);
@@ -341,7 +342,7 @@ public class DeviceActorMessageProcessor extends AbstractContextAwareMsgProcesso
         );
     }
 
-    void onRulesProcessedMsg(ActorContext context, RulesProcessedMsg msg) {
+    void onRulesProcessedMsg(RulesProcessedMsg msg) {
         ChainProcessingContext ctx = msg.getCtx();
         ToDeviceActorMsg inMsg = ctx.getInMsg();
         SessionId sid = inMsg.getSessionId();
@@ -411,7 +412,7 @@ public class DeviceActorMessageProcessor extends AbstractContextAwareMsgProcesso
             return systemContext.getAttributesService().findAll(this.deviceId, scope).get();
         } catch (InterruptedException | ExecutionException e) {
             logger.warning("[{}] Failed to fetch attributes for scope: {}", deviceId, scope);
-            throw new RuntimeException(e);
+            throw new TempusRuntimeException(e);
         }
     }
 
@@ -420,14 +421,12 @@ public class DeviceActorMessageProcessor extends AbstractContextAwareMsgProcesso
              return systemContext.getTsService().findAllLatest(this.deviceId).get();
         } catch (InterruptedException | ExecutionException e) {
             logger.warning("[{}] Failed to fetch latestTelemetry", deviceId);
-            throw new RuntimeException(e);
+            throw new TempusRuntimeException(e);
         }
     }
 
     public void processCredentialsUpdate() {
-        sessions.forEach((k, v) -> {
-            sendMsgToSessionActor(new BasicToDeviceSessionActorMsg(new SessionCloseNotification(), k), v.getServer());
-        });
+        sessions.forEach((k, v) -> sendMsgToSessionActor(new BasicToDeviceSessionActorMsg(new SessionCloseNotification(), k), v.getServer()));
         attributeSubscriptions.clear();
         telemetrySubscriptions.clear();
         rpcSubscriptions.clear();

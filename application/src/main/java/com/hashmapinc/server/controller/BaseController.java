@@ -25,7 +25,6 @@ import com.hashmapinc.server.common.data.id.*;
 import com.hashmapinc.server.common.data.page.TextPageLink;
 import com.hashmapinc.server.common.data.plugin.ComponentDescriptor;
 import com.hashmapinc.server.common.data.schema.Schema;
-import com.hashmapinc.server.dao.application.ApplicationService;
 import com.hashmapinc.server.dao.cluster.NodeMetricService;
 import com.hashmapinc.server.dao.datamodel.DataModelObjectService;
 import com.hashmapinc.server.dao.datamodel.DataModelService;
@@ -139,9 +138,6 @@ public abstract class BaseController {
     protected RelationService relationService;
 
     @Autowired
-    protected ApplicationService applicationService;
-
-    @Autowired
     protected ComputationJobService computationJobService;
 
     @Autowired
@@ -152,10 +148,10 @@ public abstract class BaseController {
     protected AuditLogService auditLogService;
 
     @Autowired
-    protected SchemaService schemaService;
+    protected NodeMetricService nodeMetricService;
 
     @Autowired
-    protected NodeMetricService nodeMetricService;
+    protected SchemaService schemaService;
 
 
     @ExceptionHandler(TempusException.class)
@@ -284,7 +280,7 @@ public abstract class BaseController {
 
     Long checkLong(String value, String paramName) {
         try {
-           return Long.parseLong(value);
+            return Long.parseLong(value);
         } catch (Exception e) {
             throw new IllegalArgumentException("Incorrect "+paramName + " value supplied");
         }
@@ -359,18 +355,6 @@ public abstract class BaseController {
             throw handleException(e, false);
         }
     }
-
-    Application checkApplicationId(ApplicationId applicationId) throws TempusException {
-        try{
-            validateId(applicationId, "Incorrect applicationId " + applicationId);
-            Application application = applicationService.findApplicationById(applicationId);
-            checkNotNull(application);
-            return application;
-        } catch (Exception e) {
-            throw handleException(e, false);
-        }
-    }
-
 
     Device checkDeviceId(DeviceId deviceId) throws TempusException {
         try {
@@ -505,19 +489,19 @@ public abstract class BaseController {
         checkNotNull(dashboard);
         checkTenantId(dashboard.getTenantId());
         SecurityUser authUser = getCurrentUser();
-        if (authUser.getAuthority() == Authority.CUSTOMER_USER) {
-            if (!dashboard.isAssignedToCustomer(authUser.getCustomerId())) {
-                throw new TempusException(YOU_DON_T_HAVE_PERMISSION_TO_PERFORM_THIS_OPERATION,
-                        TempusErrorCode.PERMISSION_DENIED);
-            }
+        final boolean isDashboardAssignedToCurrentCustomer = authUser.getAuthority() == Authority.CUSTOMER_USER
+                && !dashboard.isAssignedToCustomer(authUser.getCustomerId());
+
+        if (isDashboardAssignedToCurrentCustomer) {
+            throw new TempusException(YOU_DON_T_HAVE_PERMISSION_TO_PERFORM_THIS_OPERATION,
+                    TempusErrorCode.PERMISSION_DENIED);
         }
     }
 
     ComponentDescriptor checkComponentDescriptorByClazz(String clazz) throws TempusException {
         try {
             log.debug("[{}] Lookup component descriptor", clazz);
-            ComponentDescriptor componentDescriptor = checkNotNull(componentDescriptorService.getComponent(clazz));
-            return componentDescriptor;
+            return checkNotNull(componentDescriptorService.getComponent(clazz));
         } catch (Exception e) {
             throw handleException(e, false);
         }
@@ -564,11 +548,11 @@ public abstract class BaseController {
         checkNotNull(computationJob);
         SecurityUser authUser = getCurrentUser();
         TenantId tenantId = computationJob.getTenantId();
-        validateId(tenantId, "Incorrect tenantId " + tenantId);
+        validateId(tenantId, INCORRECT_TENANT_ID + tenantId);
         if (authUser.getAuthority() != Authority.SYS_ADMIN) {
             if (authUser.getTenantId() == null ||
                     !tenantId.getId().equals(ModelConstants.NULL_UUID) && !authUser.getTenantId().equals(tenantId)) {
-                throw new TempusException("You don't have permission to perform this operation!",
+                throw new TempusException(YOU_DON_T_HAVE_PERMISSION_TO_PERFORM_THIS_OPERATION,
                         TempusErrorCode.PERMISSION_DENIED);
 
             } else if (tenantId.getId().equals(ModelConstants.NULL_UUID)) {
@@ -593,13 +577,14 @@ public abstract class BaseController {
         SecurityUser authUser = getCurrentUser();
         TenantId tenantId = rule.getTenantId();
         validateId(tenantId, INCORRECT_TENANT_ID + tenantId);
-        if (authUser.getAuthority() != Authority.SYS_ADMIN) {
-            if (authUser.getTenantId() == null ||
-                    !tenantId.getId().equals(ModelConstants.NULL_UUID) && !authUser.getTenantId().equals(tenantId)) {
-                throw new TempusException(YOU_DON_T_HAVE_PERMISSION_TO_PERFORM_THIS_OPERATION,
-                        TempusErrorCode.PERMISSION_DENIED);
 
-            }
+        final boolean ruleNotBelongsToCurrentTenant = authUser.getTenantId() == null ||
+                !tenantId.getId().equals(ModelConstants.NULL_UUID) && !authUser.getTenantId().equals(tenantId);
+
+        if (authUser.getAuthority() != Authority.SYS_ADMIN && ruleNotBelongsToCurrentTenant) {
+            throw new TempusException(YOU_DON_T_HAVE_PERMISSION_TO_PERFORM_THIS_OPERATION,
+                    TempusErrorCode.PERMISSION_DENIED);
+
         }
         return rule;
     }
@@ -615,7 +600,6 @@ public abstract class BaseController {
         }
     }
 
-
     protected String constructBaseUrl(HttpServletRequest request) {
         String scheme = request.getScheme();
         if (request.getHeader("x-forwarded-proto") != null) {
@@ -626,14 +610,14 @@ public abstract class BaseController {
             try {
                 serverPort = request.getIntHeader("x-forwarded-port");
             } catch (NumberFormatException e) {
+                log.trace(e.getMessage());
             }
         }
 
-        String baseUrl = String.format("%s://%s:%d",
+        return String.format("%s://%s:%d",
                 scheme,
                 request.getServerName(),
                 serverPort);
-        return baseUrl;
     }
 
     protected <I extends UUIDBased & EntityId> I emptyId(EntityType entityType) {

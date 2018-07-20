@@ -15,7 +15,6 @@
  */
 package com.hashmapinc.server.dao.sql.settings;
 
-import com.hashmapinc.server.common.data.id.UserId;
 import com.hashmapinc.server.dao.model.sql.UserSettingsEntity;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;

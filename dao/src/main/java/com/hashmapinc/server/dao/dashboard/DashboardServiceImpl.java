@@ -15,7 +15,6 @@
  */
 package com.hashmapinc.server.dao.dashboard;
 
-import com.google.common.base.Function;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.hashmapinc.server.common.data.Customer;
@@ -27,6 +26,7 @@ import com.hashmapinc.server.common.data.page.TextPageData;
 import com.hashmapinc.server.common.data.page.TextPageLink;
 import com.hashmapinc.server.common.data.page.TimePageLink;
 import com.hashmapinc.server.common.data.relation.RelationTypeGroup;
+import com.hashmapinc.server.common.msg.exception.TempusRuntimeException;
 import com.hashmapinc.server.dao.customer.CustomerDao;
 import com.hashmapinc.server.dao.entity.AbstractEntityService;
 import com.hashmapinc.server.dao.service.DataValidator;
@@ -35,7 +35,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import com.hashmapinc.server.common.data.*;
 import com.hashmapinc.server.common.data.id.CustomerId;
 import com.hashmapinc.server.common.data.id.DashboardId;
 import com.hashmapinc.server.common.data.page.TimePageData;
@@ -57,6 +56,7 @@ public class DashboardServiceImpl extends AbstractEntityService implements Dashb
 
     public static final String INCORRECT_DASHBOARD_ID = "Incorrect dashboardId ";
     public static final String INCORRECT_TENANT_ID = "Incorrect tenantId ";
+    public static final String INCORRECT_CUSTOMER_ID = "Incorrect customerId ";
     @Autowired
     private DashboardDao dashboardDao;
 
@@ -119,7 +119,7 @@ public class DashboardServiceImpl extends AbstractEntityService implements Dashb
                 createRelation(new EntityRelation(customerId, dashboardId, EntityRelation.CONTAINS_TYPE, RelationTypeGroup.DASHBOARD));
             } catch (ExecutionException | InterruptedException e) {
                 log.warn("[{}] Failed to create dashboard relation. Customer Id: [{}]", dashboardId, customerId);
-                throw new RuntimeException(e);
+                throw new TempusRuntimeException(e);
             }
             return saveDashboard(dashboard);
         } else {
@@ -139,7 +139,7 @@ public class DashboardServiceImpl extends AbstractEntityService implements Dashb
                 deleteRelation(new EntityRelation(customerId, dashboardId, EntityRelation.CONTAINS_TYPE, RelationTypeGroup.DASHBOARD));
             } catch (ExecutionException | InterruptedException e) {
                 log.warn("[{}] Failed to delete dashboard relation. Customer Id: [{}]", dashboardId, customerId);
-                throw new RuntimeException(e);
+                throw new TempusRuntimeException(e);
             }
             return saveDashboard(dashboard);
         } else {
@@ -194,23 +194,17 @@ public class DashboardServiceImpl extends AbstractEntityService implements Dashb
     public ListenableFuture<TimePageData<DashboardInfo>> findDashboardsByTenantIdAndCustomerId(TenantId tenantId, CustomerId customerId, TimePageLink pageLink) {
         log.trace("Executing findDashboardsByTenantIdAndCustomerId, tenantId [{}], customerId [{}], pageLink [{}]", tenantId, customerId, pageLink);
         Validator.validateId(tenantId, INCORRECT_TENANT_ID + tenantId);
-        Validator.validateId(customerId, "Incorrect customerId " + customerId);
+        Validator.validateId(customerId, INCORRECT_CUSTOMER_ID + customerId);
         Validator.validatePageLink(pageLink, "Incorrect page link " + pageLink);
         ListenableFuture<List<DashboardInfo>> dashboards = dashboardInfoDao.findDashboardsByTenantIdAndCustomerId(tenantId.getId(), customerId.getId(), pageLink);
 
-        return Futures.transform(dashboards, new Function<List<DashboardInfo>, TimePageData<DashboardInfo>>() {
-            @Nullable
-            @Override
-            public TimePageData<DashboardInfo> apply(@Nullable List<DashboardInfo> dashboards) {
-                return new TimePageData<>(dashboards, pageLink);
-            }
-        });
+        return Futures.transform(dashboards, (@Nullable List<DashboardInfo> dashboardInfoList) -> new TimePageData<>(dashboardInfoList, pageLink));
     }
 
     @Override
     public void unassignCustomerDashboards(CustomerId customerId) {
         log.trace("Executing unassignCustomerDashboards, customerId [{}]", customerId);
-        Validator.validateId(customerId, "Incorrect customerId " + customerId);
+        Validator.validateId(customerId, INCORRECT_CUSTOMER_ID + customerId);
         Customer customer = customerDao.findById(customerId.getId());
         if (customer == null) {
             throw new DataValidationException("Can't unassign dashboards from non-existent customer!");
@@ -221,7 +215,7 @@ public class DashboardServiceImpl extends AbstractEntityService implements Dashb
     @Override
     public void updateCustomerDashboards(CustomerId customerId) {
         log.trace("Executing updateCustomerDashboards, customerId [{}]", customerId);
-        Validator.validateId(customerId, "Incorrect customerId " + customerId);
+        Validator.validateId(customerId, INCORRECT_CUSTOMER_ID + customerId);
         Customer customer = customerDao.findById(customerId.getId());
         if (customer == null) {
             throw new DataValidationException("Can't update dashboards for non-existent customer!");
@@ -275,7 +269,7 @@ public class DashboardServiceImpl extends AbstractEntityService implements Dashb
                 return dashboardInfoDao.findDashboardsByTenantIdAndCustomerId(customer.getTenantId().getId(), customer.getId().getId(), pageLink).get();
             } catch (InterruptedException | ExecutionException e) {
                 log.warn("Failed to get dashboards by tenantId [{}] and customerId [{}].", customer.getTenantId().getId(), customer.getId().getId());
-                throw new RuntimeException(e);
+                throw new TempusRuntimeException(e);
             }
         }
 
@@ -300,7 +294,7 @@ public class DashboardServiceImpl extends AbstractEntityService implements Dashb
                 return dashboardInfoDao.findDashboardsByTenantIdAndCustomerId(customer.getTenantId().getId(), customer.getId().getId(), pageLink).get();
             } catch (InterruptedException | ExecutionException e) {
                 log.warn("Failed to get dashboards by tenantId [{}] and customerId [{}].", customer.getTenantId().getId(), customer.getId().getId());
-                throw new RuntimeException(e);
+                throw new TempusRuntimeException(e);
             }
         }
 

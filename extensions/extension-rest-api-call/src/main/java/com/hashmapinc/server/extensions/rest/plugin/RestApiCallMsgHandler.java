@@ -15,6 +15,7 @@
  */
 package com.hashmapinc.server.extensions.rest.plugin;
 
+import com.hashmapinc.server.common.msg.exception.TempusRuntimeException;
 import com.hashmapinc.server.extensions.api.plugins.msg.ResponsePluginToRuleMsg;
 import com.hashmapinc.server.extensions.api.plugins.msg.RuleToPluginMsg;
 import lombok.RequiredArgsConstructor;
@@ -54,7 +55,7 @@ public class RestApiCallMsgHandler implements RuleMsgHandler {
                 ctx.reply(new ResponsePluginToRuleMsg(msg.getUid(), tenantId, ruleId,
                         BasicStatusCodeResponse.onSuccess(payload.getMsgType(), payload.getRequestId())));
             } else if(!exchangeResponse.getStatusCode().equals(payload.getExpectedResultCode())) {
-                throw new RuntimeException("Response Status Code '"
+                throw new TempusRuntimeException("Response Status Code '"
                         + exchangeResponse.getStatusCode()
                         + "' doesn't equals to Expected Status Code '"
                         + payload.getExpectedResultCode() + "'");

@@ -126,6 +126,6 @@ public final class TsKvEntity implements ToData<TsKvEntry> {
     }
 
     public boolean isNotEmpty() {
-        return strValue != null || longValue != null || doubleValue != null || booleanValue != null | jsonValue != null;
+        return strValue != null || longValue != null || doubleValue != null || booleanValue != null || jsonValue != null;
     }
 }

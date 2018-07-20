@@ -15,6 +15,7 @@
  */
 package com.hashmapinc.server.extensions.mqtt.plugin;
 
+import com.hashmapinc.server.common.msg.exception.TempusRuntimeException;
 import com.hashmapinc.server.extensions.api.plugins.msg.ResponsePluginToRuleMsg;
 import com.hashmapinc.server.extensions.api.plugins.msg.RuleToPluginMsg;
 import lombok.RequiredArgsConstructor;
@@ -64,7 +65,7 @@ public class MqttMsgHandler implements RuleMsgHandler {
                 }
             });
         } catch (MqttException e) {
-            throw new RuntimeException(e.getMessage(), e);
+            throw new TempusRuntimeException(e.getMessage(), e);
         }
     }
 }

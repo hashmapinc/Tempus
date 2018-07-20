@@ -73,6 +73,7 @@
         <hazelcast.version>3.6.6</hazelcast.version>
         <hazelcast-zookeeper.version>3.6.1</hazelcast-zookeeper.version>
         <surfire.version>2.19.1</surfire.version>
+        <failsafe.version>2.18.1</failsafe.version>
         <jar-plugin.version>3.0.2</jar-plugin.version>
         <springfox-swagger.version>2.6.1</springfox-swagger.version>
         <bouncycastle.version>1.56</bouncycastle.version>
@@ -228,7 +229,57 @@
                                 </sources>
                             </configuration>
                         </execution>
+                        <execution>
+                            <id>add-integration-test-sources</id>
+                            <phase>generate-test-sources</phase>
+                            <goals>
+                                <goal>add-test-source</goal>
+                            </goals>
+                            <configuration>
+                                <sources>
+                                    <source>src/it/java</source>
+                                </sources>
+                            </configuration>
+                        </execution>
+                        <execution>
+                            <id>add-integration-test-resources</id>
+                            <phase>generate-test-resources</phase>
+                            <goals>
+                                <goal>add-test-resource</goal>
+                            </goals>
+                            <configuration>
+                                <resources>
+                                    <resource>
+                                        <directory>src/it/resources</directory>
+                                    </resource>
+                                </resources>
+                            </configuration>
+                        </execution>
                     </executions>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-failsafe-plugin</artifactId>
+                    <version>${failsafe.version}</version>
+                    <executions>
+                        <execution>
+                            <id>integration-test</id>
+                            <goals>
+                                <goal>integration-test</goal>
+                            </goals>
+                        </execution>
+                        <execution>
+                            <id>verify</id>
+                            <goals>
+                                <goal>verify</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                    <configuration>
+                        <includes>
+                            <include>**/*IntegrationTestSuite.java</include>
+                        </includes>
+                    </configuration>
                 </plugin>
                 <plugin>
                     <groupId>org.eclipse.m2e</groupId>
@@ -282,6 +333,7 @@
                             <exclude>node_modules/**</exclude>
                             <exclude>**/*.properties</exclude>
                             <exclude>src/test/resources/**</exclude>
+                            <exclude>src/it/resources/**</exclude>
                             <exclude>src/vendor/**</exclude>
                             <exclude>src/font/**</exclude>
                             <exclude>src/sh/**</exclude>
@@ -292,6 +344,7 @@
                             <exclude>**/*.env</exclude>
                             <exclude>**/*.deb</exclude>
                             <exclude>**/.helmignore</exclude>
+                            <exclude>**/.m2/*</exclude>
                         </excludes>
                         <mapping>
                             <proto>JAVADOC_STYLE</proto>

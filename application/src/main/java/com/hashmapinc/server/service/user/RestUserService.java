@@ -79,6 +79,7 @@ import static net.javacrumbs.futureconverter.springguava.FutureConverter.toGuava
 @Service
 public class RestUserService extends AbstractEntityService implements UserService{
 
+    public static final String USER_CREDENTIALS_RESOURCE = "/user-credentials";
     @Value("${identity.url}")
     private String identityUrl;
 
@@ -128,17 +129,13 @@ public class RestUserService extends AbstractEntityService implements UserServic
     public ListenableFuture<User> findUserByIdAsync(UserId userId) {
         ListenableFuture<ResponseEntity<IdentityUser>> response = toGuavaListenableFuture(asyncRestTemplate
                 .getForEntity(identityUrl + "/" + userId.getId(), IdentityUser.class));
-        Function<ResponseEntity<IdentityUser>, User> userTransfomer = new Function<ResponseEntity<IdentityUser>, User>() {
-            @Nullable
-            @Override
-            public User apply(@Nullable ResponseEntity<IdentityUser> responseEntity) {
-                if(responseEntity != null && responseEntity.getStatusCode().equals(HttpStatus.OK)){
-                    return  responseEntity.getBody().toUser();
-                }
-                return null;
+        Function<ResponseEntity<IdentityUser>, User> userTransformer = (@Nullable ResponseEntity<IdentityUser> responseEntity) -> {
+            if(responseEntity != null && responseEntity.getStatusCode().equals(HttpStatus.OK)){
+                return  responseEntity.getBody().toUser();
             }
+            return null;
         };
-        return Futures.transform(response, userTransfomer);
+        return Futures.transform(response, userTransformer);
     }
 
     @Override
@@ -191,7 +188,7 @@ public class RestUserService extends AbstractEntityService implements UserServic
         validateId(userId, INCORRECT_USER_ID + userId);
 
         ResponseEntity<IdentityUserCredentials> response = restTemplate
-                .getForEntity(identityUrl + "/" + userId.getId() + "/user-credentials", IdentityUserCredentials.class);
+                .getForEntity(identityUrl + "/" + userId.getId() + USER_CREDENTIALS_RESOURCE, IdentityUserCredentials.class);
         if(response.getStatusCode().equals(HttpStatus.OK)){
             return response.getBody().toUserCredentials();
         }
@@ -204,7 +201,7 @@ public class RestUserService extends AbstractEntityService implements UserServic
         log.trace("Executing findUserCredentialsByActivateToken [{}]", activateToken);
         Validator.validateString(activateToken, "Incorrect activateToken " + activateToken);
         ResponseEntity<IdentityUserCredentials> response = restTemplate
-                .getForEntity(identityUrl + "/" + "activate/" + activateToken +"/user-credentials",
+                .getForEntity(identityUrl + "/" + "activate/" + activateToken + USER_CREDENTIALS_RESOURCE,
                         IdentityUserCredentials.class);
         if(response.getStatusCode().equals(HttpStatus.OK)){
             return response.getBody().toUserCredentials();
@@ -217,7 +214,7 @@ public class RestUserService extends AbstractEntityService implements UserServic
         log.trace("Executing findUserCredentialsByResetToken [{}]", resetToken);
         Validator.validateString(resetToken, "Incorrect resetToken " + resetToken);
         ResponseEntity<IdentityUserCredentials> response = restTemplate
-                .getForEntity(identityUrl + "/reset/"+ resetToken + "/user-credentials",
+                .getForEntity(identityUrl + "/reset/"+ resetToken + USER_CREDENTIALS_RESOURCE,
                         IdentityUserCredentials.class);
 
         if(response.getStatusCode().equals(HttpStatus.OK)){
@@ -232,7 +229,7 @@ public class RestUserService extends AbstractEntityService implements UserServic
         log.trace("Executing saveUserCredentials [{}]", userCredentials);
         userCredentialsValidator.validate(userCredentials);
         ResponseEntity<IdentityUserCredentials> response = restTemplate
-                .exchange(identityUrl + "/" + userCredentials.getId().getId() +"/user-credentials",
+                .exchange(identityUrl + "/" + userCredentials.getId().getId() + USER_CREDENTIALS_RESOURCE,
                         HttpMethod.PUT,
                         new HttpEntity<>(new IdentityUserCredentials(userCredentials)),
                         IdentityUserCredentials.class);
@@ -426,14 +423,8 @@ public class RestUserService extends AbstractEntityService implements UserServic
                     if (userCredentials.getUserId() == null) {
                         throw new DataValidationException("User credentials should be assigned to user!");
                     }
-                    if (userCredentials.isEnabled()) {
-                        //activated ldap users can have no password
-                        /*if (StringUtils.isEmpty(userCredentials.getPassword())) {
-                            throw new DataValidationException("Enabled user credentials should have password!");
-                        }*/
-                        if (StringUtils.isNotEmpty(userCredentials.getActivateToken())) {
-                            throw new DataValidationException("Enabled user credentials can't have activate token!");
-                        }
+                    if (userCredentials.isEnabled() && StringUtils.isNotEmpty(userCredentials.getActivateToken())) {
+                        throw new DataValidationException("Enabled user credentials can't have activate token!");
                     }
                     User user = findUserById(userCredentials.getUserId());
                     if (user == null) {

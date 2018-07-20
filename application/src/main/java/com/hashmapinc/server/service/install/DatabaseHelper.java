@@ -20,6 +20,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
+import org.apache.commons.csv.CSVRecord;
 import org.apache.commons.lang3.StringUtils;
 import com.hashmapinc.server.common.data.ShortCustomerInfo;
 import com.hashmapinc.server.common.data.UUIDConverter;
@@ -38,6 +39,9 @@ import java.util.*;
 @Slf4j
 public class DatabaseHelper {
 
+    private DatabaseHelper() {
+    }
+
     public static final CSVFormat CSV_DUMP_FORMAT = CSVFormat.DEFAULT.withNullString("\\N");
 
     public static final String DEVICE = "device";
@@ -54,38 +58,40 @@ public class DatabaseHelper {
 
     public static final ObjectMapper objectMapper = new ObjectMapper();
 
-    public static void upgradeTo40_assignDashboards(Path dashboardsDump, DashboardService dashboardService, boolean sql) throws Exception {
+    public static void upgradeTo40AssignDashboards(Path dashboardsDump, DashboardService dashboardService, boolean sql) throws IOException {
         JavaType assignedCustomersType =
                 objectMapper.getTypeFactory().constructCollectionType(HashSet.class, ShortCustomerInfo.class);
         try (CSVParser csvParser = new CSVParser(Files.newBufferedReader(dashboardsDump), CSV_DUMP_FORMAT.withFirstRecordAsHeader())) {
-            csvParser.forEach(record -> {
-                String customerIdString = record.get(CUSTOMER_ID);
-                String assignedCustomersString = record.get(ASSIGNED_CUSTOMERS);
-                DashboardId dashboardId = new DashboardId(toUUID(record.get(ID), sql));
-                List<CustomerId> customerIds = new ArrayList<>();
-                if (!StringUtils.isEmpty(assignedCustomersString)) {
-                    try {
-                        Set<ShortCustomerInfo> assignedCustomers = objectMapper.readValue(assignedCustomersString, assignedCustomersType);
-                        assignedCustomers.forEach((customerInfo) -> {
-                            CustomerId customerId = customerInfo.getCustomerId();
-                            if (!customerId.isNullUid()) {
-                                customerIds.add(customerId);
-                            }
-                        });
-                    } catch (IOException e) {
-                        log.error("Unable to parse assigned customers field", e);
-                    }
-                }
-                if (!StringUtils.isEmpty(customerIdString)) {
-                    CustomerId customerId = new CustomerId(toUUID(customerIdString, sql));
+            csvParser.forEach(record -> processRecord(dashboardService, sql, assignedCustomersType, record));
+        }
+    }
+
+    private static void processRecord(DashboardService dashboardService, boolean sql, JavaType assignedCustomersType, CSVRecord record) {
+        String customerIdString = record.get(CUSTOMER_ID);
+        String assignedCustomersString = record.get(ASSIGNED_CUSTOMERS);
+        DashboardId dashboardId = new DashboardId(toUUID(record.get(ID), sql));
+        List<CustomerId> customerIds = new ArrayList<>();
+        if (!StringUtils.isEmpty(assignedCustomersString)) {
+            try {
+                Set<ShortCustomerInfo> assignedCustomers = objectMapper.readValue(assignedCustomersString, assignedCustomersType);
+                assignedCustomers.forEach(customerInfo -> {
+                    CustomerId customerId = customerInfo.getCustomerId();
                     if (!customerId.isNullUid()) {
                         customerIds.add(customerId);
                     }
-                }
-                for (CustomerId customerId : customerIds) {
-                    dashboardService.assignDashboardToCustomer(dashboardId, customerId);
-                }
-            });
+                });
+            } catch (IOException e) {
+                log.error("Unable to parse assigned customers field", e);
+            }
+        }
+        if (!StringUtils.isEmpty(customerIdString)) {
+            CustomerId customerId = new CustomerId(toUUID(customerIdString, sql));
+            if (!customerId.isNullUid()) {
+                customerIds.add(customerId);
+            }
+        }
+        for (CustomerId customerId : customerIds) {
+            dashboardService.assignDashboardToCustomer(dashboardId, customerId);
         }
     }
 

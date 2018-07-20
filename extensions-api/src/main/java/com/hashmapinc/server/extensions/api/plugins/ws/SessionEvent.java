@@ -25,7 +25,7 @@ public class SessionEvent {
 
     public enum SessionEventType {
         ESTABLISHED, CLOSED, ERROR
-    };
+    }
 
     @Getter
     private final SessionEventType eventType;

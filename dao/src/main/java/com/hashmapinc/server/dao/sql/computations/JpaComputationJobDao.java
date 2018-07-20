@@ -43,6 +43,7 @@ import static com.hashmapinc.server.dao.model.ModelConstants.NULL_UUID_STR;
 @SqlDao
 public class JpaComputationJobDao extends JpaAbstractSearchTextDao<ComputationJobEntity, ComputationJob> implements ComputationJobDao {
 
+    public static final String SEARCH_RESULT = "Search result: [{}]";
     @Autowired
     ComputationJobRepository computationJobRepository;
 
@@ -63,7 +64,7 @@ public class JpaComputationJobDao extends JpaAbstractSearchTextDao<ComputationJo
         if (log.isTraceEnabled()) {
             log.trace("Search result: [{}] for computationJob entity [{}]", computationJob != null, computationJob);
         } else {
-            log.debug("Search result: [{}]", computationJob != null);
+            log.debug(SEARCH_RESULT, computationJob != null);
         }
         return computationJob;
     }
@@ -85,9 +86,9 @@ public class JpaComputationJobDao extends JpaAbstractSearchTextDao<ComputationJo
                                 pageLink.getIdOffset() == null ? NULL_UUID_STR :  UUIDConverter.fromTimeUUID(pageLink.getIdOffset()),
                                 new PageRequest(0, pageLink.getLimit()));
         if (log.isTraceEnabled()) {
-            log.trace("Search result: [{}]", Arrays.toString(entities.toArray()));
+            log.trace(SEARCH_RESULT, Arrays.toString(entities.toArray()));
         } else {
-            log.debug("Search result: [{}]", entities.size());
+            log.debug(SEARCH_RESULT, entities.size());
         }
         return DaoUtil.convertDataList(entities);
     }

@@ -20,26 +20,17 @@ import java.util.Map;
 import java.util.Optional;
 
 import com.hashmapinc.server.actors.ActorSystemContext;
-import com.hashmapinc.server.actors.application.ComputationJobDeleteMessage;
-import com.hashmapinc.server.actors.application.DashboardDeleteMessage;
-import com.hashmapinc.server.actors.application.RuleDeleteMessage;
 import com.hashmapinc.server.actors.device.DeviceActor;
 import com.hashmapinc.server.actors.plugin.PluginTerminationMsg;
 import com.hashmapinc.server.actors.rule.ComplexRuleActorChain;
 import com.hashmapinc.server.actors.service.ContextAwareActor;
 import com.hashmapinc.server.actors.service.ContextBasedCreator;
 import com.hashmapinc.server.actors.service.DefaultActorService;
-import com.hashmapinc.server.actors.shared.application.ApplicationManager;
-import com.hashmapinc.server.actors.shared.application.TenantApplicationManager;
 import com.hashmapinc.server.actors.shared.computation.TenantComputationManager;
 import com.hashmapinc.server.actors.shared.plugin.PluginManager;
 import com.hashmapinc.server.actors.shared.rule.RuleManager;
 import com.hashmapinc.server.actors.shared.rule.TenantRuleManager;
-import com.hashmapinc.server.common.data.id.DeviceId;
-import com.hashmapinc.server.common.data.id.PluginId;
-import com.hashmapinc.server.common.data.id.RuleId;
-import com.hashmapinc.server.common.data.id.TenantId;
-import com.hashmapinc.server.common.data.plugin.ComponentLifecycleEvent;
+import com.hashmapinc.server.common.data.id.*;
 import com.hashmapinc.server.common.msg.cluster.ClusterEventMsg;
 import com.hashmapinc.server.extensions.api.device.ToDeviceActorNotificationMsg;
 import com.hashmapinc.server.extensions.api.plugins.msg.ToPluginActorMsg;
@@ -61,7 +52,6 @@ public class TenantActor extends ContextAwareActor {
     private final TenantId tenantId;
     private final RuleManager ruleManager;
     private final PluginManager pluginManager;
-    private final ApplicationManager applicationManager;
     private final TenantComputationManager computationManager;
     private final Map<DeviceId, ActorRef> deviceActors;
 
@@ -70,7 +60,6 @@ public class TenantActor extends ContextAwareActor {
         this.tenantId = tenantId;
         this.ruleManager = new TenantRuleManager(systemContext, tenantId);
         this.pluginManager = new TenantPluginManager(systemContext, tenantId);
-        this.applicationManager = new TenantApplicationManager(systemContext, tenantId);
         this.computationManager = new TenantComputationManager(systemContext, tenantId);
         this.deviceActors = new HashMap<>();
     }
@@ -148,50 +137,37 @@ public class TenantActor extends ContextAwareActor {
     }
 
     private void onComponentLifecycleMsg(ComponentLifecycleMsg msg) {
-        Optional<PluginId> pluginId = msg.getPluginId();
-        Optional<RuleId> ruleId = msg.getRuleId();
-        if (pluginId.isPresent()) {
-            ActorRef pluginActor = pluginManager.getOrCreatePluginActor(this.context(), pluginId.get());
-            pluginActor.tell(msg, ActorRef.noSender());
+        if (msg.getPluginId().isPresent()) {
+            msg.getPluginId().ifPresent(pluginId -> onComponentLifecycleMsgForPlugin(msg, pluginId));
         } else if (msg.getRuleId().isPresent()) {
-            if(msg.getEvent().equals(ComponentLifecycleEvent.DELETED)) {
-                ActorRef applicationActor = applicationManager.getOrCreateApplicationActor(this.context());
-                RuleDeleteMessage ruleDeleteMessage = new RuleDeleteMessage(msg.getRuleId().get());
-                applicationActor.tell(ruleDeleteMessage, ActorRef.noSender());
-            }
-            ActorRef target;
-            Optional<ActorRef> ref = ruleManager.update(this.context(), ruleId.get(), msg.getEvent());
-            if (ref.isPresent()) {
-                target = ref.get();
-            } else {
-                logger.debug("Failed to find actor for rule: [{}]", ruleId);
-                return;
-            }
-            target.tell(msg, ActorRef.noSender());
-        } else if (msg.getDashboardId().isPresent()){
-            if(msg.getEvent().equals(ComponentLifecycleEvent.DELETED)) {
-                ActorRef applicationActor = applicationManager.getOrCreateApplicationActor(this.context());
-                DashboardDeleteMessage dashboardDeleteMessage = new DashboardDeleteMessage(msg.getDashboardId().get());
-                applicationActor.tell(dashboardDeleteMessage, ActorRef.noSender());
-            }
+            msg.getRuleId().ifPresent(ruleId -> onComponentLifecycleMsgForRule(msg, ruleId));
         } else if(msg.getComputationId().isPresent()){
-            if(msg.getEvent().equals(ComponentLifecycleEvent.DELETED)) {
-                ActorRef applicationActor = applicationManager.getOrCreateApplicationActor(this.context());
-                if(msg.getComputationJobId().isPresent()) {
-                    ComputationJobDeleteMessage computationJobDeleteMessage = new ComputationJobDeleteMessage(msg.getComputationJobId().get());
-                    applicationActor.tell(computationJobDeleteMessage, ActorRef.noSender());
-                } /*else if(msg.getComputationId().isPresent()){
-                    ComputationDeleteMessage computationDeleteMessage = new ComputationDeleteMessage(msg.getComputationId().get());
-                    applicationActor.tell(computationDeleteMessage, ActorRef.noSender());
-                }*/ else {
-                    logger.debug("Invalid message: Computation delete message without computationId or ComputationJobId");
-                }
-            }
-            ActorRef computationActor = computationManager.getOrCreateComputationActor(this.context(), msg.getComputationId().get());
-            computationActor.tell(msg, ActorRef.noSender());
+            msg.getComputationId().ifPresent(computationId -> onComponentLifecycleMsgForComputation(msg, computationId));
         }else {
             logger.debug("[{}] Invalid component lifecycle msg.", tenantId);
         }
+    }
+
+    private void onComponentLifecycleMsgForComputation(ComponentLifecycleMsg msg, ComputationId computationId) {
+        ActorRef computationActor = computationManager.getOrCreateComputationActor(this.context(), computationId);
+        computationActor.tell(msg, ActorRef.noSender());
+    }
+
+    private void onComponentLifecycleMsgForRule(ComponentLifecycleMsg msg, RuleId ruleId) {
+        ActorRef target;
+        Optional<ActorRef> ref = ruleManager.update(this.context(), ruleId, msg.getEvent());
+        if (ref.isPresent()) {
+            target = ref.get();
+        } else {
+            logger.debug("Failed to find actor for rule: [{}]", ruleId);
+            return;
+        }
+        target.tell(msg, ActorRef.noSender());
+    }
+
+    private void onComponentLifecycleMsgForPlugin(ComponentLifecycleMsg msg, PluginId pluginId) {
+        ActorRef pluginActor = pluginManager.getOrCreatePluginActor(this.context(), pluginId);
+        pluginActor.tell(msg, ActorRef.noSender());
     }
 
     private void onPluginTerminated(PluginTerminationMsg msg) {

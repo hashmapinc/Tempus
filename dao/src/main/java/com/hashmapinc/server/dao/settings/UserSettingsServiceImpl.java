@@ -26,7 +26,6 @@ import org.springframework.stereotype.Service;
 import com.hashmapinc.server.dao.exception.DataValidationException;
 import com.hashmapinc.server.dao.service.Validator;
 
-import java.util.UUID;
 
 @Service
 @Slf4j

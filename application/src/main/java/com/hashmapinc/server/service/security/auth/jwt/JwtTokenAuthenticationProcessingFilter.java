@@ -16,8 +16,10 @@
 package com.hashmapinc.server.service.security.auth.jwt;
 
 import com.hashmapinc.server.common.data.security.Authority;
+import com.hashmapinc.server.service.security.auth.JwtAuthenticationToken;
+import com.hashmapinc.server.service.security.auth.jwt.extractor.TokenExtractor;
 import com.hashmapinc.server.service.security.model.SecurityUser;
-import org.springframework.beans.factory.InitializingBean;
+import com.hashmapinc.server.service.security.model.token.RawAccessJwtToken;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.security.oauth2.resource.ResourceServerProperties;
 import org.springframework.http.HttpEntity;
@@ -25,9 +27,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.codec.Base64;
-import com.hashmapinc.server.service.security.auth.JwtAuthenticationToken;
-import com.hashmapinc.server.service.security.auth.jwt.extractor.TokenExtractor;
-import com.hashmapinc.server.service.security.model.token.RawAccessJwtToken;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
@@ -51,7 +50,11 @@ public class JwtTokenAuthenticationProcessingFilter implements Filter{
     }
 
 
+    @Override
     public void init(FilterConfig filterConfig) throws ServletException {
+        /*
+        * EMPTY
+        * */
     }
 
     @Override
@@ -64,12 +67,12 @@ public class JwtTokenAuthenticationProcessingFilter implements Filter{
         if(tokenString !=null && !tokenString.isEmpty()) {
             RawAccessJwtToken token = new RawAccessJwtToken(tokenString);
 
-            MultiValueMap<String, String> formData = new LinkedMultiValueMap<String, String>();
+            MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
             formData.add("token", token.getToken());
 
             HttpHeaders headers = new HttpHeaders();
             headers.set("Authorization", getAuthorizationHeader(resourceServerProperties.getClientId(), resourceServerProperties.getClientSecret()));
-            Map map = (new RestTemplate()).exchange(resourceServerProperties.getTokenInfoUri(), HttpMethod.POST, new HttpEntity<>(formData, headers), new HashMap<String, Object>().getClass()).getBody();
+            Map map = (new RestTemplate()).exchange(resourceServerProperties.getTokenInfoUri(), HttpMethod.POST, new HttpEntity<>(formData, headers), HashMap.class).getBody();
 
             //todo more information needs to go it.
             SecurityUser securityUser = new SecurityUser();
@@ -83,7 +86,9 @@ public class JwtTokenAuthenticationProcessingFilter implements Filter{
 
     @Override
     public void destroy() {
-
+        /*
+         * EMPTY
+         * */
     }
 
     private String getAuthorizationHeader(String clientId, String clientSecret) {

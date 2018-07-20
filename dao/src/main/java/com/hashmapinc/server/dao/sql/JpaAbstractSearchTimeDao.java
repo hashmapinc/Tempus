@@ -22,7 +22,6 @@ import com.hashmapinc.server.dao.model.BaseEntity;
 import org.springframework.data.jpa.domain.Specification;
 
 import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import java.util.ArrayList;
@@ -35,17 +34,14 @@ import java.util.UUID;
 public abstract class JpaAbstractSearchTimeDao<E extends BaseEntity<D>, D> extends JpaAbstractDao<E, D> {
 
     public static <T> Specification<T> getTimeSearchPageSpec(TimePageLink pageLink, String idColumn) {
-        return new Specification<T>() {
-            @Override
-            public Predicate toPredicate(Root<T> root, CriteriaQuery<?> criteriaQuery, CriteriaBuilder criteriaBuilder) {
-                List<Predicate> predicates;
-                if (pageLink.isAscOrder()) {
-                    predicates = createAscPredicates(pageLink, idColumn, root, criteriaBuilder);
-                } else {
-                    predicates = createDescPredicates(pageLink, idColumn, root, criteriaBuilder);
-                }
-                return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
+        return (root, criteriaQuery, criteriaBuilder) -> {
+            List<Predicate> predicates;
+            if (pageLink.isAscOrder()) {
+                predicates = createAscPredicates(pageLink, idColumn, root, criteriaBuilder);
+            } else {
+                predicates = createDescPredicates(pageLink, idColumn, root, criteriaBuilder);
             }
+            return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
         };
     }
 
