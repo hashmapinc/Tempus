@@ -14,14 +14,15 @@ pipeline {
 echo M2_HOME = ${M2_HOME}
 mvn clean
 mvn validate'''
+        slackSend(message: 'Build Started for Branch: '+env.BRANCH_NAME+' for: '+env.CHANGE_AUTHOR+' on: '+env.BUILD_TAG, color: 'Green', channel: 'Tempus', botUser: true)
       }
     }
     stage('Build') {
       steps {
-        sh 'mvn -Dmaven.test.failure.ignore=true -Dlicense.skip=true package'
+        sh 'mvn -Dmaven.test.failure.ignore=true -DskipITs install'
       }
     }
-    stage('Integration Tests'){
+    stage('Integration Tests') {
       steps {
         sh 'mvn failsafe:integration-test'
         sh 'mvn failsafe:verify'
@@ -49,6 +50,11 @@ sudo docker build $WORKSPACE/docker/cassandra-setup/ -t hashmapinc/cassandra-set
         sh '''sudo docker push hashmapinc/tempus:dev
 sudo docker push hashmapinc/cassandra-setup:dev
 '''
+      }
+    }
+    stage('Success Message') {
+      steps {
+        slackSend(message: 'Build Completed for Branch: '+env.BRANCH_NAME+' for: '+env.CHANGE_AUTHOR+' on: '+env.BUILD_TAG, channel: 'Tempus', color: 'Green')
       }
     }
   }
