@@ -45,7 +45,7 @@
 
 ## Features
 
-Tempus was made to simplify ingest/analysis/storage/visualization of your IIoT data. Some of the key features include:
+Tempus was made to simplify ingest/analysis/storage/visualization of your IIoT data. The key features include:
 
 - Device Management
   - Configure and Control your edge devices and acquistion conifigurations
