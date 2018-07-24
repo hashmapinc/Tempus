@@ -32,7 +32,6 @@ import com.hashmapinc.server.transport.mqtt.util.SslUtil;
 import javax.net.ssl.*;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.security.KeyStore;

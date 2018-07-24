@@ -15,6 +15,9 @@
  */
 package com.hashmapinc.server.extensions.core.plugin.telemetry;
 
+import lombok.EqualsAndHashCode;
+
+@EqualsAndHashCode
 public class AttributeData implements Comparable<AttributeData>{
 
     private final long lastUpdateTs;
