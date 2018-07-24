@@ -92,7 +92,8 @@ plugins:
 
 spark:
   jar_path: "${SPARK_COMPUTATIONS_PATH:${java.io.tmpdir}}"
-  polling_interval: "${DIRECTORY_POLLING_INTERVAL:10}" # Number of Seconds
+  livy_host: "${LIVY_HOST:spark-master}"
+  livy_port: "${LIVY_PORT:8998}"
 
 # JWT Token parameters
 security.jwt:
