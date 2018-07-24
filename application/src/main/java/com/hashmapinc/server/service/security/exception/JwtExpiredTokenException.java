@@ -21,10 +21,11 @@ import com.hashmapinc.server.service.security.model.token.JwtToken;
 public class JwtExpiredTokenException extends AuthenticationException {
     private static final long serialVersionUID = -5959543783324224864L;
 
-    private JwtToken token;
+    private final JwtToken token;
 
     public JwtExpiredTokenException(String msg) {
         super(msg);
+        token = null;
     }
 
     public JwtExpiredTokenException(JwtToken token, String msg, Throwable t) {

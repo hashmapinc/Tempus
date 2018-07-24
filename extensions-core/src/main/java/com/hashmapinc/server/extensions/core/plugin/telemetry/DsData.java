@@ -15,6 +15,9 @@
  */
 package com.hashmapinc.server.extensions.core.plugin.telemetry;
 
+import lombok.EqualsAndHashCode;
+
+@EqualsAndHashCode
 public class DsData implements Comparable<DsData>{
 
     private final Double ds;
