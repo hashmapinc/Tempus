@@ -15,15 +15,14 @@
  */
 package com.hashmapinc.server.actors.computation;
 
+import com.hashmapinc.server.ComputationJobActor;
 import com.hashmapinc.server.actors.ActorSystemContext;
-import com.hashmapinc.server.actors.service.ComponentActor;
 import com.hashmapinc.server.actors.service.ContextBasedCreator;
 import com.hashmapinc.server.common.data.computation.Computations;
 import com.hashmapinc.server.common.data.id.ComputationJobId;
 import com.hashmapinc.server.common.data.id.TenantId;
-import com.hashmapinc.server.common.msg.plugin.ComponentLifecycleMsg;
 
-public class SparkComputationJobActor extends ComponentActor<ComputationJobId, SparkComputationJobActorMessageProcessor> {
+public class SparkComputationJobActor extends ComputationJobActor<SparkComputationJobActorMessageProcessor> {
 
     public SparkComputationJobActor(ActorSystemContext systemContext, TenantId tenantId,
                                     Computations computation, ComputationJobId computationJobId) {
@@ -31,24 +30,6 @@ public class SparkComputationJobActor extends ComponentActor<ComputationJobId, S
         setProcessor(new SparkComputationJobActorMessageProcessor(tenantId, computationJobId, systemContext,
                 logger, context().parent(), context().self(), computation));
     }
-
-    @Override
-    public void onReceive(Object msg) throws Exception {
-        logger.debug("[{}] Received message: {}", tenantId, msg);
-        if(msg instanceof ComponentLifecycleMsg){
-            onComponentLifecycleMsg((ComponentLifecycleMsg)msg);
-        }else if(msg instanceof ComputationJobTerminationMsg) {
-            context().stop(self());
-        }else {
-            logger.warning("[{}] Unknown message: {}!", tenantId, msg);
-        }
-    }
-
-    @Override
-    protected long getErrorPersistFrequency() {
-        return systemContext.getComputationErrorPersistFrequency();
-    }
-
 
     public static class ActorCreator extends ContextBasedCreator<SparkComputationJobActor> {
         private static final long serialVersionUID = 1L;

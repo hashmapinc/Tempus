@@ -21,6 +21,7 @@ import com.hashmapinc.server.common.data.id.ComputationId;
 import com.hashmapinc.server.common.data.id.UUIDBased;
 import com.hashmapinc.server.dao.model.ModelConstants;
 import com.hashmapinc.server.dao.util.mapping.JsonStringType;
+import lombok.EqualsAndHashCode;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
@@ -31,6 +32,7 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 
 @Slf4j
+@EqualsAndHashCode(callSuper = true)
 @Entity
 @TypeDef(name = "json", typeClass = JsonStringType.class)
 @Table(name = ModelConstants.SPARK_COMPUTATIONS_META_DATA)
