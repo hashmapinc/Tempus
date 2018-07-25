@@ -27,7 +27,8 @@ message SubscriptionProto {
   string type = 5;
   bool allKeys = 6;
   repeated SubscriptionKetStateProto keyStates = 7;
-  string scope = 8;
+  repeated DepthSubscriptionKetStateProto depthKeyStates = 8;
+  string scope = 9;
 }
 
 message SubscriptionUpdateProto {
@@ -51,6 +52,12 @@ message TimeseriesUpdateProto {
     repeated KeyValueProto data = 4;
 }
 
+message DepthseriesUpdateProto {
+    string entityType = 1;
+    string entityId = 2;
+    repeated DepthKeyValueProto data = 4;
+}
+
 message SessionCloseProto {
     string sessionId = 1;
 }
@@ -65,15 +72,31 @@ message SubscriptionKetStateProto {
     int64 ts = 2;
 }
 
+message DepthSubscriptionKetStateProto {
+    string key = 1;
+    double ds = 2;
+}
+
 message SubscriptionUpdateValueListProto {
     string key = 1;
     repeated int64 ts = 2;
-    repeated string value = 3;
+    repeated double ds = 3;
+    repeated string value = 4;
 }
 
 message KeyValueProto {
     string key = 1;
     int64 ts = 2;
+    int32 valueType = 3;
+    string strValue = 4;
+    int64 longValue = 5;
+    double doubleValue = 6;
+    bool boolValue = 7;
+}
+
+message DepthKeyValueProto {
+    string key = 1;
+    double ds = 2;
     int32 valueType = 3;
     string strValue = 4;
     int64 longValue = 5;

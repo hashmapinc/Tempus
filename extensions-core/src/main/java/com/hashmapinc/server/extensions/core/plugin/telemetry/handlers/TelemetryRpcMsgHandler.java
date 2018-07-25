@@ -48,6 +48,8 @@ public class TelemetryRpcMsgHandler implements RpcMsgHandler {
     private static final int SUBSCRIPTION_UPDATE_CLAZZ = 4;
     private static final int SESSION_CLOSE_CLAZZ = 5;
     private static final int SUBSCRIPTION_CLOSE_CLAZZ = 6;
+    private static final int DEPTH_SUBSCRIPTION_CLAZZ = 7;
+    private static final int DEPTH_SUBSCRIPTION_UPDATE_CLAZZ = 8;
 
     @Override
     public void process(PluginContext ctx, RpcMsg msg) {
@@ -70,6 +72,12 @@ public class TelemetryRpcMsgHandler implements RpcMsgHandler {
             case SUBSCRIPTION_CLOSE_CLAZZ:
                 processSubscriptionClose(ctx, msg);
                 break;
+            case DEPTH_SUBSCRIPTION_CLAZZ:
+                processDepthSubscriptionCmd(ctx, msg);
+                break;
+            case DEPTH_SUBSCRIPTION_UPDATE_CLAZZ:
+                processRemoteDepthSubscriptionUpdate(ctx, msg);
+                break;
             default:
                 throw new TempusRuntimeException("Unknown command id: " + msg.getMsgClazz());
         }
@@ -83,6 +91,16 @@ public class TelemetryRpcMsgHandler implements RpcMsgHandler {
             throw new TempusRuntimeException(e);
         }
         subscriptionManager.onRemoteSubscriptionUpdate(ctx, proto.getSessionId(), convert(proto));
+    }
+
+    private void processRemoteDepthSubscriptionUpdate(PluginContext ctx, RpcMsg msg) {
+        SubscriptionUpdateProto proto;
+        try {
+            proto = SubscriptionUpdateProto.parseFrom(msg.getMsgData());
+        } catch (InvalidProtocolBufferException e) {
+            throw new TempusRuntimeException(e);
+        }
+        subscriptionManager.onRemoteDepthSubscriptionUpdate(ctx, proto.getSessionId(), convertToDepthSubscriptionUpdate(proto));
     }
 
     private void processAttributeUpdate(PluginContext ctx, RpcMsg msg) {
@@ -121,6 +139,20 @@ public class TelemetryRpcMsgHandler implements RpcMsgHandler {
         subscriptionManager.addRemoteWsSubscription(ctx, msg.getServerAddress(), proto.getSessionId(), subscription);
     }
 
+    private void processDepthSubscriptionCmd(PluginContext ctx, RpcMsg msg) {
+        SubscriptionProto proto;
+        try {
+            proto = SubscriptionProto.parseFrom(msg.getMsgData());
+        } catch (InvalidProtocolBufferException e) {
+            throw new TempusRuntimeException(e);
+        }
+        Map<String, Double> statesMap = proto.getDepthKeyStatesList().stream().collect(Collectors.toMap(DepthSubscriptionKetStateProto::getKey, DepthSubscriptionKetStateProto::getDs));
+        Subscription subscription = new Subscription(
+                new SubscriptionState(proto.getSessionId(), proto.getSubscriptionId(), EntityIdFactory.getByTypeAndId(proto.getEntityType(), proto.getEntityId()), SubscriptionType.valueOf(proto.getType()), proto.getAllKeys(), statesMap, proto.getScope()),
+                false, msg.getServerAddress());
+        subscriptionManager.addRemoteDepthWsSubscription(ctx, msg.getServerAddress(), proto.getSessionId(), subscription);
+    }
+
     public void onNewSubscription(PluginContext ctx, ServerAddress address, String sessionId, Subscription<Long> cmd) {
         SubscriptionProto.Builder builder = SubscriptionProto.newBuilder();
         builder.setSessionId(sessionId);
@@ -134,9 +166,27 @@ public class TelemetryRpcMsgHandler implements RpcMsgHandler {
         ctx.sendPluginRpcMsg(new RpcMsg(address, SUBSCRIPTION_CLAZZ, builder.build().toByteArray()));
     }
 
+    public void onNewDepthSubscription(PluginContext ctx, ServerAddress address, String sessionId, Subscription<Double> cmd) {
+        SubscriptionProto.Builder builder = SubscriptionProto.newBuilder();
+        builder.setSessionId(sessionId);
+        builder.setSubscriptionId(cmd.getSubscriptionId());
+        builder.setEntityType(cmd.getEntityId().getEntityType().name());
+        builder.setEntityId(cmd.getEntityId().getId().toString());
+        builder.setType(cmd.getType().name());
+        builder.setAllKeys(cmd.isAllKeys());
+        builder.setScope(cmd.getScope());
+        cmd.getKeyStates().entrySet().forEach(e -> builder.addDepthKeyStates(DepthSubscriptionKetStateProto.newBuilder().setKey(e.getKey()).setDs(e.getValue()).build()));
+        ctx.sendPluginRpcMsg(new RpcMsg(address, DEPTH_SUBSCRIPTION_CLAZZ, builder.build().toByteArray()));
+    }
+
     public void onSubscriptionUpdate(PluginContext ctx, ServerAddress address, String sessionId, SubscriptionUpdate update) {
         SubscriptionUpdateProto proto = getSubscriptionUpdateProto(sessionId, update);
         ctx.sendPluginRpcMsg(new RpcMsg(address, SUBSCRIPTION_UPDATE_CLAZZ, proto.toByteArray()));
+    }
+
+    public void onDepthSubscriptionUpdate(PluginContext ctx, ServerAddress address, String sessionId, DepthSubscriptionUpdate update) {
+        SubscriptionUpdateProto proto = getSubscriptionUpdateProto(sessionId, update);
+        ctx.sendPluginRpcMsg(new RpcMsg(address, DEPTH_SUBSCRIPTION_UPDATE_CLAZZ, proto.toByteArray()));
     }
 
     public void onSessionClose(PluginContext ctx, ServerAddress address, String vSessionId) {
@@ -194,6 +244,31 @@ public class TelemetryRpcMsgHandler implements RpcMsgHandler {
         return builder.build();
     }
 
+    private static SubscriptionUpdateProto getSubscriptionUpdateProto(String sessionId, DepthSubscriptionUpdate update) {
+        SubscriptionUpdateProto.Builder builder = SubscriptionUpdateProto.newBuilder();
+        builder.setSessionId(sessionId);
+        builder.setSubscriptionId(update.getSubscriptionId());
+        builder.setErrorCode(update.getErrorCode());
+        if (update.getErrorMsg() != null) {
+            builder.setErrorMsg(update.getErrorMsg());
+        }
+        update.getData().entrySet().forEach(
+                e -> {
+                    SubscriptionUpdateValueListProto.Builder dataBuilder = SubscriptionUpdateValueListProto.newBuilder();
+
+                    dataBuilder.setKey(e.getKey());
+                    e.getValue().forEach(v -> {
+                        Object[] array = (Object[]) v;
+                        dataBuilder.addDs((double) array[0]);
+                        dataBuilder.addValue((String) array[1]);
+                    });
+
+                    builder.addData(dataBuilder.build());
+                }
+        );
+        return builder.build();
+    }
+
     private SubscriptionUpdate convert(SubscriptionUpdateProto proto) {
         if (proto.getErrorCode() > 0) {
             return new SubscriptionUpdate(proto.getSubscriptionId(), SubscriptionErrorCode.forCode(proto.getErrorCode()), proto.getErrorMsg());
@@ -211,6 +286,25 @@ public class TelemetryRpcMsgHandler implements RpcMsgHandler {
             return new SubscriptionUpdate(proto.getSubscriptionId(), data);
         }
     }
+
+    private DepthSubscriptionUpdate convertToDepthSubscriptionUpdate(SubscriptionUpdateProto proto) {
+        if (proto.getErrorCode() > 0) {
+            return new DepthSubscriptionUpdate(proto.getSubscriptionId(), SubscriptionErrorCode.forCode(proto.getErrorCode()), proto.getErrorMsg());
+        } else {
+            Map<String, List<Object>> data = new TreeMap<>();
+            proto.getDataList().forEach(v -> {
+                List<Object> values = data.computeIfAbsent(v.getKey(), k -> new ArrayList<>());
+                for (int i = 0; i < v.getTsCount(); i++) {
+                    Object[] value = new Object[2];
+                    value[0] = v.getDs(i);
+                    value[1] = v.getValue(i);
+                    values.add(value);
+                }
+            });
+            return new DepthSubscriptionUpdate(proto.getSubscriptionId(), data);
+        }
+    }
+
 
     public void onAttributesUpdate(PluginContext ctx, ServerAddress address, EntityId entityId, String scope, List<AttributeKvEntry> attributes) {
         ctx.sendPluginRpcMsg(new RpcMsg(address, ATTRIBUTES_UPDATE_CLAZZ, getAttributesUpdateProto(entityId, scope, attributes).toByteArray()));

@@ -37,6 +37,7 @@ import static com.hashmapinc.server.extensions.core.plugin.telemetry.handlers.Te
 @Slf4j
 public class SubscriptionManager {
 
+    public static final String FAILED_TO_FETCH_MISSED_UPDATES = "Failed to fetch missed updates.";
     private final Map<EntityId, Set<Subscription>> subscriptionsByEntityId = new HashMap<>();
 
     private final Map<String, Map<Integer, Subscription>> subscriptionsByWsSessionId = new HashMap<>();
@@ -69,6 +70,7 @@ public class SubscriptionManager {
             ServerAddress address = server.get();
             log.trace("[{}] Forwarding subscription [{}] for device [{}] to [{}]", sessionId, sub.getSubscriptionId(), entityId, address);
             subscription = new Subscription(sub, true, address);
+            rpcHandler.onNewDepthSubscription(ctx, address, sessionId, subscription);
         } else {
             log.trace("[{}] Registering local subscription [{}] for device [{}]", sessionId, sub.getSubscriptionId(), entityId);
             subscription = new Subscription(sub, true);
@@ -98,7 +100,7 @@ public class SubscriptionManager {
 
                 @Override
                 public void onFailure(PluginContext ctx, Exception e) {
-                    log.error("Failed to fetch missed updates.", e);
+                    log.error(FAILED_TO_FETCH_MISSED_UPDATES, e);
                 }
             });
         } else if (subscription.getType() == SubscriptionType.TIMESERIES) {
@@ -117,11 +119,33 @@ public class SubscriptionManager {
 
                 @Override
                 public void onFailure(PluginContext ctx, Exception e) {
-                    log.error("Failed to fetch missed updates.", e);
+                    log.error(FAILED_TO_FETCH_MISSED_UPDATES, e);
                 }
             });
         }
 
+    }
+
+    public void addRemoteDepthWsSubscription(PluginContext ctx, ServerAddress address, String sessionId, Subscription<Double> subscription) {
+        EntityId entityId = subscription.getEntityId();
+
+            List<DsKvQuery> queries = new ArrayList<>();
+            subscription.getKeyStates().entrySet().forEach(e ->
+                    queries.add(new BaseDsKvQuery(e.getKey(), e.getValue() - 1.0, e.getValue())));
+
+            ctx.loadDepthSeries(entityId, queries, new PluginCallback<List<DsKvEntry>>() {
+                @Override
+                public void onSuccess(PluginContext ctx, List<DsKvEntry> missedUpdates) {
+                    if (!missedUpdates.isEmpty()) {
+                        rpcHandler.onDepthSubscriptionUpdate(ctx, address, sessionId, new DepthSubscriptionUpdate(subscription.getSubscriptionId(), missedUpdates));
+                    }
+                }
+
+                @Override
+                public void onFailure(PluginContext ctx, Exception e) {
+                    log.error(FAILED_TO_FETCH_MISSED_UPDATES, e);
+                }
+            });
     }
 
     private void registerSubscription(String sessionId, EntityId entityId, Subscription subscription) {
@@ -258,7 +282,7 @@ public class SubscriptionManager {
                         updateDepthSubscriptionState(sessionId, s, update);
                         websocketHandler.sendWsMsg(ctx, sessionId, update);
                     } else {
-                        log.debug("Subscription not local");
+                        rpcHandler.onDepthSubscriptionUpdate(ctx, s.getServer(), sessionId, update);
                     }
                 }
             });
@@ -272,6 +296,15 @@ public class SubscriptionManager {
         Optional<Subscription> subOpt = getSubscription(sessionId, update.getSubscriptionId());
         if (subOpt.isPresent()) {
             updateSubscriptionState(sessionId, subOpt.get(), update);
+            websocketHandler.sendWsMsg(ctx, sessionId, update);
+        }
+    }
+
+    public void onRemoteDepthSubscriptionUpdate(PluginContext ctx, String sessionId, DepthSubscriptionUpdate update) {
+        log.trace("[{}] Processing remote subscription onUpdate [{}]", sessionId, update);
+        Optional<Subscription> subOpt = getSubscription(sessionId, update.getSubscriptionId());
+        if (subOpt.isPresent()) {
+            updateDepthSubscriptionState(sessionId, subOpt.get(), update);
             websocketHandler.sendWsMsg(ctx, sessionId, update);
         }
     }
