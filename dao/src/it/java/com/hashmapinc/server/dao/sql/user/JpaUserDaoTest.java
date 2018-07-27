@@ -50,7 +50,7 @@ public class JpaUserDaoTest extends AbstractJpaDaoTest {
     @DatabaseSetup("classpath:dbunit/user.xml")
     public void testFindAll() {
         List<User> users = userDao.find();
-        assertEquals(users.size(), 5);
+        assertEquals(5, users.size());
     }
 
     @Test
