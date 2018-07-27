@@ -13,10 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.hashmapinc.server.common.data;
+package com.hashmapinc.server.dao.sql.schema;
 
+import com.hashmapinc.server.common.data.id.SchemaId;
+import com.hashmapinc.server.dao.model.sql.NodeMetricEntity;
+import com.hashmapinc.server.dao.model.sql.SchemaEntity;
+import com.hashmapinc.server.dao.util.SqlDao;
+import org.springframework.data.repository.CrudRepository;
 
-public enum EntityType {
-    TENANT, CUSTOMER, USER, RULE, PLUGIN, DASHBOARD, ASSET, DEVICE, ALARM, COMPUTATION, COMPUTATION_JOB, NODE_METRIC,THEME, LOGO,
-    DATA_MODEL_OBJECT, DATA_MODEL, SCHEMA
+import java.util.UUID;
+
+@SqlDao
+public interface SchemaRepository extends CrudRepository<SchemaEntity, String> {
+
+    SchemaEntity findSchemaById(SchemaId schemaId);
+
+    SchemaEntity findSchemaByName(String name);
 }

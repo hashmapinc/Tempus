@@ -11,6 +11,10 @@
         "title": "Topic Name",
         "type": "string"
       },
+      "schema": {
+        "title": "Saved Template",
+        "type": "string"
+      },
       "template": {
         "title": "Body Template",
         "type": "string"
@@ -29,6 +33,21 @@
       "key": "template",
       "type": "textarea",
       "rows": 5
+    },
+    {
+      "key": "schema",
+      "type": "rc-select",
+      "multiple": false,
+      "items": [
+        {
+          "value": "Velocity Template 1",
+          "label": "Velocity Template 1"
+        },
+        {
+          "value": "Velocity Template 2",
+          "label": "Velocity Template 2"
+        }
+      ]
     }
   ]
 }

@@ -1301,7 +1301,17 @@ export default angular.module('tempus.locale', [])
                 "rule-plugin": {
                     "management": "Rules and plugins management"
                 },
-                "cluster": {
+                "schema": {
+                    "schemas": "Schema Registry"
+                },
+                "schemas": {
+                    "add": "Add Schema",
+                    "name": "Name",
+                    "description" :"Description",
+                    "name-required":"This field is required"
+                },
+
+                    "cluster": {
                     "cluster-info": "Cluster Info",
                     "management": "Cluster Information Management",
                     "refresh": "Refresh"

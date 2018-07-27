@@ -13,10 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.hashmapinc.server.common.data;
+package com.hashmapinc.server.common.data.schema;
 
+public enum SchemaType {
+    VELOCITY("VELOCITY"),
+    AVRO("AVRO"),
+    PROTOBUF("PROTOBUF");
 
-public enum EntityType {
-    TENANT, CUSTOMER, USER, RULE, PLUGIN, DASHBOARD, ASSET, DEVICE, ALARM, COMPUTATION, COMPUTATION_JOB, NODE_METRIC,THEME, LOGO,
-    DATA_MODEL_OBJECT, DATA_MODEL, SCHEMA
+    private String type;
+
+    public String getSchemaType() {
+        return this.type;
+    }
+
+    public void setSchemaType(String type) {
+        this.type = type;
+    }
+
+    private SchemaType(String type) {
+        this.type = type;
+    }
 }

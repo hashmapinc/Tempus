@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright © 2017-2018 Hashmap, Inc
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,10 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.hashmapinc.server.common.data;
+/* eslint-disable import/no-unresolved, import/default, no-unused-vars */
 
+/*@ngInject*/
+import {AddDataModelController} from "../data_models/data_models.controller";
 
-public enum EntityType {
-    TENANT, CUSTOMER, USER, RULE, PLUGIN, DASHBOARD, ASSET, DEVICE, ALARM, COMPUTATION, COMPUTATION_JOB, NODE_METRIC,THEME, LOGO,
-    DATA_MODEL_OBJECT, DATA_MODEL, SCHEMA
+export function SchemaController($scope, $window) {
+
+    var vm = this;
+
+    /*$window.alert("hello");*/
 }

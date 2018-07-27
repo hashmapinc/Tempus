@@ -283,6 +283,13 @@ function Menu(userService, $state, $rootScope) {
                             link: '/static/svg/computationslightgray.svg'
                         },
                         {
+                            name: 'schema.schemas',
+                            type: 'link',
+                            state: 'home.schemas',
+                            icon: 'schemas',
+                            link: '/static/svg/schema-registry-icon.svg'
+                        },
+                        {
                             name: 'audit-log.audit-logs',
                             type: 'link',
                             state: 'home.auditLogs',

@@ -202,7 +202,17 @@ public class ModelConstants {
     public static final String NODE_METRIC_RPC_SESSION = "rpc_session_count";
     public static final String NODE_METRIC_DEVICE_SESSION = "device_session_count";
 
-    /* Cassandra audit log constants.
+    /**
+     *  Schema Registry constants.
+     */
+    public static final String SCHEMA_REGISTRY_TABLE_NAME = "schema_registry";
+    public static final String SCHEMA_REGISTRY_NAME = "name";
+    public static final String SCHEMA_REGISTRY_DESCRIPTION = "description";
+    public static final String SCHEMA_REGISTRY_TYPE = "type";
+    public static final String SCHEMA_REGISTRY_SCHEMA_TXT = "schema_txt";
+
+    /**
+     * Cassandra audit log constants.
      */
 
     public static final String AUDIT_LOG_COLUMN_FAMILY_NAME = "audit_log";
@@ -383,6 +393,15 @@ public class ModelConstants {
     public static final String ATTRIBUTE_DEFINITION_VALUE_TYPE = "value_type";
     public static final String ATTRIBUTE_DEFINITION_MODEL_OBJECT_ID = "data_model_object_id";
     public static final String ATTRIBUTE_DEFINITION_SOURCE = "source";
+
+    /**
+     * Cassandra schema_registry constants.
+     */
+    public static final String SCHEMA_REGISTRY_COLUMN_FAMILY_NAME = "schema_registry";
+    public static final String SCHEMA_REGISTRY_NAME_PROPERTY = "name";
+    public static final String SCHEMA_REGISTRY_DESCRIPTION_PROPERTY = "description";
+    public static final String SCHEMA_REGISTRY_TYPE_PROPERTY = "type";
+    public static final String SCHEMA_REGISTRY_SCHEMA_TXT_PROPERTY = "schema_txt";
 
     /**
      * Cassandra Node Metric Contants

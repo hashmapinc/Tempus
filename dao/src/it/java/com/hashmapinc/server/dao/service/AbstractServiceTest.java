@@ -33,8 +33,11 @@ import com.hashmapinc.server.common.data.plugin.ComponentType;
 import com.hashmapinc.server.common.data.plugin.PluginMetaData;
 import com.hashmapinc.server.common.data.rule.RuleMetaData;
 
+import com.hashmapinc.server.common.data.schema.Schema;
+import com.hashmapinc.server.common.data.schema.SchemaType;
 import com.hashmapinc.server.dao.UserServiceTestConfiguration;
 
+import com.hashmapinc.server.dao.schema.SchemaService;
 import com.hashmapinc.server.dao.tagmetadata.TagMetaDataService;
 
 import com.hashmapinc.server.dao.alarm.AlarmService;
@@ -166,6 +169,9 @@ public abstract class AbstractServiceTest {
     @Autowired
     protected DataModelObjectService dataModelObjectService;
 
+    @Autowired
+    protected SchemaService schemaService;
+
     class IdComparator<D extends BaseData<? extends UUIDBased>> implements Comparator<D> {
         @Override
         public int compare(D o1, D o2) {
@@ -226,6 +232,15 @@ public abstract class AbstractServiceTest {
         nodeMetric.setRpcSessionCount(rpcSessionCount);
         nodeMetric.setId(new NodeMetricId(UUIDs.timeBased()));
         return nodeMetric;
+    }
+
+    protected Schema generateSchema(String name, String descripiton, SchemaType type, String text) throws IOException {
+        Schema schema = new Schema();
+        schema.setName(name);
+        schema.setDescription(descripiton);
+        schema.setType(type);
+        schema.setSchema_txt(text);
+        return schema;
     }
 
     protected Computations generateComputation(TenantId tenantId) throws IOException {

@@ -24,11 +24,13 @@ import com.hashmapinc.server.common.data.computation.ComputationJob;
 import com.hashmapinc.server.common.data.id.*;
 import com.hashmapinc.server.common.data.page.TextPageLink;
 import com.hashmapinc.server.common.data.plugin.ComponentDescriptor;
+import com.hashmapinc.server.common.data.schema.Schema;
 import com.hashmapinc.server.dao.cluster.NodeMetricService;
 import com.hashmapinc.server.dao.datamodel.DataModelObjectService;
 import com.hashmapinc.server.dao.datamodel.DataModelService;
 import com.hashmapinc.server.dao.device.DeviceCredentialsService;
 import com.hashmapinc.server.dao.rule.RuleService;
+import com.hashmapinc.server.dao.schema.SchemaService;
 import com.hashmapinc.server.dao.user.UserService;
 import com.hashmapinc.server.service.component.ComponentDiscoveryService;
 import com.hashmapinc.server.service.security.model.SecurityUser;
@@ -147,6 +149,9 @@ public abstract class BaseController {
 
     @Autowired
     protected NodeMetricService nodeMetricService;
+
+    @Autowired
+    protected SchemaService schemaService;
 
 
     @ExceptionHandler(TempusException.class)
@@ -275,7 +280,7 @@ public abstract class BaseController {
 
     Long checkLong(String value, String paramName) {
         try {
-           return Long.parseLong(value);
+            return Long.parseLong(value);
         } catch (Exception e) {
             throw new IllegalArgumentException("Incorrect "+paramName + " value supplied");
         }
@@ -488,8 +493,8 @@ public abstract class BaseController {
                 && !dashboard.isAssignedToCustomer(authUser.getCustomerId());
 
         if (isDashboardAssignedToCurrentCustomer) {
-                throw new TempusException(YOU_DON_T_HAVE_PERMISSION_TO_PERFORM_THIS_OPERATION,
-                        TempusErrorCode.PERMISSION_DENIED);
+            throw new TempusException(YOU_DON_T_HAVE_PERMISSION_TO_PERFORM_THIS_OPERATION,
+                    TempusErrorCode.PERMISSION_DENIED);
         }
     }
 
@@ -577,11 +582,22 @@ public abstract class BaseController {
                 !tenantId.getId().equals(ModelConstants.NULL_UUID) && !authUser.getTenantId().equals(tenantId);
 
         if (authUser.getAuthority() != Authority.SYS_ADMIN && ruleNotBelongsToCurrentTenant) {
-                throw new TempusException(YOU_DON_T_HAVE_PERMISSION_TO_PERFORM_THIS_OPERATION,
-                        TempusErrorCode.PERMISSION_DENIED);
+            throw new TempusException(YOU_DON_T_HAVE_PERMISSION_TO_PERFORM_THIS_OPERATION,
+                    TempusErrorCode.PERMISSION_DENIED);
 
         }
         return rule;
+    }
+
+    Schema checkSchemaId(SchemaId schemaId) throws TempusException {
+        try {
+            validateId(schemaId, "Incorrect schemaId " + schemaId);
+            Schema schema = schemaService.findSchemaById(schemaId);
+            checkNotNull(schema);
+            return schema;
+        } catch (Exception e) {
+            throw handleException(e, false);
+        }
     }
 
     protected String constructBaseUrl(HttpServletRequest request) {
