@@ -309,7 +309,7 @@ export default function AttributeTableDirective($compile, $templateCache, $rootS
                     controllerAs: 'vm',
                     templateUrl: addAttributeDialogTemplate,
                     parent: angular.element($document[0].body),
-                    locals: {entityType: scope.entityType, entityId: scope.entityId, attributeScope: scope.attributeScope.value},
+                    locals: {telementryData:'', depthData:'', entityType: scope.entityType, entityId: scope.entityId, attributeScope: scope.attributeScope.value},
                     fullscreen: true,
                     targetEvent: $event
                 }).then(function () {
