@@ -142,7 +142,7 @@
                 </md-button>
             </div>
         </md-toolbar>
-        <md-button ng-if ="entityType == 'DEVICE'" style="margin-left: 530px;margin-top: 3px;"ng-disabled="$root.loading" ng-click="download($event,{attributeScope})"
+        <md-button ng-hide="mode==='widget'" ng-if ="entityType == 'DEVICE'"  style="left: 83%;margin-top: 3px;"ng-disabled="$root.loading" ng-click="download($event,{attributeScope})"
                    class="md-raised md-primary"><span translate>attribute.download-button</span>
         </md-button>
 
