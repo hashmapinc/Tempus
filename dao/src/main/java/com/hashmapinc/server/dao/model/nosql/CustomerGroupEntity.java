@@ -13,64 +13,71 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.hashmapinc.server.dao.model.sql;
+package com.hashmapinc.server.dao.model.nosql;
 
 import com.datastax.driver.core.utils.UUIDs;
+import com.datastax.driver.mapping.annotations.Column;
+import com.datastax.driver.mapping.annotations.PartitionKey;
+import com.datastax.driver.mapping.annotations.Table;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.hashmapinc.server.common.data.Customer;
 import com.hashmapinc.server.common.data.CustomerGroup;
-import com.hashmapinc.server.common.data.UUIDConverter;
 import com.hashmapinc.server.common.data.id.CustomerGroupId;
 import com.hashmapinc.server.common.data.id.CustomerId;
 import com.hashmapinc.server.common.data.id.TenantId;
-import com.hashmapinc.server.dao.model.BaseSqlEntity;
 import com.hashmapinc.server.dao.model.ModelConstants;
 import com.hashmapinc.server.dao.model.SearchTextEntity;
-import com.hashmapinc.server.dao.util.mapping.JsonStringType;
+import com.hashmapinc.server.dao.model.type.JsonCodec;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.Type;
-import org.hibernate.annotations.TypeDef;
+import lombok.ToString;
 
-import javax.persistence.*;
+import javax.persistence.CollectionTable;
+import javax.persistence.ElementCollection;
+import javax.persistence.JoinColumn;
 import java.util.List;
+import java.util.UUID;
+
+import static com.hashmapinc.server.dao.model.ModelConstants.*;
 
 @NoArgsConstructor
 @Data
-@EqualsAndHashCode(callSuper = true)
-@Entity
-@TypeDef(name = "json", typeClass = JsonStringType.class)
-@Table(name = ModelConstants.CUSTOMER_GROUP_TABLE_NAME)
-public class CustomerGroupEntity extends BaseSqlEntity<CustomerGroup> implements SearchTextEntity<CustomerGroup> {
+@Table(name = CUSTOMER_GROUP_COLUMN_FAMILY_NAME)
+@EqualsAndHashCode
+@ToString
+public class CustomerGroupEntity implements SearchTextEntity<CustomerGroup> {
 
-    @Column(name = ModelConstants.CUSTOMER_GROUP_TITLE)
+    @PartitionKey(value = 0)
+    @Column(name = ID_PROPERTY)
+    private UUID id;
+
+    @PartitionKey(value = 1)
+    @Column(name = CUSTOMER_GROUP_TENANT_ID_PROPERTY)
+    private UUID tenantId;
+
+    @Column(name = CUSTOMER_GROUP_TITLE_PROPERTY)
     private String title;
 
-    @Column(name = ModelConstants.CUSTOMER_GROUP_TENANT_ID)
-    private String tenantId;
-
-    @Column(name = ModelConstants.CUSTOMER_GROUP_CUSTOMER_ID)
-    private String customerId;
+    @Column(name = CUSTOMER_GROUP_CUSTOMER_ID_PROPERTY)
+    private UUID customerId;
 
     @ElementCollection()
-    @CollectionTable(name = ModelConstants.CUSTOMER_GROUP_POLICY_TABLE_NAME, joinColumns = @JoinColumn(name = ModelConstants.CUSTOMER_GROUP_POLICY_ID))
-    @Column(name = ModelConstants.CUSTOMER_GROUP_POLICY_COLUMN)
+    @CollectionTable(name = ModelConstants.CUSTOMER_GROUP_POLICY_COLUMN_FAMILY_NAME, joinColumns = @JoinColumn(name = ModelConstants.CUSTOMER_GROUP_POLICY_ID_PROPERTY))
+    @Column(name = ModelConstants.CUSTOMER_GROUP_POLICY_PROPERTY)
     private List<String> policies;
 
-    @Type(type = "json")
-    @Column(name = ModelConstants.CUSTOMER_ADDITIONAL_INFO_PROPERTY)
-    private JsonNode additionalInfo;
-
-    @Column(name = ModelConstants.SEARCH_TEXT_PROPERTY)
+    @Column(name = SEARCH_TEXT_PROPERTY)
     private String searchText;
+
+    @Column(name = ADDITIONAL_INFO_PROPERTY, codec = JsonCodec.class)
+    private JsonNode additionalInfo;
 
     public CustomerGroupEntity(CustomerGroup customerGroup) {
         if (customerGroup.getId() != null) {
             this.setId(customerGroup.getId().getId());
         }
-        this.tenantId = UUIDConverter.fromTimeUUID(customerGroup.getTenantId().getId());
-        this.customerId = UUIDConverter.fromTimeUUID(customerGroup.getCustomerId().getId());
+        this.tenantId = customerGroup.getTenantId().getId();
+        this.customerId = customerGroup.getCustomerId().getId();
         this.title = customerGroup.getTitle();
         this.policies = customerGroup.getPolicies();
         this.additionalInfo = customerGroup.getAdditionalInfo();
@@ -90,8 +97,8 @@ public class CustomerGroupEntity extends BaseSqlEntity<CustomerGroup> implements
     public CustomerGroup toData() {
         CustomerGroup customerGroup = new CustomerGroup(new CustomerGroupId(getId()));
         customerGroup.setCreatedTime(UUIDs.unixTimestamp(getId()));
-        customerGroup.setTenantId(new TenantId(UUIDConverter.fromString(tenantId)));
-        customerGroup.setCustomerId(new CustomerId(UUIDConverter.fromString(customerId)));
+        customerGroup.setTenantId(new TenantId(tenantId));
+        customerGroup.setCustomerId(new CustomerId(customerId));
         customerGroup.setTitle(title);
         customerGroup.setAdditionalInfo(additionalInfo);
         return customerGroup;

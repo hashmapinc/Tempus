@@ -543,7 +543,7 @@ public class ModelConstants {
     /**
      * Cassandra CustomerGroup Constants
      */
-    public static final String CUSTOMER_GROUP_FAMILY_NAME = "customer_group";
+    public static final String CUSTOMER_GROUP_COLUMN_FAMILY_NAME = "customer_group";
     public static final String CUSTOMER_GROUP_TITLE_PROPERTY = TITLE_PROPERTY;
     public static final String CUSTOMER_GROUP_TENANT_ID_PROPERTY = TENANT_ID_PROPERTY;
     public static final String CUSTOMER_GROUP_CUSTOMER_ID_PROPERTY = CUSTOMER_ID_PROPERTY;
@@ -560,7 +560,7 @@ public class ModelConstants {
      * Cassandra CustomerGroup Policy Constants
      */
 
-    public static final String CUSTOMER_GROUP_POLICY_FAMILY_NAME = "customer_group_policy";
+    public static final String CUSTOMER_GROUP_POLICY_COLUMN_FAMILY_NAME = "customer_group_policy";
     public static final String CUSTOMER_GROUP_POLICY_ID_PROPERTY = "group_id";
     public static final String CUSTOMER_GROUP_POLICY_PROPERTY = "policy";
 
