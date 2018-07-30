@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import {loadLogViewer} from './logViewer';
+import loadLogViewer from './logViewer';
 //import loadLogViewer from 'WellLogViewer/logViewer';
 //import welllogviwer from 'WellLogViewer'
 //import * as welllogviwer from 'WellLogViewer'
