@@ -36,15 +36,6 @@ public interface CustomerGroupDao extends Dao<CustomerGroup> {
     CustomerGroup save(CustomerGroup customerGroup);
 
     /**
-     * Find customerGroups by tenant id and page link.
-     *
-     * @param tenantId the tenant id
-     * @param pageLink the page link
-     * @return the list of customerGroup objects
-     */
-    List<CustomerGroup> findCustomerGroupsByTenantId(UUID tenantId, TextPageLink pageLink);
-
-    /**
      * Find customerGroups by tenantId, customerId and page link.
      *
      * @param tenantId the tenantId
@@ -58,8 +49,9 @@ public interface CustomerGroupDao extends Dao<CustomerGroup> {
      * Find customerGroups by tenantId and customerGroup title.
      *
      * @param tenantId the tenantId
+     * @param customerId the customerId
      * @param title the customerGroup title
-     * @return the optional customerGroup object
+     * @return the list of customerGroup objects
      */
-    Optional<CustomerGroup> findCustomerGroupsByTenantIdAndTitle(UUID tenantId, String title);
+    Optional<CustomerGroup> findCustomerGroupsByTenantIdAndCustomerIdAndTitle(UUID tenantId, UUID customerId, String title);
 }
