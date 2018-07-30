@@ -1,12 +1,12 @@
 //var d3 = require('./node_modules/d3/build/d3');
-
 //require('./node_modules/d3-selection-multi/build/d3-selection-multi');
-if(typeof LogViewer === 'undefined') {LogViewer = {};}
+import * as d3 from 'well-log-viewer/node_modules/d3/build/d3';
+import './logViewer.css';
 /*@ngInject*/
-lnGrid = function(lineConfig) {
+var linearGrid = function(lineConfig) {
   'use strict';
-  var o,
-      local;
+  var o;
+     // local;
 
   o = {
     wodth: 200,
@@ -26,19 +26,20 @@ lnGrid = function(lineConfig) {
     o.mirorStroke = "6,0";
   }
 
-  local = {
-  //  label: d3.local(),
-  //  dimensions: d3.local()
-  };
+  // local = {
+  // //  label: d3.local(),
+  // //  dimensions: d3.local()
+  // };
  
   function lGrid(group) {
     // group-scope
     group.each(render);
   }
  
-  function render(data) {
+  //function render(data) {
+  function render() {
     var context,
-        dim,
+      //  dim,
         ticks = [];
 
     context = d3.select(this);
@@ -47,7 +48,7 @@ lnGrid = function(lineConfig) {
       width = 440 - margin.right - margin.left,
       height = 700 - margin.top - margin.bottom;
 
-      var dx = width - margin.right - margin.left;
+     // var dx = width - margin.right - margin.left;
 
     var isMajorTick = function (index) {
       return ticks[index].isVisible;
@@ -114,4 +115,4 @@ lnGrid = function(lineConfig) {
  
   return lGrid;
 };
-export {lnGrid};
+export {linearGrid};
