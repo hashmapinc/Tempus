@@ -531,6 +531,41 @@ public class ModelConstants {
     public static final String DOUBLE_VALUE_COLUMN = "dbl_v";
     public static final String JSON_VALUE_COLUMN = "json_v";
 
+    /**
+     * CustomerGroup Constants
+     */
+    public static final String CUSTOMER_GROUP_TABLE_NAME = "customer_group";
+    public static final String CUSTOMER_GROUP_TITLE = TITLE_PROPERTY;
+    public static final String CUSTOMER_GROUP_TENANT_ID = TENANT_ID_PROPERTY;
+    public static final String CUSTOMER_GROUP_CUSTOMER_ID = CUSTOMER_ID_PROPERTY;
+
+
+    /**
+     * Cassandra CustomerGroup Constants
+     */
+    public static final String CUSTOMER_GROUP_FAMILY_NAME = "customer_group";
+    public static final String CUSTOMER_GROUP_TITLE_PROPERTY = TITLE_PROPERTY;
+    public static final String CUSTOMER_GROUP_TENANT_ID_PROPERTY = TENANT_ID_PROPERTY;
+    public static final String CUSTOMER_GROUP_CUSTOMER_ID_PROPERTY = CUSTOMER_ID_PROPERTY;
+
+    /**
+     * CustomerGroup Policy Constants
+     */
+
+    public static final String CUSTOMER_GROUP_POLICY_TABLE_NAME = "customer_group_policy";
+    public static final String CUSTOMER_GROUP_POLICY_ID = "group_id";
+    public static final String CUSTOMER_GROUP_POLICY_COLUMN = "policy";
+
+    /**
+     * Cassandra CustomerGroup Policy Constants
+     */
+
+    public static final String CUSTOMER_GROUP_POLICY_FAMILY_NAME = "customer_group_policy";
+    public static final String CUSTOMER_GROUP_POLICY_ID_PROPERTY = "group_id";
+    public static final String CUSTOMER_GROUP_POLICY_PROPERTY = "policy";
+
+
+
     protected static final String[] NONE_AGGREGATION_COLUMNS = new String[]{LONG_VALUE_COLUMN, DOUBLE_VALUE_COLUMN, BOOLEAN_VALUE_COLUMN, STRING_VALUE_COLUMN, JSON_VALUE_COLUMN, KEY_COLUMN, TS_COLUMN, TS_DIFF};
     protected static final String[] NONE_DS_AGGREGATION_COLUMNS = new String[]{LONG_VALUE_COLUMN, DOUBLE_VALUE_COLUMN, BOOLEAN_VALUE_COLUMN, STRING_VALUE_COLUMN, JSON_VALUE_COLUMN, KEY_COLUMN, DS_COLUMN, DS_DIFF};
 
