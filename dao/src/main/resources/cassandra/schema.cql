@@ -811,3 +811,19 @@ CREATE TABLE IF NOT exists tempus.tag_metadata_cf (
     source text,
     PRIMARY KEY (( entity_type, entity_id ), key)
 ) WITH compaction = { 'class' :  'LeveledCompactionStrategy'  };
+
+CREATE TABLE IF NOT EXISTS tempus.customer_group (
+    id timeuuid,
+    title text,
+    tenant_id timeuuid,
+    customer_id timeuuid,
+    additional_info text,
+    search_text text,
+    PRIMARY KEY((id, tenant_id), title)
+);
+
+CREATE TABLE IF NOT EXISTS customer_group_policy (
+    group_id timeuuid,
+    policy text,
+    PRIMARY KEY(group_id, policy)
+);

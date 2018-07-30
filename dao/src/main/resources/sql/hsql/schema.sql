@@ -389,3 +389,17 @@ CREATE TABLE IF NOT EXISTS tag_metadata (
 );
 
 CREATE TABLE IF NOT EXISTS installed_schema_versions(executed_scripts varchar(255) UNIQUE);
+
+CREATE TABLE IF NOT EXISTS customer_group (
+    id varchar(31) NOT NULL CONSTRAINT customer_group_pkey PRIMARY KEY,
+    title varchar(255),
+    tenant_id varchar(31),
+    customer_id varchar(31),
+    additional_info varchar,
+    search_text varchar(255)
+);
+
+CREATE TABLE IF NOT EXISTS customer_group_policy (
+    group_id varchar(31) NOT NULL CONSTRAINT customer_group_policy_pkey PRIMARY KEY,
+    policy varchar
+);
