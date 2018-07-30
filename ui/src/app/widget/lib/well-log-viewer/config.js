@@ -1,6 +1,5 @@
-if(typeof LogViewer === 'undefined') {LogViewer = {};}
 /*@ngInject*/
-loadConfig = function() {
+var loadConfig = function() {
 	var config = {
 		"tracks": [{
 			"trackId": 1,
