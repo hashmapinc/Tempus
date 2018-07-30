@@ -1,17 +1,20 @@
+import * as d3 from 'well-log-viewer/node_modules/d3/build/d3';
 import {loadConfig} from './config';
-import {lnGrid} from './linearGrid';
+import {linearGrid} from './linearGrid';
+import {headerLegend} from './headerLegend';
+import {lineGraph} from './lineGraph';
+import './logViewer.css';
+
 // var loadConfig = require('./config');
 // var lnGrid = require('./linearGrid');
 //var d3 = require('./node_modules/d3/build/d3');
 //require('./node_modules/d3-selection-multi/build/d3-selection-multi');
-
-if(typeof LogViewer === 'undefined') {LogViewer = {};}
 /*@ngInject*/
-loadLogViewer = function(){
+export default function loadLogViewer(){
     'use strict';
     var config,
-        buildArray = [],
-        events;
+        buildArray = [];
+    //    events;
    
     function build() {
       config = loadConfig();
@@ -20,21 +23,21 @@ loadLogViewer = function(){
         var headerCount = 0
         track.components.forEach(function(component){
           if(component.hasHeader){
-            headerCount +=1;
-            // var headerLegend = LogViewer.headerLegend(component.type, headerCount);
-            // trackObj.push(headerLegend);
+           headerCount +=1;
+            var hLegend = headerLegend(component.type, headerCount);
+            trackObj.push(hLegend);
           }
           if(component.type.type === 'linearGrid'){
-            var linearGrid = lnGrid(component.type);
-            trackObj.push(linearGrid);
+            var lnGrid = linearGrid(component.type);
+            trackObj.push(lnGrid);
           }
           if(component.type.type === 'timeYaxis'){
             // var timeYaxis = LogViewer.timeYaxis(component.type)
             // trackObj.push(timeYaxis);
           }
           if(component.type.type === 'line'){
-            // var lineGraph = LogViewer.lineGraph(component.type);
-            // trackObj.push(lineGraph);
+            var lnGraph = lineGraph(component.type);
+            trackObj.push(lnGraph);
           }
 
         })
@@ -47,6 +50,7 @@ loadLogViewer = function(){
       buildArray.forEach(function(track){
         var trackId = '#track' + panelTracker;
         panelTracker += 1;
+        alert(d3);
         d3.select(trackId)
            .append("div")
            .attr("class", "header")
@@ -80,13 +84,13 @@ loadLogViewer = function(){
     //  d3.select('button').on('click', events.dataButtonClick);
     }
    
-    events = {
-      dataButtonClick: function() {
-      }
-    };
+    // events = {
+    //   dataButtonClick: function() {
+    //   }
+    // };
    
     build();
     addToDom();
     addListeners();
 }
-module.exports = loadLogViewer;
+//export {loadLogViewer};
