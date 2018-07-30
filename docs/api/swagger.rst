@@ -1,4 +1,4 @@
-##############
+#############
 Admin REST API
 ##############
 
@@ -6,9 +6,9 @@ Admin REST API
 Swagger
 *******
 
-Tempus Cloud REST API can be explored using Swagger UI. 
+Tempus Cloud REST API can be explored using Swagger UI.
 
-Once you will install the Tempus Cloud server you can open UI using the following URL:
+Once you will install the Tempus Cloud server you can open the Swagger Tempus REST API UI using the following URL:
 
 .. code-block:: bash
 
@@ -34,7 +34,7 @@ In case of remote installation:
 
         .. code-block:: bash
 
-            curl -X POST --header 'Content-Type: application/json' --header 'Accept: application/json' -d '{"username":"tenant@hashmapinc.com", "password":"tenant"}' 'http://TEMPUS_URL/api/auth/login'
+            curl -X POST --header 'Content-Type: application/json' --header 'Accept: application/json' -d '{"username":"demo@hashmapinc.com", "password":"tenant"}' 'http://TEMPUS_URL/api/auth/login'
 
     .. tab:: response.json
 
@@ -42,4 +42,8 @@ In case of remote installation:
 
             {"token":"$YOUR_JWT_TOKEN", "refreshToken":"$YOUR_JWT_REFRESH_TOKEN"}
 
-* Now, you should set ‘X-Authorization’ to “Bearer $YOUR_JWT_TOKEN”
+*******************************
+Set Api Key Authorization Value
+*******************************
+
+Now, in the Tempus REST API URL click 'Authorize' button located in the page header, then in the 'Api key authorization' 'value' text field  enter “Bearer $YOUR_JWT_TOKEN”
