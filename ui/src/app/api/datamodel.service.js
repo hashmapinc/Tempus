@@ -28,7 +28,8 @@ function DatamodelService($http, $q) {
         getDatamodelObjects:    getDatamodelObjects,
         saveDatamodel:          saveDatamodel,
         saveDatamodelObject:    saveDatamodelObject,
-        listDatamodels:         listDatamodels
+        listDatamodels:         listDatamodels,
+        deleteDatamodelObject:  deleteDatamodelObject
     }
 
     // loads the datamodel objects for the datamodel with ID = datamodelID
@@ -62,7 +63,7 @@ function DatamodelService($http, $q) {
      */
     function saveDatamodelObject(datamodelObject, datamodelID) {
         var deferred = $q.defer();
-        var url = '/api/data-model/' + datamodelID + '/objects';
+        var url = '/api/data-model/' + datamodelID + '/objects/' + datamodelObject.id;
         $http.post(url, datamodelObject).then(function success(response) {
             deferred.resolve(response);
         }, function fail(response) {
@@ -91,6 +92,21 @@ function DatamodelService($http, $q) {
             deferred.resolve(response.data);
         }, function fail(response) {
             deferred.reject(response.data);
+        });
+        return deferred.promise;
+    }
+
+    /**
+     *  deletes a datamodel object in the backend
+     *  @param dmObjectId - ID of the datamodel object to delete
+     */
+    function deleteDatamodelObject(dmObjectId) {
+        var deferred = $q.defer();
+        var url = '/api/data-model/objects/' + dmObjectId;
+        $http.delete(url).then(function success(response) {
+            deferred.resolve(response);
+        }, function fail(response) {
+            deferred.reject(response);
         });
         return deferred.promise;
     }
