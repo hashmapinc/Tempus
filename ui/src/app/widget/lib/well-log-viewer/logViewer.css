@@ -1,0 +1,63 @@
+body {
+  font: 10px sans-serif;
+  /*shape-rendering: crispEdges;*/
+}
+
+.grid-background {
+  fill: lightgray;
+}
+
+.grid line {
+  stroke: #fff;
+}
+
+.grid .minor line {
+  stroke-opacity: .5;
+}
+
+.grid text {
+  display: none;
+}
+
+.axis line {
+  stroke: gray;
+}
+
+.axis path,
+.grid path {
+  display: none;
+}
+
+.yaxis {
+    stroke: lightgray;
+}
+
+.line-graph {
+  fill: none;
+  stroke: #fff;
+  stroke-width: 2px;
+}
+
+.data {
+  stroke: #fff;
+  stroke-width: 2px;
+}
+
+svg {
+  display: block;
+} 
+
+.tracks {
+  overflow-x: scroll;
+  white-space: nowrap;
+}
+.track {
+  display: inline-block;
+}
+
+  /* Below, we set the tick length to 10px. The stroke-dasharray only displays 6px to create a minor tick effect. */
+.axis .minor line {
+    stroke: gray;
+    stroke-width: 1px;
+    //stroke-dasharray: 6,2;
+}
