@@ -124,6 +124,9 @@
 
     <md-dialog-actions layout="row">
       <span flex></span>
+      <md-button ng-click="vm.onStepperDelete()" style="margin-right:20px;" ng-if="vm.stepperMode === 'EDIT'" id="stepperDelete" class="md-warn md-raised">
+        Delete
+      </md-button>
       <md-button ng-click="vm.stepperState = vm.stepperState - 1" ng-if="vm.stepperState > 0" id="stepperBack">
         Back
       </md-button>

@@ -30,6 +30,7 @@ export function DataModelController($log, $mdDialog, $document, $stateParams, $t
 
     // create the stepper
     vm.stepperState = 0;        // keeps track of the current stepper step
+    vm.stepperMode = "";        // keeps track of the current stepper mode ("CREATE" or "EDIT")
     vm.stepperData = {};        // keeps track of the in-progress data model object and is bound to the stepper
     resetStepperState();        // instantiate the stepper model and structure the stepperData object
 
@@ -88,16 +89,16 @@ export function DataModelController($log, $mdDialog, $document, $stateParams, $t
 
     // reset the stepper state and clear its current form data
     function resetStepperState() {
-        vm.stepperState = 0; // keeps track of the current stepper step (0-3)
-        vm.stepperData = {   // keeps track of the in-progress data model object and is bound to the stepper
+        vm.stepperState = 0;    // keeps track of the current stepper step (0-3)
+        vm.stepperMode = "";    // either CREATE or EDIT. Usefull for hiding/showing the delete option
+        vm.stepperData = {      // keeps track of the in-progress data model object and is bound to the stepper
             id: null,
             name: "",
             desc: "",
             type: "",
-            parent: null,      // should be {name: parentName, id: parentId}
+            parent: null,
             currentAttribute: "",
-            attributes: [],    // array attributes
-            editingIndex: null // when editing an existing node, this is the index of the node in the local array
+            attributes: []
         }
     }
 
@@ -280,6 +281,7 @@ export function DataModelController($log, $mdDialog, $document, $stateParams, $t
 
     // handle the selection of a visjs node
     function onDatamodelObjectSelect(properties) {
+        // immediately deselect everything
         network.unselectAll();
 
         // get the node that was selected
@@ -320,6 +322,11 @@ export function DataModelController($log, $mdDialog, $document, $stateParams, $t
             if(!nodeToEdit.datamodelObject) {
                 return;
             }
+
+            // set stepper mode
+            vm.stepperMode = "EDIT"
+
+            // process the object into stepper data
             var dmo = nodeToEdit.datamodelObject;
             vm.stepperData.id = dmo.id;
             vm.stepperData.name = dmo.name;
@@ -445,6 +452,26 @@ export function DataModelController($log, $mdDialog, $document, $stateParams, $t
                 $log.error("could not create datamodel object..." + response);
             });
         }
+    };
+
+    // delete the object and reload the datamodel
+    vm.onStepperDelete = function () {
+        $log.debug("deleting data model object...");
+
+        // delete the object by ID
+        datamodelService.deleteDatamodelObject(
+            vm.stepperData.id
+        ).then(function success(response) {
+            $log.debug("successfully deleted datamodel object..." + response);
+
+            // hide the stepper and reset its state
+            vm.cancel();
+
+            // reload the datamodel
+            loadDatamodel();
+        }, function fail(response) {
+            $log.error("could not create datamodel object..." + response);
+        });
     };
 
     // add a datamodel object attribute to the stepper's current data

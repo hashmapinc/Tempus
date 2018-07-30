@@ -63,7 +63,7 @@ function DatamodelService($http, $q) {
      */
     function saveDatamodelObject(datamodelObject, datamodelID) {
         var deferred = $q.defer();
-        var url = '/api/data-model/' + datamodelID + '/objects/' + datamodelObject.id;
+        var url = '/api/data-model/' + datamodelID + '/objects';
         $http.post(url, datamodelObject).then(function success(response) {
             deferred.resolve(response);
         }, function fail(response) {
