@@ -1,5 +1,6 @@
 /*
- * Copyright © 2017-2018 Hashmap, Inc
+ * Copyright © 2016-2018 The Thingsboard Authors
+ * Modifications © 2017-2018 Hashmap, Inc
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,9 +21,13 @@ import tempusToast from '../services/toast';
 
 import UserRoutes from './user.routes';
 import UserController from './user.controller';
+import UserActionListController from './useractionlist.controller';
+import UserGroupController from './usergroup.controller';
+import AddGroupModelController from './add-group.controller'
 import AddUserController from './add-user.controller';
 import ActivationLinkDialogController from './activation-link.controller';
 import UserDirective from './user.directive';
+import UsergroupDirective from './usergroup.directive';
 
 export default angular.module('tempus.user', [
     uiRouter,
@@ -32,7 +37,11 @@ export default angular.module('tempus.user', [
 ])
     .config(UserRoutes)
     .controller('UserController', UserController)
+    .controller('UserActionListController', UserActionListController)
     .controller('AddUserController', AddUserController)
+    .controller('UserGroupController', UserGroupController)
+    .controller('AddGroupModelController', AddGroupModelController)
     .controller('ActivationLinkDialogController', ActivationLinkDialogController)
     .directive('tbUser', UserDirective)
+    .directive('tbUsergroup', UsergroupDirective)
     .name;

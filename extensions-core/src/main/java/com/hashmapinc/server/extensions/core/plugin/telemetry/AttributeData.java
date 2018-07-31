@@ -1,5 +1,6 @@
 /**
- * Copyright © 2017-2018 Hashmap, Inc
+ * Copyright © 2016-2018 The Thingsboard Authors
+ * Modifications © 2017-2018 Hashmap, Inc
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +16,9 @@
  */
 package com.hashmapinc.server.extensions.core.plugin.telemetry;
 
+import lombok.EqualsAndHashCode;
+
+@EqualsAndHashCode
 public class AttributeData implements Comparable<AttributeData>{
 
     private final long lastUpdateTs;

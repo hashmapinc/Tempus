@@ -1,5 +1,6 @@
 /**
- * Copyright © 2017-2018 Hashmap, Inc
+ * Copyright © 2016-2018 The Thingsboard Authors
+ * Modifications © 2017-2018 Hashmap, Inc
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -181,6 +182,12 @@ public class ActorSystemContext {
 
     @Value("${actors.computation.location}")
     @Getter private String computationLocation;
+
+    @Value("${spark.livy_host}")
+    @Getter private String livyHost;
+
+    @Value("${spark.livy_port}")
+    @Getter private int livyPort;
 
     @Getter @Setter private ActorSystem actorSystem;
 

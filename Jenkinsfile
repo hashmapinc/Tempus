@@ -2,7 +2,7 @@ pipeline {
   agent {
     docker {
       image 'hashmapinc/tempusbuild:latest'
-      args '-u root -v /var/run/docker.sock:/var/run/docker.sock -v /home/ubuntu/.m2:/root/.m2 -v /home/ubuntu/.npm:/root/.npm -v /home/ubuntu/.gradle:/root/.gradle'
+      args '-u root -v /var/run/docker.sock:/var/run/docker.sock'
     }
 
   }

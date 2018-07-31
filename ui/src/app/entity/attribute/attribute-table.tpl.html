@@ -1,6 +1,7 @@
 <!--
 
-    Copyright © 2017-2018 Hashmap, Inc
+    Copyright © 2016-2018 The Thingsboard Authors
+    Modifications © 2017-2018 Hashmap, Inc
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -142,7 +143,7 @@
                 </md-button>
             </div>
         </md-toolbar>
-        <md-button ng-if ="entityType == 'DEVICE'" style="margin-left: 530px;margin-top: 3px;"ng-disabled="$root.loading" ng-click="download($event,{attributeScope})"
+        <md-button ng-hide="mode==='widget'" ng-if ="entityType == 'DEVICE'"  style="left: 83%;margin-top: 3px;"ng-disabled="$root.loading" ng-click="download($event,{attributeScope})"
                    class="md-raised md-primary"><span translate>attribute.download-button</span>
         </md-button>
 

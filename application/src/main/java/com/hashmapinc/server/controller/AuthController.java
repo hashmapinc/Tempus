@@ -1,5 +1,6 @@
 /**
- * Copyright © 2017-2018 Hashmap, Inc
+ * Copyright © 2016-2018 The Thingsboard Authors
+ * Modifications © 2017-2018 Hashmap, Inc
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -72,7 +73,7 @@ public class AuthController extends BaseController {
     private MailService mailService;
 
     @PreAuthorize("isAuthenticated()")
-    @RequestMapping(value = "/auth/user", method = RequestMethod.GET)
+    @GetMapping(value = "/auth/user")
     public @ResponseBody User getUser() throws TempusException {
         try {
             SecurityUser securityUser = getCurrentUser();
