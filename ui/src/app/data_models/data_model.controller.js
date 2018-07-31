@@ -38,7 +38,6 @@ export function DataModelController($log, $mdDialog, $document, $stateParams, $t
     var objectDeleteList = [];  // list of datamodel object ID's to delete when changes are confirmed
 
     // Create the graph that will be plotted
-    vm.visIDs = {} // hashmap of object id strings -> visjs ids
     vm.nodes = new vis.DataSet();
     vm.edges = new vis.DataSet();
     var network_data = {
@@ -207,40 +206,49 @@ export function DataModelController($log, $mdDialog, $document, $stateParams, $t
         then(function success(data) {
             $log.info("successfully loaded datamodel objects:" + angular.toJson(data));
             
-            // process the objects
-            var datamodelObjects = [];  // array of processed dm objects
-            vm.visIDs = {};             // clear the hashmap
-            var currId = 1;             // keeps track of current visjs ID
-            data.forEach(dmo => {       // iterate and process each object
-                // record object ID into hashmap
-                vm.visIDs[dmo.id.id] = currId++;
-
-                // get parent ID if it exists
-                var parentId = dmo.parentId ? dmo.parentId.id : null; 
-
+            // process the nodes, gather the raw edges
+            var dmo_to_node = {}    // hashmap of dmo id strings -> visjs node ids
+            var edges = [];         // array of {to: child_dmo_id, from: parent_dmo_id} edges
+            var currId = 1;         // keeps track of current node id
+            data.forEach(dmo => {   // iterate and process each object
                 // get attributes
                 var attributes = dmo.attributeDefinitions.map(attribute => {
                     return attribute.name;
                 });
+
+                // add edge if parent exists
+                if (dmo.parentId) {
+                    edges.push({ to: dmo.id.id, from: dmo.parentId.id});
+                }
                 
-                // push the new object
-                datamodelObjects.push(createDatamodelObject(
-                    dmo.id.id,
-                    dmo.name,
-                    dmo.description,
-                    dmo.type,
-                    attributes
-                ));
+                // create node
+                var node = {
+                    id:     currId++,
+                    label:  dmo.name,
+                    group:  dmo.type,
+                    datamodelObject: createDatamodelObject(
+                        dmo.id.id,
+                        dmo.name,
+                        dmo.description,
+                        dmo.type,
+                        attributes
+                    )
+                };
+
+                // store id in hashmap
+                dmo_to_node[dmo.id.id] = node.id;
+
+                // add the node to the nodes set
+                vm.nodes.add(node);
             });
 
-            // add the objects to the nodes array
-            var currEdgeId = 1; // current ID of an edge
-            datamodelObjects.forEach(dmo => {
-                vm.nodes.add({
-                    id: vm.visIDs[dmo.id], // get visjs ID from dmo ID string using visIDs hashmap
-                    label: dmo.name,
-                    group: dmo.type,
-                    datamodelObject: dmo
+            // process the raw edges
+            currId = 1; // reuse this counter for keeping track of current edge id
+            edges.forEach(edge => {
+                vm.edges.add({
+                    id:     currId++, 
+                    to:     dmo_to_node[edge.to],
+                    from:   dmo_to_node[edge.from]
                 });
             });
 
@@ -255,20 +263,6 @@ export function DataModelController($log, $mdDialog, $document, $stateParams, $t
      * plot the datamodel
      */
     function plotDatamodel() {
-        // add new edges if necessary to the edges list
-        vm.edges.clear();
-        var currEdgeId = 1;
-        vm.nodes.forEach(node => {
-            var dmo = node.datamodelObject;
-            if (dmo.parent_id) {
-                vm.edges.add({
-                    id: currEdgeId++,
-                    from: vm.visIDs[dmo.parent_id],
-                    to: vm.visIDs[dmo.id]
-                });
-            }
-        });
-
         // center the view after the drawing is finished
         network.once('afterDrawing', function (params) {
             // focus the camera on the new nodes
