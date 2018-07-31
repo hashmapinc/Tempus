@@ -19,7 +19,7 @@ package com.hashmapinc.server.common.data.computation;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.hashmapinc.server.common.data.BaseData;
-import com.hashmapinc.server.common.data.id.ComputationId;
+import com.hashmapinc.server.common.data.id.ComputationJobId;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -30,20 +30,20 @@ import lombok.EqualsAndHashCode;
         include = JsonTypeInfo.As.PROPERTY,
         property = "type")
 @JsonSubTypes({
-        @JsonSubTypes.Type(value = KubelessComputationMetadata.class, name = "KUBELESS"),
-        @JsonSubTypes.Type(value = SparkComputationMetadata.class, name = "SPARK")
+        @JsonSubTypes.Type(value = KubelessComputationJob.class, name = "KUBELESS"),
+        @JsonSubTypes.Type(value = SparkComputationJob.class, name = "SPARK")
 })
-public class ComputationMetadata extends BaseData<ComputationId> {
+public class ComputationJobConfiguration extends BaseData<ComputationJobId> {
 
-    public ComputationMetadata() {
+    public ComputationJobConfiguration() {
         super();
     }
 
-    public ComputationMetadata(ComputationId id) {
+    public ComputationJobConfiguration(ComputationJobId id) {
         super(id);
     }
 
-    public ComputationMetadata(ComputationMetadata md){
-        super(md);
+    public ComputationJobConfiguration(ComputationJobConfiguration config){
+        super(config);
     }
 }

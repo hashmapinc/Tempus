@@ -16,51 +16,26 @@
  */
 package com.hashmapinc.server.common.data.computation;
 
+import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.hashmapinc.server.common.data.SearchTextBased;
-import com.hashmapinc.server.common.data.HasName;
-import com.hashmapinc.server.common.data.id.ComputationId;
-import com.hashmapinc.server.common.data.id.ComputationJobId;
-import com.hashmapinc.server.common.data.id.TenantId;
-import com.hashmapinc.server.common.data.plugin.ComponentLifecycleState;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class ComputationJob extends SearchTextBased<ComputationJobId> implements HasName {
+@JsonTypeName("SPARK")
+public class SparkComputationJob extends ComputationJobConfiguration{
 
-    private TenantId tenantId;
-    private ComputationId computationId;
     private transient JsonNode argParameters;
-    private String name;
-    private ComponentLifecycleState state;
     private String jobId;
 
-    public ComputationJob() {
+    public SparkComputationJob() {
         super();
     }
 
-    public ComputationJob(ComputationJobId id) {
-        super(id);
-    }
-
-    public ComputationJob(ComputationJob computationJob) {
+    public SparkComputationJob(SparkComputationJob computationJob) {
         super(computationJob);
         this.argParameters = computationJob.argParameters;
-        this.computationId = computationJob.computationId;
-        this.tenantId = computationJob.tenantId;
-        this.name = computationJob.name;
-        this.state = computationJob.state;
         this.jobId = computationJob.jobId;
-    }
-
-    @Override
-    public String getName() {
-        return name;
-    }
-    @Override
-    public String getSearchText() {
-        return getName();
     }
 }

@@ -14,28 +14,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.hashmapinc.kubeless.models.triggers;
+package com.hashmapinc.server.common.data.computation;
 
-import com.google.gson.annotations.SerializedName;
-import com.hashmapinc.kubeless.models.V1beta1AbstractType;
+import com.fasterxml.jackson.annotation.JsonTypeName;
+import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+@Data
 @EqualsAndHashCode(callSuper = true)
-public class V1beta1CronJobTrigger extends V1beta1AbstractType<V1beta1CronJobTriggerSpec>{
+@JsonTypeName("KUBELESS")
+public class KubelessComputationJob extends ComputationJobConfiguration{
 
-    @SerializedName("kind")
-    protected String kind = "CronJobTrigger";
 
-    public V1beta1CronJobTrigger kind(String kind) {
-        this.kind = kind;
-        return this;
-    }
-
-    public String getKind() {
-        return kind;
-    }
-
-    public void setKind(String kind) {
-        this.kind = kind;
-    }
 }
