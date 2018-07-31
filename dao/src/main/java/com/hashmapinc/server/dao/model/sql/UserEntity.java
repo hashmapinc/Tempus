@@ -20,6 +20,7 @@ import com.datastax.driver.core.utils.UUIDs;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.hashmapinc.server.common.data.UUIDConverter;
 import com.hashmapinc.server.common.data.User;
+import com.hashmapinc.server.common.data.id.CustomerGroupId;
 import com.hashmapinc.server.common.data.id.CustomerId;
 import com.hashmapinc.server.common.data.id.TenantId;
 import com.hashmapinc.server.common.data.id.UserId;
@@ -34,6 +35,7 @@ import org.hibernate.annotations.TypeDef;
 import com.hashmapinc.server.dao.model.SearchTextEntity;
 
 import javax.persistence.*;
+import java.util.Collection;
 
 /**
  * Created by Valerii Sosliuk on 4/21/2017.
@@ -50,6 +52,9 @@ public class UserEntity extends BaseSqlEntity<User> implements SearchTextEntity<
 
     @Column(name = ModelConstants.USER_CUSTOMER_ID_PROPERTY)
     private String customerId;
+
+    @Column(name = ModelConstants.USER_CUSTOMER_GROUP_ID_PROPERTY)
+    private String customerGroupId;
 
     @Enumerated(EnumType.STRING)
     @Column(name = ModelConstants.USER_AUTHORITY_PROPERTY)
@@ -71,6 +76,11 @@ public class UserEntity extends BaseSqlEntity<User> implements SearchTextEntity<
     @Column(name = ModelConstants.USER_ADDITIONAL_INFO_PROPERTY)
     private JsonNode additionalInfo;
 
+    @ElementCollection()
+    @CollectionTable(name = ModelConstants.CUSTOMER_GROUP_POLICY_TABLE_NAME, joinColumns = @JoinColumn(name = ModelConstants.USER_CUSTOMER_GROUP_ID_PROPERTY))
+    @Column(name = ModelConstants.CUSTOMER_GROUP_POLICY_COLUMN)
+    private Collection<String> policies;
+
     public UserEntity() {
     }
 
@@ -85,10 +95,14 @@ public class UserEntity extends BaseSqlEntity<User> implements SearchTextEntity<
         if (user.getCustomerId() != null) {
             this.customerId = UUIDConverter.fromTimeUUID(user.getCustomerId().getId());
         }
+        if (user.getCustomerGroupId() != null) {
+            this.customerGroupId = UUIDConverter.fromTimeUUID(user.getCustomerGroupId().getId());
+        }
         this.email = user.getEmail();
         this.firstName = user.getFirstName();
         this.lastName = user.getLastName();
         this.additionalInfo = user.getAdditionalInfo();
+        this.policies = user.getPermissions();
     }
 
     @Override
@@ -112,10 +126,14 @@ public class UserEntity extends BaseSqlEntity<User> implements SearchTextEntity<
         if (customerId != null) {
             user.setCustomerId(new CustomerId(UUIDConverter.fromString(customerId)));
         }
+        if (customerGroupId != null) {
+            user.setCustomerGroupId(new CustomerGroupId(UUIDConverter.fromString(customerGroupId)));
+        }
         user.setEmail(email);
         user.setFirstName(firstName);
         user.setLastName(lastName);
         user.setAdditionalInfo(additionalInfo);
+        user.setPermissions(policies);
         return user;
     }
 

@@ -16,11 +16,14 @@
  */
 package com.hashmapinc.server.requests;
 
+import com.hashmapinc.server.common.data.UUIDConverter;
 import com.hashmapinc.server.common.data.User;
+import com.hashmapinc.server.common.data.id.CustomerGroupId;
 import com.hashmapinc.server.common.data.id.CustomerId;
 import com.hashmapinc.server.common.data.id.TenantId;
 import com.hashmapinc.server.common.data.id.UserId;
 import com.hashmapinc.server.common.data.security.Authority;
+import com.hashmapinc.server.dao.model.ModelConstants;
 import lombok.Data;
 
 import java.util.*;
@@ -62,6 +65,7 @@ public class IdentityUser {
 
         this.firstName = user.getFirstName();
         this.lastName = user.getLastName();
+        additionalDetails.put(ModelConstants.USER_CUSTOMER_GROUP_ID_PROPERTY, user.getCustomerGroupId().getId().toString());
     }
 
     public User toUser(){
@@ -78,6 +82,8 @@ public class IdentityUser {
         }
         user.setAuthority(Authority.parse(authorities.get(0)));
         user.setPermissions(permissions);
+        String customerGroupId = additionalDetails.get(ModelConstants.USER_CUSTOMER_GROUP_ID_PROPERTY);
+        user.setCustomerGroupId(CustomerGroupId.fromString(customerGroupId));
         return user;
     }
 }
