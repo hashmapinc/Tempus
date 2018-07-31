@@ -452,13 +452,13 @@ export function DeviceController($rootScope,userService, deviceService, customer
             .cancel($translate.instant('action.no'))
             .ok($translate.instant('action.yes'));
         $mdDialog.show(confirm).then(function () {
-                vm.deviceGridConfig.deleteItemFunc(item.id.id).then(function success() {
-                    $scope.resetFilter();
+            vm.deviceGridConfig.deleteItemFunc(item.id.id).then(function success() {
+                $scope.resetFilter();
 
-                });
-            },
-            function () {
             });
+        },
+        function () {
+        });
     }
 
     $scope.addDevice = function($event) {

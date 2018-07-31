@@ -91,6 +91,12 @@ public class DataModelObjectServiceImp implements DataModelObjectService {
         return dataModelObjects;
     }
 
+    @Override
+    public void removeById(DataModelObjectId dataModelObjectId) {
+        validateId(dataModelObjectId, INCORRECT_DATA_MODEL_OBJECT_ID + dataModelObjectId);
+        dataModelObjectDao.removeById(dataModelObjectId.getId());
+    }
+
     private DataValidator<DataModelObject> dataModelObjectDataValidator =
             new DataValidator<DataModelObject>() {
                 @Override
