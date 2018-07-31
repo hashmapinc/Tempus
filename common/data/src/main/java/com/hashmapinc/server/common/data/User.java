@@ -17,6 +17,7 @@
 package com.hashmapinc.server.common.data;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.hashmapinc.server.common.data.id.CustomerGroupId;
 import com.hashmapinc.server.common.data.id.CustomerId;
 import com.hashmapinc.server.common.data.id.TenantId;
 import com.hashmapinc.server.common.data.id.UserId;
@@ -33,6 +34,7 @@ public class User extends SearchTextBasedWithAdditionalInfo<UserId> implements H
 
     private TenantId tenantId;
     private CustomerId customerId;
+    private CustomerGroupId customerGroupId;
     private String email;
     private Authority authority;
     private Collection<String> permissions = Collections.emptyList();
@@ -51,6 +53,7 @@ public class User extends SearchTextBasedWithAdditionalInfo<UserId> implements H
         super(user);
         this.tenantId = user.getTenantId();
         this.customerId = user.getCustomerId();
+        this.customerGroupId = user.getCustomerGroupId();
         this.email = user.getEmail();
         this.authority = user.getAuthority();
         this.permissions = user.getPermissions();
@@ -72,6 +75,14 @@ public class User extends SearchTextBasedWithAdditionalInfo<UserId> implements H
 
     public void setCustomerId(CustomerId customerId) {
         this.customerId = customerId;
+    }
+
+    public CustomerGroupId getCustomerGroupId() {
+        return customerGroupId;
+    }
+
+    public void setCustomerGroupId(CustomerGroupId customerGroupId) {
+        this.customerGroupId = customerGroupId;
     }
 
     public String getEmail() {
@@ -132,6 +143,8 @@ public class User extends SearchTextBasedWithAdditionalInfo<UserId> implements H
         builder.append(tenantId);
         builder.append(", customerId=");
         builder.append(customerId);
+        builder.append(", customerGroupId=");
+        builder.append(customerGroupId);
         builder.append(", email=");
         builder.append(email);
         builder.append(", authority=");
