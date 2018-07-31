@@ -115,7 +115,7 @@
 
             <md-subheader class="md-no-sticky">Relationships</md-subheader>
             <md-list-item>
-              <p>Parent: {{vm.stepperData.parent ? vm.stepperData.parent.name : "None"}}</p>
+              <p>Parent: {{vm.stepperData.parent_node_id ? vm.nodes.get(vm.stepperData.parent_node_id).label : "--"}}</p>
             </md-list-item>
           </md-content>
         </md-tab>
