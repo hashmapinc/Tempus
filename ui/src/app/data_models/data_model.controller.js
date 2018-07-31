@@ -191,12 +191,15 @@ export function DataModelController($log, $mdDialog, $document, $stateParams, $t
         vm.nodes.clear();
         vm.edges.clear();
 
+        // reset data persistence queue
+        objectDeleteList = [];
+
         // load datamodel
         datamodelService.getDatamodel($stateParams.datamodelId).
         then(function success(data) {
             vm.datamodelTitle = data.name;
         }, function fail(data) {
-            $log.error("Could not load datamodel:" + data);
+            $log.error("Could not load datamodel:" + angular.toJson(data));
         });
 
         // load datamodel objects
@@ -453,25 +456,26 @@ export function DataModelController($log, $mdDialog, $document, $stateParams, $t
             .cancel("Cancel")
             .ok("Submit");
         $mdDialog.show(confirm).then(function () {
-            $log.debug("deleting data model object...");
+            $log.debug("deleting data model object node...");
 
-            // delete the object by ID
-            datamodelService.deleteDatamodelObject(
-                vm.stepperData.id
-            ).then(function success(response) {
-                $log.debug("successfully deleted datamodel object..." + angular.toJson(response));
+            // remove the node
+            var nodeId = vm.stepperData.node_id;
+            vm.nodes.remove(nodeId);
 
-                // hide the stepper and reset its state
-                vm.cancel();
-
-                // reload the datamodel
-                loadDatamodel();
-            }, function fail(response) {
-                $log.error("could not create datamodel object..." + angular.toJson(response));
+            // remove any edge utilizing this node
+            var old_edges = vm.edges.get().filter(edge => {
+                return edge.to === nodeId || edge.from === nodeId;
             });
-        }, function () {
-        });
-        
+            vm.edges.remove(old_edges);
+
+            // queue the object up for deletion if it has an ID
+            if (vm.stepperData.id) {
+                objectDeleteList.push(vm.stepperData.id);
+            }
+
+            // close the dialog
+            vm.cancel();
+        }, function () {});
     };
 
     // add a datamodel object attribute to the stepper's current data
@@ -485,9 +489,23 @@ export function DataModelController($log, $mdDialog, $document, $stateParams, $t
         vm.stepperData.currentAttribute = ""; 
     };
 
-    // persist the datamodel and exit edit mode
+    // update the datamodel and exit edit mode
     vm.acceptDatamodelEdit = function () {
         $log.debug("accepting datamodel edit...");
+
+        // delete any removed objects
+        objectDeleteList.forEach(id_to_delete => {
+            // delete the object by ID
+            datamodelService.deleteDatamodelObject(
+                id_to_delete
+            ).then(function success(response) {
+                $log.debug("successfully deleted datamodel object..." + angular.toJson(response));
+            }, function fail(response) {
+                $log.error("could not delete datamodel object..." + angular.toJson(response));
+            });
+        });
+
+        // save and exit edit mode
         saveDatamodel();
         vm.toggleDMEditMode();
     };
