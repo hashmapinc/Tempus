@@ -30,6 +30,7 @@ export function DataModelController($log, $mdDialog, $document, $stateParams, $t
 
     // create the stepper
     vm.stepperState = 0;        // keeps track of the current stepper step
+    vm.stepperMode = "";        // keeps track of the current stepper mode ("CREATE" or "EDIT")
     vm.stepperData = {};        // keeps track of the in-progress data model object and is bound to the stepper
     resetStepperState();        // instantiate the stepper model and structure the stepperData object
 
@@ -88,16 +89,16 @@ export function DataModelController($log, $mdDialog, $document, $stateParams, $t
 
     // reset the stepper state and clear its current form data
     function resetStepperState() {
-        vm.stepperState = 0; // keeps track of the current stepper step (0-3)
-        vm.stepperData = {   // keeps track of the in-progress data model object and is bound to the stepper
+        vm.stepperState = 0;    // keeps track of the current stepper step (0-3)
+        vm.stepperMode = "";    // either CREATE or EDIT. Usefull for hiding/showing the delete option
+        vm.stepperData = {      // keeps track of the in-progress data model object and is bound to the stepper
             id: null,
             name: "",
             desc: "",
             type: "",
-            parent: null,      // should be {name: parentName, id: parentId}
+            parent: null,
             currentAttribute: "",
-            attributes: [],    // array attributes
-            editingIndex: null // when editing an existing node, this is the index of the node in the local array
+            attributes: []
         }
     }
 
@@ -138,9 +139,9 @@ export function DataModelController($log, $mdDialog, $document, $stateParams, $t
             name: vm.datamodelTitle
         };
         datamodelService.saveDatamodel(datamodelToSave).then(function success(response) {
-            $log.debug("successfully saved datamodel..." + response);
+            $log.debug("successfully saved datamodel..." + angular.toJson(response));
         }, function fail(response) {
-            $log.error("could not save datamodel..." + response);
+            $log.error("could not save datamodel..." + angular.toJson(response));
         });
 
         // save the datamodel objects
@@ -170,9 +171,9 @@ export function DataModelController($log, $mdDialog, $document, $stateParams, $t
 
             // save the datamodel object
             datamodelService.saveDatamodelObject(toSave, $stateParams.datamodelId).then(function success(response) {
-                $log.debug("successfully saved datamodel object..." + response);
+                $log.debug("successfully saved datamodel object..." + angular.toJson(response));
             }, function fail(response) {
-                $log.error("could not save datamodel object..." + response);
+                $log.error("could not save datamodel object..." + angular.toJson(response));
             });
         });
     }
@@ -198,7 +199,7 @@ export function DataModelController($log, $mdDialog, $document, $stateParams, $t
         // load datamodel objects
         datamodelService.getDatamodelObjects($stateParams.datamodelId).
         then(function success(data) {
-            $log.info("successfully loaded datamodel objects:" + data);
+            $log.info("successfully loaded datamodel objects:" + angular.toJson(data));
             
             // process the objects
             var datamodelObjects = [];  // array of processed dm objects
@@ -280,6 +281,7 @@ export function DataModelController($log, $mdDialog, $document, $stateParams, $t
 
     // handle the selection of a visjs node
     function onDatamodelObjectSelect(properties) {
+        // immediately deselect everything
         network.unselectAll();
 
         // get the node that was selected
@@ -320,6 +322,11 @@ export function DataModelController($log, $mdDialog, $document, $stateParams, $t
             if(!nodeToEdit.datamodelObject) {
                 return;
             }
+
+            // set stepper mode
+            vm.stepperMode = "EDIT"
+
+            // process the object into stepper data
             var dmo = nodeToEdit.datamodelObject;
             vm.stepperData.id = dmo.id;
             vm.stepperData.name = dmo.name;
@@ -413,7 +420,7 @@ export function DataModelController($log, $mdDialog, $document, $stateParams, $t
                 { "name": vm.stepperData.name },
                 $stateParams.datamodelId
             ).then(function success(response) {
-                $log.debug("successfully created datamodel object..." + response);
+                $log.debug("successfully created datamodel object..." + angular.toJson(response));
 
                 // parse the response into a datamodelObject 
                 var dmo = createDatamodelObject(
@@ -442,9 +449,39 @@ export function DataModelController($log, $mdDialog, $document, $stateParams, $t
                 // hide the stepper and reset its state
                 vm.cancel();
             }, function fail(response) {
-                $log.error("could not create datamodel object..." + response);
+                $log.error("could not create datamodel object..." + angular.toJson(response));
             });
         }
+    };
+
+    // delete the object and reload the datamodel
+    vm.onStepperDelete = function () {
+        // confirm delete
+        var confirm = $mdDialog.confirm()
+            .title('Delete Object')
+            .htmlContent("Are you sure you want to delete this object?")
+            .cancel("Cancel")
+            .ok("Submit");
+        $mdDialog.show(confirm).then(function () {
+            $log.debug("deleting data model object...");
+
+            // delete the object by ID
+            datamodelService.deleteDatamodelObject(
+                vm.stepperData.id
+            ).then(function success(response) {
+                $log.debug("successfully deleted datamodel object..." + angular.toJson(response));
+
+                // hide the stepper and reset its state
+                vm.cancel();
+
+                // reload the datamodel
+                loadDatamodel();
+            }, function fail(response) {
+                $log.error("could not create datamodel object..." + angular.toJson(response));
+            });
+        }, function () {
+        });
+        
     };
 
     // add a datamodel object attribute to the stepper's current data

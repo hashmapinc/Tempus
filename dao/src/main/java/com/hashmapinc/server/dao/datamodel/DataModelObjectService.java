@@ -24,6 +24,7 @@ import java.util.List;
 
 public interface DataModelObjectService {
     DataModelObject save(DataModelObject dataModelObject);
+    void removeById(DataModelObjectId dataModelObjectId);
     DataModelObject findById(DataModelObjectId dataModelObjectId);
     List<DataModelObject> findByDataModelId(DataModelId dataModelId);
 }
