@@ -31,7 +31,7 @@ export default function DashboardDirective($compile, $templateCache, $translate,
         scope.listOfDataModel = [];
         scope.dataModelView = null;
         scope.types = types;
-        $log.log(element)
+        scope.listOfDataModelAssets = [];
         scope.$watch('dashboard', function(newVal) {
             if (newVal) {
                 if (scope.dashboard.publicCustomerId) {
@@ -50,6 +50,7 @@ export default function DashboardDirective($compile, $templateCache, $translate,
          * Fetch all the data models related to login tenant
          */
         scope.loadDataModel = function(){
+            scope.listOfDataModel = [];
             scope.dataModels = datamodelService.listDatamodels();
             scope.dataModels.then(function (data) {
                 scope.listOfDataModel = data;
@@ -63,10 +64,14 @@ export default function DashboardDirective($compile, $templateCache, $translate,
          * @param dataModelId
          */
         scope.loadDataModelAssets = function(){
+            scope.listOfDataModelAssets = [];
             scope.dataModelsAssets = datamodelService.getDatamodelObjects(scope.dataModelView.id.id);
             scope.dataModelsAssets.then(function (data) {
-                scope.listOfDataModelAssets = data;
-                $log.log(scope.listOfDataModelAssets);
+                angular.forEach(data, function (list) {
+                    if (list.type === "Asset") {
+                        scope.listOfDataModelAssets.push(list);
+                    }
+                  });
             }, function (error) {
                 $log.error(error);
             }) 
