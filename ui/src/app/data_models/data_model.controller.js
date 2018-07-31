@@ -34,6 +34,9 @@ export function DataModelController($log, $mdDialog, $document, $stateParams, $t
     vm.stepperData = {};        // keeps track of the in-progress data model object and is bound to the stepper
     resetStepperState();        // instantiate the stepper model and structure the stepperData object
 
+    // manage persistence states
+    var objectDeleteList = [];  // list of datamodel object ID's to delete when changes are confirmed
+
     // Create the graph that will be plotted
     vm.visIDs = {} // hashmap of object id strings -> visjs ids
     vm.nodes = new vis.DataSet();
@@ -92,24 +95,24 @@ export function DataModelController($log, $mdDialog, $document, $stateParams, $t
         vm.stepperState = 0;    // keeps track of the current stepper step (0-3)
         vm.stepperMode = "";    // either CREATE or EDIT. Usefull for hiding/showing the delete option
         vm.stepperData = {      // keeps track of the in-progress data model object and is bound to the stepper
-            id: null,
+            id: null,           // datamodel object id
+            node_id: null,      // visjs node id
             name: "",
             desc: "",
             type: "",
-            parent: null,
+            parent_node_id: null,   // visjs node id of the parent
             currentAttribute: "",
             attributes: []
         }
     }
 
     // structure for a datamodel object
-    function createDatamodelObject(id, name, desc, obj_type, parent_id, attributes) {
+    function createDatamodelObject(id, name, desc, obj_type, attributes) {
         return {
             id: id,
             name: name,
             desc: desc,
             type: obj_type,
-            parent_id: parent_id,
             attributes: attributes
         }
     }
@@ -223,7 +226,6 @@ export function DataModelController($log, $mdDialog, $document, $stateParams, $t
                     dmo.name,
                     dmo.description,
                     dmo.type,
-                    parentId,
                     attributes
                 ));
             });
@@ -329,19 +331,16 @@ export function DataModelController($log, $mdDialog, $document, $stateParams, $t
             // process the object into stepper data
             var dmo = nodeToEdit.datamodelObject;
             vm.stepperData.id = dmo.id;
+            vm.stepperData.node_id = nodeToEdit.id;
             vm.stepperData.name = dmo.name;
             vm.stepperData.desc = dmo.desc;
             vm.stepperData.type = dmo.type;
             vm.stepperData.attribute = dmo.attribute;
             vm.stepperState = 3; // go straight to review page
 
-            // get parent if it exists
-            vm.stepperData.parent = null;
-
-            if(dmo.parent_id) {
-                var parentNode = vm.nodes.get(vm.visIDs[dmo.parent_id]);
-                vm.stepperData.parent = parentNode.datamodelObject;
-            }
+        } else {
+            // create a new node id for a new object creation stepper
+            vm.stepperData.node_id = vm.nodes.length + 1;
         }
 
         // show the mdDialog
@@ -381,77 +380,68 @@ export function DataModelController($log, $mdDialog, $document, $stateParams, $t
         });
     } 
 
-    // add the datamodel object to the object list and replot
+    // process new and edited objects from a stepper submit click
     vm.onStepperSubmit = function() {
-        // process an object that alread has an ID
-        if (vm.stepperData.id) {
-            $log.debug("updating data model object...");
+        // create the data model object to be submitted
+        var dmo = createDatamodelObject(
+            vm.stepperData.id,
+            vm.stepperData.name,
+            vm.stepperData.desc,
+            vm.stepperData.type,
+            vm.stepperData.attributes
+        );
 
-            // get the visjs node associated with this ID
-            var nodeId = vm.visIDs[vm.stepperData.id];
-            var node = vm.nodes.get(nodeId);
+        // get the nodeId and the node (if it exists)
+        var nodeId = vm.stepperData.node_id
+        var node = vm.nodes.get(nodeId) // this is null if no node exists with this id
 
+        if (node) { // handle an existing node
             // update the node
-            node.datamodelObject = createDatamodelObject(
-                vm.stepperData.id,
-                vm.stepperData.name,
-                vm.stepperData.desc,
-                vm.stepperData.type,
-                vm.stepperData.parent ? vm.stepperData.parent.id : null, // parent ID if it exists
-                vm.stepperData.attributes
-            );
+            node.datamodelObject = dmo
             node.label = vm.stepperData.name;
             node.group = vm.stepperData.type;
 
             // merge the node changes back into nodes
             vm.nodes.update(node);
 
-            // plot the data
-            plotDatamodel();
-
-            // hide the stepper and reset its state
-            vm.cancel();
-
-        // process an object that does not exist already
-        } else {
-            $log.debug("creating data model object...");
-            // create the object to get an id
-            datamodelService.saveDatamodelObject(
-                { "name": vm.stepperData.name },
-                $stateParams.datamodelId
-            ).then(function success(response) {
-                $log.debug("successfully created datamodel object..." + angular.toJson(response));
-
-                // parse the response into a datamodelObject 
-                var dmo = createDatamodelObject(
-                    response.data.id.id,
-                    vm.stepperData.name,
-                    vm.stepperData.desc,
-                    vm.stepperData.type,
-                    vm.stepperData.parent ? vm.stepperData.parent.id : null, // parent ID if it exists,
-                    vm.stepperData.attributes
-                );
-
-                // record the ID into the hashmap
-                vm.visIDs[dmo.id] = vm.nodes.length + 1; // increase node ID by 1
-
-                // add a new node into the nodes list
-                vm.nodes.add({
-                    id: vm.visIDs[dmo.id], // get visjs ID from dmo ID string using visIDs hashmap
-                    label: dmo.name,
-                    group: dmo.type,
-                    datamodelObject: dmo
-                });
-
-                // plot the data
-                plotDatamodel();
-
-                // hide the stepper and reset its state
-                vm.cancel();
-            }, function fail(response) {
-                $log.error("could not create datamodel object..." + angular.toJson(response));
+        } else { // handle a new node
+            // add a new node into the nodes list
+            vm.nodes.add({
+                id: nodeId,
+                label: dmo.name,
+                group: dmo.type,
+                datamodelObject: dmo
             });
         }
+
+        // update the parent relationship
+        var parent_nodeId = vm.stepperData.parent_node_id;
+        var edge = vm.edges.get().filter(function (edge) { // get the existing edge if it exists, otherwise get empty object
+            return edge.to === nodeId;
+        }).pop() || {};
+        if (parent_nodeId) { // handle a parent that exists
+            // update endpoints
+            edge.to = nodeId;
+            edge.from = parent_nodeId;
+
+            // add edge to edges
+            if (edge.id) {  // update existing edge
+                vm.edges.update(edge);
+            } else {        // create new edge
+                edge.id = vm.edges.length + 1;
+                vm.edges.add(edge);
+            }
+        } else { // handle a parent that does not exist
+            if (edge.id) { // delete an existing edge
+                vm.edges.remove(edge.id);
+            }
+        }
+
+        // plot the data
+        plotDatamodel();
+
+        // hide the stepper and reset its state
+        vm.cancel();
     };
 
     // delete the object and reload the datamodel
