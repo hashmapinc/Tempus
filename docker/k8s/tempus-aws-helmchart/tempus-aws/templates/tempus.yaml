@@ -63,14 +63,15 @@ data:
   database.type: "cassandra"
   postgres.host: "postgres"
   postgres.port: "5432"
-  schema.data: "false"
-  demo.data: "false"
+  schema.data: "true"
+  demo.data: "true"
   mqtt.address: "0.0.0.0"
   mqtt.port: "1883"
   coap.address: "0.0.0.0"
   coap.port: "5683"
   spark.path: "/tmp"
   http.port: "8080"
+  identity.base.url: "http://{{ .Values.identity.name }}:{{ .Values.identity.service.port }}/uaa"
 ---
 apiVersion: "apps/v1beta1"
 kind: StatefulSet
@@ -107,6 +108,11 @@ spec:
         - containerPort: 9999
           name: tempus-port
         env:
+        - name: IDENTITY_BASE_URL
+          valueFrom:
+            configMapKeyRef:
+              name: tempus-config
+              key: identity.base.url
         - name: SPARK_COMPUTATIONS_PATH
           valueFrom:
             configMapKeyRef:

@@ -1,0 +1,50 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.discovery.name }}
+  labels:
+    app: {{ .Values.discovery.name }}
+spec:
+  type: {{ .Values.discovery.service.type }}
+  ports:
+  - port: {{ .Values.discovery.service.port }}
+    targetPort: http
+    protocol: TCP
+    name: http
+  selector:
+    app: {{ .Values.discovery.name }}
+---
+apiVersion: policy/v1beta1
+kind: PodDisruptionBudget
+metadata:
+  name: {{ .Values.discovery.name }}
+spec:
+  selector:
+    matchLabels:
+      app: {{ .Values.discovery.name }}
+  minAvailable: {{ .Values.discovery.pdb.minAvailable }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.discovery.name }}
+  labels:
+    app: {{ .Values.discovery.name }}
+spec:
+  replicas: {{ .Values.discovery.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ .Values.discovery.name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.discovery.name }}
+    spec:
+      containers:
+      - name: {{ .Values.discovery.name }}
+        image: "{{ .Values.discovery.image.repository }}:{{ .Values.discovery.image.tag }}"
+        imagePullPolicy: {{ .Values.discovery.image.pullPolicy }}
+        ports:
+        - name: http
+          containerPort: {{ .Values.discovery.app.port }}
+          protocol: TCP
