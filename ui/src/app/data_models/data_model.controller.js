@@ -20,7 +20,7 @@ import 'vis/dist/vis-network.min.css';
 import objectStepper from './datamodel-object-stepper.tpl.html';
 
 /*@ngInject*/
-export function DataModelController($log, $mdDialog, $document, $stateParams, $timeout, datamodelService) {
+export function DataModelController($log, $mdDialog, $document, $stateParams, $timeout, $q, datamodelService) {
     //=============================================================================
     // Main
     //=============================================================================
@@ -146,37 +146,76 @@ export function DataModelController($log, $mdDialog, $document, $stateParams, $t
             $log.error("could not save datamodel..." + angular.toJson(response));
         });
 
-        // save the datamodel objects
-        vm.nodes.forEach(node => {
-            // get the datamodel object associated with this node
-            var dmo = node.datamodelObject;
 
-            // create the saveable object
-            var toSave          = {};
-            toSave.dataModelId = { id: $stateParams.datamodelId, entityType: "DATA_MODEL"};
-            toSave.id           = {id: dmo.id, entityType: "DATA_MODEL_OBJECT"};
-            toSave.description  = dmo.desc;
-            toSave.name         = dmo.name;
-            toSave.type         = dmo.type;
-            if (dmo.parent_id) {
-                toSave.parentId = { id: dmo.parent_id, entityType: "DATA_MODEL_OBJECT"};
-            }
-            if (dmo.attributes) {
-                toSave.attributeDefinitions = dmo.attributes.map(attr => {
-                    return {
-                        "dataModelObjectId" : toSave.id,
-                        "name"              : attr,
-                        "valueType"         : "STRING"
-                    }
-                });
-            }
+        // get the brand new nodes that do not have a dmo id
+        var new_nodes = vm.nodes.get().filter(node => { 
+            return !node.datamodelObject.id; // true if id does not exist
+        });
+        
+        // create an array of promises for each create call
+        var promises = new_nodes.map(node => {  // return promises for each node
+            $log.debug("creating data model object IDs...");
 
-            // save the datamodel object
-            datamodelService.saveDatamodelObject(toSave, $stateParams.datamodelId).then(function success(response) {
-                $log.debug("successfully saved datamodel object..." + angular.toJson(response));
-            }, function fail(response) {
-                $log.error("could not save datamodel object..." + angular.toJson(response));
+            // get ID's
+            return datamodelService.saveDatamodelObject( 
+                { "name": " " }, // name doesn't matter now, just need the ID
+                $stateParams.datamodelId
+            );
+        });
+
+        // once all promises resolve, we'll have enough IDs to save the model
+        $q.all(promises).then(function success(response) {
+            $log.debug("successfully created datamodel objects..." + angular.toJson(response));
+
+            // save the new id in the new nodes
+            response.forEach(r => {
+                let node = new_nodes.pop();
+                node.datamodelObject.id = r.data.id.id;
+                vm.nodes.update(node);
             });
+
+            // create a map from each dmo ID to it's parent dmo ID
+            var parentMap = {};
+            vm.edges.forEach(edge => {
+                let child_id = vm.nodes.get(edge.to).datamodelObject.id;
+                let parent_id = vm.nodes.get(edge.from).datamodelObject.id;
+                parentMap[child_id] = parent_id;
+            });
+
+            // save the datamodel objects
+            vm.nodes.forEach(node => {
+                // get the datamodel object associated with this node
+                let dmo = node.datamodelObject;
+
+                // create the saveable object
+                let toSave = {};
+                toSave.dataModelId = { id: $stateParams.datamodelId, entityType: "DATA_MODEL" };
+                toSave.id = { id: dmo.id, entityType: "DATA_MODEL_OBJECT" };
+                toSave.description = dmo.desc;
+                toSave.name = dmo.name;
+                toSave.type = dmo.type;
+                if (parentMap[dmo.id]) { // get parent dmo ID, if it exists
+                    toSave.parentId = { id: parentMap[dmo.id], entityType: "DATA_MODEL_OBJECT" };
+                }
+                if (dmo.attributes) { // get attributes, if any
+                    toSave.attributeDefinitions = dmo.attributes.map(attr => {
+                        return {
+                            "dataModelObjectId": toSave.id,
+                            "name": attr,
+                            "valueType": "STRING"
+                        }
+                    });
+                }
+
+                // save the datamodel object
+                datamodelService.saveDatamodelObject(toSave, $stateParams.datamodelId).then(function success(response) {
+                    $log.debug("successfully saved datamodel object..." + angular.toJson(response));
+                }, function fail(response) {
+                    $log.error("could not save datamodel object..." + angular.toJson(response));
+                });
+            });
+        }, function fail(response) {
+            $log.error("could not create datamodel object..." + angular.toJson(response));
         });
     }
 
@@ -190,7 +229,7 @@ export function DataModelController($log, $mdDialog, $document, $stateParams, $t
         vm.nodes.clear();
         vm.edges.clear();
 
-        // reset data persistence queue
+        // reset data persistence state
         objectDeleteList = [];
 
         // load datamodel
@@ -332,8 +371,16 @@ export function DataModelController($log, $mdDialog, $document, $stateParams, $t
             vm.stepperData.name = dmo.name;
             vm.stepperData.desc = dmo.desc;
             vm.stepperData.type = dmo.type;
-            vm.stepperData.attribute = dmo.attribute;
+            vm.stepperData.attributes = dmo.attributes;
             vm.stepperState = 3; // go straight to review page
+
+            // get the parent ID if it exists
+            let edge = vm.edges.get().filter(e => {
+                return e.to === nodeToEdit.id;
+            }).pop();
+            if (edge) {
+                vm.stepperData.parent_node_id = edge.from;
+            }
 
         } else {
             // create a new node id for a new object creation stepper
@@ -499,9 +546,9 @@ export function DataModelController($log, $mdDialog, $document, $stateParams, $t
             });
         });
 
-        // save and exit edit mode
+        // save and exit edit mode, and cleanly reload the data
         saveDatamodel();
-        vm.toggleDMEditMode();
+        vm.toggleDMEditMode();   
     };
 
     // discard changes and replot the datamodel
