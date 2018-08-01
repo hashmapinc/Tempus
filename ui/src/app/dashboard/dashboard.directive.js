@@ -21,13 +21,18 @@ import dashboardFieldsetTemplate from './dashboard-fieldset.tpl.html';
 /* eslint-enable import/no-unresolved, import/default */
 
 /*@ngInject*/
-export default function DashboardDirective($compile, $templateCache, $translate, types, toast, dashboardService) {
+export default function DashboardDirective($compile, $templateCache, $translate, types, toast, dashboardService, $log, datamodelService) {
     var linker = function (scope, element) {
         var template = $templateCache.get(dashboardFieldsetTemplate);
         element.html(template);
         scope.publicLink = null;
+        scope.dataModels = null;
+        scope.landingDashboard = false;
+        scope.showAssetsList = false;
+        scope.listOfDataModel = [];
+        scope.dataModelView = null;
         scope.types = types;
-
+        scope.listOfDataModelAssets = [];
         scope.$watch('dashboard', function(newVal) {
             if (newVal) {
                 if (scope.dashboard.publicCustomerId) {
@@ -41,6 +46,44 @@ export default function DashboardDirective($compile, $templateCache, $translate,
         scope.onPublicLinkCopied = function() {
             toast.showSuccess($translate.instant('dashboard.public-link-copied-message'), 750, angular.element(element).parent().parent(), 'bottom left');
         };
+
+        /**
+         * Fetch all the data models related to login tenant
+         */
+        scope.loadDataModel = function(){
+            scope.listOfDataModel = [];
+            scope.dataModels = datamodelService.listDatamodels();
+            scope.dataModels.then(function (data) {
+                scope.listOfDataModel = data;
+            }, function (error) {
+                $log.error(error);
+            }) 
+        }
+
+        /**
+         * Fetch Assets of data model
+         * @param dataModelId
+         */
+        scope.loadDataModelAssets = function(){
+            scope.listOfDataModelAssets = [];
+            scope.dataModelsAssets = datamodelService.getDatamodelObjects(scope.dataModelView.id.id);
+            scope.dataModelsAssets.then(function (data) {
+                angular.forEach(data, function (list) {
+                    if (list.type === "Asset") {
+                        scope.listOfDataModelAssets.push(list);
+                    }
+                  });
+            }, function (error) {
+                $log.error(error);
+            }) 
+        }
+        /**
+         * Show Assets List
+         */
+        scope.showAssets = function(dataModel){
+            scope.showAssetsList = true;
+            scope.dataModelView = dataModel;
+        }
 
         $compile(element.contents())(scope);
     }
@@ -58,7 +101,8 @@ export default function DashboardDirective($compile, $templateCache, $translate,
             onManageAssignedCustomers: '&',
             onUnassignFromCustomer: '&',
             onExportDashboard: '&',
-            onDeleteDashboard: '&'
+            onDeleteDashboard: '&',
+            loadDataModel: '&'
         }
     };
 }

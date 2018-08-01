@@ -77,5 +77,16 @@
 			<label translate>dashboard.description</label>
 			<textarea ng-model="dashboard.configuration.description" rows="2"></textarea>
 		</md-input-container>
+		<div flex-gt-sm="50">
+			<md-checkbox ng-model="landingDashboard" aria-label="Dashboard Landing Page">
+				Dashboard Landing Page
+			</md-checkbox>
+		</div>
+		<md-select ng-if="landingDashboard" placeholder="Assign Data Model View" ng-model="dataModelView" md-on-open="loadDataModel()" style="min-width: 200px;" ng-change="showAssets(dataModelView)">
+			<md-option  ng-value="datamodel" ng-repeat="datamodel in listOfDataModel">{{datamodel.name}}</md-option>
+		</md-select>
+		<md-select  ng-if="showAssetsList && landingDashboard" placeholder="Select Data Model Assets" ng-model="dataModelAssets" md-on-open="loadDataModelAssets(dataModelView)" style="min-width: 200px;">
+			<md-option ng-value="datamodelAsset" ng-repeat="datamodelAsset in listOfDataModelAssets">{{datamodelAsset.name}}</md-option>
+		</md-select>
 	</fieldset>
 </md-content>
