@@ -29,7 +29,7 @@ discovery:
   app:
     port: 8761
   service:
-    type: LoadBalancer
+    type: ClusterIP
     port: 80
   pdb:
     minAvailable: 1
@@ -44,10 +44,17 @@ identity:
   app:
     port: 9002
   service:
-    type: LoadBalancer
+    type: ClusterIP
     port: 80
   pdb:
     minAvailable: 1
+  db:
+    host: postgresql
+    port: 5432
+    name: identity
+    user: identity
+    ## TODO We need to extract secrets from here
+    password: identity
 
 resources: {}
   # We usually recommend not to specify default resources and to leave this as a conscious

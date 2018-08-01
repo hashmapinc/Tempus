@@ -60,3 +60,32 @@ nodeSelector: {}
 tolerations: []
 
 affinity: {}
+
+## Configuration values for the postgresql.
+postgresql:
+  name: "postgresql"
+  replicaCount: 2
+  image:
+    repository: postgres
+    tag: 9.6.2
+    pullPolicy: Always
+  port: 5432
+  postgresUser: identity
+  postgresDatabase: identity
+  ## TODO We need to extract secrets from here
+  postgresPassword: identity
+  persistence:
+    storageClass: tempus
+    accessMode: ReadWriteOnce
+    size: 3Gi
+    mountPath: /var/lib/postgresql/data/pgdata
+    subPath: "postgresql-db"
+  probes:
+    liveness:
+      initialDelay: 60
+      timeoutSeconds: 5
+      failureThreshold: 6
+    readiness:
+      initialDelay: 30
+      timeoutSeconds: 3
+      periodSeconds: 5
