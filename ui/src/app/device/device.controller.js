@@ -1,5 +1,6 @@
 /*
- * Copyright © 2017-2018 Hashmap, Inc
+ * Copyright © 2016-2018 The Thingsboard Authors
+ * Modifications © 2017-2018 Hashmap, Inc
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -451,13 +452,13 @@ export function DeviceController($rootScope,userService, deviceService, customer
             .cancel($translate.instant('action.no'))
             .ok($translate.instant('action.yes'));
         $mdDialog.show(confirm).then(function () {
-                vm.deviceGridConfig.deleteItemFunc(item.id.id).then(function success() {
-                    $scope.resetFilter();
+            vm.deviceGridConfig.deleteItemFunc(item.id.id).then(function success() {
+                $scope.resetFilter();
 
-                });
-            },
-            function () {
             });
+        },
+        function () {
+        });
     }
 
     $scope.addDevice = function($event) {

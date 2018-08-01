@@ -1,5 +1,6 @@
 /**
- * Copyright © 2017-2018 Hashmap, Inc
+ * Copyright © 2016-2018 The Thingsboard Authors
+ * Modifications © 2017-2018 Hashmap, Inc
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -124,6 +125,19 @@ public class DataModelController extends BaseController {
         try {
             checkParameter("objectId", objectId);
             return  dataModelObjectService.findById(new DataModelObjectId(toUUID(objectId)));
+        } catch (Exception e) {
+            throw handleException(e);
+        }
+    }
+
+    @PreAuthorize("hasAnyAuthority('TENANT_ADMIN', 'CUSTOMER_USER')")
+    @DeleteMapping(value = "/data-model/objects/{objectId}")
+    @ResponseBody
+    public Boolean removeDatamodelObjectById(@PathVariable("objectId") String objectId) throws TempusException {
+        try {
+            checkParameter("objectId", objectId);
+            dataModelObjectService.removeById(new DataModelObjectId(toUUID(objectId)));
+            return true;
         } catch (Exception e) {
             throw handleException(e);
         }

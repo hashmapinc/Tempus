@@ -1,5 +1,6 @@
 /*
- * Copyright © 2017-2018 Hashmap, Inc
+ * Copyright © 2016-2018 The Thingsboard Authors
+ * Modifications © 2017-2018 Hashmap, Inc
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -192,7 +193,7 @@ export default function CustomerController(customerService, $state, $stateParams
         if ($event) {
             $event.stopPropagation();
         }
-        $state.go('home.customers.users', {customerId: customer.id.id});
+        $state.go('home.customers.usergroups', {customerId: customer.id.id});
     }
 
     function openCustomerAssets($event, customer) {
