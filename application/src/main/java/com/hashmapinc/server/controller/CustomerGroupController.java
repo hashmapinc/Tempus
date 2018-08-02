@@ -21,13 +21,17 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.hashmapinc.server.common.data.CustomerGroup;
 import com.hashmapinc.server.common.data.EntityType;
+import com.hashmapinc.server.common.data.User;
 import com.hashmapinc.server.common.data.audit.ActionType;
 import com.hashmapinc.server.common.data.id.CustomerGroupId;
 import com.hashmapinc.server.common.data.id.CustomerId;
 import com.hashmapinc.server.common.data.id.TenantId;
 import com.hashmapinc.server.common.data.page.TextPageData;
 import com.hashmapinc.server.common.data.page.TextPageLink;
+import com.hashmapinc.server.common.data.security.Authority;
+import com.hashmapinc.server.exception.TempusErrorCode;
 import com.hashmapinc.server.exception.TempusException;
+import com.hashmapinc.server.service.security.model.SecurityUser;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -159,6 +163,31 @@ public class CustomerGroupController extends BaseController {
             TenantId tenantId = getCurrentUser().getTenantId();
             CustomerId customerId = getCurrentUser().getCustomerId();
             return checkNotNull(customerGroupService.findCustomerByTenantIdAndCustomerIdAndTitle(tenantId, customerId, customerGroupTitle));
+        } catch (Exception e) {
+            throw handleException(e);
+        }
+    }
+
+    @PreAuthorize("hasAuthority('TENANT_ADMIN')")
+    @GetMapping(value = "/group/{customerGroupId}/users", params = { "limit" })
+    @ResponseBody
+    public TextPageData<User> getUsersByGropuId(
+            @PathVariable(CUSTOMER_GROUP_ID) String strCustomerGroupId,
+            @RequestParam int limit,
+            @RequestParam(required = false) String textSearch,
+            @RequestParam(required = false) String idOffset,
+            @RequestParam(required = false) String textOffset) throws TempusException {
+        checkParameter(CUSTOMER_GROUP_ID, strCustomerGroupId);
+        try {
+            CustomerGroupId customerGroupId = new CustomerGroupId(toUUID(strCustomerGroupId));
+            SecurityUser authUser = getCurrentUser();
+            if (authUser.getAuthority() == Authority.CUSTOMER_USER && !authUser.getId().equals(customerGroupId)) {
+                throw new TempusException(YOU_DON_T_HAVE_PERMISSION_TO_PERFORM_THIS_OPERATION,
+                        TempusErrorCode.PERMISSION_DENIED);
+            }
+            final CustomerGroup customerGroup = checkNotNull(checkCustomerGroupId(customerGroupId));
+            TextPageLink pageLink = createPageLink(limit, textSearch, idOffset, textOffset);
+            return new TextPageData<>(customerGroup.getUsers(), pageLink);
         } catch (Exception e) {
             throw handleException(e);
         }

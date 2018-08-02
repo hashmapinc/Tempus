@@ -18,6 +18,7 @@ package com.hashmapinc.server.controller;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.hashmapinc.server.common.data.CustomerGroup;
 import com.hashmapinc.server.common.data.EntityType;
 import com.hashmapinc.server.common.data.User;
 import com.hashmapinc.server.common.data.audit.ActionType;
@@ -287,5 +288,31 @@ public class UserController extends BaseController {
             throw handleException(e);
         }
     }
+
+    @PreAuthorize("hasAuthority('TENANT_ADMIN')")
+    @GetMapping(value = "/user/{userId}/groups", params = { "limit" })
+    @ResponseBody
+    public TextPageData<CustomerGroup> getGroupsByUserId(
+            @PathVariable(USER_ID) String strUserId,
+            @RequestParam int limit,
+            @RequestParam(required = false) String textSearch,
+            @RequestParam(required = false) String idOffset,
+            @RequestParam(required = false) String textOffset) throws TempusException {
+        checkParameter(USER_ID, strUserId);
+        try {
+            UserId userId = new UserId(toUUID(strUserId));
+            SecurityUser authUser = getCurrentUser();
+            if (authUser.getAuthority() == Authority.CUSTOMER_USER && !authUser.getId().equals(userId)) {
+                throw new TempusException(YOU_DON_T_HAVE_PERMISSION_TO_PERFORM_THIS_OPERATION,
+                        TempusErrorCode.PERMISSION_DENIED);
+            }
+            final User user = checkNotNull(checkUserId(userId));
+            TextPageLink pageLink = createPageLink(limit, textSearch, idOffset, textOffset);
+            return new TextPageData<>(user.getGroups(), pageLink);
+        } catch (Exception e) {
+            throw handleException(e);
+        }
+    }
+
     
 }
