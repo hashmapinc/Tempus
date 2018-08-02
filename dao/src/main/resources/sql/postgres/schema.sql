@@ -421,6 +421,11 @@ CREATE TABLE IF NOT EXISTS customer_group (
     search_text varchar(255)
 );
 
+CREATE TABLE IF NOT EXISTS user_groups (
+    user_id varchar(31),
+    group_id varchar(31)
+);
+
 CREATE TABLE IF NOT EXISTS customer_group_policy (
     group_id varchar(31) NOT NULL CONSTRAINT customer_group_policy_pkey PRIMARY KEY,
     policy varchar
