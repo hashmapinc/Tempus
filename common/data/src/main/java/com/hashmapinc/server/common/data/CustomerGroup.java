@@ -15,6 +15,7 @@
  */
 package com.hashmapinc.server.common.data;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.hashmapinc.server.common.data.id.CustomerGroupId;
 import com.hashmapinc.server.common.data.id.CustomerId;
 import com.hashmapinc.server.common.data.id.TenantId;
@@ -33,6 +34,8 @@ public class CustomerGroup extends SearchTextBasedWithAdditionalInfo<CustomerGro
     private TenantId tenantId;
     private CustomerId customerId;
     private List<String> policies;
+    @JsonIgnore
+    private List<User> users;
 
     public CustomerGroup(CustomerGroupId id) {
         super(id);
@@ -44,6 +47,7 @@ public class CustomerGroup extends SearchTextBasedWithAdditionalInfo<CustomerGro
         this.tenantId = customerGroup.tenantId;
         this.customerId = customerGroup.customerId;
         this.policies = customerGroup.policies;
+        this.users = customerGroup.users;
     }
 
     @Override

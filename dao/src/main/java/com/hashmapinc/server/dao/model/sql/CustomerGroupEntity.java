@@ -20,6 +20,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.hashmapinc.server.common.data.Customer;
 import com.hashmapinc.server.common.data.CustomerGroup;
 import com.hashmapinc.server.common.data.UUIDConverter;
+import com.hashmapinc.server.common.data.User;
 import com.hashmapinc.server.common.data.id.CustomerGroupId;
 import com.hashmapinc.server.common.data.id.CustomerId;
 import com.hashmapinc.server.common.data.id.TenantId;
@@ -52,6 +53,9 @@ public class CustomerGroupEntity extends BaseSqlEntity<CustomerGroup> implements
 
     @Column(name = ModelConstants.CUSTOMER_GROUP_CUSTOMER_ID)
     private String customerId;
+
+    @ManyToMany(mappedBy = ModelConstants.GROUPS_PROPERTY)
+    private List<User> users;
 
     @ElementCollection()
     @CollectionTable(name = ModelConstants.CUSTOMER_GROUP_POLICY_TABLE_NAME, joinColumns = @JoinColumn(name = ModelConstants.CUSTOMER_GROUP_POLICY_ID))

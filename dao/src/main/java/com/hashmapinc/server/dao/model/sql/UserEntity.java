@@ -18,6 +18,7 @@ package com.hashmapinc.server.dao.model.sql;
 
 import com.datastax.driver.core.utils.UUIDs;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.hashmapinc.server.common.data.CustomerGroup;
 import com.hashmapinc.server.common.data.UUIDConverter;
 import com.hashmapinc.server.common.data.User;
 import com.hashmapinc.server.common.data.id.CustomerGroupId;
@@ -36,6 +37,7 @@ import com.hashmapinc.server.dao.model.SearchTextEntity;
 
 import javax.persistence.*;
 import java.util.Collection;
+import java.util.List;
 
 /**
  * Created by Valerii Sosliuk on 4/21/2017.
@@ -75,6 +77,12 @@ public class UserEntity extends BaseSqlEntity<User> implements SearchTextEntity<
     @Type(type = "json")
     @Column(name = ModelConstants.USER_ADDITIONAL_INFO_PROPERTY)
     private JsonNode additionalInfo;
+
+    @ManyToMany
+    @JoinTable(name = ModelConstants.USER_GROUP_TABLE_NAME,
+            joinColumns = @JoinColumn(name = ModelConstants.USER_ID_PROPERTY),
+            inverseJoinColumns = @JoinColumn(name = ModelConstants.CUSTOMER_GROUP_POLICY_ID))
+    private List<CustomerGroup> groups;
 
     @ElementCollection()
     @CollectionTable(name = ModelConstants.CUSTOMER_GROUP_POLICY_TABLE_NAME, joinColumns = @JoinColumn(name = ModelConstants.USER_CUSTOMER_GROUP_ID_PROPERTY))

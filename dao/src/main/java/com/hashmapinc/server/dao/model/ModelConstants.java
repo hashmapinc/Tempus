@@ -47,6 +47,7 @@ public class ModelConstants {
     public static final String SEARCH_TEXT_PROPERTY = "search_text";
     public static final String ADDITIONAL_INFO_PROPERTY = "additional_info";
     public static final String ENTITY_TYPE_PROPERTY = "entity_type";
+    public static final String GROUPS_PROPERTY = "groups";
 
     public static final String ENTITY_TYPE_COLUMN = ENTITY_TYPE_PROPERTY;
     public static final String ENTITY_ID_COLUMN = "entity_id";
@@ -77,6 +78,7 @@ public class ModelConstants {
     public static final String USER_FIRST_NAME_PROPERTY = "first_name";
     public static final String USER_LAST_NAME_PROPERTY = "last_name";
     public static final String USER_ADDITIONAL_INFO_PROPERTY = ADDITIONAL_INFO_PROPERTY;
+    public static final String USER_GROUP_TABLE_NAME = "user_groups";
 
     public static final String USER_BY_EMAIL_COLUMN_FAMILY_NAME = "user_by_email";
     public static final String USER_BY_TENANT_AND_SEARCH_TEXT_COLUMN_FAMILY_NAME = "user_by_tenant_and_search_text";
@@ -550,6 +552,7 @@ public class ModelConstants {
     public static final String CUSTOMER_GROUP_CUSTOMER_ID_PROPERTY = CUSTOMER_ID_PROPERTY;
     public static final String CUSTOMER_GROUP_BY_TENANT_AND_CUSTOMER_AND_TITLE_VIEW_NAME = "customer_by_tenant_and_customer_and_title";
     public static final String CUSTOMER_GROUP_BY_TENANT_AND_CUSTOMER_SEARCH_TEXT_COLUMN_FAMILY_NAME = "customer_by_tenant_and_customer_and_search_text";
+
 
     /**
      * CustomerGroup Policy Constants
