@@ -18,6 +18,7 @@
 import vis from "vis";
 import 'vis/dist/vis-network.min.css';
 import objectStepper from './datamodel-object-stepper.tpl.html';
+import objectInformation from './object_info.tpl.html';
 
 /*@ngInject*/
 
@@ -370,21 +371,41 @@ export function DataModelController($scope, $log, $mdDialog, $document, $statePa
         // get the node that was selected
         var nodeId = properties.nodes[0];
         var node = vm.nodes.get(nodeId);
+        vm.nodeValue = node;
+
+        if(node.datamodelObject.parent_id) {
+            var parentNode = vm.nodes.get(vm.visIDs[node.datamodelObject.parent_id]);
+            vm.nodeValue.datamodelObject.parent = parentNode.datamodelObject.name;
+         }
 
         if (vm.isEdit) {
-            // handle object editing
             vm.showDatamodelObjectStepper(null, node);
         } else {
             // handle object viewing
-            var content = // generate prettified json html
-                '<h5>' + 
-                angular.toJson(node.datamodelObject, true).replace(/\n/g, '<br/>').replace(/[\,\{\}]/g, '') + 
-                '</h5>';
-            $mdDialog.show($mdDialog.alert({
-                title: 'Object Information',
-                htmlContent: content,
-                ok: 'Close'
-            }));
+//            var content = // generate prettified json html
+//                '<h5>' +
+//                angular.toJson(node.datamodelObject, true).replace(/\n/g, '<br/>').replace(/[\,\{\}]/g, '') +
+//                '</h5>';
+//            $mdDialog.show($mdDialog.alert({
+//                title: 'Object Information',
+//                htmlContent: content,
+//                ok: 'Close'
+//            }));
+        $timeout( function(){
+               $mdDialog.show({
+                    controller: function () { return vm }, // use the current controller (this) as the mdDialog controller
+                    controllerAs: 'vm',
+                    templateUrl: objectInformation,
+                    parent: angular.element($document[0].body),
+                    fullscreen: true,
+                    targetEvent: nodeId
+                }).then(
+                function () {
+                },
+                function () {
+                });
+         }, 0 );
+
         }
     }
 
@@ -416,7 +437,9 @@ export function DataModelController($scope, $log, $mdDialog, $document, $statePa
             vm.stepperData.name = dmo.name;
             vm.stepperData.desc = dmo.desc;
             vm.stepperData.type = dmo.type;
-            vm.stepperData.attributes = dmo.attributes;
+            vm.stepperData.attribute = dmo.attribute;
+            vm.stepperData.logoFile = dmo.logoFile;
+
             vm.stepperState = 3; // go straight to review page
 
             // get the parent ID if it exists
@@ -641,7 +664,7 @@ export function DataModelController($scope, $log, $mdDialog, $document, $statePa
     }
 
     function clearFile() {
-        $scope.theForm.$setDirty();
+       // $scope.theForm.$setDirty();
         vm.stepperData.logoFile = null;
         vm.stepperData.logoFileName = null;
     }

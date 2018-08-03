@@ -576,7 +576,15 @@ export default angular.module('tempus.locale', [])
                     "add": "Add Data Model",
                     "name": "Title",
                     "description" :"Description",
-                    "name-required":"This feild is required"
+                    "name-required":"This feild is required",
+                    "objectInfo":"Object Information",
+                    "datamodelObject":"Datamodel Object",
+                    "objectAttribute":"Object Attributes",
+                    "relationships":"Relationships",
+                    "image":"Image",
+                    "icon":"Icon",
+                    "parent":"Parent",
+                    "type":"Type"
 
                 },
                 "datakey": {
