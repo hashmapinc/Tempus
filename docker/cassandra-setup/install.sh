@@ -25,6 +25,12 @@ do
   sleep 10
 done
 
+until nmap $IDENTITY_HOST -p $IDENTITY_PORT | grep "$IDENTITY_PORT/tcp open"
+do
+  echo "Wait for identity service to start..."
+  sleep 10
+done
+
 echo "Creating 'Tempus' schema and system data..."
 if [ "$ADD_DEMO_DATA" == "true" ]; then
     echo "plus demo data..."

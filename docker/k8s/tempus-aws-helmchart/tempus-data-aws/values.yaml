@@ -64,7 +64,7 @@ affinity: {}
 ## Configuration values for the postgresql.
 postgresql:
   name: "postgresql"
-  replicaCount: 2
+  replicaCount: 1
   image:
     repository: postgres
     tag: 9.6.2
