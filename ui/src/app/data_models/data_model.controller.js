@@ -21,9 +21,7 @@ import objectStepper from './datamodel-object-stepper.tpl.html';
 import objectInformation from './object_info.tpl.html';
 
 /*@ngInject*/
-
 export function DataModelController($scope, $log, $mdDialog, $document, $stateParams, $timeout, $q, datamodelService) {
-
     //=============================================================================
     // Main
     //=============================================================================
@@ -41,6 +39,8 @@ export function DataModelController($scope, $log, $mdDialog, $document, $statePa
     var objectDeleteList = [];  // list of datamodel object ID's to delete when changes are confirmed
     vm.fileAdded = fileAdded;
     vm.clearFile = clearFile;
+
+
     // Create the graph that will be plotted
     vm.nodes = new vis.DataSet();
     vm.edges = new vis.DataSet();
@@ -79,7 +79,6 @@ export function DataModelController($scope, $log, $mdDialog, $document, $statePa
         }
     };
 
-    $scope.theForm = {};
     // build the vis network and add assign event listeners
     var networkContainer = angular.element("#dataModelViewerContainer")[0];
     var network = new vis.Network(networkContainer, network_data, network_options);
@@ -96,10 +95,11 @@ export function DataModelController($scope, $log, $mdDialog, $document, $statePa
 
     // reset the stepper state and clear its current form data
     function resetStepperState() {
+        vm.stepperState = 0;    // keeps track of the current stepper step (0-3)
         vm.stepperMode = "";    // either CREATE or EDIT. Usefull for hiding/showing the delete option
-        vm.stepperState = 0; // keeps track of the current stepper step (0-4)
-        vm.stepperData = {   // keeps track of the in-progress data model object and is bound to the stepper
-            id: null,
+        vm.stepperData = {      // keeps track of the in-progress data model object and is bound to the stepper
+            id: null,           // datamodel object id
+            node_id: null,      // visjs node id
             name: "",
             desc: "",
             type: "",
@@ -110,16 +110,14 @@ export function DataModelController($scope, $log, $mdDialog, $document, $statePa
     }
 
     // structure for a datamodel object
-    function createDatamodelObject(id, name, desc, obj_type, parent_id, attributes, logoFile) {
-
+    function createDatamodelObject(id, name, desc, obj_type, attributes, logoFile) {
         return {
             id: id,
             name: name,
             desc: desc,
             type: obj_type,
-            parent_id: parent_id,
             attributes: attributes,
-            logoFile: logoFile
+            logoFile:logoFile
         }
     }
 
@@ -152,31 +150,7 @@ export function DataModelController($scope, $log, $mdDialog, $document, $statePa
         }, function fail(response) {
             $log.error("could not save datamodel..." + angular.toJson(response));
         });
-        // save the datamodel objects
-        vm.nodes.forEach(node => {
-            // get the datamodel object associated with this node
-            var dmo = node.datamodelObject;
 
-            // create the saveable object
-            var toSave          = {};
-            toSave.dataModelId = { id: $stateParams.datamodelId, entityType: "DATA_MODEL"};
-            toSave.id           = {id: dmo.id, entityType: "DATA_MODEL_OBJECT"};
-            toSave.description  = dmo.desc;
-            toSave.name         = dmo.name;
-            toSave.type         = dmo.type;
-            toSave.logoFile = dmo.logoFile;
-            if (dmo.parent_id) {
-                toSave.parentId = { id: dmo.parent_id, entityType: "DATA_MODEL_OBJECT"};
-            }
-            if (dmo.attributes) {
-                toSave.attributeDefinitions = dmo.attributes.map(attr => {
-                    return {
-                        "dataModelObjectId" : toSave.id,
-                        "name"              : attr,
-                        "valueType"         : "STRING"
-                    }
-                });
-            }
 
         // get the brand new nodes that do not have a dmo id
         var new_nodes = vm.nodes.get().filter(node => {
@@ -248,12 +222,10 @@ export function DataModelController($scope, $log, $mdDialog, $document, $statePa
         }, function fail(response) {
             $log.error("could not create datamodel object..." + angular.toJson(response));
         });
-        });
-      }
-
+    }
 
     /**
-     * load the data model 
+     * load the data model
      */
     function loadDatamodel() {
         $log.debug("loading data model...");
@@ -276,9 +248,10 @@ export function DataModelController($scope, $log, $mdDialog, $document, $statePa
         // load datamodel objects
         datamodelService.getDatamodelObjects($stateParams.datamodelId).
         then(function success(data) {
+            $log.info("successfully loaded datamodel objects:" + angular.toJson(data));
+
             // process the nodes, gather the raw edges
-            var dmo_to_node = {};    // hashmap of dmo id strings -> visjs node ids
-            var datamodelObjects =[];
+            var dmo_to_node = {}    // hashmap of dmo id strings -> visjs node ids
             var edges = [];         // array of {to: child_dmo_id, from: parent_dmo_id} edges
             var currId = 1;         // keeps track of current node id
             data.forEach(dmo => {   // iterate and process each object
@@ -292,6 +265,7 @@ export function DataModelController($scope, $log, $mdDialog, $document, $statePa
                     edges.push({ to: dmo.id.id, from: dmo.parentId.id});
                 }
 
+                var logoFile = dmo.logoFile ? dmo.logoFile : null;
                 // create node
                 var node = {
                     id:     currId++,
@@ -302,7 +276,8 @@ export function DataModelController($scope, $log, $mdDialog, $document, $statePa
                         dmo.name,
                         dmo.description,
                         dmo.type,
-                        attributes
+                        attributes,
+                        logoFile
                     )
                 };
 
@@ -311,20 +286,6 @@ export function DataModelController($scope, $log, $mdDialog, $document, $statePa
 
                 // add the node to the nodes set
                 vm.nodes.add(node);
-
-                var logoFile = dmo.logoFile ? dmo.logoFile : null;
-
-                // push the new object
-                datamodelObjects.push(createDatamodelObject(
-                    dmo.id.id,
-                    dmo.name,
-                    dmo.description,
-                    dmo.type,
-                    dmo.parentId,
-                    attributes,
-                    logoFile
-                ));
-
             });
 
             // process the raw edges
@@ -361,6 +322,30 @@ export function DataModelController($scope, $log, $mdDialog, $document, $statePa
         network.once('stabilized', function (params) {
             network.setOptions({ nodes: { physics: false } });
         });
+    }
+
+    function fileAdded($file) {
+        var reader = new FileReader();
+        reader.onload = function(event) {
+            $scope.$apply(function() {
+                if(event.target.result) {
+                    var addedFile = event.target.result;
+                    if (addedFile && addedFile.length > 0) {
+                        if($file.getExtension() === 'png' || $file.getExtension() === 'jpeg' || $file.getExtension() === 'svg' || $file.getExtension() === 'jpg'){
+                            vm.stepperData.logoFile = addedFile.replace(/^data:image\/(png|jpg|svg|jpeg);base64,/, "");
+                            vm.stepperData.logoFileName = $file.name;
+                        }
+                    }
+                }
+            });
+        };
+        reader.readAsDataURL($file.file);
+    }
+
+    function clearFile() {
+       // $scope.theForm.$setDirty();
+        vm.stepperData.logoFile = null;
+        vm.stepperData.logoFileName = null;
     }
 
     // handle the selection of a visjs node
@@ -408,10 +393,9 @@ export function DataModelController($scope, $log, $mdDialog, $document, $statePa
 
         }
     }
-
     /**
      * start the mdDialog for adding a datamodel object
-     * 
+     *
      * @param targetEvent - event, if any, that triggered this show
      * @param nodeToEdit - visjs node to edit if a node is being edited, otherwise null for new node
      */
@@ -437,9 +421,8 @@ export function DataModelController($scope, $log, $mdDialog, $document, $statePa
             vm.stepperData.name = dmo.name;
             vm.stepperData.desc = dmo.desc;
             vm.stepperData.type = dmo.type;
-            vm.stepperData.attribute = dmo.attribute;
+            vm.stepperData.attributes = dmo.attributes;
             vm.stepperData.logoFile = dmo.logoFile;
-
             vm.stepperState = 3; // go straight to review page
 
             // get the parent ID if it exists
@@ -465,7 +448,7 @@ export function DataModelController($scope, $log, $mdDialog, $document, $statePa
             targetEvent: targetEvent
         }).then(
         function () {
-        }, 
+        },
         function () {
         });
     };
@@ -487,23 +470,21 @@ export function DataModelController($scope, $log, $mdDialog, $document, $statePa
 
                 // handle review tab
             } else if (vm.stepperState === 3) {
-                angular.element('#stepperNext').click();
-            } else if (vm.stepperState === 4) {
                 angular.element('#stepperSubmit').click();
             }
         });
-    } 
+    }
 
     // process new and edited objects from a stepper submit click
     vm.onStepperSubmit = function() {
-
         // create the data model object to be submitted
         var dmo = createDatamodelObject(
             vm.stepperData.id,
             vm.stepperData.name,
             vm.stepperData.desc,
             vm.stepperData.type,
-            vm.stepperData.attributes
+            vm.stepperData.attributes,
+            vm.stepperData.logoFile
         );
 
         // get the nodeId and the node (if it exists)
@@ -513,25 +494,6 @@ export function DataModelController($scope, $log, $mdDialog, $document, $statePa
         if (node) { // handle an existing node
             // update the node
             node.datamodelObject = dmo
-
-        // process an object that alread has an ID
-        if (vm.stepperData.id) {
-            $log.debug("updating data model object..." );
-
-            // get the visjs node associated with this ID
-           // var nodeId = vm.visIDs[vm.stepperData.id];
-            //var node = vm.nodes.get(nodeId);
-
-            // update the node
-            node.datamodelObject = createDatamodelObject(
-                vm.stepperData.id,
-                vm.stepperData.name,
-                vm.stepperData.desc,
-                vm.stepperData.type,
-                vm.stepperData.parent ? vm.stepperData.parent.id : null, // parent ID if it exists
-                vm.stepperData.attributes,
-                vm.stepperData.logoFile
-            );
             node.label = vm.stepperData.name;
             node.group = vm.stepperData.type;
 
@@ -571,47 +533,11 @@ export function DataModelController($scope, $log, $mdDialog, $document, $statePa
             }
         }
 
-
         // plot the data
         plotDatamodel();
 
-        // process an object that does not exist already
-        } else {
-            $log.debug("creating data model object...");
-            // create the object to get an id
-            datamodelService.saveDatamodelObject(
-                //{ "name": vm.stepperData.name },
-                vm.stepperData,
-                $stateParams.datamodelId
-            ).then(function success(response) {
-                $log.debug("successfully created datamodel object..." + response);
-
-                // parse the response into a datamodelObject 
-                var dmo = createDatamodelObject(
-                    response.data.id.id,
-                    vm.stepperData.name,
-                    vm.stepperData.desc,
-                    vm.stepperData.type,
-                    vm.stepperData.parent ? vm.stepperData.parent.id : null, // parent ID if it exists,
-                    vm.stepperData.attributes,
-                    vm.stepperData.logoFile
-                );
-
-                // record the ID into the hashmap
-                vm.visIDs[dmo.id] = vm.nodes.length + 1; // increase node ID by 1
-
-                // add a new node into the nodes list
-                vm.nodes.add({
-                    id: vm.visIDs[dmo.id], // get visjs ID from dmo ID string using visIDs hashmap
-                    label: dmo.name,
-                    group: dmo.type,
-                    datamodelObject: dmo
-                });
-
-            }, function fail(response) {
-                $log.error("could not create datamodel object..." + response);
-            });
-        }
+        // hide the stepper and reset its state
+        vm.cancel();
     };
 
     // delete the object and reload the datamodel
@@ -644,30 +570,6 @@ export function DataModelController($scope, $log, $mdDialog, $document, $statePa
             vm.cancel();
         }, function () {});
     };
-
-    function fileAdded($file) {
-        var reader = new FileReader();
-        reader.onload = function(event) {
-            $scope.$apply(function() {
-                if(event.target.result) {
-                    var addedFile = event.target.result;
-                    if (addedFile && addedFile.length > 0) {
-                        if($file.getExtension() === 'png' || $file.getExtension() === 'jpeg' || $file.getExtension() === 'svg' || $file.getExtension() === 'jpg'){
-                            vm.stepperData.logoFile = addedFile.replace(/^data:image\/(png|jpg|svg|jpeg);base64,/, "");
-                            vm.stepperData.logoFileName = $file.name;
-                        }
-                    }
-                }
-            });
-        };
-        reader.readAsDataURL($file.file);
-    }
-
-    function clearFile() {
-       // $scope.theForm.$setDirty();
-        vm.stepperData.logoFile = null;
-        vm.stepperData.logoFileName = null;
-    }
 
     // add a datamodel object attribute to the stepper's current data
     vm.addDatamodelObjectAttribute = function () {
