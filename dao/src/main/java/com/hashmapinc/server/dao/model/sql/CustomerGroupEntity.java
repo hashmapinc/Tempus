@@ -54,9 +54,6 @@ public class CustomerGroupEntity extends BaseSqlEntity<CustomerGroup> implements
     @Column(name = ModelConstants.CUSTOMER_GROUP_CUSTOMER_ID)
     private String customerId;
 
-    @ManyToMany(mappedBy = ModelConstants.GROUPS_PROPERTY)
-    private List<User> users;
-
     @ElementCollection()
     @CollectionTable(name = ModelConstants.CUSTOMER_GROUP_POLICY_TABLE_NAME, joinColumns = @JoinColumn(name = ModelConstants.CUSTOMER_GROUP_POLICY_ID))
     @Column(name = ModelConstants.CUSTOMER_GROUP_POLICY_COLUMN)

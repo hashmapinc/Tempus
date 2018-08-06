@@ -36,14 +36,13 @@ public class User extends SearchTextBasedWithAdditionalInfo<UserId> implements H
 
     private TenantId tenantId;
     private CustomerId customerId;
-    private CustomerGroupId customerGroupId;
     private String email;
     private Authority authority;
     private Collection<String> permissions = Collections.emptyList();
     private String firstName;
     private String lastName;
     @JsonIgnore
-    private List<CustomerGroup> groups;
+    private List<CustomerGroupId> groupIds;
 
     public User() {
         super();
@@ -57,13 +56,12 @@ public class User extends SearchTextBasedWithAdditionalInfo<UserId> implements H
         super(user);
         this.tenantId = user.getTenantId();
         this.customerId = user.getCustomerId();
-        this.customerGroupId = user.getCustomerGroupId();
         this.email = user.getEmail();
         this.authority = user.getAuthority();
         this.permissions = user.getPermissions();
         this.firstName = user.getFirstName();
         this.lastName = user.getLastName();
-        this.groups = user.getGroups();
+        this.groupIds = user.getGroupIds();
     }
 
     public TenantId getTenantId() {
@@ -80,14 +78,6 @@ public class User extends SearchTextBasedWithAdditionalInfo<UserId> implements H
 
     public void setCustomerId(CustomerId customerId) {
         this.customerId = customerId;
-    }
-
-    public CustomerGroupId getCustomerGroupId() {
-        return customerGroupId;
-    }
-
-    public void setCustomerGroupId(CustomerGroupId customerGroupId) {
-        this.customerGroupId = customerGroupId;
     }
 
     public String getEmail() {
@@ -136,12 +126,12 @@ public class User extends SearchTextBasedWithAdditionalInfo<UserId> implements H
         this.lastName = lastName;
     }
 
-    public List<CustomerGroup> getGroups() {
-        return groups;
+    public List<CustomerGroupId> getGroupIds() {
+        return groupIds;
     }
 
-    public void setGroups(List<CustomerGroup> groups) {
-        this.groups = groups;
+    public void setGroupIds(List<CustomerGroupId> groupIds) {
+        this.groupIds = groupIds;
     }
 
     @Override
@@ -156,8 +146,6 @@ public class User extends SearchTextBasedWithAdditionalInfo<UserId> implements H
         builder.append(tenantId);
         builder.append(", customerId=");
         builder.append(customerId);
-        builder.append(", customerGroupId=");
-        builder.append(customerGroupId);
         builder.append(", email=");
         builder.append(email);
         builder.append(", authority=");

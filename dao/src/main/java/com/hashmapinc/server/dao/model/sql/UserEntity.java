@@ -55,9 +55,6 @@ public class UserEntity extends BaseSqlEntity<User> implements SearchTextEntity<
     @Column(name = ModelConstants.USER_CUSTOMER_ID_PROPERTY)
     private String customerId;
 
-    @Column(name = ModelConstants.USER_CUSTOMER_GROUP_ID_PROPERTY)
-    private String customerGroupId;
-
     @Enumerated(EnumType.STRING)
     @Column(name = ModelConstants.USER_AUTHORITY_PROPERTY)
     private Authority authority;
@@ -78,17 +75,6 @@ public class UserEntity extends BaseSqlEntity<User> implements SearchTextEntity<
     @Column(name = ModelConstants.USER_ADDITIONAL_INFO_PROPERTY)
     private JsonNode additionalInfo;
 
-    @ManyToMany
-    @JoinTable(name = ModelConstants.USER_GROUP_TABLE_NAME,
-            joinColumns = @JoinColumn(name = ModelConstants.USER_ID_PROPERTY),
-            inverseJoinColumns = @JoinColumn(name = ModelConstants.CUSTOMER_GROUP_POLICY_ID))
-    private List<CustomerGroup> groups;
-
-    @ElementCollection()
-    @CollectionTable(name = ModelConstants.CUSTOMER_GROUP_POLICY_TABLE_NAME, joinColumns = @JoinColumn(name = ModelConstants.USER_CUSTOMER_GROUP_ID_PROPERTY))
-    @Column(name = ModelConstants.CUSTOMER_GROUP_POLICY_COLUMN)
-    private Collection<String> policies;
-
     public UserEntity() {
     }
 
@@ -103,14 +89,11 @@ public class UserEntity extends BaseSqlEntity<User> implements SearchTextEntity<
         if (user.getCustomerId() != null) {
             this.customerId = UUIDConverter.fromTimeUUID(user.getCustomerId().getId());
         }
-        if (user.getCustomerGroupId() != null) {
-            this.customerGroupId = UUIDConverter.fromTimeUUID(user.getCustomerGroupId().getId());
-        }
+
         this.email = user.getEmail();
         this.firstName = user.getFirstName();
         this.lastName = user.getLastName();
         this.additionalInfo = user.getAdditionalInfo();
-        this.policies = user.getPermissions();
     }
 
     @Override
@@ -134,14 +117,10 @@ public class UserEntity extends BaseSqlEntity<User> implements SearchTextEntity<
         if (customerId != null) {
             user.setCustomerId(new CustomerId(UUIDConverter.fromString(customerId)));
         }
-        if (customerGroupId != null) {
-            user.setCustomerGroupId(new CustomerGroupId(UUIDConverter.fromString(customerGroupId)));
-        }
         user.setEmail(email);
         user.setFirstName(firstName);
         user.setLastName(lastName);
         user.setAdditionalInfo(additionalInfo);
-        user.setPermissions(policies);
         return user;
     }
 
