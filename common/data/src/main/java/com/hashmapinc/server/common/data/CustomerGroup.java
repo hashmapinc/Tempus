@@ -19,6 +19,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.hashmapinc.server.common.data.id.CustomerGroupId;
 import com.hashmapinc.server.common.data.id.CustomerId;
 import com.hashmapinc.server.common.data.id.TenantId;
+import com.hashmapinc.server.common.data.id.UserId;
 import lombok.*;
 
 import java.util.List;
@@ -35,7 +36,7 @@ public class CustomerGroup extends SearchTextBasedWithAdditionalInfo<CustomerGro
     private CustomerId customerId;
     private List<String> policies;
     @JsonIgnore
-    private List<User> users;
+    private List<UserId> userIds;
 
     public CustomerGroup(CustomerGroupId id) {
         super(id);
@@ -47,7 +48,7 @@ public class CustomerGroup extends SearchTextBasedWithAdditionalInfo<CustomerGro
         this.tenantId = customerGroup.tenantId;
         this.customerId = customerGroup.customerId;
         this.policies = customerGroup.policies;
-        this.users = customerGroup.users;
+        this.userIds = customerGroup.userIds;
     }
 
     @Override

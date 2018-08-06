@@ -21,6 +21,7 @@ import com.datastax.driver.mapping.annotations.Column;
 import com.datastax.driver.mapping.annotations.PartitionKey;
 import com.datastax.driver.mapping.annotations.Table;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.hashmapinc.server.common.data.CustomerGroup;
 import com.hashmapinc.server.common.data.id.CustomerGroupId;
 import com.hashmapinc.server.dao.model.ModelConstants;
 import lombok.EqualsAndHashCode;
@@ -34,10 +35,9 @@ import com.hashmapinc.server.dao.model.SearchTextEntity;
 import com.hashmapinc.server.dao.model.type.AuthorityCodec;
 import com.hashmapinc.server.dao.model.type.JsonCodec;
 
-import javax.persistence.CollectionTable;
-import javax.persistence.ElementCollection;
-import javax.persistence.JoinColumn;
+import javax.persistence.*;
 import java.util.Collection;
+import java.util.List;
 import java.util.UUID;
 
 import static com.hashmapinc.server.dao.model.ModelConstants.*;
@@ -59,9 +59,6 @@ public final class UserEntity implements SearchTextEntity<User> {
     @Column(name = USER_CUSTOMER_ID_PROPERTY)
     private UUID customerId;
 
-    @Column(name = USER_CUSTOMER_GROUP_ID_PROPERTY)
-    private UUID customerGroupId;
-
     @PartitionKey(value = 3)
     @Column(name = USER_AUTHORITY_PROPERTY, codec = AuthorityCodec.class)
     private Authority authority;
@@ -81,11 +78,6 @@ public final class UserEntity implements SearchTextEntity<User> {
     @Column(name = USER_ADDITIONAL_INFO_PROPERTY, codec = JsonCodec.class)
     private JsonNode additionalInfo;
 
-    @ElementCollection()
-    @CollectionTable(name = ModelConstants.CUSTOMER_GROUP_POLICY_COLUMN_FAMILY_NAME, joinColumns = @JoinColumn(name = ModelConstants.USER_CUSTOMER_GROUP_ID_PROPERTY))
-    @Column(name = ModelConstants.CUSTOMER_GROUP_POLICY_PROPERTY)
-    private Collection<String> policies;
-
     public UserEntity() {
         super();
     }
@@ -101,14 +93,10 @@ public final class UserEntity implements SearchTextEntity<User> {
         if (user.getCustomerId() != null) {
         	this.customerId = user.getCustomerId().getId();
         }
-        if (user.getCustomerGroupId() != null) {
-            this.customerGroupId = user.getCustomerGroupId().getId();
-        }
         this.email = user.getEmail();
         this.firstName = user.getFirstName();
         this.lastName = user.getLastName();
         this.additionalInfo = user.getAdditionalInfo();
-        this.policies = user.getPermissions();
     }
     
 	public UUID getId() {
@@ -142,14 +130,6 @@ public final class UserEntity implements SearchTextEntity<User> {
 	public void setCustomerId(UUID customerId) {
 		this.customerId = customerId;
 	}
-
-    public UUID getCustomerGroupId() {
-        return customerGroupId;
-    }
-
-    public void setCustomerGroupId(UUID customerGroupId) {
-        this.customerGroupId = customerGroupId;
-    }
 
     public String getEmail() {
 		return email;
@@ -197,13 +177,6 @@ public final class UserEntity implements SearchTextEntity<User> {
         return searchText;
     }
 
-    public Collection<String> getPolicies() {
-        return policies;
-    }
-
-    public void setPolicies(Collection<String> policies) {
-        this.policies = policies;
-    }
 
     @Override
     public User toData() {
@@ -216,14 +189,10 @@ public final class UserEntity implements SearchTextEntity<User> {
 		if (customerId != null) {
 			user.setCustomerId(new CustomerId(customerId));
 		}
-        if (customerGroupId != null) {
-            user.setCustomerGroupId(new CustomerGroupId(customerGroupId));
-        }
 		user.setEmail(email);
 		user.setFirstName(firstName);
 		user.setLastName(lastName);
 		user.setAdditionalInfo(additionalInfo);
-		user.setPermissions(policies);
         return user;
     }
 
