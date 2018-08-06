@@ -15,4 +15,4 @@
 -- limitations under the License.
 --
 
-ALTER TABLE tempus.data_model_object_cf ADD logo_file blob;
+ALTER TABLE tempus.data_model_object_cf ADD logo_file text;

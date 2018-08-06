@@ -62,7 +62,7 @@ public final class DataModelObjectEntity implements SearchTextEntity<DataModelOb
     private UUID customerId;
 
     @Column(name = ModelConstants.DATA_MODEL_LOGO_FILE)
-    private ByteBuffer logoFile;
+    private String logoFile;
 
     @Column(name = ModelConstants.DATA_MODEL_OBJECT_DESCRIPTION, codec = JsonCodec.class)
     private JsonNode description;
@@ -88,7 +88,7 @@ public final class DataModelObjectEntity implements SearchTextEntity<DataModelOb
             this.customerId = dataModelObject.getParentId().getId();
         }
         if (dataModelObject.getLogoFile() != null) {
-            this.logoFile = ByteBuffer.wrap(dataModelObject.getLogoFile());
+            this.logoFile = dataModelObject.getLogoFile();
         }
         this.name = dataModelObject.getName();
         this.description = dataModelObject.getDescription();
@@ -152,11 +152,11 @@ public final class DataModelObjectEntity implements SearchTextEntity<DataModelOb
         this.customerId = customerId;
     }
 
-    public ByteBuffer getLogoFile() {
+    public String getLogoFile() {
         return logoFile;
     }
 
-    public void setLogoFile(ByteBuffer logoFile) {
+    public void setLogoFile(String logoFile) {
         this.logoFile = logoFile;
     }
 
@@ -191,9 +191,7 @@ public final class DataModelObjectEntity implements SearchTextEntity<DataModelOb
             dataModelObject.setParentId(new DataModelObjectId(parentId));
         }
         if (logoFile != null) {
-            byte[] fileByteArray = new byte[logoFile.remaining()];
-            logoFile.get(fileByteArray);
-            dataModelObject.setLogoFile(fileByteArray);
+            dataModelObject.setLogoFile(logoFile);
         }
         dataModelObject.setName(name);
         dataModelObject.setDescription(description);

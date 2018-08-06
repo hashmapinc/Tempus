@@ -199,6 +199,7 @@ export function DataModelController($scope, $log, $mdDialog, $document, $statePa
                 toSave.description = dmo.desc;
                 toSave.name = dmo.name;
                 toSave.type = dmo.type;
+                toSave.logoFile = dmo.logoFile;
                 if (parentMap[dmo.id]) { // get parent dmo ID, if it exists
                     toSave.parentId = { id: parentMap[dmo.id], entityType: "DATA_MODEL_OBJECT" };
                 }
@@ -332,7 +333,7 @@ export function DataModelController($scope, $log, $mdDialog, $document, $statePa
                     var addedFile = event.target.result;
                     if (addedFile && addedFile.length > 0) {
                         if($file.getExtension() === 'png' || $file.getExtension() === 'jpeg' || $file.getExtension() === 'svg' || $file.getExtension() === 'jpg'){
-                            vm.stepperData.logoFile = addedFile.replace(/^data:image\/(png|jpg|svg|jpeg);base64,/, "");
+                            vm.stepperData.logoFile = addedFile;
                             vm.stepperData.logoFileName = $file.name;
                         }
                     }

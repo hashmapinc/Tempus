@@ -15,4 +15,4 @@
 -- limitations under the License.
 --
 
-ALTER TABLE data_model_object ADD logo_file bytea DEFAULT '';
+ALTER TABLE data_model_object ADD logo_file VARCHAR;

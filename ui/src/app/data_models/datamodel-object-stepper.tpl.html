@@ -124,38 +124,6 @@
           </md-content>
         </md-tab>
 
-        <!--<md-tab label="Add Logo" ng-click="vm.stepperState = 3" ng-disabled="!vm.stepperData.name || !vm.stepperData.type">-->
-          <!--<md-content class="md-padding">-->
-            <!--<md-input-container class="md-block" ng-keypress="$event.keyCode === 13 && vm.onStepperEnter();">-->
-              <!--<div class="tb-container">-->
-              <!--<label class="tb-label" translate>Logo</label>-->
-              <!--<div flow-init="{singleFile:true}" flow-file-added='vm.fileAdded($file)' class="tb-file-select-container">-->
-                <!--<div class="tb-file-clear-container">-->
-                  <!--<md-button ng-click='vm.clearFile()' class="tb-file-clear-btn md-icon-button md-primary" aria-label="{{ 'action.remove' | translate }}">-->
-                    <!--<md-tooltip md-direction="top">-->
-                      <!--{{ 'action.remove' | translate }}-->
-                    <!--</md-tooltip>-->
-                    <!--<md-icon aria-label="{{ 'action.remove' | translate }}" class="material-icons">close</md-icon>-->
-                  <!--</md-button>-->
-                <!--</div>-->
-                <!--<div class="alert tb-flow-drop" flow-drop>-->
-                  <!--<label for="select" translate>import.drop-file</label>-->
-                  <!--<input flow-attrs="{accept:'.jpg,.png,.svg,.jpeg'}"-->
-                         <!--class="file-input"-->
-                         <!--flow-btn id="select"-->
-                         <!--ng-model="vm.stepperData.logoFileName"-->
-                  <!--&gt;-->
-                <!--</div>-->
-              <!--</div>-->
-              <!--</div>-->
-              <!--<div>-->
-                <!--<div ng-show="!vm.stepperData.logoFile" translate>import.no-file</div>-->
-                <!--<div ng-show="vm.stepperData.logoFile">{{ vm.stepperData.logoFile.name }}</div>-->
-              <!--</div>-->
-            <!--</md-input-container>-->
-          <!--</md-content>-->
-        <!--</md-tab>-->
-
         <md-tab label="Review" ng-click="vm.stepperState = 3" ng-disabled="!vm.stepperData.name || !vm.stepperData.type">
           <md-content class="md-padding">
             <md-subheader class="md-no-sticky">Datamodel Object</md-subheader>
@@ -182,7 +150,7 @@
               <md-subheader class="md-no-sticky">Image</md-subheader>
 
               <md-list-item>
-                  <p>Icon:<img class="" style="width: 98%; margin-top: -1%;"ng-src="data:image/JPEG;base64,{{vm.stepperData.logoFile}}"></p>
+                  <p>Icon:<img class="" style="width: 98%; margin-top: -1%;"ng-src="{{vm.stepperData.logoFile}}"></p>
               </md-list-item>
 
           </md-content>

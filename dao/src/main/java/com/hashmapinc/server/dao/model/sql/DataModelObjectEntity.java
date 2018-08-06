@@ -61,7 +61,7 @@ public final class DataModelObjectEntity extends BaseSqlEntity<DataModelObject> 
     private String dataModelId;
 
     @Column(name = ModelConstants.DATA_MODEL_LOGO_FILE)
-    private byte[] logoFile;
+    private String logoFile;
 
     @Type(type = "json")
     @Column(name = ModelConstants.DATA_MODEL_OBJECT_DESCRIPTION)
