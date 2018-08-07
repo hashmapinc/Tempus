@@ -24,6 +24,7 @@ import com.hashmapinc.server.common.data.id.UserId;
 import com.hashmapinc.server.common.data.page.TextPageData;
 import com.hashmapinc.server.common.data.page.TextPageLink;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface CustomerGroupService {
@@ -44,4 +45,5 @@ public interface CustomerGroupService {
 
     void deleteCustomerGroupsByTenantIdAndCustomerId(TenantId tenantId, CustomerId customerId);
 
+    CustomerGroup assignUsers(CustomerGroupId customerGroupId, List<UserId> userIds);
 }
