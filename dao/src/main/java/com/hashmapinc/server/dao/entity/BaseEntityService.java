@@ -20,6 +20,7 @@ import com.google.common.base.Function;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.hashmapinc.server.common.data.id.*;
+import com.hashmapinc.server.dao.customergroup.CustomerGroupService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -70,6 +71,9 @@ public class BaseEntityService extends AbstractEntityService implements EntitySe
     @Autowired
     private AlarmService alarmService;
 
+    @Autowired
+    private CustomerGroupService customerGroupService;
+
     @Override
     public void deleteEntityRelations(EntityId entityId) {
         super.deleteEntityRelations(entityId);
@@ -107,6 +111,9 @@ public class BaseEntityService extends AbstractEntityService implements EntitySe
                 break;
             case ALARM:
                 hasName = alarmService.findAlarmByIdAsync(new AlarmId(entityId.getId()));
+                break;
+            case CUSTOMER_GROUP:
+                hasName = customerGroupService.findCustomerGroupByIdAsync(new CustomerGroupId(entityId.getId()));
                 break;
             default:
                 throw new IllegalStateException("Not Implemented!");

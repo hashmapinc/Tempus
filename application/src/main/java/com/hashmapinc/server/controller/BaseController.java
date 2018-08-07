@@ -384,6 +384,9 @@ public abstract class BaseController {
                 case USER:
                     checkUserId(new UserId(entityId.getId()));
                     return;
+                case CUSTOMER_GROUP:
+                    checkCustomerGroupId(new CustomerGroupId(entityId.getId()));
+                    return;
                 default:
                     throw new IllegalArgumentException("Unsupported entity type: " + entityId.getEntityType());
             }
