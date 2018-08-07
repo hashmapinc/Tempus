@@ -27,6 +27,7 @@ import com.hashmapinc.server.common.data.audit.ActionType;
 import com.hashmapinc.server.common.data.id.CustomerGroupId;
 import com.hashmapinc.server.common.data.id.CustomerId;
 import com.hashmapinc.server.common.data.id.TenantId;
+import com.hashmapinc.server.common.data.id.UserId;
 import com.hashmapinc.server.common.data.page.TextPageData;
 import com.hashmapinc.server.common.data.page.TextPageLink;
 import com.hashmapinc.server.common.data.security.Authority;
@@ -37,6 +38,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/customer")
@@ -199,6 +204,25 @@ public class CustomerGroupController extends BaseController {
             TextPageLink pageLink = createPageLink(limit, textSearch, idOffset, textOffset);
             return userService.findUsersByIds(customerGroup.getUserIds(), pageLink);
         } catch (Exception e) {
+            throw handleException(e);
+        }
+    }
+
+    @PreAuthorize("hasAuthority('TENANT_ADMIN')")
+    @PostMapping(value = "/group/{customerGroupId}/users")
+    @ResponseBody
+    public CustomerGroup assignUsersToGroup(
+            @PathVariable(CUSTOMER_GROUP_ID) String strCustomerGroupId,
+            @RequestBody List<UUID> userUuids) throws TempusException {
+        checkParameter(CUSTOMER_GROUP_ID, strCustomerGroupId);
+        try{
+            CustomerGroupId customerGroupId = new CustomerGroupId(toUUID(strCustomerGroupId));
+            List<UserId> userIds = userUuids.stream().map(UserId::new).collect(Collectors.toList());
+            for (UserId userId: userIds) {
+                checkUserId(userId);
+            }
+            return checkNotNull(customerGroupService.assignUsers(customerGroupId, userIds));
+        } catch (Exception e){
             throw handleException(e);
         }
     }

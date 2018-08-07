@@ -21,7 +21,6 @@ import com.google.common.util.concurrent.ListenableFuture;
 import com.hashmapinc.server.common.data.Customer;
 import com.hashmapinc.server.common.data.CustomerGroup;
 import com.hashmapinc.server.common.data.Tenant;
-import com.hashmapinc.server.common.data.User;
 import com.hashmapinc.server.common.data.id.CustomerGroupId;
 import com.hashmapinc.server.common.data.id.CustomerId;
 import com.hashmapinc.server.common.data.id.TenantId;
@@ -36,9 +35,6 @@ import com.hashmapinc.server.dao.service.DataValidator;
 import com.hashmapinc.server.dao.service.PaginatedRemover;
 import com.hashmapinc.server.dao.service.Validator;
 import com.hashmapinc.server.dao.tenant.TenantDao;
-import com.hashmapinc.server.dao.user.UserService;
-import lombok.Getter;
-import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,10 +42,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 
-import static com.hashmapinc.server.dao.model.ModelConstants.NULL_UUID;
 import static com.hashmapinc.server.dao.service.Validator.validateId;
 
 @Service
@@ -168,6 +162,16 @@ public class CustomerGroupServiceImpl extends AbstractEntityService implements C
         Validator.validateId(tenantId, INCORRECT_TENANT_ID + tenantId);
         Validator.validateId(customerId, INCORRECT_CUSTOMER_ID + customerId);
         new CustomerGroupRemover(tenantId).removeEntities(customerId);
+    }
+
+    @Override
+    public CustomerGroup assignUsers(CustomerGroupId customerGroupId, List<UserId> userIds) {
+        log.trace("Executing assignUsers, CustomerGroupId [{}] and userIds [{}]", customerGroupId, userIds);
+        Validator.validateId(customerGroupId, INCORRECT_CUSTOMER_GROUP_ID + customerGroupId);
+        customerGroupDao.assignUsers(customerGroupId, userIds);
+        CustomerGroup customerGroup = customerGroupDao.findById(customerGroupId.getId());
+        customerGroup.setUserIds(userIds);
+        return customerGroup;
     }
 
     private class CustomerGroupRemover extends PaginatedRemover<CustomerId, CustomerGroup> {

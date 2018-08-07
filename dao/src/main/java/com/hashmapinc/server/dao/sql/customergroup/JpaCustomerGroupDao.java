@@ -29,10 +29,13 @@ import com.hashmapinc.server.dao.util.SqlDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.repository.CrudRepository;
+import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -44,10 +47,11 @@ import static com.hashmapinc.server.dao.model.ModelConstants.*;
 @Component
 @SqlDao
 public class JpaCustomerGroupDao extends JpaAbstractSearchTextDao<CustomerGroupEntity, CustomerGroup> implements CustomerGroupDao {
-    public static final String QUERY_TO_FETCH_USER_ID_BY_GROUP_ID =
+    private static final String QUERY_TO_FETCH_USER_ID_BY_GROUP_ID =
             String.format("select %s from %s where %s = ?", USER_ID_PROPERTY, USER_GROUP_TABLE_NAME, CUSTOMER_GROUP_ID_PROPERTY);
-    public static final String DELETE_USER_ID_FROM_USER_GROUP = String.format("delete from %s where %s = ?", USER_GROUP_TABLE_NAME, CUSTOMER_GROUP_ID_PROPERTY);
-    public static final String SELECT_GROUP_IDS_FOR_USER_ID = String.format("select %s from %s where %s = ?", CUSTOMER_GROUP_ID_PROPERTY, USER_GROUP_TABLE_NAME, USER_ID_PROPERTY);
+    private static final String DELETE_USER_ID_FROM_USER_GROUP = String.format("delete from %s where %s = ?", USER_GROUP_TABLE_NAME, CUSTOMER_GROUP_ID_PROPERTY);
+    private static final String SELECT_GROUP_IDS_FOR_USER_ID = String.format("select %s from %s where %s = ?", CUSTOMER_GROUP_ID_PROPERTY, USER_GROUP_TABLE_NAME, USER_ID_PROPERTY);
+    private static final String INSERT_USER_GROUPS = String.format("INSERT INTO %s " + "(%s, %s) VALUES (?, ?)", USER_GROUP_TABLE_NAME, USER_ID_PROPERTY, CUSTOMER_GROUP_ID_PROPERTY);
 
     @Autowired
     JdbcTemplate jdbcTemplate;
@@ -92,6 +96,26 @@ public class JpaCustomerGroupDao extends JpaAbstractSearchTextDao<CustomerGroupE
         List<String> customerGroupIdsStr = customerGroupIds.stream().map(id -> id.getId().toString()).collect(Collectors.toList());
         List<CustomerGroupEntity> customerGroupEntities = customerGroupRepository.findByIdIn(customerGroupIdsStr , new PageRequest(0 , textPageLink.getLimit()));
         return customerGroupEntities.stream().map(CustomerGroupEntity::toData).collect(Collectors.toList());
+    }
+
+    @Override
+    public void assignUsers(CustomerGroupId customerGroupId, List<UserId> userIds) {
+
+        List<String> userIdsStr = userIds.stream().map(userId -> UUIDConverter.fromTimeUUID(userId.getId())).collect(Collectors.toList());
+
+        jdbcTemplate.batchUpdate(INSERT_USER_GROUPS, new BatchPreparedStatementSetter() {
+            @Override
+            public void setValues(PreparedStatement ps, int i) throws SQLException {
+                String userIdStr = userIdsStr.get(i);
+                ps.setString(1, userIdStr);
+                ps.setString(2, UUIDConverter.fromTimeUUID(customerGroupId.getId()));
+            }
+
+            @Override
+            public int getBatchSize() {
+                return userIds.size();
+            }
+        });
     }
 
     @Override

@@ -17,6 +17,7 @@ package com.hashmapinc.server.dao.customergroup;
 
 import com.datastax.driver.core.querybuilder.Select;
 import com.hashmapinc.server.common.data.CustomerGroup;
+import com.hashmapinc.server.common.data.id.CustomerGroupId;
 import com.hashmapinc.server.common.data.id.UserId;
 import com.hashmapinc.server.common.data.page.TextPageLink;
 import com.hashmapinc.server.dao.DaoUtil;
@@ -77,6 +78,11 @@ public class CassandraCustomerGroupDao extends CassandraAbstractSearchTextDao<Cu
     @Override
     public List<CustomerGroup> findByUserId(UUID userId, TextPageLink textPageLink) {
         return null;
+    }
+
+    @Override
+    public void assignUsers(CustomerGroupId customerGroupId, List<UserId> userIds) {
+
     }
 
     @Override
