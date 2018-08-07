@@ -70,6 +70,8 @@ public class EntityIdFactory {
                 return new DataModelId(uuid);
             case DATA_MODEL_OBJECT:
                 return new DataModelObjectId(uuid);
+            case CUSTOMER_GROUP:
+                return new CustomerGroupId(uuid);
         }
         throw new IllegalArgumentException("EntityType " + type + " is not supported!");
     }
