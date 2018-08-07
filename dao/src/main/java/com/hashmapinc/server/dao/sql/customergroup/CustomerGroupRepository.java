@@ -15,6 +15,8 @@
  */
 package com.hashmapinc.server.dao.sql.customergroup;
 
+import com.hashmapinc.server.common.data.CustomerGroup;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import com.hashmapinc.server.dao.model.nosql.CustomerGroupEntity;
 import com.hashmapinc.server.dao.util.SqlDao;
@@ -37,4 +39,6 @@ public interface CustomerGroupRepository  extends CrudRepository<CustomerGroupEn
                                                           Pageable pageable);
 
     CustomerGroupEntity findByTenantIdAndCustomerIdAndTitle(String tenantId, String customerId, String title);
+
+    List<CustomerGroup> findByIdIn(List<String> id, PageRequest pageRequest);
 }

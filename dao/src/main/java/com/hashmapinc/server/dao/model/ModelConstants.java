@@ -552,6 +552,7 @@ public class ModelConstants {
     public static final String CUSTOMER_GROUP_CUSTOMER_ID_PROPERTY = CUSTOMER_ID_PROPERTY;
     public static final String CUSTOMER_GROUP_BY_TENANT_AND_CUSTOMER_AND_TITLE_VIEW_NAME = "customer_by_tenant_and_customer_and_title";
     public static final String CUSTOMER_GROUP_BY_TENANT_AND_CUSTOMER_SEARCH_TEXT_COLUMN_FAMILY_NAME = "customer_by_tenant_and_customer_and_search_text";
+    public static final String CUSTOMER_GROUP_ID_PROPERTY = "group_id";
 
 
     /**

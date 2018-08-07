@@ -16,6 +16,7 @@
 package com.hashmapinc.server.dao.customergroup;
 
 import com.hashmapinc.server.common.data.CustomerGroup;
+import com.hashmapinc.server.common.data.id.UserId;
 import com.hashmapinc.server.common.data.page.TextPageLink;
 import com.hashmapinc.server.dao.Dao;
 
@@ -54,4 +55,30 @@ public interface CustomerGroupDao extends Dao<CustomerGroup> {
      * @return the list of customerGroup objects
      */
     Optional<CustomerGroup> findCustomerGroupsByTenantIdAndCustomerIdAndTitle(UUID tenantId, UUID customerId, String title);
+
+    /**
+     * Find User IDs by customer group id.
+     *
+     * @param customerGroupId the customer group id
+     * @return the list of UserId objects
+     */
+    List<UserId> findUserIdsByCustomerGroupId(UUID customerGroupId);
+
+    /**
+     * Delete User IDs by customer group id.
+     *
+     * @param customerGroupId the customer group id
+     *
+     */
+    void deleteUserIdsForCustomerGroupId(UUID customerGroupId);
+
+
+    /**
+     * Find Customer groups by user id.
+     *
+     * @param userId the user id
+     * @param textPageLink the page link
+     * @return the list of customer group objects
+     */
+    List<CustomerGroup> findByUserId(UUID userId, TextPageLink textPageLink);
 }

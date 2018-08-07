@@ -86,4 +86,9 @@ public class CassandraUserDao extends CassandraAbstractSearchTextDao<UserEntity,
         return DaoUtil.convertDataList(userEntities);
     }
 
+    @Override
+    public List<User> findByIdIn(List<UUID> userIds) {
+        return null;
+    }
+
 }

@@ -185,9 +185,10 @@ public class CustomerGroupController extends BaseController {
                 throw new TempusException(YOU_DON_T_HAVE_PERMISSION_TO_PERFORM_THIS_OPERATION,
                         TempusErrorCode.PERMISSION_DENIED);
             }
+//            final CustomerGroup customerGroup = checkNotNull(checkCustomerGroupId(customerGroupId));
             final CustomerGroup customerGroup = checkNotNull(checkCustomerGroupId(customerGroupId));
             TextPageLink pageLink = createPageLink(limit, textSearch, idOffset, textOffset);
-            return new TextPageData<>(customerGroup.getUsers(), pageLink);
+            return userService.findUsersByIds(customerGroup.getUserIds(), pageLink);
         } catch (Exception e) {
             throw handleException(e);
         }
