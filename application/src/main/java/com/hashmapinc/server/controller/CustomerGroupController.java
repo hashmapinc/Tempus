@@ -21,6 +21,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.hashmapinc.server.common.data.CustomerGroup;
 import com.hashmapinc.server.common.data.EntityType;
+import com.hashmapinc.server.common.data.UUIDConverter;
 import com.hashmapinc.server.common.data.User;
 import com.hashmapinc.server.common.data.audit.ActionType;
 import com.hashmapinc.server.common.data.id.CustomerGroupId;
@@ -32,12 +33,14 @@ import com.hashmapinc.server.common.data.security.Authority;
 import com.hashmapinc.server.exception.TempusErrorCode;
 import com.hashmapinc.server.exception.TempusException;
 import com.hashmapinc.server.service.security.model.SecurityUser;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/customer")
+@Slf4j
 public class CustomerGroupController extends BaseController {
 
     public static final String CUSTOMER_GROUP_ID = "customerGroupId";
@@ -95,7 +98,7 @@ public class CustomerGroupController extends BaseController {
     public CustomerGroup saveCustomerGroup(@RequestBody CustomerGroup customerGroup) throws TempusException {
         try {
             customerGroup.setTenantId(getCurrentUser().getTenantId());
-            customerGroup.setCustomerId(getCurrentUser().getCustomerId());
+            customerGroup.setCustomerId(customerGroup.getCustomerId());
             CustomerGroup savedCustomerGroup = checkNotNull(customerGroupService.saveCustomerGroup(customerGroup));
 
             logEntityAction(savedCustomerGroup.getId(), savedCustomerGroup,
@@ -138,16 +141,19 @@ public class CustomerGroupController extends BaseController {
     }
 
     @PreAuthorize("hasAuthority('TENANT_ADMIN')")
-    @GetMapping(value = "/groups", params = {"limit"})
+    @GetMapping(value = "/{customerId}/group", params = {"limit"})
     @ResponseBody
-    public TextPageData<CustomerGroup> getCustomerGroups(@RequestParam int limit,
+    public TextPageData<CustomerGroup> getCustomerGroups(@PathVariable("customerId") String strCustomerId,
+                                               @RequestParam int limit,
                                                @RequestParam(required = false) String textSearch,
                                                @RequestParam(required = false) String idOffset,
                                                @RequestParam(required = false) String textOffset) throws TempusException {
+        checkParameter("customerId", strCustomerId);
         try {
             TextPageLink pageLink = createPageLink(limit, textSearch, idOffset, textOffset);
             TenantId tenantId = getCurrentUser().getTenantId();
-            CustomerId customerId = getCurrentUser().getCustomerId();
+            CustomerId customerId = new CustomerId(toUUID(strCustomerId));
+            checkCustomerId(customerId);
             return checkNotNull(customerGroupService.findCustomerGroupsByTenantIdAndCustomerId(tenantId, customerId, pageLink));
         } catch (Exception e) {
             throw handleException(e);
@@ -155,13 +161,16 @@ public class CustomerGroupController extends BaseController {
     }
 
     @PreAuthorize("hasAuthority('TENANT_ADMIN')")
-    @GetMapping(value = "/group", params = {"customerGroupTitle"})
+    @GetMapping(value = "/{customerId}/group/{customerGroupTitle}")
     @ResponseBody
     public CustomerGroup getCustomerGroupByTitle(
-            @RequestParam String customerGroupTitle) throws TempusException {
+            @PathVariable("customerId") String strCustomerId,
+            @PathVariable("customerGroupTitle") String customerGroupTitle) throws TempusException {
+        checkParameter("customerId", strCustomerId);
         try {
             TenantId tenantId = getCurrentUser().getTenantId();
-            CustomerId customerId = getCurrentUser().getCustomerId();
+            CustomerId customerId = new CustomerId(toUUID(strCustomerId));
+            checkCustomerId(customerId);
             return checkNotNull(customerGroupService.findCustomerByTenantIdAndCustomerIdAndTitle(tenantId, customerId, customerGroupTitle));
         } catch (Exception e) {
             throw handleException(e);
