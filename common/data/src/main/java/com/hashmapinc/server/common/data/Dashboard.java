@@ -24,6 +24,8 @@ public class Dashboard extends DashboardInfo {
     private static final long serialVersionUID = 872682138346187503L;
     
     private transient JsonNode configuration;
+
+    private DashboardType type;
     
     public Dashboard() {
         super();
@@ -35,6 +37,14 @@ public class Dashboard extends DashboardInfo {
 
     public Dashboard(DashboardInfo dashboardInfo) {
         super(dashboardInfo);
+    }
+
+    public DashboardType getType() {
+        return type;
+    }
+
+    public void setType(DashboardType type) {
+        this.type = type;
     }
 
     public Dashboard(Dashboard dashboard) {
@@ -49,6 +59,8 @@ public class Dashboard extends DashboardInfo {
     public void setConfiguration(JsonNode configuration) {
         this.configuration = configuration;
     }
+
+
 
     @Override
     public int hashCode() {
@@ -70,7 +82,11 @@ public class Dashboard extends DashboardInfo {
         if (configuration == null) {
             if (other.configuration != null)
                 return false;
-        } else if (!configuration.equals(other.configuration))
+        } else if(type == null){
+            if (other.type != null)
+                return false;
+        }
+        else if (!configuration.equals(other.configuration))
             return false;
         return true;
     }
@@ -82,6 +98,8 @@ public class Dashboard extends DashboardInfo {
         builder.append(getTenantId());
         builder.append(", title=");
         builder.append(getTitle());
+        builder.append(", type=");
+        builder.append(getType());
         builder.append(", configuration=");
         builder.append(configuration);
         builder.append("]");
