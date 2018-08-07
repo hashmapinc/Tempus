@@ -16,6 +16,7 @@
  */
 package com.hashmapinc.server.dao.sql.user;
 
+import com.hashmapinc.server.common.data.User;
 import com.hashmapinc.server.common.data.security.Authority;
 import com.hashmapinc.server.dao.model.sql.UserEntity;
 import com.hashmapinc.server.dao.util.SqlDao;
@@ -42,5 +43,7 @@ public interface UserRepository extends CrudRepository<UserEntity, String> {
                                           @Param("searchText") String searchText,
                                           @Param("authority") Authority authority,
                                           Pageable pageable);
+
+    List<UserEntity> findByIdIn(List<String> id);
 
 }

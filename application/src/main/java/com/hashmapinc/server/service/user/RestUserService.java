@@ -56,6 +56,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
@@ -72,6 +73,7 @@ import java.io.IOException;
 import java.util.Base64;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import static com.hashmapinc.server.dao.service.Validator.validateId;
 import static net.javacrumbs.futureconverter.springguava.FutureConverter.toGuavaListenableFuture;
@@ -122,6 +124,28 @@ public class RestUserService extends AbstractEntityService implements UserServic
         ResponseEntity<IdentityUser> response = restTemplate.getForEntity(identityUrl + "/" + userId.getId(), IdentityUser.class);
         if(response.getStatusCode().equals(HttpStatus.OK)){
             return response.getBody().toUser();
+        }
+        return null;
+    }
+
+    @Override
+    public TextPageData<User> findUsersByIds(List<UserId> userIds, TextPageLink pageLink) {
+        UUID idOffset = pageLink.getIdOffset() != null ? pageLink.getIdOffset() : ModelConstants.NULL_UUID;
+        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(identityUrl + "/list")
+                .queryParam("limit", pageLink.getLimit())
+                .queryParam("idOffset", idOffset);
+
+
+        ResponseEntity<String> response = restTemplate
+                .postForEntity(builder.build().encode().toUri(), userIds, String.class);
+        if(response.getStatusCode().equals(HttpStatus.OK)){
+            JavaType type = mapper.getTypeFactory().constructParametrizedType(TextPageData.class, TextPageData.class, User.class);
+            try {
+                return mapper.readValue(response.getBody(), type);
+            } catch (IOException e) {
+                log.error("Error while fetching users ", e);
+                return null;
+            }
         }
         return null;
     }

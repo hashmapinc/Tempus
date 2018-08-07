@@ -25,9 +25,13 @@ import com.hashmapinc.server.common.data.page.TextPageData;
 import com.hashmapinc.server.common.data.page.TextPageLink;
 import com.hashmapinc.server.common.data.security.UserCredentials;
 
+import java.util.List;
+
 public interface UserService {
 	
 	User findUserById(UserId userId);
+
+	TextPageData<User> findUsersByIds(List<UserId> userIds, TextPageLink pageLink);
 
 	ListenableFuture<User> findUserByIdAsync(UserId userId);
 

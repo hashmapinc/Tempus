@@ -306,9 +306,8 @@ public class UserController extends BaseController {
                 throw new TempusException(YOU_DON_T_HAVE_PERMISSION_TO_PERFORM_THIS_OPERATION,
                         TempusErrorCode.PERMISSION_DENIED);
             }
-            final User user = checkNotNull(checkUserId(userId));
             TextPageLink pageLink = createPageLink(limit, textSearch, idOffset, textOffset);
-            return new TextPageData<>(user.getGroups(), pageLink);
+            return customerGroupService.findByUserId(userId, pageLink);
         } catch (Exception e) {
             throw handleException(e);
         }

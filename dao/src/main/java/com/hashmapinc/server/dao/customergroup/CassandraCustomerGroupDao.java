@@ -17,6 +17,7 @@ package com.hashmapinc.server.dao.customergroup;
 
 import com.datastax.driver.core.querybuilder.Select;
 import com.hashmapinc.server.common.data.CustomerGroup;
+import com.hashmapinc.server.common.data.id.UserId;
 import com.hashmapinc.server.common.data.page.TextPageLink;
 import com.hashmapinc.server.dao.DaoUtil;
 import com.hashmapinc.server.dao.model.ModelConstants;
@@ -61,6 +62,21 @@ public class CassandraCustomerGroupDao extends CassandraAbstractSearchTextDao<Cu
         CustomerGroupEntity customerGroupEntity = findOneByStatement(query);
         CustomerGroup customerGroup = DaoUtil.getData(customerGroupEntity);
         return Optional.ofNullable(customerGroup);
+    }
+
+    @Override
+    public List<UserId> findUserIdsByCustomerGroupId(UUID customerGroupId) {
+        return null;
+    }
+
+    @Override
+    public void deleteUserIdsForCustomerGroupId(UUID customerGroupId) {
+        //TODO
+    }
+
+    @Override
+    public List<CustomerGroup> findByUserId(UUID userId, TextPageLink textPageLink) {
+        return null;
     }
 
     @Override

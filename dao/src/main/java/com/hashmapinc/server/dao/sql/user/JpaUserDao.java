@@ -34,6 +34,8 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 
 @Component
@@ -83,5 +85,11 @@ public class JpaUserDao extends JpaAbstractSearchTextDao<UserEntity, User> imple
                                 Authority.CUSTOMER_USER,
                                 new PageRequest(0, pageLink.getLimit())));
 
+    }
+
+    @Override
+    public List<User> findByIdIn(List<UUID> userIds) {
+        List<String> userIdsStr = userIds.stream().map(UUIDConverter::fromTimeUUID).collect(Collectors.toList());
+        return DaoUtil.convertDataList(userRepository.findByIdIn(userIdsStr));
     }
 }

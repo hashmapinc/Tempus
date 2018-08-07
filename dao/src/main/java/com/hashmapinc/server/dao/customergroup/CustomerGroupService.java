@@ -20,6 +20,7 @@ import com.hashmapinc.server.common.data.CustomerGroup;
 import com.hashmapinc.server.common.data.id.CustomerGroupId;
 import com.hashmapinc.server.common.data.id.CustomerId;
 import com.hashmapinc.server.common.data.id.TenantId;
+import com.hashmapinc.server.common.data.id.UserId;
 import com.hashmapinc.server.common.data.page.TextPageData;
 import com.hashmapinc.server.common.data.page.TextPageLink;
 
@@ -28,6 +29,8 @@ import java.util.Optional;
 public interface CustomerGroupService {
 
     CustomerGroup findByCustomerGroupId(CustomerGroupId customerGroupId);
+
+    TextPageData<CustomerGroup> findByUserId(UserId userId, TextPageLink pageLink);
 
     ListenableFuture<CustomerGroup> findCustomerGroupByIdAsync(CustomerGroupId customerGroupId);
 
