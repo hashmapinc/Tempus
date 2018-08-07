@@ -23,7 +23,7 @@ import com.hashmapinc.server.common.data.page.TextPageLink;
 import com.hashmapinc.server.dao.DaoUtil;
 import com.hashmapinc.server.dao.customergroup.CustomerGroupDao;
 import com.hashmapinc.server.dao.model.ModelConstants;
-import com.hashmapinc.server.dao.model.nosql.CustomerGroupEntity;
+import com.hashmapinc.server.dao.model.sql.CustomerGroupEntity;
 import com.hashmapinc.server.dao.sql.JpaAbstractSearchTextDao;
 import com.hashmapinc.server.dao.util.SqlDao;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -90,8 +90,8 @@ public class JpaCustomerGroupDao extends JpaAbstractSearchTextDao<CustomerGroupE
         List<CustomerGroupId> customerGroupIds = jdbcTemplate.query(SELECT_GROUP_IDS_FOR_USER_ID, new Object[]{userId},
                 (ResultSet rs, int rowNum) -> CustomerGroupId.fromString(rs.getString(CUSTOMER_GROUP_ID_PROPERTY)));
         List<String> customerGroupIdsStr = customerGroupIds.stream().map(id -> id.getId().toString()).collect(Collectors.toList());
-        customerGroupRepository.findByIdIn(customerGroupIdsStr, new PageRequest(0, textPageLink.getLimit()));
-        return null;
+        List<CustomerGroupEntity> customerGroupEntities = customerGroupRepository.findByIdIn(customerGroupIdsStr , new PageRequest(0 , textPageLink.getLimit()));
+        return customerGroupEntities.stream().map(CustomerGroupEntity::toData).collect(Collectors.toList());
     }
 
     @Override
