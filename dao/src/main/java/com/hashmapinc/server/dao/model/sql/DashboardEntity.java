@@ -21,12 +21,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.extern.slf4j.Slf4j;
-import org.hibernate.annotations.Type;
-import org.hibernate.annotations.TypeDef;
-import org.springframework.util.StringUtils;
+import com.hashmapinc.server.common.data.DashboardType;
 import com.hashmapinc.server.common.data.Dashboard;
 import com.hashmapinc.server.common.data.ShortCustomerInfo;
 import com.hashmapinc.server.common.data.id.DashboardId;
@@ -35,10 +30,14 @@ import com.hashmapinc.server.dao.model.BaseSqlEntity;
 import com.hashmapinc.server.dao.model.ModelConstants;
 import com.hashmapinc.server.dao.model.SearchTextEntity;
 import com.hashmapinc.server.dao.util.mapping.JsonStringType;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.extern.slf4j.Slf4j;
+import org.hibernate.annotations.Type;
+import org.hibernate.annotations.TypeDef;
+import org.springframework.util.StringUtils;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.io.IOException;
 import java.util.HashSet;
 
@@ -70,6 +69,10 @@ public final class DashboardEntity extends BaseSqlEntity<Dashboard> implements S
     @Column(name = ModelConstants.DASHBOARD_CONFIGURATION_PROPERTY)
     private JsonNode configuration;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = ModelConstants.DASHBOARD_TYPE_PROPERTY)
+    private DashboardType type;
+
     public DashboardEntity() {
         super();
     }
@@ -80,6 +83,9 @@ public final class DashboardEntity extends BaseSqlEntity<Dashboard> implements S
         }
         if (dashboard.getTenantId() != null) {
             this.tenantId = toString(dashboard.getTenantId().getId());
+        }
+        if(dashboard.getType() != null) {
+            this.type = dashboard.getType();
         }
         this.title = dashboard.getTitle();
         if (dashboard.getAssignedCustomers() != null) {
@@ -118,6 +124,12 @@ public final class DashboardEntity extends BaseSqlEntity<Dashboard> implements S
             }
         }
         dashboard.setConfiguration(configuration);
+        if(type != null){
+            dashboard.setType(type);
+        } else {
+            dashboard.setType(DashboardType.DEFAULT);
+        }
+
         return dashboard;
     }
 }
