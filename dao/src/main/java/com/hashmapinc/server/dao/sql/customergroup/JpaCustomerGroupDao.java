@@ -76,18 +76,18 @@ public class JpaCustomerGroupDao extends JpaAbstractSearchTextDao<CustomerGroupE
 
     @Override
     public List<UserId> findUserIdsByCustomerGroupId(UUID customerGroupId) {
-        return jdbcTemplate.query(QUERY_TO_FETCH_USER_ID_BY_GROUP_ID, new Object[]{customerGroupId},
+        return jdbcTemplate.query(QUERY_TO_FETCH_USER_ID_BY_GROUP_ID, new Object[]{UUIDConverter.fromTimeUUID(customerGroupId)},
                 (ResultSet rs, int rowNum) -> UserId.fromString(rs.getString(USER_ID_PROPERTY)));
     }
 
     @Override
     public void deleteUserIdsForCustomerGroupId(UUID customerGroupId) {
-        jdbcTemplate.update(DELETE_USER_ID_FROM_USER_GROUP);
+        jdbcTemplate.update(DELETE_USER_ID_FROM_USER_GROUP, UUIDConverter.fromTimeUUID(customerGroupId));
     }
 
     @Override
     public List<CustomerGroup> findByUserId(UUID userId, TextPageLink textPageLink) {
-        List<CustomerGroupId> customerGroupIds = jdbcTemplate.query(SELECT_GROUP_IDS_FOR_USER_ID, new Object[]{userId},
+        List<CustomerGroupId> customerGroupIds = jdbcTemplate.query(SELECT_GROUP_IDS_FOR_USER_ID, new Object[]{UUIDConverter.fromTimeUUID(userId)},
                 (ResultSet rs, int rowNum) -> CustomerGroupId.fromString(rs.getString(CUSTOMER_GROUP_ID_PROPERTY)));
         List<String> customerGroupIdsStr = customerGroupIds.stream().map(id -> id.getId().toString()).collect(Collectors.toList());
         List<CustomerGroupEntity> customerGroupEntities = customerGroupRepository.findByIdIn(customerGroupIdsStr , new PageRequest(0 , textPageLink.getLimit()));
