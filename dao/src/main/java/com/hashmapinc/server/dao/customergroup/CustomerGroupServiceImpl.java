@@ -38,6 +38,7 @@ import com.hashmapinc.server.dao.tenant.TenantDao;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -172,6 +173,14 @@ public class CustomerGroupServiceImpl extends AbstractEntityService implements C
         CustomerGroup customerGroup = customerGroupDao.findById(customerGroupId.getId());
         customerGroup.setUserIds(userIds);
         return customerGroup;
+    }
+
+    @Override
+    public List<String> findGroupPoliciesForUser(UserId userId) {
+        log.trace("Executing findGroupPoliciesForUser, userId [{}]", userId);
+        Validator.validateId(userId, INCORRECT_USER_ID + userId);
+        List<CustomerGroup> customerGroups = customerGroupDao.findByUserId(userId.getId(), new TextPageLink(Integer.MAX_VALUE));
+        return customerGroups.stream().flatMap(customerGroup -> customerGroup.getPolicies().stream()).distinct().collect(Collectors.toList());
     }
 
     private class CustomerGroupRemover extends PaginatedRemover<CustomerId, CustomerGroup> {
