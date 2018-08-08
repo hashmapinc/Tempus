@@ -73,6 +73,14 @@ public interface CustomerGroupDao extends Dao<CustomerGroup> {
      */
     void deleteUserIdsForCustomerGroupId(UUID customerGroupId);
 
+    /**
+     * Delete Group IDs by userId.
+     *
+     * @param userId the userId
+     *
+     */
+    void deleteGroupIdsForUserId(UUID userId);
+
 
     /**
      * Find Customer groups by user id.

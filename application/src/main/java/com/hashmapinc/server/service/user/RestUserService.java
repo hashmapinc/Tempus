@@ -308,6 +308,7 @@ public class RestUserService extends AbstractEntityService implements UserServic
         validateId(userId, INCORRECT_USER_ID + userId);
         restTemplate.delete(identityUrl + "/" + userId.getId());
         deleteEntityRelations(userId);
+        customerGroupDao.deleteGroupIdsForUserId(userId.getId());
     }
 
     @Override

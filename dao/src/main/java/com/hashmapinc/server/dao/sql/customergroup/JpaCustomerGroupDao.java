@@ -26,6 +26,7 @@ import com.hashmapinc.server.dao.model.ModelConstants;
 import com.hashmapinc.server.dao.model.sql.CustomerGroupEntity;
 import com.hashmapinc.server.dao.sql.JpaAbstractSearchTextDao;
 import com.hashmapinc.server.dao.util.SqlDao;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.repository.CrudRepository;
@@ -46,12 +47,14 @@ import static com.hashmapinc.server.dao.model.ModelConstants.*;
 
 @Component
 @SqlDao
+@Slf4j
 public class JpaCustomerGroupDao extends JpaAbstractSearchTextDao<CustomerGroupEntity, CustomerGroup> implements CustomerGroupDao {
 
     private static final String QUERY_TO_FETCH_USER_ID_BY_GROUP_ID =
-            String.format("SELECT %s FROM %s WHERE %s = ?", USER_ID_PROPERTY, USER_GROUP_TABLE_NAME, CUSTOMER_GROUP_ID_PROPERTY);
+            String.format("SELECT DISTINCT %s FROM %s WHERE %s = ?", USER_ID_PROPERTY, USER_GROUP_TABLE_NAME, CUSTOMER_GROUP_ID_PROPERTY);
     private static final String DELETE_USER_ID_FROM_USER_GROUP = String.format("DELETE FROM %s WHERE %s = ?", USER_GROUP_TABLE_NAME, CUSTOMER_GROUP_ID_PROPERTY);
-    private static final String SELECT_GROUP_IDS_FOR_USER_ID = String.format("SELECT %s FROM %s WHERE %s = ?", CUSTOMER_GROUP_ID_PROPERTY, USER_GROUP_TABLE_NAME, USER_ID_PROPERTY);
+    private static final String DELETE_GROUP_IDS_FROM_USER_GROUP = String.format("DELETE FROM %s WHERE %s = ?", USER_GROUP_TABLE_NAME, USER_ID_PROPERTY);
+    private static final String SELECT_GROUP_IDS_FOR_USER_ID = String.format("SELECT DISTINCT %s FROM %s WHERE %s = ?", CUSTOMER_GROUP_ID_PROPERTY, USER_GROUP_TABLE_NAME, USER_ID_PROPERTY);
     private static final String INSERT_USER_GROUPS = String.format("INSERT INTO %s  (%s, %s) VALUES (?, ?)", USER_GROUP_TABLE_NAME, USER_ID_PROPERTY, CUSTOMER_GROUP_ID_PROPERTY);
 
     @Autowired
@@ -91,10 +94,15 @@ public class JpaCustomerGroupDao extends JpaAbstractSearchTextDao<CustomerGroupE
     }
 
     @Override
+    public void deleteGroupIdsForUserId(UUID userId) {
+        jdbcTemplate.update(DELETE_GROUP_IDS_FROM_USER_GROUP, UUIDConverter.fromTimeUUID(userId));
+    }
+
+    @Override
     public List<CustomerGroup> findByUserId(UUID userId, TextPageLink textPageLink) {
         List<CustomerGroupId> customerGroupIds = jdbcTemplate.query(SELECT_GROUP_IDS_FOR_USER_ID, new Object[]{UUIDConverter.fromTimeUUID(userId)},
-                (ResultSet rs, int rowNum) -> CustomerGroupId.fromString(rs.getString(CUSTOMER_GROUP_ID_PROPERTY)));
-        List<String> customerGroupIdsStr = customerGroupIds.stream().map(id -> id.getId().toString()).collect(Collectors.toList());
+                (ResultSet rs, int rowNum) -> new CustomerGroupId(UUIDConverter.fromString(rs.getString(CUSTOMER_GROUP_ID_PROPERTY))));
+        List<String> customerGroupIdsStr = customerGroupIds.stream().map(id -> UUIDConverter.fromTimeUUID((id.getId()))).collect(Collectors.toList());
         List<CustomerGroupEntity> customerGroupEntities = customerGroupRepository.findByIdIn(customerGroupIdsStr , new PageRequest(0 , textPageLink.getLimit()));
         return customerGroupEntities.stream().map(CustomerGroupEntity::toData).collect(Collectors.toList());
     }
