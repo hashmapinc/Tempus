@@ -21,8 +21,11 @@ import com.hashmapinc.server.common.data.id.TenantId;
 import com.hashmapinc.server.common.data.id.UserId;
 import com.hashmapinc.server.common.data.security.Authority;
 import com.hashmapinc.server.common.msg.exception.TempusRuntimeException;
+import com.hashmapinc.server.dao.customergroup.CustomerGroupService;
 import com.hashmapinc.server.service.security.auth.JwtAuthenticationToken;
 import com.hashmapinc.server.service.security.model.SecurityUser;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.oauth2.provider.token.UserAuthenticationConverter;
@@ -34,8 +37,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+@Slf4j
 @Component
 public class UserInfoTokenConverter implements UserAuthenticationConverter {
+    @Autowired
+    CustomerGroupService customerGroupService;
 
     @Override
     public Map<String, ?> convertUserAuthentication(Authentication userAuthentication) {
@@ -53,6 +59,10 @@ public class UserInfoTokenConverter implements UserAuthenticationConverter {
         }
         if(user.getPermissions() != null && !user.getPermissions().isEmpty()){
             response.put("permissions", user.getPermissions());
+        } else {
+            List<String> permissionList = customerGroupService.findGroupPoliciesForUser(user.getId());
+            if(!permissionList.isEmpty())
+                response.put("permissions", permissionList);
         }
 
         return response;
@@ -94,6 +104,10 @@ public class UserInfoTokenConverter implements UserAuthenticationConverter {
         Object permissions = map.get("permissions");
         if(permissions != null){
             List<String> permissionList = ((List<String>)permissions);
+            if(!permissionList.isEmpty())
+                securityUser.setPermissions(permissionList);
+        } else {
+            List<String> permissionList = customerGroupService.findGroupPoliciesForUser(securityUser.getId());
             if(!permissionList.isEmpty())
                 securityUser.setPermissions(permissionList);
         }
