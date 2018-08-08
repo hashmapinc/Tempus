@@ -791,3 +791,10 @@ CREATE TABLE IF NOT EXISTS tempus.tag_metadata_cf (
     source text,
     PRIMARY KEY (( entity_type, entity_id ), key)
 ) WITH compaction = { 'class' :  'LeveledCompactionStrategy'  };
+
+CREATE TABLE IF NOT EXISTS tempus.asset_landing_dashboard (
+    dashboard_id timeuuid,
+    data_model_id timeuuid,
+    data_model_object_id timeuuid,
+    PRIMARY KEY(dashboard_id)
+);
