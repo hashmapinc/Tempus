@@ -400,4 +400,10 @@ CREATE TABLE IF NOT EXISTS tag_metadata (
     CONSTRAINT tag_metadata_unq_key UNIQUE (entity_type, entity_id, key)
 );
 
+CREATE TABLE IF NOT EXISTS asset_landing_dashboard (
+    dashboard_id varchar(31) NOT NULL CONSTRAINT asset_landing_dashboard_pkey PRIMARY KEY,
+    data_model_id varchar(31),
+    data_model_object_id varchar(31)
+);
+
 CREATE TABLE IF NOT EXISTS installed_schema_versions(executed_scripts varchar(255) UNIQUE);
