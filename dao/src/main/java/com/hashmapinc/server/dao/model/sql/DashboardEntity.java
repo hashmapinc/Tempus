@@ -126,8 +126,6 @@ public final class DashboardEntity extends BaseSqlEntity<Dashboard> implements S
         dashboard.setConfiguration(configuration);
         if(type != null){
             dashboard.setType(type);
-        } else {
-            dashboard.setType(DashboardType.DEFAULT);
         }
 
         return dashboard;

@@ -179,8 +179,6 @@ public final class DashboardEntity implements SearchTextEntity<Dashboard> {
         }
         if(type != null){
             dashboard.setType(type);
-        } else {
-            dashboard.setType(DashboardType.DEFAULT);
         }
         dashboard.setConfiguration(configuration);
         return dashboard;
