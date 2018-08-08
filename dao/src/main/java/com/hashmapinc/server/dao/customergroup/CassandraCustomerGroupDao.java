@@ -76,6 +76,11 @@ public class CassandraCustomerGroupDao extends CassandraAbstractSearchTextDao<Cu
     }
 
     @Override
+    public void deleteGroupIdsForUserId(UUID userId) {
+        //TODO
+    }
+
+    @Override
     public List<CustomerGroup> findByUserId(UUID userId, TextPageLink textPageLink) {
         return null;
     }
