@@ -49,6 +49,7 @@ import java.util.stream.Collectors;
 public class CustomerGroupController extends BaseController {
 
     public static final String CUSTOMER_GROUP_ID = "customerGroupId";
+    public static final String USER_ID = "userId";
 
     @PreAuthorize("hasAuthority('TENANT_ADMIN')")
     @GetMapping(value = "/group/{customerGroupId}")
@@ -222,6 +223,22 @@ public class CustomerGroupController extends BaseController {
                 checkUserId(userId);
             }
             return checkNotNull(customerGroupService.assignUsers(customerGroupId, userIds));
+        } catch (Exception e){
+            throw handleException(e);
+        }
+    }
+
+    @PreAuthorize("hasAuthority('TENANT_ADMIN')")
+    @GetMapping(value = "/group/policy/{userId}")
+    @ResponseBody
+    public List<String> getPoliciesForUser(
+            @PathVariable(USER_ID) String strUserId) throws TempusException {
+        checkParameter(USER_ID, strUserId);
+        try{
+
+            UserId userId = new UserId(toUUID(strUserId));
+            checkUserId(userId);
+            return checkNotNull(customerGroupService.findGroupPoliciesForUser(userId));
         } catch (Exception e){
             throw handleException(e);
         }

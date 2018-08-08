@@ -46,4 +46,6 @@ public interface CustomerGroupService {
     void deleteCustomerGroupsByTenantIdAndCustomerId(TenantId tenantId, CustomerId customerId);
 
     CustomerGroup assignUsers(CustomerGroupId customerGroupId, List<UserId> userIds);
+
+    List<String> findGroupPoliciesForUser(UserId userId);
 }
