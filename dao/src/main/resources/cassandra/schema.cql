@@ -778,4 +778,10 @@ CREATE TABLE IF NOT EXISTS tempus.user_groups (
     user_id timeuuid,
     group_id timeuuid,
     PRIMARY KEY(user_id, group_id)
+
+CREATE TABLE IF NOT EXISTS tempus.asset_landing_dashboard (
+    dashboard_id timeuuid,
+    data_model_id timeuuid,
+    data_model_object_id timeuuid,
+    PRIMARY KEY(dashboard_id)
 );
