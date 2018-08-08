@@ -28,6 +28,7 @@ import com.google.common.util.concurrent.ListenableFuture;
 import com.hashmapinc.server.common.data.Customer;
 import com.hashmapinc.server.common.data.Tenant;
 import com.hashmapinc.server.common.data.User;
+import com.hashmapinc.server.common.data.id.CustomerGroupId;
 import com.hashmapinc.server.common.data.id.CustomerId;
 import com.hashmapinc.server.common.data.id.TenantId;
 import com.hashmapinc.server.common.data.id.UserId;
@@ -36,6 +37,7 @@ import com.hashmapinc.server.common.data.page.TextPageLink;
 import com.hashmapinc.server.common.data.security.Authority;
 import com.hashmapinc.server.common.data.security.UserCredentials;
 import com.hashmapinc.server.dao.customer.CustomerDao;
+import com.hashmapinc.server.dao.customergroup.CustomerGroupDao;
 import com.hashmapinc.server.dao.entity.AbstractEntityService;
 import com.hashmapinc.server.dao.exception.DataValidationException;
 import com.hashmapinc.server.dao.exception.IncorrectParameterException;
@@ -104,6 +106,9 @@ public class RestUserService extends AbstractEntityService implements UserServic
 
     @Autowired
     private CustomerDao customerDao;
+
+    @Autowired
+    private CustomerGroupDao customerGroupDao;
 
     private ObjectMapper mapper = new ObjectMapper();
 
@@ -335,6 +340,16 @@ public class RestUserService extends AbstractEntityService implements UserServic
         validateId(tenantId, INCORRECT_TENANT_ID + tenantId);
         validateId(customerId, "Incorrect customerId " + customerId);
         new RestUserService.CustomerUsersRemover(tenantId).removeEntities(customerId);
+    }
+
+    @Override
+    public User assignGroups(UserId userId , List<CustomerGroupId> customerGroupIds) {
+        log.trace("Executing assignGroups, UserId [{}] and customerGroupIds [{}]", userId, customerGroupIds);
+        Validator.validateId(userId, INCORRECT_USER_ID + userId);
+        customerGroupDao.assignGroups(userId, customerGroupIds);
+        User user = findUserById(userId);
+        user.setGroupIds(customerGroupIds);
+        return user;
     }
 
     private TextPageData<User> findUsers(TenantId tenantId, CustomerId customerId, TextPageLink pageLink){

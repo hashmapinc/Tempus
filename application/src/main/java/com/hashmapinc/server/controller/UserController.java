@@ -22,6 +22,7 @@ import com.hashmapinc.server.common.data.CustomerGroup;
 import com.hashmapinc.server.common.data.EntityType;
 import com.hashmapinc.server.common.data.User;
 import com.hashmapinc.server.common.data.audit.ActionType;
+import com.hashmapinc.server.common.data.id.CustomerGroupId;
 import com.hashmapinc.server.common.data.id.CustomerId;
 import com.hashmapinc.server.common.data.id.TenantId;
 import com.hashmapinc.server.common.data.id.UserId;
@@ -49,6 +50,9 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api")
@@ -313,5 +317,22 @@ public class UserController extends BaseController {
         }
     }
 
-    
+    @PreAuthorize("hasAuthority('TENANT_ADMIN')")
+    @PostMapping(value = "/user/{userId}/groups")
+    @ResponseBody
+    public User assignGropusToUser(
+            @PathVariable(USER_ID) String strUserId ,
+            @RequestBody List<UUID> groupUuids) throws TempusException {
+        checkParameter(USER_ID, strUserId);
+        try{
+            UserId userId = new UserId(toUUID(strUserId));
+            List<CustomerGroupId> customerGroupIds = groupUuids.stream().map(CustomerGroupId::new).collect(Collectors.toList());
+            for (CustomerGroupId customerGroupId: customerGroupIds) {
+                checkCustomerGroupId(customerGroupId);
+            }
+            return checkNotNull(userService.assignGroups(userId, customerGroupIds));
+        } catch (Exception e){
+            throw handleException(e);
+        }
+    }
 }
