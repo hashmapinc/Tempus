@@ -54,7 +54,7 @@ public class CustomerGroupEntity extends BaseSqlEntity<CustomerGroup> implements
     @Column(name = ModelConstants.CUSTOMER_GROUP_CUSTOMER_ID)
     private String customerId;
 
-    @ElementCollection()
+    @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = ModelConstants.CUSTOMER_GROUP_POLICY_TABLE_NAME, joinColumns = @JoinColumn(name = ModelConstants.CUSTOMER_GROUP_POLICY_ID))
     @Column(name = ModelConstants.CUSTOMER_GROUP_POLICY_COLUMN)
     private List<String> policies;
@@ -95,6 +95,7 @@ public class CustomerGroupEntity extends BaseSqlEntity<CustomerGroup> implements
         customerGroup.setCustomerId(new CustomerId(UUIDConverter.fromString(customerId)));
         customerGroup.setTitle(title);
         customerGroup.setAdditionalInfo(additionalInfo);
+        customerGroup.setPolicies(policies);
         return customerGroup;
     }
 }

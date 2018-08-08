@@ -103,6 +103,7 @@ public class CustomerGroupEntity implements SearchTextEntity<CustomerGroup> {
         customerGroup.setCustomerId(new CustomerId(customerId));
         customerGroup.setTitle(title);
         customerGroup.setAdditionalInfo(additionalInfo);
+        customerGroup.setPolicies(policies);
         return customerGroup;
     }
 }
