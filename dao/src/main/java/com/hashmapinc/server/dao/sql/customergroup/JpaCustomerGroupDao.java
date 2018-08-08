@@ -47,11 +47,12 @@ import static com.hashmapinc.server.dao.model.ModelConstants.*;
 @Component
 @SqlDao
 public class JpaCustomerGroupDao extends JpaAbstractSearchTextDao<CustomerGroupEntity, CustomerGroup> implements CustomerGroupDao {
+
     private static final String QUERY_TO_FETCH_USER_ID_BY_GROUP_ID =
-            String.format("select %s from %s where %s = ?", USER_ID_PROPERTY, USER_GROUP_TABLE_NAME, CUSTOMER_GROUP_ID_PROPERTY);
-    private static final String DELETE_USER_ID_FROM_USER_GROUP = String.format("delete from %s where %s = ?", USER_GROUP_TABLE_NAME, CUSTOMER_GROUP_ID_PROPERTY);
-    private static final String SELECT_GROUP_IDS_FOR_USER_ID = String.format("select %s from %s where %s = ?", CUSTOMER_GROUP_ID_PROPERTY, USER_GROUP_TABLE_NAME, USER_ID_PROPERTY);
-    private static final String INSERT_USER_GROUPS = String.format("INSERT INTO %s " + "(%s, %s) VALUES (?, ?)", USER_GROUP_TABLE_NAME, USER_ID_PROPERTY, CUSTOMER_GROUP_ID_PROPERTY);
+            String.format("SELECT %s FROM %s WHERE %s = ?", USER_ID_PROPERTY, USER_GROUP_TABLE_NAME, CUSTOMER_GROUP_ID_PROPERTY);
+    private static final String DELETE_USER_ID_FROM_USER_GROUP = String.format("DELETE FROM %s WHERE %s = ?", USER_GROUP_TABLE_NAME, CUSTOMER_GROUP_ID_PROPERTY);
+    private static final String SELECT_GROUP_IDS_FOR_USER_ID = String.format("SELECT %s FROM %s WHERE %s = ?", CUSTOMER_GROUP_ID_PROPERTY, USER_GROUP_TABLE_NAME, USER_ID_PROPERTY);
+    private static final String INSERT_USER_GROUPS = String.format("INSERT INTO %s  (%s, %s) VALUES (?, ?)", USER_GROUP_TABLE_NAME, USER_ID_PROPERTY, CUSTOMER_GROUP_ID_PROPERTY);
 
     @Autowired
     JdbcTemplate jdbcTemplate;
@@ -114,6 +115,25 @@ public class JpaCustomerGroupDao extends JpaAbstractSearchTextDao<CustomerGroupE
             @Override
             public int getBatchSize() {
                 return userIds.size();
+            }
+        });
+    }
+
+    @Override
+    public void assignGroups(UserId userId , List<CustomerGroupId> customerGroupIds) {
+        List<String> groupIdsStr = customerGroupIds.stream().map(groupId -> UUIDConverter.fromTimeUUID(groupId.getId())).collect(Collectors.toList());
+
+        jdbcTemplate.batchUpdate(INSERT_USER_GROUPS , new BatchPreparedStatementSetter() {
+            @Override
+            public void setValues(PreparedStatement ps , int i) throws SQLException {
+                String groupIdStr = groupIdsStr.get(i);
+                ps.setString(1, UUIDConverter.fromTimeUUID(userId.getId()));
+                ps.setString(2, groupIdStr);
+            }
+
+            @Override
+            public int getBatchSize() {
+                return customerGroupIds.size();
             }
         });
     }

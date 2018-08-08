@@ -86,6 +86,11 @@ public class CassandraCustomerGroupDao extends CassandraAbstractSearchTextDao<Cu
     }
 
     @Override
+    public void assignGroups(UserId userId , List<CustomerGroupId> customerGroupIds) {
+
+    }
+
+    @Override
     protected Class<CustomerGroupEntity> getColumnFamilyClass() {
         return CustomerGroupEntity.class;
     }
