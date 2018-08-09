@@ -36,6 +36,7 @@ import com.hashmapinc.server.common.data.rule.RuleMetaData;
 
 import com.hashmapinc.server.dao.UserServiceTestConfiguration;
 
+import com.hashmapinc.server.dao.assetlandingdashboard.AssetLandingDashboardService;
 import com.hashmapinc.server.dao.tagmetadata.TagMetaDataService;
 
 import com.hashmapinc.server.dao.alarm.AlarmService;
@@ -166,6 +167,9 @@ public abstract class AbstractServiceTest {
 
     @Autowired
     protected DataModelObjectService dataModelObjectService;
+
+    @Autowired
+    protected AssetLandingDashboardService assetLandingDashboardService;
 
     class IdComparator<D extends BaseData<? extends UUIDBased>> implements Comparator<D> {
         @Override
