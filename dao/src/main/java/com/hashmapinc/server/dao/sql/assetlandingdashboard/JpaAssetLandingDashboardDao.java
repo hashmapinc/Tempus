@@ -21,7 +21,7 @@ import com.hashmapinc.server.common.data.UUIDConverter;
 import com.hashmapinc.server.common.data.id.DashboardId;
 import com.hashmapinc.server.common.data.id.DataModelObjectId;
 import com.hashmapinc.server.dao.DaoUtil;
-import com.hashmapinc.server.dao.assetlandingdashboard.AssetLandingDashboardServiceDao;
+import com.hashmapinc.server.dao.assetlandingdashboard.AssetLandingDashboardDao;
 import com.hashmapinc.server.dao.model.sql.AssetLandingDashboardEntity;
 import com.hashmapinc.server.dao.sql.JpaAbstractDaoListeningExecutorService;
 import com.hashmapinc.server.dao.util.SqlDao;
@@ -32,7 +32,7 @@ import java.util.List;
 
 @Service
 @SqlDao
-public class JpaAssetLandingDashboardDao extends JpaAbstractDaoListeningExecutorService implements AssetLandingDashboardServiceDao{
+public class JpaAssetLandingDashboardDao extends JpaAbstractDaoListeningExecutorService implements AssetLandingDashboardDao {
 
     @Autowired
     AssetLandingDashboardRepository assetLandingDashboardRepository;

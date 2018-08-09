@@ -28,25 +28,25 @@ import java.util.List;
 public class AssetLandingDashboardServiceImp implements AssetLandingDashboardService{
 
     @Autowired
-    AssetLandingDashboardServiceDao assetLandingDashboardServiceDao;
+    AssetLandingDashboardDao assetLandingDashboardDao;
 
     @Override
     public AssetLandingDashboard save(AssetLandingDashboard assetLandingDashboard) {
-        return assetLandingDashboardServiceDao.save(assetLandingDashboard);
+        return assetLandingDashboardDao.save(assetLandingDashboard);
     }
 
     @Override
     public List<AssetLandingDashboard> findByDataModelObjectId(DataModelObjectId dataModelObjectId) {
-        return assetLandingDashboardServiceDao.findByDataModelObjectId(dataModelObjectId);
+        return assetLandingDashboardDao.findByDataModelObjectId(dataModelObjectId);
     }
 
     @Override
     public AssetLandingDashboard findByDashboardId(DashboardId dashboardId) {
-        return assetLandingDashboardServiceDao.findByDashboardId(dashboardId);
+        return assetLandingDashboardDao.findByDashboardId(dashboardId);
     }
 
     @Override
     public void removeByDashboardId(DashboardId dashboardId) {
-        assetLandingDashboardServiceDao.removeByDashBoardId(dashboardId);
+        assetLandingDashboardDao.removeByDashBoardId(dashboardId);
     }
 }
