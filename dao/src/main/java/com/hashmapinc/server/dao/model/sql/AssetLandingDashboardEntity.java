@@ -47,6 +47,10 @@ public class AssetLandingDashboardEntity implements ToData<AssetLandingDashboard
     @Column(name = ModelConstants.ASSET_LANDING_DATAMODEL_OBJECT_ID)
     private String dataModelObjectId;
 
+    public AssetLandingDashboardEntity() {
+
+    }
+
     public AssetLandingDashboardEntity(AssetLandingDashboard assetLandingDashboard){
         if (assetLandingDashboard.getDashboardId() != null) {
             this.dashboardId = UUIDConverter.fromTimeUUID(assetLandingDashboard.getDashboardId().getId());
