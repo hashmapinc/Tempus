@@ -14,17 +14,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.hashmapinc.server.dao.assetlandingdashboard;
+package com.hashmapinc.server.dao.service.nosql;
 
-import com.hashmapinc.server.common.data.AssetLandingDashboard;
-import com.hashmapinc.server.common.data.id.DashboardId;
-import com.hashmapinc.server.common.data.id.DataModelObjectId;
+import com.hashmapinc.server.dao.service.BaseAssetLandingDashboardServiceTest;
+import com.hashmapinc.server.dao.service.DaoNoSqlTest;
 
-import java.util.List;
+@DaoNoSqlTest
+public class AssetLandingDashboardServiceNoSqlTest extends BaseAssetLandingDashboardServiceTest{
 
-public interface AssetLandingDashboardServiceDao {
-    AssetLandingDashboard save(AssetLandingDashboard assetLandingDashboard);
-    List<AssetLandingDashboard> findByDataModelObjectId(DataModelObjectId dataModelObjectId);
-    void removeByDashBoardId(DashboardId dashboardId);
-    AssetLandingDashboard findByDashboardId(DashboardId dashboardId);
 }
