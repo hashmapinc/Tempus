@@ -25,6 +25,7 @@ import com.hashmapinc.server.common.data.computation.ComputationJob;
 import com.hashmapinc.server.common.data.id.*;
 import com.hashmapinc.server.common.data.page.TextPageLink;
 import com.hashmapinc.server.common.data.plugin.ComponentDescriptor;
+import com.hashmapinc.server.dao.assetlandingdashboard.AssetLandingDashboardService;
 import com.hashmapinc.server.dao.cluster.NodeMetricService;
 import com.hashmapinc.server.dao.datamodel.DataModelObjectService;
 import com.hashmapinc.server.dao.datamodel.DataModelService;
@@ -148,6 +149,9 @@ public abstract class BaseController {
 
     @Autowired
     protected NodeMetricService nodeMetricService;
+
+    @Autowired
+    protected AssetLandingDashboardService assetLandingDashboardService;
 
 
     @ExceptionHandler(TempusException.class)
