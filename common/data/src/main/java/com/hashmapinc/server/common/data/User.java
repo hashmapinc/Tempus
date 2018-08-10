@@ -38,6 +38,7 @@ public class User extends SearchTextBasedWithAdditionalInfo<UserId> implements H
     private CustomerId customerId;
     private String email;
     private Authority authority;
+    @JsonIgnore
     private Collection<String> permissions = Collections.emptyList();
     private String firstName;
     private String lastName;

@@ -85,7 +85,7 @@ public class JpaCustomerGroupDao extends JpaAbstractSearchTextDao<CustomerGroupE
     @Override
     public List<UserId> findUserIdsByCustomerGroupId(UUID customerGroupId) {
         return jdbcTemplate.query(QUERY_TO_FETCH_USER_ID_BY_GROUP_ID, new Object[]{UUIDConverter.fromTimeUUID(customerGroupId)},
-                (ResultSet rs, int rowNum) -> UserId.fromString(rs.getString(USER_ID_PROPERTY)));
+                (ResultSet rs, int rowNum) -> new UserId(UUIDConverter.fromString(rs.getString(USER_ID_PROPERTY))));
     }
 
     @Override
