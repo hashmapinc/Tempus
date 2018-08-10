@@ -26,6 +26,8 @@ import com.hashmapinc.server.actors.ActorSystemContext;
 import com.hashmapinc.server.actors.shared.ComponentMsgProcessor;
 import com.hashmapinc.server.common.data.computation.ComputationJob;
 import com.hashmapinc.server.common.data.computation.Computations;
+import com.hashmapinc.server.common.data.computation.CronKubelessTrigger;
+import com.hashmapinc.server.common.data.computation.KafkaKubelessTrigger;
 import com.hashmapinc.server.common.data.id.ComputationJobId;
 import com.hashmapinc.server.common.data.id.TenantId;
 import com.hashmapinc.server.common.data.plugin.ComponentLifecycleState;
@@ -57,9 +59,12 @@ public class KubelessComputationJobActorMessageProcessor extends ComponentMsgPro
         if (job == null) {
             throw new ComputationInitializationException("kubelesss computation Job not found!");
         }
-        if (job.getArgParameters() == null) {
-            throw new ComputationInitializationException("kubeless computation Job Arguments is empty!");
+        if(!isKubelessComputationJob()){
+            throw new ComputationInitializationException("Computation Job configurations are invalid!");
         }
+        /*if (job.getArgParameters() == null) {
+            throw new ComputationInitializationException("kubeless computation Job Arguments is empty!");
+        }*/
         if (job.getState() == ComponentLifecycleState.ACTIVE) {
             logger.info("[{}] kubeless computation Job is active. Going to initialize job.", entityId);
             initComponent();
@@ -83,11 +88,11 @@ public class KubelessComputationJobActorMessageProcessor extends ComponentMsgPro
         ComputationJob oldJob = job;
         job = systemContext.getComputationJobService().findComputationJobById(entityId);
         logger.info("[{}] Computation configuration was updated from {} to {}.", entityId, oldJob, job);
-        if(!oldJob.getArgParameters().equals(job.getArgParameters())){
+        /*if(!oldJob.getArgParameters().equals(job.getArgParameters())){
             onStop(context);
             systemContext.getComputationJobService().activateComputationJobById(job.getId());
             start();
-        }
+        }*/
     }
 
     @Override
@@ -120,14 +125,14 @@ public class KubelessComputationJobActorMessageProcessor extends ComponentMsgPro
     }
 
     private void processHeaders(){
-        JsonNode jsonHeaders = job.getArgParameters().get("headers");
+        /*JsonNode jsonHeaders = job.getArgParameters().get("headers");
         headers.add("Content-Type", "application/json");
         if(jsonHeaders != null && jsonHeaders.isArray()){
             logger.info("Processing headers " + jsonHeaders.asText());
             for(JsonNode e : jsonHeaders){
                 this.headers.add(e.get("key").asText(), e.get("value").asText());
             }
-        }
+        }*/
     }
 
     private void postJob(){
@@ -140,5 +145,9 @@ public class KubelessComputationJobActorMessageProcessor extends ComponentMsgPro
             systemContext.getComputationJobService().suspendComputationJobById(job.getId());
     }
 
+    private boolean isKubelessComputationJob(){
+        return job.getConfiguration() instanceof CronKubelessTrigger ||
+                job.getConfiguration() instanceof KafkaKubelessTrigger;
+    }
 
 }

@@ -14,16 +14,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.hashmapinc.server.common.data.computation;
+package com.hashmapinc.server.json;
 
-import com.fasterxml.jackson.annotation.JsonTypeName;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
-@Data
-@EqualsAndHashCode(callSuper = true)
-@JsonTypeName("KUBELESS")
-public class KubelessComputationJob extends ComputationJobConfiguration{
-
-
+@JsonTypeInfo(
+        use = JsonTypeInfo.Id.NAME,
+        include = JsonTypeInfo.As.PROPERTY,
+        property = "type")
+@JsonSubTypes({
+        @JsonSubTypes.Type(value = CronFunction.class, name = "cron"),
+        @JsonSubTypes.Type(value = KafkaFunction.class, name = "kafka")
+})
+public interface ParentInterface {
 }

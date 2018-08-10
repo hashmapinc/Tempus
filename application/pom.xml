@@ -299,6 +299,10 @@
             <version>1.11.302</version>
         </dependency>
         <dependency>
+            <groupId>io.minio</groupId>
+            <artifactId>minio</artifactId>
+        </dependency>
+        <dependency>
             <groupId>com.hashmapinc.tempus</groupId>
             <artifactId>tempus-spark-annotations</artifactId>
         </dependency>

@@ -23,6 +23,7 @@ import com.datastax.driver.mapping.annotations.Table;
 import com.datastax.driver.mapping.annotations.Transient;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.hashmapinc.server.common.data.computation.ComputationJob;
+import com.hashmapinc.server.common.data.computation.ComputationJobConfiguration;
 import com.hashmapinc.server.common.data.id.ComputationId;
 import com.hashmapinc.server.common.data.id.ComputationJobId;
 import com.hashmapinc.server.common.data.id.TenantId;
@@ -30,13 +31,16 @@ import com.hashmapinc.server.common.data.plugin.ComponentLifecycleState;
 import com.hashmapinc.server.dao.model.ModelConstants;
 import com.hashmapinc.server.dao.model.SearchTextEntity;
 import com.hashmapinc.server.dao.model.type.ComponentLifecycleStateCodec;
+import com.hashmapinc.server.dao.model.type.ConfigurationJsonCodec;
 import com.hashmapinc.server.dao.model.type.JsonCodec;
+import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import java.util.UUID;
 
 import static com.hashmapinc.server.dao.model.ModelConstants.ID_PROPERTY;
 
+@Data
 @EqualsAndHashCode
 @Table(name = ModelConstants.COMPUTATION_JOB_COLUMN_FAMILY_NAME)
 public class ComputationJobEntity implements SearchTextEntity<ComputationJob> {
@@ -54,9 +58,6 @@ public class ComputationJobEntity implements SearchTextEntity<ComputationJob> {
     @Column(name = ModelConstants.COMPUTATION_JOB_COMPUTATION_ID_PROPERTY)
     private UUID computationId;
 
-    @Column(name = ModelConstants.COMPUTATION_JOB_ARG_PRS_PROPERTY, codec = JsonCodec.class)
-    private JsonNode argParameters;
-
     @PartitionKey(value = 2)
     @Column(name = ModelConstants.COMPUTATION_JOB_TENANT_ID_PROPERTY)
     private UUID tenantId;
@@ -64,11 +65,11 @@ public class ComputationJobEntity implements SearchTextEntity<ComputationJob> {
     @Column(name = ModelConstants.SEARCH_TEXT_PROPERTY)
     private String searchText;
 
-    @Column(name = ModelConstants.COMPUTATION_JOB_ID_PROPERTY)
-    private String jobId;
-
     @Column(name = ModelConstants.COMPUTATION_JOB_STATE_PROPERTY, codec = ComponentLifecycleStateCodec.class)
     private ComponentLifecycleState state;
+
+    @Column(name = ModelConstants.COMPUTATION_JOB_CONFIGURATION, codec = ConfigurationJsonCodec.class)
+    private ComputationJobConfiguration configuration;
 
     @Override
     public String getSearchTextSource() {
@@ -87,20 +88,14 @@ public class ComputationJobEntity implements SearchTextEntity<ComputationJob> {
         if(computationJob.getName() != null) {
             this.jobName = computationJob.getName();
         }
-        if(computationJob.getArgParameters() != null) {
-            this.argParameters = computationJob.getArgParameters();
-        }
         if(computationJob.getComputationId() != null) {
             this.computationId = computationJob.getComputationId().getId();
         }
         if(computationJob.getTenantId() != null) {
             this.tenantId = computationJob.getTenantId().getId();
         }
-        if(computationJob.getJobId() != null){
-            this.jobId = computationJob.getJobId();
-        }
         this.state = computationJob.getState();
-
+        this.configuration = computationJob.getConfiguration();
     }
 
     @Override
@@ -118,65 +113,11 @@ public class ComputationJobEntity implements SearchTextEntity<ComputationJob> {
         this.id = id;
     }
 
-
-    public String getJobName() {
-        return jobName;
-    }
-
-    public void setJobName(String jobName) {
-        this.jobName = jobName;
-    }
-
-    public UUID getComputationId() {
-        return computationId;
-    }
-
-    public void setComputationId(UUID computationId) {
-        this.computationId = computationId;
-    }
-
-    public JsonNode getArgParameters() {
-        return argParameters;
-    }
-
-    public void setArgParameters(JsonNode argParameters) {
-        this.argParameters = argParameters;
-    }
-
-    public UUID getTenantId() {
-        return tenantId;
-    }
-
-    public void setTenantId(UUID tenantId) {
-        this.tenantId = tenantId;
-    }
-
-    public String getSearchText() {
-        return searchText;
-    }
-
-    public String getJobId() {
-        return jobId;
-    }
-
-    public void setJobId(String jobId) {
-        this.jobId = jobId;
-    }
-
-    public ComponentLifecycleState getState() {
-        return state;
-    }
-
-    public void setState(ComponentLifecycleState state) {
-        this.state = state;
-    }
-
     @Override
     public ComputationJob toData() {
         ComputationJob computationJob = new ComputationJob(new ComputationJobId(getId()));
         computationJob.setCreatedTime(UUIDs.unixTimestamp(getId()));
         computationJob.setName(jobName);
-        computationJob.setArgParameters(argParameters);
         computationJob.setState(state);
         if(computationId != null) {
             computationJob.setComputationId(new ComputationId(computationId));
@@ -184,7 +125,7 @@ public class ComputationJobEntity implements SearchTextEntity<ComputationJob> {
         if (tenantId != null) {
             computationJob.setTenantId(new TenantId(tenantId));
         }
-        computationJob.setJobId(jobId);
+        computationJob.setConfiguration(configuration);
         return computationJob;
     }
 }

@@ -24,16 +24,12 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hashmap.tempus.models.ArgType;
-import com.hashmapinc.server.common.data.computation.SparkComputationMetadata;
-import com.hashmapinc.server.exception.TempusApplicationException;
-import org.apache.commons.lang.StringUtils;
-import org.springframework.http.*;
-import org.springframework.web.client.RestClientException;
-import org.springframework.web.client.RestTemplate;
 import com.hashmapinc.server.actors.ActorSystemContext;
 import com.hashmapinc.server.actors.shared.ComponentMsgProcessor;
 import com.hashmapinc.server.common.data.computation.ComputationJob;
 import com.hashmapinc.server.common.data.computation.Computations;
+import com.hashmapinc.server.common.data.computation.SparkComputationJob;
+import com.hashmapinc.server.common.data.computation.SparkComputationMetadata;
 import com.hashmapinc.server.common.data.id.ComputationJobId;
 import com.hashmapinc.server.common.data.id.TenantId;
 import com.hashmapinc.server.common.data.plugin.ComponentLifecycleState;
@@ -82,9 +78,15 @@ public class SparkComputationJobActorMessageProcessor extends ComponentMsgProces
         if (job == null) {
             throw new ComputationInitializationException("Computation Job not found!");
         }
-        if (job.getArgParameters() == null) {
+        if(!(job.getConfiguration() instanceof SparkComputationJob)){
+            throw new ComputationInitializationException("Computation Job configurations are invalid!");
+        }
+        if (((SparkComputationJob)job.getConfiguration()).getArgParameters() == null) {
             throw new ComputationInitializationException("Computation Job Arguments is empty!");
         }
+        //We need to build these parameters irrespective of Job is Active or Suspended
+        buildBaseUrl();
+        processHeaders();
         if (job.getState() == ComponentLifecycleState.ACTIVE) {
             logger.info("[{}] Computation Job is active. Going to initialize job.", entityId);
             initComponent();
@@ -108,7 +110,7 @@ public class SparkComputationJobActorMessageProcessor extends ComponentMsgProces
         ComputationJob oldJob = job;
         job = systemContext.getComputationJobService().findComputationJobById(entityId);
         logger.info("[{}] Computation configuration was updated from {} to {}.", entityId, oldJob, job);
-        if(!oldJob.getArgParameters().equals(job.getArgParameters())){
+        if(!oldJob.getConfiguration().equals(job.getConfiguration())){
             onStop();
             systemContext.getComputationJobService().activateComputationJobById(job.getId());
             start();
@@ -143,8 +145,6 @@ public class SparkComputationJobActorMessageProcessor extends ComponentMsgProces
     private void initComponent(){
         logger.info("[{}] Going to initialize computation job.", entityId);
         try {
-            buildBaseUrl();
-            processHeaders();
             checkJobStatus();
             postJob();
         } catch (IOException e) {
@@ -157,7 +157,7 @@ public class SparkComputationJobActorMessageProcessor extends ComponentMsgProces
     }
 
     private void processHeaders(){
-        JsonNode jsonHeaders = job.getArgParameters().get("headers");
+        JsonNode jsonHeaders = ((SparkComputationJob)job.getConfiguration()).getArgParameters().get("headers");
         headers.add("Content-Type", "application/json");
         if(jsonHeaders != null && jsonHeaders.isArray()){
             logger.info("Processing headers " + jsonHeaders.asText());
@@ -168,8 +168,8 @@ public class SparkComputationJobActorMessageProcessor extends ComponentMsgProces
     }
 
     private void buildBaseUrl(){
-        JsonNode configuration = job.getArgParameters();
-        logger.info("Configuration is : " + configuration.toString());
+        JsonNode configuration = ((SparkComputationJob)job.getConfiguration()).getArgParameters();
+        logger.info("Configuration is : [{}] ", configuration.toString());
         String host = (configuration.get("host") != null)?configuration.get("host").asText():systemContext.getLivyHost();
         int port = (configuration.get("port") != null)?configuration.get("port").asInt():systemContext.getLivyPort();
         this.baseUrl = String.format(
@@ -183,9 +183,10 @@ public class SparkComputationJobActorMessageProcessor extends ComponentMsgProces
     }
 
     private void postJob() throws IOException {
+        SparkComputationJob configuration = (SparkComputationJob) job.getConfiguration();
         logger.info("Status is " + status);
         if(status != SparkComputationStatus.RUNNING){
-            JsonNode conf = job.getArgParameters();
+            JsonNode conf = configuration.getArgParameters();
             logger.info("Payload is " + buildSparkComputationRequest());
             ResponseEntity<Batch> response = new RestTemplate().exchange(
                     baseUrl + conf.get("actionPath").asText("batches"),
@@ -195,8 +196,9 @@ public class SparkComputationJobActorMessageProcessor extends ComponentMsgProces
             if (response.getStatusCode() == HttpStatus.CREATED) {
                 Batch res =  response.getBody();
                 logger.info("[{}] Computation Job is created with id [{}]", entityId, res.getId());
-                job.setJobId(String.valueOf(res.getId()));
+                configuration.setJobId(String.valueOf(res.getId()));
                 job.setState(ComponentLifecycleState.ACTIVE);
+                job.setConfiguration(configuration);
                 systemContext.getComputationJobService().saveComputationJob(job);
                 this.status = SparkComputationStatus.RUNNING;
                 schedulePeriodicStatusCheckWithDelay();
@@ -222,7 +224,7 @@ public class SparkComputationJobActorMessageProcessor extends ComponentMsgProces
     }
 
     private String[] args() {
-        JsonNode conf = job.getArgParameters();
+        JsonNode conf = ((SparkComputationJob)job.getConfiguration()).getArgParameters();
         SparkComputationMetadata md = (SparkComputationMetadata) computation.getComputationMetadata();
         String argsFormat = md.getArgsformat();
         List<String> args = new ArrayList<>();
@@ -242,14 +244,15 @@ public class SparkComputationJobActorMessageProcessor extends ComponentMsgProces
     }
 
     private void stopJobOnServer(){
-        if(job.getJobId() != null){
+        SparkComputationJob configuration = (SparkComputationJob) job.getConfiguration();
+        if(configuration.getJobId() != null){
             final String format = this.baseUrl + BATCH_STATE_URI;
-            String url = String.format(format, job.getJobId());
+            String url = String.format(format, configuration.getJobId());
             try{
                 ResponseEntity<String> response = new RestTemplate().exchange(
                         url, HttpMethod.DELETE, new HttpEntity<>(headers), String.class);
                 if (response.getStatusCode() == HttpStatus.OK) {
-                    logger.info("[{}] Computation job with id [{}] deleted. Suspending Job from DB", entityId, job.getJobId());
+                    logger.info("[{}] Computation job with id [{}] deleted. Suspending Job from DB", entityId, configuration.getJobId());
                     suspendJob();
                 }else{
                     logger.info("[{}] Computation job with id [{}] deletion returned invalid response [{}]", entityId, response.getStatusCodeValue());
@@ -275,9 +278,10 @@ public class SparkComputationJobActorMessageProcessor extends ComponentMsgProces
     }
 
     private void checkJobStatus(){
-        if(job.getJobId() != null){
+        SparkComputationJob configuration = (SparkComputationJob) job.getConfiguration();
+        if(configuration.getJobId() != null){
             final String format = this.baseUrl + BATCH_STATE_URI;
-            String url = String.format(format, job.getJobId());
+            String url = String.format(format, configuration.getJobId());
             try {
                 ResponseEntity<Batch> response = new RestTemplate().exchange(
                         url, HttpMethod.GET, new HttpEntity<>(headers), Batch.class);

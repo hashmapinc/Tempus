@@ -542,19 +542,8 @@ public abstract class BaseController {
 
     protected ComputationJob checkComputationJob(ComputationJob computationJob) throws TempusException {
         checkNotNull(computationJob);
-        SecurityUser authUser = getCurrentUser();
         TenantId tenantId = computationJob.getTenantId();
-        validateId(tenantId, INCORRECT_TENANT_ID + tenantId);
-        if (authUser.getAuthority() != Authority.SYS_ADMIN) {
-            if (authUser.getTenantId() == null ||
-                    !tenantId.getId().equals(ModelConstants.NULL_UUID) && !authUser.getTenantId().equals(tenantId)) {
-                throw new TempusException(YOU_DON_T_HAVE_PERMISSION_TO_PERFORM_THIS_OPERATION,
-                        TempusErrorCode.PERMISSION_DENIED);
-
-            } else if (tenantId.getId().equals(ModelConstants.NULL_UUID)) {
-                computationJob.setArgParameters(null);
-            }
-        }
+        validatePermissions(tenantId);
         return computationJob;
     }
 
@@ -570,19 +559,21 @@ public abstract class BaseController {
 
     protected RuleMetaData checkRule(RuleMetaData rule) throws TempusException {
         checkNotNull(rule);
-        SecurityUser authUser = getCurrentUser();
         TenantId tenantId = rule.getTenantId();
+        validatePermissions(tenantId);
+        return rule;
+    }
+
+    private void validatePermissions(TenantId tenantId) throws TempusException {
+        SecurityUser authUser = getCurrentUser();
         validateId(tenantId, INCORRECT_TENANT_ID + tenantId);
-
-        final boolean ruleNotBelongsToCurrentTenant = authUser.getTenantId() == null ||
+        boolean computationNotBelongsToTenant = authUser.getTenantId() == null ||
                 !tenantId.getId().equals(ModelConstants.NULL_UUID) && !authUser.getTenantId().equals(tenantId);
-
-        if (authUser.getAuthority() != Authority.SYS_ADMIN && ruleNotBelongsToCurrentTenant) {
-                throw new TempusException(YOU_DON_T_HAVE_PERMISSION_TO_PERFORM_THIS_OPERATION,
-                        TempusErrorCode.PERMISSION_DENIED);
+        if (authUser.getAuthority() != Authority.SYS_ADMIN && computationNotBelongsToTenant) {
+            throw new TempusException(YOU_DON_T_HAVE_PERMISSION_TO_PERFORM_THIS_OPERATION,
+                    TempusErrorCode.PERMISSION_DENIED);
 
         }
-        return rule;
     }
 
     protected String constructBaseUrl(HttpServletRequest request) {

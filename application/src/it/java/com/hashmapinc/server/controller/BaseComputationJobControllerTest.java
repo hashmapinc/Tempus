@@ -17,10 +17,7 @@
 package com.hashmapinc.server.controller;
 
 import com.datastax.driver.core.utils.UUIDs;
-import com.hashmapinc.server.common.data.computation.ComputationJob;
-import com.hashmapinc.server.common.data.computation.ComputationType;
-import com.hashmapinc.server.common.data.computation.Computations;
-import com.hashmapinc.server.common.data.computation.SparkComputationMetadata;
+import com.hashmapinc.server.common.data.computation.*;
 import com.hashmapinc.server.common.data.id.ComputationId;
 import com.hashmapinc.server.dao.computations.ComputationsService;
 import org.junit.Assert;
@@ -63,10 +60,13 @@ public class BaseComputationJobControllerTest extends AbstractControllerTest {
 
 
     @Test
-    public void testDeleteComputationJob() throws Exception {
+    public void testDeleteSparkComputationJob() throws Exception {
         ComputationJob computationJob = new ComputationJob();
+
         computationJob.setName("Computation Job");
-        computationJob.setJobId("0123");
+        SparkComputationJob configuration = new SparkComputationJob();
+        configuration.setJobId("0123");
+        computationJob.setConfiguration(configuration);
 
         ComputationJob savedComputationJob = doPost("/api/computations/"+savedComputations.getId().getId().toString()+"/jobs", computationJob, ComputationJob.class);
         Assert.assertEquals(computationJob.getName(), savedComputationJob.getName());

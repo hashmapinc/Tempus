@@ -962,6 +962,11 @@
                 <artifactId>future-converter-spring-guava</artifactId>
                 <version>1.1.0</version>
             </dependency>
+            <dependency>
+                <groupId>io.minio</groupId>
+                <artifactId>minio</artifactId>
+                <version>4.0.2</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 

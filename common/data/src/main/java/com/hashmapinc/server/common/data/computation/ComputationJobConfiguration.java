@@ -18,32 +18,35 @@ package com.hashmapinc.server.common.data.computation;
 
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import com.hashmapinc.server.common.data.BaseData;
-import com.hashmapinc.server.common.data.id.ComputationJobId;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.extern.slf4j.Slf4j;
 
+import java.io.Serializable;
+
+@Slf4j
 @Data
-@EqualsAndHashCode(callSuper = true)
+@EqualsAndHashCode
 @JsonTypeInfo(
         use = JsonTypeInfo.Id.NAME,
         include = JsonTypeInfo.As.PROPERTY,
         property = "type")
 @JsonSubTypes({
-        @JsonSubTypes.Type(value = KubelessComputationJob.class, name = "KUBELESS"),
+        @JsonSubTypes.Type(value = KafkaKubelessTrigger.class, name = "KUBELESS-KAFKA"),
+        @JsonSubTypes.Type(value = CronKubelessTrigger.class, name = "KUBELESS-CRON"),
         @JsonSubTypes.Type(value = SparkComputationJob.class, name = "SPARK")
 })
-public class ComputationJobConfiguration extends BaseData<ComputationJobId> {
+public abstract class ComputationJobConfiguration implements Serializable {
+
+    private static final long serialVersionUID = 6428888846471945035L;
+
+    private String key;
 
     public ComputationJobConfiguration() {
         super();
     }
 
-    public ComputationJobConfiguration(ComputationJobId id) {
-        super(id);
-    }
-
-    public ComputationJobConfiguration(ComputationJobConfiguration config){
-        super(config);
+    protected void markSuspended(){
+        log.warn("Suspend method not implemented for [{}]", this.getClass().getName());
     }
 }

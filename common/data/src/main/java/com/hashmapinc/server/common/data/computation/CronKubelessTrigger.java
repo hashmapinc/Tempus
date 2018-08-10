@@ -17,29 +17,15 @@
 package com.hashmapinc.server.common.data.computation;
 
 import com.fasterxml.jackson.annotation.JsonTypeName;
-import com.fasterxml.jackson.databind.JsonNode;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-@JsonTypeName("SPARK")
-public class SparkComputationJob extends ComputationJobConfiguration{
+@JsonTypeName("KUBELESS-CRON")
+public class CronKubelessTrigger extends ComputationJobConfiguration{
+    private static final long serialVersionUID = 8249254152279905531L;
 
-    private transient JsonNode argParameters;
-    private String jobId;
-
-    public SparkComputationJob() {
-        super();
-    }
-
-    @Override
-    protected void markSuspended() {
-        setJobId(null);
-    }
-
-    public SparkComputationJob(SparkComputationJob computationJob) {
-        this.argParameters = computationJob.argParameters;
-        this.jobId = computationJob.jobId;
-    }
+    private String schedule;
+    private String functionName;
 }

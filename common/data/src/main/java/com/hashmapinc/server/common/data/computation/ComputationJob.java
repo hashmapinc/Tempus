@@ -16,9 +16,8 @@
  */
 package com.hashmapinc.server.common.data.computation;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.hashmapinc.server.common.data.SearchTextBased;
 import com.hashmapinc.server.common.data.HasName;
+import com.hashmapinc.server.common.data.SearchTextBased;
 import com.hashmapinc.server.common.data.id.ComputationId;
 import com.hashmapinc.server.common.data.id.ComputationJobId;
 import com.hashmapinc.server.common.data.id.TenantId;
@@ -30,12 +29,12 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(callSuper = true)
 public class ComputationJob extends SearchTextBased<ComputationJobId> implements HasName {
 
+    private static final long serialVersionUID = 7428719692971356844L;
     private TenantId tenantId;
     private ComputationId computationId;
-    private transient JsonNode argParameters;
     private String name;
     private ComponentLifecycleState state;
-    private String jobId;
+    private ComputationJobConfiguration configuration;
 
     public ComputationJob() {
         super();
@@ -47,12 +46,11 @@ public class ComputationJob extends SearchTextBased<ComputationJobId> implements
 
     public ComputationJob(ComputationJob computationJob) {
         super(computationJob);
-        this.argParameters = computationJob.argParameters;
         this.computationId = computationJob.computationId;
         this.tenantId = computationJob.tenantId;
         this.name = computationJob.name;
         this.state = computationJob.state;
-        this.jobId = computationJob.jobId;
+        this.configuration = computationJob.configuration;
     }
 
     @Override
@@ -62,5 +60,9 @@ public class ComputationJob extends SearchTextBased<ComputationJobId> implements
     @Override
     public String getSearchText() {
         return getName();
+    }
+
+    public void suspend(){
+        this.getConfiguration().markSuspended();
     }
 }

@@ -14,32 +14,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.hashmapinc.server.common.data.computation;
+package com.hashmapinc.server.json;
 
-import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.databind.JsonNode;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 @Data
-@EqualsAndHashCode(callSuper = true)
-@JsonTypeName("SPARK")
-public class SparkComputationJob extends ComputationJobConfiguration{
+@EqualsAndHashCode
+public class KafkaFunction implements ParentInterface{
 
-    private transient JsonNode argParameters;
-    private String jobId;
-
-    public SparkComputationJob() {
-        super();
-    }
-
-    @Override
-    protected void markSuspended() {
-        setJobId(null);
-    }
-
-    public SparkComputationJob(SparkComputationJob computationJob) {
-        this.argParameters = computationJob.argParameters;
-        this.jobId = computationJob.jobId;
-    }
+    private String topic;
+    private String label;
+    private JsonNode conf;
 }

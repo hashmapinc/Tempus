@@ -188,9 +188,8 @@ public class ModelConstants {
     public static final String COMPUTATION_JOB_TABLE_NAME = "computation_job";
     public static final String COMPUTATION_JOB_NAME = "job_name";
     public static final String COMPUTATION_JOB_COMPUTAION_ID = "computation_id";
-    public static final String COMPUTATION_JOB_ARG_PRS = "arg_parameters";
+    public static final String COMPUTATION_JOB_CONFIGURATION = "job_configuration";
     public static final String COMPUTATION_JOB_STATE = "state";
-    public static final String COMPUTATION_JOB_ID = "job_id";
     public static final String COMPUTATION_JOB_TENANT_ID = TENANT_ID_PROPERTY;
     public static final String SPARK_COMPUTATIONS_META_DATA = "spark_computation_meta_data";
     public static final String KUBELESS_COMPUTATIONS_META_DATA = "kubeless_computation_meta_data";
