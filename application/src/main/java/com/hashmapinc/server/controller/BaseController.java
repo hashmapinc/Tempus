@@ -36,6 +36,7 @@ import com.hashmapinc.server.common.data.widget.WidgetType;
 import com.hashmapinc.server.common.data.widget.WidgetsBundle;
 import com.hashmapinc.server.dao.alarm.AlarmService;
 import com.hashmapinc.server.dao.asset.AssetService;
+import com.hashmapinc.server.dao.assetlandingdashboard.AssetLandingDashboardService;
 import com.hashmapinc.server.dao.audit.AuditLogService;
 import com.hashmapinc.server.dao.cluster.NodeMetricService;
 import com.hashmapinc.server.dao.computations.ComputationJobService;
@@ -164,6 +165,9 @@ public abstract class BaseController {
 
     @Autowired
     protected CustomerGroupService customerGroupService;
+
+    protected AssetLandingDashboardService assetLandingDashboardService;
+
 
     @ExceptionHandler(TempusException.class)
     public void handleTempusException(TempusException ex, HttpServletResponse response) {

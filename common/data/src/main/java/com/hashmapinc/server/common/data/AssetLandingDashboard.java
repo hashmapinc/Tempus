@@ -32,6 +32,9 @@ public class AssetLandingDashboard implements Serializable{
     private DataModelId dataModelId;
     private DataModelObjectId dataModelObjectId;
 
+    public AssetLandingDashboard() {
+    }
+
     public AssetLandingDashboard(DashboardId dashboardId){
         this.dashboardId = dashboardId;
     }
@@ -54,5 +57,9 @@ public class AssetLandingDashboard implements Serializable{
 
     public void setDataModelObjectId(DataModelObjectId dataModelObjectId) {
         this.dataModelObjectId = dataModelObjectId;
+    }
+
+    public void setDashboardId(DashboardId dashboardId) {
+        this.dashboardId = dashboardId;
     }
 }
