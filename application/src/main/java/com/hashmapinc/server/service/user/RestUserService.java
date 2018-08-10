@@ -28,10 +28,7 @@ import com.google.common.util.concurrent.ListenableFuture;
 import com.hashmapinc.server.common.data.Customer;
 import com.hashmapinc.server.common.data.Tenant;
 import com.hashmapinc.server.common.data.User;
-import com.hashmapinc.server.common.data.id.CustomerGroupId;
-import com.hashmapinc.server.common.data.id.CustomerId;
-import com.hashmapinc.server.common.data.id.TenantId;
-import com.hashmapinc.server.common.data.id.UserId;
+import com.hashmapinc.server.common.data.id.*;
 import com.hashmapinc.server.common.data.page.TextPageData;
 import com.hashmapinc.server.common.data.page.TextPageLink;
 import com.hashmapinc.server.common.data.security.Authority;
@@ -140,9 +137,10 @@ public class RestUserService extends AbstractEntityService implements UserServic
                 .queryParam("limit", pageLink.getLimit())
                 .queryParam("idOffset", idOffset);
 
+        List<UUID> usersUuid = userIds.stream().map(UUIDBased::getId).collect(Collectors.toList());
 
         ResponseEntity<String> response = restTemplate
-                .postForEntity(builder.build().encode().toUri(), userIds, String.class);
+                .postForEntity(builder.build().encode().toUri(), usersUuid, String.class);
         if(response.getStatusCode().equals(HttpStatus.OK)){
             JavaType type = mapper.getTypeFactory().constructParametrizedType(TextPageData.class, TextPageData.class, User.class);
             try {
