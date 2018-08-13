@@ -367,17 +367,7 @@ export function DataModelController($scope, $log, $mdDialog, $document, $statePa
         if (vm.isEdit) {
             vm.showDatamodelObjectStepper(null, node);
         } else {
-            // handle object viewing
-//            var content = // generate prettified json html
-//                '<h5>' +
-//                angular.toJson(node.datamodelObject, true).replace(/\n/g, '<br/>').replace(/[\,\{\}]/g, '') +
-//                '</h5>';
-//            $mdDialog.show($mdDialog.alert({
-//                title: 'Object Information',
-//                htmlContent: content,
-//                ok: 'Close'
-//            }));
-        $timeout( function(){
+            $timeout( function(){
                $mdDialog.show({
                     controller: function () { return vm }, // use the current controller (this) as the mdDialog controller
                     controllerAs: 'vm',
@@ -390,7 +380,7 @@ export function DataModelController($scope, $log, $mdDialog, $document, $statePa
                 },
                 function () {
                 });
-         }, 0 );
+         }  , 0 );
 
         }
     }
