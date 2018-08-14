@@ -71,6 +71,7 @@ export default function WidgetController($scope, $state, $timeout, $window, $ele
         isMobile: isMobile,
         dashboard: dashboard,
         widgetConfig: widget.config,
+        widgetInfo: widgetInfo,
         settings: widget.config.settings,
         units: widget.config.units || '',
         decimals: angular.isDefined(widget.config.decimals) ? widget.config.decimals : 2,
