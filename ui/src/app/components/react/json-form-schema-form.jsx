@@ -29,6 +29,7 @@ import TempusText from './json-form-text.jsx';
 import Select from 'react-schema-form/lib/Select';
 import Radios from 'react-schema-form/lib/Radios';
 import TempusDate from './json-form-date.jsx';
+import TempusDatasource from './json-form-datasource.jsx';
 import TempusImage from './json-form-image.jsx';
 import TempusCheckbox from './json-form-checkbox.jsx';
 import Help from 'react-schema-form/lib/Help';
@@ -49,6 +50,7 @@ class TempusSchemaForm extends React.Component {
             'select': Select,
             'radios': Radios,
             'date': TempusDate,
+            'datasource': TempusDatasource,
             'image': TempusImage,
             'checkbox': TempusCheckbox,
             'help': Help,
@@ -82,8 +84,15 @@ class TempusSchemaForm extends React.Component {
             console.log('Invalid field: \"' + form.key[0] + '\"!');
             return null;
         }
-        if(form.condition && eval(form.condition) === false) {
+ /*       if(form.condition && eval(form.condition) === false) {
             return null;
+        }
+*/
+
+        if(form.condition) {
+            if(eval(form.condition) === false){
+                return null;
+            }
         }
         return <Field model={model} form={form} key={index} onChange={onChange} onColorClick={onColorClick} mapper={mapper} builder={this.builder}/>
     }
