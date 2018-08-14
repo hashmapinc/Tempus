@@ -69,7 +69,22 @@ function Widget($controller, widgetService) {
                 }
             );
 
-            function loadFromWidgetInfo(widgetInfo) {
+            function loadFromWidgetInfo(widgetInfo) { 
+
+                if(widgetInfo.alias === 'welllogviewer'){
+                    var dk = [];
+                    locals.widget.config.datasources.forEach(function(dkeys){
+                        dkeys.dataKeys.forEach(function(datakey){
+
+                            dk.push({"value": datakey.label, "label": datakey.label});
+                        })
+                    })
+                    widgetInfo.typeSettingsSchema.form[0].items.forEach(function(item){
+                        if(item.key === "Track[].test2"){
+                            item.items = dk;
+                        }
+                    })
+                }
 
                 scope.loadingData = true;
 
