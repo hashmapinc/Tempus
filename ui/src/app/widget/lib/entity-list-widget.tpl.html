@@ -1,0 +1,43 @@
+<!--
+
+    Copyright © 2016-2018 The Thingsboard Authors
+    Modifications © 2017-2018 Hashmap, Inc
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+        http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<div ng-if="!showList"> 
+    <span class="msg-align">Entity List is empty</span>
+</div>
+<div ng-if="showList">
+        <md-table-container  class ="tb-device-container" style="overflow-x: overlay;height: 100%;">
+                <table class="tb-device-table" md-table>
+                    <thead md-head md-order="query.order" md-on-reorder="onReorder">
+                    <tr md-row>
+                        <th md-column><span translate>Name</span></th>
+                        <th md-column><span translate>Entity Type</span></th>
+                    </tr>
+                    </thead>
+                    <tbody md-body>
+                    <tr md-row  ng-repeat="device in devices.data">
+                        <td md-cell><a href ng-click="vm.deviceDetailFunc($event,device)">{{device.name}}</a></td>
+                        <td md-cell style="text-transform: uppercase">{{device.type}}</td>
+                    </tr>
+                    </tbody>
+                </table>
+        </md-table-container>
+        <md-table-pagination class ="tb-device-container" ng-show="tableView" md-limit="query.limit" md-limit-options="[5, 10, 15]"
+                                md-page="query.page" md-total="{{devices.count}}"
+                                md-on-paginate="onPaginate" md-page-select>
+        </md-table-pagination>
+</div>
