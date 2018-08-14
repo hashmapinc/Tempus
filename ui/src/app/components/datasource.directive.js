@@ -39,13 +39,11 @@ function Datasource($compile, $templateCache, utils, types) {
         element.html(template);
 
         scope.types = types;
-
         if (scope.functionsOnly) {
             scope.datasourceTypes = [types.datasourceType.function];
-        } else{
+        }else{
             scope.datasourceTypes = [types.datasourceType.entity, types.datasourceType.function];
         }
-
         scope.updateView = function () {
             if (!scope.model.dataKeys) {
                 scope.model.dataKeys = [];
@@ -90,7 +88,9 @@ function Datasource($compile, $templateCache, utils, types) {
             datakeySettingsSchema: '=',
             generateDataKey: '&',
             fetchEntityKeys: '&',
-            onCreateEntityAlias: '&'
+            onCreateEntityAlias: '&',
+            entityDatasource: '=',
+            widgetInfo: '='
         },
         link: linker
     };

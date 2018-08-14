@@ -20,13 +20,13 @@
 		 layout-align="center" layout-gt-sm='row' layout-align-gt-sm="start center">
 	<md-input-container ng-show="widgetType != types.widgetType.alarm.value"
 						class="tb-datasource-name" md-no-float style="min-width: 200px;">
-		<input name="datasourceName"
+		<input name="datasourceName" ng-if="!entityDatasource"
 			   placeholder="{{ 'datasource.name' | translate }}"
 			   ng-model="datasourceName"
 			   aria-label="{{ 'datasource.name' | translate }}">
 	</md-input-container>
     <section flex layout='column' style="padding-left: 4px;">
-	   <md-chips flex ng-if="widgetType != types.widgetType.alarm.value"
+	   <md-chips flex ng-if="widgetType != types.widgetType.alarm.value && !entityDatasource"
 					 id="function_datakey_chips"
 					 ng-required="true"
 					 ng-model="funcDataKeys" md-autocomplete-snap
@@ -77,7 +77,7 @@
 					  </div>
 				  </md-chip-template>
 		</md-chips>
-		<md-chips flex ng-if="widgetType == types.widgetType.alarm.value"
+		<md-chips flex ng-if="widgetType == types.widgetType.alarm.value && !entityDatasource"
 				  id="alarm_datakey_chips"
 				  ng-required="true"
 				  ng-model="alarmDataKeys" md-autocomplete-snap
@@ -129,9 +129,17 @@
 				</div>
 			</md-chip-template>
 		</md-chips>
+		<div ng-if="widgetType != types.widgetType.alarm.value && entityDatasource">
+			<md-input-container style="margin-right: 10px;">
+				<label>Entity List</label>
+				<md-select  id= "entityId" ng-model="selectedEntity" ng-change="selectChanged()" aria-label="ShowHideAccountant">
+					<md-option ng-repeat="selectedEntity in entityList" ng-value="selectedEntity">{{selectedEntity}}</md-option>
+				</md-select>
+			</md-input-container>
+		</div>
 		<div class="tb-error-messages" ng-messages="ngModelCtrl.$error" role="alert">
-			<div translate ng-message="datasourceKeys" ng-if="widgetType !== types.widgetType.alarm.value" class="tb-error-message">datakey.function-types-required</div>
-			<div translate ng-message="datasourceKeys" ng-if="widgetType === types.widgetType.alarm.value" class="tb-error-message">datakey.alarm-fields-required</div>
+			<div translate ng-message="datasourceKeys" ng-if="widgetType !== types.widgetType.alarm.value && !entityDatasource" class="tb-error-message">datakey.function-types-required</div>
+			<div translate ng-message="datasourceKeys" ng-if="widgetType === types.widgetType.alarm.value && !entityDatasource" class="tb-error-message">datakey.alarm-fields-required</div>
 		</div>
 		<div class="md-caption" style="color: rgba(0,0,0,0.57);" ng-if="maxDataKeys > -1"
 			 translate="datakey.maximum-function-types"

@@ -17,13 +17,17 @@
 
 -->
 <section flex layout='column' layout-align="center" layout-gt-sm='row' layout-align-gt-sm="start center" class="tb-datasource">
-    <md-input-container style="min-width: 110px;">
+    <md-input-container style="min-width: 110px;" ng-if="entityDatasource == false">
         <md-select placeholder="{{ 'datasource.type' | translate }}" required id="datasourceType" ng-model="model.type">
             <md-option ng-repeat="datasourceType in datasourceTypes" value="{{datasourceType}}">
                 {{ datasourceType | translate }}
             </md-option>
         </md-select>
     </md-input-container>
+    <md-input-container style="min-width: 110px;" ng-if="entityDatasource == true">
+        <label>Entity Type</label>
+    </md-input-container>
+
     <section flex class="datasource" ng-switch on="model.type">
         <tb-datasource-func flex
                             ng-switch-default
@@ -33,7 +37,9 @@
                             datakey-settings-schema="datakeySettingsSchema"
                             ng-required="model.type === types.datasourceType.function"
                             widget-type="widgetType"
-                            generate-data-key="generateDataKey({chip: chip, type: type})">
+                            generate-data-key="generateDataKey({chip: chip, type: type})"
+                            entity-datasource="entityDatasource"
+                            widget-info= "widgetInfo">
         </tb-datasource-func>
         <tb-datasource-entity flex
                               ng-model="model"

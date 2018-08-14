@@ -45,7 +45,6 @@ function DatasourceFunc($compile, $templateCache, $mdDialog, $window, $document,
 
         scope.ngModelCtrl = ngModelCtrl;
         scope.types = types;
-
         scope.functionTypes = utils.getPredefinedFunctionsList();
         scope.alarmFields = [];
         for (var alarmField in types.alarmFields) {
@@ -57,7 +56,12 @@ function DatasourceFunc($compile, $templateCache, $mdDialog, $window, $document,
 
         scope.selectedAlarmDataKey = null;
         scope.alarmDataKeySearchText = null;
-
+        
+        //Entity list array
+        scope.entityList = [
+            "Devices",
+            "Assets",
+        ];
         scope.updateValidity = function () {
             if (ngModelCtrl.$viewValue) {
                 var value = ngModelCtrl.$viewValue;
@@ -84,6 +88,7 @@ function DatasourceFunc($compile, $templateCache, $mdDialog, $window, $document,
             updateDataKeys();
         }, true);
 
+
         function updateDataKeys() {
             if (ngModelCtrl.$viewValue) {
                 var dataKeys = [];
@@ -100,6 +105,18 @@ function DatasourceFunc($compile, $templateCache, $mdDialog, $window, $document,
                 scope.updateValidity();
             }
         });
+
+        /**
+         * Set selected entity (device or assets) to data keys
+         */
+        scope.selectChanged = function(){
+            var entity = angular.element('#entityId').scope();
+            scope.widgetInfo.selectedEntity = entity.selectedEntity;
+            types.widgetInfo = scope.widgetInfo;
+            var dataKeys = [];
+                dataKeys = dataKeys.concat(entity.selectedEntity);
+                ngModelCtrl.$viewValue.dataKeys = dataKeys;
+        };
 
         ngModelCtrl.$render = function () {
             if (ngModelCtrl.$viewValue) {
@@ -229,7 +246,9 @@ function DatasourceFunc($compile, $templateCache, $mdDialog, $window, $document,
             maxDataKeys: '=',
             optDataKeys: '=',
             generateDataKey: '&',
-            datakeySettingsSchema: '='
+            datakeySettingsSchema: '=',
+            entityDatasource: '=',
+            widgetInfo: '='
         },
         link: linker
     };
