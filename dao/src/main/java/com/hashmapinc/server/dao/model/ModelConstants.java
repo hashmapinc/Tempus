@@ -468,6 +468,7 @@ public class ModelConstants {
     public static final String DATA_MODEL_OBJECT_TYPE = "type";
     public static final String DATA_MODEL_OBJECT_PARENT_ID = "parent_id";
     public static final String DATA_MODEL_ID = "data_model_id";
+    public static final String DATA_MODEL_LOGO_FILE = "logo_file";
 
     /**
      * cassandra modelObject constants.

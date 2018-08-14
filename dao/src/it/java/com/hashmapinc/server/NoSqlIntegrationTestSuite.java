@@ -49,6 +49,7 @@ public class NoSqlIntegrationTestSuite {
         List<CustomCassandraCQLUnit.NamedDataset> dataSets = new ArrayList<>();
         dataSets.add(new CustomCassandraCQLUnit.NamedDataset("1.cql", new ClassPathCQLDataSet("cassandra/upgrade/1.cql" , false, false)));
         dataSets.add(new CustomCassandraCQLUnit.NamedDataset("2.cql", new ClassPathCQLDataSet("cassandra/upgrade/2.cql" , false, false)));
+        dataSets.add(new CustomCassandraCQLUnit.NamedDataset("3.cql", new ClassPathCQLDataSet("cassandra/upgrade/3.cql" , false, false)));
         return dataSets;
     }
 }

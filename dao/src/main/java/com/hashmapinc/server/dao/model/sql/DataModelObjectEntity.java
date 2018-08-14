@@ -33,6 +33,7 @@ import com.hashmapinc.server.dao.model.SearchTextEntity;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
+import java.nio.ByteBuffer;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
@@ -59,6 +60,9 @@ public final class DataModelObjectEntity extends BaseSqlEntity<DataModelObject> 
     @Column(name = ModelConstants.DATA_MODEL_ID)
     private String dataModelId;
 
+    @Column(name = ModelConstants.DATA_MODEL_LOGO_FILE)
+    private String logoFile;
+
     @Type(type = "json")
     @Column(name = ModelConstants.DATA_MODEL_OBJECT_DESCRIPTION)
     private JsonNode description;
@@ -83,6 +87,7 @@ public final class DataModelObjectEntity extends BaseSqlEntity<DataModelObject> 
         if (dataModelObject.getCustomerId()!= null) {
             this.customerId = UUIDConverter.fromTimeUUID(dataModelObject.getCustomerId().getId());
         }
+        this.logoFile = dataModelObject.getLogoFile();
         this.name = dataModelObject.getName();
         this.description = dataModelObject.getDescription();
     }
@@ -117,6 +122,7 @@ public final class DataModelObjectEntity extends BaseSqlEntity<DataModelObject> 
         if (parentId != null){
             dataModelObject.setParentId(new DataModelObjectId(UUIDConverter.fromString(parentId)));
         }
+        dataModelObject.setLogoFile(logoFile);
         dataModelObject.setName(name);
         dataModelObject.setDescription(description);
         return dataModelObject;

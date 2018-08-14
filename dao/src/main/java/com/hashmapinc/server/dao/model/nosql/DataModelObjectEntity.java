@@ -28,6 +28,8 @@ import lombok.ToString;
 import com.hashmapinc.server.dao.model.SearchTextEntity;
 
 import com.datastax.driver.mapping.annotations.*;
+
+import java.nio.ByteBuffer;
 import java.util.UUID;
 
 import static com.hashmapinc.server.dao.model.ModelConstants.ID_PROPERTY;
@@ -59,6 +61,9 @@ public final class DataModelObjectEntity implements SearchTextEntity<DataModelOb
     @Column(name = ModelConstants.CUSTOMER_ID_PROPERTY)
     private UUID customerId;
 
+    @Column(name = ModelConstants.DATA_MODEL_LOGO_FILE)
+    private String logoFile;
+
     @Column(name = ModelConstants.DATA_MODEL_OBJECT_DESCRIPTION, codec = JsonCodec.class)
     private JsonNode description;
 
@@ -81,6 +86,9 @@ public final class DataModelObjectEntity implements SearchTextEntity<DataModelOb
         }
         if (dataModelObject.getParentId()!= null) {
             this.customerId = dataModelObject.getParentId().getId();
+        }
+        if (dataModelObject.getLogoFile() != null) {
+            this.logoFile = dataModelObject.getLogoFile();
         }
         this.name = dataModelObject.getName();
         this.description = dataModelObject.getDescription();
@@ -144,6 +152,14 @@ public final class DataModelObjectEntity implements SearchTextEntity<DataModelOb
         this.customerId = customerId;
     }
 
+    public String getLogoFile() {
+        return logoFile;
+    }
+
+    public void setLogoFile(String logoFile) {
+        this.logoFile = logoFile;
+    }
+
     @Override
     public String getSearchTextSource() {
         return getName();
@@ -173,6 +189,9 @@ public final class DataModelObjectEntity implements SearchTextEntity<DataModelOb
         }
         if (parentId != null){
             dataModelObject.setParentId(new DataModelObjectId(parentId));
+        }
+        if (logoFile != null) {
+            dataModelObject.setLogoFile(logoFile);
         }
         dataModelObject.setName(name);
         dataModelObject.setDescription(description);
