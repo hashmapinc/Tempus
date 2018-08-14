@@ -30,6 +30,9 @@ import java.util.List;
 import com.datastax.driver.core.utils.UUIDs;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hashmapinc.server.common.data.*;
+import com.hashmapinc.server.common.data.datamodel.AttributeDefinition;
+import com.hashmapinc.server.common.data.datamodel.DataModel;
+import com.hashmapinc.server.common.data.datamodel.DataModelObject;
 import com.hashmapinc.server.common.data.page.TextPageLink;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.*;
@@ -363,6 +366,122 @@ public abstract class BaseDashboardControllerTest extends AbstractControllerTest
         Collections.sort(loadedDashboards, idComparator);
         
         Assert.assertEquals(dashboards, loadedDashboards);
+    }
+
+    @Test
+    public void testAssetLandingDashboardSave() throws Exception {
+        Dashboard dashboard = new Dashboard();
+        dashboard.setTitle("My dashboard");
+        Dashboard savedDashboard = doPost("/api/dashboard", dashboard, Dashboard.class);
+
+        Assert.assertNotNull(savedDashboard);
+        Assert.assertNotNull(savedDashboard.getId());
+
+        DataModel dataModel = createDataModel();
+        DataModelObject dataModelObject = createDataModelObject(dataModel);
+
+        AssetLandingDashboard ald = new AssetLandingDashboard(savedDashboard.getId());
+        ald.setDataModelId(dataModel.getId());
+        ald.setDataModelObjectId(dataModelObject.getId());
+
+        AssetLandingDashboard savedAld = doPost("/api/asset-landing-dashboard/", ald, AssetLandingDashboard.class);
+        Assert.assertNotNull(savedAld);
+
+        AssetLandingDashboard foundAld = doGet("/api/asset-landing-dashboard/" + savedAld.getDashboardId().getId().toString(), AssetLandingDashboard.class);
+        Assert.assertEquals(foundAld.getDashboardId(), savedAld.getDashboardId());
+    }
+
+    @Test
+    public void testAssetLandingDashboardDelete() throws Exception {
+        Dashboard dashboard = new Dashboard();
+        dashboard.setTitle("My dashboard");
+        Dashboard savedDashboard = doPost("/api/dashboard", dashboard, Dashboard.class);
+
+        Assert.assertNotNull(savedDashboard);
+        Assert.assertNotNull(savedDashboard.getId());
+
+        DataModel dataModel = createDataModel();
+        DataModelObject dataModelObject = createDataModelObject(dataModel);
+
+        AssetLandingDashboard ald = new AssetLandingDashboard(savedDashboard.getId());
+        ald.setDataModelId(dataModel.getId());
+        ald.setDataModelObjectId(dataModelObject.getId());
+
+        AssetLandingDashboard savedAld = doPost("/api/asset-landing-dashboard/", ald, AssetLandingDashboard.class);
+        Assert.assertNotNull(savedAld);
+
+        doDelete("/api/asset-landing-dashboard/"+savedAld.getDashboardId().getId().toString())
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    public void testFindAssetLandingDashboardByDataModelObj() throws Exception {
+        Dashboard dashboard = new Dashboard();
+        dashboard.setTitle("My dashboard");
+        Dashboard savedDashboard = doPost("/api/dashboard", dashboard, Dashboard.class);
+
+        Assert.assertNotNull(savedDashboard);
+        Assert.assertNotNull(savedDashboard.getId());
+
+        Dashboard dashboard2 = new Dashboard();
+        dashboard2.setTitle("My dashboard2");
+        Dashboard savedDashboard2 = doPost("/api/dashboard", dashboard2, Dashboard.class);
+
+        Assert.assertNotNull(savedDashboard2);
+        Assert.assertNotNull(savedDashboard2.getId());
+
+        DataModel dataModel = createDataModel();
+        DataModelObject dataModelObject = createDataModelObject(dataModel);
+
+        AssetLandingDashboard ald = new AssetLandingDashboard(savedDashboard.getId());
+        ald.setDataModelId(dataModel.getId());
+        ald.setDataModelObjectId(dataModelObject.getId());
+
+        AssetLandingDashboard ald2 = new AssetLandingDashboard(savedDashboard2.getId());
+        ald2.setDataModelId(dataModel.getId());
+        ald2.setDataModelObjectId(dataModelObject.getId());
+
+        AssetLandingDashboard savedAld = doPost("/api/asset-landing-dashboard/", ald, AssetLandingDashboard.class);
+        Assert.assertNotNull(savedAld);
+
+        AssetLandingDashboard savedAld2 = doPost("/api/asset-landing-dashboard/", ald2, AssetLandingDashboard.class);
+        Assert.assertNotNull(savedAld2);
+
+        List<AssetLandingDashboard> list = doGetTyped("/api/asset-landing-dashboard/data-model-object/" + dataModelObject.getId().toString(),  new TypeReference<List<AssetLandingDashboard>>(){});
+        Assert.assertEquals(2, list.size());
+    }
+
+    private DataModel createDataModel() throws Exception{
+        DataModel dataModel = new DataModel();
+        dataModel.setName("Default Drilling Data Model1");
+        dataModel.setLastUpdatedTs(System.currentTimeMillis());
+
+        DataModel savedDataModel = doPost("/api/data-model", dataModel, DataModel.class);
+
+        Assert.assertNotNull(savedDataModel);
+        Assert.assertNotNull(savedDataModel.getId());
+        Assert.assertTrue(savedDataModel.getCreatedTime() > 0);
+        Assert.assertEquals(savedTenant.getId(), savedDataModel.getTenantId());
+        Assert.assertEquals(dataModel.getName(), savedDataModel.getName());
+        Assert.assertTrue(savedDataModel.getLastUpdatedTs() > 0);
+        return savedDataModel;
+    }
+
+    private DataModelObject createDataModelObject(DataModel dataModel) throws Exception{
+        DataModelObject dataModelObject = new DataModelObject();
+        dataModelObject.setName("Well2");
+
+        AttributeDefinition ad = new AttributeDefinition();
+        ad.setValueType("STRING");
+        ad.setName("attr name2");
+        List<AttributeDefinition> attributeDefinitions = new ArrayList<>();
+        attributeDefinitions.add(ad);
+        dataModelObject.setAttributeDefinitions(attributeDefinitions);
+
+        DataModelObject savedDataModelObj = doPost("/api/data-model/" + dataModel.getId().toString() + "/objects", dataModelObject, DataModelObject.class);
+        Assert.assertNotNull(savedDataModelObj);
+        Assert.assertEquals(dataModel.getId(), savedDataModelObj.getDataModelId());
+        return savedDataModelObj;
     }
 
     private Computations saveComputation() {
