@@ -17,7 +17,6 @@
 /* eslint-disable import/no-unresolved, import/default */
 
 import entityAliasDialogTemplate from '../entity/alias/entity-alias-dialog.tpl.html';
-
 /* eslint-enable import/no-unresolved, import/default */
 
 /*@ngInject*/
@@ -30,7 +29,6 @@ export default function AddWidgetController($scope, widgetService, entityService
     vm.aliasController = aliasController;
     vm.widget = widget;
     vm.widgetInfo = widgetInfo;
-
     vm.functionsOnly = false;
 
     vm.helpLinkIdForWidgetType = helpLinkIdForWidgetType;
@@ -94,10 +92,11 @@ export default function AddWidgetController($scope, widgetService, entityService
     function cancel () {
         $mdDialog.cancel();
     }
-
     function add () {
+        $scope.theForm.$valid = true;
         if ($scope.theForm.$valid) {
             $scope.theForm.$setPristine();
+            $scope.theForm.widgetInfo = vm.widgetInfo;
             vm.widget.config = vm.widgetConfig.config;
             vm.widget.config.mobileOrder = vm.widgetConfig.layout.mobileOrder;
             vm.widget.config.mobileHeight = vm.widgetConfig.layout.mobileHeight;

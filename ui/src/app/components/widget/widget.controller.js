@@ -26,7 +26,6 @@ export default function WidgetController($scope, $state, $timeout, $window, $ele
                                          dashboardTimewindowApi, dashboardDepthwindowApi, dashboard, widget, aliasController, stateController, widgetInfo, widgetType) {
 
     var vm = this;
-
     $scope.$timeout = $timeout;
     $scope.$q = $q;
     $scope.$injector = $injector;
@@ -188,7 +187,6 @@ export default function WidgetController($scope, $state, $timeout, $window, $ele
     var widgetTypeInstance;
 
     vm.typeParameters = widgetInfo.typeParameters;
-
     try {
         widgetTypeInstance = new widgetType(widgetContext);
     } catch (e) {
@@ -304,6 +302,7 @@ export default function WidgetController($scope, $state, $timeout, $window, $ele
     }
 
     function defaultComponentsOptions(options) {
+
         options.useDashboardTimewindow = angular.isDefined(widget.config.useDashboardTimewindow)
             ? widget.config.useDashboardTimewindow : true;
         options.useDashboardDepthwindow = angular.isDefined(widget.config.useDashboardDepthwindow)
@@ -450,7 +449,7 @@ export default function WidgetController($scope, $state, $timeout, $window, $ele
         } else if (widget.type === types.widgetType.static.value) {
             $scope.loadingData = false;
             deferred.resolve();
-        } else {
+        }else {
             deferred.resolve();
         }
         return deferred.promise;
@@ -550,7 +549,6 @@ export default function WidgetController($scope, $state, $timeout, $window, $ele
     }
 
     function configureWidgetElement() {
-
         $scope.displayLegend = angular.isDefined(widget.config.showLegend) ?
             widget.config.showLegend : ( widget.type === types.widgetType.timeseries.value ||
                 widget.type === types.widgetType.depthseries.value);
@@ -627,7 +625,6 @@ export default function WidgetController($scope, $state, $timeout, $window, $ele
          progressElement.remove();
          progressElement = null;
          }*/
-
         $element.html(html);
 
         var containerElement = $scope.displayLegend ? angular.element($element[0].querySelector('#widget-container')) : $element;
@@ -640,7 +637,12 @@ export default function WidgetController($scope, $state, $timeout, $window, $ele
         }
 
         widgetContext.$scope = $scope.$new();
-
+        if (widgetInfo.alias === "alias") {
+            $scope.loadingData = false;
+        }
+        if (widgetInfo.alias === "device_list") {
+            $scope.loadingData = false;
+        } 
         $compile($element.contents())(widgetContext.$scope);
 
         addResizeListener(widgetContext.$containerParent[0], onResize); // eslint-disable-line no-undef
@@ -657,7 +659,6 @@ export default function WidgetController($scope, $state, $timeout, $window, $ele
     }
 
     function initialize() {
-
         $scope.$on('toggleDashboardEditMode', function (event, isEdit) {
             onEditModeChanged(isEdit);
         });

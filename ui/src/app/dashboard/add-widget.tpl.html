@@ -45,13 +45,14 @@
                                       fetch-entity-keys="vm.fetchEntityKeys(entityAliasId, query, type)"
                                       fetch-dashboard-states="vm.fetchDashboardStates(query)"
                                       on-create-entity-alias="vm.createEntityAlias(event, alias, allowedEntityTypes)"
-                                      the-form="theForm"></tb-widget-config>
+                                      the-form="theForm"
+                                      widget-info="vm.widgetInfo"></tb-widget-config>
                 </fieldset>
             </div>
         </md-dialog-content>
         <md-dialog-actions layout="row">
             <span flex></span>
-            <md-button ng-disabled="$root.loading || theForm.$invalid" type="submit"
+            <md-button  type="submit"
                        class="md-raised md-primary">
                 {{ 'action.add' | translate }}
             </md-button>
