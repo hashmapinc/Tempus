@@ -64,8 +64,6 @@ var lineGraph = function(lineConfig) {
 
     let xAxis = d3.axisTop()
       .scale(x)
-      .tickPadding(10)
-      .ticks(20)
 
     let yAxis = d3.axisLeft()
       .scale(y)
@@ -76,7 +74,7 @@ var lineGraph = function(lineConfig) {
       .y((d, i) => y(i + dataGen.time))
       .x(d => x(d));
 
-    if(o.areaFill.enable){
+    if(angular.isDefined(o.areaFill)){
       if(o.areaFill.fill === "left"){
         var area = d3.area()
           .x0(-14)
@@ -98,12 +96,12 @@ var lineGraph = function(lineConfig) {
     //   .attr('transform', 'translate(30, 20)');
 
     // let $xAxis = context.select('.linearGrid')
-       context.select('.linearGrid')
-      .attr("width", w + margin.right + 1)
-      .append('g')
-      .attr('class', 'x axis')
-      .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
-      .call(xAxis);
+      //  context.select('.linearGrid')
+      // .attr("width", w + margin.right + 1)
+      // .append('g')
+      // .attr('class', 'x axis')
+      // .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
+     // .call(xAxis);
 
 
     //grid
@@ -121,7 +119,7 @@ var lineGraph = function(lineConfig) {
       .attr('fill', 'none')
       .attr('stroke-width', o.lineWeight);
 
-      let $areaGraph = context.select('.linearGrid').append('path')
+    let $areaGraph = context.select('.linearGrid').append('path')
       .attr('fill', o.areaFill.color)
       .style("opacity", o.areaFill.opacity);
 
@@ -149,7 +147,6 @@ var lineGraph = function(lineConfig) {
         .datum(dataGen.latestData)
         .attr("transform", "translate(" + leftPadding + ", 0)")
         .attr('d', area);
-
 
       // $rects
       //   .attr('height', (_, i) => Math.abs(latestDeltas[i] * h / 10))
