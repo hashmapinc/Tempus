@@ -227,6 +227,25 @@ public class CustomerGroupController extends BaseController {
     }
 
     @PreAuthorize("hasAuthority('TENANT_ADMIN')")
+    @DeleteMapping(value = "/group/{customerGroupId}/users")
+    @ResponseBody
+    public CustomerGroup unassignUsersFromGroup(
+            @PathVariable(CUSTOMER_GROUP_ID) String strCustomerGroupId,
+            @RequestBody List<UUID> userUuids) throws TempusException {
+        checkParameter(CUSTOMER_GROUP_ID, strCustomerGroupId);
+        try{
+            CustomerGroupId customerGroupId = new CustomerGroupId(toUUID(strCustomerGroupId));
+            List<UserId> userIds = userUuids.stream().map(UserId::new).collect(Collectors.toList());
+            for (UserId userId: userIds) {
+                checkUserId(userId);
+            }
+            return checkNotNull(customerGroupService.unassignUsers(customerGroupId, userIds));
+        } catch (Exception e){
+            throw handleException(e);
+        }
+    }
+
+    @PreAuthorize("hasAuthority('TENANT_ADMIN')")
     @GetMapping(value = "/group/policy/{userId}")
     @ResponseBody
     public List<String> getPoliciesForUser(
