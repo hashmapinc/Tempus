@@ -38,7 +38,6 @@ import com.hashmapinc.server.dao.tenant.TenantDao;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -133,10 +132,6 @@ public class CustomerGroupServiceImpl extends AbstractEntityService implements C
         if (customerGroup == null) {
             throw new IncorrectParameterException("Unable to delete non-existent customer group.");
         }
-//        dashboardService.unassignCustomerDashboards(customerGroupId);
-//        assetService.unassignCustomerAssets(customerGroup.getTenantId(), customerGroupId);
-//        deviceService.unassignCustomerDevices(customerGroup.getTenantId(), customerGroupId);
-//        userService.deleteCustomerUsers(customerGroup.getTenantId(), customerGroupId);  TODO : Need to confirm this implementation
         deleteEntityRelations(customerGroupId);
         customerGroupDao.removeById(customerGroupId.getId());
         customerGroupDao.deleteUserIdsForCustomerGroupId(customerGroupId.getId());
@@ -173,6 +168,14 @@ public class CustomerGroupServiceImpl extends AbstractEntityService implements C
         CustomerGroup customerGroup = customerGroupDao.findById(customerGroupId.getId());
         customerGroup.setUserIds(userIds);
         return customerGroup;
+    }
+
+    @Override
+    public CustomerGroup unassignUsers(CustomerGroupId customerGroupId , List<UserId> userIds) {
+        log.trace("Executing unassignUsers, CustomerGroupId [{}] and userIds [{}]", customerGroupId, userIds);
+        Validator.validateId(customerGroupId, INCORRECT_CUSTOMER_GROUP_ID + customerGroupId);
+        customerGroupDao.unassignUsers(customerGroupId, userIds);
+        return customerGroupDao.findById(customerGroupId.getId());
     }
 
     @Override
