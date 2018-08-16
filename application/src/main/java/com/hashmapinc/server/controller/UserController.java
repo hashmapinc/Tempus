@@ -320,7 +320,7 @@ public class UserController extends BaseController {
     @PreAuthorize("hasAuthority('TENANT_ADMIN')")
     @PostMapping(value = "/user/{userId}/groups")
     @ResponseBody
-    public User assignGropusToUser(
+    public User assignGroupsToUser(
             @PathVariable(USER_ID) String strUserId ,
             @RequestBody List<UUID> groupUuids) throws TempusException {
         checkParameter(USER_ID, strUserId);
@@ -331,6 +331,25 @@ public class UserController extends BaseController {
                 checkCustomerGroupId(customerGroupId);
             }
             return checkNotNull(userService.assignGroups(userId, customerGroupIds));
+        } catch (Exception e){
+            throw handleException(e);
+        }
+    }
+
+    @PreAuthorize("hasAuthority('TENANT_ADMIN')")
+    @DeleteMapping(value = "/user/{userId}/groups")
+    @ResponseBody
+    public User unassignGroupsFromUser(
+            @PathVariable(USER_ID) String strUserId ,
+            @RequestBody List<UUID> groupUuids) throws TempusException {
+        checkParameter(USER_ID, strUserId);
+        try{
+            UserId userId = new UserId(toUUID(strUserId));
+            List<CustomerGroupId> customerGroupIds = groupUuids.stream().map(CustomerGroupId::new).collect(Collectors.toList());
+            for (CustomerGroupId customerGroupId: customerGroupIds) {
+                checkCustomerGroupId(customerGroupId);
+            }
+            return checkNotNull(userService.unassignGroups(userId, customerGroupIds));
         } catch (Exception e){
             throw handleException(e);
         }
