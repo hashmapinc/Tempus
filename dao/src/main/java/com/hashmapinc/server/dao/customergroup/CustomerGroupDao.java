@@ -100,10 +100,26 @@ public interface CustomerGroupDao extends Dao<CustomerGroup> {
     void assignUsers(CustomerGroupId customerGroupId, List<UserId> userIds);
 
     /**
+     * Unassign Users to groups by id.
+     *
+     * @param customerGroupId the customerGroupId
+     * @param userIds list of userId objects
+     */
+    void unassignUsers(CustomerGroupId customerGroupId, List<UserId> userIds);
+
+    /**
      * Assign Groups to user by id.
      *
      * @param userId the userId
      * @param customerGroupIds list of customerGroupId objects
      */
     void assignGroups(UserId userId , List<CustomerGroupId> customerGroupIds);
+
+    /**
+     * Unassign Groups to user by id.
+     *
+     * @param userId the userId
+     * @param customerGroupIds list of customerGroupId objects
+     */
+    void unassignGroups(UserId userId , List<CustomerGroupId> customerGroupIds);
 }
