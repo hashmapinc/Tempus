@@ -16,75 +16,75 @@
  */
 package com.hashmapinc.server.controller;
 
-import com.hashmapinc.server.common.data.MetadataConfig;
 import com.hashmapinc.server.common.data.MetadataIngestionEntries;
-import com.hashmapinc.server.common.data.UUIDConverter;
 import com.hashmapinc.server.common.data.id.TenantId;
-import com.hashmapinc.server.exception.TempusErrorCode;
+import com.hashmapinc.server.common.data.metadata.MetadataConfig;
+import com.hashmapinc.server.common.data.metadata.MetadataConfigId;
+import com.hashmapinc.server.dao.metadataingestion.MetadataConfigService;
 import com.hashmapinc.server.exception.TempusException;
 import com.hashmapinc.server.service.security.model.SecurityUser;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.client.RestTemplate;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api")
 @Slf4j
-public class MetadataConfigController extends BaseController {
+public class MetadataController extends BaseController {
+
+    @Autowired
+    MetadataConfigService metadataConfigService;
 
     @PreAuthorize("hasAuthority('TENANT_ADMIN')")
-    @RequestMapping(value = "/metadataconfig", method = RequestMethod.POST)
+    @PostMapping(value = "/metadata/config")
     @ResponseBody
     public MetadataConfig saveMetadataConfig(MetadataConfig metadataConfig) throws TempusException {
         try {
-            metadataConfig.setTenantId(UUIDConverter.fromTimeUUID(getCurrentUser().getTenantId().getId()));
-            RestTemplate restTemplate = new RestTemplate();
-            String url = "localhost:9005/metadataconfig" ;
-            return restTemplate.postForObject(url, metadataConfig, MetadataConfig.class);
+            TenantId tenantId = getCurrentUser().getTenantId();
+            metadataConfig.setOwnerId(tenantId.getId().toString());
+            return metadataConfigService.save(metadataConfig);
         } catch (Exception e) {
             throw handleException(e);
         }
     }
 
     @PreAuthorize("hasAuthority('TENANT_ADMIN')")
-    @RequestMapping(value = "/metadataconfig/{metadataConfigId}", method = RequestMethod.GET)
+    @GetMapping(value = "/metadata/config/{metadataConfigId}")
     @ResponseBody
     public MetadataConfig getMetadataConfigById(@PathVariable("metadataConfigId") String strMetadataConfigId) throws TempusException {
         checkParameter("metadataConfigId", strMetadataConfigId);
         try {
-            String url = "localhost:9005"+ "/" +strMetadataConfigId;
-            RestTemplate restTemplate = new RestTemplate();
-            return restTemplate.getForObject(url , MetadataConfig.class);
-        } catch (Exception e){
-            throw handleException(e);
-        }
-    }
-
-    @PreAuthorize("hasAuthority('TENANT_ADMIN')")
-    @RequestMapping(value = "/tenant/metadataconfigs",  method = RequestMethod.GET)
-    @ResponseBody
-    public MetadataConfig[] getTenantMetadataConfigs() throws TempusException {
-        TenantId tenantId = getCurrentUser().getTenantId();
-        try {
-            String url = "localhost:9005/"+tenantId.getId().toString();
-            RestTemplate restTemplate = new RestTemplate();
-            return restTemplate.getForObject(url, MetadataConfig[].class);
+            MetadataConfigId metadataConfigId = new MetadataConfigId(toUUID(strMetadataConfigId));
+            return metadataConfigService.findById(metadataConfigId);
         } catch (Exception e) {
             throw handleException(e);
         }
     }
 
     @PreAuthorize("hasAuthority('TENANT_ADMIN')")
-    @RequestMapping(value = "/metadataconfig/{metadataConfigId}", method = RequestMethod.DELETE)
+    @GetMapping(value = "/tenant/metadataconfigs")
+    @ResponseBody
+    public List<MetadataConfig> getTenantMetadataConfigs() throws TempusException {
+        try {
+            TenantId tenantId = getCurrentUser().getTenantId();
+            return metadataConfigService.findByTenant(tenantId);
+        } catch (Exception e) {
+            throw handleException(e);
+        }
+    }
+
+    @PreAuthorize("hasAuthority('TENANT_ADMIN')")
+    @DeleteMapping(value = "/metadataconfig/{metadataConfigId}")
     @ResponseStatus(value = HttpStatus.OK)
     public void deleteMetaDataConfig(@PathVariable("metadataConfigId") String strMetadataConfigId) throws TempusException {
         checkParameter("metadataConfigId", strMetadataConfigId);
         try {
-            String url = "localhost:9005/"+strMetadataConfigId;
-            RestTemplate restTemplate = new RestTemplate();
-            restTemplate.delete(url);
+            MetadataConfigId metadataConfigId = new MetadataConfigId(toUUID(strMetadataConfigId));
+            metadataConfigService.delete(metadataConfigId);
         } catch (Exception e) {
             throw handleException(e);
         }
@@ -92,36 +92,32 @@ public class MetadataConfigController extends BaseController {
 
 
     @PreAuthorize("hasAuthority('TENANT_ADMIN')")
-    @RequestMapping(value = "/metadataconfig/test/{metadataConfigId}", method = RequestMethod.DELETE)
+    @GetMapping(value = "/metadataconfig/test/{metadataConfigId}")
     @ResponseStatus(value = HttpStatus.OK)
     public Boolean testSource(@PathVariable("metadataConfigId") String strMetadataConfigId) throws TempusException {
         checkParameter("metadataConfigId", strMetadataConfigId);
         try {
-            String url = "run_test_ingestion_endpoint/"+strMetadataConfigId;
-            RestTemplate restTemplate = new RestTemplate();
-            MetadataIngestionEntries metadataIngestionEntries = restTemplate.getForObject(url, MetadataIngestionEntries.class);
-            return metadataIngestionEntries.getMetaDataKvEntries().size() > 0;
-        } catch (Exception e){
+            MetadataConfigId metadataConfigId = new MetadataConfigId(toUUID(strMetadataConfigId));
+            return metadataConfigService.testSource(metadataConfigId);
+        } catch (Exception e) {
             throw handleException(e);
         }
 
     }
 
-    @PreAuthorize("hasAuthority('API_USER')")
-    @RequestMapping(value = "/metadataconfig/insert", method = RequestMethod.POST)
+    @PreAuthorize("#oauth2.isClient() and #oauth2.hasScope('server')")
+    @PostMapping(value = "/metadataconfig/insert")
     @ResponseBody
     public void insert(MetadataIngestionEntries metadataIngestionEntries) throws TempusException {
         SecurityUser securityUser = getCurrentUser();
-        //TODO: Fix this before checkin
-        if(true) {
+        try {
             metadataIngestionService.save(
                     metadataIngestionEntries.getTenantId(),
                     metadataIngestionEntries.getMetadataConfigId(),
                     metadataIngestionEntries.getMetadataSourceName(),
                     metadataIngestionEntries.getMetaDataKvEntries());
-        } else {
-            throw new TempusException("API with registered "+securityUser.getEmail() + " is not entitled to insert metadata", TempusErrorCode.PERMISSION_DENIED);
+        } catch (Exception e) {
+            throw handleException(e);
         }
     }
-
 }

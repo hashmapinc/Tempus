@@ -16,33 +16,18 @@
  */
 package com.hashmapinc.server.controller;
 
+import com.hashmapinc.server.actors.service.ActorService;
 import com.hashmapinc.server.common.data.*;
 import com.hashmapinc.server.common.data.alarm.Alarm;
+import com.hashmapinc.server.common.data.alarm.AlarmId;
 import com.hashmapinc.server.common.data.alarm.AlarmInfo;
 import com.hashmapinc.server.common.data.asset.Asset;
 import com.hashmapinc.server.common.data.audit.ActionType;
 import com.hashmapinc.server.common.data.computation.ComputationJob;
 import com.hashmapinc.server.common.data.id.*;
 import com.hashmapinc.server.common.data.page.TextPageLink;
-import com.hashmapinc.server.common.data.plugin.ComponentDescriptor;
-import com.hashmapinc.server.dao.cluster.NodeMetricService;
-import com.hashmapinc.server.dao.datamodel.DataModelObjectService;
-import com.hashmapinc.server.dao.datamodel.DataModelService;
-import com.hashmapinc.server.dao.device.DeviceCredentialsService;
-import com.hashmapinc.server.dao.metadataingestion.MetadataIngestionService;
-import com.hashmapinc.server.dao.rule.RuleService;
-import com.hashmapinc.server.dao.user.UserService;
-import com.hashmapinc.server.service.component.ComponentDiscoveryService;
-import com.hashmapinc.server.service.security.model.SecurityUser;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.ExceptionHandler;
-import com.hashmapinc.server.actors.service.ActorService;
-import com.hashmapinc.server.common.data.alarm.AlarmId;
 import com.hashmapinc.server.common.data.page.TimePageLink;
+import com.hashmapinc.server.common.data.plugin.ComponentDescriptor;
 import com.hashmapinc.server.common.data.plugin.ComponentType;
 import com.hashmapinc.server.common.data.plugin.PluginMetaData;
 import com.hashmapinc.server.common.data.rule.RuleMetaData;
@@ -51,25 +36,38 @@ import com.hashmapinc.server.common.data.widget.WidgetType;
 import com.hashmapinc.server.common.data.widget.WidgetsBundle;
 import com.hashmapinc.server.dao.alarm.AlarmService;
 import com.hashmapinc.server.dao.asset.AssetService;
-
+import com.hashmapinc.server.dao.audit.AuditLogService;
+import com.hashmapinc.server.dao.cluster.NodeMetricService;
 import com.hashmapinc.server.dao.computations.ComputationJobService;
 import com.hashmapinc.server.dao.computations.ComputationsService;
-
-import com.hashmapinc.server.dao.audit.AuditLogService;
-
 import com.hashmapinc.server.dao.customer.CustomerService;
 import com.hashmapinc.server.dao.dashboard.DashboardService;
+import com.hashmapinc.server.dao.datamodel.DataModelObjectService;
+import com.hashmapinc.server.dao.datamodel.DataModelService;
+import com.hashmapinc.server.dao.device.DeviceCredentialsService;
 import com.hashmapinc.server.dao.device.DeviceService;
 import com.hashmapinc.server.dao.exception.DataValidationException;
 import com.hashmapinc.server.dao.exception.IncorrectParameterException;
+import com.hashmapinc.server.dao.metadataingestion.MetadataConfigService;
+import com.hashmapinc.server.dao.metadataingestion.MetadataIngestionService;
 import com.hashmapinc.server.dao.model.ModelConstants;
 import com.hashmapinc.server.dao.plugin.PluginService;
 import com.hashmapinc.server.dao.relation.RelationService;
+import com.hashmapinc.server.dao.rule.RuleService;
+import com.hashmapinc.server.dao.user.UserService;
 import com.hashmapinc.server.dao.widget.WidgetTypeService;
 import com.hashmapinc.server.dao.widget.WidgetsBundleService;
 import com.hashmapinc.server.exception.TempusErrorCode;
 import com.hashmapinc.server.exception.TempusErrorResponseHandler;
 import com.hashmapinc.server.exception.TempusException;
+import com.hashmapinc.server.service.component.ComponentDiscoveryService;
+import com.hashmapinc.server.service.security.model.SecurityUser;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 
 import javax.mail.MessagingException;
 import javax.servlet.http.HttpServletRequest;
@@ -153,6 +151,8 @@ public abstract class BaseController {
     @Autowired
     protected MetadataIngestionService metadataIngestionService;
 
+    @Autowired
+    protected MetadataConfigService metadataConfigService;
 
     @ExceptionHandler(TempusException.class)
     public void handleTempusException(TempusException ex, HttpServletResponse response) {

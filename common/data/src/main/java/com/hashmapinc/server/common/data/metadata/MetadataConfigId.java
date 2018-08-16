@@ -14,17 +14,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.hashmapinc.server.common.data.id;
+package com.hashmapinc.server.common.data.metadata;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.hashmapinc.server.common.data.EntityType;
+import com.hashmapinc.server.common.data.id.UUIDBased;
 
 import java.util.UUID;
 
-public class MetadataConfigId extends UUIDBased implements EntityId {
-    private static final long serialVersionUID = 5151086890304113742L;
+public class MetadataConfigId extends UUIDBased {
 
     @JsonCreator
     public MetadataConfigId(@JsonProperty("id") UUID id) {
@@ -33,11 +31,5 @@ public class MetadataConfigId extends UUIDBased implements EntityId {
 
     public static MetadataConfigId fromString(String metadataConfigId) {
         return new MetadataConfigId(UUID.fromString(metadataConfigId));
-    }
-
-    @JsonIgnore
-    @Override
-    public EntityType getEntityType() {
-        return EntityType.METADATA_CONFIG;
     }
 }
