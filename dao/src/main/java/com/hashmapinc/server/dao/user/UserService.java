@@ -65,4 +65,6 @@ public interface UserService {
 	void deleteCustomerUsers(TenantId tenantId, CustomerId customerId);
 
 	User assignGroups(UserId userId , List<CustomerGroupId> customerGroupIds);
+
+	User unassignGroups(UserId userId , List<CustomerGroupId> customerGroupIds);
 }

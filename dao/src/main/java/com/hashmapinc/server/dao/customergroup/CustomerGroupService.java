@@ -47,5 +47,7 @@ public interface CustomerGroupService {
 
     CustomerGroup assignUsers(CustomerGroupId customerGroupId, List<UserId> userIds);
 
+    CustomerGroup unassignUsers(CustomerGroupId customerGroupId, List<UserId> userIds);
+
     List<String> findGroupPoliciesForUser(UserId userId);
 }
