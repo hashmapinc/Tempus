@@ -79,6 +79,7 @@ public class ModelConstants {
     public static final String USER_LAST_NAME_PROPERTY = "last_name";
     public static final String USER_ADDITIONAL_INFO_PROPERTY = ADDITIONAL_INFO_PROPERTY;
     public static final String USER_GROUP_TABLE_NAME = "user_groups";
+    public static final String USER_GROUP_COLUMN_FAMILY_NAME = "user_groups";
 
     public static final String USER_BY_EMAIL_COLUMN_FAMILY_NAME = "user_by_email";
     public static final String USER_BY_TENANT_AND_SEARCH_TEXT_COLUMN_FAMILY_NAME = "user_by_tenant_and_search_text";
@@ -550,15 +551,14 @@ public class ModelConstants {
     public static final String CUSTOMER_GROUP_TITLE_PROPERTY = TITLE_PROPERTY;
     public static final String CUSTOMER_GROUP_TENANT_ID_PROPERTY = TENANT_ID_PROPERTY;
     public static final String CUSTOMER_GROUP_CUSTOMER_ID_PROPERTY = CUSTOMER_ID_PROPERTY;
-    public static final String CUSTOMER_GROUP_BY_TENANT_AND_CUSTOMER_AND_TITLE_VIEW_NAME = "customer_by_tenant_and_customer_and_title";
-    public static final String CUSTOMER_GROUP_BY_TENANT_AND_CUSTOMER_SEARCH_TEXT_COLUMN_FAMILY_NAME = "customer_by_tenant_and_customer_and_search_text";
+    public static final String CUSTOMER_GROUP_BY_TENANT_AND_CUSTOMER_AND_TITLE_VIEW_NAME = "customer_group_by_tenant_and_customer_and_title";
+    public static final String CUSTOMER_GROUP_BY_TENANT_AND_CUSTOMER_SEARCH_TEXT_COLUMN_FAMILY_NAME = "group_by_tenant_and_customer_and_search_text";
     public static final String CUSTOMER_GROUP_ID_PROPERTY = "group_id";
 
 
     /**
      * CustomerGroup Policy Constants
      */
-
     public static final String CUSTOMER_GROUP_POLICY_TABLE_NAME = "customer_group_policy";
     public static final String CUSTOMER_GROUP_POLICY_ID = "group_id";
     public static final String CUSTOMER_GROUP_POLICY_COLUMN = "policy";
@@ -566,10 +566,9 @@ public class ModelConstants {
     /**
      * Cassandra CustomerGroup Policy Constants
      */
-
     public static final String CUSTOMER_GROUP_POLICY_COLUMN_FAMILY_NAME = "customer_group_policy";
     public static final String CUSTOMER_GROUP_POLICY_ID_PROPERTY = "group_id";
-    public static final String CUSTOMER_GROUP_POLICY_PROPERTY = "policy";
+    public static final String CUSTOMER_GROUP_POLICY_PROPERTY = "policies";
 
 
 
