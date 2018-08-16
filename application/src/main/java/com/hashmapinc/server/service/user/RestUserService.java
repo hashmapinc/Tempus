@@ -351,6 +351,14 @@ public class RestUserService extends AbstractEntityService implements UserServic
         return user;
     }
 
+    @Override
+    public User unassignGroups(UserId userId , List<CustomerGroupId> customerGroupIds) {
+        log.trace("Executing unassignGroups, UserId [{}] and customerGroupIds [{}]", userId, customerGroupIds);
+        Validator.validateId(userId, INCORRECT_USER_ID + userId);
+        customerGroupDao.unassignGroups(userId, customerGroupIds);
+        return findUserById(userId);
+    }
+
     private TextPageData<User> findUsers(TenantId tenantId, CustomerId customerId, TextPageLink pageLink){
         UUID idOffset = pageLink.getIdOffset() != null ? pageLink.getIdOffset() : ModelConstants.NULL_UUID;
         UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(identityUrl + "/list")
