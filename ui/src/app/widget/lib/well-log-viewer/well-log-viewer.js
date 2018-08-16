@@ -23,12 +23,13 @@ import loadLogViewer from './logViewer';
 /* eslint-disable */
 export default class WellLogViewer {
      constructor(ctx) {
+     	this.cntr = 0;
      	this.ctx = ctx;
           //  var settings = ctx.settings;
             this.init();
      }
      init() {
-		//loadLogViewer();
+		//loadLogViewer(this.ctx, "init");
         //alert(test);
         //alert("test.test");
      }
@@ -47,8 +48,11 @@ export default class WellLogViewer {
      }
 
      update() {
-     	loadLogViewer(this.ctx);
-     	console.log(this.ctx);
+     	this.cntr +=1;
+     	if(this.cntr < 2){
+     		loadLogViewer(this.ctx, "update");
+     	}
+     	//loadLogViewer();
      }
 
      static settingsSchema(ctx){
@@ -59,66 +63,174 @@ export default class WellLogViewer {
 			      "Track": {
 			        "type": "array",
 			        "items": {
-			              "title": "Settings",
-			              "type": "object",
-			              "properties":{
-			                  "component":{
-			                      "title":"Component",
-			                      "type": "array",
-			                      "items": {
-			                          "title": "Settings",
-			                          "type": "object",
-			                          "properties":{
-			                              "ComponentType":{
-			                                  "title":"Type",
-			                                  "type": "string",
-			                                  "enum": ["yy","tt"]
-			                              },
-			                              "lineWidth":{
-			                                  "title":"Line Width",
-			                                  "type": "string"
-			                              }
-			                            }       
-			                      }
-			                  },
-			                  "test":{
-			                      "title": "tttt",
-			                      "type": "string"
-			                  },
-			                  "test1":{
-			                      "title": "yyyy",
-			                      "type": "string"
-			                  },
-			                  "test2":{
-			                  	"title": "Datasource",
-								"type": "string"
-								}
-			                }       
-			          
+			            "title": "Settings",
+			            "type": "object",
+			            "properties":{
+			                "component":{
+			                    "title":"Component",
+			                    "type": "array",
+			                    "items":{ 
+		                            "title": "fields",
+			                        "type": "object",
+			                        "properties": {
+			                         	"cType": {
+			                  	            "title": "Component Type",
+			                                "type": "string",
+			                          		"enum": ["line","linearGrid"]
+			                      		},
+			                      		"dataSource": {
+											"title": "Data Source",
+			                      			"type": "string"
+			                      		},
+			                      		"color": {
+			                      			"title": "Color",
+			                      			"type": "string"
+			                      		},
+			                      		"lineWeight": {
+			                      			"title": "Line Width",
+			                      			"type": "string"
+			                      		},
+			                      		"hasHeader": {
+			                      			"title": "Has Header",
+			                      			"type": "boolean"
+			                      		},
+			                      		"headerMin": {
+			                      			"title": "Header minimum",
+			                      			"type": "string"
+			                      		},
+			                      		"headerMax": {
+			                      			"title": "Header max",
+			                      			"type": "string"
+			                      		},
+			                      		"headerName": {
+			                      			"title": "Header Name",
+			                      			"type": "string"
+			                      		},
+			                      		"areaFill": {
+			                      			"title": "Area Fill",
+			                      			"type": "object",
+			                      			"properties":{
+			                      				"enable" : {
+			                      					"title": "Enable Area Fill",
+			                      					"type": "boolean"
+			                      				},
+			                      				"fill": {
+			                      					"title": "Fill",
+			                      					"type": "string",
+			                      					"enum": ["none", "left", "right"]
+			                      				}
+			                      				,
+			                      				"color": {
+			                      					"title": "Fill Color",
+			                      					"type": "string"
+			                      				}
+			                      				,
+			                      				"opacity": {
+			                      					"title": "Fill Opacity",
+			                      					"type": "string"
+			                      				}
+			                      			}
+			                      		},
+			                      		"minorLines": {
+			                      			"title": "Grid minor lines",
+			                      			"type": "object",
+			                      			"properties":{
+			                      				"lines" : {
+			                      					"title": "Number of lines",
+			                      					"type": "string"
+			                      				},
+			                      				"lineWeight": {
+			                      					"title": "Line weight",
+			                      					"type": "string"
+			                      				}
+			                      				,
+			                      				"style": {
+			                      					"title": "Style",
+			                      					"type": "string",
+			                      					"enum": ["dashed", "solid"]
+			                      				}	                      				
+			                      			}
+			                      		},
+			                      		"majorLines": {
+			                      			"title": "Grid major lines",
+			                      			"type": "object",
+			                      			"properties":{
+			                      				"lines" : {
+			                      					"title": "Number of lines",
+			                      					"type": "string"
+			                      				},
+			                      				"lineWeight": {
+			                      					"title": "Line weight",
+			                      					"type": "string"
+			                      				}		                      				
+			                      			}
+			                      		}
+			                        }
+			                 	}
+			             	}			                 			               
+			            }       	          
 			        }
 			      }
 			    }
-			  },
-		"form":[{
-	      "key": "Track",
-	      "items": [
-	           {
-	              "key": "Track[].component",
-	              "items": [
-	                "Track[].component[].ComponentType",
-	                {
-	                  "key": "Track[].component[].lineWidth",
-	                  "condition": "model.Track[form.key[1]].component[form.arrayIndex].ComponentType === 'one'"
-	                }
-	              ]
-	            },
-	           "Track[].test1",
-	           {
-                    "key": "Track[].test2",
-                    "type": "rc-select",
-                    "multiple": false,
-                    "items": ["one", "two"]
-                }
+			},
+		   "form":[{
+	       		"key": "Track",
+	      		"items": [
+	            {
+	                "key": "Track[].component",
+	                "items": [
+	               		"Track[].component[].cType",
+	               		{
+	               			"key":"Track[].component[].dataSource",
+	               			"type": "rc-select",
+		                    "multiple": false,
+		                    "items": [],
+		                    "condition": "model.Track[form.key[1]].component[form.arrayIndex].cType === 'line'"
+	               		},             		
+	               		 {
+	                 		 "key": "Track[].component[].color",
+	                	 	 "condition": "model.Track[form.key[1]].component[form.arrayIndex].cType === 'line'"
+	               		 },
+	               		 {
+	                 		 "key": "Track[].component[].lineWeight",
+	                	 	 "condition": "model.Track[form.key[1]].component[form.arrayIndex].cType === 'line'"
+	               		 },
+	               		 "Track[].component[].hasHeader",
+	               		 {
+	                 		 "key": "Track[].component[].headerMin",
+	                	 	 "condition": "model.Track[form.key[1]].component[form.arrayIndex].hasHeader === true"
+	               		 },
+	               		 {
+	                 		 "key": "Track[].component[].headerMax",
+	                	 	 "condition": "model.Track[form.key[1]].component[form.arrayIndex].hasHeader === true"
+	               		 },
+	               		 {
+	                 		 "key": "Track[].component[].headerName",
+	                	 	 "condition": "model.Track[form.key[1]].component[form.arrayIndex].hasHeader === true"
+	               		 },
+	               		 {
+	                 		 "key": "Track[].component[].areaFill",
+	                	 	 "condition": "model.Track[form.key[1]].component[form.arrayIndex].cType === 'line'"
+	               		 },
+	               		 {
+	                 		 "key": "Track[].component[].minorLines",
+	                	 	 "condition": "model.Track[form.key[1]].component[form.arrayIndex].cType === 'linearGrid'"
+	               		 },
+	               		 {
+	                 		 "key": "Track[].component[].majorLines",
+	                	 	 "condition": "model.Track[form.key[1]].component[form.arrayIndex].cType === 'linearGrid'"
+	               		 }
+	               		
+
+
+
+
+	                // {
+	                //   "key": "Track[].component[].color"
+	                // //  "condition": "model.Track[form.key[1]].component[form.arrayIndex].ComponentType === 'one'"
+	                // }
+	                ]
+	            }
 	      ]
 	}]
 
