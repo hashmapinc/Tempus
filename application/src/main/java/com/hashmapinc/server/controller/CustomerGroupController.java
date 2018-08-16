@@ -21,7 +21,6 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.hashmapinc.server.common.data.CustomerGroup;
 import com.hashmapinc.server.common.data.EntityType;
-import com.hashmapinc.server.common.data.UUIDConverter;
 import com.hashmapinc.server.common.data.User;
 import com.hashmapinc.server.common.data.audit.ActionType;
 import com.hashmapinc.server.common.data.id.CustomerGroupId;
@@ -147,7 +146,7 @@ public class CustomerGroupController extends BaseController {
     }
 
     @PreAuthorize("hasAuthority('TENANT_ADMIN')")
-    @GetMapping(value = "/{customerId}/group", params = {"limit"})
+    @GetMapping(value = "/{customerId}/groups", params = {"limit"})
     @ResponseBody
     public TextPageData<CustomerGroup> getCustomerGroups(@PathVariable("customerId") String strCustomerId,
                                                @RequestParam int limit,
@@ -200,7 +199,6 @@ public class CustomerGroupController extends BaseController {
                 throw new TempusException(YOU_DON_T_HAVE_PERMISSION_TO_PERFORM_THIS_OPERATION,
                         TempusErrorCode.PERMISSION_DENIED);
             }
-//            final CustomerGroup customerGroup = checkNotNull(checkCustomerGroupId(customerGroupId));
             final CustomerGroup customerGroup = checkNotNull(checkCustomerGroupId(customerGroupId));
             TextPageLink pageLink = createPageLink(limit, textSearch, idOffset, textOffset);
             return userService.findUsersByIds(customerGroup.getUserIds(), pageLink);
