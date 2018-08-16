@@ -110,14 +110,7 @@ public class CassandraCustomerGroupDao extends CassandraAbstractSearchTextDao<Cu
     public void deleteUserIdsForCustomerGroupId(UUID customerGroupId) {
         log.trace("delete UserIds for CustomerGroupId [{}]", customerGroupId);
         List<UserId> userIds = findUserIdsByCustomerGroupId(customerGroupId);
-
-        for (UserId userId: userIds) {
-            Delete.Where delete = QueryBuilder.delete().all()
-                    .from(USER_GROUP_COLUMN_FAMILY_NAME)
-                    .where(eq(USER_ID_PROPERTY, userId.getId()))
-                    .and(eq(CUSTOMER_GROUP_ID_PROPERTY, customerGroupId));
-            getSession().execute(delete);
-        }
+        userIds.forEach(userId -> executeDeleteUserForGroup(customerGroupId, userId.getId()));
     }
 
     @Override
@@ -171,6 +164,12 @@ public class CassandraCustomerGroupDao extends CassandraAbstractSearchTextDao<Cu
     }
 
     @Override
+    public void unassignUsers(CustomerGroupId customerGroupId , List<UserId> userIds) {
+        log.trace("unassign users [{}] from groups [{}]", userIds, customerGroupId);
+        userIds.forEach(userId -> executeDeleteUserForGroup(customerGroupId.getId(), userId.getId()));
+    }
+
+    @Override
     public void assignGroups(UserId userId , List<CustomerGroupId> customerGroupIds) {
         log.trace("assign groups [{}] to user [{}]", customerGroupIds, userId);
         customerGroupIds.forEach(customerGroupId -> {
@@ -179,6 +178,20 @@ public class CassandraCustomerGroupDao extends CassandraAbstractSearchTextDao<Cu
                     .value(CUSTOMER_GROUP_ID_PROPERTY, customerGroupId.getId());
             getSession().execute(insert.toString());
         });
+    }
+
+    @Override
+    public void unassignGroups(UserId userId , List<CustomerGroupId> customerGroupIds) {
+        log.trace("unassign groups [{}] from user [{}]", customerGroupIds, userId);
+        customerGroupIds.forEach(customerGroupId -> executeDeleteUserForGroup(customerGroupId.getId(), userId.getId()));
+    }
+
+    private void executeDeleteUserForGroup(UUID customerGroupId, UUID userId) {
+        Delete.Where delete = QueryBuilder.delete().all()
+                .from(USER_GROUP_COLUMN_FAMILY_NAME)
+                .where(eq(USER_ID_PROPERTY, userId))
+                .and(eq(CUSTOMER_GROUP_ID_PROPERTY, customerGroupId));
+        getSession().execute(delete);
     }
 
     @Override
