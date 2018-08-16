@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 import * as d3 from 'well-log-viewer/node_modules/d3/build/d3';
-import {loadConfig} from './config';
+//import {loadConfig} from './config';
 import {linearGrid} from './linearGrid';
 import {headerLegend} from './headerLegend';
 import {lineGraph} from './lineGraph';
@@ -25,33 +25,34 @@ import './logViewer.css';
 //var d3 = require('./node_modules/d3/build/d3');
 //require('./node_modules/d3-selection-multi/build/d3-selection-multi');
 /*@ngInject*/
-export default function loadLogViewer(){
+export default function loadLogViewer(ctx, sequence){
     'use strict';
     var config,
         buildArray = [];
     //    events;
    
-    function build() {
-      config = loadConfig();
-      config.tracks.forEach(function(track){
+    function build(ctx) {
+    //  config = loadConfig();
+      config = ctx.widgetConfig.settings;
+      config.Track.forEach(function(track){
         var trackObj = [];
         var headerCount = 0
-        track.components.forEach(function(component){
-          if(component.hasHeader){
+        track.component.forEach(function(componentObj){
+          if(componentObj.hasHeader){
            headerCount +=1;
-            var hLegend = headerLegend(component.type, headerCount);
+            var hLegend = headerLegend(componentObj, headerCount);
             trackObj.push(hLegend);
           }
-          if(component.type.type === 'linearGrid'){
-            var lnGrid = linearGrid(component.type);
+          if(componentObj.cType === 'linearGrid'){
+            var lnGrid = linearGrid(componentObj);
             trackObj.push(lnGrid);
           }
-          if(component.type.type === 'timeYaxis'){
+          if(componentObj.cType === 'timeYaxis'){
             // var timeYaxis = LogViewer.timeYaxis(component.type)
             // trackObj.push(timeYaxis);
           }
-          if(component.type.type === 'line'){
-            var lnGraph = lineGraph(component.type);
+          if(componentObj.cType === 'line'){
+            var lnGraph = lineGraph(componentObj);
             trackObj.push(lnGraph);
           }
 
@@ -63,9 +64,14 @@ export default function loadLogViewer(){
     function addToDom() {
       var panelTracker = 1;
       buildArray.forEach(function(track){
+
         var trackId = '#track' + panelTracker;
+
+        d3.select(trackId).selectAll('div')
+           .remove();
+            d3.select(trackId).selectAll('svg')
+           .remove();
         panelTracker += 1;
-        alert(d3);
         d3.select(trackId)
            .append("div")
            .attr("class", "header")
@@ -104,8 +110,10 @@ export default function loadLogViewer(){
     //   }
     // };
    
-    build();
-    addToDom();
-    addListeners();
+   if(sequence === "update"){
+      build(ctx);
+      addToDom();
+      addListeners();
+   }
 }
 //export {loadLogViewer};
