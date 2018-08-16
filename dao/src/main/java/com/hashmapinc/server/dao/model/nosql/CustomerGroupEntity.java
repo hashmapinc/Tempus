@@ -21,7 +21,6 @@ import com.datastax.driver.mapping.annotations.PartitionKey;
 import com.datastax.driver.mapping.annotations.Table;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.hashmapinc.server.common.data.CustomerGroup;
-import com.hashmapinc.server.common.data.User;
 import com.hashmapinc.server.common.data.id.CustomerGroupId;
 import com.hashmapinc.server.common.data.id.CustomerId;
 import com.hashmapinc.server.common.data.id.TenantId;
@@ -33,10 +32,6 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
-import javax.persistence.CollectionTable;
-import javax.persistence.ElementCollection;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToMany;
 import java.util.List;
 import java.util.UUID;
 
@@ -57,14 +52,13 @@ public class CustomerGroupEntity implements SearchTextEntity<CustomerGroup> {
     @Column(name = CUSTOMER_GROUP_TENANT_ID_PROPERTY)
     private UUID tenantId;
 
-    @Column(name = CUSTOMER_GROUP_TITLE_PROPERTY)
-    private String title;
-
+    @PartitionKey(value = 2)
     @Column(name = CUSTOMER_GROUP_CUSTOMER_ID_PROPERTY)
     private UUID customerId;
 
-    @ElementCollection()
-    @CollectionTable(name = ModelConstants.CUSTOMER_GROUP_POLICY_COLUMN_FAMILY_NAME, joinColumns = @JoinColumn(name = ModelConstants.CUSTOMER_GROUP_POLICY_ID_PROPERTY))
+    @Column(name = CUSTOMER_GROUP_TITLE_PROPERTY)
+    private String title;
+
     @Column(name = ModelConstants.CUSTOMER_GROUP_POLICY_PROPERTY)
     private List<String> policies;
 
