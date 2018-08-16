@@ -14,8 +14,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.hashmapinc.server.common.data;
+package com.hashmapinc.server.common.data.metadata;
 
-public enum  MetadataIngestionTriggerType {
-    ON_DEMAND, SCHEDULE
+import com.hashmapinc.server.common.data.BaseData;
+import com.hashmapinc.server.common.data.metadata.source.MetadataSource;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
+
+@EqualsAndHashCode(callSuper = true)
+@Data
+@ToString
+public class MetadataConfig extends BaseData<MetadataConfigId> {
+
+    private static final long serialVersionUID = -4951937006489620857L;
+
+    private String ownerId;
+    private String name;
+    private MetadataSource source;
+    private MetadataSource sink;
+    private MetadataIngestionTriggerType triggerType;
+    private String triggerSchedule;
 }

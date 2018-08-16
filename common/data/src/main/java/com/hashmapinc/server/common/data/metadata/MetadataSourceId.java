@@ -14,10 +14,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.hashmapinc.server.common.data;
+package com.hashmapinc.server.common.data.metadata;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.hashmapinc.server.common.data.id.UUIDBased;
 
-public enum EntityType {
-    TENANT, CUSTOMER, USER, RULE, PLUGIN, DASHBOARD, ASSET, DEVICE, ALARM, COMPUTATION, COMPUTATION_JOB, NODE_METRIC,THEME, LOGO,
-    DATA_MODEL_OBJECT, DATA_MODEL
+import java.util.UUID;
+
+public class MetadataSourceId extends UUIDBased {
+
+    @JsonCreator
+    public MetadataSourceId(@JsonProperty("id") UUID id) {
+        super(id);
+    }
+
+    public static MetadataSourceId fromString(String jdbcSourceId) {
+        return new MetadataSourceId(UUID.fromString(jdbcSourceId));
+    }
 }
