@@ -814,16 +814,31 @@ CREATE TABLE IF NOT exists tempus.tag_metadata_cf (
 
 CREATE TABLE IF NOT EXISTS tempus.customer_group (
     id timeuuid,
-    title text,
     tenant_id timeuuid,
     customer_id timeuuid,
+    title text,
+    policies list<text>,
     additional_info text,
     search_text text,
-    PRIMARY KEY((id, tenant_id), title)
+    PRIMARY KEY(id, tenant_id, customer_id)
 );
 
-CREATE TABLE IF NOT EXISTS customer_group_policy (
+CREATE MATERIALIZED VIEW IF NOT EXISTS tempus.group_by_tenant_and_customer_and_search_text AS
+	SELECT *
+	from tempus.customer_group
+	WHERE tenant_id IS NOT NULL AND customer_id IS NOT NULL AND search_text IS NOT NULL AND id IS NOT NULL
+	PRIMARY KEY ( tenant_id, customer_id, search_text, id )
+	WITH CLUSTERING ORDER BY ( search_text ASC, id DESC );
+
+CREATE MATERIALIZED VIEW IF NOT EXISTS tempus.customer_group_by_tenant_and_customer_and_title AS
+	SELECT *
+	from tempus.customer_group
+	WHERE tenant_id IS NOT NULL AND customer_id IS NOT NULL AND title IS NOT NULL AND id IS NOT NULL
+	PRIMARY KEY ( tenant_id, customer_id, title, id )
+	WITH CLUSTERING ORDER BY ( title ASC, id DESC );
+
+CREATE TABLE IF NOT EXISTS tempus.user_groups (
+    user_id timeuuid,
     group_id timeuuid,
-    policy text,
-    PRIMARY KEY(group_id, policy)
+    PRIMARY KEY(user_id, group_id)
 );
