@@ -56,6 +56,7 @@ public class JpaCustomerGroupDao extends JpaAbstractSearchTextDao<CustomerGroupE
     private static final String DELETE_GROUP_IDS_FROM_USER_GROUP = String.format("DELETE FROM %s WHERE %s = ?", USER_GROUP_TABLE_NAME, USER_ID_PROPERTY);
     private static final String SELECT_GROUP_IDS_FOR_USER_ID = String.format("SELECT DISTINCT %s FROM %s WHERE %s = ?", CUSTOMER_GROUP_ID_PROPERTY, USER_GROUP_TABLE_NAME, USER_ID_PROPERTY);
     private static final String INSERT_USER_GROUPS = String.format("INSERT INTO %s  (%s, %s) VALUES (?, ?)", USER_GROUP_TABLE_NAME, USER_ID_PROPERTY, CUSTOMER_GROUP_ID_PROPERTY);
+    private static final String DELETE_FROM_USER_GROUP = String.format("DELETE FROM %s WHERE %s = ? AND %s = ?", USER_GROUP_TABLE_NAME, USER_ID_PROPERTY,CUSTOMER_GROUP_ID_PROPERTY);
 
     @Autowired
     JdbcTemplate jdbcTemplate;
@@ -122,9 +123,15 @@ public class JpaCustomerGroupDao extends JpaAbstractSearchTextDao<CustomerGroupE
 
             @Override
             public int getBatchSize() {
-                return userIds.size();
+                return userIdsStr.size();
             }
         });
+    }
+
+    @Override
+    public void unassignUsers(CustomerGroupId customerGroupId , List<UserId> userIds) {
+        List<String> userIdsStr = userIds.stream().map(userId -> UUIDConverter.fromTimeUUID(userId.getId())).collect(Collectors.toList());
+        userIdsStr.forEach(userId -> jdbcTemplate.update(DELETE_FROM_USER_GROUP, userId, UUIDConverter.fromTimeUUID(customerGroupId.getId())));
     }
 
     @Override
@@ -144,6 +151,12 @@ public class JpaCustomerGroupDao extends JpaAbstractSearchTextDao<CustomerGroupE
                 return customerGroupIds.size();
             }
         });
+    }
+
+    @Override
+    public void unassignGroups(UserId userId , List<CustomerGroupId> customerGroupIds) {
+        List<String> customerGroupIdsStr = customerGroupIds.stream().map(customerGroupId -> UUIDConverter.fromTimeUUID(customerGroupId.getId())).collect(Collectors.toList());
+        customerGroupIdsStr.forEach(customerGroupId -> jdbcTemplate.update(DELETE_FROM_USER_GROUP, UUIDConverter.fromTimeUUID(userId.getId()), customerGroupId));
     }
 
     @Override
