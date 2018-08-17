@@ -14,23 +14,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.hashmapinc.server.dao.metadataingestion;
+package com.hashmapinc.server.common.data.metadata;
 
-import com.hashmapinc.server.common.data.id.TenantId;
-import com.hashmapinc.server.common.data.metadata.MetadataConfig;
-import com.hashmapinc.server.common.data.metadata.MetadataConfigId;
+import com.hashmapinc.server.common.data.SearchTextBased;
+import lombok.*;
 
-import java.util.List;
+@EqualsAndHashCode(callSuper = true)
+@Data
+@ToString
+@NoArgsConstructor
+@AllArgsConstructor
+public class MetadataQuery extends SearchTextBased<MetadataQueryId> {
 
-public interface MetadataConfigService {
+    private static final long serialVersionUID = -4071001721651568365L;
 
-    MetadataConfig save(MetadataConfig metadataConfig);
+    private MetadataConfigId metadataConfigId;
+    private String queryStmt;
+    private MetadataIngestionTriggerType triggerType;
+    private String triggerSchedule;
 
-    MetadataConfig findById(MetadataConfigId id);
-
-    List<MetadataConfig> findByTenant(TenantId tenantId);
-
-    void delete(MetadataConfigId id);
-
-    Boolean testSource(MetadataConfigId id);
+    @Override
+    public String getSearchText() {
+        return queryStmt;
+    }
 }

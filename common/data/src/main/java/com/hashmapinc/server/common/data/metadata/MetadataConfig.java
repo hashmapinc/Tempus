@@ -16,16 +16,16 @@
  */
 package com.hashmapinc.server.common.data.metadata;
 
-import com.hashmapinc.server.common.data.BaseData;
+import com.hashmapinc.server.common.data.SearchTextBased;
 import com.hashmapinc.server.common.data.metadata.source.MetadataSource;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
+import lombok.*;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
 @ToString
-public class MetadataConfig extends BaseData<MetadataConfigId> {
+@NoArgsConstructor
+@AllArgsConstructor
+public class MetadataConfig extends SearchTextBased<MetadataConfigId> {
 
     private static final long serialVersionUID = -4951937006489620857L;
 
@@ -33,6 +33,9 @@ public class MetadataConfig extends BaseData<MetadataConfigId> {
     private String name;
     private MetadataSource source;
     private MetadataSource sink;
-    private MetadataIngestionTriggerType triggerType;
-    private String triggerSchedule;
+
+    @Override
+    public String getSearchText() {
+        return name;
+    }
 }
