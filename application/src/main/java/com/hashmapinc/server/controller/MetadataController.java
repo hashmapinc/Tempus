@@ -20,11 +20,9 @@ import com.hashmapinc.server.common.data.MetadataIngestionEntries;
 import com.hashmapinc.server.common.data.id.TenantId;
 import com.hashmapinc.server.common.data.metadata.MetadataConfig;
 import com.hashmapinc.server.common.data.metadata.MetadataConfigId;
-import com.hashmapinc.server.dao.metadataingestion.MetadataConfigService;
 import com.hashmapinc.server.exception.TempusException;
 import com.hashmapinc.server.service.security.model.SecurityUser;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -35,9 +33,6 @@ import java.util.List;
 @RequestMapping("/api")
 @Slf4j
 public class MetadataController extends BaseController {
-
-    @Autowired
-    MetadataConfigService metadataConfigService;
 
     @PreAuthorize("hasAuthority('TENANT_ADMIN')")
     @PostMapping(value = "/metadata/config")
@@ -66,7 +61,7 @@ public class MetadataController extends BaseController {
     }
 
     @PreAuthorize("hasAuthority('TENANT_ADMIN')")
-    @GetMapping(value = "/tenant/metadataconfigs")
+    @GetMapping(value = "/metadata/tenant/configs")
     @ResponseBody
     public List<MetadataConfig> getTenantMetadataConfigs() throws TempusException {
         try {
@@ -78,7 +73,7 @@ public class MetadataController extends BaseController {
     }
 
     @PreAuthorize("hasAuthority('TENANT_ADMIN')")
-    @DeleteMapping(value = "/metadataconfig/{metadataConfigId}")
+    @DeleteMapping(value = "/metadata/config/{metadataConfigId}")
     @ResponseStatus(value = HttpStatus.OK)
     public void deleteMetaDataConfig(@PathVariable("metadataConfigId") String strMetadataConfigId) throws TempusException {
         checkParameter("metadataConfigId", strMetadataConfigId);
@@ -92,7 +87,7 @@ public class MetadataController extends BaseController {
 
 
     @PreAuthorize("hasAuthority('TENANT_ADMIN')")
-    @GetMapping(value = "/metadataconfig/test/{metadataConfigId}")
+    @GetMapping(value = "/metadata/config/{metadataConfigId}/test")
     @ResponseStatus(value = HttpStatus.OK)
     public Boolean testSource(@PathVariable("metadataConfigId") String strMetadataConfigId) throws TempusException {
         checkParameter("metadataConfigId", strMetadataConfigId);
@@ -106,7 +101,7 @@ public class MetadataController extends BaseController {
     }
 
     @PreAuthorize("#oauth2.isClient() and #oauth2.hasScope('server')")
-    @PostMapping(value = "/metadataconfig/insert")
+    @PostMapping(value = "/metadata/insert")
     @ResponseBody
     public void insert(MetadataIngestionEntries metadataIngestionEntries) throws TempusException {
         SecurityUser securityUser = getCurrentUser();

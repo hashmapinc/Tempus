@@ -48,7 +48,6 @@ import com.hashmapinc.server.dao.device.DeviceCredentialsService;
 import com.hashmapinc.server.dao.device.DeviceService;
 import com.hashmapinc.server.dao.exception.DataValidationException;
 import com.hashmapinc.server.dao.exception.IncorrectParameterException;
-import com.hashmapinc.server.dao.metadataingestion.MetadataConfigService;
 import com.hashmapinc.server.dao.metadataingestion.MetadataIngestionService;
 import com.hashmapinc.server.dao.model.ModelConstants;
 import com.hashmapinc.server.dao.plugin.PluginService;
@@ -61,6 +60,8 @@ import com.hashmapinc.server.exception.TempusErrorCode;
 import com.hashmapinc.server.exception.TempusErrorResponseHandler;
 import com.hashmapinc.server.exception.TempusException;
 import com.hashmapinc.server.service.component.ComponentDiscoveryService;
+import com.hashmapinc.server.service.metadataingestion.MetadataConfigService;
+import com.hashmapinc.server.service.metadataingestion.MetadataQueryService;
 import com.hashmapinc.server.service.security.model.SecurityUser;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -153,6 +154,9 @@ public abstract class BaseController {
 
     @Autowired
     protected MetadataConfigService metadataConfigService;
+
+    @Autowired
+    protected MetadataQueryService metadataQueryService;
 
     @ExceptionHandler(TempusException.class)
     public void handleTempusException(TempusException ex, HttpServletResponse response) {

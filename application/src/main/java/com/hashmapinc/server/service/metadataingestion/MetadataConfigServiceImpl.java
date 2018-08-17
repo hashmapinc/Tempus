@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.hashmapinc.server.dao.metadataingestion;
+package com.hashmapinc.server.service.metadataingestion;
 
 import com.hashmapinc.server.common.data.id.TenantId;
 import com.hashmapinc.server.common.data.metadata.MetadataConfig;

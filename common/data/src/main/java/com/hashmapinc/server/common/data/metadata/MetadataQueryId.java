@@ -16,6 +16,22 @@
  */
 package com.hashmapinc.server.common.data.metadata;
 
-public enum  MetadataIngestionTriggerType {
-    CRON
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.hashmapinc.server.common.data.id.UUIDBased;
+
+import java.util.UUID;
+
+public class MetadataQueryId extends UUIDBased {
+
+    private static final long serialVersionUID = 3815540728910634657L;
+
+    @JsonCreator
+    public MetadataQueryId(@JsonProperty("id") UUID id) {
+        super(id);
+    }
+
+    public static MetadataQueryId fromString(String queryId) {
+        return new MetadataQueryId(UUID.fromString(queryId));
+    }
 }

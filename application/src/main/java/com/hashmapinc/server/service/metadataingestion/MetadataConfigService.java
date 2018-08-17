@@ -14,8 +14,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.hashmapinc.server.common.data.metadata;
+package com.hashmapinc.server.service.metadataingestion;
 
-public enum  MetadataIngestionTriggerType {
-    CRON
+import com.hashmapinc.server.common.data.id.TenantId;
+import com.hashmapinc.server.common.data.metadata.MetadataConfig;
+import com.hashmapinc.server.common.data.metadata.MetadataConfigId;
+
+import java.util.List;
+
+public interface MetadataConfigService {
+
+    MetadataConfig save(MetadataConfig metadataConfig);
+
+    MetadataConfig findById(MetadataConfigId id);
+
+    List<MetadataConfig> findByTenant(TenantId tenantId);
+
+    void delete(MetadataConfigId id);
+
+    Boolean testSource(MetadataConfigId id);
 }
