@@ -20,6 +20,8 @@ import com.hashmapinc.server.common.data.MetadataIngestionEntries;
 import com.hashmapinc.server.common.data.id.TenantId;
 import com.hashmapinc.server.common.data.metadata.MetadataConfig;
 import com.hashmapinc.server.common.data.metadata.MetadataConfigId;
+import com.hashmapinc.server.common.data.metadata.MetadataQuery;
+import com.hashmapinc.server.common.data.metadata.MetadataQueryId;
 import com.hashmapinc.server.exception.TempusException;
 import com.hashmapinc.server.service.security.model.SecurityUser;
 import lombok.extern.slf4j.Slf4j;
@@ -85,7 +87,6 @@ public class MetadataController extends BaseController {
         }
     }
 
-
     @PreAuthorize("hasAuthority('TENANT_ADMIN')")
     @GetMapping(value = "/metadata/config/{metadataConfigId}/test")
     @ResponseStatus(value = HttpStatus.OK)
@@ -98,6 +99,55 @@ public class MetadataController extends BaseController {
             throw handleException(e);
         }
 
+    }
+
+    @PreAuthorize("hasAuthority('TENANT_ADMIN')")
+    @PostMapping(value = "/metadata/query")
+    @ResponseBody
+    public MetadataQuery saveMetadataQuery(MetadataQuery metadataQuery) throws TempusException {
+        try {
+            return metadataQueryService.save(metadataQuery);
+        } catch (Exception e) {
+            throw handleException(e);
+        }
+    }
+
+    @PreAuthorize("hasAuthority('TENANT_ADMIN')")
+    @GetMapping(value = "/metadata/query/{metadataQueryId}")
+    @ResponseBody
+    public MetadataQuery getMetadataQueryById(@PathVariable("metadataQueryId") String strMetadataQueryId) throws TempusException {
+        checkParameter("metadataQueryId", strMetadataQueryId);
+        try {
+            MetadataQueryId metadataQueryId = new MetadataQueryId(toUUID(strMetadataQueryId));
+            return metadataQueryService.findById(metadataQueryId);
+        } catch (Exception e) {
+            throw handleException(e);
+        }
+    }
+
+    @PreAuthorize("hasAuthority('TENANT_ADMIN')")
+    @GetMapping(value = "/metadata/config/{metadataConfigId}/query")
+    @ResponseBody
+    public List<MetadataQuery> getMetadataQueriesForConfig(@PathVariable("metadataConfigId") String strMetadataConfigId) throws TempusException {
+        try {
+            MetadataConfigId metadataConfigId = new MetadataConfigId(toUUID(strMetadataConfigId));
+            return metadataQueryService.findAllByMetadataConfigId(metadataConfigId);
+        } catch (Exception e) {
+            throw handleException(e);
+        }
+    }
+
+    @PreAuthorize("hasAuthority('TENANT_ADMIN')")
+    @DeleteMapping(value = "/metadata/query/{metadataConfigId}")
+    @ResponseStatus(value = HttpStatus.OK)
+    public void deleteMetaDataQuery(@PathVariable("metadataQueryId") String strMetadataQueryId) throws TempusException {
+        checkParameter("metadataQueryId", strMetadataQueryId);
+        try {
+            MetadataQueryId metadataQueryId = new MetadataQueryId(toUUID(strMetadataQueryId));
+            metadataQueryService.delete(metadataQueryId);
+        } catch (Exception e) {
+            throw handleException(e);
+        }
     }
 
     @PreAuthorize("#oauth2.isClient() and #oauth2.hasScope('server')")
