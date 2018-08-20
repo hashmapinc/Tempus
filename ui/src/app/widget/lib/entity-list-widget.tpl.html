@@ -19,8 +19,8 @@
 <div ng-if="!showList"> 
     <span class="msg-align">{{ 'widget.entity-list-is-empty' | translate }}</span>
 </div>
-<div ng-if="showList">
-        <md-table-container  class ="tb-device-container" style="overflow-x: overlay;height: 100%;">
+<div ng-if="showList" class="div-scroll">
+        <md-table-container  class ="tb-device-container tb-width" style="overflow-x: overlay;height: 100%;">
                 <table class="tb-device-table" md-table>
                     <thead md-head md-order="query.order" md-on-reorder="onReorder">
                     <tr md-row>
