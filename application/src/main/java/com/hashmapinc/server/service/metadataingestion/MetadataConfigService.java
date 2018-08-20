@@ -33,4 +33,6 @@ public interface MetadataConfigService {
     void delete(MetadataConfigId id);
 
     Boolean testSource(MetadataConfigId id);
+
+    MetadataConfig runIngestion(MetadataConfigId id);
 }

@@ -39,7 +39,7 @@ public class MetadataController extends BaseController {
     @PreAuthorize("hasAuthority('TENANT_ADMIN')")
     @PostMapping(value = "/metadata/config")
     @ResponseBody
-    public MetadataConfig saveMetadataConfig(MetadataConfig metadataConfig) throws TempusException {
+    public MetadataConfig saveMetadataConfig(@RequestBody MetadataConfig metadataConfig) throws TempusException {
         try {
             TenantId tenantId = getCurrentUser().getTenantId();
             metadataConfig.setOwnerId(tenantId.getId().toString());
@@ -98,13 +98,25 @@ public class MetadataController extends BaseController {
         } catch (Exception e) {
             throw handleException(e);
         }
+    }
 
+    @PreAuthorize("hasAuthority('TENANT_ADMIN')")
+    @GetMapping(value = "/metadata/config/{metadataConfigId}/start")
+    @ResponseBody
+    public MetadataConfig runIngestion(@PathVariable("metadataConfigId") String strMetadataConfigId) throws TempusException {
+        checkParameter("metadataConfigId", strMetadataConfigId);
+        try {
+            MetadataConfigId metadataConfigId = new MetadataConfigId(toUUID(strMetadataConfigId));
+            return metadataConfigService.runIngestion(metadataConfigId);
+        } catch (Exception e) {
+            throw handleException(e);
+        }
     }
 
     @PreAuthorize("hasAuthority('TENANT_ADMIN')")
     @PostMapping(value = "/metadata/query")
     @ResponseBody
-    public MetadataQuery saveMetadataQuery(MetadataQuery metadataQuery) throws TempusException {
+    public MetadataQuery saveMetadataQuery(@RequestBody MetadataQuery metadataQuery) throws TempusException {
         try {
             return metadataQueryService.save(metadataQuery);
         } catch (Exception e) {
@@ -153,7 +165,7 @@ public class MetadataController extends BaseController {
     @PreAuthorize("#oauth2.isClient() and #oauth2.hasScope('server')")
     @PostMapping(value = "/metadata/insert")
     @ResponseBody
-    public void insert(MetadataIngestionEntries metadataIngestionEntries) throws TempusException {
+    public void insert(@RequestBody MetadataIngestionEntries metadataIngestionEntries) throws TempusException {
         SecurityUser securityUser = getCurrentUser();
         try {
             metadataIngestionService.save(

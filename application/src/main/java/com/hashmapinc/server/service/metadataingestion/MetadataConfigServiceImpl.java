@@ -110,4 +110,15 @@ public class MetadataConfigServiceImpl implements MetadataConfigService {
             return Boolean.FALSE;
         }
     }
+
+    @Override
+    public MetadataConfig runIngestion(MetadataConfigId id) {
+        log.trace("Executing MetadataConfigServiceImpl.runIngestion [{}]", id);
+        String getByIdUrl = SERVICE_URL + PATH_SEPARATOR + id.getId() + PATH_SEPARATOR + INGESTION_PATH;
+        ResponseEntity<MetadataConfig> response = restTemplate.getForEntity(getByIdUrl, MetadataConfig.class);
+        if (response.getStatusCode().equals(HttpStatus.OK)) {
+            return response.getBody();
+        }
+        return null;
+    }
 }
