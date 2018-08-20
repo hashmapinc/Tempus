@@ -26,6 +26,13 @@ import tempusTimewindow from './timewindow.directive';
 import tempusDepthwindow from './depthwindow.directive';
 import tempusEvents from './tb-event-directives';
 import tempusMousepointMenu from './mousepoint-menu.directive';
+import tempusGrid from './grid.directive';
+import deviceCard from '../device/device-card.tpl.html';
+import assetCard from '../asset/asset-card.tpl.html';
+import addAssetTemplate from '../asset/add-asset.tpl.html';
+
+
+
 
 /* eslint-disable import/no-unresolved, import/default */
 
@@ -36,6 +43,7 @@ import dashboardTemplate from './dashboard.tpl.html';
 /* eslint-disable angular/angularelement */
 
 export default angular.module('tempus.directives.dashboard', [tempusTypes,
+    tempusGrid,
     tempusToast,
     tempusApiWidget,
     tempusWidget,
@@ -43,6 +51,7 @@ export default angular.module('tempus.directives.dashboard', [tempusTypes,
     tempusDepthwindow,
     tempusEvents,
     tempusMousepointMenu,
+   // tempusDevice,
     angularGridster.name])
     .directive('tbDashboard', Dashboard)
     .name;
@@ -91,18 +100,191 @@ function Dashboard() {
 }
 
 /*@ngInject*/
-function DashboardController($scope, $rootScope, $element, $timeout, $mdMedia, $mdUtil, $q, timeService, depthService, types, utils) {
-
+function DashboardController($scope, $rootScope, $element, $timeout, $mdMedia, $mdUtil, $q, timeService, depthService, types, utils, $translate,$log,deviceService,customerService,assetService) {
     var highlightedMode = false;
     var highlightedWidget = null;
     var selectedWidget = null;
-
     var gridsterParent = angular.element('#gridster-parent', $element);
     var gridsterElement = angular.element('#gridster-child', gridsterParent);
+    var deviceActionsList = [];
+    var deviceGroupActionsList = [];
+    var assetActionsList = [];
+    var assetGroupActionsList = [];
 
     var vm = this;
-
+    vm.types = types;
+    $scope.displayDeviceGrid = false;
+    $scope.displayAssetsGrid = false;
+    $log.log("vm.types");
+    $log.log(vm.types);
     vm.gridster = null;
+
+    vm.dashboardGridConfig = {
+        deleteItemTitleFunc: deleteTitle,
+        deleteItemContentFunc: deleteText,
+        deleteItemsTitleFunc: deleteDevicesTitle,
+        deleteItemsActionTitleFunc: deleteDevicesActionTitle,
+        deleteItemsContentFunc: deleteDevicesText,
+
+        saveItemFunc: saveDevice,
+        getItemTitleFunc: getDeviceTitle,
+
+        itemCardController: 'DeviceCardController',
+        itemCardTemplateUrl: deviceCard,
+        parentCtl: vm,
+
+        actionsList: deviceActionsList,
+        groupActionsList: deviceGroupActionsList,
+
+        onGridInited: gridInited,
+        addItemTemplateUrl: dashboardTemplate,
+
+        addItemText: function() { return $translate.instant('device.add-device-text') },
+        noItemsText: function() { return $translate.instant('device.no-devices-text') },
+        itemDetailsText: function() { return $translate.instant('device.device-details') },
+        isDetailsReadOnly: isCustomerUser,
+        isSelectionEnabled: function () {
+            return !isCustomerUser();
+        }    
+    };
+    vm.assetGridConfig = {
+        deleteItemTitleFunc: deleteTitle,
+        deleteItemContentFunc: deleteText,
+        deleteItemsTitleFunc: deleteAssetsTitle,
+        deleteItemsActionTitleFunc: deleteAssetsActionTitle,
+        deleteItemsContentFunc: deleteAssetsText,
+
+        saveItemFunc: saveAsset,
+
+        getItemTitleFunc: getAssetTitle,
+
+        itemCardController: 'AssetCardController',
+        itemCardTemplateUrl: assetCard,
+        parentCtl: vm,
+
+        actionsList: assetActionsList,
+        groupActionsList: assetGroupActionsList,
+
+        onGridInited: gridInited,
+
+        addItemTemplateUrl: addAssetTemplate,
+
+        addItemText: function() { return $translate.instant('asset.add-asset-text') },
+        noItemsText: function() { return $translate.instant('asset.no-assets-text') },
+        itemDetailsText: function() { return $translate.instant('asset.asset-details') },
+        isDetailsReadOnly: isCustomerUser,
+        isSelectionEnabled: function () {
+            return !isCustomerUser();
+        }
+    };
+    
+    var entityTableDevice = $rootScope.$on("CallTableDetailDeviceOnDashboard", function($event, data){
+        $log.log(data[1]);
+        if(data[1].id.entityType == 'DEVICE'){
+            $scope.displayDeviceGrid = true;
+        } else if (data[1].id.entityType == 'ASSET') {
+            $log.log("here")
+            $scope.displayAssetsGrid = true;
+        }
+        $log.log(data[0])
+        $rootScope.$emit("CallTableDetailDevice", [data[0], data[1]]);
+    });
+    $scope.$on('$destroy', entityTableDevice);
+    
+    function getAssetTitle(asset) {
+        return asset ? asset.name : '';
+    }
+
+    function saveAsset(asset) {
+        var deferred = $q.defer();
+        assetService.saveAsset(asset).then(
+            function success(savedAsset) {
+                $rootScope.$broadcast('assetSaved');
+                var assets = [ savedAsset ];
+                customerService.applyAssignedCustomersInfo(assets).then(
+                    function success(items) {
+                        if (items && items.length == 1) {
+                            deferred.resolve(items[0]);
+                        } else {
+                            deferred.reject();
+                        }
+                    },
+                    function fail() {
+                        deferred.reject();
+                    }
+                );
+            },
+            function fail() {
+                deferred.reject();
+            }
+        );
+        return deferred.promise;
+    }
+    
+    function deleteAssetsTitle(selectedCount) {
+        return $translate.instant('asset.delete-assets-title', {count: selectedCount}, 'messageformat');
+    }
+    function deleteAssetsActionTitle(selectedCount) {
+        return $translate.instant('asset.delete-assets-action-title', {count: selectedCount}, 'messageformat');
+    }
+    function deleteAssetsText () {
+        return $translate.instant('asset.delete-assets-text');
+    }
+    function saveDevice(device) {
+        var deferred = $q.defer();
+        deviceService.saveDevice(device).then(
+            function success(savedDevice) {
+                $rootScope.$broadcast('deviceSaved');
+                var devices = [ savedDevice ];
+                customerService.applyAssignedCustomersInfo(devices).then(
+                    function success(items) {
+                        if (items && items.length == 1) {
+                            deferred.resolve(items[0]);
+                        } else {
+                            deferred.reject();
+                        }
+                    },
+                    function fail() {
+                        deferred.reject();
+                    }
+                );
+            },
+            function fail() {
+                deferred.reject();
+            }
+        );
+        return deferred.promise;
+    }
+    function getDeviceTitle(device) {
+        return device ? device.name : '';
+    }
+    function isCustomerUser() {
+        return vm.devicesScope === 'customer_user';
+    }
+
+    function deleteTitle(device) {
+        return $translate.instant('device.delete-device-title', {deviceName: device.name});
+    }
+
+    function deleteText() {
+        return $translate.instant('device.delete-device-text');
+    }
+
+    function deleteDevicesTitle(selectedCount) {
+        return $translate.instant('device.delete-devices-title', {count: selectedCount}, 'messageformat');
+    }
+
+    function deleteDevicesActionTitle(selectedCount) {
+    
+        return $translate.instant('device.delete-devices-action-title', {count: selectedCount}, 'messageformat');
+    }
+
+    function deleteDevicesText () {
+        return $translate.instant('device.delete-devices-text');
+    }
+    function gridInited(grid) {
+        vm.grid = grid;
+    }
 
     vm.isMobileDisabled = angular.isDefined(vm.isMobileDisabled) ? vm.isMobileDisabled : false;
 

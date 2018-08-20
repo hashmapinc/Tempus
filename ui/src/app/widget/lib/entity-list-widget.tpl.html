@@ -29,9 +29,9 @@
                     </tr>
                     </thead>
                     <tbody md-body>
-                    <tr md-row  ng-repeat="device in devices.data">
-                        <td md-cell><a href ng-click="vm.deviceDetailFunc($event,device)">{{device.name}}</a></td>
-                        <td md-cell style="text-transform: uppercase">{{device.type}}</td>
+                    <tr md-row  ng-repeat="list in devices.data">
+                        <td md-cell><a href ng-click="vm.deviceDetailFunc($event,list)">{{list.name}}</a></td>
+                        <td md-cell style="text-transform: uppercase">{{list.type}}</td>
                     </tr>
                     </tbody>
                 </table>

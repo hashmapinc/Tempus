@@ -23,7 +23,7 @@ import deviceListWidgetTemplate from './entity-list-widget.tpl.html';
 
 
 export default angular.module('tempus.widgets.deviceListWidget', [])
-    .directive('tbDeviceListWidget', DeviceListWidget)
+    .directive('tbEntityListWidget', DeviceListWidget)
     .name;
 
 /*@ngInject*/
@@ -43,7 +43,8 @@ function DeviceListWidget() {
 }
 
 /*@ngInject*/
-function DeviceListWidgetController($rootScope,$scope,$filter,$log,deviceService,types,assetService) {
+function DeviceListWidgetController($rootScope,$scope,$filter,$log,deviceService,types,assetService,userService,
+    $state,$stateParams,$translate,customerService) {
     var vm = this,promise;
     $scope.query = {
         order: 'name',
@@ -54,15 +55,51 @@ function DeviceListWidgetController($rootScope,$scope,$filter,$log,deviceService
     vm.deviceDetailFunc = deviceDetailFunc;
     vm.loadTableData = loadTableData;
     $scope.showList = true;
-    $log.log("in devices");
-    $log.log(vm.config)
+    var customerId = $stateParams.customerId;
+    
+    initController();
     vm.loadTableData();
+    $scope.devices = {
+        count: 0,
+        data: []
+    };
+    vm.devicesScope = $state.$current.data.devicesType;
+
+    function initController() {
+        var user = userService.getCurrentUser();
+        $log.log("user");
+        $log.log(user);
+        if (user.authority === 'CUSTOMER_USER') {
+            vm.devicesScope = 'customer_user';
+            customerId = user.customerId;
+        }else {
+            vm.devicesScope = 'tenant';
+        }
+        if (customerId) {
+            vm.customerDevicesTitle = $translate.instant('customer.devices');
+            customerService.getShortCustomerInfo(customerId).then(
+                function success(info) {
+                    if (info.isPublic) {
+                        vm.customerDevicesTitle = $translate.instant('customer.public-devices');
+                    }
+                }
+            );
+        }
+    }
     function loadTableData(){
         if(vm.config.config.datasources && vm.config.config.datasources.length > 0){
             if(vm.config.config.datasources[0].dataKeys[0] == 'Assets'){
-                promise = assetService.getTenantAssets({limit: 200, textSearch: ''}, true, null, false);
+                if (vm.devicesScope === 'tenant') {
+                    promise = assetService.getTenantAssets({limit: 200, textSearch: ''}, true, null, false);
+                }else if (vm.devicesScope === 'customer' || vm.devicesScope === 'customer_user') {
+                    promise = assetService.getCustomerAssets(customerId, {limit: 200, textSearch: ''}, true, null, false);
+                }   
             }else if(vm.config.config.datasources[0].dataKeys[0] == 'Devices'){
-                promise = deviceService.getTenantDevices({limit: 200, textSearch: ''}, true, null, false);
+                if (vm.devicesScope === 'tenant') {
+                    promise = deviceService.getTenantDevices({limit: 200, textSearch: ''}, true, null, false);
+                }else if (vm.devicesScope === 'customer' || vm.devicesScope === 'customer_user') {
+                    promise = deviceService.getCustomerDevices(customerId, {limit: 200, textSearch: ''}, true, null,false);
+                }
             }
             if(promise) {
                 promise.then(function success(items) {
@@ -95,13 +132,9 @@ function DeviceListWidgetController($rootScope,$scope,$filter,$log,deviceService
         }else{
             $scope.showList = false;
         }
-              
         
     }
-    function deviceDetailFunc($event,device){
-        $log.log($event);
-        $log.log(device);
-        $rootScope.$emit("CallTableDetailDevice", [$event, device]);
-        //$rootScope.$emit("CallTableDetailDeviceOnDashboard", [$event, device]);
+    function deviceDetailFunc($event,list){
+        $rootScope.$emit("CallTableDetailDeviceOnDashboard", [$event, list]);
     }
 }
