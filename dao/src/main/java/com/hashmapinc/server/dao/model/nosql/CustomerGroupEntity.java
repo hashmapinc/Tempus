@@ -76,7 +76,9 @@ public class CustomerGroupEntity implements SearchTextEntity<CustomerGroup> {
         this.tenantId = customerGroup.getTenantId().getId();
         this.customerId = customerGroup.getCustomerId().getId();
         this.title = customerGroup.getTitle();
-        this.policies = customerGroup.getPolicies();
+        if (customerGroup.getPolicies() != null && !customerGroup.getPolicies().isEmpty()) {
+            this.policies = customerGroup.getPolicies();
+        }
         this.additionalInfo = customerGroup.getAdditionalInfo();
     }
 
@@ -98,7 +100,9 @@ public class CustomerGroupEntity implements SearchTextEntity<CustomerGroup> {
         customerGroup.setCustomerId(new CustomerId(customerId));
         customerGroup.setTitle(title);
         customerGroup.setAdditionalInfo(additionalInfo);
-        customerGroup.setPolicies(policies);
+        if (policies != null && !policies.isEmpty()) {
+            customerGroup.setPolicies(policies);
+        }
         return customerGroup;
     }
 }
