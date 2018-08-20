@@ -42,9 +42,9 @@ function MenuLink($compile, $templateCache, menu) {
         element.on('click', function(event) {
             event.stopPropagation();
             //remove
-            $("ul.test").find('.tb-active').removeClass('tb-active');
+            $("ul.tb-custom-menu-toggle-list").find('.tb-active').removeClass('tb-active');
             //this for collapsing the generatedSectionTree when some one click on static side menu section
-            $("ul.test li").addClass('collapsed');
+            $("ul.tb-custom-menu-toggle-list li").addClass('collapsed');
 
         });
 

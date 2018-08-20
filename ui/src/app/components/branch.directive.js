@@ -26,19 +26,19 @@ return {
     restrict: 'E', // tells Angular to apply this to only html tag that is <branch>
     replace: true, // tells Angular to replace <branch> by the whole template
     scope: {
-      b: '=src' // create an isolated scope variable 'b' and pass 'src' to it.
+        generatedSectionTree: '=src' // create an isolated scope variable 'generatedSectionTree' and pass 'src' to it.
     },
-    template: '<li><a ui-sref-active-eq="tb-active1" ui-sref="{{b.state}}" ><md-icon ng-if="b.logoFile == null"  md-svg-src="{{b.link}}" class="material-icons"> ></md-icon> <img  ng-if = "b.logoFile != null" ng-src = {{b.logoFile}} class="material-icons ng-scope md-themeDark-theme">{{b.name | translate}}</a></li>',
+    template: '<li><a  ui-sref="{{generatedSectionTree.state}}" ><md-icon ng-if="generatedSectionTree.logoFile == null"  md-svg-src="{{generatedSectionTree.link}}" class="material-icons"> ></md-icon> <img  ng-if = "generatedSectionTree.logoFile != null" ng-src = {{generatedSectionTree.logoFile}} class="material-icons ng-scope md-themeDark-theme">{{generatedSectionTree.name | translate}}</a></li>',
     link: function(scope, element) {
       //// Check if there are any children, otherwise we'll have infinite execution
 
-      var has_children = angular.isArray(scope.b.children);
+      var has_children = angular.isArray(scope.generatedSectionTree.children);
 
       //// Manipulate HTML in DOM
       if (has_children) {
-        element.append('<tb-custom-menu src="b"></tb-custom-menu>');
+        element.append('<tb-custom-menu src="generatedSectionTree"></tb-custom-menu>');
         //this is for the dynamically adding the padding left  custom-side-menu sections
-        element.find('a').css('padding-left', 16*scope.b.level +'px' );
+        element.find('a').css('padding-left', 16*scope.generatedSectionTree.level +'px' );
 
         element.addClass("collapsed");
         // recompile Angular because of manual appending
@@ -51,7 +51,7 @@ return {
 
 
           //remove the tb-active menu in custom-side-menu sections
-          $("ul.test").find('.tb-active').removeClass('tb-active');
+          $("ul.tb-custom-menu-toggle-list").find('.tb-active').removeClass('tb-active');
           $(event.target).addClass('tb-active');
 
 

@@ -29,8 +29,8 @@ function CustomMenu() {
     restrict: 'E', // tells Angular to apply this to only html tag that is <tree>
     replace: true, // tells Angular to replace <tree> by the whole template
     scope: {
-      t: '=src' // create an isolated scope variable 't' and pass 'src' to it.
+        generatedSectionTree: '=src' // create an isolated scope variable 'generatedSectionTree' and pass 'src' to it.
     },
-    template: '<ul class ="test"><tb-branch ng-repeat="c in t.children" src="c"></tb-branch></ul>'
+    template: '<ul class ="tb-custom-menu-toggle-list"><tb-branch ng-repeat="children in generatedSectionTree.children" src="children"></tb-branch></ul>'
   };
 }

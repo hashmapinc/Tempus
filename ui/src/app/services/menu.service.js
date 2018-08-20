@@ -136,6 +136,9 @@ function Menu(userService, $state, $rootScope, $log,datamodelService,customerSer
 
                             ]
                         }];
+
+                    generatedSectionTree = {};
+
                     homeSections =
                         [{
                             name: 'rule-plugin.management',
@@ -298,6 +301,8 @@ function Menu(userService, $state, $rootScope, $log,datamodelService,customerSer
                             state: 'home.auditLogs',
                             icon: 'track_changes'
                         }];
+
+                    generatedSectionTree = {};
 
                     homeSections =
                         [{
