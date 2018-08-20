@@ -74,7 +74,9 @@ public class CustomerGroupEntity extends BaseSqlEntity<CustomerGroup> implements
         this.tenantId = UUIDConverter.fromTimeUUID(customerGroup.getTenantId().getId());
         this.customerId = UUIDConverter.fromTimeUUID(customerGroup.getCustomerId().getId());
         this.title = customerGroup.getTitle();
-        this.policies = customerGroup.getPolicies();
+        if (customerGroup.getPolicies() != null && !customerGroup.getPolicies().isEmpty()) {
+            this.policies = customerGroup.getPolicies();
+        }
         this.additionalInfo = customerGroup.getAdditionalInfo();
     }
 
@@ -96,7 +98,9 @@ public class CustomerGroupEntity extends BaseSqlEntity<CustomerGroup> implements
         customerGroup.setCustomerId(new CustomerId(UUIDConverter.fromString(customerId)));
         customerGroup.setTitle(title);
         customerGroup.setAdditionalInfo(additionalInfo);
-        customerGroup.setPolicies(policies);
+        if (policies != null && !policies.isEmpty()) {
+            customerGroup.setPolicies(policies);
+        }
         return customerGroup;
     }
 }

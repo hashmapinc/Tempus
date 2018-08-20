@@ -76,7 +76,9 @@ public class CustomerGroupServiceImpl extends AbstractEntityService implements C
         log.trace("Executing findByCustomerGroupId [{}]", customerGroupId);
         Validator.validateId(customerGroupId, INCORRECT_CUSTOMER_ID + customerGroupId);
         CustomerGroup customerGroup = customerGroupDao.findById(customerGroupId.getId());
-        customerGroup.setUserIds(findUserIdsByCustomerGroupId(customerGroupId));
+        if (customerGroup != null) {
+            customerGroup.setUserIds(findUserIdsByCustomerGroupId(customerGroupId));
+        }
         return customerGroup;
     }
 
