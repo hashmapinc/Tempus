@@ -100,7 +100,7 @@ function Dashboard() {
 }
 
 /*@ngInject*/
-function DashboardController($scope, $rootScope, $element, $timeout, $mdMedia, $mdUtil, $q, timeService, depthService, types, utils, $translate,$log,deviceService,customerService,assetService) {
+function DashboardController($scope, $rootScope, $element, $timeout, $mdMedia, $mdUtil, $q, timeService, depthService, types, utils, $translate, deviceService, customerService, assetService) {
     var highlightedMode = false;
     var highlightedWidget = null;
     var selectedWidget = null;
@@ -115,8 +115,6 @@ function DashboardController($scope, $rootScope, $element, $timeout, $mdMedia, $
     vm.types = types;
     $scope.displayDeviceGrid = false;
     $scope.displayAssetsGrid = false;
-    $log.log("vm.types");
-    $log.log(vm.types);
     vm.gridster = null;
 
     vm.dashboardGridConfig = {
@@ -179,14 +177,11 @@ function DashboardController($scope, $rootScope, $element, $timeout, $mdMedia, $
     };
     
     var entityTableDevice = $rootScope.$on("CallTableDetailDeviceOnDashboard", function($event, data){
-        $log.log(data[1]);
         if(data[1].id.entityType == 'DEVICE'){
             $scope.displayDeviceGrid = true;
         } else if (data[1].id.entityType == 'ASSET') {
-            $log.log("here")
             $scope.displayAssetsGrid = true;
         }
-        $log.log(data[0])
         $rootScope.$emit("CallTableDetailDevice", [data[0], data[1]]);
     });
     $scope.$on('$destroy', entityTableDevice);

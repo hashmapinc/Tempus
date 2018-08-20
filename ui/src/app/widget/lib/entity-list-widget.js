@@ -43,7 +43,7 @@ function DeviceListWidget() {
 }
 
 /*@ngInject*/
-function DeviceListWidgetController($rootScope,$scope,$filter,$log,deviceService,types,assetService,userService,
+function DeviceListWidgetController($rootScope, $scope, $filter, deviceService, types, assetService, userService,
     $state,$stateParams,$translate,customerService) {
     var vm = this,promise;
     $scope.query = {
@@ -67,8 +67,6 @@ function DeviceListWidgetController($rootScope,$scope,$filter,$log,deviceService
 
     function initController() {
         var user = userService.getCurrentUser();
-        $log.log("user");
-        $log.log(user);
         if (user.authority === 'CUSTOMER_USER') {
             vm.devicesScope = 'customer_user';
             customerId = user.customerId;
