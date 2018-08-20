@@ -131,8 +131,8 @@
 		</md-chips>
 		<div class="tb-entity-div" ng-if="widgetType != types.widgetType.alarm.value && entityDatasource">
 			<md-input-container style="margin-right: 10px;">
-				<label>Entity List</label>
-				<md-select  class="tb-entity-select" id= "entityId" ng-model="selectedEntity" ng-change="selectChanged()" aria-label="ShowHideAccountant">
+				<label>{{'datasource.entity-list' | translate }}</label>
+				<md-select  class="tb-entity-select" id= "entityId" ng-model="selectedEntity" ng-change="selectChanged()" aria-label="">
 					<md-option ng-repeat="selectedEntity in entityList" ng-value="selectedEntity">{{selectedEntity}}</md-option>
 				</md-select>
 			</md-input-container>

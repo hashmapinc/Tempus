@@ -574,7 +574,10 @@ export default angular.module('tempus.locale', [])
                     "show-details": "Show details",
                     "hide-details": "Hide details",
                     "select-state": "Select target state",
-                    "state-controller": "State controller"
+                    "state-controller": "State controller",
+                    "dashboard-landing-page": "Dashboard Landing Page",
+                    "assign-data-model-view":"Assign Data Model View",
+                    "select-data-model-asset" : "Select Data Model Asset"
                 },
 
                 "dataModels": {
@@ -612,7 +615,9 @@ export default angular.module('tempus.locale', [])
                 "datasource": {
                     "type": "Datasource type",
                     "name": "Name",
-                    "add-datasource-prompt": "Please add datasource"
+                    "add-datasource-prompt": "Please add datasource",
+                    "entity-list":"Entity List",
+                    "entity-type" : "Entity Type"
                 },
                 "details": {
                     "edit-mode": "Edit mode",
@@ -1548,7 +1553,10 @@ export default angular.module('tempus.locale', [])
                     "widget-template-load-failed-error": "Failed to load widget template!",
                     "add": "Add Widget",
                     "undo": "Undo widget changes",
-                    "export": "Export widget"
+                    "export": "Export widget",
+                    "entity-list-is-empty":"Entity List is empty",
+                    "name": "Name",
+                    "entity-type":"Entity Type"
                 },
                 "widget-action": {
                     "header-button": "Widget header button",

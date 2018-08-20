@@ -44,7 +44,7 @@ function DeviceListWidget() {
 
 /*@ngInject*/
 function DeviceListWidgetController($rootScope, $scope, $filter, deviceService, types, assetService, userService,
-    $state,$stateParams,$translate,customerService) {
+    $state, $stateParams, $translate, customerService) {
     var vm = this,promise;
     $scope.query = {
         order: 'name',
