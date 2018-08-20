@@ -17,6 +17,7 @@
 package com.hashmapinc.server.common.data;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.hashmapinc.server.common.data.id.CustomerGroupId;
 import com.hashmapinc.server.common.data.id.CustomerId;
 import com.hashmapinc.server.common.data.id.TenantId;
@@ -53,8 +54,9 @@ public class CustomerGroup extends SearchTextBasedWithAdditionalInfo<CustomerGro
     }
 
     @Override
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     public String getName() {
-        return getTitle();
+        return title;
     }
 
     @Override
