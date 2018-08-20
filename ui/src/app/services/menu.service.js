@@ -422,7 +422,7 @@ function Menu(userService, $state, $rootScope, $log,datamodelService,customerSer
                         var dataModelObjects = datamodelService.getDatamodelObjects(data.dataModelId.id);
 
                         dataModelObjects.then(function(modelObjects){
-
+                            $log.log(modelObjects);
                             dataModelsOfAssetType = getDataModelObjectsOfTypeAsset(modelObjects);
                             generatedSectionTree.children = buildGeneratedSectionTree(dataModelsOfAssetType);
 
@@ -488,8 +488,8 @@ function Menu(userService, $state, $rootScope, $log,datamodelService,customerSer
                     name:dataModelObject.name,
                     state: 'home.assets',
                     icon: 'domain',
-                    link: '/static/svg/assetslightgray.svg'
-
+                    link: '/static/svg/assetslightgray.svg',
+                    logoFile: dataModelObject.logoFile
                 };
 
                 if(dataModelObject.parentId != null)

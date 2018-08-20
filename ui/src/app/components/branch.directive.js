@@ -28,7 +28,7 @@ return {
     scope: {
       b: '=src' // create an isolated scope variable 'b' and pass 'src' to it.
     },
-    template: '<li><a ui-sref-active-eq="tb-active1" ui-sref="{{b.state}}" ><md-icon ng-if="b.link" ng-show="{{b.link != null}}"  md-svg-src="{{b.link}}" class="material-icons"></md-icon>{{b.name | translate}}</a></li>',
+    template: '<li><a ui-sref-active-eq="tb-active1" ui-sref="{{b.state}}" ><md-icon ng-if="b.logoFile == null"  md-svg-src="{{b.link}}" class="material-icons"> ></md-icon> <img  ng-if = "b.logoFile != null" ng-src = {{b.logoFile}} class="material-icons ng-scope md-themeDark-theme">{{b.name | translate}}</a></li>',
     link: function(scope, element) {
       //// Check if there are any children, otherwise we'll have infinite execution
 
