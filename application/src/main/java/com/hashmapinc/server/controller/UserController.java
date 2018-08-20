@@ -337,7 +337,7 @@ public class UserController extends BaseController {
     }
 
     @PreAuthorize("hasAuthority('TENANT_ADMIN')")
-    @DeleteMapping(value = "/user/{userId}/groups")
+    @PutMapping(value = "/user/{userId}/groups")
     @ResponseBody
     public User unassignGroupsFromUser(
             @PathVariable(USER_ID) String strUserId ,

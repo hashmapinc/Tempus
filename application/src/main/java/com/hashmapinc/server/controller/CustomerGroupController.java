@@ -228,7 +228,7 @@ public class CustomerGroupController extends BaseController {
     }
 
     @PreAuthorize("hasAuthority('TENANT_ADMIN')")
-    @DeleteMapping(value = "/group/{customerGroupId}/users")
+    @PutMapping(value = "/group/{customerGroupId}/users")
     @ResponseBody
     public CustomerGroup unassignUsersFromGroup(
             @PathVariable(CUSTOMER_GROUP_ID) String strCustomerGroupId,
