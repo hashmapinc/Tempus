@@ -34,6 +34,10 @@ import com.hashmapinc.server.common.data.plugin.ComponentType;
 import com.hashmapinc.server.common.data.plugin.PluginMetaData;
 import com.hashmapinc.server.common.data.rule.RuleMetaData;
 import com.hashmapinc.server.dao.UserServiceTestConfiguration;
+
+import com.hashmapinc.server.dao.customergroup.CustomerGroupService;
+import com.hashmapinc.server.dao.tagmetadata.TagMetaDataService;
+
 import com.hashmapinc.server.dao.alarm.AlarmService;
 import com.hashmapinc.server.dao.asset.AssetService;
 import com.hashmapinc.server.dao.audit.AuditLogLevelFilter;
@@ -74,10 +78,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.context.support.AnnotationConfigContextLoader;
 
 import java.io.IOException;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 
 @ActiveProfiles("dao-test")
@@ -161,6 +162,9 @@ public abstract class AbstractServiceTest {
 
     @Autowired
     protected LogoService logoService;
+
+    @Autowired
+    protected CustomerGroupService customerGroupService;
 
     @Autowired
     protected DataModelObjectService dataModelObjectService;
