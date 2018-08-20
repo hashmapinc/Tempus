@@ -129,10 +129,10 @@
 				</div>
 			</md-chip-template>
 		</md-chips>
-		<div ng-if="widgetType != types.widgetType.alarm.value && entityDatasource">
+		<div class="tb-entity-div" ng-if="widgetType != types.widgetType.alarm.value && entityDatasource">
 			<md-input-container style="margin-right: 10px;">
 				<label>Entity List</label>
-				<md-select  id= "entityId" ng-model="selectedEntity" ng-change="selectChanged()" aria-label="ShowHideAccountant">
+				<md-select  class="tb-entity-select" id= "entityId" ng-model="selectedEntity" ng-change="selectChanged()" aria-label="ShowHideAccountant">
 					<md-option ng-repeat="selectedEntity in entityList" ng-value="selectedEntity">{{selectedEntity}}</md-option>
 				</md-select>
 			</md-input-container>
