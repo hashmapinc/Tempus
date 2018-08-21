@@ -20,13 +20,21 @@
 	<div layout="row" class="row" style="width:100%; clear:both;">
 	</div>
 </section>
-<section layout="row" layout-wrap class="tb-footer-buttons md-fab" layout-align="start end">
-	<md-button ng-disabled="$root.loading" ng-click="vm.addUserGroup($event,vm.customerId)" class="tb-btn-footer md-accent md-hue-2 md-fab" aria-label="{{ 'add data model'}}">
-		<md-tooltip>
-			<span translate>user.usersgroups</span>
-		</md-tooltip>
-		<ng-md-icon icon="group_add"></ng-md-icon>
-	</md-button>
+<tb-grid grid-configuration="vm.userGroupGridConfig">
+	<details-buttons tb-help="'users'" help-container-id="help-container">
+		<div id="help-container"></div>
+	</details-buttons>
+	<md-tabs ng-class="{'tb-headless': vm.grid.detailsConfig.isDetailsEditMode}"
+			 id="tabs" md-border-bottom flex class="tb-absolute-fill">
+		<md-tab label="{{ 'customer.usergroup' | translate }}">
+			<tb-usergroup data="vm.grid.operatingItem()"
+					 is-edit="vm.grid.detailsConfig.isDetailsEditMode"
+					 the-form="vm.grid.detailsForm"></tb-usergroup>
 
-</section>
+		</md-tab>
+
+
+	</md-tabs>
+</tb-grid>
+
 

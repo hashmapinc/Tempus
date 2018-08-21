@@ -15,35 +15,76 @@
  * limitations under the License.
  */
 /* eslint-disable import/no-unresolved, import/default */
-
 import addUserTemplate from './add-user.tpl.html';
 import userCard from './user-card.tpl.html';
 import activationLinkDialogTemplate from './activation-link.dialog.tpl.html';
+import assignGroupsToUsers from './assign-to-user.tpl.html';
+import unassignGroupsToUsers from './unassign-to-user.tpl.html';
+//import unassignUserToGroups from './unassign-to-group.tpl.html';
+
 
 /* eslint-enable import/no-unresolved, import/default */
 
 
 /*@ngInject*/
-export default function UserController(userService, toast, $scope, $mdDialog, $document, $controller, $state, $stateParams, $translate, types) {
+export default function UserController(usergroupService, $log, userService, toast, $scope, $mdDialog, $document, $controller, $state, $stateParams, $translate, types) {
 
     var tenantId = $stateParams.tenantId;
     var customerId = $stateParams.customerId;
     var usersType = $state.$current.data.usersType;
+    var userActionsList = [];
 
-    var userActionsList = [
+    userActionsList.push({
+        onAction: function($event, item) {
+            assignGroupToUsers($event, [item.id.id]);
+        },
+        name: function() {
+            return $translate.instant('action.assign')
+        },
+        details: function() {
+            return $translate.instant('user.assignToUsers')
+        },
+        icon: "assignment_ind"
+
+    });
+
+    userActionsList.push(
+
         {
-            onAction: function ($event, item) {
-                vm.grid.deleteItem($event, item);
+            onAction: function($event, item) {
+                unassignToUsers($event, [item.id.id]);
             },
-            name: function() { return $translate.instant('action.delete') },
-            details: function() { return $translate.instant('user.delete') },
-            icon: "delete"
+            name: function() {
+                return $translate.instant('action.unassign')
+            },
+            details: function() {
+                return $translate.instant('user.unassignToUsers')
+            },
+            icon: "assignment_return"
+
         }
-    ];
+    );
+
+
+    userActionsList.push({
+        onAction: function($event, item) {
+            vm.grid.deleteItem($event, item);
+        },
+        name: function() {
+            return $translate.instant('action.delete')
+        },
+        details: function() {
+            return $translate.instant('user.delete')
+        },
+        icon: "delete"
+    });
 
     var vm = this;
 
     vm.types = types;
+    vm.assignGroupToUsers = assignGroupToUsers;
+    vm.unassignToUsers = unassignToUsers;
+    vm.customerId = customerId;
 
     vm.userGridConfig = {
         deleteItemTitleFunc: deleteUserTitle,
@@ -64,9 +105,15 @@ export default function UserController(userService, toast, $scope, $mdDialog, $d
         addItemTemplateUrl: addUserTemplate,
         addItemController: 'AddUserController',
 
-        addItemText: function() { return $translate.instant('user.add-user-text') },
-        noItemsText: function() { return $translate.instant('user.no-users-text') },
-        itemDetailsText: function() { return $translate.instant('user.user-details') }
+        addItemText: function() {
+            return $translate.instant('user.add-user-text')
+        },
+        noItemsText: function() {
+            return $translate.instant('user.no-users-text')
+        },
+        itemDetailsText: function() {
+            return $translate.instant('user.user-details')
+        }
     };
 
     if (angular.isDefined($stateParams.items) && $stateParams.items !== null) {
@@ -88,10 +135,10 @@ export default function UserController(userService, toast, $scope, $mdDialog, $d
         var refreshUsersParamsFunction = null;
 
         if (usersType === 'tenant') {
-            fetchUsersFunction = function (pageLink) {
+            fetchUsersFunction = function(pageLink) {
                 return userService.getTenantAdmins(tenantId, pageLink);
             };
-            saveUserFunction = function (user) {
+            saveUserFunction = function(user) {
                 user.authority = "TENANT_ADMIN";
                 user.tenantId = {
                     entityType: types.entityType.tenant,
@@ -99,15 +146,18 @@ export default function UserController(userService, toast, $scope, $mdDialog, $d
                 };
                 return userService.saveUser(user);
             };
-            refreshUsersParamsFunction = function () {
-                return {"tenantId": tenantId, "topIndex": vm.topIndex};
+            refreshUsersParamsFunction = function() {
+                return {
+                    "tenantId": tenantId,
+                    "topIndex": vm.topIndex
+                };
             };
 
         } else if (usersType === 'customer') {
-            fetchUsersFunction = function (pageLink) {
+            fetchUsersFunction = function(pageLink) {
                 return userService.getCustomerUsers(customerId, pageLink);
             };
-            saveUserFunction = function (user) {
+            saveUserFunction = function(user) {
                 user.authority = "CUSTOMER_USER";
                 user.customerId = {
                     entityType: types.entityType.customer,
@@ -115,8 +165,11 @@ export default function UserController(userService, toast, $scope, $mdDialog, $d
                 };
                 return userService.saveUser(user);
             };
-            refreshUsersParamsFunction = function () {
-                return {"customerId": customerId, "topIndex": vm.topIndex};
+            refreshUsersParamsFunction = function() {
+                return {
+                    "customerId": customerId,
+                    "topIndex": vm.topIndex
+                };
             };
         }
 
@@ -126,7 +179,9 @@ export default function UserController(userService, toast, $scope, $mdDialog, $d
     }
 
     function deleteUserTitle(user) {
-        return $translate.instant('user.delete-user-title', {userEmail: user.email});
+        return $translate.instant('user.delete-user-title', {
+            userEmail: user.email
+        });
     }
 
     function deleteUserText() {
@@ -134,11 +189,15 @@ export default function UserController(userService, toast, $scope, $mdDialog, $d
     }
 
     function deleteUsersTitle(selectedCount) {
-        return $translate.instant('user.delete-users-title', {count: selectedCount}, 'messageformat');
+        return $translate.instant('user.delete-users-title', {
+            count: selectedCount
+        }, 'messageformat');
     }
 
     function deleteUsersActionTitle(selectedCount) {
-        return $translate.instant('user.delete-users-action-title', {count: selectedCount}, 'messageformat');
+        return $translate.instant('user.delete-users-action-title', {
+            count: selectedCount
+        }, 'messageformat');
     }
 
     function deleteUsersText() {
@@ -151,6 +210,104 @@ export default function UserController(userService, toast, $scope, $mdDialog, $d
 
     function getUserTitle(user) {
         return user ? user.email : '';
+    }
+
+    function assignGroupToUsers($event, id) {
+
+        if ($event) {
+            $event.stopPropagation();
+        }
+
+        var pageSize = 10;
+
+        usergroupService.getGroups(vm.customerId, {
+            limit: pageSize,
+            textSearch: ''
+        }).then(
+            function success(_users) {
+                var users = {
+                    pageSize: pageSize,
+                    data: _users.data,
+                    nextPageLink: _users.nextPageLink,
+                    selection: null,
+                    hasNext: _users.hasNext,
+                    pending: false
+                };
+                if (users.hasNext) {
+                    users.nextPageLink.limit = pageSize;
+                }
+
+                $mdDialog.show({
+                    controller: 'AddGroupsToUserController',
+                    controllerAs: 'vm',
+                    templateUrl: assignGroupsToUsers,
+                    locals: {
+                        userId: id,
+                        users: users,
+                        customerId: vm.customerId
+                    },
+                    parent: angular.element($document[0].body),
+                    fullscreen: true,
+                    targetEvent: $event
+                }).then(function() {
+                    vm.grid.refreshList();
+                }, function() {});
+
+
+                $log.log(users, id);
+            },
+            function fail() {});
+
+
+    }
+    function unassignToUsers($event,id) {
+
+         if ($event) {
+             $event.stopPropagation();
+         }
+
+
+
+         var pageSize = 10;
+
+         usergroupService.assignedGroups(id, {
+             limit: pageSize,
+             textSearch: ''
+         }).then(
+             function success(_users) {
+                 var users = {
+                     pageSize: pageSize,
+                     data: _users.data,
+                     nextPageLink: _users.nextPageLink,
+                     selection: null,
+                     hasNext: _users.hasNext,
+                     pending: false
+                 };
+                 if (users.hasNext) {
+                     users.nextPageLink.limit = pageSize;
+                 }
+
+                 $mdDialog.show({
+                     controller: 'DeleteGroupsToUserController',
+                     controllerAs: 'vm',
+                     templateUrl: unassignGroupsToUsers,
+                     locals: {
+                         userId: id,
+                         users: users,
+                         customerId: vm.customerId
+                     },
+                     parent: angular.element($document[0].body),
+                     fullscreen: true,
+                     targetEvent: $event
+                 }).then(function() {
+                     vm.grid.refreshList();
+                 }, function() {});
+
+
+                 $log.log(users, id);
+             },
+             function fail() {});
+
     }
 
     function deleteUser(userId) {
