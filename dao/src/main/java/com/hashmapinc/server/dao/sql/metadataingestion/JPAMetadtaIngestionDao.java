@@ -34,8 +34,6 @@ import javax.annotation.PostConstruct;
 import java.util.Optional;
 import java.util.concurrent.Executors;
 
-import static com.hashmapinc.server.common.data.UUIDConverter.fromTimeUUID;
-
 @Component
 @Slf4j
 @SqlDao
@@ -86,7 +84,7 @@ public class JPAMetadtaIngestionDao extends JpaAbstractDaoListeningExecutorServi
         metadataIngestionEntity.setTenantId(tenantId);
         metadataIngestionEntity.setMetadataConfigId(metadataConfigId);
         metadataIngestionEntity.setMetadataSourceName(dataSourceName);
-        metadataIngestionEntity.setLastUpdateTs(metadataIngestionEntity.getLastUpdateTs());
+        metadataIngestionEntity.setLastUpdateTs(metaDataKvEntry.getLastUpdateTs());
         log.trace("Saving MetadataIngestionEntity: {}", metadataIngestionEntity);
         return insertService.submit(() -> {
             metadataIngestionEntityRepository.save(metadataIngestionEntity);

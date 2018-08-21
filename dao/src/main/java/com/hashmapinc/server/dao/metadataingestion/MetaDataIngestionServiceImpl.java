@@ -19,6 +19,7 @@ package com.hashmapinc.server.dao.metadataingestion;
 import com.google.common.collect.Lists;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
+import com.hashmapinc.server.common.data.MetadataIngestionEntries;
 import com.hashmapinc.server.common.data.kv.MetaDataKvEntry;
 import com.hashmapinc.server.dao.exception.IncorrectParameterException;
 import lombok.extern.slf4j.Slf4j;
@@ -36,13 +37,13 @@ public class MetaDataIngestionServiceImpl implements MetadataIngestionService {
     private MetaDataIngestionDao metaDataIngestionDao;
 
     @Override
-    public ListenableFuture<List<Void>> save(String tenantId, String metadataConfigId, String dataSourceName, List<MetaDataKvEntry> metaDataKvEntries) {
-        List<ListenableFuture<Void>> futures = Lists.newArrayListWithExpectedSize(metaDataKvEntries.size());
-        for(MetaDataKvEntry metaDataKvEntry:  metaDataKvEntries) {
+    public ListenableFuture<List<Void>> save(MetadataIngestionEntries ingestionEntries) {
+        List<ListenableFuture<Void>> futures = Lists.newArrayListWithExpectedSize(ingestionEntries.getMetaDataKvEntries().size());
+        for (MetaDataKvEntry metaDataKvEntry : ingestionEntries.getMetaDataKvEntries()) {
             if(metaDataKvEntry == null) {
                 throw new IncorrectParameterException("Meta Data Key value entry can't be null");
             }
-            futures.add(metaDataIngestionDao.save(tenantId, metadataConfigId, dataSourceName, metaDataKvEntry));
+            futures.add(metaDataIngestionDao.save(ingestionEntries.getTenantId(), ingestionEntries.getMetadataConfigId(), ingestionEntries.getMetadataSourceName(), metaDataKvEntry));
         }
         return Futures.allAsList(futures);
     }
