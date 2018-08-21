@@ -224,12 +224,12 @@ sql:
 metadata-ingestion:
     config:
         service_url: "${METADATA_CONFIG_URL:${METADATA_BASE_URL:http://localhost:9003/api}/metaconfig}"
-        owner_path: "${METADATA_CONFIG_GET_BY_OWNER_URL:owner"
-        ingest_path: "${METADATA_CONFIG_START_INGESTION_URL:ingest"
-        connect_path: "${METADATA_CONFIG_TEST_CONNECTION_URL:connection"
+        owner_path: "${METADATA_CONFIG_GET_BY_OWNER_URL:owner}"
+        ingest_path: "${METADATA_CONFIG_START_INGESTION_URL:ingest}"
+        connect_path: "${METADATA_CONFIG_TEST_CONNECTION_URL:connection}"
     query:
         service_url: "${METADATA_QUERY_URL:${METADATA_BASE_URL:http://localhost:9003/api}/metaquery}"
-        config_path: "${METADATA_QUERY_GET_BY_CONFIG_URL:metaconfig"
+        config_path: "${METADATA_QUERY_GET_BY_CONFIG_URL:metaconfig}"
     # Specify executor service type used to perform metadata insert tasks: SINGLE FIXED CACHED
     inserts_executor_type: "${SQL_METADATA_INSERTS_EXECUTOR_TYPE:fixed}"
     # Specify thread pool size for FIXED executor service type

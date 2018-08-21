@@ -17,52 +17,24 @@
 package com.hashmapinc.server.common.data;
 
 import com.hashmapinc.server.common.data.kv.MetaDataKvEntry;
+import lombok.Builder;
+import lombok.Data;
 
 import java.util.List;
 
+@Data
+@Builder
 public class MetadataIngestionEntries {
+
     private String tenantId;
     private String metadataConfigId;
     private String metadataSourceName;
     private List<MetaDataKvEntry> metaDataKvEntries;
-
 
     public MetadataIngestionEntries(String tenantId, String metadataConfigId, String metadataSourceName, List<MetaDataKvEntry> metaDataKvEntries) {
         this.tenantId = tenantId;
         this.metadataConfigId = metadataConfigId;
         this.metaDataKvEntries = metaDataKvEntries;
         this.metadataSourceName = metadataSourceName;
-    }
-
-    public String getTenantId() {
-        return tenantId;
-    }
-
-    public void setTenantId(String tenantId) {
-        this.tenantId = tenantId;
-    }
-
-    public String getMetadataConfigId() {
-        return metadataConfigId;
-    }
-
-    public void setMetadataConfigId(String metadataConfigId) {
-        this.metadataConfigId = metadataConfigId;
-    }
-
-    public String getMetadataSourceName() {
-        return metadataSourceName;
-    }
-
-    public void setMetadataSourceName(String metadataSourceName) {
-        this.metadataSourceName = metadataSourceName;
-    }
-
-    public List<MetaDataKvEntry> getMetaDataKvEntries() {
-        return metaDataKvEntries;
-    }
-
-    public void setMetaDataKvEntries(List<MetaDataKvEntry> metaDataKvEntries) {
-        this.metaDataKvEntries = metaDataKvEntries;
     }
 }

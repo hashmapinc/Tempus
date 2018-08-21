@@ -17,19 +17,24 @@
 package com.hashmapinc.server.controller;
 
 import com.hashmapinc.server.common.data.MetadataIngestionEntries;
+import com.hashmapinc.server.common.data.UUIDConverter;
 import com.hashmapinc.server.common.data.id.TenantId;
+import com.hashmapinc.server.common.data.kv.MetaDataKvEntry;
+import com.hashmapinc.server.common.data.kv.StringDataEntry;
 import com.hashmapinc.server.common.data.metadata.MetadataConfig;
 import com.hashmapinc.server.common.data.metadata.MetadataConfigId;
 import com.hashmapinc.server.common.data.metadata.MetadataQuery;
 import com.hashmapinc.server.common.data.metadata.MetadataQueryId;
 import com.hashmapinc.server.exception.TempusException;
-import com.hashmapinc.server.service.security.model.SecurityUser;
+import com.hashmapinc.server.requests.IngestMetadataRequest;
 import lombok.extern.slf4j.Slf4j;
+import org.joda.time.DateTime;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api")
@@ -101,7 +106,7 @@ public class MetadataController extends BaseController {
     }
 
     @PreAuthorize("hasAuthority('TENANT_ADMIN')")
-    @GetMapping(value = "/metadata/config/{metadataConfigId}/start")
+    @GetMapping(value = "/metadata/config/{metadataConfigId}/ingest")
     @ResponseBody
     public MetadataConfig runIngestion(@PathVariable("metadataConfigId") String strMetadataConfigId) throws TempusException {
         checkParameter("metadataConfigId", strMetadataConfigId);
@@ -150,7 +155,7 @@ public class MetadataController extends BaseController {
     }
 
     @PreAuthorize("hasAuthority('TENANT_ADMIN')")
-    @DeleteMapping(value = "/metadata/query/{metadataConfigId}")
+    @DeleteMapping(value = "/metadata/query/{metadataQueryId}")
     @ResponseStatus(value = HttpStatus.OK)
     public void deleteMetaDataQuery(@PathVariable("metadataQueryId") String strMetadataQueryId) throws TempusException {
         checkParameter("metadataQueryId", strMetadataQueryId);
@@ -165,14 +170,21 @@ public class MetadataController extends BaseController {
     @PreAuthorize("#oauth2.isClient() and #oauth2.hasScope('server')")
     @PostMapping(value = "/metadata/insert")
     @ResponseBody
-    public void insert(@RequestBody MetadataIngestionEntries metadataIngestionEntries) throws TempusException {
-        SecurityUser securityUser = getCurrentUser();
+    public void insert(@RequestBody IngestMetadataRequest request) throws TempusException {
         try {
-            metadataIngestionService.save(
-                    metadataIngestionEntries.getTenantId(),
-                    metadataIngestionEntries.getMetadataConfigId(),
-                    metadataIngestionEntries.getMetadataSourceName(),
-                    metadataIngestionEntries.getMetaDataKvEntries());
+            final MetadataIngestionEntries ingestionEntries = MetadataIngestionEntries.builder()
+                    .metadataConfigId(UUIDConverter.fromTimeUUID(request.getConfigId().getId()))
+                    .metadataSourceName(request.getConfigName())
+                    .tenantId(UUIDConverter.fromTimeUUID(toUUID(request.getOwnerId())))
+                    .metaDataKvEntries(request.getData().entrySet().stream()
+                            .map(e -> new MetaDataKvEntry(
+                                            new StringDataEntry(e.getKey(), e.getValue().toString()),
+                                            DateTime.now().getMillis()
+                                    )
+                            ).collect(Collectors.toList())
+                    )
+                    .build();
+            metadataIngestionService.save(ingestionEntries);
         } catch (Exception e) {
             throw handleException(e);
         }
