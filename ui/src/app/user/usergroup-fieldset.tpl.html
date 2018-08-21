@@ -20,15 +20,12 @@
     <fieldset ng-disabled="loading || !isEdit">
         <md-input-container class="md-block">
             <label translate>user.name</label>
-            <input required name="name" ng-model="data.name">
+            <input required name="name" ng-model="data.title">
             <div ng-messages="theForm.name.$error">
                 <div translate ng-message="required">user.name-required</div>
             </div>
         </md-input-container>
-        <md-input-container class="md-block">
-            <tb-json-form form-control="theForm" model="dataModel">
-            </tb-json-form>
-        </md-input-container>
+
         <md-input-container class="md-block">
             <label translate>user.description</label>
             <textarea ng-model="data.additionalInfo.description" rows="2"></textarea>

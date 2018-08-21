@@ -231,6 +231,7 @@ function GridController($scope, $rootScope, $state, $mdDialog, $document, $q, $m
                                     $window.localStorage.removeItem('currentApp');
                                     $window.localStorage.removeItem('currentTab');
                                 }
+                                if(items.data.length > 0) {
                                 if(items.data[0].id.entityType == 'DASHBOARD' && angular.isDefined(vm.config.parentCtl.currentApplication) && (angular.isDefined(vm.config.parentCtl.currentApplication.miniDashboardId) || angular.isDefined(vm.config.parentCtl.currentApplication.dashboardId))){
                                     if(vm.config.parentCtl.showAppMini){
                                         items.data.forEach(function(miniDashboard){
@@ -279,6 +280,8 @@ function GridController($scope, $rootScope, $state, $mdDialog, $document, $q, $m
                                      vm.items.data = vm.items.data.concat(items.data);
                                      var startIndex = vm.items.data.length - items.data.length;
                                      var endIndex = vm.items.data.length;
+                                }
+
                                 }
 
                                 for (var i = startIndex; i < endIndex; i++) {
@@ -355,6 +358,7 @@ function GridController($scope, $rootScope, $state, $mdDialog, $document, $q, $m
             };
 
         vm.config = vm.gridConfiguration();
+
 
         vm.itemHeight = vm.config.itemHeight || 199;
 
@@ -449,14 +453,29 @@ function GridController($scope, $rootScope, $state, $mdDialog, $document, $q, $m
                 return $translate.instant('grid.add-item-text');
             };
 
-        vm.addItemAction = vm.config.addItemAction || {
-                onAction: function ($event) {
-                    addItem($event);
-                },
-                name: function() { return $translate.instant('action.add') },
-                details: function() { return vm.addItemText() },
-                icon: "add"
-            };
+        if (angular.isDefined(vm.config.entType) && vm.config.entType == "usergroup") {
+
+            vm.addItemAction = vm.config.addItemAction || {
+                    onAction: function ($event) {
+                        addItem($event);
+                    },
+                    name: function() { return $translate.instant('action.add') },
+                    details: function() { return vm.addItemText() },
+                    icon: "group_add"
+                };
+        } else {
+            vm.addItemAction = vm.config.addItemAction || {
+                    onAction: function ($event) {
+                        addItem($event);
+                    },
+                    name: function() { return $translate.instant('action.add') },
+                    details: function() { return vm.addItemText() },
+                    icon: "add"
+                };
+
+        }
+
+
 
         vm.addItemActionsOpen = false;
 
