@@ -17,7 +17,7 @@
 package com.hashmapinc.server.dao.service;
 
 import com.datastax.driver.core.utils.UUIDs;
-import com.hashmapinc.server.common.data.AssetLandingDashboard;
+import com.hashmapinc.server.common.data.AssetLandingDashboardInfo;
 import com.hashmapinc.server.common.data.id.DashboardId;
 import com.hashmapinc.server.common.data.id.DataModelId;
 import com.hashmapinc.server.common.data.id.DataModelObjectId;
@@ -28,7 +28,7 @@ import org.junit.Test;
 
 import java.util.List;
 
-public abstract class BaseAssetLandingDashboardServiceTest extends AbstractServiceTest {
+public abstract class BaseAssetLandingDashboardInfoServiceTest extends AbstractServiceTest {
 
     DataModelObjectId dataModelObjectId;
     DataModelId dataModelId;
@@ -43,18 +43,18 @@ public abstract class BaseAssetLandingDashboardServiceTest extends AbstractServi
         dashboardId1 = new DashboardId(UUIDs.timeBased());
         dashboardId2 = new DashboardId(UUIDs.timeBased());
 
-        AssetLandingDashboard assetLandingDashboard = new AssetLandingDashboard(dashboardId1);
-        assetLandingDashboard.setDataModelId(dataModelId);
-        assetLandingDashboard.setDataModelObjectId(dataModelObjectId);
+        AssetLandingDashboardInfo assetLandingDashboardInfo = new AssetLandingDashboardInfo(dashboardId1);
+        assetLandingDashboardInfo.setDataModelId(dataModelId);
+        assetLandingDashboardInfo.setDataModelObjectId(dataModelObjectId);
 
-        AssetLandingDashboard saved = assetLandingDashboardService.save(assetLandingDashboard);
+        AssetLandingDashboardInfo saved = assetLandingDashboardService.save(assetLandingDashboardInfo);
         Assert.assertNotNull(saved);
 
-        AssetLandingDashboard assetLandingDashboard2 = new AssetLandingDashboard(dashboardId2);
-        assetLandingDashboard2.setDataModelId(dataModelId);
-        assetLandingDashboard2.setDataModelObjectId(dataModelObjectId);
+        AssetLandingDashboardInfo assetLandingDashboardInfo2 = new AssetLandingDashboardInfo(dashboardId2);
+        assetLandingDashboardInfo2.setDataModelId(dataModelId);
+        assetLandingDashboardInfo2.setDataModelObjectId(dataModelObjectId);
 
-        AssetLandingDashboard saved2 = assetLandingDashboardService.save(assetLandingDashboard2);
+        AssetLandingDashboardInfo saved2 = assetLandingDashboardService.save(assetLandingDashboardInfo2);
         Assert.assertNotNull(saved2);
 
     }
@@ -67,16 +67,16 @@ public abstract class BaseAssetLandingDashboardServiceTest extends AbstractServi
 
     @Test
     public void testFetchByDataModelObjectId() {
-        List<AssetLandingDashboard> assetLanding = assetLandingDashboardService.findByDataModelObjectId(dataModelObjectId);
+        List<AssetLandingDashboardInfo> assetLanding = assetLandingDashboardService.findByDataModelObjectId(dataModelObjectId);
         Assert.assertEquals(2, assetLanding.size());
     }
 
     @Test
     public void testFetchByDashboardId() {
-        AssetLandingDashboard assetLandingDashboard = assetLandingDashboardService.findByDashboardId(dashboardId1);
-        Assert.assertNotNull(assetLandingDashboard);
-        Assert.assertEquals(assetLandingDashboard.getDataModelId(), dataModelId);
-        Assert.assertEquals(assetLandingDashboard.getDataModelObjectId(), dataModelObjectId);
+        AssetLandingDashboardInfo assetLandingDashboardInfo = assetLandingDashboardService.findByDashboardId(dashboardId1);
+        Assert.assertNotNull(assetLandingDashboardInfo);
+        Assert.assertEquals(assetLandingDashboardInfo.getDataModelId(), dataModelId);
+        Assert.assertEquals(assetLandingDashboardInfo.getDataModelObjectId(), dataModelObjectId);
     }
 
 }

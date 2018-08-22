@@ -16,7 +16,7 @@
  */
 package com.hashmapinc.server.dao.assetlandingdashboard;
 
-import com.hashmapinc.server.common.data.AssetLandingDashboard;
+import com.hashmapinc.server.common.data.AssetLandingDashboardInfo;
 import com.hashmapinc.server.common.data.id.DashboardId;
 import com.hashmapinc.server.common.data.id.DataModelObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,17 +31,17 @@ public class AssetLandingDashboardServiceImp implements AssetLandingDashboardSer
     AssetLandingDashboardDao assetLandingDashboardDao;
 
     @Override
-    public AssetLandingDashboard save(AssetLandingDashboard assetLandingDashboard) {
-        return assetLandingDashboardDao.save(assetLandingDashboard);
+    public AssetLandingDashboardInfo save(AssetLandingDashboardInfo assetLandingDashboardInfo) {
+        return assetLandingDashboardDao.save(assetLandingDashboardInfo);
     }
 
     @Override
-    public List<AssetLandingDashboard> findByDataModelObjectId(DataModelObjectId dataModelObjectId) {
+    public List<AssetLandingDashboardInfo> findByDataModelObjectId(DataModelObjectId dataModelObjectId) {
         return assetLandingDashboardDao.findByDataModelObjectId(dataModelObjectId);
     }
 
     @Override
-    public AssetLandingDashboard findByDashboardId(DashboardId dashboardId) {
+    public AssetLandingDashboardInfo findByDashboardId(DashboardId dashboardId) {
         return assetLandingDashboardDao.findByDashboardId(dashboardId);
     }
 

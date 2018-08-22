@@ -16,15 +16,15 @@
  */
 package com.hashmapinc.server.dao.assetlandingdashboard;
 
-import com.hashmapinc.server.common.data.AssetLandingDashboard;
+import com.hashmapinc.server.common.data.AssetLandingDashboardInfo;
 import com.hashmapinc.server.common.data.id.DashboardId;
 import com.hashmapinc.server.common.data.id.DataModelObjectId;
 
 import java.util.List;
 
 public interface AssetLandingDashboardDao {
-    AssetLandingDashboard save(AssetLandingDashboard assetLandingDashboard);
-    List<AssetLandingDashboard> findByDataModelObjectId(DataModelObjectId dataModelObjectId);
+    AssetLandingDashboardInfo save(AssetLandingDashboardInfo assetLandingDashboardInfo);
+    List<AssetLandingDashboardInfo> findByDataModelObjectId(DataModelObjectId dataModelObjectId);
     void removeByDashBoardId(DashboardId dashboardId);
-    AssetLandingDashboard findByDashboardId(DashboardId dashboardId);
+    AssetLandingDashboardInfo findByDashboardId(DashboardId dashboardId);
 }

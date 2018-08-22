@@ -17,7 +17,7 @@
 package com.hashmapinc.server.dao.assetlandingdashboard;
 
 import com.datastax.driver.core.*;
-import com.hashmapinc.server.common.data.AssetLandingDashboard;
+import com.hashmapinc.server.common.data.AssetLandingDashboardInfo;
 import com.hashmapinc.server.common.data.id.DashboardId;
 import com.hashmapinc.server.common.data.id.DataModelId;
 import com.hashmapinc.server.common.data.id.DataModelObjectId;
@@ -58,20 +58,20 @@ public class CassandraAssetLandingDashboardDao extends CassandraAbstractAsyncDao
     }
 
     @Override
-    public AssetLandingDashboard save(AssetLandingDashboard assetLandingDashboard) {
+    public AssetLandingDashboardInfo save(AssetLandingDashboardInfo assetLandingDashboardInfo) {
         BoundStatement stmt = getSaveStmt().bind()
-                .setUUID(0, assetLandingDashboard.getDashboardId().getId())
-                .setUUID(1, assetLandingDashboard.getDataModelId().getId())
-                .setUUID(2, assetLandingDashboard.getDataModelObjectId().getId());
+                .setUUID(0, assetLandingDashboardInfo.getDashboardId().getId())
+                .setUUID(1, assetLandingDashboardInfo.getDataModelId().getId())
+                .setUUID(2, assetLandingDashboardInfo.getDataModelObjectId().getId());
 
         ResultSet rs = executeWrite(stmt);
         if(rs.wasApplied())
-            return assetLandingDashboard;
+            return assetLandingDashboardInfo;
         return null;
     }
 
     @Override
-    public List<AssetLandingDashboard> findByDataModelObjectId(DataModelObjectId dataModelObjectId) {
+    public List<AssetLandingDashboardInfo> findByDataModelObjectId(DataModelObjectId dataModelObjectId) {
         BoundStatement stmt = getFetchByDataModelObjStmt().bind()
                 .setUUID(0, dataModelObjectId.getId());
         ResultSet rs = executeRead(stmt);
@@ -86,7 +86,7 @@ public class CassandraAssetLandingDashboardDao extends CassandraAbstractAsyncDao
     }
 
     @Override
-    public AssetLandingDashboard findByDashboardId(DashboardId dashboardId) {
+    public AssetLandingDashboardInfo findByDashboardId(DashboardId dashboardId) {
         BoundStatement stmt = getFetchByDashboardIdStmt().bind()
                 .setUUID(0, dashboardId.getId());
         ResultSet rs = executeRead(stmt);
@@ -148,16 +148,16 @@ public class CassandraAssetLandingDashboardDao extends CassandraAbstractAsyncDao
         return fetchByDataModelObjStmt;
     }
 
-    private AssetLandingDashboard convertToAssetLandingDashboard(Row row) {
-        AssetLandingDashboard dashboard = new AssetLandingDashboard(new DashboardId(row.getUUID(0)));
+    private AssetLandingDashboardInfo convertToAssetLandingDashboard(Row row) {
+        AssetLandingDashboardInfo dashboard = new AssetLandingDashboardInfo(new DashboardId(row.getUUID(0)));
         dashboard.setDataModelId(new DataModelId(row.getUUID(1)));
         dashboard.setDataModelObjectId(new DataModelObjectId(row.getUUID(2)));
         return dashboard;
     }
 
-    private List<AssetLandingDashboard> convertToAssetLandingDashboarList(ResultSet rs) {
+    private List<AssetLandingDashboardInfo> convertToAssetLandingDashboarList(ResultSet rs) {
         List<Row> rows = rs.all();
-        List<AssetLandingDashboard> list = new ArrayList<>();
+        List<AssetLandingDashboardInfo> list = new ArrayList<>();
         rows.forEach(row -> list.add(convertToAssetLandingDashboard(row)));
         return list;
     }

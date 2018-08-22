@@ -27,6 +27,7 @@ import com.hashmapinc.server.common.data.page.TextPageLink;
 import com.hashmapinc.server.common.data.page.TimePageData;
 import com.hashmapinc.server.common.data.page.TimePageLink;
 import com.hashmapinc.server.common.data.security.Authority;
+import com.hashmapinc.server.dao.exception.DataValidationException;
 import com.hashmapinc.server.exception.TempusException;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -477,20 +478,44 @@ public class DashboardController extends BaseController {
     }
 
     @PreAuthorize("hasAnyAuthority('TENANT_ADMIN','CUSTOMER_USER')")
-    @PostMapping(value = "/asset-landing-dashboard/")
+    @PostMapping(value = "/asset/dashboard/")
     @ResponseBody
-    public AssetLandingDashboard saveAssetLandingDashboard(@RequestBody AssetLandingDashboard assetLandingDashboard) throws TempusException {
+    public RequestAssetDashboard saveAssetLandingDashboard(@RequestBody RequestAssetDashboard requestAssetDashboard) throws TempusException {
         try {
-            return checkNotNull(assetLandingDashboardService.save(assetLandingDashboard));
+            AssetLandingDashboardInfo assetLandingDashboardInfo = requestAssetDashboard.getAssetLandingDashboardInfo();
+            Dashboard dashboard = requestAssetDashboard.getDashboard();
+
+            List<AssetLandingDashboardInfo> assetLandingDashboardInfos;
+            assetLandingDashboardInfos = assetLandingDashboardService.findByDataModelObjectId(assetLandingDashboardInfo.getDataModelObjectId());
+
+            if(assetLandingDashboardInfos.isEmpty()) {
+
+                User user = getCurrentUser();
+                dashboard.setTenantId(user.getTenantId());
+
+                Dashboard savedDashboard = checkNotNull(dashboardService.saveDashboard(dashboard));
+
+                if((user).getAuthority().compareTo(Authority.CUSTOMER_USER) == 0) {
+                    savedDashboard = autoAssignedUserToDashboard(savedDashboard.getId(),user.getCustomerId());
+                }
+
+                assetLandingDashboardInfo.setDashboardId(savedDashboard.getId());
+
+                AssetLandingDashboardInfo savedAssetLandingDashboardInfo = checkNotNull(assetLandingDashboardService.save(assetLandingDashboardInfo));
+
+                return new RequestAssetDashboard(savedDashboard,savedAssetLandingDashboardInfo);
+            }else {
+                throw new DataValidationException("Asset landing page is already created for dataModelObject");
+            }
         } catch (Exception e) {
             throw handleException(e);
         }
     }
 
     @PreAuthorize("hasAnyAuthority('TENANT_ADMIN','CUSTOMER_USER')")
-    @GetMapping(value = "/asset-landing-dashboard/{dashboardId}")
+    @GetMapping(value = "/asset/dashboard/{dashboardId}")
     @ResponseBody
-    public AssetLandingDashboard findAssetDashboardByDashboardId(@PathVariable(DASHBOARD_ID) String strDashboardId) throws TempusException {
+    public AssetLandingDashboardInfo findAssetDashboardByDashboardId(@PathVariable(DASHBOARD_ID) String strDashboardId) throws TempusException {
         try {
             DashboardId dashboardId = new DashboardId(toUUID(strDashboardId));
             checkDashboardId(dashboardId);
@@ -501,7 +526,7 @@ public class DashboardController extends BaseController {
     }
 
     @PreAuthorize("hasAnyAuthority('TENANT_ADMIN','CUSTOMER_USER')")
-    @DeleteMapping(value = "/asset-landing-dashboard/{dashboardId}")
+    @DeleteMapping(value = "/asset/dashboard/{dashboardId}")
     @ResponseBody
     public void deleteAssetDashboardByDashboardId(@PathVariable(DASHBOARD_ID) String strDashboardId) throws TempusException {
         try {
@@ -514,9 +539,9 @@ public class DashboardController extends BaseController {
     }
 
     @PreAuthorize("hasAnyAuthority('TENANT_ADMIN','CUSTOMER_USER')")
-    @GetMapping(value = "/asset-landing-dashboard/data-model-object/{dataModelObjectId}")
+    @GetMapping(value = "/asset/dashboard/data-model-object/{dataModelObjectId}")
     @ResponseBody
-    public List<AssetLandingDashboard> findAssetLandingDashboardByDataModelObj(@PathVariable("dataModelObjectId") String strDataModelObjectId) throws TempusException {
+    public List<AssetLandingDashboardInfo> findAssetLandingDashboardByDataModelObj(@PathVariable("dataModelObjectId") String strDataModelObjectId) throws TempusException {
         try {
             DataModelObjectId dataModelObjectId = new DataModelObjectId(toUUID(strDataModelObjectId));
             return assetLandingDashboardService.findByDataModelObjectId(dataModelObjectId);

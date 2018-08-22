@@ -16,7 +16,7 @@
  */
 package com.hashmapinc.server.dao.sql.assetlandingdashboard;
 
-import com.hashmapinc.server.common.data.AssetLandingDashboard;
+import com.hashmapinc.server.common.data.AssetLandingDashboardInfo;
 import com.hashmapinc.server.common.data.UUIDConverter;
 import com.hashmapinc.server.common.data.id.DashboardId;
 import com.hashmapinc.server.common.data.id.DataModelObjectId;
@@ -38,20 +38,20 @@ public class JpaAssetLandingDashboardDao extends JpaAbstractDaoListeningExecutor
     AssetLandingDashboardRepository assetLandingDashboardRepository;
 
     @Override
-    public AssetLandingDashboard save(AssetLandingDashboard assetLandingDashboard) {
-        AssetLandingDashboardEntity assetLandingDashboardEntity = new AssetLandingDashboardEntity(assetLandingDashboard);
+    public AssetLandingDashboardInfo save(AssetLandingDashboardInfo assetLandingDashboardInfo) {
+        AssetLandingDashboardEntity assetLandingDashboardEntity = new AssetLandingDashboardEntity(assetLandingDashboardInfo);
          assetLandingDashboardEntity = assetLandingDashboardRepository.save(assetLandingDashboardEntity);
          return assetLandingDashboardEntity.toData();
     }
 
     @Override
-    public List<AssetLandingDashboard> findByDataModelObjectId(DataModelObjectId dataModelObjectId) {
+    public List<AssetLandingDashboardInfo> findByDataModelObjectId(DataModelObjectId dataModelObjectId) {
         String dmoIdStr = UUIDConverter.fromTimeUUID(dataModelObjectId.getId());
         return DaoUtil.convertDataList(assetLandingDashboardRepository.findByDataModelObjectId(dmoIdStr));
     }
 
     @Override
-    public AssetLandingDashboard findByDashboardId(DashboardId dashboardId) {
+    public AssetLandingDashboardInfo findByDashboardId(DashboardId dashboardId) {
         String dashboardIdStr = UUIDConverter.fromTimeUUID(dashboardId.getId());
         AssetLandingDashboardEntity entity = assetLandingDashboardRepository.findOne(dashboardIdStr);
         return entity.toData();

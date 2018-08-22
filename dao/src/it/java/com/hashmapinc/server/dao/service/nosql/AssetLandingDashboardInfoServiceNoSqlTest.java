@@ -16,10 +16,10 @@
  */
 package com.hashmapinc.server.dao.service.nosql;
 
-import com.hashmapinc.server.dao.service.BaseAssetLandingDashboardServiceTest;
+import com.hashmapinc.server.dao.service.BaseAssetLandingDashboardInfoServiceTest;
 import com.hashmapinc.server.dao.service.DaoNoSqlTest;
 
 @DaoNoSqlTest
-public class AssetLandingDashboardServiceNoSqlTest extends BaseAssetLandingDashboardServiceTest{
+public class AssetLandingDashboardInfoServiceNoSqlTest extends BaseAssetLandingDashboardInfoServiceTest {
 
 }

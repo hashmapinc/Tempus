@@ -34,8 +34,12 @@ import com.hashmapinc.server.common.data.datamodel.AttributeDefinition;
 import com.hashmapinc.server.common.data.datamodel.DataModel;
 import com.hashmapinc.server.common.data.datamodel.DataModelObject;
 import com.hashmapinc.server.common.data.page.TextPageLink;
+import com.hashmapinc.server.dao.exception.DataValidationException;
+import com.hashmapinc.server.exception.TempusException;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.*;
+import org.junit.rules.ExpectedException;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.hashmapinc.server.common.data.computation.Computations;
 import com.hashmapinc.server.common.data.id.ComputationId;
@@ -53,7 +57,7 @@ import com.hashmapinc.server.dao.computations.ComputationsService;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.hashmapinc.server.extensions.core.plugin.telemetry.TelemetryStoragePlugin;
-
+@Slf4j
 public abstract class BaseDashboardControllerTest extends AbstractControllerTest {
     
     private IdComparator<DashboardInfo> idComparator = new IdComparator<>();
@@ -372,45 +376,70 @@ public abstract class BaseDashboardControllerTest extends AbstractControllerTest
     public void testAssetLandingDashboardSave() throws Exception {
         Dashboard dashboard = new Dashboard();
         dashboard.setTitle("My dashboard");
-        Dashboard savedDashboard = doPost("/api/dashboard", dashboard, Dashboard.class);
-
-        Assert.assertNotNull(savedDashboard);
-        Assert.assertNotNull(savedDashboard.getId());
 
         DataModel dataModel = createDataModel();
         DataModelObject dataModelObject = createDataModelObject(dataModel);
 
-        AssetLandingDashboard ald = new AssetLandingDashboard(savedDashboard.getId());
-        ald.setDataModelId(dataModel.getId());
-        ald.setDataModelObjectId(dataModelObject.getId());
+        AssetLandingDashboardInfo assetLandingDashboardInfo = new AssetLandingDashboardInfo();
+        assetLandingDashboardInfo.setDataModelId(dataModel.getId());
+        assetLandingDashboardInfo.setDataModelObjectId(dataModelObject.getId());
 
-        AssetLandingDashboard savedAld = doPost("/api/asset-landing-dashboard/", ald, AssetLandingDashboard.class);
-        Assert.assertNotNull(savedAld);
+        RequestAssetDashboard requestAssetDashboard = new RequestAssetDashboard(dashboard,assetLandingDashboardInfo);
 
-        AssetLandingDashboard foundAld = doGet("/api/asset-landing-dashboard/" + savedAld.getDashboardId().getId().toString(), AssetLandingDashboard.class);
-        Assert.assertEquals(foundAld.getDashboardId(), savedAld.getDashboardId());
+        RequestAssetDashboard savedRequestAssetDashboard = doPost("/api/asset/dashboard/", requestAssetDashboard, RequestAssetDashboard.class);
+        Assert.assertNotNull(savedRequestAssetDashboard);
+
+        AssetLandingDashboardInfo foundAld = doGet("/api/asset/dashboard/" + savedRequestAssetDashboard.getDashboard().getId().toString(), AssetLandingDashboardInfo.class);
+        Assert.assertEquals(foundAld.getDashboardId(), savedRequestAssetDashboard.getDashboard().getId());
+    }
+
+
+    @Test(expected = java.lang.AssertionError.class) // returns http error 400 on doPost
+    public void assetLandingDashboardSaveWithSameDataModelObjReturnsAssertionError() throws Exception {
+
+        Dashboard dashboard = new Dashboard();
+        dashboard.setTitle("My dashboard");
+
+        Dashboard dashboard1 = new Dashboard();
+        dashboard1.setTitle("My dashboard1");
+
+
+        DataModel dataModel = createDataModel();
+        DataModelObject dataModelObject = createDataModelObject(dataModel);
+
+        AssetLandingDashboardInfo assetLandingDashboardInfo = new AssetLandingDashboardInfo();
+        assetLandingDashboardInfo.setDataModelId(dataModel.getId());
+        assetLandingDashboardInfo.setDataModelObjectId(dataModelObject.getId());
+
+        RequestAssetDashboard requestAssetDashboard = new RequestAssetDashboard(dashboard, assetLandingDashboardInfo);
+
+        RequestAssetDashboard savedRequestAssetDashboard = doPost("/api/asset/dashboard/", requestAssetDashboard, RequestAssetDashboard.class);
+        Assert.assertNotNull(savedRequestAssetDashboard);
+
+        RequestAssetDashboard requestAssetDashboard1 = new RequestAssetDashboard(dashboard1,assetLandingDashboardInfo);
+
+        doPost("/api/asset/dashboard/", requestAssetDashboard1, RequestAssetDashboard.class);
+
     }
 
     @Test
     public void testAssetLandingDashboardDelete() throws Exception {
         Dashboard dashboard = new Dashboard();
         dashboard.setTitle("My dashboard");
-        Dashboard savedDashboard = doPost("/api/dashboard", dashboard, Dashboard.class);
-
-        Assert.assertNotNull(savedDashboard);
-        Assert.assertNotNull(savedDashboard.getId());
 
         DataModel dataModel = createDataModel();
         DataModelObject dataModelObject = createDataModelObject(dataModel);
 
-        AssetLandingDashboard ald = new AssetLandingDashboard(savedDashboard.getId());
-        ald.setDataModelId(dataModel.getId());
-        ald.setDataModelObjectId(dataModelObject.getId());
+        AssetLandingDashboardInfo assetLandingDashboardInfo = new AssetLandingDashboardInfo(dashboard.getId());
+        assetLandingDashboardInfo.setDataModelId(dataModel.getId());
+        assetLandingDashboardInfo.setDataModelObjectId(dataModelObject.getId());
 
-        AssetLandingDashboard savedAld = doPost("/api/asset-landing-dashboard/", ald, AssetLandingDashboard.class);
-        Assert.assertNotNull(savedAld);
+        RequestAssetDashboard requestAssetDashboard = new RequestAssetDashboard(dashboard,assetLandingDashboardInfo);
 
-        doDelete("/api/asset-landing-dashboard/"+savedAld.getDashboardId().getId().toString())
+        RequestAssetDashboard savedRequestAssetDashboard = doPost("/api/asset/dashboard/", requestAssetDashboard, RequestAssetDashboard.class);
+        Assert.assertNotNull(savedRequestAssetDashboard);
+
+        doDelete("/api/asset/dashboard/"+savedRequestAssetDashboard.getDashboard().getId().toString())
                 .andExpect(status().isOk());
     }
 
@@ -418,37 +447,22 @@ public abstract class BaseDashboardControllerTest extends AbstractControllerTest
     public void testFindAssetLandingDashboardByDataModelObj() throws Exception {
         Dashboard dashboard = new Dashboard();
         dashboard.setTitle("My dashboard");
-        Dashboard savedDashboard = doPost("/api/dashboard", dashboard, Dashboard.class);
-
-        Assert.assertNotNull(savedDashboard);
-        Assert.assertNotNull(savedDashboard.getId());
-
-        Dashboard dashboard2 = new Dashboard();
-        dashboard2.setTitle("My dashboard2");
-        Dashboard savedDashboard2 = doPost("/api/dashboard", dashboard2, Dashboard.class);
-
-        Assert.assertNotNull(savedDashboard2);
-        Assert.assertNotNull(savedDashboard2.getId());
 
         DataModel dataModel = createDataModel();
         DataModelObject dataModelObject = createDataModelObject(dataModel);
 
-        AssetLandingDashboard ald = new AssetLandingDashboard(savedDashboard.getId());
+        AssetLandingDashboardInfo ald = new AssetLandingDashboardInfo();
         ald.setDataModelId(dataModel.getId());
         ald.setDataModelObjectId(dataModelObject.getId());
 
-        AssetLandingDashboard ald2 = new AssetLandingDashboard(savedDashboard2.getId());
-        ald2.setDataModelId(dataModel.getId());
-        ald2.setDataModelObjectId(dataModelObject.getId());
 
-        AssetLandingDashboard savedAld = doPost("/api/asset-landing-dashboard/", ald, AssetLandingDashboard.class);
-        Assert.assertNotNull(savedAld);
 
-        AssetLandingDashboard savedAld2 = doPost("/api/asset-landing-dashboard/", ald2, AssetLandingDashboard.class);
-        Assert.assertNotNull(savedAld2);
+        RequestAssetDashboard requestAssetDashboard = new RequestAssetDashboard(dashboard,ald);
+        RequestAssetDashboard savedRequestAssetDashboard = doPost("/api/asset/dashboard/", requestAssetDashboard, RequestAssetDashboard.class);
+        Assert.assertNotNull(savedRequestAssetDashboard);
 
-        List<AssetLandingDashboard> list = doGetTyped("/api/asset-landing-dashboard/data-model-object/" + dataModelObject.getId().toString(),  new TypeReference<List<AssetLandingDashboard>>(){});
-        Assert.assertEquals(2, list.size());
+        List<AssetLandingDashboardInfo> list = doGetTyped("/api/asset/dashboard/data-model-object/" + dataModelObject.getId().toString(), new TypeReference<List<AssetLandingDashboardInfo>>(){});
+        Assert.assertEquals(1, list.size());
     }
 
     private DataModel createDataModel() throws Exception{

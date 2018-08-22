@@ -16,7 +16,7 @@
  */
 package com.hashmapinc.server.dao.model.sql;
 
-import com.hashmapinc.server.common.data.AssetLandingDashboard;
+import com.hashmapinc.server.common.data.AssetLandingDashboardInfo;
 import com.hashmapinc.server.common.data.UUIDConverter;
 import com.hashmapinc.server.common.data.id.DashboardId;
 import com.hashmapinc.server.common.data.id.DataModelId;
@@ -35,7 +35,7 @@ import javax.persistence.Table;
 @EqualsAndHashCode
 @Entity
 @Table(name = ModelConstants.ASSET_LANDING_COLUMN_FAMILY_NAME)
-public class AssetLandingDashboardEntity implements ToData<AssetLandingDashboard> {
+public class AssetLandingDashboardEntity implements ToData<AssetLandingDashboardInfo> {
 
     @Id
     @Column(name = ModelConstants.ASSET_LANDING_DASHBOARD_ID)
@@ -51,21 +51,21 @@ public class AssetLandingDashboardEntity implements ToData<AssetLandingDashboard
 
     }
 
-    public AssetLandingDashboardEntity(AssetLandingDashboard assetLandingDashboard){
-        if (assetLandingDashboard.getDashboardId() != null) {
-            this.dashboardId = UUIDConverter.fromTimeUUID(assetLandingDashboard.getDashboardId().getId());
+    public AssetLandingDashboardEntity(AssetLandingDashboardInfo assetLandingDashboardInfo){
+        if (assetLandingDashboardInfo.getDashboardId() != null) {
+            this.dashboardId = UUIDConverter.fromTimeUUID(assetLandingDashboardInfo.getDashboardId().getId());
         }
-        if (assetLandingDashboard.getDataModelId() != null) {
-            this.dataModelId = UUIDConverter.fromTimeUUID(assetLandingDashboard.getDataModelId().getId());
+        if (assetLandingDashboardInfo.getDataModelId() != null) {
+            this.dataModelId = UUIDConverter.fromTimeUUID(assetLandingDashboardInfo.getDataModelId().getId());
         }
-        if (assetLandingDashboard.getDataModelObjectId() != null) {
-            this.dataModelObjectId = UUIDConverter.fromTimeUUID(assetLandingDashboard.getDataModelObjectId().getId());
+        if (assetLandingDashboardInfo.getDataModelObjectId() != null) {
+            this.dataModelObjectId = UUIDConverter.fromTimeUUID(assetLandingDashboardInfo.getDataModelObjectId().getId());
         }
     }
 
     @Override
-    public AssetLandingDashboard toData() {
-        AssetLandingDashboard landingDashboard = new AssetLandingDashboard(new DashboardId(UUIDConverter.fromString(this.getDashboardId())));
+    public AssetLandingDashboardInfo toData() {
+        AssetLandingDashboardInfo landingDashboard = new AssetLandingDashboardInfo(new DashboardId(UUIDConverter.fromString(this.getDashboardId())));
         if (dataModelId != null)
             landingDashboard.setDataModelId(new DataModelId(UUIDConverter.fromString(this.getDataModelId())));
         if (dataModelObjectId != null)

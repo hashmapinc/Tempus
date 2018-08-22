@@ -25,17 +25,17 @@ import lombok.EqualsAndHashCode;
 import java.io.Serializable;
 
 @EqualsAndHashCode
-public class AssetLandingDashboard implements Serializable{
+public class AssetLandingDashboardInfo implements Serializable{
     private static final long serialVersionUID = 8142208716716668541L;
 
     private DashboardId dashboardId;
     private DataModelId dataModelId;
     private DataModelObjectId dataModelObjectId;
 
-    public AssetLandingDashboard() {
+    public AssetLandingDashboardInfo() {
     }
 
-    public AssetLandingDashboard(DashboardId dashboardId){
+    public AssetLandingDashboardInfo(DashboardId dashboardId){
         this.dashboardId = dashboardId;
     }
 

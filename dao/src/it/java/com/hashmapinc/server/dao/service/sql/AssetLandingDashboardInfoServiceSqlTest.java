@@ -16,9 +16,9 @@
  */
 package com.hashmapinc.server.dao.service.sql;
 
-import com.hashmapinc.server.dao.service.BaseAssetLandingDashboardServiceTest;
+import com.hashmapinc.server.dao.service.BaseAssetLandingDashboardInfoServiceTest;
 import com.hashmapinc.server.dao.service.DaoSqlTest;
 
 @DaoSqlTest
-public class AssetLandingDashboardServiceSqlTest extends BaseAssetLandingDashboardServiceTest {
+public class AssetLandingDashboardInfoServiceSqlTest extends BaseAssetLandingDashboardInfoServiceTest {
 }
