@@ -23,10 +23,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.github.tomakehurst.wiremock.client.WireMock;
-import com.hashmapinc.server.common.data.BaseData;
-import com.hashmapinc.server.common.data.Customer;
-import com.hashmapinc.server.common.data.Tenant;
-import com.hashmapinc.server.common.data.User;
+import com.hashmapinc.server.common.data.*;
 import com.hashmapinc.server.common.data.id.TenantId;
 import com.hashmapinc.server.common.data.id.UUIDBased;
 import com.hashmapinc.server.common.data.page.TextPageData;
@@ -150,9 +147,11 @@ public abstract class AbstractControllerTest {
     protected TenantId tenantId;
     protected Tenant savedTenant;
     protected User tenantAdmin;
+    protected CustomerGroup tenantGroup;
 
     protected Customer savedCustomer;
     protected User customerUser;
+    protected CustomerGroup customerGroup;
 
     @SuppressWarnings("rawtypes")
     private HttpMessageConverter mappingJackson2HttpMessageConverter;
@@ -219,13 +218,20 @@ public abstract class AbstractControllerTest {
 
         tenantAdmin = new User();
         tenantAdmin.setAuthority(Authority.TENANT_ADMIN);
-        tenantAdmin.setPermissions(Arrays.asList(TENANT_ADMIN_DEFAULT_PERMISSION));
+        tenantAdmin.setPermissions(Collections.singletonList(TENANT_ADMIN_DEFAULT_PERMISSION));
         tenantAdmin.setTenantId(tenantId);
         tenantAdmin.setEmail(TENANT_ADMIN_EMAIL);
 
         stubUser(tenantAdmin, TENANT_ADMIN_PASSWORD);
-
         tenantAdmin = createUserAndLogin(tenantAdmin, TENANT_ADMIN_PASSWORD);
+
+        tenantGroup = new CustomerGroup();
+        tenantGroup.setTitle("Test Tenant Group");
+        tenantGroup.setTenantId(tenantId);
+        tenantGroup.setCustomerId(null);
+        tenantGroup.setPolicies(Collections.singletonList(TENANT_ADMIN_DEFAULT_PERMISSION));
+        tenantGroup = doPost("/api/customer/group", tenantGroup, CustomerGroup.class);
+        doPost("/api/customer/group/" + tenantGroup.getId()+"/users", Collections.singletonList(tenantAdmin.getId().getId()));
 
         Customer customer = new Customer();
         customer.setTitle("Customer");
@@ -234,19 +240,26 @@ public abstract class AbstractControllerTest {
 
         customerUser = new User();
         customerUser.setAuthority(Authority.CUSTOMER_USER);
-        customerUser.setPermissions(Arrays.asList(
+        customerUser.setTenantId(tenantId);
+        customerUser.setCustomerId(savedCustomer.getId());
+        customerUser.setEmail(CUSTOMER_USER_EMAIL);
+
+        customerGroup = new CustomerGroup();
+        customerGroup.setTenantId(tenantId);
+        customerGroup.setCustomerId(savedCustomer.getId());
+        customerGroup.setTitle("Test Customer Group");
+        customerGroup.setPolicies(Arrays.asList(
                 CUSTOMER_USER_DEFAULT_ASSET_READ_PERMISSION,
                 CUSTOMER_USER_DEFAULT_ASSET_UPDATE_PERMISSION,
                 CUSTOMER_USER_DEFAULT_DEVICE_READ_PERMISSION,
                 CUSTOMER_USER_DEFAULT_DEVICE_UPDATE_PERMISSION)
         );
-        customerUser.setTenantId(tenantId);
-        customerUser.setCustomerId(savedCustomer.getId());
-        customerUser.setEmail(CUSTOMER_USER_EMAIL);
 
+        customerGroup = doPost("/api/customer/group", customerGroup, CustomerGroup.class);
         stubUser(customerUser, CUSTOMER_USER_PASSWORD);
 
         customerUser = createUserAndLogin(customerUser, CUSTOMER_USER_PASSWORD);
+        doPost("/api/customer/group/"+ customerGroup.getId() + "/users", Collections.singletonList(customerUser.getId().getId()));
 
         logout();
         log.info("Executed setup");
