@@ -37,21 +37,6 @@ export default function ComputationController(computationService, computationJob
         }
     ];
 
-    var computationAddItemActionsList = [
-        {
-            onAction: function ($event) {
-                importExport.importComputation($event).then(
-                    function() {
-                        vm.grid.refreshList();
-                    }
-                );
-            },
-            name: function() { return $translate.instant('action.import') },
-            details: function() { return $translate.instant('computation.import') },
-            icon: "file_upload"
-        }
-    ];
-
     var vm = this;
     vm.types = types;
 
@@ -72,12 +57,12 @@ export default function ComputationController(computationService, computationJob
         parentCtl: vm,
 
         actionsList: computationActionsList,
-        addItemActions: computationAddItemActionsList,
+        //addItemActions: computationAddItemActionsList,
 
         onGridInited: gridInited,
 
         addItemTemplateUrl: addComputationTemplate,
-
+        addItemController: 'AddComputationController',
         addItemText: function() { return $translate.instant('computation.add-computation-text') },
         noItemsText: function() { return $translate.instant('computation.no-computations-text') },
 

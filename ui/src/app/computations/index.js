@@ -19,9 +19,8 @@ import uiRouter from 'angular-ui-router';
 import tempusApiComputation from '../api/computation.service';
 import tempusApiComputationJob from '../api/computation-job.service';
 import ComputationController from './computation.controller';
-//import ComputationTestController from './computationsTest.controller';
+import AddComputationController from './add-computation.controller';
 import ComputationJobController from './computation-job.controller';
-//import ComputationUploadDirective from './computation-upload.directive';
 import ComputationDirective from './computation.directive';
 import ComputationJobDirective from './computation-job.directive';
 import ComputationRoutes from './computation.routes';
@@ -34,9 +33,8 @@ export default angular.module('tempus.computation', [
 ])
     .config(ComputationRoutes)
     .controller('ComputationController', ComputationController)
-    //.controller('ComputationTestController', ComputationTestController)
+    .controller('AddComputationController', AddComputationController)
     .controller('ComputationJobController', ComputationJobController)
-    //.directive('fileModel', ComputationUploadDirective)
     .directive('tbComputation',ComputationDirective)
     .directive('tbComputationJob',ComputationJobDirective)
     .name;

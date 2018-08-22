@@ -32,7 +32,33 @@
         <span style="min-height: 5px;" flex="" ng-show="!loading"></span>
         <md-dialog-content>
             <div class="md-dialog-content">
-                <tb-computation computation="vm.item" is-edit="true" the-form="theForm"></tb-computation>
+                <md-content class="md-padding" layout="column">
+                    <fieldset ng-disabled="$root.loading">
+                        <section flex layout="row">
+                            <md-input-container flex="60" class="md-block" md-is-error="theForm.computationName.$touched && theForm.computationName.$invalid">
+                                <label translate>extension.extension-id</label>
+                                <input required name="computationName" ng-model="vm.item.name">
+                                <div ng-messages="theForm.computationName.$error">
+                                    <div translate ng-message="required">extension.field-required</div>
+                                </div>
+                            </md-input-container>
+                            <md-input-container flex="40" class="md-block" md-is-error="theForm.computationType.$touched && theForm.computationType.$invalid">
+                                <label translate>extension.extension-type</label>
+
+                                <md-select required name="computationType" ng-change="vm.computationTypeChange()" ng-model="vm.extension.type">
+                                    <md-option ng-repeat="(key,value) in vm.types.computationType" ng-value="value">
+                                        {{value}}
+                                    </md-option>
+                                </md-select>
+
+                                <div ng-messages="theForm.computationType.$error">
+                                    <div translate ng-message="required">extension.field-required</div>
+                                </div>
+                            </md-input-container>
+                            <div tb-computation computation="vm.item" is-edit="true" the-form="theForm" ng-if="vm.item.type && vm.item.type == vm.types.computationType.spark"></div>
+                        </section>
+                    </fieldset>
+                </md-content>
             </div>
         </md-dialog-content>
         <md-dialog-actions layout="row">
