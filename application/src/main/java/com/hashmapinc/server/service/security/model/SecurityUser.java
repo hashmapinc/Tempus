@@ -58,6 +58,10 @@ public class SecurityUser extends User { //NOSONAR
         return userPermissions;
     }
 
+    public void setUserPermissions(Collection<String> userPermissions) {
+        this.userPermissions = userPermissions.stream().map(UserPermission::new).collect(Collectors.toList());
+    }
+
     public Collection<GrantedAuthority> getAuthorities() {
         if (authorities == null) {
             authorities = Stream.of(SecurityUser.this.getAuthority())
