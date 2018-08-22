@@ -32,6 +32,7 @@ import com.hashmapinc.server.dao.customer.CustomerDao;
 import com.hashmapinc.server.dao.entity.AbstractEntityService;
 import com.hashmapinc.server.dao.exception.DataValidationException;
 import com.hashmapinc.server.dao.exception.IncorrectParameterException;
+import com.hashmapinc.server.dao.model.ModelConstants;
 import com.hashmapinc.server.dao.service.DataValidator;
 import com.hashmapinc.server.dao.service.PaginatedRemover;
 import com.hashmapinc.server.dao.service.Validator;
@@ -243,20 +244,28 @@ public class CustomerGroupServiceImpl extends AbstractEntityService implements C
                     if (StringUtils.isEmpty(customerGroup.getTitle())) {
                         throw new DataValidationException("Customer Group title should be specified!");
                     }
-                    if (customerGroup.getTenantId() == null) {
-                        throw new DataValidationException("Customer Group should be assigned to tenant!");
+
+                    TenantId tenantId = customerGroup.getTenantId();
+                    if (tenantId == null) {
+                        tenantId = new TenantId(ModelConstants.NULL_UUID);
+                        customerGroup.setTenantId(tenantId);
                     } else {
                         Tenant tenant = tenantDao.findById(customerGroup.getTenantId().getId());
                         if (tenant == null) {
                             throw new DataValidationException("Customer Group is referencing to non-existent tenant!");
                         }
                     }
-                    if (customerGroup.getCustomerId() == null) {
-                        throw new DataValidationException("Customer Group should be assigned to Customer!");
+
+                    CustomerId customerId = customerGroup.getCustomerId();
+                    if (customerId == null) {
+                        customerId = new CustomerId(ModelConstants.NULL_UUID);
+                        customerGroup.setCustomerId(customerId);
                     } else {
                         Customer customer = customerDao.findById(customerGroup.getCustomerId().getId());
                         if (customer == null) {
                             throw new DataValidationException("Customer Group is referencing to non-existent Customer!");
+                        } else if (!customer.getTenantId().getId().equals(customerGroup.getTenantId().getId())) {
+                            throw new DataValidationException("Customer Group can't be assigned to customer from different tenant!");
                         }
                     }
                 }

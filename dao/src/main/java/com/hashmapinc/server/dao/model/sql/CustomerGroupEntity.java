@@ -18,10 +18,8 @@ package com.hashmapinc.server.dao.model.sql;
 
 import com.datastax.driver.core.utils.UUIDs;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.hashmapinc.server.common.data.Customer;
 import com.hashmapinc.server.common.data.CustomerGroup;
 import com.hashmapinc.server.common.data.UUIDConverter;
-import com.hashmapinc.server.common.data.User;
 import com.hashmapinc.server.common.data.id.CustomerGroupId;
 import com.hashmapinc.server.common.data.id.CustomerId;
 import com.hashmapinc.server.common.data.id.TenantId;
