@@ -36,6 +36,7 @@ import com.hashmapinc.server.common.data.widget.WidgetsBundle;
 import com.hashmapinc.server.common.msg.exception.TempusRuntimeException;
 import com.hashmapinc.server.dao.attributes.AttributesService;
 import com.hashmapinc.server.dao.customer.CustomerService;
+import com.hashmapinc.server.dao.customergroup.CustomerGroupService;
 import com.hashmapinc.server.dao.dashboard.DashboardService;
 import com.hashmapinc.server.dao.device.DeviceCredentialsService;
 import com.hashmapinc.server.dao.device.DeviceService;
@@ -63,10 +64,7 @@ import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 
 import static com.hashmapinc.server.common.data.DataConstants.*;
 
@@ -87,6 +85,9 @@ public class DefaultSystemDataLoaderService implements SystemDataLoaderService {
     public static final String JSON_EXT = ".json";
     public static final String CUSTOMER_CRED = "customer";
     public static final String DEFAULT_DEVICE_TYPE = "default";
+
+    private static final String SYS_ADMIN_GROUP = "SysAdmin Group";
+    private static final String TENANT_GROUP = "Tenant Group";
 
     @Value("${install.data_dir}")
     private String dataDir;
@@ -130,6 +131,9 @@ public class DefaultSystemDataLoaderService implements SystemDataLoaderService {
     @Autowired
     private ThemeService themeService;
 
+    @Autowired
+    private CustomerGroupService customerGroupService;
+
     @Bean
     protected BCryptPasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
@@ -142,6 +146,12 @@ public class DefaultSystemDataLoaderService implements SystemDataLoaderService {
     private boolean isLdapEnabled;
 
     private User adminUser;
+    private CustomerGroup adminGroup;
+
+    @Override
+    public void createSysAdminGroup() throws TempusApplicationException {
+        adminGroup = createGroup(SYS_ADMIN_GROUP, Collections.singletonList(SYS_ADMIN_DEFAULT_PERMISSION) , null, null);
+    }
 
     @Override
     public void createSysAdmin() {
@@ -150,6 +160,7 @@ public class DefaultSystemDataLoaderService implements SystemDataLoaderService {
         } else {
             adminUser = createUser(Authority.SYS_ADMIN, Arrays.asList(SYS_ADMIN_DEFAULT_PERMISSION),null, null, adminEmail, "sysadmin", false);
         }
+        customerGroupService.assignUsers(adminGroup.getId(), Collections.singletonList(adminUser.getId()));
     }
 
     @Override
@@ -262,13 +273,15 @@ public class DefaultSystemDataLoaderService implements SystemDataLoaderService {
         demoTenant.setRegion("Global");
         demoTenant.setTitle("DemoTenant");
         demoTenant = tenantService.saveTenant(demoTenant);
-        createUser(Authority.TENANT_ADMIN, Arrays.asList(TENANT_ADMIN_DEFAULT_PERMISSION), demoTenant.getId(), null, "demo@hashmapinc.com", "tenant", false);
+
+        CustomerGroup tenantGroup = createGroup(TENANT_GROUP, Collections.singletonList(TENANT_ADMIN_DEFAULT_PERMISSION) , demoTenant.getId(), null);
+        User tenantUser = createUser(Authority.TENANT_ADMIN, Collections.singletonList(TENANT_ADMIN_DEFAULT_PERMISSION) , demoTenant.getId(), null, "demo@hashmapinc.com", "tenant", false);
+        customerGroupService.assignUsers(tenantGroup.getId(), Collections.singletonList(tenantUser.getId()));
 
         Customer customerA = new Customer();
         customerA.setTenantId(demoTenant.getId());
         customerA.setTitle("Drilling Team");
         customerA = customerService.saveCustomer(customerA);
-
 
         List<String> customerPermissions = Arrays.asList(
                 CUSTOMER_USER_DEFAULT_ASSET_READ_PERMISSION,
@@ -276,7 +289,9 @@ public class DefaultSystemDataLoaderService implements SystemDataLoaderService {
                 CUSTOMER_USER_DEFAULT_DEVICE_READ_PERMISSION,
                 CUSTOMER_USER_DEFAULT_DEVICE_UPDATE_PERMISSION
         );
-        createUser(Authority.CUSTOMER_USER, customerPermissions, demoTenant.getId(), customerA.getId(), "bob.jones@hashmapinc.com", "driller", false);
+        CustomerGroup customerGroupA = createGroup("Driller Group", customerPermissions, demoTenant.getId(), customerA.getId());
+        User bobJones = createUser(Authority.CUSTOMER_USER, customerPermissions, demoTenant.getId(), customerA.getId(), "bob.jones@hashmapinc.com", "driller", false);
+        customerGroupService.assignUsers(customerGroupA.getId(), Collections.singletonList(bobJones.getId()));
 
         List<AttributeKvEntry> attributesTank123 = new ArrayList<>();
         attributesTank123.add(new BaseAttributeKvEntry(new StringDataEntry("latitude", "52.330732"), DateTime.now().getMillis()));
@@ -327,6 +342,15 @@ public class DefaultSystemDataLoaderService implements SystemDataLoaderService {
         if (widgetsBundle != null) {
             widgetsBundleService.deleteWidgetsBundle(widgetsBundle.getId());
         }
+    }
+
+    private CustomerGroup createGroup(String title, List<String> permissions , TenantId tenantId , CustomerId customerId) {
+        CustomerGroup customerGroup = new CustomerGroup();
+        customerGroup.setTitle(title);
+        customerGroup.setTenantId(tenantId);
+        customerGroup.setCustomerId(customerId);
+        customerGroup.setPolicies(permissions);
+        return customerGroupService.saveCustomerGroup(customerGroup);
     }
 
     private User createUser(Authority authority,

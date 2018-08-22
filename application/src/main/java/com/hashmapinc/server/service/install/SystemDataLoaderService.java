@@ -20,6 +20,8 @@ import com.hashmapinc.server.exception.TempusApplicationException;
 
 public interface SystemDataLoaderService {
 
+    void createSysAdminGroup() throws TempusApplicationException;
+
     void createSysAdmin() throws TempusApplicationException;
 
     void createAdminSettings() throws TempusApplicationException;
