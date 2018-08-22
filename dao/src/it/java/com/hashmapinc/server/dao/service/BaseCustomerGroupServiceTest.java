@@ -113,25 +113,10 @@ public abstract class BaseCustomerGroupServiceTest extends AbstractServiceTest {
     }
 
     @Test(expected = DataValidationException.class)
-    public void saveCustomerGroupWithEmptyTenant() {
-        CustomerGroup customerGroup = new CustomerGroup();
-        customerGroup.setTitle("My Group");
-        customerGroupService.saveCustomerGroup(customerGroup);
-    }
-
-    @Test(expected = DataValidationException.class)
     public void saveCustomerGroupWithInvalidTenant() {
         CustomerGroup customerGroup = new CustomerGroup();
         customerGroup.setTitle("My Group");
         customerGroup.setTenantId(new TenantId(UUIDs.timeBased()));
-        customerGroupService.saveCustomerGroup(customerGroup);
-    }
-
-    @Test(expected = DataValidationException.class)
-    public void saveCustomerGroupWithEmptyCustomer() {
-        CustomerGroup customerGroup = new CustomerGroup();
-        customerGroup.setTenantId(tenantId);
-        customerGroup.setTitle("My Group");
         customerGroupService.saveCustomerGroup(customerGroup);
     }
 
