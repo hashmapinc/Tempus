@@ -22,6 +22,7 @@ import com.hashmapinc.server.common.data.TempusResource;
 import com.hashmapinc.server.common.data.id.AssetId;
 import com.hashmapinc.server.common.data.id.DeviceId;
 import com.hashmapinc.server.dao.asset.AssetService;
+import com.hashmapinc.server.dao.customergroup.CustomerGroupService;
 import com.hashmapinc.server.dao.device.DeviceService;
 import com.hashmapinc.server.service.security.auth.permissions.PermissionChecker;
 import com.hashmapinc.server.service.security.model.SecurityUser;
@@ -34,6 +35,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
 import java.io.Serializable;
+import java.util.List;
 import java.util.UUID;
 
 @Slf4j
@@ -46,6 +48,9 @@ public class AttributeBasedPermissionEvaluator implements PermissionEvaluator{
     @Autowired
     @Lazy
     private DeviceService deviceService;
+
+    @Autowired
+    private CustomerGroupService customerGroupService;
 
     @Autowired
     @Lazy
@@ -74,6 +79,7 @@ public class AttributeBasedPermissionEvaluator implements PermissionEvaluator{
             return false;
         }
         SecurityUser user = (SecurityUser) authentication.getPrincipal();
+        setUserPermissions(user);
         TempusResource resource = (TempusResource) targetDomainObject;
         String resourceType = actionTokens[0];
         String operation = actionTokens[1];
@@ -96,5 +102,10 @@ public class AttributeBasedPermissionEvaluator implements PermissionEvaluator{
             default:
                 return null;
         }
+    }
+
+    private void setUserPermissions(SecurityUser user) {
+        List<String> policies = customerGroupService.findGroupPoliciesForUser(user.getId());
+        user.setUserPermissions(policies);
     }
 }
