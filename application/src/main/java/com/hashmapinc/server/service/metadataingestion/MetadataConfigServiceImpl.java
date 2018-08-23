@@ -16,6 +16,7 @@
  */
 package com.hashmapinc.server.service.metadataingestion;
 
+import com.hashmapinc.server.common.data.UUIDConverter;
 import com.hashmapinc.server.common.data.id.TenantId;
 import com.hashmapinc.server.common.data.metadata.MetadataConfig;
 import com.hashmapinc.server.common.data.metadata.MetadataConfigId;
@@ -81,7 +82,7 @@ public class MetadataConfigServiceImpl implements MetadataConfigService {
     public List<MetadataConfig> findByTenant(TenantId tenantId) {
         log.trace("Executing MetadataConfigServiceImpl.findByTenant [{}]", tenantId);
         validateId(tenantId, INCORRECT_TENANT_ID + tenantId);
-        String getByOwnerUrl = serviceUrl + PATH_SEPARATOR + getByOwnerPath + PATH_SEPARATOR + tenantId.getId();
+        String getByOwnerUrl = serviceUrl + PATH_SEPARATOR + getByOwnerPath + PATH_SEPARATOR + UUIDConverter.fromTimeUUID(tenantId.getId());
         ResponseEntity<List<MetadataConfig>> response = restTemplate.exchange(getByOwnerUrl, HttpMethod.GET, null, new ParameterizedTypeReference<List<MetadataConfig>>() {
         });
         return response.getBody();

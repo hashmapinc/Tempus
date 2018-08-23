@@ -16,7 +16,9 @@
  */
 package com.hashmapinc.server.common.data;
 
+import com.hashmapinc.server.common.data.id.TenantId;
 import com.hashmapinc.server.common.data.kv.MetaDataKvEntry;
+import com.hashmapinc.server.common.data.metadata.MetadataConfigId;
 import lombok.Builder;
 import lombok.Data;
 
@@ -26,15 +28,8 @@ import java.util.List;
 @Builder
 public class MetadataIngestionEntries {
 
-    private String tenantId;
-    private String metadataConfigId;
+    private TenantId tenantId;
+    private MetadataConfigId metadataConfigId;
     private String metadataSourceName;
     private List<MetaDataKvEntry> metaDataKvEntries;
-
-    public MetadataIngestionEntries(String tenantId, String metadataConfigId, String metadataSourceName, List<MetaDataKvEntry> metaDataKvEntries) {
-        this.tenantId = tenantId;
-        this.metadataConfigId = metadataConfigId;
-        this.metaDataKvEntries = metaDataKvEntries;
-        this.metadataSourceName = metadataSourceName;
-    }
 }

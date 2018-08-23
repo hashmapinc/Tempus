@@ -17,10 +17,12 @@
 package com.hashmapinc.server.dao.metadataingestion;
 
 import com.google.common.util.concurrent.ListenableFuture;
+import com.hashmapinc.server.common.data.id.TenantId;
 import com.hashmapinc.server.common.data.kv.MetaDataKvEntry;
+import com.hashmapinc.server.common.data.metadata.MetadataConfigId;
 
 public interface MetaDataIngestionDao {
 
-    ListenableFuture<Void> save(String tenantId, String metadataConfigId, String dataSourceName, MetaDataKvEntry metaDataKvEntry);
+    ListenableFuture<Void> save(TenantId tenantId, MetadataConfigId metadataConfigId, String dataSourceName, MetaDataKvEntry metaDataKvEntry);
 
 }
