@@ -24,6 +24,7 @@ import ComputationJobController from './computation-job.controller';
 import ComputationDirective from './computation.directive';
 import ComputationJobDirective from './computation-job.directive';
 import ComputationRoutes from './computation.routes';
+import ComputationFormSparkDirective from './computation-forms/computation-form-spark.directive';
 /* eslint-enable import/no-unresolved, import/default */
 
 export default angular.module('tempus.computation', [
@@ -36,5 +37,6 @@ export default angular.module('tempus.computation', [
     .controller('AddComputationController', AddComputationController)
     .controller('ComputationJobController', ComputationJobController)
     .directive('tbComputation',ComputationDirective)
+    .directive('tbComputationFormSpark',ComputationFormSparkDirective)
     .directive('tbComputationJob',ComputationJobDirective)
     .name;

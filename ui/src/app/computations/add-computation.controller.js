@@ -16,9 +16,10 @@
  */
 
 /*@ngInject*/
-export default function AddComputationController($scope, $mdDialog, types/*, $state, $stateParams, $document, $q, types, userService, saveItemFunction*/) {
+export default function AddComputationController($scope, $mdDialog, types, helpLinks, computationService, $q, $window) {
     var vm = this;
 
+    vm.helpLinks = helpLinks;
     vm.item = {};
 
     vm.types = types;
@@ -30,16 +31,34 @@ export default function AddComputationController($scope, $mdDialog, types/*, $st
     }
 
     vm.computationTypeChange = function () {
-
         if (vm.item.type === 'SPARK') {
-            vm.item.file = null;
+            vm.item.importData = null;
+            vm.item.fileName = null;
         }
     };
 
+    function saveSparkComputation() {
+        var deferred = $q.defer();
+        computationService.upload(vm.item.importData.file).then(
+            function success() {
+                deferred.resolve();
+                $window.localStorage.setItem('currentTab', 4);
+            },
+            function fail() {
+                deferred.reject();
+            }
+        );
+        return deferred.promise;
+    }
+
     function add() {
         if (vm.item.type === 'SPARK') {
-            vm.item.type = 'SPARK';
+            saveSparkComputation().then(function success(item) {
+                vm.item = item;
+                $scope.theForm.$setPristine();
+                $mdDialog.hide();
+            });
         }
-        $mdDialog.hide();
+        //$mdDialog.hide();
     }
 }

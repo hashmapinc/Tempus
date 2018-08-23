@@ -45,7 +45,7 @@
                             <md-input-container flex="40" class="md-block" md-is-error="theForm.computationType.$touched && theForm.computationType.$invalid">
                                 <label translate>extension.extension-type</label>
 
-                                <md-select required name="computationType" ng-change="vm.computationTypeChange()" ng-model="vm.extension.type">
+                                <md-select required name="computationType" ng-change="vm.computationTypeChange()" ng-model="vm.item.type">
                                     <md-option ng-repeat="(key,value) in vm.types.computationType" ng-value="value">
                                         {{value}}
                                     </md-option>
@@ -55,15 +55,15 @@
                                     <div translate ng-message="required">extension.field-required</div>
                                 </div>
                             </md-input-container>
-                            <div tb-computation computation="vm.item" is-edit="true" the-form="theForm" ng-if="vm.item.type && vm.item.type == vm.types.computationType.spark"></div>
                         </section>
+                        <div tb-computation-form-spark model="vm.item" ng-if="vm.item.type && vm.item.type == vm.types.computationType.spark"></div>
                     </fieldset>
                 </md-content>
             </div>
         </md-dialog-content>
         <md-dialog-actions layout="row">
             <span flex></span>
-            <md-button ng-disabled="loading || theForm.$invalid || !theForm.$dirty" type="submit"
+            <md-button ng-disabled="loading || theForm.$invalid || !theForm.$dirty || (vm.item.type == vm.types.computationType.spark && !vm.item.importData)" type="submit"
                        class="md-raised md-primary">
                 {{ 'action.add' | translate }}
             </md-button>

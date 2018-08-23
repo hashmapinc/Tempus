@@ -24,7 +24,7 @@ import computationJobCard from './computation-job-card.tpl.html';
 /* eslint-enable import/no-unresolved, import/default */
 
 /*@ngInject*/
-export default function ComputationController(computationService, computationJobService, userService, importExport, $state, $stateParams, $translate, types) {
+export default function ComputationController(computationService, computationJobService, userService, $state, $stateParams, $translate, types) {
 
     var computationActionsList = [
         {
@@ -57,7 +57,6 @@ export default function ComputationController(computationService, computationJob
         parentCtl: vm,
 
         actionsList: computationActionsList,
-        //addItemActions: computationAddItemActionsList,
 
         onGridInited: gridInited,
 
@@ -81,7 +80,6 @@ export default function ComputationController(computationService, computationJob
     }
 
     function fetchComputations(pageLink) {
-
         return computationService.getAllComputations(pageLink);
     }
 
