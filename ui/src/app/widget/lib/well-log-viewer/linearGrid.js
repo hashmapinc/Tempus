@@ -27,8 +27,8 @@ var linearGrid = function(lineConfig) {
     wodth: 200,
     value: null,
     key: null,
-    majorLines: lineConfig.majorLines.lines -1,
-    minorLines: lineConfig.minorLines.lines +1,
+    majorLines: parseInt(lineConfig.majorLines.lines) -1,
+    minorLines: parseInt(lineConfig.minorLines.lines) +1,
     majorColor: lineConfig.majorLines.color,
     minorColor: lineConfig.minorLines.color,
     majorLineWeight: lineConfig.majorLines.lineWeight,
@@ -68,7 +68,7 @@ var linearGrid = function(lineConfig) {
     var isMajorTick = function (index) {
       return ticks[index].isVisible;
     }
-
+    
     for (var i = 0; i <= o.minorLines*o.majorLines; i++) {
       ticks.push( { value: i, isVisible: i % o.minorLines === 0 });
     }
