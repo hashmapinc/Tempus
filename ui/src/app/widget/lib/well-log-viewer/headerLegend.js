@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- import * as d3 from 'well-log-viewer/node_modules/d3/build/d3';
+import * as d3 from 'well-log-viewer/node_modules/d3/build/d3';
 import './logViewer.css';
 
 /*@ngInject*/
@@ -24,7 +24,7 @@ var headerLegend = function(lineConfig, headerCount) {
      // local;
 
   o = {
-    wodth: 200,
+    width: 200,
     value: null,
     key: null,
     min: lineConfig.headerMin,
