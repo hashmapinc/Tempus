@@ -1,5 +1,6 @@
 /**
- * Copyright © 2017-2018 Hashmap, Inc
+ * Copyright © 2016-2018 The Thingsboard Authors
+ * Modifications © 2017-2018 Hashmap, Inc
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -62,7 +63,7 @@ public class DeviceApiController {
     @Autowired(required = false)
     private QuotaService quotaService;
 
-    @RequestMapping(value = "/{deviceToken}/attributes", method = RequestMethod.GET, produces = "application/json")
+    @GetMapping(value = "/{deviceToken}/attributes", produces = "application/json")
     public DeferredResult<ResponseEntity> getDeviceAttributes(@PathVariable("deviceToken") String deviceToken,
                                                               @RequestParam(value = "clientKeys", required = false, defaultValue = "") String clientKeys,
                                                               @RequestParam(value = "sharedKeys", required = false, defaultValue = "") String sharedKeys,
@@ -89,7 +90,7 @@ public class DeviceApiController {
         return responseWriter;
     }
 
-    @RequestMapping(value = "/{deviceToken}/attributes", method = RequestMethod.POST)
+    @PostMapping(value = "/{deviceToken}/attributes")
     public DeferredResult<ResponseEntity> postDeviceAttributes(@PathVariable("deviceToken") String deviceToken,
                                                                @RequestBody String json, HttpServletRequest request) {
         DeferredResult<ResponseEntity> responseWriter = new DeferredResult<>();
@@ -109,7 +110,7 @@ public class DeviceApiController {
         return responseWriter;
     }
 
-    @RequestMapping(value = "/{deviceToken}/telemetry", method = RequestMethod.POST)
+    @PostMapping(value = "/{deviceToken}/telemetry")
     public DeferredResult<ResponseEntity> postTelemetry(@PathVariable("deviceToken") String deviceToken,
                                                         @RequestBody String json, HttpServletRequest request) {
         DeferredResult<ResponseEntity> responseWriter = new DeferredResult<>();
@@ -129,7 +130,7 @@ public class DeviceApiController {
         return responseWriter;
     }
 
-    @RequestMapping(value = "/{deviceToken}/rpc", method = RequestMethod.GET, produces = "application/json")
+    @GetMapping(value = "/{deviceToken}/rpc", produces = "application/json")
     public DeferredResult<ResponseEntity> subscribeToCommands(@PathVariable("deviceToken") String deviceToken,
                                                               @RequestParam(value = "timeout", required = false, defaultValue = "0") long timeout,
                                                               HttpServletRequest request) {
@@ -137,7 +138,7 @@ public class DeviceApiController {
         return subscribe(deviceToken, timeout, new RpcSubscribeMsg(), request);
     }
 
-    @RequestMapping(value = "/{deviceToken}/rpc/{requestId}", method = RequestMethod.POST)
+    @PostMapping(value = "/{deviceToken}/rpc/{requestId}")
     public DeferredResult<ResponseEntity> replyToCommand(@PathVariable("deviceToken") String deviceToken,
                                                          @PathVariable("requestId") Integer requestId,
                                                          @RequestBody String json, HttpServletRequest request) {
@@ -159,7 +160,7 @@ public class DeviceApiController {
         return responseWriter;
     }
 
-    @RequestMapping(value = "/{deviceToken}/rpc", method = RequestMethod.POST)
+    @PostMapping(value = "/{deviceToken}/rpc")
     public DeferredResult<ResponseEntity> postRpcRequest(@PathVariable("deviceToken") String deviceToken,
                                                          @RequestBody String json, HttpServletRequest httpRequest) {
         DeferredResult<ResponseEntity> responseWriter = new DeferredResult<>();
@@ -182,7 +183,7 @@ public class DeviceApiController {
         return responseWriter;
     }
 
-    @RequestMapping(value = "/{deviceToken}/attributes/updates", method = RequestMethod.GET, produces = "application/json")
+    @GetMapping(value = "/{deviceToken}/attributes/updates", produces = "application/json")
     public DeferredResult<ResponseEntity> subscribeToAttributes(@PathVariable("deviceToken") String deviceToken,
                                                                 @RequestParam(value = "timeout", required = false, defaultValue = "0") long timeout,
                                                                 HttpServletRequest httpRequest) {

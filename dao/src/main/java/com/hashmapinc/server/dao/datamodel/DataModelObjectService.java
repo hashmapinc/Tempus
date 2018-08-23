@@ -1,5 +1,6 @@
 /**
- * Copyright © 2017-2018 Hashmap, Inc
+ * Copyright © 2016-2018 The Thingsboard Authors
+ * Modifications © 2017-2018 Hashmap, Inc
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +24,7 @@ import java.util.List;
 
 public interface DataModelObjectService {
     DataModelObject save(DataModelObject dataModelObject);
+    void removeById(DataModelObjectId dataModelObjectId);
     DataModelObject findById(DataModelObjectId dataModelObjectId);
     List<DataModelObject> findByDataModelId(DataModelId dataModelId);
 }

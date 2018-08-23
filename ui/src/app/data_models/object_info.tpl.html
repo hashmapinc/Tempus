@@ -1,0 +1,66 @@
+<!--
+
+    Copyright © 2016-2018 The Thingsboard Authors
+    Modifications © 2017-2018 Hashmap, Inc
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+        http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<md-dialog style="min-width: 600px;" tb-help="'datamodel_object_creation'" help-container-id="help-container">
+        <md-toolbar>
+            <div class="md-toolbar-tools">
+                <span translate class="md-headline"><h2>dataModels.objectInfo</h2></span>
+                <span flex></span>
+                <md-button class="md-icon-button" ng-click="vm.cancel()">
+                    <ng-md-icon icon="close" aria-label="{{ 'dialog.close' | translate }}"></ng-md-icon>
+                </md-button>
+            </div>
+        </md-toolbar>
+
+    <md-card-content>
+
+                <md-content class="md-padding">
+                    <md-subheader class="md-no-sticky"><span translate class="md-headline">dataModels.datamodelObject</span></md-subheader>
+                    <md-list-item>
+                        <p class="dmoFont"><span translate>dataModels.name</span>: {{vm.nodeValue.datamodelObject.name}} </p>
+                    </md-list-item>
+                    <md-list-item>
+                        <p class="dmoFont"><span translate>dataModels.description</span>: {{vm.nodeValue.datamodelObject.desc}} </p>
+                    </md-list-item>
+                    <md-list-item>
+                        <p class="dmoFont"><span translate>dataModels.type</span>: {{vm.nodeValue.datamodelObject.type}} </p>
+                    </md-list-item>
+
+                    <md-subheader class="md-no-sticky sections"><span translate class="md-headline">dataModels.objectAttribute</span></md-subheader>
+                    <md-list-item ng-repeat="attrib in vm.nodeValue.datamodelObject.attributedas">
+                        <p class="dmoFont"> {{ attrib }} </p>
+                    </md-list-item>
+
+                    <md-subheader class="md-no-sticky sections"><span translate class="md-headline">dataModels.relationships</span></md-subheader>
+                    <md-list-item>
+                        <p class="dmoFont"><span translate>dataModels.parent</span>: {{vm.nodeValue.datamodelObject.parent_id ? vm.nodeValue.datamodelObject.parent : "None"}}</p>
+                    </md-list-item>
+
+                    <md-subheader class="md-no-sticky sections"><span translate class="md-headline">dataModels.image</span></md-subheader>
+
+                    <md-list-item>
+                        <p class="dmoFont"><span translate>dataModels.icon</span>:<img class="" style="width: 98%; margin-top: -1%;"ng-src="{{vm.nodeValue.datamodelObject.logoFile}}"></p>
+                        </md-list-item>
+
+                </md-content>
+
+
+    </md-card-content>
+
+
+</md-dialog>

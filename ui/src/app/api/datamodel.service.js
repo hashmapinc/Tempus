@@ -1,5 +1,6 @@
 /*
- * Copyright © 2017-2018 Hashmap, Inc
+ * Copyright © 2016-2018 The Thingsboard Authors
+ * Modifications © 2017-2018 Hashmap, Inc
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 import angularStorage from 'angular-storage';
 
 export default angular.module('tempus.api.datamodel', [
@@ -28,7 +28,8 @@ function DatamodelService($http, $q) {
         getDatamodelObjects:    getDatamodelObjects,
         saveDatamodel:          saveDatamodel,
         saveDatamodelObject:    saveDatamodelObject,
-        listDatamodels:         listDatamodels
+        listDatamodels:         listDatamodels,
+        deleteDatamodelObject:  deleteDatamodelObject
     }
 
     // loads the datamodel objects for the datamodel with ID = datamodelID
@@ -91,6 +92,21 @@ function DatamodelService($http, $q) {
             deferred.resolve(response.data);
         }, function fail(response) {
             deferred.reject(response.data);
+        });
+        return deferred.promise;
+    }
+
+    /**
+     *  deletes a datamodel object in the backend
+     *  @param dmObjectId - ID of the datamodel object to delete
+     */
+    function deleteDatamodelObject(dmObjectId) {
+        var deferred = $q.defer();
+        var url = '/api/data-model/objects/' + dmObjectId;
+        $http.delete(url).then(function success(response) {
+            deferred.resolve(response);
+        }, function fail(response) {
+            deferred.reject(response);
         });
         return deferred.promise;
     }

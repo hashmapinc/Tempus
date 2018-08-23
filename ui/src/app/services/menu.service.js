@@ -1,5 +1,6 @@
 /*
- * Copyright © 2017-2018 Hashmap, Inc
+ * Copyright © 2016-2018 The Thingsboard Authors
+ * Modifications © 2017-2018 Hashmap, Inc
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,17 +15,21 @@
  * limitations under the License.
  */
 import tempusApiUser from '../api/user.service';
+import tempusApiDatamodel from '../api/datamodel.service';
+import tempusApiCustomer from '../api/customer.service';
 
-export default angular.module('tempus.menu', [tempusApiUser])
+export default angular.module('tempus.menu', [tempusApiUser,tempusApiDatamodel,tempusApiCustomer])
     .factory('menu', Menu)
     .name;
 
 /*@ngInject*/
-function Menu(userService, $state, $rootScope) {
+function Menu(userService, $state, $rootScope, $log,datamodelService,customerService) {
 
     var authority = '';
     var sections = [];
     var homeSections = [];
+    var generatedSectionTree = {};
+
 
     if (userService.isUserLoaded() === true) {
         buildMenu();
@@ -39,8 +44,9 @@ function Menu(userService, $state, $rootScope) {
         getHomeSections: getHomeSections,
         getSections: getSections,
         sectionHeight: sectionHeight,
-        sectionActive: sectionActive
-    }
+        sectionActive: sectionActive,
+        getGeneratedSectionTree: getGeneratedSectionTree
+    };
 
     return service;
 
@@ -48,6 +54,10 @@ function Menu(userService, $state, $rootScope) {
         return sections;
     }
 
+    function getGeneratedSectionTree() {
+        return generatedSectionTree;
+    }
+    
     function getHomeSections() {
         return homeSections;
     }
@@ -126,6 +136,9 @@ function Menu(userService, $state, $rootScope) {
 
                             ]
                         }];
+
+                    generatedSectionTree = {};
+
                     homeSections =
                         [{
                             name: 'rule-plugin.management',
@@ -289,6 +302,8 @@ function Menu(userService, $state, $rootScope) {
                             icon: 'track_changes'
                         }];
 
+                    generatedSectionTree = {};
+
                     homeSections =
                         [{
                             name: 'rule-plugin.management',
@@ -379,7 +394,7 @@ function Menu(userService, $state, $rootScope) {
                                     }
                                 ]
                             }
-                           ];
+                        ];
 
                 } else if (authority === 'CUSTOMER_USER') {
                     sections = [
@@ -403,6 +418,25 @@ function Menu(userService, $state, $rootScope) {
                             icon: 'dashboard',
                             link: '/static/svg/dashboardlightgray.svg'
                         }];
+
+                    var dataModelsOfAssetType = [];
+
+                    var customer = customerService.getCustomer(user.customerId, {ignoreLoading: true});
+
+                    customer.then(function (data) {
+                        var dataModelObjects = datamodelService.getDatamodelObjects(data.dataModelId.id);
+
+                        dataModelObjects.then(function(modelObjects){
+                            $log.log(modelObjects);
+                            dataModelsOfAssetType = getDataModelObjectsOfTypeAsset(modelObjects);
+                            generatedSectionTree.children = buildGeneratedSectionTree(dataModelsOfAssetType);
+
+                        }, function (error){
+                            $log.error(error);
+                        })
+                    }, function (error) {
+                        $log.error(error);
+                    });
 
                     homeSections =
                         [{
@@ -443,6 +477,89 @@ function Menu(userService, $state, $rootScope) {
             }
         }
     }
+
+
+    function getDataModelObjectsOfTypeAsset(dataModelObjects){
+
+        var dataModels = [];
+
+        angular.forEach(dataModelObjects, function (dataModelObject) {
+
+            if (dataModelObject.type === "Asset") {
+
+                var sec = {
+                    id : dataModelObject.id.id,
+                    type: 'link',
+                    name:dataModelObject.name,
+                    state: 'home.assets',
+                    icon: 'domain',
+                    link: '/static/svg/assetslightgray.svg',
+                    logoFile: dataModelObject.logoFile
+                };
+
+                if(dataModelObject.parentId != null)
+                    sec['parentId'] =  dataModelObject.parentId.id;
+                else
+                    sec['parentId'] = null;
+
+                dataModels.push(sec);
+            }
+        });
+
+        return dataModels;
+    }
+
+
+    function buildSectionTreeList(id, parentId, children, list) {
+        if (!id) id = 'id';
+        if (!parentId) parentId = 'parentId';
+        if (!children) children = 'children';
+        var treeList = [];
+        var lookup = {};
+        list.forEach(function (obj) {
+            lookup[obj.id] = obj;
+            obj[children] = [];
+
+        });
+
+
+        list.forEach(function (obj) {
+            if (obj[parentId] != null) {
+                lookup[obj[parentId]][children].push(obj);
+            } else {
+                treeList.push(obj);
+            }
+        });
+        return treeList;
+    }
+
+
+    function addToggleAndLevelToGeneratedSectionTree(parent,level) {
+
+        var children = parent.children;
+
+        if (children.length === 0){
+            parent.type = 'link';
+        }else {
+            parent.type = 'toggle';
+        }
+
+        for (var i = 0, len = children.length; i < len; i++) {
+            addToggleAndLevelToGeneratedSectionTree(children[i],level+1);
+        }
+
+        parent.level = level;
+    }
+
+    function buildGeneratedSectionTree(list, id, parentId, children) {
+        var generatedSectionTreeList = buildSectionTreeList(id, parentId, children, list);
+
+        var startingLevel = 1;
+        addToggleAndLevelToGeneratedSectionTree(generatedSectionTreeList[0],startingLevel);
+
+        return generatedSectionTreeList;
+    }
+
 
     function sectionHeight(section) {
         if ($state.includes(section.state)) {

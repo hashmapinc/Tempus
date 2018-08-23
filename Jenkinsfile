@@ -2,7 +2,7 @@ pipeline {
   agent {
     docker {
       image 'hashmapinc/tempusbuild:latest'
-      args '-u root -v /var/run/docker.sock:/var/run/docker.sock -v /home/ubuntu/.m2:/root/.m2 -v /home/ubuntu/.npm:/root/.npm -v /home/ubuntu/.gradle:/root/.gradle'
+      args '-u root -v /var/run/docker.sock:/var/run/docker.sock'
     }
 
   }
@@ -14,7 +14,7 @@ pipeline {
 echo M2_HOME = ${M2_HOME}
 mvn clean
 mvn validate'''
-        slackSend(message: 'Build Started for Branch: '+env.BRANCH_NAME+' for: '+env.CHANGE_AUTHOR+' on: '+env.BUILD_TAG, color: 'Green', channel: 'Tempus', botUser: true)
+        slackSend(message: 'Build Started for Branch: '+env.BRANCH_NAME+' for: '+env.CHANGE_AUTHOR+' on: '+env.BUILD_TAG, color: 'Green', channel: 'tempusbuild', botUser: true)
       }
     }
     stage('Build') {
@@ -54,7 +54,7 @@ sudo docker push hashmapinc/cassandra-setup:dev
     }
     stage('Success Message') {
       steps {
-        slackSend(message: 'Build Completed for Branch: '+env.BRANCH_NAME+' for: '+env.CHANGE_AUTHOR+' on: '+env.BUILD_TAG, channel: 'Tempus', color: 'Green')
+        slackSend(message: 'Build Completed for Branch: '+env.BRANCH_NAME+' for: '+env.CHANGE_AUTHOR+' on: '+env.BUILD_TAG, channel: 'tempusbuild', color: 'Green')
       }
     }
   }

@@ -1,5 +1,6 @@
 /*
- * Copyright © 2017-2018 Hashmap, Inc
+ * Copyright © 2016-2018 The Thingsboard Authors
+ * Modifications © 2017-2018 Hashmap, Inc
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +18,7 @@ import './side-menu.scss';
 
 import tempusMenu from '../services/menu.service';
 import tempusMenuLink from './menu-link.directive';
+import tempusCustomMenu from './custom-menu.directive';
 
 /* eslint-disable import/no-unresolved, import/default */
 
@@ -24,7 +26,7 @@ import sidemenuTemplate from './side-menu.tpl.html';
 
 /* eslint-enable import/no-unresolved, import/default */
 
-export default angular.module('tempus.directives.sideMenu', [tempusMenu, tempusMenuLink])
+export default angular.module('tempus.directives.sideMenu', [tempusMenu, tempusMenuLink,tempusCustomMenu])
     .directive('tbSideMenu', SideMenu)
     .name;
 
@@ -34,6 +36,7 @@ function SideMenu($compile, $templateCache, menu) {
     var linker = function (scope, element) {
 
         scope.sections = menu.getSections();
+        scope.generatedSectionTree = menu.getGeneratedSectionTree();
 
         var template = $templateCache.get(sidemenuTemplate);
 

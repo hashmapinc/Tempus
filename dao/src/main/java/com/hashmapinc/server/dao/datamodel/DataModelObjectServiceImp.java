@@ -1,5 +1,6 @@
 /**
- * Copyright © 2017-2018 Hashmap, Inc
+ * Copyright © 2016-2018 The Thingsboard Authors
+ * Modifications © 2017-2018 Hashmap, Inc
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -88,6 +89,12 @@ public class DataModelObjectServiceImp implements DataModelObjectService {
             }
         });
         return dataModelObjects;
+    }
+
+    @Override
+    public void removeById(DataModelObjectId dataModelObjectId) {
+        validateId(dataModelObjectId, INCORRECT_DATA_MODEL_OBJECT_ID + dataModelObjectId);
+        dataModelObjectDao.removeById(dataModelObjectId.getId());
     }
 
     private DataValidator<DataModelObject> dataModelObjectDataValidator =

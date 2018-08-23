@@ -1,5 +1,6 @@
 /*
- * Copyright © 2017-2018 Hashmap, Inc
+ * Copyright © 2016-2018 The Thingsboard Authors
+ * Modifications © 2017-2018 Hashmap, Inc
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,6 +15,8 @@
  * limitations under the License.
  */
 import './menu-link.scss';
+import $ from 'jquery';
+
 
 import tempusMenu from '../services/menu.service';
 
@@ -35,6 +38,16 @@ function MenuLink($compile, $templateCache, menu) {
     var linker = function (scope, element) {
         var template;
 
+        //this is for  removing the  tb-active class  on custom-side-menu , when we click on the static side-menu
+        element.on('click', function(event) {
+            event.stopPropagation();
+            //remove
+            $("ul.tb-custom-menu-toggle-list").find('.tb-active').removeClass('tb-active');
+            //this for collapsing the generatedSectionTree when some one click on static side menu section
+            $("ul.tb-custom-menu-toggle-list li").addClass('collapsed');
+
+        });
+
         if (scope.section.type === 'link') {
             template = $templateCache.get(menulinkTemplate);
         } else {
@@ -46,6 +59,7 @@ function MenuLink($compile, $templateCache, menu) {
                 element[0].firstChild.setAttribute('aria-describedby', heading.id);
             }
 
+
             scope.sectionActive = function () {
                 return menu.sectionActive(scope.section);
             };
@@ -53,6 +67,7 @@ function MenuLink($compile, $templateCache, menu) {
             scope.sectionHeight = function () {
                 return menu.sectionHeight(scope.section);
             };
+
         }
 
         element.html(template);

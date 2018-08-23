@@ -1,5 +1,6 @@
 /**
- * Copyright © 2017-2018 Hashmap, Inc
+ * Copyright © 2016-2018 The Thingsboard Authors
+ * Modifications © 2017-2018 Hashmap, Inc
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,6 +32,7 @@ import com.hashmapinc.server.common.msg.session.BasicToDeviceActorSessionMsg;
 import com.hashmapinc.server.common.msg.session.SessionContext;
 import com.hashmapinc.server.common.msg.session.SessionType;
 import com.hashmapinc.server.dao.attributes.AttributesService;
+import com.hashmapinc.server.dao.cluster.NodeMetricService;
 import com.hashmapinc.server.gen.discovery.ServerInstanceProtos;
 import com.hashmapinc.server.service.cluster.discovery.ServerInstance;
 import com.hashmapinc.server.actors.service.DefaultActorService;
@@ -98,6 +100,7 @@ public class DefaultActorServiceTest {
     private ComponentDiscoveryService componentService;
     private EventService eventService;
     private ServerInstance serverInstance;
+    private NodeMetricService nodeMetricService;
 
     private RuleMetaData ruleMock;
     private PluginMetaData pluginMock;
@@ -123,6 +126,7 @@ public class DefaultActorServiceTest {
         attributesService = mock(AttributesService.class);
         componentService = mock(ComponentDiscoveryService.class);
         eventService = mock(EventService.class);
+        nodeMetricService = mock(NodeMetricService.class);
         serverInstance = new ServerInstance(ServerInstanceProtos.ServerInfo.newBuilder().setHost("localhost").setPort(8080).build());
 
         ReflectionTestUtils.setField(actorService, "actorContext", actorContext);
@@ -148,6 +152,7 @@ public class DefaultActorServiceTest {
         ReflectionTestUtils.setField(actorContext, "attributesService", attributesService);
         ReflectionTestUtils.setField(actorContext, "componentService", componentService);
         ReflectionTestUtils.setField(actorContext, "eventService", eventService);
+        ReflectionTestUtils.setField(actorContext, "nodeMetricService", nodeMetricService);
 
 
         when(routingService.resolveById((EntityId) any())).thenReturn(Optional.empty());
