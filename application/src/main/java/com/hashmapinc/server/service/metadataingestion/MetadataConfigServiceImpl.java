@@ -32,23 +32,27 @@ import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
 
+import static com.hashmapinc.server.dao.service.Validator.validateId;
+
 @Service
 @Slf4j
 public class MetadataConfigServiceImpl implements MetadataConfigService {
 
     @Value("${metadata-ingestion.config.service_url}")
-    private String SERVICE_URL;
+    private String serviceUrl;
 
     @Value("${metadata-ingestion.config.owner_path}")
-    private String GET_BY_OWNER_PATH;
+    private String getByOwnerPath;
 
     @Value("${metadata-ingestion.config.ingest_path}")
-    private String INGESTION_PATH;
+    private String ingestionPath;
 
     @Value("${metadata-ingestion.config.connect_path}")
-    private String CONNECT_PATH;
+    private String connectPath;
 
-    private final static String PATH_SEPARATOR = "/";
+    private static final String PATH_SEPARATOR = "/";
+    private static final String INCORRECT_CONFIG_ID = "Incorrect metadata config id ";
+    private static final String INCORRECT_TENANT_ID = "Incorrect tenant id ";
 
     @Autowired
     @Qualifier("clientRestTemplate")
@@ -58,51 +62,44 @@ public class MetadataConfigServiceImpl implements MetadataConfigService {
     public MetadataConfig save(MetadataConfig metadataConfig) {
         log.trace("Executing MetadataConfigServiceImpl.save [{}]", metadataConfig);
         if (metadataConfig.getId() == null) {
-            ResponseEntity<MetadataConfig> response = restTemplate.postForEntity(SERVICE_URL, metadataConfig, MetadataConfig.class);
-            if (response.getStatusCode().equals(HttpStatus.CREATED)) {
-                return response.getBody();
-            }
+            return restTemplate.postForObject(serviceUrl, metadataConfig, MetadataConfig.class);
         } else {
-            restTemplate.put(SERVICE_URL, metadataConfig);
+            restTemplate.put(serviceUrl, metadataConfig);
             return metadataConfig;
         }
-        return null;
     }
 
     @Override
     public MetadataConfig findById(MetadataConfigId id) {
         log.trace("Executing MetadataConfigServiceImpl.findById [{}]", id);
-        String getByIdUrl = SERVICE_URL + PATH_SEPARATOR + id.getId();
-        ResponseEntity<MetadataConfig> response = restTemplate.getForEntity(getByIdUrl, MetadataConfig.class);
-        if (response.getStatusCode().equals(HttpStatus.OK)) {
-            return response.getBody();
-        }
-        return null;
+        validateId(id, INCORRECT_CONFIG_ID + id);
+        String getByIdUrl = serviceUrl + PATH_SEPARATOR + id.getId();
+        return restTemplate.getForObject(getByIdUrl, MetadataConfig.class);
     }
 
     @Override
     public List<MetadataConfig> findByTenant(TenantId tenantId) {
         log.trace("Executing MetadataConfigServiceImpl.findByTenant [{}]", tenantId);
-        String getByOwnerUrl = SERVICE_URL + PATH_SEPARATOR + GET_BY_OWNER_PATH + PATH_SEPARATOR + tenantId.getId();
+        validateId(tenantId, INCORRECT_TENANT_ID + tenantId);
+        String getByOwnerUrl = serviceUrl + PATH_SEPARATOR + getByOwnerPath + PATH_SEPARATOR + tenantId.getId();
         ResponseEntity<List<MetadataConfig>> response = restTemplate.exchange(getByOwnerUrl, HttpMethod.GET, null, new ParameterizedTypeReference<List<MetadataConfig>>() {
         });
-        if (response.getStatusCode().equals(HttpStatus.OK)) {
-            return response.getBody();
-        }
-        return null;
+        return response.getBody();
     }
 
     @Override
     public void delete(MetadataConfigId id) {
         log.trace("Executing MetadataConfigServiceImpl.delete [{}]", id);
-        String deleteByIdUrl = SERVICE_URL + PATH_SEPARATOR + id.getId();
+        validateId(id, INCORRECT_CONFIG_ID + id);
+        String deleteByIdUrl = serviceUrl + PATH_SEPARATOR + id.getId();
         restTemplate.delete(deleteByIdUrl);
     }
 
     @Override
     public Boolean testSource(MetadataConfigId id) {
         log.trace("Executing MetadataConfigServiceImpl.testSource [{}]", id);
-        String testSourceUrl = SERVICE_URL + PATH_SEPARATOR + id.getId() + PATH_SEPARATOR + CONNECT_PATH;
+        validateId(id, INCORRECT_CONFIG_ID + id);
+        String testSourceUrl = serviceUrl + PATH_SEPARATOR + id.getId() + PATH_SEPARATOR + connectPath;
         ResponseEntity<String> response = restTemplate.getForEntity(testSourceUrl, String.class);
         if (response.getStatusCode().equals(HttpStatus.OK)) {
             return Boolean.TRUE;
@@ -114,11 +111,8 @@ public class MetadataConfigServiceImpl implements MetadataConfigService {
     @Override
     public MetadataConfig runIngestion(MetadataConfigId id) {
         log.trace("Executing MetadataConfigServiceImpl.runIngestion [{}]", id);
-        String getByIdUrl = SERVICE_URL + PATH_SEPARATOR + id.getId() + PATH_SEPARATOR + INGESTION_PATH;
-        ResponseEntity<MetadataConfig> response = restTemplate.getForEntity(getByIdUrl, MetadataConfig.class);
-        if (response.getStatusCode().equals(HttpStatus.OK)) {
-            return response.getBody();
-        }
-        return null;
+        validateId(id, INCORRECT_CONFIG_ID + id);
+        String getByIdUrl = serviceUrl + PATH_SEPARATOR + id.getId() + PATH_SEPARATOR + ingestionPath;
+        return restTemplate.getForObject(getByIdUrl, MetadataConfig.class);
     }
 }

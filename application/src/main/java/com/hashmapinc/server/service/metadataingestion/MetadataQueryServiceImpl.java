@@ -25,71 +25,68 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
 
+import static com.hashmapinc.server.dao.service.Validator.validateId;
+
 @Service
 @Slf4j
 public class MetadataQueryServiceImpl implements MetadataQueryService {
 
     @Value("${metadata-ingestion.query.service_url}")
-    private String SERVICE_URL;
+    private String serviceUrl;
 
     @Value("${metadata-ingestion.query.config_path}")
-    private String GET_BY_CONFIG_PATH;
+    private String getByConfigPath;
 
-    private final static String PATH_SEPARATOR = "/";
+    private static final String PATH_SEPARATOR = "/";
 
     @Autowired
     @Qualifier("clientRestTemplate")
     private RestTemplate restTemplate;
 
+    private static final String INCORRECT_CONFIG_ID = "Incorrect metadata config id ";
+    private static final String INCORRECT_QUERY_ID = "Incorrect metadata query id ";
+
     @Override
     public MetadataQuery save(MetadataQuery query) {
         log.trace("Executing MetadataQueryServiceImpl.save [{}]", query);
         if (query.getId() == null) {
-            ResponseEntity<MetadataQuery> response = restTemplate.postForEntity(SERVICE_URL, query, MetadataQuery.class);
-            if (response.getStatusCode().equals(HttpStatus.CREATED)) {
-                return response.getBody();
-            }
+            return restTemplate.postForObject(serviceUrl, query, MetadataQuery.class);
         } else {
-            restTemplate.put(SERVICE_URL, query);
+            restTemplate.put(serviceUrl, query);
             return query;
         }
-        return null;
     }
 
     @Override
     public MetadataQuery findById(MetadataQueryId id) {
         log.trace("Executing MetadataQueryServiceImpl.findById [{}]", id);
-        String getByIdUrl = SERVICE_URL + PATH_SEPARATOR + id.getId();
-        ResponseEntity<MetadataQuery> response = restTemplate.getForEntity(getByIdUrl, MetadataQuery.class);
-        if (response.getStatusCode().equals(HttpStatus.OK)) {
-            return response.getBody();
-        }
-        return null;
+        validateId(id, INCORRECT_QUERY_ID + id);
+        String getByIdUrl = serviceUrl + PATH_SEPARATOR + id.getId();
+        return restTemplate.getForObject(getByIdUrl, MetadataQuery.class);
     }
 
     @Override
     public List<MetadataQuery> findAllByMetadataConfigId(MetadataConfigId metadataConfigId) {
         log.trace("Executing MetadataQueryServiceImpl.findAllByMetadataConfigId [{}]", metadataConfigId);
-        String getByOwnerUrl = SERVICE_URL + PATH_SEPARATOR + GET_BY_CONFIG_PATH + PATH_SEPARATOR + metadataConfigId.getId();
+        validateId(metadataConfigId, INCORRECT_CONFIG_ID + metadataConfigId);
+        String getByOwnerUrl = serviceUrl + PATH_SEPARATOR + getByConfigPath + PATH_SEPARATOR + metadataConfigId.getId();
         ResponseEntity<List<MetadataQuery>> response = restTemplate.exchange(getByOwnerUrl, HttpMethod.GET, null, new ParameterizedTypeReference<List<MetadataQuery>>() {
         });
-        if (response.getStatusCode().equals(HttpStatus.OK)) {
-            return response.getBody();
-        }
-        return null;
+
+        return response.getBody();
     }
 
     @Override
     public void delete(MetadataQueryId id) {
         log.trace("Executing MetadataQueryServiceImpl.delete [{}]", id);
-        String deleteByIdUrl = SERVICE_URL + PATH_SEPARATOR + id.getId();
+        validateId(id, INCORRECT_QUERY_ID + id);
+        String deleteByIdUrl = serviceUrl + PATH_SEPARATOR + id.getId();
         restTemplate.delete(deleteByIdUrl);
     }
 }
