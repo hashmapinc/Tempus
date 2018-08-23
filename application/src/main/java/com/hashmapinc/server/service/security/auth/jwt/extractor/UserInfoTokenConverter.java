@@ -64,6 +64,12 @@ public class UserInfoTokenConverter implements UserAuthenticationConverter {
         Object id = map.get("id");
         Object tenantId = map.get("tenant_id");
         Object enabled = map.get("enabled");
+        Object authorities = map.get("authorities");
+
+        if (StringUtils.isEmpty(userName) && StringUtils.isEmpty(id) && StringUtils.isEmpty(tenantId) && authorities == null) {
+            return null;
+        }
+
         if(StringUtils.isEmpty(userName) || StringUtils.isEmpty(id) || StringUtils.isEmpty(tenantId)){
             throw new TempusRuntimeException("Invalid details");
         }
@@ -79,7 +85,7 @@ public class UserInfoTokenConverter implements UserAuthenticationConverter {
         securityUser.setEnabled(enabled != null && (Boolean)enabled);
         securityUser.setFirstName(extractNullable("firstName", map));
         securityUser.setLastName(extractNullable("lastName", map));
-        Object authorities = map.get("authorities");
+
         if(authorities != null){
             List<String> authority = (List<String>) authorities;
             if(!authority.isEmpty())
