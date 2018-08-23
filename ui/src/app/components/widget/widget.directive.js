@@ -80,10 +80,14 @@ function Widget($controller, widgetService) {
                         })
                     })
                     widgetInfo.typeSettingsSchema.form[0].items.forEach(function(item){
-                        if(item.key === "Track[].test2"){
-                            item.items = dk;
-                        }
-                    })
+                        item.items.forEach(function(component){
+                                if(component.key === "Track[].component[].dataSource"){
+                                     component.items = dk;
+                                 }
+                            })
+                        
+                        })
+                    
                 }
 
                 scope.loadingData = true;
