@@ -41,6 +41,9 @@ import java.util.stream.Collectors;
 @Slf4j
 public class MetadataController extends BaseController {
 
+    private static final String METADATA_CONFIG_ID = "metadataConfigId";
+    private static final String METADATA_QUERY_ID = "metadataQueryId";
+
     @PreAuthorize("hasAuthority('TENANT_ADMIN')")
     @PostMapping(value = "/metadata/config")
     @ResponseBody
@@ -57,8 +60,8 @@ public class MetadataController extends BaseController {
     @PreAuthorize("hasAuthority('TENANT_ADMIN')")
     @GetMapping(value = "/metadata/config/{metadataConfigId}")
     @ResponseBody
-    public MetadataConfig getMetadataConfigById(@PathVariable("metadataConfigId") String strMetadataConfigId) throws TempusException {
-        checkParameter("metadataConfigId", strMetadataConfigId);
+    public MetadataConfig getMetadataConfigById(@PathVariable(METADATA_CONFIG_ID) String strMetadataConfigId) throws TempusException {
+        checkParameter(METADATA_CONFIG_ID, strMetadataConfigId);
         try {
             MetadataConfigId metadataConfigId = new MetadataConfigId(toUUID(strMetadataConfigId));
             return metadataConfigService.findById(metadataConfigId);
@@ -82,8 +85,8 @@ public class MetadataController extends BaseController {
     @PreAuthorize("hasAuthority('TENANT_ADMIN')")
     @DeleteMapping(value = "/metadata/config/{metadataConfigId}")
     @ResponseStatus(value = HttpStatus.OK)
-    public void deleteMetaDataConfig(@PathVariable("metadataConfigId") String strMetadataConfigId) throws TempusException {
-        checkParameter("metadataConfigId", strMetadataConfigId);
+    public void deleteMetaDataConfig(@PathVariable(METADATA_CONFIG_ID) String strMetadataConfigId) throws TempusException {
+        checkParameter(METADATA_CONFIG_ID, strMetadataConfigId);
         try {
             MetadataConfigId metadataConfigId = new MetadataConfigId(toUUID(strMetadataConfigId));
             metadataConfigService.delete(metadataConfigId);
@@ -95,8 +98,8 @@ public class MetadataController extends BaseController {
     @PreAuthorize("hasAuthority('TENANT_ADMIN')")
     @GetMapping(value = "/metadata/config/{metadataConfigId}/test")
     @ResponseStatus(value = HttpStatus.OK)
-    public Boolean testSource(@PathVariable("metadataConfigId") String strMetadataConfigId) throws TempusException {
-        checkParameter("metadataConfigId", strMetadataConfigId);
+    public Boolean testSource(@PathVariable(METADATA_CONFIG_ID) String strMetadataConfigId) throws TempusException {
+        checkParameter(METADATA_CONFIG_ID, strMetadataConfigId);
         try {
             MetadataConfigId metadataConfigId = new MetadataConfigId(toUUID(strMetadataConfigId));
             return metadataConfigService.testSource(metadataConfigId);
@@ -108,8 +111,8 @@ public class MetadataController extends BaseController {
     @PreAuthorize("hasAuthority('TENANT_ADMIN')")
     @GetMapping(value = "/metadata/config/{metadataConfigId}/ingest")
     @ResponseBody
-    public MetadataConfig runIngestion(@PathVariable("metadataConfigId") String strMetadataConfigId) throws TempusException {
-        checkParameter("metadataConfigId", strMetadataConfigId);
+    public MetadataConfig runIngestion(@PathVariable(METADATA_CONFIG_ID) String strMetadataConfigId) throws TempusException {
+        checkParameter(METADATA_CONFIG_ID, strMetadataConfigId);
         try {
             MetadataConfigId metadataConfigId = new MetadataConfigId(toUUID(strMetadataConfigId));
             return metadataConfigService.runIngestion(metadataConfigId);
@@ -132,8 +135,8 @@ public class MetadataController extends BaseController {
     @PreAuthorize("hasAuthority('TENANT_ADMIN')")
     @GetMapping(value = "/metadata/query/{metadataQueryId}")
     @ResponseBody
-    public MetadataQuery getMetadataQueryById(@PathVariable("metadataQueryId") String strMetadataQueryId) throws TempusException {
-        checkParameter("metadataQueryId", strMetadataQueryId);
+    public MetadataQuery getMetadataQueryById(@PathVariable(METADATA_QUERY_ID) String strMetadataQueryId) throws TempusException {
+        checkParameter(METADATA_QUERY_ID, strMetadataQueryId);
         try {
             MetadataQueryId metadataQueryId = new MetadataQueryId(toUUID(strMetadataQueryId));
             return metadataQueryService.findById(metadataQueryId);
@@ -145,7 +148,8 @@ public class MetadataController extends BaseController {
     @PreAuthorize("hasAuthority('TENANT_ADMIN')")
     @GetMapping(value = "/metadata/config/{metadataConfigId}/query")
     @ResponseBody
-    public List<MetadataQuery> getMetadataQueriesForConfig(@PathVariable("metadataConfigId") String strMetadataConfigId) throws TempusException {
+    public List<MetadataQuery> getMetadataQueriesForConfig(@PathVariable(METADATA_CONFIG_ID) String strMetadataConfigId) throws TempusException {
+        checkParameter(METADATA_CONFIG_ID, strMetadataConfigId);
         try {
             MetadataConfigId metadataConfigId = new MetadataConfigId(toUUID(strMetadataConfigId));
             return metadataQueryService.findAllByMetadataConfigId(metadataConfigId);
@@ -157,8 +161,8 @@ public class MetadataController extends BaseController {
     @PreAuthorize("hasAuthority('TENANT_ADMIN')")
     @DeleteMapping(value = "/metadata/query/{metadataQueryId}")
     @ResponseStatus(value = HttpStatus.OK)
-    public void deleteMetaDataQuery(@PathVariable("metadataQueryId") String strMetadataQueryId) throws TempusException {
-        checkParameter("metadataQueryId", strMetadataQueryId);
+    public void deleteMetaDataQuery(@PathVariable(METADATA_QUERY_ID) String strMetadataQueryId) throws TempusException {
+        checkParameter(METADATA_QUERY_ID, strMetadataQueryId);
         try {
             MetadataQueryId metadataQueryId = new MetadataQueryId(toUUID(strMetadataQueryId));
             metadataQueryService.delete(metadataQueryId);
