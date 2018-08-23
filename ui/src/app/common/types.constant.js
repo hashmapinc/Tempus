@@ -597,8 +597,8 @@ export default angular.module('tempus.types', [])
                 customTranslationsPrefix: "custom."
             },
             computationType: {
-                spark: "SPARK",
-                kubeless: "KUBELESS"
+                spark: "SPARK"
+                //kubeless: "KUBELESS"
             }
         }
     ).name;
