@@ -193,7 +193,7 @@ export default function CustomerController(customerService, $state, $stateParams
         if ($event) {
             $event.stopPropagation();
         }
-        $state.go('home.customers.usergroups', {customerId: customer.id.id});
+        $state.go('home.customers.users', {customerId: customer.id.id});
     }
 
     function openCustomerAssets($event, customer) {

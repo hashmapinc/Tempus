@@ -18,6 +18,7 @@ import './side-menu.scss';
 
 import tempusMenu from '../services/menu.service';
 import tempusMenuLink from './menu-link.directive';
+import tempusCustomMenu from './custom-menu.directive';
 
 /* eslint-disable import/no-unresolved, import/default */
 
@@ -25,7 +26,7 @@ import sidemenuTemplate from './side-menu.tpl.html';
 
 /* eslint-enable import/no-unresolved, import/default */
 
-export default angular.module('tempus.directives.sideMenu', [tempusMenu, tempusMenuLink])
+export default angular.module('tempus.directives.sideMenu', [tempusMenu, tempusMenuLink,tempusCustomMenu])
     .directive('tbSideMenu', SideMenu)
     .name;
 
@@ -35,6 +36,7 @@ function SideMenu($compile, $templateCache, menu) {
     var linker = function (scope, element) {
 
         scope.sections = menu.getSections();
+        scope.generatedSectionTree = menu.getGeneratedSectionTree();
 
         var template = $templateCache.get(sidemenuTemplate);
 

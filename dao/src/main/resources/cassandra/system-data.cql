@@ -292,7 +292,7 @@ INSERT INTO tempus.rule ( id, tenant_id, name, plugin_token, state, search_text,
 action )
 VALUES ( minTimeuuid ( '2016-11-01 01:01:02+0000' ), minTimeuuid ( 0 ), 'System Telemetry Rule', 'telemetry', 'ACTIVE',
 'system telemetry rule', 0,
-'[{"clazz":"com.hashmapinc.server.extensions.core.filter.MsgTypeFilter", "name":"TelemetryFilter", "configuration": {"messageTypes":["POST_TELEMETRY","POST_ATTRIBUTES","GET_ATTRIBUTES"]}}]',
+'[{"clazz":"com.hashmapinc.server.extensions.core.filter.MsgTypeFilter", "name":"TelemetryFilter", "configuration": {"messageTypes":["POST_TELEMETRY","POST_ATTRIBUTES","GET_ATTRIBUTES","POST_TELEMETRY_DEPTH"]}}]',
 null,
 '{"clazz":"com.hashmapinc.server.extensions.core.action.telemetry.TelemetryPluginAction", "name":"TelemetryMsgConverterAction", "configuration":{}}'
 );

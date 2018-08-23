@@ -16,30 +16,30 @@
  */
 @import "~compass-sass-mixins/lib/compass";
 
+
 .tb-side-menu .md-button.tb-active {
   background-color: rgba(255, 255, 255, 0.15);
   font-weight: 500;
 }
-
 .tb-side-menu, .tb-side-menu ul {
   list-style: none;
   padding: 0;
   margin-top: 0;
 }
 
-.tb-side-menu .tb-menu-toggle-list a.md-button {
+.tb-side-menu .tb-custom-menu-toggle-list a.md-button {
   padding: 0 16px 0 32px;
   text-transform: none;
   text-rendering: optimizeLegibility;
   font-weight: 500;
 }
 
-.tb-side-menu .tb-menu-toggle-list .md-button {
+.tb-side-menu .tb-custom-menu-toggle-list .md-button {
   padding: 0 16px 0 32px;
   text-transform: none;
 }
 
-.tb-side-menu .tb-menu-toggle-list .tb-menu-toggle-list a.md-button {
+.tb-side-menu .tb-custom-menu-toggle-list .tb-custom-menu-toggle-list a.md-button {
   padding: 0 16px 0 48px;
 }
 
@@ -90,4 +90,77 @@
 .tb-side-menu md-icon {
   margin-right: 8px;
   margin-left: 0px;
+}
+
+.tb-side-menu {
+  margin: 0px;
+}
+
+ul.tb-custom-menu-toggle-list{
+  padding-left:0px;
+  //border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+}
+
+.side-menu-tree{
+  border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+}
+
+
+.tb-custom-menu-toggle-list {
+  list-style-type: none;
+  margin: 0px;
+
+  a{
+    display: flex;
+    border-radius: 0;
+    color: inherit;
+    cursor: pointer;
+    line-height: 40px;
+    margin: 0;
+    max-height: 40px;
+    overflow: hidden;
+    padding: 0px;
+    text-align: left;
+    text-decoration: none;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    width: 100%;
+    text-transform: uppercase;
+    font-weight: 500;
+    font-size: 14px;
+    border: none;
+  }
+  md-icon{
+    height: 24px;
+    width: 24px;
+    min-height: 24px;
+    min-width: 24px;
+    margin-right: 8px;
+    margin-left: 0px;
+  }
+
+  img{
+    height: 24px;
+    width: 24px;
+    min-height: 24px;
+    min-width: 24px;
+    margin-right: 8px;
+    margin-left: 0px;
+    margin-top: 8px;
+    margin-bottom: 8px;
+  }
+
+}
+
+.tb-custom-menu-toggle-list .tb-active {
+  background-color: rgba(255, 255, 255, 0.15);
+  font-weight: 500;
+}
+
+.collapsed ul {
+  display: none;
+}
+
+li a:hover {
+  cursor: pointer;
 }
