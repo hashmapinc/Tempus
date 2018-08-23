@@ -50,7 +50,7 @@ public class MetadataController extends BaseController {
     public MetadataConfig saveMetadataConfig(@RequestBody MetadataConfig metadataConfig) throws TempusException {
         try {
             TenantId tenantId = getCurrentUser().getTenantId();
-            metadataConfig.setOwnerId(tenantId.getId().toString());
+            metadataConfig.setOwnerId(UUIDConverter.fromTimeUUID(tenantId.getId()));
             return metadataConfigService.save(metadataConfig);
         } catch (Exception e) {
             throw handleException(e);
@@ -177,9 +177,9 @@ public class MetadataController extends BaseController {
     public void insert(@RequestBody IngestMetadataRequest request) throws TempusException {
         try {
             final MetadataIngestionEntries ingestionEntries = MetadataIngestionEntries.builder()
-                    .metadataConfigId(UUIDConverter.fromTimeUUID(request.getConfigId().getId()))
+                    .metadataConfigId(request.getConfigId())
                     .metadataSourceName(request.getConfigName())
-                    .tenantId(UUIDConverter.fromTimeUUID(toUUID(request.getOwnerId())))
+                    .tenantId(new TenantId(UUIDConverter.fromString(request.getOwnerId())))
                     .metaDataKvEntries(request.getData().entrySet().stream()
                             .map(e -> new MetaDataKvEntry(
                                             new StringDataEntry(e.getKey(), e.getValue().toString()),

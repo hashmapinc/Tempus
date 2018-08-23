@@ -19,7 +19,10 @@ package com.hashmapinc.server.dao.sql.metadataingestion;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.ListeningExecutorService;
 import com.google.common.util.concurrent.MoreExecutors;
+import com.hashmapinc.server.common.data.UUIDConverter;
+import com.hashmapinc.server.common.data.id.TenantId;
 import com.hashmapinc.server.common.data.kv.MetaDataKvEntry;
+import com.hashmapinc.server.common.data.metadata.MetadataConfigId;
 import com.hashmapinc.server.dao.metadataingestion.MetaDataIngestionDao;
 import com.hashmapinc.server.dao.model.sql.MetadataIngestionEntity;
 import com.hashmapinc.server.dao.sql.JpaAbstractDaoListeningExecutorService;
@@ -77,12 +80,12 @@ public class JPAMetadtaIngestionDao extends JpaAbstractDaoListeningExecutorServi
     }
 
     @Override
-    public ListenableFuture<Void> save(String tenantId, String metadataConfigId, String dataSourceName, MetaDataKvEntry metaDataKvEntry) {
+    public ListenableFuture<Void> save(TenantId tenantId, MetadataConfigId metadataConfigId, String dataSourceName, MetaDataKvEntry metaDataKvEntry) {
         MetadataIngestionEntity metadataIngestionEntity = new MetadataIngestionEntity();
         metadataIngestionEntity.setKey(metaDataKvEntry.getKey());
         metadataIngestionEntity.setValue(metaDataKvEntry.getValue());
-        metadataIngestionEntity.setTenantId(tenantId);
-        metadataIngestionEntity.setMetadataConfigId(metadataConfigId);
+        metadataIngestionEntity.setTenantId(UUIDConverter.fromTimeUUID(tenantId.getId()));
+        metadataIngestionEntity.setMetadataConfigId(UUIDConverter.fromTimeUUID(metadataConfigId.getId()));
         metadataIngestionEntity.setMetadataSourceName(dataSourceName);
         metadataIngestionEntity.setLastUpdateTs(metaDataKvEntry.getLastUpdateTs());
         log.trace("Saving MetadataIngestionEntity: {}", metadataIngestionEntity);

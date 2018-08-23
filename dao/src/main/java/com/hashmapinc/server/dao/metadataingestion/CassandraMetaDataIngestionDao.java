@@ -19,14 +19,14 @@ package com.hashmapinc.server.dao.metadataingestion;
 import com.datastax.driver.core.BoundStatement;
 import com.datastax.driver.core.PreparedStatement;
 import com.google.common.util.concurrent.ListenableFuture;
+import com.hashmapinc.server.common.data.id.TenantId;
 import com.hashmapinc.server.common.data.kv.MetaDataKvEntry;
+import com.hashmapinc.server.common.data.metadata.MetadataConfigId;
 import com.hashmapinc.server.dao.model.ModelConstants;
 import com.hashmapinc.server.dao.nosql.CassandraAbstractAsyncDao;
 import com.hashmapinc.server.dao.util.NoSqlDao;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-
-import java.util.UUID;
 
 @Component
 @Slf4j
@@ -36,10 +36,10 @@ public class CassandraMetaDataIngestionDao extends CassandraAbstractAsyncDao imp
     private PreparedStatement saveStmt;
 
     @Override
-    public ListenableFuture<Void> save(String tenantId, String metadataConfigId, String dataSourceName, MetaDataKvEntry metaDataKvEntry){
+    public ListenableFuture<Void> save(TenantId tenantId, MetadataConfigId metadataConfigId, String dataSourceName, MetaDataKvEntry metaDataKvEntry) {
         BoundStatement stmt = getSaveStmt().bind();
-        stmt.setUUID(0, UUID.fromString(tenantId));
-        stmt.setUUID(1, UUID.fromString(metadataConfigId));
+        stmt.setUUID(0, tenantId.getId());
+        stmt.setUUID(1, metadataConfigId.getId());
         stmt.setString(2, dataSourceName);
         stmt.setString(3, metaDataKvEntry.getKey());
         stmt.setString(4, metaDataKvEntry.getValue());
