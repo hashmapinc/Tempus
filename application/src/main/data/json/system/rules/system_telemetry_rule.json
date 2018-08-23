@@ -11,7 +11,8 @@
         "messageTypes": [
           "POST_TELEMETRY",
           "POST_ATTRIBUTES",
-          "GET_ATTRIBUTES"
+          "GET_ATTRIBUTES",
+          "POST_TELEMETRY_DEPTH"
         ]
       }
     }
