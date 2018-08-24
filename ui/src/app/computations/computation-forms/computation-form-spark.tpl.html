@@ -32,12 +32,12 @@
                     </div>
                     <div class="alert tb-flow-drop" flow-drop>
                         <label for="select" translate>import.drop-file</label>
-                        <input class="file-input" flow-btn flow-attrs="{accept:'..jar,application/java-archive'}" id="select">
+                        <input class="file-input" flow-btn flow-attrs="{accept:'.jar,application/java-archive'}" id="select">
                     </div>
                 </div>
             </div>
             <div class="dropdown-messages">
-                <div ng-if="!model.importData" class="tb-error-message" translate>extension.no-file</div>
+                <div ng-if="!model.importData" class="tb-error-message" translate>import.no-file</div>
                 <div ng-if="model.fileName">{{model.fileName}}</div>
             </div>
         </section>
