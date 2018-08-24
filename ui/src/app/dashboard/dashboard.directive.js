@@ -65,8 +65,9 @@ export default function DashboardDirective($compile, $templateCache, $translate,
          * @param dataModelId
          */
         scope.loadDataModelAssets = function(){
+            $log.log(scope.dashboard.dataModelView)
             scope.listOfDataModelAssets = [];
-            scope.dataModelsAssets = datamodelService.getDatamodelObjects(scope.dataModelView.id.id);
+            scope.dataModelsAssets = datamodelService.getDatamodelObjects(scope.dashboard.dataModelView.id.id);
             scope.dataModelsAssets.then(function (data) {
                 angular.forEach(data, function (list) {
                     if (list.type === "Asset") {
@@ -80,7 +81,7 @@ export default function DashboardDirective($compile, $templateCache, $translate,
         /**
          * Show Assets List
          */
-        scope.showAssets = function(dataModel){
+        scope.showAssets = function(dataModel){ 
             scope.showAssetsList = true;
             scope.dataModelView = dataModel;
         }

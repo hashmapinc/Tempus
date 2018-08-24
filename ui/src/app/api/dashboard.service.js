@@ -150,12 +150,41 @@ function DashboardService($rootScope, $http, $q, $location, $filter) {
 
     function saveDashboard(dashboard) {
         var deferred = $q.defer();
-        var url = '/api/dashboard';
-        $http.post(url, cleanDashboard(dashboard)).then(function success(response) {
-            deferred.resolve(prepareDashboard(response.data));
-        }, function fail() {
-            deferred.reject();
-        });
+        var url;        
+        if(dashboard.landingDashboard) {
+            url = '/api/asset/dashboard/';
+            // var assetLandingDashboardInfo ={
+            //     dataModelId:dashboard.dataModelView.id.id,
+            //     dataModelObjectId: dashboard.dataModelAssets.id.id
+            // }
+            var requestBody = {
+                dashboard:{
+                    title:dashboard.title,
+                    configuration : dashboard.configuration,
+                    type: "ASSET_LANDING_PAGE"
+                 },
+                 assetLandingDashboardInfo:{  
+                    dataModelId:{  
+                       id:dashboard.dataModelView.id.id
+                    },
+                    dataModelObjectId:{  
+                       id:dashboard.dataModelAssets.id.id
+                    }
+                 }
+            }
+            $http.post(url, cleanDashboard(requestBody)).then(function success(response) {
+                deferred.resolve(prepareDashboard(response.data));
+            }, function fail() {
+                deferred.reject();
+            }); 
+        }else {
+            url = '/api/dashboard';
+            $http.post(url, cleanDashboard(dashboard)).then(function success(response) {
+                deferred.resolve(prepareDashboard(response.data));
+            }, function fail() {
+                deferred.reject();
+            });
+        }
         return deferred.promise;
     }
 
