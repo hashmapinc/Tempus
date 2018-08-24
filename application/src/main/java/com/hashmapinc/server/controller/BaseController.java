@@ -66,9 +66,11 @@ import com.hashmapinc.server.service.security.model.SecurityUser;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.client.HttpClientErrorException;
 
 import javax.mail.MessagingException;
 import javax.servlet.http.HttpServletRequest;
@@ -84,6 +86,7 @@ public abstract class BaseController {
 
     public static final String INCORRECT_TENANT_ID = "Incorrect tenantId ";
     public static final String YOU_DON_T_HAVE_PERMISSION_TO_PERFORM_THIS_OPERATION = "You don't have permission to perform this operation!";
+    private static final String ITEM_NOT_FOUND = "Requested item wasn't found!";
 
     @Autowired
     private TempusErrorResponseHandler errorResponseHandler;
@@ -184,6 +187,8 @@ public abstract class BaseController {
             return new TempusException(exception.getMessage(), TempusErrorCode.BAD_REQUEST_PARAMS);
         } else if (exception instanceof MessagingException) {
             return new TempusException("Unable to send mail: " + exception.getMessage(), TempusErrorCode.GENERAL);
+        } else if (exception instanceof HttpClientErrorException && ((HttpClientErrorException) exception).getStatusCode().equals(HttpStatus.NOT_FOUND)) {
+            return new TempusException(ITEM_NOT_FOUND, TempusErrorCode.ITEM_NOT_FOUND);
         } else {
             return new TempusException(exception.getMessage(), TempusErrorCode.GENERAL);
         }
@@ -191,7 +196,7 @@ public abstract class BaseController {
 
     <T> T checkNotNull(T reference) throws TempusException {
         if (reference == null) {
-            throw new TempusException("Requested item wasn't found!", TempusErrorCode.ITEM_NOT_FOUND);
+            throw new TempusException(ITEM_NOT_FOUND, TempusErrorCode.ITEM_NOT_FOUND);
         }
         return reference;
     }
@@ -200,7 +205,7 @@ public abstract class BaseController {
         if (reference.isPresent()) {
             return reference.get();
         } else {
-            throw new TempusException("Requested item wasn't found!", TempusErrorCode.ITEM_NOT_FOUND);
+            throw new TempusException(ITEM_NOT_FOUND, TempusErrorCode.ITEM_NOT_FOUND);
         }
     }
 
