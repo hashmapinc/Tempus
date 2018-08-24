@@ -595,6 +595,10 @@ export default angular.module('tempus.types', [])
             },
             translate: {
                 customTranslationsPrefix: "custom."
+            },
+            computationType: {
+                spark: "SPARK"
+                //kubeless: "KUBELESS"
             }
         }
     ).name;

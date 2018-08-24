@@ -24,7 +24,7 @@ import computationJobCard from './computation-job-card.tpl.html';
 /* eslint-enable import/no-unresolved, import/default */
 
 /*@ngInject*/
-export default function ComputationController(computationService, computationJobService, userService, importExport, $state, $stateParams, $translate, types) {
+export default function ComputationController(computationService, computationJobService, userService, $state, $stateParams, $translate, types) {
 
     var computationActionsList = [
         {
@@ -34,21 +34,6 @@ export default function ComputationController(computationService, computationJob
             name: function() { return $translate.instant('action.delete') },
             details: function() { return $translate.instant('computation.delete') },
             icon: "delete",
-        }
-    ];
-
-    var computationAddItemActionsList = [
-        {
-            onAction: function ($event) {
-                importExport.importComputation($event).then(
-                    function() {
-                        vm.grid.refreshList();
-                    }
-                );
-            },
-            name: function() { return $translate.instant('action.import') },
-            details: function() { return $translate.instant('computation.import') },
-            icon: "file_upload"
         }
     ];
 
@@ -72,12 +57,11 @@ export default function ComputationController(computationService, computationJob
         parentCtl: vm,
 
         actionsList: computationActionsList,
-        addItemActions: computationAddItemActionsList,
 
         onGridInited: gridInited,
 
         addItemTemplateUrl: addComputationTemplate,
-
+        addItemController: 'AddComputationController',
         addItemText: function() { return $translate.instant('computation.add-computation-text') },
         noItemsText: function() { return $translate.instant('computation.no-computations-text') },
 
@@ -96,7 +80,6 @@ export default function ComputationController(computationService, computationJob
     }
 
     function fetchComputations(pageLink) {
-
         return computationService.getAllComputations(pageLink);
     }
 
