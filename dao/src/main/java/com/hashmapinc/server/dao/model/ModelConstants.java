@@ -176,6 +176,7 @@ public class ModelConstants {
      * Metadata Ingestion Constants
      */
     public static final String METADATA_ENTRIES_TABLE = "metadata_entries";
+    public static final String METADATA_ENTRIES_VIEW_BY_CONFIG = "metadata_entries_by_config";
     public static final String METADATA_CONFIG_ID = "metadata_config_id";
     public static final String METADATA_INGESTION_KEY_COLUMN = "key";
     public static final String METADATA_DATASOURCE_NAME_COLUMN = "datasource_name";
