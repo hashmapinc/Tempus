@@ -16,6 +16,8 @@
  */
 package com.hashmapinc.server.dao.sql.metadataingestion;
 
+import com.google.common.collect.Lists;
+import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.ListeningExecutorService;
 import com.google.common.util.concurrent.MoreExecutors;
@@ -23,6 +25,7 @@ import com.hashmapinc.server.common.data.UUIDConverter;
 import com.hashmapinc.server.common.data.id.TenantId;
 import com.hashmapinc.server.common.data.kv.MetaDataKvEntry;
 import com.hashmapinc.server.common.data.metadata.MetadataConfigId;
+import com.hashmapinc.server.dao.DaoUtil;
 import com.hashmapinc.server.dao.metadataingestion.MetaDataIngestionDao;
 import com.hashmapinc.server.dao.model.sql.MetadataIngestionEntity;
 import com.hashmapinc.server.dao.sql.JpaAbstractDaoListeningExecutorService;
@@ -34,6 +37,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
+import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.Executors;
 
@@ -93,5 +97,14 @@ public class JPAMetadtaIngestionDao extends JpaAbstractDaoListeningExecutorServi
             metadataIngestionEntityRepository.save(metadataIngestionEntity);
             return null;
         });
+    }
+
+    @Override
+    public ListenableFuture<List<MetaDataKvEntry>> findAll(MetadataConfigId metadataConfigId) {
+        return Futures.immediateFuture(
+                DaoUtil.convertDataList(Lists.newArrayList(
+                        metadataIngestionEntityRepository.findByMetadataConfigIdOrderByKeyAsc(UUIDConverter.fromTimeUUID(metadataConfigId.getId()))
+                ))
+        );
     }
 }

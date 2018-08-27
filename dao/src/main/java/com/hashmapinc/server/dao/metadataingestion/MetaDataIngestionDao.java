@@ -21,8 +21,11 @@ import com.hashmapinc.server.common.data.id.TenantId;
 import com.hashmapinc.server.common.data.kv.MetaDataKvEntry;
 import com.hashmapinc.server.common.data.metadata.MetadataConfigId;
 
+import java.util.List;
+
 public interface MetaDataIngestionDao {
 
     ListenableFuture<Void> save(TenantId tenantId, MetadataConfigId metadataConfigId, String dataSourceName, MetaDataKvEntry metaDataKvEntry);
 
+    ListenableFuture<List<MetaDataKvEntry>> findAll(MetadataConfigId metadataConfigId);
 }

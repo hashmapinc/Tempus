@@ -18,15 +18,27 @@ package com.hashmapinc.server.dao.metadataingestion;
 
 import com.datastax.driver.core.BoundStatement;
 import com.datastax.driver.core.PreparedStatement;
+import com.datastax.driver.core.ResultSet;
+import com.datastax.driver.core.Row;
+import com.datastax.driver.core.querybuilder.Select;
+import com.google.common.base.Function;
+import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.hashmapinc.server.common.data.id.TenantId;
 import com.hashmapinc.server.common.data.kv.MetaDataKvEntry;
+import com.hashmapinc.server.common.data.kv.StringDataEntry;
 import com.hashmapinc.server.common.data.metadata.MetadataConfigId;
 import com.hashmapinc.server.dao.model.ModelConstants;
 import com.hashmapinc.server.dao.nosql.CassandraAbstractAsyncDao;
 import com.hashmapinc.server.dao.util.NoSqlDao;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import static com.datastax.driver.core.querybuilder.QueryBuilder.eq;
+import static com.datastax.driver.core.querybuilder.QueryBuilder.select;
 
 @Component
 @Slf4j
@@ -47,6 +59,15 @@ public class CassandraMetaDataIngestionDao extends CassandraAbstractAsyncDao imp
         return getFuture(executeAsyncWrite(stmt), rs -> null);
     }
 
+    @Override
+    public ListenableFuture<List<MetaDataKvEntry>> findAll(MetadataConfigId metadataConfigId) {
+        Select.Where select = select().from(ModelConstants.METADATA_ENTRIES_VIEW_BY_CONFIG)
+                .where(eq(ModelConstants.METADATA_CONFIG_ID, metadataConfigId.getId()));
+        log.trace("Generated query [{}] for metadataConfigId {}", select, metadataConfigId);
+        return Futures.transform(executeAsyncRead(select), (Function<? super ResultSet, ? extends List<MetaDataKvEntry>>) this::convertResultToMetadataKvEntryList
+                , readResultsProcessingExecutor);
+    }
+
     private PreparedStatement getSaveStmt() {
         if (saveStmt == null) {
             saveStmt = getSession().prepare("INSERT INTO " + ModelConstants.METADATA_ENTRIES_TABLE +
@@ -60,5 +81,17 @@ public class CassandraMetaDataIngestionDao extends CassandraAbstractAsyncDao imp
                     " VALUES(?, ?, ?, ?, ?, ?)");
         }
         return saveStmt;
+    }
+
+    private List<MetaDataKvEntry> convertResultToMetadataKvEntryList(ResultSet resultSet) {
+        List<Row> rows = resultSet.all();
+        List<MetaDataKvEntry> entries = new ArrayList<>(rows.size());
+        rows.forEach(row -> {
+            String key = row.getString(ModelConstants.METADATA_INGESTION_KEY_COLUMN);
+            String value = row.getString(ModelConstants.METADATA_INGESTION_VALUE_COLUMN);
+            long lastUpdateTs = row.get(ModelConstants.LAST_UPDATE_TS_COLUMN, Long.class);
+            entries.add(new MetaDataKvEntry(new StringDataEntry(key, value), lastUpdateTs));
+        });
+        return entries;
     }
 }

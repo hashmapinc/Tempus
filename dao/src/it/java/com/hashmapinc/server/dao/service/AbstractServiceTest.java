@@ -33,11 +33,7 @@ import com.hashmapinc.server.common.data.plugin.ComponentScope;
 import com.hashmapinc.server.common.data.plugin.ComponentType;
 import com.hashmapinc.server.common.data.plugin.PluginMetaData;
 import com.hashmapinc.server.common.data.rule.RuleMetaData;
-
 import com.hashmapinc.server.dao.UserServiceTestConfiguration;
-
-import com.hashmapinc.server.dao.tagmetadata.TagMetaDataService;
-
 import com.hashmapinc.server.dao.alarm.AlarmService;
 import com.hashmapinc.server.dao.asset.AssetService;
 import com.hashmapinc.server.dao.audit.AuditLogLevelFilter;
@@ -54,10 +50,12 @@ import com.hashmapinc.server.dao.device.DeviceCredentialsService;
 import com.hashmapinc.server.dao.device.DeviceService;
 import com.hashmapinc.server.dao.event.EventService;
 import com.hashmapinc.server.dao.logo.LogoService;
+import com.hashmapinc.server.dao.metadataingestion.MetadataIngestionService;
 import com.hashmapinc.server.dao.plugin.PluginService;
 import com.hashmapinc.server.dao.relation.RelationService;
 import com.hashmapinc.server.dao.rule.RuleService;
 import com.hashmapinc.server.dao.settings.UserSettingsService;
+import com.hashmapinc.server.dao.tagmetadata.TagMetaDataService;
 import com.hashmapinc.server.dao.tenant.TenantService;
 import com.hashmapinc.server.dao.theme.ThemeService;
 import com.hashmapinc.server.dao.timeseries.TimeseriesService;
@@ -166,6 +164,9 @@ public abstract class AbstractServiceTest {
 
     @Autowired
     protected DataModelObjectService dataModelObjectService;
+
+    @Autowired
+    protected MetadataIngestionService metadataIngestionService;
 
     class IdComparator<D extends BaseData<? extends UUIDBased>> implements Comparator<D> {
         @Override
