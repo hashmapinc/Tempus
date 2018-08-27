@@ -19,7 +19,7 @@ import addUserTemplate from './add-user.tpl.html';
 import userCard from './user-card.tpl.html';
 import activationLinkDialogTemplate from './activation-link.dialog.tpl.html';
 import assignGroupsToUsers from './assign-to-user.tpl.html';
-import unassignGroupsToUsers from './unassign-to-user.tpl.html';
+import unassignGroupsFromUser from './unassign-from-user.tpl.html';
 //import unassignUserToGroups from './unassign-to-group.tpl.html';
 
 
@@ -27,7 +27,7 @@ import unassignGroupsToUsers from './unassign-to-user.tpl.html';
 
 
 /*@ngInject*/
-export default function UserController(usergroupService, $log, userService, toast, $scope, $mdDialog, $document, $controller, $state, $stateParams, $translate, types) {
+export default function UserController(userGroupService, userService, toast, $scope, $mdDialog, $document, $controller, $state, $stateParams, $translate, types) {
 
     var tenantId = $stateParams.tenantId;
     var customerId = $stateParams.customerId;
@@ -52,7 +52,7 @@ export default function UserController(usergroupService, $log, userService, toas
 
         {
             onAction: function($event, item) {
-                unassignToUsers($event, [item.id.id]);
+                unassignFromUsers($event, [item.id.id]);
             },
             name: function() {
                 return $translate.instant('action.unassign')
@@ -83,7 +83,7 @@ export default function UserController(usergroupService, $log, userService, toas
 
     vm.types = types;
     vm.assignGroupToUsers = assignGroupToUsers;
-    vm.unassignToUsers = unassignToUsers;
+    vm.unassignFromUsers = unassignFromUsers;
     vm.customerId = customerId;
 
     vm.userGridConfig = {
@@ -220,30 +220,30 @@ export default function UserController(usergroupService, $log, userService, toas
 
         var pageSize = 10;
 
-        usergroupService.getGroups(vm.customerId, {
+        userGroupService.getGroups(vm.customerId, {
             limit: pageSize,
             textSearch: ''
         }).then(
-            function success(_users) {
-                var users = {
+            function success(_groups) {
+                var groups = {
                     pageSize: pageSize,
-                    data: _users.data,
-                    nextPageLink: _users.nextPageLink,
+                    data: _groups.data,
+                    nextPageLink: _groups.nextPageLink,
                     selection: null,
-                    hasNext: _users.hasNext,
+                    hasNext: _groups.hasNext,
                     pending: false
                 };
-                if (users.hasNext) {
-                    users.nextPageLink.limit = pageSize;
+                if (groups.hasNext) {
+                    groups.nextPageLink.limit = pageSize;
                 }
 
                 $mdDialog.show({
-                    controller: 'AddGroupsToUserController',
+                    controller: 'AssignGroupsToUserController',
                     controllerAs: 'vm',
                     templateUrl: assignGroupsToUsers,
                     locals: {
                         userId: id,
-                        users: users,
+                        groups: groups,
                         customerId: vm.customerId
                     },
                     parent: angular.element($document[0].body),
@@ -254,13 +254,13 @@ export default function UserController(usergroupService, $log, userService, toas
                 }, function() {});
 
 
-                $log.log(users, id);
+
             },
             function fail() {});
 
 
     }
-    function unassignToUsers($event,id) {
+    function unassignFromUsers($event,id) {
 
          if ($event) {
              $event.stopPropagation();
@@ -270,30 +270,30 @@ export default function UserController(usergroupService, $log, userService, toas
 
          var pageSize = 10;
 
-         usergroupService.assignedGroups(id, {
+         userGroupService.assignedGroups(id, {
              limit: pageSize,
              textSearch: ''
          }).then(
-             function success(_users) {
-                 var users = {
+             function success(_groups) {
+                 var groups = {
                      pageSize: pageSize,
-                     data: _users.data,
-                     nextPageLink: _users.nextPageLink,
+                     data: _groups.data,
+                     nextPageLink: _groups.nextPageLink,
                      selection: null,
-                     hasNext: _users.hasNext,
+                     hasNext: _groups.hasNext,
                      pending: false
                  };
-                 if (users.hasNext) {
-                     users.nextPageLink.limit = pageSize;
+                 if (groups.hasNext) {
+                     groups.nextPageLink.limit = pageSize;
                  }
 
                  $mdDialog.show({
-                     controller: 'DeleteGroupsToUserController',
+                     controller: 'UnassignGroupsFromUserController',
                      controllerAs: 'vm',
-                     templateUrl: unassignGroupsToUsers,
+                     templateUrl: unassignGroupsFromUser,
                      locals: {
                          userId: id,
-                         users: users,
+                         groups: groups,
                          customerId: vm.customerId
                      },
                      parent: angular.element($document[0].body),
@@ -304,7 +304,7 @@ export default function UserController(usergroupService, $log, userService, toas
                  }, function() {});
 
 
-                 $log.log(users, id);
+
              },
              function fail() {});
 

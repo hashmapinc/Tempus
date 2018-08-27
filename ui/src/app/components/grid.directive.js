@@ -362,6 +362,8 @@ function GridController($scope, $rootScope, $state, $mdDialog, $document, $q, $m
 
         vm.itemHeight = vm.config.itemHeight || 199;
 
+        vm.addIcon = vm.config.addIcon || "add";
+
         vm.refreshParamsFunc = vm.config.refreshParamsFunc || function () {
                 return {"topIndex": vm.topIndex};
             };
@@ -453,7 +455,6 @@ function GridController($scope, $rootScope, $state, $mdDialog, $document, $q, $m
                 return $translate.instant('grid.add-item-text');
             };
 
-        if (angular.isDefined(vm.config.entType) && vm.config.entType == "usergroup") {
 
             vm.addItemAction = vm.config.addItemAction || {
                     onAction: function ($event) {
@@ -461,21 +462,8 @@ function GridController($scope, $rootScope, $state, $mdDialog, $document, $q, $m
                     },
                     name: function() { return $translate.instant('action.add') },
                     details: function() { return vm.addItemText() },
-                    icon: "group_add"
+                    icon: vm.addIcon
                 };
-        } else {
-            vm.addItemAction = vm.config.addItemAction || {
-                    onAction: function ($event) {
-                        addItem($event);
-                    },
-                    name: function() { return $translate.instant('action.add') },
-                    details: function() { return vm.addItemText() },
-                    icon: "add"
-                };
-
-        }
-
-
 
         vm.addItemActionsOpen = false;
 
