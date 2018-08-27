@@ -17,22 +17,21 @@
 import uiRouter from 'angular-ui-router';
 import tempusGrid from '../components/grid.directive';
 import tempusApiUser from '../api/user.service';
-import tempusApiUserGroup from '../api/usergroup.service';
+import tempusApiUserGroup from '../api/user-group.service';
 import tempusToast from '../services/toast';
 
 import UserRoutes from './user.routes';
 import UserController from './user.controller';
-import UserActionListController from './useractionlist.controller';
 import UserGroupController from './usergroup.controller';
 import AddGroupModelController from './add-group.controller'
 import AddUserController from './add-user.controller';
 import ActivationLinkDialogController from './activation-link.controller';
 import UserDirective from './user.directive';
 import UsergroupDirective from './usergroup.directive';
-import AddUsersToGroupController from './add-users-to-group.controller';
-import AddGroupsToUserController from './add-groups-to-user.controller';
-import DeleteUsersToGroupController from './delete-users-to-group.controller';
-import DeleteGroupsToUserController from './delete-groups-to-user.controller'
+import AssignUsersToGroupController from './assign-users-to-group.controller';
+import AssignGroupsToUserController from './assign-groups-to-user.controller';
+import UnassignUsersFromGroupController from './unassign-users-from-group.controller';
+import UnassignGroupsFromUserController from './unassign-groups-from-user.controller'
 
 export default angular.module('tempus.user', [
     uiRouter,
@@ -43,15 +42,14 @@ export default angular.module('tempus.user', [
 ])
     .config(UserRoutes)
     .controller('UserController', UserController)
-    .controller('UserActionListController', UserActionListController)
     .controller('AddUserController', AddUserController)
     .controller('UserGroupController', UserGroupController)
     .controller('AddGroupModelController', AddGroupModelController)
     .controller('ActivationLinkDialogController', ActivationLinkDialogController)
-    .controller('AddUsersToGroupController', AddUsersToGroupController)
-    .controller('DeleteUsersToGroupController', DeleteUsersToGroupController)
-    .controller('AddGroupsToUserController', AddGroupsToUserController)
-    .controller('DeleteGroupsToUserController', DeleteGroupsToUserController)
+    .controller('AssignUsersToGroupController', AssignUsersToGroupController)
+    .controller('UnassignUsersFromGroupController', UnassignUsersFromGroupController)
+    .controller('AssignGroupsToUserController', AssignGroupsToUserController)
+    .controller('UnassignGroupsFromUserController', UnassignGroupsFromUserController)
     .directive('tbUser', UserDirective)
     .directive('tbUsergroup', UsergroupDirective)
     .name;
