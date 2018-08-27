@@ -19,10 +19,7 @@ package com.hashmapinc.server.controller;
 import com.datastax.driver.core.utils.UUIDs;
 import com.hashmapinc.server.common.data.EntityType;
 import com.hashmapinc.server.common.data.audit.ActionType;
-import com.hashmapinc.server.common.data.computation.ComputationJob;
-import com.hashmapinc.server.common.data.computation.ComputationType;
-import com.hashmapinc.server.common.data.computation.Computations;
-import com.hashmapinc.server.common.data.computation.SparkComputationMetadata;
+import com.hashmapinc.server.common.data.computation.*;
 import com.hashmapinc.server.common.data.id.ComputationId;
 import com.hashmapinc.server.common.data.id.TenantId;
 import com.hashmapinc.server.common.data.page.TextPageData;
@@ -33,6 +30,8 @@ import com.hashmapinc.server.dao.model.ModelConstants;
 import com.hashmapinc.server.exception.TempusErrorCode;
 import com.hashmapinc.server.exception.TempusException;
 import com.hashmapinc.server.service.computation.ComputationDiscoveryService;
+import com.hashmapinc.server.service.computation.ComputationFunctionDeploymentService;
+import com.hashmapinc.server.service.computation.ComputationFunctionService;
 import com.hashmapinc.server.service.security.model.SecurityUser;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,6 +48,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -68,6 +68,12 @@ public class ComputationsController extends BaseController {
 
     @Autowired
     private ComputationDiscoveryService computationDiscoveryService;
+
+    @Autowired
+    private ComputationFunctionService computationFunctionService;
+
+    @Autowired
+    private ComputationFunctionDeploymentService computationFunctionDeploymentService;
 
     @PreAuthorize("hasAuthority('TENANT_ADMIN')")
     @PostMapping(value = "/computations/upload", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -103,9 +109,10 @@ public class ComputationsController extends BaseController {
     @PreAuthorize("hasAuthority('TENANT_ADMIN')")
     @PostMapping(value = "/computations", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
-    public Computations addComputations(@RequestBody Computations computation) throws TempusException {
+    public ComputationRequest addComputations(@RequestBody ComputationRequest computationRequest) throws TempusException {
         try {
             TenantId tenantId = getCurrentUser().getTenantId();
+            Computations computation = computationRequest.getComputation();
             computation.setTenantId(tenantId);
             Optional<Computations> savedComputation = computationsService.findByTenantIdAndName(tenantId, computation.getName());
             if(!savedComputation.isPresent()){
@@ -116,15 +123,20 @@ public class ComputationsController extends BaseController {
                 computation.setId(savedComputation.get().getId());
                 computation.getComputationMetadata().setId(savedComputation.get().getId());
             }
-            computationDiscoveryService.uploadToS3Bucket(computation);
+            if(computationFunctionService.uploadKubelessFunction(computationRequest, tenantId)) {
+                computationFunctionDeploymentService.deployKubelessFunction(computationRequest);
+                computationsService.save(computationRequest.getComputation());
+            }
+            else
+                throw new TempusException("Kubeless function upload unsuccessful ", TempusErrorCode.GENERAL);
         } catch (Exception e){
-            logEntityAction(emptyId(EntityType.COMPUTATION), computation, null,
+            logEntityAction(emptyId(EntityType.COMPUTATION), computationRequest.getComputation(), null,
                     ActionType.ADDED, e);
             log.info("Exception is : " + e);
             throw handleException(e);
         }
 
-        return computation;
+        return computationRequest;
     }
 
     @PreAuthorize("hasAuthority('TENANT_ADMIN')")
@@ -180,14 +192,24 @@ public class ComputationsController extends BaseController {
     @PreAuthorize("hasAnyAuthority('SYS_ADMIN', 'TENANT_ADMIN')")
     @GetMapping(value = "/computations")
     @ResponseBody
-    public List<Computations> getComputations() throws TempusException {
+    public List<ComputationRequest> getComputations() throws TempusException {
         try {
+                List<ComputationRequest> crList = new ArrayList<>();
                 TenantId tenantId = getCurrentUser().getTenantId();
                 List<Computations> computations = checkNotNull(computationsService.findAllTenantComputationsByTenantId(tenantId));
                 computations = computations.stream()
                         .filter(computation -> !computation.getTenantId().getId().equals(ModelConstants.NULL_UUID)).collect(Collectors.toList());
+                for (Computations computation : computations) {
+                    if(computation.getType() == ComputationType.KUBELESS) {
+                        crList.add(computationFunctionDeploymentService.fetchKubelessFunction(computation));
+                    } else if (computation.getType() == ComputationType.SPARK) {
+                        ComputationRequest cr = new ComputationRequest();
+                        cr.setComputation(computation);
+                        crList.add(cr);
+                    }
+                }
                 log.info(" returning Computations {} ", computations);
-                return computations;
+                return crList;
         } catch (Exception e) {
             throw handleException(e);
         }
@@ -196,13 +218,19 @@ public class ComputationsController extends BaseController {
     @PreAuthorize("hasAnyAuthority('SYS_ADMIN', 'TENANT_ADMIN')")
     @GetMapping(value = "/computations/{computationId}")
     @ResponseBody
-    public Computations getComputation(@PathVariable(COMPUTATION_ID) String strComputationId) throws TempusException {
+    public ComputationRequest getComputation(@PathVariable(COMPUTATION_ID) String strComputationId) throws TempusException {
 
         try {
+            ComputationRequest cr = new ComputationRequest();
             ComputationId computationId = new ComputationId(toUUID(strComputationId));
             Computations computation = checkNotNull(computationsService.findById(computationId));
+            if(computation.getType() == ComputationType.KUBELESS) {
+                cr = computationFunctionDeploymentService.fetchKubelessFunction(computation);
+            } else if (computation.getType() == ComputationType.SPARK) {
+                cr.setComputation(computation);
+            }
             log.info(" returning Computations by id {} ", computation);
-            return computation;
+            return cr;
         } catch (Exception e) {
             throw handleException(e);
         }

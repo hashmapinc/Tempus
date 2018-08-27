@@ -14,17 +14,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.hashmapinc.server.json;
+package com.hashmapinc.server.common.data.computation;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
+
+import java.util.Base64;
 
 @Data
-@EqualsAndHashCode
-public class KafkaFunction implements ParentInterface{
-
-    private String topic;
-    private String label;
-    private JsonNode conf;
+public class ComputationRequest {
+    private Computations computation;
+    private String functionContent;
+    //private boolean isZip;
 }
+

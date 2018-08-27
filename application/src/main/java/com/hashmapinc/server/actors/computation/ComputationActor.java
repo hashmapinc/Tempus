@@ -24,9 +24,7 @@ import com.hashmapinc.server.actors.ActorSystemContext;
 import com.hashmapinc.server.actors.service.ContextAwareActor;
 import com.hashmapinc.server.actors.service.ContextBasedCreator;
 import com.hashmapinc.server.actors.service.DefaultActorService;
-import com.hashmapinc.server.common.data.computation.ComputationJob;
-import com.hashmapinc.server.common.data.computation.ComputationType;
-import com.hashmapinc.server.common.data.computation.Computations;
+import com.hashmapinc.server.common.data.computation.*;
 import com.hashmapinc.server.common.data.id.ComputationId;
 import com.hashmapinc.server.common.data.id.ComputationJobId;
 import com.hashmapinc.server.common.data.id.TenantId;
@@ -66,6 +64,25 @@ public class ComputationActor extends ContextAwareActor {
         computation = systemContext.getComputationsService().findById(computationId);
         if(computation == null){
             throw new ComputationInitializationException("Computation not found!");
+        }
+        if(computation.getType() == ComputationType.KUBELESS) {
+            ComputationRequest cr = systemContext.getComputationFunctionDeploymentService().fetchKubelessFunction(computation);
+            if (cr == null) {
+                KubelessComputationMetadata md = (KubelessComputationMetadata) computation.getComputationMetadata();
+                try {
+                    String functionContent = systemContext.getComputationFunctionService().getFunctionByTenantAndName(tenantId, md.getFunction());
+                    if (functionContent == null) {
+                        throw new ComputationInitializationException("Kubeless Computation function not found!");
+                    } else {
+                        cr = new ComputationRequest();
+                        cr.setComputation(computation);
+                        cr.setFunctionContent(functionContent);
+                        systemContext.getComputationFunctionDeploymentService().deployKubelessFunction(cr);
+                    }
+                } catch (Exception e ){
+                    logger.info("Exeption occured while deploying kubeless function : ", e);
+                }
+            }
         }
         init();
         logger.info("[{}][{}] Started computation actor.", computation, tenantId);

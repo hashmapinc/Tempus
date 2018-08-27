@@ -34,6 +34,7 @@ import com.hashmapinc.server.actors.shared.plugin.TenantPluginManager;
 import com.hashmapinc.server.actors.shared.rule.RuleManager;
 import com.hashmapinc.server.actors.shared.rule.TenantRuleManager;
 import com.hashmapinc.server.common.data.computation.ComputationType;
+import com.hashmapinc.server.common.data.computation.Computations;
 import com.hashmapinc.server.common.data.id.*;
 import com.hashmapinc.server.common.msg.cluster.ClusterEventMsg;
 import com.hashmapinc.server.common.msg.device.ToDeviceActorMsg;
@@ -150,7 +151,8 @@ public class TenantActor extends ContextAwareActor {
     }
 
     private void onComponentLifecycleMsgForComputation(ComponentLifecycleMsg msg, ComputationId computationId) {
-        ActorRef computationActor = computationManager.getOrCreateComputationActor(this.context(), computationId, ComputationType.SPARK);
+        Computations computation = systemContext.getComputationsService().findById(computationId);
+        ActorRef computationActor = computationManager.getOrCreateComputationActor(this.context(), computationId, computation.getType());
         computationActor.tell(msg, ActorRef.noSender());
     }
 

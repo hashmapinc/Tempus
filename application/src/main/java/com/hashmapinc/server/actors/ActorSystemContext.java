@@ -30,6 +30,8 @@ import com.hashmapinc.server.dao.cluster.NodeMetricService;
 import com.hashmapinc.server.dao.event.EventService;
 import com.hashmapinc.server.service.cluster.discovery.DiscoveryService;
 import com.hashmapinc.server.service.component.ComponentDiscoveryService;
+import com.hashmapinc.server.service.computation.ComputationFunctionDeploymentService;
+import com.hashmapinc.server.service.computation.ComputationFunctionService;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 import lombok.Getter;
@@ -137,6 +139,12 @@ public class ActorSystemContext {
 
     @Autowired
     @Getter private NodeMetricService nodeMetricService;
+
+    @Autowired
+    @Getter private ComputationFunctionService computationFunctionService;
+
+    @Autowired
+    @Getter private ComputationFunctionDeploymentService computationFunctionDeploymentService;
 
     @Autowired
     @Getter @Setter private PluginWebSocketMsgEndpoint wsMsgEndpoint;

@@ -17,7 +17,6 @@
 package com.hashmapinc.server.service.computation;
 
 import com.datastax.driver.core.utils.UUIDs;
-import com.hashmapinc.server.common.data.computation.ComputationMetadata;
 import com.hashmapinc.server.common.data.computation.ComputationType;
 import com.hashmapinc.server.common.data.computation.Computations;
 import com.hashmapinc.server.common.data.computation.SparkComputationMetadata;
@@ -48,7 +47,7 @@ UploadComputationDiscoveryService implements ComputationDiscoveryService{
     private ComputationsService computationsService;
 
     @Autowired
-    private S3BucketService s3BucketService;
+    private MinioService minioService;
 
     private RuntimeJavaCompiler compiler;
 
@@ -116,12 +115,6 @@ UploadComputationDiscoveryService implements ComputationDiscoveryService{
     @Override
     public Computations onJarUpload(String path, TenantId tenantId) {
         return onFileCreate(new File(path), tenantId);
-    }
-
-    @Override
-    public void uploadToS3Bucket(Computations computation){
-        if(s3BucketService.uploadToS3Bucket(computation))
-            computationsService.save(computation);
     }
 
     @PreDestroy

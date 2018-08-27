@@ -14,18 +14,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.hashmapinc.server.json;
+package com.hashmapinc.server.service.computation;
 
-import com.fasterxml.jackson.annotation.JsonSubTypes;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.hashmapinc.server.common.data.computation.ComputationRequest;
+import com.hashmapinc.server.common.data.computation.Computations;
 
-@JsonTypeInfo(
-        use = JsonTypeInfo.Id.NAME,
-        include = JsonTypeInfo.As.PROPERTY,
-        property = "type")
-@JsonSubTypes({
-        @JsonSubTypes.Type(value = CronFunction.class, name = "cron"),
-        @JsonSubTypes.Type(value = KafkaFunction.class, name = "kafka")
-})
-public interface ParentInterface {
+public interface ComputationFunctionDeploymentService {
+    void deployKubelessFunction(ComputationRequest computationRequest);
+    ComputationRequest fetchKubelessFunction(Computations computation);
 }
