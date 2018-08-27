@@ -126,7 +126,7 @@ function Grid() {
 }
 
 /*@ngInject*/
-function GridController($scope, $rootScope, $state, $mdDialog, $document, $q, $mdUtil, $timeout, $translate, $mdMedia, $templateCache, $window, userService,$log) {
+function GridController($scope, $rootScope, $state, $mdDialog, $document, $q, $mdUtil, $timeout, $translate, $mdMedia, $templateCache, $window, userService) {
 
     var vm = this;
 
@@ -660,7 +660,6 @@ function GridController($scope, $rootScope, $state, $mdDialog, $document, $q, $m
             if (vm.detailsConfig.editingItem) {
                 vm.detailsConfig.editingItem = null;
             }
-            $log.log(vm.detailsConfig.currentItem)
             return vm.detailsConfig.currentItem;
         } else {
             if (!vm.detailsConfig.editingItem) {
@@ -824,7 +823,7 @@ function GridController($scope, $rootScope, $state, $mdDialog, $document, $q, $m
 }
 
 /*@ngInject*/
-function AddItemController($scope, $mdDialog, saveItemFunction, helpLinks,$log) {
+function AddItemController($scope, $mdDialog, saveItemFunction, helpLinks) {
 
     var vm = this;
     vm.helpLinks = helpLinks;
@@ -838,8 +837,6 @@ function AddItemController($scope, $mdDialog, saveItemFunction, helpLinks,$log) 
     }
 
     function add() {
-        $log.log("add");
-        $log.log(vm.item);
         saveItemFunction(vm.item).then(function success(item) {
             vm.item = item;
             $scope.theForm.$setPristine();

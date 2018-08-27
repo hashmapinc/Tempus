@@ -82,10 +82,10 @@
 				{{ 'dashboard.dashboard-landing-page' | translate }}
 			</md-checkbox>
 		</div>
-		<md-select ng-if="dashboard.landingDashboard" placeholder="{{ 'dashboard.assign-data-model-view' | translate }}" ng-model="dashboard.dataModelView" md-on-open="loadDataModel()" style="min-width: 200px;" ng-change="showAssets(dataModelView)">
+		<md-select ng-if="dashboard.landingDashboard" placeholder="{{ 'dashboard.assign-data-model-view' | translate }}" ng-model="dashboardDataModel" md-on-open="loadDataModel()" style="min-width: 200px;" ng-change="showAssets(dashboardDataModel)">
 			<md-option  ng-value="datamodel" ng-repeat="datamodel in listOfDataModel">{{datamodel.name}}</md-option>
 		</md-select>
-		<md-select  ng-if="showAssetsList && dashboard.landingDashboard" placeholder="{{ 'dashboard.select-data-model-asset' | translate }}" ng-model="dashboard.dataModelAssets" md-on-open="loadDataModelAssets(dashboard.dataModelView)" style="min-width: 200px;">
+		<md-select  ng-if="showAssetsList && dashboard.landingDashboard" placeholder="{{ 'dashboard.select-data-model-asset' | translate }}" ng-model="dashboarddataModelAsset" md-on-open="loadDataModelAssets(dashboard.dataModelId)" style="min-width: 200px;" ng-change="setAssets(dashboarddataModelAsset)">
 			<md-option ng-value="datamodelAsset" ng-repeat="datamodelAsset in listOfDataModelAssets">{{datamodelAsset.name}}</md-option>
 		</md-select>
 	</fieldset>

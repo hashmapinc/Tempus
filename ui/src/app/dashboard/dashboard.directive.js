@@ -27,13 +27,18 @@ export default function DashboardDirective($compile, $templateCache, $translate,
         element.html(template);
         scope.publicLink = null;
         scope.dataModels = null;
-        scope.landingDashboard = false;
+        scope.dashboardDataModel = null;
         scope.showAssetsList = false;
         scope.listOfDataModel = [];
         scope.dataModelView = null;
         scope.types = types;
         scope.listOfDataModelAssets = [];
         scope.$watch('dashboard', function(newVal) {
+            if(scope.dashboard && scope.dashboard.type == "ASSET_LANDING_PAGE"){    
+                scope.dashboard.landingDashboard = true;
+                scope.loadDataModel();
+                scope.loadDataModelAssets();
+            }
             if (newVal) {
                 if (scope.dashboard.publicCustomerId) {
                     scope.publicLink = dashboardService.getPublicDashboardLink(scope.dashboard);
@@ -52,9 +57,12 @@ export default function DashboardDirective($compile, $templateCache, $translate,
          */
         scope.loadDataModel = function(){
             scope.listOfDataModel = [];
+            var val;
             scope.dataModels = datamodelService.listDatamodels();
             scope.dataModels.then(function (data) {
                 scope.listOfDataModel = data;
+                val = scope.listOfDataModel.filter(e => e.id.id === scope.dashboard.dataModelId);
+                scope.dashboardDataModel = val[0];
             }, function (error) {
                 $log.error(error);
             }) 
@@ -65,15 +73,18 @@ export default function DashboardDirective($compile, $templateCache, $translate,
          * @param dataModelId
          */
         scope.loadDataModelAssets = function(){
-            $log.log(scope.dashboard.dataModelView)
             scope.listOfDataModelAssets = [];
-            scope.dataModelsAssets = datamodelService.getDatamodelObjects(scope.dashboard.dataModelView.id.id);
+            var val;
+            scope.dataModelsAssets = datamodelService.getDatamodelObjects(scope.dashboard.dataModelId);
             scope.dataModelsAssets.then(function (data) {
                 angular.forEach(data, function (list) {
                     if (list.type === "Asset") {
                         scope.listOfDataModelAssets.push(list);
                     }
                   });
+                val = scope.listOfDataModelAssets.filter(e => e.id.id === scope.dashboard.dataModelObjectId);
+                scope.dashboarddataModelAsset = val[0];   
+                scope.showAssets();  
             }, function (error) {
                 $log.error(error);
             }) 
@@ -84,8 +95,20 @@ export default function DashboardDirective($compile, $templateCache, $translate,
         scope.showAssets = function(dataModel){ 
             scope.showAssetsList = true;
             scope.dataModelView = dataModel;
+            if(dataModel){
+                scope.dashboard.dataModelId= dataModel.id.id
+            }
         }
+        /**
+         * Set data model asset id to dashboard
+         */
 
+        scope.setAssets = function(dataModelobj){ 
+            if(dataModelobj){
+                scope.dashboard.dataModelObjectId= dataModelobj.id.id
+            }
+        }
+        
         $compile(element.contents())(scope);
     }
     return {
