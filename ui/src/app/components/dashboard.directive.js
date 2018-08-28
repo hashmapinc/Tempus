@@ -100,7 +100,7 @@ function Dashboard() {
 }
 
 /*@ngInject*/
-function DashboardController($scope, $rootScope, $element, $timeout, $mdMedia, $mdUtil, $q, timeService, depthService, types, utils, $translate, deviceService, customerService, assetService) {
+function DashboardController($scope, $rootScope, $element, $timeout, $mdMedia, $mdUtil, $q, timeService, depthService, types, utils, $translate, deviceService, customerService, assetService,$log) {
     var highlightedMode = false;
     var highlightedWidget = null;
     var selectedWidget = null;
@@ -532,6 +532,7 @@ function DashboardController($scope, $rootScope, $element, $timeout, $mdMedia, $
     });
 
     $scope.$watch('vm.isEdit', function () {
+        $log.log("in edit")
         vm.gridsterOpts.resizable.enabled = vm.isEdit;
         vm.gridsterOpts.draggable.enabled = vm.isEdit;
         $scope.$broadcast('toggleDashboardEditMode', vm.isEdit);

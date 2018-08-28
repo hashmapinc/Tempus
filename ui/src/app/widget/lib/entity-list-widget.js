@@ -18,12 +18,14 @@
 
 
 import './entity-list-widget.scss'
+import addAssetTemplate from './add-asset.tpl.html'
 import deviceListWidgetTemplate from './entity-list-widget.tpl.html';
   
 
 
 export default angular.module('tempus.widgets.deviceListWidget', [])
     .directive('tbEntityListWidget', DeviceListWidget)
+    .controller('addAssetController',AddAssetController)
     .name;
 
 /*@ngInject*/
@@ -42,9 +44,16 @@ function DeviceListWidget() {
     };
 }
 
+function AddAssetController ($scope,$log){
+    $log.log("in add asset");
+}
+
 /*@ngInject*/
 function DeviceListWidgetController($rootScope, $scope, $filter, deviceService, types, assetService, userService,
-    $state, $stateParams, $translate, customerService) {
+    $state, $stateParams, $translate, customerService,$document, $mdDialog,$log) {
+    $log.log("DeviceListWidgetController");
+    $log.log(types);
+    
     var vm = this,promise;
     $scope.query = {
         order: 'name',
@@ -85,6 +94,7 @@ function DeviceListWidgetController($rootScope, $scope, $filter, deviceService, 
         }
     }
     function loadTableData(){
+        $log.log($state);
         if(vm.config.config.datasources && vm.config.config.datasources.length > 0){
             if(vm.config.config.datasources[0].dataKeys[0] == 'Assets'){
                 if (vm.devicesScope === 'tenant') {
@@ -134,5 +144,24 @@ function DeviceListWidgetController($rootScope, $scope, $filter, deviceService, 
     }
     function deviceDetailFunc($event,list){
         $rootScope.$emit("CallTableDetailDeviceOnDashboard", [$event, list]);
+    }
+
+    /**
+     * Add Asset
+     */
+
+    $scope.addAsset = function($event) {
+        $mdDialog.show({
+            controller: AddAssetController,
+            controllerAs: 'vm',
+            templateUrl: addAssetTemplate,
+            parent: angular.element($document[0].body),
+            locals: {saveItemFunction: vm.deviceGridConfig.saveItemFunc},
+            fullscreen: true,
+            targetEvent: $event
+        }).then(function () {
+            $scope.resetFilter();
+        }, function () {
+        });
     }
 }

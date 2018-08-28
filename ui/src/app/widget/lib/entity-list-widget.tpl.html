@@ -41,3 +41,20 @@
                                 md-on-paginate="onPaginate" md-page-select>
         </md-table-pagination>
 </div>
+<div>
+    <md-fab-trigger>
+                    <md-button style="float: right;
+                    margin-top: 30px;
+                    width: 50px !important;
+                    height: 50px !important;"
+                                class="tb-btn-footer mini-fab md-fab "
+                                aria-label="{{ 'dashboard.add-widget' | translate }}" ng-click="addAsset($event)">
+                        <md-tooltip md-direction="top">
+                            {{ 'dashboard.add-widget' | translate }}
+                        </md-tooltip>
+                        <ng-md-icon icon="add" style="height: 30px !important"></ng-md-icon>
+                    </md-button>
+                </md-fab-trigger>
+    </md-fab-speed-dial>
+</div>
+

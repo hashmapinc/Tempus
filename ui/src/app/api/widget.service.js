@@ -657,7 +657,9 @@ function WidgetService($rootScope, $http, $q, $filter, $ocLazyLoad, $window, $tr
                 result.actionSources[actionSourceId] = angular.copy(types.widgetActionSources[actionSourceId]);
                 result.actionSources[actionSourceId].name = $translate.instant(result.actionSources[actionSourceId].name) + '';
             }
-
+            if(widgetInfo.alias == "device_list"){
+                result.typeParameters.useCustomDatasources = true;
+            }
             return result;
         } catch (e) {
             utils.processWidgetException(e);
