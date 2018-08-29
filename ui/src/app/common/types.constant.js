@@ -615,8 +615,42 @@ export default angular.module('tempus.types', [])
                 customTranslationsPrefix: "custom."
             },
             computationType: {
-                spark: "SPARK"
-                //kubeless: "KUBELESS"
+                spark: "SPARK",
+                kubeless: "KUBELESS"
+            },
+            runtimeTypes: {
+                python27: {
+                    name: "Python 2.7",
+                    value: "python2.7"
+                },
+                python34: {
+                    name: "Python 3.4",
+                    value: "python3.4"
+                },
+                python36: {
+                    name: "Python 3.6",
+                    value: "python3.6"
+                },
+                nodejs6: {
+                    name: "Node.js 6",
+                    value: "nodejs6"
+                },
+                nodejs8: {
+                    name: "Node.js 8",
+                    value: "nodejs8"
+                },
+                ruby24: {
+                    name: "Ruby 2.4",
+                    value: "ruby2.4"
+                },
+                go110: {
+                    name: "Go 1.10",
+                    value: "go1.10"
+                },
+                java18: {
+                    name: "Java 1.8",
+                    value: "java1.8"
+                }
             },
             metadataSourceType: {
                 jdbc: "JDBC"

@@ -1167,8 +1167,18 @@ export default angular.module('tempus.locale', [])
                     "computation-file": "Computation file",
                     "invalid-computation-file-error": "Unable to import computation: Invalid computation data structure.",
                     "copyId": "Copy computation Id",
-                    "idCopiedMessage": "Computation Id has been copied to clipboard"
-
+                    "idCopiedMessage": "Computation Id has been copied to clipboard",
+                    "function-configurations": "Function Configurations",
+                    "function-name": "Function Name",
+                    "runtime": "Runtime",
+                    "runtime-required": "Runtime is required",
+                    "import-function": "Import Function",
+                    "import-dependency": "Import Dependency",
+                    "no-function": "No Function file selected",
+                    "no-dependencies": "No dependency file selected",
+                    "function-handler": "Function handler",
+                    "timeout": "Function timeout",
+                    "handler-required": "Function handler is required"
                 },
                 "computationJob": {
                     "computationJobs": "Computation Jobs",

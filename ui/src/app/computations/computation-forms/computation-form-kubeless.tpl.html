@@ -1,0 +1,110 @@
+<!--
+
+    Copyright © 2016-2018 The Thingsboard Authors
+    Modifications © 2017-2018 Hashmap, Inc
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+        http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<md-card flex>
+    <md-card-title>
+        <md-card-title-text>
+            <span translate class="md-headline" ng-class="{'tb-readonly-label' : ($root.loading || !isEdit || isReadOnly)}">computation.function-configurations</span>
+        </md-card-title-text>
+    </md-card-title>
+    <md-content class="md-padding" layout="column" style="overflow-x: hidden">
+        <fieldset ng-disabled="$root.loading">
+            <section flex layout="row">
+                <md-input-container flex="60" class="md-block" md-is-error="theForm.functionName.$touched && theForm.functionName.$invalid">
+                    <label translate>computation.function-name</label>
+                    <input required name="functionName" ng-model="model.functionName">
+                    <div ng-messages="theForm.functionName.$error">
+                        <div translate ng-message="required">computation.name-required</div>
+                    </div>
+                </md-input-container>
+                <md-input-container flex="40" class="md-block">
+                    <label translate>computation.runtime</label>
+                    <md-select required name="runtimeType" ng-model="model.runtime"> <!-- ng-change="vm.runtimeChange()" -->
+                        <md-option ng-repeat="runtimeType in types.runtimeTypes" ng-value="runtimeType.value">
+                            {{ runtimeType.name }}
+                        </md-option>
+                    </md-select>
+                    <div ng-messages="theForm.runtimeType.$error">
+                        <div translate ng-message="required">computation.runtime-required</div>
+                    </div>
+                </md-input-container>
+            </section>
+            <section class="dropdown-section">
+                <div class="tb-container" ng-class="{'ng-invalid':!model.function}">
+                    <span ng-init='fieldsToFill = {"fileName":"functionFileName", "file":"function"}'></span>
+                    <label class="tb-label" translate>computation.import-function</label>
+                    <div flow-init="{singleFile:true}" flow-file-added='fileAdded($file, fieldsToFill)' class="tb-file-select-container">
+                        <div class="tb-file-clear-container">
+                            <md-button ng-click='clearFile(fieldsToFill)' class="tb-file-clear-btn md-icon-button md-primary" aria-label="{{ 'action.remove' | translate }}">
+                                <md-tooltip md-direction="top">
+                                    {{ 'action.remove' | translate }}
+                                </md-tooltip>
+                                <md-icon aria-label="{{ 'action.remove' | translate }}" class="material-icons">close</md-icon>
+                            </md-button>
+                        </div>
+                        <div class="alert tb-flow-drop" flow-drop>
+                            <label for="select" translate>import.drop-file</label>
+                            <input class="file-input" flow-btn id="select">
+                        </div>
+                    </div>
+                </div>
+                <div class="dropdown-messages">
+                    <div ng-if="!model[fieldsToFill.fileName]" class="tb-error-message" translate>computation.no-function</div>
+                    <div ng-if="model[fieldsToFill.fileName]">{{model[fieldsToFill.fileName]}}</div>
+                </div>
+            </section>
+            <section class="dropdown-section">
+                <div class="tb-container" ng-class="{'ng-invalid':!model.dependencies}">
+                    <span ng-init='fieldsToFill = {"fileName":"dependenciesFileName", "file":"dependencies"}'></span>
+                    <label class="tb-label" translate>computation.import-dependency</label>
+                    <div flow-init="{singleFile:true}" flow-file-added='fileAdded($file, fieldsToFill)' class="tb-file-select-container">
+                        <div class="tb-file-clear-container">
+                            <md-button ng-click='clearFile(fieldsToFill)' class="tb-file-clear-btn md-icon-button md-primary" aria-label="{{ 'action.remove' | translate }}">
+                                <md-tooltip md-direction="top">
+                                    {{ 'action.remove' | translate }}
+                                </md-tooltip>
+                                <md-icon aria-label="{{ 'action.remove' | translate }}" class="material-icons">close</md-icon>
+                            </md-button>
+                        </div>
+                        <div class="alert tb-flow-drop" flow-drop>
+                            <label for="select" translate>import.drop-file</label>
+                            <input class="file-input" flow-btn id="select">
+                        </div>
+                    </div>
+                </div>
+                <div class="dropdown-messages">
+                    <div ng-if="!model[fieldsToFill.fileName]" class="tb-error-message" translate>computation.no-dependencies</div>
+                    <div ng-if="model[fieldsToFill.fileName]">{{model[fieldsToFill.fileName]}}</div>
+                </div>
+            </section>
+            <section flex layout="row">
+                <md-input-container flex="60" class="md-block" md-is-error="theForm.handler.$touched && theForm.handler.$invalid">
+                    <label translate>computation.function-handler</label>
+                    <input required name="handler" ng-model="model.handler">
+                    <div ng-messages="theForm.handler.$error">
+                        <div translate ng-message="required">computation.handler-required</div>
+                    </div>
+                </md-input-container>
+                <md-input-container flex="40" class="md-block" md-is-error="theForm.timeout.$touched && theForm.timeout.$invalid">
+                    <label translate>computation.timeout</label>
+                    <input name="timeout" ng-model="model.timeout">
+                </md-input-container>
+            </section>
+        </fieldset>
+    </md-content>
+</md-card>

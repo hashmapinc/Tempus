@@ -44,19 +44,18 @@
                             </md-input-container>
                             <md-input-container flex="40" class="md-block" md-is-error="theForm.computationType.$touched && theForm.computationType.$invalid">
                                 <label translate>computation.type</label>
-
                                 <md-select required name="computationType" ng-change="vm.computationTypeChange()" ng-model="vm.item.type">
                                     <md-option ng-repeat="(key,value) in vm.types.computationType" ng-value="value">
                                         {{value}}
                                     </md-option>
                                 </md-select>
-
                                 <div ng-messages="theForm.computationType.$error">
                                     <div translate ng-message="required">computation.type-required</div>
                                 </div>
                             </md-input-container>
                         </section>
                         <div tb-computation-form-spark model="vm.item" ng-if="vm.item.type && vm.item.type == vm.types.computationType.spark"></div>
+                        <div tb-computation-form-kubeless model="vm.item" ng-if="vm.item.type && vm.item.type == vm.types.computationType.kubeless"></div>
                     </fieldset>
                 </md-content>
             </div>
