@@ -14,25 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.hashmapinc.server.common.data.metadata.source.jdbc;
+package com.hashmapinc.server.controller.nosql;
 
-import com.hashmapinc.server.common.data.metadata.source.MetadataSource;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
-import lombok.extern.slf4j.Slf4j;
+import com.hashmapinc.server.controller.BaseMetadataControllerTest;
+import com.hashmapinc.server.dao.service.DaoNoSqlTest;
 
-@Slf4j
-@Data
-@ToString
-@AllArgsConstructor
-@EqualsAndHashCode(callSuper = true)
-public class JdbcMetadataSource extends MetadataSource {
-
-    private static final long serialVersionUID = -1351868393893791972L;
-
-    private String dbUrl;
-    private String username;
-    private String password;
+@DaoNoSqlTest
+public class MetadataControllerNoSqlTest extends BaseMetadataControllerTest {
 }

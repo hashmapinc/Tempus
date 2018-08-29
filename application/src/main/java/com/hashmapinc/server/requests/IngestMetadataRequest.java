@@ -17,11 +17,13 @@
 package com.hashmapinc.server.requests;
 
 import com.hashmapinc.server.common.data.metadata.MetadataConfigId;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
 import java.util.Map;
 
 @Data
+@AllArgsConstructor
 public class IngestMetadataRequest {
     private MetadataConfigId configId;
     private String ownerId;
