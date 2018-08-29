@@ -44,13 +44,12 @@
                     </div>
                 </md-input-container>
             </section>
-            <section class="dropdown-section">
-                <div class="tb-container" ng-class="{'ng-invalid':!model.function}">
-                    <span ng-init='fieldsToFill = {"fileName":"functionFileName", "file":"function"}'></span>
+            <section flex layout="column" class="dropdown-section">
+                <div class="tb-container" ng-class="model.functionFileName ? 'ng-valid' : 'ng-invalid'">
                     <label class="tb-label" translate>computation.import-function</label>
-                    <div flow-init="{singleFile:true}" flow-file-added='fileAdded($file, fieldsToFill)' class="tb-file-select-container">
+                    <div flow-init="{singleFile:true}" flow-file-added='fileAdded($file, model, "function")' class="tb-file-select-container">
                         <div class="tb-file-clear-container">
-                            <md-button ng-click='clearFile(fieldsToFill)' class="tb-file-clear-btn md-icon-button md-primary" aria-label="{{ 'action.remove' | translate }}">
+                            <md-button ng-click='clearFile(model, "function")' class="tb-file-clear-btn md-icon-button md-primary" aria-label="{{ 'action.remove' | translate }}">
                                 <md-tooltip md-direction="top">
                                     {{ 'action.remove' | translate }}
                                 </md-tooltip>
@@ -58,23 +57,20 @@
                             </md-button>
                         </div>
                         <div class="alert tb-flow-drop" flow-drop>
-                            <label for="select" translate>import.drop-file</label>
-                            <input class="file-input" flow-btn id="select">
+                            <label for="function" translate>import.drop-file</label>
+                            <input class="file-input" flow-btn id="function">
                         </div>
                     </div>
                 </div>
                 <div class="dropdown-messages">
-                    <div ng-if="!model[fieldsToFill.fileName]" class="tb-error-message" translate>computation.no-function</div>
-                    <div ng-if="model[fieldsToFill.fileName]">{{model[fieldsToFill.fileName]}}</div>
+                    <div ng-if="!model.functionFileName" class="tb-error-message" translate>computation.no-function</div>
+                    <div ng-if="model.functionFileName">{{model.functionFileName}}</div>
                 </div>
-            </section>
-            <section class="dropdown-section">
-                <div class="tb-container" ng-class="{'ng-invalid':!model.dependencies}">
-                    <span ng-init='fieldsToFill = {"fileName":"dependenciesFileName", "file":"dependencies"}'></span>
+                <div class="tb-container" ng-class="model.dependenciesFileName ? 'ng-valid' : 'ng-invalid'">
                     <label class="tb-label" translate>computation.import-dependency</label>
-                    <div flow-init="{singleFile:true}" flow-file-added='fileAdded($file, fieldsToFill)' class="tb-file-select-container">
+                    <div flow-init="{singleFile:true}" flow-file-added='fileAdded($file, model, "dependencies")' class="tb-file-select-container">
                         <div class="tb-file-clear-container">
-                            <md-button ng-click='clearFile(fieldsToFill)' class="tb-file-clear-btn md-icon-button md-primary" aria-label="{{ 'action.remove' | translate }}">
+                            <md-button ng-click='clearFile(model, "dependencies")' class="tb-file-clear-btn md-icon-button md-primary" aria-label="{{ 'action.remove' | translate }}">
                                 <md-tooltip md-direction="top">
                                     {{ 'action.remove' | translate }}
                                 </md-tooltip>
@@ -82,14 +78,14 @@
                             </md-button>
                         </div>
                         <div class="alert tb-flow-drop" flow-drop>
-                            <label for="select" translate>import.drop-file</label>
-                            <input class="file-input" flow-btn id="select">
+                            <label for="dependencies" translate>import.drop-file</label>
+                            <input class="file-input" flow-btn id="dependencies">
                         </div>
                     </div>
                 </div>
                 <div class="dropdown-messages">
-                    <div ng-if="!model[fieldsToFill.fileName]" class="tb-error-message" translate>computation.no-dependencies</div>
-                    <div ng-if="model[fieldsToFill.fileName]">{{model[fieldsToFill.fileName]}}</div>
+                    <div ng-if="!model.dependenciesFileName" class="tb-error-message" translate>computation.no-dependencies</div>
+                    <div ng-if="model.dependenciesFileName">{{model.dependenciesFileName}}</div>
                 </div>
             </section>
             <section flex layout="row">
@@ -102,7 +98,7 @@
                 </md-input-container>
                 <md-input-container flex="40" class="md-block" md-is-error="theForm.timeout.$touched && theForm.timeout.$invalid">
                     <label translate>computation.timeout</label>
-                    <input name="timeout" ng-model="model.timeout">
+                    <input type="number" name="timeout" ng-model="model.timeout">
                 </md-input-container>
             </section>
         </fieldset>

@@ -31,34 +31,56 @@ export default function AddComputationController($scope, $mdDialog, types, helpL
     }
 
     vm.computationTypeChange = function () {
-        if (vm.item.type === 'SPARK') {
+        if (vm.item.type === vm.types.computationType.spark) {
             vm.item.importData = null;
             vm.item.fileName = null;
+        }else if (vm.item.type === vm.types.computationType.kubeless) {
+            /*vm.item.functionName = null;
+            vm.item.runtime = null;
+            vm.item.function = null;
+            vm.item.functionFileName = null;
+            vm.item.dependenciesFileName = null;
+            vm.item.dependencies = null;
+            vm.item.handler = null;
+            vm.item.timeout = null;*/
+            vm.item = {
+                type: vm.types.computationType.kubeless
+            };
+
         }
     };
 
-    function saveSparkComputation() {
+    function saveComputation() {
         var deferred = $q.defer();
-        computationService.upload(vm.item.importData.file).then(
-            function success() {
-                deferred.resolve();
-                $window.localStorage.setItem('currentTab', 4);
-            },
-            function fail() {
-                deferred.reject();
-            }
-        );
+        if (vm.item.type === 'SPARK') {
+
+            computationService.upload(vm.item.importData.file).then(
+                function success() {
+                    deferred.resolve();
+                    $window.localStorage.setItem('currentTab', 4);
+                },
+                function fail() {
+                    deferred.reject();
+                }
+            );
+        }else if(vm.item.type === vm.types.computationType.kubeless){
+            computationService.saveComputation(vm.item).then(
+                function success() {
+                    deferred.resolve();
+                },
+                function fail() {
+                    deferred.reject();
+                }
+            );
+        }
         return deferred.promise;
     }
 
     function add() {
-        if (vm.item.type === 'SPARK') {
-            saveSparkComputation().then(function success(item) {
-                vm.item = item;
-                $scope.theForm.$setPristine();
-                $mdDialog.hide();
-            });
-        }
-        //$mdDialog.hide();
+        saveComputation().then(function success(item) {
+            vm.item = item;
+            $scope.theForm.$setPristine();
+            $mdDialog.hide();
+        });
     }
 }

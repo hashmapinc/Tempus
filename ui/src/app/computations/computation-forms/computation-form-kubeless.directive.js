@@ -18,6 +18,8 @@
 /* eslint-disable angular/log */
 
 import computationFormSparkTemplate from './computation-form-kubeless.tpl.html';
+import sha256 from 'crypto-js/sha256';
+import base64 from 'crypto-js/enc-base64';
 
 /* eslint-enable import/no-unresolved, import/default */
 
@@ -34,17 +36,45 @@ export default function ComputationFormKubelessDirective($compile, $templateCach
         $compile(element.contents())(scope);
 
 
-        scope.fileAdded = function($file, options) {
-            scope.theForm.$setDirty();
-            scope.model[options.file] = $file;
-            scope.model[options.fileName] = $file.name;
+        scope.fileAdded = function($file, model, fileType) {
+            let reader = new FileReader();
+            reader.onload = function(event) {
+                scope.$apply(function() {
+                    if(event.target.result) {
+                        scope.theForm.$setDirty();
+                        let addedFile = event.target.result;
+
+                        if (addedFile && addedFile.length > 0) {
+                            if(fileType == "function"){
+                                model.functionFileName = $file.name;
+                                model.function = addedFile.replace(/^data.*base64,/, "");
+                                model.checksum = base64.stringify(sha256(model.function));
+                                model.functionContentType = 'base64';
+                                if($file.getExtension() === 'jar' || $file.getExtension() === 'zip'){
+                                    model.functionContentType = model.functionContentType+'+zip';
+                                }
+                            }
+                            if(fileType == "dependencies"){
+                                model.dependenciesFileName = $file.name;
+                                model.dependencies = addedFile.replace(/^data.*base64,/, "");
+                            }
+                        }
+                    }
+                });
+            };
+            reader.readAsDataURL($file.file);
         };
 
-        scope.clearFile = function(options) {
+        scope.clearFile = function(model, fileType) {
             scope.theForm.$setDirty();
-
-            scope.model[options.file] = null;
-            scope.model[options.fileName] = null;
+            if(fileType == "dependencies"){
+                model.dependenciesFileName = null;
+                model.dependencies = null;
+            }
+            if(fileType == "function"){
+                model.functionFileName = null;
+                model.function = null;
+            }
         };
 
     };
