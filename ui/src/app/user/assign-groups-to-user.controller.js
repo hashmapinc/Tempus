@@ -29,7 +29,7 @@ export default function AssignGroupsToUserController($scope, toast, $translate, 
     vm.hasData = hasData;
     vm.noData = noData;
     vm.searchUserTextUpdated = searchUserTextUpdated;
-    vm.toggleUserSelection = toggleUserSelection;
+    vm.toggleGroupSelection = toggleGroupSelection;
     vm.customerId = customerId;
     vm.groupId = userId;
     vm.groupName = [];
@@ -137,18 +137,18 @@ export default function AssignGroupsToUserController($scope, toast, $translate, 
         return vm.groups.data.length > 0;
     }
 
-    function toggleUserSelection($event, user) {
+    function toggleGroupSelection($event, group) {
 
         $event.stopPropagation();
-        var selected = angular.isDefined(user.selected) && user.selected;
+        var selected = angular.isDefined(group.selected) && group.selected;
 
-        user.selected = !selected;
-        if (user.selected) {
-            vm.groups.selections.push(user.id.id);
+        group.selected = !selected;
+        if (group.selected) {
+            vm.groups.selections.push(group.id.id);
             vm.groups.selectedCount++;
         } else {
 
-            var index = vm.groups.selections.indexOf(user.id.id)
+            var index = vm.groups.selections.indexOf(group.id.id)
             vm.groups.selections.splice(index, 1);
             vm.groups.selectedCount--;
         }
