@@ -201,6 +201,7 @@ export default function ComputationController(computationService, computationJob
         onGridInited: gridInited,
 
         addItemTemplateUrl: addComputationJobTemplate,
+        //addItemController: 'AddComputationJobController',
 
         addItemText: function() { return $translate.instant('computationJob.add-computationJob-text') },
         noItemsText: function() { return $translate.instant('computationJob.no-computationJobs-text') },

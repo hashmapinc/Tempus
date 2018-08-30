@@ -19,6 +19,7 @@ import '../plugin/plugin.scss';
 /* eslint-disable import/no-unresolved, import/default */
 
 import computationJobFieldsetTemplate from './computation-job-fieldset.tpl.html';
+import sparkComputationJobForm from './computation-job-forms/form-spark.tpl.html';
 
 /* eslint-enable import/no-unresolved, import/default */
 
@@ -26,8 +27,9 @@ import computationJobFieldsetTemplate from './computation-job-fieldset.tpl.html'
 export default function ComputationJobDirective($compile, $templateCache, $translate, types, toast, $stateParams, computationService) {
     var linker = function (scope, element) {
         var template = $templateCache.get(computationJobFieldsetTemplate);
+        scope.sparkJobTemplate = $templateCache.get(sparkComputationJobForm);
         element.html(template);
-
+        scope.types = types;
         scope.showComputationJobConfig = false;
 
         scope.computationJobConfiguration = {

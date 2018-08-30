@@ -44,7 +44,7 @@
                     </div>
                 </md-input-container>
             </section>
-            <section flex layout="column" class="dropdown-section">
+            <section class="dropdown-section" style="margin-bottom: 30px">
                 <div class="tb-container" ng-class="model.functionFileName ? 'ng-valid' : 'ng-invalid'">
                     <label class="tb-label" translate>computation.import-function</label>
                     <div flow-init="{singleFile:true}" flow-file-added='fileAdded($file, model, "function")' class="tb-file-select-container">
@@ -66,6 +66,8 @@
                     <div ng-if="!model.functionFileName" class="tb-error-message" translate>computation.no-function</div>
                     <div ng-if="model.functionFileName">{{model.functionFileName}}</div>
                 </div>
+            </section>
+            <section class="dropdown-section" style="margin-bottom: 30px">
                 <div class="tb-container" ng-class="model.dependenciesFileName ? 'ng-valid' : 'ng-invalid'">
                     <label class="tb-label" translate>computation.import-dependency</label>
                     <div flow-init="{singleFile:true}" flow-file-added='fileAdded($file, model, "dependencies")' class="tb-file-select-container">

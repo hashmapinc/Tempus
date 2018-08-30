@@ -55,14 +55,7 @@
                     <span translate class="md-headline" ng-class="{'tb-readonly-label' : (loading || !isEdit || isReadOnly)}">computationJob.configuration</span>
                 </md-card-title-text>
             </md-card-title>
-            <md-card-content>
-                <tb-json-form schema="computationDescriptor.schema"
-                              form="computationDescriptor.form"
-                              model="computationJobConfiguration.data"
-                              readonly="loading || !isEdit || isReadOnly"
-                              form-control="theForm">
-                </tb-json-form>
-            </md-card-content>
+            <ng-include src="'computations/computation-job-forms/form-spark.tpl.html'"/>
         </md-card>
     </fieldset>
 </md-content>
