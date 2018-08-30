@@ -43,7 +43,6 @@ import com.hashmapinc.server.dao.service.DataValidator;
 import com.hashmapinc.server.dao.service.PaginatedRemover;
 import com.hashmapinc.server.dao.service.Validator;
 import com.hashmapinc.server.dao.tenant.TenantDao;
-import com.hashmapinc.server.dao.user.UserCredentialsDao;
 import com.hashmapinc.server.dao.user.UserService;
 import com.hashmapinc.server.requests.ActivateUserRequest;
 import com.hashmapinc.server.requests.CreateUserRequest;
@@ -89,9 +88,6 @@ public class RestUserService extends AbstractEntityService implements UserServic
 
     public static final String INCORRECT_USER_ID = "Incorrect userId ";
     public static final String INCORRECT_TENANT_ID = "Incorrect tenantId ";
-
-    @Autowired
-    private UserCredentialsDao userCredentialsDao;
 
     @Autowired
     private TenantDao tenantDao;
@@ -244,7 +240,7 @@ public class RestUserService extends AbstractEntityService implements UserServic
             return response.getBody().toUserCredentials();
         }
 
-        return userCredentialsDao.findByResetToken(resetToken);
+        return null;
     }
 
     @Override

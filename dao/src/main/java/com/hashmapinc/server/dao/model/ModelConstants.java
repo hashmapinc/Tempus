@@ -70,22 +70,6 @@ public class ModelConstants {
      */
     public static final String USER_GROUP_TABLE_NAME = "user_groups";
     public static final String USER_GROUP_COLUMN_FAMILY_NAME = "user_groups";
-
-
-    /**
-     * Cassandra user_credentials constants.
-     */
-    public static final String USER_CREDENTIALS_COLUMN_FAMILY_NAME = "user_credentials";
-    public static final String USER_CREDENTIALS_USER_ID_PROPERTY = USER_ID_PROPERTY;
-    public static final String USER_CREDENTIALS_ENABLED_PROPERTY = "enabled";
-    public static final String USER_CREDENTIALS_PASSWORD_PROPERTY = "password"; //NOSONAR, the constant used to identify password column name (not password value itself)
-    public static final String USER_CREDENTIALS_ACTIVATE_TOKEN_PROPERTY = "activate_token";
-    public static final String USER_CREDENTIALS_RESET_TOKEN_PROPERTY = "reset_token";
-
-    public static final String USER_CREDENTIALS_BY_USER_COLUMN_FAMILY_NAME = "user_credentials_by_user";
-    public static final String USER_CREDENTIALS_BY_ACTIVATE_TOKEN_COLUMN_FAMILY_NAME = "user_credentials_by_activate_token";
-    public static final String USER_CREDENTIALS_BY_RESET_TOKEN_COLUMN_FAMILY_NAME = "user_credentials_by_reset_token";
-
     /**
      * Cassandra admin_settings constants.
      */

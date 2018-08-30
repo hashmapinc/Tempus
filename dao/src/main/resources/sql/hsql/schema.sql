@@ -259,15 +259,6 @@ CREATE TABLE IF NOT EXISTS ds_kv_latest (
     CONSTRAINT ds_kv_latest_unq_key UNIQUE (entity_type, entity_id, key)
 );
 
-CREATE TABLE IF NOT EXISTS user_credentials (
-    id varchar(31) NOT NULL CONSTRAINT user_credentials_pkey PRIMARY KEY,
-    activate_token varchar(255) UNIQUE,
-    enabled boolean,
-    password varchar(255),
-    reset_token varchar(255) UNIQUE,
-    user_id varchar(31) UNIQUE
-);
-
 CREATE TABLE IF NOT EXISTS widget_type (
     id varchar(31) NOT NULL CONSTRAINT widget_type_pkey PRIMARY KEY,
     alias varchar(255),
