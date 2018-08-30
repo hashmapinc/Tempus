@@ -20,7 +20,6 @@ import tempusApiComputation from '../api/computation.service';
 import tempusApiComputationJob from '../api/computation-job.service';
 import ComputationController from './computation.controller';
 import AddComputationController from './add-computation.controller';
-import ComputationJobController from './computation-job.controller';
 import ComputationDirective from './computation.directive';
 import ComputationJobDirective from './computation-job.directive';
 import ComputationRoutes from './computation.routes';
@@ -36,7 +35,6 @@ export default angular.module('tempus.computation', [
     .config(ComputationRoutes)
     .controller('ComputationController', ComputationController)
     .controller('AddComputationController', AddComputationController)
-    .controller('ComputationJobController', ComputationJobController)
     .directive('tbComputation',ComputationDirective)
     .directive('tbComputationFormSpark',ComputationFormSparkDirective)
     .directive('tbComputationFormKubeless',ComputationFormKubelessDirective)
