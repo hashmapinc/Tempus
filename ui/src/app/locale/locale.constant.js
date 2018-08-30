@@ -575,7 +575,7 @@ export default angular.module('tempus.locale', [])
                     "hide-details": "Hide details",
                     "select-state": "Select target state",
                     "state-controller": "State controller",
-                    "dashboard-landing-page": "Dashboard Landing Page",
+                    "dashboard-landing-page": "Asset Landing Page",
                     "assign-data-model-view":"Assign Data Model View",
                     "select-data-model-asset" : "Select Data Model Asset"
                 },

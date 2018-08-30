@@ -44,10 +44,10 @@
                         <label translate>asset.description</label>
                         <textarea  rows="2" ng-model="vm.description"></textarea>
                     </md-input-container>
-                    <md-input-container class="md-block">
+                    <md-input-container class="md-block" ng-if="vm.showParent">
                         <label translate>Child of : {{vm.parentName}} </label>
                     </md-input-container>
-                    <md-input-container class="md-block">
+                    <md-input-container class="md-block" ng-if="vm.showCustList">
                         <md-select placeholder="Assign to user" ng-model="vm.user" md-on-open="loadUsers()" style="min-width: 200px;">
                             <md-option ng-value="user" ng-repeat="user in vm.users">{{user.name}}</md-option>
                           </md-select>
@@ -57,7 +57,7 @@
         </md-dialog-content>
         <md-dialog-actions layout="row">
             <span flex></span>
-            <md-button  type="submit" class="md-raised md-primary">
+            <md-button  type="submit" class="md-raised md-primary" ng-disabled="theForm.$invalid">
                 {{ 'action.add' | translate }}
             </md-button>
             <md-button  ng-click="vm.cancel()" style="margin-right:20px;">{{ 'action.cancel' | translate }}</md-button>

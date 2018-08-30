@@ -54,9 +54,13 @@ function AddAssetController ($log,customerService,$state,dashboardService,datamo
     vm.parentId = null;
     vm.addAsset = addAsset;
     vm.cancel = cancel;
-    initController();
+    vm.showCustList = false;
+    vm.showParent =  false;
+    
     var currentuser = userService.getCurrentUser();
+    $log.log("currentuser");
     $log.log(currentuser);
+    initController();
     function initController(){
         var pageSize = 10;
         dashboardService.getDashboard($state.params.dashboardId).then(function success(response) {
@@ -68,9 +72,12 @@ function AddAssetController ($log,customerService,$state,dashboardService,datamo
                         if(object_response.data.parentId) {
                             var parentDetails = getDataModelObjectDetails(object_response.data.parentId.id);
                             parentDetails.then(function success(parentResponse) {
+                                vm.showParent =  true;
                                 vm.parentName = parentResponse.data.name;
                                 vm.parentId = parentResponse.data.id.id
                             });
+                        }else{
+                            vm.showParent =  false;
                         }
                     }
                 },
@@ -80,14 +87,19 @@ function AddAssetController ($log,customerService,$state,dashboardService,datamo
         },
         function fail() {
         });
-        customerService.getCustomers({limit: pageSize, textSearch: ''}).then(
-            function success(_customers) {
-                vm.users = _customers.data;
-                $log.log("vm.users")
-                $log.log(vm.users)
-            },
-            function fail() {
+        if (currentuser.authority === 'CUSTOMER_USER') {
+            vm.showCustList = false;
+        }else {
+            vm.showCustList = true;
+            customerService.getCustomers({limit: pageSize, textSearch: ''}).then(
+                function success(_customers) {
+                    vm.users = _customers.data;
+                    $log.log("vm.users")
+                    $log.log(vm.users)
+                },
+                function fail() {
             });
+        }
     }
     function getDataModelObjectDetails(dataModelObjectId){
         return datamodelService.getDatamodelObject(dataModelObjectId);
@@ -101,10 +113,16 @@ function AddAssetController ($log,customerService,$state,dashboardService,datamo
                 parentId:vm.parentId
             },
             customerId:{
-                id:vm.user.id.id,
                 entityType:"CUSTOMER"
             },
             type:vm.name.toLowerCase()
+        }
+        if(currentuser.authority === 'CUSTOMER_USER'){
+            requestObj.customerId.id = currentuser.id
+        }else {
+            if (vm.user){
+                requestObj.customerId.id = vm.user.id.id 
+            }
         }
         $log.log(requestObj);
         assetService.saveAsset(requestObj).then(
@@ -129,7 +147,7 @@ function DeviceListWidgetController($rootScope, $scope, $filter, deviceService, 
     var vm = this,promise;
     $scope.query = {
         order: 'name',
-        limit: 15,
+        limit: 10,
         page: 1,
         search: null
     };
