@@ -21,34 +21,7 @@ WITH replication = {
 	'replication_factor' : 1
 };
 
-CREATE TABLE IF NOT EXISTS tempus.user_credentials (
-	id timeuuid PRIMARY KEY,
-	user_id timeuuid,
-	enabled boolean,
-	password text,
-	activate_token text,
-	reset_token text
-);
-
-CREATE MATERIALIZED VIEW IF NOT exists tempus.user_credentials_by_user AS
-	SELECT *
-FROM tempus.user_credentials
-	WHERE user_id IS NOT NULL AND id IS NOT NULL
-	PRIMARY KEY ( user_id, id );
-
-CREATE MATERIALIZED VIEW IF NOT exists tempus.user_credentials_by_activate_token AS
-	SELECT *
-FROM tempus.user_credentials
-	WHERE activate_token IS NOT NULL AND id IS NOT NULL
-	PRIMARY KEY ( activate_token, id );
-
-CREATE MATERIALIZED VIEW IF NOT exists tempus.user_credentials_by_reset_token AS
-	SELECT *
-FROM tempus.user_credentials
-	WHERE reset_token IS NOT NULL AND id IS NOT NULL
-	PRIMARY KEY ( reset_token, id );
-
-CREATE TABLE IF NOT exists tempus.user_settings (
+CREATE TABLE IF NOT EXISTS tempus.user_settings (
   id timeuuid ,
   key text,
   json_value text,
