@@ -195,7 +195,7 @@ public abstract class BaseCustomerGroupServiceTest extends AbstractServiceTest {
 
         customerGroupService.deleteCustomerGroupsByTenantIdAndCustomerId(tenantId, customerId);
 
-        pageLink = new TextPageLink(33);
+        pageLink = new TextPageLink(3);
         pageData = customerGroupService.findCustomerGroupsByTenantIdAndCustomerId(tenantId, customerId, pageLink);
         Assert.assertFalse(pageData.hasNext());
         Assert.assertTrue(pageData.getData().isEmpty());
@@ -207,7 +207,7 @@ public abstract class BaseCustomerGroupServiceTest extends AbstractServiceTest {
     public void findCustomerByTenantIdAndCustomerIdAndTitle() {
         String title1 = "Customer Group title 1";
         List<CustomerGroup> customerGroupsTitle1 = new ArrayList<>();
-        for (int i = 0; i < 143; i++) {
+        for (int i = 0; i < 10; i++) {
             CustomerGroup customerGroup = new CustomerGroup();
             customerGroup.setTenantId(tenantId);
             customerGroup.setCustomerId(customerId);
@@ -220,7 +220,7 @@ public abstract class BaseCustomerGroupServiceTest extends AbstractServiceTest {
 
         String title2 = "Customer Group title 2";
         List<CustomerGroup> customersGroupTitle2 = new ArrayList<>();
-        for (int i = 0; i < 175; i++) {
+        for (int i = 0; i < 12; i++) {
             CustomerGroup customerGroup = new CustomerGroup();
             customerGroup.setTenantId(tenantId);
             customerGroup.setCustomerId(customerId);
@@ -232,7 +232,7 @@ public abstract class BaseCustomerGroupServiceTest extends AbstractServiceTest {
         }
 
         List<CustomerGroup> loadedCustomerGroupsTitle1 = new ArrayList<>();
-        TextPageLink pageLink = new TextPageLink(15, title1);
+        TextPageLink pageLink = new TextPageLink(10, title1);
         TextPageData<CustomerGroup> pageData = null;
         do {
             pageData = customerGroupService.findCustomerGroupsByTenantIdAndCustomerId(tenantId, customerId, pageLink);
