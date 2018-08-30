@@ -256,7 +256,7 @@ public class DashboardServiceImpl extends AbstractEntityService implements Dashb
 
                         dashboards = findDashboardByDataModelObjectId(dataModelObjectId);
 
-                        if(!dashboards.isEmpty()) {
+                        if(dashboards != null && !dashboards.isEmpty()) {
                             throw new DataValidationException("Asset landing page is already created for dataModelObject");
                         }
                     }

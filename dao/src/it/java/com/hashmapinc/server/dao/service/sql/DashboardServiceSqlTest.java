@@ -16,9 +16,69 @@
  */
 package com.hashmapinc.server.dao.service.sql;
 
+import com.datastax.driver.core.utils.UUIDs;
+import com.hashmapinc.server.common.data.AssetLandingDashboardInfo;
+import com.hashmapinc.server.common.data.Dashboard;
+import com.hashmapinc.server.common.data.DashboardType;
+import com.hashmapinc.server.common.data.Tenant;
+import com.hashmapinc.server.common.data.id.DashboardId;
+import com.hashmapinc.server.common.data.id.DataModelId;
+import com.hashmapinc.server.common.data.id.DataModelObjectId;
+import com.hashmapinc.server.common.data.id.TenantId;
 import com.hashmapinc.server.dao.service.DaoSqlTest;
 import com.hashmapinc.server.dao.service.BaseDashboardServiceTest;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
+
+import java.util.List;
 
 @DaoSqlTest
 public class DashboardServiceSqlTest extends BaseDashboardServiceTest {
+
+    private TenantId tenantId;
+
+    @Before
+    public void before() {
+        Tenant tenant = new Tenant();
+        tenant.setTitle("My tenant");
+        Tenant savedTenant = tenantService.saveTenant(tenant);
+        Assert.assertNotNull(savedTenant);
+        tenantId = savedTenant.getId();
+    }
+
+    @Test
+    public void testFetchByDataModelObjectId() {
+        Dashboard dashboard = CreateDashboard();
+
+        Dashboard savedDashboard = dashboardService.saveDashboard(dashboard);
+        Assert.assertNotNull(savedDashboard);
+
+        DataModelObjectId dataModelObjectId = dashboard.getAssetLandingDashboardInfo().getDataModelObjectId();
+
+        List<Dashboard> dashboards = dashboardService.findDashboardByDataModelObjectId(dataModelObjectId);
+        System.out.println(savedDashboard);
+        System.out.println(dashboards);
+        Assert.assertEquals(1, dashboards.size());
+    }
+
+    private Dashboard CreateDashboard() {
+        Dashboard dashboard = new Dashboard();
+        dashboard.setTitle("My dashboard");
+        dashboard.setTenantId(tenantId);
+        dashboard.setType(DashboardType.ASSET_LANDING_PAGE);
+        DashboardId dashboardId = new DashboardId(UUIDs.timeBased());
+        dashboard.setId(dashboardId);
+
+        AssetLandingDashboardInfo assetLandingDashboardInfo = new AssetLandingDashboardInfo();
+
+        assetLandingDashboardInfo.setDashboardId(dashboardId);
+        DataModelId dataModelId = new DataModelId(UUIDs.timeBased());
+        assetLandingDashboardInfo.setDataModelId(dataModelId);
+        DataModelObjectId dataModelObjectId = new DataModelObjectId(UUIDs.timeBased());
+        assetLandingDashboardInfo.setDataModelObjectId(dataModelObjectId);
+
+        dashboard.setAssetLandingDashboardInfo(assetLandingDashboardInfo);
+        return  dashboard;
+    }
 }

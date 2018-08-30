@@ -325,38 +325,4 @@ public abstract class BaseDashboardServiceTest extends AbstractServiceTest {
         tenantService.deleteTenant(tenantId);
     }
 
-
-    @Test
-    public void testFetchByDataModelObjectId() {
-        Dashboard dashboard = CreateDashboard();
-
-        Dashboard savedDashboard = dashboardService.saveDashboard(dashboard);
-        Assert.assertNotNull(savedDashboard);
-
-        DataModelObjectId dataModelObjectId = dashboard.getAssetLandingDashboardInfo().getDataModelObjectId();
-
-        List<Dashboard> dashboards = dashboardService.findDashboardByDataModelObjectId(dataModelObjectId);
-        Assert.assertEquals(1, dashboards.size());
-    }
-
-    private Dashboard CreateDashboard() {
-        Dashboard dashboard = new Dashboard();
-        dashboard.setTitle("My dashboard");
-        dashboard.setTenantId(tenantId);
-        dashboard.setType(DashboardType.ASSET_LANDING_PAGE);
-        DashboardId dashboardId = new DashboardId(UUIDs.timeBased());
-        dashboard.setId(dashboardId);
-
-        AssetLandingDashboardInfo assetLandingDashboardInfo = new AssetLandingDashboardInfo();
-
-        assetLandingDashboardInfo.setDashboardId(dashboardId);
-        DataModelId dataModelId = new DataModelId(UUIDs.timeBased());
-        assetLandingDashboardInfo.setDataModelId(dataModelId);
-        DataModelObjectId dataModelObjectId = new DataModelObjectId(UUIDs.timeBased());
-        assetLandingDashboardInfo.setDataModelObjectId(dataModelObjectId);
-
-        dashboard.setAssetLandingDashboardInfo(assetLandingDashboardInfo);
-        return  dashboard;
-    }
-
 }

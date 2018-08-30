@@ -21,4 +21,5 @@ import com.hashmapinc.server.dao.service.BaseDashboardServiceTest;
 
 @DaoNoSqlTest
 public class DashboardServiceNoSqlTest extends BaseDashboardServiceTest {
+
 }
