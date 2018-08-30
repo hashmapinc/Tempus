@@ -19,6 +19,7 @@ package com.hashmapinc.server.dao.dashboard;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.hashmapinc.server.common.data.Dashboard;
 import com.hashmapinc.server.common.data.DashboardInfo;
+import com.hashmapinc.server.common.data.id.DataModelObjectId;
 import com.hashmapinc.server.common.data.id.TenantId;
 import com.hashmapinc.server.common.data.page.TextPageData;
 import com.hashmapinc.server.common.data.page.TextPageLink;
@@ -26,6 +27,8 @@ import com.hashmapinc.server.common.data.page.TimePageLink;
 import com.hashmapinc.server.common.data.id.CustomerId;
 import com.hashmapinc.server.common.data.id.DashboardId;
 import com.hashmapinc.server.common.data.page.TimePageData;
+
+import java.util.List;
 
 public interface DashboardService {
     
@@ -55,4 +58,5 @@ public interface DashboardService {
 
     void updateCustomerDashboards(CustomerId customerId);
 
+    List<Dashboard> findDashboardByDataModelObjectId(DataModelObjectId dataModelObjectId);
 }

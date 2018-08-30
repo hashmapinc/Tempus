@@ -25,7 +25,7 @@ public class Dashboard extends DashboardInfo {
     
     private transient JsonNode configuration;
 
-    private DashboardType type;
+    private AssetLandingDashboardInfo assetLandingDashboardInfo;
     
     public Dashboard() {
         super();
@@ -39,17 +39,10 @@ public class Dashboard extends DashboardInfo {
         super(dashboardInfo);
     }
 
-    public DashboardType getType() {
-        return type;
-    }
-
-    public void setType(DashboardType type) {
-        this.type = type;
-    }
-
     public Dashboard(Dashboard dashboard) {
         super(dashboard);
         this.configuration = dashboard.getConfiguration();
+        this.assetLandingDashboardInfo = dashboard.getAssetLandingDashboardInfo();
     }
 
     public JsonNode getConfiguration() {
@@ -60,7 +53,13 @@ public class Dashboard extends DashboardInfo {
         this.configuration = configuration;
     }
 
+    public AssetLandingDashboardInfo getAssetLandingDashboardInfo() {
+        return assetLandingDashboardInfo;
+    }
 
+    public void setAssetLandingDashboardInfo(AssetLandingDashboardInfo assetLandingDashboardInfo) {
+        this.assetLandingDashboardInfo = assetLandingDashboardInfo;
+    }
 
     @Override
     public int hashCode() {
@@ -82,11 +81,13 @@ public class Dashboard extends DashboardInfo {
         if (configuration == null) {
             if (other.configuration != null)
                 return false;
-        } else if(type == null){
-            if (other.type != null)
-                return false;
         }
         else if (!configuration.equals(other.configuration))
+            return false;
+        else if (assetLandingDashboardInfo == null) {
+            return other.assetLandingDashboardInfo == null;
+        }
+        else if (!assetLandingDashboardInfo.equals(other.assetLandingDashboardInfo))
             return false;
         return true;
     }
@@ -98,8 +99,6 @@ public class Dashboard extends DashboardInfo {
         builder.append(getTenantId());
         builder.append(", title=");
         builder.append(getTitle());
-        builder.append(", type=");
-        builder.append(getType());
         builder.append(", configuration=");
         builder.append(configuration);
         builder.append("]");

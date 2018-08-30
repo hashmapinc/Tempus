@@ -73,6 +73,11 @@ public final class DashboardEntity extends BaseSqlEntity<Dashboard> implements S
     @Column(name = ModelConstants.DASHBOARD_TYPE_PROPERTY)
     private DashboardType type;
 
+    @OneToOne(cascade = CascadeType.ALL)
+    @PrimaryKeyJoinColumn
+    private AssetLandingDashboardEntity assetLandingDashboardEntity;
+
+
     public DashboardEntity() {
         super();
     }
@@ -96,6 +101,9 @@ public final class DashboardEntity extends BaseSqlEntity<Dashboard> implements S
             }
         }
         this.configuration = dashboard.getConfiguration();
+        if(dashboard.getAssetLandingDashboardInfo() != null) {
+            this.assetLandingDashboardEntity = new AssetLandingDashboardEntity(dashboard.getAssetLandingDashboardInfo());
+        }
     }
 
     @Override
@@ -127,7 +135,9 @@ public final class DashboardEntity extends BaseSqlEntity<Dashboard> implements S
         if(type != null){
             dashboard.setType(type);
         }
-
+        if(assetLandingDashboardEntity != null) {
+            dashboard.setAssetLandingDashboardInfo(assetLandingDashboardEntity.toData());
+        }
         return dashboard;
     }
 }

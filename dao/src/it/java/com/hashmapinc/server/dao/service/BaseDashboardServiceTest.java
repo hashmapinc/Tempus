@@ -17,18 +17,14 @@
 package com.hashmapinc.server.dao.service;
 
 import com.datastax.driver.core.utils.UUIDs;
-import com.hashmapinc.server.common.data.Customer;
-import com.hashmapinc.server.common.data.Dashboard;
-import com.hashmapinc.server.common.data.DashboardInfo;
+import com.hashmapinc.server.common.data.*;
+import com.hashmapinc.server.common.data.id.*;
 import com.hashmapinc.server.common.data.page.TextPageLink;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import com.hashmapinc.server.common.data.Tenant;
-import com.hashmapinc.server.common.data.id.CustomerId;
-import com.hashmapinc.server.common.data.id.TenantId;
 import com.hashmapinc.server.common.data.page.TextPageData;
 import com.hashmapinc.server.common.data.page.TimePageData;
 import com.hashmapinc.server.common.data.page.TimePageLink;
@@ -327,6 +323,40 @@ public abstract class BaseDashboardServiceTest extends AbstractServiceTest {
         Assert.assertTrue(pageData.getData().isEmpty());
         
         tenantService.deleteTenant(tenantId);
+    }
+
+
+    @Test
+    public void testFetchByDataModelObjectId() {
+        Dashboard dashboard = CreateDashboard();
+
+        Dashboard savedDashboard = dashboardService.saveDashboard(dashboard);
+        Assert.assertNotNull(savedDashboard);
+
+        DataModelObjectId dataModelObjectId = dashboard.getAssetLandingDashboardInfo().getDataModelObjectId();
+
+        List<Dashboard> dashboards = dashboardService.findDashboardByDataModelObjectId(dataModelObjectId);
+        Assert.assertEquals(1, dashboards.size());
+    }
+
+    private Dashboard CreateDashboard() {
+        Dashboard dashboard = new Dashboard();
+        dashboard.setTitle("My dashboard");
+        dashboard.setTenantId(tenantId);
+        dashboard.setType(DashboardType.ASSET_LANDING_PAGE);
+        DashboardId dashboardId = new DashboardId(UUIDs.timeBased());
+        dashboard.setId(dashboardId);
+
+        AssetLandingDashboardInfo assetLandingDashboardInfo = new AssetLandingDashboardInfo();
+
+        assetLandingDashboardInfo.setDashboardId(dashboardId);
+        DataModelId dataModelId = new DataModelId(UUIDs.timeBased());
+        assetLandingDashboardInfo.setDataModelId(dataModelId);
+        DataModelObjectId dataModelObjectId = new DataModelObjectId(UUIDs.timeBased());
+        assetLandingDashboardInfo.setDataModelObjectId(dataModelObjectId);
+
+        dashboard.setAssetLandingDashboardInfo(assetLandingDashboardInfo);
+        return  dashboard;
     }
 
 }

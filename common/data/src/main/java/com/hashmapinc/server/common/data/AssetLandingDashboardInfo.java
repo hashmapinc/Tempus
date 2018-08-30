@@ -24,6 +24,7 @@ import lombok.EqualsAndHashCode;
 
 import java.io.Serializable;
 
+@Data
 @EqualsAndHashCode
 public class AssetLandingDashboardInfo implements Serializable{
     private static final long serialVersionUID = 8142208716716668541L;

@@ -28,6 +28,7 @@ public class DashboardInfo extends SearchTextBased<DashboardId> implements HasNa
     private TenantId tenantId;
     private String title;
     private transient Set<ShortCustomerInfo> assignedCustomers;
+    private DashboardType type;
 
     public DashboardInfo() {
         super();
@@ -42,6 +43,7 @@ public class DashboardInfo extends SearchTextBased<DashboardId> implements HasNa
         this.tenantId = dashboardInfo.getTenantId();
         this.title = dashboardInfo.getTitle();
         this.assignedCustomers = dashboardInfo.getAssignedCustomers();
+        this.type = dashboardInfo.getType();
     }
 
     public TenantId getTenantId() {
@@ -66,6 +68,14 @@ public class DashboardInfo extends SearchTextBased<DashboardId> implements HasNa
 
     public void setAssignedCustomers(Set<ShortCustomerInfo> assignedCustomers) {
         this.assignedCustomers = assignedCustomers;
+    }
+
+    public DashboardType getType() {
+        return type;
+    }
+
+    public void setType(DashboardType type) {
+        this.type = type;
     }
 
     public boolean isAssignedToCustomer(CustomerId customerId) {
@@ -155,6 +165,11 @@ public class DashboardInfo extends SearchTextBased<DashboardId> implements HasNa
                 return false;
         } else if (!title.equals(other.title))
             return false;
+
+        if(type == null){
+            return other.type == null;
+        }
+
         return true;
     }
 
@@ -165,6 +180,8 @@ public class DashboardInfo extends SearchTextBased<DashboardId> implements HasNa
         builder.append(tenantId);
         builder.append(", title=");
         builder.append(title);
+        builder.append(", type=");
+        builder.append(getType());
         builder.append("]");
         return builder.toString();
     }

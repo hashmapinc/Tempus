@@ -38,7 +38,7 @@ import javax.persistence.Table;
 public class AssetLandingDashboardEntity implements ToData<AssetLandingDashboardInfo> {
 
     @Id
-    @Column(name = ModelConstants.ASSET_LANDING_DASHBOARD_ID)
+    @Column(name = ModelConstants.ID_PROPERTY)
     private String dashboardId;
 
     @Column(name = ModelConstants.ASSET_LANDING_DATA_MODEL_ID)

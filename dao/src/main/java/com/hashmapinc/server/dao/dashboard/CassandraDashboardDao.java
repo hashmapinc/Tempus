@@ -22,6 +22,9 @@ import com.hashmapinc.server.dao.model.nosql.DashboardEntity;
 import com.hashmapinc.server.dao.nosql.CassandraAbstractSearchTextDao;
 import com.hashmapinc.server.dao.util.NoSqlDao;
 
+import java.util.List;
+import java.util.UUID;
+
 import static com.hashmapinc.server.dao.model.ModelConstants.DASHBOARD_COLUMN_FAMILY_NAME;
 
 @Component
@@ -36,5 +39,10 @@ public class CassandraDashboardDao extends CassandraAbstractSearchTextDao<Dashbo
     @Override
     protected String getColumnFamilyName() {
         return DASHBOARD_COLUMN_FAMILY_NAME;
+    }
+
+    @Override
+    public List<Dashboard> findDashboardByDataModelObjectId(UUID dataModelObjectId) {
+        return null;
     }
 }

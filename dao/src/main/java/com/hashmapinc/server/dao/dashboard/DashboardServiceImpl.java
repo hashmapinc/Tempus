@@ -18,11 +18,8 @@ package com.hashmapinc.server.dao.dashboard;
 
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
-import com.hashmapinc.server.common.data.Customer;
-import com.hashmapinc.server.common.data.Dashboard;
-import com.hashmapinc.server.common.data.DashboardInfo;
-import com.hashmapinc.server.common.data.Tenant;
-import com.hashmapinc.server.common.data.id.TenantId;
+import com.hashmapinc.server.common.data.*;
+import com.hashmapinc.server.common.data.id.*;
 import com.hashmapinc.server.common.data.page.TextPageData;
 import com.hashmapinc.server.common.data.page.TextPageLink;
 import com.hashmapinc.server.common.data.page.TimePageLink;
@@ -36,8 +33,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import com.hashmapinc.server.common.data.id.CustomerId;
-import com.hashmapinc.server.common.data.id.DashboardId;
 import com.hashmapinc.server.common.data.page.TimePageData;
 import com.hashmapinc.server.common.data.relation.EntityRelation;
 import com.hashmapinc.server.dao.exception.DataValidationException;
@@ -58,6 +53,12 @@ public class DashboardServiceImpl extends AbstractEntityService implements Dashb
     public static final String INCORRECT_DASHBOARD_ID = "Incorrect dashboardId ";
     public static final String INCORRECT_TENANT_ID = "Incorrect tenantId ";
     public static final String INCORRECT_CUSTOMER_ID = "Incorrect customerId ";
+    public static final String INCORRECT_DATA_MODEL_OBJECT_ID = "Incorrect dataModelObjectId ";
+    public static final String INCORRECT_DATA_MODEL_ID = "Incorrect dataModelId ";
+
+
+
+
     @Autowired
     private DashboardDao dashboardDao;
 
@@ -96,6 +97,13 @@ public class DashboardServiceImpl extends AbstractEntityService implements Dashb
         log.trace("Executing findDashboardInfoByIdAsync [{}]", dashboardId);
         validateId(dashboardId, INCORRECT_DASHBOARD_ID + dashboardId);
         return dashboardInfoDao.findByIdAsync(dashboardId.getId());
+    }
+
+    @Override
+    public List<Dashboard> findDashboardByDataModelObjectId(DataModelObjectId dataModelObjectId) {
+        log.trace("Executing findDashboardByDataModelObjectId [{}]", dataModelObjectId);
+        Validator.validateId(dataModelObjectId, INCORRECT_DATA_MODEL_OBJECT_ID + dataModelObjectId);
+        return dashboardDao.findDashboardByDataModelObjectId(dataModelObjectId.getId());
     }
 
     @Override
@@ -237,6 +245,19 @@ public class DashboardServiceImpl extends AbstractEntityService implements Dashb
                         Tenant tenant = tenantDao.findById(dashboard.getTenantId().getId());
                         if (tenant == null) {
                             throw new DataValidationException("Dashboard is referencing to non-existent tenant!");
+                        }
+                    }
+                    if(dashboard.getType() == DashboardType.ASSET_LANDING_PAGE) {
+                        List<Dashboard> dashboards;
+                        DataModelObjectId dataModelObjectId;
+
+                        AssetLandingDashboardInfo assetLandingDashboardInfo = dashboard.getAssetLandingDashboardInfo();
+                        dataModelObjectId = assetLandingDashboardInfo.getDataModelObjectId();
+
+                        dashboards = findDashboardByDataModelObjectId(dataModelObjectId);
+
+                        if(!dashboards.isEmpty()) {
+                            throw new DataValidationException("Asset landing page is already created for dataModelObject");
                         }
                     }
                 }

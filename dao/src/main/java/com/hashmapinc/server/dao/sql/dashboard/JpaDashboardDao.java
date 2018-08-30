@@ -17,6 +17,8 @@
 package com.hashmapinc.server.dao.sql.dashboard;
 
 import com.hashmapinc.server.common.data.Dashboard;
+import com.hashmapinc.server.common.data.UUIDConverter;
+import com.hashmapinc.server.dao.DaoUtil;
 import com.hashmapinc.server.dao.model.sql.DashboardEntity;
 import com.hashmapinc.server.dao.util.SqlDao;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +26,9 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Component;
 import com.hashmapinc.server.dao.dashboard.DashboardDao;
 import com.hashmapinc.server.dao.sql.JpaAbstractSearchTextDao;
+
+import java.util.List;
+import java.util.UUID;
 
 /**
  * Created by Valerii Sosliuk on 5/6/2017.
@@ -43,5 +48,12 @@ public class JpaDashboardDao extends JpaAbstractSearchTextDao<DashboardEntity, D
     @Override
     protected CrudRepository<DashboardEntity, String> getCrudRepository() {
         return dashboardRepository;
+    }
+
+    @Override
+    public List<Dashboard> findDashboardByDataModelObjectId(UUID dataModelObjectId) {
+        return DaoUtil.convertDataList(dashboardRepository
+                                               .findByAssetLandingDashboardEntity_dataModelObjectId(
+                                                       UUIDConverter.fromTimeUUID(dataModelObjectId)));
     }
 }

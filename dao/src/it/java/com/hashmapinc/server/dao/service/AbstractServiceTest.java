@@ -34,11 +34,6 @@ import com.hashmapinc.server.common.data.plugin.ComponentType;
 import com.hashmapinc.server.common.data.plugin.PluginMetaData;
 import com.hashmapinc.server.common.data.rule.RuleMetaData;
 import com.hashmapinc.server.dao.UserServiceTestConfiguration;
-
-import com.hashmapinc.server.dao.customergroup.CustomerGroupService;
-import com.hashmapinc.server.dao.assetlandingdashboard.AssetLandingDashboardService;
-import com.hashmapinc.server.dao.tagmetadata.TagMetaDataService;
-
 import com.hashmapinc.server.dao.alarm.AlarmService;
 import com.hashmapinc.server.dao.asset.AssetService;
 import com.hashmapinc.server.dao.audit.AuditLogLevelFilter;
@@ -47,6 +42,7 @@ import com.hashmapinc.server.dao.cluster.NodeMetricService;
 import com.hashmapinc.server.dao.component.ComponentDescriptorService;
 import com.hashmapinc.server.dao.computations.ComputationsService;
 import com.hashmapinc.server.dao.customer.CustomerService;
+import com.hashmapinc.server.dao.customergroup.CustomerGroupService;
 import com.hashmapinc.server.dao.dashboard.DashboardService;
 import com.hashmapinc.server.dao.datamodel.DataModelObjectService;
 import com.hashmapinc.server.dao.datamodel.DataModelService;
@@ -79,7 +75,10 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.context.support.AnnotationConfigContextLoader;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
 
 @ActiveProfiles("dao-test")
@@ -172,7 +171,6 @@ public abstract class AbstractServiceTest {
 
     @Autowired
     protected MetadataIngestionService metadataIngestionService;
-    protected AssetLandingDashboardService assetLandingDashboardService;
 
     class IdComparator<D extends BaseData<? extends UUIDBased>> implements Comparator<D> {
         @Override

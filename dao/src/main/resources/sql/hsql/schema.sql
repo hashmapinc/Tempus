@@ -368,7 +368,7 @@ CREATE TABLE IF NOT EXISTS tag_metadata (
 );
 
 CREATE TABLE IF NOT EXISTS asset_landing_dashboard (
-    dashboard_id varchar(31) NOT NULL CONSTRAINT asset_landing_dashboard_pkey PRIMARY KEY,
+    id varchar(31) NOT NULL CONSTRAINT asset_landing_dashboard_pkey PRIMARY KEY,
     data_model_id varchar(31),
     data_model_object_id varchar(31)
 );
