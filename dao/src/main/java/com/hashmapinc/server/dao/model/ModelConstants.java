@@ -68,22 +68,9 @@ public class ModelConstants {
     /**
      * Cassandra user constants.
      */
-    public static final String USER_COLUMN_FAMILY_NAME = "user";
-    public static final String USER_PG_HIBERNATE_COLUMN_FAMILY_NAME = "tb_user";
-    public static final String USER_TENANT_ID_PROPERTY = TENANT_ID_PROPERTY;
-    public static final String USER_CUSTOMER_ID_PROPERTY = CUSTOMER_ID_PROPERTY;
-    public static final String USER_CUSTOMER_GROUP_ID_PROPERTY = "customer_group_id";
-    public static final String USER_EMAIL_PROPERTY = "email";
-    public static final String USER_AUTHORITY_PROPERTY = "authority";
-    public static final String USER_FIRST_NAME_PROPERTY = "first_name";
-    public static final String USER_LAST_NAME_PROPERTY = "last_name";
-    public static final String USER_ADDITIONAL_INFO_PROPERTY = ADDITIONAL_INFO_PROPERTY;
     public static final String USER_GROUP_TABLE_NAME = "user_groups";
     public static final String USER_GROUP_COLUMN_FAMILY_NAME = "user_groups";
 
-    public static final String USER_BY_EMAIL_COLUMN_FAMILY_NAME = "user_by_email";
-    public static final String USER_BY_TENANT_AND_SEARCH_TEXT_COLUMN_FAMILY_NAME = "user_by_tenant_and_search_text";
-    public static final String USER_BY_CUSTOMER_AND_SEARCH_TEXT_COLUMN_FAMILY_NAME = "user_by_customer_and_search_text";
 
     /**
      * Cassandra user_credentials constants.

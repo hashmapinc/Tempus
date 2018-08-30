@@ -44,7 +44,6 @@ import com.hashmapinc.server.dao.service.PaginatedRemover;
 import com.hashmapinc.server.dao.service.Validator;
 import com.hashmapinc.server.dao.tenant.TenantDao;
 import com.hashmapinc.server.dao.user.UserCredentialsDao;
-import com.hashmapinc.server.dao.user.UserDao;
 import com.hashmapinc.server.dao.user.UserService;
 import com.hashmapinc.server.requests.ActivateUserRequest;
 import com.hashmapinc.server.requests.CreateUserRequest;
@@ -55,7 +54,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
@@ -91,9 +89,6 @@ public class RestUserService extends AbstractEntityService implements UserServic
 
     public static final String INCORRECT_USER_ID = "Incorrect userId ";
     public static final String INCORRECT_TENANT_ID = "Incorrect tenantId ";
-
-    @Autowired
-    private UserDao userDao;
 
     @Autowired
     private UserCredentialsDao userCredentialsDao;
@@ -205,9 +200,9 @@ public class RestUserService extends AbstractEntityService implements UserServic
 
     @Override
     public User saveExternalUser(User user){
+        // TODO : Tempus: 437 : LDAP Support in HAF
         log.trace("Executing save external user [{}]", user);
-        userValidator.validate(user);
-        return userDao.save(user);
+        return null;
     }
 
     @Override
