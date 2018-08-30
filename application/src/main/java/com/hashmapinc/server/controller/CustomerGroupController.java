@@ -195,11 +195,6 @@ public class CustomerGroupController extends BaseController {
         checkParameter(CUSTOMER_GROUP_ID, strCustomerGroupId);
         try {
             CustomerGroupId customerGroupId = new CustomerGroupId(toUUID(strCustomerGroupId));
-            SecurityUser authUser = getCurrentUser();
-            if (authUser.getAuthority() == Authority.CUSTOMER_USER && !authUser.getId().equals(customerGroupId)) {
-                throw new TempusException(YOU_DON_T_HAVE_PERMISSION_TO_PERFORM_THIS_OPERATION,
-                        TempusErrorCode.PERMISSION_DENIED);
-            }
             final CustomerGroup customerGroup = checkNotNull(checkCustomerGroupId(customerGroupId));
             TextPageLink pageLink = createPageLink(limit, textSearch, idOffset, textOffset);
             return userService.findUsersByIds(customerGroup.getUserIds(), pageLink);

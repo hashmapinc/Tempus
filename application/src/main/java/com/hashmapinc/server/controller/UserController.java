@@ -305,11 +305,6 @@ public class UserController extends BaseController {
         checkParameter(USER_ID, strUserId);
         try {
             UserId userId = new UserId(toUUID(strUserId));
-            SecurityUser authUser = getCurrentUser();
-            if (authUser.getAuthority() == Authority.CUSTOMER_USER && !authUser.getId().equals(userId)) {
-                throw new TempusException(YOU_DON_T_HAVE_PERMISSION_TO_PERFORM_THIS_OPERATION,
-                        TempusErrorCode.PERMISSION_DENIED);
-            }
             TextPageLink pageLink = createPageLink(limit, textSearch, idOffset, textOffset);
             return customerGroupService.findByUserId(userId, pageLink);
         } catch (Exception e) {

@@ -156,9 +156,9 @@ public class DefaultSystemDataLoaderService implements SystemDataLoaderService {
     @Override
     public void createSysAdmin() {
         if(isLdapEnabled) {
-            adminUser = createUser(Authority.SYS_ADMIN, Arrays.asList(SYS_ADMIN_DEFAULT_PERMISSION),null, null, adminEmail, null, true);
+            adminUser = createUser(Authority.SYS_ADMIN,null, null, adminEmail, null, true);
         } else {
-            adminUser = createUser(Authority.SYS_ADMIN, Arrays.asList(SYS_ADMIN_DEFAULT_PERMISSION),null, null, adminEmail, "sysadmin", false);
+            adminUser = createUser(Authority.SYS_ADMIN,null, null, adminEmail, "sysadmin", false);
         }
         customerGroupService.assignUsers(adminGroup.getId(), Collections.singletonList(adminUser.getId()));
     }
@@ -275,7 +275,7 @@ public class DefaultSystemDataLoaderService implements SystemDataLoaderService {
         demoTenant = tenantService.saveTenant(demoTenant);
 
         CustomerGroup tenantGroup = createGroup(TENANT_GROUP, Collections.singletonList(TENANT_ADMIN_DEFAULT_PERMISSION) , demoTenant.getId(), null);
-        User tenantUser = createUser(Authority.TENANT_ADMIN, Collections.singletonList(TENANT_ADMIN_DEFAULT_PERMISSION) , demoTenant.getId(), null, "demo@hashmapinc.com", "tenant", false);
+        User tenantUser = createUser(Authority.TENANT_ADMIN, demoTenant.getId(), null, "demo@hashmapinc.com", "tenant", false);
         customerGroupService.assignUsers(tenantGroup.getId(), Collections.singletonList(tenantUser.getId()));
 
         Customer customerA = new Customer();
@@ -290,7 +290,7 @@ public class DefaultSystemDataLoaderService implements SystemDataLoaderService {
                 CUSTOMER_USER_DEFAULT_DEVICE_UPDATE_PERMISSION
         );
         CustomerGroup customerGroupA = createGroup("Driller Group", customerPermissions, demoTenant.getId(), customerA.getId());
-        User bobJones = createUser(Authority.CUSTOMER_USER, customerPermissions, demoTenant.getId(), customerA.getId(), "bob.jones@hashmapinc.com", "driller", false);
+        User bobJones = createUser(Authority.CUSTOMER_USER, demoTenant.getId(), customerA.getId(), "bob.jones@hashmapinc.com", "driller", false);
         customerGroupService.assignUsers(customerGroupA.getId(), Collections.singletonList(bobJones.getId()));
 
         List<AttributeKvEntry> attributesTank123 = new ArrayList<>();
@@ -354,7 +354,6 @@ public class DefaultSystemDataLoaderService implements SystemDataLoaderService {
     }
 
     private User createUser(Authority authority,
-                            Collection<String> permissions,
                             TenantId tenantId,
                             CustomerId customerId,
                             String email,
@@ -362,7 +361,6 @@ public class DefaultSystemDataLoaderService implements SystemDataLoaderService {
                             boolean isExternalUser) {
         User user = new User();
         user.setAuthority(authority);
-        user.setPermissions(permissions);
         user.setEmail(email);
         user.setTenantId(tenantId);
         user.setCustomerId(customerId);
