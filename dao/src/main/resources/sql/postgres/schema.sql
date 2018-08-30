@@ -199,18 +199,6 @@ CREATE TABLE IF NOT EXISTS rule (
     weight integer
 );
 
-CREATE TABLE IF NOT EXISTS tb_user (
-    id varchar(31) NOT NULL CONSTRAINT tb_user_pkey PRIMARY KEY,
-    additional_info varchar,
-    authority varchar(255),
-    customer_id varchar(31),
-    email varchar(255) UNIQUE,
-    first_name varchar(255),
-    last_name varchar(255),
-    search_text varchar(255),
-    tenant_id varchar(31)
-);
-
 CREATE TABLE IF NOT EXISTS tenant (
     id varchar(31) NOT NULL CONSTRAINT tenant_pkey PRIMARY KEY,
     additional_info varchar,
