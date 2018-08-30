@@ -1177,7 +1177,7 @@ export default angular.module('tempus.locale', [])
                     "no-function": "No Function file selected",
                     "no-dependencies": "No dependency file selected",
                     "function-handler": "Function handler",
-                    "timeout": "Function timeout",
+                    "timeout": "Function timeout (Seconds)",
                     "handler-required": "Function handler is required"
                 },
                 "computationJob": {
