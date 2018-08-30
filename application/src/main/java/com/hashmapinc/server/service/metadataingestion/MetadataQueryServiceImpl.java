@@ -41,7 +41,7 @@ public class MetadataQueryServiceImpl implements MetadataQueryService {
     private String serviceUrl;
 
     @Value("${metadata-ingestion.query.config_path}")
-    private String getByConfigPath;
+    private String configQueryPath;
 
     private static final String PATH_SEPARATOR = "/";
 
@@ -67,16 +67,16 @@ public class MetadataQueryServiceImpl implements MetadataQueryService {
     public MetadataQuery findById(MetadataQueryId id) {
         log.trace("Executing MetadataQueryServiceImpl.findById [{}]", id);
         validateId(id, INCORRECT_QUERY_ID + id);
-        String getByIdUrl = serviceUrl + PATH_SEPARATOR + id.getId();
-        return restTemplate.getForObject(getByIdUrl, MetadataQuery.class);
+        String url = serviceUrl + PATH_SEPARATOR + id.getId();
+        return restTemplate.getForObject(url, MetadataQuery.class);
     }
 
     @Override
     public List<MetadataQuery> findAllByMetadataConfigId(MetadataConfigId metadataConfigId) {
         log.trace("Executing MetadataQueryServiceImpl.findAllByMetadataConfigId [{}]", metadataConfigId);
         validateId(metadataConfigId, INCORRECT_CONFIG_ID + metadataConfigId);
-        String getByOwnerUrl = serviceUrl + PATH_SEPARATOR + getByConfigPath + PATH_SEPARATOR + metadataConfigId.getId();
-        ResponseEntity<List<MetadataQuery>> response = restTemplate.exchange(getByOwnerUrl, HttpMethod.GET, null, new ParameterizedTypeReference<List<MetadataQuery>>() {
+        String url = serviceUrl + PATH_SEPARATOR + configQueryPath + PATH_SEPARATOR + metadataConfigId.getId();
+        ResponseEntity<List<MetadataQuery>> response = restTemplate.exchange(url, HttpMethod.GET, null, new ParameterizedTypeReference<List<MetadataQuery>>() {
         });
 
         return response.getBody();
@@ -86,7 +86,7 @@ public class MetadataQueryServiceImpl implements MetadataQueryService {
     public void delete(MetadataQueryId id) {
         log.trace("Executing MetadataQueryServiceImpl.delete [{}]", id);
         validateId(id, INCORRECT_QUERY_ID + id);
-        String deleteByIdUrl = serviceUrl + PATH_SEPARATOR + id.getId();
-        restTemplate.delete(deleteByIdUrl);
+        String url = serviceUrl + PATH_SEPARATOR + id.getId();
+        restTemplate.delete(url);
     }
 }
