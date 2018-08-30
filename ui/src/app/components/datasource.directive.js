@@ -89,7 +89,7 @@ function Datasource($compile, $templateCache, utils, types) {
             generateDataKey: '&',
             fetchEntityKeys: '&',
             onCreateEntityAlias: '&',
-            entityDatasource: '=',
+            0: '=',
             widgetInfo: '='
         },
         link: linker

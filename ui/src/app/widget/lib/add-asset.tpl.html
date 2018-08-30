@@ -17,10 +17,10 @@
 
 -->
 <md-dialog aria-label="{{ 'asset.add' | translate }}" tb-help="'assets'" help-container-id="help-container">
-    <form name="theForm" ng-submit="vm.add()">
+    <form name="theForm" ng-submit="vm.addAsset()">
         <md-toolbar>
             <div class="md-toolbar-tools">
-                <h2 translate>asset.add</h2>
+                <h2 >Add {{vm.name}}</h2>
                 <span flex></span>
                 <div id="help-container"></div>
                 <md-button class="md-icon-button" ng-click="vm.cancel()">
@@ -32,25 +32,24 @@
         <span style="min-height: 5px;" flex="" ng-show="!$root.loading"></span>
         <md-dialog-content>
             <div class="md-dialog-content">
-                <fieldset ng-disabled="$root.loading || !isEdit">
+                <fieldset>
                     <md-input-container class="md-block">
                         <label translate>asset.name</label>
-                        <input required name="name" ng-model="asset.name">
+                        <input required name="name" ng-model="vm.asset_name">
                         <div ng-messages="theForm.name.$error">
                             <div translate ng-message="required">asset.name-required</div>
                         </div>
                     </md-input-container>
                     <md-input-container class="md-block">
                         <label translate>asset.description</label>
-                        <textarea ng-model="asset.additionalInfo.description" rows="2"></textarea>
+                        <textarea  rows="2" ng-model="vm.description"></textarea>
                     </md-input-container>
                     <md-input-container class="md-block">
-                        <label translate>Child of</label>
-                        <span><Fieldset></Fieldset></span>
+                        <label translate>Child of : {{vm.parentName}} </label>
                     </md-input-container>
                     <md-input-container class="md-block">
-                        <md-select placeholder="Assign to user" ng-model="user" md-on-open="loadUsers()" style="min-width: 200px;">
-                            <md-option ng-value="user" ng-repeat="user in users">{{user.name}}</md-option>
+                        <md-select placeholder="Assign to user" ng-model="vm.user" md-on-open="loadUsers()" style="min-width: 200px;">
+                            <md-option ng-value="user" ng-repeat="user in vm.users">{{user.name}}</md-option>
                           </md-select>
                     </md-input-container>
                 </fieldset>
@@ -58,10 +57,10 @@
         </md-dialog-content>
         <md-dialog-actions layout="row">
             <span flex></span>
-            <md-button ng-disabled="$root.loading || theForm.$invalid || !theForm.$dirty" type="submit" class="md-raised md-primary">
+            <md-button  type="submit" class="md-raised md-primary">
                 {{ 'action.add' | translate }}
             </md-button>
-            <md-button ng-disabled="$root.loading" ng-click="vm.cancel()" style="margin-right:20px;">{{ 'action.cancel' | translate }}</md-button>
+            <md-button  ng-click="vm.cancel()" style="margin-right:20px;">{{ 'action.cancel' | translate }}</md-button>
         </md-dialog-actions>
     </form>
 </md-dialog>

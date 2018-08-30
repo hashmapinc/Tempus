@@ -44,15 +44,87 @@ function DeviceListWidget() {
     };
 }
 
-function AddAssetController ($scope,$log){
-    $log.log("in add asset");
+function AddAssetController ($log,customerService,$state,dashboardService,datamodelService,userService,
+    $rootScope,assetService,$mdDialog){
+    $log.log($state);
+    var vm = this;
+    vm.name = null;
+    vm.dataModelObject = null;
+    vm.parentName = null;
+    vm.parentId = null;
+    vm.addAsset = addAsset;
+    vm.cancel = cancel;
+    initController();
+    var currentuser = userService.getCurrentUser();
+    $log.log(currentuser);
+    function initController(){
+        var pageSize = 10;
+        dashboardService.getDashboard($state.params.dashboardId).then(function success(response) {
+            if(response){
+                vm.isParent = getDataModelObjectDetails(response.dataModelObjectId);
+                vm.isParent.then(function success(object_response) {
+                    if(object_response.data){ 
+                        vm.name = object_response.data.name;
+                        if(object_response.data.parentId) {
+                            var parentDetails = getDataModelObjectDetails(object_response.data.parentId.id);
+                            parentDetails.then(function success(parentResponse) {
+                                vm.parentName = parentResponse.data.name;
+                                vm.parentId = parentResponse.data.id.id
+                            });
+                        }
+                    }
+                },
+                function fail(){
+                });               
+            } 
+        },
+        function fail() {
+        });
+        customerService.getCustomers({limit: pageSize, textSearch: ''}).then(
+            function success(_customers) {
+                vm.users = _customers.data;
+                $log.log("vm.users")
+                $log.log(vm.users)
+            },
+            function fail() {
+            });
+    }
+    function getDataModelObjectDetails(dataModelObjectId){
+        return datamodelService.getDatamodelObject(dataModelObjectId);
+    }
+    function addAsset(){
+        
+        var requestObj = {
+            name:vm.asset_name,
+            additionalInfo:{
+                description:vm.description,
+                parentId:vm.parentId
+            },
+            customerId:{
+                id:vm.user.id.id,
+                entityType:"CUSTOMER"
+            },
+            type:vm.name.toLowerCase()
+        }
+        $log.log(requestObj);
+        assetService.saveAsset(requestObj).then(
+            function success() {
+                $rootScope.$broadcast('assetSaved');
+                cancel();
+            },
+            function fail() {
+            }
+        );
+    }
+    function cancel() {
+        $mdDialog.cancel();
+    }
+
 }
 
 /*@ngInject*/
 function DeviceListWidgetController($rootScope, $scope, $filter, deviceService, types, assetService, userService,
     $state, $stateParams, $translate, customerService,$document, $mdDialog,$log) {
-    $log.log("DeviceListWidgetController");
-    $log.log(types);
     
     var vm = this,promise;
     $scope.query = {
@@ -64,10 +136,11 @@ function DeviceListWidgetController($rootScope, $scope, $filter, deviceService, 
     vm.deviceDetailFunc = deviceDetailFunc;
     vm.loadTableData = loadTableData;
     $scope.showList = true;
+    
     var customerId = $stateParams.customerId;
     
     initController();
-    vm.loadTableData();
+    
     $scope.devices = {
         count: 0,
         data: []
@@ -92,54 +165,46 @@ function DeviceListWidgetController($rootScope, $scope, $filter, deviceService, 
                 }
             );
         }
+        vm.loadTableData();
     }
     function loadTableData(){
-        $log.log($state);
-        if(vm.config.config.datasources && vm.config.config.datasources.length > 0){
-            if(vm.config.config.datasources[0].dataKeys[0] == 'Assets'){
-                if (vm.devicesScope === 'tenant') {
-                    promise = assetService.getTenantAssets({limit: 200, textSearch: ''}, true, null, false);
-                }else if (vm.devicesScope === 'customer' || vm.devicesScope === 'customer_user') {
-                    promise = assetService.getCustomerAssets(customerId, {limit: 200, textSearch: ''}, true, null, false);
-                }   
-            }else if(vm.config.config.datasources[0].dataKeys[0] == 'Devices'){
-                if (vm.devicesScope === 'tenant') {
-                    promise = deviceService.getTenantDevices({limit: 200, textSearch: ''}, true, null, false);
-                }else if (vm.devicesScope === 'customer' || vm.devicesScope === 'customer_user') {
-                    promise = deviceService.getCustomerDevices(customerId, {limit: 200, textSearch: ''}, true, null,false);
+        $log.log($log.log("in load"))
+        $log.log(vm.devicesScope);
+        $log.log(customerId)
+        if (vm.devicesScope === 'tenant') {
+            promise = assetService.getTenantAssets({limit: 200, textSearch: ''}, true, null, false);
+        }else if (vm.devicesScope === 'customer' || vm.devicesScope === 'customer_user') {
+            promise = assetService.getCustomerAssets(customerId, {limit: 200, textSearch: ''}, true, null, false);
+        }   
+        if(promise) {
+            promise.then(function success(items) {
+                $log.log(items)
+                $scope.loadingData = false;
+
+                var deviceSortList = $filter('orderBy')(items.data, $scope.query.order);
+                var startIndex = $scope.query.limit * ($scope.query.page - 1);
+
+
+                if ($scope.query.search != null) {
+
+                    deviceSortList = $filter('filter')(items.data, function(data) {
+                        if ($scope.query.search) {
+                            return data.name.toLowerCase().indexOf($scope.query.search.toLowerCase()) > -1 || data.type.toLowerCase().indexOf($scope.query.search.toLowerCase()) > -1;
+                        } else {
+                            return true;
+                        }
+                    });
+                    //$scope.query.page =1;
+                    deviceSortList = $filter('orderBy')(deviceSortList, $scope.query.order);
+                    if ($scope.query.search != '') {startIndex =0;}
                 }
+                    var devicePaginatedata = deviceSortList.slice(startIndex, startIndex + $scope.query.limit);
+                    $scope.devices = {
+                        count: items.data.length,
+                        data: devicePaginatedata
+                    };
+                })
             }
-            if(promise) {
-                promise.then(function success(items) {
-                    $scope.loadingData = false;
-    
-                    var deviceSortList = $filter('orderBy')(items.data, $scope.query.order);
-                    var startIndex = $scope.query.limit * ($scope.query.page - 1);
-    
-    
-                    if ($scope.query.search != null) {
-    
-                        deviceSortList = $filter('filter')(items.data, function(data) {
-                            if ($scope.query.search) {
-                                return data.name.toLowerCase().indexOf($scope.query.search.toLowerCase()) > -1 || data.type.toLowerCase().indexOf($scope.query.search.toLowerCase()) > -1;
-                            } else {
-                                return true;
-                            }
-                        });
-                        //$scope.query.page =1;
-                        deviceSortList = $filter('orderBy')(deviceSortList, $scope.query.order);
-                        if ($scope.query.search != '') {startIndex =0;}
-                    }
-                        var devicePaginatedata = deviceSortList.slice(startIndex, startIndex + $scope.query.limit);
-                        $scope.devices = {
-                            count: items.data.length,
-                            data: devicePaginatedata
-                        };
-                    })
-                }
-        }else{
-            $scope.showList = false;
-        }
         
     }
     function deviceDetailFunc($event,list){
@@ -156,12 +221,12 @@ function DeviceListWidgetController($rootScope, $scope, $filter, deviceService, 
             controllerAs: 'vm',
             templateUrl: addAssetTemplate,
             parent: angular.element($document[0].body),
-            locals: {saveItemFunction: vm.deviceGridConfig.saveItemFunc},
             fullscreen: true,
             targetEvent: $event
         }).then(function () {
-            $scope.resetFilter();
         }, function () {
+            initController();
         });
     }
+    
 }
