@@ -83,7 +83,7 @@ export default function UnassignUsersFromGroupController($scope, toast, $transla
 
     function unassign() {
         //var tasks = [];
-        userGroupService.unassignUserToGroup(vm.groupId, vm.users.selections).then(
+        userGroupService.unassignUserFromGroup(vm.groupId, vm.users.selections).then(
 
             function success() {
 

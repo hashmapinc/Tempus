@@ -15,11 +15,11 @@
  * limitations under the License.
  */
 export default angular.module('tempus.api.userGroup', [])
-    .factory('userGroupService', userGroupService)
+    .factory('userGroupService', UserGroupService)
     .name;
 
 /*@ngInject*/
-function userGroupService($q, $http) {
+function UserGroupService($q, $http) {
 
 
     var service = {
@@ -28,10 +28,10 @@ function userGroupService($q, $http) {
       deleteUserGroup:deleteUserGroup,
       assignUserToGroup:assignUserToGroup,
       assignedUsers:assignedUsers,
-      unassignUserToGroup:unassignUserToGroup,
+      unassignUserFromGroup:unassignUserFromGroup,
       assignedGroups:assignedGroups,
       assignGroupToUser:assignGroupToUser,
-      unassignGroupToUser:unassignGroupToUser
+      unassignGroupFromUser:unassignGroupFromUser
 
     }
 
@@ -84,7 +84,7 @@ function userGroupService($q, $http) {
 
     }
 
-    function unassignUserToGroup(groupId, userIds) {
+    function unassignUserFromGroup(groupId, userIds) {
         var deferred = $q.defer();
         var url = '/api/customer/group/' + groupId + '/users';
         $http.put(url,userIds).then(function success(response) {
@@ -96,7 +96,7 @@ function userGroupService($q, $http) {
     }
 
 
-    function unassignGroupToUser(userId, groupIds) {
+    function unassignGroupFromUser(userId, groupIds) {
         var deferred = $q.defer();
         var url = '/api/user/' + userId + '/groups';
         $http.put(url,groupIds).then(function success(response) {

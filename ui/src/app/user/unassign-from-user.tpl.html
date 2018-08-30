@@ -53,7 +53,7 @@
                             <md-list>
                                 <md-list-item md-virtual-repeat="group in vm.theGroups" md-on-demand
                                               class="repeated-item" flex>
-                                    <md-checkbox ng-click="vm.toggleUserSelection($event, group)"
+                                    <md-checkbox ng-click="vm.toggleGroupSelection($event, group)"
                                                  aria-label="{{ 'item.selected' | translate }}"
                                                  ng-checked="group.selected"></md-checkbox>
                                     <span> {{ group.name }} </span>
