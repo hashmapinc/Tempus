@@ -19,32 +19,42 @@ package com.hashmapinc.server.service.computation;
 import com.hashmapinc.kubeless.apis.KubelessV1beta1FunctionApi;
 import com.hashmapinc.kubeless.models.V1beta1Function;
 import com.hashmapinc.kubeless.models.V1beta1FunctionSpec;
-import com.hashmapinc.server.common.data.computation.ComputationRequest;
+import com.hashmapinc.server.common.data.computation.ComputationMetadata;
 import com.hashmapinc.server.common.data.computation.Computations;
 import com.hashmapinc.server.common.data.computation.KubelessComputationMetadata;
-import com.hashmapinc.server.exception.TempusException;
+import com.hashmapinc.server.common.msg.exception.TempusRuntimeException;
 import com.squareup.okhttp.Call;
 import com.squareup.okhttp.Response;
+import io.kubernetes.client.ApiClient;
 import io.kubernetes.client.ApiException;
+import io.kubernetes.client.models.V1ObjectMeta;
+import io.kubernetes.client.util.Config;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.Base64;
 
-import static com.hashmapinc.server.exception.TempusErrorCode.ITEM_NOT_FOUND;
-
 @Slf4j
+@Service
 public class KubelessDeploymentService implements ComputationFunctionDeploymentService{
 
     public static final String DEFAULT_NAMESPACE = "default";
-    public static final String ZIP_CONST = "+zip";
     public static final String TXT = "txt";
     public static final String TXT_ZIP = "txt+zip";
     public static final String BASE64 = "base64";
     public static final String BASE64_ZIP = "base64+zip";
+    public static final int INTERNAL_SERVER_ERROR = 500;
+    public static final int CREATED = 201;
+    public static final int OK = 200;
+
+    @Value("${kubeless.cluster_mode_enabled}")
+    private boolean clusterModeEnabled;
+
+    @Value("${kubeless.kube_config_path}")
+    private String kublessConfigPath;
+
 
     private static volatile  KubelessV1beta1FunctionApi kubelessV1beta1FunctionApi;
 
@@ -52,102 +62,111 @@ public class KubelessDeploymentService implements ComputationFunctionDeploymentS
     private Base64.Encoder encoder = Base64.getEncoder();
 
     @Override
-    public void deployKubelessFunction(ComputationRequest computationRequest) {
+    public void deployKubelessFunction(Computations computation) {
         try {
-            Computations computation = computationRequest.getComputation();
             KubelessV1beta1FunctionApi functionApi = getKubelessV1beta1FunctionApi(DEFAULT_NAMESPACE);
             KubelessComputationMetadata md = (KubelessComputationMetadata) computation.getComputationMetadata();
+            int resposeCode = INTERNAL_SERVER_ERROR;
             switch (md.getFunctionContentType()) {
                 case TXT_ZIP:
                 case TXT:
-                    String textContent = convertToTxt(computationRequest.getFunctionContent());
-                    V1beta1Function v1beta1Function = createV1beta1Function(computationRequest, textContent);
-                    functionApi.createFunctionCall(v1beta1Function);
+                    String textContent = convertToTxt(md.getFunctionContent());
+                    md.setFunctionContent(textContent);
+                    V1beta1Function v1beta1Function = createV1beta1Function(md);
+                    Call call = functionApi.createFunctionCall(v1beta1Function);
+                    Response response = call.execute();
+                    resposeCode = response.code();
                     break;
                 case BASE64_ZIP:
                 case BASE64:
-                    v1beta1Function = createV1beta1Function(computationRequest, computationRequest.getFunctionContent());
-                    functionApi.createFunctionCall(v1beta1Function);
+                    v1beta1Function = createV1beta1Function(md);
+                    call = functionApi.createFunctionCall(v1beta1Function);
+                    response = call.execute();
+                    resposeCode = response.code();
                     break;
                     default:
                         break;
             }
+
+            if ( resposeCode != CREATED)
+                throw new TempusRuntimeException("Function");
         }
         catch (ApiException e){
-            log.info("Kubeless api exception for deploy funtion : ", e);
+            log.info("Kubeless api e.kubeconfigxception for deploy funtion : " + e);
+        } catch (IOException e) {
+            log.info("");
         }
     }
 
     @Override
-    public ComputationRequest fetchKubelessFunction(Computations computation) {
-        ComputationRequest cr = null;
+    public boolean checkKubelessfunction(Computations computation) {
         try {
-            KubelessComputationMetadata md = (KubelessComputationMetadata)computation.getComputationMetadata();
+            KubelessComputationMetadata md = (KubelessComputationMetadata)(computation.getComputationMetadata());
             KubelessV1beta1FunctionApi functionApi = getKubelessV1beta1FunctionApi(DEFAULT_NAMESPACE);
+
             Call call = functionApi.getFunctionCall(md.getFunction());
             Response response = call.execute();
-            byte[] resBytes = response.body().bytes();
-            MessageDigest digest = MessageDigest.getInstance("SHA-256");
-            byte[] hash = digest.digest(resBytes);
-            String hashSha1 = new String(hash);
-            if (!hashSha1.contentEquals(md.getChecksum()))
-                throw new TempusException("Checksum of functions did not match ", ITEM_NOT_FOUND);
-            // Convert function to base64 and put in request
-            cr = new ComputationRequest();
-            cr.setComputation(computation);
-            cr.setFunctionContent(convertToBase64(resBytes));
-
+            if (response.code() != OK)
+                return false;
         } catch (ApiException e) {
-            log.info("Kubeless api exception for fetch function : ", e);
+            log.error("Kubeless api exception for fetch function : " + e);
         } catch (IOException e) {
-            log.info("Exception occured in call execution : ", e);
+            log.error("Exception occured in call execution : " + e);
         } catch (Exception e) {
-            log.info("Exception occured : ", e);
+            log.error("Exception occured : " + e);
         }
 
-        return cr;
+        return true;
     }
 
     private KubelessV1beta1FunctionApi getKubelessV1beta1FunctionApi(String namespace) {
-        if (kubelessV1beta1FunctionApi == null) {
-            synchronized (KubelessV1beta1FunctionApi.class) {
-                if(kubelessV1beta1FunctionApi == null)
-                return new KubelessV1beta1FunctionApi(namespace);
+        try {
+            if (kubelessV1beta1FunctionApi == null) {
+                synchronized (KubelessV1beta1FunctionApi.class) {
+                    if (kubelessV1beta1FunctionApi == null) {
+                        if (clusterModeEnabled) {
+                            ApiClient client = Config.fromCluster();
+                            return new KubelessV1beta1FunctionApi(client, namespace);
+                        } else {
+                            ApiClient client = Config.fromConfig("/home/himanshu/.kube/aws.secure.kubeconfig");
+                            return new KubelessV1beta1FunctionApi(client, namespace);
+                        }
+                    }
+                }
             }
+        } catch (IOException e) {
+            log.info("Execption occured in getting Kubernetes Api client : ", e);
         }
         return kubelessV1beta1FunctionApi;
     }
 
-    private V1beta1Function createV1beta1Function(ComputationRequest computationRequest, String textContent) {
+    private V1beta1Function createV1beta1Function(ComputationMetadata computationMetadata) {
         try {
-            MessageDigest digest = MessageDigest.getInstance("SHA-256");
-            byte[] hash = digest.digest(textContent.getBytes(StandardCharsets.UTF_8));
-            V1beta1FunctionSpec v1beta1FunctionSpec = createV1beta1FunctionSpec(textContent, computationRequest, hash);
+            V1ObjectMeta v1ObjectMeta = new V1ObjectMeta();
+            v1ObjectMeta.setName(((KubelessComputationMetadata)computationMetadata).getFunction());
+            v1ObjectMeta.setNamespace(((KubelessComputationMetadata)computationMetadata).getNamespace());
+            V1beta1FunctionSpec v1beta1FunctionSpec = createV1beta1FunctionSpec(computationMetadata);
             V1beta1Function v1beta1Function = new V1beta1Function();
+            v1beta1Function.setMetadata(v1ObjectMeta);
             v1beta1Function.setSpec(v1beta1FunctionSpec);
             return v1beta1Function;
         }
-        catch (NoSuchAlgorithmException e) {
-            log.info("Sha1 algorithm not present ");
+        catch (Exception e) {
+            log.info("Exception occured : ", e);
         }
         return null;
     }
 
-    private V1beta1FunctionSpec createV1beta1FunctionSpec(String textContent, ComputationRequest computationRequest, byte[] hash) {
-        Computations computation = computationRequest.getComputation();
-        KubelessComputationMetadata md = (KubelessComputationMetadata)computation.getComputationMetadata();
+    private V1beta1FunctionSpec createV1beta1FunctionSpec(ComputationMetadata computationMetadata) {
+        KubelessComputationMetadata md = (KubelessComputationMetadata)computationMetadata;
         V1beta1FunctionSpec v1beta1FunctionSpec = new V1beta1FunctionSpec();
-        v1beta1FunctionSpec.setChecksum(new String(hash));
-        md.setChecksum(new String(hash));
-        v1beta1FunctionSpec.setFunction(textContent);
+        v1beta1FunctionSpec.setFunction(md.getFunctionContent());
         v1beta1FunctionSpec.dependencies(md.getDependencies());
         v1beta1FunctionSpec.setHandler(md.getHandler());
-        v1beta1FunctionSpec.setRuntime(md.getRuntime().name());
-//        if(computationRequest.isZip())
-//            v1beta1FunctionSpec.functionContentType(md.getFunctionContentType() + ZIP_CONST);
-//        else
+        v1beta1FunctionSpec.setRuntime("java1.8");
         v1beta1FunctionSpec.functionContentType(md.getFunctionContentType());
-        v1beta1FunctionSpec.setTimeout("180");
+        v1beta1FunctionSpec.setChecksum(md.getChecksum());
+        v1beta1FunctionSpec.setTimeout(md.getTimeout());
         return v1beta1FunctionSpec;
     }
 
@@ -156,7 +175,4 @@ public class KubelessDeploymentService implements ComputationFunctionDeploymentS
         return new String(decodedContent);
     }
 
-    private String convertToBase64(byte[] fuctionBytes) {
-        return encoder.encodeToString(fuctionBytes);
-    }
 }

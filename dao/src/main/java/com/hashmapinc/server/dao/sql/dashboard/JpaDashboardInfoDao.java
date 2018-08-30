@@ -88,6 +88,8 @@ public class JpaDashboardInfoDao extends JpaAbstractSearchTextDao<DashboardInfoE
         return Futures.transform(relations, (AsyncFunction<List<EntityRelation>, List<DashboardInfo>>) input -> {
             List<ListenableFuture<DashboardInfo>> dashboardFutures = new ArrayList<>(input.size());
             for (EntityRelation relation : input) {
+                ListenableFuture<DashboardInfo> future = findByIdAsync(relation.getTo().getId());
+
                 dashboardFutures.add(findByIdAsync(relation.getTo().getId()));
             }
             return Futures.successfulAsList(dashboardFutures);

@@ -15,7 +15,7 @@
 -- limitations under the License.
 --
 
-DROP TABLE computation_job
+DROP TABLE computation_job;
 
 CREATE TABLE IF NOT EXISTS computation_job (
     id varchar(31) NOT NULL CONSTRAINT computation_job_pkey PRIMARY KEY,

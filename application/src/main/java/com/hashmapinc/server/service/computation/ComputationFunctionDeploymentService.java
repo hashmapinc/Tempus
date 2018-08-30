@@ -16,10 +16,9 @@
  */
 package com.hashmapinc.server.service.computation;
 
-import com.hashmapinc.server.common.data.computation.ComputationRequest;
 import com.hashmapinc.server.common.data.computation.Computations;
 
 public interface ComputationFunctionDeploymentService {
-    void deployKubelessFunction(ComputationRequest computationRequest);
-    ComputationRequest fetchKubelessFunction(Computations computation);
+    void deployKubelessFunction(Computations computations);
+    boolean checkKubelessfunction(Computations computation);
 }

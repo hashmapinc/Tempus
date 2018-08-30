@@ -26,10 +26,12 @@ import lombok.EqualsAndHashCode;
 public class KubelessComputationMetadata extends ComputationMetadata {
     private String namespace;
     private String function;
+    private transient String functionContent;
     private String functionContentType;
     private String handler;
     private Runtimes runtime;
     private String dependencies;
+    private transient String dependencyFileName;
     private String checksum;
     private String timeout;
 

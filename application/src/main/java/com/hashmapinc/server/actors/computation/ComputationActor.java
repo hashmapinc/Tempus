@@ -66,26 +66,28 @@ public class ComputationActor extends ContextAwareActor {
             throw new ComputationInitializationException("Computation not found!");
         }
         if(computation.getType() == ComputationType.KUBELESS) {
-            ComputationRequest cr = systemContext.getComputationFunctionDeploymentService().fetchKubelessFunction(computation);
-            if (cr == null) {
-                KubelessComputationMetadata md = (KubelessComputationMetadata) computation.getComputationMetadata();
-                try {
-                    String functionContent = systemContext.getComputationFunctionService().getFunctionByTenantAndName(tenantId, md.getFunction());
-                    if (functionContent == null) {
-                        throw new ComputationInitializationException("Kubeless Computation function not found!");
-                    } else {
-                        cr = new ComputationRequest();
-                        cr.setComputation(computation);
-                        cr.setFunctionContent(functionContent);
-                        systemContext.getComputationFunctionDeploymentService().deployKubelessFunction(cr);
-                    }
-                } catch (Exception e ){
-                    logger.info("Exeption occured while deploying kubeless function : ", e);
-                }
-            }
+            checkOrDeployKubelessFunction();
         }
         init();
         logger.info("[{}][{}] Started computation actor.", computation, tenantId);
+    }
+
+    private void checkOrDeployKubelessFunction() {
+        boolean functionPresent = systemContext.getComputationFunctionDeploymentService().checkKubelessfunction(computation);
+        if (!functionPresent) {
+            KubelessComputationMetadata md = (KubelessComputationMetadata) computation.getComputationMetadata();
+            try {
+                String functionContent = systemContext.getS3BucketService().getFunctionObjByTenantAndUrl(tenantId, computation);
+                if (functionContent == null) {
+                    throw new ComputationInitializationException("Kubeless Computation function not found!");
+                } else {
+                    md.setFunctionContent(functionContent);
+                    systemContext.getComputationFunctionDeploymentService().deployKubelessFunction(computation);
+                }
+            } catch (Exception e ){
+                logger.info("Exeption occured while deploying kubeless function : ", e);
+            }
+        }
     }
 
     private void init(){
@@ -129,6 +131,8 @@ public class ComputationActor extends ContextAwareActor {
 
     private void handleComponentLifecycleMsgForNonExistingComputation(ComponentLifecycleMsg msg) {
         if(msg.getEvent() != ComponentLifecycleEvent.DELETED){
+            computation = systemContext.getComputationsService().findById(computationId);
+            checkOrDeployKubelessFunction();
             if(computationJobActors.isEmpty()){
                 init();
             }

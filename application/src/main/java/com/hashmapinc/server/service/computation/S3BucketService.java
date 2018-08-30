@@ -16,7 +16,6 @@
  */
 package com.hashmapinc.server.service.computation;
 
-import com.hashmapinc.server.common.data.computation.ComputationRequest;
 import com.hashmapinc.server.common.data.computation.Computations;
 import com.hashmapinc.server.common.data.id.TenantId;
 import org.xmlpull.v1.XmlPullParserException;
@@ -26,8 +25,8 @@ import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
 
-public interface ComputationFunctionService {
-    boolean uploadKubelessFunction(ComputationRequest computationRequest, TenantId tenantId) throws Exception;
+public interface S3BucketService {
+    boolean uploadKubelessFunction(Computations computation, TenantId tenantId) throws Exception;
     List<String> getAllKubelessFunctionsForTenant (TenantId tenantId) throws IOException, NoSuchAlgorithmException, InvalidKeyException, XmlPullParserException;
-    String getFunctionByTenantAndName (TenantId tenantId, String name) throws IOException, NoSuchAlgorithmException, InvalidKeyException, XmlPullParserException;
+    String getFunctionObjByTenantAndUrl(TenantId tenantId, Computations computations) throws IOException, NoSuchAlgorithmException, InvalidKeyException, XmlPullParserException;
 }

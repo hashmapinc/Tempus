@@ -97,9 +97,12 @@ spark:
   livy_port: "${LIVY_PORT:8998}"
 
 kubeless:
-  minio_url: "${MINIO_HOST:tempus.hashmapinc.com/minio}"
+  minio_host: "${MINIO_HOST:play.minio.io}"
   minio_access_key: "${MINIO_ACCESS_KEY:Q3AM3UQ867SPQQA43P2F}"
   minio_secret_key: "${MINIO_SECRET_KEY:zuf+tfteSlswRu7BJ86wekitnifILbZam1KYY3TG}"
+  minio_port: "${MINIO_PORT:9000}"
+  cluster_mode_enabled: "${CLUSTER_MODE_ENABLED:false}"
+  kube_config_path: "{KUBE_CONFIG_PATH:/home/himanshu/.kube/config}"
 
 
 # JWT Token parameters
@@ -171,7 +174,7 @@ quota:
     intervalMin: 2
 
 database:
-  type: "${DATABASE_TYPE:cassandra}" # cassandra OR sql
+  type: "${DATABASE_TYPE:sql}" # cassandra OR sql
 
 # Cassandra driver configuration parameters
 cassandra:
@@ -318,22 +321,6 @@ configurations:
     depthSeries: "true"
 
 # HSQLDB DAO Configuration
-spring:
-  data:
-    jpa:
-      repositories:
-        enabled: "true"
-  jpa:
-    hibernate:
-      ddl-auto: "validate"
-    database-platform: "${SPRING_JPA_DATABASE_PLATFORM:org.hibernate.dialect.HSQLDialect}"
-  datasource:
-    driverClassName: "${SPRING_DRIVER_CLASS_NAME:org.hsqldb.jdbc.JDBCDriver}"
-    url: "${SPRING_DATASOURCE_URL:jdbc:hsqldb:file:${SQL_DATA_FOLDER:/tmp}/tempusDb;sql.enforce_size=false}"
-    username: "${SPRING_DATASOURCE_USERNAME:sa}"
-    password: "${SPRING_DATASOURCE_PASSWORD:}"
-
-# PostgreSQL DAO Configuration
 #spring:
 #  data:
 #    jpa:
@@ -342,12 +329,29 @@ spring:
 #  jpa:
 #    hibernate:
 #      ddl-auto: "validate"
-#    database-platform: "${SPRING_JPA_DATABASE_PLATFORM:org.hibernate.dialect.PostgreSQLDialect}"
+#    database-platform: "${SPRING_JPA_DATABASE_PLATFORM:org.hibernate.dialect.HSQLDialect}"
 #  datasource:
-#    driverClassName: "${SPRING_DRIVER_CLASS_NAME:org.postgresql.Driver}"
+#    driverClassName: "${SPRING_DRIVER_CLASS_NAME:org.hsqldb.jdbc.JDBCDriver}"
+#    url: "${SPRING_DATASOURCE_URL:jdbc:hsqldb:file:${SQL_DATA_FOLDER:/tmp}/tempusDb;sql.enforce_size=false}"
+#    username: "${SPRING_DATASOURCE_USERNAME:sa}"
+#    password: "${SPRING_DATASOURCE_PASSWORD:}"
+
+# PostgreSQL DAO Configuration
+spring:
+  data:
+    jpa:
+      repositories:
+        enabled: "true"
+  jpa:
+    hibernate:
+      ddl-auto: "validate"
+    database-platform: "${SPRING_JPA_DATABASE_PLATFORM:org.hibernate.dialect.PostgreSQLDialect}"
+  datasource:
+    driverClassName: "${SPRING_DRIVER_CLASS_NAME:org.postgresql.Driver}"
 #    url: "${SPRING_DATASOURCE_URL:jdbc:postgresql://postgres:5432/tempus}"
-#    username: "${SPRING_DATASOURCE_USERNAME:postgres}"
-#    password: "${SPRING_DATASOURCE_PASSWORD:postgres}"
+    url: "${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/tempus}"
+    username: "${SPRING_DATASOURCE_USERNAME:postgres}"
+    password: "${SPRING_DATASOURCE_PASSWORD:postgres}"
 
 #max file and request size
 spring.http:
