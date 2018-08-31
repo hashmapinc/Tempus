@@ -14,35 +14,33 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import '../dashboard/dashboard.scss';
+import './metadata.scss';
 
 import uiRouter from 'angular-ui-router';
-import tempusGrid from '../components/grid.directive';
-import tempusApiUser from '../api/user.service';
-import tempusApiDatamodel from '../api/datamodel.service';
-import tempusApiDevice from '../api/device.service';
-import tempusApiCustomer from '../api/customer.service';
-import tempusApiDashboard from '../api/dashboard.service';
-import tempusApiWidget from '../api/widget.service';
-import tempusWidgetConfig from '../components/widget/widget-config.directive';
-import dashboardStates from '../dashboard/states';
-
+import tempusApiMetadata from '../api/metadata.service';
+import MetadataController from './metadata.controller';
+import AddMetadataController from './add-metadata.controller';
 import MetadataRoutes from './metadata.routes';
-import {MetadataController} from './metadata.controller';
+import MetadataSourceDirective from './metadata-source.directive';
+import MetadataSinkDirective from './metadata-sink.directive';
+import MetadataConfigDirective from './metadataConfig.directive';
+
+import MetadataQueryDirective from './metadata-query.directive'; 
+import QueryDialogController from './query-dialog.controller';
+
+
 
 
 export default angular.module('tempus.metadata', [
     uiRouter,
-    tempusGrid,
-    tempusApiUser,
-    tempusApiDevice,
-    tempusApiCustomer,
-    tempusApiDashboard,
-    tempusApiDatamodel,
-    tempusApiWidget,
-    tempusWidgetConfig,
-    dashboardStates
+    tempusApiMetadata
 ])
     .config(MetadataRoutes)
     .controller('MetadataController', MetadataController)
+    .controller('AddMetadataController', AddMetadataController)
+    .controller('QueryDialogController', QueryDialogController)
+    .directive('tbMetadataSource', MetadataSourceDirective)
+    .directive('tbMetadataSink', MetadataSinkDirective)
+    .directive('tbMetadataConfig', MetadataConfigDirective)
+    .directive('tbMetadataQuery', MetadataQueryDirective)
     .name;

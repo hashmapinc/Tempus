@@ -14,89 +14,138 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+
 /* eslint-disable import/no-unresolved, import/default, no-unused-vars */
+import addMetadataModel from './add-metadata.tpl.html';
 
 /*@ngInject*/
 
-export function AddMetadataController($scope, $mdDialog, saveItemFunction, helpLinks, $state) {
+export default function MetadataController(metadataService, $q,$mdDialog, $document, $state, $translate, types) {
 
     var vm = this;
-    vm.helpLinks = helpLinks;
-    vm.item = {};
-
-    vm.add = add;
+    vm.types = types;
+    var metadataActionsList =[],metadataGroupActionsList=[];
+    vm.openMetadataDialog = openMetadataDialog;
     vm.cancel = cancel;
+    vm.AddDataModelController = 'AddMetadataController';
 
-    function cancel() {
-        $mdDialog.cancel();
+    vm.metadataConfig = {
+        deleteItemTitleFunc: deleteMetadataTitle,
+        deleteItemContentFunc: deleteMetadataText,
+        deleteItemsTitleFunc: deleteMetadataTitle,
+        deleteItemsActionTitleFunc: deleteMetadataActionTitle,
+        deleteItemsContentFunc: deleteMetadataText,
+       
+        getItemTitleFunc: getMetadataTitle,
+
+        parentCtl: vm,
+        saveItemFunc: saveMetadataConfig,
+
+
+        actionsList: metadataActionsList,
+        groupActionsList: metadataGroupActionsList,
+
+        onGridInited: gridInited,
+
+        addItemTemplateUrl: addMetadataModel,
+
+        addItemText: function() { return $translate.instant('metadataConfig.add-metadata-text') },
+        noItemsText: function() { return $translate.instant('metadataConfig.no-metadata-text') },
+        itemDetailsText: function() { return $translate.instant('metadataConfig.metadata-details') }
+    };
+
+    function saveMetadataConfig(metadata) {
+        var deferred = $q.defer();
+               metadataService.saveMetadata(metadata).then(
+                   function success() {
+                   },
+                   function fail() {
+                       deferred.reject();
+                   }
+               );
+               return deferred.promise;
     }
 
-    function add() {
-
-        saveItemFunction(vm.item).then(function success(item) {
-            vm.item = item;
-            $scope.theForm.$setPristine();
-            $mdDialog.hide();
-
-            // go to the newly created data model
-            $state.go('home.data_models.data_model', { dashboardId: 123 });
-        });
+    function deleteMetadataTitle(metadata) {
+        return $translate.instant('metadataConfig.delete-metadata-title', {metadataName: metadata.name});
     }
-}
 
-/*@ngInject*/
-export function MetadataController($scope, $rootScope, $state, $stateParams, userService, datamodelService, deviceService, types, attributeService, $q, dashboardService, entityService, utils, $filter, dashboardUtils, $mdDialog, $document, $translate) {
-
-    var vm = this;
-
-    vm.openDataModelDialog = openDataModelDialog;
-    vm.cancel = cancel;
-    vm.saveDataModelFunc = saveDataModelFunc;
-    vm.AddDataModelController = AddMetadataController;
-    vm.listDataModel = listDataModel;
+    function deleteMetadataText() {
+        return $translate.instant('metadataConfig.delete-metadata-text');
+    }
 
 
-    function openDataModelDialog($event) {
+    function deleteMetadataActionTitle(selectedCount) {
+        return $translate.instant('metadataConfig.delete-metadata-action-title', {count: selectedCount}, 'messageformat');
+    }
+
+    function getMetadataTitle(metadata) {
+        return metadata ? metadata.name : '';
+    }
+
+
+    function gridInited(grid) {
+        vm.grid = grid;
+    }
+
+
+    initController();
+
+    function initController() {
+        var fetchMetadataFunction = null;
+        var deleteMetadataFunction = null;
+
+        fetchMetadataFunction = function (pageLink) {
+            return metadataService.getAllTenantMetadata(pageLink);
+        };
+        deleteMetadataFunction = function (metadataId) {
+            return metadataService.deleteMetadata(metadataId);
+        };
+
+        vm.metadataConfig.fetchItemsFunc = fetchMetadataFunction;
+        vm.metadataConfig.deleteItemFunc = deleteMetadataFunction;
+        metadataActionsList.push(
+            {
+                onAction: function ($event, item) {
+                    vm.grid.deleteItem($event, item);
+                },
+                name: function() { return $translate.instant('action.delete') },
+                details: function() { return $translate.instant('metadataConfig.delete') },
+                icon: "delete"
+            }
+        );
+        metadataGroupActionsList.push(
+            {
+                onAction: function ($event) {
+                    vm.grid.deleteItems($event);
+                },
+                name: function() { return $translate.instant('asset.delete-assets') },
+                details: deleteMetadataActionTitle,
+                icon: "delete"
+            }
+        );
+    }
+
+    function openMetadataDialog($event) {
 
         $mdDialog.show({
             controller: vm.AddDataModelController,
             controllerAs: 'vm',
-            templateUrl: '',
+            templateUrl: addMetadataModel,
             parent: angular.element($document[0].body),
-            locals: {saveItemFunction: vm.saveDataModelFunc},
+            locals: {},
             fullscreen: true,
             targetEvent: $event
         }).then(function () {
+            vm.grid.refreshList();
         }, function () {
         });
     }
 
 
-    function saveDataModelFunc(item) {
-
-        var deferred = $q.defer();
-        datamodelService.saveDataModel(item).then(function success(response) {
-            deferred.resolve(response.data);
-        }, function fail(response) {
-            deferred.reject(response.data);
-        });
-        return deferred.promise;
-
-    }
-
     function cancel() {
         $mdDialog.cancel();
-    }
-
-    function listDataModel() {
-
-        var deferred = $q.defer();
-        datamodelService.listDatamodels().then(function success(response) {
-            deferred.resolve(response.data);
-        }, function fail(response) {
-            deferred.reject(response.data);
-        });
-        return deferred.promise;
     }
 
 }

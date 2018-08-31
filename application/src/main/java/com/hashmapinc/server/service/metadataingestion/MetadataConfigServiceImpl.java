@@ -105,7 +105,11 @@ public class MetadataConfigServiceImpl implements MetadataConfigService {
         });
         TextPageData<MetadataConfig> metadataConfigTextPageData = response.getBody();
         List<MetadataConfig> metadataConfigs = metadataConfigTextPageData.getData().stream().peek(this::decodePassword).collect(Collectors.toList());
-        return new TextPageData<>(metadataConfigs, metadataConfigTextPageData.getNextPageLink());
+        TextPageLink nextPageLink = metadataConfigTextPageData.getNextPageLink();
+        if (nextPageLink == null) {
+           nextPageLink = new TextPageLink(0, null);
+        }
+        return new TextPageData<>(metadataConfigs, nextPageLink);
     }
 
     @Override

@@ -1,0 +1,54 @@
+<<<<<<< a67959da5513337e927c7bc08f2a8cffe4f08dea
+/**
+ * Copyright © 2016-2018 The Thingsboard Authors
+ * Modifications © 2017-2018 Hashmap, Inc
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+
+.setWidth{
+    width: 25%
+}
+.btnmargin{
+    margin-right:20px;  
+}
+.selectMargin{
+    margin-bottom: 15px;
+}
+#inputelement{
+    display: block;
+    margin-top: 0;
+    background: none;
+    padding: 2px 2px 1px;
+    border-width: 0 0 1px;
+    line-height: 26px;
+    height: 30px;
+}
+.btn{
+    display: inline-block;
+    cursor: pointer;
+    min-height: 36px;
+    min-width: 88px;
+    line-height: 36px;
+    vertical-align: middle;
+    text-align: center;
+    box-sizing: border-box;
+    margin: 0px 1px;
+    white-space: nowrap;
+    text-transform: uppercase;
+    font-weight: 500;
+    font-size: 14px;
+    color: rgba(255,255,255,0.87);
+    background-color: rgb(16,108,200);
+}
