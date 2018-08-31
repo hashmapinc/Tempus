@@ -177,11 +177,8 @@ function DashboardController($scope, $rootScope, $element, $timeout, $mdMedia, $
     };
     
     var entityTableDevice = $rootScope.$on("CallTableDetailDeviceOnDashboard", function($event, data){
-        if(data[1].id.entityType == 'DEVICE'){
-            $scope.displayDeviceGrid = true;
-        } else if (data[1].id.entityType == 'ASSET') {
-            $scope.displayAssetsGrid = true;
-        }
+        $log.log(data[1])
+        $scope.displayAssetsGrid = true;
         $rootScope.$emit("CallTableDetailDevice", [data[0], data[1]]);
     });
     $scope.$on('$destroy', entityTableDevice);
@@ -532,7 +529,7 @@ function DashboardController($scope, $rootScope, $element, $timeout, $mdMedia, $
     });
 
     $scope.$watch('vm.isEdit', function () {
-        $log.log("in edit")
+        
         vm.gridsterOpts.resizable.enabled = vm.isEdit;
         vm.gridsterOpts.draggable.enabled = vm.isEdit;
         $scope.$broadcast('toggleDashboardEditMode', vm.isEdit);

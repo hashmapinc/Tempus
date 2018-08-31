@@ -83,7 +83,7 @@ position: fixed;">
             </div>
     </mat-list-item>
     <mat-divider></mat-divider>
-    <mat-list-item>
+    <mat-list-item ng-if="showList">
         <md-table-pagination class ="tb-device-container dash-cont"  md-limit="query.limit" md-limit-options="[5, 10, 15]"
                 md-page="query.page" md-total="{{devices.count}}"
                 md-on-paginate="onPaginate" md-page-select>

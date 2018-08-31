@@ -153,7 +153,7 @@ function DeviceListWidgetController($rootScope, $scope, $filter, deviceService, 
     };
     vm.deviceDetailFunc = deviceDetailFunc;
     vm.loadTableData = loadTableData;
-    $scope.showList = true;
+    $scope.showList = false;
     
     var customerId = $stateParams.customerId;
     
@@ -197,6 +197,9 @@ function DeviceListWidgetController($rootScope, $scope, $filter, deviceService, 
         if(promise) {
             promise.then(function success(items) {
                 $log.log(items)
+                if(items.data.length > 0){
+                    $scope.showList = true;
+                }
                 $scope.loadingData = false;
 
                 var deviceSortList = $filter('orderBy')(items.data, $scope.query.order);
