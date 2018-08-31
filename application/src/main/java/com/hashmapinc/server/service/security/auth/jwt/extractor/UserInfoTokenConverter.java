@@ -102,10 +102,10 @@ public class UserInfoTokenConverter implements UserAuthenticationConverter {
                 securityUser.setAuthority(Authority.parse(authority.get(0)));
         }
         Object permissions = map.get("permissions");
-        if(permissions != null){
+
+        if(permissions != null && !((List<String>)permissions).isEmpty()){
             List<String> permissionList = ((List<String>)permissions);
-            if(!permissionList.isEmpty())
-                securityUser.setPermissions(permissionList);
+            securityUser.setPermissions(permissionList);
         } else {
             List<String> permissionList = customerGroupService.findGroupPoliciesForUser(securityUser.getId());
             if(!permissionList.isEmpty())

@@ -295,13 +295,12 @@ public abstract class BaseController {
         try {
             validateId(customerGroupId, "Incorrect customerGroupId " + customerGroupId);
             SecurityUser authUser = getCurrentUser();
-            if (authUser.getAuthority() == Authority.SYS_ADMIN ||
-                    (authUser.getAuthority() != Authority.TENANT_ADMIN)) {
+            CustomerGroup customerGroup = customerGroupService.findByCustomerGroupId(customerGroupId);
+            checkCustomerGroup(customerGroup);
+            if (!customerGroup.getTenantId().getId().equals(authUser.getTenantId().getId())) {
                 throw new TempusException(YOU_DON_T_HAVE_PERMISSION_TO_PERFORM_THIS_OPERATION,
                         TempusErrorCode.PERMISSION_DENIED);
             }
-            CustomerGroup customerGroup = customerGroupService.findByCustomerGroupId(customerGroupId);
-            checkCustomerGroup(customerGroup);
             return customerGroup;
         } catch (Exception e) {
             throw handleException(e, false);
