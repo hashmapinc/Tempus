@@ -40,7 +40,7 @@ public abstract class BaseDashboardServiceTest extends AbstractServiceTest {
     
     private IdComparator<DashboardInfo> idComparator = new IdComparator<>();
     
-    private TenantId tenantId;
+    protected TenantId tenantId;
 
     @Before
     public void before() {

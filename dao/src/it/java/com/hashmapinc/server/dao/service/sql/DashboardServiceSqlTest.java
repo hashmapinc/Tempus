@@ -36,17 +36,6 @@ import java.util.List;
 @DaoSqlTest
 public class DashboardServiceSqlTest extends BaseDashboardServiceTest {
 
-    private TenantId tenantId;
-
-    @Before
-    public void before() {
-        Tenant tenant = new Tenant();
-        tenant.setTitle("My tenant");
-        Tenant savedTenant = tenantService.saveTenant(tenant);
-        Assert.assertNotNull(savedTenant);
-        tenantId = savedTenant.getId();
-    }
-
     @Test
     public void testFetchByDataModelObjectId() {
         Dashboard dashboard = CreateDashboard();
@@ -57,8 +46,6 @@ public class DashboardServiceSqlTest extends BaseDashboardServiceTest {
         DataModelObjectId dataModelObjectId = dashboard.getAssetLandingDashboardInfo().getDataModelObjectId();
 
         List<Dashboard> dashboards = dashboardService.findDashboardByDataModelObjectId(dataModelObjectId);
-        System.out.println(savedDashboard);
-        System.out.println(dashboards);
         Assert.assertEquals(1, dashboards.size());
     }
 
