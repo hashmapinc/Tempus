@@ -50,9 +50,6 @@ public class AttributeBasedPermissionEvaluator implements PermissionEvaluator{
     private DeviceService deviceService;
 
     @Autowired
-    private CustomerGroupService customerGroupService;
-
-    @Autowired
     @Lazy
     private AssetService assetService;
 
@@ -79,7 +76,6 @@ public class AttributeBasedPermissionEvaluator implements PermissionEvaluator{
             return false;
         }
         SecurityUser user = (SecurityUser) authentication.getPrincipal();
-        setUserPermissions(user);
         TempusResource resource = (TempusResource) targetDomainObject;
         String resourceType = actionTokens[0];
         String operation = actionTokens[1];
@@ -104,8 +100,4 @@ public class AttributeBasedPermissionEvaluator implements PermissionEvaluator{
         }
     }
 
-    private void setUserPermissions(SecurityUser user) {
-        List<String> policies = customerGroupService.findGroupPoliciesForUser(user.getId());
-        user.setUserPermissions(policies);
-    }
 }

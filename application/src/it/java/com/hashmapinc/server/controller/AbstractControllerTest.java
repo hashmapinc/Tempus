@@ -218,7 +218,6 @@ public abstract class AbstractControllerTest {
 
         tenantAdmin = new User();
         tenantAdmin.setAuthority(Authority.TENANT_ADMIN);
-        tenantAdmin.setPermissions(Collections.singletonList(TENANT_ADMIN_DEFAULT_PERMISSION));
         tenantAdmin.setTenantId(tenantId);
         tenantAdmin.setEmail(TENANT_ADMIN_EMAIL);
 
