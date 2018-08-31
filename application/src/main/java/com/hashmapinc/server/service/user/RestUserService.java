@@ -104,7 +104,9 @@ public class RestUserService extends AbstractEntityService implements UserServic
 
     @PostConstruct
     public void init(){
-        asyncRestTemplate = new AsyncRestTemplate(new SimpleClientHttpRequestFactory(), restTemplate);
+        SimpleClientHttpRequestFactory requestFactory = new SimpleClientHttpRequestFactory();
+        requestFactory.setOutputStreaming(false);
+        asyncRestTemplate = new AsyncRestTemplate(requestFactory, restTemplate);
         SimpleModule module = new SimpleModule();
         module.addDeserializer(User.class, new UserDeserializer());
         mapper.registerModule(module);
