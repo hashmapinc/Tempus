@@ -59,7 +59,6 @@ public class KubelessDeploymentService implements ComputationFunctionDeploymentS
     private static volatile  KubelessV1beta1FunctionApi kubelessV1beta1FunctionApi;
 
     private Base64.Decoder decoder = Base64.getDecoder();
-    private Base64.Encoder encoder = Base64.getEncoder();
 
     @Override
     public void deployKubelessFunction(Computations computation) {
@@ -89,10 +88,10 @@ public class KubelessDeploymentService implements ComputationFunctionDeploymentS
             }
 
             if ( resposeCode != CREATED)
-                throw new TempusRuntimeException("Function");
+                throw new TempusRuntimeException("Function was not deployed!!");
         }
         catch (ApiException e){
-            log.info("Kubeless api e.kubeconfigxception for deploy funtion : " + e);
+            log.info("Kubeless api e.kubeconfigxception for deploy funtion : {}", e);
         } catch (IOException e) {
             log.info("");
         }
@@ -163,7 +162,7 @@ public class KubelessDeploymentService implements ComputationFunctionDeploymentS
         v1beta1FunctionSpec.setFunction(md.getFunctionContent());
         v1beta1FunctionSpec.dependencies(md.getDependencies());
         v1beta1FunctionSpec.setHandler(md.getHandler());
-        v1beta1FunctionSpec.setRuntime("java1.8");
+        v1beta1FunctionSpec.setRuntime(md.getRuntime());
         v1beta1FunctionSpec.functionContentType(md.getFunctionContentType());
         v1beta1FunctionSpec.setChecksum(md.getChecksum());
         v1beta1FunctionSpec.setTimeout(md.getTimeout());

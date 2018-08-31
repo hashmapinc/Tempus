@@ -29,7 +29,7 @@ public class KubelessComputationMetadata extends ComputationMetadata {
     private transient String functionContent;
     private String functionContentType;
     private String handler;
-    private Runtimes runtime;
+    private String runtime;
     private String dependencies;
     private transient String dependencyFileName;
     private String checksum;

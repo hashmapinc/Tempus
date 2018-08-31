@@ -17,8 +17,6 @@
 package com.hashmapinc.server.dao.model.sql;
 
 import com.hashmapinc.server.common.data.computation.KubelessComputationMetadata;
-import com.hashmapinc.server.common.data.computation.Runtimes;
-import com.hashmapinc.server.common.data.computation.SparkComputationMetadata;
 import com.hashmapinc.server.common.data.id.ComputationId;
 import com.hashmapinc.server.dao.model.ModelConstants;
 
@@ -76,7 +74,7 @@ public class KubelessComputationMetadataEntity extends ComputationMetadataEntity
             this.namespace = md.getNamespace();
         }
         if(md.getRuntime() != null){
-            this.runtime = md.getRuntime().name();
+            this.runtime = md.getRuntime();
         }
         if(md.getFunctionContentType() != null){
             this.functionContentType = md.getFunctionContentType();
@@ -97,7 +95,7 @@ public class KubelessComputationMetadataEntity extends ComputationMetadataEntity
        md.setDependencies(this.dependencies);
        md.setFunction(this.function);
        md.setNamespace(this.namespace);
-       md.setRuntime(Runtimes.valueOf(this.runtime));
+       md.setRuntime(this.runtime);
        md.setHandler(this.handler);
        md.setFunctionContentType(this.functionContentType);
        md.setChecksum(this.checksum);

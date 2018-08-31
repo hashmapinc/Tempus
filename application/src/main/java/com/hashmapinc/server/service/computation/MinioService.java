@@ -171,10 +171,11 @@ public class MinioService implements S3BucketService {
         String functionName = md.getFunction();
         String type = md.getFunctionContentType();
         String functionObjUrl;
+        String folderName = computation.getName().replace(" ","-").toLowerCase();
         if(type.contains("zip"))
-            functionObjUrl = String.format(FUNCTION_URL_FORMAT, computation.getName(), functionName, "zip");
+            functionObjUrl = String.format(FUNCTION_URL_FORMAT, folderName, functionName, "zip");
         else
-            functionObjUrl = String.format(FUNCTION_URL_FORMAT, computation.getName(), functionName, type);
+            functionObjUrl = String.format(FUNCTION_URL_FORMAT, folderName, functionName, type);
         return functionObjUrl;
     }
 
