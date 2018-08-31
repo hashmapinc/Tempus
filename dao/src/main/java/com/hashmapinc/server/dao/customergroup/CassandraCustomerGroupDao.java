@@ -122,11 +122,6 @@ public class CassandraCustomerGroupDao extends CassandraAbstractSearchTextDao<Cu
     }
 
     @Override
-    public void deleteGroupIdsForUserId(UUID userId) {
-        //TODO
-    }
-
-    @Override
     public List<CustomerGroup> findByUserId(UUID userId, TextPageLink textPageLink) {
         log.trace("find customer groups by UserId [{}]", userId);
         List<UUID> customerGroupIds;
@@ -198,16 +193,6 @@ public class CassandraCustomerGroupDao extends CassandraAbstractSearchTextDao<Cu
                 .where(eq(USER_ID_PROPERTY, userId))
                 .and(eq(CUSTOMER_GROUP_ID_PROPERTY, customerGroupId));
         getSession().execute(delete);
-    }
-
-    @Override
-    public void assignUsers(CustomerGroupId customerGroupId, List<UserId> userIds) {
-
-    }
-
-    @Override
-    public void assignGroups(UserId userId , List<CustomerGroupId> customerGroupIds) {
-
     }
 
     @Override
