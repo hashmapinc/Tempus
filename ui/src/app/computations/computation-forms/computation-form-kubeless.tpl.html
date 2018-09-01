@@ -27,14 +27,14 @@
             <section flex layout="row">
                 <md-input-container flex="60" class="md-block" md-is-error="theForm.functionName.$touched && theForm.functionName.$invalid">
                     <label translate>computation.function-name</label>
-                    <input required name="functionName" ng-model="model.functionName">
+                    <input required name="functionName" ng-model="model.computationMetadata.function">
                     <div ng-messages="theForm.functionName.$error">
                         <div translate ng-message="required">computation.name-required</div>
                     </div>
                 </md-input-container>
                 <md-input-container flex="40" class="md-block">
                     <label translate>computation.runtime</label>
-                    <md-select required name="runtimeType" ng-model="model.runtime"> <!-- ng-change="vm.runtimeChange()" -->
+                    <md-select required name="runtimeType" ng-model="model.computationMetadata.runtime"> <!-- ng-change="vm.runtimeChange()" -->
                         <md-option ng-repeat="runtimeType in types.runtimeTypes" ng-value="runtimeType.value">
                             {{ runtimeType.name }}
                         </md-option>
@@ -45,7 +45,7 @@
                 </md-input-container>
             </section>
             <section class="dropdown-section" style="margin-bottom: 30px">
-                <div class="tb-container" ng-class="model.functionFileName ? 'ng-valid' : 'ng-invalid'">
+                <div class="tb-container" ng-class="model.computationMetadata.functionFileName ? 'ng-valid' : 'ng-invalid'">
                     <label class="tb-label" translate>computation.import-function</label>
                     <div flow-init="{singleFile:true}" flow-file-added='fileAdded($file, model, "function")' class="tb-file-select-container">
                         <div class="tb-file-clear-container">
@@ -63,12 +63,12 @@
                     </div>
                 </div>
                 <div class="dropdown-messages">
-                    <div ng-if="!model.functionFileName" class="tb-error-message" translate>computation.no-function</div>
-                    <div ng-if="model.functionFileName">{{model.functionFileName}}</div>
+                    <div ng-if="!model.computationMetadata.functionFileName" class="tb-error-message" translate>computation.no-function</div>
+                    <div ng-if="model.computationMetadata.functionFileName">{{model.computationMetadata.functionFileName}}</div>
                 </div>
             </section>
             <section class="dropdown-section" style="margin-bottom: 30px">
-                <div class="tb-container" ng-class="model.dependenciesFileName ? 'ng-valid' : 'ng-invalid'">
+                <div class="tb-container" ng-class="model.computationMetadata.dependenciesFileName ? 'ng-valid' : 'ng-invalid'">
                     <label class="tb-label" translate>computation.import-dependency</label>
                     <div flow-init="{singleFile:true}" flow-file-added='fileAdded($file, model, "dependencies")' class="tb-file-select-container">
                         <div class="tb-file-clear-container">
@@ -86,21 +86,21 @@
                     </div>
                 </div>
                 <div class="dropdown-messages">
-                    <div ng-if="!model.dependenciesFileName" class="tb-error-message" translate>computation.no-dependencies</div>
-                    <div ng-if="model.dependenciesFileName">{{model.dependenciesFileName}}</div>
+                    <div ng-if="!model.computationMetadata.dependenciesFileName" class="tb-error-message" translate>computation.no-dependencies</div>
+                    <div ng-if="model.computationMetadata.dependenciesFileName">{{model.computationMetadata.dependenciesFileName}}</div>
                 </div>
             </section>
             <section flex layout="row">
                 <md-input-container flex="60" class="md-block" md-is-error="theForm.handler.$touched && theForm.handler.$invalid">
                     <label translate>computation.function-handler</label>
-                    <input required name="handler" ng-model="model.handler">
+                    <input required name="handler" ng-model="model.computationMetadata.handler">
                     <div ng-messages="theForm.handler.$error">
                         <div translate ng-message="required">computation.handler-required</div>
                     </div>
                 </md-input-container>
                 <md-input-container flex="40" class="md-block" md-is-error="theForm.timeout.$touched && theForm.timeout.$invalid">
                     <label translate>computation.timeout</label>
-                    <input type="number" name="timeout" ng-model="model.timeout">
+                    <input type="number" name="timeout" ng-model="model.computationMetadata.timeout">
                 </md-input-container>
             </section>
         </fieldset>

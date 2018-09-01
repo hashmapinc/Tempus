@@ -35,6 +35,10 @@ export default function ComputationFormKubelessDirective($compile, $templateCach
 
         $compile(element.contents())(scope);
 
+        if(!scope.model.computationMetadata)
+            scope.model.computationMetadata = {}
+
+        scope.model.computationMetadata.type = types.computationType.kubeless;
 
         scope.fileAdded = function($file, model, fileType) {
             let reader = new FileReader();
@@ -46,17 +50,17 @@ export default function ComputationFormKubelessDirective($compile, $templateCach
 
                         if (addedFile && addedFile.length > 0) {
                             if(fileType == "function"){
-                                model.functionFileName = $file.name;
-                                model.function = addedFile.replace(/^data.*base64,/, "");
-                                model.checksum = base64.stringify(sha256(model.function));
-                                model.functionContentType = 'base64';
+                                model.computationMetadata.functionFileName = $file.name;
+                                model.computationMetadata.functionContent = addedFile.replace(/^data.*base64,/, "");
+                                model.computationMetadata.checksum = base64.stringify(sha256(model.computationMetadata.functionContent));
+                                model.computationMetadata.functionContentType = 'base64';
                                 if($file.getExtension() === 'jar' || $file.getExtension() === 'zip'){
-                                    model.functionContentType = model.functionContentType+'+zip';
+                                    model.computationMetadata.functionContentType = model.computationMetadata.functionContentType+'+zip';
                                 }
                             }
                             if(fileType == "dependencies"){
-                                model.dependenciesFileName = $file.name;
-                                model.dependencies = addedFile.replace(/^data.*base64,/, "");
+                                model.computationMetadata.dependenciesFileName = $file.name;
+                                model.computationMetadata.dependencies = addedFile.replace(/^data.*base64,/, "");
                             }
                         }
                     }
@@ -68,12 +72,12 @@ export default function ComputationFormKubelessDirective($compile, $templateCach
         scope.clearFile = function(model, fileType) {
             scope.theForm.$setDirty();
             if(fileType == "dependencies"){
-                model.dependenciesFileName = null;
-                model.dependencies = null;
+                model.computationMetadata.dependenciesFileName = null;
+                model.computationMetadata.dependencies = null;
             }
             if(fileType == "function"){
-                model.functionFileName = null;
-                model.function = null;
+                model.computationMetadata.functionFileName = null;
+                model.computationMetadata.functionContent = null;
             }
         };
 
