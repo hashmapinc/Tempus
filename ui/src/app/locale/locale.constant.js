@@ -1452,7 +1452,21 @@ export default angular.module('tempus.locale', [])
                     "user-unassigned-message":"User unassigned from group(s)",
                     "user-assigned-message":"User assigned to group(s)",
                     "group-assigned-message" :"User(s) assigned to group",
-                    "group-unassigned-message": "User(s) unassigned to group"
+                    "group-unassigned-message": "User(s) unassigned to group",
+                    "assigned-user-tab":"ASSIGNED USERS",
+                    "assigned-group-tab":"GROUPS",
+                    "no-user-assigned":"No user(s) assigned to group",
+                    "no-group-assigned":"User not assigned to any group(s)",
+                    "policies":"POLICY"
+
+                },
+
+                "policy" : {
+                    "policy": "POLICY",
+                    "entityType": "Entity Type",
+                    "entity": "Entity",
+                    "accessLevel" :"Access Level"
+
                 },
                 "value": {
                     "type": "Value type",

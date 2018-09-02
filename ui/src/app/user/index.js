@@ -14,6 +14,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+import './assign-detail.scss';
 import uiRouter from 'angular-ui-router';
 import tempusGrid from '../components/grid.directive';
 import tempusApiUser from '../api/user.service';
@@ -31,7 +33,9 @@ import UsergroupDirective from './usergroup.directive';
 import AssignUsersToGroupController from './assign-users-to-group.controller';
 import AssignGroupsToUserController from './assign-groups-to-user.controller';
 import UnassignUsersFromGroupController from './unassign-users-from-group.controller';
-import UnassignGroupsFromUserController from './unassign-groups-from-user.controller'
+import UnassignGroupsFromUserController from './unassign-groups-from-user.controller';
+import AssignUserGroupDetailDirective from './assign-user-group-detail.directive';
+//import PolicyTblDirective from './policy-tbl.directive';
 
 export default angular.module('tempus.user', [
     uiRouter,
@@ -51,5 +55,7 @@ export default angular.module('tempus.user', [
     .controller('AssignGroupsToUserController', AssignGroupsToUserController)
     .controller('UnassignGroupsFromUserController', UnassignGroupsFromUserController)
     .directive('tbUser', UserDirective)
+    .directive('tbAssignUserGroupDetail', AssignUserGroupDetailDirective)
     .directive('tbUsergroup', UsergroupDirective)
+    //.directive('tbPolicyTbl',PolicyTblDirective)
     .name;
