@@ -56,7 +56,7 @@ function AddAssetController ($log,customerService,$state,dashboardService,datamo
     vm.cancel = cancel;
     vm.showCustList = false;
     vm.showParent =  false;
-    
+    vm.attributeList;
     var currentuser = userService.getCurrentUser();
     $log.log("currentuser");
     $log.log(currentuser);
@@ -67,8 +67,13 @@ function AddAssetController ($log,customerService,$state,dashboardService,datamo
             if(response){
                 vm.isParent = getDataModelObjectDetails(response.dataModelObjectId);
                 vm.isParent.then(function success(object_response) {
+                    $log.log(object_response.data)
                     if(object_response.data){ 
                         vm.name = object_response.data.name;
+                        if(object_response.data.attributeDefinitions.length > 0){
+                            vm.attributeList = object_response.data.attributeDefinitions;
+                        }
+                        $log.log(vm.attributeList)
                         if(object_response.data.parentId) {
                             var parentDetails = getDataModelObjectDetails(object_response.data.parentId.id);
                             parentDetails.then(function success(parentResponse) {
@@ -156,6 +161,8 @@ function DeviceListWidgetController($rootScope, $scope, $filter, deviceService, 
     $scope.showList = false;
     
     var customerId = $stateParams.customerId;
+    $log.log($state);
+    $log.log(vm);
     
     initController();
     

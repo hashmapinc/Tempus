@@ -47,6 +47,12 @@
                     <md-input-container class="md-block" ng-if="vm.showParent">
                         <label translate>Child of : {{vm.parentName}} </label>
                     </md-input-container>
+                    <div ng-repeat="attribute in vm.attributeList">
+                        <md-input-container class="md-block">
+                            <label>{{attribute.name}}</label>
+                            <input>
+                        </md-input-container>
+                    </div>
                     <md-input-container class="md-block" ng-if="vm.showCustList">
                         <md-select placeholder="Assign to user" ng-model="vm.user" md-on-open="loadUsers()" style="min-width: 200px;">
                             <md-option ng-value="user" ng-repeat="user in vm.users">{{user.name}}</md-option>
