@@ -247,12 +247,14 @@ public class DashboardServiceImpl extends AbstractEntityService implements Dashb
                             throw new DataValidationException("Dashboard is referencing to non-existent tenant!");
                         }
                     }
+                }
+                @Override
+                protected void validateCreate(Dashboard dashboard) {
                     if(dashboard.getType() == DashboardType.ASSET_LANDING_PAGE) {
                         List<Dashboard> dashboards;
                         DataModelObjectId dataModelObjectId;
-
-                        AssetLandingDashboardInfo assetLandingDashboardInfo = dashboard.getAssetLandingDashboardInfo();
-                        dataModelObjectId = assetLandingDashboardInfo.getDataModelObjectId();
+                        AssetLandingInfo assetLandingInfo = dashboard.getAssetLandingInfo();
+                        dataModelObjectId = assetLandingInfo.getDataModelObjectId();
 
                         dashboards = findDashboardByDataModelObjectId(dataModelObjectId);
 

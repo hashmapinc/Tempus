@@ -20,6 +20,7 @@ import com.datastax.driver.core.utils.UUIDs;
 import com.datastax.driver.mapping.annotations.Column;
 import com.datastax.driver.mapping.annotations.PartitionKey;
 import com.datastax.driver.mapping.annotations.Table;
+import com.datastax.driver.mapping.annotations.Transient;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -31,6 +32,7 @@ import com.hashmapinc.server.common.data.id.DashboardId;
 import com.hashmapinc.server.common.data.id.TenantId;
 import com.hashmapinc.server.dao.model.ModelConstants;
 import com.hashmapinc.server.dao.model.SearchTextEntity;
+import com.hashmapinc.server.dao.model.sql.AssetLandingInfoEntity;
 import com.hashmapinc.server.dao.model.type.DashboardTypeCodec;
 import com.hashmapinc.server.dao.model.type.JsonCodec;
 import lombok.EqualsAndHashCode;
@@ -75,6 +77,9 @@ public final class DashboardEntity implements SearchTextEntity<Dashboard> {
     @Column(name = ModelConstants.DASHBOARD_TYPE_PROPERTY, codec = DashboardTypeCodec.class)
     private DashboardType type;
 
+    @Transient
+    private AssetLandingInfoEntity assetLandingInfoEntity;
+
     public DashboardEntity() {
         super();
     }
@@ -82,12 +87,20 @@ public final class DashboardEntity implements SearchTextEntity<Dashboard> {
     public DashboardEntity(Dashboard dashboard) {
         if (dashboard.getId() != null) {
             this.id = dashboard.getId().getId();
+        } else {
+            this.id = UUIDs.timeBased();
         }
         if (dashboard.getTenantId() != null) {
             this.tenantId = dashboard.getTenantId().getId();
         }
         if (dashboard.getType() != null) {
             this.type = dashboard.getType();
+        }
+        if (dashboard.getAssetLandingInfo() != null) {
+            if (dashboard.getAssetLandingInfo().getDashboardId() == null) {
+                dashboard.getAssetLandingInfo().setDashboardId(new DashboardId(this.id));
+            }
+            this.assetLandingInfoEntity = new AssetLandingInfoEntity(dashboard.getAssetLandingInfo());
         }
         this.title = dashboard.getTitle();
         if (dashboard.getAssignedCustomers() != null) {
@@ -162,6 +175,14 @@ public final class DashboardEntity implements SearchTextEntity<Dashboard> {
         this.type = type;
     }
 
+    public AssetLandingInfoEntity getAssetLandingInfoEntity() {
+        return assetLandingInfoEntity;
+    }
+
+    public void setAssetLandingInfoEntity(AssetLandingInfoEntity assetLandingInfoEntity) {
+        this.assetLandingInfoEntity = assetLandingInfoEntity;
+    }
+
     @Override
     public Dashboard toData() {
         Dashboard dashboard = new Dashboard(new DashboardId(id));
@@ -179,6 +200,9 @@ public final class DashboardEntity implements SearchTextEntity<Dashboard> {
         }
         if(type != null){
             dashboard.setType(type);
+        }
+        if(assetLandingInfoEntity != null) {
+            dashboard.setAssetLandingInfo(assetLandingInfoEntity.toData());
         }
         dashboard.setConfiguration(configuration);
         return dashboard;

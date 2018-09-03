@@ -323,8 +323,8 @@ public class ModelConstants {
     /**
      * Cassandra asset landing dashboard constants.
      */
-    public static final String ASSET_LANDING_COLUMN_FAMILY_NAME = "asset_landing_dashboard";
-    public static final String ASSET_LANDING_DASHBOARD_ID = "dashboard_id";
+    public static final String ASSET_LANDING_COLUMN_FAMILY_NAME = "asset_landing_info";
+    public static final String ASSET_LANDING_VIEW_BY_DATA_MODEL_OBJ_ID = "asset_landing_info_by_data_model_object_id";
     public static final String ASSET_LANDING_DATA_MODEL_ID = "data_model_id";
     public static final String ASSET_LANDING_DATAMODEL_OBJECT_ID = "data_model_object_id";
 

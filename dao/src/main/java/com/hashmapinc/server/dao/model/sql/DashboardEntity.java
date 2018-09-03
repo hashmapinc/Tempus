@@ -21,9 +21,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.hashmapinc.server.common.data.DashboardType;
-import com.hashmapinc.server.common.data.Dashboard;
-import com.hashmapinc.server.common.data.ShortCustomerInfo;
+import com.hashmapinc.server.common.data.*;
 import com.hashmapinc.server.common.data.id.DashboardId;
 import com.hashmapinc.server.common.data.id.TenantId;
 import com.hashmapinc.server.dao.model.BaseSqlEntity;
@@ -75,7 +73,7 @@ public final class DashboardEntity extends BaseSqlEntity<Dashboard> implements S
 
     @OneToOne(cascade = CascadeType.ALL)
     @PrimaryKeyJoinColumn
-    private AssetLandingDashboardEntity assetLandingDashboardEntity;
+    private AssetLandingInfoEntity assetLandingInfoEntity;
 
 
     public DashboardEntity() {
@@ -85,6 +83,9 @@ public final class DashboardEntity extends BaseSqlEntity<Dashboard> implements S
     public DashboardEntity(Dashboard dashboard) {
         if (dashboard.getId() != null) {
             this.setId(dashboard.getId().getId());
+        }  else {
+            DashboardId dashboardId = new DashboardId(UUIDs.timeBased());
+            this.setId(dashboardId.getId());
         }
         if (dashboard.getTenantId() != null) {
             this.tenantId = toString(dashboard.getTenantId().getId());
@@ -101,8 +102,15 @@ public final class DashboardEntity extends BaseSqlEntity<Dashboard> implements S
             }
         }
         this.configuration = dashboard.getConfiguration();
-        if(dashboard.getAssetLandingDashboardInfo() != null) {
-            this.assetLandingDashboardEntity = new AssetLandingDashboardEntity(dashboard.getAssetLandingDashboardInfo());
+        if(dashboard.getAssetLandingInfo() != null) {
+            AssetLandingInfo assetLandingInfo = dashboard.getAssetLandingInfo();
+            if(assetLandingInfo != null) {
+                if (assetLandingInfo.getDashboardId() == null) {
+                    DashboardId dashboardId = new DashboardId(UUIDConverter.fromString(this.id));
+                    assetLandingInfo.setDashboardId(dashboardId);
+                }
+                this.assetLandingInfoEntity = new AssetLandingInfoEntity(assetLandingInfo);
+            }
         }
     }
 
@@ -135,8 +143,8 @@ public final class DashboardEntity extends BaseSqlEntity<Dashboard> implements S
         if(type != null){
             dashboard.setType(type);
         }
-        if(assetLandingDashboardEntity != null) {
-            dashboard.setAssetLandingDashboardInfo(assetLandingDashboardEntity.toData());
+        if(assetLandingInfoEntity != null) {
+            dashboard.setAssetLandingInfo(assetLandingInfoEntity.toData());
         }
         return dashboard;
     }

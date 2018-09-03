@@ -53,7 +53,7 @@ public class JpaDashboardDao extends JpaAbstractSearchTextDao<DashboardEntity, D
     @Override
     public List<Dashboard> findDashboardByDataModelObjectId(UUID dataModelObjectId) {
         return DaoUtil.convertDataList(dashboardRepository
-                                               .findByAssetLandingDashboardEntity_dataModelObjectId(
+                                               .findByAssetLandingInfoEntity_dataModelObjectId(
                                                        UUIDConverter.fromTimeUUID(dataModelObjectId)));
     }
 }

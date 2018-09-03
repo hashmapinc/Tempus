@@ -21,46 +21,21 @@ import com.hashmapinc.server.common.data.id.DataModelId;
 import com.hashmapinc.server.common.data.id.DataModelObjectId;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 
 @Data
+@NoArgsConstructor
 @EqualsAndHashCode
-public class AssetLandingDashboardInfo implements Serializable{
+public class AssetLandingInfo implements Serializable{
     private static final long serialVersionUID = 8142208716716668541L;
 
     private DashboardId dashboardId;
     private DataModelId dataModelId;
     private DataModelObjectId dataModelObjectId;
 
-    public AssetLandingDashboardInfo() {
-    }
-
-    public AssetLandingDashboardInfo(DashboardId dashboardId){
-        this.dashboardId = dashboardId;
-    }
-
-    public DashboardId getDashboardId() {
-        return dashboardId;
-    }
-
-    public DataModelId getDataModelId() {
-        return dataModelId;
-    }
-
-    public void setDataModelId(DataModelId dataModelId) {
-        this.dataModelId = dataModelId;
-    }
-
-    public DataModelObjectId getDataModelObjectId() {
-        return dataModelObjectId;
-    }
-
-    public void setDataModelObjectId(DataModelObjectId dataModelObjectId) {
-        this.dataModelObjectId = dataModelObjectId;
-    }
-
-    public void setDashboardId(DashboardId dashboardId) {
+    public AssetLandingInfo(DashboardId dashboardId){
         this.dashboardId = dashboardId;
     }
 }

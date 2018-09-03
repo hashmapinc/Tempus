@@ -35,6 +35,10 @@ public interface DashboardDao extends Dao<Dashboard> {
      */
     Dashboard save(Dashboard dashboard);
 
-    List<Dashboard> findDashboardByDataModelObjectId(UUID dataModelObjectId);
+    List<Dashboard>
+
+
+
+    findDashboardByDataModelObjectId(UUID dataModelObjectId);
 
 }

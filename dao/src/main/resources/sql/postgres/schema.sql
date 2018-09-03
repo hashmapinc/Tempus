@@ -389,8 +389,8 @@ CREATE TABLE IF NOT EXISTS tag_metadata (
     CONSTRAINT tag_metadata_unq_key UNIQUE (entity_type, entity_id, key)
 );
 
-CREATE TABLE IF NOT EXISTS asset_landing_dashboard (
-    dashboard_id varchar(31) NOT NULL CONSTRAINT asset_landing_dashboard_pkey PRIMARY KEY,
+CREATE TABLE IF NOT EXISTS asset_landing_info (
+    id varchar(31) NOT NULL CONSTRAINT asset_landing_info_pkey PRIMARY KEY,
     data_model_id varchar(31),
     data_model_object_id varchar(31)
 );

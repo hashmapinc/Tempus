@@ -779,9 +779,16 @@ CREATE TABLE IF NOT EXISTS tempus.user_groups (
     group_id timeuuid,
     PRIMARY KEY(user_id, group_id)
 
-CREATE TABLE IF NOT EXISTS tempus.asset_landing_dashboard (
-    dashboard_id timeuuid,
+CREATE TABLE IF NOT EXISTS tempus.asset_landing_info (
+    id timeuuid,
     data_model_id timeuuid,
     data_model_object_id timeuuid,
-    PRIMARY KEY(dashboard_id)
+    PRIMARY KEY(id)
 );
+
+CREATE MATERIALIZED VIEW IF NOT EXISTS tempus.asset_landing_info_by_data_model_object_id AS
+    SELECT *
+    from tempus.asset_landing_info
+    WHERE data_model_object_id IS NOT NULL AND id IS NOT NULL
+    PRIMARY KEY ( data_model_object_id, id)
+    WITH CLUSTERING ORDER BY ( id DESC );

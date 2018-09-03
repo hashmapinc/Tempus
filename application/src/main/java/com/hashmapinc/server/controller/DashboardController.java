@@ -28,7 +28,6 @@ import com.hashmapinc.server.common.data.page.TextPageLink;
 import com.hashmapinc.server.common.data.page.TimePageData;
 import com.hashmapinc.server.common.data.page.TimePageLink;
 import com.hashmapinc.server.common.data.security.Authority;
-import com.hashmapinc.server.dao.exception.DataValidationException;
 import com.hashmapinc.server.exception.TempusException;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -37,7 +36,6 @@ import org.springframework.web.bind.annotation.*;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.UUID;
 
 @RestController
 @RequestMapping("/api")
@@ -86,15 +84,6 @@ public class DashboardController extends BaseController {
         try {
             User user = getCurrentUser();
             dashboard.setTenantId(user.getTenantId());
-
-            if(dashboard.getId() == null) {
-                DashboardId dashboardId = new DashboardId(UUIDs.timeBased());
-                dashboard.setId(dashboardId);
-
-                if(dashboard.getType() == DashboardType.ASSET_LANDING_PAGE)
-                    dashboard.getAssetLandingDashboardInfo().setDashboardId(dashboardId);
-            }
-
             Dashboard savedDashboard = checkNotNull(dashboardService.saveDashboard(dashboard));
 
             if((user).getAuthority().compareTo(Authority.CUSTOMER_USER) == 0) {

@@ -25,7 +25,7 @@ public class Dashboard extends DashboardInfo {
     
     private transient JsonNode configuration;
 
-    private AssetLandingDashboardInfo assetLandingDashboardInfo;
+    private AssetLandingInfo assetLandingInfo;
     
     public Dashboard() {
         super();
@@ -42,7 +42,7 @@ public class Dashboard extends DashboardInfo {
     public Dashboard(Dashboard dashboard) {
         super(dashboard);
         this.configuration = dashboard.getConfiguration();
-        this.assetLandingDashboardInfo = dashboard.getAssetLandingDashboardInfo();
+        this.assetLandingInfo = dashboard.getAssetLandingInfo();
     }
 
     public JsonNode getConfiguration() {
@@ -53,12 +53,12 @@ public class Dashboard extends DashboardInfo {
         this.configuration = configuration;
     }
 
-    public AssetLandingDashboardInfo getAssetLandingDashboardInfo() {
-        return assetLandingDashboardInfo;
+    public AssetLandingInfo getAssetLandingInfo() {
+        return assetLandingInfo;
     }
 
-    public void setAssetLandingDashboardInfo(AssetLandingDashboardInfo assetLandingDashboardInfo) {
-        this.assetLandingDashboardInfo = assetLandingDashboardInfo;
+    public void setAssetLandingInfo(AssetLandingInfo assetLandingInfo) {
+        this.assetLandingInfo = assetLandingInfo;
     }
 
     @Override
@@ -84,10 +84,10 @@ public class Dashboard extends DashboardInfo {
         }
         else if (!configuration.equals(other.configuration))
             return false;
-        else if (assetLandingDashboardInfo == null) {
-            return other.assetLandingDashboardInfo == null;
+        else if (assetLandingInfo == null) {
+            return other.assetLandingInfo == null;
         }
-        else if (!assetLandingDashboardInfo.equals(other.assetLandingDashboardInfo))
+        else if (!assetLandingInfo.equals(other.assetLandingInfo))
             return false;
         return true;
     }
