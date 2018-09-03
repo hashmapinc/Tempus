@@ -194,7 +194,7 @@ public class UserController extends BaseController {
     }
 
     @PreAuthorize("hasAnyAuthority('SYS_ADMIN', 'TENANT_ADMIN')")
-    @GetMapping(value = "/user/{userId}/activationLink")
+    @GetMapping(value = "/user/{userId}/activationLink", produces = "text/plain")
     @ResponseBody
     public String getActivationLink(
             @PathVariable(USER_ID) String strUserId,

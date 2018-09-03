@@ -20,6 +20,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.security.oauth2.client.OAuth2RestTemplate;
 import org.springframework.security.oauth2.client.token.grant.client.ClientCredentialsResourceDetails;
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableOAuth2Client;
@@ -38,6 +39,8 @@ public class TempusResourceClient {
     @Bean
     @Qualifier("clientRestTemplate")
     public RestTemplate restTemplate() {
-        return new OAuth2RestTemplate(resourceDetails());
+        OAuth2RestTemplate oAuth2RestTemplate = new OAuth2RestTemplate(resourceDetails());
+        ((SimpleClientHttpRequestFactory) oAuth2RestTemplate.getRequestFactory()).setOutputStreaming(false);
+        return oAuth2RestTemplate;
     }
 }
