@@ -1468,6 +1468,19 @@ export default angular.module('tempus.locale', [])
                     "accessLevel" :"Access Level"
 
                 },
+
+                "policy" : {
+                    "policy": "POLICY",
+                    "entityType": "Entity Type",
+                    "entity": "Entity",
+                    "accessLevel" :"Access Level",
+                    "add" :"Add Policy",
+                    "edit": "Edit Policy",
+                    "access-level": "Access Level",
+                    "field-required": "Field is required"
+
+                },
+
                 "value": {
                     "type": "Value type",
                     "string": "String",
