@@ -26,8 +26,7 @@ import com.hashmapinc.server.common.data.EntitySubtype;
 import com.hashmapinc.server.common.data.EntityType;
 import com.hashmapinc.server.common.data.asset.Asset;
 import com.hashmapinc.server.common.data.asset.AssetSearchQuery;
-import com.hashmapinc.server.common.data.id.EntityId;
-import com.hashmapinc.server.common.data.id.TenantId;
+import com.hashmapinc.server.common.data.id.*;
 import com.hashmapinc.server.common.data.page.TextPageData;
 import com.hashmapinc.server.common.data.page.TextPageLink;
 import com.hashmapinc.server.common.data.relation.EntityRelation;
@@ -43,8 +42,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import com.hashmapinc.server.common.data.Tenant;
-import com.hashmapinc.server.common.data.id.AssetId;
-import com.hashmapinc.server.common.data.id.CustomerId;
 import com.hashmapinc.server.common.data.relation.EntitySearchDirection;
 import com.hashmapinc.server.dao.exception.DataValidationException;
 
@@ -61,6 +58,8 @@ public class BaseAssetService extends AbstractEntityService implements AssetServ
     public static final String INCORRECT_PAGE_LINK = "Incorrect page link ";
     public static final String INCORRECT_CUSTOMER_ID = "Incorrect customerId ";
     public static final String INCORRECT_ASSET_ID = "Incorrect assetId ";
+    public static final String INCORRECT_DATA_MODEL_OBJECT_ID = "Incorrect dataModelObjectId ";
+
     @Autowired
     private AssetDao assetDao;
 
@@ -222,6 +221,13 @@ public class BaseAssetService extends AbstractEntityService implements AssetServ
                     assetTypes.sort(Comparator.comparing(EntitySubtype::getType));
                     return assetTypes;
                 });
+    }
+
+    @Override
+    public List<Asset> findAssetsByDataModelObjectId(DataModelObjectId dataModelObjectId) {
+        log.trace("Executing findAssetsByDataModelObjectId [{}]", dataModelObjectId);
+        validateId(dataModelObjectId, INCORRECT_DATA_MODEL_OBJECT_ID + dataModelObjectId);
+        return assetDao.findAssetsByDataModelObjectId(dataModelObjectId.getId());
     }
 
     private DataValidator<Asset> assetValidator =

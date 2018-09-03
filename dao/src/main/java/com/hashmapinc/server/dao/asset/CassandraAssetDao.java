@@ -164,4 +164,8 @@ public class CassandraAssetDao extends CassandraAbstractSearchTextDao<AssetEntit
         });
     }
 
+    @Override
+    public List<Asset> findAssetsByDataModelObjectId(UUID dataModelObjectId) {
+        return Collections.emptyList();
+    }
 }
