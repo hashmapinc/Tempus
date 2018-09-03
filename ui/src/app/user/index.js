@@ -34,7 +34,7 @@ import AssignGroupsToUserController from './assign-groups-to-user.controller';
 import UnassignUsersFromGroupController from './unassign-users-from-group.controller';
 import UnassignGroupsFromUserController from './unassign-groups-from-user.controller';
 import AssignUserGroupDetailDirective from './assign-user-group-detail.directive';
-//import PolicyTblDirective from './policy-tbl.directive';
+import PolicyTblDirective from './policy-tbl.directive';
 
 export default angular.module('tempus.user', [
     uiRouter,
@@ -56,5 +56,5 @@ export default angular.module('tempus.user', [
     .directive('tbUser', UserDirective)
     .directive('tbAssignUserGroupDetail', AssignUserGroupDetailDirective)
     .directive('tbUsergroup', UsergroupDirective)
-    //.directive('tbPolicyTbl',PolicyTblDirective)
+    .directive('tbPolicyTbl',PolicyTblDirective)
     .name;
