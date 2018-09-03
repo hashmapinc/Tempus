@@ -42,7 +42,7 @@ public abstract class BaseAssetServiceTest extends AbstractServiceTest {
 
     private IdComparator<Asset> idComparator = new IdComparator<>();
 
-    private TenantId tenantId;
+    protected TenantId tenantId;
 
     @Before
     public void before() {
