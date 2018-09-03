@@ -24,7 +24,7 @@ import computationJobCard from './computation-job-card.tpl.html';
 /* eslint-enable import/no-unresolved, import/default */
 
 /*@ngInject*/
-export default function ComputationController(computationService, computationJobService, userService, $state, $stateParams, $translate, types) {
+export default function ComputationController($log, computationService, computationJobService, userService, $state, $stateParams, $translate, types) {
 
     var computationActionsList = [
         {
@@ -169,14 +169,6 @@ export default function ComputationController(computationService, computationJob
         }
     ];
 
-    //var vm = this;
-    
-
-    //vm.types = types;
-
-    //vm.helpLinkIdForComputationJob = helpLinkIdForComputationJob;
-
-
     vm.computationJobGridConfig = {
 
         refreshParamsFunc: null,
@@ -256,16 +248,16 @@ export default function ComputationController(computationService, computationJob
 
     function fetchComputationJobs(pageLink) {
         if(vm.computation != null){
-                    return computationJobService.getAllComputationJobs(pageLink, vm.computation.id.id);
+            return computationJobService.getAllComputationJobs(pageLink, vm.computation.id.id);
         }
         else {
-                computationService.getComputation($stateParams.computationId).then(
-                function success(computation) {
-                    //vm.computation = computation;
-                    return computationJobService.getAllComputationJobs(pageLink, computation.id.id)
-                },
-                function fail() {
-                }
+            computationService.getComputation($stateParams.computationId).then(
+            function success(computation) {
+                //vm.computation = computation;
+                return computationJobService.getAllComputationJobs(pageLink, computation.id.id)
+            },
+            function fail() {
+            }
             );
         }
     }
