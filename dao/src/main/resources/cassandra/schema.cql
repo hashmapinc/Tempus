@@ -778,6 +778,7 @@ CREATE TABLE IF NOT EXISTS tempus.user_groups (
     user_id timeuuid,
     group_id timeuuid,
     PRIMARY KEY(user_id, group_id)
+);
 
 CREATE TABLE IF NOT EXISTS tempus.asset_landing_info (
     id timeuuid,
