@@ -19,16 +19,13 @@ package com.hashmapinc.server.dao.customergroup;
 import com.google.common.base.Function;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
-import com.hashmapinc.server.common.data.Customer;
-import com.hashmapinc.server.common.data.CustomerGroup;
-import com.hashmapinc.server.common.data.Tenant;
-import com.hashmapinc.server.common.data.id.CustomerGroupId;
-import com.hashmapinc.server.common.data.id.CustomerId;
-import com.hashmapinc.server.common.data.id.TenantId;
-import com.hashmapinc.server.common.data.id.UserId;
+import com.hashmapinc.server.common.data.*;
+import com.hashmapinc.server.common.data.id.*;
 import com.hashmapinc.server.common.data.page.TextPageData;
 import com.hashmapinc.server.common.data.page.TextPageLink;
+import com.hashmapinc.server.dao.asset.AssetService;
 import com.hashmapinc.server.dao.customer.CustomerDao;
+import com.hashmapinc.server.dao.datamodel.DataModelObjectService;
 import com.hashmapinc.server.dao.entity.AbstractEntityService;
 import com.hashmapinc.server.dao.exception.DataValidationException;
 import com.hashmapinc.server.dao.exception.IncorrectParameterException;
@@ -42,8 +39,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.hashmapinc.server.dao.service.Validator.validateId;
@@ -65,6 +61,12 @@ public class CustomerGroupServiceImpl extends AbstractEntityService implements C
 
     @Autowired
     private CustomerDao customerDao;
+
+    @Autowired
+    private DataModelObjectService dataModelObjectService;
+
+    @Autowired
+    private AssetService assetService;
 
 
     private List<UserId> findUserIdsByCustomerGroupId(CustomerGroupId customerGroupId){
@@ -188,6 +190,55 @@ public class CustomerGroupServiceImpl extends AbstractEntityService implements C
         Validator.validateId(userId, INCORRECT_USER_ID + userId);
         List<CustomerGroup> customerGroups = customerGroupDao.findByUserId(userId.getId(), new TextPageLink(Integer.MAX_VALUE));
         return customerGroups.stream().flatMap(customerGroup -> customerGroup.getPolicies().stream()).distinct().collect(Collectors.toList());
+    }
+
+    @Override
+    public Map<String, Map<String, String>> findGroupPolicies(CustomerGroupId customerGroupId) {
+        log.trace("Executing findGroupPolicies, customerGroupId [{}]", customerGroupId);
+        Validator.validateId(customerGroupId, INCORRECT_CUSTOMER_GROUP_ID + customerGroupId);
+        CustomerGroup customerGroup = customerGroupDao.findById(customerGroupId.getId());
+        List<String> policies = customerGroup.getPolicies();
+        if(policies != null) {
+            List<UserPermission> userPermissions = policies.stream().map(UserPermission::new).collect(Collectors.toList());
+            return getDisplayablePermissions(userPermissions);
+        } else {
+            return Collections.emptyMap();
+        }
+    }
+
+    private Map<String, Map<String, String>> getDisplayablePermissions(List<UserPermission> userPermissions) {
+        Map<String, Map<String, String> > displayablePermissions = new HashMap<>();
+        userPermissions.forEach(userPermission -> {
+            Map<String, String> attrs = new HashMap<>();
+            boolean isAccessedToSingleResource = !userPermission.getResources().isEmpty() || userPermission.getResources().size() == 1;
+            if(isAccessedToSingleResource) {
+                EntityType entityType = (EntityType) userPermission.getResources().toArray()[0];
+
+                userPermission.getResourceAttributes().forEach((attrName, attrId) -> {
+                    String nameOfEntity = getNameOfEntity(entityType, attrName, attrId);
+                    if(!nameOfEntity.isEmpty())
+                        attrs.put(attrName.toString(), nameOfEntity);
+                });
+            }
+            displayablePermissions.put(userPermission.getPermissionExpr(), attrs);
+        });
+        return displayablePermissions;
+    }
+
+    private String getNameOfEntity(EntityType entityType, UserPermission.ResourceAttribute attrName, String attrId){
+        switch (attrName){
+            case DATA_MODEL_ID: return dataModelObjectService.findById(new DataModelObjectId(UUID.fromString(attrId))).getName();
+            case ID: return getNameOfEntityByResource(entityType, attrId);
+        }
+        return "";
+    }
+
+    private String getNameOfEntityByResource(EntityType entityType, String attrId) {
+        if(entityType.equals(EntityType.ASSET)){
+            return assetService.findAssetById(new AssetId(UUID.fromString(attrId))).getName();
+        } else {
+            return "";
+        }
     }
 
     private class CustomerGroupRemover extends PaginatedRemover<CustomerId, CustomerGroup> {
