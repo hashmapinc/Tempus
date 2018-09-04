@@ -46,7 +46,6 @@ export default function MetadataSinkDirective($compile, $templateCache, $transla
         };
 
         $compile(element.contents())(scope);
-
     };
 
     return {

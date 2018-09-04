@@ -25,7 +25,7 @@ export default function AddMetadataController($scope, $mdDialog, types, helpLink
     vm.item = {};
 
     vm.types = types;
-
+ta
     vm.add = add;
     vm.cancel = cancel;
 
@@ -42,7 +42,6 @@ export default function AddMetadataController($scope, $mdDialog, types, helpLink
 
     vm.metadataSinkTypeChange = function () {
         if (vm.metadata.sink.type === 'REST') {
-
             vm.item.importData = null;
             vm.item.fileName = null;
         }
@@ -55,6 +54,5 @@ export default function AddMetadataController($scope, $mdDialog, types, helpLink
                 $mdDialog.hide();
             },function fail(){});
         }
-
     }
 }
