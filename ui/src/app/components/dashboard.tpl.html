@@ -72,6 +72,12 @@
 											   </md-tooltip>
 											   <ng-md-icon size="20" icon="{{action.icon}}"></ng-md-icon>
 									</md-button>
+									<md-button ng-if="widget.typeAlias=='device_list'" class="md-icon-button" ng-click="addAsset($event)">
+											<md-icon>add</md-icon>
+											<md-tooltip md-direction="top">
+												{{ 'action.add' | translate }}
+											</md-tooltip>
+									</md-button>
 									<md-button id="expand-button"
 											   ng-show="!vm.isEdit && vm.enableWidgetFullscreen(widget)"
 											   aria-label="{{ 'fullscreen.fullscreen' | translate }}"
@@ -106,6 +112,7 @@
 										</md-tooltip>
 										<ng-md-icon size="20" icon="close"></ng-md-icon>
 									</md-button>
+									
 								</div>
 								<div flex layout="column" class="tb-widget-content">
 									<div flex tb-widget

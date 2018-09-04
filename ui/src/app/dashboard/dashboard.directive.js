@@ -34,6 +34,9 @@ export default function DashboardDirective($compile, $templateCache, $translate,
         scope.types = types;
         scope.listOfDataModelAssets = [];
         scope.$watch('dashboard', function(newVal) {
+            $log.log(newVal);
+            $log.log(scope.theForm);
+            scope.theForm.editFlag = true;
             if(scope.dashboard && scope.dashboard.type == "ASSET_LANDING_PAGE"){    
                 scope.dashboard.landingDashboard = true;
                 scope.loadDataModel();

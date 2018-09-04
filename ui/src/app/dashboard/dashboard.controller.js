@@ -625,8 +625,9 @@ export default function DashboardController(types, utils, dashboardUtils, widget
     }
 
     function widgetClicked($event, layoutCtx, widget) {
-        $log.log("widget clicked");
-        $log.log($event);
+        if(widget.typeAlias == 'device_list'){
+            $rootScope.$emit("CallAddAssetDialog", [$event]);
+        }
         if (vm.isEditingWidget) {
             editWidget($event, layoutCtx, widget);
         }

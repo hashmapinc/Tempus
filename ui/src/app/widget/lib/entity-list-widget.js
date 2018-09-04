@@ -56,6 +56,7 @@ function AddAssetController ($log,customerService,$state,dashboardService,datamo
     vm.cancel = cancel;
     vm.showCustList = false;
     vm.showParent =  false;
+    vm.assetList = vm.assetList;
     vm.attributeList;
     var currentuser = userService.getCurrentUser();
     $log.log("currentuser");
@@ -81,6 +82,15 @@ function AddAssetController ($log,customerService,$state,dashboardService,datamo
                                 vm.parentName = parentResponse.data.name;
                                 vm.parentId = parentResponse.data.id.id
                             });
+                            vm.assetList =[{
+                                id:"1",
+                                name:"asset_1"
+                            },{
+                                id:"2",
+                                name:"asset_2"
+                            },{
+                                id:"3",
+                                name:"asset_3"}]
                         }else{
                             vm.showParent =  false;
                         }
@@ -110,7 +120,7 @@ function AddAssetController ($log,customerService,$state,dashboardService,datamo
         return datamodelService.getDatamodelObject(dataModelObjectId);
     }
     function addAsset(){
-        
+        $log.log(vm.attributes)
         var requestObj = {
             name:vm.asset_name,
             additionalInfo:{
@@ -120,7 +130,8 @@ function AddAssetController ($log,customerService,$state,dashboardService,datamo
             customerId:{
                 entityType:"CUSTOMER"
             },
-            type:vm.name.toLowerCase()
+            type:vm.name.toLowerCase(),
+            attributes:vm.attributes
         }
         if(currentuser.authority === 'CUSTOMER_USER'){
             requestObj.customerId.id = currentuser.id
@@ -138,6 +149,7 @@ function AddAssetController ($log,customerService,$state,dashboardService,datamo
             function fail() {
             }
         );
+
     }
     function cancel() {
         $mdDialog.cancel();
@@ -239,6 +251,11 @@ function DeviceListWidgetController($rootScope, $scope, $filter, deviceService, 
         $rootScope.$emit("CallTableDetailDeviceOnDashboard", [$event, list]);
     }
 
+    var assetAdd = $rootScope.$on("CallAddAssetDialog", function($event){
+        $scope.addAsset($event);
+     });
+ 
+     $scope.$on('$destroy', assetAdd);
     /**
      * Add Asset
      */

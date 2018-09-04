@@ -31,7 +31,7 @@
         <md-progress-linear class="md-warn" md-mode="indeterminate" ng-disabled="!$root.loading" ng-show="$root.loading"></md-progress-linear>
         <span style="min-height: 5px;" flex="" ng-show="!$root.loading"></span>
         <md-dialog-content>
-            <div class="md-dialog-content">
+            <!-- <div class="md-dialog-content">
                 <fieldset>
                     <md-input-container class="md-block">
                         <label translate>asset.name</label>
@@ -47,10 +47,13 @@
                     <md-input-container class="md-block" ng-if="vm.showParent">
                         <label translate>Child of : {{vm.parentName}} </label>
                     </md-input-container>
-                    <div ng-repeat="attribute in vm.attributeList">
+                    <md-switch ng-model="isActive" aria-label="Populate Attribute" ng-click="vm.showAttribute()">
+                        Populate Attribute
+                      </md-switch>                      
+                    <div ng-show="vm.showAttributeFlag" ng-repeat="attribute in vm.attributeList">
                         <md-input-container class="md-block">
                             <label>{{attribute.name}}</label>
-                            <input>
+                            <input ng-model="attributes[attribute.name]">
                         </md-input-container>
                     </div>
                     <md-input-container class="md-block" ng-if="vm.showCustList">
@@ -59,7 +62,50 @@
                           </md-select>
                     </md-input-container>
                 </fieldset>
-            </div>
+            </div> -->
+            <md-tabs md-dynamic-height md-border-bottom>
+                <md-tab label="Details">
+                  <md-content class="md-padding">
+                        <fieldset>
+                                <md-input-container class="md-block">
+                                    <label translate>asset.name</label>
+                                    <input required name="name" ng-model="vm.asset_name">
+                                    <div ng-messages="theForm.name.$error">
+                                        <div translate ng-message="required">asset.name-required</div>
+                                    </div>
+                                </md-input-container>
+                                <md-input-container class="md-block">
+                                    <label translate>asset.description</label>
+                                    <textarea  rows="2" ng-model="vm.description"></textarea>
+                                </md-input-container>
+                                <md-input-container class="md-block" ng-if="vm.showParent">
+                                    <label style="margin-bottom: 10px;">Child of : {{vm.parentName}} </label>
+                                </md-input-container>
+                                <md-input-container class="md-block" ng-if="vm.showParent">
+                                        <md-select  placeholder="Assign asset" ng-model="associatedAsset" style="min-width: 200px;">
+                                                <md-option ng-value="asset" ng-repeat="asset in vm.assetList">{{asset.name}}</md-option>
+                                        </md-select>
+                                    </md-input-container>
+                                <md-input-container class="md-block" ng-if="vm.showCustList">
+                                    <md-select placeholder="Assign to user" ng-model="vm.user"  style="min-width: 200px;margin-top: 20px;">
+                                        <md-option ng-value="user" ng-repeat="user in vm.users">{{user.name}}</md-option>
+                                      </md-select>
+                                </md-input-container>
+                            </fieldset>
+                  </md-content>
+                </md-tab>
+                <md-tab label="attribute">
+                  <md-content class="md-padding">                     
+                        <div ng-repeat="attribute in vm.attributeList">
+                            <md-input-container class="md-block">
+                                <label>{{attribute.name}}</label>
+                                <input ng-model="vm.attributes[attribute.name]">
+                            </md-input-container>
+                        </div>
+                  </md-content>
+                </md-tab>
+
+              </md-tabs>
         </md-dialog-content>
         <md-dialog-actions layout="row">
             <span flex></span>

@@ -630,6 +630,9 @@ function GridController($scope, $rootScope, $state, $mdDialog, $document, $q, $m
         if (!vm.detailsConfig.isDetailsEditMode) {
             theForm.$setPristine();
         }
+        if(theForm.editFlag){
+            theForm.editFlag = false;
+        }
     }
 
     function onCloseDetails() {
