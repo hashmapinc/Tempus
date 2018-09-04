@@ -30,7 +30,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static com.hashmapinc.server.dao.service.Validator.validateId;
@@ -89,6 +91,20 @@ public class DataModelObjectServiceImp implements DataModelObjectService {
             }
         });
         return dataModelObjects;
+    }
+
+    @Override
+    public Set<DataModelObjectId> getAllParentDataModelIdsOf(DataModelObjectId dataModelObjectId) {
+        Set<DataModelObjectId> parents = new HashSet<>();
+        DataModelObject dataModelObject = findById(dataModelObjectId);
+        if(dataModelObject != null) {
+            DataModelObjectId parentId = dataModelObject.getParentId();
+            while (parentId != null) {
+                parents.add(parentId);
+                parentId = findById(parentId).getParentId();
+            }
+        }
+        return parents;
     }
 
     @Override
