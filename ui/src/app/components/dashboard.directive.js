@@ -27,7 +27,7 @@ import tempusDepthwindow from './depthwindow.directive';
 import tempusEvents from './tb-event-directives';
 import tempusMousepointMenu from './mousepoint-menu.directive';
 import tempusGrid from './grid.directive';
-import deviceCard from '../device/device-card.tpl.html';
+//import deviceCard from '../device/device-card.tpl.html';
 import assetCard from '../asset/asset-card.tpl.html';
 import addAssetTemplate from '../asset/add-asset.tpl.html';
 
@@ -106,8 +106,6 @@ function DashboardController($scope, $rootScope, $element, $timeout, $mdMedia, $
     var selectedWidget = null;
     var gridsterParent = angular.element('#gridster-parent', $element);
     var gridsterElement = angular.element('#gridster-child', gridsterParent);
-    var deviceActionsList = [];
-    var deviceGroupActionsList = [];
     var assetActionsList = [];
     var assetGroupActionsList = [];
 
@@ -117,34 +115,6 @@ function DashboardController($scope, $rootScope, $element, $timeout, $mdMedia, $
     $scope.displayAssetsGrid = false;
     vm.gridster = null;
 
-    vm.dashboardGridConfig = {
-        deleteItemTitleFunc: deleteTitle,
-        deleteItemContentFunc: deleteText,
-        deleteItemsTitleFunc: deleteDevicesTitle,
-        deleteItemsActionTitleFunc: deleteDevicesActionTitle,
-        deleteItemsContentFunc: deleteDevicesText,
-
-        saveItemFunc: saveDevice,
-        getItemTitleFunc: getDeviceTitle,
-
-        itemCardController: 'DeviceCardController',
-        itemCardTemplateUrl: deviceCard,
-        parentCtl: vm,
-
-        actionsList: deviceActionsList,
-        groupActionsList: deviceGroupActionsList,
-
-        onGridInited: gridInited,
-        addItemTemplateUrl: dashboardTemplate,
-
-        addItemText: function() { return $translate.instant('device.add-device-text') },
-        noItemsText: function() { return $translate.instant('device.no-devices-text') },
-        itemDetailsText: function() { return $translate.instant('device.device-details') },
-        isDetailsReadOnly: isCustomerUser,
-        isSelectionEnabled: function () {
-            return !isCustomerUser();
-        }    
-    };
     vm.assetGridConfig = {
         deleteItemTitleFunc: deleteTitle,
         deleteItemContentFunc: deleteText,
@@ -222,34 +192,7 @@ function DashboardController($scope, $rootScope, $element, $timeout, $mdMedia, $
     function deleteAssetsText () {
         return $translate.instant('asset.delete-assets-text');
     }
-    function saveDevice(device) {
-        var deferred = $q.defer();
-        deviceService.saveDevice(device).then(
-            function success(savedDevice) {
-                $rootScope.$broadcast('deviceSaved');
-                var devices = [ savedDevice ];
-                customerService.applyAssignedCustomersInfo(devices).then(
-                    function success(items) {
-                        if (items && items.length == 1) {
-                            deferred.resolve(items[0]);
-                        } else {
-                            deferred.reject();
-                        }
-                    },
-                    function fail() {
-                        deferred.reject();
-                    }
-                );
-            },
-            function fail() {
-                deferred.reject();
-            }
-        );
-        return deferred.promise;
-    }
-    function getDeviceTitle(device) {
-        return device ? device.name : '';
-    }
+
     function isCustomerUser() {
         return vm.devicesScope === 'customer_user';
     }
@@ -262,18 +205,6 @@ function DashboardController($scope, $rootScope, $element, $timeout, $mdMedia, $
         return $translate.instant('device.delete-device-text');
     }
 
-    function deleteDevicesTitle(selectedCount) {
-        return $translate.instant('device.delete-devices-title', {count: selectedCount}, 'messageformat');
-    }
-
-    function deleteDevicesActionTitle(selectedCount) {
-    
-        return $translate.instant('device.delete-devices-action-title', {count: selectedCount}, 'messageformat');
-    }
-
-    function deleteDevicesText () {
-        return $translate.instant('device.delete-devices-text');
-    }
     function gridInited(grid) {
         vm.grid = grid;
     }

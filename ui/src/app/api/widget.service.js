@@ -23,7 +23,7 @@ import tempusTimeseriesTableWidget from '../widget/lib/timeseries-table-widget';
 import tempusAlarmsTableWidget from '../widget/lib/alarms-table-widget';
 import tempusEntitiesTableWidget from '../widget/lib/entities-table-widget';
 import tempusExtensionsTableWidget from '../widget/lib/extensions-table-widget';
-import tempusDeviceListWidget from '../widget/lib/entity-list-widget';
+import tempusEntityListWidget from '../widget/lib/entity-list-widget';
 
 import tempusRpcWidgets from '../widget/lib/rpc';
 
@@ -49,7 +49,7 @@ import tempusTypes from '../common/types.constant';
 import tempusUtils from '../common/utils.service';
 
 export default angular.module('tempus.api.widget', ['oc.lazyLoad', tempusLedLight, tempusTimeseriesTableWidget,
-    tempusAlarmsTableWidget, tempusEntitiesTableWidget, tempusExtensionsTableWidget, tempusRpcWidgets, tempusTypes, tempusUtils, tempusDeviceListWidget])
+    tempusAlarmsTableWidget, tempusEntitiesTableWidget, tempusExtensionsTableWidget, tempusRpcWidgets, tempusTypes, tempusUtils, tempusEntityListWidget])
     .factory('widgetService', WidgetService)
     .name;
 
