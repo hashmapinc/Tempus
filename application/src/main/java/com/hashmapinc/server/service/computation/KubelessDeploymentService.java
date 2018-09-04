@@ -17,6 +17,7 @@
 package com.hashmapinc.server.service.computation;
 
 import com.hashmapinc.kubeless.apis.KubelessV1beta1FunctionApi;
+import com.hashmapinc.kubeless.models.V1beta1AbstractType;
 import com.hashmapinc.kubeless.models.V1beta1Function;
 import com.hashmapinc.kubeless.models.V1beta1FunctionSpec;
 import com.hashmapinc.server.common.data.computation.ComputationMetadata;
@@ -27,6 +28,7 @@ import com.squareup.okhttp.Call;
 import com.squareup.okhttp.Response;
 import io.kubernetes.client.ApiClient;
 import io.kubernetes.client.ApiException;
+import io.kubernetes.client.Configuration;
 import io.kubernetes.client.models.V1ObjectMeta;
 import io.kubernetes.client.util.Config;
 import lombok.extern.slf4j.Slf4j;
@@ -71,15 +73,15 @@ public class KubelessDeploymentService implements ComputationFunctionDeploymentS
                 case TXT:
                     String textContent = convertToTxt(md.getFunctionContent());
                     md.setFunctionContent(textContent);
-                    V1beta1Function v1beta1Function = createV1beta1Function(md);
-                    Call call = functionApi.createFunctionCall(v1beta1Function);
+                    V1beta1AbstractType<V1beta1FunctionSpec> v1beta1Function = createV1beta1Function(md);
+                    Call call = functionApi.createFunctionCall((V1beta1Function)v1beta1Function);
                     Response response = call.execute();
                     resposeCode = response.code();
                     break;
                 case BASE64_ZIP:
                 case BASE64:
                     v1beta1Function = createV1beta1Function(md);
-                    call = functionApi.createFunctionCall(v1beta1Function);
+                    call = functionApi.createFunctionCall((V1beta1Function)v1beta1Function);
                     response = call.execute();
                     resposeCode = response.code();
                     break;
@@ -98,7 +100,7 @@ public class KubelessDeploymentService implements ComputationFunctionDeploymentS
     }
 
     @Override
-    public boolean checkKubelessfunction(Computations computation) {
+    public boolean checkKubelessFunction(Computations computation) {
         try {
             KubelessComputationMetadata md = (KubelessComputationMetadata)(computation.getComputationMetadata());
             KubelessV1beta1FunctionApi functionApi = getKubelessV1beta1FunctionApi(DEFAULT_NAMESPACE);
@@ -118,6 +120,25 @@ public class KubelessDeploymentService implements ComputationFunctionDeploymentS
         return true;
     }
 
+    @Override
+    public void deleteKubelessFunction(Computations computation) {
+        try {
+            KubelessComputationMetadata md = (KubelessComputationMetadata)(computation.getComputationMetadata());
+            KubelessV1beta1FunctionApi functionApi = getKubelessV1beta1FunctionApi(DEFAULT_NAMESPACE);
+
+            Call call = functionApi.deleteFunctionCall(md.getFunction());
+            Response response = call.execute();
+            if (response.code() != OK)
+                throw new TempusRuntimeException("Problem occured in deleting kubeless funtion from kubernetes.");
+        } catch (ApiException e) {
+            log.error("Kubeless api exception for fetch function : " + e);
+        } catch (IOException e) {
+            log.error("Exception occured in call execution : " + e);
+        } catch (Exception e) {
+            log.error("Exception occured : " + e);
+        }
+    }
+
     private KubelessV1beta1FunctionApi getKubelessV1beta1FunctionApi(String namespace) {
         try {
             if (kubelessV1beta1FunctionApi == null) {
@@ -125,10 +146,12 @@ public class KubelessDeploymentService implements ComputationFunctionDeploymentS
                     if (kubelessV1beta1FunctionApi == null) {
                         if (clusterModeEnabled) {
                             ApiClient client = Config.fromCluster();
-                            return new KubelessV1beta1FunctionApi(client, namespace);
+                            Configuration.setDefaultApiClient(client);
+                            return new KubelessV1beta1FunctionApi(namespace);
                         } else {
                             ApiClient client = Config.fromConfig("/home/himanshu/.kube/aws.secure.kubeconfig");
-                            return new KubelessV1beta1FunctionApi(client, namespace);
+                            Configuration.setDefaultApiClient(client);
+                            return new KubelessV1beta1FunctionApi(namespace);
                         }
                     }
                 }
@@ -143,7 +166,7 @@ public class KubelessDeploymentService implements ComputationFunctionDeploymentS
         try {
             V1ObjectMeta v1ObjectMeta = new V1ObjectMeta();
             v1ObjectMeta.setName(((KubelessComputationMetadata)computationMetadata).getFunction());
-            v1ObjectMeta.setNamespace(((KubelessComputationMetadata)computationMetadata).getNamespace());
+            v1ObjectMeta.setNamespace(DEFAULT_NAMESPACE);
             V1beta1FunctionSpec v1beta1FunctionSpec = createV1beta1FunctionSpec(computationMetadata);
             V1beta1Function v1beta1Function = new V1beta1Function();
             v1beta1Function.setMetadata(v1ObjectMeta);
@@ -160,7 +183,8 @@ public class KubelessDeploymentService implements ComputationFunctionDeploymentS
         KubelessComputationMetadata md = (KubelessComputationMetadata)computationMetadata;
         V1beta1FunctionSpec v1beta1FunctionSpec = new V1beta1FunctionSpec();
         v1beta1FunctionSpec.setFunction(md.getFunctionContent());
-        v1beta1FunctionSpec.dependencies(md.getDependencies());
+        if(md.getDependencies() != null)
+            v1beta1FunctionSpec.dependencies(md.getDependencies());
         v1beta1FunctionSpec.setHandler(md.getHandler());
         v1beta1FunctionSpec.setRuntime(md.getRuntime());
         v1beta1FunctionSpec.functionContentType(md.getFunctionContentType());

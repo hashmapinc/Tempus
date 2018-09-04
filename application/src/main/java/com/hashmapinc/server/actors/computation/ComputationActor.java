@@ -32,6 +32,8 @@ import com.hashmapinc.server.common.data.page.PageDataIterable;
 import com.hashmapinc.server.common.data.plugin.ComponentLifecycleEvent;
 import com.hashmapinc.server.common.data.plugin.ComponentLifecycleState;
 import com.hashmapinc.server.common.msg.plugin.ComponentLifecycleMsg;
+import com.hashmapinc.server.service.computation.ComputationFunctionDeploymentService;
+import com.hashmapinc.server.service.computation.KubelessDeploymentService;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -73,7 +75,7 @@ public class ComputationActor extends ContextAwareActor {
     }
 
     private void checkOrDeployKubelessFunction() {
-        boolean functionPresent = systemContext.getComputationFunctionDeploymentService().checkKubelessfunction(computation);
+        boolean functionPresent = systemContext.getComputationFunctionDeploymentService().checkKubelessFunction(computation);
         if (!functionPresent) {
             KubelessComputationMetadata md = (KubelessComputationMetadata) computation.getComputationMetadata();
             try {
@@ -130,14 +132,17 @@ public class ComputationActor extends ContextAwareActor {
     }
 
     private void handleComponentLifecycleMsgForNonExistingComputation(ComponentLifecycleMsg msg) {
+        computation = systemContext.getComputationsService().findById(computationId);
         if(msg.getEvent() != ComponentLifecycleEvent.DELETED){
-            computation = systemContext.getComputationsService().findById(computationId);
             checkOrDeployKubelessFunction();
             if(computationJobActors.isEmpty()){
                 init();
             }
             computationJobActors.forEach((k, v) -> v.tell(msg, ActorRef.noSender()));
         }else{
+            ComputationFunctionDeploymentService service = systemContext.getComputationFunctionDeploymentService();
+            service.deleteKubelessFunction(computation);
+            systemContext.getComputationsService().deleteById(computationId);
             computationJobActors.forEach((k, v) -> v.tell(msg, ActorRef.noSender()));
             context().stop(self());
         }
@@ -145,7 +150,11 @@ public class ComputationActor extends ContextAwareActor {
 
     private void handleComponentLifecycleMsgForExistingComputation(ComponentLifecycleMsg msg, ComputationJobId jobId) {
         ActorRef target;
+        computation = systemContext.getComputationsService().findById(computationId);
         if(msg.getEvent() == ComponentLifecycleEvent.DELETED){
+            ComputationFunctionDeploymentService service = systemContext.getComputationFunctionDeploymentService();
+            service.deleteKubelessFunction(computation);
+            systemContext.getComputationsService().deleteById(computationId);
             target = computationJobActors.get(jobId);
             if(target != null){
                 computationJobActors.remove(jobId);

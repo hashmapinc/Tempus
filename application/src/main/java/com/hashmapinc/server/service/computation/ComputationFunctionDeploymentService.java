@@ -20,5 +20,6 @@ import com.hashmapinc.server.common.data.computation.Computations;
 
 public interface ComputationFunctionDeploymentService {
     void deployKubelessFunction(Computations computations);
-    boolean checkKubelessfunction(Computations computation);
+    boolean checkKubelessFunction(Computations computation);
+    void deleteKubelessFunction(Computations computation);
 }

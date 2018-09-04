@@ -49,7 +49,7 @@ import java.util.List;
 @Service
 public class MinioService implements S3BucketService {
 
-    public static final String MINIO_EXECPTION = "Minio Execption ";
+    public static final String MINIO_EXECPTION = "Minio Execption {} ";
     public static final int BUFFER_SIZE = 16384;
     public static final String SHA_256 = "SHA-256";
     private volatile static MinioClient minioClient;
@@ -86,6 +86,7 @@ public class MinioService implements S3BucketService {
 
             Tenant tenant = tenantService.findTenantById(tenantId);
             String tenantName = tenant.getName().replaceAll(" ", "-").toLowerCase();
+
             boolean isExist = client.bucketExists(tenantName);
             if(!isExist) {
                 client.makeBucket(tenantName);
@@ -148,6 +149,21 @@ public class MinioService implements S3BucketService {
             log.info(MINIO_EXECPTION, e);
         }
         return null;
+    }
+
+    @Override
+    public boolean deleteKubelessFunction(Computations computation) throws IOException, NoSuchAlgorithmException, InvalidKeyException, XmlPullParserException {
+        try {
+            String functionObjectUrl = createFunctionObjectUrl(computation);
+            MinioClient client = getMinioClientInstance();
+            Tenant tenant = tenantService.findTenantById(computation.getTenantId());
+            String tenantName = tenant.getName().replaceAll(" ", "-").toLowerCase();
+            client.removeObject(tenantName, functionObjectUrl);
+            return true;
+        } catch (MinioException e) {
+            log.info(MINIO_EXECPTION, e);
+        }
+        return false;
     }
 
     private boolean checksum(KubelessComputationMetadata md) {

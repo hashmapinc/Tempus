@@ -51,6 +51,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -157,11 +158,13 @@ public class ComputationsController extends BaseController {
                 actorService.onComputationJobStateChange(computationJob.getTenantId(), computationJob.getComputationId(), computationJob.getId(), ComponentLifecycleEvent.DELETED);
             }
 
-            computationsService.deleteById(computationId);
-
-            if (computation.getType() == ComputationType.SPARK)
-                Files.deleteIfExists(Paths.get(((SparkComputationMetadata)computation.getComputationMetadata()).getJarPath()));
-
+            if (computation.getType() == ComputationType.SPARK) {
+                Files.deleteIfExists(Paths.get(((SparkComputationMetadata) computation.getComputationMetadata()).getJarPath()));
+            }
+            else if (computation.getType() == ComputationType.KUBELESS) {
+                actorService.onComputationStateChange(computation.getTenantId(), computation.getId(), ComponentLifecycleEvent.DELETED);
+                s3BucketService.deleteKubelessFunction(computation);
+            }
             logEntityAction(computationId,computation,getCurrentUser().getCustomerId(),
                     ActionType.DELETED, null, strComputationId);
         }
@@ -200,12 +203,21 @@ public class ComputationsController extends BaseController {
                 List<Computations> computations = checkNotNull(computationsService.findAllTenantComputationsByTenantId(tenantId));
                 computations = computations.stream()
                         .filter(computation -> !computation.getTenantId().getId().equals(ModelConstants.NULL_UUID)).collect(Collectors.toList());
-                for (Computations computation : computations) {
+
+                Iterator itr = computations.iterator();
+                while(itr.hasNext()){
+                    Computations computation = (Computations) itr.next();
                     if(computation.getType() == ComputationType.KUBELESS &&
-                            (!computationFunctionDeploymentService.checkKubelessfunction(computation))) {
-                        computations.remove(computation);
+                            (!computationFunctionDeploymentService.checkKubelessFunction(computation))) {
+                        itr.remove();
                     }
                 }
+//                for (Computations computation : computations) {
+//                    if(computation.getType() == ComputationType.KUBELESS &&
+//                            (!computationFunctionDeploymentService.checkKubelessFunction(computation))) {
+//                        computations.remove(computation);
+//                    }
+//                }
                 log.info(" returning Computations {} ", computations);
                 return computations;
         } catch (Exception e) {
@@ -222,7 +234,7 @@ public class ComputationsController extends BaseController {
             ComputationId computationId = new ComputationId(toUUID(strComputationId));
             Computations computation = checkNotNull(computationsService.findById(computationId));
             if(computation.getType() == ComputationType.KUBELESS
-                    && !computationFunctionDeploymentService.checkKubelessfunction(computation)) {
+                    && !computationFunctionDeploymentService.checkKubelessFunction(computation)) {
                 throw new TempusException("Kubeless fuction not present in kubernetes cluster ", ITEM_NOT_FOUND);
             }
             log.info(" returning Computations by id {} ", computation);
