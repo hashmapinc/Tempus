@@ -31,17 +31,17 @@
                     <md-card-content>
                         <section flex layout="row">
                             <md-input-container flex="40" class="md-block">
-                                <label translate>extension.topic-filter</label>
+                                <label translate>computationJob.kubeless.functionSelector-key</label>
                                 <input required name="functionSelector_key{{mapIndex}}" ng-model="map.key">
                                 <div ng-messages="theForm['functionSelector_key' + mapIndex].$error">
-                                    <div translate ng-message="required">extension.field-required</div>
+                                    <div translate ng-message="required">computationJob.kubeless.field-required</div>
                                 </div>
                             </md-input-container>
                             <md-input-container flex="60" class="md-block">
-                                <label translate>extension.topic-filter</label>
+                                <label translate>computationJob.kubeless.functionSelector-value</label>
                                 <input required name="functionSelector_value{{mapIndex}}" ng-model="map.value">
                                 <div ng-messages="theForm['functionSelector_value' + mapIndex].$error">
-                                    <div translate ng-message="required">extension.field-required</div>
+                                    <div translate ng-message="required">computationJob.kubeless.field-required</div>
                                 </div>
                             </md-input-container>
                         </section>
@@ -55,6 +55,6 @@
     <md-button class="md-primary md-raised"
                ng-click="addMap(config.functionSelector)" aria-label="{{ 'action.add' | translate }}">
         <md-icon class="material-icons">add</md-icon>
-        <span translate>extension.add-map</span>
+        <span translate>computationJob.kubeless.add-map</span>
     </md-button>
 </div>

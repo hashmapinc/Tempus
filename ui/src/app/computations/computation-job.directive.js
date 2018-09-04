@@ -24,7 +24,7 @@ import sparkComputationJobForm from './computation-job-forms/form-spark.tpl.html
 /* eslint-enable import/no-unresolved, import/default */
 
 /*@ngInject*/
-export default function ComputationJobDirective($log, $compile, $templateCache, $translate, types, toast, $stateParams, computationService) {
+export default function ComputationJobDirective($compile, $templateCache, $translate, types, toast, $stateParams, computationService) {
     var linker = function (scope, element) {
         var template = $templateCache.get(computationJobFieldsetTemplate);
         scope.sparkJobTemplate = $templateCache.get(sparkComputationJobForm);
@@ -61,18 +61,9 @@ export default function ComputationJobDirective($log, $compile, $templateCache, 
             } 
         }, true);
 
-        $log.log('computation job ', scope.computationjob);
         if (scope.computationjob && !scope.computationjob.computationJobConfiguration) {
             scope.computationjob.computationJobConfiguration = {};
         }
-
-        /*scope.$watch("computationJobConfiguration.data", function (newValue, prevValue) {
-            if (newValue && !angular.equals(newValue, prevValue)) {
-                if(scope.computationjob !=null && angular.isDefined(scope.computationjob)){
-                     scope.computationjob.argParameters = angular.copy(scope.computationJobConfiguration.data);
-                }
-            }
-        }, true);*/
 
         scope.onComputationJobIdCopied = function() {
             toast.showSuccess($translate.instant('computationJob.idCopiedMessage'), 750, angular.element(element).parent().parent(), 'bottom left');

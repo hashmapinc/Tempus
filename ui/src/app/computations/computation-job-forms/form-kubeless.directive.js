@@ -23,13 +23,13 @@ import kafkaTriggerForm from './triggers/trigger-kafka.tpl.html';
 /* eslint-enable import/no-unresolved, import/default */
 
 /*@ngInject*/
-export default function ComputationJobKubelessDirective($compile, $templateCache, $translate, types, $log) {
+export default function ComputationJobKubelessDirective($log, $compile, $templateCache, $translate, types) {
     var linker = function (scope, element) {
         var template = $templateCache.get(kubelessComputationJobForm);
         scope.sparkJobTemplate = $templateCache.get(kafkaTriggerForm);
         element.html(template);
         scope.types = types;
-        $log.log('Config is ', scope.config);
+        //TODO: Add type check
         if(!scope.config || !scope.config.functionSelector){
             scope.config = {
                 functionSelector: []
@@ -37,7 +37,6 @@ export default function ComputationJobKubelessDirective($compile, $templateCache
         }
 
         scope.addMap = function(mapping) {
-            $log.log('Mapping is ', mapping);
             var newMap = {key:"", value:""};
             mapping.push(newMap);
         };
@@ -48,6 +47,21 @@ export default function ComputationJobKubelessDirective($compile, $templateCache
                 mapping.splice(index, 1);
             }
         };
+
+        scope.$watch('config', function (newValue, oldValue) {
+            $log.log('Values New {} and Old {}', newValue, oldValue);
+            if(newValue){
+                var selectors = newValue.functionSelector;
+                if(selectors) {
+                    var result = selectors.reduce(function (map, obj) {
+                        map[obj.key] = obj.val;
+                        return map;
+                    }, {});
+                    newValue.selectors = result;
+                }
+                $log.log('Selectors ', newValue.selectors);
+            }
+        });
 
         $compile(element.contents())(scope);
     }

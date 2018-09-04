@@ -18,20 +18,20 @@
 -->
 
 <md-card-content>
-    <fieldset ng-disabled="$root.loading || !isEdit">
+    <fieldset ng-disabled="$root.loading || !isEdit || isReadOnly">
         <section flex layout="row">
             <md-input-container flex="100" class="md-block" md-is-error="theForm.computationJobType.$touched && theForm.computationJobType.$invalid">
-                <label translate>computationJob.type</label>
+                <label translate>computationJob.kubeless.type</label>
                 <md-select required name="computationJobType" ng-model="config.type">
-                    <md-option ng-repeat="(key,value) in types.computationType" ng-value="value">
-                        {{value}}
+                    <md-option ng-repeat="(key,value) in types.triggerTypes" ng-value="value">
+                        {{key}}
                     </md-option>
                 </md-select>
                 <div ng-messages="theForm.computationJobType.$error">
-                    <div translate ng-message="required">computation.type-required</div>
+                    <div translate ng-message="required">computationJob.kubeless.type-required</div>
                 </div>
             </md-input-container>
         </section>
-        <ng-include src="'computations/computation-job-forms/triggers/trigger-kafka.tpl.html'"/>
+        <ng-include ng-if="config.type === types.triggerTypes.Kafka" src="'computations/computation-job-forms/triggers/trigger-kafka.tpl.html'"/>
     </fieldset>
 </md-card-content>

@@ -1202,7 +1202,7 @@ export default angular.module('tempus.locale', [])
                     "computationJob-details": "Computation Job details",
                     "api-token": "API token",
                     "api-token-required": "API token is required.",
-                    "type": "Plugin type",
+                    "type": "Computation Job type",
                     "type-required": "Computation Job type is required.",
                     "configuration": "Computation Job configuration",
                     "system": "System",
@@ -1220,8 +1220,14 @@ export default angular.module('tempus.locale', [])
                     "computationJob-file": "Computation Job file",
                     "invalid-computationJob-file-error": "Unable to import Computation Job: Invalid Computation Job data structure.",
                     "copyId": "Copy Computation Job Id",
-                    "idCopiedMessage": "Computation Job Id has been copied to clipboard"
-
+                    "idCopiedMessage": "Computation Job Id has been copied to clipboard",
+                    "kubeless": {
+                        "functionSelector-key": "Label",
+                        "functionSelector-value": "Selector",
+                        "field-required": "Field is required",
+                        "add-map": "Add Selector",
+                        "type": "Trigger Type"
+                    }
                 },
                 "position": {
                     "top": "Top",
