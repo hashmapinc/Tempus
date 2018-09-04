@@ -15,7 +15,6 @@
  * limitations under the License.
  */
 
-import './assign-detail.scss';
 import uiRouter from 'angular-ui-router';
 import tempusGrid from '../components/grid.directive';
 import tempusApiUser from '../api/user.service';

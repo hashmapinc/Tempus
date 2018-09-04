@@ -15,7 +15,6 @@
  * limitations under the License.
  */
 //mport './audit-log.scss';
-import './assign-detail.scss';
 import './user-fieldset.scss';
 /* eslint-disable import/no-unresolved, import/default */
 import assignDetailTemplate from './assign-user-group-detail.tpl.html';
