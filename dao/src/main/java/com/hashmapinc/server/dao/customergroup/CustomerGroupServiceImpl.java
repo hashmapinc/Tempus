@@ -210,7 +210,7 @@ public class CustomerGroupServiceImpl extends AbstractEntityService implements C
         Map<String, Map<String, String> > displayablePermissions = new HashMap<>();
         userPermissions.forEach(userPermission -> {
             Map<String, String> attrs = new HashMap<>();
-            boolean isAccessedToSingleResource = !userPermission.getResources().isEmpty() || userPermission.getResources().size() == 1;
+            boolean isAccessedToSingleResource = !userPermission.getResources().isEmpty() && userPermission.getResources().size() == 1;
             if(isAccessedToSingleResource) {
                 EntityType entityType = (EntityType) userPermission.getResources().toArray()[0];
 
