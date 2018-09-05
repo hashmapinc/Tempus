@@ -24,12 +24,13 @@ import metadataSourceFieldsetTemplate from './metadata-source-fieldset.tpl.html'
 export default function MetadataSourceDirective($compile, $templateCache, $translate, types, metadataService, toast) {
 
     var linker = function(scope, element) {
-
+    
         var template = $templateCache.get(metadataSourceFieldsetTemplate);
         element.html(template);
 
         scope.types = types;
         scope.theForm = scope.$parent.theForm;
+        $log.log(scope.source);
 
         $compile(element.contents())(scope);
 

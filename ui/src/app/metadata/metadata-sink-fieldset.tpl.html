@@ -22,7 +22,7 @@
             <div class="tb-container" ng-class="{'ng-invalid':!model.importData}">
                 <md-input-container class="md-block">
                     <label translate>metadata.restUrl</label>
-                    <input required name="restUrl" ng-model="data.name">
+                    <input required name="restUrl" ng-model="sink.url">
                     <div ng-messages="theForm.name.$error">
                         <div translate ng-message="required">metadata.restUrl-required</div>
                     </div>

@@ -36,6 +36,7 @@ function MetadataService($http, $q, $filter, utils) {
         deleteMetadataQuery: deleteMetadataQuery,
         testMetadataConfig: testMetadataConfig
         getAllTenantMetadata :getAllTenantMetadata
+        deleteMetadata: deleteMetadata
 
     }
 
@@ -73,7 +74,6 @@ function MetadataService($http, $q, $filter, utils) {
         return deferred.promise;
     }
 
-<<<<<<< 9134fe7636f6cdfc6c6da21cdc06d82e1926546c
     function getAllTenantMetadata(pageLink) {
         $log.log(pageLink);
         var deferred = $q.defer();
@@ -130,7 +130,6 @@ function MetadataService($http, $q, $filter, utils) {
         });
         return deferred.promise;
     }
-
 
     /**
      * Save Metadata configuration details.
