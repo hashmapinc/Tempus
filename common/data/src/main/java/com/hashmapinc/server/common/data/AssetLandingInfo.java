@@ -14,22 +14,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.hashmapinc.server.dao.service.sql;
+package com.hashmapinc.server.common.data;
 
-import com.datastax.driver.core.utils.UUIDs;
-import com.hashmapinc.server.common.data.AssetLandingInfo;
-import com.hashmapinc.server.common.data.Dashboard;
-import com.hashmapinc.server.common.data.DashboardType;
 import com.hashmapinc.server.common.data.id.DashboardId;
 import com.hashmapinc.server.common.data.id.DataModelId;
 import com.hashmapinc.server.common.data.id.DataModelObjectId;
-import com.hashmapinc.server.dao.service.DaoSqlTest;
-import com.hashmapinc.server.dao.service.BaseDashboardServiceTest;
-import org.junit.Assert;
-import org.junit.Test;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 
-import java.util.List;
+import java.io.Serializable;
 
-@DaoSqlTest
-public class DashboardServiceSqlTest extends BaseDashboardServiceTest {
+@Data
+@NoArgsConstructor
+@EqualsAndHashCode
+public class AssetLandingInfo implements Serializable{
+    private static final long serialVersionUID = 8142208716716668541L;
+
+    private DashboardId dashboardId;
+    private DataModelId dataModelId;
+    private DataModelObjectId dataModelObjectId;
+
+    public AssetLandingInfo(DashboardId dashboardId){
+        this.dashboardId = dashboardId;
+    }
 }

@@ -14,31 +14,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.hashmapinc.server.dao.dashboard;
+package com.hashmapinc.server.common.data;
 
-import com.hashmapinc.server.common.data.Dashboard;
-import com.hashmapinc.server.dao.Dao;
-
-import java.util.List;
-import java.util.UUID;
-
-/**
- * The Interface DashboardDao.
- */
-public interface DashboardDao extends Dao<Dashboard> {
-
-    /**
-     * Save or update dashboard object
-     *
-     * @param dashboard the dashboard object
-     * @return saved dashboard object
-     */
-    Dashboard save(Dashboard dashboard);
-
-    List<Dashboard>
-
-
-
-    findDashboardByDataModelObjectId(UUID dataModelObjectId);
-
+public enum DashboardType {
+    ASSET_LANDING_PAGE, DEFAULT
 }

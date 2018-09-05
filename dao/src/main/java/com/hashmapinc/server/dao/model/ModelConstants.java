@@ -316,8 +316,17 @@ public class ModelConstants {
     public static final String DASHBOARD_TITLE_PROPERTY = TITLE_PROPERTY;
     public static final String DASHBOARD_CONFIGURATION_PROPERTY = "configuration";
     public static final String DASHBOARD_ASSIGNED_CUSTOMERS_PROPERTY = "assigned_customers";
+    public static final String DASHBOARD_TYPE_PROPERTY = "type";
 
     public static final String DASHBOARD_BY_TENANT_AND_SEARCH_TEXT_COLUMN_FAMILY_NAME = "dashboard_by_tenant_and_search_text";
+
+    /**
+     * Cassandra asset landing dashboard constants.
+     */
+    public static final String ASSET_LANDING_COLUMN_FAMILY_NAME = "asset_landing_info";
+    public static final String ASSET_LANDING_VIEW_BY_DATA_MODEL_OBJ_ID = "asset_landing_info_by_data_model_object_id";
+    public static final String ASSET_LANDING_DATA_MODEL_ID = "data_model_id";
+    public static final String ASSET_LANDING_DATAMODEL_OBJECT_ID = "data_model_object_id";
 
     /**
      * Cassandra plugin metadata constants.
