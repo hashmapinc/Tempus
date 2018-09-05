@@ -19,7 +19,7 @@ export default angular.module('tempus.api.attribute', [])
     .name;
 
 /*@ngInject*/
-function AttributeService($http, $q, $filter, types, telemetryWebsocketService) {
+function AttributeService($http, $q, $filter, types, telemetryWebsocketService,$log) {
 
     var entityAttributesSubscriptionMap = {};
 
@@ -262,6 +262,9 @@ function AttributeService($http, $q, $filter, types, telemetryWebsocketService) 
         if (deleteAttributes.length) {
             deleteEntityAttributesPromise = deleteEntityAttributes(entityType, entityId, attributeScope, deleteAttributes);
         }
+        $log.log("attributesData")
+        $log.log(attributesData);
+        $log.log(Object.keys(attributesData).length)
         if (Object.keys(attributesData).length) {
             var url = '/api/plugins/telemetry/' + entityType + '/' + entityId + '/' + attributeScope;
             $http.post(url, attributesData).then(function success(response) {

@@ -73,7 +73,7 @@ position: fixed;">
                             </tr>
                             </thead>
                             <tbody md-body>
-                            <tr md-row  ng-repeat="list in devices.data">
+                            <tr md-row  ng-repeat="list in entityList.data">
                                 <td md-cell><a href ng-click="vm.deviceDetailFunc($event,list)">{{list.name}}</a></td>
                                 <td md-cell style="text-transform: uppercase">{{list.type}}</td>
                             </tr>
@@ -85,7 +85,7 @@ position: fixed;">
     <mat-divider></mat-divider>
     <mat-list-item ng-if="showList">
         <md-table-pagination class ="tb-device-container dash-cont"  md-limit="query.limit" md-limit-options="[5, 10, 15]"
-                md-page="query.page" md-total="{{devices.count}}"
+                md-page="query.page" md-total="{{entityList.count}}"
                 md-on-paginate="onPaginate" md-page-select>
         </md-table-pagination>
     </mat-list-item>

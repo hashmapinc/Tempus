@@ -33,7 +33,8 @@ function AssetService($http, $q, customerService, userService) {
         getCustomerAssets: getCustomerAssets,
         findByQuery: findByQuery,
         fetchAssetsByNameFilter: fetchAssetsByNameFilter,
-        getAssetTypes: getAssetTypes
+        getAssetTypes: getAssetTypes,
+        getAssetByObjectId: getAssetByObjectId
     }
 
     return service;
@@ -269,6 +270,21 @@ function AssetService($http, $q, customerService, userService) {
     function getAssetTypes(config) {
         var deferred = $q.defer();
         var url = '/api/asset/types';
+        $http.get(url, config).then(function success(response) {
+            deferred.resolve(response.data);
+        }, function fail() {
+            deferred.reject();
+        });
+        return deferred.promise;
+    }
+
+    function getAssetByObjectId(dataObjectId,ignoreErrors, config) {
+        var deferred = $q.defer();
+        var url = '/api/datamodelobject/assets/' + dataObjectId;
+        if (!config) {
+            config = {};
+        }
+        config = Object.assign(config, { ignoreErrors: ignoreErrors });
         $http.get(url, config).then(function success(response) {
             deferred.resolve(response.data);
         }, function fail() {

@@ -78,19 +78,20 @@
                                     <label translate>asset.description</label>
                                     <textarea  rows="2" ng-model="vm.description"></textarea>
                                 </md-input-container>
-                                <md-input-container class="md-block" ng-if="vm.showParent">
-                                    <label style="margin-bottom: 10px;">Child of : {{vm.parentName}} </label>
-                                </md-input-container>
-                                <md-input-container class="md-block" ng-if="vm.showParent">
-                                        <md-select  placeholder="Assign asset" ng-model="associatedAsset" style="min-width: 200px;">
-                                                <md-option ng-value="asset" ng-repeat="asset in vm.assetList">{{asset.name}}</md-option>
-                                        </md-select>
-                                    </md-input-container>
                                 <md-input-container class="md-block" ng-if="vm.showCustList">
-                                    <md-select placeholder="Assign to user" ng-model="vm.user"  style="min-width: 200px;margin-top: 20px;">
+                                    <md-select placeholder="Assign to user" ng-model="vm.user"  style="min-width: 200px;" ng-disabled="vm.disableFlag">
                                         <md-option ng-value="user" ng-repeat="user in vm.users">{{user.name}}</md-option>
                                       </md-select>
                                 </md-input-container>
+                                <md-input-container class="md-block" ng-if="vm.showParent" style="margin-top: 30px;">
+                                    <label style="margin-bottom: 10px;">Child of : {{vm.parentName}} </label>
+                                </md-input-container>
+                                <md-input-container class="md-block" ng-if="vm.showParent">
+                                        <md-select  placeholder="Assign relation" md-on-open="vm.loadrelationModel()" ng-model="vm.associatedAsset" style="min-width: 200px;margin-top: 20px">
+                                                <md-option ng-value="asset" ng-repeat="asset in vm.assetList">{{asset.name}}</md-option>
+                                        </md-select>
+                                </md-input-container>
+                                
                             </fieldset>
                   </md-content>
                 </md-tab>
