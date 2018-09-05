@@ -56,6 +56,9 @@ public class UserPermission {
 
         this.subject = new EnumUtil<>(Authority.class).parse(expressionTokens[0]);
 
+        if(this.subject == null){
+            throw new IllegalArgumentException(String.format("Invalid Subject :[%s] in user permission expression", expressionTokens[0]));
+        }
 
         String[] resourcesExpression = expressionTokens[1].split("\\?", 2);
 
@@ -69,18 +72,37 @@ public class UserPermission {
         if(expressionTokens[2].trim().equals("*"))
             this.userActions = Arrays.asList(UserAction.values());
         else {
-            this.userActions = Collections.singletonList(new EnumUtil<>(UserAction.class).parse(expressionTokens[2]));
+            UserAction userAction = new EnumUtil<>(UserAction.class).parse(expressionTokens[2]);
+            if(userAction == null){
+                throw new IllegalArgumentException(String.format("Invalid User Action : [%s] in user permission expression", expressionTokens[2]));
+            }
+            this.userActions = Collections.singletonList(userAction);
         }
     }
 
-    private static Map<ResourceAttribute, String> getQueryAttributes(String query)
+    private Map<ResourceAttribute, String> getQueryAttributes(String query)
     {
         String[] params = query.split("&");
         Map<ResourceAttribute, String> map = new HashMap<>();
         for (String param : params)
         {
             String[] keyAndVal = param.split("=");
-            map.put(ResourceAttribute.fromString(keyAndVal[0].trim()), keyAndVal[1].trim());
+            if(keyAndVal.length != 2){
+                throw new IllegalArgumentException("Invalid user permission expression !!");
+            }
+            String attrNameStr = keyAndVal[0].trim();
+            String attrValStr = keyAndVal[1].trim();
+            ResourceAttribute resourceAttribute = ResourceAttribute.fromString(attrNameStr);
+            if(resourceAttribute == null){
+                throw new IllegalArgumentException(String.format(
+                        "Invalid user permission expression, %s is not valid resource attribute, valid attributes are [%s]",
+                        attrNameStr, Arrays.toString(ResourceAttribute.values())));
+            }
+            if(attrValStr.isEmpty()){
+                throw new IllegalArgumentException(String.format(
+                        "Invalid user permission expression, empty value for resource attribute %s", attrNameStr));
+            }
+            map.put(resourceAttribute, attrValStr);
         }
         return map;
     }
