@@ -125,6 +125,7 @@ public class CustomerGroupServiceImpl extends AbstractEntityService implements C
     public CustomerGroup saveCustomerGroup(CustomerGroup customerGroup) {
         log.trace("Executing saveCustomerGroup [{}]", customerGroup);
         customerGroupValidator.validate(customerGroup);
+        customerGroup.setPolicies(customerGroup.getPolicies().stream().distinct().collect(Collectors.toList()));
         CustomerGroup savedCustomerGroup = customerGroupDao.save(customerGroup);
         savedCustomerGroup.setUserIds(findUserIdsByCustomerGroupId(savedCustomerGroup.getId()));
         return savedCustomerGroup;
@@ -317,6 +318,15 @@ public class CustomerGroupServiceImpl extends AbstractEntityService implements C
                             throw new DataValidationException("Customer Group is referencing to non-existent Customer!");
                         } else if (!customer.getTenantId().getId().equals(customerGroup.getTenantId().getId())) {
                             throw new DataValidationException("Customer Group can't be assigned to customer from different tenant!");
+                        }
+                    }
+
+                    List<String> policies = customerGroup.getPolicies();
+                    for(String policyExpression : policies){
+                        try{
+                            UserPermission userPermission = new UserPermission(policyExpression); //NOSONAR
+                        } catch (IllegalArgumentException e){
+                            throw new DataValidationException(e.getMessage());
                         }
                     }
                 }
