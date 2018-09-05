@@ -57,13 +57,12 @@ public class KubelessDeploymentService implements ComputationFunctionDeploymentS
     @Value("${kubeless.kube_config_path}")
     private String kublessConfigPath;
 
-
     private static volatile  KubelessV1beta1FunctionApi kubelessV1beta1FunctionApi;
 
     private Base64.Decoder decoder = Base64.getDecoder();
 
     @Override
-    public void deployKubelessFunction(Computations computation) {
+    public boolean deployKubelessFunction(Computations computation) {
         try {
             KubelessV1beta1FunctionApi functionApi = getKubelessV1beta1FunctionApi(DEFAULT_NAMESPACE);
             KubelessComputationMetadata md = (KubelessComputationMetadata) computation.getComputationMetadata();
@@ -89,14 +88,17 @@ public class KubelessDeploymentService implements ComputationFunctionDeploymentS
                         break;
             }
 
-            if ( resposeCode != CREATED)
-                throw new TempusRuntimeException("Function was not deployed!!");
+            if ( resposeCode != CREATED) {
+                log.info("Function was not deployed!!");
+                return false;
+            }
         }
         catch (ApiException e){
             log.info("Kubeless api e.kubeconfigxception for deploy funtion : {}", e);
         } catch (IOException e) {
             log.info("");
         }
+        return true;
     }
 
     @Override
@@ -121,15 +123,17 @@ public class KubelessDeploymentService implements ComputationFunctionDeploymentS
     }
 
     @Override
-    public void deleteKubelessFunction(Computations computation) {
+    public boolean deleteKubelessFunction(Computations computation) {
         try {
             KubelessComputationMetadata md = (KubelessComputationMetadata)(computation.getComputationMetadata());
             KubelessV1beta1FunctionApi functionApi = getKubelessV1beta1FunctionApi(DEFAULT_NAMESPACE);
 
             Call call = functionApi.deleteFunctionCall(md.getFunction());
             Response response = call.execute();
-            if (response.code() != OK)
-                throw new TempusRuntimeException("Problem occured in deleting kubeless funtion from kubernetes.");
+            if (response.code() != OK) {
+                log.info("Problem occured in deleting kubeless funtion from kubernetes!!!");
+                return false;
+            }
         } catch (ApiException e) {
             log.error("Kubeless api exception for fetch function : " + e);
         } catch (IOException e) {
@@ -137,6 +141,7 @@ public class KubelessDeploymentService implements ComputationFunctionDeploymentS
         } catch (Exception e) {
             log.error("Exception occured : " + e);
         }
+        return true;
     }
 
     private KubelessV1beta1FunctionApi getKubelessV1beta1FunctionApi(String namespace) {
@@ -182,13 +187,15 @@ public class KubelessDeploymentService implements ComputationFunctionDeploymentS
     private V1beta1FunctionSpec createV1beta1FunctionSpec(ComputationMetadata computationMetadata) {
         KubelessComputationMetadata md = (KubelessComputationMetadata)computationMetadata;
         V1beta1FunctionSpec v1beta1FunctionSpec = new V1beta1FunctionSpec();
-        v1beta1FunctionSpec.setFunction(md.getFunctionContent());
+        byte[] funcBytes = decoder.decode(md.getFunctionContent());
+        String funcContent = new String(funcBytes);
+        v1beta1FunctionSpec.setFunction(funcContent);
         if(md.getDependencies() != null)
             v1beta1FunctionSpec.dependencies(md.getDependencies());
         v1beta1FunctionSpec.setHandler(md.getHandler());
         v1beta1FunctionSpec.setRuntime(md.getRuntime());
-        v1beta1FunctionSpec.functionContentType(md.getFunctionContentType());
-        v1beta1FunctionSpec.setChecksum(md.getChecksum());
+        v1beta1FunctionSpec.functionContentType("text");
+        //v1beta1FunctionSpec.setChecksum(md.getChecksum());
         v1beta1FunctionSpec.setTimeout(md.getTimeout());
         return v1beta1FunctionSpec;
     }

@@ -33,7 +33,6 @@ import com.hashmapinc.server.common.data.plugin.ComponentLifecycleEvent;
 import com.hashmapinc.server.common.data.plugin.ComponentLifecycleState;
 import com.hashmapinc.server.common.msg.plugin.ComponentLifecycleMsg;
 import com.hashmapinc.server.service.computation.ComputationFunctionDeploymentService;
-import com.hashmapinc.server.service.computation.KubelessDeploymentService;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -67,9 +66,7 @@ public class ComputationActor extends ContextAwareActor {
         if(computation == null){
             throw new ComputationInitializationException("Computation not found!");
         }
-        if(computation.getType() == ComputationType.KUBELESS) {
-            checkOrDeployKubelessFunction();
-        }
+        handleComponentLifecycleMsgForComputationType();
         init();
         logger.info("[{}][{}] Started computation actor.", computation, tenantId);
     }
@@ -84,7 +81,8 @@ public class ComputationActor extends ContextAwareActor {
                     throw new ComputationInitializationException("Kubeless Computation function not found!");
                 } else {
                     md.setFunctionContent(functionContent);
-                    systemContext.getComputationFunctionDeploymentService().deployKubelessFunction(computation);
+                    if(!systemContext.getComputationFunctionDeploymentService().deployKubelessFunction(computation))
+                        systemContext.getComputationsService().deleteById(computationId);
                 }
             } catch (Exception e ){
                 logger.info("Exeption occured while deploying kubeless function : ", e);
@@ -134,17 +132,22 @@ public class ComputationActor extends ContextAwareActor {
     private void handleComponentLifecycleMsgForNonExistingComputation(ComponentLifecycleMsg msg) {
         computation = systemContext.getComputationsService().findById(computationId);
         if(msg.getEvent() != ComponentLifecycleEvent.DELETED){
-            checkOrDeployKubelessFunction();
+            handleComponentLifecycleMsgForComputationType();
             if(computationJobActors.isEmpty()){
                 init();
             }
             computationJobActors.forEach((k, v) -> v.tell(msg, ActorRef.noSender()));
         }else{
             ComputationFunctionDeploymentService service = systemContext.getComputationFunctionDeploymentService();
-            service.deleteKubelessFunction(computation);
-            systemContext.getComputationsService().deleteById(computationId);
+            handleDeleteMsgForComputationType();
             computationJobActors.forEach((k, v) -> v.tell(msg, ActorRef.noSender()));
             context().stop(self());
+        }
+    }
+
+    private void handleComponentLifecycleMsgForComputationType() {
+        if (computation != null && computation.getType() == ComputationType.KUBELESS) {
+            checkOrDeployKubelessFunction();
         }
     }
 
@@ -152,9 +155,7 @@ public class ComputationActor extends ContextAwareActor {
         ActorRef target;
         computation = systemContext.getComputationsService().findById(computationId);
         if(msg.getEvent() == ComponentLifecycleEvent.DELETED){
-            ComputationFunctionDeploymentService service = systemContext.getComputationFunctionDeploymentService();
-            service.deleteKubelessFunction(computation);
-            systemContext.getComputationsService().deleteById(computationId);
+            handleDeleteMsgForComputationType();
             target = computationJobActors.get(jobId);
             if(target != null){
                 computationJobActors.remove(jobId);
@@ -168,6 +169,14 @@ public class ComputationActor extends ContextAwareActor {
                 target = computationJobActors.get(jobId);
                 target.tell(msg, ActorRef.noSender());
             }
+        }
+    }
+
+    private void handleDeleteMsgForComputationType() {
+        if (computation != null && computation.getType() == ComputationType.KUBELESS) {
+            ComputationFunctionDeploymentService service = systemContext.getComputationFunctionDeploymentService();
+            if (service.deleteKubelessFunction(computation))
+                systemContext.getComputationsService().deleteById(computationId);
         }
     }
 

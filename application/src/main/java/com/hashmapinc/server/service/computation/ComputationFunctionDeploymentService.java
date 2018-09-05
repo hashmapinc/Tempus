@@ -19,7 +19,7 @@ package com.hashmapinc.server.service.computation;
 import com.hashmapinc.server.common.data.computation.Computations;
 
 public interface ComputationFunctionDeploymentService {
-    void deployKubelessFunction(Computations computations);
+    boolean deployKubelessFunction(Computations computations);
     boolean checkKubelessFunction(Computations computation);
-    void deleteKubelessFunction(Computations computation);
+    boolean deleteKubelessFunction(Computations computation);
 }

@@ -118,17 +118,14 @@ public class ComputationsController extends BaseController {
             TenantId tenantId = getCurrentUser().getTenantId();
             computation.setTenantId(tenantId);
             Optional<Computations> savedComputation = computationsService.findByTenantIdAndName(tenantId, computation.getName());
-            if(!savedComputation.isPresent()){
+            if(!savedComputation.isPresent()) {
                 ComputationId computationId = new ComputationId(UUIDs.timeBased());
                 computation.setId(computationId);
                 computation.getComputationMetadata().setId(computationId);
-            } else {
-                computation.setId(savedComputation.get().getId());
-                computation.getComputationMetadata().setId(savedComputation.get().getId());
-            }
-            if(s3BucketService.uploadKubelessFunction(computation, tenantId)) {
-                computationsService.save(computation);
-                actorService.onComputationStateChange(tenantId, computation.getId(), ComponentLifecycleEvent.CREATED);
+                if (s3BucketService.uploadKubelessFunction(computation, tenantId)) {
+                    computationsService.save(computation);
+                    actorService.onComputationStateChange(tenantId, computation.getId(), ComponentLifecycleEvent.CREATED);
+                }
             }
             else
                 throw new TempusException("Kubeless function upload unsuccessful ", TempusErrorCode.GENERAL);
@@ -158,9 +155,8 @@ public class ComputationsController extends BaseController {
                 actorService.onComputationJobStateChange(computationJob.getTenantId(), computationJob.getComputationId(), computationJob.getId(), ComponentLifecycleEvent.DELETED);
             }
 
-            if (computation.getType() == ComputationType.SPARK) {
-                Files.deleteIfExists(Paths.get(((SparkComputationMetadata) computation.getComputationMetadata()).getJarPath()));
-            }
+            if (computation.getType() == ComputationType.SPARK)
+                Files.deleteIfExists(Paths.get(((SparkComputationMetadata)computation.getComputationMetadata()).getJarPath()));
             else if (computation.getType() == ComputationType.KUBELESS) {
                 actorService.onComputationStateChange(computation.getTenantId(), computation.getId(), ComponentLifecycleEvent.DELETED);
                 s3BucketService.deleteKubelessFunction(computation);
@@ -203,7 +199,6 @@ public class ComputationsController extends BaseController {
                 List<Computations> computations = checkNotNull(computationsService.findAllTenantComputationsByTenantId(tenantId));
                 computations = computations.stream()
                         .filter(computation -> !computation.getTenantId().getId().equals(ModelConstants.NULL_UUID)).collect(Collectors.toList());
-
                 Iterator itr = computations.iterator();
                 while(itr.hasNext()){
                     Computations computation = (Computations) itr.next();
@@ -212,12 +207,6 @@ public class ComputationsController extends BaseController {
                         itr.remove();
                     }
                 }
-//                for (Computations computation : computations) {
-//                    if(computation.getType() == ComputationType.KUBELESS &&
-//                            (!computationFunctionDeploymentService.checkKubelessFunction(computation))) {
-//                        computations.remove(computation);
-//                    }
-//                }
                 log.info(" returning Computations {} ", computations);
                 return computations;
         } catch (Exception e) {
