@@ -24,6 +24,7 @@ import com.hashmapinc.server.common.data.Tenant;
 import com.hashmapinc.server.common.data.User;
 import com.hashmapinc.server.common.data.asset.Asset;
 import com.hashmapinc.server.common.data.id.CustomerId;
+import com.hashmapinc.server.common.data.id.DataModelObjectId;
 import com.hashmapinc.server.common.data.page.TextPageData;
 import com.hashmapinc.server.common.data.page.TextPageLink;
 import com.hashmapinc.server.common.data.security.Authority;
@@ -615,6 +616,29 @@ public abstract class BaseAssetControllerTest extends AbstractControllerTest {
                 new TypeReference<TextPageData<Asset>>(){}, pageLink, type2);
         Assert.assertFalse(pageData.hasNext());
         Assert.assertEquals(0, pageData.getData().size());
+    }
+
+    @Test
+    public void testFindAssetsByDataModelObjectId() throws Exception {
+
+        Asset asset = new Asset();
+        DataModelObjectId dataModelObjectId = new DataModelObjectId(UUIDs.timeBased());
+        asset.setDataModelObjectId(dataModelObjectId);
+        asset.setName("My asset");
+        asset.setType("default");
+
+        Asset asset2 = new Asset();
+        asset2.setDataModelObjectId(dataModelObjectId);
+        asset2.setName("My asset2");
+        asset2.setType("default");
+
+        Asset savedAsset = doPost("/api/asset", asset, Asset.class);
+        Asset savedAsset2 = doPost("/api/asset", asset2, Asset.class);
+
+        List<Asset> foundAsset = doGetTyped("/api/datamodelobject/assets/" + savedAsset.getDataModelObjectId().getId().toString(), new TypeReference<List<Asset>>(){});
+
+        Assert.assertNotNull(foundAsset);
+        Assert.assertEquals(2, foundAsset.size());
     }
 
 }
