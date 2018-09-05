@@ -16,3 +16,4 @@
 --
 
 ALTER TABLE tempus.dashboard ADD type text;
+ALTER TABLE tempus.asset ADD data_model_object_id timeuuid;
