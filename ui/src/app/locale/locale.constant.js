@@ -1472,14 +1472,22 @@ export default angular.module('tempus.locale', [])
                 "policy" : {
                     "policy": "POLICY",
                     "entityType": "Entity Type",
-                    "entity": "Entity",
+                    "entity": "Entity Name",
                     "accessLevel" :"Access Level",
                     "add" :"Add Policy",
                     "edit": "Edit Policy",
                     "access-level": "Access Level",
-                    "field-required": "Field is required"
+                    "field-required": "Field is required",
+                    "datamodel-object":"Data Model Object",
+                    "delete":"Delete Policy",
+                    "selected-policy":"{ count, select, 1 {1 policy} other {# policy} } selected",
+                    "delete-policy-title": "Are you sure you want to delete the policy?",
+                    "delete-policy-text": "Be careful, after the confirmation the policy and all related data will become unrecoverable.",
+                     "delete-policies-title": "Are you sure you want to delete { count, select, 1 {1 policy} other {# policies} }?",
+                     "delete-policies-text": "Be careful, after the confirmation all selected policies will be removed.",
+                     "no-data":"NO DATA AVAILABLE"
 
-                },
+                    },
 
                 "value": {
                     "type": "Value type",

@@ -408,16 +408,17 @@ export default angular.module('tempus.types', [])
                 witsml: "WITSML"
             },
             permissionType: {
-                'create': "CREATE",
-                'read': "READ",
-                'update': "UPDATE",
-                'delete': "DELETE",
-                'assign': "ASSIGN",
-                '*':"ALL"
+                '*':"ALL",
+                'ASSIGN': "ASSIGN",
+                'CREATE': "CREATE",
+                'DELETE': "DELETE",
+                'READ': "READ",
+                'UPDATE': "UPDATE",
             },
            entityTypes: {
-                'asset': "ASSET",
-                'device': "DEVICE"
+                'ALL':'ALL',
+                'ASSET': "ASSET",
+                'DEVICE': "DEVICE"
             },
             extensionValueType: {
                 string: 'value.string',

@@ -41,7 +41,7 @@
                             <md-input-container flex="40" class="md-block" md-is-error="theForm.entityType.$touched && theForm.entityType.$invalid">
                                 <label translate>policy.entityType</label>
 
-                                <md-select ng-disabled="!vm.isAdd" required name="entityType" ng-change="vm.extensionTypeChange()" ng-model="vm.entity.type">
+                                <md-select ng-disabled="!vm.isAdd" required name="entityType" ng-change="vm.entityTypeChange()" ng-model="vm.entity.type">
                                     <md-option ng-repeat="(key,value) in vm.types.entityTypes" ng-value="value">
                                         {{value}}
                                     </md-option>
@@ -52,25 +52,48 @@
                                 </div>
                             </md-input-container>
 
-                            <md-input-container flex="40" class="md-block" md-is-error="theForm.extensionType.$touched && theForm.extensionType.$invalid">
-                                <label translate>policy.entity</label>
+                            <!--<md-input-container flex="40" class="md-block" md-is-error="theForm.entityValues.$touched && theForm.entityValues.$invalid">-->
+                                <!--<label translate>policy.entity</label>-->
 
-                                <md-select ng-disabled="!vm.isAdd" required name="extensionType" ng-change="vm.extensionTypeChange()" ng-model="vm.extension.type">
-                                    <md-option ng-repeat="(key,value) in vm.types.extensionType" ng-value="value">
-                                        {{value}}
-                                    </md-option>
+                                <!--<md-select  required ng-model="selectedUser" ng-change="vm.entityChange()">-->
+                                    <!--<md-option ng-value="val.id" ng-repeat="val in vm.entityValues">{{ val.name }}</md-option>-->
+                                <!--</md-select>-->
+
+                                <!--<div ng-messages="theForm.extensionType.$error">-->
+                                    <!--<div translate ng-message="required">policy.field-required</div>-->
+                                <!--</div>-->
+                            <!--</md-input-container>-->
+
+                            <md-input-container flex="40" class="md-block" md-is-error="theForm.dataModelObject.$touched && theForm.dataModelObject.$invalid">
+                                <label translate>policy.datamodel-object</label>
+
+                                <md-select ng-disabled="vm.entity.type == 'ALL'" required ng-model="vm.dataModelObject" ng-change="vm.dataModelObjectChange()">
+                                    <md-option ng-selected="{{ vm.entity.type === 'ALL' ? 'true' : 'false' }}" ng-value="key" ng-repeat="(key,value) in vm.dataModelObjectValues">{{ value }}</md-option>
                                 </md-select>
 
-                                <div ng-messages="theForm.extensionType.$error">
+                                <div ng-messages="theForm.dataModelObject.$error">
                                     <div translate ng-message="required">policy.field-required</div>
                                 </div>
                             </md-input-container>
+
+                            <md-input-container flex="40" class="md-block" md-is-error="theForm.entityValues.$touched && theForm.entityValues.$invalid">
+                                <label translate>policy.entity</label>
+
+                                <md-select ng-disabled="vm.dataModelObject == 'ALL' || vm.entity.type == 'ALL'" required ng-model="vm.entity.values">
+                                    <md-option ng-selected="{{ vm.entity.type === 'ALL' || vm.dataModelObject == 'ALL' ? 'true' : 'false' }}" ng-value="key" ng-repeat="(key,value) in vm.entityValues">{{ value }}</md-option>
+                                </md-select>
+
+                                <div ng-messages="theForm.entityValues.$error">
+                                    <div translate ng-message="required">policy.field-required</div>
+                                </div>
+                            </md-input-container>
+
 
                             <md-input-container flex="40" class="md-block" md-is-error="theForm.permissionType.$touched && theForm.extensionType.$invalid">
                                 <label translate>policy.access-level</label>
 
                                 <md-select ng-disabled="!vm.isAdd" required name="permissionType" ng-change="vm.extensionTypeChange()" ng-model="vm.permission.type">
-                                    <md-option ng-repeat="(key,value) in vm.types.permissionType" ng-value="value">
+                                    <md-option ng-repeat="(key,value) in vm.types.permissionType" ng-value="key">
                                         {{value}}
                                     </md-option>
                                 </md-select>
