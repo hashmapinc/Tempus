@@ -65,8 +65,9 @@ public abstract class AbstractPermissionMatcher implements PermissionMatcher {
             return resourceAttributes.entrySet().stream().allMatch(entry -> {
                 switch (entry.getKey()) {
                     case DATA_MODEL_ID:
-                        return entry.getValue().equals(assetResource.getDataModelObjectId().getId().toString())
-                                || getParentsOf(assetResource.getDataModelObjectId()).contains(entry.getValue());
+                        return assetResource.getDataModelObjectId() != null
+                                && (entry.getValue().equals(assetResource.getDataModelObjectId().getId().toString())
+                                || getParentsOf(assetResource.getDataModelObjectId()).contains(entry.getValue()));
                     case ID:
                         return entry.getValue().equals(resource.getId().getId().toString());
                 }
