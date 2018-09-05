@@ -18,6 +18,21 @@
 -->
 <md-content flex class="md-padding tb-absolute-fill tb-data-table extension-table" layout="column">
     <div layout="column" class="md-whiteframe-z1" ng-class="{'tb-absolute-fill' : vm.inWidget}">
+        <md-toolbar class="md-table-toolbar alternate" ng-show="vm.selectedPolicy.length" ng-class="{'toolbar-widget' : vm.inWidget}">
+            <div class="md-toolbar-tools">
+                <span translate
+                      translate-values="{count: vm.selectedPolicy.length}"
+                      translate-interpolation="messageformat">policy.selected-policy</span>
+                <span flex></span>
+                <md-button class="md-icon-button" ng-click="vm.deletePolicies($event)">
+                    <md-icon>delete</md-icon>
+                    <md-tooltip md-direction="{{vm.ctx.dashboard.isWidgetExpanded ? 'bottom' : 'top'}}">
+                        {{ 'action.delete' | translate }}
+                    </md-tooltip>
+                </md-button>
+            </div>
+        </md-toolbar>
+
         <md-toolbar  class="md-table-toolbar md-default">
             <div class="md-toolbar-tools">
                 <span translate>{{ 'policy.policy' }}</span>
@@ -29,41 +44,47 @@
                         {{ 'action.add' | translate }}
                     </md-tooltip>
                 </md-button>
-                <md-button class="md-icon-button" ng-click="vm.enterFilterMode()">
-                    <md-icon>search</md-icon>
-                    <md-tooltip md-direction="top">
-                        {{ 'action.search' | translate }}
-                    </md-tooltip>
-                </md-button>
-                <md-button class="md-icon-button" ng-click="vm.reloadExtensions()">
-                    <md-icon>refresh</md-icon>
-                    <md-tooltip md-direction="top">
-                        {{ 'action.refresh' | translate }}
-                    </md-tooltip>
-                </md-button>
             </div>
         </md-toolbar>
 
+
         <md-table-container flex>
-            <table md-table md-row-select multiple=""  md-progress="vm.extensionsDeferred.promise">
-                <thead md-head md-order="vm.query.order" md-on-reorder="vm.onReorder">
+            <table md-table md-row-select multiple="" ng-model="vm.selectedPolicy">
+                <thead md-head >
                 <tr md-row>
-                    <th md-column md-order-by="id"><span translate>policy.entityType</span></th>
-                    <th md-column md-order-by="type"><span translate>policy.entity</span></th>
+                    <th md-column><span translate>policy.entityType</span></th>
+                    <th md-column><span translate>policy.datamodel-object</span></th>
+                    <th md-column><span translate>policy.entity</span></th>
                     <th md-column><span translate>policy.accessLevel</span></th>
                     <th md-column><span>&nbsp</span></th>
                 </tr>
                 </thead>
                 <tbody md-body>
+                <tr md-row md-select="policy.key" md-select-id="policy.key" md-auto-select ng-repeat="policy in vm.policies">
+                    <td md-cell>{{ policy.entStr }}</td>
+                    <td md-cell>{{ policy.dmoStr }}</td>
+                    <td md-cell>{{ policy.assStr }}</td>
+                    <td md-cell>{{ policy.perStr }}</td>
+                    <td md-cell class="tb-action-cell">
+
+                        <md-button class="md-icon-button" aria-label="{{ 'action.delete' | translate }}" ng-click="vm.deletePolicy($event, policy.key)">
+                            <md-icon aria-label="{{ 'action.delete' | translate }}" class="material-icons">delete</md-icon>
+                            <md-tooltip md-direction="top">
+                                {{ 'policy.delete' | translate }}
+                            </md-tooltip>
+                        </md-button>
+                    </td>
+                </tr>
+                <tr ng-show ="vm.policies.length == 0" ><td colspan="5"><div><span style="
+    padding-left: 40%;
+"translate>policy.no-data</span></div></td></tr>
 
                 </tbody>
             </table>
             <md-divider ng-if="vm.inWidget"></md-divider>
         </md-table-container>
-        <md-table-pagination md-limit="vm.query.limit" md-limit-options="[5, 10, 15]"
-                             md-page="vm.query.page" md-total="{{vm.extensionsCount}}"
-                             md-on-paginate="vm.onPaginate" md-page-select>
-        </md-table-pagination>
     </div>
+
+
 
 </md-content>

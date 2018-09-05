@@ -34,21 +34,10 @@
 		</md-tab>
 
 		<md-tab label="{{ 'user.assigned-user-tab' | translate }}">
-
-
 			<tb-assign-user-group-detail flex group-id="vm.grid.operatingItem().id.id" ent-type="group"></tb-assign-user-group-detail>
 		</md-tab>
-
-		<!--<md-tab label="{{ 'policy.policy' | translate }}">-->
-
-
-			<!--<tb-policy-tbl flex group-id="vm.grid.operatingItem().id.id" ent-type="group"></tb-policy-tbl>-->
-		<!--</md-tab>-->
-
 		<md-tab label="{{ 'policy.policy' | translate }}">
-
-
-			<tb-policy-tbl flex group-id="vm.grid.operatingItem().id.id" customer-id="vm.customerId" ent-type="group"></tb-policy-tbl>
+			<tb-policy-tbl flex group-id="vm.grid.operatingItem().id.id" group-object="vm.grid.operatingItem()" customer-id="vm.customerId" datamodel-id ="vm.dataModelId" ent-type="group"></tb-policy-tbl>
 		</md-tab>
 
 	</md-tabs>

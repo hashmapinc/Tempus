@@ -215,7 +215,13 @@ export default function CustomerController(customerService, $state, $stateParams
         if ($event) {
             $event.stopPropagation();
         }
-        $state.go('home.customers.usergroups', {customerId: customer.id.id});
+
+        var dataModelId = '';
+        if (angular.isDefined(customer.dataModelId) && customer.dataModelId.id !== null) {
+            dataModelId = customer.dataModelId.id;
+        }
+
+        $state.go('home.customers.usergroups', {customerId: customer.id.id, dataModelId: dataModelId});
     }
 
     function openCustomerAssets($event, customer) {

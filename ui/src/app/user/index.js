@@ -20,6 +20,7 @@ import tempusGrid from '../components/grid.directive';
 import tempusApiUser from '../api/user.service';
 import tempusApiUserGroup from '../api/user-group.service';
 import tempusToast from '../services/toast';
+import tempusApiDatamodel from '../api/datamodel.service';
 
 import UserRoutes from './user.routes';
 import UserController from './user.controller';
@@ -41,7 +42,8 @@ export default angular.module('tempus.user', [
     tempusGrid,
     tempusApiUser,
     tempusApiUserGroup,
-    tempusToast
+    tempusToast,
+    tempusApiDatamodel
 ])
     .config(UserRoutes)
     .controller('UserController', UserController)

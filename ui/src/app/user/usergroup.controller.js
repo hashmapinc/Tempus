@@ -31,9 +31,9 @@ export default function UserGroupController($scope, $state, types, $stateParams,
 
     var tenantId = $stateParams.tenantId;
     var customerId = $stateParams.customerId;
+    var dataModelId = $stateParams.dataModelId;
     var usersType = $state.$current.data.usersType;
     var groupActionsList = [];
-
 
     groupActionsList.push({
         onAction: function($event, item) {
@@ -80,6 +80,7 @@ export default function UserGroupController($scope, $state, types, $stateParams,
 
     vm.addUserGroup = addUserGroup;
     vm.customerId = customerId;
+    vm.dataModelId = dataModelId;
     vm.AddGroupModelController = "AddGroupModelController";
     vm.saveGroup = saveGroup;
     vm.assignToGroup = assignToGroup;
@@ -149,7 +150,6 @@ export default function UserGroupController($scope, $state, types, $stateParams,
                     entityType: "CUSTOMER",
                     id: customerId
                 };
-
                 return userGroupService.saveUserGroup(usergroup);
             };
 
