@@ -20,6 +20,7 @@ import com.datastax.driver.core.utils.UUIDs;
 import com.hashmapinc.server.common.data.Customer;
 import com.hashmapinc.server.common.data.EntitySubtype;
 import com.hashmapinc.server.common.data.asset.Asset;
+import com.hashmapinc.server.common.data.id.DataModelObjectId;
 import com.hashmapinc.server.common.data.page.TextPageLink;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.After;
@@ -630,6 +631,33 @@ public abstract class BaseAssetServiceTest extends AbstractServiceTest {
         Assert.assertFalse(pageData.hasNext());
         Assert.assertEquals(0, pageData.getData().size());
         customerService.deleteCustomer(customerId);
+    }
+
+    @Test
+    public void testFindAssetsByDataModelObjectId() {
+        Asset asset = new Asset();
+        asset.setTenantId(tenantId);
+        DataModelObjectId dataModelObjectId = new DataModelObjectId(UUIDs.timeBased());
+        asset.setDataModelObjectId(dataModelObjectId);
+        asset.setName("My asset");
+        asset.setType("default");
+
+        Asset asset2 = new Asset();
+        asset2.setTenantId(tenantId);
+        asset2.setDataModelObjectId(dataModelObjectId);
+        asset2.setName("My asset2");
+        asset2.setType("default");
+
+        Asset savedAsset = assetService.saveAsset(asset);
+        Asset savedAsset2 = assetService.saveAsset(asset2);
+
+        List<Asset> foundAsset = assetService.findAssetsByDataModelObjectId(savedAsset.getDataModelObjectId());
+
+        Assert.assertNotNull(foundAsset);
+        Assert.assertEquals(2, foundAsset.size());
+
+        assetService.deleteAsset(savedAsset.getId());
+        assetService.deleteAsset(savedAsset2.getId());
     }
 
 }
