@@ -19,7 +19,7 @@ import './logViewer.css';
 
 /*@ngInject*/
 
-var headerLegend = function(lineConfig, headerCount) {
+var headerLegend = function(lineConfig, headerCount, data, state) {
   'use strict';
   var o;
      // local;
@@ -33,7 +33,9 @@ var headerLegend = function(lineConfig, headerCount) {
     lineWeight: lineConfig.lineWeight,
     color: lineConfig.color,
     label: lineConfig.headerName,
-    headerCount: headerCount
+    headerCount: headerCount,
+    data: data,
+    state:state
   };  
 
   // local = {
