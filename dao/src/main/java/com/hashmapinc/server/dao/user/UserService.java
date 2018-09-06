@@ -18,6 +18,7 @@ package com.hashmapinc.server.dao.user;
 
 import com.google.common.util.concurrent.ListenableFuture;
 import com.hashmapinc.server.common.data.User;
+import com.hashmapinc.server.common.data.id.CustomerGroupId;
 import com.hashmapinc.server.common.data.id.CustomerId;
 import com.hashmapinc.server.common.data.id.TenantId;
 import com.hashmapinc.server.common.data.id.UserId;
@@ -25,9 +26,13 @@ import com.hashmapinc.server.common.data.page.TextPageData;
 import com.hashmapinc.server.common.data.page.TextPageLink;
 import com.hashmapinc.server.common.data.security.UserCredentials;
 
+import java.util.List;
+
 public interface UserService {
 	
 	User findUserById(UserId userId);
+
+	TextPageData<User> findUsersByIds(List<UserId> userIds, TextPageLink pageLink);
 
 	ListenableFuture<User> findUserByIdAsync(UserId userId);
 
@@ -58,5 +63,8 @@ public interface UserService {
 	TextPageData<User> findCustomerUsers(TenantId tenantId, CustomerId customerId, TextPageLink pageLink);
 	    
 	void deleteCustomerUsers(TenantId tenantId, CustomerId customerId);
-	
+
+	User assignGroups(UserId userId , List<CustomerGroupId> customerGroupIds);
+
+	User unassignGroups(UserId userId , List<CustomerGroupId> customerGroupIds);
 }

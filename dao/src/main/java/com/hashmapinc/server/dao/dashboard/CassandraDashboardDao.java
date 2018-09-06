@@ -16,11 +16,18 @@
  */
 package com.hashmapinc.server.dao.dashboard;
 
+import com.hashmapinc.server.common.data.AssetLandingInfo;
 import com.hashmapinc.server.common.data.Dashboard;
-import org.springframework.stereotype.Component;
+import com.hashmapinc.server.common.data.DashboardType;
 import com.hashmapinc.server.dao.model.nosql.DashboardEntity;
 import com.hashmapinc.server.dao.nosql.CassandraAbstractSearchTextDao;
 import com.hashmapinc.server.dao.util.NoSqlDao;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 
 import static com.hashmapinc.server.dao.model.ModelConstants.DASHBOARD_COLUMN_FAMILY_NAME;
 
@@ -37,4 +44,48 @@ public class CassandraDashboardDao extends CassandraAbstractSearchTextDao<Dashbo
     protected String getColumnFamilyName() {
         return DASHBOARD_COLUMN_FAMILY_NAME;
     }
+
+    @Autowired
+    AssetLandingInfoDao assetLandingInfoDao;
+
+    @Override
+    public List<Dashboard> findDashboardByDataModelObjectId(UUID dataModelObjectId) {
+        List<AssetLandingInfo> assetLandingInfoList = assetLandingInfoDao.findByDataModelObjId(dataModelObjectId);
+        List<Dashboard> dashboards = new ArrayList<>();
+        for (AssetLandingInfo ali: assetLandingInfoList) {
+            dashboards.add(findById(ali.getDashboardId().getId()));
+        }
+        return dashboards;
+    }
+
+    @Override
+    public Dashboard save(Dashboard dashboard) {
+        Dashboard savedDashboard = super.save(dashboard);
+        if (savedDashboard.getType() == DashboardType.ASSET_LANDING_PAGE) {
+            AssetLandingInfo savedAli = assetLandingInfoDao.save(savedDashboard.getAssetLandingInfo());
+            savedDashboard.setAssetLandingInfo(savedAli);
+        }
+        return savedDashboard;
+    }
+
+    @Override
+    public boolean removeById(UUID id) {
+        if (assetLandingInfoDao.findById(id) != null) {
+            if (assetLandingInfoDao.removeById(id)) {
+                return super.removeById(id);
+            }
+        } else {
+            return super.removeById(id);
+        }
+        return false;
+    }
+
+    @Override
+    public Dashboard findById(UUID id) {
+        Dashboard dashboard = super.findById(id);
+        if (dashboard != null && dashboard.getType() == DashboardType.ASSET_LANDING_PAGE)
+            dashboard.setAssetLandingInfo(assetLandingInfoDao.findById(id));
+        return dashboard;
+    }
+
 }

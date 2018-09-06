@@ -19,6 +19,9 @@ package com.hashmapinc.server.dao.dashboard;
 import com.hashmapinc.server.common.data.Dashboard;
 import com.hashmapinc.server.dao.Dao;
 
+import java.util.List;
+import java.util.UUID;
+
 /**
  * The Interface DashboardDao.
  */
@@ -31,5 +34,11 @@ public interface DashboardDao extends Dao<Dashboard> {
      * @return saved dashboard object
      */
     Dashboard save(Dashboard dashboard);
+
+    List<Dashboard>
+
+
+
+    findDashboardByDataModelObjectId(UUID dataModelObjectId);
 
 }

@@ -23,6 +23,7 @@ import com.hashmapinc.server.common.data.Customer;
 import com.hashmapinc.server.common.data.datamodel.DataModel;
 import com.hashmapinc.server.common.data.id.DataModelId;
 import com.hashmapinc.server.common.data.page.TextPageLink;
+import com.hashmapinc.server.dao.customergroup.CustomerGroupService;
 import com.hashmapinc.server.dao.datamodel.DataModelDao;
 import com.hashmapinc.server.dao.user.UserService;
 import lombok.extern.slf4j.Slf4j;
@@ -80,6 +81,9 @@ public class CustomerServiceImpl extends AbstractEntityService implements Custom
     @Autowired
     private DashboardService dashboardService;
 
+    @Autowired
+    private CustomerGroupService customerGroupService;
+
     @Override
     public Customer findCustomerById(CustomerId customerId) {
         log.trace("Executing findCustomerById [{}]", customerId);
@@ -122,6 +126,7 @@ public class CustomerServiceImpl extends AbstractEntityService implements Custom
         assetService.unassignCustomerAssets(customer.getTenantId(), customerId);
         deviceService.unassignCustomerDevices(customer.getTenantId(), customerId);
         userService.deleteCustomerUsers(customer.getTenantId(), customerId);
+        customerGroupService.deleteCustomerGroupsByTenantIdAndCustomerId(customer.getTenantId(), customerId);
         deleteEntityRelations(customerId);
         customerDao.removeById(customerId.getId());
     }
