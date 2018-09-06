@@ -17,7 +17,7 @@
 import * as d3 from 'well-log-viewer/node_modules/d3/build/d3';
 //import {loadConfig} from './config';
 import {linearGrid} from './linearGrid';
-import {headerLegend} from './headerLegend';
+//import {headerLegend} from './headerLegend';
 import {lineGraph} from './lineGraph';
 import './logViewer.css';
 
@@ -32,20 +32,30 @@ export default function loadLogViewer(ctx, sequence){
         buildArray = [];
     //    events;
    
-    function build(ctx) {
+    function build(ctx, state) {
+      function datasourceFilter(settings, datasources){
+        var ds;
+        datasources.forEach(function(datasource){
+          if(settings.dataSource === datasource.dataKey.label){
+            ds = datasource;
+          }
+        })
+        return ds;
+      }
     //  config = loadConfig();
       config = ctx.widgetConfig.settings;
+      if(angular.isDefined(config.Track)){
       config.Track.forEach(function(track){
         var trackObj = [];
-        var headerCount = 0
+    //    var headerCount = 0
         track.component.forEach(function(componentObj){
-          if(componentObj.hasHeader){
-           headerCount +=1;
-            var hLegend = headerLegend(componentObj, headerCount);
-            trackObj.push(hLegend);
-          }
+          // if(componentObj.hasHeader){
+          //   headerCount +=1;
+            // var hLegend = headerLegend(componentObj, headerCount, datasourceFilter(componentObj, ctx.data), state);
+            // trackObj.push(hLegend);
+         // }
           if(componentObj.cType === 'linearGrid'){
-            var lnGrid = linearGrid(componentObj);
+            var lnGrid = linearGrid(componentObj, datasourceFilter(componentObj, ctx.data), state);
             trackObj.push(lnGrid);
           }
           if(componentObj.cType === 'timeYaxis'){
@@ -53,43 +63,47 @@ export default function loadLogViewer(ctx, sequence){
             // trackObj.push(timeYaxis);
           }
           if(componentObj.cType === 'line'){
-            var lnGraph = lineGraph(componentObj);
+            var lnGraph = lineGraph(componentObj, datasourceFilter(componentObj, ctx.data), state);
             trackObj.push(lnGraph);
           }
 
         })
         buildArray.push(trackObj);
       })
+     }
     }
    
-    function addToDom() {
+    function addToDom(state) {
       var panelTracker = 1;
       buildArray.forEach(function(track){
 
         var trackId = '#track' + panelTracker;
 
-        d3.select(trackId).selectAll('div')
-           .remove();
-            d3.select(trackId).selectAll('svg')
-           .remove();
-        panelTracker += 1;
-        d3.select(trackId)
-           .append("div")
-           .attr("class", "header")
-           // .append("svg")
-           // .attr("class", "header")
-           // .attr("width", 440)
-           // .attr("height", 0)
 
-        d3.select(trackId)
-           .append("svg")
-           .attr("class", "linearGrid")
+        if(state !== 'update'){
+          d3.select(trackId).selectAll('div')
+             .remove();
+              d3.select(trackId).selectAll('svg')
+             .remove();
+          panelTracker += 1;
+          d3.select(trackId)
+             .append("div")
+             .attr("class", "header")
+             // .append("svg")
+             // .attr("class", "header")
+             // .attr("width", 440)
+             // .attr("height", 0)
+
+          d3.select(trackId)
+             .append("svg")
+             .attr("class", "linearGrid")
+        }
 
         for(var i = 0; i < 3; i++){
           track.forEach(function(component){
             if(component.order == i)
              d3.select(trackId)
-               .call(component)
+               .call(component);
           })
         }
 
@@ -112,7 +126,12 @@ export default function loadLogViewer(ctx, sequence){
     // };
    
    if(sequence === "update"){
-      build(ctx);
+      build(ctx, "update");
+      addToDom("update");
+    //  addListeners();
+   }
+   else {
+      build(ctx, "init");
       addToDom();
       addListeners();
    }
