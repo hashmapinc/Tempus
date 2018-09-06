@@ -23,6 +23,7 @@ import addMetadataModel from './add-metadata.tpl.html';
 
 export default function MetadataController(metadataService, $q,$mdDialog, $document, $state, $translate, types) {
 
+
     var vm = this;
     vm.types = types;
     var metadataActionsList =[],metadataGroupActionsList=[];
