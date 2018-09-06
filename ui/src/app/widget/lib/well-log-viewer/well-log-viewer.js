@@ -1,6 +1,5 @@
 /*
- * Copyright © 2016-2018 The Thingsboard Authors
- * Modifications © 2017-2018 Hashmap, Inc
+ * Copyright © 2017-2018 Hashmap, Inc
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 import loadLogViewer from './logViewer';
 //import loadLogViewer from 'WellLogViewer/logViewer';
 //import welllogviwer from 'WellLogViewer'
@@ -50,6 +50,9 @@ export default class WellLogViewer {
      update() {
      	this.cntr +=1;
      	if(this.cntr < 2){
+     		loadLogViewer(this.ctx, "init");
+     	}     	
+     	else{
      		loadLogViewer(this.ctx, "update");
      	}
      	//loadLogViewer();
@@ -221,14 +224,6 @@ export default class WellLogViewer {
 	                	 	 "condition": "model.Track[form.key[1]].component[form.arrayIndex].cType === 'linearGrid'"
 	               		 }
 	               		
-
-
-
-
-	                // {
-	                //   "key": "Track[].component[].color"
-	                // //  "condition": "model.Track[form.key[1]].component[form.arrayIndex].ComponentType === 'one'"
-	                // }
 	                ]
 	            }
 	      ]
