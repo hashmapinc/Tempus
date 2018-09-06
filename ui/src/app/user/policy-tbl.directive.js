@@ -57,12 +57,6 @@ function PolicyTableController($mdDialog, $document, $scope, userGroupService, $
     vm.selectedPolicy = [];
 
 
-
-    //vm.policyTable = policyTable;
-
-
-    //vm.policyTable();
-
     $scope.$watch('vm.selectedPolicy.length', function(newLength) {
         var selectionMode = newLength ? true : false;
         if (vm.ctx) {

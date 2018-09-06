@@ -67,8 +67,8 @@
                             <md-input-container flex="40" class="md-block" md-is-error="theForm.dataModelObject.$touched && theForm.dataModelObject.$invalid">
                                 <label translate>policy.datamodel-object</label>
 
-                                <md-select ng-disabled="vm.entity.type == 'ALL'" required ng-model="vm.dataModelObject" ng-change="vm.dataModelObjectChange()">
-                                    <md-option ng-selected="{{ vm.entity.type === 'ALL' ? 'true' : 'false' }}" ng-value="key" ng-repeat="(key,value) in vm.dataModelObjectValues">{{ value }}</md-option>
+                                <md-select ng-disabled="vm.entity.type == 'ALL' || vm.entity.type === 'DEVICE'" required ng-model="vm.dataModelObject" ng-change="vm.dataModelObjectChange()">
+                                    <md-option ng-selected="{{ vm.entity.type === 'ALL'  ? 'true' : 'false' }}" ng-value="key" ng-repeat="(key,value) in vm.dataModelObjectValues">{{ value }}</md-option>
                                 </md-select>
 
                                 <div ng-messages="theForm.dataModelObject.$error">
@@ -79,7 +79,7 @@
                             <md-input-container flex="40" class="md-block" md-is-error="theForm.entityValues.$touched && theForm.entityValues.$invalid">
                                 <label translate>policy.entity</label>
 
-                                <md-select ng-disabled="vm.dataModelObject == 'ALL' || vm.entity.type == 'ALL'" required ng-model="vm.entity.values">
+                                <md-select ng-disabled="vm.dataModelObject == 'ALL' || vm.entity.type == 'ALL' || vm.entity.type === 'DEVICE'" required ng-model="vm.entity.values" ng-change="vm.entityChange()">
                                     <md-option ng-selected="{{ vm.entity.type === 'ALL' || vm.dataModelObject == 'ALL' ? 'true' : 'false' }}" ng-value="key" ng-repeat="(key,value) in vm.entityValues">{{ value }}</md-option>
                                 </md-select>
 
@@ -93,7 +93,7 @@
                                 <label translate>policy.access-level</label>
 
                                 <md-select ng-disabled="!vm.isAdd" required name="permissionType" ng-change="vm.extensionTypeChange()" ng-model="vm.permission.type">
-                                    <md-option ng-repeat="(key,value) in vm.types.permissionType" ng-value="key">
+                                    <md-option  ng-repeat="(key,value) in vm.permissions" ng-value="key">
                                         {{value}}
                                     </md-option>
                                 </md-select>

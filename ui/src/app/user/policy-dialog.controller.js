@@ -27,6 +27,8 @@ export default function PolicyDialogController($scope, groupId, isAdd, $mdDialog
     vm.dataModelObjectChange = dataModelObjectChange;
     vm.groupObject = groupObject;
     vm.save = save;
+    vm.entityChange = entityChange;
+    vm.permissions = '';
 
     //vm.entity.type = "ALL";
 
@@ -69,6 +71,30 @@ export default function PolicyDialogController($scope, groupId, isAdd, $mdDialog
             });
 
         }
+    }
+
+
+    function entityChange() {
+
+        if(vm.entity.values !== '' || vm.entity.values !== null) {
+
+            vm.permissions = angular.copy(vm.types.permissionType);
+
+            if(vm.entity.values !== 'ALL') {
+
+               // $log.log(vm.types.permissionType);
+                delete vm.permissions['CREATE'];
+
+                //vm.types.permissionType.splice(2,1);
+            } else {
+               // $log.log(vm.types.permissionType);
+                vm.permissions = '';
+                vm.permissions = vm.types.permissionType;
+
+
+            }
+        }
+
     }
 
 
