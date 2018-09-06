@@ -30,7 +30,6 @@ export default function MetadataSourceDirective($compile, $templateCache, $trans
 
         scope.types = types;
         scope.theForm = scope.$parent.theForm;
-        $log.log(scope.source);
 
         $compile(element.contents())(scope);
 

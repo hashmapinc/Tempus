@@ -21,7 +21,7 @@ import metadataSinkFieldsetTemplate from './metadata-sink-fieldset.tpl.html';
 /* eslint-enable import/no-unresolved, import/default */
 
 /*@ngInject*/
-export default function MetadataSinkDirective($compile, $templateCache, $translate, types,$log) {
+export default function MetadataSinkDirective($compile, $templateCache, $translate, types) {
     var linker = function(scope, element) {
 
         var template = $templateCache.get(metadataSinkFieldsetTemplate);

@@ -43,4 +43,5 @@ export default angular.module('tempus.metadata', [
     .directive('tbMetadataSink', MetadataSinkDirective)
     .directive('tbMetadataConfig', MetadataConfigDirective)
     .directive('tbMetadataQuery', MetadataQueryDirective)
+
     .name;

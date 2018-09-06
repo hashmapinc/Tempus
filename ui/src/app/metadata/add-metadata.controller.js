@@ -19,6 +19,7 @@
 /*@ngInject*/
 export default function AddMetadataController($scope, $mdDialog, types, helpLinks, metadataService) {
 
+
     var vm = this;
     vm.helpLinks = helpLinks;
     vm.item = {};
@@ -47,7 +48,6 @@ export default function AddMetadataController($scope, $mdDialog, types, helpLink
     };
 
     function add() {
-        $log.log(vm.metadata);
         if (vm.metadata.source.type === 'JDBC' && vm.metadata.sink.type === 'REST') {
             metadataService.saveMetadata(vm.metadata).then(function success(response){
                 $scope.theForm.$setPristine();

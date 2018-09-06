@@ -30,6 +30,25 @@ export default function MetadataController(metadataService, $q,$mdDialog, $docum
     vm.cancel = cancel;
     vm.AddDataModelController = 'AddMetadataController';
 
+    function getMetadataTitle(metadata) {
+        return metadata ? metadata.name : '';
+    }
+
+    function gridInited(grid) {
+        vm.grid = grid;
+    }
+
+    initController();
+
+    function initController() {
+        var fetchMetadataFunction = null;
+
+        fetchMetadataFunction = function (pageLink) {
+            return metadataService.getAllTenantMetadata(pageLink);
+        };
+        vm.metadataConfig.fetchItemsFunc = fetchMetadataFunction;
+    }
+
     vm.metadataConfig = {
         deleteItemTitleFunc: deleteMetadataTitle,
         deleteItemContentFunc: deleteMetadataText,

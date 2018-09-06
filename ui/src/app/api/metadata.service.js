@@ -27,8 +27,7 @@ function MetadataService($http, $q, $filter, utils) {
         upload: upload,
         getAllMetadatas: getAllMetadatas,
         getMetadata: getMetadata,
-        deleteMetadata: deleteMetadata,
-        saveMetadata: saveMetadata,
+
 
         getAllTenantMetadata :getAllTenantMetadata,
         saveMetadataQuery: saveMetadataQuery,
@@ -37,6 +36,7 @@ function MetadataService($http, $q, $filter, utils) {
         testMetadataConfig: testMetadataConfig
         getAllTenantMetadata :getAllTenantMetadata
         deleteMetadata: deleteMetadata
+        saveMetadata: saveMetadata
 
     }
 
@@ -74,6 +74,7 @@ function MetadataService($http, $q, $filter, utils) {
         return deferred.promise;
     }
 
+
     function getAllTenantMetadata(pageLink) {
         $log.log(pageLink);
         var deferred = $q.defer();
@@ -92,6 +93,7 @@ function MetadataService($http, $q, $filter, utils) {
         );
         return deferred.promise;
     }
+
     function getMetadata(metadataId) {
         var deferred = $q.defer();
         var url = '/api/metadata/' + metadataId;
