@@ -19,7 +19,7 @@
 import * as d3 from 'well-log-viewer/node_modules/d3/build/d3';
 import './logViewer.css';
 /*@ngInject*/
-var linearGrid = function(lineConfig) {
+var linearGrid = function(lineConfig, data, state) {
   'use strict';
   var o;
      // local;
@@ -33,7 +33,9 @@ var linearGrid = function(lineConfig) {
     majorColor: lineConfig.majorLines.color,
     minorColor: lineConfig.minorLines.color,
     majorLineWeight: lineConfig.majorLines.lineWeight,
-    minorLineWeight: lineConfig.minorLines.lineWeight
+    minorLineWeight: lineConfig.minorLines.lineWeight,
+    data : data,
+    state:state
   };  
   if(lineConfig.minorLines.style === "dashed"){
     o.mirorStroke = "6,4";
