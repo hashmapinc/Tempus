@@ -20,12 +20,14 @@ import com.google.common.base.Function;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.hashmapinc.server.common.data.*;
+import com.hashmapinc.server.common.data.asset.Asset;
 import com.hashmapinc.server.common.data.id.*;
 import com.hashmapinc.server.common.data.page.TextPageData;
 import com.hashmapinc.server.common.data.page.TextPageLink;
 import com.hashmapinc.server.dao.asset.AssetService;
 import com.hashmapinc.server.dao.customer.CustomerDao;
 import com.hashmapinc.server.dao.datamodel.DataModelObjectService;
+import com.hashmapinc.server.dao.device.DeviceService;
 import com.hashmapinc.server.dao.entity.AbstractEntityService;
 import com.hashmapinc.server.dao.exception.DataValidationException;
 import com.hashmapinc.server.dao.exception.IncorrectParameterException;
@@ -67,6 +69,8 @@ public class CustomerGroupServiceImpl extends AbstractEntityService implements C
 
     @Autowired
     private AssetService assetService;
+
+    private DeviceService deviceService;
 
 
     private List<UserId> findUserIdsByCustomerGroupId(CustomerGroupId customerGroupId){
@@ -236,7 +240,11 @@ public class CustomerGroupServiceImpl extends AbstractEntityService implements C
 
     private String getNameOfEntityByResource(EntityType entityType, String attrId) {
         if(entityType.equals(EntityType.ASSET)){
-            return assetService.findAssetById(new AssetId(UUID.fromString(attrId))).getName();
+            Asset assetById = assetService.findAssetById(new AssetId(UUID.fromString(attrId)));
+            return (assetById == null) ? "" : assetById.getName();
+        } else if(entityType.equals(EntityType.DEVICE)){
+            Device deviceById = deviceService.findDeviceById(new DeviceId(UUID.fromString(attrId)));
+            return (deviceById == null) ? "" : deviceById.getName();
         } else {
             return "";
         }

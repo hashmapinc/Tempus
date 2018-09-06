@@ -73,7 +73,18 @@ public abstract class AbstractPermissionMatcher implements PermissionMatcher {
                 }
                 return true;
             });
-        }else {
+        } else if(resource instanceof Device){
+            Device deviceResource = (Device) resource;
+            return resourceAttributes.entrySet().stream().allMatch(entry -> {
+                switch (entry.getKey()) {
+                    case DATA_MODEL_ID:
+                        return true;  // TODO : Implement this when data model association is done for device
+                    case ID:
+                        return entry.getValue().equals(resource.getId().getId().toString());
+                }
+                return true;
+            });
+        } else {
             return true;
         }
     }
