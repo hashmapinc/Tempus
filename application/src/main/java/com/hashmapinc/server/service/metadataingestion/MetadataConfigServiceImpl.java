@@ -22,6 +22,7 @@ import com.hashmapinc.server.common.data.metadata.MetadataConfig;
 import com.hashmapinc.server.common.data.metadata.MetadataConfigId;
 import com.hashmapinc.server.common.data.page.TextPageData;
 import com.hashmapinc.server.common.data.page.TextPageLink;
+import com.hashmapinc.server.common.data.metadata.source.jdbc.JdbcMetadataSource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -33,6 +34,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
+
+import java.util.Base64;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import static com.hashmapinc.server.dao.service.Validator.validateId;
 
@@ -63,12 +68,14 @@ public class MetadataConfigServiceImpl implements MetadataConfigService {
     @Override
     public MetadataConfig save(MetadataConfig metadataConfig) {
         log.trace("Executing MetadataConfigServiceImpl.save [{}]", metadataConfig);
+        encodePassword(metadataConfig);
         if (metadataConfig.getId() == null) {
-            return restTemplate.postForObject(serviceUrl, metadataConfig, MetadataConfig.class);
+            metadataConfig =  restTemplate.postForObject(serviceUrl, metadataConfig, MetadataConfig.class);
         } else {
             restTemplate.put(serviceUrl, metadataConfig);
-            return metadataConfig;
         }
+        decodePassword(metadataConfig);
+        return metadataConfig;
     }
 
     @Override
@@ -76,7 +83,9 @@ public class MetadataConfigServiceImpl implements MetadataConfigService {
         log.trace("Executing MetadataConfigServiceImpl.findById [{}]", id);
         validateId(id, INCORRECT_CONFIG_ID + id);
         String url = serviceUrl + PATH_SEPARATOR + id.getId();
-        return restTemplate.getForObject(url, MetadataConfig.class);
+        MetadataConfig foundMetadataConfig = restTemplate.getForObject(url , MetadataConfig.class);
+        decodePassword(foundMetadataConfig);
+        return foundMetadataConfig;
     }
 
     @Override
@@ -94,7 +103,9 @@ public class MetadataConfigServiceImpl implements MetadataConfigService {
         ResponseEntity<TextPageData<MetadataConfig>> response = restTemplate.exchange(builder.build().encode().toUri(),
                 HttpMethod.GET, null, new ParameterizedTypeReference<TextPageData<MetadataConfig>>() {
         });
-        return response.getBody();
+        TextPageData<MetadataConfig> metadataConfigTextPageData = response.getBody();
+        List<MetadataConfig> metadataConfigs = metadataConfigTextPageData.getData().stream().peek(this::decodePassword).collect(Collectors.toList());
+        return new TextPageData<>(metadataConfigs, metadataConfigTextPageData.getNextPageLink());
     }
 
     @Override
@@ -123,6 +134,22 @@ public class MetadataConfigServiceImpl implements MetadataConfigService {
         log.trace("Executing MetadataConfigServiceImpl.runIngestion [{}]", id);
         validateId(id, INCORRECT_CONFIG_ID + id);
         String url = serviceUrl + PATH_SEPARATOR + id.getId() + PATH_SEPARATOR + ingestionPath;
-        return restTemplate.getForObject(url, MetadataConfig.class);
+        MetadataConfig metadataConfig = restTemplate.getForObject(url , MetadataConfig.class);
+        decodePassword(metadataConfig);
+        return metadataConfig;
+    }
+
+    private void encodePassword(MetadataConfig metadataConfig) {
+        if (metadataConfig.getSource() instanceof JdbcMetadataSource) {
+            String password = ((JdbcMetadataSource) metadataConfig.getSource()).getPassword();
+            ((JdbcMetadataSource) metadataConfig.getSource()).setPassword(Base64.getEncoder().encodeToString(password.getBytes()));
+        }
+    }
+
+    private void decodePassword(MetadataConfig metadataConfig) {
+        if (metadataConfig.getSource() instanceof JdbcMetadataSource) {
+            String password = ((JdbcMetadataSource) metadataConfig.getSource()).getPassword();
+            ((JdbcMetadataSource) metadataConfig.getSource()).setPassword(new String(Base64.getDecoder().decode(password)));
+        }
     }
 }
