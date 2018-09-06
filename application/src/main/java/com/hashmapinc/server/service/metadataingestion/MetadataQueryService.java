@@ -19,8 +19,8 @@ package com.hashmapinc.server.service.metadataingestion;
 import com.hashmapinc.server.common.data.metadata.MetadataConfigId;
 import com.hashmapinc.server.common.data.metadata.MetadataQuery;
 import com.hashmapinc.server.common.data.metadata.MetadataQueryId;
-
-import java.util.List;
+import com.hashmapinc.server.common.data.page.TextPageData;
+import com.hashmapinc.server.common.data.page.TextPageLink;
 
 public interface MetadataQueryService {
 
@@ -28,7 +28,7 @@ public interface MetadataQueryService {
 
     MetadataQuery findById(MetadataQueryId id);
 
-    List<MetadataQuery> findAllByMetadataConfigId(MetadataConfigId metadataConfigId);
+    TextPageData<MetadataQuery> findAllByMetadataConfigId(MetadataConfigId metadataConfigId, TextPageLink pageLink);
 
     void delete(MetadataQueryId id);
 }
