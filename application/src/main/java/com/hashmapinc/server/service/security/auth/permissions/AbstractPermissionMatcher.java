@@ -69,7 +69,7 @@ public abstract class AbstractPermissionMatcher implements PermissionMatcher {
                                 && (entry.getValue().equals(assetResource.getDataModelObjectId().getId().toString())
                                 || getParentsOf(assetResource.getDataModelObjectId()).contains(entry.getValue()));
                     case ID:
-                        return entry.getValue().equals(resource.getId().getId().toString());
+                        return resource.getId() != null && entry.getValue().equals(resource.getId().getId().toString());
                 }
                 return true;
             });
@@ -80,7 +80,7 @@ public abstract class AbstractPermissionMatcher implements PermissionMatcher {
                     case DATA_MODEL_ID:
                         return true;  // TODO : Implement this when data model association is done for device
                     case ID:
-                        return entry.getValue().equals(resource.getId().getId().toString());
+                        return resource.getId() != null && entry.getValue().equals(resource.getId().getId().toString());
                 }
                 return true;
             });
