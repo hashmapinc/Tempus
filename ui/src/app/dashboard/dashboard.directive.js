@@ -34,6 +34,7 @@ export default function DashboardDirective($compile, $templateCache, $translate,
         scope.types = types;
         scope.listOfDataModelAssets = [];
         scope.$watch('dashboard', function(newVal) {
+            $log.log(newVal)
             if(newVal !=null && newVal.hasOwnProperty("title")){
                 scope.theForm.editFlag = true;
             }else{
@@ -78,9 +79,11 @@ export default function DashboardDirective($compile, $templateCache, $translate,
          * @param dataModelId
          */
         scope.loadDataModelAssets = function(){
+            $log.log("scope.dashboard")
+            $log.log(scope.dashboard);
             scope.listOfDataModelAssets = [];
             var val;
-            scope.dataModelsAssets = datamodelService.getDatamodelObjects(scope.dashboard.dataModelId);
+            scope.dataModelsAssets = datamodelService.getDatamodelObjects(scope.dashboard.assetLandingInfo.dataModelId.id);
             scope.dataModelsAssets.then(function (data) {
                 angular.forEach(data, function (list) {
                     if (list.type === "Asset") {

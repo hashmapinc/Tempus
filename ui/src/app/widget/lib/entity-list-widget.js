@@ -70,7 +70,7 @@ function AddAssetController ($log,customerService,$state,dashboardService,datamo
             $log.log(response);
             if(response){
                 vm.dashboardDetail = response;
-                vm.isParent = getDataModelObjectDetails(response.dataModelObjectId);
+                vm.isParent = getDataModelObjectDetails(response.assetLandingInfo.dataModelObjectId.id);
                 vm.isParent.then(function success(object_response) {
                     $log.log(object_response.data)
                     if(object_response.data){ 
@@ -274,7 +274,7 @@ function DeviceListWidgetController($rootScope, $scope, $filter, dashboardServic
                     assetService.getTenantAssets({limit: 200, textSearch: ''}, true, null, false).
                     then(function success(response_data) {
                         $log.log(response_data);
-                        getAssetList(response_data,response.dataModelObjectId);
+                        getAssetList(response_data,response.assetLandingInfo.dataModelObjectId.id);
                     },function fail(){});
                 }else if (scope === 'customer' || scope === 'customer_user') {
                     assetService.getCustomerAssets(customerId, {limit: 200, textSearch: ''}, true, null, false).

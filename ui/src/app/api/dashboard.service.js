@@ -130,20 +130,7 @@ function DashboardService($rootScope, $http, $q, $location, $filter) {
         var deferred = $q.defer();
         var url = '/api/dashboard/' + dashboardId;
         $http.get(url, null).then(function success(response) {
-           if(response.data.type == 'ASSET_LANDING_PAGE'){
-            var urlAsset = '/api/asset/dashboard/' + dashboardId;
-            $http.get(urlAsset, null).then(function successasset(asset_response) {
-                if(asset_response.data){
-                    response.data.dataModelId = asset_response.data.dataModelId.id
-                    response.data.dataModelObjectId = asset_response.data.dataModelObjectId.id
-                }
-                deferred.resolve(prepareDashboard(response.data)); 
-            }, function fail() {
-                deferred.reject();
-            });
-           } else {
             deferred.resolve(prepareDashboard(response.data)); 
-           }   
         }, function fail() {
             deferred.reject();
         });
@@ -164,38 +151,61 @@ function DashboardService($rootScope, $http, $q, $location, $filter) {
     function saveDashboard(dashboard) {
         var deferred = $q.defer();
         var url;        
-        if(dashboard.landingDashboard) {
-            url = '/api/asset/dashboard/';
-            var requestBody = {
-                dashboard:{
-                    title:dashboard.title,
-                    configuration : dashboard.configuration,
-                    type: "ASSET_LANDING_PAGE"
-                 },
-                 assetLandingDashboardInfo:{  
-                    dataModelId:{  
-                       id:dashboard.dataModelId,
-                       entityType : "DATA_MODEL"
+        // if(dashboard.landingDashboard) {
+        //     url = '/api/asset/dashboard/';
+        //     var requestBody = {
+        //         dashboard:{
+        //             title:dashboard.title,
+        //             configuration : dashboard.configuration,
+        //             type: "ASSET_LANDING_PAGE"
+        //          },
+        //          assetLandingDashboardInfo:{  
+        //             dataModelId:{  
+        //                id:dashboard.dataModelId,
+        //                entityType : "DATA_MODEL"
+        //             },
+        //             dataModelObjectId:{  
+        //                id:dashboard.dataModelObjectId,
+        //                entityType : "DATA_MODEL_OBJECT"
+        //             }
+        //          }
+        //     }
+        //     $http.post(url, cleanDashboard(requestBody)).then(function success(response) {
+        //         deferred.resolve(prepareDashboard(response.data));
+        //     }, function fail() {
+        //         deferred.reject();
+        //     }); 
+        //}else {
+            if(dashboard.landingDashboard) {
+                dashboard.assetLandingInfo ={
+                    dataModelId:{
+                        id:dashboard.dataModelId,
+                        entityType : "DATA_MODEL"
                     },
                     dataModelObjectId:{  
-                       id:dashboard.dataModelObjectId,
-                       entityType : "DATA_MODEL_OBJECT"
+                        id:dashboard.dataModelObjectId,
+                        entityType : "DATA_MODEL_OBJECT"
                     }
-                 }
+                }
+                dashboard.type="ASSET_LANDING_PAGE"
             }
-            $http.post(url, cleanDashboard(requestBody)).then(function success(response) {
-                deferred.resolve(prepareDashboard(response.data));
-            }, function fail() {
-                deferred.reject();
-            }); 
-        }else {
+            // dashboard.assetLandingInfo ={
+            //     dataModelId:{
+            //         id:dashboard.dataModelId,
+            //         entityType : "DATA_MODEL"
+            //     },
+            //     dataModelObjectId:{  
+            //         id:dashboard.dataModelObjectId,
+            //         entityType : "DATA_MODEL_OBJECT"
+            //     }
+            // }
             url = '/api/dashboard';
             $http.post(url, cleanDashboard(dashboard)).then(function success(response) {
                 deferred.resolve(prepareDashboard(response.data));
             }, function fail() {
                 deferred.reject();
             });
-        }
+        //}
         return deferred.promise;
     }
 

@@ -79,7 +79,7 @@
                                     <textarea  rows="2" ng-model="vm.description"></textarea>
                                 </md-input-container>
                                 <md-input-container class="md-block" ng-if="vm.showCustList">
-                                    <md-select placeholder="Assign to user" ng-model="vm.user"  style="min-width: 200px;" ng-disabled="vm.disableFlag">
+                                    <md-select placeholder="Assign to Business Unit" ng-model="vm.user"  style="min-width: 200px;" ng-disabled="vm.disableFlag">
                                         <md-option ng-value="user" ng-repeat="user in vm.users">{{user.name}}</md-option>
                                       </md-select>
                                 </md-input-container>
