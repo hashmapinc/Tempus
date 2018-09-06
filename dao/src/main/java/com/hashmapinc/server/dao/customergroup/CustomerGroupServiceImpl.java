@@ -129,7 +129,10 @@ public class CustomerGroupServiceImpl extends AbstractEntityService implements C
     public CustomerGroup saveCustomerGroup(CustomerGroup customerGroup) {
         log.trace("Executing saveCustomerGroup [{}]", customerGroup);
         customerGroupValidator.validate(customerGroup);
-        customerGroup.setPolicies(customerGroup.getPolicies().stream().distinct().collect(Collectors.toList()));
+        List<String> policies = customerGroup.getPolicies();
+        if(policies != null) {
+            customerGroup.setPolicies(policies.stream().distinct().collect(Collectors.toList()));
+        }
         CustomerGroup savedCustomerGroup = customerGroupDao.save(customerGroup);
         savedCustomerGroup.setUserIds(findUserIdsByCustomerGroupId(savedCustomerGroup.getId()));
         return savedCustomerGroup;
@@ -330,11 +333,13 @@ public class CustomerGroupServiceImpl extends AbstractEntityService implements C
                     }
 
                     List<String> policies = customerGroup.getPolicies();
-                    for(String policyExpression : policies){
-                        try{
-                            UserPermission userPermission = new UserPermission(policyExpression); //NOSONAR
-                        } catch (IllegalArgumentException e){
-                            throw new DataValidationException(e.getMessage());
+                    if(policies != null) {
+                        for (String policyExpression : policies) {
+                            try {
+                                UserPermission userPermission = new UserPermission(policyExpression); //NOSONAR
+                            } catch (IllegalArgumentException e) {
+                                throw new DataValidationException(e.getMessage());
+                            }
                         }
                     }
                 }
