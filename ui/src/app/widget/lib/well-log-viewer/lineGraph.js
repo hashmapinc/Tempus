@@ -20,11 +20,17 @@ import {dataGenerator} from './dataGenerator';
 import './logViewer.css';
 
 /*@ngInject*/
-var lineGraph = function(lineConfig) {
+var lineGraph = function(lineConfig, data, state) {
+
   'use strict';
   var o,
      // local,
       dataGen;
+   // data.data.forEach(function(dataEle){
+   //    var parse = d3.timeParse("%s");
+   //    dataEle[0] = parse(dataEle[0]);
+   // })
+
 
   o = {
     // width: 200,
@@ -34,13 +40,16 @@ var lineGraph = function(lineConfig) {
     min: lineConfig.headerMin,
     max: lineConfig.headerMax,
     lineWeight: lineConfig.lineWeight,
-    areaFill: lineConfig.areaFill  
+    areaFill: lineConfig.areaFill,  
+    data: data,    
+    state:state
   }
 
   // local = {
   // //  label: d3.local(),
   // //  dimensions: d3.local()
   // };
+
 
   dataGen = dataGenerator();
  
@@ -72,8 +81,10 @@ var lineGraph = function(lineConfig) {
       .tickFormat("");
 
     let line = d3.line()
-      .y((d, i) => y(i + dataGen.time))
-      .x(d => x(d));
+      .y((d) => y(d[0]))
+      .y(function(d) { return y(d[0]); })
+     // .y((d, i) => y(i + dataGen.time))
+      .x(d => x(d[1]));
 
     if(angular.isDefined(o.areaFill)){
       if(o.areaFill.fill === "left"){
@@ -91,6 +102,7 @@ var lineGraph = function(lineConfig) {
       }
     }
 
+if(o.state === "init"){
 
     // context.select('.linearGrid')
     // .append('g')
@@ -115,22 +127,27 @@ var lineGraph = function(lineConfig) {
     let $lineGraph = context.select('.linearGrid')
       .attr("width", w + margin.right + 1)
       .append('g')
+      .attr("class", 'linepath')
       .append('path')
       .attr('stroke', o.color)
-      .attr('fill', 'none')
+     // .attr('fill', 'none')
       .attr('stroke-width', o.lineWeight);
 
-    let $areaGraph = context.select('.linearGrid').append('path')
-      .attr('fill', o.areaFill.color)
-      .style("opacity", o.areaFill.opacity);
-
+    // let $areaGraph = context.select('.linearGrid').append('path')
+    //   .attr('fill', o.areaFill.color)
+    //   .style("opacity", o.areaFill.opacity);
+ 
+ } 
     function update() {
       var leftPadding = margin.left + 15;
-      y.domain([dataGen.time + dataGen.num, dataGen.time]);
-      let xDom = d3.extent(dataGen.latestData);
-      xDom[0] = o.min;
-      xDom[1] = o.max;
-      x.domain(xDom);
+      var test = d3.extent(o.data.data, function(d) { return d[1]; })
+      x.domain(d3.extent(o.data.data, function(d) { return d[1]; }));
+      y.domain(d3.extent(o.data.data, function(d) { return d[0]; }));
+   //   y.domain([dataGen.time + dataGen.num, dataGen.time]);
+      // let xDom = d3.extent(dataGen.latestData);
+      // xDom[0] = o.min;
+      // xDom[1] = o.max;
+      // x.domain(xDom);
     //  x.domain([0,200]);
 
       // $xAxis
@@ -138,16 +155,26 @@ var lineGraph = function(lineConfig) {
 
        // $yAxis
        //   .call(yAxis);
+   //    let $lngrp = context.select('.linearGrid').select('.linepath')
 
-      $lineGraph
-        .datum(dataGen.latestData)
+    //  $lngrp
+
+      let $lineGraph = context.select('.linearGrid').select('.linepath')
+      .select('path')
+      .attr('stroke', o.color)
+     // .attr('fill', 'none')
+      .attr('stroke-width', o.lineWeight);
+
+     $lineGraph
+        //.datum(dataGen.latestData)
+        .datum(o.data.data)
         .attr("transform", "translate(" + leftPadding + ", 0)")
         .attr('d', line);
 
-      $areaGraph
-        .datum(dataGen.latestData)
-        .attr("transform", "translate(" + leftPadding + ", 0)")
-        .attr('d', area);
+      // $areaGraph
+      //   .datum(dataGen.latestData)
+      //   .attr("transform", "translate(" + leftPadding + ", 0)")
+      //   .attr('d', area);
 
       // $rects
       //   .attr('height', (_, i) => Math.abs(latestDeltas[i] * h / 10))
@@ -161,10 +188,10 @@ var lineGraph = function(lineConfig) {
 
     update();
 
-    setInterval(() => {
-      dataGen.tick();
-      update();
-    }, 300);
+    // setInterval(() => {
+    //   dataGen.tick();
+    //   update();
+    // }, 300);
 
 
   }
