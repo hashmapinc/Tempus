@@ -37,7 +37,6 @@ function MetadataService($http, $q, $filter, utils) {
         getAllTenantMetadata :getAllTenantMetadata
         deleteMetadata: deleteMetadata
         saveMetadata: saveMetadata
-
     }
 
     return service;
@@ -108,7 +107,7 @@ function MetadataService($http, $q, $filter, utils) {
     function deleteMetadata(metadataId) {
         var deferred = $q.defer();
         var url = '/api/metadata/config/' + metadataId;
-
+.
         $http.delete(url).then(function success() {
             deferred.resolve();
         }, function fail(response) {
@@ -136,6 +135,7 @@ function MetadataService($http, $q, $filter, utils) {
     /**
      * Save Metadata configuration details.
      *
+
      * @param {*} metadataConfig
      */
     function saveMetadata(metadataConfig) {

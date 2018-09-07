@@ -19,7 +19,6 @@
 <md-card>
     <md-card-content>
         <section class="dropdown-section">
-            <div class="tb-container" ng-class="{'ng-invalid':!model.importData}">
                 <md-input-container class="md-block">
                     <label translate>metadata.restUrl</label>
                     <input required name="restUrl" ng-model="sink.url">
@@ -27,7 +26,6 @@
                         <div translate ng-message="required">metadata.restUrl-required</div>
                     </div>
                 </md-input-container>
-            </div>
         </section>
     </md-card-content>
 </md-card>
