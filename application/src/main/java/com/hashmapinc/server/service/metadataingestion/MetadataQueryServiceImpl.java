@@ -19,6 +19,8 @@ package com.hashmapinc.server.service.metadataingestion;
 import com.hashmapinc.server.common.data.metadata.MetadataConfigId;
 import com.hashmapinc.server.common.data.metadata.MetadataQuery;
 import com.hashmapinc.server.common.data.metadata.MetadataQueryId;
+import com.hashmapinc.server.common.data.page.TextPageData;
+import com.hashmapinc.server.common.data.page.TextPageLink;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -28,8 +30,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
-
-import java.util.List;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import static com.hashmapinc.server.dao.service.Validator.validateId;
 
@@ -72,11 +73,19 @@ public class MetadataQueryServiceImpl implements MetadataQueryService {
     }
 
     @Override
-    public List<MetadataQuery> findAllByMetadataConfigId(MetadataConfigId metadataConfigId) {
+    public TextPageData<MetadataQuery> findAllByMetadataConfigId(MetadataConfigId metadataConfigId, TextPageLink pageLink) {
         log.trace("Executing MetadataQueryServiceImpl.findAllByMetadataConfigId [{}]", metadataConfigId);
         validateId(metadataConfigId, INCORRECT_CONFIG_ID + metadataConfigId);
+
         String url = serviceUrl + PATH_SEPARATOR + configQueryPath + PATH_SEPARATOR + metadataConfigId.getId();
-        ResponseEntity<List<MetadataQuery>> response = restTemplate.exchange(url, HttpMethod.GET, null, new ParameterizedTypeReference<List<MetadataQuery>>() {
+        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(url)
+                .queryParam("limit", pageLink.getLimit());
+
+        if (pageLink.getIdOffset() != null)
+            builder.queryParam("idOffset", pageLink.getIdOffset());
+
+        ResponseEntity<TextPageData<MetadataQuery>> response = restTemplate.exchange(builder.build().encode().toUri(),
+                HttpMethod.GET, null, new ParameterizedTypeReference<TextPageData<MetadataQuery>>() {
         });
 
         return response.getBody();
