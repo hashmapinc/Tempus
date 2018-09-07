@@ -70,6 +70,7 @@ public class CustomerGroupServiceImpl extends AbstractEntityService implements C
     @Autowired
     private AssetService assetService;
 
+    @Autowired
     private DeviceService deviceService;
 
 
