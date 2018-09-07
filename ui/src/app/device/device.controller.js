@@ -360,13 +360,15 @@ export function DeviceController($rootScope,userService, deviceService, customer
 
     function loadTableData() {
 
-        var promise = vm.deviceGridConfig.fetchItemsFunc({limit: 200, textSearch: ''}, false);
+        var promise = vm.deviceGridConfig.fetchItemsFunc({limit: $scope.query.limit*$scope.query.page, textSearch: ''}, false);
         if(promise) {
 
             promise.then(function success(items) {
 
                 var deviceSortList = $filter('orderBy')(items.data, $scope.query.order);
                 var startIndex = $scope.query.limit * ($scope.query.page - 1);
+
+
 
 
                 if ($scope.query.search != null) {
@@ -388,7 +390,7 @@ export function DeviceController($rootScope,userService, deviceService, customer
                 var devicePaginatedata = deviceSortList.slice(startIndex, startIndex + $scope.query.limit);
 
                 $scope.devices = {
-                    count: items.data.length,
+                    count: 15,
                     data: devicePaginatedata
                 };
 
@@ -438,6 +440,7 @@ export function DeviceController($rootScope,userService, deviceService, customer
 
     $scope.onPaginate = function() {
 
+        //var startIndex = $scope.query.limit * ($scope.query.page - 1);
         loadTableData();
 
     }
