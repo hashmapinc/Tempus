@@ -20,6 +20,8 @@ import com.hashmapinc.server.common.data.UUIDConverter;
 import com.hashmapinc.server.common.data.id.TenantId;
 import com.hashmapinc.server.common.data.metadata.MetadataConfig;
 import com.hashmapinc.server.common.data.metadata.MetadataConfigId;
+import com.hashmapinc.server.common.data.page.TextPageData;
+import com.hashmapinc.server.common.data.page.TextPageLink;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -30,8 +32,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
-
-import java.util.List;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import static com.hashmapinc.server.dao.service.Validator.validateId;
 
@@ -79,11 +80,19 @@ public class MetadataConfigServiceImpl implements MetadataConfigService {
     }
 
     @Override
-    public List<MetadataConfig> findByTenant(TenantId tenantId) {
+    public TextPageData<MetadataConfig> findByTenant(TenantId tenantId, TextPageLink pageLink) {
         log.trace("Executing MetadataConfigServiceImpl.findByTenant [{}]", tenantId);
         validateId(tenantId, INCORRECT_TENANT_ID + tenantId);
+
         String url = serviceUrl + PATH_SEPARATOR + ownerQueryPath + PATH_SEPARATOR + UUIDConverter.fromTimeUUID(tenantId.getId());
-        ResponseEntity<List<MetadataConfig>> response = restTemplate.exchange(url, HttpMethod.GET, null, new ParameterizedTypeReference<List<MetadataConfig>>() {
+        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(url)
+                .queryParam("limit", pageLink.getLimit());
+
+        if (pageLink.getIdOffset() != null)
+            builder.queryParam("idOffset", pageLink.getIdOffset());
+
+        ResponseEntity<TextPageData<MetadataConfig>> response = restTemplate.exchange(builder.build().encode().toUri(),
+                HttpMethod.GET, null, new ParameterizedTypeReference<TextPageData<MetadataConfig>>() {
         });
         return response.getBody();
     }
