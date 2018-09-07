@@ -420,6 +420,11 @@ export default angular.module('tempus.types', [])
                 'ASSET': "ASSET",
                 'DEVICE': "DEVICE"
             },
+           userTypes: {
+                'CUSTOMER_USER':'CUSTOMER_USER',
+                'SYSADMIN_USER': "SYSADMIN_USER",
+                'TENANT_USER': "TENANT_USER"
+            },
             extensionValueType: {
                 string: 'value.string',
                 long: 'value.long',
