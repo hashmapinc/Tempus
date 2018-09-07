@@ -216,20 +216,30 @@ public class CustomerGroupServiceImpl extends AbstractEntityService implements C
 
     private Map<String, Map<String, String>> getDisplayablePermissions(List<UserPermission> userPermissions) {
         Map<String, Map<String, String> > displayablePermissions = new HashMap<>();
-        userPermissions.forEach(userPermission -> {
+        for (UserPermission userPermission : userPermissions) {
             Map<String, String> attrs = new HashMap<>();
             boolean isAccessedToSingleResource = !userPermission.getResources().isEmpty() && userPermission.getResources().size() == 1;
-            if(isAccessedToSingleResource) {
+            boolean isOneOfTheAttributeEntitiesDeleted = false;
+            if (isAccessedToSingleResource) {
                 EntityType entityType = (EntityType) userPermission.getResources().toArray()[0];
 
-                userPermission.getResourceAttributes().forEach((attrName, attrId) -> {
+                Map<UserPermission.ResourceAttribute, String> resourceAttribute = userPermission.getResourceAttributes();
+                for (Map.Entry<UserPermission.ResourceAttribute, String> resAttrEntry : resourceAttribute.entrySet()) {
+                    UserPermission.ResourceAttribute attrName = resAttrEntry.getKey();
+                    String attrId = resAttrEntry.getValue();
                     String nameOfEntity = getNameOfEntity(entityType, attrName, attrId);
-                    if(!nameOfEntity.isEmpty())
+                    if (!nameOfEntity.isEmpty()) {
                         attrs.put(attrName.toString(), nameOfEntity);
-                });
+                    }
+                    else {
+                        isOneOfTheAttributeEntitiesDeleted = true;
+                        break;
+                    }
+                }
             }
-            displayablePermissions.put(userPermission.getPermissionExpr(), attrs);
-        });
+            if (!isOneOfTheAttributeEntitiesDeleted)
+                displayablePermissions.put(userPermission.getPermissionExpr(), attrs);
+        }
         return displayablePermissions;
     }
 
