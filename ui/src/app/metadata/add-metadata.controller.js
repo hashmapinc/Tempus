@@ -19,7 +19,6 @@
 /*@ngInject*/
 export default function AddMetadataController($scope, $mdDialog, types, helpLinks, metadataService) {
 
-
     var vm = this;
     vm.helpLinks = helpLinks;
     vm.item = {};
