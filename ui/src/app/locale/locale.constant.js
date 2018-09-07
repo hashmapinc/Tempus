@@ -1461,13 +1461,6 @@ export default angular.module('tempus.locale', [])
 
                 },
 
-                "policy" : {
-                    "policy": "POLICY",
-                    "entityType": "Entity Type",
-                    "entity": "Entity",
-                    "accessLevel" :"Access Level"
-
-                },
 
                 "policy" : {
                     "policy": "POLICY",
