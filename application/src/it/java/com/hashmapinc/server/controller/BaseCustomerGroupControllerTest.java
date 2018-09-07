@@ -19,7 +19,12 @@ package com.hashmapinc.server.controller;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.hashmapinc.server.common.data.Customer;
 import com.hashmapinc.server.common.data.CustomerGroup;
-import com.hashmapinc.server.common.data.id.CustomerId;
+import com.hashmapinc.server.common.data.UserPermission;
+import com.hashmapinc.server.common.data.asset.Asset;
+import com.hashmapinc.server.common.data.datamodel.AttributeDefinition;
+import com.hashmapinc.server.common.data.datamodel.DataModel;
+import com.hashmapinc.server.common.data.datamodel.DataModelObject;
+import com.hashmapinc.server.common.data.id.*;
 import com.hashmapinc.server.common.data.page.TextPageData;
 import com.hashmapinc.server.common.data.page.TextPageLink;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -27,11 +32,11 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.test.web.servlet.ResultActions;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
+import static com.hashmapinc.server.dao.model.ModelConstants.NULL_UUID;
 import static org.hamcrest.Matchers.containsString;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -235,5 +240,104 @@ public abstract class BaseCustomerGroupControllerTest extends AbstractController
         pageData = doGetTypedWithPageLink("/api/customer/"+customerId+"/groups?", new TypeReference<TextPageData<CustomerGroup>>(){}, pageLink);
         Assert.assertFalse(pageData.hasNext());
         Assert.assertEquals(0, pageData.getData().size());
+    }
+
+
+    @Test
+    public void testGetDisplayablePoliciesForGroup() throws Exception {
+
+        DataModel dataModel = createDataModel();
+        DataModelObject dataModelObject = createDataModelObject(dataModel);
+        Asset asset = createAsset(dataModelObject.getId());
+
+        try {
+            String policy = String.format("CUSTOMER_USER:ASSET?%s=%s&%s=%s:*",
+                    UserPermission.ResourceAttribute.ID, asset.getId().getId().toString(),
+                    UserPermission.ResourceAttribute.DATA_MODEL_ID, dataModelObject.getId().getId().toString());
+
+            String policyForAll = "CUSTOMER_USER:*:*";
+            List<String> policies = Arrays.asList(
+                    policy,
+                    policyForAll
+            );
+
+            CustomerGroup savedCustomerGroup = createGroupWithPolicies(policies);
+            String groupId = savedCustomerGroup.getId().getId().toString();
+            final Map<String, Map<String, String>> displayablePolicies = getDisplayablePolicies(groupId);
+
+            Assert.assertArrayEquals(policies.toArray(), displayablePolicies.keySet().toArray());
+            Assert.assertTrue(displayablePolicies.get(policyForAll).isEmpty());
+            Assert.assertEquals(displayablePolicies.get(policy).get(UserPermission.ResourceAttribute.ID.toString()), asset.getName());
+            Assert.assertEquals(displayablePolicies.get(policy).get(UserPermission.ResourceAttribute.DATA_MODEL_ID.toString()), dataModelObject.getName());
+            deleteAsset(asset.getId());
+            final Map<String, Map<String, String>> displayablePoliciesNew = getDisplayablePolicies(groupId);
+            Assert.assertEquals(1, displayablePoliciesNew.keySet().toArray().length);
+            Assert.assertNull(displayablePoliciesNew.get(policy));
+            deleteGroup(savedCustomerGroup.getId());
+        } finally {
+            deleteDataModelObject(dataModelObject.getId());
+        }
+    }
+
+    private Map<String, Map<String, String>> getDisplayablePolicies(String groupId) throws Exception {
+        String getPolicyUrl = "/api/customer/group/" + groupId + "/policy";
+
+        return doGetTyped(getPolicyUrl, new TypeReference<Map<String, Map<String, String>>>() {
+        });
+    }
+
+
+    private CustomerGroup createGroupWithPolicies(List<String> policies) throws Exception {
+        CustomerGroup customerGroup = new CustomerGroup();
+        customerGroup.setTitle("My Customer Group");
+        customerGroup.setTenantId(tenantId);
+        customerGroup.setCustomerId(customerId);
+        customerGroup.setPolicies(policies);
+        return doPost("/api/customer/group", customerGroup, CustomerGroup.class);
+    }
+
+    private void deleteGroup(CustomerGroupId customerGroupId) throws Exception {
+        doDelete("/api/customer/group/"+customerGroupId.getId().toString())
+                .andExpect(status().isOk());
+    }
+
+
+    private DataModel createDataModel() throws Exception{
+        DataModel dataModel = new DataModel();
+        dataModel.setName("Default Drilling Data Model1");
+        dataModel.setLastUpdatedTs(System.currentTimeMillis());
+        return doPost("/api/data-model", dataModel, DataModel.class);
+    }
+
+    private DataModelObject createDataModelObject(DataModel dataModel) throws Exception{
+        DataModelObject dataModelObject = new DataModelObject();
+        dataModelObject.setName("Well");
+
+        AttributeDefinition ad = new AttributeDefinition();
+        ad.setValueType("STRING");
+        ad.setName("attr name2");
+        List<AttributeDefinition> attributeDefinitions = new ArrayList<>();
+        attributeDefinitions.add(ad);
+        dataModelObject.setAttributeDefinitions(attributeDefinitions);
+
+        return doPost("/api/data-model/" + dataModel.getId().toString() + "/objects", dataModelObject, DataModelObject.class);
+    }
+
+    private void deleteDataModelObject(DataModelObjectId dataModelObjectId) throws Exception {
+        doDelete("/api/data-model/objects/"+dataModelObjectId.getId().toString())
+                .andExpect(status().isOk());
+    }
+
+    public Asset createAsset(DataModelObjectId dataModelObjectId) throws Exception {
+        Asset asset = new Asset();
+        asset.setName("My asset");
+        asset.setType("default");
+        asset.setDataModelObjectId(dataModelObjectId);
+        return doPost("/api/asset", asset, Asset.class);
+    }
+
+    private void deleteAsset(AssetId assetId) throws Exception {
+        doDelete("/api/asset/"+assetId.getId().toString())
+                .andExpect(status().isOk());
     }
 }
