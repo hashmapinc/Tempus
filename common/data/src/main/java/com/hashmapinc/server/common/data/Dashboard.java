@@ -24,6 +24,8 @@ public class Dashboard extends DashboardInfo {
     private static final long serialVersionUID = 872682138346187503L;
     
     private transient JsonNode configuration;
+
+    private AssetLandingInfo assetLandingInfo;
     
     public Dashboard() {
         super();
@@ -40,6 +42,7 @@ public class Dashboard extends DashboardInfo {
     public Dashboard(Dashboard dashboard) {
         super(dashboard);
         this.configuration = dashboard.getConfiguration();
+        this.assetLandingInfo = dashboard.getAssetLandingInfo();
     }
 
     public JsonNode getConfiguration() {
@@ -48,6 +51,14 @@ public class Dashboard extends DashboardInfo {
 
     public void setConfiguration(JsonNode configuration) {
         this.configuration = configuration;
+    }
+
+    public AssetLandingInfo getAssetLandingInfo() {
+        return assetLandingInfo;
+    }
+
+    public void setAssetLandingInfo(AssetLandingInfo assetLandingInfo) {
+        this.assetLandingInfo = assetLandingInfo;
     }
 
     @Override
@@ -70,7 +81,13 @@ public class Dashboard extends DashboardInfo {
         if (configuration == null) {
             if (other.configuration != null)
                 return false;
-        } else if (!configuration.equals(other.configuration))
+        }
+        else if (!configuration.equals(other.configuration))
+            return false;
+        else if (assetLandingInfo == null) {
+            return other.assetLandingInfo == null;
+        }
+        else if (!assetLandingInfo.equals(other.assetLandingInfo))
             return false;
         return true;
     }

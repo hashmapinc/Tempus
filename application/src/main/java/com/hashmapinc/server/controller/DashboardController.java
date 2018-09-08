@@ -16,10 +16,12 @@
  */
 package com.hashmapinc.server.controller;
 
+import com.datastax.driver.core.utils.UUIDs;
 import com.hashmapinc.server.common.data.*;
 import com.hashmapinc.server.common.data.audit.ActionType;
 import com.hashmapinc.server.common.data.id.CustomerId;
 import com.hashmapinc.server.common.data.id.DashboardId;
+import com.hashmapinc.server.common.data.id.DataModelObjectId;
 import com.hashmapinc.server.common.data.id.TenantId;
 import com.hashmapinc.server.common.data.page.TextPageData;
 import com.hashmapinc.server.common.data.page.TextPageLink;
@@ -32,6 +34,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @RestController
@@ -81,7 +84,6 @@ public class DashboardController extends BaseController {
         try {
             User user = getCurrentUser();
             dashboard.setTenantId(user.getTenantId());
-
             Dashboard savedDashboard = checkNotNull(dashboardService.saveDashboard(dashboard));
 
             if((user).getAuthority().compareTo(Authority.CUSTOMER_USER) == 0) {
@@ -469,6 +471,18 @@ public class DashboardController extends BaseController {
             checkCustomerId(customerId);
             TimePageLink pageLink = createPageLink(limit, startTime, endTime, ascOrder, offset);
             return checkNotNull(dashboardService.findDashboardsByTenantIdAndCustomerId(tenantId, customerId, pageLink).get());
+        } catch (Exception e) {
+            throw handleException(e);
+        }
+    }
+
+    @PreAuthorize("hasAnyAuthority('TENANT_ADMIN','CUSTOMER_USER')")
+    @GetMapping(value = "/asset/dashboard/data-model-object/{dataModelObjectId}")
+    @ResponseBody
+    public List<Dashboard> findDashboardByDataModelObj(@PathVariable("dataModelObjectId") String strDataModelObjectId) throws TempusException {
+        try {
+            DataModelObjectId dataModelObjectId = new DataModelObjectId(toUUID(strDataModelObjectId));
+            return dashboardService.findDashboardByDataModelObjectId(dataModelObjectId);
         } catch (Exception e) {
             throw handleException(e);
         }

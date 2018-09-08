@@ -17,11 +17,11 @@
 package com.hashmapinc.server.dao.model;
 
 import com.datastax.driver.core.utils.UUIDs;
+import com.hashmapinc.server.common.data.UUIDConverter;
 import com.hashmapinc.server.common.data.kv.Aggregation;
 import com.hashmapinc.server.common.data.kv.DepthAggregation;
 import com.hashmapinc.server.common.msg.exception.TempusRuntimeException;
 import org.apache.commons.lang3.ArrayUtils;
-import com.hashmapinc.server.common.data.UUIDConverter;
 
 import java.util.UUID;
 
@@ -47,6 +47,7 @@ public class ModelConstants {
     public static final String SEARCH_TEXT_PROPERTY = "search_text";
     public static final String ADDITIONAL_INFO_PROPERTY = "additional_info";
     public static final String ENTITY_TYPE_PROPERTY = "entity_type";
+    public static final String GROUPS_PROPERTY = "groups";
 
     public static final String ENTITY_TYPE_COLUMN = ENTITY_TYPE_PROPERTY;
     public static final String ENTITY_ID_COLUMN = "entity_id";
@@ -67,34 +68,8 @@ public class ModelConstants {
     /**
      * Cassandra user constants.
      */
-    public static final String USER_COLUMN_FAMILY_NAME = "user";
-    public static final String USER_PG_HIBERNATE_COLUMN_FAMILY_NAME = "tb_user";
-    public static final String USER_TENANT_ID_PROPERTY = TENANT_ID_PROPERTY;
-    public static final String USER_CUSTOMER_ID_PROPERTY = CUSTOMER_ID_PROPERTY;
-    public static final String USER_EMAIL_PROPERTY = "email";
-    public static final String USER_AUTHORITY_PROPERTY = "authority";
-    public static final String USER_FIRST_NAME_PROPERTY = "first_name";
-    public static final String USER_LAST_NAME_PROPERTY = "last_name";
-    public static final String USER_ADDITIONAL_INFO_PROPERTY = ADDITIONAL_INFO_PROPERTY;
-
-    public static final String USER_BY_EMAIL_COLUMN_FAMILY_NAME = "user_by_email";
-    public static final String USER_BY_TENANT_AND_SEARCH_TEXT_COLUMN_FAMILY_NAME = "user_by_tenant_and_search_text";
-    public static final String USER_BY_CUSTOMER_AND_SEARCH_TEXT_COLUMN_FAMILY_NAME = "user_by_customer_and_search_text";
-
-    /**
-     * Cassandra user_credentials constants.
-     */
-    public static final String USER_CREDENTIALS_COLUMN_FAMILY_NAME = "user_credentials";
-    public static final String USER_CREDENTIALS_USER_ID_PROPERTY = USER_ID_PROPERTY;
-    public static final String USER_CREDENTIALS_ENABLED_PROPERTY = "enabled";
-    public static final String USER_CREDENTIALS_PASSWORD_PROPERTY = "password"; //NOSONAR, the constant used to identify password column name (not password value itself)
-    public static final String USER_CREDENTIALS_ACTIVATE_TOKEN_PROPERTY = "activate_token";
-    public static final String USER_CREDENTIALS_RESET_TOKEN_PROPERTY = "reset_token";
-
-    public static final String USER_CREDENTIALS_BY_USER_COLUMN_FAMILY_NAME = "user_credentials_by_user";
-    public static final String USER_CREDENTIALS_BY_ACTIVATE_TOKEN_COLUMN_FAMILY_NAME = "user_credentials_by_activate_token";
-    public static final String USER_CREDENTIALS_BY_RESET_TOKEN_COLUMN_FAMILY_NAME = "user_credentials_by_reset_token";
-
+    public static final String USER_GROUP_TABLE_NAME = "user_groups";
+    public static final String USER_GROUP_COLUMN_FAMILY_NAME = "user_groups";
     /**
      * Cassandra admin_settings constants.
      */
@@ -171,6 +146,16 @@ public class ModelConstants {
     public static final String TAG_METADATA_MEAN_FREQUENCY = "mean_frequency";
     public static final String TAG_METADATA_MEDIAN_FREQUENCY = "median_frequency";
     public static final String TAG_METADATA_SOURCE = "source";
+
+    /**
+     * Metadata Ingestion Constants
+     */
+    public static final String METADATA_ENTRIES_TABLE = "metadata_entries";
+    public static final String METADATA_ENTRIES_VIEW_BY_CONFIG = "metadata_entries_by_config";
+    public static final String METADATA_CONFIG_ID = "metadata_config_id";
+    public static final String METADATA_INGESTION_KEY_COLUMN = "key";
+    public static final String METADATA_DATASOURCE_NAME_COLUMN = "datasource_name";
+    public static final String METADATA_INGESTION_VALUE_COLUMN = "value";
 
     /**
      * Computations Constants
@@ -331,8 +316,17 @@ public class ModelConstants {
     public static final String DASHBOARD_TITLE_PROPERTY = TITLE_PROPERTY;
     public static final String DASHBOARD_CONFIGURATION_PROPERTY = "configuration";
     public static final String DASHBOARD_ASSIGNED_CUSTOMERS_PROPERTY = "assigned_customers";
+    public static final String DASHBOARD_TYPE_PROPERTY = "type";
 
     public static final String DASHBOARD_BY_TENANT_AND_SEARCH_TEXT_COLUMN_FAMILY_NAME = "dashboard_by_tenant_and_search_text";
+
+    /**
+     * Cassandra asset landing dashboard constants.
+     */
+    public static final String ASSET_LANDING_COLUMN_FAMILY_NAME = "asset_landing_info";
+    public static final String ASSET_LANDING_VIEW_BY_DATA_MODEL_OBJ_ID = "asset_landing_info_by_data_model_object_id";
+    public static final String ASSET_LANDING_DATA_MODEL_ID = "data_model_id";
+    public static final String ASSET_LANDING_DATAMODEL_OBJECT_ID = "data_model_object_id";
 
     /**
      * Cassandra plugin metadata constants.
@@ -520,6 +514,43 @@ public class ModelConstants {
     public static final String LONG_VALUE_COLUMN = "long_v";
     public static final String DOUBLE_VALUE_COLUMN = "dbl_v";
     public static final String JSON_VALUE_COLUMN = "json_v";
+
+    /**
+     * CustomerGroup Constants
+     */
+    public static final String CUSTOMER_GROUP_TABLE_NAME = "customer_group";
+    public static final String CUSTOMER_GROUP_TITLE = TITLE_PROPERTY;
+    public static final String CUSTOMER_GROUP_TENANT_ID = TENANT_ID_PROPERTY;
+    public static final String CUSTOMER_GROUP_CUSTOMER_ID = CUSTOMER_ID_PROPERTY;
+
+
+    /**
+     * Cassandra CustomerGroup Constants
+     */
+    public static final String CUSTOMER_GROUP_COLUMN_FAMILY_NAME = "customer_group";
+    public static final String CUSTOMER_GROUP_TITLE_PROPERTY = TITLE_PROPERTY;
+    public static final String CUSTOMER_GROUP_TENANT_ID_PROPERTY = TENANT_ID_PROPERTY;
+    public static final String CUSTOMER_GROUP_CUSTOMER_ID_PROPERTY = CUSTOMER_ID_PROPERTY;
+    public static final String CUSTOMER_GROUP_BY_TENANT_AND_CUSTOMER_AND_TITLE_VIEW_NAME = "customer_group_by_tenant_and_customer_and_title";
+    public static final String CUSTOMER_GROUP_BY_TENANT_AND_CUSTOMER_SEARCH_TEXT_COLUMN_FAMILY_NAME = "group_by_tenant_and_customer_and_search_text";
+    public static final String CUSTOMER_GROUP_ID_PROPERTY = "group_id";
+
+
+    /**
+     * CustomerGroup Policy Constants
+     */
+    public static final String CUSTOMER_GROUP_POLICY_TABLE_NAME = "customer_group_policy";
+    public static final String CUSTOMER_GROUP_POLICY_ID = "group_id";
+    public static final String CUSTOMER_GROUP_POLICY_COLUMN = "policy";
+
+    /**
+     * Cassandra CustomerGroup Policy Constants
+     */
+    public static final String CUSTOMER_GROUP_POLICY_COLUMN_FAMILY_NAME = "customer_group_policy";
+    public static final String CUSTOMER_GROUP_POLICY_ID_PROPERTY = "group_id";
+    public static final String CUSTOMER_GROUP_POLICY_PROPERTY = "policies";
+
+
 
     protected static final String[] NONE_AGGREGATION_COLUMNS = new String[]{LONG_VALUE_COLUMN, DOUBLE_VALUE_COLUMN, BOOLEAN_VALUE_COLUMN, STRING_VALUE_COLUMN, JSON_VALUE_COLUMN, KEY_COLUMN, TS_COLUMN, TS_DIFF};
     protected static final String[] NONE_DS_AGGREGATION_COLUMNS = new String[]{LONG_VALUE_COLUMN, DOUBLE_VALUE_COLUMN, BOOLEAN_VALUE_COLUMN, STRING_VALUE_COLUMN, JSON_VALUE_COLUMN, KEY_COLUMN, DS_COLUMN, DS_DIFF};

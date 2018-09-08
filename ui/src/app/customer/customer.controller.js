@@ -36,6 +36,20 @@ export default function CustomerController(customerService, $state, $stateParams
                 return customer && (!customer.additionalInfo || !customer.additionalInfo.isPublic);
             }
         },
+
+        {
+            onAction: function ($event, item) {
+                openGroups($event, item);
+            },
+            name: function() { return $translate.instant('user.groups') },
+            details: function() { return $translate.instant('customer.manage-customer-groups') },
+            icon: "group",
+            isEnabled: function(customer) {
+                return customer && (!customer.additionalInfo || !customer.additionalInfo.isPublic);
+            }
+        },
+
+
         {
             onAction: function ($event, item) {
                 openCustomerAssets($event, item);
@@ -148,6 +162,7 @@ export default function CustomerController(customerService, $state, $stateParams
     vm.openCustomerAssets = openCustomerAssets;
     vm.openCustomerDevices = openCustomerDevices;
     vm.openCustomerDashboards = openCustomerDashboards;
+    vm.openGroups = openGroups;
 
     function deleteCustomerTitle(customer) {
         return $translate.instant('customer.delete-customer-title', {customerTitle: customer.title});
@@ -194,6 +209,13 @@ export default function CustomerController(customerService, $state, $stateParams
             $event.stopPropagation();
         }
         $state.go('home.customers.users', {customerId: customer.id.id});
+    }
+
+    function openGroups($event, customer) {
+        if ($event) {
+            $event.stopPropagation();
+        }
+        $state.go('home.customers.usergroups', {customerId: customer.id.id});
     }
 
     function openCustomerAssets($event, customer) {

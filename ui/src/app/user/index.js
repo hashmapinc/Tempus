@@ -14,34 +14,47 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 import uiRouter from 'angular-ui-router';
 import tempusGrid from '../components/grid.directive';
 import tempusApiUser from '../api/user.service';
+import tempusApiUserGroup from '../api/user-group.service';
 import tempusToast from '../services/toast';
 
 import UserRoutes from './user.routes';
 import UserController from './user.controller';
-import UserActionListController from './useractionlist.controller';
 import UserGroupController from './usergroup.controller';
 import AddGroupModelController from './add-group.controller'
 import AddUserController from './add-user.controller';
 import ActivationLinkDialogController from './activation-link.controller';
 import UserDirective from './user.directive';
 import UsergroupDirective from './usergroup.directive';
+import AssignUsersToGroupController from './assign-users-to-group.controller';
+import AssignGroupsToUserController from './assign-groups-to-user.controller';
+import UnassignUsersFromGroupController from './unassign-users-from-group.controller';
+import UnassignGroupsFromUserController from './unassign-groups-from-user.controller';
+import AssignUserGroupDetailDirective from './assign-user-group-detail.directive';
+//import PolicyTblDirective from './policy-tbl.directive';
 
 export default angular.module('tempus.user', [
     uiRouter,
     tempusGrid,
     tempusApiUser,
+    tempusApiUserGroup,
     tempusToast
 ])
     .config(UserRoutes)
     .controller('UserController', UserController)
-    .controller('UserActionListController', UserActionListController)
     .controller('AddUserController', AddUserController)
     .controller('UserGroupController', UserGroupController)
     .controller('AddGroupModelController', AddGroupModelController)
     .controller('ActivationLinkDialogController', ActivationLinkDialogController)
+    .controller('AssignUsersToGroupController', AssignUsersToGroupController)
+    .controller('UnassignUsersFromGroupController', UnassignUsersFromGroupController)
+    .controller('AssignGroupsToUserController', AssignGroupsToUserController)
+    .controller('UnassignGroupsFromUserController', UnassignGroupsFromUserController)
     .directive('tbUser', UserDirective)
+    .directive('tbAssignUserGroupDetail', AssignUserGroupDetailDirective)
     .directive('tbUsergroup', UsergroupDirective)
+    //.directive('tbPolicyTbl',PolicyTblDirective)
     .name;

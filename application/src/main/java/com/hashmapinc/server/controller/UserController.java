@@ -18,9 +18,11 @@ package com.hashmapinc.server.controller;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.hashmapinc.server.common.data.CustomerGroup;
 import com.hashmapinc.server.common.data.EntityType;
 import com.hashmapinc.server.common.data.User;
 import com.hashmapinc.server.common.data.audit.ActionType;
+import com.hashmapinc.server.common.data.id.CustomerGroupId;
 import com.hashmapinc.server.common.data.id.CustomerId;
 import com.hashmapinc.server.common.data.id.TenantId;
 import com.hashmapinc.server.common.data.id.UserId;
@@ -48,6 +50,9 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api")
@@ -189,7 +194,7 @@ public class UserController extends BaseController {
     }
 
     @PreAuthorize("hasAnyAuthority('SYS_ADMIN', 'TENANT_ADMIN')")
-    @GetMapping(value = "/user/{userId}/activationLink")
+    @GetMapping(value = "/user/{userId}/activationLink", produces = "text/plain")
     @ResponseBody
     public String getActivationLink(
             @PathVariable(USER_ID) String strUserId,
@@ -287,5 +292,61 @@ public class UserController extends BaseController {
             throw handleException(e);
         }
     }
-    
+
+    @PreAuthorize("hasAuthority('TENANT_ADMIN')")
+    @GetMapping(value = "/user/{userId}/groups", params = { "limit" })
+    @ResponseBody
+    public TextPageData<CustomerGroup> getGroupsByUserId(
+            @PathVariable(USER_ID) String strUserId,
+            @RequestParam int limit,
+            @RequestParam(required = false) String textSearch,
+            @RequestParam(required = false) String idOffset,
+            @RequestParam(required = false) String textOffset) throws TempusException {
+        checkParameter(USER_ID, strUserId);
+        try {
+            UserId userId = new UserId(toUUID(strUserId));
+            TextPageLink pageLink = createPageLink(limit, textSearch, idOffset, textOffset);
+            return customerGroupService.findByUserId(userId, pageLink);
+        } catch (Exception e) {
+            throw handleException(e);
+        }
+    }
+
+    @PreAuthorize("hasAuthority('TENANT_ADMIN')")
+    @PostMapping(value = "/user/{userId}/groups")
+    @ResponseBody
+    public User assignGroupsToUser(
+            @PathVariable(USER_ID) String strUserId ,
+            @RequestBody List<UUID> groupUuids) throws TempusException {
+        checkParameter(USER_ID, strUserId);
+        try{
+            UserId userId = new UserId(toUUID(strUserId));
+            List<CustomerGroupId> customerGroupIds = groupUuids.stream().map(CustomerGroupId::new).collect(Collectors.toList());
+            for (CustomerGroupId customerGroupId: customerGroupIds) {
+                checkCustomerGroupId(customerGroupId);
+            }
+            return checkNotNull(userService.assignGroups(userId, customerGroupIds));
+        } catch (Exception e){
+            throw handleException(e);
+        }
+    }
+
+    @PreAuthorize("hasAuthority('TENANT_ADMIN')")
+    @PutMapping(value = "/user/{userId}/groups")
+    @ResponseBody
+    public User unassignGroupsFromUser(
+            @PathVariable(USER_ID) String strUserId ,
+            @RequestBody List<UUID> groupUuids) throws TempusException {
+        checkParameter(USER_ID, strUserId);
+        try{
+            UserId userId = new UserId(toUUID(strUserId));
+            List<CustomerGroupId> customerGroupIds = groupUuids.stream().map(CustomerGroupId::new).collect(Collectors.toList());
+            for (CustomerGroupId customerGroupId: customerGroupIds) {
+                checkCustomerGroupId(customerGroupId);
+            }
+            return checkNotNull(userService.unassignGroups(userId, customerGroupIds));
+        } catch (Exception e){
+            throw handleException(e);
+        }
+    }
 }

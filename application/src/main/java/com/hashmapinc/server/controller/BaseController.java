@@ -16,32 +16,18 @@
  */
 package com.hashmapinc.server.controller;
 
+import com.hashmapinc.server.actors.service.ActorService;
 import com.hashmapinc.server.common.data.*;
 import com.hashmapinc.server.common.data.alarm.Alarm;
+import com.hashmapinc.server.common.data.alarm.AlarmId;
 import com.hashmapinc.server.common.data.alarm.AlarmInfo;
 import com.hashmapinc.server.common.data.asset.Asset;
 import com.hashmapinc.server.common.data.audit.ActionType;
 import com.hashmapinc.server.common.data.computation.ComputationJob;
 import com.hashmapinc.server.common.data.id.*;
 import com.hashmapinc.server.common.data.page.TextPageLink;
-import com.hashmapinc.server.common.data.plugin.ComponentDescriptor;
-import com.hashmapinc.server.dao.cluster.NodeMetricService;
-import com.hashmapinc.server.dao.datamodel.DataModelObjectService;
-import com.hashmapinc.server.dao.datamodel.DataModelService;
-import com.hashmapinc.server.dao.device.DeviceCredentialsService;
-import com.hashmapinc.server.dao.rule.RuleService;
-import com.hashmapinc.server.dao.user.UserService;
-import com.hashmapinc.server.service.component.ComponentDiscoveryService;
-import com.hashmapinc.server.service.security.model.SecurityUser;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.ExceptionHandler;
-import com.hashmapinc.server.actors.service.ActorService;
-import com.hashmapinc.server.common.data.alarm.AlarmId;
 import com.hashmapinc.server.common.data.page.TimePageLink;
+import com.hashmapinc.server.common.data.plugin.ComponentDescriptor;
 import com.hashmapinc.server.common.data.plugin.ComponentType;
 import com.hashmapinc.server.common.data.plugin.PluginMetaData;
 import com.hashmapinc.server.common.data.rule.RuleMetaData;
@@ -50,25 +36,42 @@ import com.hashmapinc.server.common.data.widget.WidgetType;
 import com.hashmapinc.server.common.data.widget.WidgetsBundle;
 import com.hashmapinc.server.dao.alarm.AlarmService;
 import com.hashmapinc.server.dao.asset.AssetService;
-
+import com.hashmapinc.server.dao.audit.AuditLogService;
+import com.hashmapinc.server.dao.cluster.NodeMetricService;
 import com.hashmapinc.server.dao.computations.ComputationJobService;
 import com.hashmapinc.server.dao.computations.ComputationsService;
-
-import com.hashmapinc.server.dao.audit.AuditLogService;
-
 import com.hashmapinc.server.dao.customer.CustomerService;
+import com.hashmapinc.server.dao.customergroup.CustomerGroupService;
 import com.hashmapinc.server.dao.dashboard.DashboardService;
+import com.hashmapinc.server.dao.datamodel.DataModelObjectService;
+import com.hashmapinc.server.dao.datamodel.DataModelService;
+import com.hashmapinc.server.dao.device.DeviceCredentialsService;
 import com.hashmapinc.server.dao.device.DeviceService;
 import com.hashmapinc.server.dao.exception.DataValidationException;
 import com.hashmapinc.server.dao.exception.IncorrectParameterException;
+import com.hashmapinc.server.dao.metadataingestion.MetadataIngestionService;
 import com.hashmapinc.server.dao.model.ModelConstants;
 import com.hashmapinc.server.dao.plugin.PluginService;
 import com.hashmapinc.server.dao.relation.RelationService;
+import com.hashmapinc.server.dao.rule.RuleService;
+import com.hashmapinc.server.dao.user.UserService;
 import com.hashmapinc.server.dao.widget.WidgetTypeService;
 import com.hashmapinc.server.dao.widget.WidgetsBundleService;
 import com.hashmapinc.server.exception.TempusErrorCode;
 import com.hashmapinc.server.exception.TempusErrorResponseHandler;
 import com.hashmapinc.server.exception.TempusException;
+import com.hashmapinc.server.service.component.ComponentDiscoveryService;
+import com.hashmapinc.server.service.metadataingestion.MetadataConfigService;
+import com.hashmapinc.server.service.metadataingestion.MetadataQueryService;
+import com.hashmapinc.server.service.security.model.SecurityUser;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.client.HttpClientErrorException;
 
 import javax.mail.MessagingException;
 import javax.servlet.http.HttpServletRequest;
@@ -84,6 +87,7 @@ public abstract class BaseController {
 
     public static final String INCORRECT_TENANT_ID = "Incorrect tenantId ";
     public static final String YOU_DON_T_HAVE_PERMISSION_TO_PERFORM_THIS_OPERATION = "You don't have permission to perform this operation!";
+    private static final String ITEM_NOT_FOUND = "Requested item wasn't found!";
 
     @Autowired
     private TempusErrorResponseHandler errorResponseHandler;
@@ -149,6 +153,18 @@ public abstract class BaseController {
     @Autowired
     protected NodeMetricService nodeMetricService;
 
+    @Autowired
+    protected MetadataIngestionService metadataIngestionService;
+
+    @Autowired
+    protected MetadataConfigService metadataConfigService;
+
+    @Autowired
+    protected MetadataQueryService metadataQueryService;
+
+    @Autowired
+    protected CustomerGroupService customerGroupService;
+
 
     @ExceptionHandler(TempusException.class)
     public void handleTempusException(TempusException ex, HttpServletResponse response) {
@@ -176,6 +192,8 @@ public abstract class BaseController {
             return new TempusException(exception.getMessage(), TempusErrorCode.BAD_REQUEST_PARAMS);
         } else if (exception instanceof MessagingException) {
             return new TempusException("Unable to send mail: " + exception.getMessage(), TempusErrorCode.GENERAL);
+        } else if (exception instanceof HttpClientErrorException && ((HttpClientErrorException) exception).getStatusCode().equals(HttpStatus.NOT_FOUND)) {
+            return new TempusException(ITEM_NOT_FOUND, TempusErrorCode.ITEM_NOT_FOUND);
         } else {
             return new TempusException(exception.getMessage(), TempusErrorCode.GENERAL);
         }
@@ -183,7 +201,7 @@ public abstract class BaseController {
 
     <T> T checkNotNull(T reference) throws TempusException {
         if (reference == null) {
-            throw new TempusException("Requested item wasn't found!", TempusErrorCode.ITEM_NOT_FOUND);
+            throw new TempusException(ITEM_NOT_FOUND, TempusErrorCode.ITEM_NOT_FOUND);
         }
         return reference;
     }
@@ -192,7 +210,7 @@ public abstract class BaseController {
         if (reference.isPresent()) {
             return reference.get();
         } else {
-            throw new TempusException("Requested item wasn't found!", TempusErrorCode.ITEM_NOT_FOUND);
+            throw new TempusException(ITEM_NOT_FOUND, TempusErrorCode.ITEM_NOT_FOUND);
         }
     }
 
@@ -274,6 +292,22 @@ public abstract class BaseController {
         }
     }
 
+    CustomerGroup checkCustomerGroupId(CustomerGroupId customerGroupId) throws TempusException {
+        try {
+            validateId(customerGroupId, "Incorrect customerGroupId " + customerGroupId);
+            SecurityUser authUser = getCurrentUser();
+            CustomerGroup customerGroup = customerGroupService.findByCustomerGroupId(customerGroupId);
+            checkCustomerGroup(customerGroup);
+            if (!customerGroup.getTenantId().getId().equals(authUser.getTenantId().getId())) {
+                throw new TempusException(YOU_DON_T_HAVE_PERMISSION_TO_PERFORM_THIS_OPERATION,
+                        TempusErrorCode.PERMISSION_DENIED);
+            }
+            return customerGroup;
+        } catch (Exception e) {
+            throw handleException(e, false);
+        }
+    }
+
     Long checkLong(String value, String paramName) {
         try {
            return Long.parseLong(value);
@@ -294,6 +328,12 @@ public abstract class BaseController {
     private void checkCustomer(Customer customer) throws TempusException {
         checkNotNull(customer);
         checkTenantId(customer.getTenantId());
+    }
+
+    private void checkCustomerGroup(CustomerGroup customerGroup) throws TempusException {
+        checkNotNull(customerGroup);
+        checkTenantId(customerGroup.getTenantId());
+        checkCustomerId(customerGroup.getCustomerId());
     }
 
     User checkUserId(UserId userId) throws TempusException {
@@ -343,6 +383,9 @@ public abstract class BaseController {
                     return;
                 case USER:
                     checkUserId(new UserId(entityId.getId()));
+                    return;
+                case CUSTOMER_GROUP:
+                    checkCustomerGroupId(new CustomerGroupId(entityId.getId()));
                     return;
                 default:
                     throw new IllegalArgumentException("Unsupported entity type: " + entityId.getEntityType());

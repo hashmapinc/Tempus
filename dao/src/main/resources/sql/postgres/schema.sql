@@ -77,6 +77,16 @@ CREATE TABLE IF NOT EXISTS attribute_kv (
   CONSTRAINT attribute_kv_unq_key UNIQUE (entity_type, entity_id, attribute_type, attribute_key)
 );
 
+CREATE TABLE IF NOT EXISTS metadata_entries(
+    tenant_id varchar(31) NOT NULL,
+    metadata_config_id varchar(31) NOT NULL,
+    datasource_name varchar(255) NOT NULL,
+    key varchar(255) NOT NULL,
+    value varchar(10000000) NOT NULL,
+    last_update_ts bigint,
+    CONSTRAINT metadata_entries_unq_key UNIQUE (tenant_id, metadata_config_id, key)
+);
+
 CREATE TABLE IF NOT EXISTS component_descriptor (
     id varchar(31) NOT NULL CONSTRAINT component_descriptor_pkey PRIMARY KEY,
     actions varchar(255),
@@ -189,18 +199,6 @@ CREATE TABLE IF NOT EXISTS rule (
     weight integer
 );
 
-CREATE TABLE IF NOT EXISTS tb_user (
-    id varchar(31) NOT NULL CONSTRAINT tb_user_pkey PRIMARY KEY,
-    additional_info varchar,
-    authority varchar(255),
-    customer_id varchar(31),
-    email varchar(255) UNIQUE,
-    first_name varchar(255),
-    last_name varchar(255),
-    search_text varchar(255),
-    tenant_id varchar(31)
-);
-
 CREATE TABLE IF NOT EXISTS tenant (
     id varchar(31) NOT NULL CONSTRAINT tenant_pkey PRIMARY KEY,
     additional_info varchar,
@@ -281,15 +279,6 @@ CREATE TABLE IF NOT EXISTS tag_metadata (
     median_frequency double precision,
     source varchar,
     CONSTRAINT tag_metadata_unq_key UNIQUE (entity_type, entity_id, key)
-);
-
-CREATE TABLE IF NOT EXISTS user_credentials (
-    id varchar(31) NOT NULL CONSTRAINT user_credentials_pkey PRIMARY KEY,
-    activate_token varchar(255) UNIQUE,
-    enabled boolean,
-    password varchar(255),
-    reset_token varchar(255) UNIQUE,
-    user_id varchar(31) UNIQUE
 );
 
 CREATE TABLE IF NOT EXISTS widget_type (
@@ -400,4 +389,28 @@ CREATE TABLE IF NOT EXISTS tag_metadata (
     CONSTRAINT tag_metadata_unq_key UNIQUE (entity_type, entity_id, key)
 );
 
+CREATE TABLE IF NOT EXISTS asset_landing_info (
+    id varchar(31) NOT NULL CONSTRAINT asset_landing_info_pkey PRIMARY KEY,
+    data_model_id varchar(31),
+    data_model_object_id varchar(31)
+);
+
 CREATE TABLE IF NOT EXISTS installed_schema_versions(executed_scripts varchar(255) UNIQUE);
+CREATE TABLE IF NOT EXISTS customer_group (
+    id varchar(31) NOT NULL CONSTRAINT customer_group_pkey PRIMARY KEY,
+    title varchar(255),
+    tenant_id varchar(31),
+    customer_id varchar(31),
+    additional_info varchar,
+    search_text varchar(255)
+);
+
+CREATE TABLE IF NOT EXISTS user_groups (
+    user_id varchar(31),
+    group_id varchar(31)
+);
+
+CREATE TABLE IF NOT EXISTS customer_group_policy (
+    group_id varchar(31),
+    policy varchar
+);
