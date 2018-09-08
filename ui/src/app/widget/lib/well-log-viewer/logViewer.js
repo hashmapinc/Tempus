@@ -17,7 +17,7 @@
 import * as d3 from 'well-log-viewer/node_modules/d3/build/d3';
 //import {loadConfig} from './config';
 import {linearGrid} from './linearGrid';
-//import {headerLegend} from './headerLegend';
+import {headerLegend} from './headerLegend';
 import {lineGraph} from './lineGraph';
 import './logViewer.css';
 
@@ -47,15 +47,15 @@ export default function loadLogViewer(ctx, sequence){
       if(angular.isDefined(config.Track)){
       config.Track.forEach(function(track){
         var trackObj = [];
-    //    var headerCount = 0
-        track.component.forEach(function(componentObj){
-          // if(componentObj.hasHeader){
-          //   headerCount +=1;
-            // var hLegend = headerLegend(componentObj, headerCount, datasourceFilter(componentObj, ctx.data), state);
-            // trackObj.push(hLegend);
-         // }
+        var headerCount = 0
+        track.component.forEach(function(componentObj, index){
+          if(componentObj.hasHeader){
+            headerCount +=1;
+            var hLegend = headerLegend(componentObj, headerCount, datasourceFilter(componentObj, ctx.data), state, index);
+            trackObj.push(hLegend);
+          }
           if(componentObj.cType === 'linearGrid'){
-            var lnGrid = linearGrid(componentObj, datasourceFilter(componentObj, ctx.data), state);
+            var lnGrid = linearGrid(componentObj, datasourceFilter(componentObj, ctx.data), state, index);
             trackObj.push(lnGrid);
           }
           if(componentObj.cType === 'timeYaxis'){
@@ -63,7 +63,7 @@ export default function loadLogViewer(ctx, sequence){
             // trackObj.push(timeYaxis);
           }
           if(componentObj.cType === 'line'){
-            var lnGraph = lineGraph(componentObj, datasourceFilter(componentObj, ctx.data), state);
+            var lnGraph = lineGraph(componentObj, datasourceFilter(componentObj, ctx.data), state, index);
             trackObj.push(lnGraph);
           }
 
@@ -78,14 +78,13 @@ export default function loadLogViewer(ctx, sequence){
       buildArray.forEach(function(track){
 
         var trackId = '#track' + panelTracker;
-
+        panelTracker += 1;
 
         if(state !== 'update'){
           d3.select(trackId).selectAll('div')
              .remove();
               d3.select(trackId).selectAll('svg')
              .remove();
-          panelTracker += 1;
           d3.select(trackId)
              .append("div")
              .attr("class", "header")

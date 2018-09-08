@@ -20,16 +20,12 @@ import {dataGenerator} from './dataGenerator';
 import './logViewer.css';
 
 /*@ngInject*/
-var lineGraph = function(lineConfig, data, state) {
+var lineGraph = function(lineConfig, data, state, index) {
 
   'use strict';
   var o,
      // local,
       dataGen;
-   // data.data.forEach(function(dataEle){
-   //    var parse = d3.timeParse("%s");
-   //    dataEle[0] = parse(dataEle[0]);
-   // })
 
 
   o = {
@@ -42,7 +38,8 @@ var lineGraph = function(lineConfig, data, state) {
     lineWeight: lineConfig.lineWeight,
     areaFill: lineConfig.areaFill,  
     data: data,    
-    state:state
+    state:state,
+    index: index
   }
 
   // local = {
@@ -90,14 +87,14 @@ var lineGraph = function(lineConfig, data, state) {
       if(o.areaFill.fill === "left"){
         var area = d3.area()
           .x0(-14)
-          .x1(d => x(d))
-          .y((d, i) => y(i + dataGen.time));
+          .x1(d => x(d[1]))
+          .y((d) => y(d[0]));
       }
       if(o.areaFill.fill === "right"){
          area = d3.area()
-          .x0(d => x(d))
+          .x0(d => x(d[1]))
           .x1(w)
-          .y((d, i) => y(i + dataGen.time));
+          .y((d) => y(d[0]));
 
       }
     }
@@ -126,29 +123,32 @@ if(o.state === "init"){
 
     let $lineGraph = context.select('.linearGrid')
       .attr("width", w + margin.right + 1)
+      .attr("height", '100vh')
       .append('g')
-      .attr("class", 'linepath')
+      .attr("class", 'linepath'+o.index)
       .append('path')
       .attr('stroke', o.color)
-     // .attr('fill', 'none')
+      .attr('fill', 'none')
       .attr('stroke-width', o.lineWeight);
 
-    // let $areaGraph = context.select('.linearGrid').append('path')
-    //   .attr('fill', o.areaFill.color)
-    //   .style("opacity", o.areaFill.opacity);
+    let $areaGraph = context.select('.linearGrid')
+      .append('g')
+      .attr("class", 'areapath'+o.index)
+      .append('path')
+      .attr('fill', o.areaFill.color)
+      .style("opacity", o.areaFill.opacity);
  
  } 
     function update() {
       var leftPadding = margin.left + 15;
-      var test = d3.extent(o.data.data, function(d) { return d[1]; })
-      x.domain(d3.extent(o.data.data, function(d) { return d[1]; }));
-      y.domain(d3.extent(o.data.data, function(d) { return d[0]; }));
+     // x.domain(d3.extent(o.data.data, function(d) { return d[1]; }));
+      y.domain(d3.extent(o.data.data, function(d) { return d[0]; }).reverse());
    //   y.domain([dataGen.time + dataGen.num, dataGen.time]);
-      // let xDom = d3.extent(dataGen.latestData);
-      // xDom[0] = o.min;
-      // xDom[1] = o.max;
-      // x.domain(xDom);
-    //  x.domain([0,200]);
+       let xDom = [o.min, o.max];
+       // xDom[0] = o.min;
+       // xDom[1] = o.max;
+       x.domain(xDom);
+     // x.domain([-500,500]);
 
       // $xAxis
         // .call(xAxis);
@@ -159,11 +159,16 @@ if(o.state === "init"){
 
     //  $lngrp
 
-      let $lineGraph = context.select('.linearGrid').select('.linepath')
+      let $lineGraph = context.select('.linearGrid').select('.linepath'+o.index)
       .select('path')
       .attr('stroke', o.color)
-     // .attr('fill', 'none')
+      .attr('fill', 'none')
       .attr('stroke-width', o.lineWeight);
+
+      let $areaGraph = context.select('.linearGrid').select('.areapath'+o.index)
+      .select('path')
+      .attr('fill', o.areaFill.color)
+      .style("opacity", o.areaFill.opacity);
 
      $lineGraph
         //.datum(dataGen.latestData)
@@ -171,10 +176,10 @@ if(o.state === "init"){
         .attr("transform", "translate(" + leftPadding + ", 0)")
         .attr('d', line);
 
-      // $areaGraph
-      //   .datum(dataGen.latestData)
-      //   .attr("transform", "translate(" + leftPadding + ", 0)")
-      //   .attr('d', area);
+      $areaGraph
+        .datum(o.data.data)
+        .attr("transform", "translate(" + leftPadding + ", 0)")
+        .attr('d', area);
 
       // $rects
       //   .attr('height', (_, i) => Math.abs(latestDeltas[i] * h / 10))

@@ -19,7 +19,7 @@
 import * as d3 from 'well-log-viewer/node_modules/d3/build/d3';
 import './logViewer.css';
 /*@ngInject*/
-var linearGrid = function(lineConfig, data, state) {
+var linearGrid = function(lineConfig, data, state, index) {
   'use strict';
   var o;
      // local;
@@ -35,7 +35,8 @@ var linearGrid = function(lineConfig, data, state) {
     majorLineWeight: lineConfig.majorLines.lineWeight,
     minorLineWeight: lineConfig.minorLines.lineWeight,
     data : data,
-    state:state
+    state:state,
+    index: index
   };  
   if(lineConfig.minorLines.style === "dashed"){
     o.mirorStroke = "6,4";
@@ -82,10 +83,6 @@ var linearGrid = function(lineConfig, data, state) {
         .domain([tickValues[0], tickValues[tickValues.length - 1]])
         .range([margin.left, width + margin.left]);
 
-  context.select('.linearGrid')
-        .attr('width', width + margin.right + margin.left)
-        .attr('height', height + margin.top + margin.bottom)
-
     var xAxis = d3.axisBottom(xScale)
         .tickSizeInner(-height)
         .tickSizeOuter(0)
@@ -93,6 +90,24 @@ var linearGrid = function(lineConfig, data, state) {
         .tickFormat(function (d, i) {
           return isMajorTick(i) ? "" : "";
         });
+
+    var y = d3.scaleLinear()
+        .range([0, height]);
+
+    var yAxis = d3.axisLeft()
+        .scale(y)
+        .tickFormat(function(d){ return d.x;})
+        .ticks(10)
+        .tickSize(-width);
+
+  //  if(o.state === "init"){
+
+
+    context.select('.linearGrid')
+        .attr('width', width + margin.right + margin.left)
+        .attr('height', height + margin.top + margin.bottom)
+
+
 
       var x_axis =  context.select('.linearGrid').append("g")
         .attr("id", "x_axis")
@@ -109,15 +124,6 @@ var linearGrid = function(lineConfig, data, state) {
         .style("stroke-width", o.minorLineWeight)
         .style("stroke-dasharray", o.mirorStroke)
       // console.log("all the visible points", xAxis.scale().ticks(xAxis.ticks()[0]));
-
-    var y = d3.scaleLinear()
-        .range([0, height]);
-
-    var yAxis = d3.axisLeft()
-        .scale(y)
-        .tickFormat(function(d){ return d.x;})
-        .ticks(10)
-        .tickSize(-width);
 
     context.select('.linearGrid')
     .append("g")

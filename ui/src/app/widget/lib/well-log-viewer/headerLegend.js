@@ -19,7 +19,7 @@ import './logViewer.css';
 
 /*@ngInject*/
 
-var headerLegend = function(lineConfig, headerCount, data, state) {
+var headerLegend = function(lineConfig, headerCount, data, state, index) {
   'use strict';
   var o;
      // local;
@@ -35,7 +35,8 @@ var headerLegend = function(lineConfig, headerCount, data, state) {
     label: lineConfig.headerName,
     headerCount: headerCount,
     data: data,
-    state:state
+    state:state,
+    index: index
   };  
 
   // local = {
@@ -45,7 +46,9 @@ var headerLegend = function(lineConfig, headerCount, data, state) {
  
   function header(group) {
     // group-scope
-    group.each(render);
+    if(state === 'init'){
+      group.each(render);
+    }  
   }
  
   //function render(data) {
