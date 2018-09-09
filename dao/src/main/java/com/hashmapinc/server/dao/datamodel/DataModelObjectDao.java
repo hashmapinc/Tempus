@@ -29,4 +29,5 @@ public interface DataModelObjectDao {
     List<DataModelObject> findByDataModelId(DataModelId dataModelId);
     DataModelObject findByDataModeIdAndName(DataModelObject dataModelObject);
     boolean removeById(UUID id);
+    List<DataModelObject> findByName(String name);
 }
