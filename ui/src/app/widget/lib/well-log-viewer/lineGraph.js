@@ -22,7 +22,7 @@ import {dataGenerator} from './dataGenerator';
 import './logViewer.css';
 
 /*@ngInject*/
-var lineGraph = function(lineConfig, data, state, index) {
+var lineGraph = function(lineConfig, data, state, index, width) {
 
   'use strict';
   var o,
@@ -31,7 +31,6 @@ var lineGraph = function(lineConfig, data, state, index) {
 
 
   o = {
-    // width: 200,
     // value: null,
     // key: null,
     color: lineConfig.color,
@@ -41,8 +40,13 @@ var lineGraph = function(lineConfig, data, state, index) {
     areaFill: lineConfig.areaFill,  
     data: data,    
     state:state,
-    index: index
+    index: index,
+    width: width
   }
+
+  if(angular.isUndefined(o.width)){
+    o.width = 3;
+  } 
 
   // local = {
   // //  label: d3.local(),
@@ -50,7 +54,7 @@ var lineGraph = function(lineConfig, data, state, index) {
   // };
 
 
-  dataGen = dataGenerator();
+  //dataGen = dataGenerator();
  
   function lineChart(group) {
     // group-scope
@@ -65,7 +69,7 @@ var lineGraph = function(lineConfig, data, state, index) {
     context = d3.select(this);
 
     let margin = {top: 30, right: 10, bottom: 30, left: 10},
-      w = 440 - margin.right - margin.left,
+      w = o.width*110 - margin.right - margin.left,
       h = 700 - margin.top;
 
     let x = d3.scaleLinear().domain(o.min, o.max).range([0 + margin.left, w]);
@@ -189,9 +193,9 @@ if(o.state === "init"){
       //   .attr('y', (_, i) => h - Math.abs(latestDeltas[i] * h / 10) - 42);
     }
 
-    for (let i = 0; i < dataGen.num + 50; i++) {
-      dataGen.tick();
-    }
+    // for (let i = 0; i < dataGen.num + 50; i++) {
+    //   dataGen.tick();
+    // }
 
     update();
 

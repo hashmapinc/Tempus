@@ -69,6 +69,11 @@ export default class WellLogViewer {
 			            "title": "Settings",
 			            "type": "object",
 			            "properties":{
+			            	"width": {
+			             		 "title": "Track Width",
+                                 "type": "string",
+                          		 "enum": ["1", "2", "3", "4", "5"]
+			             	},	
 			                "component":{
 			                    "title":"Component",
 			                    "type": "array",
@@ -170,7 +175,7 @@ export default class WellLogViewer {
 			                      		}
 			                        }
 			                 	}
-			             	}			                 			               
+			             	}		                 			               
 			            }       	          
 			        }
 			      }
@@ -179,7 +184,8 @@ export default class WellLogViewer {
 		   "form":[{
 	       		"key": "Track",
 	      		"items": [
-	            {
+	      			"Track[].width",
+	            	{
 	                "key": "Track[].component",
 	                "items": [
 	               		"Track[].component[].cType",

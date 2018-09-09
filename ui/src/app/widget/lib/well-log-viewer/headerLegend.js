@@ -21,13 +21,12 @@ import './logViewer.css';
 
 /*@ngInject*/
 
-var headerLegend = function(lineConfig, headerCount, data, state, index) {
+var headerLegend = function(lineConfig, headerCount, data, state, index, width) {
   'use strict';
   var o;
      // local;
 
   o = {
-    width: 200,
     value: null,
     key: null,
     min: lineConfig.headerMin,
@@ -38,9 +37,13 @@ var headerLegend = function(lineConfig, headerCount, data, state, index) {
     headerCount: headerCount,
     data: data,
     state:state,
-    index: index
+    index: index,
+    width: width
   };  
 
+  if(angular.isUndefined(o.width)){
+    o.width = 3;
+  } 
   // local = {
   // //  label: d3.local(),
   // //  dimensions: d3.local()
@@ -61,7 +64,7 @@ var headerLegend = function(lineConfig, headerCount, data, state, index) {
     context = d3.select(this);
 
     var margin = {top: 30, right: 10, bottom: 30, left: 10},
-      width = 440 - margin.right - margin.left,
+      width = o.width*110 - margin.right - margin.left,
       height = 60 - margin.top - margin.bottom;
 
     var x = d3.scaleLinear()
