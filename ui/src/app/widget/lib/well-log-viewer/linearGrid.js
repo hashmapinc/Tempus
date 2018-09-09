@@ -16,7 +16,9 @@
  */
  //var d3 = require('./node_modules/d3/build/d3');
 //require('./node_modules/d3-selection-multi/build/d3-selection-multi');
-import * as d3 from 'well-log-viewer/node_modules/d3/build/d3';
+//import * as d3 from 'well-log-viewer/node_modules/d3/build/d3';
+import * as d3 from 'd3';
+
 import './logViewer.css';
 /*@ngInject*/
 var linearGrid = function(lineConfig, data, state, index) {
