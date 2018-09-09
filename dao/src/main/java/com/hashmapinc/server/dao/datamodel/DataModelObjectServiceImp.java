@@ -36,6 +36,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import static com.hashmapinc.server.dao.service.Validator.validateId;
+import static com.hashmapinc.server.dao.service.Validator.validateString;
 
 @Service
 @Slf4j
@@ -43,6 +44,7 @@ public class DataModelObjectServiceImp implements DataModelObjectService {
 
     public static final String INCORRECT_DATA_MODEL_ID = "Incorrect dataModelId ";
     public static final String INCORRECT_DATA_MODEL_OBJECT_ID = "Incorrect dataModelObjectId ";
+    public static final String INCORRECT_DATA_MODEL_OBJECT_NAME = "Incorrect dataModelObjectName ";
 
     @Autowired
     DataModelObjectDao dataModelObjectDao;
@@ -113,6 +115,20 @@ public class DataModelObjectServiceImp implements DataModelObjectService {
         dataModelObjectDao.removeById(dataModelObjectId.getId());
     }
 
+    @Override
+    public List<DataModelObject> findByName(String name) {
+        log.trace("Executing findByName for DataModel Object name {}", name);
+        validateString(name, INCORRECT_DATA_MODEL_OBJECT_NAME + name);
+        List<DataModelObject> dataModelObjects = dataModelObjectDao.findByName(name);
+        dataModelObjects.forEach(dataModelObject -> {
+            if(dataModelObject != null){
+                List<AttributeDefinition> attributeDefinitions = attributeDefinitionDao.findByDataModelObjectId(dataModelObject.getId());
+                dataModelObject.setAttributeDefinitions(attributeDefinitions);
+            }
+        });
+        return dataModelObjects;
+    }
+
     private DataValidator<DataModelObject> dataModelObjectDataValidator =
             new DataValidator<DataModelObject>() {
                 @Override
@@ -127,6 +143,15 @@ public class DataModelObjectServiceImp implements DataModelObjectService {
                             throw new DataValidationException("Data Model object is referencing to non-existent data model!");
                         }
                     }
+                }
+
+                @Override
+                protected void validateCreate(DataModelObject dataModelObject) {
+                        List<DataModelObject> dataModelObjects;
+                        dataModelObjects = dataModelObjectDao.findByName(dataModelObject.getName());
+                        if(dataModelObjects != null && !dataModelObjects.isEmpty()) {
+                            throw new DataValidationException("DataModelObject is already created for name");
+                        }
                 }
             };
 
