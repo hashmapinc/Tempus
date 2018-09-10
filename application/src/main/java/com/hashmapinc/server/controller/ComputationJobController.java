@@ -122,6 +122,7 @@ public class ComputationJobController extends BaseController{
             ComputationJobId computationJobId = new ComputationJobId(toUUID(strComputationJobId));
             ComputationId computationId = new ComputationId(toUUID(strComputationId));
             ComputationJob computationJob = checkComputationJob(computationJobService.findComputationJobById(computationJobId));
+
             computationJobService.activateComputationJobById(computationJobId);
             actorService.onComputationJobStateChange(computationJob.getTenantId(), computationId, computationJob.getId(), ComponentLifecycleEvent.ACTIVATED);
 

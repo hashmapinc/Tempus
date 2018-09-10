@@ -30,7 +30,7 @@ import com.hashmapinc.server.dao.cluster.NodeMetricService;
 import com.hashmapinc.server.dao.event.EventService;
 import com.hashmapinc.server.service.cluster.discovery.DiscoveryService;
 import com.hashmapinc.server.service.component.ComponentDiscoveryService;
-import com.hashmapinc.server.service.computation.ComputationFunctionDeploymentService;
+import com.hashmapinc.server.service.computation.ComputationFunctionService;
 import com.hashmapinc.server.service.computation.S3BucketService;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
@@ -144,7 +144,7 @@ public class ActorSystemContext {
     @Getter private S3BucketService s3BucketService;
 
     @Autowired
-    @Getter private ComputationFunctionDeploymentService computationFunctionDeploymentService;
+    @Getter private ComputationFunctionService computationFunctionService;
 
     @Autowired
     @Getter @Setter private PluginWebSocketMsgEndpoint wsMsgEndpoint;

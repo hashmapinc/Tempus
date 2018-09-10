@@ -20,7 +20,6 @@ import akka.actor.ActorContext;
 import akka.actor.ActorRef;
 import akka.event.LoggingAdapter;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hashmapinc.server.actors.ActorSystemContext;
 import com.hashmapinc.server.actors.shared.ComponentMsgProcessor;
@@ -62,9 +61,6 @@ public class KubelessComputationJobActorMessageProcessor extends ComponentMsgPro
         if(!isKubelessComputationJob()){
             throw new ComputationInitializationException("Computation Job configurations are invalid!");
         }
-        /*if (job.getArgParameters() == null) {
-            throw new ComputationInitializationException("kubeless computation Job Arguments is empty!");
-        }*/
         if (job.getState() == ComponentLifecycleState.ACTIVE) {
             logger.info("[{}] kubeless computation Job is active. Going to initialize job.", entityId);
             initComponent();
@@ -104,14 +100,17 @@ public class KubelessComputationJobActorMessageProcessor extends ComponentMsgPro
     @Override
     public void onSuspend(ActorContext context) throws TempusApplicationException {
         logger.info("[{}] Going to process onSuspend computation job.", entityId);
+        suspendJob();
     }
 
     @Override
     public void onStop(ActorContext context) throws TempusApplicationException {
         logger.info("[{}] Going to process onStop computation job.", entityId);
-        scheduleMsgWithDelay(new ComputationJobTerminationMsg(entityId), systemContext.getComputationActorTerminationDelay(), parent);
-        scheduleMsgWithDelay(new ComputationJobTerminationMsg(entityId), systemContext.getComputationActorTerminationDelay(), self);
-    }
+        if(systemContext.getComputationFunctionService().deleteTrigger(job)) {
+            scheduleMsgWithDelay(new ComputationJobTerminationMsg(entityId), systemContext.getComputationActorTerminationDelay(), parent);
+            scheduleMsgWithDelay(new ComputationJobTerminationMsg(entityId), systemContext.getComputationActorTerminationDelay(), self);
+        }
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        }
 
     @Override
     public void onClusterEventMsg(ClusterEventMsg msg) throws TempusApplicationException {
@@ -120,19 +119,14 @@ public class KubelessComputationJobActorMessageProcessor extends ComponentMsgPro
 
     private void initComponent(){
         logger.info("[{}] Going to initialize computation job.", entityId);
-        processHeaders();
-        postJob();
+        checkAndCreateTrigger();
     }
 
-    private void processHeaders(){
-        /*JsonNode jsonHeaders = job.getArgParameters().get("headers");
-        headers.add("Content-Type", "application/json");
-        if(jsonHeaders != null && jsonHeaders.isArray()){
-            logger.info("Processing headers " + jsonHeaders.asText());
-            for(JsonNode e : jsonHeaders){
-                this.headers.add(e.get("key").asText(), e.get("value").asText());
-            }
-        }*/
+    private void checkAndCreateTrigger(){
+        if(!systemContext.getComputationFunctionService().checkTrigger(job) &&
+                !systemContext.getComputationFunctionService().createTrigger(job)) {
+            systemContext.getComputationJobService().suspendComputationJobById(job.getId());
+        }
     }
 
     private void postJob(){
@@ -141,8 +135,9 @@ public class KubelessComputationJobActorMessageProcessor extends ComponentMsgPro
 
     private void suspendJob(){
         ComputationJob savedJob = systemContext.getComputationJobService().findComputationJobById(job.getId());
-        if(savedJob != null)
-            systemContext.getComputationJobService().suspendComputationJobById(job.getId());
+        if(savedJob != null && systemContext.getComputationFunctionService().checkTrigger(job))
+            if(systemContext.getComputationFunctionService().deleteTrigger(job))
+                systemContext.getComputationJobService().suspendComputationJobById(job.getId());
     }
 
     private boolean isKubelessComputationJob(){

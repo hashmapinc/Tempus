@@ -33,7 +33,7 @@ import com.hashmapinc.server.dao.model.ModelConstants;
 import com.hashmapinc.server.exception.TempusErrorCode;
 import com.hashmapinc.server.exception.TempusException;
 import com.hashmapinc.server.service.computation.ComputationDiscoveryService;
-import com.hashmapinc.server.service.computation.ComputationFunctionDeploymentService;
+import com.hashmapinc.server.service.computation.ComputationFunctionService;
 import com.hashmapinc.server.service.computation.S3BucketService;
 import com.hashmapinc.server.service.security.model.SecurityUser;
 import lombok.extern.slf4j.Slf4j;
@@ -77,7 +77,7 @@ public class ComputationsController extends BaseController {
     private S3BucketService s3BucketService;
 
     @Autowired
-    private ComputationFunctionDeploymentService computationFunctionDeploymentService;
+    private ComputationFunctionService computationFunctionService;
 
     @PreAuthorize("hasAuthority('TENANT_ADMIN')")
     @PostMapping(value = "/computations/upload", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -203,7 +203,7 @@ public class ComputationsController extends BaseController {
                 while(itr.hasNext()){
                     Computations computation = (Computations) itr.next();
                     if(computation.getType() == ComputationType.KUBELESS &&
-                            (!computationFunctionDeploymentService.checkKubelessFunction(computation))) {
+                            (!computationFunctionService.checkKubelessFunction(computation))) {
                         itr.remove();
                     }
                 }
@@ -223,7 +223,7 @@ public class ComputationsController extends BaseController {
             ComputationId computationId = new ComputationId(toUUID(strComputationId));
             Computations computation = checkNotNull(computationsService.findById(computationId));
             if(computation.getType() == ComputationType.KUBELESS
-                    && !computationFunctionDeploymentService.checkKubelessFunction(computation)) {
+                    && !computationFunctionService.checkKubelessFunction(computation)) {
                 throw new TempusException("Kubeless fuction not present in kubernetes cluster ", ITEM_NOT_FOUND);
             }
             log.info(" returning Computations by id {} ", computation);

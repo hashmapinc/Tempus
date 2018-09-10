@@ -16,10 +16,14 @@
  */
 package com.hashmapinc.server.service.computation;
 
+import com.hashmapinc.server.common.data.computation.ComputationJob;
 import com.hashmapinc.server.common.data.computation.Computations;
 
-public interface ComputationFunctionDeploymentService {
+public interface ComputationFunctionService {
     boolean deployKubelessFunction(Computations computations);
     boolean checkKubelessFunction(Computations computation);
     boolean deleteKubelessFunction(Computations computation);
+    boolean createTrigger(ComputationJob computationJob);
+    boolean checkTrigger(ComputationJob computationJob);
+    boolean deleteTrigger(ComputationJob computationJob);
 }
