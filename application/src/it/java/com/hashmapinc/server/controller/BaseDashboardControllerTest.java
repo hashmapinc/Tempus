@@ -394,39 +394,6 @@ public abstract class BaseDashboardControllerTest extends AbstractControllerTest
         Assert.assertEquals(1, dashboards.size());
     }
 
-    private DataModel createDataModel() throws Exception{
-        DataModel dataModel = new DataModel();
-        dataModel.setName("Default Drilling Data Model1");
-        dataModel.setLastUpdatedTs(System.currentTimeMillis());
-
-        DataModel savedDataModel = doPost("/api/data-model", dataModel, DataModel.class);
-
-        Assert.assertNotNull(savedDataModel);
-        Assert.assertNotNull(savedDataModel.getId());
-        Assert.assertTrue(savedDataModel.getCreatedTime() > 0);
-        Assert.assertEquals(savedTenant.getId(), savedDataModel.getTenantId());
-        Assert.assertEquals(dataModel.getName(), savedDataModel.getName());
-        Assert.assertTrue(savedDataModel.getLastUpdatedTs() > 0);
-        return savedDataModel;
-    }
-
-    private DataModelObject createDataModelObject(DataModel dataModel) throws Exception{
-        DataModelObject dataModelObject = new DataModelObject();
-        dataModelObject.setName("Well2");
-
-        AttributeDefinition ad = new AttributeDefinition();
-        ad.setValueType("STRING");
-        ad.setName("attr name2");
-        List<AttributeDefinition> attributeDefinitions = new ArrayList<>();
-        attributeDefinitions.add(ad);
-        dataModelObject.setAttributeDefinitions(attributeDefinitions);
-
-        DataModelObject savedDataModelObj = doPost("/api/data-model/" + dataModel.getId().toString() + "/objects", dataModelObject, DataModelObject.class);
-        Assert.assertNotNull(savedDataModelObj);
-        Assert.assertEquals(dataModel.getId(), savedDataModelObj.getDataModelId());
-        return savedDataModelObj;
-    }
-
     private Computations saveComputation() {
         Computations computations = new Computations();
         computations.setName("Computation");

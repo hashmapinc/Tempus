@@ -22,10 +22,10 @@ import com.hashmapinc.server.common.data.CustomerGroup;
 import com.hashmapinc.server.common.data.Tenant;
 import com.hashmapinc.server.common.data.UserPermission;
 import com.hashmapinc.server.common.data.asset.Asset;
-import com.hashmapinc.server.common.data.datamodel.AttributeDefinition;
 import com.hashmapinc.server.common.data.datamodel.DataModel;
 import com.hashmapinc.server.common.data.datamodel.DataModelObject;
-import com.hashmapinc.server.common.data.id.*;
+import com.hashmapinc.server.common.data.id.CustomerId;
+import com.hashmapinc.server.common.data.id.TenantId;
 import com.hashmapinc.server.common.data.page.TextPageData;
 import com.hashmapinc.server.common.data.page.TextPageLink;
 import com.hashmapinc.server.dao.exception.DataValidationException;
@@ -286,9 +286,9 @@ public abstract class BaseCustomerGroupServiceTest extends AbstractServiceTest {
     @Test
     public void testGetDisplayablePoliciesForGroup() {
 
-        DataModel dataModel = createDataModel();
+        DataModel dataModel = createDataModel(tenantId);
         DataModelObject dataModelObject = createDataModelObject(dataModel);
-        Asset asset = createAsset(dataModelObject.getId());
+        Asset asset = createAsset(dataModelObject.getId(), tenantId);
 
         String policy = String.format("CUSTOMER_USER:ASSET?%s=%s&%s=%s:*",
                 UserPermission.ResourceAttribute.ID, asset.getId().getId().toString(),
@@ -300,7 +300,7 @@ public abstract class BaseCustomerGroupServiceTest extends AbstractServiceTest {
                 policyForAll
         );
 
-        CustomerGroup savedCustomerGroup = createGroupWithPolicies(policies);
+        CustomerGroup savedCustomerGroup = createGroupWithPolicies(policies, tenantId, customerId);
         final Map<String, Map<String, String>> displayablePolicies = customerGroupService.findGroupPolicies(savedCustomerGroup.getId());
         Assert.assertArrayEquals(policies.toArray(), displayablePolicies.keySet().toArray());
         Assert.assertTrue(displayablePolicies.get(policyForAll).isEmpty());
@@ -312,60 +312,6 @@ public abstract class BaseCustomerGroupServiceTest extends AbstractServiceTest {
         Assert.assertNull(displayablePoliciesNew.get(policy));
         deleteGroup(savedCustomerGroup.getId());
         deleteDataModelObject(dataModelObject.getId());
-    }
-
-
-
-    private CustomerGroup createGroupWithPolicies(List<String> policies) {
-        CustomerGroup customerGroup = new CustomerGroup();
-        customerGroup.setTitle("My Customer Group");
-        customerGroup.setTenantId(tenantId);
-        customerGroup.setCustomerId(customerId);
-        customerGroup.setPolicies(policies);
-        return customerGroupService.saveCustomerGroup(customerGroup);
-    }
-
-    private void deleteGroup(CustomerGroupId customerGroupId) {
-        customerGroupService.deleteCustomerGroup(customerGroupId);
-    }
-
-
-    private DataModel createDataModel() {
-        DataModel dataModel = new DataModel();
-        dataModel.setName("Default Drilling Data Model1");
-        dataModel.setLastUpdatedTs(System.currentTimeMillis());
-        dataModel.setTenantId(tenantId);
-        return dataModelService.saveDataModel(dataModel);
-    }
-
-    private DataModelObject createDataModelObject(DataModel dataModel){
-        DataModelObject dataModelObject = new DataModelObject();
-        dataModelObject.setName("Well");
-        dataModelObject.setDataModelId(dataModel.getId());
-        AttributeDefinition ad = new AttributeDefinition();
-        ad.setValueType("STRING");
-        ad.setName("attr name2");
-        List<AttributeDefinition> attributeDefinitions = new ArrayList<>();
-        attributeDefinitions.add(ad);
-        dataModelObject.setAttributeDefinitions(attributeDefinitions);
-        return dataModelObjectService.save(dataModelObject);
-    }
-
-    private void deleteDataModelObject(DataModelObjectId dataModelObjectId) {
-        dataModelObjectService.removeById(dataModelObjectId);
-    }
-
-    public Asset createAsset(DataModelObjectId dataModelObjectId){
-        Asset asset = new Asset();
-        asset.setName("My asset");
-        asset.setType("default");
-        asset.setDataModelObjectId(dataModelObjectId);
-        asset.setTenantId(tenantId);
-        return assetService.saveAsset(asset);
-    }
-
-    private void deleteAsset(AssetId assetId){
-        assetService.deleteAsset(assetId);
     }
 
 }
