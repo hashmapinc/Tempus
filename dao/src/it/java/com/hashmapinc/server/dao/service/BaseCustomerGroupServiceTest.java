@@ -38,6 +38,8 @@ import org.junit.Test;
 
 import java.util.*;
 
+import static org.hamcrest.collection.IsIterableContainingInAnyOrder.containsInAnyOrder;
+
 @Slf4j
 public abstract class BaseCustomerGroupServiceTest extends AbstractServiceTest {
 
@@ -302,7 +304,8 @@ public abstract class BaseCustomerGroupServiceTest extends AbstractServiceTest {
 
         CustomerGroup savedCustomerGroup = createGroupWithPolicies(policies, tenantId, customerId);
         final Map<String, Map<String, String>> displayablePolicies = customerGroupService.findGroupPolicies(savedCustomerGroup.getId());
-        Assert.assertArrayEquals(policies.toArray(), displayablePolicies.keySet().toArray());
+        Assert.assertThat("List equality without order",
+                policies, containsInAnyOrder(displayablePolicies.keySet().toArray()));
         Assert.assertTrue(displayablePolicies.get(policyForAll).isEmpty());
         Assert.assertEquals(displayablePolicies.get(policy).get(UserPermission.ResourceAttribute.ID.toString()), asset.getName());
         Assert.assertEquals(displayablePolicies.get(policy).get(UserPermission.ResourceAttribute.DATA_MODEL_ID.toString()), dataModelObject.getName());
