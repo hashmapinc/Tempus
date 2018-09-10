@@ -61,19 +61,7 @@ public abstract class BaseAssetServiceTest extends AbstractServiceTest {
 
     @Test
     public void testSaveAsset() {
-        Asset asset = new Asset();
-        asset.setTenantId(tenantId);
-        asset.setName("My asset");
-        asset.setType("default");
-        Asset savedAsset = assetService.saveAsset(asset);
-
-        Assert.assertNotNull(savedAsset);
-        Assert.assertNotNull(savedAsset.getId());
-        Assert.assertTrue(savedAsset.getCreatedTime() > 0);
-        Assert.assertEquals(asset.getTenantId(), savedAsset.getTenantId());
-        Assert.assertNotNull(savedAsset.getCustomerId());
-        Assert.assertEquals(NULL_UUID, savedAsset.getCustomerId().getId());
-        Assert.assertEquals(asset.getName(), savedAsset.getName());
+        Asset savedAsset = createAsset(null, tenantId);
 
         savedAsset.setName("My new asset");
 
@@ -81,7 +69,7 @@ public abstract class BaseAssetServiceTest extends AbstractServiceTest {
         Asset foundAsset = assetService.findAssetById(savedAsset.getId());
         Assert.assertEquals(foundAsset.getName(), savedAsset.getName());
 
-        assetService.deleteAsset(savedAsset.getId());
+        deleteAsset(savedAsset.getId());
     }
 
     @Test(expected = DataValidationException.class)
@@ -147,11 +135,7 @@ public abstract class BaseAssetServiceTest extends AbstractServiceTest {
 
     @Test
     public void testFindAssetById() {
-        Asset asset = new Asset();
-        asset.setTenantId(tenantId);
-        asset.setName("My asset");
-        asset.setType("default");
-        Asset savedAsset = assetService.saveAsset(asset);
+        Asset savedAsset = createAsset(null, tenantId);
         Asset foundAsset = assetService.findAssetById(savedAsset.getId());
         Assert.assertNotNull(foundAsset);
         Assert.assertEquals(savedAsset, foundAsset);
@@ -196,15 +180,9 @@ public abstract class BaseAssetServiceTest extends AbstractServiceTest {
 
     @Test
     public void testDeleteAsset() {
-        Asset asset = new Asset();
-        asset.setTenantId(tenantId);
-        asset.setName("My asset");
-        asset.setType("default");
-        Asset savedAsset = assetService.saveAsset(asset);
+        Asset savedAsset = createAsset(null, tenantId);
+        deleteAsset(savedAsset.getId());
         Asset foundAsset = assetService.findAssetById(savedAsset.getId());
-        Assert.assertNotNull(foundAsset);
-        assetService.deleteAsset(savedAsset.getId());
-        foundAsset = assetService.findAssetById(savedAsset.getId());
         Assert.assertNull(foundAsset);
     }
 

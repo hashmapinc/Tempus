@@ -33,6 +33,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.test.web.servlet.ResultActions;
+import static org.hamcrest.collection.IsIterableContainingInAnyOrder.containsInAnyOrder;
 
 import java.util.*;
 
@@ -248,7 +249,7 @@ public abstract class BaseCustomerGroupControllerTest extends AbstractController
 
         DataModel dataModel = createDataModel();
         DataModelObject dataModelObject = createDataModelObject(dataModel);
-        Asset asset = createAsset(dataModelObject.getId());
+        Asset asset = createAsset(dataModelObject.getId(), null);
 
         try {
             String policy = String.format("CUSTOMER_USER:ASSET?%s=%s&%s=%s:*",
@@ -261,15 +262,17 @@ public abstract class BaseCustomerGroupControllerTest extends AbstractController
                     policyForAll
             );
 
-            CustomerGroup savedCustomerGroup = createGroupWithPolicies(policies);
+            CustomerGroup savedCustomerGroup = createGroupWithPolicies(policies, customerId);
             String groupId = savedCustomerGroup.getId().getId().toString();
             final Map<String, Map<String, String>> displayablePolicies = getDisplayablePolicies(groupId);
-
-            Assert.assertArrayEquals(policies.toArray(), displayablePolicies.keySet().toArray());
+            Assert.assertThat("List equality without order",
+                    policies, containsInAnyOrder(displayablePolicies.keySet().toArray()));
+            //Assert.assertArrayEquals(policies.toArray(), displayablePolicies.keySet().toArray());
             Assert.assertTrue(displayablePolicies.get(policyForAll).isEmpty());
             Assert.assertEquals(displayablePolicies.get(policy).get(UserPermission.ResourceAttribute.ID.toString()), asset.getName());
             Assert.assertEquals(displayablePolicies.get(policy).get(UserPermission.ResourceAttribute.DATA_MODEL_ID.toString()), dataModelObject.getName());
             deleteAsset(asset.getId());
+
             final Map<String, Map<String, String>> displayablePoliciesNew = getDisplayablePolicies(groupId);
             Assert.assertEquals(1, displayablePoliciesNew.keySet().toArray().length);
             Assert.assertNull(displayablePoliciesNew.get(policy));
@@ -287,57 +290,6 @@ public abstract class BaseCustomerGroupControllerTest extends AbstractController
     }
 
 
-    private CustomerGroup createGroupWithPolicies(List<String> policies) throws Exception {
-        CustomerGroup customerGroup = new CustomerGroup();
-        customerGroup.setTitle("My Customer Group");
-        customerGroup.setTenantId(tenantId);
-        customerGroup.setCustomerId(customerId);
-        customerGroup.setPolicies(policies);
-        return doPost("/api/customer/group", customerGroup, CustomerGroup.class);
-    }
-
-    private void deleteGroup(CustomerGroupId customerGroupId) throws Exception {
-        doDelete("/api/customer/group/"+customerGroupId.getId().toString())
-                .andExpect(status().isOk());
-    }
 
 
-    private DataModel createDataModel() throws Exception{
-        DataModel dataModel = new DataModel();
-        dataModel.setName("Default Drilling Data Model1");
-        dataModel.setLastUpdatedTs(System.currentTimeMillis());
-        return doPost("/api/data-model", dataModel, DataModel.class);
-    }
-
-    private DataModelObject createDataModelObject(DataModel dataModel) throws Exception{
-        DataModelObject dataModelObject = new DataModelObject();
-        dataModelObject.setName("Well");
-
-        AttributeDefinition ad = new AttributeDefinition();
-        ad.setValueType("STRING");
-        ad.setName("attr name2");
-        List<AttributeDefinition> attributeDefinitions = new ArrayList<>();
-        attributeDefinitions.add(ad);
-        dataModelObject.setAttributeDefinitions(attributeDefinitions);
-
-        return doPost("/api/data-model/" + dataModel.getId().toString() + "/objects", dataModelObject, DataModelObject.class);
-    }
-
-    private void deleteDataModelObject(DataModelObjectId dataModelObjectId) throws Exception {
-        doDelete("/api/data-model/objects/"+dataModelObjectId.getId().toString())
-                .andExpect(status().isOk());
-    }
-
-    public Asset createAsset(DataModelObjectId dataModelObjectId) throws Exception {
-        Asset asset = new Asset();
-        asset.setName("My asset");
-        asset.setType("default");
-        asset.setDataModelObjectId(dataModelObjectId);
-        return doPost("/api/asset", asset, Asset.class);
-    }
-
-    private void deleteAsset(AssetId assetId) throws Exception {
-        doDelete("/api/asset/"+assetId.getId().toString())
-                .andExpect(status().isOk());
-    }
 }
