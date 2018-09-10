@@ -542,7 +542,7 @@ public abstract class BaseMetadataControllerTest extends AbstractControllerTest 
         keyValueMap.put("Key 2", "Value 2");
 
         IngestMetadataRequest content = new IngestMetadataRequest(metadataConfig.getId(), metadataConfig.getOwnerId(), metadataConfig.getName(), keyValueMap);
-        MockHttpServletRequestBuilder postRequest = post("/api/metadata/insert")
+        MockHttpServletRequestBuilder postRequest = post("/api/metadata")
                 .header("authorization", "bearer " + clientCredentialToken)
                 .contentType(contentType)
                 .content(json(content));
@@ -559,14 +559,14 @@ public abstract class BaseMetadataControllerTest extends AbstractControllerTest 
 
         IngestMetadataRequest content = new IngestMetadataRequest(metadataConfig.getId(), metadataConfig.getOwnerId(), metadataConfig.getName(), keyValueMap);
 
-        doPost("/api/metadata/insert", content).andExpect(status().isForbidden());
+        doPost("/api/metadata", content).andExpect(status().isForbidden());
     }
 
     private MetadataConfig createMetadataConfig() throws Exception {
         String configName = "Test Config";
         MetadataConfig mc = new MetadataConfig();
         mc.setName(configName);
-        mc.setSink(new RestMetadataSource("http://localhost:8080/api/metadata/insert", null, null));
+        mc.setSink(new RestMetadataSource("http://localhost:8080/api/metadata", null, null));
         mc.setSource(new JdbcMetadataSource("jdbc:hsqldb:file:/tmp/tempusDb", "sa", ""));
 
         RemoteMappingBuilder stubMappingBuilder = setupStub(HttpMethod.POST.name(),
@@ -628,7 +628,7 @@ public abstract class BaseMetadataControllerTest extends AbstractControllerTest 
         jdbcMetadataSource.setId(new MetadataSourceId(UUIDs.timeBased()));
         jdbcMetadataSource.setCreatedTime(DateTime.now().getMillis());
 
-        RestMetadataSource restMetadataSource = new RestMetadataSource("http://localhost:8080/api/metadata/insert", null, null);
+        RestMetadataSource restMetadataSource = new RestMetadataSource("http://localhost:8080/api/metadata", null, null);
         restMetadataSource.setId(new MetadataSourceId(UUIDs.timeBased()));
         restMetadataSource.setCreatedTime(DateTime.now().getMillis());
 
