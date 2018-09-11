@@ -24,7 +24,7 @@ export default angular.module('tempus.locale', [])
                 "access": {
                     "unauthorized": "Unauthorized",
                     "unauthorized-access": "Unauthorized Access",
-                    "unauthorized-access-text": "You should sign in to have access to this resource!",
+                    "unauthorized-access-text": "Your session has expired, please log in again.",
                     "access-forbidden": "Access Forbidden",
                     "access-forbidden-text": "You haven't access rights to this location!<br/>Try to sign in with different user if you still wish to gain access to this location.",
                     "refresh-token-expired": "Session has expired",

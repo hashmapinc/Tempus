@@ -23,10 +23,11 @@ import com.hashmapinc.server.service.security.auth.rest.LoginRequest;
 import com.hashmapinc.server.service.security.auth.rest.LoginResponseToken;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.*;
+import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.codec.Base64;
 import org.springframework.security.oauth2.client.OAuth2RestOperations;
 import org.springframework.security.oauth2.client.OAuth2RestTemplate;
 import org.springframework.security.oauth2.client.token.grant.client.ClientCredentialsResourceDetails;
@@ -34,6 +35,7 @@ import org.springframework.security.oauth2.client.token.grant.password.ResourceO
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
 
 @RestController
 @RequestMapping("/api")
@@ -43,10 +45,6 @@ public class LoginController extends BaseController {
     public static final String REFRESH_TOKEN = "refresh_token";
     @Autowired
     private ClientCredentialsResourceDetails apiResourceDetails;
-
-    @Autowired
-    @Qualifier("clientRestTemplate")
-    OAuth2RestTemplate restTemplate;
 
     @PostMapping(value = "/auth/login")
     @ResponseBody
@@ -76,19 +74,26 @@ public class LoginController extends BaseController {
         try {
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+            String authHeader = "Basic " + new String(Base64.encode(String.format("%s:%s", apiResourceDetails.getClientId(), apiResourceDetails.getClientSecret()).getBytes("UTF-8")));
+            headers.set("Authorization", authHeader);
 
             MultiValueMap<String, String> requestParams = new LinkedMultiValueMap<>();
             requestParams.add("grant_type", REFRESH_TOKEN);
             requestParams.add(REFRESH_TOKEN, refreshTokenRequest.getRefreshToken());
+
             HttpEntity<MultiValueMap<String, String>> postRequest = new HttpEntity<>(requestParams, headers);
-            ResponseEntity<JsonNode> responseEntity =
-                    restTemplate.postForEntity(apiResourceDetails.getAccessTokenUri(), postRequest, JsonNode.class);
+
+            SimpleClientHttpRequestFactory requestFactory = new SimpleClientHttpRequestFactory();
+            requestFactory.setOutputStreaming(false);
+            RestTemplate restTemplate = new RestTemplate(requestFactory);
+
+            ResponseEntity<JsonNode> responseEntity = restTemplate.postForEntity(apiResourceDetails.getAccessTokenUri(), postRequest, JsonNode.class);
             if (responseEntity.getStatusCode().equals(HttpStatus.OK)) {
                 JsonNode body = responseEntity.getBody();
                 return new LoginResponseToken(body.get("access_token").asText(), body.get(REFRESH_TOKEN).asText());
             }
             return null;
-        }catch (Exception e){
+        } catch (Exception e) {
             throw handleException(e);
         }
     }
