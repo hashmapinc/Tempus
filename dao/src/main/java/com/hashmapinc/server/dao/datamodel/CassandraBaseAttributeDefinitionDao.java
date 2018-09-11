@@ -16,10 +16,8 @@
  */
 package com.hashmapinc.server.dao.datamodel;
 
-import com.datastax.driver.core.BoundStatement;
-import com.datastax.driver.core.PreparedStatement;
-import com.datastax.driver.core.ResultSet;
-import com.datastax.driver.core.Row;
+import com.datastax.driver.core.*;
+import com.datastax.driver.core.querybuilder.QueryBuilder;
 import com.datastax.driver.core.querybuilder.Select;
 import com.hashmapinc.server.common.data.datamodel.AttributeDefinition;
 import com.hashmapinc.server.common.data.id.DataModelObjectId;
@@ -35,6 +33,7 @@ import java.util.UUID;
 
 import static com.datastax.driver.core.querybuilder.QueryBuilder.eq;
 import static com.datastax.driver.core.querybuilder.QueryBuilder.select;
+import static com.hashmapinc.server.dao.model.ModelConstants.ATTRIBUTE_DEFINITION_NAME;
 
 @Slf4j
 @Service
@@ -61,7 +60,7 @@ public class CassandraBaseAttributeDefinitionDao extends CassandraAbstractDao im
         if (saveStmt == null) {
             saveStmt = getSession().prepare("INSERT INTO " + ModelConstants.ATTRIBUTE_DEFINITION_COLUMN_FAMILY_NAME +
                     "(" + ModelConstants.ATTRIBUTE_DEFINITION_MODEL_OBJECT_ID +
-                    "," + ModelConstants.ATTRIBUTE_DEFINITION_NAME +
+                    "," + ATTRIBUTE_DEFINITION_NAME +
                     "," + ModelConstants.ATTRIBUTE_DEFINITION_VALUE +
                     "," + ModelConstants.ATTRIBUTE_DEFINITION_VALUE_TYPE +
                     "," + ModelConstants.ATTRIBUTE_DEFINITION_SOURCE +
@@ -75,10 +74,18 @@ public class CassandraBaseAttributeDefinitionDao extends CassandraAbstractDao im
     public AttributeDefinition findByNameAndDataModelObjectId(String name, UUID id) {
         Select select = select().from(ModelConstants.ATTRIBUTE_DEFINITION_COLUMN_FAMILY_NAME).allowFiltering();
         Select.Where query = select.where();
-        query.and(eq(ModelConstants.ATTRIBUTE_DEFINITION_NAME, name))
+        query.and(eq(ATTRIBUTE_DEFINITION_NAME, name))
         .and(eq(ModelConstants.ATTRIBUTE_DEFINITION_MODEL_OBJECT_ID, id));
         ResultSet resultSet = executeRead(select);
-        return convertResultToAttributeDefinitionList(resultSet).get(0);
+        List<AttributeDefinition> attributeDefinitions = convertResultToAttributeDefinitionList(resultSet);
+        return getAttributeDefinition(attributeDefinitions);
+    }
+
+    private AttributeDefinition getAttributeDefinition(List<AttributeDefinition> attributeDefinitions) {
+        if(!attributeDefinitions.isEmpty())
+            return attributeDefinitions.get(0);
+        else
+            return null;
     }
 
     @Override
@@ -90,12 +97,21 @@ public class CassandraBaseAttributeDefinitionDao extends CassandraAbstractDao im
         return convertResultToAttributeDefinitionList(resultSet);
     }
 
+    @Override
+    public void removeByNameAndDataModelObjectId(String name, DataModelObjectId dataModelObjectId) {
+        Statement delete = QueryBuilder.delete().all().from(ModelConstants.ATTRIBUTE_DEFINITION_COLUMN_FAMILY_NAME)
+                .where(eq(ATTRIBUTE_DEFINITION_NAME, name))
+                .and(eq(ModelConstants.ATTRIBUTE_DEFINITION_MODEL_OBJECT_ID, dataModelObjectId.getId()));
+        log.debug("Remove request: {}", delete.toString());
+        getSession().execute(delete).wasApplied();
+    }
+
     private List<AttributeDefinition> convertResultToAttributeDefinitionList(ResultSet resultSet) {
         List<Row> rows = resultSet.all();
         List<AttributeDefinition> entries = new ArrayList<>(rows.size());
         if (!rows.isEmpty()) {
             rows.forEach(row -> {
-                String name = row.getString(ModelConstants.ATTRIBUTE_DEFINITION_NAME);
+                String name = row.getString(ATTRIBUTE_DEFINITION_NAME);
                 UUID dataModelObjectId = row.getUUID(ModelConstants.ATTRIBUTE_DEFINITION_MODEL_OBJECT_ID);
                 String value = row.getString(ModelConstants.ATTRIBUTE_DEFINITION_VALUE);
                 String valueType = row.getString(ModelConstants.ATTRIBUTE_DEFINITION_VALUE_TYPE);
