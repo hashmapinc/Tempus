@@ -24,6 +24,7 @@ import com.hashmapinc.server.common.data.id.DataModelObjectId;
 import com.hashmapinc.server.common.data.kv.DataType;
 import com.hashmapinc.server.dao.exception.DataValidationException;
 import com.hashmapinc.server.dao.service.DataValidator;
+import com.hashmapinc.server.dao.service.Validator;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.EnumUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -139,6 +140,22 @@ public class DataModelObjectServiceImp implements DataModelObjectService {
             }
         });
         return dataModelObjects;
+    }
+
+    @Override
+    public void deleteDataModelObjectsByDataModelId(DataModelId dataModelId) {
+        log.trace("Executing deleteDataModelObjectsByDataModelId, dataModelId [{}]",dataModelId);
+        Validator.validateId(dataModelId, INCORRECT_DATA_MODEL_ID + dataModelId);
+        removeEntities(dataModelId);
+    }
+
+    private void removeEntities(DataModelId dataModelId) {
+        List<DataModelObject> dataModelObjects = findByDataModelId(dataModelId);
+        dataModelObjects.forEach(dataModelObject -> {
+            if(dataModelObject != null){
+                removeById(dataModelObject.getId());
+            }
+        });
     }
 
     private DataValidator<DataModelObject> dataModelObjectDataValidator =
