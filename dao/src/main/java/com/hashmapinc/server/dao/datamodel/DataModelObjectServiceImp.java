@@ -112,7 +112,19 @@ public class DataModelObjectServiceImp implements DataModelObjectService {
     @Override
     public void removeById(DataModelObjectId dataModelObjectId) {
         validateId(dataModelObjectId, INCORRECT_DATA_MODEL_OBJECT_ID + dataModelObjectId);
+        DataModelObject dataModelObject = dataModelObjectDao.findById(dataModelObjectId);
         dataModelObjectDao.removeById(dataModelObjectId.getId());
+        removeAttributeDefinitions(dataModelObject);
+    }
+
+    private void removeAttributeDefinitions(DataModelObject dataModelObject) {
+        DataModelObjectId dataModelObjectId = dataModelObject.getId();
+        List<AttributeDefinition> attributeDefinitions = attributeDefinitionDao.findByDataModelObjectId(dataModelObjectId);
+        attributeDefinitions.forEach(attributeDefinition -> {
+            if(attributeDefinition != null){
+                attributeDefinitionDao.removeByNameAndDataModelObjectId(attributeDefinition.getName(),dataModelObjectId);
+            }
+        });
     }
 
     @Override
