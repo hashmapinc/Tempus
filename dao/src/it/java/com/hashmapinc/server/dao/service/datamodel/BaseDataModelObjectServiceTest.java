@@ -187,6 +187,23 @@ public abstract class BaseDataModelObjectServiceTest extends AbstractServiceTest
         Assert.assertNull(attributeDefinitionDao.findByNameAndDataModelObjectId("lat",savedDataModelObject.getDataModelId().getId()));
     }
 
+    @Test
+    public void testDeleteDataModelObjectsByDataModelId() {
+        DataModelObject dataModelObject = new DataModelObject();
+        dataModelObject.setName("rig");
+        dataModelObject.setCustomerId(new CustomerId(UUIDs.timeBased()));
+        dataModelObject.setDataModelId(dataModelId);
+        dataModelObject.setParentId(null);
+        dataModelObjectService.save(dataModelObject);
+
+        List<DataModelObject> savedDataModelObjects = dataModelObjectService.findByDataModelId(dataModelId);
+        Assert.assertEquals(2,savedDataModelObjects.size());
+
+        dataModelObjectService.deleteDataModelObjectsByDataModelId(dataModelId);
+        List<DataModelObject> foundDataModelObjects = dataModelObjectService.findByDataModelId(dataModelId);
+        Assert.assertEquals(0,foundDataModelObjects.size());
+    }
+
     private void createDataModelObject() {
         AttributeDefinition attributeDef = new AttributeDefinition();
         attributeDef.setName("Version");
