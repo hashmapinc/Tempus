@@ -1714,6 +1714,7 @@ export default angular.module('tempus.locale', [])
                     "no-query-found":"No query found",
                     "delete-query":"Delete query"
                     "name-required":"Name is required."
+                    "query":"Query"
                 }
             }
         }

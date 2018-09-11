@@ -30,7 +30,6 @@ import QueryDialogController from './query-dialog.controller';
 
 
 
-
 export default angular.module('tempus.metadata', [
     uiRouter,
     tempusApiMetadata
@@ -43,5 +42,4 @@ export default angular.module('tempus.metadata', [
     .directive('tbMetadataSink', MetadataSinkDirective)
     .directive('tbMetadataConfig', MetadataConfigDirective)
     .directive('tbMetadataQuery', MetadataQueryDirective)
-
     .name;
