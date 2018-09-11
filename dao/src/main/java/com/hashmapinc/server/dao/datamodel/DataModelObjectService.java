@@ -30,4 +30,5 @@ public interface DataModelObjectService {
     List<DataModelObject> findByDataModelId(DataModelId dataModelId);
     Set<DataModelObjectId> getAllParentDataModelIdsOf(DataModelObjectId dataModelObjectId);
     List<DataModelObject> findByName(String name);
+    void deleteDataModelObjectsByDataModelId(DataModelId dataModelId);
 }
