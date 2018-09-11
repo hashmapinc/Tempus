@@ -172,6 +172,21 @@ public abstract class BaseDataModelObjectServiceTest extends AbstractServiceTest
         dataModelObjectService.save(dataModelObject);
     }
 
+    @Test
+    public void testRemoveByIdShouldAlsoDeleteAttributeDefinition() {
+        AttributeDefinition attributeDef = new AttributeDefinition();
+        attributeDef.setName("vikash");
+        attributeDef.setValue("1.0");
+        attributeDef.setValueType(DataType.STRING.name());
+
+        DataModelObject dataModelObject = getDataModelObjectWithOneAttributeDef(attributeDef);
+        dataModelObject.setName("well-2");
+        DataModelObject savedDataModelObject = dataModelObjectService.save(dataModelObject);
+
+        dataModelObjectService.removeById(savedDataModelObject.getId());
+        Assert.assertNull(attributeDefinitionDao.findByNameAndDataModelObjectId("lat",savedDataModelObject.getDataModelId().getId()));
+    }
+
     private void createDataModelObject() {
         AttributeDefinition attributeDef = new AttributeDefinition();
         attributeDef.setName("Version");
