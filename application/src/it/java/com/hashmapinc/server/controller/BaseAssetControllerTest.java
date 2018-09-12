@@ -20,7 +20,6 @@ import com.datastax.driver.core.utils.UUIDs;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.hashmapinc.server.common.data.*;
 import com.hashmapinc.server.common.data.asset.Asset;
-import com.hashmapinc.server.common.data.datamodel.AttributeDefinition;
 import com.hashmapinc.server.common.data.datamodel.DataModel;
 import com.hashmapinc.server.common.data.datamodel.DataModelObject;
 import com.hashmapinc.server.common.data.id.*;
@@ -38,7 +37,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import static com.hashmapinc.server.dao.model.ModelConstants.NULL_UUID;
 import static org.hamcrest.Matchers.containsString;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -53,7 +51,7 @@ public abstract class BaseAssetControllerTest extends AbstractControllerTest {
 
     @Test
     public void testSaveAndUpdateAsset() throws Exception {
-        Asset savedAsset = createAsset(null, null);
+        Asset savedAsset = createAsset(null, null, "My asset");
 
         savedAsset.setName("My new asset");
         doPost("/api/asset", savedAsset, Asset.class);
@@ -64,7 +62,7 @@ public abstract class BaseAssetControllerTest extends AbstractControllerTest {
 
     @Test
     public void testFindAssetById() throws Exception {
-        Asset savedAsset = createAsset(null, null);
+        Asset savedAsset = createAsset(null, null, "My asset");
         Asset foundAsset = doGet("/api/asset/" + savedAsset.getId().getId().toString(), Asset.class);
         Assert.assertNotNull(foundAsset);
         Assert.assertEquals(savedAsset, foundAsset);
@@ -102,7 +100,7 @@ public abstract class BaseAssetControllerTest extends AbstractControllerTest {
 
     @Test
     public void testDeleteAsset() throws Exception {
-        Asset savedAsset = createAsset(null, null);
+        Asset savedAsset = createAsset(null, null, "My asset");
         deleteAsset(savedAsset.getId());
 
         doGet("/api/asset/"+savedAsset.getId().getId().toString())
@@ -151,7 +149,7 @@ public abstract class BaseAssetControllerTest extends AbstractControllerTest {
 
     @Test
     public void testAssignAssetToNonExistentCustomer() throws Exception {
-        Asset savedAsset = createAsset(null, null);
+        Asset savedAsset = createAsset(null, null, "My asset");
         doPost("/api/customer/" + UUIDs.timeBased().toString()
                 + "/asset/" + savedAsset.getId().getId().toString())
                 .andExpect(status().isNotFound());
@@ -181,7 +179,7 @@ public abstract class BaseAssetControllerTest extends AbstractControllerTest {
 
         loginTenantAdmin();
 
-        Asset savedAsset = createAsset(null, null);
+        Asset savedAsset = createAsset(null, null, "My asset");
 
         doPost("/api/customer/" + savedCustomer.getId().getId().toString()
                 + "/asset/" + savedAsset.getId().getId().toString())
@@ -617,19 +615,17 @@ public abstract class BaseAssetControllerTest extends AbstractControllerTest {
 
     @Test
     public void testPolicyForAsset() throws Exception {
-        CustomerId customerId = getCustomerIdOfCustomerUser();
 
-        loginTenantAdmin();
         DataModel dataModel = createDataModel();
         DataModelObject dataModelObject = createDataModelObject(dataModel);
-        Asset asset = createAsset(dataModelObject.getId(), customerId);
+        Asset asset = createAsset(dataModelObject.getId(), customerUser.getCustomerId(), "Tenant's asset");
         String policy = String.format("CUSTOMER_USER:ASSET?%s=%s&%s=%s:READ",
                 UserPermission.ResourceAttribute.ID, asset.getId().getId().toString(),
                 UserPermission.ResourceAttribute.DATA_MODEL_ID, dataModelObject.getId().getId().toString());
 
         List<String> policies = Collections.singletonList(policy);
 
-        CustomerGroup savedCustomerGroup = createGroupWithPolicies(policies, customerId);
+        CustomerGroup savedCustomerGroup = createGroupWithPolicies(policies, customerUser.getCustomerId());
         String getPolicyUrl = "/api/customer/group/" + savedCustomerGroup.getId().getId().toString() + "/policy";
 
         final Map<String, Map<String, String>> displayablePolicies = doGetTyped(getPolicyUrl, new TypeReference<Map<String, Map<String, String>>>() {
@@ -638,12 +634,12 @@ public abstract class BaseAssetControllerTest extends AbstractControllerTest {
         Assert.assertArrayEquals(policies.toArray(), displayablePolicies.keySet().toArray());
         Assert.assertEquals(displayablePolicies.get(policy).get(UserPermission.ResourceAttribute.ID.toString()), asset.getName());
         Assert.assertEquals(displayablePolicies.get(policy).get(UserPermission.ResourceAttribute.DATA_MODEL_ID.toString()), dataModelObject.getName());
-        logout();
 
 
         UserId customerUserId = getCustomerUserId();
         assignUserToGroup(customerUserId, savedCustomerGroup);
 
+        logout();
         loginCustomerUser();
         Asset assetByCustomer1 = doGet("/api/asset/"+asset.getId().getId().toString(), Asset.class);
         Assert.assertEquals(asset.getId().getId(), assetByCustomer1.getId().getId());
@@ -659,10 +655,21 @@ public abstract class BaseAssetControllerTest extends AbstractControllerTest {
         updateGroupWithPolicies(policiesNew, savedCustomerGroup);
 
 
+        logout();
         loginCustomerUser();
         assetByCustomer1.setName("UpdatedAssetName");
         Asset assetUpdated = doPost("/api/asset", assetByCustomer1, Asset.class);
         Assert.assertEquals(assetByCustomer1.getName(), assetUpdated.getName());
+        logout();
+
+        String policyNew1 = String.format("CUSTOMER_USER:ASSET?%s=%s:CREATE",
+                UserPermission.ResourceAttribute.DATA_MODEL_ID, dataModelObject.getId().getId().toString());
+        List<String> policiesNew1 = Collections.singletonList(policyNew1);
+        updateGroupWithPolicies(policiesNew1, savedCustomerGroup);
+
+        logout();
+        loginCustomerUser();
+        createAsset(dataModelObject.getId(), customerUser.getCustomerId(), "Customer's asset");
         logout();
 
         loginTenantAdmin();
