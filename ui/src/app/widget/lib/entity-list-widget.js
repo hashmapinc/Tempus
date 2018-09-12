@@ -72,6 +72,7 @@ function AddAssetController ($log,customerService,$state,dashboardService,datamo
                 vm.dashboardDetail = response;
                 vm.isParent = getDataModelObjectDetails(response.assetLandingInfo.dataModelObjectId.id);
                 vm.isParent.then(function success(object_response) {
+                    $log.log("object_response.data")
                     $log.log(object_response.data)
                     if(object_response.data){ 
                         vm.name = object_response.data.name;
@@ -82,10 +83,12 @@ function AddAssetController ($log,customerService,$state,dashboardService,datamo
                         if(object_response.data.parentId) {
                             var parentDetails = getDataModelObjectDetails(object_response.data.parentId.id);
                             parentDetails.then(function success(parentResponse) {
-                                vm.showParent =  true;
+                                $log.log("currentuser")
+                                $log.log(currentuser)
                                 vm.parentName = parentResponse.data.name;
                                 vm.parentId = parentResponse.data.id.id;
-                                if (currentuser.authority === 'CUSTOMER_USER') {
+                                if (currentuser.authority != 'CUSTOMER_USER') {
+                                    vm.showParent =  true;
                                     $log.log("parentResponse")
                                     $log.log(parentResponse)
                                     customerService.getCustomer(parentResponse.data.customerId.id).then(
@@ -95,7 +98,7 @@ function AddAssetController ($log,customerService,$state,dashboardService,datamo
                                         },
                                         function fail() {
                                     });
-                                }
+                                }else{vm.showParent =  false;}
                             });
                         }else{
                             vm.showParent =  false;
@@ -138,33 +141,42 @@ function AddAssetController ($log,customerService,$state,dashboardService,datamo
         return datamodelService.getDatamodelObject(dataModelObjectId);
     }
     function addAsset(){
+        $log.log("readdAssetquestObj");
         var requestObj = {
             name:vm.asset_name,
             additionalInfo:{
                 description:vm.description,
                 parentId:vm.parentId
             },
-            customerId:{
-                entityType:"CUSTOMER"
-            },
             type:vm.name.toLowerCase(),
             attributes:vm.attributes,
             dataModelObjectId:{
                 entityType:"DATA_MODEL_OBJECT",
-                id:vm.dashboardDetail.dataModelObjectId
+                id:vm.dashboardDetail.assetLandingInfo.dataModelObjectId.id
             }
         }
+        $log.log("currentuser")
+        $log.log(currentuser)
+        $log.log(vm.user)
         if(currentuser.authority === 'CUSTOMER_USER'){
-            requestObj.customerId.id = currentuser.id
+            $log.log("herer"); 
+            requestObj.customerId ={};
+            requestObj.customerId.entityType = "CUSTOMER";
+            requestObj.customerId.id = currentuser.id;
         }else {
             if (vm.user){
+                requestObj.customerId.entityType = "CUSTOMER";
                 requestObj.customerId.id = vm.user.id.id 
             }
         }
+        $log.log(vm.dashboardDetail);
         $log.log(requestObj);
         assetService.saveAsset(requestObj).then(
             function success(response) {
-                if(vm.parentId && vm.associatedAsset.hasOwnProperty("name") ){
+                $log.log("response saveAsset");
+                $log.log(response);
+                $log.log(vm.associatedAsset);
+                if(response && response.additionalInfo.parentId && vm.associatedAsset){
                     var relation ={
                         type:"Contains",
                         from: {
@@ -249,30 +261,34 @@ function DeviceListWidgetController($rootScope, $scope, $filter, dashboardServic
             customerId = user.customerId;
         }else {
             vm.devicesScope = 'tenant';
-        }
-        if (customerId) {
-            vm.customerDevicesTitle = $translate.instant('customer.devices');
-            customerService.getShortCustomerInfo(customerId).then(
-                function success(info) {
-                    if (info.isPublic) {
-                        vm.customerDevicesTitle = $translate.instant('customer.public-devices');
+            $log.log("customerId");
+            $log.log(customerId);
+            if (customerId) {
+                vm.customerDevicesTitle = $translate.instant('customer.devices');
+                customerService.getShortCustomerInfo(customerId).then(
+                    function success(info) {
+                        if (info.isPublic) {
+                            vm.customerDevicesTitle = $translate.instant('customer.public-devices');
+                        }
                     }
-                }
-            );
+                );
+            }
         }
+        
         vm.loadTableData(vm.devicesScope);
     }
     function loadTableData(scope){
         $log.log($log.log("in load"))
         dashboardService.getDashboard($state.params.dashboardId).then(function success(response) {
             $log.log("response");
-            $log.log(response);
+           
            
             if(response){
-                $log.log(scope);
                 if (scope === 'tenant') {
                     assetService.getTenantAssets({limit: 200, textSearch: ''}, true, null, false).
                     then(function success(response_data) {
+                        $log.log("getAssetList");
+                        $log.log(response);
                         $log.log(response_data);
                         getAssetList(response_data,response.assetLandingInfo.dataModelObjectId.id);
                     },function fail(){});
@@ -280,7 +296,7 @@ function DeviceListWidgetController($rootScope, $scope, $filter, dashboardServic
                     assetService.getCustomerAssets(customerId, {limit: 200, textSearch: ''}, true, null, false).
                     then(function success(response_data) {
                         $log.log(response);
-                        getAssetList(response_data,response.dataModelObjectId)
+                        getAssetList(response_data,response.assetLandingInfo.dataModelObjectId.id)
                     },function fail(){});
                 }
             }

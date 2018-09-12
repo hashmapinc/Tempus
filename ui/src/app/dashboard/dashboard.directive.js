@@ -62,12 +62,19 @@ export default function DashboardDirective($compile, $templateCache, $translate,
          * Fetch all the data models related to login tenant
          */
         scope.loadDataModel = function(){
+            $log.log("in load")
+            $log.log(scope.dashboard)
             scope.listOfDataModel = [];
-            var val;
+            var val,dataModelId;
+            if(scope.dashboard && scope.dashboard.assetLandingInfo){
+                dataModelId = scope.dashboard.assetLandingInfo.dataModelId.id
+            }else{
+                dataModelId = scope.dashboard.dataModelId;
+            }
             scope.dataModels = datamodelService.listDatamodels();
             scope.dataModels.then(function (data) {
                 scope.listOfDataModel = data;
-                val = scope.listOfDataModel.filter(e => e.id.id === scope.dashboard.dataModelId);
+                val = scope.listOfDataModel.filter(e => e.id.id === dataModelId);
                 scope.dashboardDataModel = val[0];
             }, function (error) {
                 $log.error(error);
@@ -81,16 +88,25 @@ export default function DashboardDirective($compile, $templateCache, $translate,
         scope.loadDataModelAssets = function(){
             $log.log("scope.dashboard")
             $log.log(scope.dashboard);
+            var dataModelObjectId,dataModelId;
+            
             scope.listOfDataModelAssets = [];
             var val;
-            scope.dataModelsAssets = datamodelService.getDatamodelObjects(scope.dashboard.assetLandingInfo.dataModelId.id);
+            if(scope.dashboard && scope.dashboard.assetLandingInfo){
+                dataModelId = scope.dashboard.assetLandingInfo.dataModelId.id;
+                dataModelObjectId = scope.dashboard.assetLandingInfo.dataModelObjectId.id
+            }else{
+                dataModelId = scope.dashboard.dataModelId;
+                dataModelObjectId = scope.dashboard.dataModelObjectId
+            }
+            scope.dataModelsAssets = datamodelService.getDatamodelObjects(dataModelId);
             scope.dataModelsAssets.then(function (data) {
                 angular.forEach(data, function (list) {
                     if (list.type === "Asset") {
                         scope.listOfDataModelAssets.push(list);
                     }
                   });
-                val = scope.listOfDataModelAssets.filter(e => e.id.id === scope.dashboard.dataModelObjectId);
+                val = scope.listOfDataModelAssets.filter(e => e.id.id === dataModelObjectId);
                 scope.dashboarddataModelAsset = val[0];   
                 scope.showAssets();  
             }, function (error) {
