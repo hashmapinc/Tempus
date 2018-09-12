@@ -60,6 +60,7 @@ export function DashboardsController(userService, dashboardService, customerServ
                                              $state, $stateParams, $mdDialog, $document, $q, $translate) {
 
     var customerId = $stateParams.customerId;
+    
     var dashboardActionsList = [
         {
             onAction: function ($event, item) {

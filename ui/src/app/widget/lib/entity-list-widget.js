@@ -44,9 +44,8 @@ function DeviceListWidget() {
     };
 }
 
-function AddAssetController ($log,customerService,$state,dashboardService,datamodelService,userService,
+function AddAssetController (customerService,$state,dashboardService,datamodelService,userService,
     $rootScope,assetService,$mdDialog,entityRelationService,attributeService){
-    $log.log($state);
     var vm = this;
     vm.name = null;
     vm.dataModelObject = null;
@@ -68,13 +67,10 @@ function AddAssetController ($log,customerService,$state,dashboardService,datamo
     function initController(){
         var pageSize = 10;
         dashboardService.getDashboard($state.params.dashboardId).then(function success(response) {
-            $log.log(response);
             if(response){
                 vm.dashboardDetail = response;
                 vm.isParent = getDataModelObjectDetails(response.assetLandingInfo.dataModelObjectId.id);
                 vm.isParent.then(function success(object_response) {
-                    $log.log("object_response.data")
-                    $log.log(object_response.data)
                     if(object_response.data){ 
                         vm.name = object_response.data.name;
                         if(object_response.data.attributeDefinitions.length > 0){
@@ -84,18 +80,13 @@ function AddAssetController ($log,customerService,$state,dashboardService,datamo
                         if(object_response.data.parentId) {
                             var parentDetails = getDataModelObjectDetails(object_response.data.parentId.id);
                             parentDetails.then(function success(parentResponse) {
-                                $log.log("currentuser")
-                                $log.log(currentuser)
                                 vm.parentName = parentResponse.data.name;
                                 vm.parentId = parentResponse.data.id.id;
                                 if (currentuser.authority != 'CUSTOMER_USER') {
                                     vm.showParent =  true;
                                     vm.showChildOf =  true;
-                                    $log.log("parentResponse")
-                                    $log.log(parentResponse)
                                     customerService.getCustomer(parentResponse.data.customerId.id).then(
                                         function success(_customer) {
-                                            $log.log(_customer)
                                             vm.user = _customer.data;
                                         },
                                         function fail() {
@@ -128,12 +119,8 @@ function AddAssetController ($log,customerService,$state,dashboardService,datamo
         }
     }
     function loadrelationModel(){
-        $log.log(vm.parentId)
         assetService.getAssetByObjectId(vm.parentId).then(function success(parentList){
             angular.forEach(parentList, function(value){
-                $log.log("value");
-                $log.log(value);
-                $log.log(vm.user);
                 if(value.customerId.id == vm.user.id.id){
                     vm.assetList.push(value)
                 }
@@ -144,7 +131,6 @@ function AddAssetController ($log,customerService,$state,dashboardService,datamo
         return datamodelService.getDatamodelObject(dataModelObjectId);
     }
     function addAsset(){
-        $log.log("readdAssetquestObj");
         var requestObj = {
             name:vm.asset_name,
             additionalInfo:{
@@ -158,11 +144,7 @@ function AddAssetController ($log,customerService,$state,dashboardService,datamo
                 id:vm.dashboardDetail.assetLandingInfo.dataModelObjectId.id
             }
         }
-        $log.log("currentuser")
-        $log.log(currentuser)
-        $log.log(vm.user)
         if(currentuser.authority === 'CUSTOMER_USER'){
-            $log.log("herer"); 
             requestObj.customerId ={};
             requestObj.customerId.entityType = "CUSTOMER";
             requestObj.customerId.id = currentuser.id;
@@ -173,13 +155,8 @@ function AddAssetController ($log,customerService,$state,dashboardService,datamo
                 requestObj.customerId.id = vm.user.id.id 
             }
         }
-        $log.log(vm.dashboardDetail);
-        $log.log(requestObj);
         assetService.saveAsset(requestObj).then(
             function success(response) {
-                $log.log("response saveAsset");
-                $log.log(response);
-                $log.log(vm.associatedAsset);
                 if(response && response.additionalInfo.parentId && vm.associatedAsset){
                     var relation ={
                         type:"Contains",
@@ -195,8 +172,6 @@ function AddAssetController ($log,customerService,$state,dashboardService,datamo
                     entityRelationService.saveRelation(relation).then(function success(){},
                     function fail(){})
                 }
-                $log.log("vm.attributes")
-                $log.log(vm.attributes)
                 var att =[];
                 if(vm.attributes){
                     angular.forEach(vm.attributes, function(value,key){
@@ -206,12 +181,8 @@ function AddAssetController ($log,customerService,$state,dashboardService,datamo
                         }
                         att.push(a);
                     });
-                    $log.log(att)
-                    attributeService.saveEntityAttributes("ASSET",response.id.id,"SERVER_SCOPE",att).then(function success(re){
-                        $log.log(re)
-                    },
+                    attributeService.saveEntityAttributes("ASSET",response.id.id,"SERVER_SCOPE",att).then(function success(){},
                     function fail(){
-                        $log.log("in fail")
                     })
                 }
 
@@ -231,7 +202,7 @@ function AddAssetController ($log,customerService,$state,dashboardService,datamo
 
 /*@ngInject*/
 function DeviceListWidgetController($rootScope, $scope, $filter, dashboardService, assetService, userService,
-    $state, $stateParams, $translate, customerService,$document, $mdDialog,$log) {
+    $state, $stateParams, $translate, customerService,$document, $mdDialog) {
     
     var vm = this;
     $scope.query = {
@@ -246,8 +217,6 @@ function DeviceListWidgetController($rootScope, $scope, $filter, dashboardServic
     
     
     var customerId = $stateParams.customerId;
-    $log.log($state);
-    $log.log(vm);
     
     initController();
     
@@ -259,14 +228,11 @@ function DeviceListWidgetController($rootScope, $scope, $filter, dashboardServic
 
     function initController() {
         var user = userService.getCurrentUser();
-        $log.log(user);
         if (user.authority === 'CUSTOMER_USER') {
             vm.devicesScope = 'customer_user';
             customerId = user.customerId;
         }else {
             vm.devicesScope = 'tenant';
-            $log.log("customerId");
-            $log.log(customerId);
             if (customerId) {
                 vm.customerDevicesTitle = $translate.instant('customer.devices');
                 customerService.getShortCustomerInfo(customerId).then(
@@ -282,24 +248,16 @@ function DeviceListWidgetController($rootScope, $scope, $filter, dashboardServic
         vm.loadTableData(vm.devicesScope);
     }
     function loadTableData(scope){
-        $log.log($log.log("in load"))
-        dashboardService.getDashboard($state.params.dashboardId).then(function success(response) {
-            $log.log("response");
-           
-           
+        dashboardService.getDashboard($state.params.dashboardId).then(function success(response) {           
             if(response){
                 if (scope === 'tenant') {
                     assetService.getTenantAssets({limit: 200, textSearch: ''}, true, null, false).
                     then(function success(response_data) {
-                        $log.log("getAssetList");
-                        $log.log(response);
-                        $log.log(response_data);
                         getAssetList(response_data,response.assetLandingInfo.dataModelObjectId.id);
                     },function fail(){});
                 }else if (scope === 'customer' || scope === 'customer_user') {
                     assetService.getCustomerAssets(customerId, {limit: 200, textSearch: ''}, true, null, false).
                     then(function success(response_data) {
-                        $log.log(response);
                         getAssetList(response_data,response.assetLandingInfo.dataModelObjectId.id)
                     },function fail(){});
                 }
@@ -308,14 +266,10 @@ function DeviceListWidgetController($rootScope, $scope, $filter, dashboardServic
         });
     }
     function getAssetList(result,dataObjectId){
-        $log.log(result.data)
-        $log.log(dataObjectId);
         var list = [];
         if(result.data.length > 0){
             $scope.showList = true;
             angular.forEach(result.data, function(value){
-                $log.log("value");
-                $log.log(value);
                 if(value.dataModelObjectId.id == dataObjectId){
                     list.push(value);
                 }
@@ -340,7 +294,6 @@ function DeviceListWidgetController($rootScope, $scope, $filter, dashboardServic
                 count: list.length,
                 data: entityPaginatedata
             };
-            $log.log($scope.entityList);
         }else{
             $scope.showList = false;
         }

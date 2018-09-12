@@ -34,7 +34,6 @@ export default function DashboardDirective($compile, $templateCache, $translate,
         scope.types = types;
         scope.listOfDataModelAssets = [];
         scope.$watch('dashboard', function(newVal) {
-            $log.log(newVal)
             if(newVal !=null && newVal.hasOwnProperty("title")){
                 scope.theForm.editFlag = true;
             }else{
@@ -62,8 +61,6 @@ export default function DashboardDirective($compile, $templateCache, $translate,
          * Fetch all the data models related to login tenant
          */
         scope.loadDataModel = function(){
-            $log.log("in load")
-            $log.log(scope.dashboard)
             scope.listOfDataModel = [];
             var val,dataModelId;
             if(scope.dashboard && scope.dashboard.assetLandingInfo){
@@ -86,8 +83,6 @@ export default function DashboardDirective($compile, $templateCache, $translate,
          * @param dataModelId
          */
         scope.loadDataModelAssets = function(){
-            $log.log("scope.dashboard")
-            $log.log(scope.dashboard);
             var dataModelObjectId,dataModelId;
             
             scope.listOfDataModelAssets = [];

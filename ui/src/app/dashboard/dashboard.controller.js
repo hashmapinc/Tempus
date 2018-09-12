@@ -30,7 +30,7 @@ import AliasController from '../api/alias-controller';
 /*@ngInject*/
 export default function DashboardController(types, utils, dashboardUtils, widgetService, userService,
                                             dashboardService, timeService, depthService, entityService, itembuffer, importExport, hotkeys, $window, $rootScope,
-                                            $scope, $element, $state, $stateParams, $mdDialog, $mdMedia, $timeout, $document, $q, $translate, $filter,$log) {
+                                            $scope, $element, $state, $stateParams, $mdDialog, $mdMedia, $timeout, $document, $q, $translate, $filter) {
 
     var vm = this;
 
@@ -908,12 +908,10 @@ export default function DashboardController(types, utils, dashboardUtils, widget
     }
 
     function addWidgetFromType(event, widget) {
-        $log.log("in add widget");
         vm.onAddWidgetClosed();
         vm.isAddingWidget = false;
         widgetService.getWidgetInfo(widget.bundleAlias, widget.typeAlias, widget.isSystemType).then(
             function (widgetTypeInfo) {
-                $log.log(widgetTypeInfo);
                 var config = angular.fromJson(widgetTypeInfo.defaultConfig);
                 config.title = 'New ' + widgetTypeInfo.widgetName;
                 config.datasources = [];
