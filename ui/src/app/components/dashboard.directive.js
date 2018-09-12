@@ -27,10 +27,7 @@ import tempusDepthwindow from './depthwindow.directive';
 import tempusEvents from './tb-event-directives';
 import tempusMousepointMenu from './mousepoint-menu.directive';
 import tempusGrid from './grid.directive';
-//import assetCard from '../asset/asset-card.tpl.html';
 import addAssetTemplate from '../asset/add-asset.tpl.html';
-
-
 
 
 /* eslint-disable import/no-unresolved, import/default */
@@ -124,7 +121,6 @@ function DashboardController($scope, $rootScope, $element, $timeout, $mdMedia, $
         getItemTitleFunc: getAssetTitle,
 
         itemCardController: 'AssetCardController',
-        //itemCardTemplateUrl: assetCard,
         parentCtl: vm,
 
         actionsList: assetActionsList,

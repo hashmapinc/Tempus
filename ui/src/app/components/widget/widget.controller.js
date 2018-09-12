@@ -637,9 +637,7 @@ export default function WidgetController($scope, $state, $timeout, $window, $ele
         }
 
         widgetContext.$scope = $scope.$new();
-        if (widgetInfo.alias === "alias") {
-            $scope.loadingData = false;
-        }
+        
         if (widgetInfo.alias === "device_list") {
             $scope.loadingData = false;
         } 

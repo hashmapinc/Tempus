@@ -41,7 +41,7 @@ function Datasource($compile, $templateCache, utils, types) {
         scope.types = types;
         if (scope.functionsOnly) {
             scope.datasourceTypes = [types.datasourceType.function];
-        }else{
+        } else{
             scope.datasourceTypes = [types.datasourceType.entity, types.datasourceType.function];
         }
         scope.updateView = function () {
@@ -89,7 +89,6 @@ function Datasource($compile, $templateCache, utils, types) {
             generateDataKey: '&',
             fetchEntityKeys: '&',
             onCreateEntityAlias: '&',
-            0: '=',
             widgetInfo: '='
         },
         link: linker

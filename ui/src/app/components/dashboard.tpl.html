@@ -157,11 +157,11 @@
 	</md-menu-content>
 </md-menu>
 
-<tb-grid grid-configuration="vm.assetGridConfig" class="device-grid">
+<tb-grid ng-if= "displayAssetsGrid" grid-configuration="vm.assetGridConfig" class="device-grid">
     <details-buttons tb-help="'assets'" help-container-id="help-container">
         <div id="help-container"></div>
     </details-buttons>
-    <md-tabs ng-if= "displayAssetsGrid" ng-class="{'tb-headless': vm.grid.detailsConfig.isDetailsEditMode}"
+    <md-tabs ng-class="{'tb-headless': vm.grid.detailsConfig.isDetailsEditMode}"
     id="tabs" md-border-bottom flex class="tb-absolute-fill">
     <md-tab label="{{ 'asset.details' | translate }}">
         <tb-asset  asset="vm.grid.operatingItem()"

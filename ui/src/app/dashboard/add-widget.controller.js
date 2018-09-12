@@ -93,7 +93,6 @@ export default function AddWidgetController($scope, widgetService, entityService
         $mdDialog.cancel();
     }
     function add () {
-        $scope.theForm.$valid = true;
         if ($scope.theForm.$valid) {
             $scope.theForm.$setPristine();
             $scope.theForm.widgetInfo = vm.widgetInfo;

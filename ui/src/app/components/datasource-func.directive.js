@@ -57,11 +57,7 @@ function DatasourceFunc($compile, $templateCache, $mdDialog, $window, $document,
         scope.selectedAlarmDataKey = null;
         scope.alarmDataKeySearchText = null;
         
-        //Entity list array
-        scope.entityList = [
-            "Devices",
-            "Assets",
-        ];
+    
         scope.updateValidity = function () {
             if (ngModelCtrl.$viewValue) {
                 var value = ngModelCtrl.$viewValue;
@@ -106,18 +102,7 @@ function DatasourceFunc($compile, $templateCache, $mdDialog, $window, $document,
             }
         });
 
-        /**
-         * Set selected entity (device or assets) to data keys
-         */
-        scope.selectChanged = function(){
-            var entity = angular.element('#entityId').scope();
-            scope.widgetInfo.selectedEntity = entity.selectedEntity;
-            types.widgetInfo = scope.widgetInfo;
-            var dataKeys = [];
-                dataKeys = dataKeys.concat(entity.selectedEntity);
-                ngModelCtrl.$viewValue.dataKeys = dataKeys;
-        };
-
+       
         ngModelCtrl.$render = function () {
             if (ngModelCtrl.$viewValue) {
                 var funcDataKeys = [];
@@ -247,7 +232,6 @@ function DatasourceFunc($compile, $templateCache, $mdDialog, $window, $document,
             optDataKeys: '=',
             generateDataKey: '&',
             datakeySettingsSchema: '=',
-            entityDatasource: '=',
             widgetInfo: '='
         },
         link: linker

@@ -52,7 +52,7 @@
         </md-dialog-content>
         <md-dialog-actions layout="row">
             <span flex></span>
-            <md-button  type="submit"
+            <md-button ng-disabled="$root.loading || theForm.$invalid" type="submit"
                        class="md-raised md-primary">
                 {{ 'action.add' | translate }}
             </md-button>

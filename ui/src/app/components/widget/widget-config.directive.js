@@ -52,12 +52,7 @@ export default angular.module('tempus.directives.widgetConfig', [tempusTypes,
 function WidgetConfig($compile, $templateCache, $rootScope, $translate, $timeout, types, utils) {
 
     var linker = function (scope, element, attrs, ngModelCtrl) {
-        scope.isEntityList = false;
-        scope.entityDatasource = false;
-        if(scope.widgetInfo.alias == "device_list"){
-            scope.isEntityList = true;
-            scope.typeParameters.maxDatasources = 1;
-        }
+        
         var template = $templateCache.get(widgetConfigTemplate);
         element.html(template);
 
@@ -397,30 +392,11 @@ function WidgetConfig($compile, $templateCache, $rootScope, $translate, $timeout
             }
         }
 
-        /**
-         * Datasource for entity types
-         */
-        scope.addDatasourceForEntity = function () {
-            var newDatasource;
-            newDatasource = { type: "Entity Types",
-                dataKeys: []
-            };
-            var datasource = {value: newDatasource};
-            scope.datasources.push(datasource);
-            scope.entityDatasource = true;
-            if (scope.theForm) {
-                scope.theForm.$valid = true;
-                scope.theForm.$setDirty();
-            }
-            scope.typeParameters.maxDatasources = 1;
-        }
-
         scope.removeDatasource = function ($event, datasource) {
             var index = scope.datasources.indexOf(datasource);
             if (index > -1) {
                 scope.datasources.splice(index, 1);
                 if (scope.theForm) {
-                    scope.theForm.$valid = false;
                     scope.theForm.$setDirty();
                 }
             }
