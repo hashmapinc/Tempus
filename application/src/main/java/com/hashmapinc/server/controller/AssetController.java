@@ -72,14 +72,8 @@ public class AssetController extends BaseController {
     public Asset saveAsset(@RequestBody Asset asset) throws TempusException {
         try {
             asset.setTenantId(getCurrentUser().getTenantId());
-            if (getCurrentUser().getAuthority() == Authority.CUSTOMER_USER) {
-                if (asset.getId() == null || asset.getId().isNullUid() ||
-                    asset.getCustomerId() == null || asset.getCustomerId().isNullUid()) {
-                    throw new TempusException("You don't have permission to perform this operation!",
-                            TempusErrorCode.PERMISSION_DENIED);
-                } else {
-                    checkCustomerId(asset.getCustomerId());
-                }
+            if (getCurrentUser().getAuthority() == Authority.CUSTOMER_USER){
+                checkCustomerId(asset.getCustomerId());
             }
             Asset savedAsset  = checkNotNull(assetService.saveAsset(asset));
 
