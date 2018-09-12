@@ -72,6 +72,7 @@ data:
   spark.path: "/tmp"
   http.port: "8080"
   identity.base.url: "http://{{ .Values.identity.name }}:{{ .Values.identity.service.port }}/uaa"
+  metadata.base.url: "http://{{ .Values.metadata.name }}:{{ .Values.metadata.service.port }}/api"
 ---
 apiVersion: "apps/v1beta1"
 kind: StatefulSet
@@ -113,6 +114,11 @@ spec:
             configMapKeyRef:
               name: tempus-config
               key: identity.base.url
+        - name: METADATA_BASE_URL
+          valueFrom:
+            configMapKeyRef:
+              name: tempus-config
+              key: metadata.base.url
         - name: SPARK_COMPUTATIONS_PATH
           valueFrom:
             configMapKeyRef:

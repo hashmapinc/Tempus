@@ -1,0 +1,110 @@
+#
+# Copyright © 2016-2018 The Thingsboard Authors
+# Modifications © 2017-2018 Hashmap, Inc
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.metadata.name }}
+  labels:
+    app: {{ .Values.metadata.name }}
+spec:
+  type: {{ .Values.metadata.service.type }}
+  ports:
+  - port: {{ .Values.metadata.service.port }}
+    targetPort: http
+    protocol: TCP
+    name: http
+  selector:
+    app: {{ .Values.metadata.name }}
+---
+apiVersion: policy/v1beta1
+kind: PodDisruptionBudget
+metadata:
+  name: {{ .Values.metadata.name }}
+spec:
+  selector:
+    matchLabels:
+      app: {{ .Values.metadata.name }}
+  minAvailable: {{ .Values.metadata.pdb.minAvailable }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Values.metadata.name }}
+data:
+  identity.base.url: "http://{{ .Values.identity.name }}:{{ .Values.identity.service.port }}/uaa"
+  spring.jpa.db: "org.hibernate.dialect.PostgreSQLDialect"
+  spring.jpa.driver: "org.postgresql.Driver"
+  spring.ds.url: "jdbc:postgresql://{{ .Values.metadata.db.host }}:{{ .Values.metadata.db.port }}/{{ .Values.metadata.db.name }}"
+  spring.ds.username: "{{ .Values.metadata.db.user }}"
+  spring.ds.password: "{{ .Values.metadata.db.password }}"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.metadata.name }}
+  labels:
+    app: {{ .Values.metadata.name }}
+spec:
+  replicas: {{ .Values.metadata.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ .Values.metadata.name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.metadata.name }}
+    spec:
+      containers:
+      - name: {{ .Values.metadata.name }}
+        image: "{{ .Values.metadata.image.repository }}:{{ .Values.metadata.image.tag }}"
+        imagePullPolicy: {{ .Values.metadata.image.pullPolicy }}
+        ports:
+        - name: http
+          containerPort: {{ .Values.metadata.app.port }}
+          protocol: TCP
+        env:
+        - name: IDENTITY_BASE_URL
+          valueFrom:
+            configMapKeyRef:
+              name: {{ .Values.metadata.name }}
+              key: identity.base.url
+        - name: SPRING_JPA_DATABASE_PLATFORM
+          valueFrom:
+            configMapKeyRef:
+              name: {{ .Values.metadata.name }}
+              key: spring.jpa.db
+        - name: SPRING_DRIVER_CLASS_NAME
+          valueFrom:
+            configMapKeyRef:
+              name: {{ .Values.metadata.name }}
+              key: spring.jpa.driver
+        - name: SPRING_DATASOURCE_URL
+          valueFrom:
+            configMapKeyRef:
+              name: {{ .Values.metadata.name }}
+              key: spring.ds.url
+        - name: SPRING_DATASOURCE_USERNAME
+          valueFrom:
+            configMapKeyRef:
+              name: {{ .Values.metadata.name }}
+              key: spring.ds.username
+        - name: SPRING_DATASOURCE_PASSWORD
+          valueFrom:
+            configMapKeyRef:
+              name: {{ .Values.metadata.name }}
+              key: spring.ds.password
