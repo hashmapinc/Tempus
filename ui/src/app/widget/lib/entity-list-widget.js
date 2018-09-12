@@ -85,12 +85,6 @@ function AddAssetController (customerService,$state,dashboardService,datamodelSe
                                 if (currentuser.authority != 'CUSTOMER_USER') {
                                     vm.showParent =  true;
                                     vm.showChildOf =  true;
-                                    customerService.getCustomer(parentResponse.data.customerId.id).then(
-                                        function success(_customer) {
-                                            vm.user = _customer.data;
-                                        },
-                                        function fail() {
-                                    });
                                 }else{vm.showParent =  false;
                                     vm.showChildOf =  true;}
                             });
@@ -147,7 +141,7 @@ function AddAssetController (customerService,$state,dashboardService,datamodelSe
         if(currentuser.authority === 'CUSTOMER_USER'){
             requestObj.customerId ={};
             requestObj.customerId.entityType = "CUSTOMER";
-            requestObj.customerId.id = currentuser.id;
+            requestObj.customerId.id = currentuser.customerId;
         }else {
             if (vm.user){
                 requestObj.customerId ={};
