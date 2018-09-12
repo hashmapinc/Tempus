@@ -231,7 +231,7 @@ function GridController($scope, $rootScope, $state, $mdDialog, $document, $q, $m
                                     $window.localStorage.removeItem('currentApp');
                                     $window.localStorage.removeItem('currentTab');
                                 }
-                                if(items.data.length > 0) {
+                                if(items.data && items.data.length > 0) {
                                 if(items.data[0].id.entityType == 'DASHBOARD' && angular.isDefined(vm.config.parentCtl.currentApplication) && (angular.isDefined(vm.config.parentCtl.currentApplication.miniDashboardId) || angular.isDefined(vm.config.parentCtl.currentApplication.dashboardId))){
                                     if(vm.config.parentCtl.showAppMini){
                                         items.data.forEach(function(miniDashboard){

@@ -278,6 +278,12 @@ function AssetService($http, $q, customerService, userService) {
         return deferred.promise;
     }
 
+    /**
+     * Get assets from asset table based on data model object Id.
+     * @param {*} dataObjectId 
+     * @param {*} ignoreErrors 
+     * @param {*} config 
+     */
     function getAssetByObjectId(dataObjectId,ignoreErrors, config) {
         var deferred = $q.defer();
         var url = '/api/datamodelobject/assets/' + dataObjectId;

@@ -151,61 +151,25 @@ function DashboardService($rootScope, $http, $q, $location, $filter) {
     function saveDashboard(dashboard) {
         var deferred = $q.defer();
         var url;        
-        // if(dashboard.landingDashboard) {
-        //     url = '/api/asset/dashboard/';
-        //     var requestBody = {
-        //         dashboard:{
-        //             title:dashboard.title,
-        //             configuration : dashboard.configuration,
-        //             type: "ASSET_LANDING_PAGE"
-        //          },
-        //          assetLandingDashboardInfo:{  
-        //             dataModelId:{  
-        //                id:dashboard.dataModelId,
-        //                entityType : "DATA_MODEL"
-        //             },
-        //             dataModelObjectId:{  
-        //                id:dashboard.dataModelObjectId,
-        //                entityType : "DATA_MODEL_OBJECT"
-        //             }
-        //          }
-        //     }
-        //     $http.post(url, cleanDashboard(requestBody)).then(function success(response) {
-        //         deferred.resolve(prepareDashboard(response.data));
-        //     }, function fail() {
-        //         deferred.reject();
-        //     }); 
-        //}else {
-            if(dashboard.landingDashboard) {
-                dashboard.assetLandingInfo ={
-                    dataModelId:{
-                        id:dashboard.dataModelId,
-                        entityType : "DATA_MODEL"
-                    },
-                    dataModelObjectId:{  
-                        id:dashboard.dataModelObjectId,
-                        entityType : "DATA_MODEL_OBJECT"
-                    }
+        if(dashboard.landingDashboard) {
+            dashboard.assetLandingInfo ={
+                dataModelId:{
+                    id:dashboard.dataModelId,
+                    entityType : "DATA_MODEL"
+                },
+                dataModelObjectId:{  
+                    id:dashboard.dataModelObjectId,
+                    entityType : "DATA_MODEL_OBJECT"
                 }
-                dashboard.type="ASSET_LANDING_PAGE"
             }
-            // dashboard.assetLandingInfo ={
-            //     dataModelId:{
-            //         id:dashboard.dataModelId,
-            //         entityType : "DATA_MODEL"
-            //     },
-            //     dataModelObjectId:{  
-            //         id:dashboard.dataModelObjectId,
-            //         entityType : "DATA_MODEL_OBJECT"
-            //     }
-            // }
-            url = '/api/dashboard';
-            $http.post(url, cleanDashboard(dashboard)).then(function success(response) {
-                deferred.resolve(prepareDashboard(response.data));
-            }, function fail() {
-                deferred.reject();
-            });
-        //}
+            dashboard.type="ASSET_LANDING_PAGE"
+        }
+        url = '/api/dashboard';
+        $http.post(url, cleanDashboard(dashboard)).then(function success(response) {
+            deferred.resolve(prepareDashboard(response.data));
+        }, function fail() {
+            deferred.reject();
+        });
         return deferred.promise;
     }
 

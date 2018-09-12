@@ -27,8 +27,7 @@ import tempusDepthwindow from './depthwindow.directive';
 import tempusEvents from './tb-event-directives';
 import tempusMousepointMenu from './mousepoint-menu.directive';
 import tempusGrid from './grid.directive';
-//import deviceCard from '../device/device-card.tpl.html';
-import assetCard from '../asset/asset-card.tpl.html';
+//import assetCard from '../asset/asset-card.tpl.html';
 import addAssetTemplate from '../asset/add-asset.tpl.html';
 
 
@@ -51,7 +50,6 @@ export default angular.module('tempus.directives.dashboard', [tempusTypes,
     tempusDepthwindow,
     tempusEvents,
     tempusMousepointMenu,
-   // tempusDevice,
     angularGridster.name])
     .directive('tbDashboard', Dashboard)
     .name;
@@ -100,7 +98,7 @@ function Dashboard() {
 }
 
 /*@ngInject*/
-function DashboardController($scope, $rootScope, $element, $timeout, $mdMedia, $mdUtil, $q, timeService, depthService, types, utils, $translate, deviceService, customerService, assetService,$log) {
+function DashboardController($scope, $rootScope, $element, $timeout, $mdMedia, $mdUtil, $q, timeService, depthService, types, utils, $translate, customerService, assetService) {
     var highlightedMode = false;
     var highlightedWidget = null;
     var selectedWidget = null;
@@ -111,7 +109,6 @@ function DashboardController($scope, $rootScope, $element, $timeout, $mdMedia, $
 
     var vm = this;
     vm.types = types;
-    $scope.displayDeviceGrid = false;
     $scope.displayAssetsGrid = false;
     vm.gridster = null;
 
@@ -127,7 +124,7 @@ function DashboardController($scope, $rootScope, $element, $timeout, $mdMedia, $
         getItemTitleFunc: getAssetTitle,
 
         itemCardController: 'AssetCardController',
-        itemCardTemplateUrl: assetCard,
+        //itemCardTemplateUrl: assetCard,
         parentCtl: vm,
 
         actionsList: assetActionsList,
@@ -147,7 +144,6 @@ function DashboardController($scope, $rootScope, $element, $timeout, $mdMedia, $
     };
     
     var entityTableDevice = $rootScope.$on("CallTableDetailDeviceOnDashboard", function($event, data){
-        $log.log(data[1])
         $scope.displayAssetsGrid = true;
         $rootScope.$emit("CallTableDetailDevice", [data[0], data[1]]);
     });

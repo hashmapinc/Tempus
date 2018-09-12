@@ -56,6 +56,7 @@ function AddAssetController ($log,customerService,$state,dashboardService,datamo
     vm.cancel = cancel;
     vm.showCustList = false;
     vm.showParent =  false;
+    vm.showChildOf =  false;
     vm.assetList= [];
     vm.attributeList;
     vm.dashboardDetail = null;
@@ -89,6 +90,7 @@ function AddAssetController ($log,customerService,$state,dashboardService,datamo
                                 vm.parentId = parentResponse.data.id.id;
                                 if (currentuser.authority != 'CUSTOMER_USER') {
                                     vm.showParent =  true;
+                                    vm.showChildOf =  true;
                                     $log.log("parentResponse")
                                     $log.log(parentResponse)
                                     customerService.getCustomer(parentResponse.data.customerId.id).then(
@@ -98,7 +100,8 @@ function AddAssetController ($log,customerService,$state,dashboardService,datamo
                                         },
                                         function fail() {
                                     });
-                                }else{vm.showParent =  false;}
+                                }else{vm.showParent =  false;
+                                    vm.showChildOf =  true;}
                             });
                         }else{
                             vm.showParent =  false;
@@ -112,7 +115,7 @@ function AddAssetController ($log,customerService,$state,dashboardService,datamo
         function fail() {
         });
         if (currentuser.authority === 'CUSTOMER_USER') {
-            vm.showCustList = true;
+            vm.showCustList = false;
             vm.disableFlag = true
         }else {
             vm.showCustList = true;
@@ -165,6 +168,7 @@ function AddAssetController ($log,customerService,$state,dashboardService,datamo
             requestObj.customerId.id = currentuser.id;
         }else {
             if (vm.user){
+                requestObj.customerId ={};
                 requestObj.customerId.entityType = "CUSTOMER";
                 requestObj.customerId.id = vm.user.id.id 
             }
