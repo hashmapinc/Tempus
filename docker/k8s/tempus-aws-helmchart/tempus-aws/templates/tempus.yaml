@@ -27,7 +27,7 @@ metadata:
     service.beta.kubernetes.io/aws-load-balancer-backend-protocol: "http"
     service.beta.kubernetes.io/aws-load-balancer-connection-idle-timeout: '3600'
 spec:
-  type: LoadBalancer
+  type: ClusterIP
   selector:
     app: tempus
   ports:
