@@ -19,7 +19,6 @@ import '../plugin/plugin.scss';
 /* eslint-disable import/no-unresolved, import/default */
 
 import computationJobFieldsetTemplate from './computation-job-fieldset.tpl.html';
-import sparkComputationJobForm from './computation-job-forms/form-spark.tpl.html';
 
 /* eslint-enable import/no-unresolved, import/default */
 
@@ -27,42 +26,39 @@ import sparkComputationJobForm from './computation-job-forms/form-spark.tpl.html
 export default function ComputationJobDirective($compile, $templateCache, $translate, types, toast, $stateParams, computationService) {
     var linker = function (scope, element) {
         var template = $templateCache.get(computationJobFieldsetTemplate);
-        scope.sparkJobTemplate = $templateCache.get(sparkComputationJobForm);
         element.html(template);
         scope.types = types;
         scope.showComputationJobConfig = false;
 
         if (scope.computation) {
             scope.showComputationJobConfig = true;
-            scope.computationDescriptor = scope.computation.jsonDescriptor;
-        } 
+            if (scope.computation.type == types.computationType.spark)
+                scope.computationDescriptor = scope.computation.computationMetadata.jsonDescriptor;
+        }
         else{
             computationService.getComputation($stateParams.computationId).then(
                 function success(computation) {
                     scope.computation = computation;
-                    scope.showComputationJobConfig = true;
-                    scope.computationDescriptor = computation.jsonDescriptor;
+                    if (scope.computation.type == types.computationType.spark)
+                        scope.computationDescriptor = computation.computationMetadata.jsonDescriptor;
+                    scope.flag=true
+                    $compile(element.contents())(scope);
                 },
                 function fail() {
                 }
             );
         }
 
-        /*scope.$watch('computationjob', function(newValue, oldValue) {
-            if (newValue && !angular.equals(newValue, oldValue)) {
-                scope.computationjob = newValue;
-            }
-        });*/
-
         scope.$watch('computation', function(newValue, oldValue) {
             if(newValue && !angular.equals(newValue, oldValue)){
                 scope.showComputationJobConfig = true;
-                scope.computationDescriptor = newValue.jsonDescriptor;
-            } 
+                if (newValue.type == types.computationType.spark)
+                    scope.computationDescriptor = newValue.computationMetadata.jsonDescriptor;
+            }
         }, true);
 
-        if (scope.computationjob && !scope.computationjob.computationJobConfiguration) {
-            scope.computationjob.computationJobConfiguration = {};
+        if (scope.computationjob && !scope.computationjob.configuration) {
+            scope.computationjob.configuration = {};
         }
 
         scope.onComputationJobIdCopied = function() {

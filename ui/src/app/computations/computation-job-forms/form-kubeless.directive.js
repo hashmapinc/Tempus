@@ -32,11 +32,12 @@ export default function ComputationJobKubelessDirective($log, $compile, $templat
         //TODO: Add type check
         if(!scope.config || !scope.config.functionSelector){
             scope.config = {
-                functionSelector: []
+                functionSelectorMap: []
             };
         }
 
         scope.addMap = function(mapping) {
+            $log.log("Mapping : ", mapping);
             var newMap = {key:"", value:""};
             mapping.push(newMap);
         };
@@ -50,18 +51,19 @@ export default function ComputationJobKubelessDirective($log, $compile, $templat
 
         scope.$watch('config', function (newValue, oldValue) {
             $log.log('Values New {} and Old {}', newValue, oldValue);
+            oldValue;
             if(newValue){
-                var selectors = newValue.functionSelector;
+                var selectors = newValue.functionSelectorMap;
                 if(selectors) {
                     var result = selectors.reduce(function (map, obj) {
-                        map[obj.key] = obj.val;
+                        map[obj.key] = obj.value;
                         return map;
                     }, {});
-                    newValue.selectors = result;
+                    newValue.functionSelector = result;
                 }
-                $log.log('Selectors ', newValue.selectors);
+                $log.log('Selectors ', newValue.functionSelector);
             }
-        });
+        }, true);
 
         $compile(element.contents())(scope);
     }

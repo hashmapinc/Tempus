@@ -18,10 +18,20 @@
 -->
 
 <section flex layout="row">
-    <div ng-if="config.functionSelector && config.functionSelector.length > 0">
+    <div>
+    <md-input-container class="md-block">
+        <label translate>Topic</label>
+        <input required name="topic" ng-model="config.topic">
+        <div ng-messages="theForm.topic.$error">
+            <div translate ng-message="required">topic required</div>
+        </div>
+    </md-input-container>
+    </div>
+
+    <div ng-if="config.functionSelectorMap && config.functionSelectorMap.length > 0">
         <ol class="list-group">
-            <li class="list-group-item" ng-repeat="(mapIndex,map) in config.functionSelector">
-                <md-button aria-label="{{ 'action.remove' | translate }}" class="md-icon-button" ng-click="removeMap(map, config.functionSelector)" ng-show="isEdit">
+            <li class="list-group-item" ng-repeat="(mapIndex,map) in config.functionSelectorMap">
+                <md-button aria-label="{{ 'action.remove' | translate }}" class="md-icon-button" ng-click="removeMap(map, config.functionSelectorMap)" ng-show="isEdit">
                     <ng-md-icon icon="close" aria-label="{{ 'action.remove' | translate }}"></ng-md-icon>
                     <md-tooltip md-direction="top">
                         {{ 'action.remove' | translate }}
@@ -32,15 +42,15 @@
                         <section flex layout="row">
                             <md-input-container flex="40" class="md-block">
                                 <label translate>computationJob.kubeless.functionSelector-key</label>
-                                <input required name="functionSelector_key{{mapIndex}}" ng-model="map.key">
-                                <div ng-messages="theForm['functionSelector_key' + mapIndex].$error">
+                                <input required name="functionSelectorMap_key{{mapIndex}}" ng-model="map.key">
+                                <div ng-messages="theForm['functionSelectorMap_key' + mapIndex].$error">
                                     <div translate ng-message="required">computationJob.kubeless.field-required</div>
                                 </div>
                             </md-input-container>
                             <md-input-container flex="60" class="md-block">
                                 <label translate>computationJob.kubeless.functionSelector-value</label>
-                                <input required name="functionSelector_value{{mapIndex}}" ng-model="map.value">
-                                <div ng-messages="theForm['functionSelector_value' + mapIndex].$error">
+                                <input required name="functionSelectorMap_value{{mapIndex}}" ng-model="map.value">
+                                <div ng-messages="theForm['functionSelectorMap_value' + mapIndex].$error">
                                     <div translate ng-message="required">computationJob.kubeless.field-required</div>
                                 </div>
                             </md-input-container>
@@ -53,7 +63,7 @@
 </section>
 <div flex layout="row" layout-align="start center" ng-show="isEdit">
     <md-button class="md-primary md-raised"
-               ng-click="addMap(config.functionSelector)" aria-label="{{ 'action.add' | translate }}">
+               ng-click="addMap(config.functionSelectorMap)" aria-label="{{ 'action.add' | translate }}">
         <md-icon class="material-icons">add</md-icon>
         <span translate>computationJob.kubeless.add-map</span>
     </md-button>

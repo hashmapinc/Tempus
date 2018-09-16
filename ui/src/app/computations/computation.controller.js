@@ -96,7 +96,7 @@ export default function ComputationController($log, computationService, computat
             $event.stopPropagation();
         }
 
-        $state.transitionTo ('.', {computationId: computation.id.id}, { location: false, relative: $state.$current, reload: false, notify: false }) 
+        $state.transitionTo ('.', {computationId: computation.id.id}, { location: false, relative: $state.$current, reload: false, notify: false })
 
                 vm.computation = computation;
                 vm.viewComputations = false;
@@ -253,7 +253,6 @@ export default function ComputationController($log, computationService, computat
         else {
             computationService.getComputation($stateParams.computationId).then(
             function success(computation) {
-                //vm.computation = computation;
                 return computationJobService.getAllComputationJobs(pageLink, computation.id.id)
             },
             function fail() {

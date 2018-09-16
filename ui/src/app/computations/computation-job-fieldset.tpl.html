@@ -55,8 +55,14 @@
                     <span translate class="md-headline" ng-class="{'tb-readonly-label' : (loading || !isEdit || isReadOnly)}">computationJob.configuration</span>
                 </md-card-title-text>
             </md-card-title>
-            <ng-include ng-if="computation.type === types.computationType.spark" src="'computations/computation-job-forms/form-spark.tpl.html'"/>
-            <tb-computation-job-kubeless ng-if="computation.type === types.computationType.kubeless" is-edit="isEdit" is-read-only="isReadOnly" config="computationjob.computationJobConfiguration" the-form="theForm"/>
+            <div  ng-show='computation.type == types.computationType.spark' >
+                <tb-computation-job-spark  is-edit="isEdit" is-read-only="isReadOnly" config="computationjob.configuration" the-form="theForm"
+                                           computation-descriptor="computationDescriptor"></tb-computation-job-spark>
+            </div>
+            <div  ng-show='computation.type == types.computationType.kubeless' >
+                <tb-computation-job-kubeless ng-if='computation.type === types.computationType.kubeless' is-edit="isEdit" is-read-only="isReadOnly"
+                                             config="computationjob.configuration" the-form="theForm"></tb-computation-job-kubeless>
+            </div>
         </md-card>
     </fieldset>
 </md-content>
