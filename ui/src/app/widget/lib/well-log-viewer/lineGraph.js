@@ -87,21 +87,23 @@ var lineGraph = function(lineConfig, data, state, index, width) {
       .y((d) => y(d[0]))
       .y(function(d) { return y(d[0]); })
      // .y((d, i) => y(i + dataGen.time))
-      .x(d => x(d[1]));
+      .x(d => x(d[1]))
+      .curve(d3.curveStepBefore);
 
     if(angular.isDefined(o.areaFill)){
       if(o.areaFill.fill === "left"){
         var area = d3.area()
           .x0(-14)
           .x1(d => x(d[1]))
-          .y((d) => y(d[0]));
+          .y((d) => y(d[0]))
+          .curve(d3.curveStepBefore);
       }
       if(o.areaFill.fill === "right"){
          area = d3.area()
           .x0(d => x(d[1]))
           .x1(w)
-          .y((d) => y(d[0]));
-
+          .y((d) => y(d[0]))
+          .curve(d3.curveStepBefore);
       }
     }
 
@@ -165,27 +167,33 @@ if(o.state === "init"){
 
     //  $lngrp
 
-      let $lineGraph = context.select('.linearGrid').select('.linepath'+o.index)
-      .select('path')
-      .attr('stroke', o.color)
-      .attr('fill', 'none')
-      .attr('stroke-width', o.lineWeight);
-
-      let $areaGraph = context.select('.linearGrid').select('.areapath'+o.index)
-      .select('path')
-      .attr('fill', o.areaFill.color)
-      .style("opacity", o.areaFill.opacity);
-
-     $lineGraph
-        //.datum(dataGen.latestData)
-        .datum(o.data.data)
+      let $lineGraph = context.select('.linearGrid').select('.linepath'+o.index).select('path');
+      
+      $lineGraph
+        .data([o.data.data])
+        .attr('d', line)
         .attr("transform", "translate(" + leftPadding + ", 0)")
-        .attr('d', line);
+        .attr('stroke', o.color)
+        .attr('fill', 'none')
+        .attr('stroke-width', o.lineWeight)
 
-      $areaGraph
-        .datum(o.data.data)
+       let $areaGraph = context.select('.linearGrid').select('.areapath'+o.index).select('path');
+
+      // .attr('fill', o.areaFill.color)
+      // .style("opacity", o.areaFill.opacity);
+
+   //   $lineGraph
+   //      //.datum(dataGen.latestData)
+   //      .datum(o.data.data)
+   // //     .attr("transform", "translate(" + leftPadding + ", 0)")
+   //      .attr('d', line);
+
+       $areaGraph
+        .data([o.data.data])
         .attr("transform", "translate(" + leftPadding + ", 0)")
-        .attr('d', area);
+        .attr('d', area)
+        .attr('fill', o.areaFill.color)
+        .style("opacity", o.areaFill.opacity);
 
       // $rects
       //   .attr('height', (_, i) => Math.abs(latestDeltas[i] * h / 10))
