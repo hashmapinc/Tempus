@@ -27,6 +27,7 @@ import com.hashmapinc.server.common.data.page.TextPageData;
 import com.hashmapinc.server.common.data.page.TextPageLink;
 import com.hashmapinc.server.common.data.security.Authority;
 import com.hashmapinc.server.common.data.security.UserCredentials;
+import com.hashmapinc.server.dao.model.ModelConstants;
 import com.hashmapinc.server.exception.TempusErrorCode;
 import com.hashmapinc.server.exception.TempusException;
 import com.hashmapinc.server.requests.CreateUserRequest;
@@ -116,7 +117,7 @@ public class UserController extends BaseController {
                     savedUser.getCustomerId(),
                     user.getId() == null ? ActionType.ADDED : ActionType.UPDATED, null);
 
-            if (getCurrentUser().getAuthority() == Authority.TENANT_ADMIN) {
+            if (getCurrentUser().getAuthority() == Authority.SYS_ADMIN) {
                 assignDefaultGroupToTenantUser(authUser.getTenantId(), savedUser.getId());
             }
 
@@ -132,7 +133,7 @@ public class UserController extends BaseController {
 
     private void assignDefaultGroupToTenantUser(TenantId tenantId, UserId userId) {
         TextPageData<CustomerGroup> customerGroupByTenant =
-                customerGroupService.findCustomerGroupsByTenantIdAndCustomerId(tenantId, null, new TextPageLink(1));
+                customerGroupService.findCustomerGroupsByTenantIdAndCustomerId(tenantId, new CustomerId(ModelConstants.NULL_UUID), new TextPageLink(1));
         List<CustomerGroupId> customerGroupIds = customerGroupByTenant.getData().stream().map(IdBased::getId).collect(Collectors.toList());
         userService.assignGroups(userId, customerGroupIds);
     }

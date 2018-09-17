@@ -19,6 +19,7 @@ package com.hashmapinc.server.dao.tenant;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.hashmapinc.server.common.data.CustomerGroup;
 import com.hashmapinc.server.common.data.DataConstants;
+import com.hashmapinc.server.common.data.id.CustomerId;
 import com.hashmapinc.server.common.data.id.TenantId;
 import com.hashmapinc.server.common.data.page.TextPageData;
 import com.hashmapinc.server.common.data.page.TextPageLink;
@@ -27,6 +28,7 @@ import com.hashmapinc.server.dao.customergroup.CustomerGroupService;
 import com.hashmapinc.server.dao.dashboard.DashboardService;
 import com.hashmapinc.server.dao.device.DeviceService;
 import com.hashmapinc.server.dao.entity.AbstractEntityService;
+import com.hashmapinc.server.dao.model.ModelConstants;
 import com.hashmapinc.server.dao.rule.RuleService;
 import com.hashmapinc.server.dao.service.DataValidator;
 import com.hashmapinc.server.dao.service.PaginatedRemover;
@@ -122,7 +124,7 @@ public class TenantServiceImpl extends AbstractEntityService implements TenantSe
         ruleService.deleteRulesByTenantId(tenantId);
         pluginService.deletePluginsByTenantId(tenantId);
         tenantDao.removeById(tenantId.getId());
-        customerGroupService.deleteCustomerGroupsByTenantIdAndCustomerId(tenantId, null);
+        customerGroupService.deleteCustomerGroupsByTenantIdAndCustomerId(tenantId, new CustomerId(ModelConstants.NULL_UUID));
         deleteEntityRelations(tenantId);
     }
 
