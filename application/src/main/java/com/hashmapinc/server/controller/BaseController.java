@@ -49,6 +49,7 @@ import com.hashmapinc.server.dao.device.DeviceCredentialsService;
 import com.hashmapinc.server.dao.device.DeviceService;
 import com.hashmapinc.server.dao.exception.DataValidationException;
 import com.hashmapinc.server.dao.exception.IncorrectParameterException;
+import com.hashmapinc.server.dao.gatewayconfiguration.TempusGatewayConfigurationService;
 import com.hashmapinc.server.dao.metadataingestion.MetadataIngestionService;
 import com.hashmapinc.server.dao.model.ModelConstants;
 import com.hashmapinc.server.dao.plugin.PluginService;
@@ -167,6 +168,9 @@ public abstract class BaseController {
 
     @Autowired
     protected CustomerGroupService customerGroupService;
+
+    @Autowired
+    protected TempusGatewayConfigurationService tempusGatewayConfigurationService;
 
     @Autowired
     protected AttributeBasedPermissionEvaluator evaluator;
@@ -313,6 +317,22 @@ public abstract class BaseController {
         }
     }
 
+    TempusGatewayConfiguration checkTempusGatewayConfigurationId(TempusGatewayConfigurationId tempusGatewayConfigurationId) throws TempusException {
+        try {
+            validateId(tempusGatewayConfigurationId, "Incorrect tempusGatewayConfigurationId " + tempusGatewayConfigurationId);
+            SecurityUser authUser = getCurrentUser();
+            TempusGatewayConfiguration tempusGatewayConfiguration = tempusGatewayConfigurationService.findTempusGatewayConfigurationById(tempusGatewayConfigurationId);
+            checkTempusGatewayConfiguration(tempusGatewayConfiguration);
+            if (!tempusGatewayConfiguration.getTenantId().getId().equals(authUser.getTenantId().getId())) {
+                throw new TempusException(YOU_DON_T_HAVE_PERMISSION_TO_PERFORM_THIS_OPERATION,
+                        TempusErrorCode.PERMISSION_DENIED);
+            }
+            return tempusGatewayConfiguration;
+        } catch (Exception e) {
+            throw handleException(e, false);
+        }
+    }
+
     Long checkLong(String value, String paramName) {
         try {
            return Long.parseLong(value);
@@ -339,6 +359,11 @@ public abstract class BaseController {
         checkNotNull(customerGroup);
         checkTenantId(customerGroup.getTenantId());
         checkCustomerId(customerGroup.getCustomerId());
+    }
+
+    private void checkTempusGatewayConfiguration(TempusGatewayConfiguration tempusGatewayConfiguration) throws TempusException {
+        checkNotNull(tempusGatewayConfiguration);
+        checkTenantId(tempusGatewayConfiguration.getTenantId());
     }
 
     User checkUserId(UserId userId) throws TempusException {

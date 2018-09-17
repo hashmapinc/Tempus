@@ -1,0 +1,81 @@
+/**
+ * Copyright © 2016-2018 The Thingsboard Authors
+ * Modifications © 2017-2018 Hashmap, Inc
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package com.hashmapinc.server.controller;
+
+import com.hashmapinc.server.common.data.EntityType;
+import com.hashmapinc.server.common.data.TempusGatewayConfiguration;
+import com.hashmapinc.server.common.data.audit.ActionType;
+import com.hashmapinc.server.common.data.id.TempusGatewayConfigurationId;
+import com.hashmapinc.server.common.data.id.TenantId;
+import com.hashmapinc.server.exception.TempusException;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
+
+@RestController
+@RequestMapping("/api/configuration/")
+public class TempusGatewayConfigurationController extends BaseController {
+    public static final String TEMPUS_GATEWAY_CONFIGURATION_ID = "tempusGatewayConfigurationId";
+
+    @PreAuthorize("hasAnyAuthority('TENANT_ADMIN')")
+    @GetMapping(value = "tempusGateway/{tempusGatewayConfigurationId}")
+    @ResponseBody
+    public TempusGatewayConfiguration getTempusGatewayConfigurationById(@PathVariable(TEMPUS_GATEWAY_CONFIGURATION_ID) String strTempusGatewayConfigurationId)
+            throws TempusException {
+        checkParameter(TEMPUS_GATEWAY_CONFIGURATION_ID, strTempusGatewayConfigurationId);
+        try {
+            TempusGatewayConfigurationId tempusGatewayConfigurationId = new TempusGatewayConfigurationId(toUUID(strTempusGatewayConfigurationId));
+            return checkTempusGatewayConfigurationId(tempusGatewayConfigurationId);
+        } catch (Exception e) {
+            throw handleException(e);
+        }
+    }
+
+    @PreAuthorize("hasAuthority('TENANT_ADMIN')")
+    @PostMapping(value = "/tempusGateway")
+    @ResponseBody
+    public TempusGatewayConfiguration saveTempusGatewayConfiguration(@RequestBody TempusGatewayConfiguration tempusGatewayConfiguration) throws TempusException {
+        try {
+            tempusGatewayConfiguration.setTenantId(getCurrentUser().getTenantId());
+            TempusGatewayConfiguration savedTempusGatewayConfiguration =
+                    checkNotNull(tempusGatewayConfigurationService.saveTempusGatewayConfiguration(tempusGatewayConfiguration));
+
+            logEntityAction(savedTempusGatewayConfiguration.getId(), savedTempusGatewayConfiguration,
+                    null,
+                    tempusGatewayConfiguration.getId() == null ? ActionType.ADDED : ActionType.UPDATED, null);
+
+            return savedTempusGatewayConfiguration;
+        } catch (Exception e) {
+
+            logEntityAction(emptyId(EntityType.TEMPUS_GATEWAY_CONFIGURATION), tempusGatewayConfiguration,
+                    null, tempusGatewayConfiguration.getId() == null ? ActionType.ADDED : ActionType.UPDATED, e);
+
+            throw handleException(e);
+        }
+    }
+
+    @PreAuthorize("hasAuthority('TENANT_ADMIN')")
+    @GetMapping(value = "/tempusGateway")
+    @ResponseBody
+    public TempusGatewayConfiguration getTempusGatewayConfiguration() throws TempusException {
+        try {
+            TenantId tenantId = getCurrentUser().getTenantId();
+            return checkNotNull(tempusGatewayConfigurationService.findTempusGatewayConfigurationByTenantId(tenantId));
+        } catch (Exception e) {
+            throw handleException(e);
+        }
+    }
+}
