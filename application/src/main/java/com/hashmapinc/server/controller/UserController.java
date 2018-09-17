@@ -107,7 +107,8 @@ public class UserController extends BaseController {
                 user.setTenantId(getCurrentUser().getTenantId());
             }
             User savedUser;
-            if(user.getId() == null){
+            final boolean isNewUser = user.getId() == null;
+            if(isNewUser){
                 savedUser = createUser(user, activationType, request);
             }else{
                 savedUser = updateUser(user);
@@ -117,7 +118,7 @@ public class UserController extends BaseController {
                     savedUser.getCustomerId(),
                     user.getId() == null ? ActionType.ADDED : ActionType.UPDATED, null);
 
-            if (getCurrentUser().getAuthority() == Authority.SYS_ADMIN) {
+            if (getCurrentUser().getAuthority() == Authority.SYS_ADMIN && isNewUser && savedUser != null) {
                 assignDefaultGroupToTenantUser(authUser.getTenantId(), savedUser.getId());
             }
 
