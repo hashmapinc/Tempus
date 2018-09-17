@@ -32,12 +32,10 @@ import com.hashmapinc.server.common.data.id.TenantId;
 import com.hashmapinc.server.common.data.plugin.ComponentLifecycleState;
 import com.hashmapinc.server.common.msg.cluster.ClusterEventMsg;
 import com.hashmapinc.server.exception.TempusApplicationException;
-import org.springframework.http.HttpHeaders;
 
 public class KubelessComputationJobActorMessageProcessor extends ComponentMsgProcessor<ComputationJobId> {
     private ComputationJob job;
     private final Computations computation;
-    private HttpHeaders headers = new HttpHeaders();
     private ObjectMapper objectMapper = new ObjectMapper();
     private final ActorRef self;
     private final ActorRef parent;
@@ -84,11 +82,6 @@ public class KubelessComputationJobActorMessageProcessor extends ComponentMsgPro
         ComputationJob oldJob = job;
         job = systemContext.getComputationJobService().findComputationJobById(entityId);
         logger.info("[{}] Computation configuration was updated from {} to {}.", entityId, oldJob, job);
-        /*if(!oldJob.getArgParameters().equals(job.getArgParameters())){
-            onStop(context);
-            systemContext.getComputationJobService().activateComputationJobById(job.getId());
-            start();
-        }*/
     }
 
     @Override
@@ -129,15 +122,12 @@ public class KubelessComputationJobActorMessageProcessor extends ComponentMsgPro
         }
     }
 
-    private void postJob(){
-        logger.info("postJob is not implemented");
-    }
-
     private void suspendJob(){
         ComputationJob savedJob = systemContext.getComputationJobService().findComputationJobById(job.getId());
-        if(savedJob != null && systemContext.getComputationFunctionService().checkTrigger(job))
-            if(systemContext.getComputationFunctionService().deleteTrigger(job))
-                systemContext.getComputationJobService().suspendComputationJobById(job.getId());
+        if (savedJob != null && systemContext.getComputationFunctionService().checkTrigger(job) &&
+                systemContext.getComputationFunctionService().deleteTrigger(job)) {
+            systemContext.getComputationJobService().suspendComputationJobById(job.getId());
+        }
     }
 
     private boolean isKubelessComputationJob(){

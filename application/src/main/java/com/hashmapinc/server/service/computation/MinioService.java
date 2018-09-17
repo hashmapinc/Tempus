@@ -52,7 +52,7 @@ public class MinioService implements S3BucketService {
     public static final String MINIO_EXECPTION = "Minio Execption {} ";
     public static final int BUFFER_SIZE = 16384;
     public static final String SHA_256 = "SHA-256";
-    private volatile static MinioClient minioClient;
+    private static volatile  MinioClient minioClient;
 
     private static final String FUNCTION_URL_FORMAT = "%s/%s.%s";
     private static final String MINIO_URL_FORMAT = "%s://%s:%s";
@@ -74,7 +74,7 @@ public class MinioService implements S3BucketService {
     @Autowired
     private TenantService tenantService;
 
-    public boolean uploadKubelessFunction(Computations computation, TenantId tenantId) throws Exception{
+    public boolean uploadKubelessFunction(Computations computation, TenantId tenantId) throws IOException, NoSuchAlgorithmException, InvalidKeyException, XmlPullParserException{
         boolean status = false;
         try {
             KubelessComputationMetadata md = (KubelessComputationMetadata) computation.getComputationMetadata();
@@ -171,13 +171,14 @@ public class MinioService implements S3BucketService {
             MessageDigest digest = MessageDigest.getInstance(SHA_256);
             byte[] hash = digest.digest(md.getFunctionContent().getBytes());
             String encodedChecksum = encoder.encodeToString(hash);
-            if(md.getChecksum().contentEquals(new String(encodedChecksum))) {
+            //if(md.getChecksum().contentEquals(new String(encodedChecksum))) {
+            if(md.getChecksum().contentEquals(encodedChecksum)) {
                 log.info("Check is same.");
                 return true;
             }
 
         } catch(NoSuchAlgorithmException e) {
-            log.info("Execption occured : ", e);
+            log.info("Execption occured : {}", e);
         }
         return false;
     }

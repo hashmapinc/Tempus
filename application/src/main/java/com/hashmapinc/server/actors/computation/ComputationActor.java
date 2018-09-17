@@ -138,7 +138,6 @@ public class ComputationActor extends ContextAwareActor {
             }
             computationJobActors.forEach((k, v) -> v.tell(msg, ActorRef.noSender()));
         }else{
-            ComputationFunctionService service = systemContext.getComputationFunctionService();
             handleDeleteMsgForComputationType();
             computationJobActors.forEach((k, v) -> v.tell(msg, ActorRef.noSender()));
             context().stop(self());
@@ -155,7 +154,6 @@ public class ComputationActor extends ContextAwareActor {
         ActorRef target;
         computation = systemContext.getComputationsService().findById(computationId);
         if(msg.getEvent() == ComponentLifecycleEvent.DELETED){
-            //handleDeleteMsgForComputationType();
             target = computationJobActors.get(jobId);
             if(target != null){
                 computationJobActors.remove(jobId);

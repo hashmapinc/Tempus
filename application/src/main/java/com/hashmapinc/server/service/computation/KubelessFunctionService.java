@@ -53,6 +53,8 @@ public class KubelessFunctionService implements ComputationFunctionService {
     public static final int INTERNAL_SERVER_ERROR = 500;
     public static final int CREATED = 201;
     public static final int OK = 200;
+    public static final String EXCEPTION = "Exception occured : {}";
+    public static final String IO_EXECPTION = "IOExecption occured : {}";
 
     @Value("${kubeless.cluster_mode_enabled}")
     private boolean clusterModeEnabled;
@@ -60,12 +62,6 @@ public class KubelessFunctionService implements ComputationFunctionService {
 
     @Value("${kubeless.kube_config_path}")
     private String kublessConfigPath;
-
-    private static volatile  KubelessV1beta1FunctionApi kubelessV1beta1FunctionApi;
-
-    private static volatile  KubelessV1beta1KafkaTriggerApi kubelessV1beta1KafkaTriggerApi;
-
-    private static volatile  KubelessV1beta1CronTriggerApi kubelessV1beta1CronTriggerApi;
 
     private Base64.Decoder decoder = Base64.getDecoder();
 
@@ -97,9 +93,9 @@ public class KubelessFunctionService implements ComputationFunctionService {
                         break;
             }
 
-            if ( resposeCode != CREATED) {
-                log.info("Function was not deployed!!");
-                return false;
+            if ( resposeCode == CREATED) {
+                log.info("Function was deployed!!");
+                return true;
             }
         }
         catch (ApiException e){
@@ -107,7 +103,7 @@ public class KubelessFunctionService implements ComputationFunctionService {
         } catch (IOException e) {
             log.info("");
         }
-        return true;
+        return false;
     }
 
     @Override
@@ -119,17 +115,17 @@ public class KubelessFunctionService implements ComputationFunctionService {
 
             Call call = functionApi.getFunctionCall(md.getFunction());
             Response response = call.execute();
-            if (response.code() != OK)
-                return false;
+            if (response.code() == OK)
+                return true;
         } catch (ApiException e) {
-            log.error("Kubeless api exception for fetch function : " + e);
+            log.error("Kubeless api exception for fetch function : {}", e);
         } catch (IOException e) {
-            log.error("Exception occured in call execution : " + e);
+            log.error("Exception occured in call execution : {}", e);
         } catch (Exception e) {
-            log.error("Exception occured : " + e);
+            log.error(EXCEPTION, e);
         }
 
-        return true;
+        return false;
     }
 
     @Override
@@ -141,18 +137,18 @@ public class KubelessFunctionService implements ComputationFunctionService {
 
             Call call = functionApi.deleteFunctionCall(md.getFunction());
             Response response = call.execute();
-            if (response.code() != OK) {
-                log.info("Problem occured in deleting kubeless funtion from kubernetes!!!");
-                return false;
+            if (response.code() == OK) {
+                log.info("Deleted kubeless funtion from kubernetes!!!");
+                return true;
             }
         } catch (ApiException e) {
-            log.error("Kubeless api exception for fetch function : " + e);
+            log.error("Kubeless api exception for fetch function : {}", e);
         } catch (IOException e) {
-            log.error("Exception occured in call execution : " + e);
+            log.error("Exception occured in call execution : {}", e);
         } catch (Exception e) {
-            log.error("Exception occured : " + e);
+            log.error(EXCEPTION,e);
         }
-        return true;
+        return false;
     }
 
     @Override
@@ -179,9 +175,9 @@ public class KubelessFunctionService implements ComputationFunctionService {
                 }
             }
         } catch (ApiException e) {
-            log.error("Api execption occured : " + e);
+            log.error("Kubeless api exception for create trigger : {}", e);
         } catch (IOException e) {
-            log.error("IOExecption occured : " + e);
+            log.error(IO_EXECPTION, e);
         }
         return false;
     }
@@ -233,22 +229,22 @@ public class KubelessFunctionService implements ComputationFunctionService {
                         clusterModeEnabled, kublessConfigPath, DEFAULT_NAMESPACE);
                 Call call = triggerApi.getKafkaTriggerCall(computationJob.getName());
                 Response response = call.execute();
-                if (response.code() != OK)
-                    return false;
+                if (response.code() == OK)
+                    return true;
             } else if (computationJob.getConfiguration().getClass() == CronKubelessTrigger.class) {
                 KubelessV1beta1CronTriggerApi triggerApi = KubelessConnectionCache.getInstance(KubelessV1beta1CronTriggerApi.class.getName(),
                         clusterModeEnabled, kublessConfigPath, DEFAULT_NAMESPACE);
                 Call call = triggerApi.getCronTriggerCall(computationJob.getName());
                 Response response = call.execute();
-                if (response.code() != OK)
-                    return false;
+                if (response.code() == OK)
+                    return true;
             }
         } catch (ApiException e) {
-            log.error("ApiExecption occured : " + e);
+            log.error("Kubeless api exception for check trigger : {}", e);
         } catch (IOException e) {
-            log.error("IOExecption occured : " + e);
+            log.error(IO_EXECPTION, e);
         }
-        return true;
+        return false;
     }
 
     @Override
@@ -270,9 +266,9 @@ public class KubelessFunctionService implements ComputationFunctionService {
                     return true;
             }
         } catch (ApiException e) {
-            log.error("ApiExecption occured : " + e);
+            log.error("Kubeless api exception for delete trigger : {}", e);
         } catch (IOException e) {
-            log.error("IOExecption occured : " + e);
+            log.error(IO_EXECPTION, e);
         }
         return false;
     }
@@ -289,7 +285,7 @@ public class KubelessFunctionService implements ComputationFunctionService {
             return v1beta1Function;
         }
         catch (Exception e) {
-            log.info("Exception occured : ", e);
+            log.info(EXCEPTION, e);
         }
         return null;
     }

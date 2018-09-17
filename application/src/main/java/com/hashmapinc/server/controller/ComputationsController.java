@@ -238,12 +238,11 @@ public class ComputationsController extends BaseController {
         SecurityUser authUser = getCurrentUser();
         TenantId tenantId = computation.getTenantId();
         validateId(tenantId, "Incorrect tenantId " + tenantId);
-        if (authUser.getAuthority() != Authority.SYS_ADMIN) {
-            if (authUser.getTenantId() == null ||
-                    !tenantId.getId().equals(ModelConstants.NULL_UUID) && !authUser.getTenantId().equals(tenantId)) {
+        if (authUser.getAuthority() != Authority.SYS_ADMIN &&
+                authUser.getTenantId() == null ||
+                !tenantId.getId().equals(ModelConstants.NULL_UUID) && !authUser.getTenantId().equals(tenantId)) {
                 throw new TempusException("You don't have permission to perform this operation!",
                         TempusErrorCode.PERMISSION_DENIED);
-            }
         }
         return computation;
     }

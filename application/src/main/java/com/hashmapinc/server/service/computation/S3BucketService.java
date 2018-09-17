@@ -26,7 +26,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.List;
 
 public interface S3BucketService {
-    boolean uploadKubelessFunction(Computations computation, TenantId tenantId) throws Exception;
+    boolean uploadKubelessFunction(Computations computation, TenantId tenantId) throws IOException, NoSuchAlgorithmException, InvalidKeyException, XmlPullParserException;
     List<String> getAllKubelessFunctionsForTenant (TenantId tenantId) throws IOException, NoSuchAlgorithmException, InvalidKeyException, XmlPullParserException;
     String getFunctionObjByTenantAndUrl(TenantId tenantId, Computations computations) throws IOException, NoSuchAlgorithmException, InvalidKeyException, XmlPullParserException;
     boolean deleteKubelessFunction(Computations computation) throws IOException, NoSuchAlgorithmException, InvalidKeyException, XmlPullParserException;

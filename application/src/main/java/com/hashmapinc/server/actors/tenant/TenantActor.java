@@ -33,7 +33,6 @@ import com.hashmapinc.server.actors.shared.plugin.PluginManager;
 import com.hashmapinc.server.actors.shared.plugin.TenantPluginManager;
 import com.hashmapinc.server.actors.shared.rule.RuleManager;
 import com.hashmapinc.server.actors.shared.rule.TenantRuleManager;
-import com.hashmapinc.server.common.data.computation.ComputationType;
 import com.hashmapinc.server.common.data.computation.Computations;
 import com.hashmapinc.server.common.data.id.*;
 import com.hashmapinc.server.common.msg.cluster.ClusterEventMsg;
