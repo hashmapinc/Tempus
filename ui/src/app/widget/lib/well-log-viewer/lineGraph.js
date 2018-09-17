@@ -88,7 +88,7 @@ var lineGraph = function(lineConfig, data, state, index, width) {
       .y(function(d) { return y(d[0]); })
      // .y((d, i) => y(i + dataGen.time))
       .x(d => x(d[1]))
-      .curve(d3.curveLinear);
+      .curve(d3.curveStepBefore);
 
     if(angular.isDefined(o.areaFill)){
       if(o.areaFill.fill === "left"){
@@ -96,14 +96,14 @@ var lineGraph = function(lineConfig, data, state, index, width) {
           .x0(-14)
           .x1(d => x(d[1]))
           .y((d) => y(d[0]))
-          .curve(d3.curveLinear);
+          .curve(d3.curveStepBefore);
       }
       if(o.areaFill.fill === "right"){
          area = d3.area()
           .x0(d => x(d[1]))
           .x1(w)
           .y((d) => y(d[0]))
-          .curve(d3.curveLinear);
+          .curve(d3.curveStepBefore);
       }
     }
 
