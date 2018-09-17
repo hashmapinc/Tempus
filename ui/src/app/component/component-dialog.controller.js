@@ -36,6 +36,17 @@ export default function ComponentDialogController($mdDialog, $q, $scope, compone
     vm.helpLinkIdForComponent = helpLinkIdForComponent;
     vm.save = save;
     vm.cancel = cancel;
+<<<<<<< 6af614a8e9f8bed58d1386d3404ca3a2b4ab6527
+=======
+     vm.queryCondition =[{
+            id:'equal',
+            name:'='
+        },{
+                  id:'not_equal',
+                  name:'!='
+              }]
+
+>>>>>>> Save query into db.
     $scope.$watch("vm.componentInfo.component.clazz", function (newValue, prevValue) {
         if (newValue != prevValue) {
             if (newValue && prevValue) {

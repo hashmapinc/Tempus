@@ -36,12 +36,14 @@
         <md-dialog-content>
             <div class="md-dialog-content">
                 <md-content class="md-padding" layout="column">
+
                     <div layout-gt-sm="row">
                         <md-input-container class="md-block" style="width: 100%;">
                             <label>{{ 'metadataConfig.query' | translate }}</label>
                             <textarea ng-model="vm.metadataQuery.queryStmt" rows="2" required></textarea>
                         </md-input-container>
                     </div>
+                    <div id="space-for-buttons"></div>
                     <div layout-gt-sm="row">
                         <md-input-container class="md-block" style="width: 50%;">
                             <label>{{ 'metadataConfig.trigger-type' | translate }}</label>
