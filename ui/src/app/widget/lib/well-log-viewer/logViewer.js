@@ -86,7 +86,7 @@ export default function loadLogViewer(ctx, sequence){
             var hLegend = headerLegend(componentObj, headerCount, datasourceFilter(componentObj, dArray), state, index, parseInt(track.width));
             trackObj.push(hLegend);
           }
-          if(componentObj.cType === 'Linear Grid'){
+          if(componentObj.cType === 'linearGrid'){
             var lnGrid = linearGrid(componentObj, datasourceFilter(componentObj, dArray), state, index, parseInt(track.width));
             trackObj.push(lnGrid);
           }
@@ -94,7 +94,7 @@ export default function loadLogViewer(ctx, sequence){
              var tYaxis = timeYaxis(componentObj, datasourceFilter(componentObj, dArray), state, index, parseInt(track.width));
             trackObj.push(tYaxis);
           }
-          if(componentObj.cType === 'Line'){
+          if(componentObj.cType === 'line'){
             var lnGraph = lineGraph(componentObj, datasourceFilter(componentObj, dArray), state, index, parseInt(track.width));
             trackObj.push(lnGraph);
           }          
