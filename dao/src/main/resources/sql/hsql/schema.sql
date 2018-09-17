@@ -399,6 +399,7 @@ CREATE TABLE IF NOT EXISTS tempus_gateway_configuration (
     tenant_id varchar(31),
     host varchar(255) NOT NULL,
     port integer NOT NULL,
+    replicas integer NOT NULL,
     gateway_token varchar(255) NOT NULL,
     additional_info varchar,
     search_text varchar(255)

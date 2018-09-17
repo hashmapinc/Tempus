@@ -32,6 +32,7 @@ public class TempusGatewayConfiguration extends SearchTextBasedWithAdditionalInf
     private TenantId tenantId;
     private String host;
     private int port;
+    private int replicas;
     private String gatewayToken;
 
     public TempusGatewayConfiguration(TempusGatewayConfigurationId id) {
@@ -44,6 +45,7 @@ public class TempusGatewayConfiguration extends SearchTextBasedWithAdditionalInf
         this.tenantId = tempusGatewayConfiguration.tenantId;
         this.host = tempusGatewayConfiguration.host;
         this.port = tempusGatewayConfiguration.port;
+        this.replicas = tempusGatewayConfiguration.replicas;
         this.gatewayToken = tempusGatewayConfiguration.gatewayToken;
     }
 

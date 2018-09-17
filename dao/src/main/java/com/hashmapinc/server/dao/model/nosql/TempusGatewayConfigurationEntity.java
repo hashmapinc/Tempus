@@ -60,6 +60,9 @@ public class TempusGatewayConfigurationEntity implements SearchTextEntity<Tempus
     @javax.persistence.Column(name = ModelConstants.TEMPUS_GATEWAY_CONFIGURATION_PORT_PROPERTY)
     private int port;
 
+    @javax.persistence.Column(name = ModelConstants.TEMPUS_GATEWAY_CONFIGURATION_REPLICAS_PROPERTY)
+    private int replicas;
+
     @javax.persistence.Column(name = ModelConstants.TEMPUS_GATEWAY_CONFIGURATION_GATEWAY_TOKEN_PROPERTY)
     private String gatewayToken;
 
@@ -77,6 +80,7 @@ public class TempusGatewayConfigurationEntity implements SearchTextEntity<Tempus
         this.title = tempusGatewayConfiguration.getTitle();
         this.host = tempusGatewayConfiguration.getHost();
         this.port = tempusGatewayConfiguration.getPort();
+        this.replicas = tempusGatewayConfiguration.getReplicas();
         this.gatewayToken = tempusGatewayConfiguration.getGatewayToken();
         this.additionalInfo = tempusGatewayConfiguration.getAdditionalInfo();
     }
@@ -99,6 +103,7 @@ public class TempusGatewayConfigurationEntity implements SearchTextEntity<Tempus
         tempusGatewayConfiguration.setTitle(title);
         tempusGatewayConfiguration.setHost(host);
         tempusGatewayConfiguration.setPort(port);
+        tempusGatewayConfiguration.setReplicas(replicas);
         tempusGatewayConfiguration.setGatewayToken(gatewayToken);
         tempusGatewayConfiguration.setAdditionalInfo(additionalInfo);
         return tempusGatewayConfiguration;

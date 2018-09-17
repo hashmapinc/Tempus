@@ -800,6 +800,7 @@ CREATE TABLE IF NOT EXISTS tempus.tempus_gateway_configuration {
     title text,
     host text,
     port int,
+    replicas int,
     gateway_token text,
     additional_info text,
     search_text text
