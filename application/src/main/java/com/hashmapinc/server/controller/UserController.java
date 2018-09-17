@@ -119,7 +119,7 @@ public class UserController extends BaseController {
                     user.getId() == null ? ActionType.ADDED : ActionType.UPDATED, null);
 
             if (getCurrentUser().getAuthority() == Authority.SYS_ADMIN && isNewUser && savedUser != null) {
-                assignDefaultGroupToTenantUser(authUser.getTenantId(), savedUser.getId());
+                assignDefaultGroupToTenantUser(savedUser.getTenantId(), savedUser.getId());
             }
 
             return savedUser;
