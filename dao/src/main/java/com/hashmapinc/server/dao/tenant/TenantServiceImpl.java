@@ -20,6 +20,7 @@ import com.google.common.util.concurrent.ListenableFuture;
 import com.hashmapinc.server.common.data.CustomerGroup;
 import com.hashmapinc.server.common.data.DataConstants;
 import com.hashmapinc.server.common.data.id.CustomerId;
+import com.hashmapinc.server.common.data.id.EntityId;
 import com.hashmapinc.server.common.data.id.TenantId;
 import com.hashmapinc.server.common.data.page.TextPageData;
 import com.hashmapinc.server.common.data.page.TextPageLink;
@@ -107,7 +108,10 @@ public class TenantServiceImpl extends AbstractEntityService implements TenantSe
         tenant.setRegion(DEFAULT_TENANT_REGION);
         tenantValidator.validate(tenant);
         Tenant savedTenant = tenantDao.save(tenant);
-        createGroupForTenant(tenant.getTitle(), savedTenant.getId());
+        final boolean isNewTenant = tenant.getId() == null || tenant.getId().equals(new TenantId(EntityId.NULL_UUID));
+        if(isNewTenant && savedTenant != null){
+            createGroupForTenant(tenant.getTitle(), savedTenant.getId());
+        }
         return savedTenant;
     }
 
