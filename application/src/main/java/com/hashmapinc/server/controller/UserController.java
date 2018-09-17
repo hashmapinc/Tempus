@@ -22,10 +22,7 @@ import com.hashmapinc.server.common.data.CustomerGroup;
 import com.hashmapinc.server.common.data.EntityType;
 import com.hashmapinc.server.common.data.User;
 import com.hashmapinc.server.common.data.audit.ActionType;
-import com.hashmapinc.server.common.data.id.CustomerGroupId;
-import com.hashmapinc.server.common.data.id.CustomerId;
-import com.hashmapinc.server.common.data.id.TenantId;
-import com.hashmapinc.server.common.data.id.UserId;
+import com.hashmapinc.server.common.data.id.*;
 import com.hashmapinc.server.common.data.page.TextPageData;
 import com.hashmapinc.server.common.data.page.TextPageLink;
 import com.hashmapinc.server.common.data.security.Authority;
@@ -119,6 +116,10 @@ public class UserController extends BaseController {
                     savedUser.getCustomerId(),
                     user.getId() == null ? ActionType.ADDED : ActionType.UPDATED, null);
 
+            if (getCurrentUser().getAuthority() == Authority.TENANT_ADMIN) {
+                assignDefaultGroupToTenantUser(authUser.getTenantId(), savedUser.getId());
+            }
+
             return savedUser;
         } catch (Exception e) {
 
@@ -127,6 +128,13 @@ public class UserController extends BaseController {
 
             throw handleException(e);
         }
+    }
+
+    private void assignDefaultGroupToTenantUser(TenantId tenantId, UserId userId) {
+        TextPageData<CustomerGroup> customerGroupByTenant =
+                customerGroupService.findCustomerGroupsByTenantIdAndCustomerId(tenantId, null, new TextPageLink(1));
+        List<CustomerGroupId> customerGroupIds = customerGroupByTenant.getData().stream().map(IdBased::getId).collect(Collectors.toList());
+        userService.assignGroups(userId, customerGroupIds);
     }
 
     private User updateUser(@RequestBody User user) throws TempusException {
