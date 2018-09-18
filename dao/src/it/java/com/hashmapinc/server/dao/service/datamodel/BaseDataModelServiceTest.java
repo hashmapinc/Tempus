@@ -124,13 +124,4 @@ public abstract class BaseDataModelServiceTest extends AbstractServiceTest {
         List<DataModel> dataModels =  dataModelService.findByTenantId(tenantId);
         Assert.assertEquals(0,dataModels.size());
     }
-
-    private DataModel createDataModel(String name ,TenantId tenantId) {
-        DataModel dataModel = new DataModel();
-        dataModel.setName(name);
-        dataModel.setLastUpdatedTs(System.currentTimeMillis());
-        dataModel.setTenantId(tenantId);
-        return dataModelService.saveDataModel(dataModel);
-    }
-
 }
