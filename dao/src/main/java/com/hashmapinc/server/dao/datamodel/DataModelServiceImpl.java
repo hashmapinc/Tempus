@@ -38,7 +38,7 @@ import static com.hashmapinc.server.dao.service.Validator.validateId;
 public class DataModelServiceImpl extends AbstractEntityService implements DataModelService {
 
     public static final String INCORRECT_DATA_MODEL_ID = "Incorrect dataModelId ";
-    public static final String INCORRECT_TENANT_ID = "Incorrect dataModelId ";
+    public static final String INCORRECT_TENANT_ID = "Incorrect tenantId ";
 
     @Autowired
     private DataModelDao dataModelDao;
@@ -88,8 +88,8 @@ public class DataModelServiceImpl extends AbstractEntityService implements DataM
         List<DataModel> dataModels = dataModelDao.findByTenantId(tenantId.getId());
         dataModels.forEach(dataModel -> {
             if(dataModel != null){
-                deleteById(dataModel.getId());
                 dataModelObjectService.deleteDataModelObjectsByDataModelId(dataModel.getId());
+                deleteById(dataModel.getId());
             }
         });
     }
