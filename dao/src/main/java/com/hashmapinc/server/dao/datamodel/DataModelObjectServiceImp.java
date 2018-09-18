@@ -114,8 +114,8 @@ public class DataModelObjectServiceImp implements DataModelObjectService {
     public void removeById(DataModelObjectId dataModelObjectId) {
         validateId(dataModelObjectId, INCORRECT_DATA_MODEL_OBJECT_ID + dataModelObjectId);
         DataModelObject dataModelObject = dataModelObjectDao.findById(dataModelObjectId);
-        dataModelObjectDao.removeById(dataModelObjectId.getId());
         removeAttributeDefinitions(dataModelObject);
+        dataModelObjectDao.removeById(dataModelObjectId.getId());
     }
 
     private void removeAttributeDefinitions(DataModelObject dataModelObject) {

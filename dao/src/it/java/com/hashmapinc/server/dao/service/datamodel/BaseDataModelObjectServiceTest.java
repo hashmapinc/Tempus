@@ -175,7 +175,7 @@ public abstract class BaseDataModelObjectServiceTest extends AbstractServiceTest
     @Test
     public void testRemoveByIdShouldAlsoDeleteAttributeDefinition() {
         AttributeDefinition attributeDef = new AttributeDefinition();
-        attributeDef.setName("vikash");
+        attributeDef.setName("lat");
         attributeDef.setValue("1.0");
         attributeDef.setValueType(DataType.STRING.name());
 
