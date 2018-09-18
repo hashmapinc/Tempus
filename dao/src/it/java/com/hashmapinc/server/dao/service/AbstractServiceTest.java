@@ -58,6 +58,7 @@ import com.hashmapinc.server.dao.depthseries.DepthSeriesService;
 import com.hashmapinc.server.dao.device.DeviceCredentialsService;
 import com.hashmapinc.server.dao.device.DeviceService;
 import com.hashmapinc.server.dao.event.EventService;
+import com.hashmapinc.server.dao.gatewayconfiguration.TempusGatewayConfigurationService;
 import com.hashmapinc.server.dao.logo.LogoService;
 import com.hashmapinc.server.dao.metadataingestion.MetadataIngestionService;
 import com.hashmapinc.server.dao.plugin.PluginService;
@@ -179,6 +180,9 @@ public abstract class AbstractServiceTest {
 
     @Autowired
     protected MetadataIngestionService metadataIngestionService;
+
+    @Autowired
+    protected TempusGatewayConfigurationService tempusGatewayConfigurationService;
 
     @Autowired
     protected AttributeDefinitionDao attributeDefinitionDao;
