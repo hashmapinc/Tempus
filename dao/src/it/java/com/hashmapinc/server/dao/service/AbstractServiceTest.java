@@ -398,6 +398,13 @@ public abstract class AbstractServiceTest {
         assetService.deleteAsset(assetId);
     }
 
-
-
+    protected DataModel createDataModel(String name ,TenantId tenantId) {
+        DataModel dataModel = new DataModel();
+        dataModel.setName(name);
+        dataModel.setLastUpdatedTs(System.currentTimeMillis());
+        dataModel.setTenantId(tenantId);
+        DataModel savedDataModel = dataModelService.saveDataModel(dataModel);
+        Assert.assertNotNull(savedDataModel);
+        return savedDataModel;
+    }
 }
