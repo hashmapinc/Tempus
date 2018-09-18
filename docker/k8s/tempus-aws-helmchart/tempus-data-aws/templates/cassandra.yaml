@@ -76,7 +76,7 @@ spec:
               command: ["/bin/sh", "-c", "PID=$(pidof java) && kill $PID && while ps -p $PID > /dev/null; do sleep 1; done"]
         env:
           - name: MAX_HEAP_SIZE
-            value: 1024M
+            value: 2048M
           - name: HEAP_NEWSIZE
             value: 100M
           - name: CASSANDRA_SEEDS
