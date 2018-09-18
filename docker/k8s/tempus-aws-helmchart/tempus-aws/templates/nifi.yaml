@@ -21,8 +21,10 @@ metadata:
   name: nifi
   labels:
     app: nifi
+  annotations:
+      service.beta.kubernetes.io/aws-load-balancer-type: "nlb"
 spec:
-  type: ClusterIP
+  type: LoadBalancer
   selector:
     app: nifi
   ports:
@@ -74,7 +76,7 @@ spec:
           name: nifi-log-dir
   volumeClaimTemplates:
   - metadata:
-      name: nifi-flowfile-repo-dir 
+      name: nifi-flowfile-repo-dir
     spec:
       accessModes: [ "ReadWriteOnce" ]
       resources:
