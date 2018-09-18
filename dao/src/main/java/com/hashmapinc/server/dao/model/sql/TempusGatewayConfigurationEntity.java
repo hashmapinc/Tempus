@@ -49,12 +49,6 @@ public class TempusGatewayConfigurationEntity extends BaseSqlEntity<TempusGatewa
     @Column(name = ModelConstants.TEMPUS_GATEWAY_CONFIGURATION_TENANT_ID)
     private String tenantId;
 
-    @Column(name = ModelConstants.TEMPUS_GATEWAY_CONFIGURATION_HOST)
-    private String host;
-
-    @Column(name = ModelConstants.TEMPUS_GATEWAY_CONFIGURATION_PORT)
-    private int port;
-
     @Column(name = ModelConstants.TEMPUS_GATEWAY_CONFIGURATION_REPLICAS)
     private int replicas;
 
@@ -74,8 +68,6 @@ public class TempusGatewayConfigurationEntity extends BaseSqlEntity<TempusGatewa
         }
         this.tenantId = UUIDConverter.fromTimeUUID(tempusGatewayConfiguration.getTenantId().getId());
         this.title = tempusGatewayConfiguration.getTitle();
-        this.host = tempusGatewayConfiguration.getHost();
-        this.port = tempusGatewayConfiguration.getPort();
         this.replicas = tempusGatewayConfiguration.getReplicas();
         this.gatewayToken = tempusGatewayConfiguration.getGatewayToken();
         this.additionalInfo = tempusGatewayConfiguration.getAdditionalInfo();
@@ -97,8 +89,6 @@ public class TempusGatewayConfigurationEntity extends BaseSqlEntity<TempusGatewa
         tempusGatewayConfiguration.setCreatedTime(UUIDs.unixTimestamp(getId()));
         tempusGatewayConfiguration.setTenantId(new TenantId(UUIDConverter.fromString(tenantId)));
         tempusGatewayConfiguration.setTitle(title);
-        tempusGatewayConfiguration.setHost(host);
-        tempusGatewayConfiguration.setPort(port);
         tempusGatewayConfiguration.setReplicas(replicas);
         tempusGatewayConfiguration.setGatewayToken(gatewayToken);
         tempusGatewayConfiguration.setAdditionalInfo(additionalInfo);

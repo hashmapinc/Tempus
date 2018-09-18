@@ -30,8 +30,6 @@ public class TempusGatewayConfiguration extends SearchTextBasedWithAdditionalInf
     private static final long serialVersionUID = -7052031036883142312L;
     private String title;
     private TenantId tenantId;
-    private String host;
-    private int port;
     private int replicas;
     private String gatewayToken;
 
@@ -43,8 +41,6 @@ public class TempusGatewayConfiguration extends SearchTextBasedWithAdditionalInf
         super(tempusGatewayConfiguration);
         this.title = tempusGatewayConfiguration.title;
         this.tenantId = tempusGatewayConfiguration.tenantId;
-        this.host = tempusGatewayConfiguration.host;
-        this.port = tempusGatewayConfiguration.port;
         this.replicas = tempusGatewayConfiguration.replicas;
         this.gatewayToken = tempusGatewayConfiguration.gatewayToken;
     }

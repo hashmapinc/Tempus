@@ -54,12 +54,6 @@ public class TempusGatewayConfigurationEntity implements SearchTextEntity<Tempus
     @Column(name = TEMPUS_GATEWAY_CONFIGURATION_TITLE_PROPERTY)
     private String title;
 
-    @javax.persistence.Column(name = ModelConstants.TEMPUS_GATEWAY_CONFIGURATION_HOST_PROPERTY)
-    private String host;
-
-    @javax.persistence.Column(name = ModelConstants.TEMPUS_GATEWAY_CONFIGURATION_PORT_PROPERTY)
-    private int port;
-
     @javax.persistence.Column(name = ModelConstants.TEMPUS_GATEWAY_CONFIGURATION_REPLICAS_PROPERTY)
     private int replicas;
 
@@ -78,8 +72,6 @@ public class TempusGatewayConfigurationEntity implements SearchTextEntity<Tempus
         }
         this.tenantId = tempusGatewayConfiguration.getTenantId().getId();
         this.title = tempusGatewayConfiguration.getTitle();
-        this.host = tempusGatewayConfiguration.getHost();
-        this.port = tempusGatewayConfiguration.getPort();
         this.replicas = tempusGatewayConfiguration.getReplicas();
         this.gatewayToken = tempusGatewayConfiguration.getGatewayToken();
         this.additionalInfo = tempusGatewayConfiguration.getAdditionalInfo();
@@ -101,8 +93,6 @@ public class TempusGatewayConfigurationEntity implements SearchTextEntity<Tempus
         tempusGatewayConfiguration.setCreatedTime(UUIDs.unixTimestamp(getId()));
         tempusGatewayConfiguration.setTenantId(new TenantId(tenantId));
         tempusGatewayConfiguration.setTitle(title);
-        tempusGatewayConfiguration.setHost(host);
-        tempusGatewayConfiguration.setPort(port);
         tempusGatewayConfiguration.setReplicas(replicas);
         tempusGatewayConfiguration.setGatewayToken(gatewayToken);
         tempusGatewayConfiguration.setAdditionalInfo(additionalInfo);

@@ -798,8 +798,6 @@ CREATE TABLE IF NOT EXISTS tempus.tempus_gateway_configuration {
     id timeuuid,
     tenant_id timeuuid,
     title text,
-    host text,
-    port int,
     replicas int,
     gateway_token text,
     additional_info text,
