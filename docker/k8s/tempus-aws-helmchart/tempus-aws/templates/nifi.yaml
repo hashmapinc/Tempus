@@ -18,13 +18,11 @@
 kind: Service
 apiVersion: v1
 metadata:
-  name: nifi
+  name: nifi-svc
   labels:
     app: nifi
-  annotations:
-      service.beta.kubernetes.io/aws-load-balancer-type: "nlb"
 spec:
-  type: LoadBalancer
+  type: NodePort
   selector:
     app: nifi
   ports:
@@ -35,7 +33,7 @@ spec:
     - protocol: TCP
       port: 9191
       targetPort: 9191
-      name: nifi
+      name: s2s
 ---
 apiVersion: "apps/v1beta1"
 kind: StatefulSet
