@@ -57,7 +57,7 @@ function AddAssetController (customerService,$state,dashboardService,datamodelSe
     vm.showParent =  false;
     vm.showChildOf =  false;
     vm.assetList= [];
-    vm.attributeList;
+    vm.attributeList =[];
     vm.dashboardDetail = null;
     vm.associatedAsset = null;
     vm.loadrelationModel =loadrelationModel;
@@ -113,6 +113,7 @@ function AddAssetController (customerService,$state,dashboardService,datamodelSe
         }
     }
     function loadrelationModel(){
+        vm.assetList = [];
         assetService.getAssetByObjectId(vm.parentId).then(function success(parentList){
             angular.forEach(parentList, function(value){
                 if(value.customerId.id == vm.user.id.id){
@@ -205,7 +206,7 @@ function DeviceListWidgetController($rootScope, $scope, $filter, dashboardServic
         page: 1,
         search: null
     };
-    vm.deviceDetailFunc = deviceDetailFunc;
+    vm.entityDetailFunc = entityDetailFunc;
     vm.loadTableData = loadTableData;
     $scope.showList = false;
     
@@ -292,11 +293,11 @@ function DeviceListWidgetController($rootScope, $scope, $filter, dashboardServic
             $scope.showList = false;
         }
     }
-    function deviceDetailFunc($event,list){
+    function entityDetailFunc($event,list){
         $rootScope.$emit("CallTableDetailDeviceOnDashboard", [$event, list]);
     }
 
-    var assetAdd = $rootScope.$on("CallAddAssetDialog", function($event){
+    var assetAdd = $rootScope.$on("addAssetByEntity", function($event){
         $scope.addAsset($event);
      });
  

@@ -63,7 +63,7 @@
                             </fieldset>
                   </md-content>
                 </md-tab>
-                <md-tab label="attribute">
+                <md-tab label="attribute" ng-if="vm.attributeList.length > 0">
                   <md-content class="md-padding">                     
                         <div ng-repeat="attribute in vm.attributeList">
                             <md-input-container class="md-block">

@@ -27,7 +27,7 @@ import tempusDepthwindow from './depthwindow.directive';
 import tempusEvents from './tb-event-directives';
 import tempusMousepointMenu from './mousepoint-menu.directive';
 import tempusGrid from './grid.directive';
-import addAssetTemplate from '../asset/add-asset.tpl.html';
+//import addAssetTemplate from '../asset/add-asset.tpl.html';
 
 
 /* eslint-disable import/no-unresolved, import/default */
@@ -106,7 +106,6 @@ function DashboardController($scope, $rootScope, $element, $timeout, $mdMedia, $
 
     var vm = this;
     vm.types = types;
-    $scope.displayAssetsGrid = false;
     vm.gridster = null;
 
     vm.assetGridConfig = {
@@ -120,7 +119,6 @@ function DashboardController($scope, $rootScope, $element, $timeout, $mdMedia, $
 
         getItemTitleFunc: getAssetTitle,
 
-        itemCardController: 'AssetCardController',
         parentCtl: vm,
 
         actionsList: assetActionsList,
@@ -128,10 +126,8 @@ function DashboardController($scope, $rootScope, $element, $timeout, $mdMedia, $
 
         onGridInited: gridInited,
 
-        addItemTemplateUrl: addAssetTemplate,
 
         addItemText: function() { return $translate.instant('asset.add-asset-text') },
-        noItemsText: function() { return $translate.instant('asset.no-assets-text') },
         itemDetailsText: function() { return $translate.instant('asset.asset-details') },
         isDetailsReadOnly: isCustomerUser,
         isSelectionEnabled: function () {
@@ -140,7 +136,6 @@ function DashboardController($scope, $rootScope, $element, $timeout, $mdMedia, $
     };
     
     var entityTableDevice = $rootScope.$on("CallTableDetailDeviceOnDashboard", function($event, data){
-        $scope.displayAssetsGrid = true;
         $rootScope.$emit("CallTableDetailDevice", [data[0], data[1]]);
     });
     $scope.$on('$destroy', entityTableDevice);
