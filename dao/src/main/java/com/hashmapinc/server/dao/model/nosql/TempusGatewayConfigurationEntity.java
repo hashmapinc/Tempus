@@ -49,10 +49,10 @@ public class TempusGatewayConfigurationEntity implements BaseEntity<TempusGatewa
     @Column(name = TEMPUS_GATEWAY_CONFIGURATION_TENANT_ID_PROPERTY)
     private UUID tenantId;
 
-    @javax.persistence.Column(name = ModelConstants.TEMPUS_GATEWAY_CONFIGURATION_REPLICAS_PROPERTY)
+    @Column(name = ModelConstants.TEMPUS_GATEWAY_CONFIGURATION_REPLICAS_PROPERTY)
     private int replicas;
 
-    @javax.persistence.Column(name = ModelConstants.TEMPUS_GATEWAY_CONFIGURATION_GATEWAY_TOKEN_PROPERTY)
+    @Column(name = ModelConstants.TEMPUS_GATEWAY_CONFIGURATION_GATEWAY_TOKEN_PROPERTY)
     private String gatewayToken;
 
     public TempusGatewayConfigurationEntity(TempusGatewayConfiguration tempusGatewayConfiguration) {

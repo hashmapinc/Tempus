@@ -46,7 +46,7 @@ public class CassandraTempusGatewayConfigurationDao extends CassandraAbstractMod
 
     @Override
     protected String getColumnFamilyName() {
-        return ModelConstants.CUSTOMER_COLUMN_FAMILY_NAME;
+        return ModelConstants.TEMPUS_GATEWAY_CONFIGURATION_FAMILY_NAME;
     }
 
 
