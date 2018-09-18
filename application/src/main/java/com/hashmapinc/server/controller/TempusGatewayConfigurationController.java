@@ -68,7 +68,7 @@ public class TempusGatewayConfigurationController extends BaseController {
     public TempusGatewayConfiguration getTempusGatewayConfiguration() throws TempusException {
         try {
             TenantId tenantId = getCurrentUser().getTenantId();
-            return checkNotNull(tempusGatewayConfigurationService.findTempusGatewayConfigurationByTenantId(tenantId));
+            return tempusGatewayConfigurationService.findTempusGatewayConfigurationByTenantId(tenantId).orElse(new TempusGatewayConfiguration());
         } catch (Exception e) {
             throw handleException(e);
         }
