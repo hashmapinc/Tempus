@@ -23,6 +23,4 @@ import org.springframework.data.repository.query.Param;
 
 public interface TempusGatewayConfigurationRepository extends CrudRepository<TempusGatewayConfigurationEntity, String> {
     TempusGatewayConfigurationEntity findByTenantId(String tenantId);
-
-    TempusGatewayConfigurationEntity findByTenantIdAndTitle(String tenantId, String title);
 }

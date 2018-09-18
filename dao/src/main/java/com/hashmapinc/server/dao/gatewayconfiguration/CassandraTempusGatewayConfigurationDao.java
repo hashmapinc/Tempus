@@ -21,6 +21,7 @@ import com.hashmapinc.server.common.data.TempusGatewayConfiguration;
 import com.hashmapinc.server.dao.DaoUtil;
 import com.hashmapinc.server.dao.model.ModelConstants;
 import com.hashmapinc.server.dao.model.nosql.TempusGatewayConfigurationEntity;
+import com.hashmapinc.server.dao.nosql.CassandraAbstractModelDao;
 import com.hashmapinc.server.dao.nosql.CassandraAbstractSearchTextDao;
 import com.hashmapinc.server.dao.util.NoSqlDao;
 import lombok.extern.slf4j.Slf4j;
@@ -35,7 +36,7 @@ import static com.datastax.driver.core.querybuilder.QueryBuilder.select;
 @Component
 @Slf4j
 @NoSqlDao
-public class CassandraTempusGatewayConfigurationDao extends CassandraAbstractSearchTextDao<TempusGatewayConfigurationEntity, TempusGatewayConfiguration>
+public class CassandraTempusGatewayConfigurationDao extends CassandraAbstractModelDao<TempusGatewayConfigurationEntity, TempusGatewayConfiguration>
         implements TempusGatewayConfigurationDao {
 
     @Override
@@ -55,18 +56,6 @@ public class CassandraTempusGatewayConfigurationDao extends CassandraAbstractSea
         Select select = select().from(ModelConstants.TEMPUS_GATEWAY_CONFIGURATION_BY_TENANT);
         Select.Where query = select.where();
         query.and(eq(ModelConstants.TEMPUS_GATEWAY_CONFIGURATION_TENANT_ID_PROPERTY, tenantId));
-        TempusGatewayConfigurationEntity tempusGatewayConfigurationEntity = findOneByStatement(query);
-        TempusGatewayConfiguration tempusGatewayConfiguration = DaoUtil.getData(tempusGatewayConfigurationEntity);
-        return Optional.ofNullable(tempusGatewayConfiguration);
-    }
-
-    @Override
-    public Optional<TempusGatewayConfiguration> findTempusGatewayConfigurationByTenantIdAndTitle(UUID tenantId, String title) {
-        log.debug("Try to find TempusGatewayConfiguration by tenantId [{}] and title [{}]", tenantId, title);
-        Select select = select().from(ModelConstants.TEMPUS_GATEWAY_CONFIGURATION_BY_TENANT_AND_TITLE);
-        Select.Where query = select.where();
-        query.and(eq(ModelConstants.TEMPUS_GATEWAY_CONFIGURATION_TENANT_ID_PROPERTY, tenantId));
-        query.and(eq(ModelConstants.TEMPUS_GATEWAY_CONFIGURATION_TITLE_PROPERTY, title));
         TempusGatewayConfigurationEntity tempusGatewayConfigurationEntity = findOneByStatement(query);
         TempusGatewayConfiguration tempusGatewayConfiguration = DaoUtil.getData(tempusGatewayConfigurationEntity);
         return Optional.ofNullable(tempusGatewayConfiguration);

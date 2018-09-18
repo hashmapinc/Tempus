@@ -16,7 +16,6 @@
  */
 package com.hashmapinc.server.common.data;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.hashmapinc.server.common.data.id.TempusGatewayConfigurationId;
 import com.hashmapinc.server.common.data.id.TenantId;
 import lombok.*;
@@ -26,9 +25,8 @@ import lombok.*;
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @ToString
-public class TempusGatewayConfiguration extends SearchTextBasedWithAdditionalInfo<TempusGatewayConfigurationId> implements HasName{
+public class TempusGatewayConfiguration extends BaseData<TempusGatewayConfigurationId>{
     private static final long serialVersionUID = -7052031036883142312L;
-    private String title;
     private TenantId tenantId;
     private int replicas;
     private String gatewayToken;
@@ -39,20 +37,8 @@ public class TempusGatewayConfiguration extends SearchTextBasedWithAdditionalInf
 
     public TempusGatewayConfiguration(TempusGatewayConfiguration tempusGatewayConfiguration){
         super(tempusGatewayConfiguration);
-        this.title = tempusGatewayConfiguration.title;
         this.tenantId = tempusGatewayConfiguration.tenantId;
         this.replicas = tempusGatewayConfiguration.replicas;
         this.gatewayToken = tempusGatewayConfiguration.gatewayToken;
-    }
-
-    @Override
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-    public String getName() {
-        return title;
-    }
-
-    @Override
-    public String getSearchText() {
-        return getTitle();
     }
 }

@@ -39,12 +39,4 @@ public interface TempusGatewayConfigurationDao extends Dao<TempusGatewayConfigur
      */
     Optional<TempusGatewayConfiguration> findTempusGatewayConfigurationByTenantId(UUID tenantId);
 
-    /**
-     * Find tempusGatewayConfiguration by tenantId and customer title.
-     *
-     * @param tenantId the tenantId
-     * @param title the tempusGatewayConfiguration title
-     * @return the optional tempusGatewayConfiguration object
-     */
-    Optional<TempusGatewayConfiguration> findTempusGatewayConfigurationByTenantIdAndTitle(UUID tenantId, String title);
 }

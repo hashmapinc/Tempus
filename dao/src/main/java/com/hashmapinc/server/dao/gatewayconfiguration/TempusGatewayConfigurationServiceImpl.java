@@ -57,20 +57,6 @@ public class TempusGatewayConfigurationServiceImpl extends AbstractEntityService
     }
 
     @Override
-    public Optional<TempusGatewayConfiguration> findTempusGatewayConfigurationByTenantIdAndTitle(TenantId tenantId, String title) {
-        log.trace("Executing findTempusGatewayConfigurationByTenantIdAndTitle [{}] [{}]", tenantId, title);
-        validateId(tenantId, INCORRECT_TENANT_ID + tenantId);
-        return tempusGatewayConfigurationDao.findTempusGatewayConfigurationByTenantIdAndTitle(tenantId.getId(), title);
-    }
-
-    @Override
-    public ListenableFuture<TempusGatewayConfiguration> findTempusGatewayConfigurationByIdAsync(TempusGatewayConfigurationId tempusGatewayConfigurationId) {
-        log.trace("Executing findTempusGatewayConfigurationByIdAsync [{}]", tempusGatewayConfigurationId);
-        validateId(tempusGatewayConfigurationId, INCORRECT_TEMPUS_GATEWAY_CONFIGURATION_ID + tempusGatewayConfigurationId);
-        return tempusGatewayConfigurationDao.findByIdAsync(tempusGatewayConfigurationId.getId());
-    }
-
-    @Override
     public TempusGatewayConfiguration saveTempusGatewayConfiguration(TempusGatewayConfiguration tempusGatewayConfiguration) {
         log.trace("Executing saveCustomer [{}]", tempusGatewayConfiguration);
         tempusGatewayConfigurationValidator.validate(tempusGatewayConfiguration);
@@ -102,35 +88,22 @@ public class TempusGatewayConfigurationServiceImpl extends AbstractEntityService
 
                 @Override
                 protected void validateCreate(TempusGatewayConfiguration tempusGatewayConfiguration) {
-                    tempusGatewayConfigurationDao.findTempusGatewayConfigurationByTenantIdAndTitle(tempusGatewayConfiguration.getTenantId().getId(),
-                            tempusGatewayConfiguration.getTitle()).ifPresent(
+                    tempusGatewayConfigurationDao.findTempusGatewayConfigurationByTenantId(tempusGatewayConfiguration.getTenantId().getId()).ifPresent(
                             c -> {
-                                throw new DataValidationException("TempusGatewayConfiguration with such title already exists!");
+                                throw new DataValidationException("TempusGatewayConfiguration for this tenant already exists!");
                             }
                     );
                 }
 
                 @Override
                 protected void validateUpdate(TempusGatewayConfiguration tempusGatewayConfiguration) {
-                    tempusGatewayConfigurationDao.findTempusGatewayConfigurationByTenantIdAndTitle(tempusGatewayConfiguration.getTenantId().getId(), 
-                            tempusGatewayConfiguration.getTitle()).ifPresent(
-                            c -> {
-                                if (!c.getId().equals(tempusGatewayConfiguration.getId())) {
-                                    throw new DataValidationException("Customer with such title already exists!");
-                                }
-                            }
-                    );
+                    if(!tempusGatewayConfigurationDao.findTempusGatewayConfigurationByTenantId(tempusGatewayConfiguration.getTenantId().getId()).isPresent()){
+                        throw new DataValidationException("TempusGatewayConfiguration for this tenant does not exists!");
+                    }
                 }
 
                 @Override
                 protected void validateDataImpl(TempusGatewayConfiguration tempusGatewayConfiguration) {
-                    if (StringUtils.isEmpty(tempusGatewayConfiguration.getTitle())) {
-                        throw new DataValidationException("TempusGatewayConfiguration title should be specified!");
-                    }
-                    if (tempusGatewayConfiguration.getTitle().equals(PUBLIC_CUSTOMER_TITLE)) {
-                        throw new DataValidationException("'Public' title for tempusGatewayConfiguration is system reserved!");
-                    }
-
                     if (tempusGatewayConfiguration.getTenantId() == null) {
                         throw new DataValidationException("TempusGatewayConfiguration should be assigned to tenant!");
                     } else {

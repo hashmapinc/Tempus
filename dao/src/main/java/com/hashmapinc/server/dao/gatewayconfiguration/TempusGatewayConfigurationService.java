@@ -26,10 +26,6 @@ import java.util.Optional;
 public interface TempusGatewayConfigurationService {
     TempusGatewayConfiguration findTempusGatewayConfigurationById(TempusGatewayConfigurationId tempusGatewayConfigurationId);
 
-    Optional<TempusGatewayConfiguration> findTempusGatewayConfigurationByTenantIdAndTitle(TenantId tenantId, String title);
-
-    ListenableFuture<TempusGatewayConfiguration> findTempusGatewayConfigurationByIdAsync(TempusGatewayConfigurationId tempusGatewayConfigurationId);
-
     TempusGatewayConfiguration saveTempusGatewayConfiguration(TempusGatewayConfiguration tempusGatewayConfiguration);
 
     void deleteTempusGatewayConfiguration(TempusGatewayConfigurationId tempusGatewayConfigurationId);

@@ -20,13 +20,11 @@ import com.datastax.driver.core.utils.UUIDs;
 import com.datastax.driver.mapping.annotations.Column;
 import com.datastax.driver.mapping.annotations.PartitionKey;
 import com.datastax.driver.mapping.annotations.Table;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.hashmapinc.server.common.data.TempusGatewayConfiguration;
 import com.hashmapinc.server.common.data.id.TempusGatewayConfigurationId;
 import com.hashmapinc.server.common.data.id.TenantId;
+import com.hashmapinc.server.dao.model.BaseEntity;
 import com.hashmapinc.server.dao.model.ModelConstants;
-import com.hashmapinc.server.dao.model.SearchTextEntity;
-import com.hashmapinc.server.dao.model.type.JsonCodec;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -42,7 +40,7 @@ import static com.hashmapinc.server.dao.model.ModelConstants.*;
 @Table(name = TEMPUS_GATEWAY_CONFIGURATION_FAMILY_NAME)
 @EqualsAndHashCode
 @ToString
-public class TempusGatewayConfigurationEntity implements SearchTextEntity<TempusGatewayConfiguration> {
+public class TempusGatewayConfigurationEntity implements BaseEntity<TempusGatewayConfiguration> {
     @PartitionKey(value = 0)
     @Column(name = ID_PROPERTY)
     private UUID id;
@@ -51,40 +49,19 @@ public class TempusGatewayConfigurationEntity implements SearchTextEntity<Tempus
     @Column(name = TEMPUS_GATEWAY_CONFIGURATION_TENANT_ID_PROPERTY)
     private UUID tenantId;
 
-    @Column(name = TEMPUS_GATEWAY_CONFIGURATION_TITLE_PROPERTY)
-    private String title;
-
     @javax.persistence.Column(name = ModelConstants.TEMPUS_GATEWAY_CONFIGURATION_REPLICAS_PROPERTY)
     private int replicas;
 
     @javax.persistence.Column(name = ModelConstants.TEMPUS_GATEWAY_CONFIGURATION_GATEWAY_TOKEN_PROPERTY)
     private String gatewayToken;
 
-    @Column(name = SEARCH_TEXT_PROPERTY)
-    private String searchText;
-
-    @Column(name = ADDITIONAL_INFO_PROPERTY, codec = JsonCodec.class)
-    private JsonNode additionalInfo;
-
     public TempusGatewayConfigurationEntity(TempusGatewayConfiguration tempusGatewayConfiguration) {
         if (tempusGatewayConfiguration.getId() != null) {
             this.setId(tempusGatewayConfiguration.getId().getId());
         }
         this.tenantId = tempusGatewayConfiguration.getTenantId().getId();
-        this.title = tempusGatewayConfiguration.getTitle();
         this.replicas = tempusGatewayConfiguration.getReplicas();
         this.gatewayToken = tempusGatewayConfiguration.getGatewayToken();
-        this.additionalInfo = tempusGatewayConfiguration.getAdditionalInfo();
-    }
-
-    @Override
-    public String getSearchTextSource() {
-        return title;
-    }
-
-    @Override
-    public void setSearchText(String searchText) {
-        this.searchText = searchText;
     }
 
     @Override
@@ -92,10 +69,8 @@ public class TempusGatewayConfigurationEntity implements SearchTextEntity<Tempus
         TempusGatewayConfiguration tempusGatewayConfiguration = new TempusGatewayConfiguration(new TempusGatewayConfigurationId(getId()));
         tempusGatewayConfiguration.setCreatedTime(UUIDs.unixTimestamp(getId()));
         tempusGatewayConfiguration.setTenantId(new TenantId(tenantId));
-        tempusGatewayConfiguration.setTitle(title);
         tempusGatewayConfiguration.setReplicas(replicas);
         tempusGatewayConfiguration.setGatewayToken(gatewayToken);
-        tempusGatewayConfiguration.setAdditionalInfo(additionalInfo);
         return tempusGatewayConfiguration;
     }
 }

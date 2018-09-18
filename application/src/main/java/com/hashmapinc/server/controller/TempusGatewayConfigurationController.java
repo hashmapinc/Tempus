@@ -22,11 +22,13 @@ import com.hashmapinc.server.common.data.audit.ActionType;
 import com.hashmapinc.server.common.data.id.TempusGatewayConfigurationId;
 import com.hashmapinc.server.common.data.id.TenantId;
 import com.hashmapinc.server.exception.TempusException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/configuration/")
+@Slf4j
 public class TempusGatewayConfigurationController extends BaseController {
     public static final String TEMPUS_GATEWAY_CONFIGURATION_ID = "tempusGatewayConfigurationId";
 
@@ -53,16 +55,9 @@ public class TempusGatewayConfigurationController extends BaseController {
             TempusGatewayConfiguration savedTempusGatewayConfiguration =
                     checkNotNull(tempusGatewayConfigurationService.saveTempusGatewayConfiguration(tempusGatewayConfiguration));
 
-            logEntityAction(savedTempusGatewayConfiguration.getId(), savedTempusGatewayConfiguration,
-                    null,
-                    tempusGatewayConfiguration.getId() == null ? ActionType.ADDED : ActionType.UPDATED, null);
-
+            log.debug("savedTempusGatewayConfiguration : [{}]", savedTempusGatewayConfiguration);
             return savedTempusGatewayConfiguration;
         } catch (Exception e) {
-
-            logEntityAction(emptyId(EntityType.TEMPUS_GATEWAY_CONFIGURATION), tempusGatewayConfiguration,
-                    null, tempusGatewayConfiguration.getId() == null ? ActionType.ADDED : ActionType.UPDATED, e);
-
             throw handleException(e);
         }
     }

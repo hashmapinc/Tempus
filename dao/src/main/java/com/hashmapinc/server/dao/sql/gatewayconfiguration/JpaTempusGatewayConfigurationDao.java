@@ -19,9 +19,9 @@ package com.hashmapinc.server.dao.sql.gatewayconfiguration;
 import com.hashmapinc.server.common.data.TempusGatewayConfiguration;
 import com.hashmapinc.server.common.data.UUIDConverter;
 import com.hashmapinc.server.dao.DaoUtil;
-import com.hashmapinc.server.dao.model.sql.TempusGatewayConfigurationEntity;
-import com.hashmapinc.server.dao.sql.JpaAbstractSearchTextDao;
 import com.hashmapinc.server.dao.gatewayconfiguration.TempusGatewayConfigurationDao;
+import com.hashmapinc.server.dao.model.sql.TempusGatewayConfigurationEntity;
+import com.hashmapinc.server.dao.sql.JpaAbstractDao;
 import com.hashmapinc.server.dao.util.SqlDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.repository.CrudRepository;
@@ -32,7 +32,7 @@ import java.util.UUID;
 
 @Component
 @SqlDao
-public class JpaTempusGatewayConfigurationDao extends JpaAbstractSearchTextDao<TempusGatewayConfigurationEntity, TempusGatewayConfiguration>  implements TempusGatewayConfigurationDao {
+public class JpaTempusGatewayConfigurationDao extends JpaAbstractDao<TempusGatewayConfigurationEntity, TempusGatewayConfiguration> implements TempusGatewayConfigurationDao {
     @Autowired
     private TempusGatewayConfigurationRepository tempusGatewayConfigurationRepository;
 
@@ -49,13 +49,6 @@ public class JpaTempusGatewayConfigurationDao extends JpaAbstractSearchTextDao<T
     public Optional<TempusGatewayConfiguration> findTempusGatewayConfigurationByTenantId(UUID tenantId) {
         return Optional.ofNullable(
                 DaoUtil.getData(tempusGatewayConfigurationRepository.findByTenantId(UUIDConverter.fromTimeUUID(tenantId)))
-        );
-    }
-
-    @Override
-    public Optional<TempusGatewayConfiguration> findTempusGatewayConfigurationByTenantIdAndTitle(UUID tenantId, String title) {
-        return Optional.ofNullable(
-                DaoUtil.getData(tempusGatewayConfigurationRepository.findByTenantIdAndTitle(UUIDConverter.fromTimeUUID(tenantId), title))
         );
     }
 }

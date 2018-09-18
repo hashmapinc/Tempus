@@ -584,7 +584,6 @@ public class ModelConstants {
      * TempusGatewayConfiguration Constants
      */
     public static final String TEMPUS_GATEWAY_CONFIGURATION_TABLE_NAME = "tempus_gateway_configuration";
-    public static final String TEMPUS_GATEWAY_CONFIGURATION_TITLE = TITLE_PROPERTY;
     public static final String TEMPUS_GATEWAY_CONFIGURATION_TENANT_ID = TENANT_ID_PROPERTY;
     public static final String TEMPUS_GATEWAY_CONFIGURATION_REPLICAS = "replicas";
     public static final String TEMPUS_GATEWAY_CONFIGURATION_GATEWAY_TOKEN = "gateway_token";
@@ -593,11 +592,9 @@ public class ModelConstants {
      * Cassandra TempusGatewayConfiguration Constants
      */
     public static final String TEMPUS_GATEWAY_CONFIGURATION_FAMILY_NAME = "tempus_gateway_configuration";
-    public static final String TEMPUS_GATEWAY_CONFIGURATION_TITLE_PROPERTY = TITLE_PROPERTY;
     public static final String TEMPUS_GATEWAY_CONFIGURATION_TENANT_ID_PROPERTY = TENANT_ID_PROPERTY;
     public static final String TEMPUS_GATEWAY_CONFIGURATION_REPLICAS_PROPERTY = "replicas";
     public static final String TEMPUS_GATEWAY_CONFIGURATION_GATEWAY_TOKEN_PROPERTY = "gateway_token";
-    public static final String TEMPUS_GATEWAY_CONFIGURATION_BY_TENANT_AND_TITLE = "tempus_gateway_configuration_by_tenant_and_title";
     public static final String TEMPUS_GATEWAY_CONFIGURATION_BY_TENANT = "tempus_gateway_configuration_by_tenant";
 
 
