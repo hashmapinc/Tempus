@@ -34,11 +34,11 @@ public class KubernetesConnectionClient {
     public CoreV1Api coreV1Api = new CoreV1Api();
     public ExtensionsV1beta1Api extensionsV1beta1Api = new ExtensionsV1beta1Api(apiClient);
 
-    @Value("${kubeless.cluster_mode_enabled}")
+    @Value("${kubernetes.cluster_mode_enabled}")
     private static boolean clusterModeEnabled;
 
 
-    @Value("${kubeless.kube_config_path}")
+    @Value("${kubernetes.kube_config_path}")
     private static String configPath;
 
     private static ApiClient apiClient;
