@@ -301,7 +301,15 @@ function Menu(userService, $state, $rootScope, $log,datamodelService,customerSer
                             type: 'link',
                             state: 'home.auditLogs',
                             icon: 'track_changes'
-                        }];
+                        },
+                        {
+                            name: 'gateway.configuration',
+                            type: 'link',
+                            state: 'home.gateway',
+                            icon: 'settings_applications'
+                        }
+
+                        ];
 
                     generatedSectionTree = {};
 
@@ -394,7 +402,20 @@ function Menu(userService, $state, $rootScope, $log,datamodelService,customerSer
                                         state: 'home.metadata'
                                     }
                                 ]
-                            }
+                            },
+
+                            {
+                                 name: 'gateway.configurationLabel',
+                                 places: [
+                                     {
+                                        name: 'gateway.configuration',
+                                        type: 'link',
+                                        state: 'home.gateway',
+                                        icon: 'settings_applications'
+                                    }
+                                 ]
+                             }
+
                         ];
 
                 } else if (authority === 'CUSTOMER_USER') {

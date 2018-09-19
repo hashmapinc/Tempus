@@ -327,6 +327,16 @@ export default angular.module('tempus.locale', [])
                     "end-required":"End is required"
 
                 },
+                "gateway":{
+                    "configuration":"Tempus Gateway",
+                    "configurationLabel": "Tempus Gateway Configuration",
+                    "device-label":"Gateway Device",
+                    "replica":"Replica",
+                    "deploy":"Deploy",
+                    "field-required":"Field is required",
+                    "config-save-message":"Configuration saved successfully"
+
+                },
                 "audit-log": {
                     "audit": "Audit",
                     "audit-logs": "Audit Logs",

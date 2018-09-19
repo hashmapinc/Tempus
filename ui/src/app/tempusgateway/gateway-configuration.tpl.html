@@ -1,0 +1,64 @@
+<!--
+
+    Copyright © 2016-2018 The Thingsboard Authors
+    Modifications © 2017-2018 Hashmap, Inc
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+        http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<div layout="row" width="100%" layout-wrap tb-help="'outgoingMailSettings'" help-container-id="help-container">
+	<md-card flex-gt-sm="60" flex="100" style="height: 100%;">
+       <md-card-title>
+          <md-card-title-text layout="row">
+           	  <span translate class="md-headline">gateway.configurationLabel</span>
+			  <span flex></span>
+          </md-card-title-text>
+        </md-card-title>	
+   	    <md-progress-linear md-mode="indeterminate" ng-disabled="!$root.loading" ng-show="$root.loading"></md-progress-linear>
+  	    <span style="min-height: 5px;" flex="" ng-show="!$root.loading"></span>
+        <md-card-content>	        		
+			<form name="vm.settingsForm" ng-submit="vm.save()">
+				<fieldset ng-disabled="$root.loading">
+					<md-input-container class="md-block">
+						<label translate>gateway.device-label</label>
+						<md-select  required name="device" ng-model="vm.accesstoken">
+							<md-option ng-repeat="(key,value) in vm.gatewayDevicelist" ng-value="key">
+								{{value}}
+							</md-option>
+						</md-select>
+						<div ng-messages="vm.settingsForm.replica.$error">
+							<div translate ng-message="required">gateway.field-required</div>
+						</div>
+					</md-input-container>
+					<md-input-container class="md-block">
+						<label translate>gateway.replica</label>
+						<input type="number" step="1"
+							   onkeypress="return event.charCode >= 48 && event.charCode <= 57"
+							   required name="replica" ng-model="vm.replica"
+							   placeholder="replica">
+						<div ng-messages="vm.settingsForm.replica.$error">
+							<div translate ng-message="required">gateway.field-required</div>
+						</div>
+
+
+					</md-input-container>
+
+					<div layout="row" layout-align="end center" width="100%" layout-wrap>
+						<md-button ng-disabled="$root.loading || vm.settingsForm.$invalid" ng-click="vm.sendTestMail()" class="md-raised">{{'gateway.deploy' | translate}}</md-button>
+						<md-button ng-disabled="$root.loading || vm.settingsForm.$invalid || !vm.settingsForm.$dirty" type="submit" class="md-raised md-primary">{{'action.save' | translate}}</md-button>
+					</div>
+				</fieldset>
+			</form>
+	    </md-card-content>
+    </md-card>
+</div>
