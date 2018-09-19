@@ -27,4 +27,5 @@ import java.util.List;
 public interface DataModelObjectRespository extends CrudRepository<DataModelObjectEntity, String> {
     List<DataModelObjectEntity> findByDataModelId(@Param("dataModelId") String dataModelId);
     DataModelObjectEntity findByDataModelIdAndName(@Param("dataModelId") String dataModelId, @Param("name") String name);
+    List<DataModelObjectEntity> findByName(@Param("name") String name);
 }

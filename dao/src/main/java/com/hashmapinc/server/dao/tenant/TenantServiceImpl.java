@@ -27,6 +27,7 @@ import com.hashmapinc.server.common.data.page.TextPageLink;
 import com.hashmapinc.server.dao.customer.CustomerService;
 import com.hashmapinc.server.dao.customergroup.CustomerGroupService;
 import com.hashmapinc.server.dao.dashboard.DashboardService;
+import com.hashmapinc.server.dao.datamodel.DataModelService;
 import com.hashmapinc.server.dao.device.DeviceService;
 import com.hashmapinc.server.dao.entity.AbstractEntityService;
 import com.hashmapinc.server.dao.model.ModelConstants;
@@ -85,8 +86,10 @@ public class TenantServiceImpl extends AbstractEntityService implements TenantSe
     private PluginService pluginService;
 
     @Autowired
-    private CustomerGroupService customerGroupService;
+    private DataModelService dataModelService;
 
+    @Autowired
+    private CustomerGroupService customerGroupService;
 
     @Override
     public Tenant findTenantById(TenantId tenantId) {
@@ -128,6 +131,7 @@ public class TenantServiceImpl extends AbstractEntityService implements TenantSe
         ruleService.deleteRulesByTenantId(tenantId);
         pluginService.deletePluginsByTenantId(tenantId);
         tenantDao.removeById(tenantId.getId());
+        dataModelService.deleteDataModelsByTenantId(tenantId);
         customerGroupService.deleteCustomerGroupsByTenantIdAndCustomerId(tenantId, new CustomerId(ModelConstants.NULL_UUID));
         deleteEntityRelations(tenantId);
     }

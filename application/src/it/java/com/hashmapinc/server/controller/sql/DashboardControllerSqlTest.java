@@ -16,20 +16,8 @@
  */
 package com.hashmapinc.server.controller.sql;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.hashmapinc.server.common.data.AssetLandingInfo;
-import com.hashmapinc.server.common.data.Dashboard;
-import com.hashmapinc.server.common.data.DashboardType;
-import com.hashmapinc.server.common.data.datamodel.AttributeDefinition;
-import com.hashmapinc.server.common.data.datamodel.DataModel;
-import com.hashmapinc.server.common.data.datamodel.DataModelObject;
 import com.hashmapinc.server.controller.BaseDashboardControllerTest;
 import com.hashmapinc.server.dao.service.DaoSqlTest;
-import org.junit.Assert;
-import org.junit.Test;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by Valerii Sosliuk on 6/28/2017.

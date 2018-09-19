@@ -49,6 +49,7 @@ import com.hashmapinc.server.dao.computations.ComputationsService;
 import com.hashmapinc.server.dao.customer.CustomerService;
 import com.hashmapinc.server.dao.customergroup.CustomerGroupService;
 import com.hashmapinc.server.dao.dashboard.DashboardService;
+import com.hashmapinc.server.dao.datamodel.AttributeDefinitionDao;
 import com.hashmapinc.server.dao.datamodel.DataModelObjectService;
 import com.hashmapinc.server.dao.datamodel.DataModelService;
 import com.hashmapinc.server.dao.depthseries.DepthSeriesService;
@@ -176,6 +177,9 @@ public abstract class AbstractServiceTest {
 
     @Autowired
     protected MetadataIngestionService metadataIngestionService;
+
+    @Autowired
+    protected AttributeDefinitionDao attributeDefinitionDao;
 
     class IdComparator<D extends BaseData<? extends UUIDBased>> implements Comparator<D> {
         @Override
@@ -394,6 +398,13 @@ public abstract class AbstractServiceTest {
         assetService.deleteAsset(assetId);
     }
 
-
-
+    protected DataModel createDataModel(String name ,TenantId tenantId) {
+        DataModel dataModel = new DataModel();
+        dataModel.setName(name);
+        dataModel.setLastUpdatedTs(System.currentTimeMillis());
+        dataModel.setTenantId(tenantId);
+        DataModel savedDataModel = dataModelService.saveDataModel(dataModel);
+        Assert.assertNotNull(savedDataModel);
+        return savedDataModel;
+    }
 }

@@ -27,6 +27,8 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.List;
+
 public abstract class BaseDataModelServiceTest extends AbstractServiceTest {
     private TenantId tenantId;
 
@@ -102,8 +104,24 @@ public abstract class BaseDataModelServiceTest extends AbstractServiceTest {
         dataModelService.saveDataModel(sameNamedataModel);
     }
 
+    @Test
+    public void testDeleteById() {
+        DataModel savedDataModel = createDataModel("Data model 1",tenantId);
+        Assert.assertNotNull(savedDataModel.getId());
 
+        dataModelService.deleteById(savedDataModel.getId());
+        Assert.assertNull(dataModelService.findById(savedDataModel.getId()));
+    }
 
+    @Test
+    public void testDeleteDataModelsByTenantId() {
+        DataModel savedDataModel1 = createDataModel("data-model-1",tenantId);
+        DataModel savedDataModel2 = createDataModel("data-model-2",tenantId);
+        Assert.assertNotNull(savedDataModel1.getId());
+        Assert.assertNotNull(savedDataModel2.getId());
 
-
+        dataModelService.deleteDataModelsByTenantId(tenantId);
+        List<DataModel> dataModels =  dataModelService.findByTenantId(tenantId);
+        Assert.assertEquals(0,dataModels.size());
+    }
 }

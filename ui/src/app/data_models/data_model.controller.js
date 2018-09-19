@@ -163,7 +163,7 @@ export function DataModelController($scope, $log, $mdDialog, $document, $statePa
 
             // get ID's
             return datamodelService.saveDatamodelObject(
-                { "name": " " }, // name doesn't matter now, just need the ID
+                { "name": node.datamodelObject.name }, // name doesn't matter now, just need the ID
                 $stateParams.datamodelId
             );
         });
