@@ -23,13 +23,13 @@ import org.springframework.context.annotation.Configuration;
 import java.util.List;
 
 @Configuration
-@EnableConfigurationProperties
+@EnableConfigurationProperties(TempusGatewayProperties.class)
 @ConfigurationProperties(prefix = "gateway")
 public class TempusGatewayProperties {
 
     private String image;
-    private String gatewayHost;
-    private int gatewayPort;
+    private String host;
+    private int port;
     private List<String> commands;
 
     public TempusGatewayProperties() {
@@ -44,20 +44,20 @@ public class TempusGatewayProperties {
         this.image = image;
     }
 
-    public String getGatewayHost() {
-        return gatewayHost;
+    public String getHost() {
+        return host;
     }
 
-    public void setGatewayHost(String gatewayHost) {
-        this.gatewayHost = gatewayHost;
+    public void setHost(String host) {
+        this.host = host;
     }
 
-    public int getGatewayPort() {
-        return gatewayPort;
+    public int getPort() {
+        return port;
     }
 
-    public void setGatewayPort(int gatewayPort) {
-        this.gatewayPort = gatewayPort;
+    public void setPort(int port) {
+        this.port = port;
     }
 
     public List<String> getCommands() {
@@ -67,4 +67,5 @@ public class TempusGatewayProperties {
     public void setCommands(List<String> commands) {
         this.commands = commands;
     }
+
 }

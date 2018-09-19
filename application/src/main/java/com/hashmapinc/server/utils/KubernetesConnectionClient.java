@@ -17,43 +17,46 @@
 package com.hashmapinc.server.utils;
 
 import io.kubernetes.client.ApiClient;
+import io.kubernetes.client.Configuration;
 import io.kubernetes.client.apis.CoreV1Api;
 import io.kubernetes.client.apis.ExtensionsV1beta1Api;
 import io.kubernetes.client.util.Config;
-import io.kubernetes.client.Configuration;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
 import java.io.IOException;
 
 @Slf4j
+@NoArgsConstructor
 @Component
+@Getter
 public class KubernetesConnectionClient {
 
-    public CoreV1Api coreV1Api = new CoreV1Api();
-    public ExtensionsV1beta1Api extensionsV1beta1Api = new ExtensionsV1beta1Api(apiClient);
+    private CoreV1Api coreV1Api;
+    private ExtensionsV1beta1Api extensionsV1beta1Api ;
 
     @Value("${kubernetes.cluster_mode_enabled}")
-    private static boolean clusterModeEnabled;
-
+    private boolean clusterModeEnabled;
 
     @Value("${kubernetes.kube_config_path}")
-    private static String configPath;
+    private String configPath;
 
-    private static ApiClient apiClient;
+    private ApiClient apiClient;
 
-    static {
+    @PostConstruct
+    public void init() {
         try {
-            if (clusterModeEnabled) {
-                apiClient = Config.fromCluster();
-                Configuration.setDefaultApiClient(apiClient);
-            } else {
-                apiClient = Config.fromConfig(configPath);
-                Configuration.setDefaultApiClient(apiClient);
-            }
+            apiClient = clusterModeEnabled ? Config.fromCluster() : Config.fromConfig(configPath);
+            Configuration.setDefaultApiClient(apiClient);
+            coreV1Api = new CoreV1Api();
+            extensionsV1beta1Api = new ExtensionsV1beta1Api(apiClient);
         } catch (IOException e) {
             log.error("Exception in apiClient creation : [{}]", e.getMessage());
         }
     }
+
 }

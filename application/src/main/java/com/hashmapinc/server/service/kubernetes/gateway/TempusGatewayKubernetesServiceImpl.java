@@ -63,11 +63,11 @@ public class TempusGatewayKubernetesServiceImpl implements TempusGatewayKubernet
         replicaSetConfig.setReplica(gatewayConfiguration.getReplicas());
         replicaSetConfig.setImage(tempusGatewayProperties.getImage());
         replicaSetConfig.setPorts(new HashMap<Integer , String>() {{
-            put(tempusGatewayProperties.getGatewayPort(), GATEWAY_PORT);
+            put(tempusGatewayProperties.getPort(), GATEWAY_PORT);
         }});
         replicaSetConfig.setEnvVariables(new HashMap<String , String>() {{
             put(GATEWAY_ACCESS_TOKEN, gatewayConfiguration.getGatewayToken());
-            put(GATEWAY_HOST, tempusGatewayProperties.getGatewayHost());
+            put(GATEWAY_HOST, tempusGatewayProperties.getHost());
         }});
         replicaSetConfig.setCommands(tempusGatewayProperties.getCommands());
         return replicaSetConfig;

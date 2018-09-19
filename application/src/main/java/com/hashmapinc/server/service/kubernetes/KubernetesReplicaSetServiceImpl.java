@@ -40,7 +40,7 @@ public class KubernetesReplicaSetServiceImpl implements   KubernetesReplicaSetSe
     public boolean deployReplicaSet(ReplicaSetConfig replicaSetConfig) {
         V1beta1ReplicaSet replicaSet = createReplicaSet(replicaSetConfig);
         try {
-            connectionClient.extensionsV1beta1Api.createNamespacedReplicaSet(DEFAULT_NAMESPACE , replicaSet , null);
+            connectionClient.getExtensionsV1beta1Api().createNamespacedReplicaSet(DEFAULT_NAMESPACE , replicaSet , null);
         } catch (ApiException e) {
             log.error("Error while deploying replica-set : [{}]", e.getMessage());
         }
