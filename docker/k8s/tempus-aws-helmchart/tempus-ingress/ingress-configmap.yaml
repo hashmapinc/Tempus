@@ -9,7 +9,7 @@ data:
   server-tokens: "false"
   ssl-redirect: "false"
   upstream-keepalive-connections: "50"
-  use-proxy-protocol: "true"
+  use-proxy-protocol: "false"
 kind: ConfigMap
 metadata:
   labels:

@@ -4,8 +4,8 @@ metadata:
   annotations:
     service.beta.kubernetes.io/aws-load-balancer-type: "nlb"
     service.beta.kubernetes.io/aws-load-balancer-ssl-ports: "443"
-    service.beta.kubernetes.io/aws-load-balancer-ssl-cert: "arn:aws:acm:us-east-2:660239660726:certificate/ec088a03-f323-4523-bfde-e93c9b0815e6"
-    service.beta.kubernetes.io/aws-load-balancer-backend-protocol: "http"
+    service.beta.kubernetes.io/aws-load-balancer-ssl-cert: "arn:aws:acm:us-east-1:660239660726:certificate/5b2617f5-b8ea-463c-b208-6f1d367a0357"
+    service.beta.kubernetes.io/aws-load-balancer-backend-protocol: "tcp"
     service.beta.kubernetes.io/aws-load-balancer-connection-idle-timeout: '3600'
   labels:
     k8s-addon: ingress-nginx.addons.k8s.io
