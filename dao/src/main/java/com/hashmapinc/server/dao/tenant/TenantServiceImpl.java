@@ -17,13 +17,19 @@
 package com.hashmapinc.server.dao.tenant;
 
 import com.google.common.util.concurrent.ListenableFuture;
+import com.hashmapinc.server.common.data.CustomerGroup;
+import com.hashmapinc.server.common.data.DataConstants;
+import com.hashmapinc.server.common.data.id.CustomerId;
+import com.hashmapinc.server.common.data.id.EntityId;
 import com.hashmapinc.server.common.data.id.TenantId;
 import com.hashmapinc.server.common.data.page.TextPageData;
 import com.hashmapinc.server.common.data.page.TextPageLink;
 import com.hashmapinc.server.dao.customer.CustomerService;
+import com.hashmapinc.server.dao.customergroup.CustomerGroupService;
 import com.hashmapinc.server.dao.dashboard.DashboardService;
 import com.hashmapinc.server.dao.device.DeviceService;
 import com.hashmapinc.server.dao.entity.AbstractEntityService;
+import com.hashmapinc.server.dao.model.ModelConstants;
 import com.hashmapinc.server.dao.rule.RuleService;
 import com.hashmapinc.server.dao.service.DataValidator;
 import com.hashmapinc.server.dao.service.PaginatedRemover;
@@ -39,6 +45,7 @@ import com.hashmapinc.server.dao.exception.DataValidationException;
 import com.hashmapinc.server.dao.plugin.PluginService;
 import com.hashmapinc.server.dao.service.Validator;
 
+import java.util.Collections;
 import java.util.List;
 
 import static com.hashmapinc.server.dao.service.Validator.validateId;
@@ -77,6 +84,9 @@ public class TenantServiceImpl extends AbstractEntityService implements TenantSe
     @Autowired
     private PluginService pluginService;
 
+    @Autowired
+    private CustomerGroupService customerGroupService;
+
 
     @Override
     public Tenant findTenantById(TenantId tenantId) {
@@ -97,7 +107,12 @@ public class TenantServiceImpl extends AbstractEntityService implements TenantSe
         log.trace("Executing saveTenant [{}]", tenant);
         tenant.setRegion(DEFAULT_TENANT_REGION);
         tenantValidator.validate(tenant);
-        return tenantDao.save(tenant);
+        Tenant savedTenant = tenantDao.save(tenant);
+        final boolean isNewTenant = tenant.getId() == null || tenant.getId().equals(new TenantId(EntityId.NULL_UUID));
+        if(isNewTenant && savedTenant != null){
+            createGroupForTenant(tenant.getTitle(), savedTenant.getId());
+        }
+        return savedTenant;
     }
 
     @Override
@@ -113,6 +128,7 @@ public class TenantServiceImpl extends AbstractEntityService implements TenantSe
         ruleService.deleteRulesByTenantId(tenantId);
         pluginService.deletePluginsByTenantId(tenantId);
         tenantDao.removeById(tenantId.getId());
+        customerGroupService.deleteCustomerGroupsByTenantIdAndCustomerId(tenantId, new CustomerId(ModelConstants.NULL_UUID));
         deleteEntityRelations(tenantId);
     }
 
@@ -156,4 +172,13 @@ public class TenantServiceImpl extends AbstractEntityService implements TenantSe
             deleteTenant(new TenantId(entity.getUuidId()));
         }
     };
+
+    private void createGroupForTenant(String title, TenantId savedTenantId) {
+        CustomerGroup customerGroup = new CustomerGroup();
+        customerGroup.setTitle("group-"+ title);
+        customerGroup.setTenantId(savedTenantId);
+        customerGroup.setCustomerId(null);
+        customerGroup.setPolicies(Collections.singletonList(DataConstants.TENANT_ADMIN_DEFAULT_PERMISSION));
+        customerGroupService.saveCustomerGroup(customerGroup);
+    }
 }
