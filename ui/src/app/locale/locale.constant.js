@@ -327,6 +327,7 @@ export default angular.module('tempus.locale', [])
                     "end-required":"End is required"
 
                 },
+
                 "gateway":{
                     "configuration":"Tempus Gateway",
                     "configurationLabel": "Tempus Gateway Configuration",
@@ -609,8 +610,15 @@ export default angular.module('tempus.locale', [])
                     "add": "Add Data Model",
                     "name": "Title",
                     "description" :"Description",
-                    "name-required":"This feild is required"
-
+                    "name-required":"This feild is required",
+                    "objectInfo":"Datamodel Object Information",
+                    "datamodelObject":"Datamodel Object",
+                    "type":"Type",
+                    "objectAttribute":"Attributes",
+                    "relationships":"Relationships",
+                    "image":"Icon",
+                    "parent":"Parent",
+                    "noAttribute":"No Attributes"
                 },
                 "datakey": {
                     "settings": "Settings",

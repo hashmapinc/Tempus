@@ -23,3 +23,85 @@
 border-top: 1px solid lightgray;
 }
 
+.half {
+  float: left;
+  width: 40%;
+  padding: 0 1em;
+  margin-top: 12px;
+}
+/* Acordeon styles */
+.tab {
+    position: relative;
+    margin-bottom: 3px;
+    width: 244%;
+    color: #fff;
+    overflow: hidden;
+    margin-left: -12px;
+}
+.tab input {
+  position: absolute;
+  opacity: 0;
+  z-index: -1;
+}
+.tab label {
+  position: relative;
+  display: block;
+  padding: 0 0 0 1em;
+  background: #320085;
+  font-weight: bold;
+  line-height: 2;
+  cursor: pointer;
+  margin-left: 3px;
+}
+.blue label {
+  background: #2980b9;
+}
+.tab-content {
+  max-height: 0;
+  overflow: hidden;
+  color: black;
+  -webkit-transition: max-height .35s;
+  -o-transition: max-height .35s;
+  transition: max-height .35s;
+}
+.blue .tab-content {
+  background: #3498db;
+}
+.tab-content p {
+  margin: 1em;
+}
+/* :checked */
+.tab input:checked ~ .tab-content {
+  max-height: 100vh;
+}
+/* Icon */
+.tab label::after {
+  position: absolute;
+  right: 0;
+  top: -6px;
+  display: block;
+  width: 3em;
+  height: 3em;
+  line-height: 3;
+  text-align: center;
+  -webkit-transition: all .35s;
+  -o-transition: all .35s;
+  transition: all .35s;
+}
+.tab input[type=checkbox] + label::after {
+  content: "+";
+}
+.tab input[type=radio] + label::after {
+  content: "\25BC";
+}
+.tab input[type=checkbox]:checked + label::after {
+  transform: rotate(315deg);
+}
+.tab input[type=radio]:checked + label::after {
+  transform: rotateX(180deg);
+}
+
+.md-headline-info{
+    font-weight: 400;
+    line-height: 34px;
+}
