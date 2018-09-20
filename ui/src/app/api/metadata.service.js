@@ -223,5 +223,4 @@ function MetadataService($http, $q, $filter, utils) {
             return deferred.promise;
     }
 
-
 }

@@ -23,7 +23,7 @@
             <div class="md-toolbar-tools">
                 <h2 translate> {{ (vm.isAdd ? 'action.add' : 'action.edit') | translate }} Query</h2>
                 <span flex></span>
-                <md-button class="md-icon-button" ng-click="vm.close()">y.
+                <md-button class="md-icon-button" ng-click="vm.close()">
                     <ng-md-icon icon="close" aria-label="{{ 'dialog.close' | translate }}"></ng-md-icon>
                 </md-button>
             </div>
@@ -35,7 +35,7 @@
 
         <md-dialog-content>
             <div class="md-dialog-content">
-                <md-content class="md-padding" layout="column">
+                <!--<md-content class="md-padding" layout="column">
 
                     <div layout-gt-sm="row">
                         <md-input-container class="md-block" style="width: 100%;">
@@ -53,6 +53,26 @@
                         </md-input-container>
                         <md-input-container style="width: 50%;">
                             <label>{{ 'metadataConfig.trigger-schedule' | translate }}</label>
+                            <input type="text" ng-model="vm.metadataQuery.triggerSchedule" ng-pattern="vm.regex" required>
+                        </md-input-container>
+                    </div>
+                </md-content>-->
+                <md-content class="md-padding" layout="column">
+                    <div layout-gt-sm="row">
+                        <md-input-container class="md-block" style="width: 100%;">
+                            <label translate>Query</label>
+                            <textarea ng-model="vm.metadataQuery.queryStmt" rows="2" required></textarea>
+                        </md-input-container>
+                    </div>
+                    <div layout-gt-sm="row">
+                        <md-input-container class="md-block" style="width: 50%;">
+                            <label>Trigger Type</label>
+                            <md-select ng-model="vm.metadataQuery.triggerType">
+                                <md-option ng-value="trigger.id" ng-repeat="trigger in vm.triggers">{{ trigger.name }}</md-option>
+                            </md-select>
+                        </md-input-container>
+                        <md-input-container style="width: 50%;">
+                            <label>Trigger Schedule</label>
                             <input type="text" ng-model="vm.metadataQuery.triggerSchedule" ng-pattern="vm.regex" required>
                         </md-input-container>
                     </div>

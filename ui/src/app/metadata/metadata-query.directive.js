@@ -40,7 +40,6 @@ export default function MetadataQueryDirective($compile, $templateCache, $mdDial
         *
         */
         scope.getAllQuery = function() {
-
             metadataService.getAllMetadataQuery(scope.metadata.id.id,scope.paginationDetails.limit).then(function success(response) {
                 scope.queries = response.data;
                 var querySortList = $filter('orderBy')(response.data, scope.paginationDetails.order);

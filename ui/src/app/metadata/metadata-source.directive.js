@@ -22,7 +22,6 @@ import metadataSourceFieldsetTemplate from './metadata-source-fieldset.tpl.html'
 
 /*@ngInject*/
 export default function MetadataSourceDirective($compile, $templateCache, $translate, types, metadataService, toast) {
-
     var linker = function(scope, element) {
     
         var template = $templateCache.get(metadataSourceFieldsetTemplate);
@@ -54,9 +53,8 @@ export default function MetadataSourceDirective($compile, $templateCache, $trans
         restrict: "A",
         link: linker,
         scope: {
-]            source: "=",
+            source: "=",
             metadata: "="
-
         }
     }
 }
