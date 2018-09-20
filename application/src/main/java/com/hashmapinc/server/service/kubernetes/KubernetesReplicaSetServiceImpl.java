@@ -41,6 +41,7 @@ public class KubernetesReplicaSetServiceImpl implements   KubernetesReplicaSetSe
         V1beta1ReplicaSet replicaSet = createReplicaSet(replicaSetConfig);
         try {
             connectionClient.getExtensionsV1beta1Api().createNamespacedReplicaSet(DEFAULT_NAMESPACE , replicaSet , null);
+            return true;
         } catch (ApiException e) {
             log.error("Error while deploying replica-set : [{}]", e.getMessage());
         }

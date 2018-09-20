@@ -62,6 +62,7 @@ import com.hashmapinc.server.exception.TempusErrorCode;
 import com.hashmapinc.server.exception.TempusErrorResponseHandler;
 import com.hashmapinc.server.exception.TempusException;
 import com.hashmapinc.server.service.component.ComponentDiscoveryService;
+import com.hashmapinc.server.service.kubernetes.gateway.TempusGatewayKubernetesService;
 import com.hashmapinc.server.service.metadataingestion.MetadataConfigService;
 import com.hashmapinc.server.service.metadataingestion.MetadataQueryService;
 import com.hashmapinc.server.service.security.auth.AttributeBasedPermissionEvaluator;
@@ -171,6 +172,9 @@ public abstract class BaseController {
 
     @Autowired
     protected TempusGatewayConfigurationService tempusGatewayConfigurationService;
+
+    @Autowired
+    protected TempusGatewayKubernetesService tempusGatewayKubernetesService;
 
     @Autowired
     protected AttributeBasedPermissionEvaluator evaluator;

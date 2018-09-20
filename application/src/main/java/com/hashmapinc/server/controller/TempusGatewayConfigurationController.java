@@ -26,6 +26,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Optional;
+
 @RestController
 @RequestMapping("/api/configuration/")
 @Slf4j
@@ -69,6 +71,26 @@ public class TempusGatewayConfigurationController extends BaseController {
         try {
             TenantId tenantId = getCurrentUser().getTenantId();
             return tempusGatewayConfigurationService.findTempusGatewayConfigurationByTenantId(tenantId).orElse(new TempusGatewayConfiguration());
+        } catch (Exception e) {
+            throw handleException(e);
+        }
+    }
+
+    @PreAuthorize("hasAuthority('TENANT_ADMIN')")
+    @GetMapping(value = "/tempusGateway/deploy")
+    @ResponseBody
+    public Boolean deployTempusGateway() throws TempusException {
+        try {
+            TenantId tenantId = getCurrentUser().getTenantId();
+            final Optional<TempusGatewayConfiguration> tempusGatewayConfigurationByTenantId =
+                    tempusGatewayConfigurationService.findTempusGatewayConfigurationByTenantId(tenantId);
+
+            if(!tempusGatewayConfigurationByTenantId.isPresent()){
+                return false;
+            }
+            tempusGatewayConfigurationByTenantId.ifPresent(tempusGatewayConfiguration ->
+                    tempusGatewayKubernetesService.deployTempusGateway(tempusGatewayConfiguration));
+            return true;
         } catch (Exception e) {
             throw handleException(e);
         }
