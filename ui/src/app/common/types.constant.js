@@ -417,8 +417,7 @@ export default angular.module('tempus.types', [])
             },
            entityTypes: {
                 'ALL':'ALL',
-                'ASSET': "ASSET",
-                'DEVICE': "DEVICE"
+                'ASSET': "ASSET"
             },
            userTypes: {
                 'CUSTOMER_USER':'CUSTOMER_USER',
