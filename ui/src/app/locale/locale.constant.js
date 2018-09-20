@@ -336,7 +336,8 @@ export default angular.module('tempus.locale', [])
                     "deploy":"Deploy",
                     "field-required":"Field is required",
                     "config-save-message":"Configuration saved successfully",
-                    "config-deploy-message":"Tempus Gateway deployed successfully"
+                    "config-deploy-message":"Tempus Gateway deployed successfully",
+                    "config-deploy-fail-message":"Tempus Gateway not deployed"
 
                 },
                 "audit-log": {

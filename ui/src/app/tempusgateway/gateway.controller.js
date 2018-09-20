@@ -91,6 +91,8 @@ export function GatewayController(deviceService, $scope, gatewayConfigurationSer
 
       gatewayConfigurationService.deployTempusGateway().then(function success(res){
             if(res.data == false) {
+                toast.showError($translate.instant('gateway.config-deploy-fail-message'));
+            } else {
                 toast.showSuccess($translate.instant('gateway.config-deploy-message'));
             }
       });
