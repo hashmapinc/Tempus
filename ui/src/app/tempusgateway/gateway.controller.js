@@ -24,9 +24,11 @@ export function GatewayController(deviceService, $scope, gatewayConfigurationSer
 
     vm.getGatewayDevices = getGatewayDevices;
     vm.save = save;
-    vm.replica = 0;
+    vm.replica = 1;
     vm.loadGatewayConfiguration = loadGatewayConfiguration;
+    vm.deployTempusGateway = deployTempusGateway;
     vm.scopeData = '';
+    vm.configId ='';
     vm.getGatewayDevices();
     vm.loadGatewayConfiguration();
 
@@ -55,6 +57,7 @@ export function GatewayController(deviceService, $scope, gatewayConfigurationSer
             if(response.id !== null) {
                 vm.replica = response.replicas;
                 vm.accesstoken = response.gatewayToken;
+                vm.configId = response.id.id;
             }
         });
 
@@ -77,9 +80,21 @@ export function GatewayController(deviceService, $scope, gatewayConfigurationSer
             if(item) {
                   vm.scopeData = item;
                   vm.accesstoken = item.gatewayToken;
+                  vm.configId = item.id.id;
                   toast.showSuccess($translate.instant('gateway.config-save-message'));
             }
         });
+    }
+
+
+    function deployTempusGateway() {
+
+      gatewayConfigurationService.deployTempusGateway().then(function success(res){
+            if(res.data == false) {
+                toast.showSuccess($translate.instant('gateway.config-deploy-message'));
+            }
+      });
+
     }
 
 }

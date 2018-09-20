@@ -43,6 +43,7 @@
 					<md-input-container class="md-block">
 						<label translate>gateway.replica</label>
 						<input type="number" step="1"
+							   min = "1"
 							   onkeypress="return event.charCode >= 48 && event.charCode <= 57"
 							   required name="replica" ng-model="vm.replica"
 							   placeholder="replica">
@@ -54,7 +55,7 @@
 					</md-input-container>
 
 					<div layout="row" layout-align="end center" width="100%" layout-wrap>
-						<md-button ng-disabled="$root.loading || vm.settingsForm.$invalid" ng-click="vm.sendTestMail()" class="md-raised">{{'gateway.deploy' | translate}}</md-button>
+						<md-button ng-disabled="vm.configId == ''" ng-click="vm.deployTempusGateway()" class="md-raised">{{'gateway.deploy' | translate}}</md-button>
 						<md-button ng-disabled="$root.loading || vm.settingsForm.$invalid || !vm.settingsForm.$dirty" type="submit" class="md-raised md-primary">{{'action.save' | translate}}</md-button>
 					</div>
 				</fieldset>

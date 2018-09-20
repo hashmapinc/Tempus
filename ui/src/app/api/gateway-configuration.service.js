@@ -24,7 +24,8 @@ function GatewayConfigurationService($q, $http) {
 
     var service = {
       saveGatewayConfiguration: saveGatewayConfiguration,
-      getGatewayConfiguration:getGatewayConfiguration
+      getGatewayConfiguration:getGatewayConfiguration,
+      deployTempusGateway:deployTempusGateway
     }
 
     return service;
@@ -53,6 +54,16 @@ function GatewayConfigurationService($q, $http) {
         return deferred.promise;
     }
 
+    function deployTempusGateway(){
 
+         var deferred = $q.defer();
+         var url = '/api/configuration/tempusGateway/deploy';
+         $http.get(url).then(function success(response) {
+             deferred.resolve(response);
+         }, function fail() {
+             deferred.reject();
+         });
+         return deferred.promise;
+    }
 
 }
