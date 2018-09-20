@@ -359,7 +359,6 @@ function GridController($scope, $rootScope, $state, $mdDialog, $document, $q, $m
 
         vm.config = vm.gridConfiguration();
 
-
         vm.itemHeight = vm.config.itemHeight || 199;
 
         vm.addIcon = vm.config.addIcon || "add";
@@ -456,7 +455,8 @@ function GridController($scope, $rootScope, $state, $mdDialog, $document, $q, $m
             };
 
 
-            vm.addItemAction = vm.config.addItemAction || {
+            if(vm.config.itemCardController != 'AssetLandingCardController' ){
+                vm.addItemAction = vm.config.addItemAction && vm.config.itemCardController != 'AssetLandingCardController' || {
                     onAction: function ($event) {
                         addItem($event);
                     },
@@ -464,6 +464,9 @@ function GridController($scope, $rootScope, $state, $mdDialog, $document, $q, $m
                     details: function() { return vm.addItemText() },
                     icon: vm.addIcon
                 };
+            }
+
+
 
         vm.addItemActionsOpen = false;
 

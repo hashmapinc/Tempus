@@ -27,7 +27,7 @@ import tempusDepthwindow from './depthwindow.directive';
 import tempusEvents from './tb-event-directives';
 import tempusMousepointMenu from './mousepoint-menu.directive';
 import tempusGrid from './grid.directive';
-//import addAssetTemplate from '../asset/add-asset.tpl.html';
+import addAssetTemplate from '../asset/add-asset.tpl.html';
 
 
 /* eslint-disable import/no-unresolved, import/default */
@@ -108,7 +108,7 @@ function DashboardController($scope, $rootScope, $element, $timeout, $mdMedia, $
     vm.types = types;
     vm.gridster = null;
 
-    vm.assetGridConfig = {
+    vm.assetLandingGridConfig = {
         deleteItemTitleFunc: deleteTitle,
         deleteItemContentFunc: deleteText,
         deleteItemsTitleFunc: deleteAssetsTitle,
@@ -119,6 +119,7 @@ function DashboardController($scope, $rootScope, $element, $timeout, $mdMedia, $
 
         getItemTitleFunc: getAssetTitle,
 
+        itemCardController:'AssetLandingCardController',
         parentCtl: vm,
 
         actionsList: assetActionsList,
@@ -126,8 +127,10 @@ function DashboardController($scope, $rootScope, $element, $timeout, $mdMedia, $
 
         onGridInited: gridInited,
 
+        addItemTemplateUrl:addAssetTemplate,
 
-        addItemText: function() { return $translate.instant('asset.add-asset-text') },
+
+        //addItemText: function() { return $translate.instant('asset.add-asset-text') },
         itemDetailsText: function() { return $translate.instant('asset.asset-details') },
         isDetailsReadOnly: isCustomerUser,
         isSelectionEnabled: function () {
