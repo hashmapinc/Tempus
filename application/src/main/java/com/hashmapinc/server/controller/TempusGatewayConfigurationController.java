@@ -92,7 +92,8 @@ public class TempusGatewayConfigurationController extends BaseController {
                     tempusGatewayKubernetesService.deployTempusGateway(tempusGatewayConfiguration));
             return true;
         } catch (Exception e) {
-            throw handleException(e);
+            log.debug("Exception [{}]", e);
+            return false;
         }
     }
 }
