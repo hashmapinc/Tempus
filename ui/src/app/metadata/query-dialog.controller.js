@@ -38,7 +38,6 @@ export default function QueryDialogController($mdDialog,types, metadata, metadat
         $mdDialog.hide();
     }
     function save(){
-.
         var requestObject ={
            metadataConfigId:{
             id:metadata.id.id

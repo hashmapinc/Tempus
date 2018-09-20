@@ -33,9 +33,8 @@ function MetadataService($http, $q, $filter, utils) {
         saveMetadataQuery: saveMetadataQuery,
         getAllMetadataQuery:getAllMetadataQuery,
         deleteMetadataQuery: deleteMetadataQuery,
-        testMetadataConfig: testMetadataConfig
-        getAllTenantMetadata :getAllTenantMetadata
-        deleteMetadata: deleteMetadata
+        testMetadataConfig: testMetadataConfig,
+        deleteMetadata: deleteMetadata,
         saveMetadata: saveMetadata
     }
 
@@ -75,18 +74,15 @@ function MetadataService($http, $q, $filter, utils) {
 
 
     function getAllTenantMetadata(pageLink) {
-        $log.log(pageLink);
         var deferred = $q.defer();
         var url = '/api/metadata/tenant/configs?limit=' + pageLink.limit;
         $http.get(url, null).then(
             function success(response) {
-                $log.log(response);
                 var allMetadatas = response.data.data;
                 allMetadatas = $filter('orderBy')(allMetadatas, ['+name', '-createdTime']);
                 utils.filterSearchTextEntities(allMetadatas, 'name', pageLink, deferred);
             },
-            function fail(error) {
-                $log.log(error);
+            function fail() {
                 deferred.reject();
             }
         );
@@ -107,7 +103,6 @@ function MetadataService($http, $q, $filter, utils) {
     function deleteMetadata(metadataId) {
         var deferred = $q.defer();
         var url = '/api/metadata/config/' + metadataId;
-.
         $http.delete(url).then(function success() {
             deferred.resolve();
         }, function fail(response) {
@@ -132,22 +127,6 @@ function MetadataService($http, $q, $filter, utils) {
         return deferred.promise;
     }
 
-    /**
-     * Save Metadata configuration details.
-     *
-
-     * @param {*} metadataConfig
-     */
-    function saveMetadata(metadataConfig) {
-        var deferred = $q.defer();
-        var url = '/api/metadata/config';
-        $http.post(url, metadataConfig).then(function success(response) {
-            deferred.resolve(response.data);
-        }, function fail() {
-            deferred.reject();
-        });
-        return deferred.promise;
-    }
 
     /**
      * Save Metadata configuration query.
@@ -177,7 +156,6 @@ function MetadataService($http, $q, $filter, utils) {
             $http.get(url, null).then(
                 function success(response) {
                     var allMetadatas = response.data.data;
-                    $log.log(allMetadatas);
                     allMetadatas = $filter('orderBy')(allMetadatas, ['+queryStmt', '-createdTime']);
                     utils.filterSearchTextEntities(allMetadatas, 'queryStmt', pageLink, deferred);
                 },
