@@ -91,7 +91,6 @@ public class TenantServiceImpl extends AbstractEntityService implements TenantSe
     @Autowired
     private DataModelService dataModelService;
 
-
     @Override
     public Tenant findTenantById(TenantId tenantId) {
         log.trace("Executing findTenantById [{}]", tenantId);
