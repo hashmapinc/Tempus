@@ -144,9 +144,8 @@ export default function MetadataController(metadataService, $q,$mdDialog, $docum
         });
     }
 
-
     function cancel() {
         $mdDialog.cancel();
     }
-
 }
+
