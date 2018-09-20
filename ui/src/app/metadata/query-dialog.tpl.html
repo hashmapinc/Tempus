@@ -60,19 +60,19 @@
                 <md-content class="md-padding" layout="column">
                     <div layout-gt-sm="row">
                         <md-input-container class="md-block" style="width: 100%;">
-                            <label translate>Query</label>
+                            <label>{{ 'metadataConfig.query' | translate }}</label>
                             <textarea ng-model="vm.metadataQuery.queryStmt" rows="2" required></textarea>
                         </md-input-container>
                     </div>
                     <div layout-gt-sm="row">
                         <md-input-container class="md-block" style="width: 50%;">
-                            <label>Trigger Type</label>
+                            <label>{{ 'metadataConfig.trigger-type' | translate }}</label>
                             <md-select ng-model="vm.metadataQuery.triggerType">
                                 <md-option ng-value="trigger.id" ng-repeat="trigger in vm.triggers">{{ trigger.name }}</md-option>
                             </md-select>
                         </md-input-container>
                         <md-input-container style="width: 50%;">
-                            <label>Trigger Schedule</label>
+                            <label>{{ 'metadataConfig.trigger-schedule' | translate }}</label>
                             <input type="text" ng-model="vm.metadataQuery.triggerSchedule" ng-pattern="vm.regex" required>
                         </md-input-container>
                     </div>

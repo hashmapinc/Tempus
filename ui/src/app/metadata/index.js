@@ -27,7 +27,6 @@ import MetadataConfigDirective from './metadataConfig.directive';
 
 import MetadataQueryDirective from './metadata-query.directive'; 
 import QueryDialogController from './query-dialog.controller';
-import MetadataQueryConditionsDirective from './metadata-query-conditions.directive';
 
 
 
@@ -43,5 +42,4 @@ export default angular.module('tempus.metadata', [
     .directive('tbMetadataSink', MetadataSinkDirective)
     .directive('tbMetadataConfig', MetadataConfigDirective)
     .directive('tbMetadataQuery', MetadataQueryDirective)
-    .directive('tbMetadataQueryConditions',MetadataQueryConditionsDirective)
     .name;
