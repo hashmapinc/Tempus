@@ -63,6 +63,7 @@ import com.hashmapinc.server.exception.TempusException;
 import com.hashmapinc.server.service.component.ComponentDiscoveryService;
 import com.hashmapinc.server.service.metadataingestion.MetadataConfigService;
 import com.hashmapinc.server.service.metadataingestion.MetadataQueryService;
+import com.hashmapinc.server.service.security.auth.AttributeBasedPermissionEvaluator;
 import com.hashmapinc.server.service.security.model.SecurityUser;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -165,6 +166,8 @@ public abstract class BaseController {
     @Autowired
     protected CustomerGroupService customerGroupService;
 
+    @Autowired
+    protected AttributeBasedPermissionEvaluator evaluator;
 
     @ExceptionHandler(TempusException.class)
     public void handleTempusException(TempusException ex, HttpServletResponse response) {
@@ -528,10 +531,10 @@ public abstract class BaseController {
         checkNotNull(dashboard);
         checkTenantId(dashboard.getTenantId());
         SecurityUser authUser = getCurrentUser();
-        final boolean isDashboardAssignedToCurrentCustomer = authUser.getAuthority() == Authority.CUSTOMER_USER
+        final boolean isDashboardNotAssignedToCurrentCustomer = authUser.getAuthority() == Authority.CUSTOMER_USER
                 && !dashboard.isAssignedToCustomer(authUser.getCustomerId());
 
-        if (isDashboardAssignedToCurrentCustomer) {
+        if (isDashboardNotAssignedToCurrentCustomer && (dashboard.getType() != DashboardType.ASSET_LANDING_PAGE)) {
                 throw new TempusException(YOU_DON_T_HAVE_PERMISSION_TO_PERFORM_THIS_OPERATION,
                         TempusErrorCode.PERMISSION_DENIED);
         }
