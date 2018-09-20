@@ -428,7 +428,6 @@ function Menu(userService, $state, $rootScope, $log,datamodelService,customerSer
                         var dataModelObjects = datamodelService.getDatamodelObjects(data.dataModelId.id);
 
                         dataModelObjects.then(function(modelObjects){
-                            //$log.log(modelObjects);
                             dataModelsOfAssetType = getDataModelObjectsOfTypeAsset(modelObjects);
                             generatedSectionTree.children = buildGeneratedSectionTree(dataModelsOfAssetType);
 
@@ -491,11 +490,11 @@ function Menu(userService, $state, $rootScope, $log,datamodelService,customerSer
                         id : dataModelObject.id.id,
                         type: 'link',
                         name:dataModelObject.name,
-                        state: 'home.customers.dashboards.dashboard',
+                        state: 'home.dashboards.blank', //if assetLanding dashboard page is not created for current dataModelObject
                         icon: 'domain',
                         link: '/static/svg/assetslightgray.svg',
                         logoFile: dataModelObject.logoFile,
-                        dashboardId: ''                       //if assetLanding dashboard page is not created for current dataModelObject
+                        dashboardId: null                       //if assetLanding dashboard page is not created for current dataModelObject
                     };
 
                     if(dataModelObject.parentId != null)
@@ -505,7 +504,7 @@ function Menu(userService, $state, $rootScope, $log,datamodelService,customerSer
 
                dashboardService.getAssetLandingDashboardByDataModelObjId(dataModelObject).then(function(response){
                         sec.dashboardId = response[0].id.id;
-                        $log.log(sec)
+                        sec.state = 'home.dashboards.dashboard';
                     },
                     function (error){
                         $log.error(error);
