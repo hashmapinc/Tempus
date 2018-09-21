@@ -45,7 +45,12 @@ export default function QueryDialogController($mdDialog,types, metadata, metadat
            triggerType:vm.metadataQuery.triggerType,
            triggerSchedule:vm.metadataQuery.triggerSchedule
         }
-
+        if(metadataQuery){
+            requestObject.id;
+             requestObject.id ={
+                id:metadataQuery.id.id
+             }
+        }
         var deferred = $q.defer();
         metadataService.saveMetadataQuery(requestObject).then(function success(response) {
             deferred.resolve(response.data);

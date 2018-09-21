@@ -28,6 +28,7 @@ export default function MetadataConfigDirective($compile, $templateCache, toast,
 
         scope.types = types;
         scope.$watch('metadata', function() {
+
         });
 
 

@@ -81,9 +81,13 @@
         </md-dialog-content>
 
         <md-dialog-actions layout="row">
-            <md-button ng-if="!vm.isReadOnly" ng-disabled="$root.loading || theForm.$invalid || !theForm.$dirty" type="submit"
+            <md-button ng-if="vm.isAdd == true" ng-disabled="$root.loading || theForm.$invalid || !theForm.$dirty" type="submit"
                        class="md-raised md-primary">
-                {{ (vm.isAdd ? 'action.add' : 'action.save') | translate }}
+                {{ 'action.add'| translate }}
+            </md-button>
+            <md-button ng-if="vm.isAdd == false"  type="submit"
+                       class="md-raised md-primary">
+                {{'action.save' | translate }}
             </md-button>
             <md-button ng-disabled="$root.loading" ng-click="vm.close()" style="margin-right:20px;">{{ 'action.cancel' | translate }}
             </md-button>

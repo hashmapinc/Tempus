@@ -15,7 +15,6 @@
  * limitations under the License.
  */
 import './metadata.scss';
-
 import uiRouter from 'angular-ui-router';
 import tempusApiMetadata from '../api/metadata.service';
 import MetadataController from './metadata.controller';
@@ -25,9 +24,8 @@ import MetadataSourceDirective from './metadata-source.directive';
 import MetadataSinkDirective from './metadata-sink.directive';
 import MetadataConfigDirective from './metadataConfig.directive';
 
-import MetadataQueryDirective from './metadata-query.directive'; 
+import MetadataQueryDirective from './metadata-query.directive';
 import QueryDialogController from './query-dialog.controller';
-
 
 
 export default angular.module('tempus.metadata', [
