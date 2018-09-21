@@ -34,13 +34,13 @@
             <label for="tab-one"><span translate class="md-headline-info">dataModels.datamodelObject</span></label>
             <div class="tab-content">
                 <md-list-item style="margin-bottom: -30px;">
-                    <p class="dmoFont"><span translate>dataModels.name</span>: {{vm.nodeValue.datamodelObject.name}} </p>
+                    <p class="dmoFont"><span translate>dataModels.name</span>: <span class="datamodel-value">{{vm.nodeValue.datamodelObject.name}}</span></p>
                 </md-list-item>
                 <md-list-item style="margin-bottom: -30px;">
-                    <p class="dmoFont"><span translate>dataModels.description</span>: {{vm.nodeValue.datamodelObject.desc}} </p>
+                    <p class="dmoFont"><span translate>dataModels.description</span>: <span class="datamodel-value">{{vm.nodeValue.datamodelObject.desc}}</span> </p>
                 </md-list-item>
                 <md-list-item>
-                    <p class="dmoFont"><span translate>dataModels.type</span>: {{vm.nodeValue.datamodelObject.type}} </p>
+                    <p class="dmoFont"><span translate>dataModels.type</span>: <span class="datamodel-value">{{vm.nodeValue.datamodelObject.type}}</span> </p>
                 </md-list-item>
 
             </div>
@@ -50,7 +50,7 @@
             <label for="tab-two"><span translate class="md-headline-info">dataModels.objectAttribute</span></label>
             <div class="tab-content">
                 <md-list-item ng-repeat="attribute in vm.nodeValue.datamodelObject.attributes">
-                    <p class="dmoFont"> {{attribute}} </p>
+                    <p class="dmoFont"><span class="datamodel-value"> {{attribute}} </span></p>
                 </md-list-item>
                 <md-list-item ng-show="vm.nodeValue.datamodelObject.attributes.length == 0">
                     <p class="dmoFont"> <span translate>dataModels.noAttribute</span> </p>
@@ -63,7 +63,7 @@
             <label for="tab-three"><span translate class="md-headline-info">dataModels.relationships</span></label>
             <div class="tab-content">
                 <md-list-item>
-                <p class="dmoFont"><span translate>dataModels.parent</span>: {{vm.nodeValue.datamodelObject.parent_id ? vm.nodeValue.datamodelObject.parent : "None"}}</p>
+                    <p class="dmoFont"><span translate>dataModels.parent</span>: <span class="datamodel-value">{{vm.nodeValue.datamodelObject.parent_id ? vm.nodeValue.datamodelObject.parent : "None"}}</span></p>
                 </md-list-item>
             </div>
         </div>
