@@ -80,7 +80,6 @@ div.tb-widget.tb-not-highlighted {
 }
 
 tb-dashboard {
-  position: relative;
   top: 0;
   left: 0;
   right: 0;
@@ -112,4 +111,7 @@ md-content.tb-dashboard-content {
   font-size: 16px;
   word-wrap: break-word;
   padding: 5px;
+}
+span.dashset {
+    display:none !important;
 }

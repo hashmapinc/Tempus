@@ -86,10 +86,10 @@ public class TenantServiceImpl extends AbstractEntityService implements TenantSe
     private PluginService pluginService;
 
     @Autowired
-    private DataModelService dataModelService;
+    private CustomerGroupService customerGroupService;
 
     @Autowired
-    private CustomerGroupService customerGroupService;
+    private DataModelService dataModelService;
 
     @Override
     public Tenant findTenantById(TenantId tenantId) {
@@ -131,8 +131,8 @@ public class TenantServiceImpl extends AbstractEntityService implements TenantSe
         ruleService.deleteRulesByTenantId(tenantId);
         pluginService.deletePluginsByTenantId(tenantId);
         tenantDao.removeById(tenantId.getId());
-        dataModelService.deleteDataModelsByTenantId(tenantId);
         customerGroupService.deleteCustomerGroupsByTenantIdAndCustomerId(tenantId, new CustomerId(ModelConstants.NULL_UUID));
+        dataModelService.deleteDataModelsByTenantId(tenantId);
         deleteEntityRelations(tenantId);
     }
 

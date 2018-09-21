@@ -717,14 +717,6 @@ public abstract class AbstractControllerTest {
         return jsonPath("$.message", matcher);
     }
 
-    protected CustomerId getCustomerIdOfCustomerUser() throws Exception {
-        loginCustomerUser();
-        User tenantUser = doGet("/api/auth/user", User.class);
-        CustomerId customerId = tenantUser.getCustomerId();
-        logout();
-        return customerId;
-    }
-
     protected void assignUserToGroup(UserId customerUserId, CustomerGroup savedCustomerGroup) throws Exception {
         loginTenantAdmin();
         doPost("/api/customer/group/"+savedCustomerGroup.getId().getId().toString()+"/users", Collections.singletonList(customerUserId.getId().toString()))
@@ -798,9 +790,9 @@ public abstract class AbstractControllerTest {
                 .andExpect(status().isOk());
     }
 
-    protected Asset createAsset(DataModelObjectId dataModelObjectId, CustomerId customerId) throws Exception {
+    protected Asset createAsset(DataModelObjectId dataModelObjectId, CustomerId customerId, String assetName) throws Exception {
         Asset asset = new Asset();
-        asset.setName("My asset");
+        asset.setName(assetName);
         asset.setType("default");
         asset.setDataModelObjectId(dataModelObjectId);
         asset.setTenantId(tenantId);

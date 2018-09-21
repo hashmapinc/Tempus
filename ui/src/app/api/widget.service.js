@@ -23,6 +23,7 @@ import tempusTimeseriesTableWidget from '../widget/lib/timeseries-table-widget';
 import tempusAlarmsTableWidget from '../widget/lib/alarms-table-widget';
 import tempusEntitiesTableWidget from '../widget/lib/entities-table-widget';
 import tempusExtensionsTableWidget from '../widget/lib/extensions-table-widget';
+import tempusEntityListWidget from '../widget/lib/entity-list-widget';
 
 import tempusRpcWidgets from '../widget/lib/rpc';
 
@@ -48,7 +49,7 @@ import tempusTypes from '../common/types.constant';
 import tempusUtils from '../common/utils.service';
 
 export default angular.module('tempus.api.widget', ['oc.lazyLoad', tempusLedLight, tempusTimeseriesTableWidget,
-    tempusAlarmsTableWidget, tempusEntitiesTableWidget, tempusExtensionsTableWidget, tempusRpcWidgets, tempusTypes, tempusUtils])
+    tempusAlarmsTableWidget, tempusEntitiesTableWidget, tempusExtensionsTableWidget, tempusRpcWidgets, tempusTypes, tempusUtils, tempusEntityListWidget])
     .factory('widgetService', WidgetService)
     .name;
 
@@ -656,7 +657,9 @@ function WidgetService($rootScope, $http, $q, $filter, $ocLazyLoad, $window, $tr
                 result.actionSources[actionSourceId] = angular.copy(types.widgetActionSources[actionSourceId]);
                 result.actionSources[actionSourceId].name = $translate.instant(result.actionSources[actionSourceId].name) + '';
             }
-
+            if(widgetInfo.alias == "device_list"){
+                result.typeParameters.useCustomDatasources = true;
+            }
             return result;
         } catch (e) {
             utils.processWidgetException(e);

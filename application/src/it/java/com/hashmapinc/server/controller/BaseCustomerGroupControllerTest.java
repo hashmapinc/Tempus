@@ -21,7 +21,6 @@ import com.hashmapinc.server.common.data.Customer;
 import com.hashmapinc.server.common.data.CustomerGroup;
 import com.hashmapinc.server.common.data.UserPermission;
 import com.hashmapinc.server.common.data.asset.Asset;
-import com.hashmapinc.server.common.data.datamodel.AttributeDefinition;
 import com.hashmapinc.server.common.data.datamodel.DataModel;
 import com.hashmapinc.server.common.data.datamodel.DataModelObject;
 import com.hashmapinc.server.common.data.id.*;
@@ -32,12 +31,11 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.springframework.test.web.servlet.ResultActions;
+
 import static org.hamcrest.collection.IsIterableContainingInAnyOrder.containsInAnyOrder;
 
 import java.util.*;
 
-import static com.hashmapinc.server.dao.model.ModelConstants.NULL_UUID;
 import static org.hamcrest.Matchers.containsString;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -249,7 +247,7 @@ public abstract class BaseCustomerGroupControllerTest extends AbstractController
 
         DataModel dataModel = createDataModel();
         DataModelObject dataModelObject = createDataModelObject(dataModel);
-        Asset asset = createAsset(dataModelObject.getId(), null);
+        Asset asset = createAsset(dataModelObject.getId(), null, "My asset");
 
         try {
             String policy = String.format("CUSTOMER_USER:ASSET?%s=%s&%s=%s:*",
