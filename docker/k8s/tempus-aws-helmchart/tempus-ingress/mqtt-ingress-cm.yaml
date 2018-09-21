@@ -4,4 +4,4 @@ metadata:
   name: tcp-services
   namespace: ingress-nginx
 data:
-  1883: "default/tempus-svc:1883"
+  1883: "default/tempus-svc:1883:PROXY"
