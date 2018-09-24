@@ -102,7 +102,7 @@ kubeless:
   minio_secret_key: "${MINIO_SECRET_KEY:zuf+tfteSlswRu7BJ86wekitnifILbZam1KYY3TG}"
   minio_port: "${MINIO_PORT:9000}"
   cluster_mode_enabled: "${CLUSTER_MODE_ENABLED:false}"
-  kube_config_path: "{KUBE_CONFIG_PATH:/home/himanshu/.kube/config}"
+  kube_config_path: "${KUBE_CONFIG_PATH:/home/himanshu/.kube/config}"
 
 
 # JWT Token parameters

@@ -26,19 +26,23 @@ import com.hashmapinc.kubeless.models.triggers.V1beta1CronJobTrigger;
 import com.hashmapinc.kubeless.models.triggers.V1beta1CronJobTriggerSpec;
 import com.hashmapinc.kubeless.models.triggers.V1beta1KafkaTrigger;
 import com.hashmapinc.kubeless.models.triggers.V1beta1KafkaTriggerSpec;
+import com.hashmapinc.server.common.data.Tenant;
 import com.hashmapinc.server.common.data.computation.*;
+import com.hashmapinc.server.common.data.id.TenantId;
 import com.hashmapinc.server.utils.KubelessConnectionCache;
 import com.squareup.okhttp.Call;
 import com.squareup.okhttp.Response;
 import io.kubernetes.client.ApiException;
 import io.kubernetes.client.models.V1LabelSelector;
 import io.kubernetes.client.models.V1ObjectMeta;
+import io.kubernetes.client.models.V1ServiceSpec;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.util.Base64;
+import java.util.HashMap;
 import java.util.Map;
 
 @Slf4j
@@ -65,6 +69,8 @@ public class KubelessFunctionService implements ComputationFunctionService {
 
     private Base64.Decoder decoder = Base64.getDecoder();
 
+    private static volatile KubelessV1beta1KafkaTriggerApi kubelessV1beta1FunctionApi;
+
     @Override
     public boolean deployKubelessFunction(Computations computation) {
         try {
@@ -77,14 +83,14 @@ public class KubelessFunctionService implements ComputationFunctionService {
                 case TXT:
                     String textContent = convertToTxt(md.getFunctionContent());
                     md.setFunctionContent(textContent);
-                    V1beta1AbstractType<V1beta1FunctionSpec> v1beta1Function = createV1beta1Function(md);
+                    V1beta1AbstractType<V1beta1FunctionSpec> v1beta1Function = createV1beta1Function(md, computation.getTenantId());
                     Call call = functionApi.createFunctionCall((V1beta1Function)v1beta1Function);
                     Response response = call.execute();
                     resposeCode = response.code();
                     break;
                 case BASE64_ZIP:
                 case BASE64:
-                    v1beta1Function = createV1beta1Function(md);
+                    v1beta1Function = createV1beta1Function(md, computation.getTenantId());
                     call = functionApi.createFunctionCall((V1beta1Function)v1beta1Function);
                     response = call.execute();
                     resposeCode = response.code();
@@ -99,7 +105,7 @@ public class KubelessFunctionService implements ComputationFunctionService {
             }
         }
         catch (ApiException e){
-            log.info("Kubeless api e.kubeconfigxception for deploy funtion : {}", e);
+            log.info("Kubeless api kubeconfig exception for deploy funtion : {}", e);
         } catch (IOException e) {
             log.info("");
         }
@@ -187,7 +193,7 @@ public class KubelessFunctionService implements ComputationFunctionService {
         V1beta1KafkaTrigger v1beta1KafkaTrigger = new V1beta1KafkaTrigger();
         V1ObjectMeta metaData = new V1ObjectMeta().name(computationJob.getName());
         v1beta1KafkaTrigger.setMetadata(metaData);
-        V1beta1KafkaTriggerSpec spec = createV1beta1KafkaTriggerSpec(trigger);
+        V1beta1KafkaTriggerSpec spec = createV1beta1KafkaTriggerSpec(trigger, computationJob.getTenantId());
         v1beta1KafkaTrigger.setMetadata(metaData);
         v1beta1KafkaTrigger.setSpec(spec);
 
@@ -207,9 +213,9 @@ public class KubelessFunctionService implements ComputationFunctionService {
         return v1beta1CronJobTrigger;
     }
 
-    private V1beta1KafkaTriggerSpec createV1beta1KafkaTriggerSpec(KafkaKubelessTrigger trigger) {
+    private V1beta1KafkaTriggerSpec createV1beta1KafkaTriggerSpec(KafkaKubelessTrigger trigger, TenantId tenantId) {
         V1LabelSelector labelSelector = new V1LabelSelector();
-        labelSelector.putMatchLabelsItem("created-by", "kubeless");
+        labelSelector.putMatchLabelsItem("created-by", tenantId.toString());
 
         Map<String, String> functionSelector = trigger.getFunctionSelector();
         functionSelector.entrySet().stream()
@@ -273,12 +279,14 @@ public class KubelessFunctionService implements ComputationFunctionService {
         return false;
     }
 
-    private V1beta1Function createV1beta1Function(ComputationMetadata computationMetadata) {
+    private V1beta1Function createV1beta1Function(ComputationMetadata computationMetadata, TenantId tenantId) {
         try {
             V1ObjectMeta v1ObjectMeta = new V1ObjectMeta();
             v1ObjectMeta.setName(((KubelessComputationMetadata)computationMetadata).getFunction());
             v1ObjectMeta.setNamespace(DEFAULT_NAMESPACE);
-            V1beta1FunctionSpec v1beta1FunctionSpec = createV1beta1FunctionSpec(computationMetadata);
+            Map<String, String> labelMap = getSelectorMap(v1ObjectMeta.getName(), tenantId);
+            v1ObjectMeta.setLabels(labelMap);
+            V1beta1FunctionSpec v1beta1FunctionSpec = createV1beta1FunctionSpec(computationMetadata, tenantId);
             V1beta1Function v1beta1Function = new V1beta1Function();
             v1beta1Function.setMetadata(v1ObjectMeta);
             v1beta1Function.setSpec(v1beta1FunctionSpec);
@@ -290,7 +298,14 @@ public class KubelessFunctionService implements ComputationFunctionService {
         return null;
     }
 
-    private V1beta1FunctionSpec createV1beta1FunctionSpec(ComputationMetadata computationMetadata) {
+    private Map<String, String> getSelectorMap(String name, TenantId tenantId) {
+        Map<String, String> map = new HashMap<>();
+        map.put("function", name);
+        map.put("created-by", tenantId.toString());
+        return map;
+    }
+
+    private V1beta1FunctionSpec createV1beta1FunctionSpec(ComputationMetadata computationMetadata, TenantId tenantId) {
         KubelessComputationMetadata md = (KubelessComputationMetadata)computationMetadata;
         V1beta1FunctionSpec v1beta1FunctionSpec = new V1beta1FunctionSpec();
         byte[] funcBytes = decoder.decode(md.getFunctionContent());
@@ -301,6 +316,9 @@ public class KubelessFunctionService implements ComputationFunctionService {
         v1beta1FunctionSpec.setHandler(md.getHandler());
         v1beta1FunctionSpec.setRuntime(md.getRuntime());
         v1beta1FunctionSpec.functionContentType("text");
+        V1ServiceSpec serviceSpec = new V1ServiceSpec();
+        serviceSpec.selector(getSelectorMap(md.getFunction(), tenantId));
+        v1beta1FunctionSpec.setServiceSpec(serviceSpec);
         v1beta1FunctionSpec.setTimeout(md.getTimeout());
         return v1beta1FunctionSpec;
     }

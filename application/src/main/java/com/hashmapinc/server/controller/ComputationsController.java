@@ -155,8 +155,10 @@ public class ComputationsController extends BaseController {
                 actorService.onComputationJobStateChange(computationJob.getTenantId(), computationJob.getComputationId(), computationJob.getId(), ComponentLifecycleEvent.DELETED);
             }
 
-            if (computation.getType() == ComputationType.SPARK)
-                Files.deleteIfExists(Paths.get(((SparkComputationMetadata)computation.getComputationMetadata()).getJarPath()));
+            if (computation.getType() == ComputationType.SPARK) {
+                Files.deleteIfExists(Paths.get(((SparkComputationMetadata) computation.getComputationMetadata()).getJarPath()));
+                computationsService.deleteById(computation.getId());
+            }
             else if (computation.getType() == ComputationType.KUBELESS) {
                 actorService.onComputationStateChange(computation.getTenantId(), computation.getId(), ComponentLifecycleEvent.DELETED);
                 s3BucketService.deleteKubelessFunction(computation);
