@@ -118,8 +118,23 @@ export default angular.module('tempus.locale', [])
 
                 },
                 "metadata" : {
-
-                    "metadata" : "MetaData"
+                    "metadata" : "Metadata",
+                    "name" : "Name",
+                    "name-required":"This feild is required",
+                    "add-metadata" : "Add New Metadata",
+                    "add" : "Add Metadata",
+                    "source-type" : "Source Type",
+                    "source-type-required" : "Metadata Source Type Required",
+                    "sink-type" : "Sink Type",
+                    "dbUrl" : "Database URL",
+                    "dbUsername" : "Username",
+                    "dbPassword" : "Password",
+                    "dbUrl-required" : "Database URL Required",
+                    "dbUsername-required" : "Database Username Required",
+                    "dbPassword-required" : "Database Password Required",
+                    "restUrl" : "URL",
+                    "restUrl-required" : "Rest Endpoint URL Required",
+                    "sink-type-required" : "Metadata Sink Type Required"
                 },
                 "alarm": {
                     "alarm": "Alarm",
@@ -1676,6 +1691,28 @@ export default angular.module('tempus.locale', [])
                         "marker-click": "On marker click",
                         "tooltip-tag-action": "Tooltip tag action"
                     }
+                },
+                "metadataConfig":{
+                    "add-metadata-text": "Add new Metadata",
+                    "no-metadata-text": "No Metadata found",
+                    "metadata-details": "Metadata Details",
+                    "delete-metadata-title": "Are you sure you want to delete the metadata '{{metadataName}}'?",
+                    "delete-metadata-text":"Be careful, after the confirmation the metadata and all related data will become unrecoverable.",
+                    "delete-metadata-action-title":"Delete { count, select, 1 {1 metadata} other {# metadatas} }",
+                    "delete":"Delete Metadata",
+                    "details":"Details",
+                    "name":"Name",
+                    "name-required":"Name is required.",
+                    "query":"Query",
+                    "trigger-type":"Trigger Type",
+                    "trigger-schedule":"Trigger Schedule",
+                    "test-connection":"Test Connection",
+                    "connection-sucessfull":"Connection sucessfull",
+                    "connection-failed":"Connection failed",
+                    "queries-selected":"queries selected",
+                    "query-name":"Query Name",
+                    "no-query-found":"No query found",
+                    "delete-query":"Delete query"
                 }
             }
         }
