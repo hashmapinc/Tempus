@@ -25,7 +25,8 @@ function GatewayConfigurationService($q, $http) {
     var service = {
       saveGatewayConfiguration: saveGatewayConfiguration,
       getGatewayConfiguration:getGatewayConfiguration,
-      deployTempusGateway:deployTempusGateway
+      deployTempusGateway:deployTempusGateway,
+      getTempusGatewayPodsStatus:getTempusGatewayPodsStatus
     }
 
     return service;
@@ -40,6 +41,20 @@ function GatewayConfigurationService($q, $http) {
             deferred.reject();
         });
         return deferred.promise;
+    }
+
+
+    function getTempusGatewayPodsStatus() {
+
+        var deferred = $q.defer();
+        var url = '/api/configuration/tempusGateway/status';
+        $http.get(url).then(function success(response) {
+            deferred.resolve(response.data);
+        }, function fail() {
+            deferred.reject();
+        });
+        return deferred.promise;
+
     }
 
     function getGatewayConfiguration() {

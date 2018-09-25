@@ -61,5 +61,43 @@
 				</fieldset>
 			</form>
 	    </md-card-content>
-    </md-card>
+	</md-card>
+
+
+
 </div>
+<md-toolbar class="md-table-toolbar tb-gateway-toolbar md-default" ng-show="vm.podStatus !== ''">
+	<div class="md-toolbar-tools">
+		<span flex></span>
+
+		<md-button  class="md-icon-button" ng-click="vm.refresh()">
+			<md-icon>refresh</md-icon>
+			<md-tooltip md-direction="top">
+				{{ 'action.refresh' | translate }}
+			</md-tooltip>
+		</md-button>
+	</div>
+</md-toolbar>
+
+<md-table-container class ="tb-gateway-container" ng-show="vm.podStatus !== ''">
+	<table class="tb-gateway-table" md-table>
+		<thead md-head>
+		<tr md-row>
+			<th md-column><span translate>gateway.total-replica</span></th>
+			<th md-column><span translate>gateway.ready</span></th>
+			<th md-column><span translate>gateway.in-progress</span></th>
+			<th md-column><span translate>gateway.crash</span></th>
+		</tr>
+		</thead>
+		<tbody md-body>
+		<tr md-row>
+			<td md-cell>{{vm.podStatus.replica}}</td>
+			<td md-cell>{{vm.podStatus.ready}}</td>
+			<td md-cell>{{vm.podStatus.inProgress}}</td>
+			<td md-cell>{{vm.podStatus.crashed}}</td>
+
+		</tr>
+		</tbody>
+	</table>
+</md-table-container>
+

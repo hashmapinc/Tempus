@@ -15,9 +15,9 @@
  * limitations under the License.
  */
 /* eslint-disable import/no-unresolved, import/default, no-unused-vars */
+import './gateway.scss';
 
 /*@ngInject*/
-
 export function GatewayController(deviceService, $scope, gatewayConfigurationService, $translate, toast) {
 
     var vm = this;
@@ -27,10 +27,14 @@ export function GatewayController(deviceService, $scope, gatewayConfigurationSer
     vm.replica = 1;
     vm.loadGatewayConfiguration = loadGatewayConfiguration;
     vm.deployTempusGateway = deployTempusGateway;
+    vm.getTempusGatewayPodsStatus = getTempusGatewayPodsStatus;
+    vm.refresh = refresh;
     vm.scopeData = '';
     vm.configId ='';
+    vm.podStatus ='';
     vm.getGatewayDevices();
     vm.loadGatewayConfiguration();
+    vm.getTempusGatewayPodsStatus();
 
     function getGatewayDevices() {
 
@@ -48,6 +52,23 @@ export function GatewayController(deviceService, $scope, gatewayConfigurationSer
             });
 
         });
+    }
+
+    function getTempusGatewayPodsStatus(){
+
+        gatewayConfigurationService.getTempusGatewayPodsStatus().then(function success(response){
+            vm.podStatus = response;
+            if(vm.podStatus.replica == 0) {
+
+                vm.getTempusGatewayPodsStatus();
+            }
+        });
+
+    }
+
+    function refresh() {
+
+        vm.getTempusGatewayPodsStatus();
     }
 
     function loadGatewayConfiguration() {
@@ -93,6 +114,7 @@ export function GatewayController(deviceService, $scope, gatewayConfigurationSer
             if(res.data == false) {
                 toast.showError($translate.instant('gateway.config-deploy-fail-message'));
             } else {
+                vm.getTempusGatewayPodsStatus();
                 toast.showSuccess($translate.instant('gateway.config-deploy-message'));
             }
       });
