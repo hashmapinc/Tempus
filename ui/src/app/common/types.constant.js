@@ -617,6 +617,12 @@ export default angular.module('tempus.types', [])
             computationType: {
                 spark: "SPARK"
                 //kubeless: "KUBELESS"
+            },
+            metadataSourceType: {
+                jdbc: "JDBC"
+            },
+            metadataSinkType: {
+                rest: "REST"
             }
         }
     ).name;
