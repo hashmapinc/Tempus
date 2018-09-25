@@ -26,7 +26,6 @@ import com.hashmapinc.kubeless.models.triggers.V1beta1CronJobTrigger;
 import com.hashmapinc.kubeless.models.triggers.V1beta1CronJobTriggerSpec;
 import com.hashmapinc.kubeless.models.triggers.V1beta1KafkaTrigger;
 import com.hashmapinc.kubeless.models.triggers.V1beta1KafkaTriggerSpec;
-import com.hashmapinc.server.common.data.Tenant;
 import com.hashmapinc.server.common.data.computation.*;
 import com.hashmapinc.server.common.data.id.TenantId;
 import com.hashmapinc.server.utils.KubelessConnectionCache;
@@ -68,8 +67,6 @@ public class KubelessFunctionService implements ComputationFunctionService {
     private String kublessConfigPath;
 
     private Base64.Decoder decoder = Base64.getDecoder();
-
-    private static volatile KubelessV1beta1KafkaTriggerApi kubelessV1beta1FunctionApi;
 
     @Override
     public boolean deployKubelessFunction(Computations computation) {

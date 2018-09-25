@@ -55,21 +55,14 @@ public class MinioService implements S3BucketService {
     private static volatile  MinioClient minioClient;
 
     private static final String FUNCTION_URL_FORMAT = "%s/%s.%s";
-    private static final String MINIO_URL_FORMAT = "%s://%s:%s";
-    private static final String HTTPS = "https";
+    private static final String AMAZON_S3_URL = "https://s3.amazonaws.com";
     private Base64.Encoder encoder = Base64.getEncoder();
-
-    @Value("${kubeless.minio_host}")
-    private String minioHost;
 
     @Value("${kubeless.minio_access_key}")
     private String minioAccesskey;
 
     @Value("${kubeless.minio_secret_key}")
     private String minioSecretKey;
-
-    @Value("${kubeless.minio_port}")
-    private String minioPort;
 
     @Autowired
     private TenantService tenantService;
@@ -85,17 +78,17 @@ public class MinioService implements S3BucketService {
             MinioClient client = getMinioClientInstance();
 
             Tenant tenant = tenantService.findTenantById(tenantId);
-            String tenantName = tenant.getName().replaceAll(" ", "-").toLowerCase();
+            String bucketName = getBucketName(tenant, tenantId.toString());
 
-            boolean isExist = client.bucketExists(tenantName);
-            if(!isExist) {
-                client.makeBucket(tenantName);
+            boolean isPresent = client.bucketExists(bucketName);
+            if(!isPresent) {
+                client.makeBucket(bucketName);
             }
             byte[] functionContent = md.getFunctionContent().getBytes();
             ByteArrayInputStream byteArrayInputStream =  new ByteArrayInputStream(functionContent);
             String functionObjectUrl = createFunctionObjectUrl(computation);
 
-            client.putObject(tenantName, functionObjectUrl, byteArrayInputStream, md.getFunctionContentType());
+            client.putObject(bucketName, functionObjectUrl, byteArrayInputStream, md.getFunctionContentType());
             return true;
         }
         catch(MinioException e) {
@@ -105,15 +98,19 @@ public class MinioService implements S3BucketService {
         return status;
     }
 
+    private String getBucketName(Tenant tenant, String tenantId) {
+        return tenant.getName().replaceAll(" ", "-").toLowerCase().concat(tenantId);
+    }
+
     public List<String> getAllKubelessFunctionsForTenant(TenantId tenantId) throws IOException, NoSuchAlgorithmException, InvalidKeyException, XmlPullParserException {
         try {
             MinioClient client = getMinioClientInstance();
             Tenant tenant = tenantService.findTenantById(tenantId);
-            String tenantName = tenant.getName().replaceAll(" ", "-").toLowerCase();
-            boolean isExist = client.bucketExists(tenantName);
+            String bucketName = getBucketName(tenant, tenantId.toString());
+            boolean isPresent = client.bucketExists(bucketName);
             List<String> functionNames = new ArrayList<>();
-            if(isExist){
-                Iterable<Result<Item>> functionObjects = client.listObjects(tenantName);
+            if(isPresent){
+                Iterable<Result<Item>> functionObjects = client.listObjects(bucketName);
                 for (Result<Item> result : functionObjects) {
                     Item item = result.get();
                     functionNames.add(item.name);
@@ -132,10 +129,10 @@ public class MinioService implements S3BucketService {
             String functionObjectUrl = createFunctionObjectUrl(computation);
             MinioClient client = getMinioClientInstance();
             Tenant tenant = tenantService.findTenantById(tenantId);
-            String tenantName = tenant.getName().replaceAll(" ", "-").toLowerCase();
-            client.statObject(tenantName, functionObjectUrl);
+            String bucketName = getBucketName(tenant, tenantId.toString());
+            client.statObject(bucketName, functionObjectUrl);
 
-            InputStream stream = client.getObject(tenantName, functionObjectUrl);
+            InputStream stream = client.getObject(bucketName, functionObjectUrl);
 
             byte[] buf = new byte[BUFFER_SIZE];
             int bytesRead;
@@ -157,8 +154,8 @@ public class MinioService implements S3BucketService {
             String functionObjectUrl = createFunctionObjectUrl(computation);
             MinioClient client = getMinioClientInstance();
             Tenant tenant = tenantService.findTenantById(computation.getTenantId());
-            String tenantName = tenant.getName().replaceAll(" ", "-").toLowerCase();
-            client.removeObject(tenantName, functionObjectUrl);
+            String bucketName = getBucketName(tenant, computation.getTenantId().toString());
+            client.removeObject(bucketName, functionObjectUrl);
             return true;
         } catch (MinioException e) {
             log.info(MINIO_EXECPTION, e);
@@ -171,7 +168,6 @@ public class MinioService implements S3BucketService {
             MessageDigest digest = MessageDigest.getInstance(SHA_256);
             byte[] hash = digest.digest(md.getFunctionContent().getBytes());
             String encodedChecksum = encoder.encodeToString(hash);
-            //if(md.getChecksum().contentEquals(new String(encodedChecksum))) {
             if(md.getChecksum().contentEquals(encodedChecksum)) {
                 log.info("Check is same.");
                 return true;
@@ -201,15 +197,12 @@ public class MinioService implements S3BucketService {
         if (minioClient == null) {
             synchronized (MinioClient.class) {
                 if (minioClient==null) {
-                    minioClient = new MinioClient(createMinoUrl(), minioAccesskey, minioSecretKey);
+                    minioClient = new MinioClient(AMAZON_S3_URL, minioAccesskey, minioSecretKey);
                     log.info("Minio connection successfull!");
                 }
             }
         }
         return minioClient;
     }
-
-    private String createMinoUrl() {
-        return String.format(MINIO_URL_FORMAT, HTTPS, minioHost, minioPort);
-    }
+    
 }

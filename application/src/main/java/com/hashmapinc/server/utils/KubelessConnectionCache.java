@@ -54,10 +54,7 @@ public class KubelessConnectionCache {
                     ApiClient client = Config.fromCluster();
                     Configuration.setDefaultApiClient(client);
                 } else {
-                    //ApiClient client = Config.fromConfig("/home/himanshu/.kube/config"); // kublessConfigPath
-                    ApiClient client = Config.fromToken("https://961027CB7DFC6FE7E8A4938AFC302DA5.sk1.us-east-1.eks.amazonaws.com",
-                            "eyJhbGciOiJSUzI1NiIsImtpZCI6IiJ9.eyJpc3MiOiJrdWJlcm5ldGVzL3NlcnZpY2VhY2NvdW50Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9uYW1lc3BhY2UiOiJrdWJlLXN5c3RlbSIsImt1YmVybmV0ZXMuaW8vc2VydmljZWFjY291bnQvc2VjcmV0Lm5hbWUiOiJla3MtYWRtaW4tdG9rZW4tczQ5NGYiLCJrdWJlcm5ldGVzLmlvL3NlcnZpY2VhY2NvdW50L3NlcnZpY2UtYWNjb3VudC5uYW1lIjoiZWtzLWFkbWluIiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9zZXJ2aWNlLWFjY291bnQudWlkIjoiNmM0ODMxMDUtYmFiNS0xMWU4LWI5YmUtMGU3NDlhNzRjYTBjIiwic3ViIjoic3lzdGVtOnNlcnZpY2VhY2NvdW50Omt1YmUtc3lzdGVtOmVrcy1hZG1pbiJ9.JqPW7c1aSosdLHkbO2pmqmQzQ4KMj84AXmKoBTZxH3IpS7zeU-J6CJDkwA-kwpFX9pNw_uyraVaSfL_F8gWVJx3I8WB9q6d3aSgqe223Ai2H0v32FhCP5_rIGJ6uY0SMo9kEODuUhLPVymRgDiuroP0bxWfgNJvyQ2l7y7fZrq06DMjoAoFtt20ihN26bvMRf31BgWh-ptJcazirdVznw_h_qNrKQyoBAr48azjII6mVKOHU8bSllHHvBaGH0ZVMCd3fMbAi0_ihbVCX51Au1izdjKcFErlLk2Ol_pitg5jJ4FjQhquoZfrrBmXYW8Wzb20LVuxU9K-c5HbXgpKM3Q",
-                    false);
+                    ApiClient client = Config.fromConfig(kublessConfigPath);
                     Configuration.setDefaultApiClient(client);
                 }
                 inst = c.getConstructor(parameterTypes).newInstance(initargs);
