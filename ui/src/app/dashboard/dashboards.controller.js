@@ -206,8 +206,12 @@ export function DashboardsController(userService, dashboardService, customerServ
                 details: function() { return $translate.instant('dashboard.manage-assigned-customers') },
                 icon: "assignment_ind",
                 isEnabled: function(dashboard) {
-                    return dashboard;
-                }
+                                     if(dashboard.type == 'DEFAULT') {
+                                         return dashboard;
+                                       }else {
+                                         return false;
+                                        }
+                                    }
             });
 
             /*dashboardActionsList.push({
