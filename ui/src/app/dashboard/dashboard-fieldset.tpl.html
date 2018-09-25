@@ -78,7 +78,7 @@
 			<textarea ng-model="dashboard.configuration.description" rows="2"></textarea>
 		</md-input-container>
 		
-		<div flex-gt-sm="50" class="dash-label md-block">
+		<div flex-gt-sm="50" class="dash-label md-block" ng-if="user.authority != 'CUSTOMER_USER'">
 			<md-checkbox ng-model="dashboard.landingDashboard" aria-label="{{ 'dashboard.dashboard-landing-page' | translate }}" ng-disabled="theForm.editFlag">
 				{{ 'dashboard.dashboard-landing-page' | translate }}
 			</md-checkbox>

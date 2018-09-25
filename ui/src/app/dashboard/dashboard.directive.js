@@ -21,7 +21,7 @@ import dashboardFieldsetTemplate from './dashboard-fieldset.tpl.html';
 /* eslint-enable import/no-unresolved, import/default */
 
 /*@ngInject*/
-export default function DashboardDirective($compile, $templateCache, $translate, types, toast, dashboardService, $log, datamodelService) {
+export default function DashboardDirective($compile, $templateCache, $translate, types, toast, dashboardService, $log, datamodelService, userService) {
     var linker = function (scope, element) {
         var template = $templateCache.get(dashboardFieldsetTemplate);
         element.html(template);
@@ -33,6 +33,7 @@ export default function DashboardDirective($compile, $templateCache, $translate,
         scope.dataModelView = null;
         scope.types = types;
         scope.listOfDataModelAssets = [];
+        scope.user = userService.getCurrentUser();
         scope.$watch('dashboard', function(newVal) {
             if(newVal !=null && newVal.hasOwnProperty("title")){
                 scope.theForm.editFlag = true;
