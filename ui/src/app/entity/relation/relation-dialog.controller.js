@@ -24,13 +24,14 @@ import './relation-dialog.scss';
 const js_beautify = beautify.js;
 
 /*@ngInject*/
-export default function RelationDialogController($scope, $mdDialog, types, entityRelationService, isAdd, direction, relation, showingCallback) {
+export default function RelationDialogController($scope, $mdDialog, types, entityRelationService, isAdd, direction, relation, showingCallback, device) {
 
     var vm = this;
 
     vm.types = types;
     vm.isAdd = isAdd;
     vm.direction = direction;
+    vm.device = device;
 
     showingCallback.onShowing = function(scope, element) {
         updateEditorSize(element);

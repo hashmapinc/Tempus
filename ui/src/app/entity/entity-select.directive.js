@@ -46,6 +46,7 @@ export default function EntitySelect($compile, $templateCache) {
                     ngModelCtrl.$setViewValue(null);
                 }
             }
+
         }
 
         ngModelCtrl.$render = function () {
@@ -107,7 +108,9 @@ export default function EntitySelect($compile, $templateCache) {
             theForm: '=?',
             tbRequired: '=?',
             disabled:'=ngDisabled',
-            useAliasEntityTypes: "=?"
+            useAliasEntityTypes: "=?",
+            device:'=',
+            relation:'='
         }
     };
 }

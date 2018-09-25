@@ -33,7 +33,8 @@ export default function RelationTable() {
         scope: true,
         bindToController: {
             entityId: '=',
-            entityType: '@'
+            entityType: '@',
+            device:'='
         },
         controller: RelationTableController,
         controllerAs: 'vm',
@@ -72,7 +73,6 @@ function RelationTableController($scope, $q, $mdDialog, $document, $translate, $
     vm.deleteRelations = deleteRelations;
     vm.reloadRelations = reloadRelations;
     vm.updateRelations = updateRelations;
-
     $scope.$watch("vm.entityId", function(newVal, prevVal) {
         if (newVal && !angular.equals(newVal, prevVal)) {
             reloadRelations();
@@ -151,7 +151,8 @@ function RelationTableController($scope, $q, $mdDialog, $document, $translate, $
             locals: { isAdd: isAdd,
                       direction: vm.direction,
                       relation: relation,
-                      showingCallback: onShowingCallback},
+                      showingCallback: onShowingCallback,
+                      device:vm.device},
             targetEvent: $event,
             fullscreen: true,
             skipHide: true,
