@@ -17,9 +17,12 @@
 package com.hashmapinc.server.service.kubernetes;
 
 import com.hashmapinc.server.common.data.kubernetes.ReplicaSetConfig;
+import com.hashmapinc.server.common.data.kubernetes.ReplicaSetStatus;
 
 public interface KubernetesReplicaSetService {
 
     boolean deployReplicaSet(ReplicaSetConfig replicaSetConfig);
+
+    ReplicaSetStatus getReplicaSetStatus(String labelSelector);
 
 }

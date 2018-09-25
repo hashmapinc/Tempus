@@ -17,8 +17,12 @@
 package com.hashmapinc.server.service.kubernetes.gateway;
 
 import com.hashmapinc.server.common.data.TempusGatewayConfiguration;
+import com.hashmapinc.server.common.data.id.TenantId;
+import com.hashmapinc.server.common.data.kubernetes.ReplicaSetStatus;
 
 public interface TempusGatewayKubernetesService {
 
     boolean deployTempusGateway(TempusGatewayConfiguration gatewayConfiguration);
+
+    ReplicaSetStatus getTempusGatewayReplicaSetStatus(TenantId tenantId);
 }

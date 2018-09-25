@@ -16,11 +16,10 @@
  */
 package com.hashmapinc.server.controller;
 
-import com.hashmapinc.server.common.data.EntityType;
 import com.hashmapinc.server.common.data.TempusGatewayConfiguration;
-import com.hashmapinc.server.common.data.audit.ActionType;
 import com.hashmapinc.server.common.data.id.TempusGatewayConfigurationId;
 import com.hashmapinc.server.common.data.id.TenantId;
+import com.hashmapinc.server.common.data.kubernetes.ReplicaSetStatus;
 import com.hashmapinc.server.exception.TempusException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -94,6 +93,26 @@ public class TempusGatewayConfigurationController extends BaseController {
         } catch (Exception e) {
             log.debug("Exception [{}]", e);
             return false;
+        }
+    }
+
+    @PreAuthorize("hasAuthority('TENANT_ADMIN')")
+    @GetMapping(value = "/tempusGateway/status")
+    @ResponseBody
+    public ReplicaSetStatus getTempusGatewayPodsStatus() throws TempusException {
+        try {
+            TenantId tenantId = getCurrentUser().getTenantId();
+            final Optional<TempusGatewayConfiguration> tempusGatewayConfiguration =
+                    tempusGatewayConfigurationService.findTempusGatewayConfigurationByTenantId(tenantId);
+
+            if(!tempusGatewayConfiguration.isPresent()){
+                return null;
+            }
+            return tempusGatewayKubernetesService.getTempusGatewayReplicaSetStatus(tenantId);
+
+        } catch (Exception e) {
+            log.debug("Exception [{}]", e);
+            return null;
         }
     }
 }

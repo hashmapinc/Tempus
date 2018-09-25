@@ -18,7 +18,9 @@ package com.hashmapinc.server.service.kubernetes.gateway;
 
 import com.hashmapinc.server.common.data.TempusGatewayConfiguration;
 import com.hashmapinc.server.common.data.UUIDConverter;
+import com.hashmapinc.server.common.data.id.TenantId;
 import com.hashmapinc.server.common.data.kubernetes.ReplicaSetConfig;
+import com.hashmapinc.server.common.data.kubernetes.ReplicaSetStatus;
 import com.hashmapinc.server.config.TempusGatewayProperties;
 import com.hashmapinc.server.service.kubernetes.KubernetesReplicaSetService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,6 +48,13 @@ public class TempusGatewayKubernetesServiceImpl implements TempusGatewayKubernet
     public boolean deployTempusGateway(TempusGatewayConfiguration gatewayConfiguration) {
         ReplicaSetConfig replicaSetConfig = createReplicaSetConfig(gatewayConfiguration);
         return replicaSetService.deployReplicaSet(replicaSetConfig);
+    }
+
+    @Override
+    public ReplicaSetStatus getTempusGatewayReplicaSetStatus(TenantId tenantId) {
+        String strTenantId = UUIDConverter.fromTimeUUID(tenantId.getId());
+        String labelSelectorStr = TENANT_ID + "=" + strTenantId;
+        return replicaSetService.getReplicaSetStatus(labelSelectorStr);
     }
 
     private ReplicaSetConfig createReplicaSetConfig(TempusGatewayConfiguration gatewayConfiguration) {

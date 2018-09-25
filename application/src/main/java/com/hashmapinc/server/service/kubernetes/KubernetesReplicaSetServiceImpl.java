@@ -17,6 +17,7 @@
 package com.hashmapinc.server.service.kubernetes;
 
 import com.hashmapinc.server.common.data.kubernetes.ReplicaSetConfig;
+import com.hashmapinc.server.common.data.kubernetes.ReplicaSetStatus;
 import com.hashmapinc.server.utils.KubernetesConnectionClient;
 import io.kubernetes.client.ApiException;
 import io.kubernetes.client.models.*;
@@ -46,6 +47,36 @@ public class KubernetesReplicaSetServiceImpl implements   KubernetesReplicaSetSe
             log.error("Error while deploying replica-set : [{}]", e.getMessage());
         }
         return false;
+    }
+
+    @Override
+    public ReplicaSetStatus getReplicaSetStatus(String labelSelector) {
+        ReplicaSetStatus replicaSetStatus = null;
+        try {
+            V1beta1ReplicaSetList v1beta1ReplicaSetList = connectionClient.getExtensionsV1beta1Api().listNamespacedReplicaSet(DEFAULT_NAMESPACE , null , null , null , null , labelSelector , null , null , null , null);
+            for (V1beta1ReplicaSet replicaSet: v1beta1ReplicaSetList.getItems() ) {
+                replicaSetStatus = createReplicaSetStatus(replicaSet.getStatus(), replicaSet.getStatus().getReplicas());
+            }
+        } catch (ApiException e) {
+            log.error("Error while listing replica-set : [{}]", e.getMessage());
+        }
+        log.error("ReplicaSetStatus [{}]", replicaSetStatus);
+        return replicaSetStatus;
+    }
+
+    private ReplicaSetStatus createReplicaSetStatus(V1beta1ReplicaSetStatus status, int replicaCount) {
+        ReplicaSetStatus replicaSetStatus = new ReplicaSetStatus();
+        replicaSetStatus.setReplica(replicaCount);
+
+        if (status.getReadyReplicas() != null) {
+            replicaSetStatus.setReady(status.getReadyReplicas());
+        } else {
+            replicaSetStatus.setReady(0);
+        }
+
+        replicaSetStatus.setInProgress(status.getReplicas() - replicaSetStatus.getReady());
+        replicaSetStatus.setCrashed(replicaCount - status.getReplicas());
+        return replicaSetStatus;
     }
 
     private V1beta1ReplicaSet createReplicaSet(ReplicaSetConfig replicaSetConfig) {
