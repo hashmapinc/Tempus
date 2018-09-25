@@ -59,8 +59,8 @@
                 <tb-computation-job-spark  is-edit="isEdit" is-read-only="isReadOnly" config="computationjob.configuration" the-form="theForm"
                                            computation-descriptor="computationDescriptor"></tb-computation-job-spark>
             </div>
-            <div  ng-show='computation.type == types.computationType.kubeless' >
-                <tb-computation-job-kubeless ng-if='computation.type === types.computationType.kubeless' is-edit="isEdit" is-read-only="isReadOnly"
+            <div ng-show='computation.type == types.computationType.kubeless' >
+                <tb-computation-job-kubeless is-edit="isEdit" is-read-only="isReadOnly"
                                              config="computationjob.configuration" the-form="theForm"></tb-computation-job-kubeless>
             </div>
         </md-card>

@@ -16,17 +16,18 @@
     limitations under the License.
 
 -->
-
 <section flex layout="row">
     <div>
-    <md-input-container class="md-block">
-        <label translate>Topic</label>
-        <input required name="topic" ng-model="config.topic">
-        <div ng-messages="theForm.topic.$error">
-            <div translate ng-message="required">topic required</div>
-        </div>
-    </md-input-container>
+        <md-input-container class="md-block">
+            <label translate>Topic</label>
+            <input required name="topic" ng-model="config.topic">
+            <div ng-messages="theForm.topic.$error">
+                <div translate ng-message="required">topic required</div>
+            </div>
+        </md-input-container>
     </div>
+</section>
+<section flex layout="row">
 
     <div ng-if="config.functionSelectorMap && config.functionSelectorMap.length > 0">
         <ol class="list-group">
@@ -47,7 +48,7 @@
                                     <div translate ng-message="required">computationJob.kubeless.field-required</div>
                                 </div>
                             </md-input-container>
-                            <md-input-container flex="60" class="md-block">
+                            <md-input-container flex="40" class="md-block">
                                 <label translate>computationJob.kubeless.functionSelector-value</label>
                                 <input required name="functionSelectorMap_value{{mapIndex}}" ng-model="map.value">
                                 <div ng-messages="theForm['functionSelectorMap_value' + mapIndex].$error">

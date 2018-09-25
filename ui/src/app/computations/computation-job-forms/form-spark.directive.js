@@ -22,11 +22,12 @@ import sparkComputationJobForm from './form-spark.tpl.html';
 /* eslint-enable import/no-unresolved, import/default */
 
 /*@ngInject*/
-export default function ComputationJobSparkDirective($compile, $templateCache, types) {
+export default function ComputationJobSparkDirective($log, $compile, $templateCache, types) {
     var linker = function (scope, element) {
         var template = $templateCache.get(sparkComputationJobForm);
         element.html(template);
 
+        $log.log('spark  config ', scope.config);
         if(scope.config){
             scope.config.type = types.computationType.spark;
         }

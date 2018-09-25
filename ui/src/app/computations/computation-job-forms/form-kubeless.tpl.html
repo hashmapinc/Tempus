@@ -22,7 +22,8 @@
         <section flex layout="row">
             <md-input-container flex="100" class="md-block" md-is-error="theForm.computationJobType.$touched && theForm.computationJobType.$invalid">
                 <label translate>computationJob.kubeless.type</label>
-                <md-select required name="computationJobType" ng-model="config.type">
+                <md-select required name="computationJobType" ng-model="config.type"
+                           ng-disabled="$root.loading || !isEdit || isReadOnly">
                     <md-option ng-repeat="(key,value) in types.triggerTypes" ng-value="value">
                         {{key}}
                     </md-option>

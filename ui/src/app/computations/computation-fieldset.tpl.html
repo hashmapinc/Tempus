@@ -22,13 +22,13 @@
 
 <md-content class="md-padding" layout="column" style="overflow-x: hidden">
     <fieldset ng-disabled="loading || !isEdit ">
-        <md-input-container class="md-block">
-            <label translate>computation.name</label>
-            <input required name="name" ng-model="computation.name">
-            <div ng-messages="theForm.name.$error">
-                <div translate ng-message="required">computation.name-required</div>
-            </div>
-        </md-input-container>
+        <!--<md-input-container class="md-block">-->
+            <!--<label translate>computation.name</label>-->
+            <!--<input required name="name" ng-model="computation.name">-->
+            <!--<div ng-messages="theForm.name.$error">-->
+                <!--<div translate ng-message="required">computation.name-required</div>-->
+            <!--</div>-->
+        <!--</md-input-container>-->
         <md-input-container class="md-block">
             <label translate>computation.description</label>
             <textarea ng-model="computation.additionalInfo.description" rows="2"></textarea>

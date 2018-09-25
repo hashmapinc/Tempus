@@ -29,11 +29,15 @@ export default function ComputationJobKubelessDirective($log, $compile, $templat
         scope.sparkJobTemplate = $templateCache.get(kafkaTriggerForm);
         element.html(template);
         scope.types = types;
+        $log.log('Computation job configuration is ', scope.config)
+
         //TODO: Add type check
         if(!scope.config || !scope.config.functionSelector){
             scope.config = {
                 functionSelectorMap: []
             };
+        }else if(scope.config){
+            //Put functionSelector in functionSelectorMap
         }
 
         scope.addMap = function(mapping) {
@@ -51,7 +55,6 @@ export default function ComputationJobKubelessDirective($log, $compile, $templat
 
         scope.$watch('config', function (newValue, oldValue) {
             $log.log('Values New {} and Old {}', newValue, oldValue);
-            oldValue;
             if(newValue){
                 var selectors = newValue.functionSelectorMap;
                 if(selectors) {
