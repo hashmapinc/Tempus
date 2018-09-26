@@ -28,6 +28,7 @@ export default class WellLogViewer {
           //  var settings = ctx.settings;
             this.init();
      }
+
      init() {
 		//loadLogViewer(this.ctx, "init");
         //alert(test);
