@@ -143,7 +143,9 @@ export function DataModelController($scope, $log, $mdDialog, $document, $statePa
                 id: $stateParams.datamodelId,
                 entityType: "DATA_MODEL"
             },
-            name: vm.datamodelTitle
+            name: vm.datamodelTitle,
+            additionalInfo:vm.additionalInfo
+
         };
         datamodelService.saveDatamodel(datamodelToSave).then(function success(response) {
             $log.debug("successfully saved datamodel..." + angular.toJson(response));
@@ -242,6 +244,7 @@ export function DataModelController($scope, $log, $mdDialog, $document, $statePa
         datamodelService.getDatamodel($stateParams.datamodelId).
         then(function success(data) {
             vm.datamodelTitle = data.name;
+            vm.additionalInfo = data.additionalInfo;
         }, function fail(data) {
             $log.error("Could not load datamodel:" + angular.toJson(data));
         });
@@ -567,10 +570,10 @@ export function DataModelController($scope, $log, $mdDialog, $document, $statePa
         $log.debug("adding data model object attribute...");
         // add the attribute if it exists
         if (vm.stepperData.currentAttribute) {
-            vm.stepperData.attributes.push(vm.stepperData.currentAttribute); 
+            vm.stepperData.attributes.push(vm.stepperData.currentAttribute);
         }
         // reset the current attribute
-        vm.stepperData.currentAttribute = ""; 
+        vm.stepperData.currentAttribute = "";
     };
 
     // update the datamodel and exit edit mode
@@ -591,7 +594,7 @@ export function DataModelController($scope, $log, $mdDialog, $document, $statePa
 
         // save and exit edit mode, and cleanly reload the data
         saveDatamodel();
-        vm.toggleDMEditMode();   
+        vm.toggleDMEditMode();
     };
 
     // discard changes and replot the datamodel
