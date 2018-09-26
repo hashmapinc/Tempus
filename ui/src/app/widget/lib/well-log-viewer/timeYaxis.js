@@ -63,6 +63,7 @@ var timeYaxis = function(timeConfig, data, state, index, width) {
       .call(y.axis = d3.axisLeft().scale(y))
     }
 
+
     // var text = context.select('.linearGrid').append('g').attr('transform', 'translate(40,30)')
 
     // var paths = context.select('.linearGrid').append('g')
