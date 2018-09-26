@@ -203,7 +203,7 @@ export function DashboardsController(userService, dashboardService, customerServ
                     manageAssignedCustomers($event, item);
                 },
                 name: function() { return $translate.instant('action.assign') },
-                details: function() { return $translate.instant('dashboard.manage-assigned-customers') },
+                details: function() { return $translate.instant('dashboard.assign-to-customer') },
                 icon: "assignment_ind",
                 isEnabled: function(dashboard) {
                                      if(dashboard.type == 'DEFAULT') {
