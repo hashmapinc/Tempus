@@ -16,8 +16,6 @@
     limitations under the License.
 
 -->
-<mat-list>
-    <mat-list-item>
         <div ng-if="!showList"> 
             <span class="msg-align">{{ 'widget.entity-list-is-empty' | translate }}</span>
         </div>
@@ -42,13 +40,8 @@
                         </table>
                 </md-table-container>
             </div>
-    </mat-list-item>
-    <mat-divider></mat-divider>
-    <mat-list-item ng-if="showList">
-        <md-table-pagination class ="tb-device-container dash-cont"  md-limit="query.limit" md-limit-options="[5, 10, 15]"
+        <md-table-pagination  style="position:fixed;" ng-if="showList"  md-limit="query.limit" md-limit-options="[5, 10, 15]"
                 md-page="query.page" md-total="{{entityList.count}}"
                 md-on-paginate="onPaginate" md-page-select>
         </md-table-pagination>
-    </mat-list-item>
-  </mat-list>
 
