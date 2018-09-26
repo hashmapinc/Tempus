@@ -20,6 +20,7 @@ import * as d3 from 'd3';
 import {linearGrid} from './linearGrid';
 import {headerLegend} from './headerLegend';
 import {lineGraph} from './lineGraph';
+import {timeYaxis} from './timeYaxis';
 import './logViewer.css';
 
 // var loadConfig = require('./config');
@@ -60,7 +61,7 @@ export default function loadLogViewer(ctx, sequence){
     function build(dArray, state) {
       function datasourceFilter(settings, datasources){
         var ds;
-        if(settings.cType === 'linearGrid'){
+        if(settings.cType === 'Linear Grid' || settings.cType === 'Time Y axis'){
           ds = datasources[0];
         }
         else {
@@ -84,15 +85,15 @@ export default function loadLogViewer(ctx, sequence){
             var hLegend = headerLegend(componentObj, headerCount, datasourceFilter(componentObj, dArray), state, index, parseInt(track.width));
             trackObj.push(hLegend);
           }
-          if(componentObj.cType === 'linearGrid'){
+          if(componentObj.cType === 'Linear Grid'){
             var lnGrid = linearGrid(componentObj, datasourceFilter(componentObj, dArray), state, index, parseInt(track.width));
             trackObj.push(lnGrid);
           }
-          if(componentObj.cType === 'timeYaxis'){
-            // var timeYaxis = LogViewer.timeYaxis(component.type)
-            // trackObj.push(timeYaxis);
+          if(componentObj.cType === 'Time Y axis'){
+             var tYaxis = timeYaxis(componentObj, datasourceFilter(componentObj, dArray), state, index, parseInt(track.width));
+            trackObj.push(tYaxis);
           }
-          if(componentObj.cType === 'line'){
+          if(componentObj.cType === 'Line'){
             var lnGraph = lineGraph(componentObj, datasourceFilter(componentObj, dArray), state, index, parseInt(track.width));
             trackObj.push(lnGraph);
           }
