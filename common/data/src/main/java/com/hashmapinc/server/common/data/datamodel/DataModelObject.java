@@ -31,6 +31,7 @@ public class DataModelObject extends SearchTextBased<DataModelObjectId> implemen
     private String type;
     private DataModelObjectId parentId;
     private CustomerId customerId;
+    private String logoFile;
     private List<AttributeDefinition> attributeDefinitions = new ArrayList<>();
 
     public DataModelObject() {
@@ -49,6 +50,7 @@ public class DataModelObject extends SearchTextBased<DataModelObjectId> implemen
         this.type = dataModelObject.type;
         this.parentId = dataModelObject.parentId;
         this.customerId = dataModelObject.customerId;
+        this.logoFile = dataModelObject.logoFile;
         this.attributeDefinitions = dataModelObject.attributeDefinitions;
     }
 
@@ -65,6 +67,7 @@ public class DataModelObject extends SearchTextBased<DataModelObjectId> implemen
         if (type != null ? !type.equals(that.type) : that.type != null) return false;
         if (parentId != null ? !parentId.equals(that.parentId) : that.parentId != null) return false;
         if (customerId != null ? !customerId.equals(that.customerId) : that.customerId != null) return false;
+        if (logoFile != null ? ! logoFile.equals(that.logoFile) : that.logoFile != null) return false;
         return (attributeDefinitions != null ? attributeDefinitions.equals(that.attributeDefinitions) : that.attributeDefinitions == null);
     }
 
@@ -77,6 +80,7 @@ public class DataModelObject extends SearchTextBased<DataModelObjectId> implemen
         result = 31 * result + (type != null ? type.hashCode() : 0);
         result = 31 * result + (parentId != null ? parentId.hashCode() : 0);
         result = 31 * result + (customerId != null ? customerId.hashCode() : 0);
+        result = 31 * result + (logoFile != null ? logoFile.hashCode() : 0);
         result = 31 * result + (attributeDefinitions != null ? attributeDefinitions.hashCode() : 0);
         return result;
     }
@@ -123,6 +127,14 @@ public class DataModelObject extends SearchTextBased<DataModelObjectId> implemen
 
     public void setCustomerId(CustomerId customerId) {
         this.customerId = customerId;
+    }
+
+    public String getLogoFile() {
+        return logoFile;
+    }
+
+    public void setLogoFile(String logoFile) {
+        this.logoFile = logoFile;
     }
 
     public List<AttributeDefinition> getAttributeDefinitions() {

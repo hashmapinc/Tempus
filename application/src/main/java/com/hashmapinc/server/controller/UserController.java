@@ -18,16 +18,16 @@ package com.hashmapinc.server.controller;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.hashmapinc.server.common.data.CustomerGroup;
 import com.hashmapinc.server.common.data.EntityType;
 import com.hashmapinc.server.common.data.User;
 import com.hashmapinc.server.common.data.audit.ActionType;
-import com.hashmapinc.server.common.data.id.CustomerId;
-import com.hashmapinc.server.common.data.id.TenantId;
-import com.hashmapinc.server.common.data.id.UserId;
+import com.hashmapinc.server.common.data.id.*;
 import com.hashmapinc.server.common.data.page.TextPageData;
 import com.hashmapinc.server.common.data.page.TextPageLink;
 import com.hashmapinc.server.common.data.security.Authority;
 import com.hashmapinc.server.common.data.security.UserCredentials;
+import com.hashmapinc.server.dao.model.ModelConstants;
 import com.hashmapinc.server.exception.TempusErrorCode;
 import com.hashmapinc.server.exception.TempusException;
 import com.hashmapinc.server.requests.CreateUserRequest;
@@ -48,6 +48,9 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api")
@@ -104,7 +107,8 @@ public class UserController extends BaseController {
                 user.setTenantId(getCurrentUser().getTenantId());
             }
             User savedUser;
-            if(user.getId() == null){
+            final boolean isNewUser = user.getId() == null;
+            if(isNewUser){
                 savedUser = createUser(user, activationType, request);
             }else{
                 savedUser = updateUser(user);
@@ -114,6 +118,10 @@ public class UserController extends BaseController {
                     savedUser.getCustomerId(),
                     user.getId() == null ? ActionType.ADDED : ActionType.UPDATED, null);
 
+            if (getCurrentUser().getAuthority() == Authority.SYS_ADMIN && isNewUser && savedUser != null) {
+                assignDefaultGroupToTenantUser(savedUser.getTenantId(), savedUser.getId());
+            }
+
             return savedUser;
         } catch (Exception e) {
 
@@ -122,6 +130,13 @@ public class UserController extends BaseController {
 
             throw handleException(e);
         }
+    }
+
+    private void assignDefaultGroupToTenantUser(TenantId tenantId, UserId userId) {
+        TextPageData<CustomerGroup> customerGroupByTenant =
+                customerGroupService.findCustomerGroupsByTenantIdAndCustomerId(tenantId, new CustomerId(ModelConstants.NULL_UUID), new TextPageLink(1));
+        List<CustomerGroupId> customerGroupIds = customerGroupByTenant.getData().stream().map(IdBased::getId).collect(Collectors.toList());
+        userService.assignGroups(userId, customerGroupIds);
     }
 
     private User updateUser(@RequestBody User user) throws TempusException {
@@ -189,7 +204,7 @@ public class UserController extends BaseController {
     }
 
     @PreAuthorize("hasAnyAuthority('SYS_ADMIN', 'TENANT_ADMIN')")
-    @GetMapping(value = "/user/{userId}/activationLink")
+    @GetMapping(value = "/user/{userId}/activationLink", produces = "text/plain")
     @ResponseBody
     public String getActivationLink(
             @PathVariable(USER_ID) String strUserId,
@@ -287,5 +302,61 @@ public class UserController extends BaseController {
             throw handleException(e);
         }
     }
-    
+
+    @PreAuthorize("hasAuthority('TENANT_ADMIN')")
+    @GetMapping(value = "/user/{userId}/groups", params = { "limit" })
+    @ResponseBody
+    public TextPageData<CustomerGroup> getGroupsByUserId(
+            @PathVariable(USER_ID) String strUserId,
+            @RequestParam int limit,
+            @RequestParam(required = false) String textSearch,
+            @RequestParam(required = false) String idOffset,
+            @RequestParam(required = false) String textOffset) throws TempusException {
+        checkParameter(USER_ID, strUserId);
+        try {
+            UserId userId = new UserId(toUUID(strUserId));
+            TextPageLink pageLink = createPageLink(limit, textSearch, idOffset, textOffset);
+            return customerGroupService.findByUserId(userId, pageLink);
+        } catch (Exception e) {
+            throw handleException(e);
+        }
+    }
+
+    @PreAuthorize("hasAuthority('TENANT_ADMIN')")
+    @PostMapping(value = "/user/{userId}/groups")
+    @ResponseBody
+    public User assignGroupsToUser(
+            @PathVariable(USER_ID) String strUserId ,
+            @RequestBody List<UUID> groupUuids) throws TempusException {
+        checkParameter(USER_ID, strUserId);
+        try{
+            UserId userId = new UserId(toUUID(strUserId));
+            List<CustomerGroupId> customerGroupIds = groupUuids.stream().map(CustomerGroupId::new).collect(Collectors.toList());
+            for (CustomerGroupId customerGroupId: customerGroupIds) {
+                checkCustomerGroupId(customerGroupId);
+            }
+            return checkNotNull(userService.assignGroups(userId, customerGroupIds));
+        } catch (Exception e){
+            throw handleException(e);
+        }
+    }
+
+    @PreAuthorize("hasAuthority('TENANT_ADMIN')")
+    @PutMapping(value = "/user/{userId}/groups")
+    @ResponseBody
+    public User unassignGroupsFromUser(
+            @PathVariable(USER_ID) String strUserId ,
+            @RequestBody List<UUID> groupUuids) throws TempusException {
+        checkParameter(USER_ID, strUserId);
+        try{
+            UserId userId = new UserId(toUUID(strUserId));
+            List<CustomerGroupId> customerGroupIds = groupUuids.stream().map(CustomerGroupId::new).collect(Collectors.toList());
+            for (CustomerGroupId customerGroupId: customerGroupIds) {
+                checkCustomerGroupId(customerGroupId);
+            }
+            return checkNotNull(userService.unassignGroups(userId, customerGroupIds));
+        } catch (Exception e){
+            throw handleException(e);
+        }
+    }
 }

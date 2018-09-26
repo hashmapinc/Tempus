@@ -115,7 +115,8 @@
                                                        datakey-settings-schema="datakeySettingsSchema"
                                                        generate-data-key="generateDataKey(chip,type)"
                                                        fetch-entity-keys="fetchEntityKeys({entityAliasId: entityAliasId, query: query, type: type})"
-                                                       on-create-entity-alias="onCreateEntityAlias({event: event, alias: alias})"></tb-datasource>
+                                                       on-create-entity-alias="onCreateEntityAlias({event: event, alias: alias})"
+                                                       widget-info="widgetInfo"></tb-datasource>
                                         <md-button ng-disabled="$root.loading" class="md-icon-button md-primary"
                                                    style="min-width: 40px;"
                                                    ng-click="removeDatasource($event, datasource)"

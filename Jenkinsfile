@@ -14,12 +14,12 @@ pipeline {
 echo M2_HOME = ${M2_HOME}
 mvn clean
 mvn validate'''
-        slackSend(message: 'Build Started for Branch: '+env.BRANCH_NAME+' for: '+env.CHANGE_AUTHOR+' on: '+env.BUILD_TAG, color: 'Green', channel: 'Tempus', botUser: true)
+        slackSend(message: 'Build Started for Branch: '+env.BRANCH_NAME+' for: '+env.CHANGE_AUTHOR+' on: '+env.BUILD_TAG, color: 'Green', channel: 'tempusbuild', botUser: true)
       }
     }
     stage('Build') {
       steps {
-        sh 'mvn -Dmaven.test.failure.ignore=true -DskipITs install'
+        sh 'mvn -Dmaven.test.failure.ignore=true -DskipITs org.jacoco:jacoco-maven-plugin:prepare-agent install'
       }
     }
     stage('Integration Tests') {
@@ -27,6 +27,13 @@ mvn validate'''
         sh 'mvn failsafe:integration-test'
         sh 'mvn failsafe:verify'
       }
+    }
+    stage('SonarQube analysis') {
+        steps {
+            withSonarQubeEnv('SonarCloud') {
+                sh 'mvn -Dsonar.organization=hashmapinc-github -Dsonar.branch.name=$BRANCH_NAME sonar:sonar'
+            }
+        }
     }
     stage('Report and Archive') {
       steps {
@@ -54,7 +61,7 @@ sudo docker push hashmapinc/cassandra-setup:dev
     }
     stage('Success Message') {
       steps {
-        slackSend(message: 'Build Completed for Branch: '+env.BRANCH_NAME+' for: '+env.CHANGE_AUTHOR+' on: '+env.BUILD_TAG, channel: 'Tempus', color: 'Green')
+        slackSend(message: 'Build Completed for Branch: '+env.BRANCH_NAME+' for: '+env.CHANGE_AUTHOR+' on: '+env.BUILD_TAG, channel: 'tempusbuild', color: 'Green')
       }
     }
   }

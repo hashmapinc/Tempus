@@ -17,7 +17,7 @@
 
 -->
 <md-dialog aria-label="New Datamodel Object" style="min-width: 600px;" tb-help="'datamodel_object_creation'" help-container-id="help-container">
-  <form ng-submit="vm.onStepperSubmit()">
+  <form name="theForm" ng-submit="vm.onStepperSubmit()">
     <md-toolbar>
       <div class="md-toolbar-tools">
         <h2>New Datamodel Object</h2>
@@ -56,10 +56,39 @@
                 <md-option value="Device">Device</md-option>
                 <md-option value="Asset">Asset</md-option>
               </md-select>
-              <div class="errors" ng-messages="myForm.favoriteColor.$error">
+              <div class="errors" ng-messages="theForm.favoriteColor.$error">
                 <div ng-message="required">Required</div>
               </div>
             </md-input-container>
+
+            <md-input-container ng-hide ="vm.stepperData.type == 'Device'" class="md-block" ng-keypress="$event.keyCode === 13 && vm.onStepperEnter();">
+              <div class="tb-container">
+                <label class="tb-label" translate>Icon</label>
+                <div style="margin-top: 27px;" flow-init="{singleFile:true}" flow-file-added='vm.fileAdded($file)' class="tb-file-select-container">
+                  <div class="tb-file-clear-container">
+                    <md-button ng-click='vm.clearFile()' class="tb-file-clear-btn md-icon-button md-primary" aria-label="{{ 'action.remove' | translate }}">
+                      <md-tooltip md-direction="top">
+                        {{ 'action.remove' | translate }}
+                      </md-tooltip>
+                      <md-icon aria-label="{{ 'action.remove' | translate }}" class="material-icons">close</md-icon>
+                    </md-button>
+                  </div>
+
+                  <div class="alert tb-flow-drop" flow-drop>
+
+                    <label for="select" translate>import.drop-file</label>
+                    <input flow-attrs="{accept:'.jpg,.png,.svg,.jpeg'}"
+                           class="file-input"
+                           flow-btn id="select"
+                           ng-model="vm.stepperData.logoFileName"
+                    >
+                  </div>
+                </div>
+              </div>
+              <div>
+              </div>
+            </md-input-container>
+              <div ng-hide ="vm.stepperData.type == 'Device'">Note:- If No Icon Uploaded Then Default Icon Of Assets Will Be Applied.</div>
           </md-content>
         </md-tab>
 
@@ -117,6 +146,13 @@
             <md-list-item>
               <p>Parent: {{vm.stepperData.parent_node_id ? vm.nodes.get(vm.stepperData.parent_node_id).label : "--"}}</p>
             </md-list-item>
+
+              <md-subheader class="md-no-sticky">Image</md-subheader>
+
+              <md-list-item>
+                  <p>Icon:<img class="" style="width: 98%; margin-top: -1%;"ng-src="{{vm.stepperData.logoFile}}"></p>
+              </md-list-item>
+
           </md-content>
         </md-tab>
       </md-tabs>
@@ -133,7 +169,7 @@
       <md-button ng-click="vm.stepperState = vm.stepperState + 1" style="margin-right:20px;" ng-if="3 > vm.stepperState" ng-disabled="!vm.stepperData.name || !vm.stepperData.type" id="stepperNext">
          Next
       </md-button>
-      <md-button type="submit" style="margin-right:20px;" ng-if="3 === vm.stepperState" id="stepperSubmit">
+      <md-button ng-disabled="$root.loading || !theForm.$valid" type="submit" style="margin-right:20px;" ng-if="3 === vm.stepperState" id="stepperSubmit">
          Submit
       </md-button>
     </md-dialog-actions>

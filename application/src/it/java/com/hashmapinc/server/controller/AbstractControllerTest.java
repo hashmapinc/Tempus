@@ -23,13 +23,12 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.github.tomakehurst.wiremock.client.WireMock;
-import com.hashmapinc.server.TempusServerApplication;
-import com.hashmapinc.server.common.data.BaseData;
-import com.hashmapinc.server.common.data.Customer;
-import com.hashmapinc.server.common.data.Tenant;
-import com.hashmapinc.server.common.data.User;
-import com.hashmapinc.server.common.data.id.TenantId;
-import com.hashmapinc.server.common.data.id.UUIDBased;
+import com.hashmapinc.server.common.data.*;
+import com.hashmapinc.server.common.data.asset.Asset;
+import com.hashmapinc.server.common.data.datamodel.AttributeDefinition;
+import com.hashmapinc.server.common.data.datamodel.DataModel;
+import com.hashmapinc.server.common.data.datamodel.DataModelObject;
+import com.hashmapinc.server.common.data.id.*;
 import com.hashmapinc.server.common.data.page.TextPageData;
 import com.hashmapinc.server.common.data.page.TextPageLink;
 import com.hashmapinc.server.common.data.page.TimePageLink;
@@ -75,7 +74,6 @@ import org.springframework.security.oauth2.common.DefaultOAuth2RefreshToken;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
@@ -97,6 +95,7 @@ import java.util.*;
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static com.github.tomakehurst.wiremock.client.WireMock.get;
 import static com.hashmapinc.server.common.data.DataConstants.*;
+import static com.hashmapinc.server.dao.model.ModelConstants.NULL_UUID;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
@@ -152,9 +151,11 @@ public abstract class AbstractControllerTest {
     protected TenantId tenantId;
     protected Tenant savedTenant;
     protected User tenantAdmin;
+    protected CustomerGroup tenantGroup;
 
     protected Customer savedCustomer;
     protected User customerUser;
+    protected CustomerGroup customerGroup;
 
     @SuppressWarnings("rawtypes")
     private HttpMessageConverter mappingJackson2HttpMessageConverter;
@@ -221,13 +222,19 @@ public abstract class AbstractControllerTest {
 
         tenantAdmin = new User();
         tenantAdmin.setAuthority(Authority.TENANT_ADMIN);
-        tenantAdmin.setPermissions(Arrays.asList(TENANT_ADMIN_DEFAULT_PERMISSION));
         tenantAdmin.setTenantId(tenantId);
         tenantAdmin.setEmail(TENANT_ADMIN_EMAIL);
 
         stubUser(tenantAdmin, TENANT_ADMIN_PASSWORD);
-
         tenantAdmin = createUserAndLogin(tenantAdmin, TENANT_ADMIN_PASSWORD);
+
+        tenantGroup = new CustomerGroup();
+        tenantGroup.setTitle("Test Tenant Group");
+        tenantGroup.setTenantId(tenantId);
+        tenantGroup.setCustomerId(null);
+        tenantGroup.setPolicies(Collections.singletonList(TENANT_ADMIN_DEFAULT_PERMISSION));
+        tenantGroup = doPost("/api/customer/group", tenantGroup, CustomerGroup.class);
+        doPost("/api/customer/group/" + tenantGroup.getId()+"/users", Collections.singletonList(tenantAdmin.getId().getId()));
 
         Customer customer = new Customer();
         customer.setTitle("Customer");
@@ -236,19 +243,26 @@ public abstract class AbstractControllerTest {
 
         customerUser = new User();
         customerUser.setAuthority(Authority.CUSTOMER_USER);
-        customerUser.setPermissions(Arrays.asList(
+        customerUser.setTenantId(tenantId);
+        customerUser.setCustomerId(savedCustomer.getId());
+        customerUser.setEmail(CUSTOMER_USER_EMAIL);
+
+        customerGroup = new CustomerGroup();
+        customerGroup.setTenantId(tenantId);
+        customerGroup.setCustomerId(savedCustomer.getId());
+        customerGroup.setTitle("Test Customer Group");
+        customerGroup.setPolicies(Arrays.asList(
                 CUSTOMER_USER_DEFAULT_ASSET_READ_PERMISSION,
                 CUSTOMER_USER_DEFAULT_ASSET_UPDATE_PERMISSION,
                 CUSTOMER_USER_DEFAULT_DEVICE_READ_PERMISSION,
                 CUSTOMER_USER_DEFAULT_DEVICE_UPDATE_PERMISSION)
         );
-        customerUser.setTenantId(tenantId);
-        customerUser.setCustomerId(savedCustomer.getId());
-        customerUser.setEmail(CUSTOMER_USER_EMAIL);
 
+        customerGroup = doPost("/api/customer/group", customerGroup, CustomerGroup.class);
         stubUser(customerUser, CUSTOMER_USER_PASSWORD);
 
         customerUser = createUserAndLogin(customerUser, CUSTOMER_USER_PASSWORD);
+        doPost("/api/customer/group/"+ customerGroup.getId() + "/users", Collections.singletonList(customerUser.getId().getId()));
 
         logout();
         log.info("Executed setup");
@@ -701,6 +715,106 @@ public abstract class AbstractControllerTest {
 
     protected static <T> ResultMatcher statusReason(Matcher<T> matcher) {
         return jsonPath("$.message", matcher);
+    }
+
+    protected void assignUserToGroup(UserId customerUserId, CustomerGroup savedCustomerGroup) throws Exception {
+        loginTenantAdmin();
+        doPost("/api/customer/group/"+savedCustomerGroup.getId().getId().toString()+"/users", Collections.singletonList(customerUserId.getId().toString()))
+                .andExpect(status().isOk());
+        logout();
+    }
+
+    protected UserId getCustomerUserId() throws Exception {
+        loginCustomerUser();
+        User user = doGet("/api/auth/user", User.class);
+        logout();
+        return user.getId();
+    }
+
+    protected CustomerGroup createGroupWithPolicies(List<String> policies, CustomerId customerId) throws Exception {
+        CustomerGroup customerGroup = new CustomerGroup();
+        customerGroup.setTitle("My Customer Group");
+        customerGroup.setTenantId(tenantId);
+        customerGroup.setCustomerId(customerId);
+        customerGroup.setPolicies(policies);
+        return doPost("/api/customer/group", customerGroup, CustomerGroup.class);
+    }
+
+    protected CustomerGroup updateGroupWithPolicies(List<String> policies, CustomerGroup customerGroup) throws Exception {
+        loginTenantAdmin();
+        customerGroup.setPolicies(policies);
+        CustomerGroup customerGroupReturned = doPost("/api/customer/group", customerGroup, CustomerGroup.class);
+        logout();
+        return customerGroupReturned;
+    }
+
+    protected void deleteGroup(CustomerGroupId customerGroupId) throws Exception {
+        doDelete("/api/customer/group/"+customerGroupId.getId().toString())
+                .andExpect(status().isOk());
+    }
+
+
+    protected DataModel createDataModel() throws Exception{
+        DataModel dataModel = new DataModel();
+        dataModel.setName("Default Drilling Data Model1");
+        dataModel.setLastUpdatedTs(System.currentTimeMillis());
+        DataModel savedDataModel = doPost("/api/data-model", dataModel, DataModel.class);
+        Assert.assertNotNull(savedDataModel);
+        Assert.assertNotNull(savedDataModel.getId());
+        Assert.assertTrue(savedDataModel.getCreatedTime() > 0);
+        Assert.assertEquals(savedTenant.getId(), savedDataModel.getTenantId());
+        Assert.assertEquals(dataModel.getName(), savedDataModel.getName());
+        Assert.assertTrue(savedDataModel.getLastUpdatedTs() > 0);
+        return savedDataModel;
+    }
+
+    protected DataModelObject createDataModelObject(DataModel dataModel) throws Exception{
+        DataModelObject dataModelObject = new DataModelObject();
+        dataModelObject.setName("Well");
+
+        AttributeDefinition ad = new AttributeDefinition();
+        ad.setValueType("STRING");
+        ad.setName("attr name2");
+        List<AttributeDefinition> attributeDefinitions = new ArrayList<>();
+        attributeDefinitions.add(ad);
+        dataModelObject.setAttributeDefinitions(attributeDefinitions);
+
+        DataModelObject savedDataModelObj = doPost("/api/data-model/" + dataModel.getId().toString() + "/objects", dataModelObject, DataModelObject.class);
+        Assert.assertNotNull(savedDataModelObj);
+        Assert.assertEquals(dataModel.getId(), savedDataModelObj.getDataModelId());
+        return savedDataModelObj;
+    }
+
+    protected void deleteDataModelObject(DataModelObjectId dataModelObjectId) throws Exception {
+        doDelete("/api/data-model/objects/"+dataModelObjectId.getId().toString())
+                .andExpect(status().isOk());
+    }
+
+    protected Asset createAsset(DataModelObjectId dataModelObjectId, CustomerId customerId, String assetName) throws Exception {
+        Asset asset = new Asset();
+        asset.setName(assetName);
+        asset.setType("default");
+        asset.setDataModelObjectId(dataModelObjectId);
+        asset.setTenantId(tenantId);
+        asset.setCustomerId(customerId);
+        Asset savedAsset = doPost("/api/asset", asset, Asset.class);
+        Assert.assertNotNull(savedAsset);
+        Assert.assertNotNull(savedAsset.getId());
+        Assert.assertTrue(savedAsset.getCreatedTime() > 0);
+        Assert.assertEquals(savedTenant.getId(), savedAsset.getTenantId());
+        Assert.assertNotNull(savedAsset.getCustomerId());
+        if(customerId == null){
+            Assert.assertEquals(NULL_UUID, savedAsset.getCustomerId().getId());
+        }else{
+            Assert.assertEquals(customerId, savedAsset.getCustomerId());
+        }
+        Assert.assertEquals(asset.getName(), savedAsset.getName());
+        return savedAsset;
+    }
+
+    protected void deleteAsset(AssetId assetId) throws Exception {
+        doDelete("/api/asset/"+assetId.getId().toString())
+                .andExpect(status().isOk());
     }
 
 }

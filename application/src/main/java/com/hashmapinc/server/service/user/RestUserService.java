@@ -28,14 +28,13 @@ import com.google.common.util.concurrent.ListenableFuture;
 import com.hashmapinc.server.common.data.Customer;
 import com.hashmapinc.server.common.data.Tenant;
 import com.hashmapinc.server.common.data.User;
-import com.hashmapinc.server.common.data.id.CustomerId;
-import com.hashmapinc.server.common.data.id.TenantId;
-import com.hashmapinc.server.common.data.id.UserId;
+import com.hashmapinc.server.common.data.id.*;
 import com.hashmapinc.server.common.data.page.TextPageData;
 import com.hashmapinc.server.common.data.page.TextPageLink;
 import com.hashmapinc.server.common.data.security.Authority;
 import com.hashmapinc.server.common.data.security.UserCredentials;
 import com.hashmapinc.server.dao.customer.CustomerDao;
+import com.hashmapinc.server.dao.customergroup.CustomerGroupDao;
 import com.hashmapinc.server.dao.entity.AbstractEntityService;
 import com.hashmapinc.server.dao.exception.DataValidationException;
 import com.hashmapinc.server.dao.exception.IncorrectParameterException;
@@ -44,8 +43,6 @@ import com.hashmapinc.server.dao.service.DataValidator;
 import com.hashmapinc.server.dao.service.PaginatedRemover;
 import com.hashmapinc.server.dao.service.Validator;
 import com.hashmapinc.server.dao.tenant.TenantDao;
-import com.hashmapinc.server.dao.user.UserCredentialsDao;
-import com.hashmapinc.server.dao.user.UserDao;
 import com.hashmapinc.server.dao.user.UserService;
 import com.hashmapinc.server.requests.ActivateUserRequest;
 import com.hashmapinc.server.requests.CreateUserRequest;
@@ -72,6 +69,7 @@ import java.io.IOException;
 import java.util.Base64;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import static com.hashmapinc.server.dao.service.Validator.validateId;
 import static net.javacrumbs.futureconverter.springguava.FutureConverter.toGuavaListenableFuture;
@@ -92,16 +90,13 @@ public class RestUserService extends AbstractEntityService implements UserServic
     public static final String INCORRECT_TENANT_ID = "Incorrect tenantId ";
 
     @Autowired
-    private UserDao userDao;
-
-    @Autowired
-    private UserCredentialsDao userCredentialsDao;
-
-    @Autowired
     private TenantDao tenantDao;
 
     @Autowired
     private CustomerDao customerDao;
+
+    @Autowired
+    private CustomerGroupDao customerGroupDao;
 
     private ObjectMapper mapper = new ObjectMapper();
 
@@ -109,7 +104,9 @@ public class RestUserService extends AbstractEntityService implements UserServic
 
     @PostConstruct
     public void init(){
-        asyncRestTemplate = new AsyncRestTemplate(new SimpleClientHttpRequestFactory(), restTemplate);
+        SimpleClientHttpRequestFactory requestFactory = new SimpleClientHttpRequestFactory();
+        requestFactory.setOutputStreaming(false);
+        asyncRestTemplate = new AsyncRestTemplate(requestFactory, restTemplate);
         SimpleModule module = new SimpleModule();
         module.addDeserializer(User.class, new UserDeserializer());
         mapper.registerModule(module);
@@ -122,6 +119,29 @@ public class RestUserService extends AbstractEntityService implements UserServic
         ResponseEntity<IdentityUser> response = restTemplate.getForEntity(identityUrl + "/" + userId.getId(), IdentityUser.class);
         if(response.getStatusCode().equals(HttpStatus.OK)){
             return response.getBody().toUser();
+        }
+        return null;
+    }
+
+    @Override
+    public TextPageData<User> findUsersByIds(List<UserId> userIds, TextPageLink pageLink) {
+        UUID idOffset = pageLink.getIdOffset() != null ? pageLink.getIdOffset() : ModelConstants.NULL_UUID;
+        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(identityUrl + "/list")
+                .queryParam("limit", pageLink.getLimit())
+                .queryParam("idOffset", idOffset);
+
+        List<UUID> usersUuid = userIds.stream().map(UUIDBased::getId).collect(Collectors.toList());
+
+        ResponseEntity<String> response = restTemplate
+                .postForEntity(builder.build().encode().toUri(), usersUuid, String.class);
+        if(response.getStatusCode().equals(HttpStatus.OK)){
+            JavaType type = mapper.getTypeFactory().constructParametrizedType(TextPageData.class, TextPageData.class, User.class);
+            try {
+                return mapper.readValue(response.getBody(), type);
+            } catch (IOException e) {
+                log.error("Error while fetching users ", e);
+                return null;
+            }
         }
         return null;
     }
@@ -178,9 +198,9 @@ public class RestUserService extends AbstractEntityService implements UserServic
 
     @Override
     public User saveExternalUser(User user){
+        // TODO : Tempus: 437 : LDAP Support in HAF
         log.trace("Executing save external user [{}]", user);
-        userValidator.validate(user);
-        return userDao.save(user);
+        return null;
     }
 
     @Override
@@ -222,7 +242,7 @@ public class RestUserService extends AbstractEntityService implements UserServic
             return response.getBody().toUserCredentials();
         }
 
-        return userCredentialsDao.findByResetToken(resetToken);
+        return null;
     }
 
     @Override
@@ -279,6 +299,7 @@ public class RestUserService extends AbstractEntityService implements UserServic
         validateId(userId, INCORRECT_USER_ID + userId);
         restTemplate.delete(identityUrl + "/" + userId.getId());
         deleteEntityRelations(userId);
+        customerGroupDao.deleteGroupIdsForUserId(userId.getId());
     }
 
     @Override
@@ -311,6 +332,24 @@ public class RestUserService extends AbstractEntityService implements UserServic
         validateId(tenantId, INCORRECT_TENANT_ID + tenantId);
         validateId(customerId, "Incorrect customerId " + customerId);
         new RestUserService.CustomerUsersRemover(tenantId).removeEntities(customerId);
+    }
+
+    @Override
+    public User assignGroups(UserId userId , List<CustomerGroupId> customerGroupIds) {
+        log.trace("Executing assignGroups, UserId [{}] and customerGroupIds [{}]", userId, customerGroupIds);
+        Validator.validateId(userId, INCORRECT_USER_ID + userId);
+        customerGroupDao.assignGroups(userId, customerGroupIds);
+        User user = findUserById(userId);
+        user.setGroupIds(customerGroupIds);
+        return user;
+    }
+
+    @Override
+    public User unassignGroups(UserId userId , List<CustomerGroupId> customerGroupIds) {
+        log.trace("Executing unassignGroups, UserId [{}] and customerGroupIds [{}]", userId, customerGroupIds);
+        Validator.validateId(userId, INCORRECT_USER_ID + userId);
+        customerGroupDao.unassignGroups(userId, customerGroupIds);
+        return findUserById(userId);
     }
 
     private TextPageData<User> findUsers(TenantId tenantId, CustomerId customerId, TextPageLink pageLink){

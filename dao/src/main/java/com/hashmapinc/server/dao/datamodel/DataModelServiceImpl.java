@@ -38,9 +38,13 @@ import static com.hashmapinc.server.dao.service.Validator.validateId;
 public class DataModelServiceImpl extends AbstractEntityService implements DataModelService {
 
     public static final String INCORRECT_DATA_MODEL_ID = "Incorrect dataModelId ";
+    public static final String INCORRECT_TENANT_ID = "Incorrect tenantId ";
 
     @Autowired
     private DataModelDao dataModelDao;
+
+    @Autowired
+    private DataModelObjectService dataModelObjectService;
 
     @Autowired
     private TenantDao tenantDao;
@@ -62,7 +66,32 @@ public class DataModelServiceImpl extends AbstractEntityService implements DataM
     @Override
     public List<DataModel> findByTenantId(TenantId tenantId) {
         log.trace("Executing DataModelServiceImpl.findByTenantId [{}]", tenantId);
+        validateId(tenantId, INCORRECT_TENANT_ID + tenantId);
         return dataModelDao.findByTenantId(tenantId.getId());
+    }
+
+    @Override
+    public void deleteById(DataModelId dataModelId) {
+        log.trace("Executing DataModelServiceImpl.deleteById [{}]", dataModelId);
+        validateId(dataModelId, INCORRECT_DATA_MODEL_ID + dataModelId);
+        dataModelDao.removeById(dataModelId.getId());
+    }
+
+    @Override
+    public void deleteDataModelsByTenantId(TenantId tenantId) {
+        log.trace("Executing DataModelServiceImpl.deleteDataModelsByTenantId [{}]", tenantId);
+        validateId(tenantId, INCORRECT_TENANT_ID + tenantId);
+        removeEntities(tenantId);
+    }
+
+    private void removeEntities(TenantId tenantId) {
+        List<DataModel> dataModels = dataModelDao.findByTenantId(tenantId.getId());
+        dataModels.forEach(dataModel -> {
+            if(dataModel != null){
+                dataModelObjectService.deleteDataModelObjectsByDataModelId(dataModel.getId());
+                deleteById(dataModel.getId());
+            }
+        });
     }
 
     private DataValidator<DataModel> dataModelValidator = new DataValidator<DataModel>() {

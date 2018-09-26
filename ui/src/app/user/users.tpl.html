@@ -35,5 +35,11 @@
 								audit-log-mode="{{vm.types.auditLogMode.user}}">
 			</tb-audit-log-table>
 		</md-tab>
+		<md-tab ng-if="vm.grid.isTenantAdmin()" label="{{ 'user.assigned-group-tab' | translate }}">
+
+			<tb-assign-user-group-detail flex user-id="vm.grid.operatingItem().id.id" ent-type="user"></tb-assign-user-group-detail>
+
+		</md-tab>
+
 	</md-tabs>
 </tb-grid>

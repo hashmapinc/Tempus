@@ -407,6 +407,24 @@ export default angular.module('tempus.types', [])
                 wits: "WITS",
                 witsml: "WITSML"
             },
+            permissionType: {
+                '*':"ALL",
+                'ASSIGN': "ASSIGN",
+                'CREATE': "CREATE",
+                'DELETE': "DELETE",
+                'READ': "READ",
+                'UPDATE': "UPDATE",
+            },
+           entityTypes: {
+                'ALL':'ALL',
+                'ASSET': "ASSET",
+                'DEVICE': "DEVICE"
+            },
+           userTypes: {
+                'CUSTOMER_USER':'CUSTOMER_USER',
+                'SYSADMIN_USER': "SYSADMIN_USER",
+                'TENANT_USER': "TENANT_USER"
+            },
             extensionValueType: {
                 string: 'value.string',
                 long: 'value.long',
@@ -595,6 +613,16 @@ export default angular.module('tempus.types', [])
             },
             translate: {
                 customTranslationsPrefix: "custom."
+            },
+            computationType: {
+                spark: "SPARK"
+                //kubeless: "KUBELESS"
+            },
+            metadataSourceType: {
+                jdbc: "JDBC"
+            },
+            metadataSinkType: {
+                rest: "REST"
             }
         }
     ).name;

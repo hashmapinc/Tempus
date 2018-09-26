@@ -29,13 +29,26 @@ function DatamodelService($http, $q) {
         saveDatamodel:          saveDatamodel,
         saveDatamodelObject:    saveDatamodelObject,
         listDatamodels:         listDatamodels,
-        deleteDatamodelObject:  deleteDatamodelObject
+        deleteDatamodelObject:  deleteDatamodelObject,
+        getDatamodelObjectAttributes: getDatamodelObjectAttributes,
+        getDatamodelObject:     getDatamodelObject
     }
 
     // loads the datamodel objects for the datamodel with ID = datamodelID
     function getDatamodelObjects(datamodelID) {
         var deferred = $q.defer();
         var url = '/api/data-model/' + datamodelID + '/objects';
+        $http.get(url).then(function success(response) {
+            deferred.resolve(response.data);
+        }, function fail(response) {
+            deferred.reject(response.data);
+        });
+        return deferred.promise;
+    }
+
+    function getDatamodelObjectAttributes(datamodelObjectID) {
+        var deferred = $q.defer();
+        var url = '/api/datamodelobject/assets/' + datamodelObjectID;
         $http.get(url).then(function success(response) {
             deferred.resolve(response.data);
         }, function fail(response) {
@@ -104,6 +117,20 @@ function DatamodelService($http, $q) {
         var deferred = $q.defer();
         var url = '/api/data-model/objects/' + dmObjectId;
         $http.delete(url).then(function success(response) {
+            deferred.resolve(response);
+        }, function fail(response) {
+            deferred.reject(response);
+        });
+        return deferred.promise;
+    }
+    /**
+     *  Get a datamodel object
+     *  @param dmObjectId - ID of the datamodel object
+     */
+    function getDatamodelObject(dmObjectId) {
+        var deferred = $q.defer();
+        var url = '/api/data-model/objects/' + dmObjectId;
+        $http.get(url).then(function success(response) {
             deferred.resolve(response);
         }, function fail(response) {
             deferred.reject(response);

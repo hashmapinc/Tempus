@@ -79,4 +79,6 @@ public interface AssetRepository extends CrudRepository<AssetEntity, String> {
     @Query("SELECT DISTINCT a.type FROM AssetEntity a WHERE a.tenantId = :tenantId")
     List<String> findTenantAssetTypes(@Param("tenantId") String tenantId);
 
+    List<AssetEntity> findByDataModelObjectId(String dataModelObjectId);
+
 }

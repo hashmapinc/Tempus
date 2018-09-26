@@ -21,7 +21,7 @@ import componentDialogTemplate from './component-dialog.tpl.html';
 /* eslint-enable import/no-unresolved, import/default */
 
 /*@ngInject*/
-export default function ComponentDialogService($mdDialog, $document, $q) {
+export default function ComponentDialogService($mdDialog, $document, $q,$log) {
 
     var service = {
         openComponentDialog: openComponentDialog
@@ -30,6 +30,7 @@ export default function ComponentDialogService($mdDialog, $document, $q) {
     return service;
 
     function openComponentDialog($event, isAdd, readOnly, title, type, pluginClazz, component) {
+    $log.log(title);
         var deferred = $q.defer();
         var componentInfo = {
             title: title,

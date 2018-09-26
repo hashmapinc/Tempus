@@ -58,11 +58,11 @@ public class MinioService implements S3BucketService {
     private static final String AMAZON_S3_URL = "https://s3.amazonaws.com";
     private Base64.Encoder encoder = Base64.getEncoder();
 
-    @Value("${kubeless.minio_access_key}")
-    private String minioAccesskey;
+    @Value("${kubeless.aws_access_key}")
+    private String awsAccesskey;
 
-    @Value("${kubeless.minio_secret_key}")
-    private String minioSecretKey;
+    @Value("${kubeless.aws_secret_key}")
+    private String awsSecretKey;
 
     @Autowired
     private TenantService tenantService;
@@ -197,7 +197,7 @@ public class MinioService implements S3BucketService {
         if (minioClient == null) {
             synchronized (MinioClient.class) {
                 if (minioClient==null) {
-                    minioClient = new MinioClient(AMAZON_S3_URL, minioAccesskey, minioSecretKey);
+                    minioClient = new MinioClient(AMAZON_S3_URL, awsAccesskey, awsSecretKey);
                     log.info("Minio connection successfull!");
                 }
             }

@@ -16,7 +16,9 @@
  */
 package com.hashmapinc.server.common.data;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.hashmapinc.server.common.data.id.CustomerGroupId;
 import com.hashmapinc.server.common.data.id.CustomerId;
 import com.hashmapinc.server.common.data.id.TenantId;
 import com.hashmapinc.server.common.data.id.UserId;
@@ -25,6 +27,7 @@ import lombok.EqualsAndHashCode;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 
 @EqualsAndHashCode(callSuper = true)
 public class User extends SearchTextBasedWithAdditionalInfo<UserId> implements HasName {
@@ -35,9 +38,12 @@ public class User extends SearchTextBasedWithAdditionalInfo<UserId> implements H
     private CustomerId customerId;
     private String email;
     private Authority authority;
+    @JsonIgnore
     private Collection<String> permissions = Collections.emptyList();
     private String firstName;
     private String lastName;
+    @JsonIgnore
+    private List<CustomerGroupId> groupIds;
 
     public User() {
         super();
@@ -56,6 +62,7 @@ public class User extends SearchTextBasedWithAdditionalInfo<UserId> implements H
         this.permissions = user.getPermissions();
         this.firstName = user.getFirstName();
         this.lastName = user.getLastName();
+        this.groupIds = user.getGroupIds();
     }
 
     public TenantId getTenantId() {
@@ -118,6 +125,14 @@ public class User extends SearchTextBasedWithAdditionalInfo<UserId> implements H
 
     public void setLastName(String lastName) {
         this.lastName = lastName;
+    }
+
+    public List<CustomerGroupId> getGroupIds() {
+        return groupIds;
+    }
+
+    public void setGroupIds(List<CustomerGroupId> groupIds) {
+        this.groupIds = groupIds;
     }
 
     @Override

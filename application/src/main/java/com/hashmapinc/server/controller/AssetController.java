@@ -21,6 +21,7 @@ import com.hashmapinc.server.common.data.Customer;
 import com.hashmapinc.server.common.data.EntitySubtype;
 import com.hashmapinc.server.common.data.asset.Asset;
 import com.hashmapinc.server.common.data.audit.ActionType;
+import com.hashmapinc.server.common.data.id.DataModelObjectId;
 import com.hashmapinc.server.common.data.id.TenantId;
 import com.hashmapinc.server.common.data.page.TextPageData;
 import com.hashmapinc.server.common.data.page.TextPageLink;
@@ -49,6 +50,8 @@ import java.util.stream.Collectors;
 public class AssetController extends BaseController {
 
     public static final String ASSET_ID = "assetId";
+    public static final String DATA_MODEL_OBJECT_ID = "dataModelObjectId";
+
 
     @PostAuthorize("hasPermission(returnObject, 'ASSET_READ')")
     @GetMapping(value = "/asset/{assetId}")
@@ -69,14 +72,8 @@ public class AssetController extends BaseController {
     public Asset saveAsset(@RequestBody Asset asset) throws TempusException {
         try {
             asset.setTenantId(getCurrentUser().getTenantId());
-            if (getCurrentUser().getAuthority() == Authority.CUSTOMER_USER) {
-                if (asset.getId() == null || asset.getId().isNullUid() ||
-                    asset.getCustomerId() == null || asset.getCustomerId().isNullUid()) {
-                    throw new TempusException("You don't have permission to perform this operation!",
-                            TempusErrorCode.PERMISSION_DENIED);
-                } else {
-                    checkCustomerId(asset.getCustomerId());
-                }
+            if (getCurrentUser().getAuthority() == Authority.CUSTOMER_USER){
+                checkCustomerId(asset.getCustomerId());
             }
             Asset savedAsset  = checkNotNull(assetService.saveAsset(asset));
 
@@ -331,4 +328,18 @@ public class AssetController extends BaseController {
             throw handleException(e);
         }
     }
+
+    @PostFilter("hasPermission(filterObject, 'ASSET_READ')")
+    @GetMapping(value = "/datamodelobject/assets/{dataModelObjectId}")
+    @ResponseBody
+    public List<Asset> getAssetsByDataModelObjectId(@PathVariable(DATA_MODEL_OBJECT_ID) String strDataModelObjectId) throws TempusException {
+        checkParameter(DATA_MODEL_OBJECT_ID, strDataModelObjectId);
+        try {
+            DataModelObjectId dataModelObjectId = new DataModelObjectId(toUUID(strDataModelObjectId));
+            return assetService.findAssetsByDataModelObjectId(dataModelObjectId);
+        } catch (Exception e) {
+            throw handleException(e);
+        }
+    }
+
 }

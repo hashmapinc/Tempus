@@ -1,0 +1,123 @@
+<!--
+
+    Copyright © 2016-2018 The Thingsboard Authors
+    Modifications © 2017-2018 Hashmap, Inc
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+        http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<md-dialog class="extensionDialog" aria-label="{{ (vm.isAdd ? 'policy.add' : 'policy.edit' ) | translate }}">
+    <form name="theForm" ng-submit="vm.save()" novalidate>
+        <md-toolbar>
+            <div class="md-toolbar-tools">
+                <h2 translate>{{ vm.isAdd ? 'policy.add' : 'policy.edit'}}</h2>
+                <span flex></span>
+                <md-button class="md-icon-button" ng-click="vm.cancel()">
+                    <ng-md-icon icon="close" aria-label="{{ 'dialog.close' | translate }}"></ng-md-icon>
+                </md-button>
+            </div>
+        </md-toolbar>
+
+        <md-progress-linear class="md-warn" md-mode="indeterminate" ng-disabled="!$root.loading" ng-show="$root.loading"></md-progress-linear>
+
+        <span style="min-height: 5px;" flex="" ng-show="!$root.loading"></span>
+
+        <md-dialog-content>
+            <div class="md-dialog-content">
+                <md-content class="md-padding" layout="column">
+                    <fieldset ng-disabled="$root.loading">
+                        <section flex layout="row">
+
+                            <md-input-container flex="40" class="md-block" md-is-error="theForm.entityType.$touched && theForm.entityType.$invalid">
+                                <label translate>policy.entityType</label>
+
+                                <md-select ng-disabled="!vm.isAdd" required name="entityType" ng-change="vm.entityTypeChange()" ng-model="vm.entity.type">
+                                    <md-option ng-repeat="(key,value) in vm.types.entityTypes" ng-value="value">
+                                        {{value}}
+                                    </md-option>
+                                </md-select>
+
+                                <div ng-messages="theForm.entityType.$error">
+                                    <div translate ng-message="required">policy.field-required</div>
+                                </div>
+                            </md-input-container>
+
+                            <!--<md-input-container flex="40" class="md-block" md-is-error="theForm.entityValues.$touched && theForm.entityValues.$invalid">-->
+                                <!--<label translate>policy.entity</label>-->
+
+                                <!--<md-select  required ng-model="selectedUser" ng-change="vm.entityChange()">-->
+                                    <!--<md-option ng-value="val.id" ng-repeat="val in vm.entityValues">{{ val.name }}</md-option>-->
+                                <!--</md-select>-->
+
+                                <!--<div ng-messages="theForm.extensionType.$error">-->
+                                    <!--<div translate ng-message="required">policy.field-required</div>-->
+                                <!--</div>-->
+                            <!--</md-input-container>-->
+
+                            <md-input-container flex="40" class="md-block" md-is-error="theForm.dataModelObject.$touched && theForm.dataModelObject.$invalid">
+                                <label translate>policy.datamodel-object</label>
+
+                                <md-select ng-disabled="vm.entity.type == 'ALL'" required ng-model="vm.dataModelObject" ng-change="vm.dataModelObjectChange()">
+                                    <md-option ng-selected="{{ vm.entity.type === 'ALL'  ? 'true' : 'false' }}" ng-value="key" ng-repeat="(key,value) in vm.dataModelObjectValues">{{ value }}</md-option>
+                                </md-select>
+
+                                <div ng-messages="theForm.dataModelObject.$error">
+                                    <div translate ng-message="required">policy.field-required</div>
+                                </div>
+                            </md-input-container>
+
+                            <md-input-container flex="40" class="md-block" md-is-error="theForm.entityValues.$touched && theForm.entityValues.$invalid">
+                                <label translate>policy.entity</label>
+
+                                <md-select ng-disabled="vm.dataModelObject == 'ALL' || vm.entity.type == 'ALL'" required ng-model="vm.entity.values" ng-change="vm.entityChange()">
+                                    <md-option ng-selected="{{ vm.entity.type === 'ALL' || vm.dataModelObject == 'ALL' ? 'true' : 'false' }}" ng-value="key" ng-repeat="(key,value) in vm.entityValues">{{ value }}</md-option>
+                                </md-select>
+
+                                <div ng-messages="theForm.entityValues.$error">
+                                    <div translate ng-message="required">policy.field-required</div>
+                                </div>
+                            </md-input-container>
+
+
+                            <md-input-container flex="40" class="md-block" md-is-error="theForm.permissionType.$touched && theForm.extensionType.$invalid">
+                                <label translate>policy.access-level</label>
+
+                                <md-select ng-disabled="!vm.isAdd" required name="permissionType" ng-model="vm.permission.type">
+                                    <md-option  ng-repeat="(key,value) in vm.permissions" ng-value="key">
+                                        {{value}}
+                                    </md-option>
+                                </md-select>
+
+                                <div ng-messages="theForm.extensionType.$error">
+                                    <div translate ng-message="required">policy.field-required</div>
+                                </div>
+                            </md-input-container>
+
+                        </section>
+                    </fieldset>
+                </md-content>
+            </div>
+        </md-dialog-content>
+
+        <md-dialog-actions layout="row">
+            <md-button type="submit"
+                       class="md-raised md-primary"
+            >
+                {{ (vm.isAdd  ? 'action.add' : 'action.save') | translate }}
+            </md-button>
+
+            <md-button ng-disabled="$root.loading" ng-click="vm.cancel()" style="margin-right:20px;">{{ 'action.cancel' | translate }}
+            </md-button>
+        </md-dialog-actions>
+    </form>
+</md-dialog>

@@ -22,7 +22,6 @@ import com.hashmapinc.server.dao.cassandra.CassandraCluster;
 import com.hashmapinc.server.dao.model.type.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import com.hashmapinc.server.dao.model.type.*;
 
 @Slf4j
 public abstract class CassandraAbstractDao {

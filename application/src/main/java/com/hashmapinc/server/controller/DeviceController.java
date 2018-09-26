@@ -84,13 +84,7 @@ public class DeviceController extends BaseController {
         try {
             device.setTenantId(getCurrentUser().getTenantId());
             if (getCurrentUser().getAuthority() == Authority.CUSTOMER_USER) {
-                if (device.getId() == null || device.getId().isNullUid() ||
-                    device.getCustomerId() == null || device.getCustomerId().isNullUid()) {
-                    throw new TempusException("You don't have permission to perform this operation!",
-                            TempusErrorCode.PERMISSION_DENIED);
-                } else {
-                    checkCustomerId(device.getCustomerId());
-                }
+                checkCustomerId(device.getCustomerId());
             }
             Device savedDevice = checkNotNull(deviceService.saveDevice(device));
 

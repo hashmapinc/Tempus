@@ -15,14 +15,5 @@
 -- limitations under the License.
 --
 
-DROP TABLE computation_job;
-
-CREATE TABLE IF NOT EXISTS computation_job (
-    id varchar(31) NOT NULL CONSTRAINT computation_job_pkey PRIMARY KEY,
-    job_name varchar,
-    search_text varchar,
-    computation_id varchar,
-    job_configuration varchar,
-    state varchar(255),
-    tenant_id varchar(31)
-);
+ALTER TABLE dashboard ADD type varchar DEFAULT 'DEFAULT';
+ALTER TABLE asset ADD data_model_object_id varchar(31) DEFAULT '1b21dd2138140008080808080808080';

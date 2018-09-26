@@ -15,6 +15,7 @@
 -- limitations under the License.
 --
 
+<<<<<<< HEAD
 DROP TABLE computations;
 
 CREATE TABLE IF NOT EXISTS computations (
@@ -46,3 +47,6 @@ CREATE TABLE IF NOT EXISTS kubeless_computation_meta_data (
     timeout varchar,
     checksum varchar
 );
+=======
+ALTER TABLE data_model_object ADD logo_file VARCHAR;
+>>>>>>> dev

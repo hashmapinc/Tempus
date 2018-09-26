@@ -625,6 +625,9 @@ export default function DashboardController(types, utils, dashboardUtils, widget
     }
 
     function widgetClicked($event, layoutCtx, widget) {
+        if(widget.typeAlias == 'device_list'){
+            $rootScope.$emit("addAssetByEntity", [$event]);
+        }
         if (vm.isEditingWidget) {
             editWidget($event, layoutCtx, widget);
         }

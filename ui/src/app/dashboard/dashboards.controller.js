@@ -60,7 +60,7 @@ export function DashboardsController(userService, dashboardService, customerServ
                                              $state, $stateParams, $mdDialog, $document, $q, $translate) {
 
     var customerId = $stateParams.customerId;
-
+    
     var dashboardActionsList = [
         {
             onAction: function ($event, item) {
@@ -206,8 +206,12 @@ export function DashboardsController(userService, dashboardService, customerServ
                 details: function() { return $translate.instant('dashboard.manage-assigned-customers') },
                 icon: "assignment_ind",
                 isEnabled: function(dashboard) {
-                    return dashboard;
-                }
+                                     if(dashboard.type == 'DEFAULT') {
+                                         return dashboard;
+                                       }else {
+                                         return false;
+                                        }
+                                    }
             });
 
             /*dashboardActionsList.push({

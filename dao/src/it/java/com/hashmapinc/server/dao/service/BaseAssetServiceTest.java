@@ -20,6 +20,7 @@ import com.datastax.driver.core.utils.UUIDs;
 import com.hashmapinc.server.common.data.Customer;
 import com.hashmapinc.server.common.data.EntitySubtype;
 import com.hashmapinc.server.common.data.asset.Asset;
+import com.hashmapinc.server.common.data.id.DataModelObjectId;
 import com.hashmapinc.server.common.data.page.TextPageLink;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.After;
@@ -42,7 +43,7 @@ public abstract class BaseAssetServiceTest extends AbstractServiceTest {
 
     private IdComparator<Asset> idComparator = new IdComparator<>();
 
-    private TenantId tenantId;
+    protected TenantId tenantId;
 
     @Before
     public void before() {
@@ -60,19 +61,7 @@ public abstract class BaseAssetServiceTest extends AbstractServiceTest {
 
     @Test
     public void testSaveAsset() {
-        Asset asset = new Asset();
-        asset.setTenantId(tenantId);
-        asset.setName("My asset");
-        asset.setType("default");
-        Asset savedAsset = assetService.saveAsset(asset);
-
-        Assert.assertNotNull(savedAsset);
-        Assert.assertNotNull(savedAsset.getId());
-        Assert.assertTrue(savedAsset.getCreatedTime() > 0);
-        Assert.assertEquals(asset.getTenantId(), savedAsset.getTenantId());
-        Assert.assertNotNull(savedAsset.getCustomerId());
-        Assert.assertEquals(NULL_UUID, savedAsset.getCustomerId().getId());
-        Assert.assertEquals(asset.getName(), savedAsset.getName());
+        Asset savedAsset = createAsset(null, tenantId);
 
         savedAsset.setName("My new asset");
 
@@ -80,7 +69,7 @@ public abstract class BaseAssetServiceTest extends AbstractServiceTest {
         Asset foundAsset = assetService.findAssetById(savedAsset.getId());
         Assert.assertEquals(foundAsset.getName(), savedAsset.getName());
 
-        assetService.deleteAsset(savedAsset.getId());
+        deleteAsset(savedAsset.getId());
     }
 
     @Test(expected = DataValidationException.class)
@@ -146,11 +135,7 @@ public abstract class BaseAssetServiceTest extends AbstractServiceTest {
 
     @Test
     public void testFindAssetById() {
-        Asset asset = new Asset();
-        asset.setTenantId(tenantId);
-        asset.setName("My asset");
-        asset.setType("default");
-        Asset savedAsset = assetService.saveAsset(asset);
+        Asset savedAsset = createAsset(null, tenantId);
         Asset foundAsset = assetService.findAssetById(savedAsset.getId());
         Assert.assertNotNull(foundAsset);
         Assert.assertEquals(savedAsset, foundAsset);
@@ -195,15 +180,9 @@ public abstract class BaseAssetServiceTest extends AbstractServiceTest {
 
     @Test
     public void testDeleteAsset() {
-        Asset asset = new Asset();
-        asset.setTenantId(tenantId);
-        asset.setName("My asset");
-        asset.setType("default");
-        Asset savedAsset = assetService.saveAsset(asset);
+        Asset savedAsset = createAsset(null, tenantId);
+        deleteAsset(savedAsset.getId());
         Asset foundAsset = assetService.findAssetById(savedAsset.getId());
-        Assert.assertNotNull(foundAsset);
-        assetService.deleteAsset(savedAsset.getId());
-        foundAsset = assetService.findAssetById(savedAsset.getId());
         Assert.assertNull(foundAsset);
     }
 
@@ -630,6 +609,33 @@ public abstract class BaseAssetServiceTest extends AbstractServiceTest {
         Assert.assertFalse(pageData.hasNext());
         Assert.assertEquals(0, pageData.getData().size());
         customerService.deleteCustomer(customerId);
+    }
+
+    @Test
+    public void testFindAssetsByDataModelObjectId() {
+        Asset asset = new Asset();
+        asset.setTenantId(tenantId);
+        DataModelObjectId dataModelObjectId = new DataModelObjectId(UUIDs.timeBased());
+        asset.setDataModelObjectId(dataModelObjectId);
+        asset.setName("My asset");
+        asset.setType("default");
+
+        Asset asset2 = new Asset();
+        asset2.setTenantId(tenantId);
+        asset2.setDataModelObjectId(dataModelObjectId);
+        asset2.setName("My asset2");
+        asset2.setType("default");
+
+        Asset savedAsset = assetService.saveAsset(asset);
+        Asset savedAsset2 = assetService.saveAsset(asset2);
+
+        List<Asset> foundAsset = assetService.findAssetsByDataModelObjectId(savedAsset.getDataModelObjectId());
+
+        Assert.assertNotNull(foundAsset);
+        Assert.assertEquals(2, foundAsset.size());
+
+        assetService.deleteAsset(savedAsset.getId());
+        assetService.deleteAsset(savedAsset2.getId());
     }
 
 }

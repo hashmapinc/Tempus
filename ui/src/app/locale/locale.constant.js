@@ -24,7 +24,7 @@ export default angular.module('tempus.locale', [])
                 "access": {
                     "unauthorized": "Unauthorized",
                     "unauthorized-access": "Unauthorized Access",
-                    "unauthorized-access-text": "You should sign in to have access to this resource!",
+                    "unauthorized-access-text": "Your session has expired, please log in again.",
                     "access-forbidden": "Access Forbidden",
                     "access-forbidden-text": "You haven't access rights to this location!<br/>Try to sign in with different user if you still wish to gain access to this location.",
                     "refresh-token-expired": "Session has expired",
@@ -118,8 +118,23 @@ export default angular.module('tempus.locale', [])
 
                 },
                 "metadata" : {
-
-                    "metadata" : "MetaData"
+                    "metadata" : "Metadata",
+                    "name" : "Name",
+                    "name-required":"This feild is required",
+                    "add-metadata" : "Add New Metadata",
+                    "add" : "Add Metadata",
+                    "source-type" : "Source Type",
+                    "source-type-required" : "Metadata Source Type Required",
+                    "sink-type" : "Sink Type",
+                    "dbUrl" : "Database URL",
+                    "dbUsername" : "Username",
+                    "dbPassword" : "Password",
+                    "dbUrl-required" : "Database URL Required",
+                    "dbUsername-required" : "Database Username Required",
+                    "dbPassword-required" : "Database Password Required",
+                    "restUrl" : "URL",
+                    "restUrl-required" : "Rest Endpoint URL Required",
+                    "sink-type-required" : "Metadata Sink Type Required"
                 },
                 "alarm": {
                     "alarm": "Alarm",
@@ -380,14 +395,19 @@ export default angular.module('tempus.locale', [])
                     "public-devices": "Public Devices",
                     "public-assets": "Public Assets",
                     "add": "Add Business Unit",
+                    "no-groups-text":"No Groups",
+                    "add-group-text":"Add New Group",
                     "delete": "Delete business unit",
                     "manage-customer-users": "Manage business unit users",
+                    "manage-customer-groups": "Manage groups",
                     "manage-customer-devices": "Manage business unit devices",
                     "manage-customer-dashboards": "Manage business unit dashboards",
                     "manage-public-devices": "Manage public devices",
                     "manage-public-dashboards": "Manage public dashboards",
                     "manage-customer-assets": "Manage business unit assets",
                     "manage-public-assets": "Manage public assets",
+                    "usergroup":"Group Details",
+                    "usergroupdelete":"Delete Group",
                     "add-customer-text": "Add new business unit",
                     "no-customers-text": "No business units found",
                     "customer-details": "Business Unit details",
@@ -569,7 +589,10 @@ export default angular.module('tempus.locale', [])
                     "show-details": "Show details",
                     "hide-details": "Hide details",
                     "select-state": "Select target state",
-                    "state-controller": "State controller"
+                    "state-controller": "State controller",
+                    "dashboard-landing-page": "Asset Landing Page",
+                    "assign-data-model-view":"Assign Data Model View",
+                    "select-data-model-asset" : "Select Data Model Asset"
                 },
 
                 "dataModels": {
@@ -607,7 +630,9 @@ export default angular.module('tempus.locale', [])
                 "datasource": {
                     "type": "Datasource type",
                     "name": "Name",
-                    "add-datasource-prompt": "Please add datasource"
+                    "add-datasource-prompt": "Please add datasource",
+                    "entity-list":"Entity List",
+                    "entity-type" : "Entity Type"
                 },
                 "details": {
                     "edit-mode": "Edit mode",
@@ -1112,6 +1137,8 @@ export default angular.module('tempus.locale', [])
                     "suspended": "Suspended",
                     "name": "Name",
                     "name-required": "Name is required.",
+                    "type": "Type",
+                    "type-required": "Computation type is required.",
                     "description": "Description",
                     "add": "Add Computation",
                     "delete-computation-title": "Are you sure you want to delete the computation '{{computationName}}'?",
@@ -1124,8 +1151,6 @@ export default angular.module('tempus.locale', [])
                     "computation-details": "computation details",
                     "api-token": "API token",
                     "api-token-required": "API token is required.",
-                    "type": "Plugin type",
-                    "type-required": "Computation type is required.",
                     "configuration": "Computation configuration",
                     "system": "System",
                     "select-computation": "Select computation",
@@ -1378,7 +1403,12 @@ export default angular.module('tempus.locale', [])
                 "user": {
                     "user": "User",
                     "users": "Users",
+                    "groupusers":"Assigned Users",
+                    "unassignToUsers":"Unassign group(s) from users",
                     "usersgroups": "Add Groups",
+                    "assignToGroups":"Assign user(s) to group",
+                    "assignToUsers":"Assign group(s) to user",
+                    "unassignToGroups":"Unassigned user(s) from groups",
                     "groups" : "Groups",
                     "userspolicy": "Add Policy",
                     "usersadd": "Add Users",
@@ -1393,13 +1423,19 @@ export default angular.module('tempus.locale', [])
                     "delete": "Delete user",
                     "add-user-text": "Add new user",
                     "no-users-text": "No users found",
+                    "no-group-text": "No Groups found",
                     "user-details": "User details",
                     "delete-user-title": "Are you sure you want to delete the user '{{userEmail}}'?",
                     "delete-user-text": "Be careful, after the confirmation the user and all related data will become unrecoverable.",
                     "delete-users-title": "Are you sure you want to delete { count, select, 1 {1 user} other {# users} }?",
+                    "delete-groups-title": "Are you sure you want to delete { count, select, 1 {1 group} other {# groups} }?",
                     "delete-users-action-title": "Delete { count, select, 1 {1 user} other {# users} }",
+                    "delete-groups-action-title": "Delete { count, select, 1 {1 group} other {# groups} }",
                     "delete-users-text": "Be careful, after the confirmation all selected users will be removed and all related data will become unrecoverable.",
+                    "delete-groups-text": "Be careful, after the confirmation all selected groups will be removed.",
                     "activation-email-sent-message": "Activation email was successfully sent!",
+                    "delete-usergroup-title": "Are you sure you want to delete the group '{{groupName}}'?",
+                    "delete-usergroup-text": "Be careful, after the confirmation the group and all related data will become unrecoverable.",
                     "resend-activation": "Resend activation",
                     "email": "Email",
                     "email-required": "Email is required.",
@@ -1422,8 +1458,50 @@ export default angular.module('tempus.locale', [])
                     "activation-link-copied-message": "User activation link has been copied to clipboard",
                     "details": "Details",
                     "name": "Name",
-                    "name-required" : "Name is required"
+                    "name-required" : "Name is required",
+                    "assign-to-group":"Assign To Group",
+                    "assign-to-user":"Assign To User",
+                    "assign-user-to-group":"Assign User(s) To Group",
+                    "assign-group-to-user":"Assign Group(s) To User",
+                    "unassign-group-to-user":"Unassign Group(s) To User",
+                    "unassign-user-to-group":"Unassign User(s) To Group",
+                    "assign-user-to-group-text":"Please select the users to assign to group",
+                    "assign-group-to-user-text":"Please select the groups to assign to user",
+                    "unassign-group-to-user-text":"Select the groups to unassign from user",
+                    "unassign-user-to-group-text":"Select the users to unassign from group",
+                    "user-unassigned-message":"User unassigned from group(s)",
+                    "user-assigned-message":"User assigned to group(s)",
+                    "group-assigned-message" :"User(s) assigned to group",
+                    "group-unassigned-message": "User(s) unassigned to group",
+                    "assigned-user-tab":"ASSIGNED USERS",
+                    "assigned-group-tab":"GROUPS",
+                    "no-user-assigned":"No user(s) assigned to group",
+                    "no-group-assigned":"User not assigned to any group(s)",
+                    "policies":"POLICY"
+
                 },
+
+
+                "policy" : {
+                    "policy": "POLICY",
+                    "entityType": "Entity Type",
+                    "entity": "Entity Name",
+                    "accessLevel" :"Access Level",
+                    "add" :"Add Policy",
+                    "edit": "Edit Policy",
+                    "access-level": "Access Level",
+                    "field-required": "Field is required",
+                    "datamodel-object":"Data Model Object",
+                    "delete":"Delete Policy",
+                    "selected-policy":"{ count, select, 1 {1 policy} other {# policy} } selected",
+                    "delete-policy-title": "Are you sure you want to delete the policy?",
+                    "delete-policy-text": "Be careful, after the confirmation the policy and all related data will become unrecoverable.",
+                     "delete-policies-title": "Are you sure you want to delete { count, select, 1 {1 policy} other {# policies} }?",
+                     "delete-policies-text": "Be careful, after the confirmation all selected policies will be removed.",
+                     "no-data":"NO DATA AVAILABLE"
+
+                    },
+
                 "value": {
                     "type": "Value type",
                     "string": "String",
@@ -1490,7 +1568,10 @@ export default angular.module('tempus.locale', [])
                     "widget-template-load-failed-error": "Failed to load widget template!",
                     "add": "Add Widget",
                     "undo": "Undo widget changes",
-                    "export": "Export widget"
+                    "export": "Export widget",
+                    "entity-list-is-empty":"Entity List is empty",
+                    "name": "Name",
+                    "entity-type":"Entity Type"
                 },
                 "widget-action": {
                     "header-button": "Widget header button",
@@ -1610,6 +1691,28 @@ export default angular.module('tempus.locale', [])
                         "marker-click": "On marker click",
                         "tooltip-tag-action": "Tooltip tag action"
                     }
+                },
+                "metadataConfig":{
+                    "add-metadata-text": "Add new Metadata",
+                    "no-metadata-text": "No Metadata found",
+                    "metadata-details": "Metadata Details",
+                    "delete-metadata-title": "Are you sure you want to delete the metadata '{{metadataName}}'?",
+                    "delete-metadata-text":"Be careful, after the confirmation the metadata and all related data will become unrecoverable.",
+                    "delete-metadata-action-title":"Delete { count, select, 1 {1 metadata} other {# metadatas} }",
+                    "delete":"Delete Metadata",
+                    "details":"Details",
+                    "name":"Name",
+                    "name-required":"Name is required.",
+                    "query":"Query",
+                    "trigger-type":"Trigger Type",
+                    "trigger-schedule":"Trigger Schedule",
+                    "test-connection":"Test Connection",
+                    "connection-sucessfull":"Connection sucessfull",
+                    "connection-failed":"Connection failed",
+                    "queries-selected":"queries selected",
+                    "query-name":"Query Name",
+                    "no-query-found":"No query found",
+                    "delete-query":"Delete query"
                 }
             }
         }

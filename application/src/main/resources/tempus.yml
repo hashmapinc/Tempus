@@ -98,8 +98,8 @@ spark:
   livy_port: "${LIVY_PORT:8998}"
 
 kubeless:
-  minio_access_key: "${MINIO_ACCESS_KEY:access_key}"
-  minio_secret_key: "${MINIO_SECRET_KEY:secret_key}"
+  aws_access_key: "${AWS_ACCESS_KEY:access_key}"
+  aws_secret_key: "${AWS_SECRET_KEY:secret_key}"
   cluster_mode_enabled: "${CLUSTER_MODE_ENABLED:false}"
   kube_config_path: "${KUBE_CONFIG_PATH:/path/to/kube/config}"
 
@@ -173,7 +173,7 @@ quota:
     intervalMin: 2
 
 database:
-  type: "${DATABASE_TYPE:sql}" # cassandra OR sql
+  type: "${DATABASE_TYPE:cassandra}" # cassandra OR sql
 
 # Cassandra driver configuration parameters
 cassandra:
@@ -228,6 +228,20 @@ sql:
     ts_inserts_executor_type: "${SQL_TS_INSERTS_EXECUTOR_TYPE:fixed}"
     # Specify thread pool size for FIXED executor service type
     ts_inserts_fixed_thread_pool_size: "${SQL_TS_INSERTS_FIXED_THREAD_POOL_SIZE:10}"
+
+metadata-ingestion:
+    config:
+        service_url: "${METADATA_CONFIG_URL:${METADATA_BASE_URL:http://localhost:9003/api}/metaconfig}"
+        owner_path: "${METADATA_CONFIG_GET_BY_OWNER_URL:owner}"
+        ingest_path: "${METADATA_CONFIG_START_INGESTION_URL:ingest}"
+        connect_path: "${METADATA_CONFIG_TEST_CONNECTION_URL:connection}"
+    query:
+        service_url: "${METADATA_QUERY_URL:${METADATA_BASE_URL:http://localhost:9003/api}/metaquery}"
+        config_path: "${METADATA_QUERY_GET_BY_CONFIG_URL:metaconfig}"
+    # Specify executor service type used to perform metadata insert tasks: SINGLE FIXED CACHED
+    inserts_executor_type: "${SQL_METADATA_INSERTS_EXECUTOR_TYPE:fixed}"
+    # Specify thread pool size for FIXED executor service type
+    inserts_fixed_thread_pool_size: "${SQL_METADATA_INSERTS_FIXED_THREAD_POOL_SIZE:10}"
 
 # Actor system parameters
 actors:

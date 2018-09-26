@@ -164,4 +164,12 @@ public class CassandraAssetDao extends CassandraAbstractSearchTextDao<AssetEntit
         });
     }
 
+    @Override
+    public List<Asset> findAssetsByDataModelObjectId(UUID dataModelObjectId) {
+        log.debug("Try to find assets by dataModelObjectId [{}]", dataModelObjectId);
+        Select select = select().from(ModelConstants.ASSET_BY_DATA_MODEL_OBJECT_VIEW_NAME);
+        Select.Where query = select.where();
+        query.and(eq(ModelConstants.ASSET_DATA_MODEL_OBJECT_ID, dataModelObjectId));
+        return DaoUtil.convertDataList(findListByStatement(query));
+    }
 }

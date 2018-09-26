@@ -15,24 +15,12 @@
 -- limitations under the License.
 --
 
-DROP MATERIALIZED VIEW tempus.cmp_jobs_by_tenant_and_cmp_search_text;
+ALTER TABLE tempus.dashboard ADD type text;
+ALTER TABLE tempus.asset ADD data_model_object_id timeuuid;
 
-DROP TABLE tempus.computation_job;
-
-CREATE TABLE IF NOT EXISTS tempus.computation_job (
-    id uuid,
-    job_name text,
-    search_text text,
-    computation_id uuid,
-    job_configuration text,
-    state text,
-    tenant_id uuid,
-    PRIMARY KEY (id, tenant_id, computation_id)
-);
-
-CREATE MATERIALIZED VIEW IF NOT EXISTS tempus.cmp_jobs_by_tenant_and_cmp_search_text AS
+CREATE MATERIALIZED VIEW IF NOT exists tempus.asset_by_data_model_object AS
     SELECT *
-    from tempus.computation_job
-    WHERE tenant_id IS NOT NULL AND computation_id IS NOT NULL AND search_text IS NOT NULL AND id IS NOT NULL
-    PRIMARY KEY (tenant_id, computation_id, search_text, id)
-    WITH CLUSTERING ORDER BY ( search_text ASC, id DESC );
+FROM tempus.asset
+    WHERE data_model_object_id IS NOT NULL AND tenant_id IS NOT NULL AND customer_id IS NOT NULL AND type IS NOT NULL AND id IS NOT NULL
+    PRIMARY KEY (data_model_object_id,tenant_id,id, customer_id, type)
+    WITH CLUSTERING ORDER BY (id DESC, customer_id DESC);

@@ -115,4 +115,12 @@ public interface AssetDao extends Dao<Asset> {
      */
     ListenableFuture<List<EntitySubtype>> findTenantAssetTypesAsync(UUID tenantId);
 
+    /**
+     * Find all asset by dataModelObjectId
+     *
+     * @param dataModelObjectId the dataModelObjectId
+     * @return the list of asset objects corresponding to dataModelObjectId
+     */
+    List<Asset> findAssetsByDataModelObjectId(UUID dataModelObjectId);
+
 }

@@ -22,24 +22,25 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.TextNode;
 import com.hashmapinc.server.common.data.BaseData;
+import com.hashmapinc.server.common.data.CustomerGroup;
 import com.hashmapinc.server.common.data.EntityType;
 import com.hashmapinc.server.common.data.Event;
+import com.hashmapinc.server.common.data.asset.Asset;
 import com.hashmapinc.server.common.data.cluster.NodeMetric;
 import com.hashmapinc.server.common.data.cluster.NodeStatus;
 import com.hashmapinc.server.common.data.computation.ComputationType;
 import com.hashmapinc.server.common.data.computation.SparkComputationMetadata;
 import com.hashmapinc.server.common.data.computation.Computations;
+import com.hashmapinc.server.common.data.datamodel.AttributeDefinition;
+import com.hashmapinc.server.common.data.datamodel.DataModel;
+import com.hashmapinc.server.common.data.datamodel.DataModelObject;
 import com.hashmapinc.server.common.data.id.*;
 import com.hashmapinc.server.common.data.plugin.ComponentDescriptor;
 import com.hashmapinc.server.common.data.plugin.ComponentScope;
 import com.hashmapinc.server.common.data.plugin.ComponentType;
 import com.hashmapinc.server.common.data.plugin.PluginMetaData;
 import com.hashmapinc.server.common.data.rule.RuleMetaData;
-
 import com.hashmapinc.server.dao.UserServiceTestConfiguration;
-
-import com.hashmapinc.server.dao.tagmetadata.TagMetaDataService;
-
 import com.hashmapinc.server.dao.alarm.AlarmService;
 import com.hashmapinc.server.dao.asset.AssetService;
 import com.hashmapinc.server.dao.audit.AuditLogLevelFilter;
@@ -48,7 +49,9 @@ import com.hashmapinc.server.dao.cluster.NodeMetricService;
 import com.hashmapinc.server.dao.component.ComponentDescriptorService;
 import com.hashmapinc.server.dao.computations.ComputationsService;
 import com.hashmapinc.server.dao.customer.CustomerService;
+import com.hashmapinc.server.dao.customergroup.CustomerGroupService;
 import com.hashmapinc.server.dao.dashboard.DashboardService;
+import com.hashmapinc.server.dao.datamodel.AttributeDefinitionDao;
 import com.hashmapinc.server.dao.datamodel.DataModelObjectService;
 import com.hashmapinc.server.dao.datamodel.DataModelService;
 import com.hashmapinc.server.dao.depthseries.DepthSeriesService;
@@ -56,16 +59,19 @@ import com.hashmapinc.server.dao.device.DeviceCredentialsService;
 import com.hashmapinc.server.dao.device.DeviceService;
 import com.hashmapinc.server.dao.event.EventService;
 import com.hashmapinc.server.dao.logo.LogoService;
+import com.hashmapinc.server.dao.metadataingestion.MetadataIngestionService;
 import com.hashmapinc.server.dao.plugin.PluginService;
 import com.hashmapinc.server.dao.relation.RelationService;
 import com.hashmapinc.server.dao.rule.RuleService;
 import com.hashmapinc.server.dao.settings.UserSettingsService;
+import com.hashmapinc.server.dao.tagmetadata.TagMetaDataService;
 import com.hashmapinc.server.dao.tenant.TenantService;
 import com.hashmapinc.server.dao.theme.ThemeService;
 import com.hashmapinc.server.dao.timeseries.TimeseriesService;
 import com.hashmapinc.server.dao.user.UserService;
 import com.hashmapinc.server.dao.widget.WidgetTypeService;
 import com.hashmapinc.server.dao.widget.WidgetsBundleService;
+import org.junit.Assert;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -78,11 +84,10 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.context.support.AnnotationConfigContextLoader;
 
 import java.io.IOException;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
+
+import static com.hashmapinc.server.dao.model.ModelConstants.NULL_UUID;
 
 @ActiveProfiles("dao-test")
 @RunWith(SpringRunner.class)
@@ -167,7 +172,16 @@ public abstract class AbstractServiceTest {
     protected LogoService logoService;
 
     @Autowired
+    protected CustomerGroupService customerGroupService;
+
+    @Autowired
     protected DataModelObjectService dataModelObjectService;
+
+    @Autowired
+    protected MetadataIngestionService metadataIngestionService;
+
+    @Autowired
+    protected AttributeDefinitionDao attributeDefinitionDao;
 
     class IdComparator<D extends BaseData<? extends UUIDBased>> implements Comparator<D> {
         @Override
@@ -332,4 +346,73 @@ public abstract class AbstractServiceTest {
         return new AuditLogLevelFilter(mask);
     }
 
+    protected CustomerGroup createGroupWithPolicies(List<String> policies, TenantId tenantId, CustomerId customerId) {
+        CustomerGroup customerGroup = new CustomerGroup();
+        customerGroup.setTitle("My Customer Group");
+        customerGroup.setTenantId(tenantId);
+        customerGroup.setCustomerId(customerId);
+        customerGroup.setPolicies(policies);
+        return customerGroupService.saveCustomerGroup(customerGroup);
+    }
+
+    protected void deleteGroup(CustomerGroupId customerGroupId) {
+        customerGroupService.deleteCustomerGroup(customerGroupId);
+    }
+
+
+    protected DataModel createDataModel(TenantId tenantId) {
+        DataModel dataModel = new DataModel();
+        dataModel.setName("Default Drilling Data Model1");
+        dataModel.setLastUpdatedTs(System.currentTimeMillis());
+        dataModel.setTenantId(tenantId);
+        return dataModelService.saveDataModel(dataModel);
+    }
+
+    protected DataModelObject createDataModelObject(DataModel dataModel){
+        DataModelObject dataModelObject = new DataModelObject();
+        dataModelObject.setName("Well");
+        dataModelObject.setDataModelId(dataModel.getId());
+        AttributeDefinition ad = new AttributeDefinition();
+        ad.setValueType("STRING");
+        ad.setName("attr name2");
+        List<AttributeDefinition> attributeDefinitions = new ArrayList<>();
+        attributeDefinitions.add(ad);
+        dataModelObject.setAttributeDefinitions(attributeDefinitions);
+        return dataModelObjectService.save(dataModelObject);
+    }
+
+    protected void deleteDataModelObject(DataModelObjectId dataModelObjectId) {
+        dataModelObjectService.removeById(dataModelObjectId);
+    }
+
+    protected Asset createAsset(DataModelObjectId dataModelObjectId, TenantId tenantId){
+        Asset asset = new Asset();
+        asset.setName("My asset");
+        asset.setType("default");
+        asset.setDataModelObjectId(dataModelObjectId);
+        asset.setTenantId(tenantId);
+        Asset savedAsset = assetService.saveAsset(asset);
+        Assert.assertNotNull(savedAsset);
+        Assert.assertNotNull(savedAsset.getId());
+        Assert.assertTrue(savedAsset.getCreatedTime() > 0);
+        Assert.assertEquals(asset.getTenantId(), savedAsset.getTenantId());
+        Assert.assertNotNull(savedAsset.getCustomerId());
+        Assert.assertEquals(NULL_UUID, savedAsset.getCustomerId().getId());
+        Assert.assertEquals(asset.getName(), savedAsset.getName());
+        return savedAsset;
+    }
+
+    protected void deleteAsset(AssetId assetId){
+        assetService.deleteAsset(assetId);
+    }
+
+    protected DataModel createDataModel(String name ,TenantId tenantId) {
+        DataModel dataModel = new DataModel();
+        dataModel.setName(name);
+        dataModel.setLastUpdatedTs(System.currentTimeMillis());
+        dataModel.setTenantId(tenantId);
+        DataModel savedDataModel = dataModelService.saveDataModel(dataModel);
+        Assert.assertNotNull(savedDataModel);
+        return savedDataModel;
+    }
 }
