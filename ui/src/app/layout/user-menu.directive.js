@@ -70,20 +70,20 @@ function UserMenuController($scope, userService, $translate, $state) {
     function userDisplayName() {
         var name = "";
         if (dashboardUser) {
-            if ((dashboardUser.firstName && dashboardUser.firstName.length > 0) ||
-                (dashboardUser.lastName && dashboardUser.lastName.length > 0)) {
-                if (dashboardUser.firstName) {
-                    name += dashboardUser.firstName;
-                }
-                if (dashboardUser.lastName) {
-                    if (name.length > 0) {
-                        name += " ";
-                    }
-                    name += dashboardUser.lastName;
-                }
-            } else {
-                name = dashboardUser.email;
-            }
+//            if ((dashboardUser.firstName && dashboardUser.firstName.length > 0) ||
+//                (dashboardUser.lastName && dashboardUser.lastName.length > 0)) {
+//                if (dashboardUser.firstName) {
+//                    name += dashboardUser.firstName;
+//                }
+//                if (dashboardUser.lastName) {
+//                    if (name.length > 0) {
+//                        name += " ";
+//                    }
+//                    name += dashboardUser.lastName;
+//                }
+//            } else {
+                name = dashboardUser.user_name;
+ //           }
         }
         return name;
     }
