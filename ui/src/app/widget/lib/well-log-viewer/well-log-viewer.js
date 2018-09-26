@@ -84,7 +84,7 @@ export default class WellLogViewer {
 			                         	"cType": {
 			                  	            "title": "Component Type",
 			                                "type": "string",
-			                          		"enum": ["line","linearGrid"]
+			                          		"enum": ["Line", "Linear Grid", "Time Y axis"]
 			                      		},
 			                      		"dataSource": {
 											"title": "Data Source",
@@ -194,15 +194,15 @@ export default class WellLogViewer {
 	               			"type": "rc-select",
 		                    "multiple": false,
 		                    "items": [],
-		                    "condition": "model.Track[form.key[1]].component[form.arrayIndex].cType === 'line'"
+		                    "condition": "model.Track[form.key[1]].component[form.arrayIndex].cType === 'Line'"
 	               		},             		
 	               		 {
 	                 		 "key": "Track[].component[].color",
-	                	 	 "condition": "model.Track[form.key[1]].component[form.arrayIndex].cType === 'line'"
+	                	 	 "condition": "model.Track[form.key[1]].component[form.arrayIndex].cType === 'Line'"
 	               		 },
 	               		 {
 	                 		 "key": "Track[].component[].lineWeight",
-	                	 	 "condition": "model.Track[form.key[1]].component[form.arrayIndex].cType === 'line'"
+	                	 	 "condition": "model.Track[form.key[1]].component[form.arrayIndex].cType === 'Line'"
 	               		 },
 	               		 "Track[].component[].hasHeader",
 	               		 {
@@ -219,15 +219,15 @@ export default class WellLogViewer {
 	               		 },
 	               		 {
 	                 		 "key": "Track[].component[].areaFill",
-	                	 	 "condition": "model.Track[form.key[1]].component[form.arrayIndex].cType === 'line'"
+	                	 	 "condition": "model.Track[form.key[1]].component[form.arrayIndex].cType === 'Line'"
 	               		 },
 	               		 {
 	                 		 "key": "Track[].component[].minorLines",
-	                	 	 "condition": "model.Track[form.key[1]].component[form.arrayIndex].cType === 'linearGrid'"
+	                	 	 "condition": "model.Track[form.key[1]].component[form.arrayIndex].cType === 'Linear Grid'"
 	               		 },
 	               		 {
 	                 		 "key": "Track[].component[].majorLines",
-	                	 	 "condition": "model.Track[form.key[1]].component[form.arrayIndex].cType === 'linearGrid'"
+	                	 	 "condition": "model.Track[form.key[1]].component[form.arrayIndex].cType === 'Linear Grid'"
 	               		 }
 	               		
 	                ]
