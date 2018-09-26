@@ -28,11 +28,23 @@ export default class WellLogViewer {
           //  var settings = ctx.settings;
             this.init();
      }
-
      init() {
 		//loadLogViewer(this.ctx, "init");
         //alert(test);
         //alert("test.test");
+     }
+
+     test(){
+     	var datasources = this.ctx.datasources;
+        console.log(settings);
+        var dataKeys = [];
+        datasources.forEach(function(dkeys){
+        	dkeys.dataKeys.forEach(function(datakey){
+
+        		dataKeys.push({"value": datakey.label, "label": datakey.label});
+        	})
+        })
+     	return dataKeys;
      }
 
      update() {
@@ -72,7 +84,7 @@ export default class WellLogViewer {
 			                         	"cType": {
 			                  	            "title": "Component Type",
 			                                "type": "string",
-			                          		"enum": ["Line", "Linear Grid", "Time Y axis", "Mud Log Viewer"]
+			                          		"enum": ["Line", "Linear Grid", "Time Y axis"]
 			                      		},
 			                      		"dataSource": {
 											"title": "Data Source",

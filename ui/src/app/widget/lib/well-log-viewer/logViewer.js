@@ -21,7 +21,6 @@ import {linearGrid} from './linearGrid';
 import {headerLegend} from './headerLegend';
 import {lineGraph} from './lineGraph';
 import {timeYaxis} from './timeYaxis';
-import {mudLog} from './mudLog';
 import './logViewer.css';
 
 // var loadConfig = require('./config');
@@ -97,10 +96,6 @@ export default function loadLogViewer(ctx, sequence){
           if(componentObj.cType === 'Line'){
             var lnGraph = lineGraph(componentObj, datasourceFilter(componentObj, dArray), state, index, parseInt(track.width));
             trackObj.push(lnGraph);
-          }          
-          if(componentObj.cType === 'Mud Log Viewer'){
-            var mdlog = mudLog(componentObj, datasourceFilter(componentObj, dArray), state, index, parseInt(track.width));
-            trackObj.push(mdlog);
           }
 
         })
