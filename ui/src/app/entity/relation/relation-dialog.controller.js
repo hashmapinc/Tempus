@@ -24,7 +24,7 @@ import './relation-dialog.scss';
 const js_beautify = beautify.js;
 
 /*@ngInject*/
-export default function RelationDialogController($scope, $mdDialog, types, entityRelationService, isAdd, direction, relation, showingCallback, entityDetail, assetService, deviceService) {
+export default function RelationDialogController($scope, $mdDialog, types, entityRelationService, isAdd, direction, relation, showingCallback, entityDetail, assetService, deviceService,$log) {
 
     var vm = this;
 
@@ -112,18 +112,24 @@ export default function RelationDialogController($scope, $mdDialog, types, entit
 
         $scope.theForm.$setValidity("additionalInfo", valid);
 
-
+        $log.log(relation);
+        $log.log(vm.relation)
         if (valid) {
             entityRelationService.saveRelation(vm.relation).then(
                 function success() {
-                    if(relation.from.entityType == 'DEVICE' && vm.entityDetail && vm.entityDetail.customerId.id == '13814000-1dd2-11b2-8080-808080808080'){
-                        if(relation.to.entityType == 'ASSET'){
+                    if((relation.from.entityType == 'DEVICE' || relation.from.entityType == 'ASSET' )&& vm.entityDetail && vm.entityDetail.customerId.id == '13814000-1dd2-11b2-8080-808080808080'){
                             assetService.getAsset(vm.relation.to.id).then(function success(response){
+                                $log.log(response)
+
                                 if(response){
-                                    deviceService.assignDeviceToCustomer(response.customerId.id,vm.entityDetail.id.id).then();
+                                    if(relation.to.entityType == 'ASSET' && relation.from.entityType == 'DEVICE'){
+                                        deviceService.assignDeviceToCustomer(response.customerId.id,vm.entityDetail.id.id).then();
+                                    }else if(relation.to.entityType == 'ASSET' && relation.from.entityType == 'ASSET'){
+                                        assetService.assignAssetToCustomer(response.customerId.id,vm.entityDetail.id.id).then();
+                                    }
+
                                 }
                             });
-                        }
                     }
                     $mdDialog.hide();
                 }
