@@ -34,7 +34,7 @@ export default function RelationTable() {
         bindToController: {
             entityId: '=',
             entityType: '@',
-            device:'='
+            entityDetail:'='
         },
         controller: RelationTableController,
         controllerAs: 'vm',
@@ -46,6 +46,7 @@ export default function RelationTable() {
 function RelationTableController($scope, $q, $mdDialog, $document, $translate, $filter, utils, types, entityRelationService) {
 
     let vm = this;
+
 
     vm.types = types;
 
@@ -152,7 +153,7 @@ function RelationTableController($scope, $q, $mdDialog, $document, $translate, $
                       direction: vm.direction,
                       relation: relation,
                       showingCallback: onShowingCallback,
-                      device:vm.device},
+                      entityDetail:vm.entityDetail},
             targetEvent: $event,
             fullscreen: true,
             skipHide: true,

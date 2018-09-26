@@ -166,7 +166,7 @@
             <tb-relation-table flex
                                entity-id="vm.grid.operatingItem().id.id"
                                entity-type="{{vm.types.entityType.device}}"
-                               device="vm.grid.operatingItem()">
+                               entity-detail="vm.grid.operatingItem()">
             </tb-relation-table>
         </md-tab>
         <md-tab ng-if="!vm.grid.detailsConfig.isDetailsEditMode && vm.grid.operatingItem().additionalInfo.gateway" md-on-select="vm.grid.triggerResize()" label="{{ 'extension.extensions' | translate }}">

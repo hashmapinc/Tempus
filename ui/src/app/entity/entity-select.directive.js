@@ -31,7 +31,6 @@ export default function EntitySelect($compile, $templateCache) {
 
         scope.tbRequired = angular.isDefined(scope.tbRequired) ? scope.tbRequired : false;
         scope.model = {};
-
         scope.updateView = function () {
             if (!scope.disabled) {
                 var value = ngModelCtrl.$viewValue;
@@ -109,7 +108,7 @@ export default function EntitySelect($compile, $templateCache) {
             tbRequired: '=?',
             disabled:'=ngDisabled',
             useAliasEntityTypes: "=?",
-            device:'=',
+            entityDetail:'=',
             relation:'='
         }
     };

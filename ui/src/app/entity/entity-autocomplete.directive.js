@@ -53,9 +53,9 @@ export default function EntityAutocomplete($compile, $templateCache, $q, $filter
                             }
                         });
                         deferred.resolve(entities);
-                    } else if(((scope.relation.to && scope.relation.to.entityType == 'DEVICE') || (scope.relation.from && scope.relation.from.entityType == 'DEVICE')) && scope.device.customerId && scope.device.customerId.id !='13814000-1dd2-11b2-8080-808080808080' ) {
+                    } else if(((scope.relation.to && scope.relation.to.entityType == 'DEVICE') || (scope.relation.from && scope.relation.from.entityType == 'DEVICE')) && scope.entityDetail.customerId && scope.entityDetail.customerId.id !='13814000-1dd2-11b2-8080-808080808080' ) {
                         result.forEach(function(entity) {
-                            if (scope.device.customerId.id == entity.customerId.id) {
+                            if (scope.entityDetail.customerId.id == entity.customerId.id) {
                                 entities.push(entity);
                             }
                         });
@@ -207,7 +207,7 @@ export default function EntityAutocomplete($compile, $templateCache, $q, $filter
             entityType: '=',
             entitySubtype: '=?',
             excludeEntityIds: '=?',
-            device: '=',
+            entityDetail: '=',
             relation:'='
         }
     };
