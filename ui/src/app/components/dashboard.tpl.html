@@ -72,8 +72,8 @@
 											   </md-tooltip>
 											   <ng-md-icon size="20" icon="{{action.icon}}"></ng-md-icon>
 									</md-button>
-									<md-button ng-if="widget.typeAlias=='device_list'" class="md-icon-button" ng-click="addAsset($event)">
-											<md-icon>add</md-icon>
+									<md-button ng-if="widget.typeAlias=='device_list'" id="addAsset" class="md-icon-button" ng-click="addAsset($event)">
+											<md-icon id="addAsset">add</md-icon>
 											<md-tooltip md-direction="top">
 												{{ 'action.add' | translate }}
 											</md-tooltip>

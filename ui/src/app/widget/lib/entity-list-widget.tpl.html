@@ -34,6 +34,9 @@
                             <tr md-row  ng-repeat="list in entityList.data">
                                 <td md-cell><a href ng-click="vm.entityDetailFunc($event,list)">{{list.name}}</a></td>
                                 <td md-cell style="text-transform: uppercase">{{list.type}}</td>
+                                <td  md-cell class="tb-value-cell" ng-click="vm.deleteAsset($event,list)">
+                                    <span><ng-md-icon size="16" icon="delete"></ng-md-icon></span>
+                                </td>
                             </tr>
                             </tbody>
                         </table>

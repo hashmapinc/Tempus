@@ -44,8 +44,8 @@ function DeviceListWidget() {
     };
 }
 
-function AddAssetController (customerService,$state,dashboardService,datamodelService,userService,
-    $rootScope,assetService,$mdDialog,entityRelationService,attributeService){
+function AddAssetController (customerService, $state, dashboardService, datamodelService, userService,
+    $rootScope, assetService, $mdDialog, entityRelationService, attributeService){
     var vm = this;
     vm.name = null;
     vm.dataModelObject = null;
@@ -207,6 +207,7 @@ function DeviceListWidgetController($rootScope, $scope, $filter, dashboardServic
         search: null
     };
     vm.entityDetailFunc = entityDetailFunc;
+    vm.deleteAsset = deleteAsset;
     vm.loadTableData = loadTableData;
     $scope.showList = false;
     
@@ -317,6 +318,23 @@ function DeviceListWidgetController($rootScope, $scope, $filter, dashboardServic
         }).then(function () {
         }, function () {
             initController();
+        });
+    }
+
+    function deleteAsset($event,item) {
+        var confirm = $mdDialog.confirm()
+            .targetEvent($event)
+            .title($translate.instant('asset.delete-asset-title', {assetName: item.name}))
+            .htmlContent($translate.instant('asset.delete-asset-text'))
+            .ariaLabel($translate.instant('grid.delete-item'))
+            .cancel($translate.instant('action.no'))
+            .ok($translate.instant('action.yes'));
+        $mdDialog.show(confirm).then(function () {
+            assetService.deleteAsset(item.id.id).then(function success() {
+                initController();
+            });
+        },
+        function () {
         });
     }
     
