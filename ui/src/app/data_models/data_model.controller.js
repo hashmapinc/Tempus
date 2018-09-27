@@ -240,7 +240,7 @@ export function DataModelController($scope, $log, $mdDialog, $document, $statePa
         // reset data persistence state
         objectDeleteList = [];
 
-        // load datamodel
+        
         datamodelService.getDatamodel($stateParams.datamodelId).
         then(function success(data) {
             vm.datamodelTitle = data.name;
