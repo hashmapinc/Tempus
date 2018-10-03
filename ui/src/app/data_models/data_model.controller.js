@@ -149,9 +149,7 @@ export function DataModelController($scope, $mdDialog, $document, $stateParams, 
             additionalInfo:vm.additionalInfo
 
         };
-        datamodelService.saveDatamodel(datamodelToSave).then(function success() {
-        }, function fail() {
-        });
+        datamodelService.saveDatamodel(datamodelToSave);
 
 
         // get the brand new nodes that do not have a dmo id
@@ -218,7 +216,6 @@ export function DataModelController($scope, $mdDialog, $document, $stateParams, 
                 datamodelService.saveDatamodelObject(toSave, $stateParams.datamodelId).then(function success(response) {
 
                     vm.dataModelSavedName.push(response.data.name);
-                }, function fail() {
                 });
             });
         }, function fail() {
@@ -237,8 +234,6 @@ export function DataModelController($scope, $mdDialog, $document, $stateParams, 
         // reset data persistence state
         objectDeleteList = [];
         objectDeleteNameList = [];
-
-
         datamodelService.getDatamodel($stateParams.datamodelId).
         then(function success(data) {
             vm.datamodelTitle = data.name;
@@ -492,7 +487,6 @@ export function DataModelController($scope, $mdDialog, $document, $stateParams, 
         var nodeId = vm.stepperData.node_id;
         var node = vm.nodes.get(nodeId); // this is null if no node exists with this id
         if(node == null) {
-
             if(vm.dataModelName.indexOf(angular.lowercase(vm.stepperData.name.trim())) !== -1) {
                 vm.stepperState = 0;    // keeps track of the current stepper step (0-3)
                 vm.stepperMode = "";    // either CREATE or EDIT. Usefull for hiding/showing the delete option
@@ -510,12 +504,21 @@ export function DataModelController($scope, $mdDialog, $document, $stateParams, 
                     return false;
                 }
             }
-
         }
 
         if(node !== null) {
           if(node.label != angular.lowercase(vm.stepperData.name.trim())) {
             if(vm.dataModelName.indexOf(angular.lowercase(vm.stepperData.name.trim())) !== -1) {
+                vm.stepperState = 0;    // keeps track of the current stepper step (0-3)
+                vm.stepperMode = "";    // either CREATE or EDIT. Usefull for hiding/showing the delete option
+                toast.showError($translate.instant('Datamodel object already present of same name.'));
+                return false;
+            } else {
+                 vm.dataModelName.push(angular.lowercase(vm.stepperData.name.trim()));
+            }
+
+        if(vm.dataModelSavedName.length > 0 ) {
+            if(vm.dataModelSavedName.indexOf(angular.lowercase(vm.stepperData.name.trim())) !== -1) {
                 vm.stepperState = 0;    // keeps track of the current stepper step (0-3)
                 vm.stepperMode = "";    // either CREATE or EDIT. Usefull for hiding/showing the delete option
                 toast.showError($translate.instant('Datamodel object already present of same name.'));
@@ -534,6 +537,7 @@ export function DataModelController($scope, $mdDialog, $document, $stateParams, 
                  }
             }
           }
+            }
         }
 
         if (node) { // handle an existing node
