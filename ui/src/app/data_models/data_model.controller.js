@@ -21,7 +21,7 @@ import objectStepper from './datamodel-object-stepper.tpl.html';
 import objectInformation from './object_info.tpl.html';
 
 /*@ngInject*/
-export function DataModelController($scope, $log, $mdDialog, $document, $stateParams, $timeout, $q, datamodelService) {
+export function DataModelController($scope, $log, $mdDialog, $document, $stateParams, $timeout, $q, datamodelService, toast, $translate) {
     //=============================================================================
     // Main
     //=============================================================================
@@ -39,6 +39,8 @@ export function DataModelController($scope, $log, $mdDialog, $document, $statePa
     var objectDeleteList = [];  // list of datamodel object ID's to delete when changes are confirmed
     vm.fileAdded = fileAdded;
     vm.clearFile = clearFile;
+    vm.dataModelName =[];
+    vm.dataModelSavedName = [];
 
 
     // Create the graph that will be plotted
@@ -130,6 +132,7 @@ export function DataModelController($scope, $log, $mdDialog, $document, $statePa
         resetStepperState();
     };
 
+
     //=============================================================================
     // Datamodel functionality
     //=============================================================================
@@ -148,7 +151,7 @@ export function DataModelController($scope, $log, $mdDialog, $document, $statePa
 
         };
         datamodelService.saveDatamodel(datamodelToSave).then(function success(response) {
-            $log.debug("successfully saved datamodel..." + angular.toJson(response));
+            $log.log(response);
         }, function fail(response) {
             $log.error("could not save datamodel..." + angular.toJson(response));
         });
@@ -164,6 +167,7 @@ export function DataModelController($scope, $log, $mdDialog, $document, $statePa
             $log.debug("creating data model object IDs...");
 
             // get ID's
+
             return datamodelService.saveDatamodelObject(
                 { "name": node.datamodelObject.name }, // name doesn't matter now, just need the ID
                 $stateParams.datamodelId
@@ -171,6 +175,7 @@ export function DataModelController($scope, $log, $mdDialog, $document, $statePa
         });
 
         // once all promises resolve, we'll have enough IDs to save the model
+       // vm.dataModelName =[];
         $q.all(promises).then(function success(response) {
             $log.debug("successfully created datamodel objects..." + angular.toJson(response));
 
@@ -217,7 +222,8 @@ export function DataModelController($scope, $log, $mdDialog, $document, $statePa
 
                 // save the datamodel object
                 datamodelService.saveDatamodelObject(toSave, $stateParams.datamodelId).then(function success(response) {
-                    $log.debug("successfully saved datamodel object..." + angular.toJson(response));
+
+                    vm.dataModelSavedName.push(response.data.name);
                 }, function fail(response) {
                     $log.error("could not save datamodel object..." + angular.toJson(response));
                 });
@@ -240,7 +246,7 @@ export function DataModelController($scope, $log, $mdDialog, $document, $statePa
         // reset data persistence state
         objectDeleteList = [];
 
-        
+
         datamodelService.getDatamodel($stateParams.datamodelId).
         then(function success(data) {
             vm.datamodelTitle = data.name;
@@ -287,6 +293,7 @@ export function DataModelController($scope, $log, $mdDialog, $document, $statePa
 
                 // store id in hashmap
                 dmo_to_node[dmo.id.id] = node.id;
+                vm.dataModelSavedName.push(angular.lowercase(dmo.name));
 
                 // add the node to the nodes set
                 vm.nodes.add(node);
@@ -312,9 +319,9 @@ export function DataModelController($scope, $log, $mdDialog, $document, $statePa
     /**
      * plot the datamodel
      */
-    function plotDatamodel() {
+    function plotDatamodel() { $log.log('hi');
         // center the view after the drawing is finished
-        network.once('afterDrawing', function (params) {
+        network.once('afterDrawing', function (params) { $log.log(params);
             // focus the camera on the new nodes
             network.fit({
                 nodes: vm.nodes.getIds(),
@@ -453,8 +460,7 @@ export function DataModelController($scope, $log, $mdDialog, $document, $statePa
             // handle object info tab
             if (vm.stepperState === 0) {
                 angular.element('#stepperNext').click();
-
-                // handle attributes tab
+               // handle attributes tab
             } else if (vm.stepperState === 1) {
                 vm.stepperData.currentAttribute.length === 0 ? angular.element('#stepperNext').click() : angular.element('#stepperAddAttrButton').click();
 
@@ -474,16 +480,36 @@ export function DataModelController($scope, $log, $mdDialog, $document, $statePa
         // create the data model object to be submitted
         var dmo = createDatamodelObject(
             vm.stepperData.id,
-            vm.stepperData.name,
+            vm.stepperData.name.trim(),
             vm.stepperData.desc,
             vm.stepperData.type,
             vm.stepperData.attributes,
             vm.stepperData.logoFile
         );
 
+
+
         // get the nodeId and the node (if it exists)
-        var nodeId = vm.stepperData.node_id
-        var node = vm.nodes.get(nodeId) // this is null if no node exists with this id
+        var nodeId = vm.stepperData.node_id;
+        var node = vm.nodes.get(nodeId); // this is null if no node exists with this id
+
+        if(vm.dataModelName.indexOf(angular.lowercase(vm.stepperData.name.trim())) !== -1) {
+            vm.stepperState = 0;    // keeps track of the current stepper step (0-3)
+            vm.stepperMode = "";    // either CREATE or EDIT. Usefull for hiding/showing the delete option
+            toast.showError($translate.instant('Datamodel object already present of same name.'));
+            return false;
+         } else {
+            vm.dataModelName.push(angular.lowercase(vm.stepperData.name.trim()));
+         }
+
+        if(vm.dataModelSavedName.length > 0 ) {
+            if(vm.dataModelSavedName.indexOf(angular.lowercase(vm.stepperData.name.trim())) !== -1) {
+                vm.stepperState = 0;    // keeps track of the current stepper step (0-3)
+                vm.stepperMode = "";    // either CREATE or EDIT. Usefull for hiding/showing the delete option
+                toast.showError($translate.instant('Datamodel object already present of same name.'));
+                return false;
+            }
+        }
 
         if (node) { // handle an existing node
             // update the node
