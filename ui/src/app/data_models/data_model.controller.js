@@ -21,7 +21,7 @@ import objectStepper from './datamodel-object-stepper.tpl.html';
 import objectInformation from './object_info.tpl.html';
 
 /*@ngInject*/
-export function DataModelController($scope, $log, $mdDialog, $document, $stateParams, $timeout, $q, datamodelService, toast, $translate) {
+export function DataModelController($scope, $mdDialog, $document, $stateParams, $timeout, $q, datamodelService, toast, $translate) {
     //=============================================================================
     // Main
     //=============================================================================
@@ -138,8 +138,6 @@ export function DataModelController($scope, $log, $mdDialog, $document, $statePa
     //=============================================================================
     // save the datamodel and datamodel objects
     function saveDatamodel() {
-        $log.debug("saving data model and objects...");
-
         // save the datamodel
         var datamodelToSave = {
             id: {
@@ -150,10 +148,8 @@ export function DataModelController($scope, $log, $mdDialog, $document, $statePa
             additionalInfo:vm.additionalInfo
 
         };
-        datamodelService.saveDatamodel(datamodelToSave).then(function success(response) {
-            $log.log(response);
-        }, function fail(response) {
-            $log.error("could not save datamodel..." + angular.toJson(response));
+        datamodelService.saveDatamodel(datamodelToSave).then(function success() {
+        }, function fail() {
         });
 
 
@@ -164,8 +160,6 @@ export function DataModelController($scope, $log, $mdDialog, $document, $statePa
 
         // create an array of promises for each create call
         var promises = new_nodes.map(node => {  // return promises for each node
-            $log.debug("creating data model object IDs...");
-
             // get ID's
 
             return datamodelService.saveDatamodelObject(
@@ -177,7 +171,6 @@ export function DataModelController($scope, $log, $mdDialog, $document, $statePa
         // once all promises resolve, we'll have enough IDs to save the model
        // vm.dataModelName =[];
         $q.all(promises).then(function success(response) {
-            $log.debug("successfully created datamodel objects..." + angular.toJson(response));
 
             // save the new id in the new nodes
             response.forEach(r => {
@@ -224,12 +217,11 @@ export function DataModelController($scope, $log, $mdDialog, $document, $statePa
                 datamodelService.saveDatamodelObject(toSave, $stateParams.datamodelId).then(function success(response) {
 
                     vm.dataModelSavedName.push(response.data.name);
-                }, function fail(response) {
-                    $log.error("could not save datamodel object..." + angular.toJson(response));
+                }, function fail() {
                 });
             });
-        }, function fail(response) {
-            $log.error("could not create datamodel object..." + angular.toJson(response));
+        }, function fail() {
+
         });
     }
 
@@ -237,8 +229,6 @@ export function DataModelController($scope, $log, $mdDialog, $document, $statePa
      * load the data model
      */
     function loadDatamodel() {
-        $log.debug("loading data model...");
-
         // erase current plot
         vm.nodes.clear();
         vm.edges.clear();
@@ -251,14 +241,12 @@ export function DataModelController($scope, $log, $mdDialog, $document, $statePa
         then(function success(data) {
             vm.datamodelTitle = data.name;
             vm.additionalInfo = data.additionalInfo;
-        }, function fail(data) {
-            $log.error("Could not load datamodel:" + angular.toJson(data));
+        }, function fail() {
         });
 
         // load datamodel objects
         datamodelService.getDatamodelObjects($stateParams.datamodelId).
         then(function success(data) {
-            $log.info("successfully loaded datamodel objects:" + angular.toJson(data));
 
             // process the nodes, gather the raw edges
             var dmo_to_node = {}    // hashmap of dmo id strings -> visjs node ids
@@ -311,17 +299,17 @@ export function DataModelController($scope, $log, $mdDialog, $document, $statePa
 
             plotDatamodel();
 
-        }, function fail(data) {
-            $log.error("Could not load datamodel objects:" + data);
+        }, function fail() {
+
         });
     }
 
     /**
      * plot the datamodel
      */
-    function plotDatamodel() { $log.log('hi');
+    function plotDatamodel() {
         // center the view after the drawing is finished
-        network.once('afterDrawing', function (params) { $log.log(params);
+        network.once('afterDrawing', function (params) {
             // focus the camera on the new nodes
             network.fit({
                 nodes: vm.nodes.getIds(),
@@ -401,7 +389,7 @@ export function DataModelController($scope, $log, $mdDialog, $document, $statePa
      * @param nodeToEdit - visjs node to edit if a node is being edited, otherwise null for new node
      */
     vm.showDatamodelObjectStepper = function (targetEvent, nodeToEdit) {
-        $log.debug("starting datamodel object stepper...");
+
         // reset stepper state
         resetStepperState();
 
@@ -569,7 +557,6 @@ export function DataModelController($scope, $log, $mdDialog, $document, $statePa
             .cancel("Cancel")
             .ok("Submit");
         $mdDialog.show(confirm).then(function () {
-            $log.debug("deleting data model object node...");
 
             // remove the node
             var nodeId = vm.stepperData.node_id;
@@ -593,7 +580,6 @@ export function DataModelController($scope, $log, $mdDialog, $document, $statePa
 
     // add a datamodel object attribute to the stepper's current data
     vm.addDatamodelObjectAttribute = function () {
-        $log.debug("adding data model object attribute...");
         // add the attribute if it exists
         if (vm.stepperData.currentAttribute) {
             vm.stepperData.attributes.push(vm.stepperData.currentAttribute);
@@ -604,17 +590,13 @@ export function DataModelController($scope, $log, $mdDialog, $document, $statePa
 
     // update the datamodel and exit edit mode
     vm.acceptDatamodelEdit = function () {
-        $log.debug("accepting datamodel edit...");
-
         // delete any removed objects
         objectDeleteList.forEach(id_to_delete => {
             // delete the object by ID
             datamodelService.deleteDatamodelObject(
                 id_to_delete
-            ).then(function success(response) {
-                $log.debug("successfully deleted datamodel object..." + angular.toJson(response));
-            }, function fail(response) {
-                $log.error("could not delete datamodel object..." + angular.toJson(response));
+            ).then(function success() {
+            }, function fail() {
             });
         });
 
@@ -625,7 +607,6 @@ export function DataModelController($scope, $log, $mdDialog, $document, $statePa
 
     // discard changes and replot the datamodel
     vm.rejectDatamodelEdit = function() {
-        $log.debug("rejecting datamodel edit...");
         loadDatamodel(); // reload the data
     };
     //=============================================================================
