@@ -29,7 +29,6 @@ export default function ComputationJobDirective($log, $compile, $templateCache, 
         element.html(template);
         scope.types = types;
         scope.showComputationJobConfig = false;
-
         if (scope.computation) {
             scope.showComputationJobConfig = true;
             if (scope.computation.type == types.computationType.spark)
@@ -55,7 +54,7 @@ export default function ComputationJobDirective($log, $compile, $templateCache, 
                 if (newValue.type == types.computationType.spark)
                     scope.computationDescriptor = newValue.computationMetadata.jsonDescriptor;
             }
-        }, true);
+        });
 
         if (scope.computationjob && !scope.computationjob.configuration) {
             scope.computationjob.configuration = {};
@@ -71,7 +70,7 @@ export default function ComputationJobDirective($log, $compile, $templateCache, 
         restrict: "E",
         link: linker,
         scope: {
-            computationjob: '=',
+            computationjob: '=?',
             computation: '=?',
             isEdit: '=',
             isReadOnly: '=',
