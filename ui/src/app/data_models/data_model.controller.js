@@ -150,9 +150,6 @@ export function DataModelController($scope, $mdDialog, $document, $stateParams, 
 
         };
         datamodelService.saveDatamodel(datamodelToSave);
-
-
-        // get the brand new nodes that do not have a dmo id
         var new_nodes = vm.nodes.get().filter(node => {
             return !node.datamodelObject.id; // true if id does not exist
         });
