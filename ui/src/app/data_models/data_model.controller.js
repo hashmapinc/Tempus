@@ -37,6 +37,7 @@ export function DataModelController($scope, $mdDialog, $document, $stateParams, 
 
     // manage persistence states
     var objectDeleteList = [];  // list of datamodel object ID's to delete when changes are confirmed
+    var objectDeleteNameList = [];
     vm.fileAdded = fileAdded;
     vm.clearFile = clearFile;
     vm.dataModelName =[];
@@ -235,6 +236,7 @@ export function DataModelController($scope, $mdDialog, $document, $stateParams, 
 
         // reset data persistence state
         objectDeleteList = [];
+        objectDeleteNameList = [];
 
 
         datamodelService.getDatamodel($stateParams.datamodelId).
@@ -357,9 +359,18 @@ export function DataModelController($scope, $mdDialog, $document, $stateParams, 
         var node = vm.nodes.get(nodeId);
         vm.nodeValue = node;
 
-        if(node.datamodelObject.parent_id) {
-            var parentNode = vm.nodes.get(vm.visIDs[node.datamodelObject.parent_id]);
+        let edge = vm.edges.get().filter(e => {
+                return e.to === node.id;
+          }).pop();
+          if (edge) {
+                vm.nodeValue.datamodelObject.parent_id = edge.from;
+         }
+
+
+        if(vm.nodeValue.datamodelObject.parent_id) {
+            var parentNode = vm.nodes.get(vm.nodeValue.datamodelObject.parent_id);
             vm.nodeValue.datamodelObject.parent = parentNode.datamodelObject.name;
+
          }
 
         if (vm.isEdit) {
@@ -571,6 +582,7 @@ export function DataModelController($scope, $mdDialog, $document, $stateParams, 
             // queue the object up for deletion if it has an ID
             if (vm.stepperData.id) {
                 objectDeleteList.push(vm.stepperData.id);
+                objectDeleteNameList.push(vm.stepperData.name);
             }
 
             // close the dialog
@@ -591,6 +603,10 @@ export function DataModelController($scope, $mdDialog, $document, $stateParams, 
     // update the datamodel and exit edit mode
     vm.acceptDatamodelEdit = function () {
         // delete any removed objects
+
+       vm.dataModelName = vm.dataModelName.filter(val => !objectDeleteNameList.includes(val));
+       vm.dataModelSavedName = vm.dataModelSavedName.filter(val => !objectDeleteNameList.includes(val));
+
         objectDeleteList.forEach(id_to_delete => {
             // delete the object by ID
             datamodelService.deleteDatamodelObject(
