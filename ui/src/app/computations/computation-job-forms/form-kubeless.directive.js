@@ -63,8 +63,18 @@ export default function ComputationJobKubelessDirective($log, $compile, $templat
                         return map;
                     }, {});
                     newValue.functionSelector = result;
+                }else {
+                    var tempArr = [];
+                    angular.forEach(newValue.functionSelector, function(value, key){
+                        $log.log(key)
+                        var obj ={
+                         "key" :key,
+                         "value": value
+                        }
+                        tempArr.push(obj);
+                    });
+                    newValue.functionSelectorMap = tempArr;
                 }
-                $log.log('Selectors ', newValue.functionSelector);
             }
         }, true);
 
