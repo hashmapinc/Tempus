@@ -242,7 +242,8 @@ function DeviceListWidgetController($rootScope, $scope, $filter, dashboardServic
         }
         
         vm.loadTableData(vm.devicesScope);
-    }    function loadTableData(scope){
+    }
+    function loadTableData(scope){
 
         dashboardService.getDashboard($state.params.dashboardId).then(function success(response) {
             if(response){
