@@ -15,6 +15,13 @@
  * limitations under the License.
  */
 
+ @import "~compass-sass-mixins/lib/compass";
+ @import '../../scss/constants';
+
+ $toolbar-height: 50px;
+ $fullscreen-toolbar-height: 64px;
+ $mobile-toolbar-height: 84px;
+
 .setWidth{
     width: 25%
 }
@@ -49,4 +56,13 @@
     font-size: 14px;
     color: rgba(255,255,255,0.87);
     background-color: rgb(16,108,200);
+}
+
+
+md-button.testbtn{
+  width: 15%;
+  @media (min-width: $layout-breakpoint-sm) {
+    width: 35%;
+  }
+
 }
