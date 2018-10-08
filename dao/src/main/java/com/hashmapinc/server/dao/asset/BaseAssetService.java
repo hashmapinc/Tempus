@@ -21,9 +21,7 @@ import com.google.common.base.Function;
 import com.google.common.util.concurrent.AsyncFunction;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
-import com.hashmapinc.server.common.data.Customer;
-import com.hashmapinc.server.common.data.EntitySubtype;
-import com.hashmapinc.server.common.data.EntityType;
+import com.hashmapinc.server.common.data.*;
 import com.hashmapinc.server.common.data.asset.Asset;
 import com.hashmapinc.server.common.data.asset.AssetSearchQuery;
 import com.hashmapinc.server.common.data.id.*;
@@ -34,6 +32,8 @@ import com.hashmapinc.server.dao.DaoUtil;
 import com.hashmapinc.server.dao.customer.CustomerDao;
 import com.hashmapinc.server.dao.entity.AbstractEntityService;
 import com.hashmapinc.server.dao.model.ModelConstants;
+import com.hashmapinc.server.dao.querybuilder.ResourceCriteria;
+import com.hashmapinc.server.dao.querybuilder.TempusResourceQueryBuilder;
 import com.hashmapinc.server.dao.service.DataValidator;
 import com.hashmapinc.server.dao.service.PaginatedRemover;
 import com.hashmapinc.server.dao.tenant.TenantDao;
@@ -41,7 +41,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
-import com.hashmapinc.server.common.data.Tenant;
 import com.hashmapinc.server.common.data.relation.EntitySearchDirection;
 import com.hashmapinc.server.dao.exception.DataValidationException;
 
@@ -224,10 +223,9 @@ public class BaseAssetService extends AbstractEntityService implements AssetServ
     }
 
     @Override
-    public List<Asset> findAssetsByDataModelObjectId(DataModelObjectId dataModelObjectId) {
-        log.trace("Executing findAssetsByDataModelObjectId [{}]", dataModelObjectId);
-        validateId(dataModelObjectId, INCORRECT_DATA_MODEL_OBJECT_ID + dataModelObjectId);
-        return assetDao.findAssetsByDataModelObjectId(dataModelObjectId.getId());
+    public TextPageData<Asset> findAll(TempusResourceCriteriaSpec tempusResourceCriteriaSpec, TextPageLink textPageLink){
+        log.trace("Executing findAll [{}]", tempusResourceCriteriaSpec);
+        return new TextPageData<>(assetDao.findAll(tempusResourceCriteriaSpec, textPageLink), textPageLink);
     }
 
     private DataValidator<Asset> assetValidator =

@@ -18,6 +18,15 @@ package com.hashmapinc.server.dao.sql.asset;
 
 import com.datastax.driver.core.utils.UUIDs;
 import com.google.common.util.concurrent.ListenableFuture;
+import com.hashmapinc.server.common.data.EntityType;
+import com.hashmapinc.server.common.data.TempusResourceCriteriaSpec;
+import com.hashmapinc.server.common.data.UUIDConverter;
+import com.hashmapinc.server.common.data.id.DataModelObjectId;
+import com.hashmapinc.server.dao.model.ModelConstants;
+import com.hashmapinc.server.dao.model.sql.AssetEntity;
+import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.core.types.dsl.PathBuilder;
+import com.querydsl.core.types.dsl.SimpleExpression;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.hashmapinc.server.common.data.EntitySubtype;
@@ -29,10 +38,7 @@ import com.hashmapinc.server.common.data.page.TextPageLink;
 import com.hashmapinc.server.dao.AbstractJpaDaoTest;
 import com.hashmapinc.server.dao.asset.AssetDao;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.ExecutionException;
 
 import static junit.framework.TestCase.assertFalse;
@@ -171,6 +177,37 @@ public class JpaAssetDaoTest extends AbstractJpaDaoTest {
         // TODO: implement
     }
 
+   /* @Test
+    public void testFindAll(){
+        UUID tenantId1 = UUIDs.timeBased();
+        UUID tenantId2 = UUIDs.timeBased();
+        UUID customerId1 = UUIDs.timeBased();
+        UUID customerId2 = UUIDs.timeBased();
+        UUID dataModelObjectId1 = UUIDs.timeBased();
+        UUID dataModelObjectId2 = UUIDs.timeBased();
+        for (int i = 0; i < 60; i++) {
+            UUID assetId = UUIDs.timeBased();
+            UUID tenantId = i % 2 == 0 ? tenantId1 : tenantId2;
+            UUID customerId = i % 2 == 0 ? customerId1 : customerId2;
+            UUID dataModelObjectId = i % 2 == 0 ? dataModelObjectId1 : dataModelObjectId2;
+            saveAsset(assetId, tenantId, customerId, dataModelObjectId, "ASSET_" + i, "TYPE_1");
+        }
+
+        assertEquals(60, assetDao.find().size());
+        *//*PathBuilder<AssetEntity> entityPath = new PathBuilder<>(AssetEntity.class, "asset");
+
+        final BooleanExpression booleanExpression = entityPath.getString(ModelConstants.ASSET_TENANT_ID_PROPERTY).contains(UUIDConverter.fromTimeUUID(tenantId1));*//*
+
+        TextPageLink pageLink1 = new TextPageLink(20, "ASSET_");
+        TempusResourceCriteriaSpec tempusResourceCriteriaSpec = new TempusResourceCriteriaSpec(EntityType.ASSET, new TenantId(tenantId1), new DataModelObjectId(dataModelObjectId1));
+        final List<Asset> page1 = assetDao.findAll(tempusResourceCriteriaSpec, pageLink1);
+        assertEquals(20, page1.size());
+
+        TextPageLink pageLink2 = new TextPageLink(20, "ASSET_", page1.get(19).getId().getId(), null);
+        List<Asset> page2 = assetDao.findAll(tempusResourceCriteriaSpec, pageLink2);
+        assertEquals(10, page2.size());
+    }*/
+
     @Test
     public void testFindTenantAssetTypesAsync() throws ExecutionException, InterruptedException {
         UUID assetId1 = UUIDs.timeBased();
@@ -213,6 +250,17 @@ public class JpaAssetDaoTest extends AbstractJpaDaoTest {
         asset.setId(new AssetId(id));
         asset.setTenantId(new TenantId(tenantId));
         asset.setCustomerId(new CustomerId(customerId));
+        asset.setName(name);
+        asset.setType(type);
+        assetDao.save(asset);
+    }
+
+    private void saveAsset(UUID id, UUID tenantId, UUID customerId, UUID dataModelObjectId, String name, String type) {
+        Asset asset = new Asset();
+        asset.setId(new AssetId(id));
+        asset.setTenantId(new TenantId(tenantId));
+        asset.setCustomerId(new CustomerId(customerId));
+        asset.setDataModelObjectId(new DataModelObjectId(dataModelObjectId));
         asset.setName(name);
         asset.setType(type);
         assetDao.save(asset);
