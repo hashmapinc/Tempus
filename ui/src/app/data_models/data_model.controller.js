@@ -215,8 +215,6 @@ export function DataModelController($scope, $mdDialog, $document, $stateParams, 
                     vm.dataModelSavedName.push(response.data.name);
                 });
             });
-        }, function fail() {
-
         });
     }
 
@@ -235,7 +233,6 @@ export function DataModelController($scope, $mdDialog, $document, $stateParams, 
         then(function success(data) {
             vm.datamodelTitle = data.name;
             vm.additionalInfo = data.additionalInfo;
-        }, function fail() {
         });
 
         // load datamodel objects
@@ -292,8 +289,6 @@ export function DataModelController($scope, $mdDialog, $document, $stateParams, 
             });
 
             plotDatamodel();
-
-        }, function fail() {
 
         });
     }
@@ -376,10 +371,6 @@ export function DataModelController($scope, $mdDialog, $document, $stateParams, 
                     parent: angular.element($document[0].body),
                     fullscreen: true,
                     targetEvent: nodeId
-                }).then(
-                function () {
-                },
-                function () {
                 });
          }  , 0 );
 
@@ -438,10 +429,6 @@ export function DataModelController($scope, $mdDialog, $document, $stateParams, 
             parent: angular.element($document[0].body),
             fullscreen: true,
             targetEvent: targetEvent
-        }).then(
-        function () {
-        },
-        function () {
         });
     };
 
@@ -477,8 +464,6 @@ export function DataModelController($scope, $mdDialog, $document, $stateParams, 
             vm.stepperData.attributes,
             vm.stepperData.logoFile
         );
-
-
 
         // get the nodeId and the node (if it exists)
         var nodeId = vm.stepperData.node_id;
@@ -602,7 +587,7 @@ export function DataModelController($scope, $mdDialog, $document, $stateParams, 
 
             // close the dialog
             vm.cancel();
-        }, function () {});
+        });
     };
 
     // add a datamodel object attribute to the stepper's current data
@@ -617,7 +602,6 @@ export function DataModelController($scope, $mdDialog, $document, $stateParams, 
 
     // update the datamodel and exit edit mode
     vm.acceptDatamodelEdit = function () {
-        // delete any removed objects
 
        vm.dataModelName = vm.dataModelName.filter(val => !objectDeleteNameList.includes(val));
        vm.dataModelSavedName = vm.dataModelSavedName.filter(val => !objectDeleteNameList.includes(val));
@@ -626,19 +610,14 @@ export function DataModelController($scope, $mdDialog, $document, $stateParams, 
             // delete the object by ID
             datamodelService.deleteDatamodelObject(
                 id_to_delete
-            ).then(function success() {
-            }, function fail() {
-            });
+            );
         });
 
-        // save and exit edit mode, and cleanly reload the data
         saveDatamodel();
         vm.toggleDMEditMode();
     };
 
-    // discard changes and replot the datamodel
     vm.rejectDatamodelEdit = function() {
-        loadDatamodel(); // reload the data
+        loadDatamodel();
     };
-    //=============================================================================
 }
