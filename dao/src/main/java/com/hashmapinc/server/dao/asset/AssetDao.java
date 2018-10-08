@@ -18,9 +18,12 @@ package com.hashmapinc.server.dao.asset;
 
 import com.google.common.util.concurrent.ListenableFuture;
 import com.hashmapinc.server.common.data.EntitySubtype;
+import com.hashmapinc.server.common.data.TempusResourceCriteriaSpec;
 import com.hashmapinc.server.common.data.asset.Asset;
 import com.hashmapinc.server.common.data.page.TextPageLink;
 import com.hashmapinc.server.dao.Dao;
+import com.hashmapinc.server.dao.querybuilder.TempusResourcePredicate;
+import com.querydsl.core.types.Predicate;
 
 import java.util.List;
 import java.util.Optional;
@@ -123,4 +126,11 @@ public interface AssetDao extends Dao<Asset> {
      */
     List<Asset> findAssetsByDataModelObjectId(UUID dataModelObjectId);
 
+    /**
+     * Find all asset by tempusResourceCriteriaSpec object
+     *
+     * @param tempusResourceCriteriaSpec the tempusResourceCriteriaSpec
+     * @return the list of asset objects corresponding to tempusResourceCriteriaSpec
+     */
+    List<Asset> findAll(TempusResourceCriteriaSpec tempusResourceCriteriaSpec, TextPageLink textPageLink);
 }

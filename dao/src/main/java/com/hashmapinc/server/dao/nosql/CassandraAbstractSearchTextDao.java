@@ -21,10 +21,10 @@ import com.datastax.driver.core.querybuilder.QueryBuilder;
 import com.datastax.driver.core.querybuilder.Select;
 import com.datastax.driver.core.querybuilder.Select.Where;
 import com.hashmapinc.server.common.data.page.TextPageLink;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import com.hashmapinc.server.dao.model.ModelConstants;
 import com.hashmapinc.server.dao.model.SearchTextEntity;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
 
@@ -45,23 +45,29 @@ public abstract class CassandraAbstractSearchTextDao<E extends SearchTextEntity<
     }
 
     protected List<E> findPageWithTextSearch(String searchView, List<Clause> clauses, TextPageLink pageLink) {
+        return _findPageWithTextSearch(searchView, clauses, pageLink, false);
+    }
+
+    private List<E> _findPageWithTextSearch(String searchView, List<Clause> clauses, TextPageLink pageLink, boolean idsInClausePresent) {
         Select select = select().from(searchView);
         Where query = select.where();
         for (Clause clause : clauses) {
             query.and(clause);
-        }       
+        }
         query.limit(pageLink.getLimit());
         if (!StringUtils.isEmpty(pageLink.getTextOffset())) {
             query.and(eq(ModelConstants.SEARCH_TEXT_PROPERTY, pageLink.getTextOffset()));
-            query.and(QueryBuilder.lt(ModelConstants.ID_PROPERTY, pageLink.getIdOffset()));
+            if(!idsInClausePresent)
+                query.and(QueryBuilder.lt(ModelConstants.ID_PROPERTY, pageLink.getIdOffset()));
             List<E> result = findListByStatement(query);
             if (result.size() < pageLink.getLimit()) {
                 select = select().from(searchView);
                 query = select.where();
                 for (Clause clause : clauses) {
                     query.and(clause);
-                }      
-                query.and(QueryBuilder.gt(ModelConstants.SEARCH_TEXT_PROPERTY, pageLink.getTextOffset()));
+                }
+                final String textPropertyLowerBound = idsInClausePresent ? pageLink.getTextSearch() : pageLink.getTextOffset();
+                query.and(QueryBuilder.gt(ModelConstants.SEARCH_TEXT_PROPERTY, textPropertyLowerBound));
                 if (!StringUtils.isEmpty(pageLink.getTextSearch())) {
                     query.and(QueryBuilder.lt(ModelConstants.SEARCH_TEXT_PROPERTY, pageLink.getTextSearchBound()));
                 }
@@ -77,6 +83,10 @@ public abstract class CassandraAbstractSearchTextDao<E extends SearchTextEntity<
         } else {
             return findListByStatement(query);
         }
+    }
+
+    protected List<E> findPageWithTextSearchAndNoIdCompare(String searchView, List<Clause> clauses, TextPageLink pageLink) {
+        return _findPageWithTextSearch(searchView, clauses, pageLink, true);
     }
 
 
