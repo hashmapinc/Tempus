@@ -724,6 +724,13 @@ public abstract class AbstractControllerTest {
         logout();
     }
 
+    protected void unAssignUserFromGroup(CustomerGroupId savedCustomerGroupId, UserId userId) throws Exception {
+        loginTenantAdmin();
+        doPut("/api/customer/group/"+savedCustomerGroupId.getId().toString()+"/users", Collections.singletonList(userId.getId().toString()))
+                .andExpect(status().isOk());
+        logout();
+    }
+
     protected UserId getCustomerUserId() throws Exception {
         loginCustomerUser();
         User user = doGet("/api/auth/user", User.class);
@@ -731,9 +738,9 @@ public abstract class AbstractControllerTest {
         return user.getId();
     }
 
-    protected CustomerGroup createGroupWithPolicies(List<String> policies, CustomerId customerId) throws Exception {
+    protected CustomerGroup createGroupWithPolicies(List<String> policies, CustomerId customerId, String my_customer_group) throws Exception {
         CustomerGroup customerGroup = new CustomerGroup();
-        customerGroup.setTitle("My Customer Group");
+        customerGroup.setTitle(my_customer_group);
         customerGroup.setTenantId(tenantId);
         customerGroup.setCustomerId(customerId);
         customerGroup.setPolicies(policies);

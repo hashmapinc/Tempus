@@ -19,6 +19,7 @@ package com.hashmapinc.server.controller;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.hashmapinc.server.common.data.Customer;
 import com.hashmapinc.server.common.data.EntitySubtype;
+import com.hashmapinc.server.common.data.TempusResourceCriteriaSpec;
 import com.hashmapinc.server.common.data.asset.Asset;
 import com.hashmapinc.server.common.data.audit.ActionType;
 import com.hashmapinc.server.common.data.id.DataModelObjectId;
@@ -329,14 +330,20 @@ public class AssetController extends BaseController {
         }
     }
 
-    @PostFilter("hasPermission(filterObject, 'ASSET_READ')")
+    @PreAuthorize("hasAnyAuthority('TENANT_ADMIN', 'CUSTOMER_USER')")
     @GetMapping(value = "/datamodelobject/assets/{dataModelObjectId}")
     @ResponseBody
-    public List<Asset> getAssetsByDataModelObjectId(@PathVariable(DATA_MODEL_OBJECT_ID) String strDataModelObjectId) throws TempusException {
+    public TextPageData<Asset> getAssetsByDataModelObjectId(@PathVariable(DATA_MODEL_OBJECT_ID) String strDataModelObjectId,
+                                                            @RequestParam int limit,
+                                                            @RequestParam(required = false) String textSearch,
+                                                            @RequestParam(required = false) String idOffset,
+                                                            @RequestParam(required = false) String textOffset) throws TempusException {
         checkParameter(DATA_MODEL_OBJECT_ID, strDataModelObjectId);
         try {
             DataModelObjectId dataModelObjectId = new DataModelObjectId(toUUID(strDataModelObjectId));
-            return assetService.findAssetsByDataModelObjectId(dataModelObjectId);
+            final TempusResourceCriteriaSpec tempusResourceCriteriaSpec = getTempusResourceCriteriaSpec(getCurrentUser(), EntityType.ASSET, dataModelObjectId);
+            TextPageLink pageLink = createPageLink(limit, textSearch, idOffset, textOffset);
+            return assetService.findAll(tempusResourceCriteriaSpec, pageLink);
         } catch (Exception e) {
             throw handleException(e);
         }

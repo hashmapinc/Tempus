@@ -260,7 +260,7 @@ public abstract class BaseCustomerGroupControllerTest extends AbstractController
                     policyForAll
             );
 
-            CustomerGroup savedCustomerGroup = createGroupWithPolicies(policies, customerId);
+            CustomerGroup savedCustomerGroup = createGroupWithPolicies(policies, customerId, "My Customer Group");
             String groupId = savedCustomerGroup.getId().getId().toString();
             final Map<String, Map<String, String>> displayablePolicies = getDisplayablePolicies(groupId);
             Assert.assertThat("List equality without order",
