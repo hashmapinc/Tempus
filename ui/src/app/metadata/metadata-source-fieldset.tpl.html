@@ -40,9 +40,9 @@
                         <div translate ng-message="required">metadata.dbPassword-required</div>
                     </div>
                 </md-input-container>
-                <md-button  ng-if="metadata.id" class="md-raised md-primary testbtn"
+                <md-button  ng-disabled="!isEdit" ng-if="metadata.id" class="md-raised md-primary testbtn"
                            ng-click="testConnection()"
-                           aria-label="Test Connection">{{ 'metadataConfig.test-connection' | translate }}
+                           aria-label="Test Connection" ng-model="source.testButton">{{ 'metadataConfig.test-connection' | translate }}
                 </md-button>
         </section>
     </md-card-content>
