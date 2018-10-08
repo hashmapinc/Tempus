@@ -29,10 +29,10 @@ import java.util.Arrays;
 
 @RunWith(ClasspathSuite.class)
 @ClasspathSuite.ClassnameFilters({
-        "com.hashmapinc.server.controller.sql.AssetControllerSqlTest"/*,
+        "com.hashmapinc.server.controller.sql.*SqlTest",
         "com.hashmapinc.server.mqtt.rpc.sql.*Test",
         "com.hashmapinc.server.mqtt.telemetry.sql.*Test",
-        "com.hashmapinc.server.system.sql.*SqlTest"*/
+        "com.hashmapinc.server.system.sql.*SqlTest"
 })
 public class SqlIntegrationTestSuite {
 
