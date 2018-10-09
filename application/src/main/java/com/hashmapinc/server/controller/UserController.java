@@ -93,7 +93,7 @@ public class UserController extends BaseController {
     @PostMapping(value = "/user")
     @ResponseBody
     public User saveUser(@RequestBody User user,
-                         @RequestParam String activationType,
+                         @RequestParam(required = false) String activationType,
                          HttpServletRequest request) throws TempusException {
 
         try {

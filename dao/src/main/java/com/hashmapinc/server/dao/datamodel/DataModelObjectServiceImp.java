@@ -176,9 +176,8 @@ public class DataModelObjectServiceImp implements DataModelObjectService {
 
                 @Override
                 protected void validateCreate(DataModelObject dataModelObject) {
-                        List<DataModelObject> dataModelObjects;
-                        dataModelObjects = dataModelObjectDao.findByName(dataModelObject.getName());
-                        if(dataModelObjects != null && !dataModelObjects.isEmpty()) {
+                        DataModelObject foundDataModelObject = dataModelObjectDao.findByDataModeIdAndName(dataModelObject);
+                        if(foundDataModelObject != null) {
                             throw new DataValidationException("DataModelObject is already created for name");
                         }
                 }
