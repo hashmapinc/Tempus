@@ -189,10 +189,16 @@ public class CassandraAssetDao extends CassandraAbstractSearchTextDao<AssetEntit
         final List<Clause> predicates = getPredicates(tempusResourceCriteriaSpec, idConstraint);
         List<AssetEntity> assetEntities = Collections.emptyList();
         if(Objects.nonNull(idConstraint)){
-            assetEntities = findPageWithTextSearchAndNoIdCompare(ModelConstants.ASSET_BY_DATA_MODEL_OBJECT_AND_ASSET_AND_CUSTOMER_VIEW_NAME, predicates, textPageLink);
+            final String viewName = tempusResourceCriteriaSpec.getCustomerId().isPresent() ?
+                    ModelConstants.ASSET_BY_DATA_MODEL_OBJECT_AND_ASSET_AND_CUSTOMER_VIEW_NAME:
+                    ModelConstants.ASSET_BY_DATA_MODEL_AND_ASSET_VIEW_NAME ;
+            assetEntities = findPageWithTextSearchAndNoIdCompare(viewName, predicates, textPageLink);
         }
         if(assetEntities.isEmpty()){
-            assetEntities = findPageWithTextSearch(ModelConstants.ASSET_BY_DATA_MODEL_OBJECT_AND_CUSTOMER_VIEW_NAME, predicates, textPageLink);
+            final String viewName = tempusResourceCriteriaSpec.getCustomerId().isPresent() ?
+                    ModelConstants.ASSET_BY_DATA_MODEL_OBJECT_AND_CUSTOMER_VIEW_NAME:
+                    ModelConstants.ASSET_BY_DATA_MODEL_VIEW_NAME;
+            assetEntities = findPageWithTextSearch(viewName, predicates, textPageLink);
         }
         return DaoUtil.convertDataList(assetEntities);
     }
@@ -200,8 +206,10 @@ public class CassandraAssetDao extends CassandraAbstractSearchTextDao<AssetEntit
     private List<Clause> getPredicates(TempusResourceCriteriaSpec tempusResourceCriteriaSpec, ResourceCriteria idConstraint) {
         final CassandraTempusResourcePredicateBuilder basicPredicateBuilder = new CassandraTempusResourcePredicateBuilder()
                 .with(new ResourceCriteria(ModelConstants.ASSET_TENANT_ID_PROPERTY, ResourceCriteria.Operation.EQUALS, tempusResourceCriteriaSpec.getTenantId().getId()))
-                .with(new ResourceCriteria(ModelConstants.ASSET_DATA_MODEL_OBJECT_ID, ResourceCriteria.Operation.EQUALS, tempusResourceCriteriaSpec.getDataModelObjectId().getId()))
-                .with(new ResourceCriteria(ModelConstants.ASSET_CUSTOMER_ID_PROPERTY, ResourceCriteria.Operation.EQUALS, tempusResourceCriteriaSpec.getCustomerId().getId()));
+                .with(new ResourceCriteria(ModelConstants.ASSET_DATA_MODEL_OBJECT_ID, ResourceCriteria.Operation.EQUALS, tempusResourceCriteriaSpec.getDataModelObjectId().getId()));
+
+        tempusResourceCriteriaSpec.getCustomerId().ifPresent(customerId ->
+                basicPredicateBuilder.with(new ResourceCriteria(ModelConstants.ASSET_CUSTOMER_ID_PROPERTY, ResourceCriteria.Operation.EQUALS, customerId.getId())));
 
         if(Objects.nonNull(idConstraint)){
             basicPredicateBuilder.with(idConstraint);

@@ -659,8 +659,11 @@ public abstract class BaseController {
     }
 
     protected TempusResourceCriteriaSpec getTempusResourceCriteriaSpec(SecurityUser user, EntityType entityType, DataModelObjectId dataModelObjectId) throws TempusException{
-        final TempusResourceCriteriaSpec tempusResourceCriteriaSpec = new TempusResourceCriteriaSpec(entityType, user.getTenantId(), dataModelObjectId, user.getCustomerId());
+        final TempusResourceCriteriaSpec tempusResourceCriteriaSpec = new TempusResourceCriteriaSpec(entityType, user.getTenantId(), dataModelObjectId);
 
+        if(isCustomerUser(user)){
+            tempusResourceCriteriaSpec.setCustomerId(Optional.of(user.getCustomerId()));
+        }
         final Supplier<Stream<UserPermission>> readableAndResourceAccessibleStream = getReadableAndResourceAccessibleStream(user, entityType);
 
         final boolean hasPermOnAllResources =
@@ -742,6 +745,10 @@ public abstract class BaseController {
             }
             return false;
         });
+    }
+
+    private boolean isCustomerUser(SecurityUser user) {
+        return user.getAuthorities().stream().anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals(Authority.CUSTOMER_USER.name()));
     }
 
 }

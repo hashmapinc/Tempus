@@ -23,19 +23,19 @@ import com.hashmapinc.server.common.data.id.TenantId;
 import lombok.Data;
 
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 
 @Data
 public class TempusResourceCriteriaSpec {
     private EntityType entityType;
     private TenantId tenantId;
-    private CustomerId customerId;
     private DataModelObjectId dataModelObjectId;
+    private Optional<CustomerId> customerId = Optional.empty();
     private Set<? extends EntityId> accessibleIdsForGivenDataModelObject = new HashSet<>();
-    public TempusResourceCriteriaSpec(EntityType entityType, TenantId tenantId, DataModelObjectId dataModelObjectId, CustomerId customerId) {
+    public TempusResourceCriteriaSpec(EntityType entityType, TenantId tenantId, DataModelObjectId dataModelObjectId) {
         this.entityType = entityType;
         this.tenantId = tenantId;
         this.dataModelObjectId = dataModelObjectId;
-        this.customerId = customerId;
     }
 }

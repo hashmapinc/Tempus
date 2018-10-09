@@ -33,7 +33,6 @@ import com.hashmapinc.server.common.data.page.TextPageData;
 import com.hashmapinc.server.dao.exception.DataValidationException;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertEquals;
 
@@ -659,7 +658,8 @@ public abstract class BaseAssetServiceTest extends AbstractServiceTest {
         }
 
         TextPageLink pageLink1 = new TextPageLink(20, "ASSET_");
-        TempusResourceCriteriaSpec tempusResourceCriteriaSpec = new TempusResourceCriteriaSpec(EntityType.ASSET, tenantId1, dataModelObjectId1, customerId1);
+        TempusResourceCriteriaSpec tempusResourceCriteriaSpec = new TempusResourceCriteriaSpec(EntityType.ASSET, tenantId1, dataModelObjectId1);
+        tempusResourceCriteriaSpec.setCustomerId(Optional.of(customerId1));
         final TextPageData<Asset> page1 = assetService.findAll(tempusResourceCriteriaSpec, pageLink1);
         assertEquals(20, page1.getData().size());
 
@@ -669,7 +669,8 @@ public abstract class BaseAssetServiceTest extends AbstractServiceTest {
 
 
         TextPageLink pageLink11 = new TextPageLink(20, "ASSET_");
-        TempusResourceCriteriaSpec tempusResourceCriteriaSpec11 = new TempusResourceCriteriaSpec(EntityType.ASSET, tenantId1, dataModelObjectId1, customerId1);
+        TempusResourceCriteriaSpec tempusResourceCriteriaSpec11 = new TempusResourceCriteriaSpec(EntityType.ASSET, tenantId1, dataModelObjectId1);
+        tempusResourceCriteriaSpec11.setCustomerId(Optional.of(customerId1));
         final HashSet<AssetId> accessibleIdsForGivenDataModelObject = new HashSet<>(allAssetIdsForTenant1.subList(0, 25));
         tempusResourceCriteriaSpec11.setAccessibleIdsForGivenDataModelObject(accessibleIdsForGivenDataModelObject);
         final TextPageData<Asset> page11 = assetService.findAll(tempusResourceCriteriaSpec11, pageLink11);

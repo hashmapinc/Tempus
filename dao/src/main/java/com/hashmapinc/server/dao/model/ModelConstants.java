@@ -242,7 +242,10 @@ public class ModelConstants {
     public static final String ASSET_TYPES_BY_TENANT_VIEW_NAME = "asset_types_by_tenant";
     public static final String ASSET_BY_DATA_MODEL_OBJECT_VIEW_NAME = "asset_by_data_model_object";
     public static final String ASSET_BY_DATA_MODEL_OBJECT_AND_ASSET_AND_CUSTOMER_VIEW_NAME = "asset_by_data_model_and_id_and_customer";
+    public static final String ASSET_BY_DATA_MODEL_AND_ASSET_VIEW_NAME = "asset_by_data_model_and_id";
     public static final String ASSET_BY_DATA_MODEL_OBJECT_AND_CUSTOMER_VIEW_NAME = "asset_by_data_model_and_customer";
+    public static final String ASSET_BY_DATA_MODEL_VIEW_NAME = "asset_by_data_model";
+
 
     /**
      * Cassandra entity_subtype constants.

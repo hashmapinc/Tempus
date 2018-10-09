@@ -152,12 +152,14 @@ public class JpaAssetDao extends JpaAbstractSearchTextDao<AssetEntity, Asset> im
         final JPATempusResourcePredicateBuilder basicPredicateBuilder = new JPATempusResourcePredicateBuilder(getEntityClass())
                 .with(new ResourceCriteria(ModelConstants.ID_PROPERTY, ResourceCriteria.Operation.GREATER_THAN, idOffset))
                 .with(new ResourceCriteria(ModelConstants.ASSET_TENANT_ID_PROPERTY, ResourceCriteria.Operation.EQUALS, UUIDConverter.fromTimeUUID(tempusResourceCriteriaSpec.getTenantId().getId())))
-                .with(new ResourceCriteria(ModelConstants.ASSET_DATA_MODEL_OBJECT_ID, ResourceCriteria.Operation.EQUALS, UUIDConverter.fromTimeUUID(tempusResourceCriteriaSpec.getDataModelObjectId().getId())))
-                .with(new ResourceCriteria(ModelConstants.ASSET_CUSTOMER_ID_PROPERTY, ResourceCriteria.Operation.EQUALS, UUIDConverter.fromTimeUUID(tempusResourceCriteriaSpec.getCustomerId().getId())));
+                .with(new ResourceCriteria(ModelConstants.ASSET_DATA_MODEL_OBJECT_ID, ResourceCriteria.Operation.EQUALS, UUIDConverter.fromTimeUUID(tempusResourceCriteriaSpec.getDataModelObjectId().getId())));
 
         if(textPageLink.getTextSearch() != null){
             basicPredicateBuilder.with(new ResourceCriteria(ModelConstants.SEARCH_TEXT_PROPERTY, ResourceCriteria.Operation.LIKE, textPageLink.getTextSearch()));
         }
+
+        tempusResourceCriteriaSpec.getCustomerId().ifPresent(customerId ->
+                basicPredicateBuilder.with(new ResourceCriteria(ModelConstants.ASSET_CUSTOMER_ID_PROPERTY, ResourceCriteria.Operation.EQUALS, UUIDConverter.fromTimeUUID(customerId.getId()))));
 
         final ResourceCriteria idConstraint = getIdConstraint(tempusResourceCriteriaSpec);
         if(Objects.nonNull(idConstraint)){
