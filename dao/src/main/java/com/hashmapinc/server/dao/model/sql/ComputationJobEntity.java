@@ -19,6 +19,7 @@ package com.hashmapinc.server.dao.model.sql;
 import com.datastax.driver.core.utils.UUIDs;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.hashmapinc.server.common.data.computation.ComputationJob;
+import com.hashmapinc.server.common.data.computation.ComputationJobConfiguration;
 import com.hashmapinc.server.common.data.id.ComputationId;
 import com.hashmapinc.server.common.data.id.ComputationJobId;
 import com.hashmapinc.server.common.data.id.TenantId;
@@ -52,22 +53,19 @@ public class ComputationJobEntity extends BaseSqlEntity<ComputationJob> implemen
     @Column(name = ModelConstants.COMPUTATION_JOB_COMPUTAION_ID)
     private String computationId;
 
-    @Type(type = "json")
-    @Column(name = ModelConstants.COMPUTATION_JOB_ARG_PRS)
-    private JsonNode argParameters;
-
     @Column(name = ModelConstants.COMPUTATION_JOB_TENANT_ID)
     private String tenantId;
 
     @Column(name = ModelConstants.SEARCH_TEXT_PROPERTY)
     private String searchText;
 
-    @Column(name = ModelConstants.COMPUTATION_JOB_ID)
-    private String jobId;
-
     @Enumerated(EnumType.STRING)
     @Column(name = ModelConstants.COMPUTATION_JOB_STATE)
     private ComponentLifecycleState state;
+
+    @Type(type = "json")
+    @Column(name = ModelConstants.COMPUTATION_JOB_CONFIGURATION)
+    private ComputationJobConfiguration configuration;
 
     @Override
     public String getSearchTextSource() {
@@ -85,19 +83,14 @@ public class ComputationJobEntity extends BaseSqlEntity<ComputationJob> implemen
         if(computationJob.getName() != null) {
             this.jobName = computationJob.getName();
         }
-        if(computationJob.getArgParameters() != null) {
-            this.argParameters = computationJob.getArgParameters();
-        }
         if(computationJob.getComputationId() != null) {
             this.computationId = fromTimeUUID(computationJob.getComputationId().getId());
         }
         if(computationJob.getTenantId() != null) {
             this.tenantId = fromTimeUUID(computationJob.getTenantId().getId());
         }
-        if(computationJob.getJobId() != null){
-            this.jobId = computationJob.getJobId();
-        }
         this.state = computationJob.getState();
+        this.configuration = computationJob.getConfiguration();
 
     }
 
@@ -107,38 +100,10 @@ public class ComputationJobEntity extends BaseSqlEntity<ComputationJob> implemen
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        if (!super.equals(o)) return false;
-
-        ComputationJobEntity that = (ComputationJobEntity) o;
-        if (jobName != null ? !jobName.equals(that.jobName) : that.jobName != null) return false;
-        if (searchText != null ? !searchText.equals(that.searchText) : that.searchText != null) return false;
-        if (argParameters != null ? !argParameters.equals(that.argParameters) : that.argParameters != null) return false;
-        if (computationId != null ? !computationId.equals(that.computationId) : that.computationId != null) return false;
-        if (tenantId != null ? !tenantId.equals(that.tenantId) : that.tenantId != null) return false;
-        return jobId != null ? jobId.equals(that.jobId) : that.jobId == null;
-    }
-
-    @Override
-    public int hashCode() {
-        int result = super.hashCode();
-        result = 31 * result + (jobName != null ? jobName.hashCode() : 0);
-        result = 31 * result + (searchText != null ? searchText.hashCode() : 0);
-        result = 31 * result + (argParameters != null ? argParameters.hashCode() : 0);
-        result = 31 * result + (computationId != null ? computationId.hashCode() : 0);
-        result = 31 * result + (tenantId != null ? tenantId.hashCode() : 0);
-        result = 31 * result + (jobId != null ? jobId.hashCode() : 0);
-        return result;
-    }
-
-    @Override
     public ComputationJob toData() {
         ComputationJob computationJob = new ComputationJob(new ComputationJobId(getId()));
         computationJob.setCreatedTime(UUIDs.unixTimestamp(getId()));
         computationJob.setName(jobName);
-        computationJob.setArgParameters(argParameters);
         computationJob.setState(state);
         if(computationId != null) {
             computationJob.setComputationId(new ComputationId(fromString(computationId)));
@@ -146,7 +111,7 @@ public class ComputationJobEntity extends BaseSqlEntity<ComputationJob> implemen
         if (tenantId != null) {
             computationJob.setTenantId(new TenantId(fromString(tenantId)));
         }
-        computationJob.setJobId(jobId);
+        computationJob.setConfiguration(configuration);
         return computationJob;
     }
 

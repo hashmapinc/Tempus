@@ -28,6 +28,8 @@ import com.hashmapinc.server.common.data.Event;
 import com.hashmapinc.server.common.data.asset.Asset;
 import com.hashmapinc.server.common.data.cluster.NodeMetric;
 import com.hashmapinc.server.common.data.cluster.NodeStatus;
+import com.hashmapinc.server.common.data.computation.ComputationType;
+import com.hashmapinc.server.common.data.computation.SparkComputationMetadata;
 import com.hashmapinc.server.common.data.computation.Computations;
 import com.hashmapinc.server.common.data.datamodel.AttributeDefinition;
 import com.hashmapinc.server.common.data.datamodel.DataModel;
@@ -257,17 +259,23 @@ public abstract class AbstractServiceTest {
         if (tenantId == null) {
             tenantId = new TenantId(UUIDs.timeBased());
         }
-        Computations computationsTest = new Computations();
-        computationsTest.setName(name);
-        computationsTest.setTenantId(tenantId);
-        computationsTest.setMainClass(mainClazz);
-        computationsTest.setJsonDescriptor(jsonDescriptor);
-        computationsTest.setJarName(jarName);
-        computationsTest.setJarPath(jarPath);
-        computationsTest.setArgsformat(argsformat);
-        computationsTest.setArgsType(argsType);
-        computationsTest.setId(new ComputationId(UUIDs.timeBased()));
-        return computationsTest;
+        Computations computations = new Computations();
+        ComputationId computationId = new ComputationId(UUIDs.timeBased());
+        computations.setName("Computation");
+        computations.setId(computationId);
+        computations.setTenantId(tenantId);
+        computations.setType(ComputationType.SPARK);
+
+        SparkComputationMetadata md = new SparkComputationMetadata();
+        md.setId(computationId);
+        md.setJarPath("/Some/Jar/path");
+        md.setMainClass("MainClass");
+        md.setArgsType("ArgsType");
+        md.setArgsformat("argsFormat");
+        md.setJarName("SomeJar");
+
+        computations.setComputationMetadata(md);
+        return computations;
     }
 
     private ComponentDescriptor getOrCreateDescriptor(ComponentScope scope, ComponentType type, String clazz, String configurationDescriptorResource) throws IOException {

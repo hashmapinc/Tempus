@@ -17,20 +17,13 @@
 package com.hashmapinc.server.controller;
 
 import com.datastax.driver.core.utils.UUIDs;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.hashmapinc.server.common.data.computation.ComputationJob;
-import com.hashmapinc.server.common.data.computation.Computations;
+import com.hashmapinc.server.common.data.computation.*;
 import com.hashmapinc.server.common.data.id.ComputationId;
+import com.hashmapinc.server.dao.computations.ComputationsService;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import com.hashmapinc.server.common.data.plugin.PluginMetaData;
-import com.hashmapinc.server.common.data.rule.RuleMetaData;
-import com.hashmapinc.server.dao.computations.ComputationsService;
-import com.hashmapinc.server.extensions.core.plugin.telemetry.TelemetryStoragePlugin;
-
-import java.io.IOException;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -38,10 +31,6 @@ public class BaseComputationsControllerTest extends AbstractControllerTest {
 
 
     private Computations savedComputations;
-
-    private PluginMetaData sysPlugin;
-    private PluginMetaData tenantPlugin;
-    private static final ObjectMapper mapper = new ObjectMapper();
 
     @Autowired
     ComputationsService computationsService;
@@ -51,39 +40,33 @@ public class BaseComputationsControllerTest extends AbstractControllerTest {
     public void beforeTest() throws Exception {
         loginTenantAdmin();
 
-
-        sysPlugin = new PluginMetaData();
-        sysPlugin.setName("Sys plugin");
-        sysPlugin.setApiToken("sysplugin");
-        sysPlugin.setConfiguration(mapper.readTree("{}"));
-        sysPlugin.setClazz(TelemetryStoragePlugin.class.getName());
-        sysPlugin = doPost("/api/plugin", sysPlugin, PluginMetaData.class);
-
-        tenantPlugin = new PluginMetaData();
-        tenantPlugin.setName("My plugin");
-        tenantPlugin.setApiToken("myplugin");
-        tenantPlugin.setConfiguration(mapper.readTree("{}"));
-        tenantPlugin.setClazz(TelemetryStoragePlugin.class.getName());
-        tenantPlugin = doPost("/api/plugin", tenantPlugin, PluginMetaData.class);
-
         Computations computations = new Computations();
+        ComputationId computationId = new ComputationId(UUIDs.timeBased());
         computations.setName("Computation");
-        computations.setId(new ComputationId(UUIDs.timeBased()));
-        computations.setJarPath("/Some/Jar/path");
+        computations.setId(computationId);
         computations.setTenantId(savedTenant.getId());
-        computations.setJarName("SomeJar");
-        computations.setMainClass("MainClass");
-        computations.setArgsformat("argsFormat");
-        computations.setArgsType("ArgsType");
+        computations.setType(ComputationType.SPARK);
+
+        SparkComputationMetadata md = new SparkComputationMetadata();
+        md.setId(computationId);
+        md.setJarPath("/Some/Jar/path");
+        md.setMainClass("MainClass");
+        md.setArgsType("ArgsType");
+        md.setArgsformat("argsFormat");
+        md.setJarName("SomeJar");
+
+        computations.setComputationMetadata(md);
         savedComputations = computationsService.save(computations);
     }
 
 
     @Test
-    public void testDeleteComputation() throws Exception {
+    public void testDeleteSparkComputation() throws Exception {
         ComputationJob computationJob = new ComputationJob();
         computationJob.setName("Computation Job");
-        computationJob.setJobId("0123");
+        SparkComputationJob configuration = new SparkComputationJob();
+        configuration.setJobId("0123");
+        computationJob.setConfiguration(configuration);
 
         ComputationJob savedComputationJob = doPost("/api/computations/"+savedComputations.getId().getId().toString()+"/jobs", computationJob, ComputationJob.class);
         Assert.assertEquals(computationJob.getName(), savedComputationJob.getName());

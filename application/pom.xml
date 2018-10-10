@@ -67,6 +67,11 @@
             <artifactId>transport</artifactId>
         </dependency>
         <dependency>
+            <groupId>com.hashmapinc.clients</groupId>
+            <artifactId>kubeless-client</artifactId>
+            <version>1.4.0</version>
+        </dependency>
+        <dependency>
             <groupId>com.hashmapinc.transport</groupId>
             <artifactId>http</artifactId>
         </dependency>
@@ -292,6 +297,10 @@
         <dependency>
             <groupId>eu.infomas</groupId>
             <artifactId>annotation-detector</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.minio</groupId>
+            <artifactId>minio</artifactId>
         </dependency>
         <dependency>
             <groupId>com.hashmapinc.tempus</groupId>
