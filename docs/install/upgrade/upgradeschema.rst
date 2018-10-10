@@ -16,9 +16,9 @@ Tempus-364 Serverless compute on Tempus
 For SQL
 =======
 
-1. Refer the file `../../../dao/src/main/resources/sql/upgrade/3.sql`
+1. Refer the file `../../../dao/src/main/resources/sql/upgrade/5.sql`
 
 For NOSQL
 =========
 
-2. Refer the file `../../../dao/src/main/resources/cassandra/upgrade/2.cql`
+2. Refer the file `../../../dao/src/main/resources/cassandra/upgrade/5.cql`
