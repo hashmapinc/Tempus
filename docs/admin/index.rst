@@ -23,3 +23,4 @@ Administration
     cluster
     mail
     whitelabeling
+    agent
