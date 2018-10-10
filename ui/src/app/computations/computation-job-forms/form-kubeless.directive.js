@@ -23,25 +23,21 @@ import kafkaTriggerForm from './triggers/trigger-kafka.tpl.html';
 /* eslint-enable import/no-unresolved, import/default */
 
 /*@ngInject*/
-export default function ComputationJobKubelessDirective($log, $compile, $templateCache, $translate, types) {
+export default function ComputationJobKubelessDirective($compile, $templateCache, $translate, types) {
     var linker = function (scope, element) {
         var template = $templateCache.get(kubelessComputationJobForm);
         scope.sparkJobTemplate = $templateCache.get(kafkaTriggerForm);
         element.html(template);
         scope.types = types;
-        $log.log('Computation job configuration is ', scope.config)
 
         //TODO: Add type check
         if(!scope.config || !scope.config.functionSelector){
             scope.config = {
                 functionSelectorMap: []
             };
-        }else if(scope.config){
-            //Put functionSelector in functionSelectorMap
         }
 
         scope.addMap = function(mapping) {
-            $log.log("Mapping : ", mapping);
             var newMap = {key:"", value:""};
             mapping.push(newMap);
         };
@@ -54,8 +50,7 @@ export default function ComputationJobKubelessDirective($log, $compile, $templat
         };
 
         scope.$watch('config', function (newValue, oldValue) {
-            $log.log('Values New {} and Old {}', newValue, oldValue);
-            if(newValue){
+            if(newValue || !angular.equals(newValue, oldValue)){
                 var selectors = newValue.functionSelectorMap;
                 if(selectors) {
                     var result = selectors.reduce(function (map, obj) {
@@ -66,7 +61,6 @@ export default function ComputationJobKubelessDirective($log, $compile, $templat
                 }else {
                     var tempArr = [];
                     angular.forEach(newValue.functionSelector, function(value, key){
-                        $log.log(key)
                         var obj ={
                          "key" :key,
                          "value": value

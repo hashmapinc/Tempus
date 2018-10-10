@@ -35,18 +35,9 @@ export default function AddComputationController($scope, $mdDialog, types, helpL
             vm.item.importData = null;
             vm.item.fileName = null;
         }else if (vm.item.type === vm.types.computationType.kubeless) {
-            /*vm.item.functionName = null;
-            vm.item.runtime = null;
-            vm.item.function = null;
-            vm.item.functionFileName = null;
-            vm.item.dependenciesFileName = null;
-            vm.item.dependencies = null;
-            vm.item.handler = null;
-            vm.item.timeout = null;*/
             vm.item = {
                 type: vm.types.computationType.kubeless
             };
-
         }
     };
 

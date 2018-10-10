@@ -1,3 +1,4 @@
+
 /*
  * Copyright © 2016-2018 The Thingsboard Authors
  * Modifications © 2017-2018 Hashmap, Inc
@@ -23,7 +24,7 @@ import computationJobFieldsetTemplate from './computation-job-fieldset.tpl.html'
 /* eslint-enable import/no-unresolved, import/default */
 
 /*@ngInject*/
-export default function ComputationJobDirective($log, $compile, $templateCache, $translate, types, toast, $stateParams, computationService) {
+export default function ComputationJobDirective($compile, $templateCache, $translate, types, toast, $stateParams, computationService) {
     var linker = function (scope, element) {
         var template = $templateCache.get(computationJobFieldsetTemplate);
         element.html(template);

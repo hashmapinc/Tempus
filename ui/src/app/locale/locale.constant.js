@@ -1190,7 +1190,6 @@ export default angular.module('tempus.locale', [])
                     "suspended": "Suspended",
                     "name": "Name",
                     "name-required": "Name is required.",
-                    "description": "Description",
                     "add": "Add Computation Job",
                     "delete-computationJob-title": "Are you sure you want to delete the Computation Job '{{computationJobName}}'?",
                     "delete-computationJob-text": "Be careful, after the confirmation the plugin and all related data will become unrecoverable.",

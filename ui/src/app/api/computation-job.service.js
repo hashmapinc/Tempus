@@ -20,7 +20,7 @@
 
 
 /*@ngInject*/
-function ComputationJobService($http, $q, $filter, utils, $log) {
+function ComputationJobService($http, $q, $filter, utils) {
     var service = {
         getAllComputationJobs: getAllComputationJobs,
         deleteComputationJob: deleteComputationJob,
@@ -51,7 +51,6 @@ function ComputationJobService($http, $q, $filter, utils, $log) {
     function saveComputationJob(computationJob, computationId) {
         var deferred = $q.defer();
         computationId;
-        $log.log("Computation Job ", angular.toJson(computationJob));
         var url = '/api/computations/'+computationId+'/jobs';
         $http.post(url, computationJob).then(function success(response) {
             deferred.resolve(response.data);

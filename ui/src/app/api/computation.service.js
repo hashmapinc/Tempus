@@ -20,7 +20,7 @@
 
 
 /*@ngInject*/
-function ComputationService($http, $q, $filter, utils, $log) {
+function ComputationService($http, $q, $filter, utils) {
 
     var service = {
         upload: upload,
@@ -51,7 +51,6 @@ function ComputationService($http, $q, $filter, utils, $log) {
     function saveComputation(computation){
         var deferred = $q.defer();
         computation.name = computation.computationMetadata.function;
-        $log.log("computation.name ", computation.name);
         var url = '/api/computations';
         $http.post(url, computation).then(function success(response) {
             deferred.resolve(response.data);
