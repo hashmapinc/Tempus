@@ -24,7 +24,7 @@ import computationJobCard from './computation-job-card.tpl.html';
 /* eslint-enable import/no-unresolved, import/default */
 
 /*@ngInject*/
-export default function ComputationController($log, computationService, computationJobService, userService, $state, $stateParams, $translate, types) {
+export default function ComputationController(computationService, computationJobService, userService, $state, $stateParams, $translate, types) {
 
     var computationActionsList = [
         {
@@ -176,7 +176,6 @@ export default function ComputationController($log, computationService, computat
         deleteItemTitleFunc: deleteComputationJobTitle,
         deleteItemContentFunc: deleteComputationJobText,
         deleteItemsTitleFunc: deleteComputationJobsTitle,
-        //deleteItemsActionTitleFunc: deleteComputationJobsActionTitle,
         deleteItemsContentFunc: deleteComputationJobsText,
 
         fetchItemsFunc: fetchComputationJobs,
@@ -193,7 +192,6 @@ export default function ComputationController($log, computationService, computat
         onGridInited: gridInited,
 
         addItemTemplateUrl: addComputationJobTemplate,
-        //addItemController: 'AddComputationJobController',
 
         addItemText: function() { return $translate.instant('computationJob.add-computationJob-text') },
         noItemsText: function() { return $translate.instant('computationJob.no-computationJobs-text') },
@@ -234,17 +232,9 @@ export default function ComputationController($log, computationService, computat
         return $translate.instant('computationJob.delete-computationJobs-title', {count: selectedCount}, 'messageformat');
     }
 
-    /*function deleteComputationJobsActionTitle(selectedCount) {
-        return $translate.instant('computationJob.delete-computationJobs-action-title', {count: selectedCount}, 'messageformat');
-    }*/
-
     function deleteComputationJobsText() {
         return $translate.instant('computationJob.delete-computationJobs-text');
     }
-
-    // function gridInited(grid) {
-    //     vm.grid = grid;
-    // }
 
     function fetchComputationJobs(pageLink) {
         if(vm.computation != null){
