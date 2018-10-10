@@ -100,7 +100,7 @@ spark:
 kubeless:
   aws_access_key: "${AWS_ACCESS_KEY:access_key}"
   aws_secret_key: "${AWS_SECRET_KEY:secret_key}"
-  cluster_mode_enabled: "${CLUSTER_MODE_ENABLED:false}"
+  cluster_mode_enabled: "${CLUSTER_MODE_ENABLED:true}"
   kube_config_path: "${KUBE_CONFIG_PATH:/path/to/kube/config}"
 
 
