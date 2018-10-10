@@ -1724,7 +1724,7 @@ export default angular.module('tempus.locale', [])
                     "trigger-schedule":"Trigger Schedule",
                     "test-connection":"Test Connection",
                     "connection-sucessfull":"Connection sucessfull",
-                    "connection-failed":"Connection failed",
+                    "connection-failed":"Connection failed.Invalid Database URL or user credentials.",
                     "queries-selected":"queries selected",
                     "query-name":"Query Name",
                     "no-query-found":"No query found",

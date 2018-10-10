@@ -31,7 +31,6 @@ export default function MetadataConfigDirective($compile, $templateCache, toast,
 
         });
 
-
         $compile(element.contents())(scope);
     }
     return {
@@ -39,7 +38,7 @@ export default function MetadataConfigDirective($compile, $templateCache, toast,
         link: linker,
         scope: {
             metadata: '=',
-            isEdit: '=',
+            isEdit: '=?',
             theForm: '=',
             onDeleteMetadata: '&'
         }

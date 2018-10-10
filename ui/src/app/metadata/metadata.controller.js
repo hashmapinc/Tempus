@@ -21,7 +21,7 @@ import addMetadataModel from './add-metadata.tpl.html';
 
 /*@ngInject*/
 
-export default function MetadataController(metadataService, $q,$mdDialog, $document, $state, $translate, types) {
+export default function MetadataController(metadataService, $q,$mdDialog, $document, $state, $translate, types, $stateParams) {
 
 
 
@@ -57,10 +57,20 @@ export default function MetadataController(metadataService, $q,$mdDialog, $docum
         itemDetailsText: function() { return $translate.instant('metadataConfig.metadata-details') }
     };
 
+    if (angular.isDefined($stateParams.items) && $stateParams.items !== null) {
+            vm.metadataConfig.items = $stateParams.items;
+        }
+
+        if (angular.isDefined($stateParams.topIndex) && $stateParams.topIndex > 0) {
+            vm.metadataConfig.topIndex = $stateParams.topIndex;
+        }
+
+
     function saveMetadataConfig(metadata) {
         var deferred = $q.defer();
                metadataService.saveMetadata(metadata).then(
-                   function success() {
+                   function success(item) {
+                        deferred.resolve(item);
                    },
                    function fail() {
                        deferred.reject();

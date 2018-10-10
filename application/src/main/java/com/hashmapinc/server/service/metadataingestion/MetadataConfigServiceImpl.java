@@ -61,6 +61,8 @@ public class MetadataConfigServiceImpl implements MetadataConfigService {
     private static final String INCORRECT_CONFIG_ID = "Incorrect metadata config id ";
     private static final String INCORRECT_TENANT_ID = "Incorrect tenant id ";
 
+    private static final String CONNECTED = "{\"status\": \"CONNECTED\" }";
+
     @Autowired
     @Qualifier("clientRestTemplate")
     private RestTemplate restTemplate;
@@ -126,7 +128,7 @@ public class MetadataConfigServiceImpl implements MetadataConfigService {
         validateId(id, INCORRECT_CONFIG_ID + id);
         String url = serviceUrl + PATH_SEPARATOR + id.getId() + PATH_SEPARATOR + connectPath;
         ResponseEntity<String> response = restTemplate.getForEntity(url, String.class);
-        if (response.getStatusCode().equals(HttpStatus.OK)) {
+        if (response.getBody().equals(CONNECTED)) {
             return Boolean.TRUE;
         } else {
             return Boolean.FALSE;
