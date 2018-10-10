@@ -54,7 +54,8 @@ export default function MetadataSourceDirective($compile, $templateCache, $trans
         link: linker,
         scope: {
             source: "=",
-            metadata: "="
+            metadata: "=",
+            isEdit: '=?',
         }
     }
 }

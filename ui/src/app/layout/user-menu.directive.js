@@ -82,8 +82,8 @@ function UserMenuController($scope, userService, $translate, $state) {
                     name += dashboardUser.lastName;
                 }
             } else {
-                name = dashboardUser.email;
-            }
+                name = dashboardUser.user_name;
+           }
         }
         return name;
     }

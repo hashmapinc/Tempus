@@ -14,33 +14,34 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 /* eslint-disable import/no-unresolved, import/default */
 
-import metadataConfigFieldsetTemplate from './metadataConfig-fieldset.tpl.html';
+import sparkComputationJobForm from './form-spark.tpl.html';
 
 /* eslint-enable import/no-unresolved, import/default */
 
 /*@ngInject*/
-export default function MetadataConfigDirective($compile, $templateCache, toast, $translate, types) {
+export default function ComputationJobSparkDirective($compile, $templateCache, types) {
     var linker = function (scope, element) {
-        var template = $templateCache.get(metadataConfigFieldsetTemplate);
+        var template = $templateCache.get(sparkComputationJobForm);
         element.html(template);
 
-        scope.types = types;
-        scope.$watch('metadata', function() {
-
-        });
-
+        if(scope.config){
+            scope.config.type = types.computationType.spark;
+        }
         $compile(element.contents())(scope);
     }
     return {
         restrict: "E",
         link: linker,
         scope: {
-            metadata: '=',
-            isEdit: '=?',
+            config: '=',
+            isEdit: '=',
+            isReadOnly: '=',
+            computationDescriptor: '=',
             theForm: '=',
-            onDeleteMetadata: '&'
+            computation:'='
         }
     };
 }

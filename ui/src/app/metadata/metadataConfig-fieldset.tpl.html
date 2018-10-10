@@ -40,7 +40,7 @@
                 <div translate ng-message="required">metadata.source-type-required</div>
             </div>
         </md-input-container>
-        <div tb-metadata-source source="metadata.source" metadata="metadata" model="vm.item" ng-if="metadata.source.type && metadata.source.type == types.metadataSourceType.jdbc"></div>
+        <div tb-metadata-source is-edit="isEdit" source="metadata.source" metadata="metadata" model="vm.item" ng-if="metadata.source.type && metadata.source.type == types.metadataSourceType.jdbc"></div>
         
         <md-input-container  class="md-block" md-is-error="theForm.metadataSinkType.$touched && theForm.metadataSinkType.$invalid">
             <label translate>metadata.sink-type</label>

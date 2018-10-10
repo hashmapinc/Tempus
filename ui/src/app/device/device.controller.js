@@ -125,6 +125,7 @@ export function DeviceController($rootScope,userService, deviceService, customer
     vm.makePublic = makePublic;
     vm.unassignFromCustomer = unassignFromCustomer;
     vm.manageCredentials = manageCredentials;
+    var user = userService.getCurrentUser();
 
     initController();
 
@@ -133,7 +134,7 @@ export function DeviceController($rootScope,userService, deviceService, customer
         var deleteDeviceFunction = null;
         var refreshDevicesParamsFunction = null;
 
-        var user = userService.getCurrentUser();
+
 
         if (user.authority === 'CUSTOMER_USER') {
             vm.devicesScope = 'customer_user';
@@ -346,7 +347,7 @@ export function DeviceController($rootScope,userService, deviceService, customer
                     }
                 );
 
-                vm.deviceGridConfig.addItemAction = {};
+                //vm.deviceGridConfig.addItemAction = {};
             }
         }
 
@@ -446,7 +447,6 @@ export function DeviceController($rootScope,userService, deviceService, customer
     }
 
     $scope.deleteDevice = function($event,item) {
-
         var confirm = $mdDialog.confirm()
             .targetEvent($event)
             .title(deleteDeviceTitle(item))
@@ -514,6 +514,13 @@ export function DeviceController($rootScope,userService, deviceService, customer
     }
 
     function saveDevice(device) {
+        if(vm.devicesScope == 'customer_user'){
+            device.customerId =null;
+            device.customerId = {
+                id:customerId,
+                entityType:'CUSTOMER'
+            }
+        }
         var deferred = $q.defer();
         deviceService.saveDevice(device).then(
             function success(savedDevice) {

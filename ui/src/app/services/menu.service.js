@@ -560,9 +560,10 @@ function Menu(userService, $state, $rootScope, $log,datamodelService,customerSer
 
     function buildGeneratedSectionTree(list, id, parentId, children) {
         var generatedSectionTreeList = buildSectionTreeList(id, parentId, children, list);
-
         var startingLevel = 1;
-        addToggleAndLevelToGeneratedSectionTree(generatedSectionTreeList[0],startingLevel);
+        if(generatedSectionTreeList.length > 0) {
+            addToggleAndLevelToGeneratedSectionTree(generatedSectionTreeList[0],startingLevel);
+        }
 
         return generatedSectionTreeList;
     }
