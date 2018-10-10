@@ -16,15 +16,11 @@
     limitations under the License.
 
 -->
-<md-button ng-click="onDeleteComputation({event: $event})"
-           ng-show="!isEdit && !isReadOnly"
-           class="md-raised md-primary">{{ 'computation.delete' | translate }}</md-button>
-
-<md-content class="md-padding" layout="column" style="overflow-x: hidden">
-    <fieldset ng-disabled="loading || !isEdit ">
-        <md-input-container class="md-block">
-            <label translate>computation.description</label>
-            <textarea ng-model="computation.additionalInfo.description" rows="2"></textarea>
-        </md-input-container>
-    </fieldset>
-</md-content>
+<md-card-content>
+    <tb-json-form schema="computationDescriptor.schema"
+                  form="computationDescriptor.form"
+                  model="config.argParameters"
+                  readonly="loading || !isEdit || isReadOnly"
+                  form-control="theForm">
+    </tb-json-form>
+</md-card-content>

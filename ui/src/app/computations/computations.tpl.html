@@ -34,10 +34,10 @@
         <details-buttons tb-help="vm.helpLinkIdForPlugin()" help-container-id="help-container">
             <div id="help-container"></div>
         </details-buttons>
-        <md-tabs ng-class="{'tb-headless': (vm.grid.detailsConfig.isDetailsEditMode || !vm.isComputationJobEditable(vm.grid.operatingItem()))}"
+        <md-tabs  ng-if="vm.grid.operatingItem()" ng-class="{'tb-headless': (vm.grid.detailsConfig.isDetailsEditMode || !vm.isComputationJobEditable(vm.grid.operatingItem()))}"
                  id="tabs" md-border-bottom flex class="tb-absolute-fill">
             <md-tab label="{{ 'computationJob.details' | translate }}">
-                <tb-computation-job computationjob="vm.grid.operatingItem()"
+                <tb-computation-job  computationjob="vm.grid.operatingItem()"
                      computation="vm.computation"
                      is-edit="vm.grid.detailsConfig.isDetailsEditMode"
                      is-read-only="vm.grid.isDetailsReadOnly(vm.grid.operatingItem())"
