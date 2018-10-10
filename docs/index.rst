@@ -61,6 +61,7 @@ Contents
    datamodel/dataobject
    development/index
    gateway/index
+   metadata/index
 
 Indices and tables
 ==================
