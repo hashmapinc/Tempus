@@ -27,9 +27,10 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Arrays;
 
 /*
- * Mud Pressure (in psi) = Mud Weight (in ppg) x 0.052 x True Vertical Depth (in ft)
+ * Mud Pressure (in psi) = Mud Weight (in ppg) x 0.052 x True Vertical Depth of hole (in ft)
  * */
 public class HydrostaticPressureAtDepthCalculator {
 
@@ -40,18 +41,19 @@ public class HydrostaticPressureAtDepthCalculator {
         private String id;
         private Double mudWeight;
         private Double ds;
+        private Double holeDepth;
     }
 
     public String calculate(io.kubeless.Event event, io.kubeless.Context context) {
         String inputJson = event.Data;
         try {
-            if (new InputParserUtility().validateJson(inputJson, Collections.singletonList("mudWeight"))) {
+            if (new InputParserUtility().validateJson(inputJson, Arrays.asList("mudWeight", "holeDepth"))) {
                 Data inputData = new Gson().fromJson(inputJson, Data.class);
 
-                double mudPressure = inputData.mudWeight * 0.052 * inputData.ds;
+                double mudPressure = inputData.mudWeight * 0.052 * inputData.holeDepth;
 
-                Map<String, Double> data = new HashMap<>();
-                data.put("mudPressure", mudPressure);
+                Map<String, Double> data = new HashMap<String, Double>();
+                data.put("mudPressureAtDepth", mudPressure);
 
                 String json = new GsonBuilder().create().toJson(data);
                 Optional<Long> empty = Optional.empty();
