@@ -44,7 +44,9 @@
                             ng-disabled="!vm.isAdd"
                             the-form="theForm"
                             tb-required="true"
-                            ng-model="vm.targetEntityId">
+                            ng-model="vm.targetEntityId",
+                            entity-detail="vm.entityDetail"
+                            relation="vm.relation">
                         </tb-entity-select>
                         <div class="md-caption" style="padding-left: 3px; padding-bottom: 10px; color: rgba(0,0,0,0.57);" translate>relation.additional-info</div>
                         <div flex class="tb-relation-additional-info-panel" layout="column">

@@ -244,7 +244,8 @@ function DeviceListWidgetController($rootScope, $scope, $filter, dashboardServic
         vm.loadTableData(vm.devicesScope);
     }
     function loadTableData(scope){
-        dashboardService.getDashboard($state.params.dashboardId).then(function success(response) {           
+
+        dashboardService.getDashboard($state.params.dashboardId).then(function success(response) {
             if(response){
                 if (scope === 'tenant') {
                     assetService.getTenantAssets({limit: 200, textSearch: ''}, true, null, false).
@@ -266,7 +267,7 @@ function DeviceListWidgetController($rootScope, $scope, $filter, dashboardServic
         if(result.data.length > 0){
             $scope.showList = true;
             angular.forEach(result.data, function(value){
-                if(value.dataModelObjectId.id == dataObjectId){
+                if(value.dataModelObjectId && value.dataModelObjectId.id == dataObjectId){
                     list.push(value);
                 }
             });

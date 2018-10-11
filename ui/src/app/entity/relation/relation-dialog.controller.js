@@ -24,13 +24,14 @@ import './relation-dialog.scss';
 const js_beautify = beautify.js;
 
 /*@ngInject*/
-export default function RelationDialogController($scope, $mdDialog, types, entityRelationService, isAdd, direction, relation, showingCallback) {
+export default function RelationDialogController($scope, $mdDialog, types, entityRelationService, isAdd, direction, relation, showingCallback, entityDetail, assetService, deviceService) {
 
     var vm = this;
 
     vm.types = types;
     vm.isAdd = isAdd;
     vm.direction = direction;
+    vm.entityDetail = entityDetail;
 
     showingCallback.onShowing = function(scope, element) {
         updateEditorSize(element);
@@ -114,6 +115,19 @@ export default function RelationDialogController($scope, $mdDialog, types, entit
         if (valid) {
             entityRelationService.saveRelation(vm.relation).then(
                 function success() {
+                    if((relation.from.entityType == 'DEVICE' || relation.from.entityType == 'ASSET' )&& vm.entityDetail && vm.entityDetail.customerId.id == '13814000-1dd2-11b2-8080-808080808080'){
+                            assetService.getAsset(vm.relation.to.id).then(function success(response){
+
+                                if(response){
+                                    if(relation.to.entityType == 'ASSET' && relation.from.entityType == 'DEVICE'){
+                                        deviceService.assignDeviceToCustomer(response.customerId.id,vm.entityDetail.id.id).then();
+                                    }else if(relation.to.entityType == 'ASSET' && relation.from.entityType == 'ASSET'){
+                                        assetService.assignAssetToCustomer(response.customerId.id,vm.entityDetail.id.id).then();
+                                    }
+
+                                }
+                            });
+                    }
                     $mdDialog.hide();
                 }
             );
