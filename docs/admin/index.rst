@@ -16,6 +16,8 @@ Administration
     users
     assets
     devices
+    groups
+    policies
     rules
     plugins
     widgets
