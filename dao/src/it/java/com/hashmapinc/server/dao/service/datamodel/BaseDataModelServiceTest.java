@@ -19,6 +19,9 @@ package com.hashmapinc.server.dao.service.datamodel;
 import com.datastax.driver.core.utils.UUIDs;
 import com.hashmapinc.server.common.data.datamodel.DataModel;
 import com.hashmapinc.server.common.data.Tenant;
+import com.hashmapinc.server.common.data.datamodel.DataModelObject;
+import com.hashmapinc.server.common.data.id.CustomerId;
+import com.hashmapinc.server.common.data.id.DataModelId;
 import com.hashmapinc.server.common.data.id.TenantId;
 import com.hashmapinc.server.dao.exception.DataValidationException;
 import com.hashmapinc.server.dao.service.AbstractServiceTest;
@@ -27,6 +30,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import javax.xml.crypto.Data;
 import java.util.List;
 
 public abstract class BaseDataModelServiceTest extends AbstractServiceTest {
@@ -111,6 +115,45 @@ public abstract class BaseDataModelServiceTest extends AbstractServiceTest {
 
         dataModelService.deleteById(savedDataModel.getId());
         Assert.assertNull(dataModelService.findById(savedDataModel.getId()));
+    }
+
+
+    @Test
+    public void testDeletionInBottomUp() {
+        DataModel dataModel = createDataModel(tenantId);
+        DataModelId dataModelId = dataModel.getId();
+
+        DataModelObject dataModelObj = new DataModelObject();
+        dataModelObj.setCustomerId(new CustomerId(UUIDs.timeBased()));
+        dataModelObj.setName("well-1");
+        dataModelObj.setType("well-type");
+        dataModelObj.setDataModelId(dataModel.getId());
+        dataModelObj.setParentId(null);
+
+        DataModelObject parentDMO = dataModelObjectService.save(dataModelObj);
+
+        for(int i =2 ;i<6;i++) {
+            dataModelObj.setName("well-"+i);
+            dataModelObj.setParentId(parentDMO.getId());
+            parentDMO = dataModelObjectService.save(dataModelObj);
+        }
+
+        try {
+            Assert.assertEquals(5,dataModelObjectService.findByDataModelId(dataModelId).size());
+            dataModelService.deleteById(dataModelId);
+            Assert.assertEquals(0,dataModelObjectService.findByDataModelId(dataModelId).size());
+
+        }catch (DataValidationException exp) {
+            Assert.assertEquals(5,dataModelObjectService.findByDataModelId(dataModelId).size());
+        }
+    }
+
+    @Test
+    public void testDeletionWithoutDataModelObjects() {
+        DataModel dataModel = createDataModel(tenantId);
+        DataModelId dataModelId = dataModel.getId();
+        dataModelService.deleteById(dataModelId);
+        Assert.assertNull(dataModelService.findById(dataModelId));
     }
 
     @Test
