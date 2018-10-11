@@ -16,10 +16,17 @@
  */
 package com.hashmapinc.server.dao.datamodel;
 
+import com.hashmapinc.server.common.data.Dashboard;
+import com.hashmapinc.server.common.data.DashboardType;
+import com.hashmapinc.server.common.data.asset.Asset;
 import com.hashmapinc.server.common.data.datamodel.DataModel;
 import com.hashmapinc.server.common.data.Tenant;
+import com.hashmapinc.server.common.data.datamodel.DataModelObject;
 import com.hashmapinc.server.common.data.id.DataModelId;
+import com.hashmapinc.server.common.data.id.DataModelObjectId;
 import com.hashmapinc.server.common.data.id.TenantId;
+import com.hashmapinc.server.dao.asset.AssetDao;
+import com.hashmapinc.server.dao.dashboard.DashboardService;
 import com.hashmapinc.server.dao.entity.AbstractEntityService;
 import com.hashmapinc.server.dao.exception.DataValidationException;
 import com.hashmapinc.server.dao.service.DataValidator;
@@ -27,9 +34,11 @@ import com.hashmapinc.server.dao.tenant.TenantDao;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
-import java.util.List;
+import java.util.*;
 
 import static com.hashmapinc.server.dao.service.Validator.validateId;
 
@@ -48,6 +57,16 @@ public class DataModelServiceImpl extends AbstractEntityService implements DataM
 
     @Autowired
     private TenantDao tenantDao;
+
+    @Autowired
+    private AssetDao assetDao;
+
+    @Autowired
+    private DashboardService dashboardService;
+
+    private Map<UUID,Boolean> marked;
+    private Stack<UUID> topologicalOrder; //NOSONAR (Needed synchronous deletion of DataModelObject
+
 
     @Override
     public DataModel saveDataModel(DataModel dataModel) {
@@ -71,10 +90,84 @@ public class DataModelServiceImpl extends AbstractEntityService implements DataM
     }
 
     @Override
+//    @Transactional(propagation = Propagation.REQUIRED,rollbackFor = RuntimeException.class)
     public void deleteById(DataModelId dataModelId) {
         log.trace("Executing DataModelServiceImpl.deleteById [{}]", dataModelId);
         validateId(dataModelId, INCORRECT_DATA_MODEL_ID + dataModelId);
+        removeDependenciesOfDataModel(dataModelId);
         dataModelDao.removeById(dataModelId.getId());
+    }
+
+    private void removeDependenciesOfDataModel(DataModelId dataModelId) {
+        List<DataModelObject> dataModelObjects = dataModelObjectService.findByDataModelId(dataModelId);
+        dataModelObjects.forEach(dataModelObject -> {
+            if(dataModelObject != null){
+                List<Asset> assets = assetDao.findAssetsByDataModelObjectId(dataModelObject.getId().getId());
+                if(!assets.isEmpty())
+                    throw new DataValidationException("can delete dataModelObject"); //refactor exception message
+            }
+        });
+
+        generateTopologicalOrder(dataModelObjects);
+        deleteDependencies(topologicalOrder);
+    }
+
+    private void deleteDependencies(Stack<UUID> topologicalOrder) {
+        topologicalOrder.forEach(uuid -> {
+            List<Dashboard> dashboards = dashboardService.findDashboardByDataModelObjectId(new DataModelObjectId(uuid));
+            dashboards.forEach(dashboard -> {
+                if(dashboard.getType() == DashboardType.ASSET_LANDING_PAGE)
+                    dashboardService.deleteDashboard(dashboard.getId());
+            });
+            dataModelObjectService.removeById(new DataModelObjectId(uuid));
+        });
+    }
+
+    private void generateTopologicalOrder(List<DataModelObject> dataModelObjects) {
+        Map<UUID, List<UUID>> adjList = getAdjacencyList(dataModelObjects);
+        marked  = new HashMap<>();
+        topologicalOrder = new Stack<>();
+        //marked the processed node
+        adjList.forEach((k,v) -> marked.put(k,false));
+        //if graph have more than one parent
+        marked.forEach((k,v) -> {
+            if(!v){
+                visit(k,adjList);
+            }
+        });
+    }
+
+    private Map<UUID, List<UUID>> getAdjacencyList(List<DataModelObject> dataModelObjects) {
+        Map<UUID, List<UUID>> adjList = new HashMap<>();
+
+        for(DataModelObject vertex : dataModelObjects) {
+            if(!adjList.containsKey(vertex.getUuidId())) {
+                List<UUID> neighbors = getNeighbors(dataModelObjects, vertex);
+                adjList.put(vertex.getUuidId(),neighbors);
+            }
+        }
+        return adjList;
+    }
+
+    private  List<UUID> getNeighbors(List<DataModelObject> nodes, DataModelObject vertex) {
+        List<UUID> neighbors = new LinkedList<>();
+
+        for (DataModelObject node : nodes) {
+            if (node.getParentId() != null && node.getParentId().equals(vertex.getId())) {
+                neighbors.add(node.getUuidId());
+            }
+
+        }
+        return neighbors;
+    }
+
+    private void visit(UUID node ,Map<UUID, List<UUID>> adjList) {
+        marked.put(node,true);
+        for(UUID vertex : adjList.get(node)) {
+            if(!marked.get(vertex))
+                 visit(vertex,adjList);
+        }
+        topologicalOrder.push(node);
     }
 
     @Override
@@ -88,7 +181,6 @@ public class DataModelServiceImpl extends AbstractEntityService implements DataM
         List<DataModel> dataModels = dataModelDao.findByTenantId(tenantId.getId());
         dataModels.forEach(dataModel -> {
             if(dataModel != null){
-                dataModelObjectService.deleteDataModelObjectsByDataModelId(dataModel.getId());
                 deleteById(dataModel.getId());
             }
         });
