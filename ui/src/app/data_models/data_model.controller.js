@@ -489,7 +489,7 @@ export function DataModelController($scope, $mdDialog, $document, $stateParams, 
             if(vm.dataModelName.indexOf(angular.lowercase(vm.stepperData.name.trim())) !== -1) {
                 vm.stepperState = 0;    // keeps track of the current stepper step (0-3)
                 vm.stepperMode = "";    // either CREATE or EDIT. Usefull for hiding/showing the delete option
-                toast.showError($translate.instant('Datamodel object already present of same name.'));
+                toast.showError($translate.instant('dataModels.duplicate-object'));
                 return false;
              } else {
                 vm.dataModelName.push(angular.lowercase(vm.stepperData.name.trim()));
@@ -499,7 +499,7 @@ export function DataModelController($scope, $mdDialog, $document, $stateParams, 
                 if(vm.dataModelSavedName.indexOf(angular.lowercase(vm.stepperData.name.trim())) !== -1) {
                     vm.stepperState = 0;    // keeps track of the current stepper step (0-3)
                     vm.stepperMode = "";    // either CREATE or EDIT. Usefull for hiding/showing the delete option
-                    toast.showError($translate.instant('Datamodel object already present of same name.'));
+                    toast.showError($translate.instant('dataModels.duplicate-object'));
                     return false;
                 }
             }
@@ -510,7 +510,7 @@ export function DataModelController($scope, $mdDialog, $document, $stateParams, 
             if(vm.dataModelSavedName.indexOf(angular.lowercase(vm.stepperData.name.trim())) !== -1) {
                 vm.stepperState = 0;    // keeps track of the current stepper step (0-3)
                 vm.stepperMode = "";    // either CREATE or EDIT. Usefull for hiding/showing the delete option
-                toast.showError($translate.instant('Datamodel object already present of same name.'));
+                toast.showError($translate.instant('dataModels.duplicate-object'));
                 return false;
              } else {
                 vm.dataModelName.push(angular.lowercase(vm.stepperData.name.trim()));

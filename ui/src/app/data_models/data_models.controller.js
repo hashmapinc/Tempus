@@ -46,7 +46,7 @@ export function AddDataModelController($scope, $mdDialog, saveItemFunction, help
 
 
 /*@ngInject*/
-export function DataModelsController($scope, datamodelService, $q, $filter, $mdDialog, $document, $state, $log, $translate) {
+export function DataModelsController($scope, datamodelService, $q, toast, $timeout, $filter, $mdDialog, $document, $state, $translate) {
     var vm = this;
 
     vm.openDataModelDialog = openDataModelDialog;
@@ -95,6 +95,7 @@ export function DataModelsController($scope, datamodelService, $q, $filter, $mdD
              $event.stopPropagation();
        }
 
+       vm.isDelete =[];
         if (vm.selectedDataModel && vm.selectedDataModel.length > 0) {
             var title = $translate.instant('dataModels.delete-datamodel-title', {
                 count: vm.selectedDataModel.length
@@ -110,11 +111,21 @@ export function DataModelsController($scope, datamodelService, $q, $filter, $mdD
                 .ok($translate.instant('action.yes'));
             $mdDialog.show(confirm).then(function() {
 
+             vm.selectedDataModel.forEach(id_to_delete => {                            // delete the object by ID
+                datamodelService.deleteDatamodel(id_to_delete).then(function success() {
+                   vm.isDelete.push(id_to_delete);
+                });
+
+             });
+               $timeout( function(){
+                     if(vm.selectedDataModel.length == vm.isDelete.length){
+                        loadDataModel();
+                        toast.showSuccess($translate.instant('dataModels.delete-success'));
+                     }
+               }, 2000 );
 
             });
         }
-
-       $log.log(vm.selectedDataModel);
 
     }
 
@@ -136,8 +147,14 @@ export function DataModelsController($scope, datamodelService, $q, $filter, $mdD
                    .cancel($translate.instant('action.no'))
                    .ok($translate.instant('action.yes'));
                $mdDialog.show(confirm).then(function () {
-               },
-               function () {
+
+                datamodelService.deleteDatamodel(id).then(function success() {
+
+                    toast.showSuccess($translate.instant('dataModels.delete-success'));
+                    loadDataModel();
+
+                });
+
                });
 
     }

@@ -630,7 +630,9 @@ export default angular.module('tempus.locale', [])
                     "lastModified":"Last Modified",
                     "noData":"No Data Available",
                     "delete-datamodel-title":"Are you sure you want to delete { count, select, 1 {1 datamodel} other {# datamodels} }?",
-                    "delete-datamodel-text": "Be careful, after the confirmation all selected datamodel(s) and related data will be removed."
+                    "delete-datamodel-text": "Be careful, after the confirmation all selected datamodel(s) and related data will be removed.",
+                    "delete-success": "Data model(s) deleted sucessfully.",
+                    "duplicate-object": "Datamodel object already present of same name."
                 },
                 "datakey": {
                     "settings": "Settings",
