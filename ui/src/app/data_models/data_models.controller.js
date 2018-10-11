@@ -25,6 +25,7 @@ export function AddDataModelController($scope, $mdDialog, saveItemFunction, help
     vm.helpLinks = helpLinks;
     vm.item = {};
 
+
     vm.add = add;
     vm.cancel = cancel;
 
@@ -45,10 +46,13 @@ export function AddDataModelController($scope, $mdDialog, saveItemFunction, help
 
 
 /*@ngInject*/
-export function DataModelsController($scope, datamodelService, $q, $filter, $mdDialog, $document, $state) {
+export function DataModelsController($scope, datamodelService, $q, $filter, $mdDialog, $document, $state, $log, $translate) {
     var vm = this;
 
     vm.openDataModelDialog = openDataModelDialog;
+    vm.deleteMultipleDataModelDialog = deleteMultipleDataModelDialog;
+    vm.deleteDataModel = deleteDataModel;
+    vm.selectedDataModel = [];
     vm.cancel = cancel;
     vm.saveDataModelFunc = saveDataModelFunc;
     vm.AddDataModelController = AddDataModelController;
@@ -83,6 +87,59 @@ export function DataModelsController($scope, datamodelService, $q, $filter, $mdD
         }).then(function () {
         }, function () {
         });
+    }
+
+    function deleteMultipleDataModelDialog($event) {
+
+       if ($event) {
+             $event.stopPropagation();
+       }
+
+        if (vm.selectedDataModel && vm.selectedDataModel.length > 0) {
+            var title = $translate.instant('dataModels.delete-datamodel-title', {
+                count: vm.selectedDataModel.length
+            }, 'messageformat');
+            var content = $translate.instant('dataModels.delete-datamodel-text');
+
+            var confirm = $mdDialog.confirm()
+                .targetEvent($event)
+                .title(title)
+                .htmlContent(content)
+                .ariaLabel(title)
+                .cancel($translate.instant('action.no'))
+                .ok($translate.instant('action.yes'));
+            $mdDialog.show(confirm).then(function() {
+
+
+            });
+        }
+
+       $log.log(vm.selectedDataModel);
+
+    }
+
+
+    function deleteDataModel($event,id) {
+           if ($event) {
+                 $event.stopPropagation();
+           }
+           var title = $translate.instant('dataModels.delete-datamodel-title', {
+                 count: 1
+           }, 'messageformat');
+
+           var content = $translate.instant('dataModels.delete-datamodel-text');
+
+           var confirm = $mdDialog.confirm()
+                   .targetEvent($event)
+                   .title(title)
+                   .htmlContent(content)
+                   .cancel($translate.instant('action.no'))
+                   .ok($translate.instant('action.yes'));
+               $mdDialog.show(confirm).then(function () {
+               },
+               function () {
+               });
+
     }
 
     function saveDataModelFunc(item) {
