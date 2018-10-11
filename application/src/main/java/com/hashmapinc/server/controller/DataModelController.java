@@ -142,4 +142,17 @@ public class DataModelController extends BaseController {
             throw handleException(e);
         }
     }
+
+    @PreAuthorize("hasAnyAuthority('TENANT_ADMIN', 'CUSTOMER_USER')")
+    @DeleteMapping(value = "/data-model/{modelId}")
+    @ResponseBody
+    public Boolean removeDataModelById(@PathVariable("modelId") String modelId) throws TempusException {
+        try {
+            checkParameter("modelId", modelId);
+            dataModelService.deleteById(new DataModelId(toUUID(modelId)));
+            return true;
+        } catch (Exception e) {
+            throw handleException(e);
+        }
+    }
 }

@@ -71,4 +71,11 @@ public class BaseDataModelControllerTest extends AbstractControllerTest {
         Assert.assertEquals(defaultDataModelObj.getName(), foundDataModelObj.getName());
     }
 
+    @Test
+    public void testRemoveDataModelById() throws Exception {
+        doDelete("/api/data-model/" + defaultDataModel.getId().toString());
+        DataModel fetchedDataModel = doGet("/api/data-model/" + defaultDataModel.getId().toString(), DataModel.class);
+        Assert.assertNull(fetchedDataModel);
+    }
+
 }
