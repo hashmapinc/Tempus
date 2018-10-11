@@ -67,6 +67,8 @@ The Review section allows us to review the DataModel Object we have defined.
 
 For our example, this looks right for our ``Developer`` object. We will accept by clicking ``Submit`` to save our object to the datamodel.
 
+``NOTE`` : After adding DataModel Objects click on the orange tick button on buttom right corner, otherwise your changes will not be saved.
+
 |
 
 
