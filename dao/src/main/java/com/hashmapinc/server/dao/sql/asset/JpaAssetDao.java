@@ -19,22 +19,30 @@ package com.hashmapinc.server.dao.sql.asset;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.hashmapinc.server.common.data.EntitySubtype;
 import com.hashmapinc.server.common.data.EntityType;
+import com.hashmapinc.server.common.data.TempusResourceCriteriaSpec;
 import com.hashmapinc.server.common.data.UUIDConverter;
 import com.hashmapinc.server.common.data.asset.Asset;
+import com.hashmapinc.server.common.data.id.AssetId;
 import com.hashmapinc.server.common.data.id.TenantId;
 import com.hashmapinc.server.common.data.page.TextPageLink;
 import com.hashmapinc.server.dao.DaoUtil;
 import com.hashmapinc.server.dao.asset.AssetDao;
 import com.hashmapinc.server.dao.model.ModelConstants;
 import com.hashmapinc.server.dao.model.sql.AssetEntity;
+import com.hashmapinc.server.dao.querybuilder.ResourceCriteria;
+import com.hashmapinc.server.dao.querybuilder.TempusResourcePredicate;
 import com.hashmapinc.server.dao.sql.JpaAbstractSearchTextDao;
+import com.hashmapinc.server.dao.sql.querydsl.JPATempusResourcePredicateBuilder;
 import com.hashmapinc.server.dao.util.SqlDao;
+import com.querydsl.core.types.dsl.BooleanExpression;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Created by Valerii Sosliuk on 5/19/2017.
@@ -128,6 +136,51 @@ public class JpaAssetDao extends JpaAbstractSearchTextDao<AssetEntity, Asset> im
         return DaoUtil.convertDataList(assetRepository
                                                .findByDataModelObjectId(
                                                        UUIDConverter.fromTimeUUID(dataModelObjectId)));
+    }
+
+    @Override
+    public List<Asset> findAll(TempusResourceCriteriaSpec tempusResourceCriteriaSpec, TextPageLink textPageLink) {
+        final List<BooleanExpression> predicates = getPredicates(tempusResourceCriteriaSpec, textPageLink);
+        final Optional<BooleanExpression> finalPredicate = predicates.stream().reduce(BooleanExpression::and);
+        final PageRequest pageable = new PageRequest(0, textPageLink.getLimit(), new Sort(new Sort.Order(Sort.Direction.ASC, ModelConstants.ID_PROPERTY)));
+        return finalPredicate.isPresent() ? DaoUtil.convertDataList(assetRepository.findAll(finalPredicate.get(), pageable).getContent()) : Collections.emptyList();
+    }
+
+    private List<BooleanExpression> getPredicates(TempusResourceCriteriaSpec tempusResourceCriteriaSpec, TextPageLink textPageLink) {
+        final String idOffset = textPageLink.getIdOffset() == null ? ModelConstants.NULL_UUID_STR : UUIDConverter.fromTimeUUID(textPageLink.getIdOffset());
+
+        final JPATempusResourcePredicateBuilder basicPredicateBuilder = new JPATempusResourcePredicateBuilder(getEntityClass())
+                .with(new ResourceCriteria(ModelConstants.ID_PROPERTY, ResourceCriteria.Operation.GREATER_THAN, idOffset))
+                .with(new ResourceCriteria(ModelConstants.ASSET_TENANT_ID_PROPERTY, ResourceCriteria.Operation.EQUALS, UUIDConverter.fromTimeUUID(tempusResourceCriteriaSpec.getTenantId().getId())))
+                .with(new ResourceCriteria(ModelConstants.ASSET_DATA_MODEL_OBJECT_ID, ResourceCriteria.Operation.EQUALS, UUIDConverter.fromTimeUUID(tempusResourceCriteriaSpec.getDataModelObjectId().getId())));
+
+        if(textPageLink.getTextSearch() != null){
+            basicPredicateBuilder.with(new ResourceCriteria(ModelConstants.SEARCH_TEXT_PROPERTY, ResourceCriteria.Operation.LIKE, textPageLink.getTextSearch()));
+        }
+
+        tempusResourceCriteriaSpec.getCustomerId().ifPresent(customerId ->
+                basicPredicateBuilder.with(new ResourceCriteria(ModelConstants.ASSET_CUSTOMER_ID_PROPERTY, ResourceCriteria.Operation.EQUALS, UUIDConverter.fromTimeUUID(customerId.getId()))));
+
+        final ResourceCriteria idConstraint = getIdConstraint(tempusResourceCriteriaSpec);
+        if(Objects.nonNull(idConstraint)){
+            basicPredicateBuilder.with(idConstraint);
+        }
+        final List<TempusResourcePredicate<BooleanExpression>> tempusResourcePredicates = basicPredicateBuilder.build();
+        return tempusResourcePredicates.stream().map(TempusResourcePredicate::getValue).collect(Collectors.toList());
+    }
+
+    private ResourceCriteria getIdConstraint(TempusResourceCriteriaSpec tempusResourceCriteriaSpec) {
+        final Set<String> accessibleTempusResourceIdsOnly = tempusResourceCriteriaSpec.getAccessibleIdsForGivenDataModelObject().stream()
+                .filter(id -> id instanceof AssetId)
+                .map(id -> UUIDConverter.fromTimeUUID(id.getId()))
+                .collect(Collectors.toSet());
+
+        if(accessibleTempusResourceIdsOnly.size() == 1){
+            return new ResourceCriteria(ModelConstants.ID_PROPERTY, ResourceCriteria.Operation.EQUALS, accessibleTempusResourceIdsOnly.toArray()[0]);
+        } else if (accessibleTempusResourceIdsOnly.size() > 1) {
+            return new ResourceCriteria(ModelConstants.ID_PROPERTY, ResourceCriteria.Operation.CONTAINS, accessibleTempusResourceIdsOnly.toArray(new String[0]));
+        }
+        return null;
     }
 
     private List<EntitySubtype> convertTenantAssetTypesToDto(UUID tenantId, List<String> types) {

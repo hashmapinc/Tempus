@@ -241,6 +241,11 @@ public class ModelConstants {
     public static final String ASSET_BY_TENANT_AND_NAME_VIEW_NAME = "asset_by_tenant_and_name";
     public static final String ASSET_TYPES_BY_TENANT_VIEW_NAME = "asset_types_by_tenant";
     public static final String ASSET_BY_DATA_MODEL_OBJECT_VIEW_NAME = "asset_by_data_model_object";
+    public static final String ASSET_BY_DATA_MODEL_OBJECT_AND_ASSET_AND_CUSTOMER_VIEW_NAME = "asset_by_data_model_and_id_and_customer";
+    public static final String ASSET_BY_DATA_MODEL_AND_ASSET_VIEW_NAME = "asset_by_data_model_and_id";
+    public static final String ASSET_BY_DATA_MODEL_OBJECT_AND_CUSTOMER_VIEW_NAME = "asset_by_data_model_and_customer";
+    public static final String ASSET_BY_DATA_MODEL_VIEW_NAME = "asset_by_data_model";
+
 
     /**
      * Cassandra entity_subtype constants.
@@ -574,7 +579,6 @@ public class ModelConstants {
     public static final String CUSTOMER_GROUP_POLICY_COLUMN_FAMILY_NAME = "customer_group_policy";
     public static final String CUSTOMER_GROUP_POLICY_ID_PROPERTY = "group_id";
     public static final String CUSTOMER_GROUP_POLICY_PROPERTY = "policies";
-
 
 
     protected static final String[] NONE_AGGREGATION_COLUMNS = new String[]{LONG_VALUE_COLUMN, DOUBLE_VALUE_COLUMN, BOOLEAN_VALUE_COLUMN, STRING_VALUE_COLUMN, JSON_VALUE_COLUMN, KEY_COLUMN, TS_COLUMN, TS_DIFF};

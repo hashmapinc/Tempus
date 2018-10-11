@@ -286,13 +286,13 @@ function AssetService($http, $q, customerService, userService) {
      */
     function getAssetByObjectId(dataObjectId,ignoreErrors, config) {
         var deferred = $q.defer();
-        var url = '/api/datamodelobject/assets/' + dataObjectId;
+        var url = '/api/datamodelobject/assets/' + dataObjectId + '?limit=30';
         if (!config) {
             config = {};
         }
         config = Object.assign(config, { ignoreErrors: ignoreErrors });
         $http.get(url, config).then(function success(response) {
-            deferred.resolve(response.data);
+            deferred.resolve(response.data.data);
         }, function fail() {
             deferred.reject();
         });

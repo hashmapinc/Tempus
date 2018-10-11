@@ -90,3 +90,31 @@ CREATE MATERIALIZED VIEW IF NOT EXISTS tempus.cmp_jobs_by_tenant_and_cmp_search_
     WHERE tenant_id IS NOT NULL AND computation_id IS NOT NULL AND search_text IS NOT NULL AND id IS NOT NULL
     PRIMARY KEY (tenant_id, computation_id, search_text, id)
     WITH CLUSTERING ORDER BY ( search_text ASC, id DESC );
+
+CREATE MATERIALIZED VIEW IF NOT exists tempus.asset_by_data_model_and_customer AS
+    SELECT *
+FROM tempus.asset
+    WHERE id IS NOT NULL and data_model_object_id IS NOT NULL AND tenant_id IS NOT NULL AND customer_id IS NOT NULL AND search_text IS NOT NULL AND type IS NOT NULL
+    PRIMARY KEY (data_model_object_id, tenant_id, customer_id, search_text, id, type)
+    WITH CLUSTERING ORDER BY (search_text ASC, id DESC);
+
+CREATE MATERIALIZED VIEW IF NOT exists tempus.asset_by_data_model_and_id_and_customer AS
+    SELECT *
+FROM tempus.asset
+    WHERE id IS NOT NULL and data_model_object_id IS NOT NULL AND tenant_id IS NOT NULL AND customer_id IS NOT NULL AND search_text IS NOT NULL AND type IS NOT NULL
+    PRIMARY KEY (data_model_object_id, tenant_id, customer_id, id, search_text, type)
+    WITH CLUSTERING ORDER BY (id DESC, search_text ASC);
+
+CREATE MATERIALIZED VIEW IF NOT exists tempus.asset_by_data_model AS
+    SELECT *
+FROM tempus.asset
+    WHERE id IS NOT NULL and data_model_object_id IS NOT NULL AND tenant_id IS NOT NULL AND customer_id IS NOT NULL AND search_text IS NOT NULL AND type IS NOT NULL
+    PRIMARY KEY (data_model_object_id, tenant_id, search_text, customer_id, id, type)
+    WITH CLUSTERING ORDER BY (search_text ASC, id DESC);
+
+CREATE MATERIALIZED VIEW IF NOT exists tempus.asset_by_data_model_and_id AS
+    SELECT *
+FROM tempus.asset
+    WHERE id IS NOT NULL and data_model_object_id IS NOT NULL AND tenant_id IS NOT NULL AND customer_id IS NOT NULL AND search_text IS NOT NULL AND type IS NOT NULL
+    PRIMARY KEY (data_model_object_id, tenant_id, id, search_text, customer_id, type)
+    WITH CLUSTERING ORDER BY (id DESC, search_text ASC);

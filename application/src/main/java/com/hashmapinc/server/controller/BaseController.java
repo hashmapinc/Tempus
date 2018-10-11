@@ -77,9 +77,10 @@ import org.springframework.web.client.HttpClientErrorException;
 import javax.mail.MessagingException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static com.hashmapinc.server.dao.service.Validator.validateId;
 
@@ -89,6 +90,7 @@ public abstract class BaseController {
     public static final String INCORRECT_TENANT_ID = "Incorrect tenantId ";
     public static final String YOU_DON_T_HAVE_PERMISSION_TO_PERFORM_THIS_OPERATION = "You don't have permission to perform this operation!";
     private static final String ITEM_NOT_FOUND = "Requested item wasn't found!";
+    public static final String NO_PERMISSION_TO_READ = "You don't have permission to read!";
 
     @Autowired
     private TempusErrorResponseHandler errorResponseHandler;
@@ -656,5 +658,97 @@ public abstract class BaseController {
         auditLogService.logEntityAction(user.getTenantId(), customerId, user.getId(), user.getName(), entityId, entity, actionType, e, additionalInfo);
     }
 
+    protected TempusResourceCriteriaSpec getTempusResourceCriteriaSpec(SecurityUser user, EntityType entityType, DataModelObjectId dataModelObjectId) throws TempusException{
+        final TempusResourceCriteriaSpec tempusResourceCriteriaSpec = new TempusResourceCriteriaSpec(entityType, user.getTenantId(), dataModelObjectId);
+
+        if(isCustomerUser(user)){
+            tempusResourceCriteriaSpec.setCustomerId(Optional.of(user.getCustomerId()));
+        }
+        final Supplier<Stream<UserPermission>> readableAndResourceAccessibleStream = getReadableAndResourceAccessibleStream(user, entityType);
+
+        final boolean hasPermOnAllResources =
+                readableAndResourceAccessibleStream.get().map(UserPermission::getResourceAttributes).anyMatch(Objects::isNull); //case: {USER}:*:READ
+
+        final boolean hasHierarchicalPermOnEntireDmo =
+                hasHierarchicalPermOnEntireDataModel(readableAndResourceAccessibleStream, dataModelObjectId);  // case: {USER}:ASSET?dataModelId={dmoid}:READ where dmoid in (parent of given dmoid)
+
+        if(!hasPermOnAllResources && !hasHierarchicalPermOnEntireDmo){
+            final boolean hasPermOnDmoWithResources =
+                    hasPermOnDmoWithResources(readableAndResourceAccessibleStream, dataModelObjectId); // case: {USER}:ASSET?dataModelId={dmoid}&id={resId}:READ where dmoid = dataModelObjectId
+            if(!hasPermOnDmoWithResources) {
+                throw new IncorrectParameterException(NO_PERMISSION_TO_READ);
+            } else {
+                final Set<EntityId> accessibleResourceIdsForGivenDmo = getAccessibleResourceIdsForGivenDmo(readableAndResourceAccessibleStream, entityType, dataModelObjectId);
+                tempusResourceCriteriaSpec.setAccessibleIdsForGivenDataModelObject(accessibleResourceIdsForGivenDmo);
+            }
+        }
+        tempusResourceCriteriaSpec.setDataModelObjectId(dataModelObjectId);
+        return tempusResourceCriteriaSpec;
+    }
+
+    private Supplier<Stream<UserPermission>> getReadableAndResourceAccessibleStream(SecurityUser user, EntityType entityType) {
+        return () -> user.getUserPermissions()
+                .stream()
+                .filter(userPermission -> userPermission.getUserActions().contains(UserAction.READ))
+                .filter(userPermission -> userPermission.getResources().contains(entityType));
+    }
+
+    private Set<EntityId> getAccessibleResourceIdsForGivenDmo(Supplier<Stream<UserPermission>> userPermissionStream, EntityType entityType, DataModelObjectId dataModelObjectId) {
+        return userPermissionStream.get()
+                .map(UserPermission::getResourceAttributes)
+                .filter(Objects::nonNull)
+                .filter(resourceAttributes -> hasResourceIdsForGivenDmo(dataModelObjectId, resourceAttributes))
+                .map(resourceAttributes -> getResourceIdByType(entityType, toUUID(resourceAttributes.get(UserPermission.ResourceAttribute.ID))))
+                .filter(Objects::nonNull)
+                .collect(Collectors.toSet());
+    }
+
+    private EntityId getResourceIdByType(EntityType entityType, UUID resourceUUID) {
+        if(entityType.equals(EntityType.ASSET)){
+            return new AssetId(resourceUUID);
+        } else if(entityType.equals(EntityType.DEVICE)){
+            return new DeviceId(resourceUUID);
+        }
+        return null;
+    }
+
+    private boolean hasResourceIdsForGivenDmo(DataModelObjectId dataModelObjectId, Map<UserPermission.ResourceAttribute, String> resourceAttributes) {
+        if(resourceAttributes.containsKey(UserPermission.ResourceAttribute.DATA_MODEL_ID)
+                && resourceAttributes.containsKey(UserPermission.ResourceAttribute.ID)){
+            final DataModelObjectId accessibleDmoid = new DataModelObjectId(toUUID(resourceAttributes.get(UserPermission.ResourceAttribute.DATA_MODEL_ID)));
+            return dataModelObjectId.equals(accessibleDmoid);
+        }
+        return false;
+    }
+
+    private boolean hasHierarchicalPermOnEntireDataModel(Supplier<Stream<UserPermission>> userPermissionStream, DataModelObjectId dataModelObjectId) {
+        Set<DataModelObjectId> parentDataModelIds = dataModelObjectService.getAllParentDataModelIdsOf(dataModelObjectId);
+        return userPermissionStream.get().map(UserPermission::getResourceAttributes).filter(Objects::nonNull).anyMatch(resourceAttributes -> {
+                boolean isAccessedToDmoidOnly = resourceAttributes.containsKey(UserPermission.ResourceAttribute.DATA_MODEL_ID)
+                    && !resourceAttributes.containsKey(UserPermission.ResourceAttribute.ID);
+
+                if(isAccessedToDmoidOnly){
+                    final DataModelObjectId accessibleDmoid = new DataModelObjectId(toUUID(resourceAttributes.get(UserPermission.ResourceAttribute.DATA_MODEL_ID)));
+                    return dataModelObjectId.equals(accessibleDmoid) || parentDataModelIds.contains(accessibleDmoid);
+            }
+            return false;
+        });
+    }
+
+    private boolean hasPermOnDmoWithResources(Supplier<Stream<UserPermission>> userPermissionStream, DataModelObjectId dataModelObjectId) {
+
+        return userPermissionStream.get().map(UserPermission::getResourceAttributes).filter(Objects::nonNull).anyMatch(resourceAttributes -> {
+            boolean isDmoidPresent = resourceAttributes.containsKey(UserPermission.ResourceAttribute.DATA_MODEL_ID);
+            if(isDmoidPresent){
+                final DataModelObjectId accessibleDmoid = new DataModelObjectId(toUUID(resourceAttributes.get(UserPermission.ResourceAttribute.DATA_MODEL_ID)));
+                return dataModelObjectId.equals(accessibleDmoid);
+            }
+            return false;
+        });
+    }
+
+    private boolean isCustomerUser(SecurityUser user) {
+        return user.getAuthorities().stream().anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals(Authority.CUSTOMER_USER.name()));
+    }
 
 }

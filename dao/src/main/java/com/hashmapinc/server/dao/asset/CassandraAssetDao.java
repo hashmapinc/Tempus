@@ -19,6 +19,7 @@ package com.hashmapinc.server.dao.asset;
 import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.ResultSetFuture;
 import com.datastax.driver.core.Statement;
+import com.datastax.driver.core.querybuilder.Clause;
 import com.datastax.driver.core.querybuilder.QueryBuilder;
 import com.datastax.driver.core.querybuilder.Select;
 import com.datastax.driver.mapping.Result;
@@ -26,26 +27,35 @@ import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.hashmapinc.server.common.data.EntitySubtype;
 import com.hashmapinc.server.common.data.EntityType;
+import com.hashmapinc.server.common.data.TempusResourceCriteriaSpec;
 import com.hashmapinc.server.common.data.asset.Asset;
+import com.hashmapinc.server.common.data.id.AssetId;
+import com.hashmapinc.server.common.data.id.EntityId;
 import com.hashmapinc.server.common.data.page.TextPageLink;
 import com.hashmapinc.server.dao.DaoUtil;
+import com.hashmapinc.server.dao.model.EntitySubtypeEntity;
 import com.hashmapinc.server.dao.model.ModelConstants;
+import com.hashmapinc.server.dao.model.nosql.AssetEntity;
 import com.hashmapinc.server.dao.nosql.CassandraAbstractSearchTextDao;
+import com.hashmapinc.server.dao.querybuilder.CassandraTempusResourcePredicateBuilder;
+import com.hashmapinc.server.dao.querybuilder.ResourceCriteria;
+import com.hashmapinc.server.dao.querybuilder.TempusResourcePredicate;
 import com.hashmapinc.server.dao.util.NoSqlDao;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-import com.hashmapinc.server.dao.model.EntitySubtypeEntity;
-import com.hashmapinc.server.dao.model.nosql.AssetEntity;
 
 import javax.annotation.Nullable;
 import java.util.*;
+import java.util.stream.Collectors;
 
-import static com.datastax.driver.core.querybuilder.QueryBuilder.*;
+import static com.datastax.driver.core.querybuilder.QueryBuilder.eq;
+import static com.datastax.driver.core.querybuilder.QueryBuilder.select;
 
 @Component
 @Slf4j
 @NoSqlDao
 public class CassandraAssetDao extends CassandraAbstractSearchTextDao<AssetEntity, Asset> implements AssetDao {
+
 
     @Override
     protected Class<AssetEntity> getColumnFamilyClass() {
@@ -151,16 +161,16 @@ public class CassandraAssetDao extends CassandraAbstractSearchTextDao<AssetEntit
         query.setConsistencyLevel(cluster.getDefaultReadConsistencyLevel());
         ResultSetFuture resultSetFuture = getSession().executeAsync(query);
         return Futures.transform(resultSetFuture,(@Nullable ResultSet resultSet)->{
-                Result<EntitySubtypeEntity> result = cluster.getMapper(EntitySubtypeEntity.class).map(resultSet);
-                if (result != null) {
-                    List<EntitySubtype> entitySubtypes = new ArrayList<>();
-                    result.all().forEach(entitySubtypeEntity ->
-                            entitySubtypes.add(entitySubtypeEntity.toEntitySubtype())
-                    );
-                    return entitySubtypes;
-                } else {
-                    return Collections.emptyList();
-                }
+            Result<EntitySubtypeEntity> result = cluster.getMapper(EntitySubtypeEntity.class).map(resultSet);
+            if (result != null) {
+                List<EntitySubtype> entitySubtypes = new ArrayList<>();
+                result.all().forEach(entitySubtypeEntity ->
+                        entitySubtypes.add(entitySubtypeEntity.toEntitySubtype())
+                );
+                return entitySubtypes;
+            } else {
+                return Collections.emptyList();
+            }
         });
     }
 
@@ -171,5 +181,60 @@ public class CassandraAssetDao extends CassandraAbstractSearchTextDao<AssetEntit
         Select.Where query = select.where();
         query.and(eq(ModelConstants.ASSET_DATA_MODEL_OBJECT_ID, dataModelObjectId));
         return DaoUtil.convertDataList(findListByStatement(query));
+    }
+
+    @Override
+    public List<Asset> findAll(TempusResourceCriteriaSpec tempusResourceCriteriaSpec, TextPageLink textPageLink) {
+        final ResourceCriteria idConstraint = getIdConstraint(tempusResourceCriteriaSpec, textPageLink);
+        final List<Clause> predicates = getPredicates(tempusResourceCriteriaSpec, idConstraint);
+        List<AssetEntity> assetEntities = Collections.emptyList();
+        if(Objects.nonNull(idConstraint)){
+            final String viewName = tempusResourceCriteriaSpec.getCustomerId().isPresent() ?
+                    ModelConstants.ASSET_BY_DATA_MODEL_OBJECT_AND_ASSET_AND_CUSTOMER_VIEW_NAME:
+                    ModelConstants.ASSET_BY_DATA_MODEL_AND_ASSET_VIEW_NAME ;
+            assetEntities = findPageWithTextSearchAndNoIdCompare(viewName, predicates, textPageLink);
+        }
+        if(assetEntities.isEmpty()){
+            final String viewName = tempusResourceCriteriaSpec.getCustomerId().isPresent() ?
+                    ModelConstants.ASSET_BY_DATA_MODEL_OBJECT_AND_CUSTOMER_VIEW_NAME:
+                    ModelConstants.ASSET_BY_DATA_MODEL_VIEW_NAME;
+            assetEntities = findPageWithTextSearch(viewName, predicates, textPageLink);
+        }
+        return DaoUtil.convertDataList(assetEntities);
+    }
+
+    private List<Clause> getPredicates(TempusResourceCriteriaSpec tempusResourceCriteriaSpec, ResourceCriteria idConstraint) {
+        final CassandraTempusResourcePredicateBuilder basicPredicateBuilder = new CassandraTempusResourcePredicateBuilder()
+                .with(new ResourceCriteria(ModelConstants.ASSET_TENANT_ID_PROPERTY, ResourceCriteria.Operation.EQUALS, tempusResourceCriteriaSpec.getTenantId().getId()))
+                .with(new ResourceCriteria(ModelConstants.ASSET_DATA_MODEL_OBJECT_ID, ResourceCriteria.Operation.EQUALS, tempusResourceCriteriaSpec.getDataModelObjectId().getId()));
+
+        tempusResourceCriteriaSpec.getCustomerId().ifPresent(customerId ->
+                basicPredicateBuilder.with(new ResourceCriteria(ModelConstants.ASSET_CUSTOMER_ID_PROPERTY, ResourceCriteria.Operation.EQUALS, customerId.getId())));
+
+        if(Objects.nonNull(idConstraint)){
+            basicPredicateBuilder.with(idConstraint);
+        }
+        return basicPredicateBuilder.build().stream().map(TempusResourcePredicate::getValue).collect(Collectors.toList());
+    }
+
+    private ResourceCriteria getIdConstraint(TempusResourceCriteriaSpec tempusResourceCriteriaSpec, TextPageLink textPageLink) {
+
+        final Set<UUID> accessibleTempusResourceIdsOnly = tempusResourceCriteriaSpec.getAccessibleIdsForGivenDataModelObject().stream()
+                .filter(id -> id instanceof AssetId)
+                .map(EntityId::getId)
+                .filter(id -> {
+                    if(textPageLink.getIdOffset() != null){
+                        return id.compareTo(textPageLink.getIdOffset()) < 0;
+                    }
+                    return true;
+                })
+                .collect(Collectors.toSet());
+
+        if(accessibleTempusResourceIdsOnly.size() == 1){
+            return new ResourceCriteria(ModelConstants.ID_PROPERTY, ResourceCriteria.Operation.EQUALS, accessibleTempusResourceIdsOnly.toArray()[0]);
+        } else if (accessibleTempusResourceIdsOnly.size() > 1) {
+            return new ResourceCriteria(ModelConstants.ID_PROPERTY, ResourceCriteria.Operation.CONTAINS, accessibleTempusResourceIdsOnly.toArray(new UUID[0]));
+        }
+        return null;
     }
 }

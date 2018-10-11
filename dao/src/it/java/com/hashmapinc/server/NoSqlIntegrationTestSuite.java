@@ -28,7 +28,7 @@ import java.util.List;
 
 @RunWith(ClasspathSuite.class)
 @ClasspathSuite.ClassnameFilters({
-        "com.hashmapinc.server.dao.service.*ServiceNoSqlTest"
+        "com.hashmapinc.server.dao.service.nosql.*ServiceNoSqlTest"
 })
 public class NoSqlIntegrationTestSuite {
 
