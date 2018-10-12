@@ -360,7 +360,6 @@ export function DeviceController($rootScope,userService, deviceService, customer
     loadTableData();
 
     function loadTableData() {
-
         var promise = vm.deviceGridConfig.fetchItemsFunc({limit: $scope.query.limit*$scope.query.page, textSearch: ''}, false);
         if(promise) {
 
@@ -394,7 +393,6 @@ export function DeviceController($rootScope,userService, deviceService, customer
                     count: 15,
                     data: devicePaginatedata
                 };
-
                 },
             )
 
@@ -578,6 +576,7 @@ export function DeviceController($rootScope,userService, deviceService, customer
                     targetEvent: $event
                 }).then(function () {
                     vm.grid.refreshList();
+                    loadTableData();
                 }, function () {
                 });
             },
@@ -655,6 +654,7 @@ export function DeviceController($rootScope,userService, deviceService, customer
         $mdDialog.show(confirm).then(function () {
             deviceService.unassignDeviceFromCustomer(device.id.id).then(function success() {
                 vm.grid.refreshList();
+                loadTableData();
             });
         });
     }
