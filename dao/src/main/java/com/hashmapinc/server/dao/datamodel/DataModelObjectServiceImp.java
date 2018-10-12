@@ -16,12 +16,17 @@
  */
 package com.hashmapinc.server.dao.datamodel;
 
+import com.hashmapinc.server.common.data.Dashboard;
+import com.hashmapinc.server.common.data.DashboardType;
+import com.hashmapinc.server.common.data.asset.Asset;
 import com.hashmapinc.server.common.data.datamodel.AttributeDefinition;
 import com.hashmapinc.server.common.data.datamodel.DataModel;
 import com.hashmapinc.server.common.data.datamodel.DataModelObject;
 import com.hashmapinc.server.common.data.id.DataModelId;
 import com.hashmapinc.server.common.data.id.DataModelObjectId;
 import com.hashmapinc.server.common.data.kv.DataType;
+import com.hashmapinc.server.dao.asset.AssetDao;
+import com.hashmapinc.server.dao.dashboard.DashboardService;
 import com.hashmapinc.server.dao.exception.DataValidationException;
 import com.hashmapinc.server.dao.service.DataValidator;
 import com.hashmapinc.server.dao.service.Validator;
@@ -55,6 +60,12 @@ public class DataModelObjectServiceImp implements DataModelObjectService {
 
     @Autowired
     AttributeDefinitionDao attributeDefinitionDao;
+
+    @Autowired
+    AssetDao assetDao;
+
+    @Autowired
+    DashboardService dashboardService;
 
     @Override
     public DataModelObject save(DataModelObject dataModelObject) {
@@ -115,8 +126,24 @@ public class DataModelObjectServiceImp implements DataModelObjectService {
     public void removeById(DataModelObjectId dataModelObjectId) {
         validateId(dataModelObjectId, INCORRECT_DATA_MODEL_OBJECT_ID + dataModelObjectId);
         DataModelObject dataModelObject = dataModelObjectDao.findById(dataModelObjectId);
-        removeAttributeDefinitions(dataModelObject);
-        dataModelObjectDao.removeById(dataModelObjectId.getId());
+        if(dataModelObject != null) {
+            List<Asset> assets = assetDao.findAssetsByDataModelObjectId(dataModelObject.getId().getId());
+            if (!assets.isEmpty())
+                throw new DataValidationException("can delete dataModelObject"); //refactor exception message
+            else {
+                removeAttributeDefinitions(dataModelObject);
+                removeAssetLandingDashboard(dataModelObjectId);
+                dataModelObjectDao.removeById(dataModelObjectId.getId());
+            }
+        }
+    }
+
+    private void removeAssetLandingDashboard(DataModelObjectId dataModelObjectId) {
+        List<Dashboard> dashboards = dashboardService.findDashboardByDataModelObjectId(dataModelObjectId);
+        dashboards.forEach(dashboard -> {
+            if(dashboard.getType() == DashboardType.ASSET_LANDING_PAGE)
+                dashboardService.deleteDashboard(dashboard.getId());
+        });
     }
 
     private void removeAttributeDefinitions(DataModelObject dataModelObject) {
