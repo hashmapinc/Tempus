@@ -40,6 +40,7 @@ export function DataModelController($scope, $mdDialog, $document, $stateParams, 
     var objectDeleteNameList = [];
     vm.fileAdded = fileAdded;
     vm.clearFile = clearFile;
+    vm.getNodes = getNodes;
     vm.dataModelName =[];
     vm.dataModelSavedName = [];
     $scope.editing = false;
@@ -134,7 +135,21 @@ export function DataModelController($scope, $mdDialog, $document, $stateParams, 
         resetStepperState();
     };
 
-
+     function getNodes() {
+        var new_nodes = vm.nodes.get();
+        if(vm.stepperData.id !== null && vm.stepperData.parent_node_id !== null) {
+            let edge = vm.edges.get().pop();
+             if (edge) {
+                  var child_id = edge.to;
+              }
+            new_nodes = vm.nodes.get().filter(node => {
+                   return vm.stepperData.id !== node.datamodelObject.id && child_id !== node.id ; // true if id does not exist
+             });
+        } else if(vm.stepperData.id !== null && vm.stepperData.parent_node_id == null) {
+            new_nodes =[];
+        }
+        return new_nodes;
+     }
     //=============================================================================
     // Datamodel functionality
     //=============================================================================
