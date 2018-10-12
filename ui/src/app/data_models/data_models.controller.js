@@ -39,7 +39,9 @@ export function AddDataModelController($scope, $mdDialog, saveItemFunction, help
             vm.item = item;
             $scope.theForm.$setPristine();
             $mdDialog.hide();
-            $state.go('home.data_models.data_model', { 'datamodelId': vm.item.id.id });
+            $state.go('home.data_models.data_model', {
+                'datamodelId': vm.item.id.id
+            });
         });
     }
 }
@@ -57,8 +59,8 @@ export function DataModelsController($scope, datamodelService, $q, toast, $timeo
     vm.saveDataModelFunc = saveDataModelFunc;
     vm.AddDataModelController = AddDataModelController;
 
-    var fetchDataModelFunction = function (pageLink, deviceType) {
-         return datamodelService.listDatamodels();
+    var fetchDataModelFunction = function(pageLink, deviceType) {
+        return datamodelService.listDatamodels();
     };
 
     vm.listDataModel = fetchDataModelFunction;
@@ -81,27 +83,26 @@ export function DataModelsController($scope, datamodelService, $q, toast, $timeo
             controllerAs: 'vm',
             templateUrl: addDataModel,
             parent: angular.element($document[0].body),
-            locals: {saveItemFunction: vm.saveDataModelFunc},
+            locals: {
+                saveItemFunction: vm.saveDataModelFunc
+            },
             fullscreen: true,
             targetEvent: $event
-        }).then(function () {
-        }, function () {
-        });
+        }).then(function() {}, function() {});
     }
 
     function deleteMultipleDataModelDialog($event) {
 
-       if ($event) {
-             $event.stopPropagation();
-       }
+        if ($event) {
+            $event.stopPropagation();
+        }
 
-       vm.isDelete =[];
+        vm.isDelete = [];
         if (vm.selectedDataModel && vm.selectedDataModel.length > 0) {
             var title = $translate.instant('dataModels.delete-datamodel-title', {
                 count: vm.selectedDataModel.length
             }, 'messageformat');
             var content = $translate.instant('dataModels.delete-datamodel-text');
-
             var confirm = $mdDialog.confirm()
                 .targetEvent($event)
                 .title(title)
@@ -111,18 +112,18 @@ export function DataModelsController($scope, datamodelService, $q, toast, $timeo
                 .ok($translate.instant('action.yes'));
             $mdDialog.show(confirm).then(function() {
 
-             vm.selectedDataModel.forEach(id_to_delete => {                            // delete the object by ID
-                datamodelService.deleteDatamodel(id_to_delete).then(function success() {
-                   vm.isDelete.push(id_to_delete);
-                });
+                vm.selectedDataModel.forEach(id_to_delete => { // delete the object by ID
+                    datamodelService.deleteDatamodel(id_to_delete).then(function success() {
+                        vm.isDelete.push(id_to_delete);
+                    });
 
-             });
-               $timeout( function(){
-                     if(vm.selectedDataModel.length == vm.isDelete.length){
+                });
+                $timeout(function() {
+                    if (vm.selectedDataModel.length == vm.isDelete.length) {
                         loadDataModel();
                         toast.showSuccess($translate.instant('dataModels.delete-success'));
-                     }
-               }, 2000 );
+                    }
+                }, 2000);
 
             });
         }
@@ -130,32 +131,31 @@ export function DataModelsController($scope, datamodelService, $q, toast, $timeo
     }
 
 
-    function deleteDataModel($event,id) {
-           if ($event) {
-                 $event.stopPropagation();
-           }
-           var title = $translate.instant('dataModels.delete-datamodel-title', {
-                 count: 1
-           }, 'messageformat');
+    function deleteDataModel($event, id) {
+        if ($event) {
+            $event.stopPropagation();
+        }
+        var title = $translate.instant('dataModels.delete-datamodel-title', {
+            count: 1
+        }, 'messageformat');
 
-           var content = $translate.instant('dataModels.delete-datamodel-text');
+        var content = $translate.instant('dataModels.delete-datamodel-text');
+        var confirm = $mdDialog.confirm()
+            .targetEvent($event)
+            .title(title)
+            .htmlContent(content)
+            .cancel($translate.instant('action.no'))
+            .ok($translate.instant('action.yes'));
+        $mdDialog.show(confirm).then(function() {
 
-           var confirm = $mdDialog.confirm()
-                   .targetEvent($event)
-                   .title(title)
-                   .htmlContent(content)
-                   .cancel($translate.instant('action.no'))
-                   .ok($translate.instant('action.yes'));
-               $mdDialog.show(confirm).then(function () {
+            datamodelService.deleteDatamodel(id).then(function success() {
 
-                datamodelService.deleteDatamodel(id).then(function success() {
+                toast.showSuccess($translate.instant('dataModels.delete-success'));
+                loadDataModel();
 
-                    toast.showSuccess($translate.instant('dataModels.delete-success'));
-                    loadDataModel();
+            });
 
-                });
-
-               });
+        });
 
     }
 
@@ -174,13 +174,14 @@ export function DataModelsController($scope, datamodelService, $q, toast, $timeo
     }
 
     loadDataModel();
+
     function loadDataModel() {
-         var promise = vm.listDataModel();
-         if(promise) {
-             promise.then(function success(items) {
-                 var dataModelSortList = $filter('orderBy')(items, $scope.query.order);
-                 var startIndex = $scope.query.limit * ($scope.query.page - 1);
-                 if ($scope.query.search != null) {
+        var promise = vm.listDataModel();
+        if (promise) {
+            promise.then(function success(items) {
+                var dataModelSortList = $filter('orderBy')(items, $scope.query.order);
+                var startIndex = $scope.query.limit * ($scope.query.page - 1);
+                if ($scope.query.search != null) {
                     dataModelSortList = $filter('filter')(items, function(data) {
                         if ($scope.query.search) {
                             return data.name.toLowerCase().indexOf($scope.query.search.toLowerCase()) > -1;
@@ -190,15 +191,16 @@ export function DataModelsController($scope, datamodelService, $q, toast, $timeo
                     });
                     //$scope.query.page =1;
                     dataModelSortList = $filter('orderBy')(dataModelSortList, $scope.query.order);
-                    if ($scope.query.search != '') {startIndex =0;}
+                    if ($scope.query.search != '') {
+                        startIndex = 0;
+                    }
                 }
                 var dataModelPaginatedata = dataModelSortList.slice(startIndex, startIndex + $scope.query.limit);
                 $scope.datamodel = {
                     count: items.length,
                     data: dataModelPaginatedata
                 };
-                },
-            )
+            }, )
         }
     }
 
@@ -238,6 +240,8 @@ export function DataModelsController($scope, datamodelService, $q, toast, $timeo
     }
 
     vm.openDatamodel = function(datamodel) {
-        $state.go('home.data_models.data_model', { 'datamodelId': datamodel.id.id });
+        $state.go('home.data_models.data_model', {
+            'datamodelId': datamodel.id.id
+        });
     }
 }
