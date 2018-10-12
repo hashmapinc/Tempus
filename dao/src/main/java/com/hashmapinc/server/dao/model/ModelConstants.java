@@ -580,6 +580,23 @@ public class ModelConstants {
     public static final String CUSTOMER_GROUP_POLICY_ID_PROPERTY = "group_id";
     public static final String CUSTOMER_GROUP_POLICY_PROPERTY = "policies";
 
+    /**
+     * TempusGatewayConfiguration Constants
+     */
+    public static final String TEMPUS_GATEWAY_CONFIGURATION_TABLE_NAME = "tempus_gateway_configuration";
+    public static final String TEMPUS_GATEWAY_CONFIGURATION_TENANT_ID = TENANT_ID_PROPERTY;
+    public static final String TEMPUS_GATEWAY_CONFIGURATION_REPLICAS = "replicas";
+    public static final String TEMPUS_GATEWAY_CONFIGURATION_GATEWAY_TOKEN = "gateway_token";
+
+    /**
+     * Cassandra TempusGatewayConfiguration Constants
+     */
+    public static final String TEMPUS_GATEWAY_CONFIGURATION_FAMILY_NAME = "tempus_gateway_configuration";
+    public static final String TEMPUS_GATEWAY_CONFIGURATION_TENANT_ID_PROPERTY = TENANT_ID_PROPERTY;
+    public static final String TEMPUS_GATEWAY_CONFIGURATION_REPLICAS_PROPERTY = "replicas";
+    public static final String TEMPUS_GATEWAY_CONFIGURATION_GATEWAY_TOKEN_PROPERTY = "gateway_token";
+    public static final String TEMPUS_GATEWAY_CONFIGURATION_BY_TENANT = "tempus_gateway_configuration_by_tenant";
+
 
     protected static final String[] NONE_AGGREGATION_COLUMNS = new String[]{LONG_VALUE_COLUMN, DOUBLE_VALUE_COLUMN, BOOLEAN_VALUE_COLUMN, STRING_VALUE_COLUMN, JSON_VALUE_COLUMN, KEY_COLUMN, TS_COLUMN, TS_DIFF};
     protected static final String[] NONE_DS_AGGREGATION_COLUMNS = new String[]{LONG_VALUE_COLUMN, DOUBLE_VALUE_COLUMN, BOOLEAN_VALUE_COLUMN, STRING_VALUE_COLUMN, JSON_VALUE_COLUMN, KEY_COLUMN, DS_COLUMN, DS_DIFF};

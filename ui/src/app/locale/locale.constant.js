@@ -327,6 +327,23 @@ export default angular.module('tempus.locale', [])
                     "end-required":"End is required"
 
                 },
+
+                "gateway":{
+                    "configuration":"Agent",
+                    "configurationLabel": "Agent Configuration",
+                    "device-label":"Gateway Device",
+                    "replica":"Replica",
+                    "deploy":"Deploy",
+                    "field-required":"Field is required",
+                    "config-save-message":"Configuration saved successfully",
+                    "config-deploy-message":"Agent deployed successfully",
+                    "config-deploy-fail-message":"Agent not deployed",
+                    "total-replica":"Total Replica",
+                    "ready":"Ready",
+                    "in-progress":"In Progress",
+                    "crash":"Crashed"
+
+                },
                 "audit-log": {
                     "audit": "Audit",
                     "audit-logs": "Audit Logs",
@@ -599,8 +616,15 @@ export default angular.module('tempus.locale', [])
                     "add": "Add Data Model",
                     "name": "Title",
                     "description" :"Description",
-                    "name-required":"This feild is required"
-
+                    "name-required":"This feild is required",
+                    "objectInfo":"Datamodel Object Information",
+                    "datamodelObject":"Datamodel Object",
+                    "type":"Type",
+                    "objectAttribute":"Attributes",
+                    "relationships":"Relationships",
+                    "image":"Icon",
+                    "parent":"Parent",
+                    "noAttribute":"No Attributes"
                 },
                 "datakey": {
                     "settings": "Settings",

@@ -14,10 +14,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.hashmapinc.server.common.data;
+package com.hashmapinc.server.common.data.kubernetes;
 
 
-public enum EntityType {
-    TENANT, CUSTOMER, USER, RULE, PLUGIN, DASHBOARD, ASSET, DEVICE, ALARM, COMPUTATION, COMPUTATION_JOB, NODE_METRIC,THEME, LOGO,
-    DATA_MODEL_OBJECT, DATA_MODEL, CUSTOMER_GROUP, TEMPUS_GATEWAY_CONFIGURATION
+import lombok.*;
+
+import java.util.List;
+import java.util.Map;
+
+@Data
+public class ReplicaSetConfig {
+
+    private String replicaName;
+    private String podTemplateName;
+    private Map<String, String> replicaLabels;
+    private Map<String, String> selectorLabels;
+    private Map<String, String> podTemplateLabels;
+    private int replica;
+    private String containerName;
+    private String image;
+    private Map<Integer, String> ports;
+    private Map<String, String> envVariables;
+    private List<String> commands;
 }

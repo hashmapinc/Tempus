@@ -14,10 +14,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.hashmapinc.server.common.data;
+package com.hashmapinc.server.service.kubernetes.gateway;
 
+import com.hashmapinc.server.common.data.TempusGatewayConfiguration;
+import com.hashmapinc.server.common.data.id.TenantId;
+import com.hashmapinc.server.common.data.kubernetes.ReplicaSetStatus;
 
-public enum EntityType {
-    TENANT, CUSTOMER, USER, RULE, PLUGIN, DASHBOARD, ASSET, DEVICE, ALARM, COMPUTATION, COMPUTATION_JOB, NODE_METRIC,THEME, LOGO,
-    DATA_MODEL_OBJECT, DATA_MODEL, CUSTOMER_GROUP, TEMPUS_GATEWAY_CONFIGURATION
+public interface TempusGatewayKubernetesService {
+
+    boolean deployTempusGateway(TempusGatewayConfiguration gatewayConfiguration);
+
+    ReplicaSetStatus getTempusGatewayReplicaSetStatus(TenantId tenantId);
 }

@@ -14,10 +14,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.hashmapinc.server.common.data;
+package com.hashmapinc.server.common.data.kubernetes;
 
+import lombok.Data;
 
-public enum EntityType {
-    TENANT, CUSTOMER, USER, RULE, PLUGIN, DASHBOARD, ASSET, DEVICE, ALARM, COMPUTATION, COMPUTATION_JOB, NODE_METRIC,THEME, LOGO,
-    DATA_MODEL_OBJECT, DATA_MODEL, CUSTOMER_GROUP, TEMPUS_GATEWAY_CONFIGURATION
+@Data
+public class ReplicaSetStatus {
+
+    Integer replica;
+    Integer ready;
+    Integer inProgress;
+    Integer crashed;
 }

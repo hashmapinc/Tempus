@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright © 2016-2018 The Thingsboard Authors
  * Modifications © 2017-2018 Hashmap, Inc
  *
@@ -14,10 +14,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.hashmapinc.server.common.data;
+
+import uiRouter from 'angular-ui-router';
+import tempusApiGatewayConfiguration from '../api/gateway-configuration.service';
+
+import TempusGatewayRoutes from './tempus_gateway.routes';
+import {GatewayController} from './gateway.controller';
 
 
-public enum EntityType {
-    TENANT, CUSTOMER, USER, RULE, PLUGIN, DASHBOARD, ASSET, DEVICE, ALARM, COMPUTATION, COMPUTATION_JOB, NODE_METRIC,THEME, LOGO,
-    DATA_MODEL_OBJECT, DATA_MODEL, CUSTOMER_GROUP, TEMPUS_GATEWAY_CONFIGURATION
-}
+export default angular.module('tempus.gateway', [
+    uiRouter,
+    tempusApiGatewayConfiguration
+])
+    .config(TempusGatewayRoutes)
+    .controller('TempusGatewayController',GatewayController)
+    .name;

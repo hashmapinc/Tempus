@@ -14,10 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.hashmapinc.server.common.data;
+package com.hashmapinc.server.controller.nosql;
 
+import com.hashmapinc.server.controller.BaseTempusGatewayConfigurationControllerTest;
+import com.hashmapinc.server.dao.service.DaoNoSqlTest;
 
-public enum EntityType {
-    TENANT, CUSTOMER, USER, RULE, PLUGIN, DASHBOARD, ASSET, DEVICE, ALARM, COMPUTATION, COMPUTATION_JOB, NODE_METRIC,THEME, LOGO,
-    DATA_MODEL_OBJECT, DATA_MODEL, CUSTOMER_GROUP, TEMPUS_GATEWAY_CONFIGURATION
+@DaoNoSqlTest
+public class TempusGatewayConfigurationControllerNoSqlTest extends BaseTempusGatewayConfigurationControllerTest {
 }

@@ -409,3 +409,19 @@ audit_log:
     password: "${AUDIT_LOG_SINK_PASSWORD:}"
 
 authorization.rules.filePath: "default-rules.json"
+
+#Tempus Gateway
+gateway:
+  image: "${TEMPUS_GATEWAY_IMAGE:hashmapinc/tempus-gateway}"
+  host: "${GATEWAY_HOST:tempus}"
+  port: "${GATEWAY_PORT:9095}"
+  commands:
+    - "sh"
+    - "-c"
+    - "/run-application.sh"
+
+#Kubernetes Configuration
+kubernetes:
+  cluster_mode_enabled: "${CLUSTER_MODE_ENABLED:true}"
+  kube_config_path: "${KUBE_CONFIG_PATH:/home/.kube/config}"
+
