@@ -29,7 +29,7 @@ import java.util.Map;
 import java.util.Optional;
 
 /*
- * Mud Pressure (in psi) = Mud Weight (in ppg) x 0.052 x Bit Depth (in ft)
+ * Mud Pressure (in N/m2) = Mud Weight (in N/m3) x Bit Depth (in m)
  * */
 public class HydrostaticPressureAtBitCalculator {
 
@@ -48,10 +48,10 @@ public class HydrostaticPressureAtBitCalculator {
             if (new InputParserUtility().validateJson(inputJson, Collections.singletonList("mudWeight"))) {
                 Data inputData = new Gson().fromJson(inputJson, Data.class);
 
-                double mudPressure = inputData.mudWeight * 0.052 * inputData.ds;
+                double mudPressure = inputData.mudWeight * inputData.ds;
 
                 Map<String, Double> data = new HashMap<String, Double>();
-                data.put("mudPressureAtBit", mudPressure);
+                data.put("HYDPRESSBIT", mudPressure);
 
                 String json = new GsonBuilder().create().toJson(data);
                 Optional<Long> empty = Optional.empty();

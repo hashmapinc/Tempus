@@ -30,7 +30,7 @@ import java.util.Optional;
 import java.util.Arrays;
 
 /*
- * Mud Pressure (in psi) = Mud Weight (in ppg) x 0.052 x True Vertical Depth of hole (in ft)
+ * Mud Pressure (in N/m2) = Mud Weight (in N/m3) x Hole Depth (in m)
  * */
 public class HydrostaticPressureAtDepthCalculator {
 
@@ -50,10 +50,10 @@ public class HydrostaticPressureAtDepthCalculator {
             if (new InputParserUtility().validateJson(inputJson, Arrays.asList("mudWeight", "holeDepth"))) {
                 Data inputData = new Gson().fromJson(inputJson, Data.class);
 
-                double mudPressure = inputData.mudWeight * 0.052 * inputData.holeDepth;
+                double mudPressure = inputData.mudWeight * inputData.holeDepth;
 
                 Map<String, Double> data = new HashMap<String, Double>();
-                data.put("mudPressureAtDepth", mudPressure);
+                data.put("HYDPRESSTD", mudPressure);
 
                 String json = new GsonBuilder().create().toJson(data);
                 Optional<Long> empty = Optional.empty();
