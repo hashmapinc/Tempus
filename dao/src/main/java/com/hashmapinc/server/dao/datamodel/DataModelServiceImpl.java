@@ -16,8 +16,7 @@
  */
 package com.hashmapinc.server.dao.datamodel;
 
-import com.hashmapinc.server.common.data.Dashboard;
-import com.hashmapinc.server.common.data.DashboardType;
+
 import com.hashmapinc.server.common.data.asset.Asset;
 import com.hashmapinc.server.common.data.datamodel.DataModel;
 import com.hashmapinc.server.common.data.Tenant;
@@ -34,8 +33,6 @@ import com.hashmapinc.server.dao.tenant.TenantDao;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import java.util.*;
@@ -113,14 +110,7 @@ public class DataModelServiceImpl extends AbstractEntityService implements DataM
     }
 
     private void deleteDependencies(Stack<UUID> topologicalOrder) {
-        topologicalOrder.forEach(uuid -> {
-            List<Dashboard> dashboards = dashboardService.findDashboardByDataModelObjectId(new DataModelObjectId(uuid));
-            dashboards.forEach(dashboard -> {
-                if(dashboard.getType() == DashboardType.ASSET_LANDING_PAGE)
-                    dashboardService.deleteDashboard(dashboard.getId());
-            });
-            dataModelObjectService.removeById(new DataModelObjectId(uuid));
-        });
+        topologicalOrder.forEach(uuid -> dataModelObjectService.removeById(new DataModelObjectId(uuid)));
     }
 
     private void generateTopologicalOrder(List<DataModelObject> dataModelObjects) {
