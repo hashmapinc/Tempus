@@ -42,6 +42,7 @@ export function DataModelController($scope, $mdDialog, $document, $stateParams, 
     vm.clearFile = clearFile;
     vm.dataModelName =[];
     vm.dataModelSavedName = [];
+    $scope.editing = false;
 
 
     // Create the graph that will be plotted
@@ -208,10 +209,8 @@ export function DataModelController($scope, $mdDialog, $document, $stateParams, 
                         }
                     });
                 }
-
                 // save the datamodel object
                 datamodelService.saveDatamodelObject(toSave, $stateParams.datamodelId).then(function success(response) {
-
                     vm.dataModelSavedName.push(response.data.name);
                 });
             });
@@ -612,4 +611,20 @@ export function DataModelController($scope, $mdDialog, $document, $stateParams, 
     vm.rejectDatamodelEdit = function() {
         loadDatamodel();
     };
+
+    vm.updateAttribute =  function (attributeName, index){
+        $scope.editing = false;
+        vm.stepperData.attributes.splice(index, 1);
+        vm.stepperData.attributes[index] = attributeName;
+    }
+    vm.deleteAttribute =  function (index){
+        var confirm = $mdDialog.confirm()
+                    .title('Delete Attribute')
+                    .htmlContent("Are you sure you want to delete this Attribute?")
+                    .cancel("Cancel")
+                    .ok("Ok");
+        $mdDialog.show(confirm).then(function () {
+            vm.stepperData.attributes.splice(index, 1);
+        });
+    }
 }
