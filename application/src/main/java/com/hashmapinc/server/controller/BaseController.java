@@ -207,6 +207,8 @@ public abstract class BaseController {
             return new TempusException("Unable to send mail: " + exception.getMessage(), TempusErrorCode.GENERAL);
         } else if (exception instanceof HttpClientErrorException && ((HttpClientErrorException) exception).getStatusCode().equals(HttpStatus.NOT_FOUND)) {
             return new TempusException(ITEM_NOT_FOUND, TempusErrorCode.ITEM_NOT_FOUND);
+        } else if (exception instanceof HttpClientErrorException && ((HttpClientErrorException) exception).getStatusCode().equals(HttpStatus.CONFLICT)) {
+            return new TempusException(((HttpClientErrorException) exception).getResponseBodyAsString(), TempusErrorCode.CONFLICT_ITEM);
         } else {
             return new TempusException(exception.getMessage(), TempusErrorCode.GENERAL);
         }
