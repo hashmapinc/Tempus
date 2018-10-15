@@ -138,17 +138,17 @@ export function DataModelController($scope, $mdDialog, $document, $stateParams, 
      function getNodes() {
         var new_nodes = vm.nodes.get();
         if(vm.stepperData.id !== null && vm.stepperData.parent_node_id !== null) {
-//            let edge = vm.edges.get().pop();
-//             if (edge) {
-//                  var child_id = edge.to;
-//              }
             new_nodes = new_nodes.filter(node => {
-                   return vm.stepperData.id !== node.datamodelObject.id; // true if id does not exist
+                   return vm.stepperData.id !== node.datamodelObject.id;
              });
         } else if(vm.stepperData.id !== null && vm.stepperData.parent_node_id == null) {
             new_nodes = new_nodes.filter(node => {
-                   return vm.stepperData.name !== node.label; // true if id does not exist
+                   return vm.stepperData.name !== node.label;
              });
+        } else if(vm.stepperData.id == null) {
+             new_nodes = new_nodes.filter(node => {
+                    return vm.stepperData.name !== node.label;
+              });
         }
         return new_nodes;
      }
