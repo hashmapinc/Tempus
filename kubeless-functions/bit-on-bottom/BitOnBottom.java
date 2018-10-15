@@ -41,15 +41,19 @@ public class BitOnBottom {
 
     public String calculate(io.kubeless.Event event, io.kubeless.Context context) {
         String inputJson = event.Data;
+        final double maxDelta = 0.33;
         try {
             if (new InputParserUtility().validateJson(inputJson, Collections.singletonList("holeDepth"))) {
                 Data inputData = new Gson().fromJson(inputJson, Data.class);
 
-                Map<String, Integer> data = new HashMap<String, Integer>();
-                if (inputData.holeDepth - inputData.ds < 1)
-                    data.put("bitOnBottom", 1);
-                else
-                    data.put("bitOnBottom", 0);
+                Map<String, String> data = new HashMap<String, String>();
+                if ((inputData.holeDepth - inputData.ds) < maxDelta) {
+                    data.put("BONB", "1");
+                    data.put("BONBTEXT", "yes");
+                } else {
+                    data.put("BONB", "0");
+                    data.put("BONBTEXT", "no");
+                }
 
                 String json = new GsonBuilder().create().toJson(data);
                 Optional<Long> empty = Optional.empty();
