@@ -33,7 +33,7 @@ import java.util.Arrays;
 /*
  * Equivalent Circulating Density (ECD) in ppg = ((annular pressure loss in psi) / 0.052 / (true vertical depth in ft)) + (current mud weight in ppg)
  */
-public class ECDCalculator {
+public class EquivalentCirculatingDensityCalculator {
 
     private static final String MQTT_URL = "tcp://tempus.hashmapinc.com:1883";
     private static final String ACCESS_TOKEN = "DEVICE_GATEWAY_TOKEN";
@@ -42,19 +42,18 @@ public class ECDCalculator {
         private String id;
         private Double annularPressureLoss;
         private Double ds;
-        private Double mudWeight;
     }
 
     public String calculate(io.kubeless.Event event, io.kubeless.Context context) {
         String inputJson = event.Data;
         try{
-            if(new InputParserUtility().validateJson(inputJson, Arrays.asList("annularPressureLoss", "mudWeight"))) {
+            if(new InputParserUtility().validateJson(inputJson, Arrays.asList("annularPressureLoss"))) {
                 Data inputData = new Gson().fromJson(inputJson, Data.class);
 
-                double ecd = (inputData.annularPressureLoss / 0.052 / inputData.ds) + inputData.mudWeight;
+                double ecd = inputData.annularPressureLoss / inputData.ds;
 
                 Map<String, Double> data = new HashMap<String, Double>();
-                data.put("ecd", ecd);
+                data.put("ECD", ecd);
 
                 String json = new GsonBuilder().create().toJson(data);
                 Optional<Long> empty = Optional.empty();
