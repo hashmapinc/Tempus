@@ -31,7 +31,7 @@ import java.util.Optional;
 import java.util.Arrays;
 
 /*
- * Equivalent Circulating Density (ECD) in ppg = ((annular pressure loss in psi) / 0.052 / (true vertical depth in ft)) + (current mud weight in ppg)
+ * Equivalent Circulating Density (ECD) in N/m3 = (annular pressure loss in N/m2) / (true vertical depth in m)
  */
 public class EquivalentCirculatingDensityCalculator {
 
