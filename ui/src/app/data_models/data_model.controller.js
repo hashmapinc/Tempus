@@ -614,17 +614,9 @@ export function DataModelController($scope, $mdDialog, $document, $stateParams, 
 
     vm.updateAttribute =  function (attributeName, index){
         $scope.editing = false;
-        vm.stepperData.attributes.splice(index, 1);
         vm.stepperData.attributes[index] = attributeName;
     }
     vm.deleteAttribute =  function (index){
-        var confirm = $mdDialog.confirm()
-                    .title('Delete Attribute')
-                    .htmlContent("Are you sure you want to delete this Attribute?")
-                    .cancel("Cancel")
-                    .ok("Ok");
-        $mdDialog.show(confirm).then(function () {
-            vm.stepperData.attributes.splice(index, 1);
-        });
+        vm.stepperData.attributes.splice(index, 1);
     }
 }
