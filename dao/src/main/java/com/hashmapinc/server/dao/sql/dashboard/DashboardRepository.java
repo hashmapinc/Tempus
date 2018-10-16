@@ -18,7 +18,6 @@ package com.hashmapinc.server.dao.sql.dashboard;
 
 import com.hashmapinc.server.dao.model.ModelConstants;
 import com.hashmapinc.server.dao.model.sql.DashboardEntity;
-import com.hashmapinc.server.dao.model.sql.DataModelObjectEntity;
 import org.springframework.data.repository.CrudRepository;
 import com.hashmapinc.server.dao.util.SqlDao;
 import org.springframework.data.repository.query.Param;
