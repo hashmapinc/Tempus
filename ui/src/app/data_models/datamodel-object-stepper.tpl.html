@@ -95,8 +95,22 @@
         <md-tab label="Attributes" ng-click="vm.stepperState = 1" ng-disabled="!vm.stepperData.name || !vm.stepperData.type">
           <md-content class="md-padding">
             <md-list-item ng-repeat="attrib in vm.stepperData.attributes">
-              <p> {{ attrib }} </p>
+
+              <md-input-container  class="md-block" ng-keypress="$event.keyCode === 13 && vm.onStepperEnter();" style="width:100%">
+
+                <input ng-disabled="!editing"  md-no-asterisk="" name="attribute" ng-model="attrib" ng-keypress="$event.keyCode === 13 && alert('c')">
+                <div ng-messages="objectStepper.attrib.$error">
+                  <div ng-message="md-maxlength">The description must be less than 256 characters long.</div>
+                </div>
+
+              </md-input-container>
+
+              <ng-md-icon ng-show="!editing" size="20" icon="edit" style="left:100% !important" ng-click="editing = true" ></ng-md-icon>
+              <ng-md-icon ng-show="!editing" size="20" icon="delete" style="left:100% !important" ng-click="vm.deleteAttribute($index)" ></ng-md-icon>
+              <ng-md-icon   ng-show="editing" size="20" icon="done" style="left:100% !important" ng-click="vm.updateAttribute(attrib, $index)"></ng-md-icon>
             </md-list-item>
+
+
             
             <md-input-container class="md-block" ng-keypress="$event.keyCode === 13 && vm.onStepperEnter();">
               <label>Attribute Name</label>
@@ -126,31 +140,31 @@
 
         <md-tab label="Review" ng-click="vm.stepperState = 3" ng-disabled="!vm.stepperData.name || !vm.stepperData.type">
           <md-content class="md-padding">
-            <md-subheader class="md-no-sticky">Datamodel Object</md-subheader>
+            <md-subheader class="md-no-sticky reviewHeader">Datamodel Object</md-subheader>
             <md-list-item>
-              <p>Name: {{ vm.stepperData.name }} </p>
+              <label>Name: {{ vm.stepperData.name }} </label>
             </md-list-item>
             <md-list-item>
-              <p>Description: {{ vm.stepperData.desc }} </p>
+              <labelp>Description: {{ vm.stepperData.desc }} </labelp>
             </md-list-item>
             <md-list-item>
-              <p>Type: {{ vm.stepperData.type }} </p>
+              <label>Type: {{ vm.stepperData.type }} </label>
             </md-list-item>
 
-            <md-subheader class="md-no-sticky">Object Attributes</md-subheader>
+            <md-subheader class="md-no-sticky reviewHeader">Object Attributes</md-subheader>
             <md-list-item ng-repeat="attrib in vm.stepperData.attributes">
-              <p> {{ attrib }} </p>
+              <label> {{ attrib }} </label>
             </md-list-item>
 
-            <md-subheader class="md-no-sticky">Relationships</md-subheader>
+            <md-subheader class="md-no-sticky reviewHeader">Relationships</md-subheader>
             <md-list-item>
-              <p>Parent: {{vm.stepperData.parent_node_id ? vm.nodes.get(vm.stepperData.parent_node_id).label : "--"}}</p>
+              <label>Parent: {{vm.stepperData.parent_node_id ? vm.nodes.get(vm.stepperData.parent_node_id).label : "--"}}</label>
             </md-list-item>
 
-              <md-subheader class="md-no-sticky">Image</md-subheader>
+              <md-subheader class="md-no-sticky reviewHeader">Image</md-subheader>
 
               <md-list-item>
-                  <p>Icon:<img class="" style="width: 98%; margin-top: -1%;"ng-src="{{vm.stepperData.logoFile}}"></p>
+                  <label>Icon:<img class="" style="width: 98%; margin-top: -1%;"ng-src="{{vm.stepperData.logoFile}}"></label>
               </md-list-item>
 
           </md-content>
