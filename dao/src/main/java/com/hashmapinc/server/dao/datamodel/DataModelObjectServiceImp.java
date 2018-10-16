@@ -62,6 +62,7 @@ public class DataModelObjectServiceImp implements DataModelObjectService {
         dataModelObjectDataValidator.validate(dataModelObject);
         DataModelObject savedDataModelObj = dataModelObjectDao.save(dataModelObject);
 
+        removeAttributeDefinitions(savedDataModelObj);
         List<AttributeDefinition> savedAttributeDefs = dataModelObject.getAttributeDefinitions().stream().map(attributeDefinition -> {
             attributeDefinition.setDataModelObjectId(savedDataModelObj.getId());
             validateAttributeDefinition(attributeDefinition);
