@@ -48,9 +48,9 @@ function DatamodelService($http, $q) {
 
     function getDatamodelObjectAttributes(datamodelObjectID) {
         var deferred = $q.defer();
-        var url = '/api/datamodelobject/assets/' + datamodelObjectID;
+        var url = '/api/datamodelobject/assets/' + datamodelObjectID + '?limit=30';
         $http.get(url).then(function success(response) {
-            deferred.resolve(response.data);
+            deferred.resolve(response.data.data);
         }, function fail(response) {
             deferred.reject(response.data);
         });

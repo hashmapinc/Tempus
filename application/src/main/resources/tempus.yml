@@ -425,3 +425,5 @@ kubernetes:
   cluster_mode_enabled: "${CLUSTER_MODE_ENABLED:true}"
   kube_config_path: "${KUBE_CONFIG_PATH:/home/.kube/config}"
 
+logging.level.org.springframework.boot.autoconfigure.security: OFF
+
