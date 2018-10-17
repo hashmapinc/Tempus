@@ -338,5 +338,9 @@ function DeviceListWidgetController($rootScope, $scope, $filter, dashboardServic
         function () {
         });
     }
+
+    $scope.onPaginate = function() {
+        initController();
+    }
     
 }

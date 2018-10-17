@@ -40,7 +40,7 @@
                         </table>
                 </md-table-container>
             </div>
-        <md-table-pagination  style="position:fixed;" ng-if="showList"  md-limit="query.limit" md-limit-options="[5, 10, 15]"
+        <md-table-pagination class="entityPaginator" ng-if="showList"  md-limit="query.limit" md-limit-options="[5, 10, 15]"
                 md-page="query.page" md-total="{{entityList.count}}"
                 md-on-paginate="onPaginate" md-page-select>
         </md-table-pagination>
