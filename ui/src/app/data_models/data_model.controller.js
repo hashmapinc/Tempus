@@ -398,6 +398,8 @@ export function DataModelController($scope, $mdDialog, $document, $stateParams, 
 
         // reset stepper state
         resetStepperState();
+        vm.attrName = [];
+
 
         // load datamodel object into stepper data if one is being edited
         if (nodeToEdit) {
@@ -408,6 +410,7 @@ export function DataModelController($scope, $mdDialog, $document, $stateParams, 
 
             // set stepper mode
             vm.stepperMode = "EDIT"
+
 
             // process the object into stepper data
             var dmo = nodeToEdit.datamodelObject;
@@ -420,6 +423,9 @@ export function DataModelController($scope, $mdDialog, $document, $stateParams, 
             vm.stepperData.logoFile = dmo.logoFile;
             vm.stepperState = 3; // go straight to review page
 
+            for (var i = 0; i < dmo.attributes.length; i++) {
+                vm.attrName.push(dmo.attributes[i].toLowerCase().trim());
+            }
             // get the parent ID if it exists
             let edge = vm.edges.get().filter(e => {
                 return e.to === nodeToEdit.id;
@@ -430,10 +436,9 @@ export function DataModelController($scope, $mdDialog, $document, $stateParams, 
 
         } else {
             // create a new node id for a new object creation stepper
-            vm.stepperData.node_id = vm.nodes.length + 1;
-        }
+           vm.stepperData.node_id = vm.nodes.length + 1;
 
-        // show the mdDialog
+        }
         $mdDialog.show({
             controller: function () { return vm }, // use the current controller (this) as the mdDialog controller
             controllerAs: 'vm',
@@ -597,10 +602,17 @@ export function DataModelController($scope, $mdDialog, $document, $stateParams, 
     // add a datamodel object attribute to the stepper's current data
     vm.addDatamodelObjectAttribute = function () {
         // add the attribute if it exists
-        if (vm.stepperData.currentAttribute) {
-            vm.stepperData.attributes.push(vm.stepperData.currentAttribute);
+        var inArray = vm.attrName.indexOf(angular.lowercase(vm.stepperData.currentAttribute.trim()));
+        if(inArray !== -1) {
+            vm.stepperState = 1;
+            vm.stepperMode = "";
+            toast.showError($translate.instant('dataModels.duplicateAttribute'));
+            return false;
         }
-        // reset the current attribute
+        if (vm.stepperData.currentAttribute) {
+           vm.stepperData.attributes.push(vm.stepperData.currentAttribute.trim());
+           vm.attrName.push(angular.lowercase(vm.stepperData.currentAttribute.trim()));
+        }
         vm.stepperData.currentAttribute = "";
     };
 
@@ -628,8 +640,10 @@ export function DataModelController($scope, $mdDialog, $document, $stateParams, 
     vm.updateAttribute =  function (attributeName, index){
         $scope.editing = false;
         vm.stepperData.attributes[index] = attributeName;
+        vm.attrName[index] = angular.lowercase(attributeName.trim());
     }
     vm.deleteAttribute =  function (index){
         vm.stepperData.attributes.splice(index, 1);
+        vm.attrName.splice(index,1);
     }
 }
