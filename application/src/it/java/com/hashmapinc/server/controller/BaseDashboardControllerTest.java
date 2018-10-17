@@ -258,20 +258,14 @@ public abstract class BaseDashboardControllerTest extends AbstractControllerTest
         List<DashboardInfo> dashboardsTitle1 = new ArrayList<>();
         for (int i=0;i<134;i++) {
             Dashboard dashboard = new Dashboard();
-            String suffix = RandomStringUtils.randomAlphanumeric((int)(Math.random()*15));
-            String title = title1+suffix;
-            title = i % 2 == 0 ? title.toLowerCase() : title.toUpperCase();
-            dashboard.setTitle(title);
+            dashboard.setTitle(title1 + i);
             dashboardsTitle1.add(new DashboardInfo(doPost("/api/dashboard", dashboard, Dashboard.class)));
         }
         String title2 = "Dashboard title 2";
         List<DashboardInfo> dashboardsTitle2 = new ArrayList<>();
         for (int i=0;i<112;i++) {
             Dashboard dashboard = new Dashboard();
-            String suffix = RandomStringUtils.randomAlphanumeric((int)(Math.random()*15));
-            String title = title2+suffix;
-            title = i % 2 == 0 ? title.toLowerCase() : title.toUpperCase();
-            dashboard.setTitle(title);
+            dashboard.setTitle(title2 + i);
             dashboardsTitle2.add(new DashboardInfo(doPost("/api/dashboard", dashboard, Dashboard.class)));
         }
 
