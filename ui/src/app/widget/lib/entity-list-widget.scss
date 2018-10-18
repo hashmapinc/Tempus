@@ -31,3 +31,10 @@
 .assetWidth{
     width: 20%;
 }
+
+.entityPaginator{
+    md-select.md-table-select {
+      min-width:0px !important;
+    }
+}
+
