@@ -460,17 +460,7 @@ function Menu(userService, $state, $rootScope, $log,datamodelService,customerSer
                     });
 
                     homeSections =
-                        [{
-                            name: 'asset.view-assets',
-                            places: [
-                                {
-                                    name: 'asset.assets',
-                                    icon: 'domain',
-                                    state: 'home.assets',
-                                    link: '/static/svg/assetslightgray.svg'
-                                }
-                            ]
-                        },
+                        [
                             {
                                 name: 'device.view-devices',
                                 places: [
