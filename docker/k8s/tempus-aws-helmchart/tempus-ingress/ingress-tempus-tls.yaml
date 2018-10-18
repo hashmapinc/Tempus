@@ -1,0 +1,32 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  annotations:
+    ingress.kubernetes.io/rewrite-target: /
+    ingress.kubernetes.io/ssl-redirect: "true"
+    kubernetes.io/ingress.class: nginx
+    kubernetes.io/tls-acme: "true"
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+  name: tempus-ingress
+  namespace: default
+spec:
+  rules:
+  - host: tempus.hashmapinc.com
+    http:
+      paths:
+      - backend:
+          serviceName: tempus-svc
+          servicePort: 8080
+        path: /
+      - backend:
+          serviceName: nifi-svc
+          servicePort: 9090
+        path: /nifi
+  tls:
+  - hosts:
+    - tempus.hashmapinc.com
+    secretName: tempus-cert
+status:
+  loadBalancer:
+    ingress:
+    - hostname: a744d241bbb8711e8b9be0e749a74ca0-564488e1fd42306d.elb.us-east-1.amazonaws.com

@@ -7,7 +7,7 @@ data:
   proxy-read-timeout: "3600"
   proxy-send-timeout: "3600"
   server-tokens: "false"
-  ssl-redirect: "false"
+  ssl-redirect: "true"
   upstream-keepalive-connections: "50"
   use-proxy-protocol: "true"
 kind: ConfigMap
