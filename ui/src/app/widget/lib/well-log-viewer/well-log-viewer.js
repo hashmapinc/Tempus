@@ -84,7 +84,7 @@ export default class WellLogViewer {
 			                         	"cType": {
 			                  	            "title": "Component Type",
 			                                "type": "string",
-			                          		"enum": ["Line", "Linear Grid", "Time Y axis"]
+			                          		"enum": ["Line", "Linear Grid", "Time Y axis", "Mud Log Viewer"]
 			                      		},
 			                      		"dataSource": {
 											"title": "Data Source",
