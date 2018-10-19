@@ -87,7 +87,6 @@ public class DataModelServiceImpl extends AbstractEntityService implements DataM
     }
 
     @Override
-//    @Transactional(propagation = Propagation.REQUIRED,rollbackFor = RuntimeException.class)
     public void deleteById(DataModelId dataModelId) {
         log.trace("Executing DataModelServiceImpl.deleteById [{}]", dataModelId);
         validateId(dataModelId, INCORRECT_DATA_MODEL_ID + dataModelId);

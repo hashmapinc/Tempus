@@ -27,6 +27,8 @@ import org.junit.Test;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 public class BaseDataModelControllerTest extends AbstractControllerTest {
 
     private DataModel defaultDataModel;
@@ -73,9 +75,11 @@ public class BaseDataModelControllerTest extends AbstractControllerTest {
 
     @Test
     public void testRemoveDataModelById() throws Exception {
-        doDelete("/api/data-model/" + defaultDataModel.getId().toString());
-        DataModel fetchedDataModel = doGet("/api/data-model/" + defaultDataModel.getId().toString(), DataModel.class);
-        Assert.assertNull(fetchedDataModel);
+        doDelete("/api/data-model/" +defaultDataModel.getId().getId().toString())
+                .andExpect(status().isOk());
+
+        doGet("/api/data-model/" +defaultDataModel.getId().getId().toString())
+                .andExpect(status().isNotFound());
     }
 
 }

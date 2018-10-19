@@ -646,12 +646,13 @@ public abstract class BaseAssetControllerTest extends AbstractControllerTest {
 
         logout();
         loginCustomerUser();
-        createAsset(dataModelObject.getId(), customerUser.getCustomerId(), "Customer's asset");
+        Asset asset1 = createAsset(dataModelObject.getId(), customerUser.getCustomerId(), "Customer's asset");
         logout();
 
         loginTenantAdmin();
         deleteGroup(savedCustomerGroup.getId());
         deleteAsset(asset.getId());
+        deleteAsset(asset1.getId());
         deleteDataModelObject(dataModelObject.getId());
         logout();
     }
