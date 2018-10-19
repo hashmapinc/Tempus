@@ -77,7 +77,7 @@ export default function EntityAutocomplete($compile, $templateCache, $q, $filter
 
         scope.updateView = function () {
             if (!scope.disabled) {
-                ngModelCtrl.$setViewValue(scope.entity ? scope.entity.id.id : null);
+                ngModelCtrl.$setViewValue(scope.entity ? scope.entity: null);
             }
         }
 

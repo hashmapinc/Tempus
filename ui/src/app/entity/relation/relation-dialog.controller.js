@@ -111,26 +111,56 @@ export default function RelationDialogController($scope, $mdDialog, types, entit
         }
 
         $scope.theForm.$setValidity("additionalInfo", valid);
+        var relationCustomerId = null;
+        var flag = true;
+        var saveRelationObject = {
+            additionalInfo: vm.relation.additionalInfo,
+            to:null,
+            from:null,
+            type:vm.relation.type
+        }
+        if(vm.relation.from.id.hasOwnProperty('name')){
+            relationCustomerId = vm.relation.from.id.customerId ? vm.relation.from.id.customerId.id : null
 
+            var from ={
+                 id:vm.relation.from.id.id.id,
+                 entityType:vm.relation.from.entityType
+            }
+            saveRelationObject.from = from;
+            saveRelationObject.to = vm.relation.to;
+        }else {
+            relationCustomerId =  vm.relation.to.id.customerId ? vm.relation.to.id.customerId.id : null;
+            var to ={
+                 id:vm.relation.to.id.id.id,
+                 entityType:vm.relation.to.entityType
+            }
+            saveRelationObject.to = to;
+            saveRelationObject.from = vm.relation.from;
+        }
+        flag = getRelationType(vm.relation);
         if (valid) {
-            entityRelationService.saveRelation(vm.relation).then(
+            entityRelationService.saveRelation(saveRelationObject).then(
                 function success() {
-                    if((relation.from.entityType == 'DEVICE' || relation.from.entityType == 'ASSET' )&& vm.entityDetail && vm.entityDetail.customerId.id == '13814000-1dd2-11b2-8080-808080808080'){
-                            assetService.getAsset(vm.relation.to.id).then(function success(response){
+                    if(((relation.from.entityType == 'DEVICE' || relation.to.entityType == 'DEVICE')
+                    || (relation.from.entityType == 'ASSET' || relation.to.entityType == 'ASSET'))
+                    && vm.entityDetail && vm.entityDetail.customerId.id == '13814000-1dd2-11b2-8080-808080808080' && flag){
+                        if(relationCustomerId != '13814000-1dd2-11b2-8080-808080808080'){
+                            deviceService.assignDeviceToCustomer(relationCustomerId,vm.entityDetail.id.id).then();
 
-                                if(response){
-                                    if(relation.to.entityType == 'ASSET' && relation.from.entityType == 'DEVICE'){
-                                        deviceService.assignDeviceToCustomer(response.customerId.id,vm.entityDetail.id.id).then();
-                                    }else if(relation.to.entityType == 'ASSET' && relation.from.entityType == 'ASSET'){
-                                        assetService.assignAssetToCustomer(response.customerId.id,vm.entityDetail.id.id).then();
-                                    }
-
-                                }
-                            });
+                        }
                     }
                     $mdDialog.hide();
                 }
             );
+        }
+    }
+    function getRelationType(relation){
+        if(relation.to.entityType != 'tenant' || relation.from.entityType != 'tenant'
+        || relation.to.entityType != 'CUSTOMER' || relation.from.entityType != 'CUSTOMER'
+        || relation.to.entityType != 'RULE' || relation.from.entityType != 'RULE'
+        || relation.to.entityType != 'PLUGIN' || relation.from.entityType != 'PLUGIN'
+        || relation.to.entityType != 'DASHBOARD' || relation.from.entityType != 'DASHBOARD'){
+            return false;
         }
     }
 
