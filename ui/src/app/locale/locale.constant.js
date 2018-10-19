@@ -624,7 +624,8 @@ export default angular.module('tempus.locale', [])
                     "relationships":"Relationships",
                     "image":"Icon",
                     "parent":"Parent",
-                    "noAttribute":"No Attributes"
+                    "noAttribute":"No Attributes",
+                    "duplicateAttribute":"Attribute already created, please use different name."
                 },
                 "datakey": {
                     "settings": "Settings",
