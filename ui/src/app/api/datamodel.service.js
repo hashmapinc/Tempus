@@ -31,7 +31,8 @@ function DatamodelService($http, $q) {
         listDatamodels:         listDatamodels,
         deleteDatamodelObject:  deleteDatamodelObject,
         getDatamodelObjectAttributes: getDatamodelObjectAttributes,
-        getDatamodelObject:     getDatamodelObject
+        getDatamodelObject:     getDatamodelObject,
+        deleteDatamodel:        deleteDatamodel
     }
 
     // loads the datamodel objects for the datamodel with ID = datamodelID
@@ -123,6 +124,22 @@ function DatamodelService($http, $q) {
         });
         return deferred.promise;
     }
+
+    /**
+     *  deletes a datamodel in the backend
+     *  @param datmodelID - ID of the datamodel to delete
+     */
+    function deleteDatamodel(dmoId) {
+        var deferred = $q.defer();
+        var url = '/api/data-model/' + dmoId;
+        $http.delete(url).then(function success(response) {
+            deferred.resolve(response);
+        }, function fail(response) {
+            deferred.reject(response);
+        });
+        return deferred.promise;
+    }
+
     /**
      *  Get a datamodel object
      *  @param dmObjectId - ID of the datamodel object

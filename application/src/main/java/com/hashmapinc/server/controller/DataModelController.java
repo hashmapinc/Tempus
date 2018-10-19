@@ -63,7 +63,9 @@ public class DataModelController extends BaseController {
     public DataModel fetchDataModelById(@PathVariable(DATA_MODEL_ID) String dataModelId) throws TempusException {
         try{
             checkParameter(DATA_MODEL_ID, dataModelId);
-            return dataModelService.findById(new DataModelId(toUUID(dataModelId)));
+            DataModel dataModel =  dataModelService.findById(new DataModelId(toUUID(dataModelId)));
+            checkNotNull(dataModel);
+            return dataModel;
         } catch (Exception e) {
             throw handleException(e);
         }
@@ -124,7 +126,9 @@ public class DataModelController extends BaseController {
             throws TempusException {
         try {
             checkParameter("objectId", objectId);
-            return  dataModelObjectService.findById(new DataModelObjectId(toUUID(objectId)));
+            DataModelObject dataModelObject = dataModelObjectService.findById(new DataModelObjectId(toUUID(objectId)));
+            checkNotNull(dataModelObject);
+            return dataModelObject;
         } catch (Exception e) {
             throw handleException(e);
         }
@@ -137,6 +141,19 @@ public class DataModelController extends BaseController {
         try {
             checkParameter("objectId", objectId);
             dataModelObjectService.removeById(new DataModelObjectId(toUUID(objectId)));
+            return true;
+        } catch (Exception e) {
+            throw handleException(e);
+        }
+    }
+
+    @PreAuthorize("hasAnyAuthority('TENANT_ADMIN', 'CUSTOMER_USER')")
+    @DeleteMapping(value = "/data-model/{modelId}")
+    @ResponseBody
+    public Boolean removeDataModelById(@PathVariable("modelId") String modelId) throws TempusException {
+        try {
+            checkParameter("modelId", modelId);
+            dataModelService.deleteById(new DataModelId(toUUID(modelId)));
             return true;
         } catch (Exception e) {
             throw handleException(e);

@@ -614,7 +614,7 @@ export default angular.module('tempus.locale', [])
 
                 "dataModels": {
                     "add": "Add Data Model",
-                    "name": "Title",
+                    "name": "Name",
                     "description" :"Description",
                     "name-required":"This feild is required",
                     "objectInfo":"Datamodel Object Information",
@@ -625,7 +625,14 @@ export default angular.module('tempus.locale', [])
                     "image":"Icon",
                     "parent":"Parent",
                     "noAttribute":"No Attributes",
-                    "duplicateAttribute":"Attribute already created, please use different name."
+                    "duplicateAttribute":"Attribute already created, please use different name.",
+                    "delete":"Delete Data Model(s)",
+                    "lastModified":"Last Modified",
+                    "noData":"No Data Available",
+                    "delete-datamodel-title":"Are you sure you want to delete { count, select, 1 {1 datamodel} other {# datamodels} }?",
+                    "delete-datamodel-text": "Be careful, after the confirmation all selected datamodel(s) and related data will be removed.",
+                    "delete-success": "Data model(s) deleted sucessfully.",
+                    "duplicate-object": "Datamodel object already present of same name."
                 },
                 "datakey": {
                     "settings": "Settings",
