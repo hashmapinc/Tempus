@@ -413,7 +413,7 @@ authorization.rules.filePath: "default-rules.json"
 #Tempus Gateway
 gateway:
   image: "${TEMPUS_GATEWAY_IMAGE:hashmapinc/tempus-gateway}"
-  host: "${GATEWAY_HOST:tempus}"
+  host: "${GATEWAY_HOST:tempus-svc}"
   port: "${GATEWAY_PORT:9095}"
   commands:
     - "sh"

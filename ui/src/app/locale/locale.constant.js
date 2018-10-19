@@ -760,7 +760,8 @@ export default angular.module('tempus.locale', [])
                     "device-public": "Device is public",
                     "select-device": "Select device",
                     "status": "Status",
-                    "lastTimeRecived" :"Last Time Received"
+                    "lastTimeRecived" :"Last Time Received",
+                    "businessUnit":"Business Unit"
                 },
                 "dialog": {
                     "close": "Close dialog"
