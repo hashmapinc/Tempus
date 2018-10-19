@@ -30,21 +30,6 @@ export default class WellLogViewer {
      }
      init() {
 		//loadLogViewer(this.ctx, "init");
-        //alert(test);
-        //alert("test.test");
-     }
-
-     test(){
-     	var datasources = this.ctx.datasources;
-        console.log(settings);
-        var dataKeys = [];
-        datasources.forEach(function(dkeys){
-        	dkeys.dataKeys.forEach(function(datakey){
-
-        		dataKeys.push({"value": datakey.label, "label": datakey.label});
-        	})
-        })
-     	return dataKeys;
      }
 
      update() {
