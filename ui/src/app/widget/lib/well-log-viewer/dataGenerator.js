@@ -19,8 +19,6 @@
 var dataGenerator = function() {
 	let dataGen = {};
 	dataGen.time = 0;
-	// let d = new Date();
-	// let time = d.getTime();
 
 	dataGen.num = 300;
 
@@ -33,7 +31,6 @@ var dataGenerator = function() {
 	let latestDeltas = [seed];
 
 	dataGen.tick = function() {
-	// d.getTime();
 		dataGen.time++;
 		dataGen.data[dataGen.time] = dataGen.data[dataGen.time - 1] + noise.noise2D(seed, dataGen.time/60);
 		dataGen.data[dataGen.time] = Math.max(dataGen.data[dataGen.time], 0);
