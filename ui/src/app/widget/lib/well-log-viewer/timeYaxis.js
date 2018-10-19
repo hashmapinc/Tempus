@@ -40,7 +40,7 @@ var timeYaxis = function(timeConfig, data, state, index, width) {
 
     let margin = {top: 0, right: 10, bottom: 30, left: 30},
       w = o.width*110 - margin.right - margin.left,
-      h = 700 - margin.top;
+      h = 700 - margin.top - margin.bottom;
 
     context.select('.linearGrid')
         .attr('width', w + margin.right + margin.left)
@@ -54,12 +54,12 @@ var timeYaxis = function(timeConfig, data, state, index, width) {
      context.select('.linearGrid')
       .append('g')
       .attr('class', 'y-axis')
-      .attr('transform', 'translate(40,0)')
+      .attr('transform', 'translate(40,20)')
       .call(y.axis = d3.axisLeft().scale(y))
     }
     else {
       context.select('.linearGrid').select('.y-axis')
-      .attr('transform', 'translate(40,0)')
+      .attr('transform', 'translate(40,20)')
       .call(y.axis = d3.axisLeft().scale(y))
     }
 
