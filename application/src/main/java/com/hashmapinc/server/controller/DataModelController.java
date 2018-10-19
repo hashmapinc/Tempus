@@ -63,7 +63,9 @@ public class DataModelController extends BaseController {
     public DataModel fetchDataModelById(@PathVariable(DATA_MODEL_ID) String dataModelId) throws TempusException {
         try{
             checkParameter(DATA_MODEL_ID, dataModelId);
-            return dataModelService.findById(new DataModelId(toUUID(dataModelId)));
+            DataModel dataModel =  dataModelService.findById(new DataModelId(toUUID(dataModelId)));
+            checkNotNull(dataModel);
+            return dataModel;
         } catch (Exception e) {
             throw handleException(e);
         }
@@ -124,7 +126,9 @@ public class DataModelController extends BaseController {
             throws TempusException {
         try {
             checkParameter("objectId", objectId);
-            return  dataModelObjectService.findById(new DataModelObjectId(toUUID(objectId)));
+            DataModelObject dataModelObject = dataModelObjectService.findById(new DataModelObjectId(toUUID(objectId)));
+            checkNotNull(dataModelObject);
+            return dataModelObject;
         } catch (Exception e) {
             throw handleException(e);
         }

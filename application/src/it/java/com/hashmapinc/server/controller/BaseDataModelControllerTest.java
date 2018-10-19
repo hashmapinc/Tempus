@@ -75,11 +75,15 @@ public class BaseDataModelControllerTest extends AbstractControllerTest {
 
     @Test
     public void testRemoveDataModelById() throws Exception {
+
+        DataModel fetchedDataModel1 = doGet("/api/data-model/" + defaultDataModel.getId().toString(), DataModel.class);
+        Assert.assertEquals(defaultDataModel.getName(), fetchedDataModel1.getName());
+
         doDelete("/api/data-model/" +defaultDataModel.getId().getId().toString())
                 .andExpect(status().isOk());
 
-        doGet("/api/data-model/" +defaultDataModel.getId().getId().toString())
-                .andExpect(status().isNotFound());
+        doGet("/api/data-model/" + defaultDataModel.getId().toString()).
+                andExpect(status().isNotFound());
     }
 
 }
