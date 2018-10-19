@@ -35,28 +35,20 @@
                 <md-content class="md-padding" layout="column">
                     <fieldset ng-disabled="$root.loading">
                         <section flex layout="row">
-                            <md-input-container flex="60" class="md-block" md-is-error="theForm.computationName.$touched && theForm.computationName.$invalid">
-                                <label translate>computation.name</label>
-                                <input required name="computationName" ng-model="vm.item.name">
-                                <div ng-messages="theForm.computationName.$error">
-                                    <div translate ng-message="required">computation.name-required</div>
-                                </div>
-                            </md-input-container>
-                            <md-input-container flex="40" class="md-block" md-is-error="theForm.computationType.$touched && theForm.computationType.$invalid">
+                            <md-input-container flex="100" class="md-block" md-is-error="theForm.computationType.$touched && theForm.computationType.$invalid">
                                 <label translate>computation.type</label>
-
                                 <md-select required name="computationType" ng-change="vm.computationTypeChange()" ng-model="vm.item.type">
                                     <md-option ng-repeat="(key,value) in vm.types.computationType" ng-value="value">
                                         {{value}}
                                     </md-option>
                                 </md-select>
-
                                 <div ng-messages="theForm.computationType.$error">
                                     <div translate ng-message="required">computation.type-required</div>
                                 </div>
                             </md-input-container>
                         </section>
                         <div tb-computation-form-spark model="vm.item" ng-if="vm.item.type && vm.item.type == vm.types.computationType.spark"></div>
+                        <div tb-computation-form-kubeless model="vm.item" ng-if="vm.item.type && vm.item.type == vm.types.computationType.kubeless"></div>
                     </fieldset>
                 </md-content>
             </div>

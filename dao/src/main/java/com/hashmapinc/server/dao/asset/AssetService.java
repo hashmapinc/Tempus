@@ -18,8 +18,10 @@ package com.hashmapinc.server.dao.asset;
 
 import com.google.common.util.concurrent.ListenableFuture;
 import com.hashmapinc.server.common.data.EntitySubtype;
+import com.hashmapinc.server.common.data.TempusResourceCriteriaSpec;
 import com.hashmapinc.server.common.data.asset.Asset;
 import com.hashmapinc.server.common.data.asset.AssetSearchQuery;
+import com.hashmapinc.server.common.data.id.DataModelObjectId;
 import com.hashmapinc.server.common.data.id.TenantId;
 import com.hashmapinc.server.common.data.page.TextPageData;
 import com.hashmapinc.server.common.data.page.TextPageLink;
@@ -64,4 +66,6 @@ public interface AssetService {
     ListenableFuture<List<Asset>> findAssetsByQuery(AssetSearchQuery query);
 
     ListenableFuture<List<EntitySubtype>> findAssetTypesByTenantId(TenantId tenantId);
+
+    TextPageData<Asset> findAll(TempusResourceCriteriaSpec tempusResourceCriteriaSpec, TextPageLink textPageLink);
 }

@@ -246,6 +246,12 @@ public class DefaultActorService implements ActorService {
     }
 
     @Override
+    public void onComputationStateChange(TenantId tenantId, ComputationId computationId, ComponentLifecycleEvent state) {
+        log.trace("[{}] Processing onComputationStateChange event: {}", computationId, state);
+        broadcast(ComponentLifecycleMsg.forComputation(tenantId, computationId, state));
+    }
+
+    @Override
     public void onCredentialsUpdate(TenantId tenantId, DeviceId deviceId) {
         DeviceCredentialsUpdateNotificationMsg msg = new DeviceCredentialsUpdateNotificationMsg(tenantId, deviceId);
         Optional<ServerAddress> address = actorContext.getRoutingService().resolveById(deviceId);

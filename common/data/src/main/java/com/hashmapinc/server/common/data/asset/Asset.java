@@ -17,6 +17,7 @@
 package com.hashmapinc.server.common.data.asset;
 
 import com.hashmapinc.server.common.data.TempusResource;
+import com.hashmapinc.server.common.data.id.DataModelObjectId;
 import lombok.EqualsAndHashCode;
 import com.hashmapinc.server.common.data.HasName;
 import com.hashmapinc.server.common.data.SearchTextBasedWithAdditionalInfo;
@@ -31,6 +32,7 @@ public class Asset extends SearchTextBasedWithAdditionalInfo<AssetId> implements
 
     private TenantId tenantId;
     private CustomerId customerId;
+    private DataModelObjectId dataModelObjectId;
     private String name;
     private String type;
 
@@ -42,10 +44,19 @@ public class Asset extends SearchTextBasedWithAdditionalInfo<AssetId> implements
         super(id);
     }
 
+    public DataModelObjectId getDataModelObjectId() {
+        return dataModelObjectId;
+    }
+
+    public void setDataModelObjectId(DataModelObjectId dataModelObjectId) {
+        this.dataModelObjectId = dataModelObjectId;
+    }
+
     public Asset(Asset asset) {
         super(asset);
         this.tenantId = asset.getTenantId();
         this.customerId = asset.getCustomerId();
+        this.dataModelObjectId = asset.getDataModelObjectId();
         this.name = asset.getName();
         this.type = asset.getType();
     }
@@ -95,6 +106,8 @@ public class Asset extends SearchTextBasedWithAdditionalInfo<AssetId> implements
         builder.append(tenantId);
         builder.append(", customerId=");
         builder.append(customerId);
+        builder.append(", dataModelObjectId=");
+        builder.append(dataModelObjectId);
         builder.append(", name=");
         builder.append(name);
         builder.append(", type=");

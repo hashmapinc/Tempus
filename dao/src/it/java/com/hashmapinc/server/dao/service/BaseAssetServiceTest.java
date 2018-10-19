@@ -17,32 +17,31 @@
 package com.hashmapinc.server.dao.service;
 
 import com.datastax.driver.core.utils.UUIDs;
-import com.hashmapinc.server.common.data.Customer;
-import com.hashmapinc.server.common.data.EntitySubtype;
+import com.hashmapinc.server.common.data.*;
 import com.hashmapinc.server.common.data.asset.Asset;
+import com.hashmapinc.server.common.data.id.AssetId;
+import com.hashmapinc.server.common.data.id.DataModelObjectId;
 import com.hashmapinc.server.common.data.page.TextPageLink;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import com.hashmapinc.server.common.data.Tenant;
 import com.hashmapinc.server.common.data.id.CustomerId;
 import com.hashmapinc.server.common.data.id.TenantId;
 import com.hashmapinc.server.common.data.page.TextPageData;
 import com.hashmapinc.server.dao.exception.DataValidationException;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
-import static com.hashmapinc.server.dao.model.ModelConstants.NULL_UUID;
+import static org.junit.Assert.assertEquals;
 
 public abstract class BaseAssetServiceTest extends AbstractServiceTest {
 
     private IdComparator<Asset> idComparator = new IdComparator<>();
 
-    private TenantId tenantId;
+    protected TenantId tenantId1;
+    protected TenantId tenantId2;
 
     @Before
     public void before() {
@@ -50,29 +49,23 @@ public abstract class BaseAssetServiceTest extends AbstractServiceTest {
         tenant.setTitle("My tenant");
         Tenant savedTenant = tenantService.saveTenant(tenant);
         Assert.assertNotNull(savedTenant);
-        tenantId = savedTenant.getId();
+        tenantId1 = savedTenant.getId();
+
+        tenant.setTitle("My tenant2");
+        savedTenant = tenantService.saveTenant(tenant);
+        Assert.assertNotNull(savedTenant);
+        tenantId2 = savedTenant.getId();
     }
 
     @After
     public void after() {
-        tenantService.deleteTenant(tenantId);
+        tenantService.deleteTenant(tenantId1);
+        tenantService.deleteTenant(tenantId2);
     }
 
     @Test
     public void testSaveAsset() {
-        Asset asset = new Asset();
-        asset.setTenantId(tenantId);
-        asset.setName("My asset");
-        asset.setType("default");
-        Asset savedAsset = assetService.saveAsset(asset);
-
-        Assert.assertNotNull(savedAsset);
-        Assert.assertNotNull(savedAsset.getId());
-        Assert.assertTrue(savedAsset.getCreatedTime() > 0);
-        Assert.assertEquals(asset.getTenantId(), savedAsset.getTenantId());
-        Assert.assertNotNull(savedAsset.getCustomerId());
-        Assert.assertEquals(NULL_UUID, savedAsset.getCustomerId().getId());
-        Assert.assertEquals(asset.getName(), savedAsset.getName());
+        Asset savedAsset = createAsset(null, tenantId1);
 
         savedAsset.setName("My new asset");
 
@@ -80,13 +73,13 @@ public abstract class BaseAssetServiceTest extends AbstractServiceTest {
         Asset foundAsset = assetService.findAssetById(savedAsset.getId());
         Assert.assertEquals(foundAsset.getName(), savedAsset.getName());
 
-        assetService.deleteAsset(savedAsset.getId());
+        deleteAsset(savedAsset.getId());
     }
 
     @Test(expected = DataValidationException.class)
     public void testSaveAssetWithEmptyName() {
         Asset asset = new Asset();
-        asset.setTenantId(tenantId);
+        asset.setTenantId(tenantId1);
         asset.setType("default");
         assetService.saveAsset(asset);
     }
@@ -113,7 +106,7 @@ public abstract class BaseAssetServiceTest extends AbstractServiceTest {
         Asset asset = new Asset();
         asset.setName("My asset");
         asset.setType("default");
-        asset.setTenantId(tenantId);
+        asset.setTenantId(tenantId1);
         asset = assetService.saveAsset(asset);
         try {
             assetService.assignAssetToCustomer(asset.getId(), new CustomerId(UUIDs.timeBased()));
@@ -127,7 +120,7 @@ public abstract class BaseAssetServiceTest extends AbstractServiceTest {
         Asset asset = new Asset();
         asset.setName("My asset");
         asset.setType("default");
-        asset.setTenantId(tenantId);
+        asset.setTenantId(tenantId1);
         asset = assetService.saveAsset(asset);
         Tenant tenant = new Tenant();
         tenant.setTitle("Test different tenant");
@@ -146,11 +139,7 @@ public abstract class BaseAssetServiceTest extends AbstractServiceTest {
 
     @Test
     public void testFindAssetById() {
-        Asset asset = new Asset();
-        asset.setTenantId(tenantId);
-        asset.setName("My asset");
-        asset.setType("default");
-        Asset savedAsset = assetService.saveAsset(asset);
+        Asset savedAsset = createAsset(null, tenantId1);
         Asset foundAsset = assetService.findAssetById(savedAsset.getId());
         Assert.assertNotNull(foundAsset);
         Assert.assertEquals(savedAsset, foundAsset);
@@ -163,26 +152,26 @@ public abstract class BaseAssetServiceTest extends AbstractServiceTest {
         try {
             for (int i=0;i<3;i++) {
                 Asset asset = new Asset();
-                asset.setTenantId(tenantId);
+                asset.setTenantId(tenantId1);
                 asset.setName("My asset B"+i);
                 asset.setType("typeB");
                 assets.add(assetService.saveAsset(asset));
             }
             for (int i=0;i<7;i++) {
                 Asset asset = new Asset();
-                asset.setTenantId(tenantId);
+                asset.setTenantId(tenantId1);
                 asset.setName("My asset C"+i);
                 asset.setType("typeC");
                 assets.add(assetService.saveAsset(asset));
             }
             for (int i=0;i<9;i++) {
                 Asset asset = new Asset();
-                asset.setTenantId(tenantId);
+                asset.setTenantId(tenantId1);
                 asset.setName("My asset A"+i);
                 asset.setType("typeA");
                 assets.add(assetService.saveAsset(asset));
             }
-            List<EntitySubtype> assetTypes = assetService.findAssetTypesByTenantId(tenantId).get();
+            List<EntitySubtype> assetTypes = assetService.findAssetTypesByTenantId(tenantId1).get();
             Assert.assertNotNull(assetTypes);
             Assert.assertEquals(3, assetTypes.size());
             Assert.assertEquals("typeA", assetTypes.get(0).getType());
@@ -195,15 +184,9 @@ public abstract class BaseAssetServiceTest extends AbstractServiceTest {
 
     @Test
     public void testDeleteAsset() {
-        Asset asset = new Asset();
-        asset.setTenantId(tenantId);
-        asset.setName("My asset");
-        asset.setType("default");
-        Asset savedAsset = assetService.saveAsset(asset);
+        Asset savedAsset = createAsset(null, tenantId1);
+        deleteAsset(savedAsset.getId());
         Asset foundAsset = assetService.findAssetById(savedAsset.getId());
-        Assert.assertNotNull(foundAsset);
-        assetService.deleteAsset(savedAsset.getId());
-        foundAsset = assetService.findAssetById(savedAsset.getId());
         Assert.assertNull(foundAsset);
     }
 
@@ -256,7 +239,7 @@ public abstract class BaseAssetServiceTest extends AbstractServiceTest {
         List<Asset> assetsTitle1 = new ArrayList<>();
         for (int i=0;i<143;i++) {
             Asset asset = new Asset();
-            asset.setTenantId(tenantId);
+            asset.setTenantId(tenantId1);
             String suffix = RandomStringUtils.randomAlphanumeric(15);
             String name = title1+suffix;
             name = i % 2 == 0 ? name.toLowerCase() : name.toUpperCase();
@@ -268,7 +251,7 @@ public abstract class BaseAssetServiceTest extends AbstractServiceTest {
         List<Asset> assetsTitle2 = new ArrayList<>();
         for (int i=0;i<175;i++) {
             Asset asset = new Asset();
-            asset.setTenantId(tenantId);
+            asset.setTenantId(tenantId1);
             String suffix = RandomStringUtils.randomAlphanumeric(15);
             String name = title2+suffix;
             name = i % 2 == 0 ? name.toLowerCase() : name.toUpperCase();
@@ -281,7 +264,7 @@ public abstract class BaseAssetServiceTest extends AbstractServiceTest {
         TextPageLink pageLink = new TextPageLink(15, title1);
         TextPageData<Asset> pageData = null;
         do {
-            pageData = assetService.findAssetsByTenantId(tenantId, pageLink);
+            pageData = assetService.findAssetsByTenantId(tenantId1, pageLink);
             loadedAssetsTitle1.addAll(pageData.getData());
             if (pageData.hasNext()) {
                 pageLink = pageData.getNextPageLink();
@@ -296,7 +279,7 @@ public abstract class BaseAssetServiceTest extends AbstractServiceTest {
         List<Asset> loadedAssetsTitle2 = new ArrayList<>();
         pageLink = new TextPageLink(4, title2);
         do {
-            pageData = assetService.findAssetsByTenantId(tenantId, pageLink);
+            pageData = assetService.findAssetsByTenantId(tenantId1, pageLink);
             loadedAssetsTitle2.addAll(pageData.getData());
             if (pageData.hasNext()) {
                 pageLink = pageData.getNextPageLink();
@@ -313,7 +296,7 @@ public abstract class BaseAssetServiceTest extends AbstractServiceTest {
         }
 
         pageLink = new TextPageLink(4, title1);
-        pageData = assetService.findAssetsByTenantId(tenantId, pageLink);
+        pageData = assetService.findAssetsByTenantId(tenantId1, pageLink);
         Assert.assertFalse(pageData.hasNext());
         Assert.assertEquals(0, pageData.getData().size());
 
@@ -322,7 +305,7 @@ public abstract class BaseAssetServiceTest extends AbstractServiceTest {
         }
 
         pageLink = new TextPageLink(4, title2);
-        pageData = assetService.findAssetsByTenantId(tenantId, pageLink);
+        pageData = assetService.findAssetsByTenantId(tenantId1, pageLink);
         Assert.assertFalse(pageData.hasNext());
         Assert.assertEquals(0, pageData.getData().size());
     }
@@ -334,7 +317,7 @@ public abstract class BaseAssetServiceTest extends AbstractServiceTest {
         List<Asset> assetsType1 = new ArrayList<>();
         for (int i=0;i<143;i++) {
             Asset asset = new Asset();
-            asset.setTenantId(tenantId);
+            asset.setTenantId(tenantId1);
             String suffix = RandomStringUtils.randomAlphanumeric(15);
             String name = title1+suffix;
             name = i % 2 == 0 ? name.toLowerCase() : name.toUpperCase();
@@ -347,7 +330,7 @@ public abstract class BaseAssetServiceTest extends AbstractServiceTest {
         List<Asset> assetsType2 = new ArrayList<>();
         for (int i=0;i<175;i++) {
             Asset asset = new Asset();
-            asset.setTenantId(tenantId);
+            asset.setTenantId(tenantId1);
             String suffix = RandomStringUtils.randomAlphanumeric(15);
             String name = title2+suffix;
             name = i % 2 == 0 ? name.toLowerCase() : name.toUpperCase();
@@ -360,7 +343,7 @@ public abstract class BaseAssetServiceTest extends AbstractServiceTest {
         TextPageLink pageLink = new TextPageLink(15);
         TextPageData<Asset> pageData = null;
         do {
-            pageData = assetService.findAssetsByTenantIdAndType(tenantId, type1, pageLink);
+            pageData = assetService.findAssetsByTenantIdAndType(tenantId1, type1, pageLink);
             loadedAssetsType1.addAll(pageData.getData());
             if (pageData.hasNext()) {
                 pageLink = pageData.getNextPageLink();
@@ -375,7 +358,7 @@ public abstract class BaseAssetServiceTest extends AbstractServiceTest {
         List<Asset> loadedAssetsType2 = new ArrayList<>();
         pageLink = new TextPageLink(4);
         do {
-            pageData = assetService.findAssetsByTenantIdAndType(tenantId, type2, pageLink);
+            pageData = assetService.findAssetsByTenantIdAndType(tenantId1, type2, pageLink);
             loadedAssetsType2.addAll(pageData.getData());
             if (pageData.hasNext()) {
                 pageLink = pageData.getNextPageLink();
@@ -392,7 +375,7 @@ public abstract class BaseAssetServiceTest extends AbstractServiceTest {
         }
 
         pageLink = new TextPageLink(4);
-        pageData = assetService.findAssetsByTenantIdAndType(tenantId, type1, pageLink);
+        pageData = assetService.findAssetsByTenantIdAndType(tenantId1, type1, pageLink);
         Assert.assertFalse(pageData.hasNext());
         Assert.assertEquals(0, pageData.getData().size());
 
@@ -401,7 +384,7 @@ public abstract class BaseAssetServiceTest extends AbstractServiceTest {
         }
 
         pageLink = new TextPageLink(4);
-        pageData = assetService.findAssetsByTenantIdAndType(tenantId, type2, pageLink);
+        pageData = assetService.findAssetsByTenantIdAndType(tenantId1, type2, pageLink);
         Assert.assertFalse(pageData.hasNext());
         Assert.assertEquals(0, pageData.getData().size());
     }
@@ -461,7 +444,7 @@ public abstract class BaseAssetServiceTest extends AbstractServiceTest {
 
         Customer customer = new Customer();
         customer.setTitle("Test customer");
-        customer.setTenantId(tenantId);
+        customer.setTenantId(tenantId1);
         customer = customerService.saveCustomer(customer);
         CustomerId customerId = customer.getId();
 
@@ -469,7 +452,7 @@ public abstract class BaseAssetServiceTest extends AbstractServiceTest {
         List<Asset> assetsTitle1 = new ArrayList<>();
         for (int i=0;i<175;i++) {
             Asset asset = new Asset();
-            asset.setTenantId(tenantId);
+            asset.setTenantId(tenantId1);
             String suffix = RandomStringUtils.randomAlphanumeric(15);
             String name = title1+suffix;
             name = i % 2 == 0 ? name.toLowerCase() : name.toUpperCase();
@@ -482,7 +465,7 @@ public abstract class BaseAssetServiceTest extends AbstractServiceTest {
         List<Asset> assetsTitle2 = new ArrayList<>();
         for (int i=0;i<143;i++) {
             Asset asset = new Asset();
-            asset.setTenantId(tenantId);
+            asset.setTenantId(tenantId1);
             String suffix = RandomStringUtils.randomAlphanumeric(15);
             String name = title2+suffix;
             name = i % 2 == 0 ? name.toLowerCase() : name.toUpperCase();
@@ -496,7 +479,7 @@ public abstract class BaseAssetServiceTest extends AbstractServiceTest {
         TextPageLink pageLink = new TextPageLink(15, title1);
         TextPageData<Asset> pageData = null;
         do {
-            pageData = assetService.findAssetsByTenantIdAndCustomerId(tenantId, customerId, pageLink);
+            pageData = assetService.findAssetsByTenantIdAndCustomerId(tenantId1, customerId, pageLink);
             loadedAssetsTitle1.addAll(pageData.getData());
             if (pageData.hasNext()) {
                 pageLink = pageData.getNextPageLink();
@@ -511,7 +494,7 @@ public abstract class BaseAssetServiceTest extends AbstractServiceTest {
         List<Asset> loadedAssetsTitle2 = new ArrayList<>();
         pageLink = new TextPageLink(4, title2);
         do {
-            pageData = assetService.findAssetsByTenantIdAndCustomerId(tenantId, customerId, pageLink);
+            pageData = assetService.findAssetsByTenantIdAndCustomerId(tenantId1, customerId, pageLink);
             loadedAssetsTitle2.addAll(pageData.getData());
             if (pageData.hasNext()) {
                 pageLink = pageData.getNextPageLink();
@@ -528,7 +511,7 @@ public abstract class BaseAssetServiceTest extends AbstractServiceTest {
         }
 
         pageLink = new TextPageLink(4, title1);
-        pageData = assetService.findAssetsByTenantIdAndCustomerId(tenantId, customerId, pageLink);
+        pageData = assetService.findAssetsByTenantIdAndCustomerId(tenantId1, customerId, pageLink);
         Assert.assertFalse(pageData.hasNext());
         Assert.assertEquals(0, pageData.getData().size());
 
@@ -537,7 +520,7 @@ public abstract class BaseAssetServiceTest extends AbstractServiceTest {
         }
 
         pageLink = new TextPageLink(4, title2);
-        pageData = assetService.findAssetsByTenantIdAndCustomerId(tenantId, customerId, pageLink);
+        pageData = assetService.findAssetsByTenantIdAndCustomerId(tenantId1, customerId, pageLink);
         Assert.assertFalse(pageData.hasNext());
         Assert.assertEquals(0, pageData.getData().size());
         customerService.deleteCustomer(customerId);
@@ -548,7 +531,7 @@ public abstract class BaseAssetServiceTest extends AbstractServiceTest {
 
         Customer customer = new Customer();
         customer.setTitle("Test customer");
-        customer.setTenantId(tenantId);
+        customer.setTenantId(tenantId1);
         customer = customerService.saveCustomer(customer);
         CustomerId customerId = customer.getId();
 
@@ -557,7 +540,7 @@ public abstract class BaseAssetServiceTest extends AbstractServiceTest {
         List<Asset> assetsType1 = new ArrayList<>();
         for (int i=0;i<175;i++) {
             Asset asset = new Asset();
-            asset.setTenantId(tenantId);
+            asset.setTenantId(tenantId1);
             String suffix = RandomStringUtils.randomAlphanumeric(15);
             String name = title1+suffix;
             name = i % 2 == 0 ? name.toLowerCase() : name.toUpperCase();
@@ -571,7 +554,7 @@ public abstract class BaseAssetServiceTest extends AbstractServiceTest {
         List<Asset> assetsType2 = new ArrayList<>();
         for (int i=0;i<143;i++) {
             Asset asset = new Asset();
-            asset.setTenantId(tenantId);
+            asset.setTenantId(tenantId1);
             String suffix = RandomStringUtils.randomAlphanumeric(15);
             String name = title2+suffix;
             name = i % 2 == 0 ? name.toLowerCase() : name.toUpperCase();
@@ -585,7 +568,7 @@ public abstract class BaseAssetServiceTest extends AbstractServiceTest {
         TextPageLink pageLink = new TextPageLink(15);
         TextPageData<Asset> pageData = null;
         do {
-            pageData = assetService.findAssetsByTenantIdAndCustomerIdAndType(tenantId, customerId, type1, pageLink);
+            pageData = assetService.findAssetsByTenantIdAndCustomerIdAndType(tenantId1, customerId, type1, pageLink);
             loadedAssetsType1.addAll(pageData.getData());
             if (pageData.hasNext()) {
                 pageLink = pageData.getNextPageLink();
@@ -600,7 +583,7 @@ public abstract class BaseAssetServiceTest extends AbstractServiceTest {
         List<Asset> loadedAssetsType2 = new ArrayList<>();
         pageLink = new TextPageLink(4);
         do {
-            pageData = assetService.findAssetsByTenantIdAndCustomerIdAndType(tenantId, customerId, type2, pageLink);
+            pageData = assetService.findAssetsByTenantIdAndCustomerIdAndType(tenantId1, customerId, type2, pageLink);
             loadedAssetsType2.addAll(pageData.getData());
             if (pageData.hasNext()) {
                 pageLink = pageData.getNextPageLink();
@@ -617,7 +600,7 @@ public abstract class BaseAssetServiceTest extends AbstractServiceTest {
         }
 
         pageLink = new TextPageLink(4);
-        pageData = assetService.findAssetsByTenantIdAndCustomerIdAndType(tenantId, customerId, type1, pageLink);
+        pageData = assetService.findAssetsByTenantIdAndCustomerIdAndType(tenantId1, customerId, type1, pageLink);
         Assert.assertFalse(pageData.hasNext());
         Assert.assertEquals(0, pageData.getData().size());
 
@@ -626,10 +609,86 @@ public abstract class BaseAssetServiceTest extends AbstractServiceTest {
         }
 
         pageLink = new TextPageLink(4);
-        pageData = assetService.findAssetsByTenantIdAndCustomerIdAndType(tenantId, customerId, type2, pageLink);
+        pageData = assetService.findAssetsByTenantIdAndCustomerIdAndType(tenantId1, customerId, type2, pageLink);
         Assert.assertFalse(pageData.hasNext());
         Assert.assertEquals(0, pageData.getData().size());
         customerService.deleteCustomer(customerId);
+    }
+
+    @Test
+    public void testFindAll(){
+        Customer customer1 = new Customer();
+        customer1.setTitle("Test customer1");
+        customer1.setTenantId(tenantId1);
+        customer1 = customerService.saveCustomer(customer1);
+        CustomerId customerId1 = customer1.getId();
+
+        Customer customer2 = new Customer();
+        customer2.setTitle("Test customer2");
+        customer2.setTenantId(tenantId2);
+        customer2 = customerService.saveCustomer(customer2);
+        CustomerId customerId2 = customer2.getId();
+
+        DataModelObjectId dataModelObjectId1 = new DataModelObjectId(UUIDs.timeBased());
+        DataModelObjectId dataModelObjectId2 = new DataModelObjectId(UUIDs.timeBased());
+
+        List<AssetId> allAssetIdsForTenant1 = new ArrayList<>();
+        List<AssetId> allAssetIdsForTenant2 = new ArrayList<>();
+
+        for (int i = 0; i < 60; i++) {
+            TenantId tenantId = tenantId1;
+            CustomerId customerId = customerId1;
+            DataModelObjectId dataModelObjectId = dataModelObjectId1;
+            String type = "TYPE_1";
+            if(i % 2 != 0){
+                tenantId = tenantId2;
+                customerId = customerId2;
+                dataModelObjectId = dataModelObjectId2;
+                type = "TYPE_2";
+            }
+
+            Asset savedAsset = saveAsset(tenantId, dataModelObjectId, "ASSET_" + i, type);
+            assetService.assignAssetToCustomer(savedAsset.getId(), customerId);
+            if(i % 2 == 0) allAssetIdsForTenant1.add(savedAsset.getId());
+            else allAssetIdsForTenant2.add(savedAsset.getId());
+
+            if(i == 0){
+                System.out.println(savedAsset);
+            }
+        }
+
+        TextPageLink pageLink1 = new TextPageLink(20, "ASSET_");
+        TempusResourceCriteriaSpec tempusResourceCriteriaSpec = new TempusResourceCriteriaSpec(EntityType.ASSET, tenantId1, dataModelObjectId1);
+        tempusResourceCriteriaSpec.setCustomerId(Optional.of(customerId1));
+        final TextPageData<Asset> page1 = assetService.findAll(tempusResourceCriteriaSpec, pageLink1);
+        assertEquals(20, page1.getData().size());
+
+        TextPageLink pageLink2 = page1.getNextPageLink();
+        final TextPageData<Asset> page2 = assetService.findAll(tempusResourceCriteriaSpec, pageLink2);
+        assertEquals(10, page2.getData().size());
+
+
+        TextPageLink pageLink11 = new TextPageLink(20, "ASSET_");
+        TempusResourceCriteriaSpec tempusResourceCriteriaSpec11 = new TempusResourceCriteriaSpec(EntityType.ASSET, tenantId1, dataModelObjectId1);
+        tempusResourceCriteriaSpec11.setCustomerId(Optional.of(customerId1));
+        final HashSet<AssetId> accessibleIdsForGivenDataModelObject = new HashSet<>(allAssetIdsForTenant1.subList(0, 25));
+        tempusResourceCriteriaSpec11.setAccessibleIdsForGivenDataModelObject(accessibleIdsForGivenDataModelObject);
+        final TextPageData<Asset> page11 = assetService.findAll(tempusResourceCriteriaSpec11, pageLink11);
+        assertEquals(20, page11.getData().size());
+
+        TextPageLink pageLink22 = page11.getNextPageLink();
+        final TextPageData<Asset> page22 = assetService.findAll(tempusResourceCriteriaSpec11, pageLink22);
+        assertEquals(5, page22.getData().size());
+
+    }
+
+    private Asset saveAsset(TenantId tenantId, DataModelObjectId dataModelObjectId, String name, String type) {
+        Asset asset = new Asset();
+        asset.setTenantId(tenantId);
+        asset.setDataModelObjectId(dataModelObjectId);
+        asset.setName(name);
+        asset.setType(type);
+        return assetService.saveAsset(asset);
     }
 
 }

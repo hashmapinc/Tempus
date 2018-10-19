@@ -21,4 +21,5 @@ import com.hashmapinc.server.dao.service.DaoSqlTest;
 
 @DaoSqlTest
 public class AssetServiceSqlTest extends BaseAssetServiceTest {
+
 }

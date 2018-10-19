@@ -72,6 +72,8 @@ public class EntityIdFactory {
                 return new DataModelObjectId(uuid);
             case CUSTOMER_GROUP:
                 return new CustomerGroupId(uuid);
+            case TEMPUS_GATEWAY_CONFIGURATION:
+                return new TempusGatewayConfigurationId(uuid);
         }
         throw new IllegalArgumentException("EntityType " + type + " is not supported!");
     }

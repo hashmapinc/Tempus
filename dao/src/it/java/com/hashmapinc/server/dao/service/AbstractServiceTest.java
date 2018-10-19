@@ -22,11 +22,18 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.TextNode;
 import com.hashmapinc.server.common.data.BaseData;
+import com.hashmapinc.server.common.data.CustomerGroup;
 import com.hashmapinc.server.common.data.EntityType;
 import com.hashmapinc.server.common.data.Event;
+import com.hashmapinc.server.common.data.asset.Asset;
 import com.hashmapinc.server.common.data.cluster.NodeMetric;
 import com.hashmapinc.server.common.data.cluster.NodeStatus;
+import com.hashmapinc.server.common.data.computation.ComputationType;
+import com.hashmapinc.server.common.data.computation.SparkComputationMetadata;
 import com.hashmapinc.server.common.data.computation.Computations;
+import com.hashmapinc.server.common.data.datamodel.AttributeDefinition;
+import com.hashmapinc.server.common.data.datamodel.DataModel;
+import com.hashmapinc.server.common.data.datamodel.DataModelObject;
 import com.hashmapinc.server.common.data.id.*;
 import com.hashmapinc.server.common.data.plugin.ComponentDescriptor;
 import com.hashmapinc.server.common.data.plugin.ComponentScope;
@@ -44,12 +51,14 @@ import com.hashmapinc.server.dao.computations.ComputationsService;
 import com.hashmapinc.server.dao.customer.CustomerService;
 import com.hashmapinc.server.dao.customergroup.CustomerGroupService;
 import com.hashmapinc.server.dao.dashboard.DashboardService;
+import com.hashmapinc.server.dao.datamodel.AttributeDefinitionDao;
 import com.hashmapinc.server.dao.datamodel.DataModelObjectService;
 import com.hashmapinc.server.dao.datamodel.DataModelService;
 import com.hashmapinc.server.dao.depthseries.DepthSeriesService;
 import com.hashmapinc.server.dao.device.DeviceCredentialsService;
 import com.hashmapinc.server.dao.device.DeviceService;
 import com.hashmapinc.server.dao.event.EventService;
+import com.hashmapinc.server.dao.gatewayconfiguration.TempusGatewayConfigurationService;
 import com.hashmapinc.server.dao.logo.LogoService;
 import com.hashmapinc.server.dao.metadataingestion.MetadataIngestionService;
 import com.hashmapinc.server.dao.plugin.PluginService;
@@ -63,6 +72,7 @@ import com.hashmapinc.server.dao.timeseries.TimeseriesService;
 import com.hashmapinc.server.dao.user.UserService;
 import com.hashmapinc.server.dao.widget.WidgetTypeService;
 import com.hashmapinc.server.dao.widget.WidgetsBundleService;
+import org.junit.Assert;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -75,11 +85,10 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.context.support.AnnotationConfigContextLoader;
 
 import java.io.IOException;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
+
+import static com.hashmapinc.server.dao.model.ModelConstants.NULL_UUID;
 
 @ActiveProfiles("dao-test")
 @RunWith(SpringRunner.class)
@@ -172,6 +181,12 @@ public abstract class AbstractServiceTest {
     @Autowired
     protected MetadataIngestionService metadataIngestionService;
 
+    @Autowired
+    protected TempusGatewayConfigurationService tempusGatewayConfigurationService;
+
+    @Autowired
+    protected AttributeDefinitionDao attributeDefinitionDao;
+
     class IdComparator<D extends BaseData<? extends UUIDBased>> implements Comparator<D> {
         @Override
         public int compare(D o1, D o2) {
@@ -248,17 +263,23 @@ public abstract class AbstractServiceTest {
         if (tenantId == null) {
             tenantId = new TenantId(UUIDs.timeBased());
         }
-        Computations computationsTest = new Computations();
-        computationsTest.setName(name);
-        computationsTest.setTenantId(tenantId);
-        computationsTest.setMainClass(mainClazz);
-        computationsTest.setJsonDescriptor(jsonDescriptor);
-        computationsTest.setJarName(jarName);
-        computationsTest.setJarPath(jarPath);
-        computationsTest.setArgsformat(argsformat);
-        computationsTest.setArgsType(argsType);
-        computationsTest.setId(new ComputationId(UUIDs.timeBased()));
-        return computationsTest;
+        Computations computations = new Computations();
+        ComputationId computationId = new ComputationId(UUIDs.timeBased());
+        computations.setName("Computation");
+        computations.setId(computationId);
+        computations.setTenantId(tenantId);
+        computations.setType(ComputationType.SPARK);
+
+        SparkComputationMetadata md = new SparkComputationMetadata();
+        md.setId(computationId);
+        md.setJarPath("/Some/Jar/path");
+        md.setMainClass("MainClass");
+        md.setArgsType("ArgsType");
+        md.setArgsformat("argsFormat");
+        md.setJarName("SomeJar");
+
+        computations.setComputationMetadata(md);
+        return computations;
     }
 
     private ComponentDescriptor getOrCreateDescriptor(ComponentScope scope, ComponentType type, String clazz, String configurationDescriptorResource) throws IOException {
@@ -329,4 +350,73 @@ public abstract class AbstractServiceTest {
         return new AuditLogLevelFilter(mask);
     }
 
+    protected CustomerGroup createGroupWithPolicies(List<String> policies, TenantId tenantId, CustomerId customerId) {
+        CustomerGroup customerGroup = new CustomerGroup();
+        customerGroup.setTitle("My Customer Group");
+        customerGroup.setTenantId(tenantId);
+        customerGroup.setCustomerId(customerId);
+        customerGroup.setPolicies(policies);
+        return customerGroupService.saveCustomerGroup(customerGroup);
+    }
+
+    protected void deleteGroup(CustomerGroupId customerGroupId) {
+        customerGroupService.deleteCustomerGroup(customerGroupId);
+    }
+
+
+    protected DataModel createDataModel(TenantId tenantId) {
+        DataModel dataModel = new DataModel();
+        dataModel.setName("Default Drilling Data Model1");
+        dataModel.setLastUpdatedTs(System.currentTimeMillis());
+        dataModel.setTenantId(tenantId);
+        return dataModelService.saveDataModel(dataModel);
+    }
+
+    protected DataModelObject createDataModelObject(DataModel dataModel){
+        DataModelObject dataModelObject = new DataModelObject();
+        dataModelObject.setName("Well");
+        dataModelObject.setDataModelId(dataModel.getId());
+        AttributeDefinition ad = new AttributeDefinition();
+        ad.setValueType("STRING");
+        ad.setName("attr name2");
+        List<AttributeDefinition> attributeDefinitions = new ArrayList<>();
+        attributeDefinitions.add(ad);
+        dataModelObject.setAttributeDefinitions(attributeDefinitions);
+        return dataModelObjectService.save(dataModelObject);
+    }
+
+    protected void deleteDataModelObject(DataModelObjectId dataModelObjectId) {
+        dataModelObjectService.removeById(dataModelObjectId);
+    }
+
+    protected Asset createAsset(DataModelObjectId dataModelObjectId, TenantId tenantId){
+        Asset asset = new Asset();
+        asset.setName("My asset");
+        asset.setType("default");
+        asset.setDataModelObjectId(dataModelObjectId);
+        asset.setTenantId(tenantId);
+        Asset savedAsset = assetService.saveAsset(asset);
+        Assert.assertNotNull(savedAsset);
+        Assert.assertNotNull(savedAsset.getId());
+        Assert.assertTrue(savedAsset.getCreatedTime() > 0);
+        Assert.assertEquals(asset.getTenantId(), savedAsset.getTenantId());
+        Assert.assertNotNull(savedAsset.getCustomerId());
+        Assert.assertEquals(NULL_UUID, savedAsset.getCustomerId().getId());
+        Assert.assertEquals(asset.getName(), savedAsset.getName());
+        return savedAsset;
+    }
+
+    protected void deleteAsset(AssetId assetId){
+        assetService.deleteAsset(assetId);
+    }
+
+    protected DataModel createDataModel(String name ,TenantId tenantId) {
+        DataModel dataModel = new DataModel();
+        dataModel.setName(name);
+        dataModel.setLastUpdatedTs(System.currentTimeMillis());
+        dataModel.setTenantId(tenantId);
+        DataModel savedDataModel = dataModelService.saveDataModel(dataModel);
+        Assert.assertNotNull(savedDataModel);
+        return savedDataModel;
+    }
 }

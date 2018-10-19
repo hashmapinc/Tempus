@@ -1,0 +1,60 @@
+<!--
+
+    Copyright © 2016-2018 The Thingsboard Authors
+    Modifications © 2017-2018 Hashmap, Inc
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+        http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+
+
+<md-content class="md-padding" layout="column">
+    <fieldset ng-disabled="$root.loading || !isEdit">
+        <md-input-container class="md-block">
+            <label translate>metadataConfig.name</label>
+            <input required name="name" ng-model="metadata.name">
+            <div ng-messages="theForm.name.$error">
+                <div translate ng-message="required">metadataConfig.name-required</div>
+            </div>
+        </md-input-container>
+        <md-input-container  class="md-block" md-is-error="theForm.metadataSourceType.$touched && theForm.metadataSourceType.$invalid">
+            <label translate>metadata.source-type </label>
+
+            <md-select required name="metadataSourceType"  ng-model="metadata.source.type" ng-disabled="$root.loading || !isEdit" class="selectMargin">
+                <md-option ng-repeat="(key,value) in types.metadataSourceType" ng-value="value">
+                    {{value}}
+                </md-option>
+            </md-select>
+
+            <div ng-messages="theForm.metadataSourceType.$error">
+                <div translate ng-message="required">metadata.source-type-required</div>
+            </div>
+        </md-input-container>
+        <div tb-metadata-source is-edit="isEdit" source="metadata.source" metadata="metadata" model="vm.item" ng-if="metadata.source.type && metadata.source.type == types.metadataSourceType.jdbc"></div>
+        
+        <md-input-container  class="md-block" md-is-error="theForm.metadataSinkType.$touched && theForm.metadataSinkType.$invalid">
+            <label translate>metadata.sink-type</label>
+
+            <md-select required name="metadataSinkType"  ng-model="metadata.sink.type" ng-disabled="$root.loading || !isEdit">
+                <md-option ng-repeat="(key,value) in types.metadataSinkType" ng-value="value">
+                    {{value}}
+                </md-option>
+            </md-select>
+
+            <div ng-messages="theForm.metadataSinkType.$error">
+                <div translate ng-message="required">metadata.sink-type-required</div>
+            </div>
+        </md-input-container>
+        <div tb-metadata-sink  sink="metadata.sink" model="vm.item" ng-if="metadata.sink.type && metadata.sink.type == types.metadataSinkType.rest"></div>
+    </fieldset>
+</md-content>

@@ -17,13 +17,14 @@
 import tempusApiUser from '../api/user.service';
 import tempusApiDatamodel from '../api/datamodel.service';
 import tempusApiCustomer from '../api/customer.service';
+import tempusApiDashboard from '../api/dashboard.service';
 
-export default angular.module('tempus.menu', [tempusApiUser,tempusApiDatamodel,tempusApiCustomer])
+export default angular.module('tempus.menu', [tempusApiUser,tempusApiDatamodel,tempusApiCustomer,tempusApiDashboard])
     .factory('menu', Menu)
     .name;
 
 /*@ngInject*/
-function Menu(userService, $state, $rootScope, $log,datamodelService,customerService) {
+function Menu(userService, $state, $rootScope, $log,datamodelService,customerService,dashboardService) {
 
     var authority = '';
     var sections = [];
@@ -300,7 +301,15 @@ function Menu(userService, $state, $rootScope, $log,datamodelService,customerSer
                             type: 'link',
                             state: 'home.auditLogs',
                             icon: 'track_changes'
-                        }];
+                        },
+                        {
+                            name: 'gateway.configuration',
+                            type: 'link',
+                            state: 'home.gateway',
+                            icon: 'settings_applications'
+                        }
+
+                        ];
 
                     generatedSectionTree = {};
 
@@ -393,7 +402,20 @@ function Menu(userService, $state, $rootScope, $log,datamodelService,customerSer
                                         state: 'home.metadata'
                                     }
                                 ]
-                            }
+                            },
+
+                            {
+                                 name: 'gateway.configurationLabel',
+                                 places: [
+                                     {
+                                        name: 'gateway.configuration',
+                                        type: 'link',
+                                        state: 'home.gateway',
+                                        icon: 'settings_applications'
+                                    }
+                                 ]
+                             }
+
                         ];
 
                 } else if (authority === 'CUSTOMER_USER') {
@@ -427,7 +449,6 @@ function Menu(userService, $state, $rootScope, $log,datamodelService,customerSer
                         var dataModelObjects = datamodelService.getDatamodelObjects(data.dataModelId.id);
 
                         dataModelObjects.then(function(modelObjects){
-                            $log.log(modelObjects);
                             dataModelsOfAssetType = getDataModelObjectsOfTypeAsset(modelObjects);
                             generatedSectionTree.children = buildGeneratedSectionTree(dataModelsOfAssetType);
 
@@ -486,26 +507,33 @@ function Menu(userService, $state, $rootScope, $log,datamodelService,customerSer
         angular.forEach(dataModelObjects, function (dataModelObject) {
 
             if (dataModelObject.type === "Asset") {
+                    var sec = {
+                        id : dataModelObject.id.id,
+                        type: 'link',
+                        name:dataModelObject.name,
+                        state: 'home.dashboards.blank', //if assetLanding dashboard page is not created for current dataModelObject
+                        icon: 'domain',
+                        link: '/static/svg/assetslightgray.svg',
+                        logoFile: dataModelObject.logoFile,
+                        dashboardId: null                       //if assetLanding dashboard page is not created for current dataModelObject
+                    };
 
-                var sec = {
-                    id : dataModelObject.id.id,
-                    type: 'link',
-                    name:dataModelObject.name,
-                    state: 'home.assets',
-                    icon: 'domain',
-                    link: '/static/svg/assetslightgray.svg',
-                    logoFile: dataModelObject.logoFile
-                };
+                    if(dataModelObject.parentId != null)
+                        sec['parentId'] =  dataModelObject.parentId.id;
+                    else
+                        sec['parentId'] = null;
 
-                if(dataModelObject.parentId != null)
-                    sec['parentId'] =  dataModelObject.parentId.id;
-                else
-                    sec['parentId'] = null;
+               dashboardService.getAssetLandingDashboardByDataModelObjId(dataModelObject).then(function(response){
+                        sec.dashboardId = response[0].id.id;
+                        sec.state = 'home.dashboards.dashboard';
+                    },
+                    function (error){
+                        $log.error(error);
+                    });
 
                 dataModels.push(sec);
             }
         });
-
         return dataModels;
     }
 
@@ -553,9 +581,10 @@ function Menu(userService, $state, $rootScope, $log,datamodelService,customerSer
 
     function buildGeneratedSectionTree(list, id, parentId, children) {
         var generatedSectionTreeList = buildSectionTreeList(id, parentId, children, list);
-
         var startingLevel = 1;
-        addToggleAndLevelToGeneratedSectionTree(generatedSectionTreeList[0],startingLevel);
+        if(generatedSectionTreeList.length > 0) {
+            addToggleAndLevelToGeneratedSectionTree(generatedSectionTreeList[0],startingLevel);
+        }
 
         return generatedSectionTreeList;
     }

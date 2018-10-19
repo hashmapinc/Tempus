@@ -20,8 +20,8 @@ import com.google.gson.annotations.SerializedName;
 import com.hashmapinc.kubeless.models.V1beta1AbstractType;
 import lombok.EqualsAndHashCode;
 
-@EqualsAndHashCode
-public class V1beta1CronJobTrigger extends V1beta1AbstractType<V1beta1HttpTriggerSpec>{
+@EqualsAndHashCode(callSuper = true)
+public class V1beta1CronJobTrigger extends V1beta1AbstractType<V1beta1CronJobTriggerSpec>{
 
     @SerializedName("kind")
     protected String kind = "CronJobTrigger";

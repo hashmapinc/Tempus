@@ -20,6 +20,7 @@ import com.datastax.driver.core.utils.UUIDs;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.hashmapinc.server.common.data.DashboardType;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.extern.slf4j.Slf4j;
@@ -32,9 +33,7 @@ import com.hashmapinc.server.dao.model.BaseSqlEntity;
 import com.hashmapinc.server.dao.model.ModelConstants;
 import com.hashmapinc.server.dao.model.SearchTextEntity;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.io.IOException;
 import java.util.HashSet;
 
@@ -61,6 +60,11 @@ public class DashboardInfoEntity extends BaseSqlEntity<DashboardInfo> implements
     @Column(name = ModelConstants.DASHBOARD_ASSIGNED_CUSTOMERS_PROPERTY)
     private String assignedCustomers;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = ModelConstants.DASHBOARD_TYPE_PROPERTY)
+    private DashboardType type;
+
+
     public DashboardInfoEntity() {
         super();
     }
@@ -71,6 +75,9 @@ public class DashboardInfoEntity extends BaseSqlEntity<DashboardInfo> implements
         }
         if (dashboardInfo.getTenantId() != null) {
             this.tenantId = toString(dashboardInfo.getTenantId().getId());
+        }
+        if(dashboardInfo.getType() != null) {
+            this.type = dashboardInfo.getType();
         }
         this.title = dashboardInfo.getTitle();
         if (dashboardInfo.getAssignedCustomers() != null) {
@@ -102,6 +109,9 @@ public class DashboardInfoEntity extends BaseSqlEntity<DashboardInfo> implements
         dashboardInfo.setCreatedTime(UUIDs.unixTimestamp(getId()));
         if (tenantId != null) {
             dashboardInfo.setTenantId(new TenantId(toUUID(tenantId)));
+        }
+        if(type != null) {
+            dashboardInfo.setType(type);
         }
         dashboardInfo.setTitle(title);
         if (!StringUtils.isEmpty(assignedCustomers)) {

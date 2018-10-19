@@ -36,7 +36,6 @@ export default function ComponentDialogController($mdDialog, $q, $scope, compone
     vm.helpLinkIdForComponent = helpLinkIdForComponent;
     vm.save = save;
     vm.cancel = cancel;
-
     $scope.$watch("vm.componentInfo.component.clazz", function (newValue, prevValue) {
         if (newValue != prevValue) {
             if (newValue && prevValue) {

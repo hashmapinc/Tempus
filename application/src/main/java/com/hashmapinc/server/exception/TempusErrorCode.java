@@ -26,7 +26,8 @@ public enum TempusErrorCode {
     PERMISSION_DENIED(20),
     INVALID_ARGUMENTS(30),
     BAD_REQUEST_PARAMS(31),
-    ITEM_NOT_FOUND(32);
+    ITEM_NOT_FOUND(32),
+    CONFLICT_ITEM(33);
 
     private int errorCode;
 

@@ -24,6 +24,8 @@ import com.hashmapinc.server.common.data.UUIDConverter;
 import com.hashmapinc.server.common.data.metadata.*;
 import com.hashmapinc.server.common.data.metadata.source.jdbc.JdbcMetadataSource;
 import com.hashmapinc.server.common.data.metadata.source.rest.RestMetadataSource;
+import com.hashmapinc.server.common.data.page.TextPageData;
+import com.hashmapinc.server.common.data.page.TextPageLink;
 import com.hashmapinc.server.requests.IngestMetadataRequest;
 import org.joda.time.DateTime;
 import org.junit.Before;
@@ -162,16 +164,16 @@ public abstract class BaseMetadataControllerTest extends AbstractControllerTest 
     @Test
     public void testGetMetadataConfigsForTenant() throws Exception {
         RemoteMappingBuilder stubMappingBuilder = setupStub(HttpMethod.GET.name(),
-                "/api/metaconfig/owner/" + metadataConfig.getOwnerId(),
+                "/api/metaconfig/owner/" + metadataConfig.getOwnerId() + "?limit=1",
                 null,
-                json(Arrays.asList(getMetadataConfigResponse(metadataConfig.getName()))),
+                json(new TextPageData<>(Arrays.asList(getMetadataConfigResponse(metadataConfig.getName())), new TextPageLink(1))),
                 HttpStatus.OK.value()
         );
 
-        ResultActions resultActions = doGet("/api/metadata/tenant/configs");
+        ResultActions resultActions = doGet("/api/metadata/tenant/configs?limit=1");
         removeStub(stubMappingBuilder);
-        List<MetadataConfig> metadataConfigs = readResponse(resultActions, new TypeReference<List<MetadataConfig>>() {
-        });
+        List<MetadataConfig> metadataConfigs = readResponse(resultActions, new TypeReference<TextPageData<MetadataConfig>>() {
+        }).getData();
         resultActions.andExpect(status().isOk());
         assertEquals(1, metadataConfigs.size());
     }
@@ -179,20 +181,20 @@ public abstract class BaseMetadataControllerTest extends AbstractControllerTest 
     @Test
     public void testGetMetadataConfigsForTenantWithUnauthorizedUser() throws Exception {
         loginCustomerUser();
-        ResultActions resultActions = doGet("/api/metadata/tenant/configs");
+        ResultActions resultActions = doGet("/api/metadata/tenant/configs?limit=1");
         resultActions.andExpect(status().isForbidden());
     }
 
     @Test
     public void testGetMetadataConfigsForTenantHavingNoConfig() throws Exception {
         RemoteMappingBuilder stubMappingBuilder = setupStub(HttpMethod.GET.name(),
-                "/api/metaconfig/owner/" + metadataConfig.getOwnerId(),
+                "/api/metaconfig/owner/" + metadataConfig.getOwnerId() + "?limit=1",
                 null,
                 NOT_FOUND_RESPONSE,
                 HttpStatus.NOT_FOUND.value()
         );
 
-        ResultActions resultActions = doGet("/api/metadata/tenant/configs");
+        ResultActions resultActions = doGet("/api/metadata/tenant/configs?limit=1");
         removeStub(stubMappingBuilder);
         resultActions.andExpect(status().isNotFound());
     }
@@ -200,13 +202,13 @@ public abstract class BaseMetadataControllerTest extends AbstractControllerTest 
     @Test
     public void testGetMetadataConfigsForTenantWithErrorFromMetadataService() throws Exception {
         RemoteMappingBuilder stubMappingBuilder = setupStub(HttpMethod.GET.name(),
-                "/api/metaconfig/owner/" + metadataConfig.getOwnerId(),
+                "/api/metaconfig/owner/" + metadataConfig.getOwnerId() + "?limit=1",
                 null,
                 INTERNAL_SERVER_ERROR_RESPONSE,
                 HttpStatus.INTERNAL_SERVER_ERROR.value()
         );
 
-        ResultActions resultActions = doGet("/api/metadata/tenant/configs");
+        ResultActions resultActions = doGet("/api/metadata/tenant/configs?limit=1");
         removeStub(stubMappingBuilder);
         resultActions.andExpect(status().isInternalServerError());
     }
@@ -446,16 +448,16 @@ public abstract class BaseMetadataControllerTest extends AbstractControllerTest 
     @Test
     public void testGetMetadataQueriesForConfig() throws Exception {
         RemoteMappingBuilder stubMappingBuilder = setupStub(HttpMethod.GET.name(),
-                "/api/metaquery/metaconfig/" + metadataQuery.getMetadataConfigId().getId(),
+                "/api/metaquery/metaconfig/" + metadataQuery.getMetadataConfigId().getId() + "?limit=1",
                 null,
-                json(Arrays.asList(metadataQuery)),
+                json(new TextPageData<>(Arrays.asList(metadataQuery), new TextPageLink(1))),
                 HttpStatus.OK.value()
         );
 
-        ResultActions resultActions = doGet("/api/metadata/config/{metadataConfigId}/query", metadataQuery.getMetadataConfigId().getId().toString());
+        ResultActions resultActions = doGet("/api/metadata/config/{metadataConfigId}/query?limit=1", metadataQuery.getMetadataConfigId().getId().toString());
         removeStub(stubMappingBuilder);
-        List<MetadataQuery> metadataQueries = readResponse(resultActions, new TypeReference<List<MetadataQuery>>() {
-        });
+        List<MetadataQuery> metadataQueries = readResponse(resultActions, new TypeReference<TextPageData<MetadataQuery>>() {
+        }).getData();
         resultActions.andExpect(status().isOk());
         assertEquals(1, metadataQueries.size());
     }
@@ -463,20 +465,20 @@ public abstract class BaseMetadataControllerTest extends AbstractControllerTest 
     @Test
     public void testGetMetadataQueriesForConfigWithUnauthorizedUser() throws Exception {
         loginCustomerUser();
-        ResultActions resultActions = doGet("/api/metadata/config/{metadataConfigId}/query", metadataQuery.getMetadataConfigId().getId().toString());
+        ResultActions resultActions = doGet("/api/metadata/config/{metadataConfigId}/query?limit=1", metadataQuery.getMetadataConfigId().getId().toString());
         resultActions.andExpect(status().isForbidden());
     }
 
     @Test
     public void testGetMetadataQueriesForConfigHavingNoConfig() throws Exception {
         RemoteMappingBuilder stubMappingBuilder = setupStub(HttpMethod.GET.name(),
-                "/api/metaquery/metaconfig/" + metadataQuery.getMetadataConfigId().getId(),
+                "/api/metaquery/metaconfig/" + metadataQuery.getMetadataConfigId().getId() + "?limit=1",
                 null,
                 NOT_FOUND_RESPONSE,
                 HttpStatus.NOT_FOUND.value()
         );
 
-        ResultActions resultActions = doGet("/api/metadata/config/{metadataConfigId}/query", metadataQuery.getMetadataConfigId().getId().toString());
+        ResultActions resultActions = doGet("/api/metadata/config/{metadataConfigId}/query?limit=1", metadataQuery.getMetadataConfigId().getId().toString());
         removeStub(stubMappingBuilder);
         resultActions.andExpect(status().isNotFound());
     }
@@ -484,13 +486,13 @@ public abstract class BaseMetadataControllerTest extends AbstractControllerTest 
     @Test
     public void testGetMetadataQueriesForConfigWithErrorFromMetadataService() throws Exception {
         RemoteMappingBuilder stubMappingBuilder = setupStub(HttpMethod.GET.name(),
-                "/api/metaquery/metaconfig/" + metadataQuery.getMetadataConfigId().getId(),
+                "/api/metaquery/metaconfig/" + metadataQuery.getMetadataConfigId().getId() + "?limit=1",
                 null,
                 INTERNAL_SERVER_ERROR_RESPONSE,
                 HttpStatus.INTERNAL_SERVER_ERROR.value()
         );
 
-        ResultActions resultActions = doGet("/api/metadata/config/{metadataConfigId}/query", metadataQuery.getMetadataConfigId().getId().toString());
+        ResultActions resultActions = doGet("/api/metadata/config/{metadataConfigId}/query?limit=1", metadataQuery.getMetadataConfigId().getId().toString());
         removeStub(stubMappingBuilder);
         resultActions.andExpect(status().isInternalServerError());
     }
@@ -540,7 +542,7 @@ public abstract class BaseMetadataControllerTest extends AbstractControllerTest 
         keyValueMap.put("Key 2", "Value 2");
 
         IngestMetadataRequest content = new IngestMetadataRequest(metadataConfig.getId(), metadataConfig.getOwnerId(), metadataConfig.getName(), keyValueMap);
-        MockHttpServletRequestBuilder postRequest = post("/api/metadata/insert")
+        MockHttpServletRequestBuilder postRequest = post("/api/metadata")
                 .header("authorization", "bearer " + clientCredentialToken)
                 .contentType(contentType)
                 .content(json(content));
@@ -557,14 +559,14 @@ public abstract class BaseMetadataControllerTest extends AbstractControllerTest 
 
         IngestMetadataRequest content = new IngestMetadataRequest(metadataConfig.getId(), metadataConfig.getOwnerId(), metadataConfig.getName(), keyValueMap);
 
-        doPost("/api/metadata/insert", content).andExpect(status().isForbidden());
+        doPost("/api/metadata", content).andExpect(status().isForbidden());
     }
 
     private MetadataConfig createMetadataConfig() throws Exception {
         String configName = "Test Config";
         MetadataConfig mc = new MetadataConfig();
         mc.setName(configName);
-        mc.setSink(new RestMetadataSource("http://localhost:8080/api/metadata/insert", null, null));
+        mc.setSink(new RestMetadataSource("http://localhost:8080/api/metadata", null, null));
         mc.setSource(new JdbcMetadataSource("jdbc:hsqldb:file:/tmp/tempusDb", "sa", ""));
 
         RemoteMappingBuilder stubMappingBuilder = setupStub(HttpMethod.POST.name(),
@@ -626,7 +628,7 @@ public abstract class BaseMetadataControllerTest extends AbstractControllerTest 
         jdbcMetadataSource.setId(new MetadataSourceId(UUIDs.timeBased()));
         jdbcMetadataSource.setCreatedTime(DateTime.now().getMillis());
 
-        RestMetadataSource restMetadataSource = new RestMetadataSource("http://localhost:8080/api/metadata/insert", null, null);
+        RestMetadataSource restMetadataSource = new RestMetadataSource("http://localhost:8080/api/metadata", null, null);
         restMetadataSource.setId(new MetadataSourceId(UUIDs.timeBased()));
         restMetadataSource.setCreatedTime(DateTime.now().getMillis());
 

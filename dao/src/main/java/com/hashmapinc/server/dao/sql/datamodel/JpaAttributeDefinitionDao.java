@@ -21,6 +21,7 @@ import com.hashmapinc.server.common.data.UUIDConverter;
 import com.hashmapinc.server.common.data.id.DataModelObjectId;
 import com.hashmapinc.server.dao.DaoUtil;
 import com.hashmapinc.server.dao.datamodel.AttributeDefinitionDao;
+import com.hashmapinc.server.dao.model.sql.AttributeDefinitionCompositeKey;
 import com.hashmapinc.server.dao.model.sql.AttributeDefinitionEntity;
 import com.hashmapinc.server.dao.util.SqlDao;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,19 +35,19 @@ import java.util.UUID;
 public class JpaAttributeDefinitionDao implements AttributeDefinitionDao{
 
     @Autowired
-    AttributeDefinitionRepository attributeDefinitionRepository;
+    private AttributeDefinitionRepository attributeDefinitionRepository;
 
     @Override
     public AttributeDefinition save(AttributeDefinition attributeDefinition) {
         AttributeDefinitionEntity attributeDefinitionEntity = new AttributeDefinitionEntity(attributeDefinition);
         AttributeDefinitionEntity retEntity = attributeDefinitionRepository.save(attributeDefinitionEntity);
-        return retEntity.toData();
+        return DaoUtil.getData(retEntity);
     }
 
     @Override
     public AttributeDefinition findByNameAndDataModelObjectId(String name, UUID id) {
         AttributeDefinitionEntity retEntity = attributeDefinitionRepository.findByNameAndDataModelObjectId(name, UUIDConverter.fromTimeUUID(id));
-        return retEntity.toData();
+        return DaoUtil.getData(retEntity);
     }
 
     @Override
@@ -55,4 +56,12 @@ public class JpaAttributeDefinitionDao implements AttributeDefinitionDao{
         return DaoUtil.convertDataList(entities);
     }
 
+    @Override
+    public void removeByNameAndDataModelObjectId(String name, DataModelObjectId dataModelObjectId) {
+        attributeDefinitionRepository.delete(createAttributeDefinitionCompositeKey(name, dataModelObjectId));
+    }
+
+    private AttributeDefinitionCompositeKey createAttributeDefinitionCompositeKey(String name, DataModelObjectId dataModelObjectId) {
+        return new AttributeDefinitionCompositeKey(name, UUIDConverter.fromTimeUUID(dataModelObjectId.getId()));
+    }
 }

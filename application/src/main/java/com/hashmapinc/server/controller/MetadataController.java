@@ -25,6 +25,8 @@ import com.hashmapinc.server.common.data.metadata.MetadataConfig;
 import com.hashmapinc.server.common.data.metadata.MetadataConfigId;
 import com.hashmapinc.server.common.data.metadata.MetadataQuery;
 import com.hashmapinc.server.common.data.metadata.MetadataQueryId;
+import com.hashmapinc.server.common.data.page.TextPageData;
+import com.hashmapinc.server.common.data.page.TextPageLink;
 import com.hashmapinc.server.exception.TempusException;
 import com.hashmapinc.server.requests.IngestMetadataRequest;
 import lombok.extern.slf4j.Slf4j;
@@ -33,7 +35,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
@@ -71,12 +72,14 @@ public class MetadataController extends BaseController {
     }
 
     @PreAuthorize("hasAuthority('TENANT_ADMIN')")
-    @GetMapping(value = "/metadata/tenant/configs")
+    @GetMapping(value = "/metadata/tenant/configs", params = {"limit"})
     @ResponseBody
-    public List<MetadataConfig> getTenantMetadataConfigs() throws TempusException {
+    public TextPageData<MetadataConfig> getTenantMetadataConfigs(@RequestParam("limit") int limit,
+                                                                 @RequestParam(required = false) String idOffset) throws TempusException {
         try {
             TenantId tenantId = getCurrentUser().getTenantId();
-            return metadataConfigService.findByTenant(tenantId);
+            TextPageLink pageLink = createPageLink(limit, null, idOffset, null);
+            return metadataConfigService.findByTenant(tenantId, pageLink);
         } catch (Exception e) {
             throw handleException(e);
         }
@@ -146,13 +149,16 @@ public class MetadataController extends BaseController {
     }
 
     @PreAuthorize("hasAuthority('TENANT_ADMIN')")
-    @GetMapping(value = "/metadata/config/{metadataConfigId}/query")
+    @GetMapping(value = "/metadata/config/{metadataConfigId}/query", params = {"limit"})
     @ResponseBody
-    public List<MetadataQuery> getMetadataQueriesForConfig(@PathVariable(METADATA_CONFIG_ID) String strMetadataConfigId) throws TempusException {
+    public TextPageData<MetadataQuery> getMetadataQueriesForConfig(@PathVariable(METADATA_CONFIG_ID) String strMetadataConfigId,
+                                                                   @RequestParam("limit") int limit,
+                                                                   @RequestParam(required = false) String idOffset) throws TempusException {
         checkParameter(METADATA_CONFIG_ID, strMetadataConfigId);
         try {
             MetadataConfigId metadataConfigId = new MetadataConfigId(toUUID(strMetadataConfigId));
-            return metadataQueryService.findAllByMetadataConfigId(metadataConfigId);
+            TextPageLink pageLink = createPageLink(limit, null, idOffset, null);
+            return metadataQueryService.findAllByMetadataConfigId(metadataConfigId, pageLink);
         } catch (Exception e) {
             throw handleException(e);
         }
@@ -172,7 +178,7 @@ public class MetadataController extends BaseController {
     }
 
     @PreAuthorize("#oauth2.isClient() and #oauth2.hasScope('server')")
-    @PostMapping(value = "/metadata/insert")
+    @PostMapping(value = "/metadata")
     @ResponseStatus(value = HttpStatus.ACCEPTED)
     public void insert(@RequestBody IngestMetadataRequest request) throws TempusException {
         try {
