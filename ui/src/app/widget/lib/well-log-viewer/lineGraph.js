@@ -15,7 +15,7 @@
  * limitations under the License.
  */
  /* eslint-disable */
-import * as d3 from 'well-log-viewer/node_modules/d3/build/d3';
+import * as d3 from 'd3';
 import {dataGenerator} from './dataGenerator';
 import './logViewer.css';
 

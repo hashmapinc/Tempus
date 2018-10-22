@@ -100,7 +100,8 @@
     "tooltipster": "^4.2.4",
     "typeface-roboto": "0.0.22",
     "v-accordion": "^1.6.0",
-    "vis": "^4.21.0"
+    "vis": "^4.21.0",
+    "d3": "4"
   },
   "devDependencies": {
     "babel-cli": "^6.18.0",
