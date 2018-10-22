@@ -39,6 +39,8 @@ import * as TrajectoryViewer from '../widget/lib/trajectory-viewer/trajectory-vi
 import * as TrajectoryViewer2D from '../widget/lib/trajectory-viewer/trajectory-viewer2D';
 import * as TrajectoryViewer3D from '../widget/lib/trajectory-viewer/trajectory-viewer3D';
 
+import WellLogViewer from '../widget/lib/well-log-viewer/well-log-viewer';
+
 import 'jquery.terminal/js/jquery.terminal.min.js';
 import 'jquery.terminal/css/jquery.terminal.min.css';
 
@@ -73,6 +75,8 @@ function WidgetService($rootScope, $http, $q, $filter, $ocLazyLoad, $window, $tr
     $window.TrajectoryViewer = TrajectoryViewer;
     $window.TrajectoryViewer2D = TrajectoryViewer2D;
     $window.TrajectoryViewer3D = TrajectoryViewer3D;
+
+    $window.WellLogViewer = WellLogViewer;
 
     $window.cssjs = cssjs;
 
