@@ -35,7 +35,7 @@ export default function EntityAutocomplete($compile, $templateCache, $q, $filter
 
         scope.fetchEntities = function(searchText) {
             var deferred = $q.defer();
-            var limit = 50;
+            var limit = 50,flag;
             var entities = [];
             if (scope.excludeEntityIds && scope.excludeEntityIds.length) {
                 limit += scope.excludeEntityIds.length;
@@ -44,6 +44,7 @@ export default function EntityAutocomplete($compile, $templateCache, $q, $filter
             if (targetType == types.aliasEntityType.current_customer) {
                 targetType = types.entityType.customer;
             }
+            flag = getRelationType(targetType);
             entityService.getEntitiesByNameFilter(targetType, searchText, limit, {ignoreLoading: true}, scope.entitySubtype).then(function success(result) {
                 if (result) {
                     if (scope.excludeEntityIds && scope.excludeEntityIds.length) {
@@ -53,7 +54,12 @@ export default function EntityAutocomplete($compile, $templateCache, $q, $filter
                             }
                         });
                         deferred.resolve(entities);
-                    } else if(((scope.relation.to && (scope.relation.to.entityType == 'DEVICE' || scope.relation.to.entityType == 'ASSET' )) || (scope.relation.from && (scope.relation.from.entityType == 'DEVICE' || scope.relation.from.entityType == 'ASSET' ))) && scope.entityDetail.customerId && scope.entityDetail.customerId.id !='13814000-1dd2-11b2-8080-808080808080' ) {
+                    } else if(
+                        ((scope.relation.to &&
+                            (scope.relation.to.entityType == 'DEVICE' || scope.relation.to.entityType == 'ASSET' ))
+                    || (scope.relation.from &&
+                            (scope.relation.from.entityType == 'DEVICE' || scope.relation.from.entityType == 'ASSET' )))
+                    && scope.entityDetail.customerId && scope.entityDetail.customerId.id !='13814000-1dd2-11b2-8080-808080808080' && flag) {
                         result.forEach(function(entity) {
                             if (scope.entityDetail.customerId.id == entity.customerId.id) {
                                 entities.push(entity);
@@ -70,6 +76,16 @@ export default function EntityAutocomplete($compile, $templateCache, $q, $filter
                 deferred.reject();
             });
             return deferred.promise;
+        }
+
+        function getRelationType(entityType){
+             if(entityType != 'TENANT' && entityType != 'CUSTOMER'
+                 && entityType != 'RULE' && entityType != 'PLUGIN'
+                 && entityType != 'DASHBOARD'){
+                    return true;
+             }else {
+                return false;
+             }
         }
 
         scope.entitySearchTextChanged = function() {

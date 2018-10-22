@@ -112,7 +112,7 @@ export default function RelationDialogController($scope, $mdDialog, types, entit
 
         $scope.theForm.$setValidity("additionalInfo", valid);
         var relationCustomerId = null;
-        var flag = true;
+        var flag;
         var saveRelationObject = {
             additionalInfo: vm.relation.additionalInfo,
             to:null,
@@ -137,6 +137,7 @@ export default function RelationDialogController($scope, $mdDialog, types, entit
             saveRelationObject.to = to;
             saveRelationObject.from = vm.relation.from;
         }
+
         flag = getRelationType(vm.relation);
         if (valid) {
             entityRelationService.saveRelation(saveRelationObject).then(
@@ -145,8 +146,11 @@ export default function RelationDialogController($scope, $mdDialog, types, entit
                     || (relation.from.entityType == 'ASSET' || relation.to.entityType == 'ASSET'))
                     && vm.entityDetail && vm.entityDetail.customerId.id == '13814000-1dd2-11b2-8080-808080808080' && flag){
                         if(relationCustomerId != '13814000-1dd2-11b2-8080-808080808080'){
-                            deviceService.assignDeviceToCustomer(relationCustomerId,vm.entityDetail.id.id).then();
-
+                            if(vm.entityDetail.id.entityType == 'DEVICE') {
+                                deviceService.assignDeviceToCustomer(relationCustomerId,vm.entityDetail.id.id).then();
+                            } else if(vm.entityDetail.id.entityType == 'ASSET') {
+                                assetService.assignAssetToCustomer(relationCustomerId,vm.entityDetail.id.id).then();
+                            }
                         }
                     }
                     $mdDialog.hide();
@@ -154,12 +158,15 @@ export default function RelationDialogController($scope, $mdDialog, types, entit
             );
         }
     }
+
     function getRelationType(relation){
-        if(relation.to.entityType != 'tenant' || relation.from.entityType != 'tenant'
-        || relation.to.entityType != 'CUSTOMER' || relation.from.entityType != 'CUSTOMER'
-        || relation.to.entityType != 'RULE' || relation.from.entityType != 'RULE'
-        || relation.to.entityType != 'PLUGIN' || relation.from.entityType != 'PLUGIN'
-        || relation.to.entityType != 'DASHBOARD' || relation.from.entityType != 'DASHBOARD'){
+        if(relation.to.entityType != 'TENANT' && relation.from.entityType != 'TENANT'
+            && relation.to.entityType != 'CUSTOMER' && relation.from.entityType != 'CUSTOMER'
+            && relation.to.entityType != 'RULE' && relation.from.entityType != 'RULE'
+            && relation.to.entityType != 'PLUGIN' && relation.from.entityType != 'PLUGIN'
+            && relation.to.entityType != 'DASHBOARD' && relation.from.entityType != 'DASHBOARD'){
+                return true;
+        }else {
             return false;
         }
     }
