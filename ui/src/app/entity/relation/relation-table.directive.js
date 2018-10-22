@@ -43,7 +43,7 @@ export default function RelationTable() {
 }
 
 /*@ngInject*/
-function RelationTableController($scope, $q, $mdDialog, $document, $translate, $filter, utils, types, entityRelationService) {
+function RelationTableController($scope, $q, $mdDialog, $document, $translate, $filter, utils, types, entityRelationService, $state) {
 
     let vm = this;
 
@@ -79,6 +79,14 @@ function RelationTableController($scope, $q, $mdDialog, $document, $translate, $
             reloadRelations();
         }
     });
+
+    initController();
+
+    function initController() {
+        if($state.current.url == '/plugins' || $state.current.url == '/rules'){
+            reloadRelations();
+        }
+    }
 
     $scope.$watch("vm.direction", function(newVal, prevVal) {
         if (newVal && !angular.equals(newVal, prevVal)) {
