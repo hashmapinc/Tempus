@@ -1,0 +1,132 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  annotations:
+    rbac.authorization.kubernetes.io/autoupdate: "true"
+  labels:
+    kubernetes.io/bootstrapping: rbac-defaults
+  name: java-client
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - pods
+  - pods/attach
+  - pods/exec
+  - pods/portforward
+  - pods/proxy
+  verbs:
+  - create
+  - delete
+  - deletecollection
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - ""
+  resources:
+  - endpoints
+  - replicationcontrollers
+  - replicationcontrollers/scale
+  verbs:
+  - create
+  - delete
+  - deletecollection
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - ""
+  resources:
+  - pods/log
+  - pods/status
+  - replicationcontrollers/status
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - apps
+  resources:
+  - daemonsets
+  - deployments
+  - deployments/rollback
+  - deployments/scale
+  - replicasets
+  - replicasets/scale
+  - statefulsets
+  verbs:
+  - create
+  - delete
+  - deletecollection
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - autoscaling
+  resources:
+  - horizontalpodautoscalers
+  verbs:
+  - create
+  - delete
+  - deletecollection
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - extensions
+  resources:
+  - daemonsets
+  - deployments
+  - deployments/rollback
+  - deployments/scale
+  - ingresses
+  - networkpolicies
+  - replicasets
+  - replicasets/scale
+  - replicationcontrollers/scale
+  verbs:
+  - create
+  - delete
+  - deletecollection
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - policy
+  resources:
+  - poddisruptionbudgets
+  verbs:
+  - create
+  - delete
+  - deletecollection
+  - get
+  - list
+  - patch
+  - update
+  - watch
+---
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: ClusterRoleBinding
+metadata:
+  name: java-client-tempus-binding
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: java-client
+subjects:
+  - kind: ServiceAccount
+    name: tempus
+    namespace: default
+---
+

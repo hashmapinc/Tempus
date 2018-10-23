@@ -87,6 +87,7 @@ spec:
       labels:
         app: tempus
     spec:
+      serviceAccountName: tempus
       containers:
       - name: tempus
         image: hashmapinc/tempus:dev
