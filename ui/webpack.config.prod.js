@@ -70,7 +70,8 @@ module.exports = {
     ],
     node: {
         tls: "empty",
-        fs: "empty"
+        fs: "empty",
+        child_process: 'empty'
     },
     module: {
         rules: [

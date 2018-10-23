@@ -85,6 +85,7 @@ class TempusSchemaForm extends React.Component {
         if(form.condition && eval(form.condition) === false) {
             return null;
         }
+
         return <Field model={model} form={form} key={index} onChange={onChange} onColorClick={onColorClick} mapper={mapper} builder={this.builder}/>
     }
 
