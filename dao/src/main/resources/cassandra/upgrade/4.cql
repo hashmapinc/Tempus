@@ -16,7 +16,6 @@
 --
 
 ALTER TABLE tempus.dashboard ADD type text;
-ALTER TABLE tempus.asset ADD data_model_object_id timeuuid;
 
 CREATE MATERIALIZED VIEW IF NOT exists tempus.asset_by_data_model_object AS
     SELECT *
