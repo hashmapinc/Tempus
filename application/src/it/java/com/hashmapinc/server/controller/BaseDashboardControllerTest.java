@@ -16,47 +16,40 @@
  */
 package com.hashmapinc.server.controller;
 
-import static org.hamcrest.Matchers.containsString;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
+import com.datastax.driver.core.utils.UUIDs;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.hashmapinc.server.common.data.*;
+import com.hashmapinc.server.common.data.computation.ComputationType;
+import com.hashmapinc.server.common.data.computation.Computations;
+import com.hashmapinc.server.common.data.computation.SparkComputationMetadata;
+import com.hashmapinc.server.common.data.datamodel.DataModel;
+import com.hashmapinc.server.common.data.datamodel.DataModelObject;
+import com.hashmapinc.server.common.data.id.ComputationId;
+import com.hashmapinc.server.common.data.id.CustomerId;
+import com.hashmapinc.server.common.data.page.TextPageData;
+import com.hashmapinc.server.common.data.page.TextPageLink;
+import com.hashmapinc.server.common.data.page.TimePageData;
+import com.hashmapinc.server.common.data.page.TimePageLink;
+import com.hashmapinc.server.common.data.plugin.PluginMetaData;
+import com.hashmapinc.server.common.data.rule.RuleMetaData;
+import com.hashmapinc.server.common.data.security.Authority;
+import com.hashmapinc.server.dao.computations.ComputationsService;
+import com.hashmapinc.server.extensions.core.plugin.telemetry.TelemetryStoragePlugin;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.RandomStringUtils;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.IOException;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-
-import com.datastax.driver.core.utils.UUIDs;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.hashmapinc.server.common.data.*;
-import com.hashmapinc.server.common.data.datamodel.AttributeDefinition;
-import com.hashmapinc.server.common.data.datamodel.DataModel;
-import com.hashmapinc.server.common.data.datamodel.DataModelObject;
-import com.hashmapinc.server.common.data.page.TextPageLink;
-import com.hashmapinc.server.dao.exception.DataValidationException;
-import com.hashmapinc.server.exception.TempusException;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.RandomStringUtils;
-import org.junit.*;
-import org.junit.rules.ExpectedException;
-import org.springframework.beans.factory.annotation.Autowired;
-import com.hashmapinc.server.common.data.computation.Computations;
-import com.hashmapinc.server.common.data.id.ComputationId;
-import com.hashmapinc.server.common.data.id.CustomerId;
-import com.hashmapinc.server.common.data.page.TextPageData;
-
-import com.hashmapinc.server.common.data.plugin.PluginMetaData;
-import com.hashmapinc.server.common.data.rule.RuleMetaData;
-
-import com.hashmapinc.server.common.data.page.TimePageData;
-import com.hashmapinc.server.common.data.page.TimePageLink;
-
-import com.hashmapinc.server.common.data.security.Authority;
-import com.hashmapinc.server.dao.computations.ComputationsService;
-
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.hashmapinc.server.extensions.core.plugin.telemetry.TelemetryStoragePlugin;
+import static org.hamcrest.Matchers.containsString;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 @Slf4j
 public abstract class BaseDashboardControllerTest extends AbstractControllerTest {
     
@@ -79,7 +72,7 @@ public abstract class BaseDashboardControllerTest extends AbstractControllerTest
         tenantPlugin = doPost("/api/plugin", tenantPlugin, PluginMetaData.class);
 
     }
-    
+
     @Test
     public void testSaveDashboard() throws Exception {
         Dashboard dashboard = new Dashboard();
@@ -265,20 +258,14 @@ public abstract class BaseDashboardControllerTest extends AbstractControllerTest
         List<DashboardInfo> dashboardsTitle1 = new ArrayList<>();
         for (int i=0;i<134;i++) {
             Dashboard dashboard = new Dashboard();
-            String suffix = RandomStringUtils.randomAlphanumeric((int)(Math.random()*15));
-            String title = title1+suffix;
-            title = i % 2 == 0 ? title.toLowerCase() : title.toUpperCase();
-            dashboard.setTitle(title);
+            dashboard.setTitle(title1 + i);
             dashboardsTitle1.add(new DashboardInfo(doPost("/api/dashboard", dashboard, Dashboard.class)));
         }
         String title2 = "Dashboard title 2";
         List<DashboardInfo> dashboardsTitle2 = new ArrayList<>();
         for (int i=0;i<112;i++) {
             Dashboard dashboard = new Dashboard();
-            String suffix = RandomStringUtils.randomAlphanumeric((int)(Math.random()*15));
-            String title = title2+suffix;
-            title = i % 2 == 0 ? title.toLowerCase() : title.toUpperCase();
-            dashboard.setTitle(title);
+            dashboard.setTitle(title2 + i);
             dashboardsTitle2.add(new DashboardInfo(doPost("/api/dashboard", dashboard, Dashboard.class)));
         }
 
@@ -394,50 +381,23 @@ public abstract class BaseDashboardControllerTest extends AbstractControllerTest
         Assert.assertEquals(1, dashboards.size());
     }
 
-    private DataModel createDataModel() throws Exception{
-        DataModel dataModel = new DataModel();
-        dataModel.setName("Default Drilling Data Model1");
-        dataModel.setLastUpdatedTs(System.currentTimeMillis());
-
-        DataModel savedDataModel = doPost("/api/data-model", dataModel, DataModel.class);
-
-        Assert.assertNotNull(savedDataModel);
-        Assert.assertNotNull(savedDataModel.getId());
-        Assert.assertTrue(savedDataModel.getCreatedTime() > 0);
-        Assert.assertEquals(savedTenant.getId(), savedDataModel.getTenantId());
-        Assert.assertEquals(dataModel.getName(), savedDataModel.getName());
-        Assert.assertTrue(savedDataModel.getLastUpdatedTs() > 0);
-        return savedDataModel;
-    }
-
-    private DataModelObject createDataModelObject(DataModel dataModel) throws Exception{
-        DataModelObject dataModelObject = new DataModelObject();
-        dataModelObject.setName("Well2");
-
-        AttributeDefinition ad = new AttributeDefinition();
-        ad.setValueType("STRING");
-        ad.setName("attr name2");
-        List<AttributeDefinition> attributeDefinitions = new ArrayList<>();
-        attributeDefinitions.add(ad);
-        dataModelObject.setAttributeDefinitions(attributeDefinitions);
-
-        DataModelObject savedDataModelObj = doPost("/api/data-model/" + dataModel.getId().toString() + "/objects", dataModelObject, DataModelObject.class);
-        Assert.assertNotNull(savedDataModelObj);
-        Assert.assertEquals(dataModel.getId(), savedDataModelObj.getDataModelId());
-        return savedDataModelObj;
-    }
-
     private Computations saveComputation() {
         Computations computations = new Computations();
+        ComputationId computationId = new ComputationId(UUIDs.timeBased());
         computations.setName("Computation");
-        computations.setId(new ComputationId(UUIDs.timeBased()));
-        computations.setJarPath("/Some/Jar/path");
+        computations.setId(computationId);
         computations.setTenantId(savedTenant.getId());
-        computations.setJarName("SomeJar");
-        computations.setMainClass("MainClass");
-        //computations.setJsonDescriptor();
-        computations.setArgsformat("argsFormat");
-        computations.setArgsType("ArgsType");
+        computations.setType(ComputationType.SPARK);
+
+        SparkComputationMetadata md = new SparkComputationMetadata();
+        md.setId(computationId);
+        md.setJarPath("/Some/Jar/path");
+        md.setMainClass("MainClass");
+        md.setArgsType("ArgsType");
+        md.setArgsformat("argsFormat");
+        md.setJarName("SomeJar");
+
+        computations.setComputationMetadata(md);
         return computationsService.save(computations);
     }
 

@@ -17,7 +17,9 @@
 package com.hashmapinc.server.service.computation;
 
 import com.datastax.driver.core.utils.UUIDs;
+import com.hashmapinc.server.common.data.computation.ComputationType;
 import com.hashmapinc.server.common.data.computation.Computations;
+import com.hashmapinc.server.common.data.computation.SparkComputationMetadata;
 import com.hashmapinc.server.common.data.id.ComputationId;
 import com.hashmapinc.server.common.data.id.TenantId;
 import com.hashmapinc.server.common.data.page.TextPageData;
@@ -38,10 +40,14 @@ import java.util.*;
 
 @Service("uploadComputationDiscoveryService")
 @Slf4j
-public class UploadComputationDiscoveryService implements ComputationDiscoveryService{
+public class
+UploadComputationDiscoveryService implements ComputationDiscoveryService{
 
     @Autowired
     private ComputationsService computationsService;
+
+    @Autowired
+    private MinioService minioService;
 
     private RuntimeJavaCompiler compiler;
 
@@ -65,22 +71,30 @@ public class UploadComputationDiscoveryService implements ComputationDiscoverySe
                 if(c != null && !c.isEmpty()) {
                     for (ComputationRequestCompiled computationRequestCompiled : c) {
                         Computations computations = new Computations();
-                        computations.setTenantId(tenantId);
-                        computations.setJarPath(j.toString());
-                        computations.setMainClass(computationRequestCompiled.getMainClazz());
-                        computations.setJsonDescriptor(computationRequestCompiled.getConfigurationDescriptor());
-                        String args = Arrays.toString(computationRequestCompiled.getArgs());
-                        computations.setArgsformat(args);
-                        computations.setArgsType(computationRequestCompiled.getArgsType());
-                        computations.setJarName(j.getFileName().toString());
                         computations.setName(computationRequestCompiled.getName());
+                        String args = Arrays.toString(computationRequestCompiled.getArgs());
+                        computations.setTenantId(tenantId);
+                        SparkComputationMetadata sparkComputationMetadata = new SparkComputationMetadata();
+
+                        sparkComputationMetadata.setMainClass(computationRequestCompiled.getMainClazz());
+                        sparkComputationMetadata.setArgsformat(args);
+                        sparkComputationMetadata.setJarPath(j.toString());
+                        sparkComputationMetadata.setArgsType(computationRequestCompiled.getArgsType());
+                        sparkComputationMetadata.setJarName(j.getFileName().toString());
+                        sparkComputationMetadata.setJsonDescriptor(computationRequestCompiled.getConfigurationDescriptor());
+
+                        computations.setComputationMetadata(sparkComputationMetadata);
+                        computations.setType(ComputationType.SPARK);
+
                         Optional<Computations> persisted = computationsService.findByTenantIdAndName(tenantId, computations.getName());
                         if (!persisted.isPresent()) {
                             ComputationId computationId = new ComputationId(UUIDs.timeBased());
+                            sparkComputationMetadata.setId(computationId);
                             computations.setId(computationId);
                             savedComputations = computationsService.save(computations);
                         } else {
                             computations.setId(persisted.get().getId());
+                            sparkComputationMetadata.setId(persisted.get().getId());
                             savedComputations = computationsService.save(computations);
                         }
                     }

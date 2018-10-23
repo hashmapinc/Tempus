@@ -392,3 +392,10 @@ CREATE TABLE IF NOT EXISTS customer_group_policy (
     group_id varchar(31),
     policy varchar
 );
+
+CREATE TABLE IF NOT EXISTS tempus_gateway_configuration (
+    id varchar(31) NOT NULL CONSTRAINT tempus_gateway_configuration_pkey PRIMARY KEY,
+    tenant_id varchar(31),
+    replicas integer NOT NULL,
+    gateway_token varchar(255) NOT NULL
+);

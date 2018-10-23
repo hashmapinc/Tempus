@@ -172,6 +172,38 @@ public abstract class BaseDataModelObjectServiceTest extends AbstractServiceTest
         dataModelObjectService.save(dataModelObject);
     }
 
+    @Test
+    public void testRemoveByIdShouldAlsoDeleteAttributeDefinition() {
+        AttributeDefinition attributeDef = new AttributeDefinition();
+        attributeDef.setName("lat");
+        attributeDef.setValue("1.0");
+        attributeDef.setValueType(DataType.STRING.name());
+
+        DataModelObject dataModelObject = getDataModelObjectWithOneAttributeDef(attributeDef);
+        dataModelObject.setName("well-2");
+        DataModelObject savedDataModelObject = dataModelObjectService.save(dataModelObject);
+
+        dataModelObjectService.removeById(savedDataModelObject.getId());
+        Assert.assertNull(attributeDefinitionDao.findByNameAndDataModelObjectId("lat",savedDataModelObject.getDataModelId().getId()));
+    }
+
+    @Test
+    public void testDeleteDataModelObjectsByDataModelId() {
+        DataModelObject dataModelObject = new DataModelObject();
+        dataModelObject.setName("rig");
+        dataModelObject.setCustomerId(new CustomerId(UUIDs.timeBased()));
+        dataModelObject.setDataModelId(dataModelId);
+        dataModelObject.setParentId(null);
+        dataModelObjectService.save(dataModelObject);
+
+        List<DataModelObject> savedDataModelObjects = dataModelObjectService.findByDataModelId(dataModelId);
+        Assert.assertEquals(2,savedDataModelObjects.size());
+
+        dataModelObjectService.deleteDataModelObjectsByDataModelId(dataModelId);
+        List<DataModelObject> foundDataModelObjects = dataModelObjectService.findByDataModelId(dataModelId);
+        Assert.assertEquals(0,foundDataModelObjects.size());
+    }
+
     private void createDataModelObject() {
         AttributeDefinition attributeDef = new AttributeDefinition();
         attributeDef.setName("Version");

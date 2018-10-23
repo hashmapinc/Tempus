@@ -70,4 +70,13 @@ public class CassandraBaseDataModelObjectDao extends CassandraAbstractSearchText
                 .and(eq(ModelConstants.DATA_MODEL_ID, dataModelObject.getDataModelId().getId()));
         return DaoUtil.getData(findOneByStatement(query));
     }
+
+    @Override
+    public List<DataModelObject> findByName(String name) {
+        Select select = select().from(ModelConstants.DATA_MODEL_OBJECT_CF).allowFiltering();
+        Select.Where query = select.where();
+        query.and(eq(ModelConstants.DATA_MODEL_OBJECT_NAME_PROPERTY, name));
+        List<DataModelObjectEntity> entities = findListByStatement(query);
+        return DaoUtil.convertDataList(entities);
+    }
 }

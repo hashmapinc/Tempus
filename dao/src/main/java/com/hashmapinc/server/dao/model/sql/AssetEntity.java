@@ -19,6 +19,7 @@ package com.hashmapinc.server.dao.model.sql;
 import com.datastax.driver.core.utils.UUIDs;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.hashmapinc.server.common.data.asset.Asset;
+import com.hashmapinc.server.common.data.id.DataModelObjectId;
 import com.hashmapinc.server.common.data.id.TenantId;
 import com.hashmapinc.server.dao.model.BaseSqlEntity;
 import com.hashmapinc.server.dao.model.ModelConstants;
@@ -49,6 +50,9 @@ public final class AssetEntity extends BaseSqlEntity<Asset> implements SearchTex
     @Column(name = ModelConstants.ASSET_CUSTOMER_ID_PROPERTY)
     private String customerId;
 
+    @Column(name = ModelConstants.ASSET_DATA_MODEL_OBJECT_ID)
+    private String dataModelObjectId;
+
     @Column(name = ModelConstants.ASSET_NAME_PROPERTY)
     private String name;
 
@@ -76,6 +80,10 @@ public final class AssetEntity extends BaseSqlEntity<Asset> implements SearchTex
         if (asset.getCustomerId() != null) {
             this.customerId = UUIDConverter.fromTimeUUID(asset.getCustomerId().getId());
         }
+        if (asset.getDataModelObjectId() != null) {
+            this.dataModelObjectId = UUIDConverter.fromTimeUUID(asset.getDataModelObjectId().getId());
+        }
+
         this.name = asset.getName();
         this.type = asset.getType();
         this.additionalInfo = asset.getAdditionalInfo();
@@ -104,6 +112,9 @@ public final class AssetEntity extends BaseSqlEntity<Asset> implements SearchTex
         }
         if (customerId != null) {
             asset.setCustomerId(new CustomerId(UUIDConverter.fromString(customerId)));
+        }
+        if (dataModelObjectId != null) {
+            asset.setDataModelObjectId(new DataModelObjectId(UUIDConverter.fromString(dataModelObjectId)));
         }
         asset.setName(name);
         asset.setType(type);

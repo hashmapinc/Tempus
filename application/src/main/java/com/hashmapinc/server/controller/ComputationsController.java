@@ -16,10 +16,13 @@
  */
 package com.hashmapinc.server.controller;
 
+import com.datastax.driver.core.utils.UUIDs;
 import com.hashmapinc.server.common.data.EntityType;
 import com.hashmapinc.server.common.data.audit.ActionType;
 import com.hashmapinc.server.common.data.computation.ComputationJob;
+import com.hashmapinc.server.common.data.computation.ComputationType;
 import com.hashmapinc.server.common.data.computation.Computations;
+import com.hashmapinc.server.common.data.computation.SparkComputationMetadata;
 import com.hashmapinc.server.common.data.id.ComputationId;
 import com.hashmapinc.server.common.data.id.TenantId;
 import com.hashmapinc.server.common.data.page.TextPageData;
@@ -30,6 +33,8 @@ import com.hashmapinc.server.dao.model.ModelConstants;
 import com.hashmapinc.server.exception.TempusErrorCode;
 import com.hashmapinc.server.exception.TempusException;
 import com.hashmapinc.server.service.computation.ComputationDiscoveryService;
+import com.hashmapinc.server.service.computation.ComputationFunctionService;
+import com.hashmapinc.server.service.computation.S3BucketService;
 import com.hashmapinc.server.service.security.model.SecurityUser;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,11 +51,14 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static com.hashmapinc.server.dao.service.Validator.validateId;
+import static com.hashmapinc.server.exception.TempusErrorCode.ITEM_NOT_FOUND;
 
 @Slf4j
 @RestController
@@ -64,6 +72,12 @@ public class ComputationsController extends BaseController {
 
     @Autowired
     private ComputationDiscoveryService computationDiscoveryService;
+
+    @Autowired
+    private S3BucketService s3BucketService;
+
+    @Autowired
+    private ComputationFunctionService computationFunctionService;
 
     @PreAuthorize("hasAuthority('TENANT_ADMIN')")
     @PostMapping(value = "/computations/upload", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -97,6 +111,35 @@ public class ComputationsController extends BaseController {
     }
 
     @PreAuthorize("hasAuthority('TENANT_ADMIN')")
+    @PostMapping(value = "/computations", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public Computations addComputations(@RequestBody Computations computation) throws TempusException {
+        try {
+            TenantId tenantId = getCurrentUser().getTenantId();
+            computation.setTenantId(tenantId);
+            Optional<Computations> savedComputation = computationsService.findByTenantIdAndName(tenantId, computation.getName());
+            if(!savedComputation.isPresent()) {
+                ComputationId computationId = new ComputationId(UUIDs.timeBased());
+                computation.setId(computationId);
+                computation.getComputationMetadata().setId(computationId);
+                if (s3BucketService.uploadKubelessFunction(computation, tenantId)) {
+                    computationsService.save(computation);
+                    actorService.onComputationStateChange(tenantId, computation.getId(), ComponentLifecycleEvent.CREATED);
+                }
+            }
+            else
+                throw new TempusException("Kubeless function upload unsuccessful ", TempusErrorCode.GENERAL);
+        } catch (Exception e){
+            logEntityAction(emptyId(EntityType.COMPUTATION), computation, null,
+                    ActionType.ADDED, e);
+            log.info("Exception is : " + e);
+            throw handleException(e);
+        }
+
+        return computation;
+    }
+
+    @PreAuthorize("hasAuthority('TENANT_ADMIN')")
     @DeleteMapping(value = "/computations/{computationId}")
     @ResponseBody
     public void delete(@PathVariable(COMPUTATION_ID) String strComputationId) throws TempusException, IOException {
@@ -111,9 +154,15 @@ public class ComputationsController extends BaseController {
                 computationJobService.deleteComputationJobById(computationJob.getId());
                 actorService.onComputationJobStateChange(computationJob.getTenantId(), computationJob.getComputationId(), computationJob.getId(), ComponentLifecycleEvent.DELETED);
             }
-            computationsService.deleteById(computationId);
-            Files.deleteIfExists(Paths.get(computation.getJarPath()));
 
+            if (computation.getType() == ComputationType.SPARK) {
+                Files.deleteIfExists(Paths.get(((SparkComputationMetadata) computation.getComputationMetadata()).getJarPath()));
+                computationsService.deleteById(computation.getId());
+            }
+            else if (computation.getType() == ComputationType.KUBELESS) {
+                actorService.onComputationStateChange(computation.getTenantId(), computation.getId(), ComponentLifecycleEvent.DELETED);
+                s3BucketService.deleteKubelessFunction(computation);
+            }
             logEntityAction(computationId,computation,getCurrentUser().getCustomerId(),
                     ActionType.DELETED, null, strComputationId);
         }
@@ -152,7 +201,15 @@ public class ComputationsController extends BaseController {
                 List<Computations> computations = checkNotNull(computationsService.findAllTenantComputationsByTenantId(tenantId));
                 computations = computations.stream()
                         .filter(computation -> !computation.getTenantId().getId().equals(ModelConstants.NULL_UUID)).collect(Collectors.toList());
-                log.trace(" returning Computations {} ", computations);
+                Iterator itr = computations.iterator();
+                while(itr.hasNext()){
+                    Computations computation = (Computations) itr.next();
+                    if(computation.getType() == ComputationType.KUBELESS &&
+                            (!computationFunctionService.checkKubelessFunction(computation))) {
+                        itr.remove();
+                    }
+                }
+                log.info(" returning Computations {} ", computations);
                 return computations;
         } catch (Exception e) {
             throw handleException(e);
@@ -167,7 +224,11 @@ public class ComputationsController extends BaseController {
         try {
             ComputationId computationId = new ComputationId(toUUID(strComputationId));
             Computations computation = checkNotNull(computationsService.findById(computationId));
-            log.trace(" returning Computations by id {} ", computation);
+            if(computation.getType() == ComputationType.KUBELESS
+                    && !computationFunctionService.checkKubelessFunction(computation)) {
+                throw new TempusException("Kubeless fuction not present in kubernetes cluster ", ITEM_NOT_FOUND);
+            }
+            log.info(" returning Computations by id {} ", computation);
             return computation;
         } catch (Exception e) {
             throw handleException(e);
@@ -179,15 +240,11 @@ public class ComputationsController extends BaseController {
         SecurityUser authUser = getCurrentUser();
         TenantId tenantId = computation.getTenantId();
         validateId(tenantId, "Incorrect tenantId " + tenantId);
-        if (authUser.getAuthority() != Authority.SYS_ADMIN) {
-            if (authUser.getTenantId() == null ||
-                    !tenantId.getId().equals(ModelConstants.NULL_UUID) && !authUser.getTenantId().equals(tenantId)) {
+        if (authUser.getAuthority() != Authority.SYS_ADMIN &&
+                authUser.getTenantId() == null ||
+                !tenantId.getId().equals(ModelConstants.NULL_UUID) && !authUser.getTenantId().equals(tenantId)) {
                 throw new TempusException("You don't have permission to perform this operation!",
                         TempusErrorCode.PERMISSION_DENIED);
-
-            } else if (tenantId.getId().equals(ModelConstants.NULL_UUID)) {
-                computation.setJsonDescriptor(null);
-            }
         }
         return computation;
     }

@@ -35,7 +35,7 @@ public class TextPageData<T extends SearchTextBased<? extends UUIDBased>> {
         super();
         this.data = data;
         int limit = pageLink.getLimit();
-        if (data != null && data.size() == limit) {
+        if (data != null && data.size() == limit && !data.isEmpty()) {
             int index = data.size()-1;
             UUID idOffset = data.get(index).getId().getId();
             String textOffset = data.get(index).getSearchText();

@@ -20,6 +20,7 @@ import tempusGrid from '../components/grid.directive';
 import tempusApiUser from '../api/user.service';
 import tempusApiUserGroup from '../api/user-group.service';
 import tempusToast from '../services/toast';
+import tempusApiDatamodel from '../api/datamodel.service';
 
 import UserRoutes from './user.routes';
 import UserController from './user.controller';
@@ -34,14 +35,15 @@ import AssignGroupsToUserController from './assign-groups-to-user.controller';
 import UnassignUsersFromGroupController from './unassign-users-from-group.controller';
 import UnassignGroupsFromUserController from './unassign-groups-from-user.controller';
 import AssignUserGroupDetailDirective from './assign-user-group-detail.directive';
-//import PolicyTblDirective from './policy-tbl.directive';
+import PolicyTblDirective from './policy-tbl.directive';
 
 export default angular.module('tempus.user', [
     uiRouter,
     tempusGrid,
     tempusApiUser,
     tempusApiUserGroup,
-    tempusToast
+    tempusToast,
+    tempusApiDatamodel
 ])
     .config(UserRoutes)
     .controller('UserController', UserController)
@@ -56,5 +58,5 @@ export default angular.module('tempus.user', [
     .directive('tbUser', UserDirective)
     .directive('tbAssignUserGroupDetail', AssignUserGroupDetailDirective)
     .directive('tbUsergroup', UsergroupDirective)
-    //.directive('tbPolicyTbl',PolicyTblDirective)
+    .directive('tbPolicyTbl',PolicyTblDirective)
     .name;

@@ -16,12 +16,15 @@
  */
 package com.hashmapinc.server.dao.sql.asset;
 
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.CrudRepository;
-import org.springframework.data.repository.query.Param;
 import com.hashmapinc.server.dao.model.sql.AssetEntity;
 import com.hashmapinc.server.dao.util.SqlDao;
+import com.querydsl.core.types.Predicate;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.querydsl.QueryDslPredicateExecutor;
+import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
@@ -29,7 +32,7 @@ import java.util.List;
  * Created by Valerii Sosliuk on 5/21/2017.
  */
 @SqlDao
-public interface AssetRepository extends CrudRepository<AssetEntity, String> {
+public interface AssetRepository extends CrudRepository<AssetEntity, String>, QueryDslPredicateExecutor<AssetEntity> {
 
     @Query("SELECT a FROM AssetEntity a WHERE a.tenantId = :tenantId " +
             "AND LOWER(a.searchText) LIKE LOWER(CONCAT(:textSearch, '%')) " +
@@ -78,5 +81,9 @@ public interface AssetRepository extends CrudRepository<AssetEntity, String> {
 
     @Query("SELECT DISTINCT a.type FROM AssetEntity a WHERE a.tenantId = :tenantId")
     List<String> findTenantAssetTypes(@Param("tenantId") String tenantId);
+
+    List<AssetEntity> findByDataModelObjectId(String dataModelObjectId);
+
+    Page<AssetEntity> findAll(Predicate predicate, Pageable pageable);
 
 }

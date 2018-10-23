@@ -45,24 +45,20 @@
                 <div translate ng-message="required">computationJob.name-required</div>
             </div>
         </md-input-container>
-        <md-input-container class="md-block">
-            <label translate>computationJob.description</label>
-            <textarea ng-model="computationjob.additionalInfo.description" rows="2"></textarea>
-        </md-input-container>
         <md-card flex class="plugin-config" ng-if="showComputationJobConfig">
             <md-card-title>
                 <md-card-title-text>
                     <span translate class="md-headline" ng-class="{'tb-readonly-label' : (loading || !isEdit || isReadOnly)}">computationJob.configuration</span>
                 </md-card-title-text>
             </md-card-title>
-            <md-card-content>
-                <tb-json-form schema="computationDescriptor.schema"
-                              form="computationDescriptor.form"
-                              model="computationJobConfiguration.data"
-                              readonly="loading || !isEdit || isReadOnly"
-                              form-control="theForm">
-                </tb-json-form>
-            </md-card-content>
+            <div  ng-if='computation.type == types.computationType.spark' >
+                <tb-computation-job-spark  is-edit="isEdit" is-read-only="isReadOnly" config="computationjob.configuration" the-form="theForm"
+                                           computation-descriptor="computationDescriptor"></tb-computation-job-spark>
+            </div>
+            <div ng-if='computation.type == types.computationType.kubeless' >
+                <tb-computation-job-kubeless is-edit="isEdit" is-read-only="isReadOnly"
+                                             config="computationjob.configuration" the-form="theForm"></tb-computation-job-kubeless>
+            </div>
         </md-card>
     </fieldset>
 </md-content>

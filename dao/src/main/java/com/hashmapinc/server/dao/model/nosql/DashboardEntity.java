@@ -96,6 +96,9 @@ public final class DashboardEntity implements SearchTextEntity<Dashboard> {
         if (dashboard.getType() != null) {
             this.type = dashboard.getType();
         }
+        else {
+            this.type = DashboardType.DEFAULT;
+        }
         if (dashboard.getAssetLandingInfo() != null) {
             if (dashboard.getAssetLandingInfo().getDashboardId() == null) {
                 dashboard.getAssetLandingInfo().setDashboardId(new DashboardId(this.id));

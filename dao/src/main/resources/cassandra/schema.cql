@@ -793,3 +793,18 @@ CREATE MATERIALIZED VIEW IF NOT EXISTS tempus.asset_landing_info_by_data_model_o
     WHERE data_model_object_id IS NOT NULL AND id IS NOT NULL
     PRIMARY KEY ( data_model_object_id, id)
     WITH CLUSTERING ORDER BY ( id DESC );
+
+CREATE TABLE IF NOT EXISTS tempus.tempus_gateway_configuration (
+    id timeuuid,
+    tenant_id timeuuid,
+    replicas int,
+    gateway_token text,
+    PRIMARY KEY(id, tenant_id)
+);
+
+CREATE MATERIALIZED VIEW IF NOT exists tempus.tempus_gateway_configuration_by_tenant AS
+	SELECT *
+FROM tempus.tempus_gateway_configuration
+	WHERE tenant_id IS NOT NULL AND id IS NOT NULL
+	PRIMARY KEY ( tenant_id, id )
+	WITH CLUSTERING ORDER BY ( id DESC );

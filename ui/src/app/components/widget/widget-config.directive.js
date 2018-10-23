@@ -52,14 +52,12 @@ export default angular.module('tempus.directives.widgetConfig', [tempusTypes,
 function WidgetConfig($compile, $templateCache, $rootScope, $translate, $timeout, types, utils) {
 
     var linker = function (scope, element, attrs, ngModelCtrl) {
-
+        
         var template = $templateCache.get(widgetConfigTemplate);
-
         element.html(template);
 
         scope.types = types;
         scope.widgetEditMode = $rootScope.widgetEditMode;
-
         scope.emptySettingsSchema = {
             type: "object",
             properties: {}
@@ -504,7 +502,8 @@ function WidgetConfig($compile, $templateCache, $rootScope, $translate, $timeout
             fetchEntityKeys: '&',
             fetchDashboardStates: '&',
             onCreateEntityAlias: '&',
-            theForm: '='
+            theForm: '=',
+            widgetInfo: '='
         },
         link: linker
     };

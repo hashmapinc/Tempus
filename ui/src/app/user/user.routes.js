@@ -68,7 +68,7 @@ export default function UserRoutes($stateProvider) {
             }
         })
         .state('home.customers.usergroups', {
-            url: '/:customerId/usergroups',
+            url: '/:customerId/:dataModelId/usergroups',
             params: {'topIndex': 0},
             module: 'private',
             auth: ['TENANT_ADMIN'],

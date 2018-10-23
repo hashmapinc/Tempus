@@ -20,12 +20,15 @@ import com.datastax.driver.core.utils.UUIDs;
 import com.hashmapinc.server.common.data.Customer;
 import com.hashmapinc.server.common.data.CustomerGroup;
 import com.hashmapinc.server.common.data.Tenant;
+import com.hashmapinc.server.common.data.UserPermission;
+import com.hashmapinc.server.common.data.asset.Asset;
+import com.hashmapinc.server.common.data.datamodel.DataModel;
+import com.hashmapinc.server.common.data.datamodel.DataModelObject;
 import com.hashmapinc.server.common.data.id.CustomerId;
 import com.hashmapinc.server.common.data.id.TenantId;
 import com.hashmapinc.server.common.data.page.TextPageData;
 import com.hashmapinc.server.common.data.page.TextPageLink;
 import com.hashmapinc.server.dao.exception.DataValidationException;
-import com.hashmapinc.server.dao.service.AbstractServiceTest;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.After;
@@ -33,9 +36,9 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
+
+import static org.hamcrest.collection.IsIterableContainingInAnyOrder.containsInAnyOrder;
 
 @Slf4j
 public abstract class BaseCustomerGroupServiceTest extends AbstractServiceTest {
@@ -279,6 +282,39 @@ public abstract class BaseCustomerGroupServiceTest extends AbstractServiceTest {
         pageData = customerGroupService.findCustomerGroupsByTenantIdAndCustomerId(tenantId, customerId, pageLink);
         Assert.assertFalse(pageData.hasNext());
         Assert.assertEquals(0, pageData.getData().size());
+    }
+
+
+    @Test
+    public void testGetDisplayablePoliciesForGroup() {
+
+        DataModel dataModel = createDataModel(tenantId);
+        DataModelObject dataModelObject = createDataModelObject(dataModel);
+        Asset asset = createAsset(dataModelObject.getId(), tenantId);
+
+        String policy = String.format("CUSTOMER_USER:ASSET?%s=%s&%s=%s:*",
+                UserPermission.ResourceAttribute.ID, asset.getId().getId().toString(),
+                UserPermission.ResourceAttribute.DATA_MODEL_ID, dataModelObject.getId().getId().toString());
+
+        String policyForAll = "CUSTOMER_USER:*:*";
+        List<String> policies = Arrays.asList(
+                policy,
+                policyForAll
+        );
+
+        CustomerGroup savedCustomerGroup = createGroupWithPolicies(policies, tenantId, customerId);
+        final Map<String, Map<String, String>> displayablePolicies = customerGroupService.findGroupPolicies(savedCustomerGroup.getId());
+        Assert.assertThat("List equality without order",
+                policies, containsInAnyOrder(displayablePolicies.keySet().toArray()));
+        Assert.assertTrue(displayablePolicies.get(policyForAll).isEmpty());
+        Assert.assertEquals(displayablePolicies.get(policy).get(UserPermission.ResourceAttribute.ID.toString()), asset.getName());
+        Assert.assertEquals(displayablePolicies.get(policy).get(UserPermission.ResourceAttribute.DATA_MODEL_ID.toString()), dataModelObject.getName());
+        deleteAsset(asset.getId());
+        final Map<String, Map<String, String>> displayablePoliciesNew = customerGroupService.findGroupPolicies(savedCustomerGroup.getId());
+        Assert.assertEquals(1, displayablePoliciesNew.keySet().toArray().length);
+        Assert.assertNull(displayablePoliciesNew.get(policy));
+        deleteGroup(savedCustomerGroup.getId());
+        deleteDataModelObject(dataModelObject.getId());
     }
 
 }

@@ -26,4 +26,5 @@ public interface AttributeDefinitionDao {
     AttributeDefinition save(AttributeDefinition attributeDefinition);
     AttributeDefinition findByNameAndDataModelObjectId(String name, UUID id);
     List<AttributeDefinition> findByDataModelObjectId(DataModelObjectId dataModelObjectId);
+    void removeByNameAndDataModelObjectId(String name,DataModelObjectId dataModelObjectId);
 }

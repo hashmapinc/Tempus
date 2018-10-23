@@ -26,6 +26,9 @@ import tempusTimewindow from './timewindow.directive';
 import tempusDepthwindow from './depthwindow.directive';
 import tempusEvents from './tb-event-directives';
 import tempusMousepointMenu from './mousepoint-menu.directive';
+import tempusGrid from './grid.directive';
+import addAssetTemplate from '../asset/add-asset.tpl.html';
+
 
 /* eslint-disable import/no-unresolved, import/default */
 
@@ -36,6 +39,7 @@ import dashboardTemplate from './dashboard.tpl.html';
 /* eslint-disable angular/angularelement */
 
 export default angular.module('tempus.directives.dashboard', [tempusTypes,
+    tempusGrid,
     tempusToast,
     tempusApiWidget,
     tempusWidget,
@@ -91,18 +95,109 @@ function Dashboard() {
 }
 
 /*@ngInject*/
-function DashboardController($scope, $rootScope, $element, $timeout, $mdMedia, $mdUtil, $q, timeService, depthService, types, utils) {
-
+function DashboardController($scope, $rootScope, $element, $timeout, $mdMedia, $mdUtil, $q, timeService, depthService, types, utils, $translate, customerService, assetService) {
     var highlightedMode = false;
     var highlightedWidget = null;
     var selectedWidget = null;
-
     var gridsterParent = angular.element('#gridster-parent', $element);
     var gridsterElement = angular.element('#gridster-child', gridsterParent);
+    var assetActionsList = [];
+    var assetGroupActionsList = [];
 
     var vm = this;
-
+    vm.types = types;
     vm.gridster = null;
+
+    vm.assetLandingGridConfig = {
+        deleteItemTitleFunc: deleteTitle,
+        deleteItemContentFunc: deleteText,
+        deleteItemsTitleFunc: deleteAssetsTitle,
+        deleteItemsActionTitleFunc: deleteAssetsActionTitle,
+        deleteItemsContentFunc: deleteAssetsText,
+
+        saveItemFunc: saveAsset,
+
+        getItemTitleFunc: getAssetTitle,
+
+        itemCardController:'AssetLandingCardController',
+        parentCtl: vm,
+
+        actionsList: assetActionsList,
+        groupActionsList: assetGroupActionsList,
+
+        onGridInited: gridInited,
+
+        addItemTemplateUrl:addAssetTemplate,
+
+
+        //addItemText: function() { return $translate.instant('asset.add-asset-text') },
+        itemDetailsText: function() { return $translate.instant('asset.asset-details') },
+        isDetailsReadOnly: isCustomerUser,
+        isSelectionEnabled: function () {
+            return !isCustomerUser();
+        }
+    };
+    
+    var entityTableDevice = $rootScope.$on("CallTableDetailDeviceOnDashboard", function($event, data){
+        $rootScope.$emit("CallTableDetailDevice", [data[0], data[1]]);
+    });
+    $scope.$on('$destroy', entityTableDevice);
+    
+    function getAssetTitle(asset) {
+        return asset ? asset.name : '';
+    }
+
+    function saveAsset(asset) {
+        var deferred = $q.defer();
+        assetService.saveAsset(asset).then(
+            function success(savedAsset) {
+                $rootScope.$broadcast('assetSaved');
+                var assets = [ savedAsset ];
+                customerService.applyAssignedCustomersInfo(assets).then(
+                    function success(items) {
+                        if (items && items.length == 1) {
+                            deferred.resolve(items[0]);
+                        } else {
+                            deferred.reject();
+                        }
+                    },
+                    function fail() {
+                        deferred.reject();
+                    }
+                );
+            },
+            function fail() {
+                deferred.reject();
+            }
+        );
+        return deferred.promise;
+    }
+    
+    function deleteAssetsTitle(selectedCount) {
+        return $translate.instant('asset.delete-assets-title', {count: selectedCount}, 'messageformat');
+    }
+    function deleteAssetsActionTitle(selectedCount) {
+        return $translate.instant('asset.delete-assets-action-title', {count: selectedCount}, 'messageformat');
+    }
+    function deleteAssetsText () {
+        return $translate.instant('asset.delete-assets-text');
+    }
+
+    function isCustomerUser() {
+        return vm.devicesScope === 'customer_user';
+    }
+
+    function deleteTitle(device) {
+        return $translate.instant('device.delete-device-title', {deviceName: device.name});
+    }
+
+    function deleteText() {
+        return $translate.instant('device.delete-device-text');
+    }
+
+    function gridInited(grid) {
+        vm.grid = grid;
+    }
 
     vm.isMobileDisabled = angular.isDefined(vm.isMobileDisabled) ? vm.isMobileDisabled : false;
 
@@ -355,6 +450,7 @@ function DashboardController($scope, $rootScope, $element, $timeout, $mdMedia, $
     });
 
     $scope.$watch('vm.isEdit', function () {
+        
         vm.gridsterOpts.resizable.enabled = vm.isEdit;
         vm.gridsterOpts.draggable.enabled = vm.isEdit;
         $scope.$broadcast('toggleDashboardEditMode', vm.isEdit);

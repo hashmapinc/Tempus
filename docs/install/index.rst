@@ -12,4 +12,14 @@ Platforms
     :maxdepth: 1
 
     linux
-  
+    temp
+
+
+==============
+Schema Upgrade
+==============
+
+.. toctree::
+    :maxdepth: 2
+
+    upgrade/upgradeschema

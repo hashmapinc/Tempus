@@ -27,45 +27,24 @@ import org.junit.Test;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 public class BaseDataModelControllerTest extends AbstractControllerTest {
 
     private DataModel defaultDataModel;
     private DataModelObject defaultDataModelObj;
 
-
     @Before
     public void beforeTest() throws Exception {
         loginTenantAdmin();
-
-        createDataModel();
-        createDataModelObject();
-    }
-
-    @Test
-    public void testSaveDataModel() throws Exception {
-        DataModel dataModel = new DataModel();
-        dataModel.setName("Drilling Data Model1");
-        dataModel.setLastUpdatedTs(System.currentTimeMillis());
-
-        DataModel savedDataModel = doPost("/api/data-model", dataModel, DataModel.class);
-
-        Assert.assertNotNull(savedDataModel);
-        Assert.assertNotNull(savedDataModel.getId());
-        Assert.assertTrue(savedDataModel.getCreatedTime() > 0);
-        Assert.assertEquals(savedTenant.getId(), savedDataModel.getTenantId());
-        Assert.assertEquals(dataModel.getName(), savedDataModel.getName());
-        Assert.assertTrue(savedDataModel.getLastUpdatedTs() > 0);
+        defaultDataModel = createDataModel();
+        defaultDataModelObj = createDataModelObject(defaultDataModel);
     }
 
     @Test
     public void testFetchDataModelById() throws Exception {
-        DataModel dataModel = new DataModel();
-        dataModel.setName("Drilling Data Model for fetch by id");
-        dataModel.setLastUpdatedTs(System.currentTimeMillis());
-        DataModel savedDataModel = doPost("/api/data-model", dataModel, DataModel.class);
-
-        DataModel fetchedDataModel = doGet("/api/data-model/" + savedDataModel.getId().toString(), DataModel.class);
-        Assert.assertEquals(savedDataModel.getName(), fetchedDataModel.getName());
+        DataModel fetchedDataModel = doGet("/api/data-model/" + defaultDataModel.getId().toString(), DataModel.class);
+        Assert.assertEquals(defaultDataModel.getName(), fetchedDataModel.getName());
     }
 
     @Test
@@ -76,23 +55,6 @@ public class BaseDataModelControllerTest extends AbstractControllerTest {
         DataModel savedDataModel = doPost("/api/data-model", dataModel, DataModel.class);
         List<DataModel> fetchedDataModels = doGetTyped("/api/data-model", new TypeReference<List<DataModel>>(){});
         Assert.assertEquals(2, fetchedDataModels.size());
-    }
-
-    @Test
-    public void testSaveDataModelObject() throws Exception {
-        DataModelObject dataModelObject = new DataModelObject();
-        dataModelObject.setName("Well");
-
-        AttributeDefinition ad = new AttributeDefinition();
-        ad.setValueType("STRING");
-        ad.setName("attr name");
-        List<AttributeDefinition> attributeDefinitions = new ArrayList<>();
-        attributeDefinitions.add(ad);
-        dataModelObject.setAttributeDefinitions(attributeDefinitions);
-
-        DataModelObject savedDataModelObj = doPost("/api/data-model/" + defaultDataModel.getId().toString() + "/objects", dataModelObject, DataModelObject.class);
-        Assert.assertNotNull(savedDataModelObj);
-        Assert.assertEquals(defaultDataModel.getId(), savedDataModelObj.getDataModelId());
     }
 
     @Test
@@ -111,36 +73,17 @@ public class BaseDataModelControllerTest extends AbstractControllerTest {
         Assert.assertEquals(defaultDataModelObj.getName(), foundDataModelObj.getName());
     }
 
-    private void createDataModel() throws Exception{
-        DataModel dataModel = new DataModel();
-        dataModel.setName("Default Drilling Data Model1");
-        dataModel.setLastUpdatedTs(System.currentTimeMillis());
+    @Test
+    public void testRemoveDataModelById() throws Exception {
 
-        DataModel savedDataModel = doPost("/api/data-model", dataModel, DataModel.class);
+        DataModel fetchedDataModel1 = doGet("/api/data-model/" + defaultDataModel.getId().toString(), DataModel.class);
+        Assert.assertEquals(defaultDataModel.getName(), fetchedDataModel1.getName());
 
-        Assert.assertNotNull(savedDataModel);
-        Assert.assertNotNull(savedDataModel.getId());
-        Assert.assertTrue(savedDataModel.getCreatedTime() > 0);
-        Assert.assertEquals(savedTenant.getId(), savedDataModel.getTenantId());
-        Assert.assertEquals(dataModel.getName(), savedDataModel.getName());
-        Assert.assertTrue(savedDataModel.getLastUpdatedTs() > 0);
-        defaultDataModel = savedDataModel;
+        doDelete("/api/data-model/" +defaultDataModel.getId().getId().toString())
+                .andExpect(status().isOk());
+
+        doGet("/api/data-model/" + defaultDataModel.getId().toString()).
+                andExpect(status().isNotFound());
     }
 
-    private void createDataModelObject() throws Exception{
-        DataModelObject dataModelObject = new DataModelObject();
-        dataModelObject.setName("Well2");
-
-        AttributeDefinition ad = new AttributeDefinition();
-        ad.setValueType("STRING");
-        ad.setName("attr name2");
-        List<AttributeDefinition> attributeDefinitions = new ArrayList<>();
-        attributeDefinitions.add(ad);
-        dataModelObject.setAttributeDefinitions(attributeDefinitions);
-
-        DataModelObject savedDataModelObj = doPost("/api/data-model/" + defaultDataModel.getId().toString() + "/objects", dataModelObject, DataModelObject.class);
-        Assert.assertNotNull(savedDataModelObj);
-        Assert.assertEquals(defaultDataModel.getId(), savedDataModelObj.getDataModelId());
-        defaultDataModelObj = savedDataModelObj;
-    }
 }

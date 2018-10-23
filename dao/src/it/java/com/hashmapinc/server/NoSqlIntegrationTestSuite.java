@@ -28,7 +28,7 @@ import java.util.List;
 
 @RunWith(ClasspathSuite.class)
 @ClasspathSuite.ClassnameFilters({
-        "com.hashmapinc.server.dao.service.*ServiceNoSqlTest"
+        "com.hashmapinc.server.dao.service.nosql.*ServiceNoSqlTest"
 })
 public class NoSqlIntegrationTestSuite {
 
@@ -51,6 +51,7 @@ public class NoSqlIntegrationTestSuite {
         dataSets.add(new CustomCassandraCQLUnit.NamedDataset("2.cql", new ClassPathCQLDataSet("cassandra/upgrade/2.cql" , false, false)));
         dataSets.add(new CustomCassandraCQLUnit.NamedDataset("3.cql", new ClassPathCQLDataSet("cassandra/upgrade/3.cql" , false, false)));
         dataSets.add(new CustomCassandraCQLUnit.NamedDataset("4.cql", new ClassPathCQLDataSet("cassandra/upgrade/4.cql" , false, false)));
+        dataSets.add(new CustomCassandraCQLUnit.NamedDataset("5.cql", new ClassPathCQLDataSet("cassandra/upgrade/5.cql" , false, false)));
         return dataSets;
     }
 }

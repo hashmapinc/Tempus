@@ -31,7 +31,6 @@ export default function EntitySelect($compile, $templateCache) {
 
         scope.tbRequired = angular.isDefined(scope.tbRequired) ? scope.tbRequired : false;
         scope.model = {};
-
         scope.updateView = function () {
             if (!scope.disabled) {
                 var value = ngModelCtrl.$viewValue;
@@ -46,6 +45,7 @@ export default function EntitySelect($compile, $templateCache) {
                     ngModelCtrl.$setViewValue(null);
                 }
             }
+
         }
 
         ngModelCtrl.$render = function () {
@@ -107,7 +107,9 @@ export default function EntitySelect($compile, $templateCache) {
             theForm: '=?',
             tbRequired: '=?',
             disabled:'=ngDisabled',
-            useAliasEntityTypes: "=?"
+            useAliasEntityTypes: "=?",
+            entityDetail:'=',
+            relation:'='
         }
     };
 }

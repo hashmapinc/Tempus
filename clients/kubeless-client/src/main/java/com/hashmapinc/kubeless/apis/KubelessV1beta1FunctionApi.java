@@ -17,6 +17,7 @@
 package com.hashmapinc.kubeless.apis;
 
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Maps;
 import com.hashmapinc.kubeless.models.V1beta1Function;
 import com.squareup.okhttp.Call;
 import io.kubernetes.client.ApiClient;
@@ -36,7 +37,9 @@ public class KubelessV1beta1FunctionApi {
         this.apiClient = client;
         this.namespace = namespace;
         this.kubelessFunctionsUri = "/apis/kubeless.io/v1beta1/namespaces/"+ namespace +"/functions/";
-        this.headers = ImmutableMap.of("Accept", "application/json", "Content-type", "application/json");
+        this.headers = Maps.newHashMap();
+        this.headers.put("Accept", "application/json");
+        this.headers.put("Content-type", "application/json");
     }
 
     public KubelessV1beta1FunctionApi(String namespace){
