@@ -131,7 +131,6 @@ export default function ExtensionFormOpcDirective($compile, $templateCache, $tra
                         if (addedFile && addedFile.length > 0) {
                             model[options.fileName] = $file.name;
                             model[options.file] = addedFile.replace(/^data.*base64,/, "");
-
                         }
                     }
                 });

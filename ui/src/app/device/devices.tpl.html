@@ -50,7 +50,7 @@
 
     <div class="md-toolbar-tools">
         <span flex></span>
-        <md-button ng-show = "vm.devicesScope != 'customer_user'" class="md-icon-button" ng-click="addDevice($event)">
+        <md-button class="md-icon-button" ng-click="addDevice($event)">
             <md-icon>add</md-icon>
             <md-tooltip md-direction="top">
                 {{ 'action.add' | translate }}
@@ -78,6 +78,7 @@
             <th md-column md-order-by="name"><span translate>device.name</span></th>
             <th md-column md-order-by="type"><span translate>device.device-type</span></th>
             <th md-column><span translate>device.description</span></th>
+            <th md-column><span translate>device.businessUnit</span></th>
             <th md-column><span translate>device.status</span></th>
             <th md-column><span translate>device.age</span></th>
             <th md-column><span translate>device.lastTimeRecived</span></th>
@@ -88,7 +89,8 @@
         <tr md-row  ng-repeat="device in devices.data">
             <td md-cell><a href ng-click="deviceDetailFunc($event,device)">{{device.name}}</a></td>
             <td md-cell style="text-transform: uppercase">{{device.type}}</td>
-            <td md-cell>{{device.additionalInfo.description}}</td>
+            <td md-cell style="width:40%;">{{device.additionalInfo.description}}</td>
+            <td md-cell>{{device.assignedCustomer.title}}</td>
             <td md-cell>NA</td>
             <td md-cell>NA</td>
             <td md-cell>{{device.createdTime | date :  'yyyy-MM-dd HH:mm:ss'}}</td>
@@ -165,7 +167,8 @@
         <md-tab ng-if="!vm.grid.detailsConfig.isDetailsEditMode" md-on-select="vm.grid.triggerResize()" label="{{ 'relation.relations' | translate }}">
             <tb-relation-table flex
                                entity-id="vm.grid.operatingItem().id.id"
-                               entity-type="{{vm.types.entityType.device}}">
+                               entity-type="{{vm.types.entityType.device}}"
+                               entity-detail="vm.grid.operatingItem()">
             </tb-relation-table>
         </md-tab>
         <md-tab ng-if="!vm.grid.detailsConfig.isDetailsEditMode && vm.grid.operatingItem().additionalInfo.gateway" md-on-select="vm.grid.triggerResize()" label="{{ 'extension.extensions' | translate }}">

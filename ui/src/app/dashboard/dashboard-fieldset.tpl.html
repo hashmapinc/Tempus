@@ -77,15 +77,16 @@
 			<label translate>dashboard.description</label>
 			<textarea ng-model="dashboard.configuration.description" rows="2"></textarea>
 		</md-input-container>
-		<div flex-gt-sm="50">
-			<md-checkbox ng-model="landingDashboard" aria-label="Dashboard Landing Page">
-				Dashboard Landing Page
+		
+		<div flex-gt-sm="50" class="dash-label md-block" ng-if="user.authority != 'CUSTOMER_USER'">
+			<md-checkbox ng-model="dashboard.landingDashboard" aria-label="{{ 'dashboard.dashboard-landing-page' | translate }}" ng-disabled="theForm.editFlag">
+				{{ 'dashboard.dashboard-landing-page' | translate }}
 			</md-checkbox>
 		</div>
-		<md-select ng-if="landingDashboard" placeholder="Assign Data Model View" ng-model="dataModelView" md-on-open="loadDataModel()" style="min-width: 200px;" ng-change="showAssets(dataModelView)">
+		<md-select required ng-if="dashboard.landingDashboard" placeholder="{{ 'dashboard.assign-data-model-view' | translate }}" ng-model="dashboardDataModel" md-on-open="loadDataModel()" style="min-width: 200px;" ng-change="showAssets(dashboardDataModel)" ng-disabled="theForm.editFlag">
 			<md-option  ng-value="datamodel" ng-repeat="datamodel in listOfDataModel">{{datamodel.name}}</md-option>
 		</md-select>
-		<md-select  ng-if="showAssetsList && landingDashboard" placeholder="Select Data Model Assets" ng-model="dataModelAssets" md-on-open="loadDataModelAssets(dataModelView)" style="min-width: 200px;">
+		<md-select  required ng-if="showAssetsList && dashboard.landingDashboard" placeholder="{{ 'dashboard.select-data-model-asset' | translate }}" ng-model="dashboarddataModelAsset" md-on-open="loadDataModelAssets(dashboard.dataModelId)" style="min-width: 200px;" ng-change="setAssets(dashboarddataModelAsset)" ng-disabled="theForm.editFlag">
 			<md-option ng-value="datamodelAsset" ng-repeat="datamodelAsset in listOfDataModelAssets">{{datamodelAsset.name}}</md-option>
 		</md-select>
 	</fieldset>

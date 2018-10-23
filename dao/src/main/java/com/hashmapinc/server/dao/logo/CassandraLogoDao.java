@@ -34,8 +34,6 @@ import static com.datastax.driver.core.querybuilder.QueryBuilder.eq;
 @Component
 @Slf4j
 @NoSqlDao
-
-
 public class CassandraLogoDao extends CassandraAbstractModelDao<LogoEntity,Logo> implements LogoDao{
 
     @Override

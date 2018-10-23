@@ -29,3 +29,6 @@ DROP TABLE IF EXISTS theme;
 DROP TABLE IF EXISTS logo;
 DROP TABLE IF EXISTS data_model_object;
 DROP TABLE IF EXISTS attribute_definition;
+DROP TABLE IF EXISTS customer_group;
+DROP TABLE IF EXISTS user_groups;
+DROP TABLE IF EXISTS customer_group_policy;

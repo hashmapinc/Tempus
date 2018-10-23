@@ -18,8 +18,6 @@ package com.hashmapinc.server.dao.sql.asset;
 
 import com.datastax.driver.core.utils.UUIDs;
 import com.google.common.util.concurrent.ListenableFuture;
-import org.junit.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import com.hashmapinc.server.common.data.EntitySubtype;
 import com.hashmapinc.server.common.data.asset.Asset;
 import com.hashmapinc.server.common.data.id.AssetId;
@@ -28,6 +26,8 @@ import com.hashmapinc.server.common.data.id.TenantId;
 import com.hashmapinc.server.common.data.page.TextPageLink;
 import com.hashmapinc.server.dao.AbstractJpaDaoTest;
 import com.hashmapinc.server.dao.asset.AssetDao;
+import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
 import java.util.List;

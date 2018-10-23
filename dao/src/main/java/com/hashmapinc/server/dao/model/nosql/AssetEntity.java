@@ -22,6 +22,7 @@ import com.datastax.driver.mapping.annotations.PartitionKey;
 import com.datastax.driver.mapping.annotations.Table;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.hashmapinc.server.common.data.asset.Asset;
+import com.hashmapinc.server.common.data.id.DataModelObjectId;
 import com.hashmapinc.server.common.data.id.TenantId;
 import com.hashmapinc.server.dao.model.ModelConstants;
 import lombok.EqualsAndHashCode;
@@ -54,6 +55,10 @@ public final class AssetEntity implements SearchTextEntity<Asset> {
     @Column(name = ModelConstants.ASSET_TYPE_PROPERTY)
     private String type;
 
+    @PartitionKey(value = 4)
+    @Column(name = ModelConstants.ASSET_DATA_MODEL_OBJECT_ID)
+    private UUID dataModelObjectId;
+
     @Column(name = ModelConstants.ASSET_NAME_PROPERTY)
     private String name;
 
@@ -76,6 +81,9 @@ public final class AssetEntity implements SearchTextEntity<Asset> {
         }
         if (asset.getCustomerId() != null) {
             this.customerId = asset.getCustomerId().getId();
+        }
+        if (asset.getDataModelObjectId() != null) {
+            this.dataModelObjectId = asset.getDataModelObjectId().getId();
         }
         this.name = asset.getName();
         this.type = asset.getType();
@@ -144,6 +152,14 @@ public final class AssetEntity implements SearchTextEntity<Asset> {
         return searchText;
     }
 
+    public UUID getDataModelObjectId() {
+        return dataModelObjectId;
+    }
+
+    public void setDataModelObjectId(UUID dataModelObjectId) {
+        this.dataModelObjectId = dataModelObjectId;
+    }
+
     @Override
     public Asset toData() {
         Asset asset = new Asset(new AssetId(id));
@@ -153,6 +169,9 @@ public final class AssetEntity implements SearchTextEntity<Asset> {
         }
         if (customerId != null) {
             asset.setCustomerId(new CustomerId(customerId));
+        }
+        if (dataModelObjectId != null) {
+            asset.setDataModelObjectId(new DataModelObjectId(dataModelObjectId));
         }
         asset.setName(name);
         asset.setType(type);

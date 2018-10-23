@@ -16,46 +16,23 @@
  */
 package com.hashmapinc.server.actors.computation;
 
-import akka.event.Logging;
-import akka.event.LoggingAdapter;
+import com.hashmapinc.server.ComputationJobActor;
 import com.hashmapinc.server.actors.ActorSystemContext;
 import com.hashmapinc.server.actors.service.ContextBasedCreator;
 import com.hashmapinc.server.common.data.computation.Computations;
 import com.hashmapinc.server.common.data.id.ComputationJobId;
 import com.hashmapinc.server.common.data.id.TenantId;
-import com.hashmapinc.server.actors.service.ComponentActor;
-import com.hashmapinc.server.common.msg.plugin.ComponentLifecycleMsg;
 
-public class ComputationJobActor extends ComponentActor<ComputationJobId, ComputationJobActorMessageProcessor> {
+public class SparkComputationJobActor extends ComputationJobActor<SparkComputationJobActorMessageProcessor> {
 
-    private final LoggingAdapter log = Logging.getLogger(getContext().system(), this);
-
-    public ComputationJobActor(ActorSystemContext systemContext, TenantId tenantId,
-                               Computations computation, ComputationJobId computationJobId) {
+    public SparkComputationJobActor(ActorSystemContext systemContext, TenantId tenantId,
+                                    Computations computation, ComputationJobId computationJobId) {
         super(systemContext, tenantId, computationJobId);
-        setProcessor(new ComputationJobActorMessageProcessor(tenantId, computationJobId, systemContext,
-                log, context().parent(), context().self(), computation));
+        setProcessor(new SparkComputationJobActorMessageProcessor(tenantId, computationJobId, systemContext,
+                logger, context().parent(), context().self(), computation));
     }
 
-    @Override
-    public void onReceive(Object msg) throws Exception {
-        log.debug("[{}] Received message: {}", tenantId, msg);
-        if(msg instanceof ComponentLifecycleMsg){
-            onComponentLifecycleMsg((ComponentLifecycleMsg)msg);
-        }else if(msg instanceof ComputationJobTerminationMsg) {
-            context().stop(self());
-        }else {
-            log.warning("[{}] Unknown message: {}!", tenantId, msg);
-        }
-    }
-
-    @Override
-    protected long getErrorPersistFrequency() {
-        return systemContext.getComputationErrorPersistFrequency();
-    }
-
-
-    public static class ActorCreator extends ContextBasedCreator<ComputationJobActor> {
+    public static class ActorCreator extends ContextBasedCreator<SparkComputationJobActor> {
         private static final long serialVersionUID = 1L;
 
         private final TenantId tenantId;
@@ -70,8 +47,8 @@ public class ComputationJobActor extends ComponentActor<ComputationJobId, Comput
         }
 
         @Override
-        public ComputationJobActor create() throws Exception {
-            return new ComputationJobActor(context, tenantId, computation, computationJobId);
+        public SparkComputationJobActor create() throws Exception {
+            return new SparkComputationJobActor(context, tenantId, computation, computationJobId);
         }
     }
 }

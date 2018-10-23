@@ -24,7 +24,10 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hashmapinc.server.common.data.DashboardInfo;
+import com.hashmapinc.server.common.data.DashboardType;
 import com.hashmapinc.server.common.data.id.TenantId;
+import com.hashmapinc.server.dao.model.ModelConstants;
+import com.hashmapinc.server.dao.model.type.DashboardTypeCodec;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
@@ -66,6 +69,10 @@ public class DashboardInfoEntity implements SearchTextEntity<DashboardInfo> {
     @Column(name = DASHBOARD_ASSIGNED_CUSTOMERS_PROPERTY)
     private String assignedCustomers;
 
+    @Column(name = ModelConstants.DASHBOARD_TYPE_PROPERTY, codec = DashboardTypeCodec.class)
+    private DashboardType type;
+
+
     public DashboardInfoEntity() {
         super();
     }
@@ -77,6 +84,9 @@ public class DashboardInfoEntity implements SearchTextEntity<DashboardInfo> {
         if (dashboardInfo.getTenantId() != null) {
             this.tenantId = dashboardInfo.getTenantId().getId();
         }
+        if (dashboardInfo.getType() != null) {
+            this.type = dashboardInfo.getType();
+        }
         this.title = dashboardInfo.getTitle();
         if (dashboardInfo.getAssignedCustomers() != null) {
             try {
@@ -85,6 +95,14 @@ public class DashboardInfoEntity implements SearchTextEntity<DashboardInfo> {
                 log.error("Unable to serialize assigned customers to string!", e);
             }
         }
+    }
+
+    public DashboardType getType() {
+        return type;
+    }
+
+    public void setType(DashboardType type) {
+        this.type = type;
     }
 
     public UUID getId() {
@@ -139,6 +157,9 @@ public class DashboardInfoEntity implements SearchTextEntity<DashboardInfo> {
         dashboardInfo.setCreatedTime(UUIDs.unixTimestamp(id));
         if (tenantId != null) {
             dashboardInfo.setTenantId(new TenantId(tenantId));
+        }
+        if(type != null){
+            dashboardInfo.setType(type);
         }
         dashboardInfo.setTitle(title);
         if (!StringUtils.isEmpty(assignedCustomers)) {

@@ -16,35 +16,35 @@
  */
 package com.hashmapinc.server.actors.tenant;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-
+import akka.actor.ActorRef;
+import akka.actor.Props;
+import akka.event.Logging;
+import akka.event.LoggingAdapter;
 import com.hashmapinc.server.actors.ActorSystemContext;
 import com.hashmapinc.server.actors.device.DeviceActor;
 import com.hashmapinc.server.actors.plugin.PluginTerminationMsg;
 import com.hashmapinc.server.actors.rule.ComplexRuleActorChain;
+import com.hashmapinc.server.actors.rule.RuleActorChain;
 import com.hashmapinc.server.actors.service.ContextAwareActor;
 import com.hashmapinc.server.actors.service.ContextBasedCreator;
 import com.hashmapinc.server.actors.service.DefaultActorService;
 import com.hashmapinc.server.actors.shared.computation.TenantComputationManager;
 import com.hashmapinc.server.actors.shared.plugin.PluginManager;
+import com.hashmapinc.server.actors.shared.plugin.TenantPluginManager;
 import com.hashmapinc.server.actors.shared.rule.RuleManager;
 import com.hashmapinc.server.actors.shared.rule.TenantRuleManager;
+import com.hashmapinc.server.common.data.computation.Computations;
 import com.hashmapinc.server.common.data.id.*;
 import com.hashmapinc.server.common.msg.cluster.ClusterEventMsg;
+import com.hashmapinc.server.common.msg.device.ToDeviceActorMsg;
+import com.hashmapinc.server.common.msg.plugin.ComponentLifecycleMsg;
 import com.hashmapinc.server.extensions.api.device.ToDeviceActorNotificationMsg;
 import com.hashmapinc.server.extensions.api.plugins.msg.ToPluginActorMsg;
 import com.hashmapinc.server.extensions.api.rules.ToRuleActorMsg;
-import com.hashmapinc.server.actors.rule.RuleActorChain;
-import com.hashmapinc.server.actors.shared.plugin.TenantPluginManager;
-import com.hashmapinc.server.common.msg.device.ToDeviceActorMsg;
 
-import akka.actor.ActorRef;
-import akka.actor.Props;
-import akka.event.Logging;
-import akka.event.LoggingAdapter;
-import com.hashmapinc.server.common.msg.plugin.ComponentLifecycleMsg;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
 
 public class TenantActor extends ContextAwareActor {
 
@@ -150,7 +150,8 @@ public class TenantActor extends ContextAwareActor {
     }
 
     private void onComponentLifecycleMsgForComputation(ComponentLifecycleMsg msg, ComputationId computationId) {
-        ActorRef computationActor = computationManager.getOrCreateComputationActor(this.context(), computationId);
+        Computations computation = systemContext.getComputationsService().findById(computationId);
+        ActorRef computationActor = computationManager.getOrCreateComputationActor(this.context(), computationId, computation.getType());
         computationActor.tell(msg, ActorRef.noSender());
     }
 

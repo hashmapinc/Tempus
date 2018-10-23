@@ -21,13 +21,10 @@ import com.google.common.base.Function;
 import com.google.common.util.concurrent.AsyncFunction;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
-import com.hashmapinc.server.common.data.Customer;
-import com.hashmapinc.server.common.data.EntitySubtype;
-import com.hashmapinc.server.common.data.EntityType;
+import com.hashmapinc.server.common.data.*;
 import com.hashmapinc.server.common.data.asset.Asset;
 import com.hashmapinc.server.common.data.asset.AssetSearchQuery;
-import com.hashmapinc.server.common.data.id.EntityId;
-import com.hashmapinc.server.common.data.id.TenantId;
+import com.hashmapinc.server.common.data.id.*;
 import com.hashmapinc.server.common.data.page.TextPageData;
 import com.hashmapinc.server.common.data.page.TextPageLink;
 import com.hashmapinc.server.common.data.relation.EntityRelation;
@@ -35,6 +32,8 @@ import com.hashmapinc.server.dao.DaoUtil;
 import com.hashmapinc.server.dao.customer.CustomerDao;
 import com.hashmapinc.server.dao.entity.AbstractEntityService;
 import com.hashmapinc.server.dao.model.ModelConstants;
+import com.hashmapinc.server.dao.querybuilder.ResourceCriteria;
+import com.hashmapinc.server.dao.querybuilder.TempusResourceQueryBuilder;
 import com.hashmapinc.server.dao.service.DataValidator;
 import com.hashmapinc.server.dao.service.PaginatedRemover;
 import com.hashmapinc.server.dao.tenant.TenantDao;
@@ -42,9 +41,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
-import com.hashmapinc.server.common.data.Tenant;
-import com.hashmapinc.server.common.data.id.AssetId;
-import com.hashmapinc.server.common.data.id.CustomerId;
 import com.hashmapinc.server.common.data.relation.EntitySearchDirection;
 import com.hashmapinc.server.dao.exception.DataValidationException;
 
@@ -61,6 +57,8 @@ public class BaseAssetService extends AbstractEntityService implements AssetServ
     public static final String INCORRECT_PAGE_LINK = "Incorrect page link ";
     public static final String INCORRECT_CUSTOMER_ID = "Incorrect customerId ";
     public static final String INCORRECT_ASSET_ID = "Incorrect assetId ";
+    public static final String INCORRECT_DATA_MODEL_OBJECT_ID = "Incorrect dataModelObjectId ";
+
     @Autowired
     private AssetDao assetDao;
 
@@ -222,6 +220,12 @@ public class BaseAssetService extends AbstractEntityService implements AssetServ
                     assetTypes.sort(Comparator.comparing(EntitySubtype::getType));
                     return assetTypes;
                 });
+    }
+
+    @Override
+    public TextPageData<Asset> findAll(TempusResourceCriteriaSpec tempusResourceCriteriaSpec, TextPageLink textPageLink){
+        log.trace("Executing findAll [{}]", tempusResourceCriteriaSpec);
+        return new TextPageData<>(assetDao.findAll(tempusResourceCriteriaSpec, textPageLink), textPageLink);
     }
 
     private DataValidator<Asset> assetValidator =

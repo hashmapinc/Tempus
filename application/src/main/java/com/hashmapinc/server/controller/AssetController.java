@@ -19,8 +19,10 @@ package com.hashmapinc.server.controller;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.hashmapinc.server.common.data.Customer;
 import com.hashmapinc.server.common.data.EntitySubtype;
+import com.hashmapinc.server.common.data.TempusResourceCriteriaSpec;
 import com.hashmapinc.server.common.data.asset.Asset;
 import com.hashmapinc.server.common.data.audit.ActionType;
+import com.hashmapinc.server.common.data.id.DataModelObjectId;
 import com.hashmapinc.server.common.data.id.TenantId;
 import com.hashmapinc.server.common.data.page.TextPageData;
 import com.hashmapinc.server.common.data.page.TextPageLink;
@@ -49,6 +51,8 @@ import java.util.stream.Collectors;
 public class AssetController extends BaseController {
 
     public static final String ASSET_ID = "assetId";
+    public static final String DATA_MODEL_OBJECT_ID = "dataModelObjectId";
+
 
     @PostAuthorize("hasPermission(returnObject, 'ASSET_READ')")
     @GetMapping(value = "/asset/{assetId}")
@@ -69,14 +73,8 @@ public class AssetController extends BaseController {
     public Asset saveAsset(@RequestBody Asset asset) throws TempusException {
         try {
             asset.setTenantId(getCurrentUser().getTenantId());
-            if (getCurrentUser().getAuthority() == Authority.CUSTOMER_USER) {
-                if (asset.getId() == null || asset.getId().isNullUid() ||
-                    asset.getCustomerId() == null || asset.getCustomerId().isNullUid()) {
-                    throw new TempusException("You don't have permission to perform this operation!",
-                            TempusErrorCode.PERMISSION_DENIED);
-                } else {
-                    checkCustomerId(asset.getCustomerId());
-                }
+            if (getCurrentUser().getAuthority() == Authority.CUSTOMER_USER){
+                checkCustomerId(asset.getCustomerId());
             }
             Asset savedAsset  = checkNotNull(assetService.saveAsset(asset));
 
@@ -331,4 +329,24 @@ public class AssetController extends BaseController {
             throw handleException(e);
         }
     }
+
+    @PreAuthorize("hasAnyAuthority('TENANT_ADMIN', 'CUSTOMER_USER')")
+    @GetMapping(value = "/datamodelobject/assets/{dataModelObjectId}")
+    @ResponseBody
+    public TextPageData<Asset> getAssetsByDataModelObjectId(@PathVariable(DATA_MODEL_OBJECT_ID) String strDataModelObjectId,
+                                                            @RequestParam int limit,
+                                                            @RequestParam(required = false) String textSearch,
+                                                            @RequestParam(required = false) String idOffset,
+                                                            @RequestParam(required = false) String textOffset) throws TempusException {
+        checkParameter(DATA_MODEL_OBJECT_ID, strDataModelObjectId);
+        try {
+            DataModelObjectId dataModelObjectId = new DataModelObjectId(toUUID(strDataModelObjectId));
+            final TempusResourceCriteriaSpec tempusResourceCriteriaSpec = getTempusResourceCriteriaSpec(getCurrentUser(), EntityType.ASSET, dataModelObjectId);
+            TextPageLink pageLink = createPageLink(limit, textSearch, idOffset, textOffset);
+            return assetService.findAll(tempusResourceCriteriaSpec, pageLink);
+        } catch (Exception e) {
+            throw handleException(e);
+        }
+    }
+
 }

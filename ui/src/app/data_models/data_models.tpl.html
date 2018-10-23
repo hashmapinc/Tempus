@@ -66,25 +66,26 @@
 </md-toolbar>
 
 <md-table-container  class ="tb-device-container">
-	<table class="tb-device-table" md-table>
+	<table md-table md-row-select multiple="" ng-model="vm.selectedDataModel" class="tb-device-table" md-table>
 		<thead md-head md-order="query.order" md-on-reorder="onReorder">
 		<tr md-row>
-			<th md-column md-order-by="name"><span translate>Name</span></th>
-			<th md-column><span translate>Description</span></th>
-			<th md-column><span translate>Assigned BU</span></th>
-			<th md-column><span translate>Last Modified</span></th>
+			<th md-column md-order-by="name"><span translate>dataModels.name</span></th>
+			<th md-column><span translate>dataModels.description</span></th>
+			<!--<th md-column><span translate>Assigned BU</span></th>-->
+			<th md-column><span translate>dataModels.lastModified</span></th>
 
 		</tr>
 		</thead>
 		<tbody md-body>
-		<tr md-row  ng-repeat="datamodel in datamodel.data">
-			<td md-cell><a href ng-click="vm.openDatamodel(datamodel)">{{datamodel.name}}</a></td>
+		<tr md-row md-select="datamodel.id.id" md-select-id="datamodel.id.id" md-auto-select ng-repeat="datamodel in datamodel.data">
+			<td md-cell style="width: 28%;"><a href ng-click="vm.openDatamodel(datamodel)">{{datamodel.name}}</a></td>
 			<td md-cell>{{datamodel.additionalInfo.description}}</td>
-			<td md-cell>NA</td>
-			<td md-cell>{{datamodel.lastUpdatedTs | date :  'yyyy-MM-dd HH:mm:ss'}}</td>
+			<!--<td md-cell>NA</td>-->
+			<td style="width: 26%;" md-cell>{{datamodel.lastUpdatedTs | date :  'yyyy-MM-dd HH:mm:ss'}}</td>
+			<td md-cell class="tb-value-cell" ng-click="vm.deleteDataModel($event, datamodel.id.id)"><span><ng-md-icon size="16" icon="delete"></ng-md-icon></span></td>
 		</tr>
 		<tr md-row ng-hide ="datamodel.count > 0">
-			<td md-cell colspan="4" style="text-align:center;">No Data Available</td>
+			<td md-cell colspan="4" style="text-align:center;"><span translate>dataModels.noData</span></td>
 		</tr>
 
 		</tbody>
@@ -95,10 +96,18 @@
 					 md-on-paginate="onPaginate" md-page-select>
 </md-table-pagination>
 <section layout="row" layout-wrap class="tb-footer-buttons md-fab" layout-align="start end">
+	<md-button ng-disabled="$root.loading" ng-click="vm.deleteMultipleDataModelDialog($event)" ng-show="vm.selectedDataModel.length > 0" class="tb-btn-footer md-accent md-hue-2 md-fab" ng-click="vm.addItemAction.onAction($event)" aria-label="{{ vm.addItemAction.name() }}" >
+		<md-tooltip md-direction="top">
+			<span translate>dataModels.delete</span>
+		</md-tooltip>
+		<ng-md-icon icon="delete"></ng-md-icon>
+	</md-button>
+
 	<md-button ng-disabled="$root.loading" ng-click="vm.openDataModelDialog($event)" class="tb-btn-footer md-accent md-hue-2 md-fab" aria-label="{{ 'add data model'}}">
 		<md-tooltip>
-			{{ "add data model"}}
+			<span translate>dataModels.add</span>
 		</md-tooltip>
 		<ng-md-icon icon="add"></ng-md-icon>
 	</md-button>
+
 </section>

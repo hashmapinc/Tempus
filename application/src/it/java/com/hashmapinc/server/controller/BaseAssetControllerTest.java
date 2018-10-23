@@ -18,12 +18,11 @@ package com.hashmapinc.server.controller;
 
 import com.datastax.driver.core.utils.UUIDs;
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.hashmapinc.server.common.data.Customer;
-import com.hashmapinc.server.common.data.EntitySubtype;
-import com.hashmapinc.server.common.data.Tenant;
-import com.hashmapinc.server.common.data.User;
+import com.hashmapinc.server.common.data.*;
 import com.hashmapinc.server.common.data.asset.Asset;
-import com.hashmapinc.server.common.data.id.CustomerId;
+import com.hashmapinc.server.common.data.datamodel.DataModel;
+import com.hashmapinc.server.common.data.datamodel.DataModelObject;
+import com.hashmapinc.server.common.data.id.*;
 import com.hashmapinc.server.common.data.page.TextPageData;
 import com.hashmapinc.server.common.data.page.TextPageLink;
 import com.hashmapinc.server.common.data.security.Authority;
@@ -36,8 +35,8 @@ import org.junit.Test;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
-import static com.hashmapinc.server.dao.model.ModelConstants.NULL_UUID;
 import static org.hamcrest.Matchers.containsString;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -51,19 +50,8 @@ public abstract class BaseAssetControllerTest extends AbstractControllerTest {
     }
 
     @Test
-    public void testSaveAsset() throws Exception {
-        Asset asset = new Asset();
-        asset.setName("My asset");
-        asset.setType("default");
-        Asset savedAsset = doPost("/api/asset", asset, Asset.class);
-
-        Assert.assertNotNull(savedAsset);
-        Assert.assertNotNull(savedAsset.getId());
-        Assert.assertTrue(savedAsset.getCreatedTime() > 0);
-        Assert.assertEquals(savedTenant.getId(), savedAsset.getTenantId());
-        Assert.assertNotNull(savedAsset.getCustomerId());
-        Assert.assertEquals(NULL_UUID, savedAsset.getCustomerId().getId());
-        Assert.assertEquals(asset.getName(), savedAsset.getName());
+    public void testSaveAndUpdateAsset() throws Exception {
+        Asset savedAsset = createAsset(null, null, "My asset");
 
         savedAsset.setName("My new asset");
         doPost("/api/asset", savedAsset, Asset.class);
@@ -74,10 +62,7 @@ public abstract class BaseAssetControllerTest extends AbstractControllerTest {
 
     @Test
     public void testFindAssetById() throws Exception {
-        Asset asset = new Asset();
-        asset.setName("My asset");
-        asset.setType("default");
-        Asset savedAsset = doPost("/api/asset", asset, Asset.class);
+        Asset savedAsset = createAsset(null, null, "My asset");
         Asset foundAsset = doGet("/api/asset/" + savedAsset.getId().getId().toString(), Asset.class);
         Assert.assertNotNull(foundAsset);
         Assert.assertEquals(savedAsset, foundAsset);
@@ -115,13 +100,8 @@ public abstract class BaseAssetControllerTest extends AbstractControllerTest {
 
     @Test
     public void testDeleteAsset() throws Exception {
-        Asset asset = new Asset();
-        asset.setName("My asset");
-        asset.setType("default");
-        Asset savedAsset = doPost("/api/asset", asset, Asset.class);
-
-        doDelete("/api/asset/"+savedAsset.getId().getId().toString())
-                .andExpect(status().isOk());
+        Asset savedAsset = createAsset(null, null, "My asset");
+        deleteAsset(savedAsset.getId());
 
         doGet("/api/asset/"+savedAsset.getId().getId().toString())
                 .andExpect(status().isNotFound());
@@ -169,11 +149,7 @@ public abstract class BaseAssetControllerTest extends AbstractControllerTest {
 
     @Test
     public void testAssignAssetToNonExistentCustomer() throws Exception {
-        Asset asset = new Asset();
-        asset.setName("My asset");
-        asset.setType("default");
-        Asset savedAsset = doPost("/api/asset", asset, Asset.class);
-
+        Asset savedAsset = createAsset(null, null, "My asset");
         doPost("/api/customer/" + UUIDs.timeBased().toString()
                 + "/asset/" + savedAsset.getId().getId().toString())
                 .andExpect(status().isNotFound());
@@ -203,10 +179,7 @@ public abstract class BaseAssetControllerTest extends AbstractControllerTest {
 
         loginTenantAdmin();
 
-        Asset asset = new Asset();
-        asset.setName("My asset");
-        asset.setType("default");
-        Asset savedAsset = doPost("/api/asset", asset, Asset.class);
+        Asset savedAsset = createAsset(null, null, "My asset");
 
         doPost("/api/customer/" + savedCustomer.getId().getId().toString()
                 + "/asset/" + savedAsset.getId().getId().toString())
@@ -615,6 +588,143 @@ public abstract class BaseAssetControllerTest extends AbstractControllerTest {
                 new TypeReference<TextPageData<Asset>>(){}, pageLink, type2);
         Assert.assertFalse(pageData.hasNext());
         Assert.assertEquals(0, pageData.getData().size());
+    }
+
+    @Test
+    public void testPolicyForAsset() throws Exception {
+
+        DataModel dataModel = createDataModel();
+        DataModelObject dataModelObject = createDataModelObject(dataModel);
+        Asset asset = createAsset(dataModelObject.getId(), customerUser.getCustomerId(), "Tenant's asset");
+        String policy = String.format("CUSTOMER_USER:ASSET?%s=%s&%s=%s:READ",
+                UserPermission.ResourceAttribute.ID, asset.getId().getId().toString(),
+                UserPermission.ResourceAttribute.DATA_MODEL_ID, dataModelObject.getId().getId().toString());
+
+        List<String> policies = Collections.singletonList(policy);
+
+        CustomerGroup savedCustomerGroup = createGroupWithPolicies(policies, customerUser.getCustomerId(), "My Customer Group");
+        String getPolicyUrl = "/api/customer/group/" + savedCustomerGroup.getId().getId().toString() + "/policy";
+
+        final Map<String, Map<String, String>> displayablePolicies = doGetTyped(getPolicyUrl, new TypeReference<Map<String, Map<String, String>>>() {
+        });
+
+        Assert.assertArrayEquals(policies.toArray(), displayablePolicies.keySet().toArray());
+        Assert.assertEquals(displayablePolicies.get(policy).get(UserPermission.ResourceAttribute.ID.toString()), asset.getName());
+        Assert.assertEquals(displayablePolicies.get(policy).get(UserPermission.ResourceAttribute.DATA_MODEL_ID.toString()), dataModelObject.getName());
+
+
+        UserId customerUserId = getCustomerUserId();
+        assignUserToGroup(customerUserId, savedCustomerGroup);
+
+        logout();
+        loginCustomerUser();
+        Asset assetByCustomer1 = doGet("/api/asset/"+asset.getId().getId().toString(), Asset.class);
+        Assert.assertEquals(asset.getId().getId(), assetByCustomer1.getId().getId());
+        assetByCustomer1.setName("UpdatedAsset");
+        doPost("/api/asset", assetByCustomer1).andExpect(status().is4xxClientError());
+        logout();
+
+
+        String policyNew = String.format("CUSTOMER_USER:ASSET?%s=%s&%s=%s:UPDATE",
+                UserPermission.ResourceAttribute.ID, asset.getId().getId().toString(),
+                UserPermission.ResourceAttribute.DATA_MODEL_ID, dataModelObject.getId().getId().toString());
+        List<String> policiesNew = Collections.singletonList(policyNew);
+        updateGroupWithPolicies(policiesNew, savedCustomerGroup);
+
+
+        logout();
+        loginCustomerUser();
+        assetByCustomer1.setName("UpdatedAssetName");
+        Asset assetUpdated = doPost("/api/asset", assetByCustomer1, Asset.class);
+        Assert.assertEquals(assetByCustomer1.getName(), assetUpdated.getName());
+        logout();
+
+        String policyNew1 = String.format("CUSTOMER_USER:ASSET?%s=%s:CREATE",
+                UserPermission.ResourceAttribute.DATA_MODEL_ID, dataModelObject.getId().getId().toString());
+        List<String> policiesNew1 = Collections.singletonList(policyNew1);
+        updateGroupWithPolicies(policiesNew1, savedCustomerGroup);
+
+        logout();
+        loginCustomerUser();
+        Asset asset1 = createAsset(dataModelObject.getId(), customerUser.getCustomerId(), "Customer's asset");
+        logout();
+
+        loginTenantAdmin();
+        deleteGroup(savedCustomerGroup.getId());
+        deleteAsset(asset.getId());
+        deleteAsset(asset1.getId());
+        deleteDataModelObject(dataModelObject.getId());
+        logout();
+    }
+
+    @Test
+    public void findAllAssetsByDataModeObject() throws Exception{
+        DataModel dataModel = createDataModel();
+        DataModelObject dataModelObject = createDataModelObject(dataModel);
+
+        String policyNew1 = String.format("CUSTOMER_USER:ASSET?%s=%s:READ",
+                UserPermission.ResourceAttribute.DATA_MODEL_ID, dataModelObject.getId().getId().toString());
+
+
+        String policyNew2 = String.format("CUSTOMER_USER:ASSET?%s=%s:CREATE",
+                UserPermission.ResourceAttribute.DATA_MODEL_ID, dataModelObject.getId().getId().toString());
+        List<String> policies = new ArrayList<>();
+        policies.add(policyNew1);
+        policies.add(policyNew2);
+        CustomerGroup savedCustomerGroup = createGroupWithPolicies(policies, customerUser.getCustomerId(), "My Customer Group");
+        UserId customerUserId = getCustomerUserId();
+        assignUserToGroup(customerUserId, savedCustomerGroup);
+
+        logout();
+        loginCustomerUser();
+        for (int i = 0; i < 20; i++) {
+            createAsset(dataModelObject.getId(), customerUser.getCustomerId(), "Customer's asset"+i);
+        }
+
+        TextPageLink pageLink = new TextPageLink(15);
+        TextPageData<Asset> pageData  = doGetTypedWithPageLink("/api/datamodelobject/assets/"+ dataModelObject.getId().getId().toString()+"?",
+                new TypeReference<TextPageData<Asset>>(){}, pageLink);
+        Assert.assertEquals(15, pageData.getData().size());
+
+        TextPageData<Asset> pageData1  = doGetTypedWithPageLink("/api/datamodelobject/assets/"+ dataModelObject.getId().getId().toString()+"?",
+                new TypeReference<TextPageData<Asset>>(){}, pageData.getNextPageLink());
+        Assert.assertEquals(5, pageData1.getData().size());
+        logout();
+
+        unAssignUserFromGroup(savedCustomerGroup.getId(), customerUserId);
+
+        logout();
+        loginTenantAdmin();
+        int i = 0;
+        List<String> policies1 = new ArrayList<>();
+        while (i < 20){
+            Asset asset_i = createAsset(dataModelObject.getId(), customerUser.getCustomerId(), "Tenant's asset "+ i);
+            String policy_i = String.format("CUSTOMER_USER:ASSET?%s=%s&%s=%s:READ",
+                    UserPermission.ResourceAttribute.ID, asset_i.getId().getId().toString(),
+                    UserPermission.ResourceAttribute.DATA_MODEL_ID, dataModelObject.getId().getId().toString());
+            if(i % 2 == 0)
+                policies1.add(policy_i);
+            i++;
+
+        }
+        CustomerGroup savedCustomerGroup1 = createGroupWithPolicies(policies1, customerUser.getCustomerId(), "My Customer Group New");
+
+        String getPolicyUrl1 = "/api/customer/group/" + savedCustomerGroup1.getId().getId().toString() + "/policy";
+        doGet(getPolicyUrl1).andExpect(status().isOk());
+        assignUserToGroup(customerUserId, savedCustomerGroup1);
+
+        logout();
+        loginCustomerUser();
+        TextPageLink pageLink11 = new TextPageLink(7);
+        TextPageData<Asset> pageData11  = doGetTypedWithPageLink("/api/datamodelobject/assets/"+ dataModelObject.getId().getId().toString()+"?",
+                new TypeReference<TextPageData<Asset>>(){}, pageLink11);
+        Assert.assertEquals(7, pageData11.getData().size());
+
+        TextPageData<Asset> pageData12  = doGetTypedWithPageLink("/api/datamodelobject/assets/"+ dataModelObject.getId().getId().toString()+"?",
+                new TypeReference<TextPageData<Asset>>(){}, pageData11.getNextPageLink());
+        Assert.assertEquals(3, pageData12.getData().size());
+        logout();
+
     }
 
 }

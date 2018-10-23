@@ -43,7 +43,8 @@ function DashboardService($rootScope, $http, $q, $location, $filter) {
         removeDashboardCustomers: removeDashboardCustomers,
         makeDashboardPublic: makeDashboardPublic,
         makeDashboardPrivate: makeDashboardPrivate,
-        getPublicDashboardLink: getPublicDashboardLink
+        getPublicDashboardLink: getPublicDashboardLink,
+        getAssetLandingDashboardByDataModelObjId:getAssetLandingDashboardByDataModelObjId
     }
 
     return service;
@@ -130,7 +131,7 @@ function DashboardService($rootScope, $http, $q, $location, $filter) {
         var deferred = $q.defer();
         var url = '/api/dashboard/' + dashboardId;
         $http.get(url, null).then(function success(response) {
-            deferred.resolve(prepareDashboard(response.data));
+            deferred.resolve(prepareDashboard(response.data)); 
         }, function fail() {
             deferred.reject();
         });
@@ -150,7 +151,21 @@ function DashboardService($rootScope, $http, $q, $location, $filter) {
 
     function saveDashboard(dashboard) {
         var deferred = $q.defer();
-        var url = '/api/dashboard';
+        var url;        
+        if(dashboard.landingDashboard) {
+            dashboard.assetLandingInfo ={
+                dataModelId:{
+                    id:dashboard.dataModelId,
+                    entityType : "DATA_MODEL"
+                },
+                dataModelObjectId:{  
+                    id:dashboard.dataModelObjectId,
+                    entityType : "DATA_MODEL_OBJECT"
+                }
+            }
+            dashboard.type="ASSET_LANDING_PAGE"
+        }
+        url = '/api/dashboard';
         $http.post(url, cleanDashboard(dashboard)).then(function success(response) {
             deferred.resolve(prepareDashboard(response.data));
         }, function fail() {
@@ -293,4 +308,14 @@ function DashboardService($rootScope, $http, $q, $location, $filter) {
         return dashboard;
     }
 
+    function getAssetLandingDashboardByDataModelObjId(dataModelObjId) {
+        var deferred = $q.defer();
+        var url = '/api/asset/dashboard/data-model-object/' + dataModelObjId.id.id;
+        $http.get(url).then(function success(response) {
+            deferred.resolve(response.data);
+        }, function fail() {
+            deferred.reject();
+        });
+        return deferred.promise;
+    }
 }

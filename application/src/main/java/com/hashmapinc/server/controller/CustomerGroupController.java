@@ -40,6 +40,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -252,6 +253,21 @@ public class CustomerGroupController extends BaseController {
             UserId userId = new UserId(toUUID(strUserId));
             checkUserId(userId);
             return checkNotNull(customerGroupService.findGroupPoliciesForUser(userId));
+        } catch (Exception e){
+            throw handleException(e);
+        }
+    }
+
+    @PreAuthorize("hasAuthority('TENANT_ADMIN')")
+    @GetMapping(value = "/group/{customerGroupId}/policy")
+    @ResponseBody
+    public Map<String, Map<String, String>> getDisplayablePoliciesForGroup(
+            @PathVariable(CUSTOMER_GROUP_ID) String strCustomerGroupId) throws TempusException {
+        checkParameter(CUSTOMER_GROUP_ID, strCustomerGroupId);
+        try{
+
+            CustomerGroupId customerGroupId = new CustomerGroupId(toUUID(strCustomerGroupId));
+            return checkNotNull(customerGroupService.findGroupPolicies(customerGroupId));
         } catch (Exception e){
             throw handleException(e);
         }

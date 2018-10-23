@@ -45,7 +45,6 @@ function DatasourceFunc($compile, $templateCache, $mdDialog, $window, $document,
 
         scope.ngModelCtrl = ngModelCtrl;
         scope.types = types;
-
         scope.functionTypes = utils.getPredefinedFunctionsList();
         scope.alarmFields = [];
         for (var alarmField in types.alarmFields) {
@@ -57,7 +56,8 @@ function DatasourceFunc($compile, $templateCache, $mdDialog, $window, $document,
 
         scope.selectedAlarmDataKey = null;
         scope.alarmDataKeySearchText = null;
-
+        
+    
         scope.updateValidity = function () {
             if (ngModelCtrl.$viewValue) {
                 var value = ngModelCtrl.$viewValue;
@@ -84,6 +84,7 @@ function DatasourceFunc($compile, $templateCache, $mdDialog, $window, $document,
             updateDataKeys();
         }, true);
 
+
         function updateDataKeys() {
             if (ngModelCtrl.$viewValue) {
                 var dataKeys = [];
@@ -101,6 +102,7 @@ function DatasourceFunc($compile, $templateCache, $mdDialog, $window, $document,
             }
         });
 
+       
         ngModelCtrl.$render = function () {
             if (ngModelCtrl.$viewValue) {
                 var funcDataKeys = [];
@@ -229,7 +231,8 @@ function DatasourceFunc($compile, $templateCache, $mdDialog, $window, $document,
             maxDataKeys: '=',
             optDataKeys: '=',
             generateDataKey: '&',
-            datakeySettingsSchema: '='
+            datakeySettingsSchema: '=',
+            widgetInfo: '='
         },
         link: linker
     };

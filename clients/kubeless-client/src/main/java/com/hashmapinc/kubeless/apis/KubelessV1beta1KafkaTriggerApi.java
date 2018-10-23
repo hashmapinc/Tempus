@@ -16,7 +16,7 @@
  */
 package com.hashmapinc.kubeless.apis;
 
-import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Maps;
 import com.hashmapinc.kubeless.models.triggers.V1beta1KafkaTrigger;
 import com.squareup.okhttp.Call;
 import io.kubernetes.client.ApiClient;
@@ -35,7 +35,9 @@ public class KubelessV1beta1KafkaTriggerApi {
     public KubelessV1beta1KafkaTriggerApi(ApiClient client, String namespace){
         this.apiClient = client;
         this.kubelessKafkaTriggerUri = "/apis/kubeless.io/v1beta1/namespaces/"+ namespace +"/kafkatriggers/";
-        this.headers = ImmutableMap.of("Accept", "application/json", "Content-type", "application/json");
+        this.headers = Maps.newHashMap();
+        this.headers.put("Accept", "application/json");
+        this.headers.put("Content-type", "application/json");
     }
 
     public KubelessV1beta1KafkaTriggerApi(String namespace){

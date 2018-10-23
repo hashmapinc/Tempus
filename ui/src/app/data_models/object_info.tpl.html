@@ -16,51 +16,70 @@
     limitations under the License.
 
 -->
-<md-dialog style="min-width: 600px;" tb-help="'datamodel_object_creation'" help-container-id="help-container">
+
+
+<md-dialog style="min-width: 600px; width: 50%;" tb-help="'datamodel_object_creation'" help-container-id="help-container">
         <md-toolbar>
             <div class="md-toolbar-tools">
-                <span translate class="md-headline"><h2>dataModels.objectInfo</h2></span>
+                <span translate class="md-headline-info"><h2>dataModels.objectInfo</h2></span>
                 <span flex></span>
                 <md-button class="md-icon-button" ng-click="vm.cancel()">
                     <ng-md-icon icon="close" aria-label="{{ 'dialog.close' | translate }}"></ng-md-icon>
                 </md-button>
             </div>
         </md-toolbar>
+    <div class="half">
+        <div class="tab">
+            <input id="tab-one" type="checkbox" name="tabs" checked>
+            <label for="tab-one"><span translate class="md-headline-info">dataModels.datamodelObject</span></label>
+            <div class="tab-content">
+                <md-list-item style="margin-bottom: -30px;">
+                    <p class="dmoFont"><span translate>dataModels.name</span>: <span class="datamodel-value">{{vm.nodeValue.datamodelObject.name}}</span></p>
+                </md-list-item>
+                <md-list-item style="margin-bottom: -30px;">
+                    <p class="dmoFont"><span translate>dataModels.description</span>: <span class="datamodel-value">{{vm.nodeValue.datamodelObject.desc}}</span> </p>
+                </md-list-item>
+                <md-list-item>
+                    <p class="dmoFont"><span translate>dataModels.type</span>: <span class="datamodel-value">{{vm.nodeValue.datamodelObject.type}}</span> </p>
+                </md-list-item>
 
-    <md-card-content>
+            </div>
+        </div>
+        <div class="tab">
+            <input id="tab-two" type="checkbox" name="tabs" checked>
+            <label for="tab-two"><span translate class="md-headline-info">dataModels.objectAttribute</span></label>
+            <div class="tab-content">
+                <md-list-item ng-repeat="attribute in vm.nodeValue.datamodelObject.attributes">
+                    <p class="dmoFont"><span class="datamodel-value"> {{attribute}} </span></p>
+                </md-list-item>
+                <md-list-item ng-show="vm.nodeValue.datamodelObject.attributes.length == 0">
+                    <p class="dmoFont"> <span translate>dataModels.noAttribute</span> </p>
+                </md-list-item>
 
-                <md-content class="md-padding">
-                    <md-subheader class="md-no-sticky"><span translate class="md-headline">dataModels.datamodelObject</span></md-subheader>
-                    <md-list-item>
-                        <p class="dmoFont"><span translate>dataModels.name</span>: {{vm.nodeValue.datamodelObject.name}} </p>
-                    </md-list-item>
-                    <md-list-item>
-                        <p class="dmoFont"><span translate>dataModels.description</span>: {{vm.nodeValue.datamodelObject.desc}} </p>
-                    </md-list-item>
-                    <md-list-item>
-                        <p class="dmoFont"><span translate>dataModels.type</span>: {{vm.nodeValue.datamodelObject.type}} </p>
-                    </md-list-item>
+            </div>
+        </div>
+        <div class="tab">
+            <input id="tab-three" type="checkbox" name="tabs" checked>
+            <label for="tab-three"><span translate class="md-headline-info">dataModels.relationships</span></label>
+            <div class="tab-content">
+                <md-list-item>
+                    <p class="dmoFont"><span translate>dataModels.parent</span>: <span class="datamodel-value">{{vm.nodeValue.datamodelObject.parent_id ? vm.nodeValue.datamodelObject.parent : "None"}}</span></p>
+                </md-list-item>
+            </div>
+        </div>
 
-                    <md-subheader class="md-no-sticky sections"><span translate class="md-headline">dataModels.objectAttribute</span></md-subheader>
-                    <md-list-item ng-repeat="attrib in vm.nodeValue.datamodelObject.attributedas">
-                        <p class="dmoFont"> {{ attrib }} </p>
-                    </md-list-item>
+        <div class="tab">
+            <input id="tab-four" type="checkbox" name="tabs" checked>
+            <label for="tab-four"><span translate class="md-headline-info">dataModels.image</span></label>
+            <div class="tab-content">
+                <md-list-item>
+                    <p class="dmoFont"><span translate>dataModels.image</span>:<img class="" style="width: 98%; margin-top: -1%;"ng-src="{{vm.nodeValue.datamodelObject.logoFile}}"></p>
+                </md-list-item>
 
-                    <md-subheader class="md-no-sticky sections"><span translate class="md-headline">dataModels.relationships</span></md-subheader>
-                    <md-list-item>
-                        <p class="dmoFont"><span translate>dataModels.parent</span>: {{vm.nodeValue.datamodelObject.parent_id ? vm.nodeValue.datamodelObject.parent : "None"}}</p>
-                    </md-list-item>
+            </div>
+        </div>
 
-                    <md-subheader class="md-no-sticky sections"><span translate class="md-headline">dataModels.image</span></md-subheader>
-
-                    <md-list-item>
-                        <p class="dmoFont"><span translate>dataModels.icon</span>:<img class="" style="width: 98%; margin-top: -1%;"ng-src="{{vm.nodeValue.datamodelObject.logoFile}}"></p>
-                        </md-list-item>
-
-                </md-content>
-
-
-    </md-card-content>
+    </div>
 
 
 </md-dialog>
