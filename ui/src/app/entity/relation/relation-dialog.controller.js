@@ -112,7 +112,7 @@ export default function RelationDialogController($scope, $mdDialog, types, entit
 
         $scope.theForm.$setValidity("additionalInfo", valid);
         var relationCustomerId = null;
-        var flag;
+        var toFromRelationFlag;
         var saveRelationObject = {
             additionalInfo: vm.relation.additionalInfo,
             to:null,
@@ -138,17 +138,19 @@ export default function RelationDialogController($scope, $mdDialog, types, entit
             saveRelationObject.from = vm.relation.from;
         }
 
-        flag = getRelationType(vm.relation);
+        toFromRelationFlag = isToFromRelationDeviceOrAsset(vm.relation);
         if (valid) {
             entityRelationService.saveRelation(saveRelationObject).then(
                 function success() {
-                    if(((relation.from.entityType == 'DEVICE' || relation.to.entityType == 'DEVICE')
-                    || (relation.from.entityType == 'ASSET' || relation.to.entityType == 'ASSET'))
-                    && vm.entityDetail && vm.entityDetail.customerId.id == '13814000-1dd2-11b2-8080-808080808080' && flag){
-                        if(relationCustomerId != '13814000-1dd2-11b2-8080-808080808080'){
-                            if(vm.entityDetail.id.entityType == 'DEVICE') {
+                    if(((relation.from.entityType === 'DEVICE' || relation.to.entityType === 'DEVICE')
+                        || (relation.from.entityType === 'ASSET' || relation.to.entityType === 'ASSET'))
+                        && vm.entityDetail && vm.entityDetail.customerId.id === '13814000-1dd2-11b2-8080-808080808080'
+                        && toFromRelationFlag){
+
+                        if(relationCustomerId !== '13814000-1dd2-11b2-8080-808080808080'){
+                            if(vm.entityDetail.id.entityType === 'DEVICE') {
                                 deviceService.assignDeviceToCustomer(relationCustomerId,vm.entityDetail.id.id).then();
-                            } else if(vm.entityDetail.id.entityType == 'ASSET') {
+                            } else if(vm.entityDetail.id.entityType === 'ASSET') {
                                 assetService.assignAssetToCustomer(relationCustomerId,vm.entityDetail.id.id).then();
                             }
                         }
@@ -159,16 +161,12 @@ export default function RelationDialogController($scope, $mdDialog, types, entit
         }
     }
 
-    function getRelationType(relation){
-        if(relation.to.entityType != 'TENANT' && relation.from.entityType != 'TENANT'
-            && relation.to.entityType != 'CUSTOMER' && relation.from.entityType != 'CUSTOMER'
-            && relation.to.entityType != 'RULE' && relation.from.entityType != 'RULE'
-            && relation.to.entityType != 'PLUGIN' && relation.from.entityType != 'PLUGIN'
-            && relation.to.entityType != 'DASHBOARD' && relation.from.entityType != 'DASHBOARD'){
-                return true;
-        }else {
-            return false;
-        }
+    function isToFromRelationDeviceOrAsset(relation){
+        return relation.to.entityType !== 'TENANT' && relation.from.entityType !== 'TENANT'
+            && relation.to.entityType !== 'CUSTOMER' && relation.from.entityType !== 'CUSTOMER'
+            && relation.to.entityType !== 'RULE' && relation.from.entityType !== 'RULE'
+            && relation.to.entityType !== 'PLUGIN' && relation.from.entityType !== 'PLUGIN'
+            && relation.to.entityType !== 'DASHBOARD' && relation.from.entityType !== 'DASHBOARD';
     }
 
 }
