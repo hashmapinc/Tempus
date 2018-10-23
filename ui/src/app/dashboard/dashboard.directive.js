@@ -34,6 +34,8 @@ export default function DashboardDirective($compile, $templateCache, $translate,
         scope.types = types;
         scope.listOfDataModelAssets = [];
         scope.user = userService.getCurrentUser();
+
+
         scope.$watch('dashboard', function(newVal) {
             if(newVal !=null && newVal.hasOwnProperty("title")){
                 scope.theForm.editFlag = true;
@@ -42,6 +44,8 @@ export default function DashboardDirective($compile, $templateCache, $translate,
             }            
             if(scope.dashboard && scope.dashboard.type == "ASSET_LANDING_PAGE"){    
                 scope.dashboard.landingDashboard = true;
+                scope.dashboard.dataModelId = scope.dashboard.assetLandingInfo.dataModelId.id;
+                scope.dashboard.dataModelObjectId = scope.dashboard.assetLandingInfo.dataModelObjectId.id;
                 scope.loadDataModel();
                 scope.loadDataModelAssets();
             }
@@ -68,15 +72,17 @@ export default function DashboardDirective($compile, $templateCache, $translate,
                 dataModelId = scope.dashboard.assetLandingInfo.dataModelId.id
             }else{
                 dataModelId = scope.dashboard.dataModelId;
+
             }
             scope.dataModels = datamodelService.listDatamodels();
             scope.dataModels.then(function (data) {
+                scope.dashboardDataModel = null;
                 scope.listOfDataModel = data;
                 val = scope.listOfDataModel.filter(e => e.id.id === dataModelId);
                 scope.dashboardDataModel = val[0];
             }, function (error) {
                 $log.error(error);
-            }) 
+            })
         }
 
         /**
@@ -102,12 +108,13 @@ export default function DashboardDirective($compile, $templateCache, $translate,
                         scope.listOfDataModelAssets.push(list);
                     }
                   });
+                scope.dashboarddataModelAsset = null;
                 val = scope.listOfDataModelAssets.filter(e => e.id.id === dataModelObjectId);
                 scope.dashboarddataModelAsset = val[0];   
                 scope.showAssets();  
             }, function (error) {
                 $log.error(error);
-            }) 
+            })
         }
         /**
          * Show Assets List
