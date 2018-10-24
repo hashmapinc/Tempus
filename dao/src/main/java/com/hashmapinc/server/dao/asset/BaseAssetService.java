@@ -278,6 +278,9 @@ public class BaseAssetService extends AbstractEntityService implements AssetServ
                             throw new DataValidationException("Can't assign asset to customer from different tenant!");
                         }
                     }
+                    if (asset.getDataModelObjectId() == null) {
+                        asset.setDataModelObjectId(new DataModelObjectId(ModelConstants.NULL_UUID));
+                    }
                 }
             };
 

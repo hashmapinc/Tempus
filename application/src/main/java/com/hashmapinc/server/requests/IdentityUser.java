@@ -63,6 +63,7 @@ public class IdentityUser {
 
         this.firstName = user.getFirstName();
         this.lastName = user.getLastName();
+        this.enabled = user.isEnabled();
     }
 
     public User toUser(){
@@ -78,6 +79,7 @@ public class IdentityUser {
             user.setCustomerId(new CustomerId(customerId));
         }
         user.setAuthority(Authority.parse(authorities.get(0)));
+        user.setEnabled(enabled);
         return user;
     }
 }
