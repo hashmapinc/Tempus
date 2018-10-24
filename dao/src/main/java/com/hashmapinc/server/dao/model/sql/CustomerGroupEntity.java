@@ -34,6 +34,7 @@ import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
 
 import javax.persistence.*;
+import java.util.Collections;
 import java.util.List;
 
 @NoArgsConstructor
@@ -98,6 +99,8 @@ public class CustomerGroupEntity extends BaseSqlEntity<CustomerGroup> implements
         customerGroup.setAdditionalInfo(additionalInfo);
         if (policies != null && !policies.isEmpty()) {
             customerGroup.setPolicies(policies);
+        } else {
+            customerGroup.setPolicies(Collections.emptyList());
         }
         return customerGroup;
     }

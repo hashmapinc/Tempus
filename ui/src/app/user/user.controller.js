@@ -34,36 +34,43 @@ export default function UserController(userGroupService, userService, toast, $sc
     var usersType = $state.$current.data.usersType;
     var userActionsList = [];
 
-    userActionsList.push({
-        onAction: function($event, item) {
-            assignGroupToUsers($event, [item.id.id]);
-        },
-        name: function() {
-            return $translate.instant('action.assign')
-        },
-        details: function() {
-            return $translate.instant('user.assignToUsers')
-        },
-        icon: "assignment_ind"
 
-    });
+    var userAuthority = userService.getAuthority();
 
-    userActionsList.push(
+     if(userAuthority === 'TENANT_ADMIN') {
 
-        {
-            onAction: function($event, item) {
-                unassignFromUsers($event, [item.id.id]);
-            },
-            name: function() {
-                return $translate.instant('action.unassign')
-            },
-            details: function() {
-                return $translate.instant('user.unassignToUsers')
-            },
-            icon: "assignment_return"
+            userActionsList.push({
+                onAction: function($event, item) {
+                    assignGroupToUsers($event, [item.id.id]);
+                },
+                name: function() {
+                    return $translate.instant('action.assign')
+                },
+                details: function() {
+                    return $translate.instant('user.assignToUsers')
+                },
+                icon: "assignment_ind"
 
-        }
-    );
+            });
+
+        userActionsList.push(
+
+            {
+                onAction: function($event, item) {
+                    unassignFromUsers($event, [item.id.id]);
+                },
+                name: function() {
+                    return $translate.instant('action.unassign')
+                },
+                details: function() {
+                    return $translate.instant('user.unassignToUsers')
+                },
+                icon: "assignment_return"
+
+            }
+        );
+
+   }
 
 
     userActionsList.push({

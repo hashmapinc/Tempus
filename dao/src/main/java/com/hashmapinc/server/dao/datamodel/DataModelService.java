@@ -27,4 +27,6 @@ public interface DataModelService {
     DataModel saveDataModel(DataModel dataModel);
     DataModel findById(DataModelId id);
     List<DataModel> findByTenantId(TenantId tenantId);
+    void deleteById(DataModelId dataModelId);
+    void deleteDataModelsByTenantId(TenantId tenantId);
 }

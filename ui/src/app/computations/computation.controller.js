@@ -96,7 +96,7 @@ export default function ComputationController(computationService, computationJob
             $event.stopPropagation();
         }
 
-        $state.transitionTo ('.', {computationId: computation.id.id}, { location: false, relative: $state.$current, reload: false, notify: false }) 
+        $state.transitionTo ('.', {computationId: computation.id.id}, { location: false, relative: $state.$current, reload: false, notify: false })
 
                 vm.computation = computation;
                 vm.viewComputations = false;
@@ -169,14 +169,6 @@ export default function ComputationController(computationService, computationJob
         }
     ];
 
-    //var vm = this;
-    
-
-    //vm.types = types;
-
-    //vm.helpLinkIdForComputationJob = helpLinkIdForComputationJob;
-
-
     vm.computationJobGridConfig = {
 
         refreshParamsFunc: null,
@@ -184,7 +176,6 @@ export default function ComputationController(computationService, computationJob
         deleteItemTitleFunc: deleteComputationJobTitle,
         deleteItemContentFunc: deleteComputationJobText,
         deleteItemsTitleFunc: deleteComputationJobsTitle,
-        //deleteItemsActionTitleFunc: deleteComputationJobsActionTitle,
         deleteItemsContentFunc: deleteComputationJobsText,
 
         fetchItemsFunc: fetchComputationJobs,
@@ -241,30 +232,21 @@ export default function ComputationController(computationService, computationJob
         return $translate.instant('computationJob.delete-computationJobs-title', {count: selectedCount}, 'messageformat');
     }
 
-    /*function deleteComputationJobsActionTitle(selectedCount) {
-        return $translate.instant('computationJob.delete-computationJobs-action-title', {count: selectedCount}, 'messageformat');
-    }*/
-
     function deleteComputationJobsText() {
         return $translate.instant('computationJob.delete-computationJobs-text');
     }
 
-    // function gridInited(grid) {
-    //     vm.grid = grid;
-    // }
-
     function fetchComputationJobs(pageLink) {
         if(vm.computation != null){
-                    return computationJobService.getAllComputationJobs(pageLink, vm.computation.id.id);
+            return computationJobService.getAllComputationJobs(pageLink, vm.computation.id.id);
         }
         else {
-                computationService.getComputation($stateParams.computationId).then(
-                function success(computation) {
-                    //vm.computation = computation;
-                    return computationJobService.getAllComputationJobs(pageLink, computation.id.id)
-                },
-                function fail() {
-                }
+            computationService.getComputation($stateParams.computationId).then(
+            function success(computation) {
+                return computationJobService.getAllComputationJobs(pageLink, computation.id.id)
+            },
+            function fail() {
+            }
             );
         }
     }

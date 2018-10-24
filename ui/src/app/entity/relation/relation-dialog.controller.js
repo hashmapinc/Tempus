@@ -24,13 +24,14 @@ import './relation-dialog.scss';
 const js_beautify = beautify.js;
 
 /*@ngInject*/
-export default function RelationDialogController($scope, $mdDialog, types, entityRelationService, isAdd, direction, relation, showingCallback) {
+export default function RelationDialogController($scope, $mdDialog, types, entityRelationService, isAdd, direction, relation, showingCallback, entityDetail, assetService, deviceService) {
 
     var vm = this;
 
     vm.types = types;
     vm.isAdd = isAdd;
     vm.direction = direction;
+    vm.entityDetail = entityDetail;
 
     showingCallback.onShowing = function(scope, element) {
         updateEditorSize(element);
@@ -110,14 +111,62 @@ export default function RelationDialogController($scope, $mdDialog, types, entit
         }
 
         $scope.theForm.$setValidity("additionalInfo", valid);
+        var relationCustomerId = null;
+        var toFromRelationFlag;
+        var saveRelationObject = {
+            additionalInfo: vm.relation.additionalInfo,
+            to:null,
+            from:null,
+            type:vm.relation.type
+        }
+        if(vm.relation.from.id.hasOwnProperty('name')){
+            relationCustomerId = vm.relation.from.id.customerId ? vm.relation.from.id.customerId.id : null
 
+            var from ={
+                 id:vm.relation.from.id.id.id,
+                 entityType:vm.relation.from.entityType
+            }
+            saveRelationObject.from = from;
+            saveRelationObject.to = vm.relation.to;
+        }else {
+            relationCustomerId =  vm.relation.to.id.customerId ? vm.relation.to.id.customerId.id : null;
+            var to ={
+                 id:vm.relation.to.id.id.id,
+                 entityType:vm.relation.to.entityType
+            }
+            saveRelationObject.to = to;
+            saveRelationObject.from = vm.relation.from;
+        }
+
+        toFromRelationFlag = isToFromRelationDeviceOrAsset(vm.relation);
         if (valid) {
-            entityRelationService.saveRelation(vm.relation).then(
+            entityRelationService.saveRelation(saveRelationObject).then(
                 function success() {
+                    if(((relation.from.entityType === 'DEVICE' || relation.to.entityType === 'DEVICE')
+                        || (relation.from.entityType === 'ASSET' || relation.to.entityType === 'ASSET'))
+                        && vm.entityDetail && vm.entityDetail.customerId.id === '13814000-1dd2-11b2-8080-808080808080'
+                        && toFromRelationFlag){
+
+                        if(relationCustomerId !== '13814000-1dd2-11b2-8080-808080808080'){
+                            if(vm.entityDetail.id.entityType === 'DEVICE') {
+                                deviceService.assignDeviceToCustomer(relationCustomerId,vm.entityDetail.id.id).then();
+                            } else if(vm.entityDetail.id.entityType === 'ASSET') {
+                                assetService.assignAssetToCustomer(relationCustomerId,vm.entityDetail.id.id).then();
+                            }
+                        }
+                    }
                     $mdDialog.hide();
                 }
             );
         }
+    }
+
+    function isToFromRelationDeviceOrAsset(relation){
+        return relation.to.entityType !== 'TENANT' && relation.from.entityType !== 'TENANT'
+            && relation.to.entityType !== 'CUSTOMER' && relation.from.entityType !== 'CUSTOMER'
+            && relation.to.entityType !== 'RULE' && relation.from.entityType !== 'RULE'
+            && relation.to.entityType !== 'PLUGIN' && relation.from.entityType !== 'PLUGIN'
+            && relation.to.entityType !== 'DASHBOARD' && relation.from.entityType !== 'DASHBOARD';
     }
 
 }

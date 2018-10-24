@@ -62,7 +62,7 @@ public class JpaComputationsDao extends JpaAbstractDaoListeningExecutorService i
 
     @Override
     public void deleteById(ComputationId computationId) {
-        computationsRepository.delete(UUIDConverter. fromTimeUUID(computationId.getId()));
+        computationsRepository.delete(UUIDConverter.fromTimeUUID(computationId.getId()));
     }
 
     @Override

@@ -33,7 +33,8 @@ export default function RelationTable() {
         scope: true,
         bindToController: {
             entityId: '=',
-            entityType: '@'
+            entityType: '@',
+            entityDetail:'='
         },
         controller: RelationTableController,
         controllerAs: 'vm',
@@ -42,9 +43,10 @@ export default function RelationTable() {
 }
 
 /*@ngInject*/
-function RelationTableController($scope, $q, $mdDialog, $document, $translate, $filter, utils, types, entityRelationService) {
+function RelationTableController($scope, $q, $mdDialog, $document, $translate, $filter, utils, types, entityRelationService, $state) {
 
     let vm = this;
+
 
     vm.types = types;
 
@@ -72,12 +74,19 @@ function RelationTableController($scope, $q, $mdDialog, $document, $translate, $
     vm.deleteRelations = deleteRelations;
     vm.reloadRelations = reloadRelations;
     vm.updateRelations = updateRelations;
-
     $scope.$watch("vm.entityId", function(newVal, prevVal) {
         if (newVal && !angular.equals(newVal, prevVal)) {
             reloadRelations();
         }
     });
+
+    initController();
+
+    function initController() {
+        if($state.current.url == '/plugins' || $state.current.url == '/rules'){
+            reloadRelations();
+        }
+    }
 
     $scope.$watch("vm.direction", function(newVal, prevVal) {
         if (newVal && !angular.equals(newVal, prevVal)) {
@@ -151,7 +160,8 @@ function RelationTableController($scope, $q, $mdDialog, $document, $translate, $
             locals: { isAdd: isAdd,
                       direction: vm.direction,
                       relation: relation,
-                      showingCallback: onShowingCallback},
+                      showingCallback: onShowingCallback,
+                      entityDetail:vm.entityDetail},
             targetEvent: $event,
             fullscreen: true,
             skipHide: true,

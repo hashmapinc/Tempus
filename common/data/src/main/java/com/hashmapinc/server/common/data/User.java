@@ -44,6 +44,7 @@ public class User extends SearchTextBasedWithAdditionalInfo<UserId> implements H
     private String lastName;
     @JsonIgnore
     private List<CustomerGroupId> groupIds;
+    private boolean enabled;
 
     public User() {
         super();
@@ -63,6 +64,7 @@ public class User extends SearchTextBasedWithAdditionalInfo<UserId> implements H
         this.firstName = user.getFirstName();
         this.lastName = user.getLastName();
         this.groupIds = user.getGroupIds();
+        this.enabled = user.isEnabled();
     }
 
     public TenantId getTenantId() {
@@ -140,6 +142,14 @@ public class User extends SearchTextBasedWithAdditionalInfo<UserId> implements H
         return getEmail();
     }
 
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
+    }
+
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();
@@ -159,6 +169,8 @@ public class User extends SearchTextBasedWithAdditionalInfo<UserId> implements H
         builder.append(lastName);
         builder.append(", additionalInfo=");
         builder.append(getAdditionalInfo());
+        builder.append(", enabled=");
+        builder.append(isEnabled());
         builder.append(", createdTime=");
         builder.append(createdTime);
         builder.append(", id=");

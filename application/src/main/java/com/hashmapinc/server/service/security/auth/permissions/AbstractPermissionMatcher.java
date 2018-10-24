@@ -17,20 +17,31 @@
 package com.hashmapinc.server.service.security.auth.permissions;
 
 import com.hashmapinc.server.common.data.*;
+import com.hashmapinc.server.common.data.asset.Asset;
+import com.hashmapinc.server.common.data.id.DataModelObjectId;
+import com.hashmapinc.server.dao.datamodel.DataModelObjectService;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Data
 @EqualsAndHashCode
 @ToString
+@Slf4j
 public abstract class AbstractPermissionMatcher implements PermissionMatcher {
+
+    @Autowired
+    DataModelObjectService dataModelObjectService;
 
     @Override
     public boolean hasAccessToResource(TempusResource resource, String resourceType, UserPermission permission, User user) {
-        return permission.getResources().stream().map(Enum::name).collect(Collectors.toList()).contains(resourceType);
+        return hasAccessToResourceType(resourceType, permission) && checkAttributeBasedPermission(resource, permission.getResourceAttributes());
     }
 
     @Override
@@ -39,5 +50,47 @@ public abstract class AbstractPermissionMatcher implements PermissionMatcher {
             return false;
 
         return permission.getUserActions().stream().map(Enum::name).collect(Collectors.toList()).contains(action);
+    }
+
+    private boolean hasAccessToResourceType(String resourceType, UserPermission permission) {
+        return permission.getResources().stream().map(Enum::name).collect(Collectors.toList()).contains(resourceType);
+    }
+
+    private boolean checkAttributeBasedPermission(TempusResource resource, Map<UserPermission.ResourceAttribute, String> resourceAttributes){
+        if(resourceAttributes == null || resourceAttributes.isEmpty()){
+            return true;
+        }
+        if(resource instanceof Asset){
+            Asset assetResource = (Asset) resource;
+            return resourceAttributes.entrySet().stream().allMatch(entry -> {
+                switch (entry.getKey()) {
+                    case DATA_MODEL_ID:
+                        return assetResource.getDataModelObjectId() != null
+                                && (entry.getValue().equals(assetResource.getDataModelObjectId().getId().toString())
+                                || getParentsOf(assetResource.getDataModelObjectId()).contains(entry.getValue()));
+                    case ID:
+                        return resource.getId() != null && entry.getValue().equals(resource.getId().getId().toString());
+                }
+                return true;
+            });
+        } else if(resource instanceof Device){
+            Device deviceResource = (Device) resource;
+            return resourceAttributes.entrySet().stream().allMatch(entry -> {
+                switch (entry.getKey()) {
+                    case DATA_MODEL_ID:
+                        return true;  // TODO : Implement this when data model association is done for device
+                    case ID:
+                        return resource.getId() != null && entry.getValue().equals(resource.getId().getId().toString());
+                }
+                return true;
+            });
+        } else {
+            return true;
+        }
+    }
+
+    private Set<String> getParentsOf(DataModelObjectId dataModelObjectId){
+        Set<DataModelObjectId> allParentDataModelIds = dataModelObjectService.getAllParentDataModelIdsOf(dataModelObjectId);
+        return allParentDataModelIds.stream().map(parentDataModelId -> parentDataModelId.getId().toString()).collect(Collectors.toSet());
     }
 }

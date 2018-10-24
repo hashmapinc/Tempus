@@ -18,18 +18,21 @@ package com.hashmapinc.server.dao.model.nosql;
 
 import com.datastax.driver.core.utils.UUIDs;
 import com.datastax.driver.mapping.annotations.*;
-import com.fasterxml.jackson.databind.JsonNode;
+import com.hashmapinc.server.common.data.computation.ComputationType;
 import com.hashmapinc.server.common.data.computation.Computations;
+import com.hashmapinc.server.common.data.computation.KubelessComputationMetadata;
+import com.hashmapinc.server.common.data.computation.SparkComputationMetadata;
 import com.hashmapinc.server.common.data.id.ComputationId;
 import com.hashmapinc.server.common.data.id.TenantId;
 import com.hashmapinc.server.dao.model.ModelConstants;
 import com.hashmapinc.server.dao.model.SearchTextEntity;
-import com.hashmapinc.server.dao.model.type.JsonCodec;
+import lombok.EqualsAndHashCode;
 
 import java.util.UUID;
 
 import static com.hashmapinc.server.dao.model.ModelConstants.ID_PROPERTY;
 
+@EqualsAndHashCode
 @Table(name = ModelConstants.COMPUTATIONS_COLUMN_FAMILY_NAME)
 public class ComputationsEntity implements SearchTextEntity<Computations> {
     @Transient
@@ -42,30 +45,18 @@ public class ComputationsEntity implements SearchTextEntity<Computations> {
     @Column(name = ModelConstants.COMPUTATIONS_NAME_PROPERTY)
     private String name;
 
-    @Column(name = ModelConstants.COMPUTATIONS_JAR_PATH_PROPERTY)
-    private String jarPath;
-
-    @Column(name = ModelConstants.COMPUTATIONS_JAR_PROPERTY)
-    private String jarName;
-
     @Column(name = ModelConstants.SEARCH_TEXT_PROPERTY)
     private String searchText;
 
-    @Column(name = ModelConstants.COMPUTATIONS_MAIN_CLASS_PROPERTY)
-    private String mainClass;
-
-    @Column(name = ModelConstants.COMPUTATIONS_ARGS_FORMAT_PROPERTY)
-    private String argsFormat;
-
-    @Column(name = ModelConstants.COMPUTATIONS_DESCRIPTOR_PROPERTY, codec = JsonCodec.class)
-    private JsonNode jsonDescriptor;
+    @Column(name = ModelConstants.COMPUTATIONS_TYPE)
+    private String type;
 
     @ClusteringColumn
     @Column(name = ModelConstants.COMPUTATIONS_TENANT_ID_PROPERTY)
     private UUID tenantId;
 
-    @Column(name = ModelConstants.COMPUTATIONS_ARGS_TYPE_PROPERTY)
-    private String argsType;
+    @Transient
+    private ComputationMetadataEntity computationMetadataEntity;
 
     @Override
     public String getSearchTextSource() {
@@ -83,26 +74,19 @@ public class ComputationsEntity implements SearchTextEntity<Computations> {
         if(computations.getName() != null) {
             this.name = computations.getName();
         }
-        if(computations.getJarPath() != null) {
-            this.jarPath = computations.getJarPath();
-        }
-        if(computations.getJarPath() != null) {
-            this.jarName = computations.getJarName();
-        }
-        if(computations.getArgsformat() != null) {
-            this.argsFormat = computations.getArgsformat();
-        }
-        if(computations.getJsonDescriptor() != null) {
-            this.jsonDescriptor = computations.getJsonDescriptor();
-        }
-        if(computations.getMainClass() != null) {
-            this.mainClass = computations.getMainClass();
-        }
-        if(computations.getTenantId() != null) {
+        if(computations.getTenantId() != null){
             this.tenantId = computations.getTenantId().getId();
         }
-        if(computations.getArgsType() != null) {
-            this.argsType = computations.getArgsType();
+        if(computations.getType() != null){
+            this.type = computations.getType().name();
+        }
+        if(computations.getComputationMetadata() != null){
+            if(computations.getType() == ComputationType.SPARK){
+                computationMetadataEntity = new SparkComputationMetadataEntity((SparkComputationMetadata) computations.getComputationMetadata());
+            } else if(computations.getType() == ComputationType.KUBELESS){
+                computationMetadataEntity = new KubelessComputationMetadataEntity((KubelessComputationMetadata) computations.getComputationMetadata());
+            }
+
         }
     }
 
@@ -129,98 +113,36 @@ public class ComputationsEntity implements SearchTextEntity<Computations> {
         this.name = name;
     }
 
-    public String getJarPath() {
-        return jarPath;
-    }
-
-    public void setJarPath(String jarPath) {
-        this.jarPath = jarPath;
-    }
-
-    public String getJarName() {
-        return jarName;
-    }
-
-    public void setJarName(String jarName) {
-        this.jarName = jarName;
-    }
-
     public String getSearchText() {
         return searchText;
-    }
-
-    public String getMainClass() {
-        return mainClass;
-    }
-
-    public void setMainClass(String mainClass) {
-        this.mainClass = mainClass;
-    }
-
-    public String getArgsFormat() {
-        return argsFormat;
-    }
-
-    public void setArgsFormat(String argsFormat) {
-        this.argsFormat = argsFormat;
-    }
-
-    public JsonNode getJsonDescriptor() {
-        return jsonDescriptor;
-    }
-
-    public void setJsonDescriptor(JsonNode jsonDescriptor) {
-        this.jsonDescriptor = jsonDescriptor;
     }
 
     public UUID getTenantId() {
         return tenantId;
     }
 
+    public static long getSerialVersionUID() {
+        return serialVersionUID;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public ComputationMetadataEntity getComputationMetadataEntity() {
+        return computationMetadataEntity;
+    }
+
+    public void setComputationMetadataEntity(ComputationMetadataEntity computationMetadataEntity) {
+        this.computationMetadataEntity = computationMetadataEntity;
+    }
+
     public void setTenantId(UUID tenantId) {
         this.tenantId = tenantId;
-    }
-
-    public String getArgsType() {
-        return argsType;
-    }
-
-    public void setArgsType(String argsType) {
-        this.argsType = argsType;
-    }
-
-    @Override
-    public boolean equals(Object o) { //NOSONAR
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        if (!super.equals(o)) return false;
-
-        ComputationsEntity that = (ComputationsEntity) o;
-        if (name != null ? !name.equals(that.name) : that.name != null) return false;
-        if (searchText != null ? !searchText.equals(that.searchText) : that.searchText != null) return false;
-        if (jarPath != null ? !jarPath.equals(that.jarPath) : that.jarPath != null) return false;
-        if (jarName != null ? !jarName.equals(that.jarName) : that.jarName != null) return false;
-
-        if (mainClass != null ? !mainClass.equals(that.mainClass) : that.mainClass != null) return false;
-        if (jsonDescriptor != null ? !jsonDescriptor.equals(that.jsonDescriptor) : that.jsonDescriptor != null) return false;
-        if (tenantId != null ? !tenantId.equals(that.tenantId) : that.tenantId != null) return false;
-        if (argsFormat != null ? !argsFormat.equals(that.argsFormat) : that.argsFormat != null) return false;
-        return argsType != null ? argsType.equals(that.argsType) : that.argsType == null;
-    }
-
-    @Override
-    public int hashCode() {
-        int result = super.hashCode();
-        result = 31 * result + (name != null ? name.hashCode() : 0);
-        result = 31 * result + (searchText != null ? searchText.hashCode() : 0);
-        result = 31 * result + (jarPath != null ? jarPath.hashCode() : 0);
-        result = 31 * result + (jarName != null ? jarName.hashCode() : 0);
-        result = 31 * result + (mainClass != null ? mainClass.hashCode() : 0);
-        result = 31 * result + (jsonDescriptor != null ? jsonDescriptor.hashCode() : 0);
-        result = 31 * result + (tenantId != null ? tenantId.hashCode() : 0);
-        result = 31 * result + (argsFormat != null ? argsFormat.hashCode() : 0);
-        result = 31 * result + (argsType != null ? argsType.hashCode() : 0);
-        return result;
     }
 
     @Override
@@ -228,15 +150,15 @@ public class ComputationsEntity implements SearchTextEntity<Computations> {
         Computations computations = new Computations(new ComputationId(getId()));
         computations.setCreatedTime(UUIDs.unixTimestamp(getId()));
         computations.setName(name);
-        computations.setJarPath(jarPath);
-        computations.setJarName(jarName);
-        computations.setArgsformat(argsFormat);
-        computations.setArgsType(argsType);
         if (tenantId != null) {
             computations.setTenantId(new TenantId(tenantId));
         }
-        computations.setMainClass(mainClass);
-        computations.setJsonDescriptor(jsonDescriptor);
+        computations.setType(ComputationType.valueOf(this.type));
+        if(this.type.contentEquals(ComputationType.SPARK.name()) && this.computationMetadataEntity != null)
+            computations.setComputationMetadata(((SparkComputationMetadataEntity)this.computationMetadataEntity).toData());
+        else if(this.type.contentEquals(ComputationType.KUBELESS.name()) && this.computationMetadataEntity != null)
+            computations.setComputationMetadata(((KubelessComputationMetadataEntity)this.computationMetadataEntity).toData());
+
         return computations;
     }
 

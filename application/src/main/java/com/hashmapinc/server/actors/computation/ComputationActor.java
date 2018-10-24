@@ -24,8 +24,7 @@ import com.hashmapinc.server.actors.ActorSystemContext;
 import com.hashmapinc.server.actors.service.ContextAwareActor;
 import com.hashmapinc.server.actors.service.ContextBasedCreator;
 import com.hashmapinc.server.actors.service.DefaultActorService;
-import com.hashmapinc.server.common.data.computation.ComputationJob;
-import com.hashmapinc.server.common.data.computation.Computations;
+import com.hashmapinc.server.common.data.computation.*;
 import com.hashmapinc.server.common.data.id.ComputationId;
 import com.hashmapinc.server.common.data.id.ComputationJobId;
 import com.hashmapinc.server.common.data.id.TenantId;
@@ -33,22 +32,26 @@ import com.hashmapinc.server.common.data.page.PageDataIterable;
 import com.hashmapinc.server.common.data.plugin.ComponentLifecycleEvent;
 import com.hashmapinc.server.common.data.plugin.ComponentLifecycleState;
 import com.hashmapinc.server.common.msg.plugin.ComponentLifecycleMsg;
+import com.hashmapinc.server.service.computation.ComputationFunctionService;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public class ComputationActor extends ContextAwareActor {
-    private final LoggingAdapter logger = Logging.getLogger(getContext().system(), this);
+    protected final LoggingAdapter logger = Logging.getLogger(getContext().system(), this);
 
     private final TenantId tenantId;
     private final ComputationId computationId;
     private Computations computation;
+    private ComputationType type;
     private final Map<ComputationJobId, ActorRef> computationJobActors;
 
-    public ComputationActor(ActorSystemContext systemContext, TenantId tenantId, ComputationId computationId) {
+
+    public ComputationActor(ActorSystemContext systemContext, TenantId tenantId, ComputationId computationId, ComputationType type) {
         super(systemContext);
         this.tenantId = tenantId;
         this.computationId = computationId;
+        this.type = type;
         this.computationJobActors = new HashMap<>();
     }
 
@@ -63,8 +66,28 @@ public class ComputationActor extends ContextAwareActor {
         if(computation == null){
             throw new ComputationInitializationException("Computation not found!");
         }
+        handleComponentLifecycleMsgForComputationType();
         init();
         logger.info("[{}][{}] Started computation actor.", computation, tenantId);
+    }
+
+    private void checkOrDeployKubelessFunction() {
+        boolean functionPresent = systemContext.getComputationFunctionService().checkKubelessFunction(computation);
+        if (!functionPresent) {
+            KubelessComputationMetadata md = (KubelessComputationMetadata) computation.getComputationMetadata();
+            try {
+                String functionContent = systemContext.getS3BucketService().getFunctionObjByTenantAndUrl(tenantId, computation);
+                if (functionContent == null) {
+                    throw new ComputationInitializationException("Kubeless Computation function not found!");
+                } else {
+                    md.setFunctionContent(functionContent);
+                    if(!systemContext.getComputationFunctionService().deployKubelessFunction(computation))
+                        systemContext.getComputationsService().deleteById(computationId);
+                }
+            } catch (Exception e ){
+                logger.info("Exeption occured while deploying kubeless function : ", e);
+            }
+        }
     }
 
     private void init(){
@@ -107,19 +130,29 @@ public class ComputationActor extends ContextAwareActor {
     }
 
     private void handleComponentLifecycleMsgForNonExistingComputation(ComponentLifecycleMsg msg) {
+        computation = systemContext.getComputationsService().findById(computationId);
         if(msg.getEvent() != ComponentLifecycleEvent.DELETED){
+            handleComponentLifecycleMsgForComputationType();
             if(computationJobActors.isEmpty()){
                 init();
             }
             computationJobActors.forEach((k, v) -> v.tell(msg, ActorRef.noSender()));
         }else{
+            handleDeleteMsgForComputationType();
             computationJobActors.forEach((k, v) -> v.tell(msg, ActorRef.noSender()));
             context().stop(self());
         }
     }
 
+    private void handleComponentLifecycleMsgForComputationType() {
+        if (computation != null && computation.getType() == ComputationType.KUBELESS) {
+            checkOrDeployKubelessFunction();
+        }
+    }
+
     private void handleComponentLifecycleMsgForExistingComputation(ComponentLifecycleMsg msg, ComputationJobId jobId) {
         ActorRef target;
+        computation = systemContext.getComputationsService().findById(computationId);
         if(msg.getEvent() == ComponentLifecycleEvent.DELETED){
             target = computationJobActors.get(jobId);
             if(target != null){
@@ -137,10 +170,28 @@ public class ComputationActor extends ContextAwareActor {
         }
     }
 
+    private void handleDeleteMsgForComputationType() {
+        if (computation != null && computation.getType() == ComputationType.KUBELESS) {
+            ComputationFunctionService service = systemContext.getComputationFunctionService();
+            if (service.deleteKubelessFunction(computation))
+                systemContext.getComputationsService().deleteById(computationId);
+        }
+    }
+
     private ActorRef getOrCreateComputationJobActor(ComputationJobId computationJobId) {
-        return computationJobActors.computeIfAbsent(computationJobId, k ->
-                context().actorOf(Props.create(new ComputationJobActor.ActorCreator(systemContext, tenantId, computation, computationJobId))
-                .withDispatcher(DefaultActorService.CORE_DISPATCHER_NAME), computationJobId.toString()));
+        ActorRef actorRef = null;
+        if(this.type == ComputationType.SPARK) {
+            actorRef = computationJobActors.computeIfAbsent(computationJobId, k ->
+                    context().actorOf(Props.create(new SparkComputationJobActor.ActorCreator(systemContext, tenantId, computation, computationJobId))
+                            .withDispatcher(DefaultActorService.CORE_DISPATCHER_NAME), computationJobId.toString()));
+        }
+        else if(this.type == ComputationType.KUBELESS){
+            actorRef = computationJobActors.computeIfAbsent(computationJobId, k ->
+                    context().actorOf(Props.create(new KubelessComputationJobActor.ActorCreator(systemContext, tenantId, computation, computationJobId))
+                            .withDispatcher(DefaultActorService.CORE_DISPATCHER_NAME), computationJobId.toString()));
+
+        }
+        return actorRef;
     }
 
     public static class ActorCreator extends ContextBasedCreator<ComputationActor> {
@@ -148,16 +199,18 @@ public class ComputationActor extends ContextAwareActor {
 
         private final TenantId tenantId;
         private final ComputationId computationId;
+        private final ComputationType type;
 
-        public ActorCreator(ActorSystemContext context, TenantId tenantId, ComputationId computationId) {
+        public ActorCreator(ActorSystemContext context, TenantId tenantId, ComputationId computationId, ComputationType type) {
             super(context);
             this.tenantId = tenantId;
             this.computationId = computationId;
+            this.type = type;
         }
 
         @Override
         public ComputationActor create() throws Exception {
-            return new ComputationActor(context, tenantId, computationId);
+            return new ComputationActor(context, tenantId, computationId, type);
         }
     }
 }

@@ -79,4 +79,5 @@ public abstract class BaseAuthControllerTest extends AbstractControllerTest {
                 .andExpect(jsonPath("$.authority",is(Authority.SYS_ADMIN.name())))
                 .andExpect(jsonPath("$.email",is(SYS_ADMIN_EMAIL)));
     }
+
 }

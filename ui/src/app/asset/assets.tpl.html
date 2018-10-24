@@ -64,7 +64,8 @@
         <md-tab ng-if="!vm.grid.detailsConfig.isDetailsEditMode" md-on-select="vm.grid.triggerResize()" label="{{ 'relation.relations' | translate }}">
             <tb-relation-table flex
                                 entity-id="vm.grid.operatingItem().id.id"
-                                entity-type="{{vm.types.entityType.asset}}">
+                                entity-type="{{vm.types.entityType.asset}}"
+                                entity-detail="vm.grid.operatingItem()">
             </tb-relation-table>
         </md-tab>
         <md-tab ng-if="!vm.grid.detailsConfig.isDetailsEditMode && vm.grid.isTenantAdmin()" md-on-select="vm.grid.triggerResize()" label="{{ 'audit-log.audit-logs' | translate }}">

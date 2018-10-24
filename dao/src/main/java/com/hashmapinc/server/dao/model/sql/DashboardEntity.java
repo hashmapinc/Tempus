@@ -93,6 +93,9 @@ public final class DashboardEntity extends BaseSqlEntity<Dashboard> implements S
         if(dashboard.getType() != null) {
             this.type = dashboard.getType();
         }
+        else {
+            this.type = DashboardType.DEFAULT;
+        }
         this.title = dashboard.getTitle();
         if (dashboard.getAssignedCustomers() != null) {
             try {

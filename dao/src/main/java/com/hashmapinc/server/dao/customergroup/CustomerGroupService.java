@@ -26,6 +26,7 @@ import com.hashmapinc.server.common.data.page.TextPageData;
 import com.hashmapinc.server.common.data.page.TextPageLink;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 public interface CustomerGroupService {
@@ -51,4 +52,6 @@ public interface CustomerGroupService {
     CustomerGroup unassignUsers(CustomerGroupId customerGroupId, List<UserId> userIds);
 
     List<String> findGroupPoliciesForUser(UserId userId);
+
+    Map<String, Map<String, String>> findGroupPolicies(CustomerGroupId customerGroupId);
 }

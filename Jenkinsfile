@@ -19,7 +19,7 @@ mvn validate'''
     }
     stage('Build') {
       steps {
-        sh 'mvn -Dmaven.test.failure.ignore=true -DskipITs install'
+        sh 'mvn -Dmaven.test.failure.ignore=true -DskipITs org.jacoco:jacoco-maven-plugin:prepare-agent install'
       }
     }
     stage('Integration Tests') {
@@ -27,6 +27,13 @@ mvn validate'''
         sh 'mvn failsafe:integration-test'
         sh 'mvn failsafe:verify'
       }
+    }
+    stage('SonarQube analysis') {
+        steps {
+            withSonarQubeEnv('SonarCloud') {
+                sh 'mvn -Dsonar.organization=hashmapinc-github -Dsonar.branch.name=$BRANCH_NAME sonar:sonar'
+            }
+        }
     }
     stage('Report and Archive') {
       steps {

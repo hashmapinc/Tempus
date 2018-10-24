@@ -178,7 +178,7 @@ public class MetadataController extends BaseController {
     }
 
     @PreAuthorize("#oauth2.isClient() and #oauth2.hasScope('server')")
-    @PostMapping(value = "/metadata/insert")
+    @PostMapping(value = "/metadata")
     @ResponseStatus(value = HttpStatus.ACCEPTED)
     public void insert(@RequestBody IngestMetadataRequest request) throws TempusException {
         try {

@@ -16,3 +16,10 @@
 --
 
 ALTER TABLE tempus.dashboard ADD type text;
+
+CREATE MATERIALIZED VIEW IF NOT exists tempus.asset_by_data_model_object AS
+    SELECT *
+FROM tempus.asset
+    WHERE data_model_object_id IS NOT NULL AND tenant_id IS NOT NULL AND customer_id IS NOT NULL AND type IS NOT NULL AND id IS NOT NULL
+    PRIMARY KEY (data_model_object_id,tenant_id,id, customer_id, type)
+    WITH CLUSTERING ORDER BY (id DESC, customer_id DESC);

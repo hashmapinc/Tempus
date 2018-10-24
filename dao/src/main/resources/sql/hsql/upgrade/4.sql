@@ -16,3 +16,4 @@
 --
 
 ALTER TABLE dashboard ADD type varchar DEFAULT 'DEFAULT';
+ALTER TABLE asset ADD data_model_object_id varchar(31) DEFAULT '1b21dd2138140008080808080808080';

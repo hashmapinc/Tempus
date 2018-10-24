@@ -22,6 +22,8 @@ import com.hashmapinc.server.common.data.asset.Asset;
 import com.hashmapinc.server.common.data.id.*;
 import com.hashmapinc.server.common.data.security.Authority;
 import com.hashmapinc.server.dao.asset.AssetService;
+import com.hashmapinc.server.dao.customergroup.CustomerGroupService;
+import com.hashmapinc.server.dao.datamodel.DataModelObjectService;
 import com.hashmapinc.server.dao.device.DeviceService;
 import com.hashmapinc.server.service.security.model.SecurityUser;
 import com.hashmapinc.server.service.security.model.UserPrincipal;
@@ -61,6 +63,12 @@ public class AttributeBasedPermissionEvaluatorTest {
 
     @Autowired
     private DeviceService deviceService;
+
+    @Autowired
+    private DataModelObjectService dataModelObjectService;
+
+    @Autowired
+    private CustomerGroupService customerGroupService;
 
     private SecurityUser admin;
     private SecurityUser tenantAdmin;
@@ -224,4 +232,12 @@ class PermissionEvaluatorTestConfiguration {
     public AssetService baseAssetService() {
         return Mockito.mock(AssetService.class);
     }
+
+    @Bean
+    @Primary
+    public DataModelObjectService dataModelObjectService () { return Mockito.mock(DataModelObjectService.class); }
+
+    @Bean
+    @Primary
+    public CustomerGroupService customerGroupService () {return Mockito.mock(CustomerGroupService.class); }
 }

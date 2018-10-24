@@ -21,14 +21,12 @@ import com.hashmapinc.server.common.data.*;
 import com.hashmapinc.server.common.data.id.*;
 import com.hashmapinc.server.common.data.page.TextPageLink;
 import org.apache.commons.lang3.RandomStringUtils;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.*;
 import com.hashmapinc.server.common.data.page.TextPageData;
 import com.hashmapinc.server.common.data.page.TimePageData;
 import com.hashmapinc.server.common.data.page.TimePageLink;
 import com.hashmapinc.server.dao.exception.DataValidationException;
+import org.junit.rules.ExpectedException;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -55,7 +53,10 @@ public abstract class BaseDashboardServiceTest extends AbstractServiceTest {
     public void after() {
         tenantService.deleteTenant(tenantId);
     }
-    
+
+    @Rule
+    public ExpectedException expectedEx = ExpectedException.none();
+
     @Test
     public void testSaveDashboard() throws IOException {
         Dashboard dashboard = new Dashboard();
@@ -99,7 +100,19 @@ public abstract class BaseDashboardServiceTest extends AbstractServiceTest {
         dashboard.setTenantId(new TenantId(UUIDs.timeBased()));
         dashboardService.saveDashboard(dashboard);
     }
-    
+
+    @Test
+    public void testSaveDashboardWithDuplicateNameShouldThrowException() throws DataValidationException{
+        expectedEx.expect(DataValidationException.class);
+        expectedEx.expectMessage("Dashboard is already created for name well-dashboard");
+
+        Dashboard dashboard = new Dashboard();
+        dashboard.setTitle("well-dashboard");
+        dashboard.setTenantId(tenantId);
+        dashboardService.saveDashboard(dashboard);
+        dashboardService.saveDashboard(dashboard);
+    }
+
     @Test(expected = DataValidationException.class)
     public void testAssignDashboardToNonExistentCustomer() {
         Dashboard dashboard = new Dashboard();
@@ -208,10 +221,7 @@ public abstract class BaseDashboardServiceTest extends AbstractServiceTest {
         for (int i=0;i<123;i++) {
             Dashboard dashboard = new Dashboard();
             dashboard.setTenantId(tenantId);
-            String suffix = RandomStringUtils.randomAlphanumeric((int)(Math.random()*17));
-            String title = title1+suffix;
-            title = i % 2 == 0 ? title.toLowerCase() : title.toUpperCase();
-            dashboard.setTitle(title);
+            dashboard.setTitle(title1 + i);
             dashboardsTitle1.add(new DashboardInfo(dashboardService.saveDashboard(dashboard)));
         }
         String title2 = "Dashboard title 2";
@@ -219,13 +229,10 @@ public abstract class BaseDashboardServiceTest extends AbstractServiceTest {
         for (int i=0;i<193;i++) {
             Dashboard dashboard = new Dashboard();
             dashboard.setTenantId(tenantId);
-            String suffix = RandomStringUtils.randomAlphanumeric((int)(Math.random()*15));
-            String title = title2+suffix;
-            title = i % 2 == 0 ? title.toLowerCase() : title.toUpperCase();
-            dashboard.setTitle(title);
+            dashboard.setTitle(title2 + i);
             dashboardsTitle2.add(new DashboardInfo(dashboardService.saveDashboard(dashboard)));
         }
-        
+
         List<DashboardInfo> loadedDashboardsTitle1 = new ArrayList<>();
         TextPageLink pageLink = new TextPageLink(19, title1);
         TextPageData<DashboardInfo> pageData = null;
@@ -236,12 +243,12 @@ public abstract class BaseDashboardServiceTest extends AbstractServiceTest {
                 pageLink = pageData.getNextPageLink();
             }
         } while (pageData.hasNext());
-        
+
         Collections.sort(dashboardsTitle1, idComparator);
         Collections.sort(loadedDashboardsTitle1, idComparator);
-        
+
         Assert.assertEquals(dashboardsTitle1, loadedDashboardsTitle1);
-        
+
         List<DashboardInfo> loadedDashboardsTitle2 = new ArrayList<>();
         pageLink = new TextPageLink(4, title2);
         do {
@@ -254,22 +261,22 @@ public abstract class BaseDashboardServiceTest extends AbstractServiceTest {
 
         Collections.sort(dashboardsTitle2, idComparator);
         Collections.sort(loadedDashboardsTitle2, idComparator);
-        
+
         Assert.assertEquals(dashboardsTitle2, loadedDashboardsTitle2);
 
         for (DashboardInfo dashboard : loadedDashboardsTitle1) {
             dashboardService.deleteDashboard(dashboard.getId());
         }
-        
+
         pageLink = new TextPageLink(4, title1);
         pageData = dashboardService.findDashboardsByTenantId(tenantId, pageLink);
         Assert.assertFalse(pageData.hasNext());
         Assert.assertEquals(0, pageData.getData().size());
-        
+
         for (DashboardInfo dashboard : loadedDashboardsTitle2) {
             dashboardService.deleteDashboard(dashboard.getId());
         }
-        
+
         pageLink = new TextPageLink(4, title2);
         pageData = dashboardService.findDashboardsByTenantId(tenantId, pageLink);
         Assert.assertFalse(pageData.hasNext());

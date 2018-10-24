@@ -44,7 +44,8 @@ import javax.servlet.http.HttpServletRequest;
 @RestController
 @RequestMapping(PluginConstants.PLUGIN_URL_PREFIX)
 @Slf4j
-public class PluginApiController extends BaseController {
+public class
+PluginApiController extends BaseController {
 
     @SuppressWarnings("rawtypes")
     @PreAuthorize("hasAnyAuthority('SYS_ADMIN', 'TENANT_ADMIN', 'CUSTOMER_USER')")

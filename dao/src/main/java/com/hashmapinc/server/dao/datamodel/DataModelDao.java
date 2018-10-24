@@ -50,4 +50,12 @@ public interface DataModelDao extends Dao<DataModel> {
      * @return the list of DataModel objects
      */
     List<DataModel> findByTenantId(UUID tenantId);
+
+    /**
+     * Delete the data model by dataModelId
+     *
+     * @param dataModelId the dataModelId
+     * @return boolean
+     */
+    boolean removeById(UUID dataModelId);
 }

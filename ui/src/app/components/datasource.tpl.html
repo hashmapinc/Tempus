@@ -24,6 +24,7 @@
             </md-option>
         </md-select>
     </md-input-container>
+
     <section flex class="datasource" ng-switch on="model.type">
         <tb-datasource-func flex
                             ng-switch-default
@@ -33,7 +34,8 @@
                             datakey-settings-schema="datakeySettingsSchema"
                             ng-required="model.type === types.datasourceType.function"
                             widget-type="widgetType"
-                            generate-data-key="generateDataKey({chip: chip, type: type})">
+                            generate-data-key="generateDataKey({chip: chip, type: type})"
+                            widget-info= "widgetInfo">
         </tb-datasource-func>
         <tb-datasource-entity flex
                               ng-model="model"

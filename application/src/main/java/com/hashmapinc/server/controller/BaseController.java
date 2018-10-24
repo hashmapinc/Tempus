@@ -49,6 +49,7 @@ import com.hashmapinc.server.dao.device.DeviceCredentialsService;
 import com.hashmapinc.server.dao.device.DeviceService;
 import com.hashmapinc.server.dao.exception.DataValidationException;
 import com.hashmapinc.server.dao.exception.IncorrectParameterException;
+import com.hashmapinc.server.dao.gatewayconfiguration.TempusGatewayConfigurationService;
 import com.hashmapinc.server.dao.metadataingestion.MetadataIngestionService;
 import com.hashmapinc.server.dao.model.ModelConstants;
 import com.hashmapinc.server.dao.plugin.PluginService;
@@ -61,8 +62,10 @@ import com.hashmapinc.server.exception.TempusErrorCode;
 import com.hashmapinc.server.exception.TempusErrorResponseHandler;
 import com.hashmapinc.server.exception.TempusException;
 import com.hashmapinc.server.service.component.ComponentDiscoveryService;
+import com.hashmapinc.server.service.kubernetes.gateway.TempusGatewayKubernetesService;
 import com.hashmapinc.server.service.metadataingestion.MetadataConfigService;
 import com.hashmapinc.server.service.metadataingestion.MetadataQueryService;
+import com.hashmapinc.server.service.security.auth.AttributeBasedPermissionEvaluator;
 import com.hashmapinc.server.service.security.model.SecurityUser;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -76,9 +79,10 @@ import org.springframework.web.client.HttpClientErrorException;
 import javax.mail.MessagingException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static com.hashmapinc.server.dao.service.Validator.validateId;
 
@@ -88,6 +92,7 @@ public abstract class BaseController {
     public static final String INCORRECT_TENANT_ID = "Incorrect tenantId ";
     public static final String YOU_DON_T_HAVE_PERMISSION_TO_PERFORM_THIS_OPERATION = "You don't have permission to perform this operation!";
     private static final String ITEM_NOT_FOUND = "Requested item wasn't found!";
+    public static final String NO_PERMISSION_TO_READ = "You don't have permission to read!";
 
     @Autowired
     private TempusErrorResponseHandler errorResponseHandler;
@@ -165,6 +170,14 @@ public abstract class BaseController {
     @Autowired
     protected CustomerGroupService customerGroupService;
 
+    @Autowired
+    protected TempusGatewayConfigurationService tempusGatewayConfigurationService;
+
+    @Autowired
+    protected TempusGatewayKubernetesService tempusGatewayKubernetesService;
+
+    @Autowired
+    protected AttributeBasedPermissionEvaluator evaluator;
 
     @ExceptionHandler(TempusException.class)
     public void handleTempusException(TempusException ex, HttpServletResponse response) {
@@ -194,6 +207,8 @@ public abstract class BaseController {
             return new TempusException("Unable to send mail: " + exception.getMessage(), TempusErrorCode.GENERAL);
         } else if (exception instanceof HttpClientErrorException && ((HttpClientErrorException) exception).getStatusCode().equals(HttpStatus.NOT_FOUND)) {
             return new TempusException(ITEM_NOT_FOUND, TempusErrorCode.ITEM_NOT_FOUND);
+        } else if (exception instanceof HttpClientErrorException && ((HttpClientErrorException) exception).getStatusCode().equals(HttpStatus.CONFLICT)) {
+            return new TempusException(((HttpClientErrorException) exception).getResponseBodyAsString(), TempusErrorCode.CONFLICT_ITEM);
         } else {
             return new TempusException(exception.getMessage(), TempusErrorCode.GENERAL);
         }
@@ -308,6 +323,22 @@ public abstract class BaseController {
         }
     }
 
+    TempusGatewayConfiguration checkTempusGatewayConfigurationId(TempusGatewayConfigurationId tempusGatewayConfigurationId) throws TempusException {
+        try {
+            validateId(tempusGatewayConfigurationId, "Incorrect tempusGatewayConfigurationId " + tempusGatewayConfigurationId);
+            SecurityUser authUser = getCurrentUser();
+            TempusGatewayConfiguration tempusGatewayConfiguration = tempusGatewayConfigurationService.findTempusGatewayConfigurationById(tempusGatewayConfigurationId);
+            checkTempusGatewayConfiguration(tempusGatewayConfiguration);
+            if (!tempusGatewayConfiguration.getTenantId().getId().equals(authUser.getTenantId().getId())) {
+                throw new TempusException(YOU_DON_T_HAVE_PERMISSION_TO_PERFORM_THIS_OPERATION,
+                        TempusErrorCode.PERMISSION_DENIED);
+            }
+            return tempusGatewayConfiguration;
+        } catch (Exception e) {
+            throw handleException(e, false);
+        }
+    }
+
     Long checkLong(String value, String paramName) {
         try {
            return Long.parseLong(value);
@@ -334,6 +365,11 @@ public abstract class BaseController {
         checkNotNull(customerGroup);
         checkTenantId(customerGroup.getTenantId());
         checkCustomerId(customerGroup.getCustomerId());
+    }
+
+    private void checkTempusGatewayConfiguration(TempusGatewayConfiguration tempusGatewayConfiguration) throws TempusException {
+        checkNotNull(tempusGatewayConfiguration);
+        checkTenantId(tempusGatewayConfiguration.getTenantId());
     }
 
     User checkUserId(UserId userId) throws TempusException {
@@ -528,10 +564,10 @@ public abstract class BaseController {
         checkNotNull(dashboard);
         checkTenantId(dashboard.getTenantId());
         SecurityUser authUser = getCurrentUser();
-        final boolean isDashboardAssignedToCurrentCustomer = authUser.getAuthority() == Authority.CUSTOMER_USER
+        final boolean isDashboardNotAssignedToCurrentCustomer = authUser.getAuthority() == Authority.CUSTOMER_USER
                 && !dashboard.isAssignedToCustomer(authUser.getCustomerId());
 
-        if (isDashboardAssignedToCurrentCustomer) {
+        if (isDashboardNotAssignedToCurrentCustomer && (dashboard.getType() != DashboardType.ASSET_LANDING_PAGE)) {
                 throw new TempusException(YOU_DON_T_HAVE_PERMISSION_TO_PERFORM_THIS_OPERATION,
                         TempusErrorCode.PERMISSION_DENIED);
         }
@@ -585,19 +621,8 @@ public abstract class BaseController {
 
     protected ComputationJob checkComputationJob(ComputationJob computationJob) throws TempusException {
         checkNotNull(computationJob);
-        SecurityUser authUser = getCurrentUser();
         TenantId tenantId = computationJob.getTenantId();
-        validateId(tenantId, INCORRECT_TENANT_ID + tenantId);
-        if (authUser.getAuthority() != Authority.SYS_ADMIN) {
-            if (authUser.getTenantId() == null ||
-                    !tenantId.getId().equals(ModelConstants.NULL_UUID) && !authUser.getTenantId().equals(tenantId)) {
-                throw new TempusException(YOU_DON_T_HAVE_PERMISSION_TO_PERFORM_THIS_OPERATION,
-                        TempusErrorCode.PERMISSION_DENIED);
-
-            } else if (tenantId.getId().equals(ModelConstants.NULL_UUID)) {
-                computationJob.setArgParameters(null);
-            }
-        }
+        validatePermissions(tenantId);
         return computationJob;
     }
 
@@ -613,19 +638,21 @@ public abstract class BaseController {
 
     protected RuleMetaData checkRule(RuleMetaData rule) throws TempusException {
         checkNotNull(rule);
-        SecurityUser authUser = getCurrentUser();
         TenantId tenantId = rule.getTenantId();
+        validatePermissions(tenantId);
+        return rule;
+    }
+
+    private void validatePermissions(TenantId tenantId) throws TempusException {
+        SecurityUser authUser = getCurrentUser();
         validateId(tenantId, INCORRECT_TENANT_ID + tenantId);
-
-        final boolean ruleNotBelongsToCurrentTenant = authUser.getTenantId() == null ||
+        boolean computationNotBelongsToTenant = authUser.getTenantId() == null ||
                 !tenantId.getId().equals(ModelConstants.NULL_UUID) && !authUser.getTenantId().equals(tenantId);
-
-        if (authUser.getAuthority() != Authority.SYS_ADMIN && ruleNotBelongsToCurrentTenant) {
-                throw new TempusException(YOU_DON_T_HAVE_PERMISSION_TO_PERFORM_THIS_OPERATION,
-                        TempusErrorCode.PERMISSION_DENIED);
+        if (authUser.getAuthority() != Authority.SYS_ADMIN && computationNotBelongsToTenant) {
+            throw new TempusException(YOU_DON_T_HAVE_PERMISSION_TO_PERFORM_THIS_OPERATION,
+                    TempusErrorCode.PERMISSION_DENIED);
 
         }
-        return rule;
     }
 
     protected String constructBaseUrl(HttpServletRequest request) {
@@ -662,5 +689,97 @@ public abstract class BaseController {
         auditLogService.logEntityAction(user.getTenantId(), customerId, user.getId(), user.getName(), entityId, entity, actionType, e, additionalInfo);
     }
 
+    protected TempusResourceCriteriaSpec getTempusResourceCriteriaSpec(SecurityUser user, EntityType entityType, DataModelObjectId dataModelObjectId) throws TempusException{
+        final TempusResourceCriteriaSpec tempusResourceCriteriaSpec = new TempusResourceCriteriaSpec(entityType, user.getTenantId(), dataModelObjectId);
+
+        if(isCustomerUser(user)){
+            tempusResourceCriteriaSpec.setCustomerId(Optional.of(user.getCustomerId()));
+        }
+        final Supplier<Stream<UserPermission>> readableAndResourceAccessibleStream = getReadableAndResourceAccessibleStream(user, entityType);
+
+        final boolean hasPermOnAllResources =
+                readableAndResourceAccessibleStream.get().map(UserPermission::getResourceAttributes).anyMatch(Objects::isNull); //case: {USER}:*:READ
+
+        final boolean hasHierarchicalPermOnEntireDmo =
+                hasHierarchicalPermOnEntireDataModel(readableAndResourceAccessibleStream, dataModelObjectId);  // case: {USER}:ASSET?dataModelId={dmoid}:READ where dmoid in (parent of given dmoid)
+
+        if(!hasPermOnAllResources && !hasHierarchicalPermOnEntireDmo){
+            final boolean hasPermOnDmoWithResources =
+                    hasPermOnDmoWithResources(readableAndResourceAccessibleStream, dataModelObjectId); // case: {USER}:ASSET?dataModelId={dmoid}&id={resId}:READ where dmoid = dataModelObjectId
+            if(!hasPermOnDmoWithResources) {
+                throw new IncorrectParameterException(NO_PERMISSION_TO_READ);
+            } else {
+                final Set<EntityId> accessibleResourceIdsForGivenDmo = getAccessibleResourceIdsForGivenDmo(readableAndResourceAccessibleStream, entityType, dataModelObjectId);
+                tempusResourceCriteriaSpec.setAccessibleIdsForGivenDataModelObject(accessibleResourceIdsForGivenDmo);
+            }
+        }
+        tempusResourceCriteriaSpec.setDataModelObjectId(dataModelObjectId);
+        return tempusResourceCriteriaSpec;
+    }
+
+    private Supplier<Stream<UserPermission>> getReadableAndResourceAccessibleStream(SecurityUser user, EntityType entityType) {
+        return () -> user.getUserPermissions()
+                .stream()
+                .filter(userPermission -> userPermission.getUserActions().contains(UserAction.READ))
+                .filter(userPermission -> userPermission.getResources().contains(entityType));
+    }
+
+    private Set<EntityId> getAccessibleResourceIdsForGivenDmo(Supplier<Stream<UserPermission>> userPermissionStream, EntityType entityType, DataModelObjectId dataModelObjectId) {
+        return userPermissionStream.get()
+                .map(UserPermission::getResourceAttributes)
+                .filter(Objects::nonNull)
+                .filter(resourceAttributes -> hasResourceIdsForGivenDmo(dataModelObjectId, resourceAttributes))
+                .map(resourceAttributes -> getResourceIdByType(entityType, toUUID(resourceAttributes.get(UserPermission.ResourceAttribute.ID))))
+                .filter(Objects::nonNull)
+                .collect(Collectors.toSet());
+    }
+
+    private EntityId getResourceIdByType(EntityType entityType, UUID resourceUUID) {
+        if(entityType.equals(EntityType.ASSET)){
+            return new AssetId(resourceUUID);
+        } else if(entityType.equals(EntityType.DEVICE)){
+            return new DeviceId(resourceUUID);
+        }
+        return null;
+    }
+
+    private boolean hasResourceIdsForGivenDmo(DataModelObjectId dataModelObjectId, Map<UserPermission.ResourceAttribute, String> resourceAttributes) {
+        if(resourceAttributes.containsKey(UserPermission.ResourceAttribute.DATA_MODEL_ID)
+                && resourceAttributes.containsKey(UserPermission.ResourceAttribute.ID)){
+            final DataModelObjectId accessibleDmoid = new DataModelObjectId(toUUID(resourceAttributes.get(UserPermission.ResourceAttribute.DATA_MODEL_ID)));
+            return dataModelObjectId.equals(accessibleDmoid);
+        }
+        return false;
+    }
+
+    private boolean hasHierarchicalPermOnEntireDataModel(Supplier<Stream<UserPermission>> userPermissionStream, DataModelObjectId dataModelObjectId) {
+        Set<DataModelObjectId> parentDataModelIds = dataModelObjectService.getAllParentDataModelIdsOf(dataModelObjectId);
+        return userPermissionStream.get().map(UserPermission::getResourceAttributes).filter(Objects::nonNull).anyMatch(resourceAttributes -> {
+                boolean isAccessedToDmoidOnly = resourceAttributes.containsKey(UserPermission.ResourceAttribute.DATA_MODEL_ID)
+                    && !resourceAttributes.containsKey(UserPermission.ResourceAttribute.ID);
+
+                if(isAccessedToDmoidOnly){
+                    final DataModelObjectId accessibleDmoid = new DataModelObjectId(toUUID(resourceAttributes.get(UserPermission.ResourceAttribute.DATA_MODEL_ID)));
+                    return dataModelObjectId.equals(accessibleDmoid) || parentDataModelIds.contains(accessibleDmoid);
+            }
+            return false;
+        });
+    }
+
+    private boolean hasPermOnDmoWithResources(Supplier<Stream<UserPermission>> userPermissionStream, DataModelObjectId dataModelObjectId) {
+
+        return userPermissionStream.get().map(UserPermission::getResourceAttributes).filter(Objects::nonNull).anyMatch(resourceAttributes -> {
+            boolean isDmoidPresent = resourceAttributes.containsKey(UserPermission.ResourceAttribute.DATA_MODEL_ID);
+            if(isDmoidPresent){
+                final DataModelObjectId accessibleDmoid = new DataModelObjectId(toUUID(resourceAttributes.get(UserPermission.ResourceAttribute.DATA_MODEL_ID)));
+                return dataModelObjectId.equals(accessibleDmoid);
+            }
+            return false;
+        });
+    }
+
+    private boolean isCustomerUser(SecurityUser user) {
+        return user.getAuthorities().stream().anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals(Authority.CUSTOMER_USER.name()));
+    }
 
 }

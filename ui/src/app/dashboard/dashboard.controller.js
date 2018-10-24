@@ -287,7 +287,13 @@ export default function DashboardController(types, utils, dashboardUtils, widget
 
             widgetService.getBundleWidgetTypes(bundleAlias, isSystem).then(
                 function (widgetTypes) {
-
+                    angular.forEach(widgetTypes, function(value,key) {
+                      if(value.alias == 'device_list'){
+                        if(vm.dashboard.type != 'ASSET_LANDING_PAGE') {
+                            widgetTypes.splice(key, 1);
+                        }
+                      }
+                    });
                     widgetTypes = $filter('orderBy')(widgetTypes, ['-createdTime']);
 
                     var top = 0;
@@ -625,6 +631,9 @@ export default function DashboardController(types, utils, dashboardUtils, widget
     }
 
     function widgetClicked($event, layoutCtx, widget) {
+        if(widget.typeAlias == 'device_list' && $event.target.id == 'addAsset'){
+            $rootScope.$emit("addAssetByEntity", [$event]);
+        }
         if (vm.isEditingWidget) {
             editWidget($event, layoutCtx, widget);
         }

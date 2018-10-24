@@ -24,7 +24,7 @@ export default angular.module('tempus.locale', [])
                 "access": {
                     "unauthorized": "Unauthorized",
                     "unauthorized-access": "Unauthorized Access",
-                    "unauthorized-access-text": "You should sign in to have access to this resource!",
+                    "unauthorized-access-text": "Your session has expired, please log in again.",
                     "access-forbidden": "Access Forbidden",
                     "access-forbidden-text": "You haven't access rights to this location!<br/>Try to sign in with different user if you still wish to gain access to this location.",
                     "refresh-token-expired": "Session has expired",
@@ -118,8 +118,23 @@ export default angular.module('tempus.locale', [])
 
                 },
                 "metadata" : {
-
-                    "metadata" : "MetaData"
+                    "metadata" : "Metadata",
+                    "name" : "Name",
+                    "name-required":"This feild is required",
+                    "add-metadata" : "Add New Metadata",
+                    "add" : "Add Metadata",
+                    "source-type" : "Source Type",
+                    "source-type-required" : "Metadata Source Type Required",
+                    "sink-type" : "Sink Type",
+                    "dbUrl" : "Database URL",
+                    "dbUsername" : "Username",
+                    "dbPassword" : "Password",
+                    "dbUrl-required" : "Database URL Required",
+                    "dbUsername-required" : "Database Username Required",
+                    "dbPassword-required" : "Database Password Required",
+                    "restUrl" : "URL",
+                    "restUrl-required" : "Rest Endpoint URL Required",
+                    "sink-type-required" : "Metadata Sink Type Required"
                 },
                 "alarm": {
                     "alarm": "Alarm",
@@ -310,6 +325,23 @@ export default angular.module('tempus.locale', [])
                     "download-depth":"Download Latest Depth",
                     "start-required":"Start is required",
                     "end-required":"End is required"
+
+                },
+
+                "gateway":{
+                    "configuration":"Agent",
+                    "configurationLabel": "Agent Configuration",
+                    "device-label":"Gateway Device",
+                    "replica":"Replica",
+                    "deploy":"Deploy",
+                    "field-required":"Field is required",
+                    "config-save-message":"Configuration saved successfully",
+                    "config-deploy-message":"Agent deployed successfully",
+                    "config-deploy-fail-message":"Agent not deployed",
+                    "total-replica":"Total Replica",
+                    "ready":"Ready",
+                    "in-progress":"In Progress",
+                    "crash":"Crashed"
 
                 },
                 "audit-log": {
@@ -574,15 +606,33 @@ export default angular.module('tempus.locale', [])
                     "show-details": "Show details",
                     "hide-details": "Hide details",
                     "select-state": "Select target state",
-                    "state-controller": "State controller"
+                    "state-controller": "State controller",
+                    "dashboard-landing-page": "Asset Landing Page",
+                    "assign-data-model-view":"Assign Data Model View",
+                    "select-data-model-asset" : "Select Data Model Asset"
                 },
 
                 "dataModels": {
                     "add": "Add Data Model",
-                    "name": "Title",
+                    "name": "Name",
                     "description" :"Description",
-                    "name-required":"This feild is required"
-
+                    "name-required":"This feild is required",
+                    "objectInfo":"Datamodel Object Information",
+                    "datamodelObject":"Datamodel Object",
+                    "type":"Type",
+                    "objectAttribute":"Attributes",
+                    "relationships":"Relationships",
+                    "image":"Icon",
+                    "parent":"Parent",
+                    "noAttribute":"No Attributes",
+                    "duplicateAttribute":"Attribute already created, please use different name.",
+                    "delete":"Delete Data Model(s)",
+                    "lastModified":"Last Modified",
+                    "noData":"No Data Available",
+                    "delete-datamodel-title":"Are you sure you want to delete { count, select, 1 {1 datamodel} other {# datamodels} }?",
+                    "delete-datamodel-text": "Be careful, after the confirmation all selected datamodel(s) and related data will be removed.",
+                    "delete-success": "Data model(s) deleted sucessfully.",
+                    "duplicate-object": "Datamodel object already present of same name."
                 },
                 "datakey": {
                     "settings": "Settings",
@@ -612,7 +662,9 @@ export default angular.module('tempus.locale', [])
                 "datasource": {
                     "type": "Datasource type",
                     "name": "Name",
-                    "add-datasource-prompt": "Please add datasource"
+                    "add-datasource-prompt": "Please add datasource",
+                    "entity-list":"Entity List",
+                    "entity-type" : "Entity Type"
                 },
                 "details": {
                     "edit-mode": "Edit mode",
@@ -715,7 +767,8 @@ export default angular.module('tempus.locale', [])
                     "device-public": "Device is public",
                     "select-device": "Select device",
                     "status": "Status",
-                    "lastTimeRecived" :"Last Time Received"
+                    "lastTimeRecived" :"Last Time Received",
+                    "businessUnit":"Business Unit"
                 },
                 "dialog": {
                     "close": "Close dialog"
@@ -1147,8 +1200,18 @@ export default angular.module('tempus.locale', [])
                     "computation-file": "Computation file",
                     "invalid-computation-file-error": "Unable to import computation: Invalid computation data structure.",
                     "copyId": "Copy computation Id",
-                    "idCopiedMessage": "Computation Id has been copied to clipboard"
-
+                    "idCopiedMessage": "Computation Id has been copied to clipboard",
+                    "function-configurations": "Function Configurations",
+                    "function-name": "Function Name",
+                    "runtime": "Runtime",
+                    "runtime-required": "Runtime is required",
+                    "import-function": "Import Function",
+                    "import-dependency": "Import Dependency",
+                    "no-function": "No Function file selected",
+                    "no-dependencies": "No dependency file selected",
+                    "function-handler": "Function handler",
+                    "timeout": "Function timeout (Seconds)",
+                    "handler-required": "Function handler is required"
                 },
                 "computationJob": {
                     "computationJobs": "Computation Jobs",
@@ -1160,7 +1223,6 @@ export default angular.module('tempus.locale', [])
                     "suspended": "Suspended",
                     "name": "Name",
                     "name-required": "Name is required.",
-                    "description": "Description",
                     "add": "Add Computation Job",
                     "delete-computationJob-title": "Are you sure you want to delete the Computation Job '{{computationJobName}}'?",
                     "delete-computationJob-text": "Be careful, after the confirmation the plugin and all related data will become unrecoverable.",
@@ -1172,7 +1234,7 @@ export default angular.module('tempus.locale', [])
                     "computationJob-details": "Computation Job details",
                     "api-token": "API token",
                     "api-token-required": "API token is required.",
-                    "type": "Plugin type",
+                    "type": "Computation Job type",
                     "type-required": "Computation Job type is required.",
                     "configuration": "Computation Job configuration",
                     "system": "System",
@@ -1190,8 +1252,14 @@ export default angular.module('tempus.locale', [])
                     "computationJob-file": "Computation Job file",
                     "invalid-computationJob-file-error": "Unable to import Computation Job: Invalid Computation Job data structure.",
                     "copyId": "Copy Computation Job Id",
-                    "idCopiedMessage": "Computation Job Id has been copied to clipboard"
-
+                    "idCopiedMessage": "Computation Job Id has been copied to clipboard",
+                    "kubeless": {
+                        "functionSelector-key": "Label",
+                        "functionSelector-value": "Selector",
+                        "field-required": "Field is required",
+                        "add-map": "Add Selector",
+                        "type": "Trigger Type"
+                    }
                 },
                 "position": {
                     "top": "Top",
@@ -1433,8 +1501,9 @@ export default angular.module('tempus.locale', [])
                     "send-activation-mail": "Send activation mail",
                     "external-no-activation": "External - No Activation",
                     "activation-link": "User activation link",
-                    "activation-link-text": "In order to activate user use the following <a href='{{activationLink}}' target='_blank'>activation link</a> :",
+                    "activation-link-text": "In order to activate user use the following activation link :",
                     "copy-activation-link": "Copy activation link",
+                    "activation-link-note" : "NOTE : To activate user, please copy this link, logout and then paste the link in your browser to set password for the user.",
                     "activation-link-copied-message": "User activation link has been copied to clipboard",
                     "details": "Details",
                     "name": "Name",
@@ -1461,13 +1530,27 @@ export default angular.module('tempus.locale', [])
 
                 },
 
+
                 "policy" : {
                     "policy": "POLICY",
                     "entityType": "Entity Type",
-                    "entity": "Entity",
-                    "accessLevel" :"Access Level"
+                    "entity": "Entity Name",
+                    "accessLevel" :"Access Level",
+                    "add" :"Add Policy",
+                    "edit": "Edit Policy",
+                    "access-level": "Access Level",
+                    "field-required": "Field is required",
+                    "datamodel-object":"Data Model Object",
+                    "delete":"Delete Policy",
+                    "selected-policy":"{ count, select, 1 {1 policy} other {# policy} } selected",
+                    "delete-policy-title": "Are you sure you want to delete the policy?",
+                    "delete-policy-text": "Be careful, after the confirmation the policy and all related data will become unrecoverable.",
+                     "delete-policies-title": "Are you sure you want to delete { count, select, 1 {1 policy} other {# policies} }?",
+                     "delete-policies-text": "Be careful, after the confirmation all selected policies will be removed.",
+                     "no-data":"NO DATA AVAILABLE"
 
-                },
+                    },
+
                 "value": {
                     "type": "Value type",
                     "string": "String",
@@ -1534,7 +1617,10 @@ export default angular.module('tempus.locale', [])
                     "widget-template-load-failed-error": "Failed to load widget template!",
                     "add": "Add Widget",
                     "undo": "Undo widget changes",
-                    "export": "Export widget"
+                    "export": "Export widget",
+                    "entity-list-is-empty":"Entity List is empty",
+                    "name": "Name",
+                    "entity-type":"Entity Type"
                 },
                 "widget-action": {
                     "header-button": "Widget header button",
@@ -1654,6 +1740,28 @@ export default angular.module('tempus.locale', [])
                         "marker-click": "On marker click",
                         "tooltip-tag-action": "Tooltip tag action"
                     }
+                },
+                "metadataConfig":{
+                    "add-metadata-text": "Add new Metadata",
+                    "no-metadata-text": "No Metadata found",
+                    "metadata-details": "Metadata Details",
+                    "delete-metadata-title": "Are you sure you want to delete the metadata '{{metadataName}}'?",
+                    "delete-metadata-text":"Be careful, after the confirmation the metadata and all related data will become unrecoverable.",
+                    "delete-metadata-action-title":"Delete { count, select, 1 {1 metadata} other {# metadatas} }",
+                    "delete":"Delete Metadata",
+                    "details":"Details",
+                    "name":"Name",
+                    "name-required":"Name is required.",
+                    "query":"Query",
+                    "trigger-type":"Trigger Type",
+                    "trigger-schedule":"Trigger Schedule",
+                    "test-connection":"Test Connection",
+                    "connection-sucessfull":"Connection sucessfull",
+                    "connection-failed":"Connection failed.Invalid Database URL or user credentials.",
+                    "queries-selected":"queries selected",
+                    "query-name":"Query Name",
+                    "no-query-found":"No query found",
+                    "delete-query":"Delete query"
                 }
             }
         }
