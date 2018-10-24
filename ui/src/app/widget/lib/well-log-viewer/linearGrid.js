@@ -21,7 +21,7 @@ import * as d3 from 'd3';
 
 import './logViewer.css';
 /*@ngInject*/
-var linearGrid = function(lineConfig, data, state, index) {
+var linearGrid = function(lineConfig, data, state, index, width) {
   'use strict';
   var o;
      // local;
@@ -38,8 +38,13 @@ var linearGrid = function(lineConfig, data, state, index) {
     minorLineWeight: lineConfig.minorLines.lineWeight,
     data : data,
     state:state,
-    index: index
-  };  
+    index: index,
+    width: width
+  }; 
+
+  if(angular.isUndefined(o.width)){
+    o.width = 3;
+  } 
   if(lineConfig.minorLines.style === "dashed"){
     o.mirorStroke = "6,4";
   }
