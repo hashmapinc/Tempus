@@ -129,7 +129,7 @@ public class DataModelObjectServiceImp implements DataModelObjectService {
         if(dataModelObject != null) {
             List<Asset> assets = assetDao.findAssetsByDataModelObjectId(dataModelObject.getId().getId());
             if (!assets.isEmpty())
-                throw new DataValidationException("Cannot delete dataModelObject because one or more asset are associated with it");
+                throw new DataValidationException("Cannot delete dataModelObject because one or more assets are associated with it");
             else {
                 removeAttributeDefinitions(dataModelObject);
                 removeAssetLandingDashboard(dataModelObjectId);

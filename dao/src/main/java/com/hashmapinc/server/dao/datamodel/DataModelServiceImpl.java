@@ -100,7 +100,7 @@ public class DataModelServiceImpl extends AbstractEntityService implements DataM
             if(dataModelObject != null){
                 List<Asset> assets = assetDao.findAssetsByDataModelObjectId(dataModelObject.getId().getId());
                 if(!assets.isEmpty())
-                    throw new DataValidationException("Cannot delete the dataModel because one or more asset are associated with it's dataModelObjects");
+                    throw new DataValidationException("Cannot delete the dataModel because one or more assets are associated with it's dataModelObjects");
             }
         });
 
