@@ -36,11 +36,16 @@ export default function loadLogViewer(ctx, sequence){
     function build(ctx, state) {
       function datasourceFilter(settings, datasources){
         var ds;
-        datasources.forEach(function(datasource){
-          if(settings.dataSource === datasource.dataKey.label){
-            ds = datasource;
-          }
-        })
+        if(settings.cType === 'linearGrid'){
+          ds = datasources[0];
+        }
+        else {
+          datasources.forEach(function(datasource){
+            if(settings.dataSource === datasource.dataKey.label){
+              ds = datasource;
+            }
+         })
+        }
         return ds;
       }
     //  config = loadConfig();

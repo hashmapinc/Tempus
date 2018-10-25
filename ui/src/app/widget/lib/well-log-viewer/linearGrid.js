@@ -71,7 +71,7 @@ var linearGrid = function(lineConfig, data, state, index, width) {
     context = d3.select(this);
 
     var margin = {top: 0, right: 10, bottom: 20, left: 10},
-      width = 440 - margin.right - margin.left,
+      width = o.width*110 - margin.right - margin.left,
       height = 700 - margin.top - margin.bottom;
 
      // var dx = width - margin.right - margin.left;
@@ -99,6 +99,7 @@ var linearGrid = function(lineConfig, data, state, index, width) {
         });
 
     var y = d3.scaleLinear()
+        .domain(d3.extent(o.data.data, function(d) { return d[0]; }))
         .range([0, height]);
 
     var yAxis = d3.axisLeft()
@@ -107,36 +108,57 @@ var linearGrid = function(lineConfig, data, state, index, width) {
         .ticks(10)
         .tickSize(-width);
 
-  //  if(o.state === "init"){
-
-
-    context.select('.linearGrid')
-        .attr('width', width + margin.right + margin.left)
-        .attr('height', height + margin.top + margin.bottom)
+    if(o.state === 'init'){
+      context.select('.linearGrid')
+          .attr('width', width + margin.right + margin.left)
+          .attr('height', height + margin.top + margin.bottom)
 
 
 
-      var x_axis =  context.select('.linearGrid').append("g")
-        .attr("id", "x_axis")
-        .attr("class", "x axis")
-        .style("stroke-width", o.majorLineWeight)
-        .attr("transform", "translate(0," +  height +")")
-        .call(xAxis)
-      // Add the class 'minor' to all minor ticks
-      x_axis.selectAll("g")
-        .filter(function (d, i) {
-          return !isMajorTick(i);
-        })
-        .classed("minor", true)
-        .style("stroke-width", o.minorLineWeight)
-        .style("stroke-dasharray", o.mirorStroke)
-      // console.log("all the visible points", xAxis.scale().ticks(xAxis.ticks()[0]));
+        var x_axis =  context.select('.linearGrid').append("g")
+          .attr("id", "x_axis")
+          .attr("class", "x axis")
+          .style("stroke-width", o.majorLineWeight)
+          .attr("transform", "translate(0," +  height +")")
+          .call(xAxis)
+        // Add the class 'minor' to all minor ticks
+        x_axis.selectAll("g")
+          .filter(function (d, i) {
+            return !isMajorTick(i);
+          })
+          .classed("minor", true)
+          .style("stroke-width", o.minorLineWeight)
+          .style("stroke-dasharray", o.mirorStroke)
+        // console.log("all the visible points", xAxis.scale().ticks(xAxis.ticks()[0]));
 
-    context.select('.linearGrid')
-    .append("g")
-          .attr("class", "axis")
-          .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
-          .call(yAxis);
+      context.select('.linearGrid')
+      .append("g")
+            .attr("class", "axis")
+            .attr("id", "moving-axis")
+            .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
+            .call(yAxis);
+    }
+    if(o.state === 'update'){
+
+        x_axis =  context.select('.linearGrid').select(".x axis")
+          .attr("id", "x_axis")
+          .style("stroke-width", o.majorLineWeight)
+          .attr("transform", "translate(0," +  height +")")
+          .call(xAxis)
+        // Add the class 'minor' to all minor ticks
+        x_axis.selectAll("g")
+          .filter(function (d, i) {
+            return !isMajorTick(i);
+          })
+          .classed("minor", true)
+          .style("stroke-width", o.minorLineWeight)
+          .style("stroke-dasharray", o.mirorStroke)
+        // console.log("all the visible points", xAxis.scale().ticks(xAxis.ticks()[0]));
+
+        context.select('.linearGrid')
+         .select("#moving-axis")
+         .call(yAxis);
+    }
 
   }
   
