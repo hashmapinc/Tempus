@@ -58,10 +58,10 @@ public class MinioService implements S3BucketService {
     private static final String AMAZON_S3_URL = "https://s3.amazonaws.com";
     private Base64.Encoder encoder = Base64.getEncoder();
 
-    @Value("${kubeless.aws_access_key}")
+    @Value("${aws.access_key}")
     private String awsAccesskey;
 
-    @Value("${kubeless.aws_secret_key}")
+    @Value("${aws.secret_key}")
     private String awsSecretKey;
 
     @Autowired

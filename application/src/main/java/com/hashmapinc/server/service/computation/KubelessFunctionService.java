@@ -59,11 +59,11 @@ public class KubelessFunctionService implements ComputationFunctionService {
     public static final String EXCEPTION = "Exception occured : {}";
     public static final String IO_EXECPTION = "IOExecption occured : {}";
 
-    @Value("${kubeless.cluster_mode_enabled}")
+    @Value("${kubernetes.cluster_mode_enabled}")
     private boolean clusterModeEnabled;
 
 
-    @Value("${kubeless.kube_config_path}")
+    @Value("${kubernetes.kube_config_path}")
     private String kublessConfigPath;
 
     private Base64.Decoder decoder = Base64.getDecoder();
