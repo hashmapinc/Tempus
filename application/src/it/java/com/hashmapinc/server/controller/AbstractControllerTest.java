@@ -826,4 +826,25 @@ public abstract class AbstractControllerTest {
                 .andExpect(status().isOk());
     }
 
+    protected Device createDevice(DataModelObjectId dataModelObjectId, CustomerId customerId, String deviceName) throws Exception {
+        Device device = new Device();
+        device.setName(deviceName);
+        device.setType("default");
+        device.setDataModelObjectId(dataModelObjectId);
+        device.setTenantId(tenantId);
+        device.setCustomerId(customerId);
+        Device savedDevice = doPost("/api/device", device, Device.class);
+        Assert.assertNotNull(savedDevice);
+        Assert.assertNotNull(savedDevice.getId());
+        Assert.assertTrue(savedDevice.getCreatedTime() > 0);
+        Assert.assertEquals(savedTenant.getId(), savedDevice.getTenantId());
+        Assert.assertNotNull(savedDevice.getCustomerId());
+        if(customerId == null){
+            Assert.assertEquals(NULL_UUID, savedDevice.getCustomerId().getId());
+        }else{
+            Assert.assertEquals(customerId, savedDevice.getCustomerId());
+        }
+        Assert.assertEquals(device.getName(), savedDevice.getName());
+        return savedDevice;
+    }
 }
