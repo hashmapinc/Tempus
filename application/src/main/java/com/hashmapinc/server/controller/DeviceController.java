@@ -21,6 +21,7 @@ import com.hashmapinc.server.common.data.*;
 import com.hashmapinc.server.common.data.audit.ActionType;
 import com.hashmapinc.server.common.data.device.DeviceSearchQuery;
 import com.hashmapinc.server.common.data.id.CustomerId;
+import com.hashmapinc.server.common.data.id.DataModelObjectId;
 import com.hashmapinc.server.common.data.id.DeviceId;
 import com.hashmapinc.server.common.data.id.TenantId;
 import com.hashmapinc.server.common.data.page.TextPageData;
@@ -54,6 +55,8 @@ import java.util.stream.Collectors;
 public class DeviceController extends BaseController {
 
     public static final String DEVICE_ID = "deviceId";
+    public static final String DATA_MODEL_OBJECT_ID = "dataModelObjectId";
+
 
     @Autowired
     protected TimeseriesService timeseriesService;
@@ -434,6 +437,25 @@ public class DeviceController extends BaseController {
             TenantId tenantId = user.getTenantId();
             ListenableFuture<List<EntitySubtype>> deviceTypes = deviceService.findDeviceTypesByTenantId(tenantId);
             return checkNotNull(deviceTypes.get());
+        } catch (Exception e) {
+            throw handleException(e);
+        }
+    }
+
+    @PreAuthorize("hasAnyAuthority('TENANT_ADMIN', 'CUSTOMER_USER')")
+    @GetMapping(value = "/datamodelobject/devices/{dataModelObjectId}")
+    @ResponseBody
+    public TextPageData<Device> getDevicesByDataModelObjectId(@PathVariable(DATA_MODEL_OBJECT_ID) String strDataModelObjectId,
+                                                            @RequestParam int limit,
+                                                            @RequestParam(required = false) String textSearch,
+                                                            @RequestParam(required = false) String idOffset,
+                                                            @RequestParam(required = false) String textOffset) throws TempusException {
+        checkParameter(DATA_MODEL_OBJECT_ID, strDataModelObjectId);
+        try {
+            DataModelObjectId dataModelObjectId = new DataModelObjectId(toUUID(strDataModelObjectId));
+            final TempusResourceCriteriaSpec tempusResourceCriteriaSpec = getTempusResourceCriteriaSpec(getCurrentUser(), EntityType.DEVICE, dataModelObjectId);
+            TextPageLink pageLink = createPageLink(limit, textSearch, idOffset, textOffset);
+            return deviceService.findAll(tempusResourceCriteriaSpec, pageLink);
         } catch (Exception e) {
             throw handleException(e);
         }
