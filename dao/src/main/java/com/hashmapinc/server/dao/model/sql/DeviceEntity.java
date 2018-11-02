@@ -18,6 +18,8 @@ package com.hashmapinc.server.dao.model.sql;
 
 import com.datastax.driver.core.utils.UUIDs;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.hashmapinc.server.common.data.UUIDConverter;
+import com.hashmapinc.server.common.data.id.DataModelObjectId;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.hibernate.annotations.Type;
@@ -51,6 +53,9 @@ public final class DeviceEntity extends BaseSqlEntity<Device> implements SearchT
     @Column(name = ModelConstants.DEVICE_TYPE_PROPERTY)
     private String type;
 
+    @Column(name = ModelConstants.DEVICE_DATA_MODEL_OBJECT_ID)
+    private String dataModelObjectId;
+
     @Column(name = ModelConstants.DEVICE_NAME_PROPERTY)
     private String name;
 
@@ -74,6 +79,9 @@ public final class DeviceEntity extends BaseSqlEntity<Device> implements SearchT
         }
         if (device.getCustomerId() != null) {
             this.customerId = toString(device.getCustomerId().getId());
+        }
+        if (device.getDataModelObjectId() != null) {
+            this.dataModelObjectId = UUIDConverter.fromTimeUUID(device.getDataModelObjectId().getId());
         }
         this.name = device.getName();
         this.type = device.getType();
@@ -99,6 +107,9 @@ public final class DeviceEntity extends BaseSqlEntity<Device> implements SearchT
         }
         if (customerId != null) {
             device.setCustomerId(new CustomerId(toUUID(customerId)));
+        }
+        if (dataModelObjectId != null) {
+            device.setDataModelObjectId(new DataModelObjectId(UUIDConverter.fromString(dataModelObjectId)));
         }
         device.setName(name);
         device.setType(type);
