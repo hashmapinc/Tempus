@@ -19,6 +19,7 @@ package com.hashmapinc.server.dao.device;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.hashmapinc.server.common.data.Device;
 import com.hashmapinc.server.common.data.EntitySubtype;
+import com.hashmapinc.server.common.data.TempusResourceCriteriaSpec;
 import com.hashmapinc.server.common.data.page.TextPageLink;
 import com.hashmapinc.server.dao.Dao;
 
@@ -115,4 +116,20 @@ public interface DeviceDao extends Dao<Device> {
      * @return the list of tenant device type objects
      */
     ListenableFuture<List<EntitySubtype>> findTenantDeviceTypesAsync(UUID tenantId);
+
+    /**
+     * Find all asset by dataModelObjectId
+     *
+     * @param dataModelObjectId the dataModelObjectId
+     * @return the list of device objects corresponding to dataModelObjectId
+     */
+    List<Device> findDeviceByDataModelObjectId(UUID dataModelObjectId);
+
+    /**
+     * Find all device by tempusResourceCriteriaSpec object
+     *
+     * @param tempusResourceCriteriaSpec the tempusResourceCriteriaSpec
+     * @return the list of device objects corresponding to tempusResourceCriteriaSpec
+     */
+    List<Device> findAll(TempusResourceCriteriaSpec tempusResourceCriteriaSpec, TextPageLink textPageLink);
 }
