@@ -17,11 +17,13 @@
 package com.hashmapinc.server.dao.sql.device;
 
 import com.hashmapinc.server.dao.model.sql.DeviceEntity;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.querydsl.QueryDslPredicateExecutor;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
-import com.hashmapinc.server.dao.util.SqlDao;
+import com.querydsl.core.types.Predicate;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -30,7 +32,7 @@ import java.util.List;
  * Created by Valerii Sosliuk on 5/6/2017.
  */
 @Repository
-public interface DeviceRepository extends CrudRepository<DeviceEntity, String> {
+public interface DeviceRepository extends CrudRepository<DeviceEntity, String>, QueryDslPredicateExecutor<DeviceEntity> {
 
 
     @Query("SELECT d FROM DeviceEntity d WHERE d.tenantId = :tenantId " +
@@ -81,4 +83,9 @@ public interface DeviceRepository extends CrudRepository<DeviceEntity, String> {
     List<DeviceEntity> findDevicesByTenantIdAndCustomerIdAndIdIn(String tenantId, String customerId, List<String> deviceIds);
 
     List<DeviceEntity> findDevicesByTenantIdAndIdIn(String tenantId, List<String> deviceIds);
+
+    List<DeviceEntity> findByDataModelObjectId(String dataModelObjectId);
+
+    Page<DeviceEntity> findAll(Predicate predicate, Pageable pageable);
+
 }

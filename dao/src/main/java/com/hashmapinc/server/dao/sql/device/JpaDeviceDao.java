@@ -17,24 +17,28 @@
 package com.hashmapinc.server.dao.sql.device;
 
 import com.google.common.util.concurrent.ListenableFuture;
-import com.hashmapinc.server.common.data.Device;
-import com.hashmapinc.server.common.data.EntitySubtype;
-import com.hashmapinc.server.common.data.EntityType;
+import com.hashmapinc.server.common.data.*;
+import com.hashmapinc.server.common.data.id.DeviceId;
 import com.hashmapinc.server.common.data.id.TenantId;
 import com.hashmapinc.server.common.data.page.TextPageLink;
 import com.hashmapinc.server.dao.DaoUtil;
 import com.hashmapinc.server.dao.device.DeviceDao;
 import com.hashmapinc.server.dao.model.ModelConstants;
 import com.hashmapinc.server.dao.model.sql.DeviceEntity;
+import com.hashmapinc.server.dao.querybuilder.ResourceCriteria;
+import com.hashmapinc.server.dao.querybuilder.TempusResourcePredicate;
 import com.hashmapinc.server.dao.sql.JpaAbstractSearchTextDao;
+import com.hashmapinc.server.dao.sql.querydsl.JPATempusResourcePredicateBuilder;
 import com.hashmapinc.server.dao.util.SqlDao;
+import com.querydsl.core.types.dsl.BooleanExpression;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Component;
-import com.hashmapinc.server.common.data.UUIDConverter;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static com.hashmapinc.server.common.data.UUIDConverter.fromTimeUUID;
 import static com.hashmapinc.server.common.data.UUIDConverter.fromTimeUUIDs;
@@ -120,8 +124,60 @@ public class JpaDeviceDao extends JpaAbstractSearchTextDao<DeviceEntity, Device>
     }
 
     @Override
+    public List<Device> findDeviceByDataModelObjectId(UUID dataModelObjectId) {
+        return DaoUtil.convertDataList(deviceRepository
+                                               .findByDataModelObjectId(
+                                                       UUIDConverter.fromTimeUUID(dataModelObjectId)));
+    }
+
+    @Override
     public ListenableFuture<List<EntitySubtype>> findTenantDeviceTypesAsync(UUID tenantId) {
         return service.submit(() -> convertTenantDeviceTypesToDto(tenantId, deviceRepository.findTenantDeviceTypes(fromTimeUUID(tenantId))));
+    }
+
+    @Override
+    public List<Device> findAll(TempusResourceCriteriaSpec tempusResourceCriteriaSpec, TextPageLink textPageLink) {
+        final List<BooleanExpression> predicates = getPredicates(tempusResourceCriteriaSpec, textPageLink);
+        final Optional<BooleanExpression> finalPredicate = predicates.stream().reduce(BooleanExpression::and);
+        final PageRequest pageable = new PageRequest(0, textPageLink.getLimit(), new Sort(new Sort.Order(Sort.Direction.ASC, ModelConstants.ID_PROPERTY)));
+        return finalPredicate.isPresent() ? DaoUtil.convertDataList(deviceRepository.findAll(finalPredicate.get(), pageable).getContent()) : Collections.emptyList();
+    }
+
+    private List<BooleanExpression> getPredicates(TempusResourceCriteriaSpec tempusResourceCriteriaSpec, TextPageLink textPageLink) {
+        final String idOffset = textPageLink.getIdOffset() == null ? ModelConstants.NULL_UUID_STR : UUIDConverter.fromTimeUUID(textPageLink.getIdOffset());
+
+        final JPATempusResourcePredicateBuilder basicPredicateBuilder = new JPATempusResourcePredicateBuilder(getEntityClass())
+                .with(new ResourceCriteria(ModelConstants.ID_PROPERTY, ResourceCriteria.Operation.GREATER_THAN, idOffset))
+                .with(new ResourceCriteria(ModelConstants.DEVICE_TENANT_ID_PROPERTY, ResourceCriteria.Operation.EQUALS, UUIDConverter.fromTimeUUID(tempusResourceCriteriaSpec.getTenantId().getId())))
+                .with(new ResourceCriteria(ModelConstants.DEVICE_DATA_MODEL_OBJECT_ID, ResourceCriteria.Operation.EQUALS, UUIDConverter.fromTimeUUID(tempusResourceCriteriaSpec.getDataModelObjectId().getId())));
+
+        if(textPageLink.getTextSearch() != null){
+            basicPredicateBuilder.with(new ResourceCriteria(ModelConstants.SEARCH_TEXT_PROPERTY, ResourceCriteria.Operation.LIKE, textPageLink.getTextSearch()));
+        }
+
+        tempusResourceCriteriaSpec.getCustomerId().ifPresent(customerId ->
+                                                                     basicPredicateBuilder.with(new ResourceCriteria(ModelConstants.DEVICE_CUSTOMER_ID_PROPERTY, ResourceCriteria.Operation.EQUALS, UUIDConverter.fromTimeUUID(customerId.getId()))));
+
+        final ResourceCriteria idConstraint = getIdConstraint(tempusResourceCriteriaSpec);
+        if(Objects.nonNull(idConstraint)){
+            basicPredicateBuilder.with(idConstraint);
+        }
+        final List<TempusResourcePredicate<BooleanExpression>> tempusResourcePredicates = basicPredicateBuilder.build();
+        return tempusResourcePredicates.stream().map(TempusResourcePredicate::getValue).collect(Collectors.toList());
+    }
+
+    private ResourceCriteria getIdConstraint(TempusResourceCriteriaSpec tempusResourceCriteriaSpec) {
+        final Set<String> accessibleTempusResourceIdsOnly = tempusResourceCriteriaSpec.getAccessibleIdsForGivenDataModelObject().stream()
+                .filter(id -> id instanceof DeviceId)
+                .map(id -> UUIDConverter.fromTimeUUID(id.getId()))
+                .collect(Collectors.toSet());
+
+        if(accessibleTempusResourceIdsOnly.size() == 1){
+            return new ResourceCriteria(ModelConstants.ID_PROPERTY, ResourceCriteria.Operation.EQUALS, accessibleTempusResourceIdsOnly.toArray()[0]);
+        } else if (accessibleTempusResourceIdsOnly.size() > 1) {
+            return new ResourceCriteria(ModelConstants.ID_PROPERTY, ResourceCriteria.Operation.CONTAINS, accessibleTempusResourceIdsOnly.toArray(new String[0]));
+        }
+        return null;
     }
 
     private List<EntitySubtype> convertTenantDeviceTypesToDto(UUID tenantId, List<String> types) {
