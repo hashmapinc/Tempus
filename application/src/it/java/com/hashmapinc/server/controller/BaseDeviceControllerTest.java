@@ -20,9 +20,12 @@ import com.datastax.driver.core.utils.UUIDs;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.gson.JsonParser;
 import com.hashmapinc.server.common.data.*;
+import com.hashmapinc.server.common.data.datamodel.DataModel;
+import com.hashmapinc.server.common.data.datamodel.DataModelObject;
 import com.hashmapinc.server.common.data.id.CustomerId;
 import com.hashmapinc.server.common.data.id.DeviceCredentialsId;
 import com.hashmapinc.server.common.data.id.DeviceId;
+import com.hashmapinc.server.common.data.id.UserId;
 import com.hashmapinc.server.common.data.kv.*;
 import com.hashmapinc.server.common.data.page.TextPageData;
 import com.hashmapinc.server.common.data.page.TextPageLink;
@@ -848,6 +851,75 @@ public abstract class BaseDeviceControllerTest extends AbstractControllerTest {
         ResultActions result = doGet("/api/download/deviceSeriesData?type=ts&deviceId="+deviceId.getId().toString()+"&startValue=40J00&endValue=4200");
     }
 
+    @Test
+    public void findAllDevicesByDataModeObject() throws Exception{
+        DataModel dataModel = createDataModel();
+        DataModelObject dataModelObject = createDataModelObject(dataModel);
+
+        String policyNew1 = String.format("CUSTOMER_USER:DEVICE?%s=%s:READ",
+                                          UserPermission.ResourceAttribute.DATA_MODEL_ID, dataModelObject.getId().getId().toString());
+
+
+        String policyNew2 = String.format("CUSTOMER_USER:DEVICE?%s=%s:CREATE",
+                                          UserPermission.ResourceAttribute.DATA_MODEL_ID, dataModelObject.getId().getId().toString());
+        List<String> policies = new ArrayList<>();
+        policies.add(policyNew1);
+        policies.add(policyNew2);
+        CustomerGroup savedCustomerGroup = createGroupWithPolicies(policies, customerUser.getCustomerId(), "My Customer Group");
+        UserId customerUserId = getCustomerUserId();
+        assignUserToGroup(customerUserId, savedCustomerGroup);
+
+        logout();
+        loginCustomerUser();
+        for (int i = 0; i < 20; i++) {
+            createDevice(dataModelObject.getId(), customerUser.getCustomerId(), "Customer's device"+i);
+        }
+
+        TextPageLink pageLink = new TextPageLink(15);
+        TextPageData<Device> pageData  = doGetTypedWithPageLink("/api/datamodelobject/devices/"+ dataModelObject.getId().getId().toString()+"?",
+                                                               new TypeReference<TextPageData<Device>>(){}, pageLink);
+        Assert.assertEquals(15, pageData.getData().size());
+
+        TextPageData<Device> pageData1  = doGetTypedWithPageLink("/api/datamodelobject/devices/"+ dataModelObject.getId().getId().toString()+"?",
+                                                                new TypeReference<TextPageData<Device>>(){}, pageData.getNextPageLink());
+        Assert.assertEquals(5, pageData1.getData().size());
+        logout();
+
+        unAssignUserFromGroup(savedCustomerGroup.getId(), customerUserId);
+
+        logout();
+        loginTenantAdmin();
+        int i = 0;
+        List<String> policies1 = new ArrayList<>();
+        while (i < 20){
+            Device device_i = createDevice(dataModelObject.getId(), customerUser.getCustomerId(), "Tenant's device "+ i);
+            String policy_i = String.format("CUSTOMER_USER:DEVICE?%s=%s&%s=%s:READ",
+                                            UserPermission.ResourceAttribute.ID, device_i.getId().getId().toString(),
+                                            UserPermission.ResourceAttribute.DATA_MODEL_ID, dataModelObject.getId().getId().toString());
+            if(i % 2 == 0)
+                policies1.add(policy_i);
+            i++;
+
+        }
+        CustomerGroup savedCustomerGroup1 = createGroupWithPolicies(policies1, customerUser.getCustomerId(), "My Customer Group New");
+
+        String getPolicyUrl1 = "/api/customer/group/" + savedCustomerGroup1.getId().getId().toString() + "/policy";
+        doGet(getPolicyUrl1).andExpect(status().isOk());
+        assignUserToGroup(customerUserId, savedCustomerGroup1);
+
+        logout();
+        loginCustomerUser();
+        TextPageLink pageLink11 = new TextPageLink(7);
+        TextPageData<Device> pageData11  = doGetTypedWithPageLink("/api/datamodelobject/devices/"+ dataModelObject.getId().getId().toString()+"?",
+                                                                 new TypeReference<TextPageData<Device>>(){}, pageLink11);
+        Assert.assertEquals(7, pageData11.getData().size());
+
+        TextPageData<Device> pageData12  = doGetTypedWithPageLink("/api/datamodelobject/devices/"+ dataModelObject.getId().getId().toString()+"?",
+                                                                 new TypeReference<TextPageData<Device>>(){}, pageData11.getNextPageLink());
+        Assert.assertEquals(3, pageData12.getData().size());
+        logout();
+
+    }
 
     @Test
     public void testDownloadCsvASData() throws Exception {
