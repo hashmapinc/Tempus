@@ -16,6 +16,7 @@
  */
 package com.hashmapinc.server.common.data;
 
+import com.hashmapinc.server.common.data.id.DataModelObjectId;
 import com.hashmapinc.server.common.data.id.DeviceId;
 import lombok.EqualsAndHashCode;
 import com.hashmapinc.server.common.data.id.CustomerId;
@@ -28,6 +29,7 @@ public class Device extends SearchTextBasedWithAdditionalInfo<DeviceId> implemen
 
     private TenantId tenantId;
     private CustomerId customerId;
+    private DataModelObjectId dataModelObjectId;
     private String name;
     private String type;
 
@@ -45,6 +47,7 @@ public class Device extends SearchTextBasedWithAdditionalInfo<DeviceId> implemen
         this.customerId = device.getCustomerId();
         this.name = device.getName();
         this.type = device.getType();
+        this.dataModelObjectId = device.getDataModelObjectId();
     }
 
     public TenantId getTenantId() {
@@ -61,6 +64,14 @@ public class Device extends SearchTextBasedWithAdditionalInfo<DeviceId> implemen
 
     public void setCustomerId(CustomerId customerId) {
         this.customerId = customerId;
+    }
+
+    public DataModelObjectId getDataModelObjectId() {
+        return dataModelObjectId;
+    }
+
+    public void setDataModelObjectId(DataModelObjectId dataModelObjectId) {
+        this.dataModelObjectId = dataModelObjectId;
     }
 
     @Override
@@ -94,6 +105,8 @@ public class Device extends SearchTextBasedWithAdditionalInfo<DeviceId> implemen
         builder.append(customerId);
         builder.append(", name=");
         builder.append(name);
+        builder.append(", dataModelObjectId=");
+        builder.append(dataModelObjectId);
         builder.append(", type=");
         builder.append(type);
         builder.append(", additionalInfo=");
