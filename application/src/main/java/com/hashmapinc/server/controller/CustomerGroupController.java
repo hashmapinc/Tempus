@@ -242,7 +242,7 @@ public class CustomerGroupController extends BaseController {
         }
     }
 
-    @PreAuthorize("hasAuthority('TENANT_ADMIN')")
+    @PreAuthorize("hasAnyAuthority('TENANT_ADMIN', 'CUSTOMER_USER')")
     @GetMapping(value = "/group/policy/{userId}")
     @ResponseBody
     public List<String> getPoliciesForUser(
