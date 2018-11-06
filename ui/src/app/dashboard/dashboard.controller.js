@@ -26,11 +26,13 @@ import selectTargetLayoutTemplate from './layouts/select-target-layout.tpl.html'
 /* eslint-enable import/no-unresolved, import/default */
 
 import AliasController from '../api/alias-controller';
+import addAssetTemplate from '../widget/lib/add-asset.tpl.html'
+import AddAssetController from '../widget/lib/add-asset.controller.js';
 
 /*@ngInject*/
 export default function DashboardController(types, utils, dashboardUtils, widgetService, userService,
                                             dashboardService, timeService, depthService, entityService, itembuffer, importExport, hotkeys, $window, $rootScope,
-                                            $scope, $element, $state, $stateParams, $mdDialog, $mdMedia, $timeout, $document, $q, $translate, $filter) {
+                                            $scope, $element, $state, $stateParams, $mdDialog, $mdMedia, $timeout, $document, $q, $translate, $filter, $log, userGroupService) {
 
     var vm = this;
 
@@ -53,11 +55,17 @@ export default function DashboardController(types, utils, dashboardUtils, widget
     vm.staticWidgetTypes = [];
     vm.widgetEditMode = $state.$current.data.widgetEditMode;
     vm.iframeMode = $rootScope.iframeMode;
+    vm.addAsset = addAsset;
     vm.types = types;
+    vm.cancel = cancel;
 
     vm.isToolbarOpened = false;
+    vm.displayAddAsset = false;
+    vm.displayAddAssetBasedPermission = false;
 
     vm.tempusVersion = TEMPUS_VERSION; //eslint-disable-line
+
+
 
     vm.currentDashboardId = $stateParams.dashboardId;
     if ($stateParams.customerId) {
@@ -348,6 +356,7 @@ export default function DashboardController(types, utils, dashboardUtils, widget
     }
 
     function loadDashboard() {
+        $log.log(vm.widgetEditMode)
         if (vm.widgetEditMode) {
             var widget = {
                 isSystemType: true,
@@ -376,6 +385,9 @@ export default function DashboardController(types, utils, dashboardUtils, widget
         } else {
             dashboardService.getDashboard($stateParams.dashboardId)
                 .then(function success(dashboard) {
+                    if(dashboard.type === 'ASSET_LANDING_PAGE') {
+                        vm.displayAddAsset = true;
+                    }
                     vm.dashboard = dashboardUtils.validateAndUpdateDashboard(dashboard);
                     vm.dashboardConfiguration = vm.dashboard.configuration;
                     vm.dashboardCtx.dashboard = vm.dashboard;
@@ -387,8 +399,30 @@ export default function DashboardController(types, utils, dashboardUtils, widget
                     vm.configurationError = true;
                 });
         }
+        if(vm.user.authority === 'TENANT_ADMIN') {
+            vm.displayAddAssetBasedPermission = true;
+        }else{
+            getUserPermission();
+        }
+
     }
 
+    function getUserPermission(){
+        userGroupService.getUserPermissions(vm.user.id)
+            .then(function success(permissions) {
+                $log.log("permissions");
+                $log.log(permissions);
+                $log.log(vm.dashboard.assetLandingInfo.dataModelId)
+                for(var i=0;i<permissions.length;i++){
+                    if(permissions[i].includes('28e97ad0-de75-11e8-b382-4571ebe8c559')){
+                        if(permissions[i].includes('CREATE')) {
+                            vm.displayAddAssetBasedPermission = true
+                        }
+                    }
+                }
+            }, function fail() {
+            });
+    }
     function openDashboardState(state, openRightLayout) {
         var layoutsData = dashboardUtils.getStateLayoutsData(vm.dashboard, state);
         if (layoutsData) {
@@ -1060,6 +1094,24 @@ export default function DashboardController(types, utils, dashboardUtils, widget
 
     function toggleDashboardEditMode() {
         setEditMode(!vm.isEdit, true);
+    }
+
+    function addAsset($event) {
+        $mdDialog.show({
+            controller: AddAssetController,
+            controllerAs: 'vm',
+            templateUrl: addAssetTemplate,
+            parent: angular.element($document[0].body),
+            fullscreen: true,
+            targetEvent: $event
+        }).then(function () {
+        }, function () {
+            $rootScope.$emit("displayAsset", $event);
+        });
+    }
+
+    function cancel() {
+            $mdDialog.cancel();
     }
 
     function saveDashboard() {

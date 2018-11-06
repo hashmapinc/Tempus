@@ -20,12 +20,13 @@
 import './entity-list-widget.scss'
 import addAssetTemplate from './add-asset.tpl.html'
 import deviceListWidgetTemplate from './entity-list-widget.tpl.html';
-  
+import AddAssetController from './add-asset.controller.js';
+
 
 
 export default angular.module('tempus.widgets.deviceListWidget', [])
     .directive('tbEntityListWidget', DeviceListWidget)
-    .controller('addAssetController',AddAssetController)
+    //.controller('addAssetController',AddAssetController)
     .name;
 
 /*@ngInject*/
@@ -44,7 +45,7 @@ function DeviceListWidget() {
     };
 }
 
-function AddAssetController (customerService, $state, dashboardService, datamodelService, userService,
+/*export default function AddAssetController (customerService, $state, dashboardService, datamodelService, userService,
     $rootScope, assetService, $mdDialog, entityRelationService, attributeService){
     var vm = this;
     vm.name = null;
@@ -193,11 +194,11 @@ function AddAssetController (customerService, $state, dashboardService, datamode
         $mdDialog.cancel();
     }
 
-}
+}*/
 
 /*@ngInject*/
 function DeviceListWidgetController($rootScope, $scope, $filter, dashboardService, assetService, userService,
-    $state, $stateParams, $translate, customerService,$document, $mdDialog) {
+    $state, $stateParams, $translate, customerService,$document, $mdDialog, $log) {
     
     var vm = this;
     $scope.query = {
@@ -303,7 +304,13 @@ function DeviceListWidgetController($rootScope, $scope, $filter, dashboardServic
         $scope.addAsset($event);
      });
  
-     $scope.$on('$destroy', assetAdd);
+    $scope.$on('$destroy', assetAdd);
+
+    var displayAsset = $rootScope.$on("displayAsset", function(){
+        $log.log("display Asset")
+        initController();
+    });
+    $scope.$on('$destroy', displayAsset);
     
     /**
      * Add Asset

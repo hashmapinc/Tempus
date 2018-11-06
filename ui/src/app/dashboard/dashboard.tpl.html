@@ -338,6 +338,16 @@
                 </md-tooltip>
                 <ng-md-icon icon="done"></ng-md-icon>
             </md-button>
+            <md-button ng-show="vm.displayAddAsset && vm.displayAddAssetBasedPermission && !$root.loading"
+                       ng-if="(vm.isTenantAdmin() || vm.isSystemAdmin() || vm.isCustomerUser()) && !forceFullscreen" ng-disabled="$root.loading"
+                       class="tb-btn-footer md-accent md-hue-2 md-fab"
+                       aria-label="{{ 'asset.add-asset-text' | translate }}"
+                       ng-click="vm.addAsset($event)">
+                <md-tooltip md-direction="top">
+                    {{ 'asset.add-asset-text' | translate }}
+                </md-tooltip>
+                <md-icon class="asset-btn" md-svg-src = '/static/svg/assetslightgray.svg'></md-icon>
+            </md-button>
             <md-button ng-show="!vm.isAddingWidget && !$root.loading"
                        ng-if="(vm.isTenantAdmin() || vm.isSystemAdmin() || vm.isCustomerUser()) && !forceFullscreen" ng-disabled="$root.loading"
                        class="tb-btn-footer md-accent md-hue-2 md-fab"

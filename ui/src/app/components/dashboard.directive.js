@@ -95,7 +95,8 @@ function Dashboard() {
 }
 
 /*@ngInject*/
-function DashboardController($scope, $rootScope, $element, $timeout, $mdMedia, $mdUtil, $q, timeService, depthService, types, utils, $translate, customerService, assetService) {
+function DashboardController($scope, $rootScope, $element, $timeout, $mdMedia, $mdUtil, $q, timeService, depthService, types, utils, $translate, customerService, assetService,
+                            $log) {
     var highlightedMode = false;
     var highlightedWidget = null;
     var selectedWidget = null;
@@ -146,6 +147,13 @@ function DashboardController($scope, $rootScope, $element, $timeout, $mdMedia, $
     function getAssetTitle(asset) {
         return asset ? asset.name : '';
     }
+
+     var assetAdd = $rootScope.$on("addDashboardAssetByEntity", function($event){
+         $log.log("in dashboard compounnet" +$event)
+         $rootScope.$emit("addAssetByEntity", [$event]);
+     });
+     $scope.$on('$destroy', assetAdd);
+
 
     function saveAsset(asset) {
         var deferred = $q.defer();
