@@ -95,8 +95,7 @@ function Dashboard() {
 }
 
 /*@ngInject*/
-function DashboardController($scope, $rootScope, $element, $timeout, $mdMedia, $mdUtil, $q, timeService, depthService, types, utils, $translate, customerService, assetService,
-                            $log) {
+function DashboardController($scope, $rootScope, $element, $timeout, $mdMedia, $mdUtil, $q, timeService, depthService, types, utils, $translate, customerService, assetService) {
     var highlightedMode = false;
     var highlightedWidget = null;
     var selectedWidget = null;
@@ -149,7 +148,6 @@ function DashboardController($scope, $rootScope, $element, $timeout, $mdMedia, $
     }
 
      var assetAdd = $rootScope.$on("addDashboardAssetByEntity", function($event){
-         $log.log("in dashboard compounnet" +$event)
          $rootScope.$emit("addAssetByEntity", [$event]);
      });
      $scope.$on('$destroy', assetAdd);

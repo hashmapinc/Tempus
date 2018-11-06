@@ -32,7 +32,7 @@ import AddAssetController from '../widget/lib/add-asset.controller.js';
 /*@ngInject*/
 export default function DashboardController(types, utils, dashboardUtils, widgetService, userService,
                                             dashboardService, timeService, depthService, entityService, itembuffer, importExport, hotkeys, $window, $rootScope,
-                                            $scope, $element, $state, $stateParams, $mdDialog, $mdMedia, $timeout, $document, $q, $translate, $filter, $log, userGroupService) {
+                                            $scope, $element, $state, $stateParams, $mdDialog, $mdMedia, $timeout, $document, $q, $translate, $filter, userGroupService) {
 
     var vm = this;
 
@@ -57,7 +57,6 @@ export default function DashboardController(types, utils, dashboardUtils, widget
     vm.iframeMode = $rootScope.iframeMode;
     vm.addAsset = addAsset;
     vm.types = types;
-    vm.cancel = cancel;
 
     vm.isToolbarOpened = false;
     vm.displayAddAsset = false;
@@ -356,7 +355,6 @@ export default function DashboardController(types, utils, dashboardUtils, widget
     }
 
     function loadDashboard() {
-        $log.log(vm.widgetEditMode)
         if (vm.widgetEditMode) {
             var widget = {
                 isSystemType: true,
@@ -410,9 +408,6 @@ export default function DashboardController(types, utils, dashboardUtils, widget
     function getUserPermission(){
         userGroupService.getUserPermissions(vm.user.id)
             .then(function success(permissions) {
-                $log.log("permissions");
-                $log.log(permissions);
-                $log.log(vm.dashboard.assetLandingInfo.dataModelId)
                 for(var i=0;i<permissions.length;i++){
                     if(permissions[i].includes('28e97ad0-de75-11e8-b382-4571ebe8c559')){
                         if(permissions[i].includes('CREATE')) {
@@ -1108,10 +1103,6 @@ export default function DashboardController(types, utils, dashboardUtils, widget
         }, function () {
             $rootScope.$emit("displayAsset", $event);
         });
-    }
-
-    function cancel() {
-            $mdDialog.cancel();
     }
 
     function saveDashboard() {
