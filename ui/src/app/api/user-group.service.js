@@ -32,7 +32,8 @@ function UserGroupService($q, $http) {
       assignedGroups:assignedGroups,
       assignGroupToUser:assignGroupToUser,
       unassignGroupFromUser:unassignGroupFromUser,
-      getPolicyList:getPolicyList
+      getPolicyList:getPolicyList,
+      getUserPermissions: getUserPermissions
 
     }
 
@@ -184,6 +185,17 @@ function UserGroupService($q, $http) {
              deferred.reject();
          });
          return deferred.promise;
+     }
+
+     function getUserPermissions(userId) {
+          var deferred = $q.defer();
+          var url = '/api/customer/group/policy/' + userId;
+          $http.get(url, null).then(function success(response) {
+              deferred.resolve(response.data);
+          }, function fail() {
+              deferred.reject();
+          });
+          return deferred.promise;
      }
 
 
