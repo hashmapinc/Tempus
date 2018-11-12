@@ -409,7 +409,7 @@ export default function DashboardController(types, utils, dashboardUtils, widget
         userGroupService.getUserPermissions(vm.user.id)
             .then(function success(permissions) {
                 for(var i=0;i<permissions.length;i++){
-                    if(permissions[i].includes('28e97ad0-de75-11e8-b382-4571ebe8c559')){
+                    if(permissions[i].includes(vm.dashboard.assetLandingInfo.dataModelObjectId.id)){
                         if(permissions[i].includes('CREATE')) {
                             vm.displayAddAssetBasedPermission = true
                         }
