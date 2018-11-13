@@ -82,10 +82,11 @@ CREATE TABLE IF NOT EXISTS metadata_entries(
     tenant_id varchar(31) NOT NULL,
     metadata_config_id varchar(31) NOT NULL,
     datasource_name varchar(255) NOT NULL,
+    attribute varchar(255) NOT NULL,
     key varchar(255) NOT NULL,
     value varchar(10000000) NOT NULL,
     last_update_ts bigint,
-    CONSTRAINT metadata_entries_unq_key UNIQUE (tenant_id, metadata_config_id, key)
+    CONSTRAINT metadata_entries_unq_key UNIQUE (tenant_id, metadata_config_id, datasource_name, attribute, key)
 );
 
 
@@ -350,6 +351,7 @@ CREATE TABLE IF NOT EXISTS attribute_definition (
     value_type varchar(100),
     data_model_object_id varchar(31),
     source varchar(250),
+    key_attribute boolean,
     CONSTRAINT attr_def_unq_key UNIQUE (name, data_model_object_id)
 );
 

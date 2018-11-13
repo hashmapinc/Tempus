@@ -34,7 +34,7 @@ import AliasController from '../../api/alias-controller';
 /*@ngInject*/
 export default function AttributeTableDirective($compile, $templateCache, $rootScope, $q, $mdEditDialog, $mdDialog,
                                                 $mdUtil, $document, $translate, $filter, utils, types, dashboardUtils,
-                                                dashboardService, entityService, attributeService, importExport, widgetService, $mdToast) {
+                                                dashboardService, entityService, attributeService, importExport, widgetService, $mdToast, $log, metadataService) {
 
     var linker = function (scope, element, attrs) {
 
@@ -59,6 +59,8 @@ export default function AttributeTableDirective($compile, $templateCache, $rootS
         scope.types = types;
 
         scope.entityType = attrs.entityType;
+        $log.log("assetLandingAttributeFlag");
+        $log.log(scope.assetLandingAttributeFlag)
 
         if (scope.entityType === types.entityType.device) {
             scope.attributeScopes = types.attributesScope;
@@ -531,6 +533,40 @@ export default function AttributeTableDirective($compile, $templateCache, $rootS
             return $rootScope.loading;
         }
 
+         scope.importMetadataEntries = function($event, attribute) {
+            $event.stopPropagation();
+            $log.log('herehe')
+            $log.log(attribute);
+            $log.log(scope.entityType);
+            $log.log(scope.entityId)
+            var param ={
+                key:attribute.key,
+                value:attribute.value
+            }
+            $log.log(param)
+            metadataService.getMetadataEntries(scope.entityType, scope.entityId,param).then(
+                  function success(data) {
+                      $log.log('in success');
+                      $log.log(data);
+                      var sharedAttributes = new Array();
+
+                      for (var attr =0; attr < data.length; attr++) {
+                          var updateAttribute = {};
+                          updateAttribute = angular.extend(updateAttribute, data[attr]);
+                          updateAttribute.key = updateAttribute.key;
+                          updateAttribute.value = data[attr].value;
+                          sharedAttributes.push(updateAttribute);
+                      }
+                      attributeService.saveEntityAttributes(scope.entityType, scope.entityId, types.attributesScope.server.value, sharedAttributes).then(
+                          function success() {
+                              scope.attributeScope = types.attributesScope.server;
+                              scope.getEntityAttributes(false, true);
+                          }
+                      );
+                  }
+            )
+         }
+
         $compile(element.contents())(scope);
     }
 
@@ -540,7 +576,8 @@ export default function AttributeTableDirective($compile, $templateCache, $rootS
         scope: {
             entityId: '=',
             entityName: '=',
-            disableAttributeScopeSelection: '@?'
+            disableAttributeScopeSelection: '@?',
+            assetLandingAttributeFlag: '='
         }
     };
 }

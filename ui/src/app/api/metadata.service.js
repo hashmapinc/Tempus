@@ -33,7 +33,8 @@ function MetadataService($http, $q, $filter, utils) {
         deleteMetadataQuery: deleteMetadataQuery,
         testMetadataConfig: testMetadataConfig,
         deleteMetadata: deleteMetadata,
-        saveMetadata: saveMetadata
+        saveMetadata: saveMetadata,
+        getMetadataEntries: getMetadataEntries
     }
 
     return service;
@@ -197,5 +198,26 @@ function MetadataService($http, $q, $filter, utils) {
             );
             return deferred.promise;
     }
+
+    /**
+    * Get Metadata Entries .
+    *
+    * @param {*} entity_type,entity_id,key,value
+    */
+
+    function getMetadataEntries(entity_type,entity_id,param) {
+        var deferred = $q.defer();
+        var url = '/api/metadata/attribute/'+entity_type+'/'+entity_id+'?key=' + param.key+'&value=' + param.value;
+        $http.get(url, null).then(
+            function success(response) {
+                deferred.resolve(response.data);
+            },
+            function fail() {
+                deferred.reject();
+            }
+        );
+        return deferred.promise;
+    }
+
 
 }

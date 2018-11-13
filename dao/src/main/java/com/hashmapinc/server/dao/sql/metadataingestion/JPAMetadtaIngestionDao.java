@@ -24,6 +24,7 @@ import com.google.common.util.concurrent.MoreExecutors;
 import com.hashmapinc.server.common.data.UUIDConverter;
 import com.hashmapinc.server.common.data.id.TenantId;
 import com.hashmapinc.server.common.data.kv.MetaDataKvEntry;
+import com.hashmapinc.server.common.data.kv.StringDataEntry;
 import com.hashmapinc.server.common.data.metadata.MetadataConfigId;
 import com.hashmapinc.server.dao.DaoUtil;
 import com.hashmapinc.server.dao.metadataingestion.MetaDataIngestionDao;
@@ -37,8 +38,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.concurrent.Executors;
 
 @Component
@@ -83,10 +86,11 @@ public class JPAMetadtaIngestionDao extends JpaAbstractDaoListeningExecutorServi
     }
 
     @Override
-    public ListenableFuture<Void> save(TenantId tenantId, MetadataConfigId metadataConfigId, String dataSourceName, MetaDataKvEntry metaDataKvEntry) {
+    public ListenableFuture<Void> save(TenantId tenantId, MetadataConfigId metadataConfigId, String dataSourceName, String attribute, MetaDataKvEntry metaDataKvEntry) {
         MetadataIngestionEntity metadataIngestionEntity = new MetadataIngestionEntity();
         metadataIngestionEntity.setKey(metaDataKvEntry.getKey());
         metadataIngestionEntity.setValue(metaDataKvEntry.getValue());
+        metadataIngestionEntity.setAttribute(attribute);
         metadataIngestionEntity.setTenantId(UUIDConverter.fromTimeUUID(tenantId.getId()));
         metadataIngestionEntity.setMetadataConfigId(UUIDConverter.fromTimeUUID(metadataConfigId.getId()));
         metadataIngestionEntity.setMetadataSourceName(dataSourceName);
@@ -105,5 +109,21 @@ public class JPAMetadtaIngestionDao extends JpaAbstractDaoListeningExecutorServi
                         metadataIngestionEntityRepository.findByMetadataConfigIdOrderByKeyAsc(UUIDConverter.fromTimeUUID(metadataConfigId.getId()))
                 ))
         );
+    }
+
+    @Override
+    public List<MetaDataKvEntry> findKvEntryByKeyAndTenantId(String key, TenantId tenantId) {
+        List<MetadataIngestionEntity> ingestionEntities = metadataIngestionEntityRepository.findByKeyAndTenantId(key, UUIDConverter.fromTimeUUID(tenantId.getId()));
+        List<MetaDataKvEntry> metaDataKvEntries = new ArrayList<>();
+        for (MetadataIngestionEntity entry: ingestionEntities) {
+            MetaDataKvEntry kvEntry = new MetaDataKvEntry(
+                                            new StringDataEntry(
+                                                    entry.getAttribute(),
+                                                    entry.getValue()),
+                                            entry.getLastUpdateTs()
+                                        );
+            metaDataKvEntries.add(kvEntry);
+        }
+        return metaDataKvEntries;
     }
 }

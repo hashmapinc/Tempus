@@ -24,6 +24,10 @@ import org.springframework.data.repository.query.Param;
 import java.util.List;
 
 public interface AttributeDefinitionRepository extends CrudRepository<AttributeDefinitionEntity, AttributeDefinitionCompositeKey> {
+
     List<AttributeDefinitionEntity> findByDataModelObjectId(@Param("dataModelObjectId") String dataModelObjectId);
+
     AttributeDefinitionEntity findByNameAndDataModelObjectId(@Param("name") String name, @Param("dataModelObjectId") String dataModelObjectId);
+
+    AttributeDefinitionEntity findByKeyAttributeAndDataModelObjectId(@Param("keyAttribute") boolean keyAttribute, @Param("dataModelObjectId") String dataModelObjectId);
 }

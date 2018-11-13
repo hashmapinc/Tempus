@@ -17,7 +17,7 @@
 
 
 /*@ngInject*/
-export default function QueryDialogController($mdDialog,types, metadata, metadataService, $q, metadataQuery, isReadOnly, isAdd) {
+export default function QueryDialogController($mdDialog,types, metadata, metadataService, $q, metadataQuery, isReadOnly, isAdd, $log) {
 
 
     var vm = this;
@@ -36,14 +36,17 @@ export default function QueryDialogController($mdDialog,types, metadata, metadat
     function close () {
         $mdDialog.hide();
     }
-    function save(){
-        var requestObject ={
+    function save(parameter){
+        $log.log('parameter');
+        $log.log(parameter);
+        var requestObject = {
            metadataConfigId:{
             id:metadata.id.id
            },
-           queryStmt:vm.metadataQuery.queryStmt,
-           triggerType:vm.metadataQuery.triggerType,
-           triggerSchedule:vm.metadataQuery.triggerSchedule
+           queryStmt:null,
+           triggerType:vm.metadataQuery.triggerType.id,
+           triggerSchedule:vm.metadataQuery.triggerSchedule,
+           attribute:vm.metadataQuery.attribute
         }
         if(metadataQuery){
             requestObject.id;
@@ -52,6 +55,13 @@ export default function QueryDialogController($mdDialog,types, metadata, metadat
              }
         }
         var deferred = $q.defer();
+        if(parameter == 'generate'){
+            $log.log("generate");
+            requestObject.queryStmt = 'select '+vm.query.key+','+vm.query.value +' from '+ vm.query.tableName +' where '+vm.query.whereCondition+';';
+        }else {
+            requestObject.queryStmt = vm.metadataQuery.queryStatement;
+        }
+        $log.log(requestObject)
         metadataService.saveMetadataQuery(requestObject).then(function success(response) {
             deferred.resolve(response.data);
         }, function fail(response) {

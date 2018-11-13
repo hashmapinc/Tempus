@@ -18,6 +18,7 @@ package com.hashmapinc.server.dao.metadataingestion;
 
 import com.google.common.util.concurrent.ListenableFuture;
 import com.hashmapinc.server.common.data.MetadataIngestionEntries;
+import com.hashmapinc.server.common.data.id.TenantId;
 import com.hashmapinc.server.common.data.kv.MetaDataKvEntry;
 import com.hashmapinc.server.common.data.metadata.MetadataConfigId;
 
@@ -28,4 +29,6 @@ public interface MetadataIngestionService {
     ListenableFuture<List<Void>> save(MetadataIngestionEntries entries);
 
     ListenableFuture<List<MetaDataKvEntry>> findAll(MetadataConfigId metadataConfigId);
+
+    List<MetaDataKvEntry> findKvEntryByKeyAttributeAndTenantId(String key, TenantId tenantId);
 }

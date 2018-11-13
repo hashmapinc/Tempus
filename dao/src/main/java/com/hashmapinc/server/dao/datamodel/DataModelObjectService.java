@@ -25,10 +25,18 @@ import java.util.Set;
 
 public interface DataModelObjectService {
     DataModelObject save(DataModelObject dataModelObject);
+
     void removeById(DataModelObjectId dataModelObjectId);
+
     DataModelObject findById(DataModelObjectId dataModelObjectId);
+
     List<DataModelObject> findByDataModelId(DataModelId dataModelId);
+
     Set<DataModelObjectId> getAllParentDataModelIdsOf(DataModelObjectId dataModelObjectId);
+
     List<DataModelObject> findByName(String name);
+
     void deleteDataModelObjectsByDataModelId(DataModelId dataModelId);
+
+    String findKeyAttributeByDataModelObjectId(DataModelObjectId dataModelObjectId);
 }

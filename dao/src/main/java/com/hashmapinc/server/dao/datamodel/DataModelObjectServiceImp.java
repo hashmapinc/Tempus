@@ -177,6 +177,14 @@ public class DataModelObjectServiceImp implements DataModelObjectService {
         removeEntities(dataModelId);
     }
 
+    @Override
+    public String findKeyAttributeByDataModelObjectId(DataModelObjectId dataModelObjectId) {
+        log.trace("Executing findKeyAttributeByDataModelObjectId, dataModelObjectId : [{}]", dataModelObjectId);
+        validateId(dataModelObjectId, INCORRECT_DATA_MODEL_OBJECT_ID + dataModelObjectId);
+        AttributeDefinition attributeDefinition = attributeDefinitionDao.findKeyAttributeDefinitionByDataModelObjectId(dataModelObjectId);
+        return attributeDefinition.getName();
+    }
+
     private void removeEntities(DataModelId dataModelId) {
         List<DataModelObject> dataModelObjects = findByDataModelId(dataModelId);
         dataModelObjects.forEach(dataModelObject -> {

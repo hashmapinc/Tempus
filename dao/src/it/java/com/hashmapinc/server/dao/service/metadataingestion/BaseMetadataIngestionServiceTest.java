@@ -47,6 +47,7 @@ public abstract class BaseMetadataIngestionServiceTest extends AbstractServiceTe
                 .tenantId(new TenantId(UUIDs.timeBased()))
                 .metadataConfigId(metadataConfigId)
                 .metadataSourceName("Metadata Source 1")
+                .attribute("Test Attribute")
                 .metaDataKvEntries(Arrays.asList(metaDataKvEntry1, metaDataKvEntry2))
                 .build();
 
@@ -70,6 +71,7 @@ public abstract class BaseMetadataIngestionServiceTest extends AbstractServiceTe
         MetadataIngestionEntries metadataEntries = MetadataIngestionEntries.builder()
                 .metadataConfigId(new MetadataConfigId(UUIDs.timeBased()))
                 .metadataSourceName("Metadata Source 1")
+                .attribute("Test Attribute")
                 .metaDataKvEntries(Arrays.asList(new MetaDataKvEntry(new StringDataEntry("Key 1", "Value 1"), DateTime.now().getMillis())))
                 .build();
 
@@ -84,6 +86,7 @@ public abstract class BaseMetadataIngestionServiceTest extends AbstractServiceTe
         MetadataIngestionEntries metadataEntries = MetadataIngestionEntries.builder()
                 .tenantId(new TenantId(UUIDs.timeBased()))
                 .metadataSourceName("Metadata Source 1")
+                .attribute("Test Attribute")
                 .metaDataKvEntries(Arrays.asList(new MetaDataKvEntry(new StringDataEntry("Key 1", "Value 1"), DateTime.now().getMillis())))
                 .build();
 
@@ -97,6 +100,7 @@ public abstract class BaseMetadataIngestionServiceTest extends AbstractServiceTe
 
         MetadataIngestionEntries metadataEntries = MetadataIngestionEntries.builder()
                 .tenantId(new TenantId(UUIDs.timeBased()))
+                .attribute("Test Attribute")
                 .metadataConfigId(new MetadataConfigId(UUIDs.timeBased()))
                 .metaDataKvEntries(Arrays.asList(new MetaDataKvEntry(new StringDataEntry("Key 1", "Value 1"), DateTime.now().getMillis())))
                 .build();
@@ -113,6 +117,7 @@ public abstract class BaseMetadataIngestionServiceTest extends AbstractServiceTe
                 .tenantId(new TenantId(UUIDs.timeBased()))
                 .metadataConfigId(new MetadataConfigId(UUIDs.timeBased()))
                 .metadataSourceName("Metadata Source 1")
+                .attribute("Test Attribute")
                 .build();
 
         metadataIngestionService.save(metadataEntries);
@@ -127,6 +132,7 @@ public abstract class BaseMetadataIngestionServiceTest extends AbstractServiceTe
                 .tenantId(new TenantId(UUIDs.timeBased()))
                 .metadataConfigId(new MetadataConfigId(UUIDs.timeBased()))
                 .metadataSourceName("Metadata Source 1")
+                .attribute("Test Attribute")
                 .metaDataKvEntries(Arrays.asList(new MetaDataKvEntry(new StringDataEntry("", "Value 1"), DateTime.now().getMillis())))
                 .build();
 
@@ -142,6 +148,7 @@ public abstract class BaseMetadataIngestionServiceTest extends AbstractServiceTe
                 .tenantId(new TenantId(UUIDs.timeBased()))
                 .metadataConfigId(new MetadataConfigId(UUIDs.timeBased()))
                 .metadataSourceName("Metadata Source 1")
+                .attribute("Test Attribute")
                 .metaDataKvEntries(Arrays.asList(new MetaDataKvEntry(new StringDataEntry("Key 1", ""), DateTime.now().getMillis())))
                 .build();
 
@@ -157,6 +164,7 @@ public abstract class BaseMetadataIngestionServiceTest extends AbstractServiceTe
                 .tenantId(new TenantId(UUIDs.timeBased()))
                 .metadataConfigId(new MetadataConfigId(UUIDs.timeBased()))
                 .metadataSourceName("Metadata Source 1")
+                .attribute("Test Attribute")
                 .metaDataKvEntries(Arrays.asList(new MetaDataKvEntry(new StringDataEntry("Key 1", "Value 1"), -1L)))
                 .build();
 

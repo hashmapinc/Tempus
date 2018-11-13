@@ -541,7 +541,7 @@ public abstract class BaseMetadataControllerTest extends AbstractControllerTest 
         keyValueMap.put("Key 1", "Value 1");
         keyValueMap.put("Key 2", "Value 2");
 
-        IngestMetadataRequest content = new IngestMetadataRequest(metadataConfig.getId(), metadataConfig.getOwnerId(), metadataConfig.getName(), keyValueMap);
+        IngestMetadataRequest content = new IngestMetadataRequest(metadataConfig.getId(), metadataConfig.getOwnerId(), metadataConfig.getName(), "attribute", keyValueMap);
         MockHttpServletRequestBuilder postRequest = post("/api/metadata")
                 .header("authorization", "bearer " + clientCredentialToken)
                 .contentType(contentType)
@@ -557,7 +557,7 @@ public abstract class BaseMetadataControllerTest extends AbstractControllerTest 
         keyValueMap.put("Key 1", "Value 1");
         keyValueMap.put("Key 2", "Value 2");
 
-        IngestMetadataRequest content = new IngestMetadataRequest(metadataConfig.getId(), metadataConfig.getOwnerId(), metadataConfig.getName(), keyValueMap);
+        IngestMetadataRequest content = new IngestMetadataRequest(metadataConfig.getId(), metadataConfig.getOwnerId(), metadataConfig.getName(), "attribute", keyValueMap);
 
         doPost("/api/metadata", content).andExpect(status().isForbidden());
     }
@@ -589,6 +589,7 @@ public abstract class BaseMetadataControllerTest extends AbstractControllerTest 
         mq.setId(new MetadataQueryId(UUIDs.timeBased()));
         mq.setMetadataConfigId(metadataConfig.getId());
         mq.setQueryStmt(queryStmt);
+        mq.setAttribute("Test Attribute");
         mq.setTriggerSchedule("0/10 * * ? * * *");
         mq.setTriggerType(MetadataIngestionTriggerType.CRON);
 

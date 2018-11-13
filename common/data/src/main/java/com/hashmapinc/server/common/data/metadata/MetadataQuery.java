@@ -32,6 +32,7 @@ public class MetadataQuery extends SearchTextBased<MetadataQueryId> {
     private String queryStmt;
     private MetadataIngestionTriggerType triggerType;
     private String triggerSchedule;
+    private String attribute;
 
     @Override
     public String getSearchText() {

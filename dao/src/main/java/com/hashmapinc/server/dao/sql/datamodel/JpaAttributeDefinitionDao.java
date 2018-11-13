@@ -60,6 +60,12 @@ public class JpaAttributeDefinitionDao implements AttributeDefinitionDao{
         attributeDefinitionRepository.delete(createAttributeDefinitionCompositeKey(name, dataModelObjectId));
     }
 
+    @Override
+    public AttributeDefinition findKeyAttributeDefinitionByDataModelObjectId(DataModelObjectId dataModelObjectId) {
+        AttributeDefinitionEntity retEntity = attributeDefinitionRepository.findByKeyAttributeAndDataModelObjectId(true, UUIDConverter.fromTimeUUID(dataModelObjectId.getId()));
+        return DaoUtil.getData(retEntity);
+    }
+
     private AttributeDefinitionCompositeKey createAttributeDefinitionCompositeKey(String name, DataModelObjectId dataModelObjectId) {
         return new AttributeDefinitionCompositeKey(name, UUIDConverter.fromTimeUUID(dataModelObjectId.getId()));
     }

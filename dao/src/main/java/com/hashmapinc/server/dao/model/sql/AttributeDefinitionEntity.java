@@ -50,6 +50,9 @@ public class AttributeDefinitionEntity implements ToData<AttributeDefinition> {
     @Column(name = ModelConstants.ATTRIBUTE_DEFINITION_SOURCE)
     private String source;
 
+    @Column(name = ModelConstants.ATTRIBUTE_DEFINITION_IS_KEY_ATTRIBUTE)
+    private boolean keyAttribute;
+
     public AttributeDefinitionEntity(){
         super();
     }
@@ -63,6 +66,7 @@ public class AttributeDefinitionEntity implements ToData<AttributeDefinition> {
         this.source = attributeDefinition.getSource();
         this.value = attributeDefinition.getValue();
         this.valueType = attributeDefinition.getValueType();
+        this.keyAttribute = attributeDefinition.isKeyAttribute();
     }
 
     @Override
@@ -83,6 +87,7 @@ public class AttributeDefinitionEntity implements ToData<AttributeDefinition> {
         if (dataModelObjectId != null ){
             attributeDefinition.setDataModelObjectId(new DataModelObjectId(fromString(dataModelObjectId)));
         }
+        attributeDefinition.setKeyAttribute(keyAttribute);
 
         return attributeDefinition;
     }
