@@ -88,7 +88,7 @@
               <div>
               </div>
             </md-input-container>
-              <div ng-hide ="vm.stepperData.type == 'Device'">Note:- If No Icon Uploaded Then Default Icon Of Assets Will Be Applied.</div>
+            <div ng-hide ="vm.stepperData.type == 'Device'">Note:- If No Icon Uploaded Then Default Icon Of Assets Will Be Applied.</div>
           </md-content>
         </md-tab>
 
@@ -111,7 +111,7 @@
             </md-list-item>
 
 
-            
+
             <md-input-container class="md-block" ng-keypress="$event.keyCode === 13 && vm.onStepperEnter();">
               <label>Attribute Name</label>
               <input md-maxlength="256" md-no-asterisk="" name="attribute" ng-model="vm.stepperData.currentAttribute" ng-keypress="$event.keyCode === 13 && alert('c')">
@@ -130,12 +130,23 @@
           <md-content class="md-padding">
             <md-input-container class="md-block" ng-keypress="$event.keyCode === 13 && vm.onStepperEnter();">
               <label>Parent</label>
-              <md-select name="tempusType" ng-model="vm.stepperData.parent_node_id" ng-init="nodes = vm.getNodes()">
+              <md-select  name="tempusType" ng-model="vm.stepperData.parent_node_id" ng-init="nodes = vm.getNodes()">
                 <md-option ng-value="null">None</md-option>
-                <md-option ng-repeat="node in nodes" ng-value="node.id">{{node.label}}</md-option>
+                <md-option  ng-repeat="node in nodes" ng-if="vm.stepperData.child_node_id.indexOf(node.id) == -1 || vm.stepperData.child_node_id == undefined" ng-value="node.id">{{node.label}}</md-option>
+              </md-select>
+            </md-input-container>
+
+          </md-content>
+
+          <md-content class="md-padding">
+            <md-input-container class="md-block" ng-keypress="$event.keyCode === 13 && vm.onStepperEnter();">
+              <label>Child</label>
+              <md-select multiple="{{false}}" name="tempusType" ng-model="vm.stepperData.child_node_id" ng-init="nodes = vm.getNodes()">
+                <md-option ng-repeat="node in nodes" ng-if ="vm.stepperData.parent_node_id !== node.id" ng-value="node.id">{{node.label}}</md-option>
               </md-select>
             </md-input-container>
           </md-content>
+
         </md-tab>
 
         <md-tab label="Review" ng-click="vm.stepperState = 3" ng-disabled="!vm.stepperData.name || !vm.stepperData.type">
@@ -161,11 +172,11 @@
               <label>Parent: {{vm.stepperData.parent_node_id ? vm.nodes.get(vm.stepperData.parent_node_id).label : "--"}}</label>
             </md-list-item>
 
-              <md-subheader class="md-no-sticky reviewHeader">Image</md-subheader>
+            <md-subheader class="md-no-sticky reviewHeader">Image</md-subheader>
 
-              <md-list-item>
-                  <label>Icon:<img class="" style="width: 98%; margin-top: -1%;"ng-src="{{vm.stepperData.logoFile}}"></label>
-              </md-list-item>
+            <md-list-item>
+              <label>Icon:<img class="" style="width: 98%; margin-top: -1%;"ng-src="{{vm.stepperData.logoFile}}"></label>
+            </md-list-item>
 
           </md-content>
         </md-tab>
@@ -181,10 +192,10 @@
         Back
       </md-button>
       <md-button ng-click="vm.stepperState = vm.stepperState + 1" style="margin-right:20px;" ng-if="3 > vm.stepperState" ng-disabled="!vm.stepperData.name || !vm.stepperData.type" id="stepperNext">
-         Next
+        Next
       </md-button>
       <md-button ng-disabled="$root.loading || !theForm.$valid" type="submit" style="margin-right:20px;" ng-if="3 === vm.stepperState" id="stepperSubmit">
-         Submit
+        Submit
       </md-button>
     </md-dialog-actions>
   </form>
