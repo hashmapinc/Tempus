@@ -147,6 +147,12 @@ function DashboardController($scope, $rootScope, $element, $timeout, $mdMedia, $
         return asset ? asset.name : '';
     }
 
+     var assetAdd = $rootScope.$on("addDashboardAssetByEntity", function($event){
+         $rootScope.$emit("addAssetByEntity", [$event]);
+     });
+     $scope.$on('$destroy', assetAdd);
+
+
     function saveAsset(asset) {
         var deferred = $q.defer();
         assetService.saveAsset(asset).then(
