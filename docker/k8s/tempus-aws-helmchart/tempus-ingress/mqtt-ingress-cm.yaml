@@ -1,4 +1,3 @@
-#!/bin/bash
 #
 # Copyright © 2016-2018 The Thingsboard Authors
 # Modifications © 2017-2018 Hashmap, Inc
@@ -16,25 +15,10 @@
 # limitations under the License.
 #
 
-
-dpkg -i /tempus.deb
-
-until nmap $CASSANDRA_HOST -p $CASSANDRA_PORT | grep "$CASSANDRA_PORT/tcp open"
-do
-  echo "Wait for cassandra db to start..."
-  sleep 10
-done
-
-until nmap $IDENTITY_HOST -p $IDENTITY_PORT | grep "$IDENTITY_PORT/tcp open"
-do
-  echo "Wait for identity service to start..."
-  sleep 10
-done
-
-echo "Creating 'Tempus' schema and system data..."
-if [ "$ADD_DEMO_DATA" == "true" ]; then
-    echo "plus demo data..."
-    /usr/share/tempus/bin/install/install.sh --loadDemo
-elif [ "$ADD_DEMO_DATA" == "false" ]; then
-    /usr/share/tempus/bin/install/install.sh
-fi
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: tcp-services
+  namespace: ingress-nginx
+data:
+  1883: "default/tempus-svc:1883:PROXY"

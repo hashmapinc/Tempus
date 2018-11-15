@@ -18,21 +18,16 @@
 kind: Service
 apiVersion: v1
 metadata:
-  name: tempus
+  name: tempus-svc
   labels:
     app: tempus
-  annotations:
-    service.beta.kubernetes.io/aws-load-balancer-ssl-ports: "443"
-    service.beta.kubernetes.io/aws-load-balancer-ssl-cert: "arn:aws:acm:us-east-2:660239660726:certificate/ec088a03-f323-4523-bfde-e93c9b0815e6"
-    service.beta.kubernetes.io/aws-load-balancer-backend-protocol: "http"
-    service.beta.kubernetes.io/aws-load-balancer-connection-idle-timeout: '3600'
 spec:
-  type: LoadBalancer
+  type: NodePort
   selector:
     app: tempus
   ports:
     - protocol: TCP
-      port: 443
+      port: 8080
       targetPort: 8080
       name: https
     - protocol: TCP
@@ -71,6 +66,8 @@ data:
   coap.port: "5683"
   spark.path: "/tmp"
   http.port: "8080"
+  identity.base.url: "http://{{ .Values.identity.name }}:{{ .Values.identity.service.port }}/uaa"
+  metadata.base.url: "http://{{ .Values.metadata.name }}:{{ .Values.metadata.service.port }}/api"
 ---
 apiVersion: "apps/v1beta1"
 kind: StatefulSet
@@ -90,6 +87,7 @@ spec:
       labels:
         app: tempus
     spec:
+      serviceAccountName: tempus
       containers:
       - name: tempus
         image: hashmapinc/tempus:dev
@@ -107,6 +105,16 @@ spec:
         - containerPort: 9999
           name: tempus-port
         env:
+        - name: IDENTITY_BASE_URL
+          valueFrom:
+            configMapKeyRef:
+              name: tempus-config
+              key: identity.base.url
+        - name: METADATA_BASE_URL
+          valueFrom:
+            configMapKeyRef:
+              name: tempus-config
+              key: metadata.base.url
         - name: SPARK_COMPUTATIONS_PATH
           valueFrom:
             configMapKeyRef:

@@ -18,11 +18,11 @@
 kind: Service
 apiVersion: v1
 metadata:
-  name: nifi
+  name: nifi-svc
   labels:
     app: nifi
 spec:
-  type: LoadBalancer
+  type: NodePort
   selector:
     app: nifi
   ports:
@@ -33,7 +33,7 @@ spec:
     - protocol: TCP
       port: 9191
       targetPort: 9191
-      name: nifi
+      name: s2s
 ---
 apiVersion: "apps/v1beta1"
 kind: StatefulSet
@@ -74,7 +74,7 @@ spec:
           name: nifi-log-dir
   volumeClaimTemplates:
   - metadata:
-      name: nifi-flowfile-repo-dir 
+      name: nifi-flowfile-repo-dir
     spec:
       accessModes: [ "ReadWriteOnce" ]
       resources:

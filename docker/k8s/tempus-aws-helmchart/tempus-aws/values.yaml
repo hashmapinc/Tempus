@@ -19,29 +19,65 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
-replicaCount: 1
+discovery:
+  name: redtail-api-discovery
+  replicaCount: 1
+  image:
+    repository: hashmapinc/redtail-api-discovery
+    tag: latest
+    pullPolicy: Always
+  app:
+    port: 8761
+  service:
+    type: ClusterIP
+    port: 80
+  pdb:
+    minAvailable: 1
 
-image:
-  repository: nginx
-  tag: stable
-  pullPolicy: IfNotPresent
+identity:
+  name: redtail-identity-service
+  replicaCount: 1
+  image:
+    repository: hashmapinc/redtail-identity-service
+    tag: latest
+    pullPolicy: Always
+  app:
+    port: 9002
+  service:
+    type: ClusterIP
+    port: 80
+  pdb:
+    minAvailable: 1
+  db:
+    host: postgresql
+    port: 5432
+    name: identity
+    user: identity
+    ## TODO We need to extract secrets from here
+    password: identity
 
-service:
-  type: ClusterIP
-  port: 80
-
-ingress:
-  enabled: false
-  annotations: {}
-    # kubernetes.io/ingress.class: nginx
-    # kubernetes.io/tls-acme: "true"
-  path: /
-  hosts:
-    - chart-example.local
-  tls: []
-  #  - secretName: chart-example-tls
-  #    hosts:
-  #      - chart-example.local
+metadata:
+  name: redtail-metadata-api
+  replicaCount: 1
+  image:
+    repository: hashmapinc/redtail-metadata-api
+    tag: latest
+    pullPolicy: Always
+  app:
+    port: 9003
+  service:
+    type: ClusterIP
+    port: 80
+  pdb:
+    minAvailable: 1
+  ## Using same db as identity for now, we can change these values later if we want a separate db instance for metadata-api
+  db:
+    host: postgresql
+    port: 5432
+    name: identity
+    user: identity
+    ## TODO We need to extract secrets from here
+    password: identity
 
 resources: {}
   # We usually recommend not to specify default resources and to leave this as a conscious

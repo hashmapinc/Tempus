@@ -35,6 +35,12 @@ spec:
       value: "cassandra"
     - name : CASSANDRA_URL
       value: "cassandra-headless:9042"
+    - name: IDENTITY_BASE_URL
+      value: "http://redtail-identity-service/uaa"
+    - name: IDENTITY_HOST
+      value: "redtail-identity-service"
+    - name: IDENTITY_PORT
+      value: "80"
     command:
     - sh
     - -c
