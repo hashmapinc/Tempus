@@ -95,7 +95,7 @@ public class JPAMetadtaIngestionDao extends JpaAbstractDaoListeningExecutorServi
         metadataIngestionEntity.setMetadataConfigId(UUIDConverter.fromTimeUUID(metadataConfigId.getId()));
         metadataIngestionEntity.setMetadataSourceName(dataSourceName);
         metadataIngestionEntity.setLastUpdateTs(metaDataKvEntry.getLastUpdateTs());
-        log.trace("Saving MetadataIngestionEntity: {}", metadataIngestionEntity);
+        log.error("Saving MetadataIngestionEntity: {}", metadataIngestionEntity);
         return insertService.submit(() -> {
             metadataIngestionEntityRepository.save(metadataIngestionEntity);
             return null;
