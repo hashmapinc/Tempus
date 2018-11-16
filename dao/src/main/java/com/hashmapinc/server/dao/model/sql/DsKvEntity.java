@@ -88,9 +88,6 @@ public final class DsKvEntity implements ToData<DsKvEntry> {
     @Column(name = DS_COLUMN)
     private Double ds;
 
-    @Column(name = DS_DIFF)
-    private double dsDiff;
-
     @Column(name = BOOLEAN_VALUE_COLUMN)
     private Boolean booleanValue;
 
@@ -122,7 +119,6 @@ public final class DsKvEntity implements ToData<DsKvEntry> {
             kvEntry = new JsonDataEntry(key, jsonValue);
         }
         BasicDsKvEntry basicDsKvEntry = new BasicDsKvEntry(ds, kvEntry);
-        basicDsKvEntry.setDsDiff(dsDiff);
         return basicDsKvEntry;
     }
 

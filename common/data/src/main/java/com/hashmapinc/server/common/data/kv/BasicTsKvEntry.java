@@ -24,19 +24,10 @@ public class BasicTsKvEntry implements TsKvEntry {
 
     private final long ts;
     private final KvEntry kv;
-    private long tsDiff;
 
     public BasicTsKvEntry(long ts, KvEntry kv) {
         this.ts = ts;
         this.kv = kv;
-    }
-
-    public long getTsDiff() {
-        return tsDiff;
-    }
-
-    public void setTsDiff(long tsDiff) {
-        this.tsDiff = tsDiff;
     }
 
     @Override

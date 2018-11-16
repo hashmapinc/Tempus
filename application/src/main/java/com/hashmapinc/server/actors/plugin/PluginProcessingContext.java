@@ -187,14 +187,6 @@ public final class PluginProcessingContext implements PluginContext {
     }
 
     @Override
-    public void saveTagMetaData(EntityId entityId, TagMetaData tagMetaData, final PluginCallback<Void> callback) {
-        validate(entityId, new ValidationCallback(callback, ctx -> {
-            ListenableFuture<List<Void>> rsListFuture = pluginCtx.tagMetaDataService.saveTagMetaData(tagMetaData);
-            Futures.addCallback(rsListFuture, getListCallback(callback, v -> null), executor);
-        }));
-    }
-
-    @Override
     public void loadTimeseries(final EntityId entityId, final List<TsKvQuery> queries, final PluginCallback<List<TsKvEntry>> callback) {
         validate(entityId, new ValidationCallback(callback, ctx -> {
             ListenableFuture<List<TsKvEntry>> future = pluginCtx.tsService.findAll(entityId, queries);

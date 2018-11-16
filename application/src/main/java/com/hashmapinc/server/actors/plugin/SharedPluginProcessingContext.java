@@ -17,32 +17,31 @@
 package com.hashmapinc.server.actors.plugin;
 
 import akka.actor.ActorRef;
-import com.hashmapinc.server.common.data.id.PluginId;
-import com.hashmapinc.server.controller.plugin.PluginWebSocketMsgEndpoint;
-import com.hashmapinc.server.dao.tagmetadata.TagMetaDataService;
-import com.hashmapinc.server.dao.attributes.AttributesService;
-import com.hashmapinc.server.extensions.api.device.DeviceTelemetryEventNotificationMsg;
-import com.hashmapinc.server.extensions.api.plugins.msg.TimeoutMsg;
-import lombok.extern.slf4j.Slf4j;
 import com.hashmapinc.server.actors.ActorSystemContext;
 import com.hashmapinc.server.common.data.id.DeviceId;
+import com.hashmapinc.server.common.data.id.PluginId;
 import com.hashmapinc.server.common.data.id.TenantId;
 import com.hashmapinc.server.common.msg.cluster.ServerAddress;
+import com.hashmapinc.server.controller.plugin.PluginWebSocketMsgEndpoint;
 import com.hashmapinc.server.dao.asset.AssetService;
+import com.hashmapinc.server.dao.attributes.AttributesService;
 import com.hashmapinc.server.dao.audit.AuditLogService;
 import com.hashmapinc.server.dao.customer.CustomerService;
+import com.hashmapinc.server.dao.depthseries.DepthSeriesService;
 import com.hashmapinc.server.dao.device.DeviceService;
 import com.hashmapinc.server.dao.plugin.PluginService;
 import com.hashmapinc.server.dao.relation.RelationService;
 import com.hashmapinc.server.dao.rule.RuleService;
 import com.hashmapinc.server.dao.tenant.TenantService;
-import com.hashmapinc.server.dao.depthseries.DepthSeriesService;
 import com.hashmapinc.server.dao.timeseries.TimeseriesService;
 import com.hashmapinc.server.extensions.api.device.DeviceAttributesEventNotificationMsg;
+import com.hashmapinc.server.extensions.api.device.DeviceTelemetryEventNotificationMsg;
+import com.hashmapinc.server.extensions.api.plugins.msg.TimeoutMsg;
 import com.hashmapinc.server.extensions.api.plugins.msg.ToDeviceRpcRequest;
 import com.hashmapinc.server.extensions.api.plugins.msg.ToDeviceRpcRequestPluginMsg;
 import com.hashmapinc.server.service.cluster.routing.ClusterRoutingService;
 import com.hashmapinc.server.service.cluster.rpc.ClusterRpcService;
+import lombok.extern.slf4j.Slf4j;
 import scala.concurrent.duration.Duration;
 
 import java.util.Optional;
@@ -64,7 +63,6 @@ public final class SharedPluginProcessingContext {
     final TimeseriesService tsService;
     final DepthSeriesService dsService;
     final AttributesService attributesService;
-    final TagMetaDataService tagMetaDataService;
     final ClusterRpcService rpcService;
     final ClusterRoutingService routingService;
     final RelationService relationService;
@@ -84,7 +82,6 @@ public final class SharedPluginProcessingContext {
         this.tsService = sysContext.getTsService();
         this.dsService = sysContext.getDsService();
         this.attributesService = sysContext.getAttributesService();
-        this.tagMetaDataService = sysContext.getTagMetaDataService();
         this.assetService = sysContext.getAssetService();
         this.deviceService = sysContext.getDeviceService();
         this.rpcService = sysContext.getRpcService();

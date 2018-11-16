@@ -65,7 +65,6 @@ import com.hashmapinc.server.dao.plugin.PluginService;
 import com.hashmapinc.server.dao.relation.RelationService;
 import com.hashmapinc.server.dao.rule.RuleService;
 import com.hashmapinc.server.dao.settings.UserSettingsService;
-import com.hashmapinc.server.dao.tagmetadata.TagMetaDataService;
 import com.hashmapinc.server.dao.tenant.TenantService;
 import com.hashmapinc.server.dao.theme.ThemeService;
 import com.hashmapinc.server.dao.timeseries.TimeseriesService;
@@ -138,9 +137,6 @@ public abstract class AbstractServiceTest {
 
     @Autowired
     protected DepthSeriesService dsService;
-
-    @Autowired
-    protected TagMetaDataService tagMetaDataService;
 
     @Autowired
     protected PluginService pluginService;

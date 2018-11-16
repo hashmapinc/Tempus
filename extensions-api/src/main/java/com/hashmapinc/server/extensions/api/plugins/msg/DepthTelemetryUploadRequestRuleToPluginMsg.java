@@ -25,19 +25,13 @@ public class DepthTelemetryUploadRequestRuleToPluginMsg extends AbstractRuleToPl
 
     private static final long serialVersionUID = 1L;
     private final long ttl;
-    private final double qualityDepthWindow;
 
-    public DepthTelemetryUploadRequestRuleToPluginMsg(TenantId tenantId, CustomerId customerId, DeviceId deviceId, DepthTelemetryUploadRequest payload, long ttl, double qualityDepthWindow) {
+    public DepthTelemetryUploadRequestRuleToPluginMsg(TenantId tenantId, CustomerId customerId, DeviceId deviceId, DepthTelemetryUploadRequest payload, long ttl) {
         super(tenantId, customerId, deviceId, payload);
         this.ttl = ttl;
-        this.qualityDepthWindow = qualityDepthWindow;
     }
 
     public long getTtl() {
         return ttl;
-    }
-
-    public double getQualityDepthWindow() {
-        return qualityDepthWindow;
     }
 }

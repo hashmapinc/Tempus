@@ -220,7 +220,6 @@ public class SubscriptionManager {
         if (timeZoneDiff != 0) {
             final long tzdiff = timeZoneDiff;
             subscriptionsByEntityId.get(entityId).forEach(subscription -> subscription.getSub().setTimeZoneDiff(tzdiff));
-
         }
     }
 

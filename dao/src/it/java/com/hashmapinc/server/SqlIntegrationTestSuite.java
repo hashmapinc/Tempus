@@ -38,5 +38,9 @@ public class SqlIntegrationTestSuite {
             Arrays.asList("sql/hsql/schema.sql", "sql/system-data.sql"),
             "sql/drop-all-tables.sql",
             "sql-test.properties",
+<<<<<<< 2f9c48500538303951cd3804cbf5e090fa68c550
             Collections.emptyList());
+=======
+            Arrays.asList("sql/hsql/upgrade/1.sql", "sql/hsql/upgrade/2.sql", "sql/hsql/upgrade/3.sql", "sql/hsql/upgrade/4.sql"));
+>>>>>>> Tempus-844 Reverting back tag meta data aggregation feature.
 }

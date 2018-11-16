@@ -88,9 +88,6 @@ public final class TsKvEntity implements ToData<TsKvEntry> {
     @Column(name = TS_COLUMN)
     private long ts;
 
-    @Column(name = TS_DIFF)
-    private long tsDiff;
-
     @Column(name = BOOLEAN_VALUE_COLUMN)
     private Boolean booleanValue;
 
@@ -122,7 +119,6 @@ public final class TsKvEntity implements ToData<TsKvEntry> {
             kvEntry = new JsonDataEntry(key, jsonValue);
         }
         BasicTsKvEntry basicTsKvEntry = new BasicTsKvEntry(ts, kvEntry);
-        basicTsKvEntry.setTsDiff(tsDiff);
         return basicTsKvEntry;
     }
 

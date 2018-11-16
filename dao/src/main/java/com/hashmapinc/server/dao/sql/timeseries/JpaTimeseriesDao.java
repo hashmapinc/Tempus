@@ -258,7 +258,6 @@ public class JpaTimeseriesDao extends JpaAbstractDaoListeningExecutorService imp
         entity.setEntityType(entityId.getEntityType());
         entity.setEntityId(fromTimeUUID(entityId.getId()));
         entity.setTs(tsKvEntry.getTs());
-        entity.setTsDiff(((BasicTsKvEntry)tsKvEntry).getTsDiff());
         entity.setKey(tsKvEntry.getKey());
         entity.setStrValue(tsKvEntry.getStrValue().orElse(null));
         entity.setDoubleValue(tsKvEntry.getDoubleValue().orElse(null));
