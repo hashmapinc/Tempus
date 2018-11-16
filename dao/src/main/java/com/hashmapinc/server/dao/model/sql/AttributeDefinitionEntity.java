@@ -87,7 +87,7 @@ public class AttributeDefinitionEntity implements ToData<AttributeDefinition> {
         if (dataModelObjectId != null ){
             attributeDefinition.setDataModelObjectId(new DataModelObjectId(fromString(dataModelObjectId)));
         }
-        attributeDefinition.setKeyAttribute(keyAttribute);
+        attributeDefinition.setIsKeyAttribute(keyAttribute);
 
         return attributeDefinition;
     }
