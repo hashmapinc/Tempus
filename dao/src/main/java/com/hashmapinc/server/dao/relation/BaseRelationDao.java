@@ -45,9 +45,9 @@ import static com.datastax.driver.core.querybuilder.QueryBuilder.eq;
 /**
  * Created by ashvayka on 25.04.17.
  */
-@Component
+//@Component
 @Slf4j
-@NoSqlDao
+//@NoSqlDao
 public class BaseRelationDao extends CassandraAbstractAsyncDao implements RelationDao {
 
     private static final String SELECT_COLUMNS = "SELECT " +

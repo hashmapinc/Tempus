@@ -20,10 +20,12 @@ import com.hashmapinc.server.dao.model.sql.DataModelObjectEntity;
 import com.hashmapinc.server.dao.util.SqlDao;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-@SqlDao
+//@SqlDao
+@Repository
 public interface DataModelObjectRespository extends CrudRepository<DataModelObjectEntity, String> {
     List<DataModelObjectEntity> findByDataModelId(@Param("dataModelId") String dataModelId);
     DataModelObjectEntity findByDataModelIdAndName(@Param("dataModelId") String dataModelId, @Param("name") String name);

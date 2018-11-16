@@ -32,7 +32,7 @@ import java.util.UUID;
 
 @Component
 @Slf4j
-@SqlDao
+//@SqlDao
 public class JpaUserSettingsDao extends JpaAbstractDao<UserSettingsEntity, UserSettings> implements UserSettingsDao {
 
     @Autowired

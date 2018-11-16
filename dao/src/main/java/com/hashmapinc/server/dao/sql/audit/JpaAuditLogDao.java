@@ -50,7 +50,7 @@ import java.util.concurrent.Executors;
 import static org.springframework.data.jpa.domain.Specifications.where;
 
 @Component
-@SqlDao
+//@SqlDao
 public class JpaAuditLogDao extends JpaAbstractDao<AuditLogEntity, AuditLog> implements AuditLogDao {
 
     private ListeningExecutorService insertService = MoreExecutors.listeningDecorator(Executors.newSingleThreadExecutor());

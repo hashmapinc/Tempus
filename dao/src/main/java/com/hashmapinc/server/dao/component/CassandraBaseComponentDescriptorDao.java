@@ -43,9 +43,9 @@ import static com.datastax.driver.core.querybuilder.QueryBuilder.eq;
 import static com.datastax.driver.core.querybuilder.QueryBuilder.select;
 
 
-@Component
+//@Component
 @Slf4j
-@NoSqlDao
+//@NoSqlDao
 public class CassandraBaseComponentDescriptorDao extends CassandraAbstractSearchTextDao<ComponentDescriptorEntity, ComponentDescriptor> implements ComponentDescriptorDao {
 
     public static final String SEARCH_RESULT = "Search result: [{}]";

@@ -77,6 +77,10 @@ public class CassandraDatabaseSchemaService implements DatabaseSchemaService {
                 executedUpgrades.add(row.getString(ModelConstants.INSTALLED_SCRIPTS_COLUMN));
             }
 
+            if(!Files.isDirectory(upgradeScriptsDirectory)){
+                log.info("There are no upgrade scripts for Cassandra");
+                return;
+            }
             try (Stream<Path> filesStream = Files.list(upgradeScriptsDirectory)) {
                 List<Integer> sortedScriptsIndexes = filesStream.map(a -> stripExtensionFromName(a.getFileName().toString())).sorted().collect(Collectors.toList());
 

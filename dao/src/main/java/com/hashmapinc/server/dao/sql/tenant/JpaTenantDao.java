@@ -38,7 +38,7 @@ import static com.hashmapinc.server.dao.model.ModelConstants.NULL_UUID_STR;
  * Created by Valerii Sosliuk on 4/30/2017.
  */
 @Component
-@SqlDao
+//@SqlDao
 public class JpaTenantDao extends JpaAbstractSearchTextDao<TenantEntity, Tenant> implements TenantDao {
 
     @Autowired

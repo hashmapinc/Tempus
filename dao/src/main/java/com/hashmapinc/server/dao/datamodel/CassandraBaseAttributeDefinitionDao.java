@@ -36,8 +36,8 @@ import static com.datastax.driver.core.querybuilder.QueryBuilder.select;
 import static com.hashmapinc.server.dao.model.ModelConstants.ATTRIBUTE_DEFINITION_NAME;
 
 @Slf4j
-@Service
-@NoSqlDao
+//@Service
+//@NoSqlDao
 public class CassandraBaseAttributeDefinitionDao extends CassandraAbstractDao implements AttributeDefinitionDao{
 
     private PreparedStatement saveStmt;

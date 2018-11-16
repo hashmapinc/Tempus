@@ -37,9 +37,9 @@ import static com.datastax.driver.core.querybuilder.QueryBuilder.*;
 import static com.hashmapinc.server.dao.model.ModelConstants.NULL_UUID;
 import static com.hashmapinc.server.dao.model.ModelConstants.PLUGIN_BY_CLASS_COLUMN_FAMILY_NAME;
 
-@Component
+//@Component
 @Slf4j
-@NoSqlDao
+//@NoSqlDao
 public class CassandraBasePluginDao extends CassandraAbstractSearchTextDao<PluginMetaDataEntity, PluginMetaData> implements PluginDao {
 
     public static final String SEARCH_RESULT = "Search result: [{}]";

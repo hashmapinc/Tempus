@@ -56,9 +56,9 @@ import java.util.stream.Collectors;
 import static com.datastax.driver.core.querybuilder.QueryBuilder.eq;
 import static com.hashmapinc.server.dao.model.ModelConstants.*;
 
-@Component
+//@Component
 @Slf4j
-@NoSqlDao
+//@NoSqlDao
 public class CassandraAuditLogDao extends CassandraAbstractSearchTimeDao<AuditLogEntity, AuditLog> implements AuditLogDao {
 
     private static final String INSERT_INTO = "INSERT INTO ";

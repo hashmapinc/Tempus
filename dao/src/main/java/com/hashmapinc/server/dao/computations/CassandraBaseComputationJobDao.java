@@ -35,9 +35,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
-@Service
+//@Service
 @Slf4j
-@NoSqlDao
+//@NoSqlDao
 public class CassandraBaseComputationJobDao extends CassandraAbstractSearchTextDao<ComputationJobEntity, ComputationJob> implements ComputationJobDao {
 
     @Override

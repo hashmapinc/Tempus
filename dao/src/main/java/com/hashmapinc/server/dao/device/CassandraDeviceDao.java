@@ -42,9 +42,9 @@ import java.util.*;
 
 import static com.datastax.driver.core.querybuilder.QueryBuilder.*;
 
-@Component
+//@Component
 @Slf4j
-@NoSqlDao
+//@NoSqlDao
 public class CassandraDeviceDao extends CassandraAbstractSearchTextDao<DeviceEntity, Device> implements DeviceDao {
 
     @Override

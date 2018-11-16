@@ -34,7 +34,7 @@ import java.util.UUID;
  * Created by Valerii Sosliuk on 4/29/2017.
  */
 @Component
-@SqlDao
+//@SqlDao
 public class JpaWidgetTypeDao extends JpaAbstractDao<WidgetTypeEntity, WidgetType> implements WidgetTypeDao {
 
     @Autowired

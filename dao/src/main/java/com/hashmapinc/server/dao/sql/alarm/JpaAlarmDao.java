@@ -52,7 +52,7 @@ import java.util.UUID;
  */
 @Slf4j
 @Component
-@SqlDao
+//@SqlDao
 public class JpaAlarmDao extends JpaAbstractDao<AlarmEntity, Alarm> implements AlarmDao {
 
     @Autowired

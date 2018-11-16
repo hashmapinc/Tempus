@@ -43,7 +43,7 @@ import java.util.concurrent.Executors;
 
 @Component
 @Slf4j
-@SqlDao
+//@SqlDao
 public class JPAMetadtaIngestionDao extends JpaAbstractDaoListeningExecutorService implements MetaDataIngestionDao {
 
     @Value("${metadata-ingestion.inserts_executor_type}")

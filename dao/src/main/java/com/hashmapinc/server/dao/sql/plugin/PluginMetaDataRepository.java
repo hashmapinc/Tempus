@@ -22,13 +22,15 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 import com.hashmapinc.server.dao.util.SqlDao;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
 /**
  * Created by Valerii Sosliuk on 5/1/2017.
  */
-@SqlDao
+//@SqlDao
+@Repository
 public interface PluginMetaDataRepository extends CrudRepository<PluginMetaDataEntity, String> {
 
     PluginMetaDataEntity findByApiToken(String apiToken);

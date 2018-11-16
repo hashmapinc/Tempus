@@ -40,7 +40,7 @@ import java.util.stream.Stream;
 @Service
 @Profile("install")
 @Slf4j
-@SqlDao
+//@SqlDao
 public class SqlDatabaseSchemaService implements DatabaseSchemaService {
 
     private static final String SQL_DIR_HSQL = "sql/hsql";
@@ -97,6 +97,11 @@ public class SqlDatabaseSchemaService implements DatabaseSchemaService {
                     while (rs.next()) {
                         executedUpgrades.add(rs.getString(ModelConstants.INSTALLED_SCRIPTS_COLUMN));
                     }
+                }
+
+                if(!Files.isDirectory(upgradeScriptsDirectory)){
+                    log.info("There are no upgrade scripts for SQL");
+                    return;
                 }
 
                 try (Stream<Path> filesStream = Files.list(upgradeScriptsDirectory)) {

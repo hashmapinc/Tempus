@@ -19,6 +19,8 @@ package com.hashmapinc.server.controller.nosql;
 import com.hashmapinc.server.controller.BaseDataModelControllerTest;
 import com.hashmapinc.server.dao.datamodel.CassandraBaseDataModelObjectDao;
 import com.hashmapinc.server.dao.datamodel.CassandraDataModelDao;
+import com.hashmapinc.server.dao.datamodel.DataModelDao;
+import com.hashmapinc.server.dao.datamodel.DataModelObjectDao;
 import com.hashmapinc.server.dao.service.DaoNoSqlTest;
 import org.junit.After;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,14 +29,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class DataModelControllerNoSqlTest extends BaseDataModelControllerTest {
 
     @Autowired
-    private CassandraDataModelDao dataModelDao;
+    private DataModelDao dataModelDao;
 
     @Autowired
-    private CassandraBaseDataModelObjectDao dataModelObjectDao;
+    private DataModelObjectDao dataModelObjectDao;
 
     @After
     public void afterTest(){
-        dataModelObjectDao.find().forEach(o -> dataModelObjectDao.removeById(o.getUuidId()));
-        dataModelDao.find().forEach(m -> dataModelDao.removeById(m.getUuidId()));
+
     }
 }

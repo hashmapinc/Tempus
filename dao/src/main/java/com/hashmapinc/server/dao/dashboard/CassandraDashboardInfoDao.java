@@ -43,9 +43,9 @@ import java.util.UUID;
 import static com.datastax.driver.core.querybuilder.QueryBuilder.eq;
 import static com.hashmapinc.server.dao.model.ModelConstants.*;
 
-@Component
+//@Component
 @Slf4j
-@NoSqlDao
+//@NoSqlDao
 public class CassandraDashboardInfoDao extends CassandraAbstractSearchTextDao<DashboardInfoEntity, DashboardInfo> implements DashboardInfoDao {
 
     @Autowired

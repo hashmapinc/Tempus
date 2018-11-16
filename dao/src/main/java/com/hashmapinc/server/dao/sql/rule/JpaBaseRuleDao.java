@@ -43,7 +43,7 @@ import java.util.UUID;
  */
 @Slf4j
 @Component
-@SqlDao
+//@SqlDao
 public class JpaBaseRuleDao extends JpaAbstractSearchTextDao<RuleMetaDataEntity, RuleMetaData> implements RuleDao {
 
     public static final String SEARCH_RESULT = "Search result: [{}]";

@@ -22,6 +22,7 @@ import org.junit.extensions.cpsuite.ClasspathSuite;
 import org.junit.runner.RunWith;
 
 import java.util.Arrays;
+import java.util.Collections;
 
 @RunWith(ClasspathSuite.class)
 @ClasspathSuite.ClassnameFilters({
@@ -37,5 +38,5 @@ public class SqlIntegrationTestSuite {
             Arrays.asList("sql/hsql/schema.sql", "sql/system-data.sql"),
             "sql/drop-all-tables.sql",
             "sql-test.properties",
-            Arrays.asList("sql/hsql/upgrade/1.sql", "sql/hsql/upgrade/2.sql", "sql/hsql/upgrade/3.sql", "sql/hsql/upgrade/4.sql", "sql/hsql/upgrade/5.sql"));
+            Collections.emptyList());
 }

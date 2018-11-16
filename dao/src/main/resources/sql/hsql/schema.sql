@@ -45,7 +45,8 @@ CREATE TABLE IF NOT EXISTS asset (
     name varchar(255),
     search_text varchar(255),
     tenant_id varchar(31),
-    type varchar(255)
+    type varchar(255),
+    data_model_object_id varchar(31) DEFAULT '1b21dd2138140008080808080808080'
 );
 
 CREATE TABLE IF NOT EXISTS audit_log (
@@ -112,7 +113,8 @@ CREATE TABLE IF NOT EXISTS customer (
     state varchar(255),
     tenant_id varchar(31),
     title varchar(255),
-    zip varchar(255)
+    zip varchar(255),
+    data_model_id varchar(31) DEFAULT '1b21dd2138140008080808080808080'
 );
 
 CREATE TABLE IF NOT EXISTS dashboard (
@@ -121,7 +123,8 @@ CREATE TABLE IF NOT EXISTS dashboard (
     assigned_customers varchar(1000000),
     search_text varchar(255),
     tenant_id varchar(31),
-    title varchar(255)
+    title varchar(255),
+    type varchar DEFAULT 'DEFAULT'
 );
 
 CREATE TABLE IF NOT EXISTS device (
@@ -217,6 +220,7 @@ CREATE TABLE IF NOT EXISTS ts_kv (
     long_v bigint,
     dbl_v double precision,
     json_v varchar,
+    ts_diff bigint,
     CONSTRAINT ts_kv_unq_key UNIQUE (entity_type, entity_id, key, ts)
 );
 
@@ -243,6 +247,7 @@ CREATE TABLE IF NOT EXISTS ds_kv (
     long_v bigint,
     dbl_v double precision,
     json_v varchar,
+    ds_diff double precision,
     CONSTRAINT ds_kv_unq_key UNIQUE (entity_type, entity_id, key, ds)
 );
 
@@ -288,24 +293,18 @@ CREATE TABLE IF NOT EXISTS node_metric (
 
 CREATE TABLE IF NOT EXISTS computations (
     id varchar(31) NOT NULL CONSTRAINT computations_pkey PRIMARY KEY,
-    jar_name varchar,
-    jar_path varchar,
     search_text varchar,
     computation_name varchar,
-    main_class varchar,
-    args_format varchar,
-    args_type varchar,
-    json_descriptor varchar,
+    type varchar,
     tenant_id varchar(31)
 );
 
 CREATE TABLE IF NOT EXISTS computation_job (
     id varchar(31) NOT NULL CONSTRAINT computation_job_pkey PRIMARY KEY,
     job_name varchar,
-    job_id varchar,
     search_text varchar,
     computation_id varchar,
-    arg_parameters varchar,
+    job_configuration varchar,
     state varchar(255),
     tenant_id varchar(31)
 );
@@ -341,7 +340,8 @@ CREATE TABLE IF NOT EXISTS data_model_object (
     parent_id varchar(31),
     type varchar(250),
     customer_id varchar(31),
-    search_text varchar(255)
+    search_text varchar(255),
+    logo_file VARCHAR
 );
 
 CREATE TABLE IF NOT EXISTS attribute_definition (
@@ -398,4 +398,26 @@ CREATE TABLE IF NOT EXISTS tempus_gateway_configuration (
     tenant_id varchar(31),
     replicas integer NOT NULL,
     gateway_token varchar(255) NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS spark_computation_meta_data (
+    id varchar(31) NOT NULL CONSTRAINT spark_computations_pkey PRIMARY KEY,
+    json_descriptor varchar,
+    jar_name varchar,
+    jar_path varchar,
+    main_class varchar,
+    args_format varchar,
+    args_type varchar
+);
+
+CREATE TABLE IF NOT EXISTS kubeless_computation_meta_data (
+    id varchar(31) NOT NULL CONSTRAINT kubeless_computations_pkey PRIMARY KEY,
+    namespace varchar,
+    function varchar,
+    handler varchar,
+    runtime varchar,
+    dependencies varchar,
+    func_type varchar,
+    timeout varchar,
+    checksum varchar
 );

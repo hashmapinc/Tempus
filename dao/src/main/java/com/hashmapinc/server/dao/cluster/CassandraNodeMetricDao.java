@@ -31,9 +31,9 @@ import java.util.Optional;
 import static com.datastax.driver.core.querybuilder.QueryBuilder.select;
 import static com.datastax.driver.core.querybuilder.QueryBuilder.eq;
 
-@Component
+//@Component
 @Slf4j
-@NoSqlDao
+//@NoSqlDao
 public class CassandraNodeMetricDao extends CassandraAbstractModelDao<NodeMetricEntity, NodeMetric> implements NodeMetricDao {
 
     @Override

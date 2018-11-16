@@ -38,9 +38,9 @@ import java.util.UUID;
 
 import static com.hashmapinc.server.dao.model.ModelConstants.*;
 
-@Component
+//@Component
 @Slf4j
-@NoSqlDao
+//@NoSqlDao
 public class CassandraBaseTagMetaDataDao extends CassandraAbstractAsyncDao implements TagMetaDataDao {
 
     public static final String INSERT_INTO = "INSERT INTO ";

@@ -33,9 +33,9 @@ import java.util.List;
 import static com.datastax.driver.core.querybuilder.QueryBuilder.eq;
 import static com.datastax.driver.core.querybuilder.QueryBuilder.select;
 
-@Service
+//@Service
 @Slf4j
-@NoSqlDao
+//@NoSqlDao
 public class CassandraBaseDataModelObjectDao extends CassandraAbstractSearchTextDao<DataModelObjectEntity, DataModelObject> implements DataModelObjectDao {
 
     @Override

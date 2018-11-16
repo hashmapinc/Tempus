@@ -30,7 +30,7 @@ import org.springframework.stereotype.Component;
 import java.util.Optional;
 
 @Component
-@SqlDao
+//@SqlDao
 @Slf4j
 public class JpaNodeMetricDao extends JpaAbstractDao<NodeMetricEntity, NodeMetric> implements NodeMetricDao {
 

@@ -39,7 +39,7 @@ import java.util.UUID;
  * Created by Valerii Sosliuk on 5/6/2017.
  */
 @Component
-@SqlDao
+//@SqlDao
 public class JpaCustomerDao extends JpaAbstractSearchTextDao<CustomerEntity, Customer> implements CustomerDao {
 
     @Autowired

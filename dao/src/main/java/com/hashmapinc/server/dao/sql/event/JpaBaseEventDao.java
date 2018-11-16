@@ -51,7 +51,7 @@ import static org.springframework.data.jpa.domain.Specifications.where;
  */
 @Slf4j
 @Component
-@SqlDao
+//@SqlDao
 public class JpaBaseEventDao extends JpaAbstractSearchTimeDao<EventEntity, Event> implements EventDao {
 
     private static final UUID systemTenantId = ModelConstants.NULL_UUID;

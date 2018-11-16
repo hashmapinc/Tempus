@@ -44,7 +44,7 @@ import static com.hashmapinc.server.dao.model.ModelConstants.NULL_UUID_STR;
  */
 @Slf4j
 @Component
-@SqlDao
+//@SqlDao
 public class JpaBasePluginDao extends JpaAbstractSearchTextDao<PluginMetaDataEntity, PluginMetaData> implements PluginDao {
 
     public static final String SEARCH_RESULT = "Search result: [{}]";

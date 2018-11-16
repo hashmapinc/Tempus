@@ -29,7 +29,7 @@ import org.springframework.stereotype.Component;
 
 
 @Component
-@SqlDao
+//@SqlDao
 @Slf4j
 public class JpaThemeDao extends JpaAbstractDao<ThemeEntity,Theme> implements ThemeDao {
 

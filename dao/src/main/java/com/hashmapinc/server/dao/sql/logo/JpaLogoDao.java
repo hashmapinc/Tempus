@@ -30,10 +30,8 @@ import org.springframework.stereotype.Component;
 
 
 @Component
-@SqlDao
+//@SqlDao
 @Slf4j
-
-
 public class JpaLogoDao extends JpaAbstractDao<LogoEntity,Logo> implements LogoDao {
 
     @Autowired

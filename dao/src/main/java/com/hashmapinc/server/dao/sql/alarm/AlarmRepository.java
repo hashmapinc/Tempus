@@ -23,13 +23,15 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
 /**
  * Created by Valerii Sosliuk on 5/21/2017.
  */
-@SqlDao
+//@SqlDao
+@Repository
 public interface AlarmRepository extends CrudRepository<AlarmEntity, String> {
 
     @Query("SELECT a FROM AlarmEntity a WHERE a.tenantId = :tenantId AND a.originatorId = :originatorId " +

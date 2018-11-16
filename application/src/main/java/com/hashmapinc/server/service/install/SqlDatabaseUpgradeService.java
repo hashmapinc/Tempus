@@ -42,7 +42,7 @@ import static com.hashmapinc.server.service.install.DatabaseHelper.CONFIGURATION
 @Service
 @Profile("install")
 @Slf4j
-@SqlDao
+//@SqlDao
 public class SqlDatabaseUpgradeService implements DatabaseUpgradeService {
 
     private static final String SCHEMA_UPDATE_SQL = "schema_update.sql";

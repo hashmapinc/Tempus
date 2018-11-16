@@ -40,9 +40,9 @@ import java.util.List;
 import static com.datastax.driver.core.querybuilder.QueryBuilder.eq;
 import static com.datastax.driver.core.querybuilder.QueryBuilder.select;
 
-@Component
+//@Component
 @Slf4j
-@NoSqlDao
+//@NoSqlDao
 public class CassandraMetaDataIngestionDao extends CassandraAbstractAsyncDao implements MetaDataIngestionDao{
 
     private PreparedStatement saveStmt;

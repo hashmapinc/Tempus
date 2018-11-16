@@ -43,7 +43,7 @@ import static com.hashmapinc.server.common.data.UUIDConverter.fromTimeUUIDs;
  * Created by Valerii Sosliuk on 5/6/2017.
  */
 @Component
-@SqlDao
+//@SqlDao
 public class JpaDeviceDao extends JpaAbstractSearchTextDao<DeviceEntity, Device> implements DeviceDao {
 
     @Autowired

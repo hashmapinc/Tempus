@@ -44,7 +44,7 @@ import java.util.concurrent.Executors;
 
 @Component
 @Slf4j
-@SqlDao
+//@SqlDao
 public class JpaTagMetaDataDao extends JpaAbstractDaoListeningExecutorService implements TagMetaDataDao {
 
     @Value("${sql.ts_inserts_executor_type}")

@@ -43,7 +43,7 @@ import java.util.Optional;
  * Created by Valerii Sosliuk on 5/6/2017.
  */
 @Component
-@SqlDao
+//@SqlDao
 public class JpaBaseComponentDescriptorDao extends JpaAbstractSearchTextDao<ComponentDescriptorEntity, ComponentDescriptor>
         implements ComponentDescriptorDao {
 

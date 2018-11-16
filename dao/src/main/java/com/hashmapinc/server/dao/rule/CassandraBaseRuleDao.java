@@ -35,9 +35,9 @@ import java.util.UUID;
 
 import static com.datastax.driver.core.querybuilder.QueryBuilder.*;
 
-@Component
+//@Component
 @Slf4j
-@NoSqlDao
+//@NoSqlDao
 public class CassandraBaseRuleDao extends CassandraAbstractSearchTextDao<RuleMetaDataEntity, RuleMetaData> implements RuleDao {
 
     public static final String SEARCH_RESULT = "Search result: [{}]";

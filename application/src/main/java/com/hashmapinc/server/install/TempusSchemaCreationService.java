@@ -17,7 +17,9 @@
 package com.hashmapinc.server.install;
 
 import com.hashmapinc.server.common.msg.exception.TempusRuntimeException;
+import com.hashmapinc.server.service.install.CassandraDatabaseSchemaService;
 import com.hashmapinc.server.service.install.DatabaseSchemaService;
+import com.hashmapinc.server.service.install.SqlDatabaseSchemaService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -27,6 +29,7 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
 import java.nio.file.Paths;
+import java.util.Optional;
 
 @Service
 @Profile("install")
@@ -45,26 +48,35 @@ public class TempusSchemaCreationService {
     @Value("${install.load_demo:false}")
     private Boolean loadDemo;
 
+//    @Autowired
+//    private DatabaseSchemaService databaseSchemaService;
+
     @Autowired
-    private DatabaseSchemaService databaseSchemaService;
+    private SqlDatabaseSchemaService sqlDatabaseSchemaService;
+
+    @Autowired
+    private Optional<CassandraDatabaseSchemaService> cassandraDatabaseSchemaService;
 
     @Autowired
     private ApplicationContext context;
 
     public void performInstall() {
         try {
-        log.info("Starting Tempus Installation...");
+            log.info("Starting Tempus Installation...");
 
-        if (this.dataDir == null) {
-            throw new TempusRuntimeException("'install.data_dir' property should specified!");
-        }
-        if (!Paths.get(this.dataDir).toFile().isDirectory()) {
-            throw new TempusRuntimeException("'install.data_dir' property value is not a valid directory!");
-        }
+            if (this.dataDir == null) {
+                throw new TempusRuntimeException("'install.data_dir' property should specified!");
+            }
+            if (!Paths.get(this.dataDir).toFile().isDirectory()) {
+                throw new TempusRuntimeException("'install.data_dir' property value is not a valid directory!");
+            }
 
-        log.info("Installing DataBase schema...");
+            log.info("Installing DataBase schema...");
 
-            databaseSchemaService.createDatabaseSchema();
+            sqlDatabaseSchemaService.createDatabaseSchema();
+            if(cassandraDatabaseSchemaService.isPresent()){
+                cassandraDatabaseSchemaService.get().createDatabaseSchema();
+            }
         } catch (Exception e) {
             log.error("Unexpected error during Tempus installation!", e);
             throw new TempusInstallException("Unexpected error during Tempus installation!", e);

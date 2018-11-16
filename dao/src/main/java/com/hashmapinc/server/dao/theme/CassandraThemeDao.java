@@ -28,9 +28,9 @@ import com.datastax.driver.core.querybuilder.Select;
 import static com.datastax.driver.core.querybuilder.QueryBuilder.select;
 import static com.datastax.driver.core.querybuilder.QueryBuilder.eq;
 
-@Component
+//@Component
 @Slf4j
-@NoSqlDao
+//@NoSqlDao
 public class CassandraThemeDao extends CassandraAbstractModelDao<ThemeEntity,Theme> implements ThemeDao{
 
     @Override

@@ -22,13 +22,15 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 import com.hashmapinc.server.dao.model.sql.RuleMetaDataEntity;
 import com.hashmapinc.server.dao.util.SqlDao;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
 /**
  * Created by Valerii Sosliuk on 4/30/2017.
  */
-@SqlDao
+//@SqlDao
+@Repository
 public interface RuleMetaDataRepository extends CrudRepository<RuleMetaDataEntity, String> {
 
     List<RuleMetaDataEntity> findByPluginToken(String pluginToken);

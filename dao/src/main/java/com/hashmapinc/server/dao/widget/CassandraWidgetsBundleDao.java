@@ -33,9 +33,9 @@ import java.util.UUID;
 import static com.datastax.driver.core.querybuilder.QueryBuilder.*;
 import static com.hashmapinc.server.dao.model.ModelConstants.*;
 
-@Component
+//@Component
 @Slf4j
-@NoSqlDao
+//@NoSqlDao
 public class CassandraWidgetsBundleDao extends CassandraAbstractSearchTextDao<WidgetsBundleEntity, WidgetsBundle> implements WidgetsBundleDao {
 
     @Override

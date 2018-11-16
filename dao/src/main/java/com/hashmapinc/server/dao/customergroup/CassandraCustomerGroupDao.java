@@ -42,9 +42,9 @@ import static com.hashmapinc.server.dao.model.ModelConstants.CUSTOMER_GROUP_ID_P
 import static com.hashmapinc.server.dao.model.ModelConstants.USER_GROUP_COLUMN_FAMILY_NAME;
 import static com.hashmapinc.server.dao.model.ModelConstants.USER_ID_PROPERTY;
 
-@Component
+//@Component
 @Slf4j
-@NoSqlDao
+//@NoSqlDao
 public class CassandraCustomerGroupDao extends CassandraAbstractSearchTextDao<CustomerGroupEntity, CustomerGroup> implements CustomerGroupDao {
 
     private static final String SELECT_PREFIX = "SELECT ";

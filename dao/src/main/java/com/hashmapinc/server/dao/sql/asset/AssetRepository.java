@@ -25,13 +25,15 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.querydsl.QueryDslPredicateExecutor;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
 /**
  * Created by Valerii Sosliuk on 5/21/2017.
  */
-@SqlDao
+//@SqlDao
+@Repository
 public interface AssetRepository extends CrudRepository<AssetEntity, String>, QueryDslPredicateExecutor<AssetEntity> {
 
     @Query("SELECT a FROM AssetEntity a WHERE a.tenantId = :tenantId " +

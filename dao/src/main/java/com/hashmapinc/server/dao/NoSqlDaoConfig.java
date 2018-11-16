@@ -23,12 +23,13 @@ import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfigurat
 import org.springframework.context.annotation.Configuration;
 import com.hashmapinc.server.dao.util.NoSqlDao;
 
-@Configuration
-@EnableAutoConfiguration(
+/*@Configuration
+@EnableAutoConfiguration
+*//*@EnableAutoConfiguration(
         exclude = {
                 DataSourceAutoConfiguration.class,
                 DataSourceTransactionManagerAutoConfiguration.class,
-                HibernateJpaAutoConfiguration.class})
-@NoSqlDao
+                HibernateJpaAutoConfiguration.class})*//*
+//@NoSqlDao
 public class NoSqlDaoConfig {
-}
+}*/

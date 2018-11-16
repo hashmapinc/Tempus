@@ -21,11 +21,13 @@ import com.hashmapinc.server.dao.model.sql.EventEntity;
 import com.hashmapinc.server.dao.util.SqlDao;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.repository.CrudRepository;
+import org.springframework.stereotype.Repository;
 
 /**
  * Created by Valerii Sosliuk on 5/3/2017.
  */
-@SqlDao
+//@SqlDao
+@Repository
 public interface EventRepository extends CrudRepository<EventEntity, String>, JpaSpecificationExecutor<EventEntity> {
 
     EventEntity findByTenantIdAndEntityTypeAndEntityIdAndEventTypeAndEventUid(String tenantId,

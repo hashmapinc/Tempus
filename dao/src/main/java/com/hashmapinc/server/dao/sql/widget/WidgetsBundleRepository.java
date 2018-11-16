@@ -22,13 +22,15 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
 /**
  * Created by Valerii Sosliuk on 4/23/2017.
  */
-@SqlDao
+//@SqlDao
+@Repository
 public interface WidgetsBundleRepository extends CrudRepository<WidgetsBundleEntity, String> {
 
     WidgetsBundleEntity findWidgetsBundleByTenantIdAndAlias(String tenantId, String alias);

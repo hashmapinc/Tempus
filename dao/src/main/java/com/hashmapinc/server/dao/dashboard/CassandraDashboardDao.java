@@ -36,8 +36,8 @@ import static com.datastax.driver.core.querybuilder.QueryBuilder.eq;
 import static com.datastax.driver.core.querybuilder.QueryBuilder.select;
 import static com.hashmapinc.server.dao.model.ModelConstants.DASHBOARD_COLUMN_FAMILY_NAME;
 
-@Component
-@NoSqlDao
+//@Component
+//@NoSqlDao
 public class CassandraDashboardDao extends CassandraAbstractSearchTextDao<DashboardEntity, Dashboard> implements DashboardDao {
 
     @Override

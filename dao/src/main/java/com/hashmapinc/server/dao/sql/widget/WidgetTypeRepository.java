@@ -19,13 +19,15 @@ package com.hashmapinc.server.dao.sql.widget;
 import com.hashmapinc.server.dao.model.sql.WidgetTypeEntity;
 import org.springframework.data.repository.CrudRepository;
 import com.hashmapinc.server.dao.util.SqlDao;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
 /**
  * Created by Valerii Sosliuk on 4/29/2017.
  */
-@SqlDao
+//@SqlDao
+@Repository
 public interface WidgetTypeRepository extends CrudRepository<WidgetTypeEntity, String> {
 
     List<WidgetTypeEntity> findByTenantIdAndBundleAlias(String tenantId, String bundleAlias);

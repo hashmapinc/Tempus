@@ -32,7 +32,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
-@SqlDao
+//@SqlDao
 public class JpaDataModelObjectDao extends JpaAbstractSearchTextDao<DataModelObjectEntity, DataModelObject> implements DataModelObjectDao {
 
     @Autowired

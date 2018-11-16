@@ -31,9 +31,9 @@ import static com.datastax.driver.core.querybuilder.QueryBuilder.eq;
 import static com.datastax.driver.core.querybuilder.QueryBuilder.select;
 import static com.hashmapinc.server.dao.model.ModelConstants.*;
 
-@Component
+//@Component
 @Slf4j
-@NoSqlDao
+//@NoSqlDao
 public class CassandraUserSettingsDao extends CassandraAbstractModelDao<UserSettingsEntity, UserSettings> implements UserSettingsDao {
 
     @Override

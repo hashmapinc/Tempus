@@ -38,7 +38,7 @@ import java.util.UUID;
  * Created by Valerii Sosliuk on 4/23/2017.
  */
 @Component
-@SqlDao
+//@SqlDao
 public class JpaWidgetsBundleDao extends JpaAbstractSearchTextDao<WidgetsBundleEntity, WidgetsBundle> implements WidgetsBundleDao {
 
     @Autowired

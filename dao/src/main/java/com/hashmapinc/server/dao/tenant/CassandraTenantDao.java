@@ -31,9 +31,9 @@ import java.util.List;
 
 import static com.datastax.driver.core.querybuilder.QueryBuilder.eq;
 
-@Component
+//@Component
 @Slf4j
-@NoSqlDao
+//@NoSqlDao
 public class CassandraTenantDao extends CassandraAbstractSearchTextDao<TenantEntity, Tenant> implements TenantDao {
 
     @Override

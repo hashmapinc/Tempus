@@ -33,7 +33,7 @@ import java.util.UUID;
 import static com.hashmapinc.server.common.data.UUIDConverter.fromTimeUUID;
 
 @Component
-@SqlDao
+//@SqlDao
 public class JpaDataModelDao extends JpaAbstractSearchTextDao<DataModelEntity, DataModel> implements DataModelDao {
 
 
