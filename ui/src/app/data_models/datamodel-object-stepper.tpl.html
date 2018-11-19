@@ -164,7 +164,7 @@
 
             <md-subheader class="md-no-sticky reviewHeader">Object Attributes</md-subheader>
             <md-list-item ng-repeat="attrib in vm.stepperData.attributes">
-              <label> {{ attrib }} </label>
+              <label> {{ attrib.name }}  <span ng-if="attrib.keyAttribute"> &nbsp;&nbsp;:: Key Attribute</span> </label>
             </md-list-item>
 
             <md-subheader class="md-no-sticky reviewHeader">Relationships</md-subheader>
