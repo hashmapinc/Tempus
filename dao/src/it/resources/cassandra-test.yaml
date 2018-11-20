@@ -101,6 +101,8 @@ data_file_directories:
 # commit log
 commitlog_directory: target/embeddedCassandra/commitlog
 
+cdc_raw_directory: target/embeddedCassandra/cdc
+
 hints_directory: target/embeddedCassandra/hints
 
 # policy for data disk failures:
@@ -561,7 +563,7 @@ request_scheduler: org.apache.cassandra.scheduler.NoScheduler
 # offs.  This value is not often changed, however if you have many
 # very small rows (many to an OS page), then increasing this will
 # often lower memory usage without a impact on performance.
-index_interval: 128
+#index_interval: 128
 
 # Enable or disable inter-node encryption
 # Default settings are TLS v1, RSA 1024-bit keys (it is imperative that

@@ -45,7 +45,7 @@ security:
       #grant-type: "${TEMPUS_CLIENT_GRANT_TYPE:password}"
       scope: ["server"]
     resource:
-      resource-id: "${TEMPUS_RESOURCE_API_ID:tempus-resource-server-rest-api}"
+      id: "${TEMPUS_RESOURCE_API_ID:tempus-resource-server-rest-api}"
       tokenInfoUri: "${TOKEN_INFO_URI:${IDENTITY_BASE_URL:http://localhost:9002/uaa}/oauth/check_token}"
 
 identity:
@@ -366,22 +366,22 @@ spring:
     username: "${SPRING_DATASOURCE_USERNAME:postgres}"
     password: "${SPRING_DATASOURCE_PASSWORD:postgres}"
 
-#max file and request size
-spring.http:
-  multipart:
-    max-file-size: -1
-    max-request-size: -1
+##max file and request size
+#spring.http:
+#  multipart:
+#    max-file-size: -1
+#    max-request-size: -1
 # Audit log parameters
-audit_log:
+audit-log:
   # Enable/disable audit log functionality.
   enabled: "${AUDIT_LOG_ENABLED:true}"
   # Specify partitioning size for audit log by tenant id storage. Example MINUTES, HOURS, DAYS, MONTHS
-  by_tenant_partitioning: "${AUDIT_LOG_BY_TENANT_PARTITIONING:MONTHS}"
+  by-tenant-partitioning: "${AUDIT_LOG_BY_TENANT_PARTITIONING:MONTHS}"
   # Number of days as history period if startTime and endTime are not specified
   default_query_period: "${AUDIT_LOG_DEFAULT_QUERY_PERIOD:30}"
   # Logging levels per each entity type.
   # Allowed values: OFF (disable), W (log write operations), RW (log read and write operations)
-  logging_level:
+  logging-level:
     mask:
       "device": "${AUDIT_LOG_MASK_DEVICE:W}"
       "asset": "${AUDIT_LOG_MASK_ASSET:W}"

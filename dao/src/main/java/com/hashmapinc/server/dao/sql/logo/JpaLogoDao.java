@@ -19,9 +19,9 @@ package com.hashmapinc.server.dao.sql.logo;
 
 import com.hashmapinc.server.common.data.Logo;
 import com.hashmapinc.server.dao.DaoUtil;
+import com.hashmapinc.server.dao.logo.LogoDao;
 import com.hashmapinc.server.dao.model.sql.LogoEntity;
 import com.hashmapinc.server.dao.sql.JpaAbstractDao;
-import com.hashmapinc.server.dao.logo.LogoDao;
 import com.hashmapinc.server.dao.util.SqlDao;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,7 +48,7 @@ public class JpaLogoDao extends JpaAbstractDao<LogoEntity,Logo> implements LogoD
 
     @Override
     public Logo findById(String id) {
-        Logo logo = DaoUtil.getData(logoRepository.findById(id));
+        Logo logo = DaoUtil.getData(logoRepository.findById(id).orElse(null));
         if (logo != null) {
             return logo;
         } else {

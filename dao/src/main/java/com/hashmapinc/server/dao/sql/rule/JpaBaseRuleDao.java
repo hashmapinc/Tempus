@@ -110,7 +110,7 @@ public class JpaBaseRuleDao extends JpaAbstractSearchTextDao<RuleMetaDataEntity,
     @Override
     public void deleteById(UUID id) {
         log.debug("Delete rule meta-data entity by id [{}]", id);
-        ruleMetaDataRepository.delete(UUIDConverter.fromTimeUUID(id));
+        ruleMetaDataRepository.deleteById(UUIDConverter.fromTimeUUID(id));
     }
 
     @Override

@@ -45,17 +45,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
-import com.hashmapinc.server.common.data.id.*;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.List;
 
-import static com.hashmapinc.server.dao.service.Validator.validateId;
-
 @Slf4j
 @Service
-@ConditionalOnProperty(prefix = "audit_log", value = "enabled", havingValue = "true")
+@ConditionalOnProperty(prefix = "audit-log", value = "enabled", havingValue = "true")
 public class AuditLogServiceImpl implements AuditLogService {
 
     private static final ObjectMapper objectMapper = new ObjectMapper();

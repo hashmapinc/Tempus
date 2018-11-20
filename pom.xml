@@ -30,12 +30,12 @@
 
     <properties>
         <main.dir>${basedir}</main.dir>
-        <spring-boot.version>1.4.3.RELEASE</spring-boot.version>
-        <spring.version>4.3.4.RELEASE</spring.version>
-        <spring-security.version>4.2.0.RELEASE</spring-security.version>
+        <spring-boot.version>2.1.0.RELEASE</spring-boot.version>
+        <spring.version>5.1.2.RELEASE</spring.version>
+        <spring-security.version>5.1.1.RELEASE</spring-security.version>
         <!--<spring-security-oauth2.version>2.3.3.RELEASE</spring-security-oauth2.version>-->
         <spring-security-oauth2.version>2.2.1.RELEASE</spring-security-oauth2.version>
-        <spring-data-redis.version>1.8.10.RELEASE</spring-data-redis.version>
+        <spring-data-redis.version>2.1.2.RELEASE</spring-data-redis.version>
         <jedis.version>2.9.0</jedis.version>
         <jjwt.version>0.7.0</jjwt.version>
         <json-path.version>2.2.0</json-path.version>
@@ -44,8 +44,8 @@
         <logback.version>1.2.3</logback.version>
         <mockito.version>1.9.5</mockito.version>
         <rat.version>0.10</rat.version>
-        <cassandra.version>3.0.0</cassandra.version>
-        <cassandra-unit.version>3.0.0.1</cassandra-unit.version>
+        <cassandra.version>3.5.0</cassandra.version>
+        <cassandra-unit.version>3.5.0.1</cassandra-unit.version>
         <takari-cpsuite.version>1.2.7</takari-cpsuite.version>
         <guava.version>18.0</guava.version>
         <caffeine.version>2.6.1</caffeine.version>
@@ -53,10 +53,10 @@
         <commons-validator.version>1.5.0</commons-validator.version>
         <commons-io.version>2.5</commons-io.version>
         <commons-csv.version>1.4</commons-csv.version>
-        <jackson.version>2.8.9</jackson.version>
+        <jackson.version>2.9.7</jackson.version>
         <json-schema-validator.version>2.2.6</json-schema-validator.version>
         <scala.version>2.11</scala.version>
-        <akka.version>2.4.2</akka.version>
+        <akka.version>2.5.18</akka.version>
         <californium.version>1.0.2</californium.version>
         <gson.version>2.6.2</gson.version>
         <velocity.version>1.7</velocity.version>
@@ -65,7 +65,7 @@
         <curator.version>2.11.0</curator.version>
         <protobuf.version>3.0.2</protobuf.version>
         <grpc.version>1.0.0</grpc.version>
-        <lombok.version>1.16.18</lombok.version>
+        <lombok.version>1.18.4</lombok.version>
         <paho.client.version>1.1.0</paho.client.version>
         <netty.version>4.1.22.Final</netty.version>
         <os-maven-plugin.version>1.5.0</os-maven-plugin.version>
@@ -88,8 +88,8 @@
         <elasticsearch.version>5.0.2</elasticsearch.version>
         <joda-time.version>2.4</joda-time.version>
         <kubernetes.client.version>1.0.0</kubernetes.client.version>
-        <querydsl-jpa.version>4.1.4</querydsl-jpa.version>
-        <querydsl-apt.version>4.1.4</querydsl-apt.version>
+        <querydsl-jpa.version>4.2.1</querydsl-jpa.version>
+        <querydsl-apt.version>4.2.1</querydsl-apt.version>
         <apt-maven-plugin.version>1.1.3</apt-maven-plugin.version>
     </properties>
 
@@ -128,10 +128,10 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
-                    <version>2.5.1</version>
+                    <version>3.8.0</version>
                     <configuration>
-                        <source>1.8</source>
-                        <target>1.8</target>
+                        <forceJavacCompilerUse>true</forceJavacCompilerUse>
+                        <release>11</release>
                     </configuration>
                 </plugin>
                 <plugin>
@@ -160,9 +160,9 @@
                     <version>${spring-boot.version}</version>
                 </plugin>
                 <plugin>
-                    <groupId>org.fortasoft</groupId>
+                    <groupId>codes.rafael.gradlemavenplugin</groupId>
                     <artifactId>gradle-maven-plugin</artifactId>
-                    <version>1.0.8</version>
+                    <version>1.0.10</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -383,6 +383,11 @@
             <artifactId>lombok</artifactId>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-properties-migrator</artifactId>
+            <scope>runtime</scope>
+        </dependency>
     </dependencies>
 
     <dependencyManagement>
@@ -557,7 +562,7 @@
             <dependency>
                 <groupId>org.springframework.cloud</groupId>
                 <artifactId>spring-cloud-starter-contract-stub-runner</artifactId>
-                <version>1.0.5.RELEASE</version>
+                <version>2.0.2.RELEASE</version>
                 <scope>test</scope>
             </dependency>
             <dependency>
@@ -607,7 +612,7 @@
                 <artifactId>jjwt</artifactId>
                 <version>${jjwt.version}</version>
             </dependency>
-	    <dependency>
+            <dependency>
                 <groupId>joda-time</groupId>
                 <artifactId>joda-time</artifactId>
                 <version>${joda-time.version}</version>
@@ -847,6 +852,11 @@
                 <scope>provided</scope>
             </dependency>
             <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-properties-migrator</artifactId>
+                <version>2.1.0.RELEASE</version>
+            </dependency>
+            <dependency>
                 <groupId>org.apache.kafka</groupId>
                 <artifactId>kafka_2.11</artifactId>
                 <version>${kafka.version}</version>
@@ -979,11 +989,30 @@
             <dependency>
                 <groupId>io.minio</groupId>
                 <artifactId>minio</artifactId>
-                <version>4.0.2</version>
+                <version>5.0.2</version>
+            </dependency>
+            <dependency>
+                <groupId>javax.annotation</groupId>
+                <artifactId>javax.annotation-api</artifactId>
+                <version>1.3.2</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.security.oauth.boot</groupId>
+                <artifactId>spring-security-oauth2-autoconfigure</artifactId>
+                <version>2.1.0.RELEASE</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-collections4</artifactId>
+                <version>4.2</version>
+            </dependency>
+            <dependency>
+                <groupId>org.yaml</groupId>
+                <artifactId>snakeyaml</artifactId>
+                <version>1.23</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
-
     <repositories>
         <repository>
             <id>central</id>

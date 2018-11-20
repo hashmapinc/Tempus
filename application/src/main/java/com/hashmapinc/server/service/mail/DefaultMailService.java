@@ -20,28 +20,28 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.hashmapinc.server.common.data.User;
 import com.hashmapinc.server.common.data.UserSettings;
 import com.hashmapinc.server.dao.exception.IncorrectParameterException;
+import com.hashmapinc.server.dao.settings.UserSettingsService;
 import com.hashmapinc.server.dao.user.UserService;
+import com.hashmapinc.server.exception.TempusErrorCode;
 import com.hashmapinc.server.exception.TempusException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.VelocityEngine;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.MessageSource;
+import org.springframework.context.annotation.Bean;
 import org.springframework.core.NestedRuntimeException;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
-import org.springframework.ui.velocity.VelocityEngineUtils;
-import com.hashmapinc.server.dao.settings.UserSettingsService;
-import com.hashmapinc.server.exception.TempusErrorCode;
 
 import javax.annotation.PostConstruct;
 import javax.mail.internet.MimeMessage;
-import java.util.HashMap;
+import java.io.StringWriter;
 import java.util.Locale;
-import java.util.Map;
 import java.util.Properties;
 
 @Service
@@ -74,6 +74,18 @@ public class DefaultMailService implements MailService {
     @PostConstruct
     private void init() {
         updateMailConfiguration();
+    }
+
+    @Bean
+    @Qualifier("velocityEngine")
+    public VelocityEngine velocityEngine() throws Exception {
+        Properties properties = new Properties();
+        properties.setProperty("input.encoding", "UTF-8");
+        properties.setProperty("output.encoding", "UTF-8");
+        properties.setProperty("resource.loader", "class");
+        properties.setProperty("class.resource.loader.class", "org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader");
+        VelocityEngine velocityEngine = new VelocityEngine(properties);
+        return velocityEngine;
     }
 
     @Override
@@ -129,13 +141,12 @@ public class DefaultMailService implements MailService {
         JavaMailSenderImpl testMailSender = createMailSender(jsonConfig);
         String from = jsonConfig.get("mailFrom").asText();
         String subject = messages.getMessage("test.message.subject", null, Locale.US);
-        
-        Map<String, Object> model = new HashMap<>();
-        model.put(TARGET_EMAIL, email);
-        
-        String message = VelocityEngineUtils.mergeTemplateIntoString(this.engine,
-                "test.vm", UTF_8, model);
-        
+
+        VelocityContext velocityContext = new VelocityContext();
+        velocityContext.put(TARGET_EMAIL, email);
+
+        String message = mergeVelocityTemplate("test.vm", velocityContext);
+
         sendMail(testMailSender, from, email, subject, message);
     }
 
@@ -143,14 +154,13 @@ public class DefaultMailService implements MailService {
     public void sendActivationEmail(String activationLink, String email) throws TempusException {
         
         String subject = messages.getMessage("activation.subject", null, Locale.US);
-        
-        Map<String, Object> model = new HashMap<>();
-        model.put("activationLink", activationLink);
-        model.put(TARGET_EMAIL, email);
-        
-        String message = VelocityEngineUtils.mergeTemplateIntoString(this.engine,
-                "activation.vm", UTF_8, model);
-        
+
+        VelocityContext velocityContext = new VelocityContext();
+        velocityContext.put("activationLink", activationLink);
+        velocityContext.put(TARGET_EMAIL, email);
+
+        String message = mergeVelocityTemplate("activation.vm", velocityContext);
+
         sendMail(mailSender, mailFrom, email, subject, message); 
     }
     
@@ -158,14 +168,13 @@ public class DefaultMailService implements MailService {
     public void sendAccountActivatedEmail(String loginLink, String email) throws TempusException {
         
         String subject = messages.getMessage("account.activated.subject", null, Locale.US);
-        
-        Map<String, Object> model = new HashMap<>();
-        model.put("loginLink", loginLink);
-        model.put(TARGET_EMAIL, email);
-        
-        String message = VelocityEngineUtils.mergeTemplateIntoString(this.engine,
-                "account.activated.vm", UTF_8, model);
-        
+
+        VelocityContext velocityContext = new VelocityContext();
+        velocityContext.put("loginLink", loginLink);
+        velocityContext.put(TARGET_EMAIL, email);
+
+        String message = mergeVelocityTemplate("account.activated.vm", velocityContext);
+
         sendMail(mailSender, mailFrom, email, subject, message); 
     }
 
@@ -173,14 +182,13 @@ public class DefaultMailService implements MailService {
     public void sendResetPasswordEmail(String passwordResetLink, String email) throws TempusException {
         
         String subject = messages.getMessage("reset.password.subject", null, Locale.US);
-        
-        Map<String, Object> model = new HashMap<>();
-        model.put("passwordResetLink", passwordResetLink);
-        model.put(TARGET_EMAIL, email);
-        
-        String message = VelocityEngineUtils.mergeTemplateIntoString(this.engine,
-                "reset.password.vm", UTF_8, model);
-        
+
+        VelocityContext velocityContext = new VelocityContext();
+        velocityContext.put("passwordResetLink", passwordResetLink);
+        velocityContext.put(TARGET_EMAIL, email);
+
+        String message = mergeVelocityTemplate("reset.password.vm", velocityContext);
+
         sendMail(mailSender, mailFrom, email, subject, message); 
     }
     
@@ -188,14 +196,13 @@ public class DefaultMailService implements MailService {
     public void sendPasswordWasResetEmail(String loginLink, String email) throws TempusException {
         
         String subject = messages.getMessage("password.was.reset.subject", null, Locale.US);
-        
-        Map<String, Object> model = new HashMap<>();
-        model.put("loginLink", loginLink);
-        model.put(TARGET_EMAIL, email);
-        
-        String message = VelocityEngineUtils.mergeTemplateIntoString(this.engine,
-                "password.was.reset.vm", UTF_8, model);
-        
+
+        VelocityContext velocityContext = new VelocityContext();
+        velocityContext.put("loginLink", loginLink);
+        velocityContext.put(TARGET_EMAIL, email);
+
+        String message = mergeVelocityTemplate("password.was.reset.vm", velocityContext);
+
         sendMail(mailSender, mailFrom, email, subject, message); 
     }
 
@@ -214,6 +221,12 @@ public class DefaultMailService implements MailService {
         } catch (Exception e) {
             throw handleException(e);
         }
+    }
+
+    private String mergeVelocityTemplate(String template, VelocityContext velocityContext) {
+        StringWriter stringWriter = new StringWriter();
+        this.engine.mergeTemplate(template, UTF_8, velocityContext, stringWriter);
+        return stringWriter.toString();
     }
 
     protected TempusException handleException(Exception exception) {

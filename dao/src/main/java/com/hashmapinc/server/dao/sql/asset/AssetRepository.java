@@ -22,7 +22,7 @@ import com.querydsl.core.types.Predicate;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.querydsl.QueryDslPredicateExecutor;
+import org.springframework.data.querydsl.QuerydslPredicateExecutor;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -33,7 +33,7 @@ import java.util.List;
  * Created by Valerii Sosliuk on 5/21/2017.
  */
 @Repository
-public interface AssetRepository extends CrudRepository<AssetEntity, String>, QueryDslPredicateExecutor<AssetEntity> {
+public interface AssetRepository extends CrudRepository<AssetEntity, String>, QuerydslPredicateExecutor<AssetEntity> {
 
     @Query("SELECT a FROM AssetEntity a WHERE a.tenantId = :tenantId " +
             "AND LOWER(a.searchText) LIKE LOWER(CONCAT(:textSearch, '%')) " +
