@@ -21,7 +21,6 @@ import com.hashmapinc.server.dao.DaoUtil;
 import com.hashmapinc.server.dao.model.sql.ThemeEntity;
 import com.hashmapinc.server.dao.sql.JpaAbstractDao;
 import com.hashmapinc.server.dao.theme.ThemeDao;
-import com.hashmapinc.server.dao.util.SqlDao;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.repository.CrudRepository;
@@ -29,7 +28,6 @@ import org.springframework.stereotype.Component;
 
 
 @Component
-//@SqlDao
 @Slf4j
 public class JpaThemeDao extends JpaAbstractDao<ThemeEntity,Theme> implements ThemeDao {
 

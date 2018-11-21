@@ -16,19 +16,18 @@
  */
 package com.hashmapinc.server.dao.sql.widget;
 
+import com.hashmapinc.server.common.data.UUIDConverter;
 import com.hashmapinc.server.common.data.page.TextPageLink;
 import com.hashmapinc.server.common.data.widget.WidgetsBundle;
 import com.hashmapinc.server.dao.DaoUtil;
 import com.hashmapinc.server.dao.model.ModelConstants;
 import com.hashmapinc.server.dao.model.sql.WidgetsBundleEntity;
-import com.hashmapinc.server.dao.util.SqlDao;
+import com.hashmapinc.server.dao.sql.JpaAbstractSearchTextDao;
 import com.hashmapinc.server.dao.widget.WidgetsBundleDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Component;
-import com.hashmapinc.server.common.data.UUIDConverter;
-import com.hashmapinc.server.dao.sql.JpaAbstractSearchTextDao;
 
 import java.util.List;
 import java.util.Objects;
@@ -38,7 +37,6 @@ import java.util.UUID;
  * Created by Valerii Sosliuk on 4/23/2017.
  */
 @Component
-//@SqlDao
 public class JpaWidgetsBundleDao extends JpaAbstractSearchTextDao<WidgetsBundleEntity, WidgetsBundle> implements WidgetsBundleDao {
 
     @Autowired

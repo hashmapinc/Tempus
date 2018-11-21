@@ -17,7 +17,6 @@
 package com.hashmapinc.server.dao.sql.widget;
 
 import com.hashmapinc.server.dao.model.sql.WidgetsBundleEntity;
-import com.hashmapinc.server.dao.util.SqlDao;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
@@ -29,7 +28,6 @@ import java.util.List;
 /**
  * Created by Valerii Sosliuk on 4/23/2017.
  */
-//@SqlDao
 @Repository
 public interface WidgetsBundleRepository extends CrudRepository<WidgetsBundleEntity, String> {
 

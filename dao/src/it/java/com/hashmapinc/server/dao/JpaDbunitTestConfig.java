@@ -33,7 +33,6 @@ import java.sql.SQLException;
  * Created by Valerii Sosliuk on 5/6/2017.
  */
 @Configuration
-//@SqlDao
 public class JpaDbunitTestConfig {
 
     @Autowired

@@ -24,7 +24,6 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-//@SqlDao
 @Repository
 public interface DataModelObjectRespository extends CrudRepository<DataModelObjectEntity, String> {
     List<DataModelObjectEntity> findByDataModelId(@Param("dataModelId") String dataModelId);

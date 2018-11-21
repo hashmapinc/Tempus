@@ -16,12 +16,11 @@
  */
 package com.hashmapinc.server.dao.sql.rule;
 
+import com.hashmapinc.server.dao.model.sql.RuleMetaDataEntity;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
-import com.hashmapinc.server.dao.model.sql.RuleMetaDataEntity;
-import com.hashmapinc.server.dao.util.SqlDao;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -29,7 +28,6 @@ import java.util.List;
 /**
  * Created by Valerii Sosliuk on 4/30/2017.
  */
-//@SqlDao
 @Repository
 public interface RuleMetaDataRepository extends CrudRepository<RuleMetaDataEntity, String> {
 

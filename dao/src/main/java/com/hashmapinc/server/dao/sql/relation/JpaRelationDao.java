@@ -50,7 +50,6 @@ import static com.hashmapinc.server.common.data.UUIDConverter.fromTimeUUID;
  */
 @Slf4j
 @Component
-//@SqlDao
 public class JpaRelationDao extends JpaAbstractDaoListeningExecutorService implements RelationDao {
 
     @Autowired

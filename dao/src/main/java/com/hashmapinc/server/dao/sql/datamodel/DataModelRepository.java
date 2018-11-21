@@ -23,7 +23,6 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-//@SqlDao
 @Repository
 public interface DataModelRepository extends CrudRepository<DataModelEntity, String> {
 

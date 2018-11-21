@@ -16,17 +16,15 @@
  */
 package com.hashmapinc.server.dao.sql.relation;
 
-import com.hashmapinc.server.dao.util.SqlDao;
+import com.hashmapinc.server.dao.model.sql.RelationCompositeKey;
+import com.hashmapinc.server.dao.model.sql.RelationEntity;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
-import com.hashmapinc.server.dao.model.sql.RelationCompositeKey;
-import com.hashmapinc.server.dao.model.sql.RelationEntity;
 
 import java.util.List;
 
-//@SqlDao
 @Repository
 public interface RelationRepository
         extends CrudRepository<RelationEntity, RelationCompositeKey>, JpaSpecificationExecutor<RelationEntity> {

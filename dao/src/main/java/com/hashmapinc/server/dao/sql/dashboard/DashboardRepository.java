@@ -28,7 +28,6 @@ import java.util.List;
 /**
  * Created by Valerii Sosliuk on 5/6/2017.
  */
-//@SqlDao
 @Repository
 public interface DashboardRepository extends CrudRepository<DashboardEntity, String> {
     List<DashboardEntity> findByAssetLandingInfoEntity_dataModelObjectId(String dataModelObjectId);

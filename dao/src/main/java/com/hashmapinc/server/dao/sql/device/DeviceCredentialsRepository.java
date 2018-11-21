@@ -24,7 +24,6 @@ import org.springframework.stereotype.Repository;
 /**
  * Created by Valerii Sosliuk on 5/6/2017.
  */
-//@SqlDao
 @Repository
 public interface DeviceCredentialsRepository extends CrudRepository<DeviceCredentialsEntity, String> {
 

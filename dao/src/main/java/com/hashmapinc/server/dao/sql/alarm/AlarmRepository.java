@@ -30,7 +30,6 @@ import java.util.List;
 /**
  * Created by Valerii Sosliuk on 5/21/2017.
  */
-//@SqlDao
 @Repository
 public interface AlarmRepository extends CrudRepository<AlarmEntity, String> {
 

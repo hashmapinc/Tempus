@@ -26,7 +26,6 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-//@SqlDao
 @Repository
 public interface ComputationsRepository extends CrudRepository<ComputationsEntity, String> {
     List <ComputationsEntity> findByName(String name);

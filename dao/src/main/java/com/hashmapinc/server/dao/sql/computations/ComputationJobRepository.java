@@ -26,7 +26,6 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-//@SqlDao
 @Repository
 public interface ComputationJobRepository extends CrudRepository<ComputationJobEntity, String> {
 

@@ -26,7 +26,6 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-//@SqlDao
 @Repository
 public interface CustomerGroupRepository  extends CrudRepository<CustomerGroupEntity, String> {
     @Query("SELECT c FROM CustomerGroupEntity c WHERE c.tenantId = :tenantId " +

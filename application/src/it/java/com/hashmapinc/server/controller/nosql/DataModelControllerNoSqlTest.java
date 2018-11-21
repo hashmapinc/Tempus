@@ -17,8 +17,6 @@
 package com.hashmapinc.server.controller.nosql;
 
 import com.hashmapinc.server.controller.BaseDataModelControllerTest;
-import com.hashmapinc.server.dao.datamodel.CassandraBaseDataModelObjectDao;
-import com.hashmapinc.server.dao.datamodel.CassandraDataModelDao;
 import com.hashmapinc.server.dao.datamodel.DataModelDao;
 import com.hashmapinc.server.dao.datamodel.DataModelObjectDao;
 import com.hashmapinc.server.dao.service.DaoNoSqlTest;
@@ -27,15 +25,4 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 @DaoNoSqlTest
 public class DataModelControllerNoSqlTest extends BaseDataModelControllerTest {
-
-    @Autowired
-    private DataModelDao dataModelDao;
-
-    @Autowired
-    private DataModelObjectDao dataModelObjectDao;
-
-    @After
-    public void afterTest(){
-
-    }
 }

@@ -31,7 +31,6 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @EnableJpaRepositories("com.hashmapinc.server.dao.sql")
 @EntityScan("com.hashmapinc.server.dao.model.sql")
 @EnableTransactionManagement
-//@SqlDao
 public class JpaDaoConfig {
 
 }

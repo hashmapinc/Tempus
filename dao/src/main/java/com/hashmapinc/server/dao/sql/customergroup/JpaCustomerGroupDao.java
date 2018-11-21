@@ -47,7 +47,6 @@ import java.util.stream.Collectors;
 import static com.hashmapinc.server.dao.model.ModelConstants.*;
 
 @Component
-//@SqlDao
 @Slf4j
 public class JpaCustomerGroupDao extends JpaAbstractSearchTextDao<CustomerGroupEntity, CustomerGroup> implements CustomerGroupDao {
 

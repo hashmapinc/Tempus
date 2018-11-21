@@ -26,7 +26,6 @@ import org.springframework.stereotype.Repository;
 /**
  * Created by Valerii Sosliuk on 5/3/2017.
  */
-//@SqlDao
 @Repository
 public interface EventRepository extends CrudRepository<EventEntity, String>, JpaSpecificationExecutor<EventEntity> {
 

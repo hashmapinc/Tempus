@@ -29,7 +29,6 @@ import java.util.List;
 /**
  * Created by Valerii Sosliuk on 5/1/2017.
  */
-//@SqlDao
 @Repository
 public interface PluginMetaDataRepository extends CrudRepository<PluginMetaDataEntity, String> {
 

@@ -31,7 +31,6 @@ import java.util.List;
 /**
  * Created by Valerii Sosliuk on 5/6/2017.
  */
-//@SqlDao
 @Repository
 public interface ComponentDescriptorRepository extends CrudRepository<ComponentDescriptorEntity, String> {
 

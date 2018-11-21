@@ -21,7 +21,6 @@ import com.hashmapinc.server.dao.util.SqlDao;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
-//@SqlDao
 @Repository
 public interface NodeMetricRepository extends CrudRepository<NodeMetricEntity, String> {
 

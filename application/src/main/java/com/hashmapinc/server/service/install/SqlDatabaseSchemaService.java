@@ -40,7 +40,6 @@ import java.util.stream.Stream;
 @Service
 @Profile("install")
 @Slf4j
-//@SqlDao
 public class SqlDatabaseSchemaService implements DatabaseSchemaService {
 
     private static final String SQL_DIR_HSQL = "sql/hsql";

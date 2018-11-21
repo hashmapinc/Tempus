@@ -31,7 +31,6 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Component
-//@SqlDao
 public class JpaTempusGatewayConfigurationDao extends JpaAbstractDao<TempusGatewayConfigurationEntity, TempusGatewayConfiguration> implements TempusGatewayConfigurationDao {
     @Autowired
     private TempusGatewayConfigurationRepository tempusGatewayConfigurationRepository;
