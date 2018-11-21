@@ -25,6 +25,7 @@ import org.springframework.scheduling.annotation.Async;
 import com.hashmapinc.server.common.data.EntityType;
 import com.hashmapinc.server.dao.model.sql.TsKvCompositeKey;
 import com.hashmapinc.server.dao.util.SqlDao;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;

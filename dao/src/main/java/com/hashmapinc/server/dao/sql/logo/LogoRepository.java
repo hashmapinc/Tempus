@@ -19,8 +19,9 @@ package com.hashmapinc.server.dao.sql.logo;
 import com.hashmapinc.server.dao.model.sql.LogoEntity;
 import com.hashmapinc.server.dao.util.SqlDao;
 import org.springframework.data.repository.CrudRepository;
+import org.springframework.stereotype.Repository;
 
-@SqlDao
+@Repository
 public interface LogoRepository extends CrudRepository<LogoEntity, String> {
 
     LogoEntity findById(String id);

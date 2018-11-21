@@ -22,10 +22,11 @@ import com.hashmapinc.server.dao.util.SqlDao;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-@SqlDao
+@Repository
 public interface CustomerGroupRepository  extends CrudRepository<CustomerGroupEntity, String> {
     @Query("SELECT c FROM CustomerGroupEntity c WHERE c.tenantId = :tenantId " +
             "AND c.customerId = :customerId " +

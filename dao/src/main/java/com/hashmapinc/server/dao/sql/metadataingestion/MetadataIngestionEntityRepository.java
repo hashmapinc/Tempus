@@ -20,10 +20,11 @@ import com.hashmapinc.server.dao.model.sql.MetadataIngestionEntity;
 import com.hashmapinc.server.dao.model.sql.MetadataIngestionEntityCompositeKey;
 import com.hashmapinc.server.dao.util.SqlDao;
 import org.springframework.data.repository.CrudRepository;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-@SqlDao
+@Repository
 public interface MetadataIngestionEntityRepository extends CrudRepository<MetadataIngestionEntity, MetadataIngestionEntityCompositeKey> {
 
     List<MetadataIngestionEntity> findByMetadataConfigIdOrderByKeyAsc(String metadataConfigId);

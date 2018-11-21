@@ -19,10 +19,11 @@ package com.hashmapinc.server.dao.sql.datamodel;
 import com.hashmapinc.server.dao.model.sql.DataModelEntity;
 import com.hashmapinc.server.dao.util.SqlDao;
 import org.springframework.data.repository.CrudRepository;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-@SqlDao
+@Repository
 public interface DataModelRepository extends CrudRepository<DataModelEntity, String> {
 
     DataModelEntity findByTenantIdAndName(String tenantId, String name);

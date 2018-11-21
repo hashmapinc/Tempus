@@ -19,11 +19,12 @@ package com.hashmapinc.server.dao.sql.device;
 import com.hashmapinc.server.dao.model.sql.DeviceCredentialsEntity;
 import com.hashmapinc.server.dao.util.SqlDao;
 import org.springframework.data.repository.CrudRepository;
+import org.springframework.stereotype.Repository;
 
 /**
  * Created by Valerii Sosliuk on 5/6/2017.
  */
-@SqlDao
+@Repository
 public interface DeviceCredentialsRepository extends CrudRepository<DeviceCredentialsEntity, String> {
 
     DeviceCredentialsEntity findByDeviceId(String deviceId);

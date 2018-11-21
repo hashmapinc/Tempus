@@ -17,12 +17,11 @@
 package com.hashmapinc.server.dao.sql.theme;
 
 import com.hashmapinc.server.dao.model.sql.ThemeEntity;
-import com.hashmapinc.server.dao.util.SqlDao;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
-import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
 
-@SqlDao
+@Repository
 public interface ThemeRepository extends CrudRepository<ThemeEntity, String> {
 
     @Query("SELECT th FROM ThemeEntity th WHERE th.enabled = 'true'")

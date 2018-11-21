@@ -16,19 +16,19 @@
  */
 package com.hashmapinc.server.dao.sql.tenant;
 
+import com.hashmapinc.server.dao.model.sql.TenantEntity;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
-import com.hashmapinc.server.dao.model.sql.TenantEntity;
-import com.hashmapinc.server.dao.util.SqlDao;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
 /**
  * Created by Valerii Sosliuk on 4/30/2017.
  */
-@SqlDao
+@Repository
 public interface TenantRepository extends CrudRepository<TenantEntity, String> {
 
     @Query("SELECT t FROM TenantEntity t WHERE t.region = :region " +

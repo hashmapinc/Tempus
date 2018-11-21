@@ -50,7 +50,6 @@ import java.util.UUID;
  */
 @Slf4j
 @Component
-@SqlDao
 public class JpaDashboardInfoDao extends JpaAbstractSearchTextDao<DashboardInfoEntity, DashboardInfo> implements DashboardInfoDao {
 
     @Autowired

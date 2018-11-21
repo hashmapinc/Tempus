@@ -25,7 +25,6 @@ import com.hashmapinc.server.common.data.UUIDConverter;
 import com.hashmapinc.server.common.data.widget.WidgetType;
 import com.hashmapinc.server.dao.DaoUtil;
 import com.hashmapinc.server.dao.sql.JpaAbstractDao;
-import com.hashmapinc.server.dao.util.SqlDao;
 
 import java.util.List;
 import java.util.UUID;
@@ -34,7 +33,6 @@ import java.util.UUID;
  * Created by Valerii Sosliuk on 4/29/2017.
  */
 @Component
-@SqlDao
 public class JpaWidgetTypeDao extends JpaAbstractDao<WidgetTypeEntity, WidgetType> implements WidgetTypeDao {
 
     @Autowired

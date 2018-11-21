@@ -25,12 +25,11 @@ import com.hashmapinc.server.common.data.TagMetaData;
 import com.hashmapinc.server.common.data.UUIDConverter;
 import com.hashmapinc.server.common.data.id.EntityId;
 import com.hashmapinc.server.dao.DaoUtil;
-import com.hashmapinc.server.dao.tagmetadata.TagMetaDataDao;
 import com.hashmapinc.server.dao.model.sql.TagMetaDataCompositeKey;
 import com.hashmapinc.server.dao.model.sql.TagMetaDataEntity;
 import com.hashmapinc.server.dao.sql.JpaAbstractDaoListeningExecutorService;
+import com.hashmapinc.server.dao.tagmetadata.TagMetaDataDao;
 import com.hashmapinc.server.dao.timeseries.TsInsertExecutorType;
-import com.hashmapinc.server.dao.util.SqlDao;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -44,7 +43,6 @@ import java.util.concurrent.Executors;
 
 @Component
 @Slf4j
-@SqlDao
 public class JpaTagMetaDataDao extends JpaAbstractDaoListeningExecutorService implements TagMetaDataDao {
 
     @Value("${sql.ts_inserts_executor_type}")

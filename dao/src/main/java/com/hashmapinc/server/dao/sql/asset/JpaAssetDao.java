@@ -48,7 +48,6 @@ import java.util.stream.Collectors;
  * Created by Valerii Sosliuk on 5/19/2017.
  */
 @Component
-@SqlDao
 public class JpaAssetDao extends JpaAbstractSearchTextDao<AssetEntity, Asset> implements AssetDao {
 
     @Autowired

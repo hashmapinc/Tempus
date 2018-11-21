@@ -16,32 +16,35 @@
  */
 package com.hashmapinc.server;
 
-import com.github.tomakehurst.wiremock.junit.WireMockClassRule;
 import com.hashmapinc.server.dao.CustomCassandraCQLUnit;
+import com.hashmapinc.server.dao.CustomSqlUnit;
 import org.cassandraunit.dataset.CQLDataSet;
 import org.cassandraunit.dataset.cql.ClassPathCQLDataSet;
 import org.junit.ClassRule;
 import org.junit.extensions.cpsuite.ClasspathSuite;
-import org.junit.rules.RuleChain;
-import org.junit.rules.TestRule;
 import org.junit.runner.RunWith;
-import org.springframework.cloud.contract.wiremock.WireMockSpring;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 @RunWith(ClasspathSuite.class)
 @ClasspathSuite.ClassnameFilters({
-        "com.hashmapinc.server.controller.nosql.*Test",
-        "com.hashmapinc.server.mqtt.*.nosql.*Test",
-        "com.hashmapinc.server.system.*NoSqlTest"
+        "com.hashmapinc.server.dao.service.nosql.*ServiceNoSqlTest"
 })
-public class NoSqlIntegrationTestSuite {
+public class HybridIntegrationTestSuite {
 
-    private static WireMockClassRule wiremock = new WireMockClassRule(
-            WireMockSpring.options().port(9002).usingFilesUnderClasspath("."));
+    @ClassRule
+    public static CustomSqlUnit sqlUnit = new CustomSqlUnit(
 
-    private static CustomCassandraCQLUnit cassandraUnit =
+            Arrays.asList("sql/hsql/schema.sql", "sql/system-data.sql"),
+            "sql/drop-all-tables.sql",
+            "sql-test.properties",
+            Collections.emptyList());
+
+    @ClassRule
+    public static CustomCassandraCQLUnit cassandraUnit =
             new CustomCassandraCQLUnit(getDataSets(),
                     getUpgradeDataSets(),
                     "cassandra-test.yaml", 30000l);
@@ -54,16 +57,6 @@ public class NoSqlIntegrationTestSuite {
     }
 
     private static List<CustomCassandraCQLUnit.NamedDataset> getUpgradeDataSets(){
-        List<CustomCassandraCQLUnit.NamedDataset> dataSets = new ArrayList<>();
-        dataSets.add(new CustomCassandraCQLUnit.NamedDataset("1.cql", new ClassPathCQLDataSet("cassandra/upgrade/1.cql" , false, false)));
-        dataSets.add(new CustomCassandraCQLUnit.NamedDataset("2.cql", new ClassPathCQLDataSet("cassandra/upgrade/2.cql" , false, false)));
-        dataSets.add(new CustomCassandraCQLUnit.NamedDataset("3.cql", new ClassPathCQLDataSet("cassandra/upgrade/3.cql" , false, false)));
-        dataSets.add(new CustomCassandraCQLUnit.NamedDataset("4.cql", new ClassPathCQLDataSet("cassandra/upgrade/4.cql" , false, false)));
-        dataSets.add(new CustomCassandraCQLUnit.NamedDataset("5.cql", new ClassPathCQLDataSet("cassandra/upgrade/5.cql" , false, false)));
-        return dataSets;
+        return Collections.emptyList();
     }
-
-    @ClassRule
-    public static TestRule ruleChain = RuleChain.outerRule(wiremock)
-            .around(cassandraUnit);
 }

@@ -18,7 +18,7 @@ package com.hashmapinc.server.install;
 
 import com.hashmapinc.server.common.msg.exception.TempusRuntimeException;
 import com.hashmapinc.server.service.component.ComponentDiscoveryService;
-import com.hashmapinc.server.service.install.SystemDataLoaderService;
+import com.hashmapinc.server.service.install.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -26,10 +26,9 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
-import com.hashmapinc.server.service.install.DatabaseSchemaService;
-import com.hashmapinc.server.service.install.DatabaseUpgradeService;
 
 import java.nio.file.Paths;
+import java.util.Optional;
 
 @Service
 @Profile("install")
@@ -48,11 +47,23 @@ public class TempusInstallService {
     @Value("${install.load_demo:false}")
     private Boolean loadDemo;
 
-    @Autowired
-    private DatabaseSchemaService databaseSchemaService;
+//    @Autowired
+//    private DatabaseSchemaService databaseSchemaService;
 
     @Autowired
-    private DatabaseUpgradeService databaseUpgradeService;
+    private SqlDatabaseSchemaService sqlDatabaseSchemaService;
+
+    @Autowired
+    private Optional<CassandraDatabaseSchemaService> cassandraDatabaseSchemaService;
+
+//    @Autowired
+//    private DatabaseUpgradeService databaseUpgradeService;
+
+    @Autowired
+    private SqlDatabaseUpgradeService sqlDatabaseUpgradeService;
+
+    @Autowired
+    private Optional<CassandraDatabaseUpgradeService> cassandraDatabaseUpgradeService;
 
     @Autowired
     private ComponentDiscoveryService componentDiscoveryService;
@@ -72,17 +83,26 @@ public class TempusInstallService {
                     case "1.2.3": //NOSONAR, Need to execute gradual upgrade starting from upgradeFromVersion
                         log.info("Upgrading Tempus from version 1.2.3 to 1.3.0 ...");
 
-                        databaseUpgradeService.upgradeDatabase("1.2.3");
+                        sqlDatabaseUpgradeService.upgradeDatabase("1.2.3");
+                        if(cassandraDatabaseUpgradeService.isPresent()){
+                            cassandraDatabaseUpgradeService.get().upgradeDatabase("1.2.3");
+                        }
 
                     case "1.3.0":  //NOSONAR, Need to execute gradual upgrade starting from upgradeFromVersion
                         log.info("Upgrading Tempus from version 1.3.0 to 1.3.1 ...");
 
-                        databaseUpgradeService.upgradeDatabase("1.3.0");
+                        sqlDatabaseUpgradeService.upgradeDatabase("1.3.0");
+                        if(cassandraDatabaseUpgradeService.isPresent()) {
+                            cassandraDatabaseUpgradeService.get().upgradeDatabase("1.3.0");
+                        }
 
                     case "1.3.1":
                         log.info("Upgrading Tempus from version 1.3.1 to 1.4.0 ...");
 
-                        databaseUpgradeService.upgradeDatabase("1.3.1");
+                        sqlDatabaseUpgradeService.upgradeDatabase("1.3.1");
+                        if(cassandraDatabaseUpgradeService.isPresent()) {
+                            cassandraDatabaseUpgradeService.get().upgradeDatabase("1.3.1");
+                        }
 
                         log.info("Updating system data...");
 
@@ -119,7 +139,11 @@ public class TempusInstallService {
 
                 log.info("Installing DataBase schema...");
 
-                databaseSchemaService.createDatabaseSchema();
+                //databaseSchemaService.createDatabaseSchema();
+                sqlDatabaseSchemaService.createDatabaseSchema();
+                if(cassandraDatabaseSchemaService.isPresent()) {
+                    cassandraDatabaseSchemaService.get().createDatabaseSchema();
+                }
 
                 log.info("Loading system data...");
 

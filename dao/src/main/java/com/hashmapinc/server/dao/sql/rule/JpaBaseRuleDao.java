@@ -16,22 +16,21 @@
  */
 package com.hashmapinc.server.dao.sql.rule;
 
+import com.hashmapinc.server.common.data.UUIDConverter;
 import com.hashmapinc.server.common.data.id.RuleId;
 import com.hashmapinc.server.common.data.id.TenantId;
 import com.hashmapinc.server.common.data.page.TextPageLink;
 import com.hashmapinc.server.common.data.rule.RuleMetaData;
 import com.hashmapinc.server.dao.DaoUtil;
 import com.hashmapinc.server.dao.model.ModelConstants;
+import com.hashmapinc.server.dao.model.sql.RuleMetaDataEntity;
 import com.hashmapinc.server.dao.rule.RuleDao;
-import com.hashmapinc.server.dao.util.SqlDao;
+import com.hashmapinc.server.dao.sql.JpaAbstractSearchTextDao;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Component;
-import com.hashmapinc.server.common.data.UUIDConverter;
-import com.hashmapinc.server.dao.model.sql.RuleMetaDataEntity;
-import com.hashmapinc.server.dao.sql.JpaAbstractSearchTextDao;
 
 import java.util.Arrays;
 import java.util.List;
@@ -43,7 +42,6 @@ import java.util.UUID;
  */
 @Slf4j
 @Component
-@SqlDao
 public class JpaBaseRuleDao extends JpaAbstractSearchTextDao<RuleMetaDataEntity, RuleMetaData> implements RuleDao {
 
     public static final String SEARCH_RESULT = "Search result: [{}]";

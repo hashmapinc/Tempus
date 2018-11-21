@@ -36,7 +36,6 @@ import java.util.*;
 import static com.hashmapinc.server.dao.model.ModelConstants.NULL_UUID_STR;
 
 @Service
-@SqlDao
 @Slf4j
 public class JpaComputationsDao extends JpaAbstractDaoListeningExecutorService implements ComputationsDao {
 

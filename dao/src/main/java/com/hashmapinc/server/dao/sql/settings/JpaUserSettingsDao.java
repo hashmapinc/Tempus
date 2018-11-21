@@ -22,7 +22,6 @@ import com.hashmapinc.server.dao.DaoUtil;
 import com.hashmapinc.server.dao.model.sql.UserSettingsEntity;
 import com.hashmapinc.server.dao.settings.UserSettingsDao;
 import com.hashmapinc.server.dao.sql.JpaAbstractDao;
-import com.hashmapinc.server.dao.util.SqlDao;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.repository.CrudRepository;
@@ -32,7 +31,6 @@ import java.util.UUID;
 
 @Component
 @Slf4j
-@SqlDao
 public class JpaUserSettingsDao extends JpaAbstractDao<UserSettingsEntity, UserSettings> implements UserSettingsDao {
 
     @Autowired

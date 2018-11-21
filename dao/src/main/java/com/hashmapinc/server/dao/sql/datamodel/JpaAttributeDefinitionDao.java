@@ -31,7 +31,6 @@ import java.util.List;
 import java.util.UUID;
 
 @Service
-@SqlDao
 public class JpaAttributeDefinitionDao implements AttributeDefinitionDao{
 
     @Autowired

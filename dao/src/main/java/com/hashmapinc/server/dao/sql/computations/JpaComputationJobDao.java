@@ -41,7 +41,6 @@ import static com.hashmapinc.server.dao.model.ModelConstants.NULL_UUID_STR;
 
 @Slf4j
 @Component
-@SqlDao
 public class JpaComputationJobDao extends JpaAbstractSearchTextDao<ComputationJobEntity, ComputationJob> implements ComputationJobDao {
 
     public static final String SEARCH_RESULT = "Search result: [{}]";

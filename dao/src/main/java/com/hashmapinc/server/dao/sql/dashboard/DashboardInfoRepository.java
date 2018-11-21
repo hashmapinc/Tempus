@@ -22,13 +22,14 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 import com.hashmapinc.server.dao.util.SqlDao;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
 /**
  * Created by Valerii Sosliuk on 5/6/2017.
  */
-@SqlDao
+@Repository
 public interface DashboardInfoRepository extends CrudRepository<DashboardInfoEntity, String> {
 
     @Query("SELECT di FROM DashboardInfoEntity di WHERE di.tenantId = :tenantId " +
