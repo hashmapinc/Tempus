@@ -239,6 +239,7 @@ public class MetadataController extends BaseController {
                 dataModelObjectId = device.getDataModelObjectId();
                 */
             }
+            checkDataModelObjectId(dataModelObjectId);
             keyAttribute = dataModelObjectService.findKeyAttributeByDataModelObjectId(dataModelObjectId);
             checkNotNull(keyAttribute);
             if (key.equals(keyAttribute)) {

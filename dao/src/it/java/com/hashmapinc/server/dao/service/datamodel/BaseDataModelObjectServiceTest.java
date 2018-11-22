@@ -204,6 +204,22 @@ public abstract class BaseDataModelObjectServiceTest extends AbstractServiceTest
         Assert.assertEquals(0,foundDataModelObjects.size());
     }
 
+    @Test
+    public void testFindKeyAttributeByDataModelObjectId() {
+        AttributeDefinition attributeDef = new AttributeDefinition();
+        attributeDef.setName("Attr_Id");
+        attributeDef.setValue("ATTR_101");
+        attributeDef.setValueType(DataType.STRING.name());
+        attributeDef.setKeyAttribute(true);
+
+        DataModelObject dataModelObj = getDataModelObjectWithOneAttributeDef(attributeDef);
+        dataModelObj.setName("Test_DMO");
+        dataModelObject = dataModelObjectService.save(dataModelObj);
+        Assert.assertNotNull(dataModelObject);
+        String keyAttribute = dataModelObjectService.findKeyAttributeByDataModelObjectId(dataModelObject.getId());
+        Assert.assertEquals("Attr_Id", keyAttribute);
+    }
+
     private void createDataModelObject() {
         AttributeDefinition attributeDef = new AttributeDefinition();
         attributeDef.setName("Version");

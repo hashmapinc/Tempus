@@ -24,6 +24,7 @@ import com.hashmapinc.server.common.data.alarm.AlarmInfo;
 import com.hashmapinc.server.common.data.asset.Asset;
 import com.hashmapinc.server.common.data.audit.ActionType;
 import com.hashmapinc.server.common.data.computation.ComputationJob;
+import com.hashmapinc.server.common.data.datamodel.DataModelObject;
 import com.hashmapinc.server.common.data.id.*;
 import com.hashmapinc.server.common.data.page.TextPageLink;
 import com.hashmapinc.server.common.data.page.TimePageLink;
@@ -466,6 +467,24 @@ public abstract class BaseController {
         checkTenantId(asset.getTenantId());
         if (asset.getCustomerId() != null && !asset.getCustomerId().getId().equals(ModelConstants.NULL_UUID)) {
             checkCustomerId(asset.getCustomerId());
+        }
+    }
+
+    DataModelObject checkDataModelObjectId(DataModelObjectId dataModelObjectId) throws TempusException {
+        try {
+            validateId(dataModelObjectId, "Incorrect dataModelObjcetId " + dataModelObjectId);
+            DataModelObject dataModelObject = dataModelObjectService.findById(dataModelObjectId);
+            checkDataModelObject(dataModelObject);
+            return dataModelObject;
+        } catch (Exception e) {
+            throw  handleException(e, false);
+        }
+    }
+
+    private void checkDataModelObject(DataModelObject dataModelObject) throws TempusException {
+        checkNotNull(dataModelObject);
+        if (dataModelObject.getCustomerId() != null && !dataModelObject.getCustomerId().getId().equals(ModelConstants.NULL_UUID)) {
+            checkCustomerId(dataModelObject.getCustomerId());
         }
     }
 
