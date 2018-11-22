@@ -22,7 +22,7 @@ export default angular.module('tempus.api.datamodel', [
     .name;
 
 /*@ngInject*/
-function DatamodelService($http, $q, $log) {
+function DatamodelService($http, $q) {
     return {
         getDatamodel:           getDatamodel,
         getDatamodelObjects:    getDatamodelObjects,
@@ -76,8 +76,6 @@ function DatamodelService($http, $q, $log) {
      *  @param datamodelID - id of the datamodel to save datamodelObject to
      */
     function saveDatamodelObject(datamodelObject, datamodelID) {
-        $log.log("save data object");
-        $log.log(datamodelObject);
         var deferred = $q.defer();
         var url = '/api/data-model/' + datamodelID + '/objects';
         $http.post(url, datamodelObject).then(function success(response) {
