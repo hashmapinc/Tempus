@@ -1,6 +1,6 @@
 VERSION=1.4.0
 PROJECT=thingsboard
-APP=cassandra-setup
+APP=database-setup
 
 build:
 	cp ../../application/target/thingsboard.deb .
