@@ -63,10 +63,6 @@ export default function Toast($mdToast, $document) {
     }
 
     function showError(errorMessage, toastParent, position) {
-        if(errorMessage == 'GET: /api/metadata/attribute/ASSET/9c422430-ec96-11e8-b8ba-e961789706bc?key=latitude&value=18.5204<br/>404: Not Found')
-        {
-            errorMessage = "Key Attribute not found with this name."
-        }
         if (!showing) {
             if (!toastParent) {
                 toastParent = angular.element($document[0].getElementById('toast-parent'));
