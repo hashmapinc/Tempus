@@ -172,6 +172,7 @@ quota:
     topSize: 10
     intervalMin: 2
 
+#Telementry database type option
 database:
   type: "${DATABASE_TYPE:cassandra}" # cassandra OR sql
 
