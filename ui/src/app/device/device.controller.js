@@ -50,7 +50,7 @@ export function DeviceCardController(types) {
 
 /*@ngInject*/
 export function DeviceController($rootScope,userService, deviceService, customerService, $state, $stateParams,
-                                 $document, $mdDialog, $q, $translate, types, $scope, $filter) {
+                                 $document, $mdDialog, $q, $translate, types, $scope, $filter, entityRelationService) {
 
     var customerId = $stateParams.customerId;
 
@@ -616,7 +616,14 @@ export function DeviceController($rootScope,userService, deviceService, customer
             .cancel($translate.instant('action.no'))
             .ok($translate.instant('action.yes'));
         $mdDialog.show(confirm).then(function () {
-            deviceService.unassignDeviceFromCustomer(device.id.id).then(function success() {
+            deviceService.unassignDeviceFromCustomer(device.id.id).then(function success(item) {
+              if(item.dataModelObjectId.id !== "13814000-1dd2-11b2-8080-808080808080") {
+                item.dataModelObjectId.id = '13814000-1dd2-11b2-8080-808080808080';
+                deviceService.saveDevice(item);
+                entityRelationService.findInfoByFrom(item.id.id,'DEVICE').then(function success(itemDevice) {
+                    entityRelationService.deleteRelation(itemDevice[0].from.id, itemDevice[0].from.entityType, 'Contains', itemDevice[0].to.id, itemDevice[0].to.entityType);
+                });
+              }
                 vm.grid.refreshList();
                 loadTableData();
             });

@@ -633,7 +633,8 @@ export default angular.module('tempus.locale', [])
                     "delete-datamodel-title":"Are you sure you want to delete { count, select, 1 {1 datamodel} other {# datamodels} }?",
                     "delete-datamodel-text": "Be careful, after the confirmation all selected datamodel(s) and related data will be removed.",
                     "delete-success": "Data model(s) deleted sucessfully.",
-                    "duplicate-object": "Datamodel object already present of same name."
+                    "duplicate-object": "Datamodel object already present of same name.",
+                    "child-of":"Child Of"
                 },
                 "datakey": {
                     "settings": "Settings",
@@ -702,6 +703,7 @@ export default angular.module('tempus.locale', [])
                     "add": "Add Device",
                     "assign-to-customer": "Assign to business unit",
                     "assign-device-to-customer": "Assign Device(s) To Business Unit",
+                    "assign-datamodel-to-device": "Associated Datamodel to selected Businees Unit is ",
                     "assign-device-to-customer-text": "Please select the devices to assign to the business unit",
                     "make-public": "Make device public",
                     "make-private": "Make device private",
