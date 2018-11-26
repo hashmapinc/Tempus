@@ -162,7 +162,7 @@
                 <plugin>
                     <groupId>codes.rafael.gradlemavenplugin</groupId>
                     <artifactId>gradle-maven-plugin</artifactId>
-                    <version>1.0.10</version>
+                    <version>1.0.11-SNAPSHOT</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -349,6 +349,7 @@
                             <exclude>**/*.deb</exclude>
                             <exclude>**/.helmignore</exclude>
                             <exclude>**/.m2/*</exclude>
+                            <exclude>**/lib/*</exclude>
                         </excludes>
                         <mapping>
                             <proto>JAVADOC_STYLE</proto>

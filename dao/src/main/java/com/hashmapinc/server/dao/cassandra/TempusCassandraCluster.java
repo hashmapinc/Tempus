@@ -16,15 +16,15 @@
  */
 package com.hashmapinc.server.dao.cassandra;
 
+import com.hashmapinc.server.dao.util.NoSqlDao;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import com.hashmapinc.server.dao.util.NoSqlDao;
 
 import javax.annotation.PostConstruct;
 
 @Component
 @NoSqlDao
-public class CassandraCluster extends AbstractCassandraCluster {
+public class TempusCassandraCluster extends AbstractCassandraCluster {
 
     @Value("${cassandra.keyspace_name}")
     private String keyspaceName;

@@ -334,6 +334,8 @@ configurations:
   ui:
     depthSeries: "true"
 
+spring.main.allow-bean-definition-overriding: true
+
 # HSQLDB DAO Configuration
 #spring:
 #  data:
@@ -398,7 +400,7 @@ audit-log:
     # Name of the index where audit logs stored
     # Index name could contain next placeholders (not mandatory):
     # @{TENANT} - substituted by tenant ID
-    # @{DATE} - substituted by current date in format provided in audit_log.sink.date_format
+    # @{DATE} - substituted by current date in format provided in audit-log.sink.date_format
     index_pattern: "${AUDIT_LOG_SINK_INDEX_PATTERN:@{TENANT}_AUDIT_LOG_@{DATE}}"
     # Date format. Details of the pattern could be found here:
     # https://docs.oracle.com/javase/8/docs/api/java/time/format/DateTimeFormatter.html

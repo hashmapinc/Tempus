@@ -18,18 +18,18 @@ package com.hashmapinc.server.service.install;
 
 import com.datastax.driver.core.KeyspaceMetadata;
 import com.hashmapinc.server.common.msg.exception.TempusRuntimeException;
-import com.hashmapinc.server.dao.cassandra.CassandraCluster;
 import com.hashmapinc.server.dao.cassandra.CassandraInstallCluster;
+import com.hashmapinc.server.dao.cassandra.TempusCassandraCluster;
+import com.hashmapinc.server.dao.dashboard.DashboardService;
+import com.hashmapinc.server.dao.util.NoSqlDao;
 import com.hashmapinc.server.exception.TempusApplicationException;
+import com.hashmapinc.server.service.install.cql.CQLStatementsParser;
 import com.hashmapinc.server.service.install.cql.CassandraDbHelper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
-import com.hashmapinc.server.dao.dashboard.DashboardService;
-import com.hashmapinc.server.dao.util.NoSqlDao;
-import com.hashmapinc.server.service.install.cql.CQLStatementsParser;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -51,7 +51,7 @@ public class CassandraDatabaseUpgradeService implements DatabaseUpgradeService {
     private String dataDir;
 
     @Autowired
-    private CassandraCluster cluster;
+    private TempusCassandraCluster cluster;
 
     @Autowired
     private CassandraInstallCluster installCluster;

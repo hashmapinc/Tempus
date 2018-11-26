@@ -18,7 +18,7 @@ package com.hashmapinc.server.dao.nosql;
 
 import com.datastax.driver.core.*;
 import com.datastax.driver.core.exceptions.CodecNotFoundException;
-import com.hashmapinc.server.dao.cassandra.CassandraCluster;
+import com.hashmapinc.server.dao.cassandra.TempusCassandraCluster;
 import com.hashmapinc.server.dao.model.type.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,7 +27,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 public abstract class CassandraAbstractDao {
 
     @Autowired
-    protected CassandraCluster cluster;
+    protected TempusCassandraCluster cluster;
 
     private Session session;
 

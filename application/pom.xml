@@ -344,6 +344,28 @@
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-install-plugin</artifactId>
+                <version>2.5.1</version>
+                <configuration>
+                    <groupId>codes.rafael.gradlemavenplugin</groupId>
+                    <artifactId>gradle-maven-plugin</artifactId>
+                    <version>1.0.11-SNAPSHOT</version>
+                    <packaging>jar</packaging>
+                    <file>${basedir}/lib/gradle-maven-plugin-1.0.11-SNAPSHOT.jar</file>
+                    <pomFile>${basedir}/lib/gradle-maven-plugin-1.0.11-SNAPSHOT.pom</pomFile>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>install-jar-lib</id>
+                        <goals>
+                            <goal>install-file</goal>
+                        </goals>
+                        <phase>validate</phase>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>${surfire.version}</version>
                 <configuration>
@@ -663,34 +685,35 @@
                     </execution>
                 </executions>
             </plugin>
-            <!--<plugin>-->
-            <!--<groupId>codes.rafael.gradlemavenplugin</groupId>-->
-            <!--<artifactId>gradle-maven-plugin</artifactId>-->
-            <!--<configuration>-->
-            <!--<gradleVersion>4.5</gradleVersion>-->
-            <!--<tasks>-->
-            <!--<task>build</task>-->
-            <!--<task>buildDeb</task>-->
-            <!--<task>buildRpm</task>-->
-            <!--</tasks>-->
-            <!--<args>-->
-            <!--<arg>-PprojectBuildDir=${project.build.directory}</arg>-->
-            <!--<arg>-PprojectVersion=${project.version}</arg>-->
-            <!--<arg>-PmainJar=${project.build.directory}/${project.build.finalName}-boot.${project.packaging}</arg>-->
-            <!--<arg>-PpkgName=${pkg.name}</arg>-->
-            <!--<arg>-PpkgInstallFolder=${pkg.installFolder}</arg>-->
-            <!--<arg>-PpkgLogFolder=${pkg.unixLogFolder}</arg>-->
-            <!--</args>-->
-            <!--</configuration>-->
-            <!--<executions>-->
-            <!--<execution>-->
-            <!--<phase>package</phase>-->
-            <!--<goals>-->
-            <!--<goal>invoke</goal>-->
-            <!--</goals>-->
-            <!--</execution>-->
-            <!--</executions>-->
-            <!--</plugin>-->
+            <plugin>
+                <groupId>codes.rafael.gradlemavenplugin</groupId>
+                <artifactId>gradle-maven-plugin</artifactId>
+                <configuration>
+                    <gradleVersion>4.10.2</gradleVersion>
+                    <tasks>
+                        <task>build</task>
+                        <task>buildDeb</task>
+                        <task>buildRpm</task>
+                    </tasks>
+                    <args>
+                        <arg>-PprojectBuildDir=${project.build.directory}</arg>
+                        <arg>-PprojectVersion=${project.version}</arg>
+                        <arg>-PmainJar=${project.build.directory}/${project.build.finalName}-boot.${project.packaging}
+                        </arg>
+                        <arg>-PpkgName=${pkg.name}</arg>
+                        <arg>-PpkgInstallFolder=${pkg.installFolder}</arg>
+                        <arg>-PpkgLogFolder=${pkg.unixLogFolder}</arg>
+                    </args>
+                </configuration>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>invoke</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-assembly-plugin</artifactId>
