@@ -16,7 +16,7 @@
  */
 /*@ngInject*/
 
-export default function PolicyDialogController($scope,userService, groupId, isAdd, $mdDialog, types, userGroupService, customerId, dataModelId, groupObject, datamodelService) {
+export default function PolicyDialogController($scope, userService, groupId, isAdd, $mdDialog, types, userGroupService, customerId, dataModelId, groupObject, datamodelService) {
 
   var vm = this;
 
@@ -43,13 +43,25 @@ export default function PolicyDialogController($scope,userService, groupId, isAd
     vm.entityValues = {};
     vm.entityValues['ALL'] = "ALL";
     if (vm.dataModelObject != "ALL") {
-      datamodelService.getDatamodelObjectAttributes(vm.dataModelObject).
-      then(function success(data) {
-        data.forEach(entVal => { //
-          vm.entityValues[entVal.id.id] = entVal.name;
+      if(vm.entity.type == "DEVICE") {
+       datamodelService.getDatamodelObjectAttributesDeviceType(vm.dataModelObject).
+       then(function success(data) {
+         data.forEach(entVal => { //
+           vm.entityValues[entVal.id.id] = entVal.name;
 
-        });
-      });
+         });
+       });
+
+      } else {
+
+       datamodelService.getDatamodelObjectAttributes(vm.dataModelObject).
+       then(function success(data) {
+         data.forEach(entVal => { //
+           vm.entityValues[entVal.id.id] = entVal.name;
+
+         });
+       });
+      }
     } else {
 
       vm.permissions = '';
