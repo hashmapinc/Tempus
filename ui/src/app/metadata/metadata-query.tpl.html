@@ -52,15 +52,19 @@
                 <thead md-head md-order="query.order" md-on-reorder="onReorder">
                 <tr md-row>
                     <th md-column><span translate>metadataConfig.query-name</span></th>
-                    <th md-column><span translate>metadataConfig.trigger-schedule</span></th>
+                    <th md-column><span translate>metadataConfig.attribute-name</span></th>
                     <th md-column><span translate>metadataConfig.trigger-type</span></th>
+                    <th md-column><span translate>metadataConfig.trigger-schedule</span></th>
+
                 </tr>
                 </thead>
                 <tbody md-body>
                 <tr md-row md-select="query" md-select-id="key"    ng-repeat="query in queries.data">
                     <td md-cell>{{ query.queryStmt }}</td>
+                    <td md-cell>{{ query.attribute }}</td>
+                    <td md-cell>{{ query.triggerType}}</td>
                     <td md-cell>{{ query.triggerSchedule }}</td>
-                    <td md-cell>{{ query.triggerType }}</td>
+
 
                     <td md-cell class="tb-action-cell">
 
