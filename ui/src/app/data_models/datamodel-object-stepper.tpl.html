@@ -132,7 +132,7 @@
               <label>Parent</label>
               <md-select  name="tempusType" ng-model="vm.stepperData.parent_node_id" ng-init="nodes = vm.getNodes()">
                 <md-option ng-value="null">None</md-option>
-                <md-option  ng-repeat="node in nodes" ng-if="vm.stepperData.child_node_id.indexOf(node.id) == -1 || vm.stepperData.child_node_id == undefined" ng-value="node.id">{{node.label}}</md-option>
+                <md-option  ng-repeat="node in nodes" ng-if="vm.stepperData.child_node_id == undefined || vm.stepperData.child_node_id.indexOf(node.id) == -1 " ng-value="node.id">{{node.label}}</md-option>
               </md-select>
             </md-input-container>
 
@@ -171,7 +171,9 @@
             <md-list-item>
               <label>Parent: {{vm.stepperData.parent_node_id ? vm.nodes.get(vm.stepperData.parent_node_id).label : "--"}}</label>
             </md-list-item>
-
+            <md-list-item>
+              <p class="dmoFont"><span translate>dataModels.child</span>: <span class="datamodel-value">{{vm.childNode.length > 0 ? vm.childName : "None"}}</span></p>
+            </md-list-item>
             <md-subheader class="md-no-sticky reviewHeader">Image</md-subheader>
 
             <md-list-item>
