@@ -63,6 +63,11 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
+            <groupId>com.hashmapinc.extensions</groupId>
+            <artifactId>extension-eventhub</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
             <groupId>com.hashmapinc.common</groupId>
             <artifactId>transport</artifactId>
         </dependency>
@@ -341,6 +346,9 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>${surfire.version}</version>
                 <configuration>
+                    <argLine>-Xmx1024m -Xms1024m -XX:MaxPermSize=512m
+                        -Djdk.net.URLClassPath.disableClassPathURLCheck=true
+                    </argLine>
                     <systemPropertyVariables>
                         <spring.config.name>tempus</spring.config.name>
                     </systemPropertyVariables>
@@ -566,6 +574,11 @@
                                 <artifactItem>
                                     <groupId>com.hashmapinc.extensions</groupId>
                                     <artifactId>extension-kafka</artifactId>
+                                    <classifier>extension</classifier>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>com.hashmapinc.extensions</groupId>
+                                    <artifactId>extension-eventhub</artifactId>
                                     <classifier>extension</classifier>
                                 </artifactItem>
                                 <artifactItem>
