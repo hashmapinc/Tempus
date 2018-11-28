@@ -624,6 +624,7 @@ export default angular.module('tempus.locale', [])
                     "relationships":"Relationships",
                     "image":"Icon",
                     "parent":"Parent",
+                    "child": "Child(s)",
                     "noAttribute":"No Attributes",
                     "duplicateAttribute":"Attribute already created, please use different name.",
                     "delete":"Delete Data Model(s)",
