@@ -23,7 +23,7 @@ spec:
   containers:
   - name: database-setup
     imagePullPolicy: Always
-    image: thingsboard/database-setup:1.4.0
+    image: hashmapinc/database-setup:1.4.0
     env:
     - name: ADD_DEMO_DATA
       value: "true"
