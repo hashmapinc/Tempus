@@ -272,20 +272,6 @@ CREATE TABLE IF NOT EXISTS ds_kv_latest (
     CONSTRAINT ds_kv_latest_unq_key UNIQUE (entity_type, entity_id, key)
 );
 
-CREATE TABLE IF NOT EXISTS tag_metadata (
-    entity_type varchar(255) NOT NULL,
-    entity_id varchar(31) NOT NULL,
-    key varchar(255) NOT NULL,
-    unit varchar(255),
-    avg_frequency double precision,
-    max_frequency double precision,
-    min_frequency double precision,
-    mean_frequency double precision,
-    median_frequency double precision,
-    source varchar,
-    CONSTRAINT tag_metadata_unq_key UNIQUE (entity_type, entity_id, key)
-);
-
 CREATE TABLE IF NOT EXISTS widget_type (
     id varchar(31) NOT NULL CONSTRAINT widget_type_pkey PRIMARY KEY,
     alias varchar(255),
@@ -374,20 +360,6 @@ CREATE TABLE IF NOT EXISTS attribute_definition (
     data_model_object_id varchar(31),
     source varchar(250),
     CONSTRAINT attr_def_unq_key UNIQUE (name, data_model_object_id)
-);
-
-CREATE TABLE IF NOT EXISTS tag_metadata (
-    entity_type varchar(255) NOT NULL,
-    entity_id varchar(31) NOT NULL,
-    key varchar(255) NOT NULL,
-    unit varchar(255),
-    avg_frequency double precision,
-    max_frequency double precision,
-    min_frequency double precision,
-    mean_frequency double precision,
-    median_frequency double precision,
-    source varchar,
-    CONSTRAINT tag_metadata_unq_key UNIQUE (entity_type, entity_id, key)
 );
 
 CREATE TABLE IF NOT EXISTS asset_landing_info (

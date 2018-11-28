@@ -22,13 +22,34 @@ import akka.actor.Scheduler;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.hashmapinc.server.actors.service.ActorService;
+import com.hashmapinc.server.common.data.DataConstants;
+import com.hashmapinc.server.common.data.Event;
+import com.hashmapinc.server.common.data.id.EntityId;
+import com.hashmapinc.server.common.data.id.TenantId;
 import com.hashmapinc.server.common.data.plugin.ComponentLifecycleEvent;
+import com.hashmapinc.server.common.msg.cluster.ServerAddress;
+import com.hashmapinc.server.common.transport.auth.DeviceAuthService;
 import com.hashmapinc.server.controller.plugin.PluginWebSocketMsgEndpoint;
-import com.hashmapinc.server.dao.tagmetadata.TagMetaDataService;
+import com.hashmapinc.server.dao.alarm.AlarmService;
+import com.hashmapinc.server.dao.asset.AssetService;
 import com.hashmapinc.server.dao.attributes.AttributesService;
+import com.hashmapinc.server.dao.audit.AuditLogService;
 import com.hashmapinc.server.dao.cluster.NodeMetricService;
+import com.hashmapinc.server.dao.computations.ComputationJobService;
+import com.hashmapinc.server.dao.computations.ComputationsService;
+import com.hashmapinc.server.dao.customer.CustomerService;
+import com.hashmapinc.server.dao.depthseries.DepthSeriesService;
+import com.hashmapinc.server.dao.device.DeviceService;
 import com.hashmapinc.server.dao.event.EventService;
+import com.hashmapinc.server.dao.plugin.PluginService;
+import com.hashmapinc.server.dao.relation.RelationService;
+import com.hashmapinc.server.dao.rule.RuleService;
+import com.hashmapinc.server.dao.tenant.TenantService;
+import com.hashmapinc.server.dao.timeseries.TimeseriesService;
 import com.hashmapinc.server.service.cluster.discovery.DiscoveryService;
+import com.hashmapinc.server.service.cluster.routing.ClusterRoutingService;
+import com.hashmapinc.server.service.cluster.rpc.ClusterRpcService;
 import com.hashmapinc.server.service.component.ComponentDiscoveryService;
 import com.hashmapinc.server.service.computation.ComputationFunctionService;
 import com.hashmapinc.server.service.computation.S3BucketService;
@@ -39,28 +60,6 @@ import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import com.hashmapinc.server.actors.service.ActorService;
-import com.hashmapinc.server.common.data.DataConstants;
-import com.hashmapinc.server.common.data.Event;
-import com.hashmapinc.server.common.data.id.EntityId;
-import com.hashmapinc.server.common.data.id.TenantId;
-import com.hashmapinc.server.common.msg.cluster.ServerAddress;
-import com.hashmapinc.server.common.transport.auth.DeviceAuthService;
-import com.hashmapinc.server.dao.alarm.AlarmService;
-import com.hashmapinc.server.dao.asset.AssetService;
-import com.hashmapinc.server.dao.computations.ComputationJobService;
-import com.hashmapinc.server.dao.computations.ComputationsService;
-import com.hashmapinc.server.dao.audit.AuditLogService;
-import com.hashmapinc.server.dao.customer.CustomerService;
-import com.hashmapinc.server.dao.device.DeviceService;
-import com.hashmapinc.server.dao.plugin.PluginService;
-import com.hashmapinc.server.dao.relation.RelationService;
-import com.hashmapinc.server.dao.rule.RuleService;
-import com.hashmapinc.server.dao.tenant.TenantService;
-import com.hashmapinc.server.dao.depthseries.DepthSeriesService;
-import com.hashmapinc.server.dao.timeseries.TimeseriesService;
-import com.hashmapinc.server.service.cluster.routing.ClusterRoutingService;
-import com.hashmapinc.server.service.cluster.rpc.ClusterRpcService;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -115,9 +114,6 @@ public class ActorSystemContext {
 
     @Autowired
     @Getter private AttributesService attributesService;
-
-    @Autowired
-    @Getter private TagMetaDataService tagMetaDataService;
 
     @Autowired
     @Getter private EventService eventService;

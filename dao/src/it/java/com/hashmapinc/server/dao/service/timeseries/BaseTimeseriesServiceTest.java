@@ -122,10 +122,6 @@ public abstract class BaseTimeseriesServiceTest extends AbstractServiceTest {
         assertEquals(35000, list.get(2).getTs());
         assertEquals(java.util.Optional.of(400L), list.get(2).getLongValue());
 
-        assertNotNull(((BasicTsKvEntry)list.get(0)).getTsDiff());
-        assertNotNull(((BasicTsKvEntry)list.get(0)).getTsDiff());
-        assertNotNull(((BasicTsKvEntry)list.get(0)).getTsDiff());
-
         list = tsService.findAll(deviceId, Collections.singletonList(new BaseTsKvQuery(LONG_KEY, 0,
                 60000, 20000, 3, Aggregation.AVG))).get();
         assertEquals(3, list.size());
@@ -206,9 +202,7 @@ public abstract class BaseTimeseriesServiceTest extends AbstractServiceTest {
     }
 
     private static TsKvEntry toTsEntry(long ts, KvEntry entry) {
-        BasicTsKvEntry basicTsKvEntry = new BasicTsKvEntry(ts, entry);
-        basicTsKvEntry.setTsDiff(0L);
-        return basicTsKvEntry;
+        return new BasicTsKvEntry(ts, entry);
     }
 
 

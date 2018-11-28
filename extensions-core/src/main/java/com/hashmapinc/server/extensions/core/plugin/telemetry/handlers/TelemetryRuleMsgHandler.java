@@ -28,7 +28,6 @@ import com.hashmapinc.server.extensions.api.plugins.PluginContext;
 import com.hashmapinc.server.extensions.api.plugins.handlers.DefaultRuleMsgHandler;
 import com.hashmapinc.server.extensions.api.plugins.msg.*;
 import com.hashmapinc.server.extensions.core.plugin.telemetry.SubscriptionManager;
-import com.hashmapinc.server.extensions.core.plugin.telemetry.dataquality.MetaDataAggregator;
 import com.hashmapinc.server.extensions.core.plugin.telemetry.sub.Subscription;
 import com.hashmapinc.server.extensions.core.plugin.telemetry.sub.SubscriptionType;
 import lombok.extern.slf4j.Slf4j;
@@ -84,59 +83,27 @@ public class TelemetryRuleMsgHandler extends DefaultRuleMsgHandler {
     @Override
     public void handleTelemetryUploadRequest(PluginContext ctx, TenantId tenantId, RuleId ruleId, TelemetryUploadRequestRuleToPluginMsg msg) {
         TelemetryUploadRequest request = msg.getPayload();
+        List<TsKvEntry> tsKvEntries = new ArrayList<>();
         for (Map.Entry<Long, List<KvEntry>> entry : request.getData().entrySet()) {
-            List<KvEntry> kvEntries = entry.getValue();
-            ctx.loadLatestTimeseries(msg.getDeviceId(), kvEntries, new PluginCallback<List<TsKvEntry>>() {
-                @Override
-                public void onSuccess(PluginContext ctx, List<TsKvEntry> data) {
-                    List<TsKvEntry> tsKvEntries = new ArrayList<>();
-                    setTsDiffTsKvList(data, tsKvEntries, kvEntries, entry);
-                    ctx.saveTsData(msg.getTenantId(), msg.getDeviceId(), tsKvEntries, msg.getTtl(), new PluginCallback<Void>() {
-                        @Override
-                        public void onSuccess(PluginContext ctx, Void data) {
-                            ctx.reply(new ResponsePluginToRuleMsg(msg.getUid(), tenantId, ruleId, BasicStatusCodeResponse.onSuccess(request.getMsgType(), request.getRequestId())));
-                            subscriptionManager.onLocalSubscriptionUpdate(ctx, msg.getDeviceId(), SubscriptionType.TIMESERIES, s ->
-                                    prepareSubscriptionUpdate(request, s)
-                            );
-                            MetaDataAggregator metaDataAggregator = new MetaDataAggregator(ctx, msg.getDeviceId());
-                            metaDataAggregator.setAggregationPeriod(msg.getQualityTimeWindow());
-                            metaDataAggregator.aggregateMetaData(entry.getKey(), kvEntries);
-                        }
-
-                        @Override
-                        public void onFailure(PluginContext ctx, Exception e) {
-                            log.error("Failed to process telemetry upload request", e);
-                            ctx.reply(new ResponsePluginToRuleMsg(msg.getUid(), tenantId, ruleId, BasicStatusCodeResponse.onError(request.getMsgType(), request.getRequestId(), e)));
-                        }
-                    });
-                }
-                @Override
-                public void onFailure(PluginContext ctx, Exception e){
-                    log.info("Failed to fetch latest TsKvEntry.");
-                }
-            });
-        }
-    }
-
-    private void setTsDiffTsKvList(List<TsKvEntry> data, List<TsKvEntry> tsKvEntries, List<KvEntry> kvEntries, Map.Entry<Long, List<KvEntry>> entry) {
-        if(data.isEmpty()){
-            for (KvEntry kv : kvEntries) {
-                BasicTsKvEntry basicTsKvEntry = new BasicTsKvEntry(entry.getKey(), kv);
-                basicTsKvEntry.setTsDiff(0);
-                tsKvEntries.add(basicTsKvEntry);
-            }
-        }else {
-            for (TsKvEntry tsKvEntry : data) {
-                for (KvEntry kv : kvEntries) {
-                    if (kv.getKey().contentEquals(tsKvEntry.getKey())) {
-                        Long tsDiff = entry.getKey() - tsKvEntry.getTs();
-                        BasicTsKvEntry basicTsKvEntry = new BasicTsKvEntry(entry.getKey(), kv);
-                        basicTsKvEntry.setTsDiff(tsDiff);
-                        tsKvEntries.add(basicTsKvEntry);
-                    }
-                }
+            for (KvEntry kv : entry.getValue()) {
+                tsKvEntries.add(new BasicTsKvEntry(entry.getKey(), kv));
             }
         }
+        ctx.saveTsData(msg.getTenantId(), msg.getDeviceId(), tsKvEntries, msg.getTtl(), new PluginCallback<Void>() {
+            @Override
+            public void onSuccess(PluginContext ctx, Void data) {
+                ctx.reply(new ResponsePluginToRuleMsg(msg.getUid(), tenantId, ruleId, BasicStatusCodeResponse.onSuccess(request.getMsgType(), request.getRequestId())));
+                subscriptionManager.onLocalSubscriptionUpdate(ctx, msg.getDeviceId(), SubscriptionType.TIMESERIES, s ->
+                        prepareSubscriptionUpdate(request, s)
+                );
+            }
+
+            @Override
+            public void onFailure(PluginContext ctx, Exception e) {
+                log.error("Failed to process telemetry upload request", e);
+                ctx.reply(new ResponsePluginToRuleMsg(msg.getUid(), tenantId, ruleId, BasicStatusCodeResponse.onError(request.getMsgType(), request.getRequestId(), e)));
+            }
+        });
     }
 
     private List<TsKvEntry> prepareSubscriptionUpdate(TelemetryUploadRequest request, Subscription s) {
@@ -154,59 +121,27 @@ public class TelemetryRuleMsgHandler extends DefaultRuleMsgHandler {
     @Override
     public void handleDepthTelemetryUploadRequest(PluginContext ctx, TenantId tenantId, RuleId ruleId, DepthTelemetryUploadRequestRuleToPluginMsg msg) {
         DepthTelemetryUploadRequest request = msg.getPayload();
+        List<DsKvEntry> dsKvEntries = new ArrayList<>();
         for (Map.Entry<Double, List<KvEntry>> entry : request.getData().entrySet()) {
-            List<KvEntry> kvEntries = entry.getValue();
-            ctx.loadLatestDepthSeries(msg.getDeviceId(), kvEntries, new PluginCallback<List<DsKvEntry>>() {
-                @Override
-                public void onSuccess(PluginContext ctx, List<DsKvEntry> data) {
-                    List<DsKvEntry> dsKvEntries = new ArrayList<>();
-                    setDsDiffDsKvList(data, dsKvEntries, kvEntries, entry);
-                    ctx.saveDsData(msg.getDeviceId(), dsKvEntries, msg.getTtl(), new PluginCallback<Void>() {
-                        @Override
-                        public void onSuccess(PluginContext ctx, Void data) {
-                            ctx.reply(new ResponsePluginToRuleMsg(msg.getUid(), tenantId, ruleId, BasicStatusCodeResponse.onSuccess(request.getMsgType(), request.getRequestId())));
-                            subscriptionManager.onLocalSubscriptionUpdateForDepth(ctx, msg.getDeviceId(), SubscriptionType.DEPTHSERIES, s ->
-                                    prepareSubscriptionUpdate(request, s)
-                            );
-                            MetaDataAggregator metaDataAggregator = new MetaDataAggregator(ctx, msg.getDeviceId());
-                            metaDataAggregator.setDepthAggregationPeriod(msg.getQualityDepthWindow());
-                            metaDataAggregator.aggregateDepthMetaData(entry.getKey(), kvEntries);
-                        }
-
-                        @Override
-                        public void onFailure(PluginContext ctx, Exception e) {
-                            log.error("Failed to process telemetry upload request", e);
-                            ctx.reply(new ResponsePluginToRuleMsg(msg.getUid(), tenantId, ruleId, BasicStatusCodeResponse.onError(request.getMsgType(), request.getRequestId(), e)));
-                        }
-                    });
-                }
-                @Override
-                public void onFailure(PluginContext ctx, Exception e){
-                    log.info("Failed to fetch latest TsKvEntry.");
-                }
-            });
-        }
-    }
-
-    private void setDsDiffDsKvList(List<DsKvEntry> data, List<DsKvEntry> dsKvEntries, List<KvEntry> kvEntries, Map.Entry<Double, List<KvEntry>> entry) {
-        if(data.isEmpty()){
-            for (KvEntry kv : kvEntries) {
-                BasicDsKvEntry basicDsKvEntry = new BasicDsKvEntry(entry.getKey(), kv);
-                basicDsKvEntry.setDsDiff(0.0);
-                dsKvEntries.add(basicDsKvEntry);
-            }
-        }else {
-            for (DsKvEntry dsKvEntry : data) {
-                for (KvEntry kv : kvEntries) {
-                    if (kv.getKey().contentEquals(dsKvEntry.getKey())) {
-                        Double dsDiff = entry.getKey() - dsKvEntry.getDs();
-                        BasicDsKvEntry basicDsKvEntry = new BasicDsKvEntry(entry.getKey(), kv);
-                        basicDsKvEntry.setDsDiff(dsDiff);
-                        dsKvEntries.add(basicDsKvEntry);
-                    }
-                }
+            for (KvEntry kv : entry.getValue()) {
+                dsKvEntries.add(new BasicDsKvEntry(entry.getKey(), kv));
             }
         }
+        ctx.saveDsData(msg.getDeviceId(), dsKvEntries, msg.getTtl(), new PluginCallback<Void>() {
+            @Override
+            public void onSuccess(PluginContext ctx, Void data) {
+                log.debug(" ctx.saveDsData On success");
+                ctx.reply(new ResponsePluginToRuleMsg(msg.getUid(), tenantId, ruleId, BasicStatusCodeResponse.onSuccess(request.getMsgType(), request.getRequestId())));
+                subscriptionManager.onLocalSubscriptionUpdateForDepth(ctx, msg.getDeviceId(), SubscriptionType.DEPTHSERIES, s ->
+                        prepareSubscriptionUpdate(request, s));
+            }
+
+            @Override
+            public void onFailure(PluginContext ctx, Exception e) {
+                log.error("Failed to process telemetry upload request", e);
+                ctx.reply(new ResponsePluginToRuleMsg(msg.getUid(), tenantId, ruleId, BasicStatusCodeResponse.onError(request.getMsgType(), request.getRequestId(), e)));
+            }
+        });
     }
 
     private List<DsKvEntry> prepareSubscriptionUpdate(DepthTelemetryUploadRequest request, Subscription s){

@@ -19,6 +19,7 @@ package com.hashmapinc.server.extensions.core.plugin.telemetry.sub;
 import com.hashmapinc.server.common.data.id.EntityId;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.Setter;
 
 import java.util.Map;
 
@@ -33,6 +34,17 @@ public class SubscriptionState<T> {
     @Getter protected final boolean allKeys;
     @Getter protected final Map<String, T> keyStates;
     @Getter protected final String scope;
+    @Getter @Setter protected Long timeZoneDiff;
+
+    public SubscriptionState(String wsSessionId, int subscriptionId, EntityId entityId, SubscriptionType type, boolean allKeys, Map<String, T> keyStates, String scope) {
+        this.wsSessionId = wsSessionId;
+        this.subscriptionId = subscriptionId;
+        this.entityId = entityId;
+        this.type = type;
+        this.allKeys = allKeys;
+        this.keyStates = keyStates;
+        this.scope = scope;
+    }
 
     @Override
     public boolean equals(Object o) {
@@ -44,6 +56,7 @@ public class SubscriptionState<T> {
         if (subscriptionId != that.subscriptionId) return false;
         if (wsSessionId != null ? !wsSessionId.equals(that.wsSessionId) : that.wsSessionId != null) return false;
         if (entityId != null ? !entityId.equals(that.entityId) : that.entityId != null) return false;
+        if (timeZoneDiff != null ? !timeZoneDiff.equals(that.timeZoneDiff) : that.timeZoneDiff != null) return false;
         return type == that.type;
     }
 
@@ -53,6 +66,7 @@ public class SubscriptionState<T> {
         result = 31 * result + subscriptionId;
         result = 31 * result + (entityId != null ? entityId.hashCode() : 0);
         result = 31 * result + (type != null ? type.hashCode() : 0);
+        result = 31 * result + (timeZoneDiff != null ? timeZoneDiff.hashCode() : 0);
         return result;
     }
 
@@ -62,6 +76,7 @@ public class SubscriptionState<T> {
                 "type=" + type +
                 ", entityId=" + entityId +
                 ", subscriptionId=" + subscriptionId +
+                ", timeZoneDiff=" + timeZoneDiff +
                 ", wsSessionId='" + wsSessionId + '\'' +
                 '}';
     }

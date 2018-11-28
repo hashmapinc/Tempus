@@ -23,9 +23,7 @@
     "name": "TelemetryMsgConverterAction",
     "configuration": {
       "timeUnit": "DAYS",
-      "ttlValue": 365,
-      "qualityTimeWindow": 60000,
-      "qualityDepthWindow": 3000
+      "ttlValue": 365
     }
   },
   "additionalInfo": null

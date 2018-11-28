@@ -120,10 +120,6 @@ public class BaseDepthseriesServiceTest extends AbstractServiceTest {
         assertEquals(new Double(35000), list.get(2).getDs());
         assertEquals(java.util.Optional.of(400L), list.get(2).getLongValue());
 
-        assertNotNull(((BasicDsKvEntry)list.get(0)).getDsDiff());
-        assertNotNull(((BasicDsKvEntry)list.get(0)).getDsDiff());
-        assertNotNull(((BasicDsKvEntry)list.get(0)).getDsDiff());
-
         list = dsService.findAll(deviceId, Collections.singletonList(new BaseDsKvQuery(LONG_KEY, 0D,
                 60000D, 20000D, 3, DepthAggregation.AVG))).get();
         assertEquals(3, list.size());
@@ -204,10 +200,7 @@ public class BaseDepthseriesServiceTest extends AbstractServiceTest {
     }
 
     private static DsKvEntry toDsEntry(Double ds, KvEntry entry) {
-        BasicDsKvEntry basicDsKvEntry =  new BasicDsKvEntry(ds, entry);
-        basicDsKvEntry.setDsDiff(0.0);
-        return basicDsKvEntry;
+        return new BasicDsKvEntry(ds, entry);
     }
-
 
 }

@@ -45,7 +45,6 @@ public class SqlIntegrationTestSuite {
             "sql/drop-all-tables.sql",
             "sql-test.properties",
             Collections.emptyList());
-
     @ClassRule
     public static TestRule ruleChain = RuleChain.outerRule(wiremock)
             .around(sqlUnit);

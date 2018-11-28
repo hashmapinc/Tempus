@@ -256,11 +256,10 @@ public class CassandraBaseDepthSeriesDao extends CassandraAbstractAsyncDao imple
                 .setUUID(1, entityId.getId())
                 .setString(2, dsKvEntry.getKey())
                 .setDouble(3, partition)
-                .setDouble(4, ((BasicDsKvEntry)dsKvEntry).getDsDiff())
-                .setDouble(5, dsKvEntry.getDs());
-        addValue(dsKvEntry, stmt, 6);
+                .setDouble(4, dsKvEntry.getDs());
+        addValue(dsKvEntry, stmt, 5);
         if (ttl > 0) {
-            stmt.setInt(7, (int) ttl);
+            stmt.setInt(6, (int) ttl);
         }
         return getFuture(executeAsyncWrite(stmt), rs -> null);
     }
@@ -395,9 +394,7 @@ public class CassandraBaseDepthSeriesDao extends CassandraAbstractAsyncDao imple
     private DsKvEntry convertResultToDsKvEntry(Row row) {
         String key = row.getString(ModelConstants.KEY_COLUMN);
         Double ds = row.getDouble(ModelConstants.DS_COLUMN);
-        Double dsDiff = row.getDouble(ModelConstants.DS_DIFF);
         BasicDsKvEntry basicDsKvEntry = new BasicDsKvEntry(ds, toKvEntry(row, key));
-        basicDsKvEntry.setDsDiff(dsDiff);
         return basicDsKvEntry;
     }
 
@@ -448,10 +445,9 @@ public class CassandraBaseDepthSeriesDao extends CassandraAbstractAsyncDao imple
                         "," + ModelConstants.ENTITY_ID_COLUMN +
                         "," + ModelConstants.KEY_COLUMN +
                         "," + ModelConstants.PARTITION_COLUMN +
-                        "," + ModelConstants.DS_DIFF +
                         "," + ModelConstants.DS_COLUMN +
                         "," + getColumnName(type) + ")" +
-                        " VALUES(?, ?, ?, ?, ?, ?, ?)");
+                        " VALUES(?, ?, ?, ?, ?, ?)");
             }
         }
         return saveStmts[dataType.ordinal()];
@@ -466,10 +462,9 @@ public class CassandraBaseDepthSeriesDao extends CassandraAbstractAsyncDao imple
                         "," + ModelConstants.ENTITY_ID_COLUMN +
                         "," + ModelConstants.KEY_COLUMN +
                         "," + ModelConstants.PARTITION_COLUMN +
-                        "," + ModelConstants.DS_DIFF +
                         "," + ModelConstants.DS_COLUMN +
                         "," + getColumnName(type) + ")" +
-                        " VALUES(?, ?, ?, ?, ?, ?, ?) USING TTL ?");
+                        " VALUES(?, ?, ?, ?, ?, ?) USING TTL ?");
             }
         }
         return saveTtlStmts[dataType.ordinal()];

@@ -246,10 +246,12 @@ public class DefaultActorServiceTest {
         Thread.sleep(1000); //NOSONAR Added for test
         actorService.process(new BasicToDeviceActorSessionMsg(device, msg));
 
-        Set<String> keys = new HashSet<>();
-        keys.add("key1");
-        keys.add("key2");
-        verify(tsService, Mockito.timeout(5000)).findLatest(deviceId, keys);
+        // Check that device data was saved to DB;
+        List<TsKvEntry> expected = new ArrayList<>();
+        expected.add(new BasicTsKvEntry(ts, entry1));
+        expected.add(new BasicTsKvEntry(ts, entry2));
+        verify(tsService, Mockito.timeout(5000)).save(deviceId, expected, 0L);
+
     }
 
 }

@@ -197,7 +197,6 @@ public class JpaDepthSeriesDao extends JpaAbstractDaoListeningExecutorService im
             result = DaoUtil.getData(entries.get(0));
         } else {
             result = new BasicDsKvEntry(0.0, new StringDataEntry(key, null));
-            ((BasicDsKvEntry)result).setDsDiff(0.0);
         }
         return Futures.immediateFuture(result);
     }
@@ -217,7 +216,6 @@ public class JpaDepthSeriesDao extends JpaAbstractDaoListeningExecutorService im
         entity.setEntityType(entityId.getEntityType());
         entity.setEntityId(fromTimeUUID(entityId.getId()));
         entity.setDs(dsKvEntry.getDs());
-        entity.setDsDiff(((BasicDsKvEntry)dsKvEntry).getDsDiff());
         entity.setKey(dsKvEntry.getKey());
         entity.setStrValue(dsKvEntry.getStrValue().orElse(null));
         entity.setDoubleValue(dsKvEntry.getDoubleValue().orElse(null));

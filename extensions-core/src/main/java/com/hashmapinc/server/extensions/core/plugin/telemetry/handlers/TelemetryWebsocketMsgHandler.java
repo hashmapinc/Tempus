@@ -163,7 +163,7 @@ public class TelemetryWebsocketMsgHandler extends DefaultWebsocketMsgHandler {
 
                         Map<String, Long> subState = new HashMap<>(attributesData.size());
                         attributesData.forEach(v -> subState.put(v.getKey(), v.getTs()));
-                        SubscriptionState<Long> sub = new SubscriptionState(sessionId, cmd.getCmdId(), entityId, SubscriptionType.ATTRIBUTES, true, subState,cmd.getScope());
+                        SubscriptionState<Long> sub = new SubscriptionState(sessionId, cmd.getCmdId(), entityId, SubscriptionType.ATTRIBUTES, true, subState,cmd.getScope(), timeZoneDiff);
                         subscriptionManager.addLocalWsSubscription(ctx, sessionId, entityId, sub);
                     }
 
@@ -199,7 +199,7 @@ public class TelemetryWebsocketMsgHandler extends DefaultWebsocketMsgHandler {
                         keys.forEach(key -> subState.put(key, 0L));
                         attributesData.forEach(v -> subState.put(v.getKey(), v.getTs()));
 
-                        SubscriptionState<Long> sub = new SubscriptionState(sessionId, cmd.getCmdId(), entityId, SubscriptionType.ATTRIBUTES, false, subState,cmd.getScope());
+                        SubscriptionState<Long> sub = new SubscriptionState(sessionId, cmd.getCmdId(), entityId, SubscriptionType.ATTRIBUTES, false, subState,cmd.getScope(), timeZoneDiff);
                         subscriptionManager.addLocalWsSubscription(ctx, sessionId, entityId, sub);
                     }
 
@@ -248,11 +248,7 @@ public class TelemetryWebsocketMsgHandler extends DefaultWebsocketMsgHandler {
                     ctx.loadLatestTimeseries(entityId, new PluginCallback<List<TsKvEntry>>() {
                         @Override
                         public void onSuccess(PluginContext ctx, List<TsKvEntry> data) {
-                            ctx.loadAttribute(entityId, DataConstants.CLIENT_SCOPE, TIME_ZONE_OFFSET, getTimeZoneAttributeCallback(sessionRef, cmd, data));
-                            Map<String, Long> subState = new HashMap<>(data.size());
-                            data.forEach(v -> subState.put(v.getKey(), v.getTs()));
-                            SubscriptionState<Long> sub = new SubscriptionState(sessionId, cmd.getCmdId(), entityId, SubscriptionType.TIMESERIES, true, subState, cmd.getScope());
-                            subscriptionManager.addLocalWsSubscription(ctx, sessionId, entityId, sub);
+                            ctx.loadAttribute(entityId, DataConstants.CLIENT_SCOPE, TIME_ZONE_OFFSET, getTimeZoneAttributeCallback(sessionRef, cmd, data, sessionId, entityId));
                         }
 
                         @Override
@@ -372,7 +368,7 @@ public class TelemetryWebsocketMsgHandler extends DefaultWebsocketMsgHandler {
                 Map<String, Long> subState = new HashMap<>(keys.size());
                 keys.forEach(key -> subState.put(key, startTs));
                 data.forEach(v -> subState.put(v.getKey(), v.getTs()));
-                SubscriptionState sub = new SubscriptionState(sessionId, cmd.getCmdId(), entityId, SubscriptionType.TIMESERIES, false, subState, cmd.getScope());
+                SubscriptionState sub = new SubscriptionState(sessionId, cmd.getCmdId(), entityId, SubscriptionType.TIMESERIES, false, subState, cmd.getScope(), timeZoneDiff);
                 subscriptionManager.addLocalWsSubscription(ctx, sessionId, entityId, sub);
             }
 
@@ -394,7 +390,7 @@ public class TelemetryWebsocketMsgHandler extends DefaultWebsocketMsgHandler {
                 Map<String, Long> subState = new HashMap<>(keys.size());
                 keys.forEach(key -> subState.put(key, startTs));
                 data.forEach(v -> subState.put(v.getKey(), v.getTs()));
-                SubscriptionState sub = new SubscriptionState(sessionId, cmd.getCmdId(), entityId, SubscriptionType.TIMESERIES, false, subState, cmd.getScope());
+                SubscriptionState sub = new SubscriptionState(sessionId, cmd.getCmdId(), entityId, SubscriptionType.TIMESERIES, false, subState, cmd.getScope(), timeZoneDiff);
                 subscriptionManager.addLocalWsSubscription(ctx, sessionId, entityId, sub);
             }
 
@@ -567,15 +563,22 @@ public class TelemetryWebsocketMsgHandler extends DefaultWebsocketMsgHandler {
         });
     }
 
-    private PluginCallback<Optional<AttributeKvEntry>> getTimeZoneAttributeCallback(final PluginWebsocketSessionRef sessionRef, final TimeseriesSubscriptionCmd cmd, List<TsKvEntry> data) {
+    private PluginCallback<Optional<AttributeKvEntry>> getTimeZoneAttributeCallback(final PluginWebsocketSessionRef sessionRef, final TimeseriesSubscriptionCmd cmd, List<TsKvEntry> data, String sessionId, EntityId entityId) {
         return new PluginCallback<Optional<AttributeKvEntry>>() {
             @Override
             public void onSuccess(PluginContext ctx, Optional<AttributeKvEntry> attributeKvEntry) {
+                long timeZoneDiff = 0;
                 if (attributeKvEntry.isPresent()){
-                    sendWsMsg(ctx, sessionRef, new SubscriptionUpdate(cmd.getCmdId(), data, attributeKvEntry.get().getLongValue().get()));
+                    timeZoneDiff = attributeKvEntry.get().getLongValue().get();
+                    sendWsMsg(ctx, sessionRef, new SubscriptionUpdate(cmd.getCmdId(), data, timeZoneDiff));
                 } else {
                     sendWsMsg(ctx, sessionRef, new SubscriptionUpdate(cmd.getCmdId(), data));
                 }
+
+                Map<String, Long> subState = new HashMap<>(data.size());
+                data.forEach(v -> subState.put(v.getKey(), v.getTs()));
+                SubscriptionState<Long> sub = new SubscriptionState(sessionId, cmd.getCmdId(), entityId, SubscriptionType.TIMESERIES, true, subState, cmd.getScope(), timeZoneDiff);
+                subscriptionManager.addLocalWsSubscription(ctx, sessionId, entityId, sub);
             }
 
             @Override
