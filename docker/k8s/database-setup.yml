@@ -18,12 +18,12 @@
 apiVersion: v1
 kind: Pod
 metadata:
-  name: cassandra-setup
+  name: database-setup
 spec:
   containers:
-  - name: cassandra-setup
+  - name: database-setup
     imagePullPolicy: Always
-    image: thingsboard/cassandra-setup:1.4.0
+    image: hashmapinc/database-setup:1.4.0
     env:
     - name: ADD_DEMO_DATA
       value: "true"
