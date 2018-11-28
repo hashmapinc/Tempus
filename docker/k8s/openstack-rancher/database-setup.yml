@@ -18,13 +18,13 @@
 apiVersion: v1
 kind: Pod
 metadata:
-  name: cassandra-setup
+  name: database-setup
   namespace: ns-tempus
 spec:
   containers:
-  - name: cassandra-setup
+  - name: database-setup
     imagePullPolicy: Always
-    image: hashmapinc/cassandra-setup:dev
+    image: hashmapinc/database-setup:dev
     env:
     - name: ADD_DEMO_DATA
       value: "true"
