@@ -20,10 +20,12 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.hashmapinc.server.common.data.Logo;
+import com.hashmapinc.server.common.data.Tenant;
 import com.hashmapinc.server.common.data.Theme;
 import com.hashmapinc.server.common.data.UserSettings;
 import com.hashmapinc.server.dao.logo.LogoService;
 import com.hashmapinc.server.dao.theme.ThemeService;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,7 +35,7 @@ import java.util.List;
 import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-
+@Slf4j
 public abstract class BaseUserSettingsControllerTest extends AbstractControllerTest {
 
     @Autowired
@@ -227,6 +229,13 @@ public abstract class BaseUserSettingsControllerTest extends AbstractControllerT
 
         logoService.deleteLogoByName(logoNew.getName());
 
+    }
+
+    @Test
+    public void testGetUserLogo() throws Exception {
+        loginSysAdmin();
+        String logo = doGet("/api/settings/getUserLogo/?tenant_id="+tenantId.getId(), String.class);
+        Assert.assertEquals(logo,"TEST LOGO");
     }
 
 
