@@ -209,7 +209,7 @@ CREATE TABLE IF NOT EXISTS tenant (
     state varchar(255),
     title varchar(255),
     zip varchar(255),
-    logo_file VARCHAR
+    logo VARCHAR
 );
 
 CREATE TABLE IF NOT EXISTS ts_kv (
