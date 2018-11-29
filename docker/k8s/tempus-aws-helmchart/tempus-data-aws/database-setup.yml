@@ -25,6 +25,12 @@ spec:
     imagePullPolicy: Always
     image: hashmapinc/database-setup:dev
     env:
+    - name: SPRING_DATASOURCE_URL
+      value: "jdbc:postgresql://postgresql:5432/identity"
+    - name : SPRING_DATASOURCE_USERNAME
+      value: "identity"
+    - name : SPRING_DATASOURCE_PASSWORD
+      value: "identity"
     - name: ADD_DEMO_DATA
       value: "true"
     - name : CASSANDRA_HOST

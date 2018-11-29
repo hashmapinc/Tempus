@@ -105,6 +105,12 @@ spec:
         - containerPort: 9999
           name: tempus-port
         env:
+        - name: SPRING_DATASOURCE_URL
+          value: "jdbc:postgresql://postgresql:5432/identity"
+        - name : SPRING_DATASOURCE_USERNAME
+          value: "identity"
+        - name : SPRING_DATASOURCE_PASSWORD
+          value: "identity"
         - name: IDENTITY_BASE_URL
           valueFrom:
             configMapKeyRef:
