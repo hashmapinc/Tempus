@@ -35,4 +35,6 @@ public interface TenantService {
     TextPageData<Tenant> findTenants(TextPageLink pageLink);
     
     void deleteTenants();
+
+    String findLogoByTenantId(TenantId tenantId);
 }

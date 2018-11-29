@@ -185,4 +185,11 @@ public class TenantServiceImpl extends AbstractEntityService implements TenantSe
         customerGroup.setPolicies(Collections.singletonList(DataConstants.TENANT_ADMIN_DEFAULT_PERMISSION));
         customerGroupService.saveCustomerGroup(customerGroup);
     }
+
+    @Override
+    public String findLogoByTenantId(TenantId tenantId) {
+        log.trace("Executing getLogo [{}]", tenantId);
+        Validator.validateId(tenantId, INCORRECT_TENANT_ID + tenantId);
+        return tenantDao.findById(tenantId.getId()).getLogoFile();
+    }
 }
