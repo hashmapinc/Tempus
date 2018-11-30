@@ -74,5 +74,3 @@ subjects:
   - kind: ServiceAccount
     name: tempus
     namespace: default
----
-
