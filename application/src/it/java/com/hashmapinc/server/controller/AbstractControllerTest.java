@@ -217,7 +217,7 @@ public abstract class AbstractControllerTest {
 
         Tenant tenant = new Tenant();
         tenant.setTitle(TEST_TENANT_NAME);
-        tenant.setLogoFile(TEST_TENANT_LOGO);
+        tenant.setLogo(TEST_TENANT_LOGO);
         savedTenant = doPost("/api/tenant", tenant, Tenant.class);
         Assert.assertNotNull(savedTenant);
         tenantId = savedTenant.getId();

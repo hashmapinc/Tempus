@@ -190,6 +190,6 @@ public class TenantServiceImpl extends AbstractEntityService implements TenantSe
     public String findLogoByTenantId(TenantId tenantId) {
         log.trace("Executing getLogo [{}]", tenantId);
         Validator.validateId(tenantId, INCORRECT_TENANT_ID + tenantId);
-        return tenantDao.findById(tenantId.getId()).getLogoFile();
+        return tenantDao.findById(tenantId.getId()).getLogo();
     }
 }
