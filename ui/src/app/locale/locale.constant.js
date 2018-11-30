@@ -1434,7 +1434,8 @@ export default angular.module('tempus.locale', [])
                     "idCopiedMessage": "Tenant Id has been copied to clipboard",
                     "select-tenant": "Select tenant",
                     "no-tenants-matching": "No tenants matching '{{entity}}' were found.",
-                    "tenant-required": "Tenant is required"
+                    "tenant-required": "Tenant is required",
+                    "logo":"Logo"
                 },
                 "timeinterval": {
                     "seconds-interval": "{ seconds, select, 1 {1 second} other {# seconds} }",

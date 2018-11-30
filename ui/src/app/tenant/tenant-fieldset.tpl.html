@@ -43,5 +43,33 @@
 			<textarea ng-model="tenant.additionalInfo.description" rows="2"></textarea>
 		</md-input-container>
 		<tb-contact contact="tenant" the-form="theForm" is-edit="isEdit"></tb-contact>
+		<md-input-container class="md-block">
+			<div class="tb-container"><div ng-if ="tenant.logo"><img class="" style="width: 28%; margin-top: 6%;"ng-src="{{tenant.logo}}"></div>
+				<label class="tb-label" translate>tenant.logo</label>
+				<div style="margin-top: 27px;" flow-init="{singleFile:true}" flow-file-added='fileAdded($file)' class="tb-file-select-container">
+					<div class="tb-file-clear-container">
+						<md-button ng-click='clearFile()' class="tb-file-clear-btn md-icon-button md-primary" aria-label="{{ 'action.remove' | translate }}">
+							<md-tooltip md-direction="top">
+								{{ 'action.remove' | translate }}
+							</md-tooltip>
+							<md-icon aria-label="{{ 'action.remove' | translate }}" class="material-icons">close</md-icon>
+						</md-button>
+					</div>
+
+					<div class="alert tb-flow-drop" flow-drop>
+
+						<label for="select" translate>import.drop-file</label>
+						<input flow-attrs="{accept:'.jpg,.png,.svg,.jpeg'}"
+							   class="file-input"
+							   flow-btn id="select"
+							   ng-model="tenant.logoFileName"
+						>
+					</div>
+				</div>
+			</div>
+			<div>
+			</div>
+		</md-input-container>
+
 	</fieldset>
 </md-content>

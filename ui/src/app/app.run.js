@@ -61,6 +61,8 @@ export default function AppRun($rootScope, $window, $injector, $location, $log, 
 
     function getLogo() {
         var promise =  userService.getLogo();
+
+
         if(promise) {
             promise.then(function success(logo) {
 
@@ -73,6 +75,18 @@ export default function AppRun($rootScope, $window, $injector, $location, $log, 
                 },
             )
         }
+    }
+
+
+    function getLogoForUser(currentUser) {
+
+        $log.log(currentUser);
+        if(currentUser.authority !== "SYS_ADMIN" ) {
+         userService.getLogoForTenant(currentUser.tenant_id).then(function success(item) {
+             $log.log(item);
+          });
+        }
+
     }
 
 
@@ -96,11 +110,14 @@ export default function AppRun($rootScope, $window, $injector, $location, $log, 
         $rootScope.stateChangeStartHandle = $rootScope.$on('$stateChangeStart', function (evt, to, params) {
 
             function waitForUserLoaded() {
+
                 if ($rootScope.userLoadedHandle) {
                     $rootScope.userLoadedHandle();
                 }
                 $rootScope.userLoadedHandle = $rootScope.$on('userLoaded', function () {
                     $rootScope.userLoadedHandle();
+                    $log.log('hiiii');
+
                     $state.go(to.name, params);
                 });
             }
@@ -123,6 +140,12 @@ export default function AppRun($rootScope, $window, $injector, $location, $log, 
 
             if (userService.isUserLoaded() === true) {
                 if (userService.isAuthenticated()) {
+
+                    if(angular.isUndefined($rootScope.logoFile)) {
+                       var currentUser = userService.getCurrentUser();
+                       getLogoForUser(currentUser);
+                    }
+
                     if (userService.isPublic()) {
                         if (userService.parsePublicId() !== publicId) {
                             evt.preventDefault();
