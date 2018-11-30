@@ -17,7 +17,7 @@
 
 /*@ngInject*/
 export default function AddAssetController (customerService, $state, dashboardService, datamodelService, userService,
-    $rootScope, assetService, $mdDialog, entityRelationService, attributeService){
+    $rootScope, assetService, $mdDialog, entityRelationService, attributeService,$log){
     var vm = this;
     vm.name = null;
     vm.dataModelObject = null;
@@ -35,6 +35,7 @@ export default function AddAssetController (customerService, $state, dashboardSe
     vm.loadrelationModel =loadrelationModel;
     var currentuser = userService.getCurrentUser();
     vm.disableFlag = false;
+    $log.log("here")
     initController();
     function initController(){
         var pageSize = 10;
@@ -48,7 +49,8 @@ export default function AddAssetController (customerService, $state, dashboardSe
                         if(object_response.data.attributeDefinitions.length > 0){
                             vm.attributeList = object_response.data.attributeDefinitions;
                         }
-
+                        $log.log('vm.attributeList');
+                        $log.log(vm.attributeList);
                         if(object_response.data.parentId) {
                             var parentDetails = getDataModelObjectDetails(object_response.data.parentId.id);
                             parentDetails.then(function success(parentResponse) {

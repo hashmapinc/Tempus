@@ -34,7 +34,7 @@ import AliasController from '../../api/alias-controller';
 /*@ngInject*/
 export default function AttributeTableDirective($compile, $templateCache, $rootScope, $q, $mdEditDialog, $mdDialog,
                                                 $mdUtil, $document, $translate, $filter, utils, types, dashboardUtils,
-                                                dashboardService, entityService, attributeService, importExport, widgetService, $mdToast, metadataService) {
+                                                dashboardService, entityService, attributeService, importExport, widgetService, $mdToast, metadataService, $log) {
 
     var linker = function (scope, element, attrs) {
 
@@ -58,7 +58,9 @@ export default function AttributeTableDirective($compile, $templateCache, $rootS
 
         scope.types = types;
 
+
         scope.entityType = attrs.entityType;
+
 
         if (scope.entityType === types.entityType.device) {
             scope.attributeScopes = types.attributesScope;
@@ -132,6 +134,8 @@ export default function AttributeTableDirective($compile, $templateCache, $rootS
         });
 
         function success(attributes, update, apply) {
+            $log.log("scope.attributes");
+            $log.log(attributes);
             scope.attributes = attributes;
             if (!update) {
                 scope.selectedAttributes = [];
@@ -209,6 +213,10 @@ export default function AttributeTableDirective($compile, $templateCache, $rootS
 
 
         scope.getEntityAttributes = function(forceUpdate, reset) {
+        $log.log("entity details");
+                $log.log(scope.entityType);
+                $log.log(scope.entityId);
+                $log.log(scope.entityName)
             if (scope.attributesDeferred) {
                 scope.attributesDeferred.resolve();
             }
