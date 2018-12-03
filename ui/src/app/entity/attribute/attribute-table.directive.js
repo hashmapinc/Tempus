@@ -34,7 +34,7 @@ import AliasController from '../../api/alias-controller';
 /*@ngInject*/
 export default function AttributeTableDirective($compile, $templateCache, $rootScope, $q, $mdEditDialog, $mdDialog,
                                                 $mdUtil, $document, $translate, $filter, utils, types, dashboardUtils,
-                                                dashboardService, entityService, attributeService, importExport, widgetService, $mdToast, metadataService, $log) {
+                                                dashboardService, entityService, attributeService, importExport, widgetService, $mdToast, metadataService, assetService, datamodelService) {
 
     var linker = function (scope, element, attrs) {
 
@@ -60,7 +60,22 @@ export default function AttributeTableDirective($compile, $templateCache, $rootS
 
 
         scope.entityType = attrs.entityType;
+        scope.entityAttribute =  null;
 
+
+
+        function getEntityAttributesList(){
+            assetService.getAsset(scope.entityId).then(function success(response){
+                if(response && response.dataModelObjectId  && response && response.dataModelObjectId.id != '13814000-1dd2-11b2-8080-808080808080'){
+                    datamodelService.getDatamodelObject(response.dataModelObjectId.id).then(function success(response_data){
+                        if(response_data.data.attributeDefinitions){
+                            scope.entityAttribute = response_data.data.attributeDefinitions;
+                            scope.getEntityAttributes(false, true);
+                        }
+                    })
+                }
+            },function fail(){})
+        }
 
         if (scope.entityType === types.entityType.device) {
             scope.attributeScopes = types.attributesScope;
@@ -97,8 +112,9 @@ export default function AttributeTableDirective($compile, $templateCache, $rootS
 
         scope.$watch("entityId", function(newVal) {
             if (newVal) {
+                getEntityAttributesList();
                 scope.resetFilter();
-                scope.getEntityAttributes(false, true);
+
             }
         });
 
@@ -134,9 +150,15 @@ export default function AttributeTableDirective($compile, $templateCache, $rootS
         });
 
         function success(attributes, update, apply) {
-            $log.log("scope.attributes");
-            $log.log(attributes);
+            angular.forEach(attributes.data, function(value1,key1) {
+                angular.forEach(scope.entityAttribute, function(value2,key2) {
+                    if(attributes.data[key1].key === scope.entityAttribute[key2].name){
+                        attributes.data[key1].keyAttribute = scope.entityAttribute[key2].keyAttribute;
+                    }
+                });
+            });
             scope.attributes = attributes;
+
             if (!update) {
                 scope.selectedAttributes = [];
             }
@@ -213,10 +235,7 @@ export default function AttributeTableDirective($compile, $templateCache, $rootS
 
 
         scope.getEntityAttributes = function(forceUpdate, reset) {
-        $log.log("entity details");
-                $log.log(scope.entityType);
-                $log.log(scope.entityId);
-                $log.log(scope.entityName)
+
             if (scope.attributesDeferred) {
                 scope.attributesDeferred.resolve();
             }
