@@ -73,8 +73,8 @@
         <kafka.version>0.11.0.2</kafka.version>
         <hazelcast.version>3.6.6</hazelcast.version>
         <hazelcast-zookeeper.version>3.6.1</hazelcast-zookeeper.version>
-        <surfire.version>2.19.1</surfire.version>
-        <failsafe.version>2.18.1</failsafe.version>
+        <surfire.version>2.22.1</surfire.version>
+        <failsafe.version>2.22.1</failsafe.version>
         <jar-plugin.version>3.0.2</jar-plugin.version>
         <springfox-swagger.version>2.6.1</springfox-swagger.version>
         <bouncycastle.version>1.56</bouncycastle.version>
@@ -283,6 +283,7 @@
                         <includes>
                             <include>**/*IntegrationTestSuite.java</include>
                         </includes>
+                        <reuseForks>false</reuseForks>
                     </configuration>
                 </plugin>
                 <plugin>
