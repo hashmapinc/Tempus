@@ -174,7 +174,6 @@ public class UserSettingsController extends BaseController {
         }
     }
 
-    @PreAuthorize("hasAnyAuthority('TENANT_ADMIN', 'CUSTOMER_USER', 'SYS_ADMIN')")
     @GetMapping(value = "/settings/getUserLogo/{tenantId}")
     @ResponseStatus(value = HttpStatus.OK)
     public String getUserLogo(@PathVariable("tenantId") String strTenantId) throws TempusException {
@@ -182,7 +181,6 @@ public class UserSettingsController extends BaseController {
         try {
             TenantId tenantId = new TenantId(toUUID(strTenantId));
             log.info("tenant in controller{}",tenantId);
-            checkTenantId(tenantId);
             return tenantService.findLogoByTenantId(tenantId);
         } catch (Exception e) {
             throw handleException(e);
