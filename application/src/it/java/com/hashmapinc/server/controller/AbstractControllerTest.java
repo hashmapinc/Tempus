@@ -847,4 +847,9 @@ public abstract class AbstractControllerTest {
         Assert.assertEquals(device.getName(), savedDevice.getName());
         return savedDevice;
     }
+
+    protected void deleteDevice(DeviceId deviceId) throws Exception {
+        doDelete("/api/device/"+deviceId.getId().toString())
+                .andExpect(status().isOk());
+    }
 }

@@ -89,7 +89,9 @@ public class AttributeBasedPermissionEvaluator implements PermissionEvaluator{
     }
 
     private Object fetchTargetDomainObject(String entityId, String entityType) {
-
+        if(entityId == null){
+            return null;
+        }
         switch (new EnumUtil<>(EntityType.class).parse(entityType)) {
             case DEVICE:
                 return deviceService.findDeviceById(new DeviceId(UUID.fromString(entityId)));

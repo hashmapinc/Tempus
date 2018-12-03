@@ -40,6 +40,7 @@ import com.opencsv.CSVWriter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -67,7 +68,7 @@ public class DeviceController extends BaseController {
     @Autowired
     protected AttributesService attributesService;
 
-    @PreAuthorize("hasAnyAuthority('TENANT_ADMIN', 'CUSTOMER_USER')")
+    @PostAuthorize("hasPermission(returnObject, 'DEVICE_READ')")
     @GetMapping(value = "/device/{deviceId}")
     @ResponseBody
     public Device getDeviceById(@PathVariable(DEVICE_ID) String strDeviceId) throws TempusException {
@@ -80,7 +81,7 @@ public class DeviceController extends BaseController {
         }
     }
 
-    @PreAuthorize("hasAnyAuthority('TENANT_ADMIN', 'CUSTOMER_USER')")
+    @PreAuthorize("hasPermission(#device, 'DEVICE_CREATE') or hasPermission(#device, 'DEVICE_UPDATE')")
     @PostMapping(value = "/device")
     @ResponseBody
     public Device saveDevice(@RequestBody Device device) throws TempusException {
@@ -110,7 +111,7 @@ public class DeviceController extends BaseController {
         }
     }
 
-    @PreAuthorize("hasAuthority('TENANT_ADMIN')")
+    @PreAuthorize("hasPermission(#strDeviceId, 'DEVICE', 'DEVICE_DELETE')")
     @DeleteMapping(value = "/device/{deviceId}")
     @ResponseStatus(value = HttpStatus.OK)
     public void deleteDevice(@PathVariable(DEVICE_ID) String strDeviceId) throws TempusException {
@@ -133,7 +134,7 @@ public class DeviceController extends BaseController {
         }
     }
 
-    @PreAuthorize("hasAnyAuthority('TENANT_ADMIN', 'CUSTOMER_USER')")
+    @PreAuthorize("hasPermission(#strDeviceId, 'DEVICE', 'DEVICE_ASSIGN')")
     @PostMapping(value = "/customer/{customerId}/device/{deviceId}")
     @ResponseBody
     public Device assignDeviceToCustomer(@PathVariable("customerId") String strCustomerId,
@@ -162,7 +163,7 @@ public class DeviceController extends BaseController {
         }
     }
 
-    @PreAuthorize("hasAuthority('TENANT_ADMIN')")
+    @PreAuthorize("hasPermission(#strDeviceId, 'DEVICE', 'DEVICE_ASSIGN')")
     @DeleteMapping(value = "/customer/device/{deviceId}")
     @ResponseBody
     public Device unassignDeviceFromCustomer(@PathVariable(DEVICE_ID) String strDeviceId) throws TempusException {
@@ -190,7 +191,7 @@ public class DeviceController extends BaseController {
         }
     }
 
-    @PreAuthorize("hasAuthority('TENANT_ADMIN')")
+    @PreAuthorize("hasPermission(#strDeviceId, 'DEVICE', 'DEVICE_ASSIGN')")
     @PostMapping(value = "/customer/public/device/{deviceId}")
     @ResponseBody
     public Device assignDeviceToPublicCustomer(@PathVariable(DEVICE_ID) String strDeviceId) throws TempusException {
@@ -214,7 +215,7 @@ public class DeviceController extends BaseController {
         }
     }
 
-    @PreAuthorize("hasAnyAuthority('TENANT_ADMIN', 'CUSTOMER_USER')")
+    @PreAuthorize("hasPermission(#strDeviceId, 'DEVICE', 'DEVICE_READ')")
     @GetMapping(value = "/device/{deviceId}/credentials")
     @ResponseBody
     public DeviceCredentials getDeviceCredentialsByDeviceId(@PathVariable(DEVICE_ID) String strDeviceId) throws TempusException {
@@ -235,7 +236,7 @@ public class DeviceController extends BaseController {
         }
     }
 
-    @PreAuthorize("hasAuthority('TENANT_ADMIN')")
+    @PreAuthorize("hasPermission((#deviceCredentials.getDeviceId() != null ? #deviceCredentials.getDeviceId().getId().toString() : null), 'DEVICE', 'DEVICE_UPDATE')")
     @PostMapping(value = "/device/credentials")
     @ResponseBody
     public DeviceCredentials saveDeviceCredentials(@RequestBody DeviceCredentials deviceCredentials) throws TempusException {
@@ -343,7 +344,7 @@ public class DeviceController extends BaseController {
         }
     }
 
-    @PreAuthorize("hasAnyAuthority('TENANT_ADMIN', 'CUSTOMER_USER')")
+    @PreAuthorize("hasPermission(#strDeviceId, 'DEVICE', 'DEVICE_READ')")
     @GetMapping(value = "/download/deviceAttributesData")
     @ResponseBody
     public void downloadAttributesDataAsCsv(HttpServletResponse response, @RequestParam("deviceId") String strDeviceId) throws IOException {
@@ -368,7 +369,7 @@ public class DeviceController extends BaseController {
         csvWriter.close();
     }
 
-    @PreAuthorize("hasAnyAuthority('TENANT_ADMIN', 'CUSTOMER_USER')")
+    @PreAuthorize("hasPermission(#strDeviceId, 'DEVICE', 'DEVICE_READ')")
     @GetMapping(value = "/download/deviceSeriesData")
     @ResponseBody
     public void downloadTimeSeriesOrDepthSeriesDataAsCSV(HttpServletResponse response,

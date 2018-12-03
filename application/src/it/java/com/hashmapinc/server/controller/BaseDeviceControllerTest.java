@@ -43,10 +43,7 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.web.servlet.ResultActions;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.ExecutionException;
 
 import static org.hamcrest.Matchers.containsString;
@@ -302,7 +299,7 @@ public abstract class BaseDeviceControllerTest extends AbstractControllerTest {
     public void testSaveDeviceCredentialsWithEmptyDevice() throws Exception {
         DeviceCredentials deviceCredentials = new DeviceCredentials();
         doPost("/api/device/credentials", deviceCredentials)
-        .andExpect(status().isBadRequest());
+        .andExpect(status().isForbidden());
     }
     
     @Test
@@ -361,7 +358,7 @@ public abstract class BaseDeviceControllerTest extends AbstractControllerTest {
                 doGet("/api/device/" + savedDevice.getId().getId().toString() + "/credentials", DeviceCredentials.class);
         deviceCredentials.setDeviceId(new DeviceId(UUIDs.timeBased()));
         doPost("/api/device/credentials", deviceCredentials)
-        .andExpect(status().isNotFound());
+        .andExpect(status().isForbidden());
     }
 
     @Test
@@ -839,16 +836,16 @@ public abstract class BaseDeviceControllerTest extends AbstractControllerTest {
 
     @Test(expected = Exception.class)
     public void testDownloadCsvDSData_incorrectFormatStartValue() throws Exception {
-        DeviceId deviceId = new DeviceId(UUIDs.timeBased());
-
-        ResultActions result = doGet("/api/download/deviceSeriesData?type=ds&deviceId="+deviceId.getId().toString()+"&startValue=40J00&endValue=4200");
+        final Device device = createDevice(null, null, "device1");
+        ResultActions result = doGet("/api/download/deviceSeriesData?type=ds&deviceId="+device.getId().getId().toString()+"&startValue=40J00&endValue=4200");
+        deleteDevice(device.getId());
     }
 
     @Test(expected = Exception.class)
     public void testDownloadCsvTSData_incorrectFormatStartValue() throws Exception {
-        DeviceId deviceId = new DeviceId(UUIDs.timeBased());
-
-        ResultActions result = doGet("/api/download/deviceSeriesData?type=ts&deviceId="+deviceId.getId().toString()+"&startValue=40J00&endValue=4200");
+        final Device device = createDevice(null, null, "device1");
+        ResultActions result = doGet("/api/download/deviceSeriesData?type=ts&deviceId="+device.getId().getId().toString()+"&startValue=40J00&endValue=4200");
+        deleteDevice(device.getId());
     }
 
     @Test
@@ -966,6 +963,74 @@ public abstract class BaseDeviceControllerTest extends AbstractControllerTest {
         Assert.assertTrue(rowWithTs76.containsAll(Arrays.asList("76", "value5")));
 
     }
+
+    @Test
+    public void testPolicyForAsset() throws Exception {
+
+        DataModel dataModel = createDataModel();
+        DataModelObject dataModelObject = createDataModelObject(dataModel);
+        Device device = createDevice(dataModelObject.getId(), customerUser.getCustomerId(), "Tenant's device");
+        String policy = String.format("CUSTOMER_USER:DEVICE?%s=%s&%s=%s:READ",
+                UserPermission.ResourceAttribute.ID, device.getId().getId().toString(),
+                UserPermission.ResourceAttribute.DATA_MODEL_ID, dataModelObject.getId().getId().toString());
+
+        List<String> policies = Collections.singletonList(policy);
+
+        CustomerGroup savedCustomerGroup = createGroupWithPolicies(policies, customerUser.getCustomerId(), "My Customer Group");
+        String getPolicyUrl = "/api/customer/group/" + savedCustomerGroup.getId().getId().toString() + "/policy";
+
+        final Map<String, Map<String, String>> displayablePolicies = doGetTyped(getPolicyUrl, new TypeReference<Map<String, Map<String, String>>>() {
+        });
+
+        Assert.assertArrayEquals(policies.toArray(), displayablePolicies.keySet().toArray());
+        Assert.assertEquals(displayablePolicies.get(policy).get(UserPermission.ResourceAttribute.ID.toString()), device.getName());
+        Assert.assertEquals(displayablePolicies.get(policy).get(UserPermission.ResourceAttribute.DATA_MODEL_ID.toString()), dataModelObject.getName());
+
+
+        UserId customerUserId = getCustomerUserId();
+        assignUserToGroup(customerUserId, savedCustomerGroup);
+
+        logout();
+        loginCustomerUser();
+        Device deviceByCustomer1 = doGet("/api/device/"+device.getId().getId().toString(), Device.class);
+        Assert.assertEquals(device.getId().getId(), deviceByCustomer1.getId().getId());
+        deviceByCustomer1.setName("UpdatedDevice");
+        doPost("/api/device", deviceByCustomer1).andExpect(status().is4xxClientError());
+        logout();
+
+
+        String policyNew = String.format("CUSTOMER_USER:DEVICE?%s=%s&%s=%s:UPDATE",
+                UserPermission.ResourceAttribute.ID, device.getId().getId().toString(),
+                UserPermission.ResourceAttribute.DATA_MODEL_ID, dataModelObject.getId().getId().toString());
+        List<String> policiesNew = Collections.singletonList(policyNew);
+        updateGroupWithPolicies(policiesNew, savedCustomerGroup);
+
+
+        logout();
+        loginCustomerUser();
+        deviceByCustomer1.setName("UpdatedDeviceName");
+        Device deviceUpdated = doPost("/api/device", deviceByCustomer1, Device.class);
+        Assert.assertEquals(deviceByCustomer1.getName(), deviceUpdated.getName());
+        logout();
+
+        String policyNew1 = String.format("CUSTOMER_USER:DEVICE?%s=%s:CREATE",
+                UserPermission.ResourceAttribute.DATA_MODEL_ID, dataModelObject.getId().getId().toString());
+        List<String> policiesNew1 = Collections.singletonList(policyNew1);
+        updateGroupWithPolicies(policiesNew1, savedCustomerGroup);
+
+        logout();
+        loginCustomerUser();
+        Device device1 = createDevice(dataModelObject.getId(), customerUser.getCustomerId(), "Customer's device");
+        logout();
+
+        loginTenantAdmin();
+        deleteGroup(savedCustomerGroup.getId());
+        deleteDevice(device.getId());
+        deleteDevice(device1.getId());
+        deleteDataModelObject(dataModelObject.getId());
+        logout();
+    }
+
 
     private List<String> geRowWithSpecifiedKeyValue(String key, List<List<String>> rows){
         for(List<String> row: rows) {
