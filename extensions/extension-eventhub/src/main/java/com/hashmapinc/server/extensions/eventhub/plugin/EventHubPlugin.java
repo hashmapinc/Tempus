@@ -21,14 +21,14 @@ import com.hashmapinc.server.extensions.api.component.Plugin;
 import com.hashmapinc.server.extensions.api.plugins.AbstractPlugin;
 import com.hashmapinc.server.extensions.api.plugins.PluginContext;
 import com.hashmapinc.server.extensions.api.plugins.handlers.RuleMsgHandler;
-import com.hashmapinc.server.extensions.eventhub.action.EventHubActionMsg;
+import com.hashmapinc.server.extensions.eventhub.action.EventHubPluginAction;
 import com.microsoft.azure.eventhubs.ConnectionStringBuilder;
 import com.microsoft.azure.eventhubs.EventHubClient;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.concurrent.Executors;
 
-@Plugin(name = "Event Hub Plugin", actions = {EventHubActionMsg.class},
+@Plugin(name = "Event Hub Plugin", actions = {EventHubPluginAction.class},
         descriptor = "EventHubPluginDescriptor.json", configuration = EventHubPluginConfiguration.class)
 @Slf4j
 public class EventHubPlugin extends AbstractPlugin<EventHubPluginConfiguration> {
