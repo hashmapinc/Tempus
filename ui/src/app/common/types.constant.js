@@ -405,7 +405,8 @@ export default angular.module('tempus.types', [])
                 mqtt: "MQTT",
                 opc: "OPC UA",
                 wits: "WITS",
-                witsml: "WITSML"
+                witsml: "WITSML",
+                modbus: "MODBUS"
             },
             permissionType: {
                 '*':"ALL",
@@ -437,6 +438,26 @@ export default angular.module('tempus.types', [])
             mqttConverterTypes: {
                 json: 'extension.converter-json',
                 custom: 'extension.custom'
+            },
+            extensionModbusFunctionCodes: {
+                1: "Read Coils (1)",
+                2: "Read Discrete Inputs (2)",
+                3: "Read Multiple Holding Registers (3)",
+                4: "Read Input Registers (4)"
+            },
+            extensionModbusTransports: {
+                tcp: "TCP",
+                udp: "UDP",
+                rtu: "RTU"
+            },
+            extensionModbusRtuParities: {
+                none: "none",
+                even: "even",
+                odd: "odd"
+            },
+            extensionModbusRtuEncodings: {
+                ascii: "ascii",
+                rtu: "rtu"
             },
             mqttCredentialTypes: {
                 anonymous:  {
