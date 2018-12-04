@@ -324,6 +324,9 @@ public class DeviceServiceImpl extends AbstractEntityService implements DeviceSe
                             throw new DataValidationException("Can't assign device to customer from different tenant!");
                         }
                     }
+                    if (device.getDataModelObjectId() == null) {
+                        device.setDataModelObjectId(new DataModelObjectId(NULL_UUID));
+                    }
                 }
             };
 
