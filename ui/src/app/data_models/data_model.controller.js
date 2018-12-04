@@ -229,8 +229,9 @@ export function DataModelController($scope, $mdDialog, $document, $stateParams, 
 					toSave.attributeDefinitions = dmo.attributes.map(attr => {
 						return {
 							"dataModelObjectId": toSave.id,
-							"name": attr,
-							"valueType": "STRING"
+							"name": attr.name,
+							"valueType": "STRING",
+							"keyAttribute":attr.keyAttribute
 						}
 					});
 				}
@@ -270,7 +271,7 @@ export function DataModelController($scope, $mdDialog, $document, $stateParams, 
 			data.forEach(dmo => { // iterate and process each object
 				// get attributes
 				var attributes = dmo.attributeDefinitions.map(attribute => {
-					return attribute.name;
+					return attribute;
 				});
 
 				// add edge if parent exists
@@ -457,7 +458,7 @@ var childNodeVal = vm.nodes.get(value.to);
 			vm.stepperState = 3; // go straight to review page
 
 			for (var i = 0; i < dmo.attributes.length; i++) {
-				vm.attrName.push(dmo.attributes[i].toLowerCase().trim());
+				vm.attrName.push(dmo.attributes[i].name.toLowerCase().trim());
 			}
 			// get the parent ID if it exists
 			let edge = vm.edges.get().filter(e => {
@@ -650,16 +651,102 @@ var childNodeVal = vm.nodes.get(value.to);
                  vm.edges.remove(edge.id);
              }
         }
-		$timeout(function () {
-			plotDatamodel();
-		}, 5000);
+        // plot the data
+        plotDatamodel();
+
+        // hide the stepper and reset its state
+        vm.cancel();
+    };
+
+    // delete the object and reload the datamodel
+    vm.onStepperDelete = function () {
+        // confirm delete
+        var confirm = $mdDialog.confirm()
+            .title('Delete Object')
+            .htmlContent("Are you sure you want to delete this object?")
+            .cancel("Cancel")
+            .ok("Submit");
+        $mdDialog.show(confirm).then(function () {
+
+            // remove the node
+            var nodeId = vm.stepperData.node_id;
+            vm.nodes.remove(nodeId);
+
+            // remove any edge utilizing this node
+            var old_edges = vm.edges.get().filter(edge => {
+                return edge.to === nodeId || edge.from === nodeId;
+            });
+            vm.edges.remove(old_edges);
+
+            // queue the object up for deletion if it has an ID
+            if (vm.stepperData.id) {
+                objectDeleteList.push(vm.stepperData.id);
+                objectDeleteNameList.push(vm.stepperData.name);
+            }
+
+            // close the dialog
+            vm.cancel();
+        });
+    };
+
+    // add a datamodel object attribute to the stepper's current data
+    vm.addDatamodelObjectAttribute = function () {
+        // add the attribute if it exists
+        var inArray = vm.attrName.indexOf(angular.lowercase(vm.stepperData.currentAttribute.name.trim()));
+        if(inArray !== -1) {
+            vm.stepperState = 1;
+            vm.stepperMode = "";
+            toast.showError($translate.instant('dataModels.duplicateAttribute'));
+            return false;
+        }
+        if(vm.stepperData.currentAttribute.keyAttribute){
+                    angular.forEach(vm.stepperData.attributes, function(value,key) {
+                        if(value.keyAttribute) {
+                            vm.stepperData.attributes[key].keyAttribute = false;
+                        }
+                    });
+                }
+        if (vm.stepperData.currentAttribute) {
+           vm.stepperData.attributes.push(vm.stepperData.currentAttribute);
+           vm.attrName.push(angular.lowercase(vm.stepperData.currentAttribute.name.trim()));
+        }
+        vm.stepperData.currentAttribute = "";
+    };
+
+    // update the datamodel and exit edit mode
+    vm.acceptDatamodelEdit = function () {
+
+       vm.dataModelName = vm.dataModelName.filter(val => !objectDeleteNameList.includes(val));
+       vm.dataModelSavedName = vm.dataModelSavedName.filter(val => !objectDeleteNameList.includes(val));
+
+        objectDeleteList.forEach(id_to_delete => {
+            // delete the object by ID
+            datamodelService.deleteDatamodelObject(
+                id_to_delete
+            );
+        });
+
+        saveDatamodel();
+        vm.toggleDMEditMode();
+    };
 
 
-		// plot the data
-		plotDatamodel();
 
-		// hide the stepper and reset its state
-		vm.cancel();
+    vm.updateAttribute =  function (attribute, index){
+        vm.enableEditing[index] = false;
+        vm.stepperData.attributes[index].name = attribute.name;
+        vm.stepperData.attributes[index].keyAttribute = attribute.keyAttribute;
+    }
+    vm.setKeyAttribute =  function (attribute, index){
+        if(vm.stepperData.attributes[index].keyAttribute){
+            angular.forEach(vm.stepperData.attributes, function(value,key) {
+              if(key != index){
+                if(value.keyAttribute) {
+                    vm.stepperData.attributes[key].keyAttribute = false;
+                }
+              }
+            });
+        }
 	};
 
 	// delete the object and reload the datamodel
@@ -693,49 +780,12 @@ var childNodeVal = vm.nodes.get(value.to);
 		});
 	};
 
-	// add a datamodel object attribute to the stepper's current data
-	vm.addDatamodelObjectAttribute = function () {
-		// add the attribute if it exists
-		var inArray = vm.attrName.indexOf(angular.lowercase(vm.stepperData.currentAttribute.trim()));
-		if (inArray !== -1) {
-			vm.stepperState = 1;
-			vm.stepperMode = "";
-			toast.showError($translate.instant('dataModels.duplicateAttribute'));
-			return false;
-		}
-		if (vm.stepperData.currentAttribute) {
-			vm.stepperData.attributes.push(vm.stepperData.currentAttribute.trim());
-			vm.attrName.push(angular.lowercase(vm.stepperData.currentAttribute.trim()));
-		}
-		vm.stepperData.currentAttribute = "";
-	};
-
-	// update the datamodel and exit edit mode
-	vm.acceptDatamodelEdit = function () {
-
-		vm.dataModelName = vm.dataModelName.filter(val => !objectDeleteNameList.includes(val));
-		vm.dataModelSavedName = vm.dataModelSavedName.filter(val => !objectDeleteNameList.includes(val));
-
-		objectDeleteList.forEach(id_to_delete => {
-			// delete the object by ID
-			datamodelService.deleteDatamodelObject(
-				id_to_delete
-			);
-		});
-
-		saveDatamodel();
-		vm.toggleDMEditMode();
-	};
 
 	vm.rejectDatamodelEdit = function () {
 		loadDatamodel();
 	};
 
-	vm.updateAttribute = function (attributeName, index) {
-		$scope.editing = false;
-		vm.stepperData.attributes[index] = attributeName;
-		vm.attrName[index] = angular.lowercase(attributeName.trim());
-	}
+
 	vm.deleteAttribute = function (index) {
 		vm.stepperData.attributes.splice(index, 1);
 		vm.attrName.splice(index, 1);
