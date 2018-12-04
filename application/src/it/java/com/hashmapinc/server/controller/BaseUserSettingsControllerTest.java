@@ -19,6 +19,7 @@ package com.hashmapinc.server.controller;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.google.gson.JsonObject;
 import com.hashmapinc.server.common.data.Logo;
 import com.hashmapinc.server.common.data.Tenant;
 import com.hashmapinc.server.common.data.Theme;
@@ -234,7 +235,8 @@ public abstract class BaseUserSettingsControllerTest extends AbstractControllerT
     @Test
     public void testGetUserLogo() throws Exception {
         loginSysAdmin();
-        String logo = doGet("/api/settings/getUserLogo/"+tenantId.getId(), String.class);
+        JsonObject logo = doGet("/api/settings/"+tenantId.getId()+"/getUserLogo", JsonObject.class);
+        log.info("logo{}",logo);
         Assert.assertEquals(logo,"TEST LOGO");
     }
 

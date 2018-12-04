@@ -16,6 +16,7 @@
  */
 package com.hashmapinc.server.controller;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.hashmapinc.server.common.data.Logo;
@@ -174,14 +175,14 @@ public class UserSettingsController extends BaseController {
         }
     }
 
-    @GetMapping(value = "/settings/getUserLogo/{tenantId}")
+    @GetMapping(value = "/settings/{tenantId}/logo")
     @ResponseStatus(value = HttpStatus.OK)
-    public String getUserLogo(@PathVariable("tenantId") String strTenantId) throws TempusException {
+    public String userLogo(@PathVariable("tenantId") String strTenantId) throws TempusException {
         checkParameter("tenantId", strTenantId);
         try {
             TenantId tenantId = new TenantId(toUUID(strTenantId));
             log.info("tenant in controller{}",tenantId);
-            return tenantService.findLogoByTenantId(tenantId);
+            return tenantService.findLogoByTenantId(tenantId).toString();
         } catch (Exception e) {
             throw handleException(e);
         }

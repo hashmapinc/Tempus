@@ -17,6 +17,8 @@
 package com.hashmapinc.server.dao.tenant;
 
 import com.google.common.util.concurrent.ListenableFuture;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 import com.hashmapinc.server.common.data.CustomerGroup;
 import com.hashmapinc.server.common.data.DataConstants;
 import com.hashmapinc.server.common.data.id.CustomerId;
@@ -48,6 +50,8 @@ import com.hashmapinc.server.dao.service.Validator;
 
 import java.util.Collections;
 import java.util.List;
+
+
 
 import static com.hashmapinc.server.dao.service.Validator.validateId;
 
@@ -187,9 +191,13 @@ public class TenantServiceImpl extends AbstractEntityService implements TenantSe
     }
 
     @Override
-    public String findLogoByTenantId(TenantId tenantId) {
-        log.trace("Executing getLogo [{}]", tenantId);
+    public JsonArray findLogoByTenantId(TenantId tenantId) {
         Validator.validateId(tenantId, INCORRECT_TENANT_ID + tenantId);
-        return tenantDao.findById(tenantId.getId()).getLogo();
+        String file = tenantDao.findById(tenantId.getId()).getLogo();
+        JsonArray jsonArray = new JsonArray();
+        JsonObject object = new JsonObject();
+        object.addProperty("file",file);
+        jsonArray.add(object);
+        return jsonArray;
     }
 }
