@@ -26,12 +26,11 @@ import logoSvg from '../../svg/Tempus_Logo_E_TagLineExtended_vectorized.svg';
 
 /*@ngInject*/
 export default function HomeController(types, loginService, userService, deviceService, Fullscreen, $scope, $element, $rootScope, $document, $state,
-                                       $window, $log, $mdMedia, $animate, $timeout) {
+                                       $window, $mdMedia, $animate, $timeout) {
 
     var siteSideNav = $('.tb-site-sidenav', $element);
 
     var vm = this;
-
     vm.Fullscreen = Fullscreen;
     vm.logoSvg = logoSvg;
 
@@ -45,6 +44,7 @@ export default function HomeController(types, loginService, userService, deviceS
             searchEntitySubtype: ""
         };
     }
+
 
     vm.isShowSidenav = false;
     vm.isLockSidenav = false;
@@ -112,6 +112,7 @@ export default function HomeController(types, loginService, userService, deviceS
             });
         }
     }
+
 
     function displaySearchMode() {
         return $scope.searchConfig.searchEnabled &&

@@ -23,7 +23,7 @@ export default angular.module('tempus.api.user', [tempusApiLogin,
     .name;
 
 /*@ngInject*/
-function UserService($http, $q, $rootScope, adminService, dashboardService, loginService, toast, store, jwtHelper, $translate, $state, $location) {
+function UserService($http, $q, $log, $rootScope, adminService, dashboardService, loginService, toast, store, jwtHelper, $translate, $state, $location) {
     var currentUser = null,
         currentUserDetails = null,
         lastPublicDashboardId = null,
@@ -109,9 +109,9 @@ function UserService($http, $q, $rootScope, adminService, dashboardService, logi
     function getLogoForTenant(tenantId) {
 
             var deferred = $q.defer();
-            var url = 'api/settings/getUserLogo/'+tenantId;
+            var url = 'api/settings/'+tenantId+'/logo';
             $http.get(url, null).then(function success(response) {
-                deferred.resolve(response.data);
+                deferred.resolve(response);
             }, function fail() {
                 deferred.reject();
             });

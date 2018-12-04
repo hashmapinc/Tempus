@@ -26,7 +26,17 @@
 			 md-is-locked-open="vm.isLockSidenav"
 			 layout="column">
 	<header class="tb-nav-header">
-		<md-toolbar class="tb-nav-header-toolbar">
+		<md-toolbar ng-if ="authority !== 'SYS_ADMIN'" class="tb-nav-header-toolbar">
+			<div flex layout="row" class="md-toolbar-tools inset">
+				<md-icon ng-show ="tenantlogo != ''"  class="material-icons hm-login-logo" style="">
+					<img class="" style="width: 54%; margin-top: 0%;"ng-src="{{tenantlogo}}">
+				</md-icon>
+
+				<md-icon ng-show ="tenantlogo == ''" md-svg-src="{{vm.logoSvg}}" aria-label="logo" class="tb-logo-title"></md-icon>
+			</div>
+		</md-toolbar>
+
+		<md-toolbar ng-if ="authority == 'SYS_ADMIN'" class="tb-nav-header-toolbar">
 			<div flex layout="row" class="md-toolbar-tools inset">
 				<md-icon ng-show ="fileType != ''" ng-switch on="fileType" class="material-icons hm-login-logo" style="">
 					<img ng-switch-when="svg" class="" style="width: 54%; margin-top: 0%;"ng-src="data:image/svg+xml;base64,{{logo}}">
@@ -37,6 +47,7 @@
 				<md-icon ng-show ="fileType == ''" md-svg-src="{{vm.logoSvg}}" aria-label="logo" class="tb-logo-title"></md-icon>
 			</div>
 		</md-toolbar>
+
 	</header>
 	<md-toolbar ng-class="{themeDarkSideMenu: theme == 'themeDark', themeBlueSideMenu: theme == 'themeBlue'}"
 				flex class="tb-side-menu-toolbar"  role="navigation" >

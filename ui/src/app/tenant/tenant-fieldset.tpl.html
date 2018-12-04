@@ -46,7 +46,7 @@
 		<md-input-container class="md-block">
 			<div class="tb-container"><div ng-if ="tenant.logo"><img class="" style="width: 28%; margin-top: 6%;"ng-src="{{tenant.logo}}"></div>
 				<label class="tb-label" translate>tenant.logo</label>
-				<div style="margin-top: 27px;" flow-init="{singleFile:true}" flow-file-added='fileAdded($file)' class="tb-file-select-container">
+				<div ng-show ="isEdit" style="margin-top: 27px;" flow-init="{singleFile:true}" flow-file-added='fileAdded($file)' class="tb-file-select-container">
 					<div class="tb-file-clear-container">
 						<md-button ng-click='clearFile()' class="tb-file-clear-btn md-icon-button md-primary" aria-label="{{ 'action.remove' | translate }}">
 							<md-tooltip md-direction="top">
