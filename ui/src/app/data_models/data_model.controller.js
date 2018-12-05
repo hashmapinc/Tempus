@@ -44,6 +44,7 @@ export function DataModelController($scope, $mdDialog, $document, $stateParams, 
 	vm.dataModelName = [];
 	vm.dataModelSavedName = [];
 	$scope.editing = false;
+	vm.enableEditing = [];
 
 
 	// Create the graph that will be plotted
@@ -790,4 +791,7 @@ var childNodeVal = vm.nodes.get(value.to);
 		vm.stepperData.attributes.splice(index, 1);
 		vm.attrName.splice(index, 1);
 	}
+	vm.enableEditAttribute = function (index) {
+         vm.enableEditing[index] = true;
+    }
 }

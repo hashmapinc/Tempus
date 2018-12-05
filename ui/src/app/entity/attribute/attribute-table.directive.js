@@ -111,6 +111,10 @@ export default function AttributeTableDirective($compile, $templateCache, $rootS
         };
 
         scope.$watch("entityId", function(newVal) {
+            scope.attributes = {
+                count: 0,
+                data: []
+            };
             if (newVal) {
                 scope.resetFilter();
                 if(scope.entityType === 'ASSET'){
