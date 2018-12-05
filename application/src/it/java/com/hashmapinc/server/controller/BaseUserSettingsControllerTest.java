@@ -235,11 +235,7 @@ public abstract class BaseUserSettingsControllerTest extends AbstractControllerT
     @Test
     public void testGetUserLogo() throws Exception {
         loginSysAdmin();
-        JsonObject logo = doGet("/api/settings/"+tenantId.getId()+"/getUserLogo", JsonObject.class);
-        log.info("logo{}",logo);
-        Assert.assertEquals(logo,"TEST LOGO");
+        String logo = doGet("/api/settings/"+tenantId.getId()+"/logo", String.class);
+        Assert.assertEquals(logo.contains("TEST LOGO"),true);
     }
-
-
-
 }
