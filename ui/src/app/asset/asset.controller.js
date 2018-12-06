@@ -168,18 +168,6 @@ export function AssetController($rootScope, userService, assetService, customerS
                 }
             );
 
-            assetActionsList.push({
-                onAction: function ($event, item) {
-                    unassignFromCustomer($event, item, true);
-                },
-                name: function() { return $translate.instant('action.make-private') },
-                details: function() { return $translate.instant('asset.make-private') },
-                icon: "reply",
-                isEnabled: function(asset) {
-                    return asset && asset.customerId && asset.customerId.id !== types.id.nullUid && asset.assignedCustomer.isPublic;
-                }
-            });
-
             assetActionsList.push(
                 {
                     onAction: function ($event, item) {
@@ -242,20 +230,6 @@ export function AssetController($rootScope, userService, assetService, customerS
                         }
                     }
                 );
-                assetActionsList.push(
-                    {
-                        onAction: function ($event, item) {
-                            unassignFromCustomer($event, item, true);
-                        },
-                        name: function() { return $translate.instant('action.make-private') },
-                        details: function() { return $translate.instant('asset.make-private') },
-                        icon: "reply",
-                        isEnabled: function(asset) {
-                            return asset && asset.assignedCustomer.isPublic;
-                        }
-                    }
-                );
-
                 assetGroupActionsList.push(
                     {
                         onAction: function ($event, items) {

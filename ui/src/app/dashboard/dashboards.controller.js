@@ -122,7 +122,6 @@ export function DashboardsController(userService, dashboardService, customerServ
 
     vm.dashboardsScope = $state.$current.data.dashboardsType;
 
-    vm.makePrivate = makePrivate;
     vm.manageAssignedCustomers = manageAssignedCustomers;
     vm.unassignFromCustomer = unassignFromCustomer;
     vm.exportDashboard = exportDashboard;
@@ -173,17 +172,7 @@ export function DashboardsController(userService, dashboardService, customerServ
                     details: function() { return $translate.instant('dashboard.export') },
                     icon: "file_download"
                 });
-            dashboardActionsList.push({
-                onAction: function ($event, item) {
-                    makePrivate($event, item);
-                },
-                name: function() { return $translate.instant('action.make-private') },
-                details: function() { return $translate.instant('dashboard.make-private') },
-                icon: "reply",
-                isEnabled: function(dashboard) {
-                    return dashboard && dashboard.publicCustomerId;
-                }
-            });
+
             dashboardActionsList.push({
                 onAction: function ($event, item) {
                     manageAssignedCustomers($event, item);
@@ -318,20 +307,6 @@ export function DashboardsController(userService, dashboardService, customerServ
                 dashboardActionsList.push(
                     {
                         onAction: function ($event, item) {
-                            makePrivate($event, item);
-                        },
-                        name: function() { return $translate.instant('action.make-private') },
-                        details: function() { return $translate.instant('dashboard.make-private') },
-                        icon: "reply",
-                        isEnabled: function(dashboard) {
-                            return dashboard && customerId == dashboard.publicCustomerId;
-                        }
-                    }
-                );
-
-                dashboardActionsList.push(
-                    {
-                        onAction: function ($event, item) {
                             unassignFromCustomer($event, item, customerId);
                         },
                         name: function() { return $translate.instant('action.unassign') },
@@ -375,19 +350,6 @@ export function DashboardsController(userService, dashboardService, customerServ
                                     details: function() { return $translate.instant('dashboard.export') },
                                     icon: "file_download"
                                 });
-
-
-                            dashboardActionsList.push({
-                                onAction: function ($event, item) {
-                                    makePrivate($event, item);
-                                },
-                                name: function() { return $translate.instant('action.make-private') },
-                                details: function() { return $translate.instant('dashboard.make-private') },
-                                icon: "reply",
-                                isEnabled: function(dashboard) {
-                                    return dashboard && dashboard.publicCustomerId;
-                                }
-                            });
 
                               dashboardActionsList.push(
                                             {
@@ -596,27 +558,6 @@ export function DashboardsController(userService, dashboardService, customerServ
         });
     }
 
-
-    function makePrivate($event, dashboard) {
-        if ($event) {
-            $event.stopPropagation();
-        }
-        var title = $translate.instant('dashboard.make-private-dashboard-title', {dashboardTitle: dashboard.title});
-        var content = $translate.instant('dashboard.make-private-dashboard-text');
-        var label = $translate.instant('dashboard.make-private-dashboard');
-        var confirm = $mdDialog.confirm()
-            .targetEvent($event)
-            .title(title)
-            .htmlContent(content)
-            .ariaLabel(label)
-            .cancel($translate.instant('action.no'))
-            .ok($translate.instant('action.yes'));
-        $mdDialog.show(confirm).then(function () {
-            dashboardService.makeDashboardPrivate(dashboard.id.id).then(function success() {
-                vm.grid.refreshList();
-            });
-        });
-    }
 
     function exportDashboard($event, dashboard) {
         $event.stopPropagation();
