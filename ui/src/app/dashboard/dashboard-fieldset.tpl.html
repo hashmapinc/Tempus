@@ -19,9 +19,6 @@
 <md-button ng-click="onExportDashboard({event: $event})"
 		   ng-show="!isEdit && (dashboardScope === 'tenant' || dashboardScope === 'customer_user')"
 		   class="md-raised md-primary">{{ 'dashboard.export' | translate }}</md-button>
-<md-button ng-click="onMakePublic({event: $event})"
-		   ng-show="!isEdit && dashboardScope === 'tenant' && !dashboard.publicCustomerId"
-		   class="md-raised md-primary">{{ 'dashboard.make-public' | translate }}</md-button>
 <md-button ng-click="onMakePrivate({event: $event})"
 		   ng-show="!isEdit && ((dashboardScope === 'tenant' && dashboard.publicCustomerId ||
 		   						dashboardScope === 'customer' && customerId == dashboard.publicCustomerId))"
