@@ -80,7 +80,6 @@ export default function DeviceDirective($compile, $templateCache, toast, $transl
             deviceScope: '=',
             theForm: '=',
             onAssignToCustomer: '&',
-            onMakePublic: '&',
             onUnassignFromCustomer: '&',
             onManageCredentials: '&',
             onDeleteDevice: '&'

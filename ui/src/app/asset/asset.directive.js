@@ -65,7 +65,6 @@ export default function AssetDirective($compile, $templateCache, toast, $transla
             assetScope: '=',
             theForm: '=',
             onAssignToCustomer: '&',
-            onMakePublic: '&',
             onUnassignFromCustomer: '&',
             onDeleteAsset: '&'
         }

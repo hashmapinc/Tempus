@@ -34,7 +34,6 @@ function DeviceService($http, $q, $window, userService, attributeService, custom
         saveDevice: saveDevice,
         saveDeviceCredentials: saveDeviceCredentials,
         unassignDeviceFromCustomer: unassignDeviceFromCustomer,
-        makeDevicePublic: makeDevicePublic,
         getDeviceAttributes: getDeviceAttributes,
         subscribeForDeviceAttributes: subscribeForDeviceAttributes,
         unsubscribeForDeviceAttributes: unsubscribeForDeviceAttributes,
@@ -232,17 +231,6 @@ function DeviceService($http, $q, $window, userService, attributeService, custom
         var deferred = $q.defer();
         var url = '/api/customer/device/' + deviceId;
         $http.delete(url).then(function success(response) {
-            deferred.resolve(response.data);
-        }, function fail() {
-            deferred.reject();
-        });
-        return deferred.promise;
-    }
-
-    function makeDevicePublic(deviceId) {
-        var deferred = $q.defer();
-        var url = '/api/customer/public/device/' + deviceId;
-        $http.post(url, null).then(function success(response) {
             deferred.resolve(response.data);
         }, function fail() {
             deferred.reject();

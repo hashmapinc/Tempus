@@ -16,9 +16,6 @@
     limitations under the License.
 
 -->
-<md-button ng-click="onMakePublic({event: $event})"
-           ng-show="!isEdit && deviceScope === 'tenant' && !isAssignedToCustomer && !isPublic"
-           class="md-raised md-primary">{{ 'device.make-public' | translate }}</md-button>
 <md-button ng-click="onAssignToCustomer({event: $event})"
            ng-show="!isEdit && deviceScope === 'tenant' && !isAssignedToCustomer"
            class="md-raised md-primary">{{ 'device.assign-to-customer' | translate }}</md-button>
