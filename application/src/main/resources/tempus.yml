@@ -369,10 +369,10 @@ spring:
     password: "${SPRING_DATASOURCE_PASSWORD:postgres}"
 
 ##max file and request size
-#spring.http:
-#  multipart:
-#    max-file-size: -1
-#    max-request-size: -1
+spring.servlet:
+  multipart:
+    max-file-size: 1GB
+    max-request-size: 1GB
 # Audit log parameters
 audit-log:
   # Enable/disable audit log functionality.

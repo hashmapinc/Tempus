@@ -1,7 +1,7 @@
 pipeline {
   agent {
     docker {
-      image 'hashmapinc/tempusbuild:latest'
+      image 'maven:3.5.4-jdk-11'
       args '-u root -v /var/run/docker.sock:/var/run/docker.sock'
     }
 
