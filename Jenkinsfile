@@ -1,7 +1,7 @@
 pipeline {
   agent {
     docker {
-      image 'maven:3.5.4-jdk-11'
+      image 'anujakt/tempusbuild:java-11'
       args '-u root -v /var/run/docker.sock:/var/run/docker.sock'
     }
 
