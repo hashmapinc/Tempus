@@ -189,17 +189,6 @@ export function DeviceController($rootScope,userService, deviceService, customer
                 }
             );
 
-            deviceActionsList.push({
-                onAction: function ($event, item) {
-                    unassignFromCustomer($event, item, true);
-                },
-                name: function() { return $translate.instant('action.make-private') },
-                details: function() { return $translate.instant('device.make-private') },
-                icon: "reply",
-                isEnabled: function(device) {
-                    return device && device.customerId && device.customerId.id !== types.id.nullUid && device.assignedCustomer.isPublic;
-                }
-            });
 
             deviceActionsList.push(
                 {
@@ -274,19 +263,7 @@ export function DeviceController($rootScope,userService, deviceService, customer
                         }
                     }
                 );
-                deviceActionsList.push(
-                    {
-                        onAction: function ($event, item) {
-                            unassignFromCustomer($event, item, true);
-                        },
-                        name: function() { return $translate.instant('action.make-private') },
-                        details: function() { return $translate.instant('device.make-private') },
-                        icon: "reply",
-                        isEnabled: function(device) {
-                            return device && device.assignedCustomer.isPublic;
-                        }
-                    }
-                );
+
 
                 deviceActionsList.push(
                     {
