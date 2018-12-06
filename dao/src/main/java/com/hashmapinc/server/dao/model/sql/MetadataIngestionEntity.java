@@ -52,6 +52,7 @@ public class MetadataIngestionEntity implements ToData<MetaDataKvEntry>, Seriali
     @Column(name = ModelConstants.LAST_UPDATE_TS_COLUMN)
     private Long lastUpdateTs;
 
+    @Id
     @Column(name = ModelConstants.METADATA_ATTRIBUTE_COLUMN)
     private String attribute;
 

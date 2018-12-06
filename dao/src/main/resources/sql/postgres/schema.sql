@@ -86,7 +86,7 @@ CREATE TABLE IF NOT EXISTS metadata_entries(
     key varchar(255) NOT NULL,
     value varchar(10000000) NOT NULL,
     last_update_ts bigint,
-    CONSTRAINT metadata_entries_unq_key UNIQUE (tenant_id, metadata_config_id, datasource_name, attribute, key)
+    CONSTRAINT metadata_entries_pkey PRIMARY KEY (tenant_id, metadata_config_id, datasource_name, attribute, key)
 );
 
 CREATE TABLE IF NOT EXISTS component_descriptor (
