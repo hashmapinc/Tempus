@@ -68,15 +68,15 @@ function DeviceListWidgetController($rootScope, $scope, $filter, dashboardServic
         count: 0,
         data: []
     };
-    vm.devicesScope = null;
+    vm.assetScope = null;
 
     function initController() {
         var user = userService.getCurrentUser();
         if (user.authority === 'CUSTOMER_USER') {
-            vm.devicesScope = 'customer_user';
+            vm.assetScope = 'customer_user';
             customerId = user.customerId;
         }else {
-            vm.devicesScope = 'tenant';
+            vm.assetScope = 'tenant';
             if (customerId) {
                 vm.customerDevicesTitle = $translate.instant('customer.devices');
                 customerService.getShortCustomerInfo(customerId).then(
@@ -88,11 +88,12 @@ function DeviceListWidgetController($rootScope, $scope, $filter, dashboardServic
                 );
             }
         }
-        
-        vm.loadTableData(vm.devicesScope);
+        if($state.current.url != '/:widgetsBundleId/widgetTypes'){
+            vm.loadTableData(vm.assetScope);
+        }
+
     }
     function loadTableData(scope){
-
         dashboardService.getDashboard($state.params.dashboardId).then(function success(response) {
             if(response){
                 if (scope === 'tenant') {

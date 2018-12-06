@@ -397,12 +397,13 @@ export default function DashboardController(types, utils, dashboardUtils, widget
                     vm.configurationError = true;
                 });
         }
-        if(vm.user.authority === 'TENANT_ADMIN') {
-            vm.displayAddAssetBasedPermission = true;
-        }else{
-            getUserPermission();
+        if(vm.user.authority != 'SYS_ADMIN') {
+            if(vm.user.authority === 'TENANT_ADMIN') {
+                vm.displayAddAssetBasedPermission = true;
+            }else{
+                getUserPermission();
+            }
         }
-
     }
 
     function getUserPermission(){
