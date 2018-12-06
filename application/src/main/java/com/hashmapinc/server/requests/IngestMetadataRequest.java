@@ -28,5 +28,6 @@ public class IngestMetadataRequest {
     private MetadataConfigId configId;
     private String ownerId;
     private String configName;
+    private String attribute;
     private Map<String, Object> data;
 }

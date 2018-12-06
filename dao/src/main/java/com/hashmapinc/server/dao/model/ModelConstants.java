@@ -157,6 +157,7 @@ public class ModelConstants {
     public static final String METADATA_INGESTION_KEY_COLUMN = "key";
     public static final String METADATA_DATASOURCE_NAME_COLUMN = "datasource_name";
     public static final String METADATA_INGESTION_VALUE_COLUMN = "value";
+    public static final String METADATA_ATTRIBUTE_COLUMN = "attribute";
 
     /**
      * Computations Constants
@@ -408,6 +409,7 @@ public class ModelConstants {
     public static final String ATTRIBUTE_DEFINITION_VALUE_TYPE = "value_type";
     public static final String ATTRIBUTE_DEFINITION_MODEL_OBJECT_ID = "data_model_object_id";
     public static final String ATTRIBUTE_DEFINITION_SOURCE = "source";
+    public static final String ATTRIBUTE_DEFINITION_IS_KEY_ATTRIBUTE = "key_attribute";
 
     /**
      * Cassandra Node Metric Contants

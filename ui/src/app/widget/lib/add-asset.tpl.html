@@ -68,7 +68,7 @@
                         <div ng-repeat="attribute in vm.attributeList">
                             <md-input-container class="md-block">
                                 <label>{{attribute.name}}</label>
-                                <input ng-model="vm.attributes[attribute.name]">
+                                <input ng-model="vm.attributes[attribute.name]" ng-required="attribute.keyAttribute">
                             </md-input-container>
                         </div>
                   </md-content>

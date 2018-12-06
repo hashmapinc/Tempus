@@ -17,9 +17,11 @@
 package com.hashmapinc.server.common.data.datamodel;
 
 import com.hashmapinc.server.common.data.id.DataModelObjectId;
+import lombok.ToString;
 
 import java.io.Serializable;
 
+@ToString
 public class AttributeDefinition implements Serializable{
 
     private static final long serialVersionUID = -4403266614883680756L;
@@ -29,6 +31,7 @@ public class AttributeDefinition implements Serializable{
     private String valueType;
     private DataModelObjectId dataModelObjectId;
     private String source;
+    private boolean keyAttribute;
 
     public AttributeDefinition(){
 
@@ -40,6 +43,7 @@ public class AttributeDefinition implements Serializable{
         this.source = attributeDefinition.source;
         this.value = attributeDefinition.value;
         this.valueType = attributeDefinition.valueType;
+        this.keyAttribute = attributeDefinition.keyAttribute;
     }
 
     @Override
@@ -53,6 +57,7 @@ public class AttributeDefinition implements Serializable{
         if (dataModelObjectId != null ? !dataModelObjectId.equals(that.dataModelObjectId) : that.dataModelObjectId != null) return false;
         if (source != null ? !source.equals(that.source) : that.source != null) return false;
         if (value != null ? !value.equals(that.value) : that.value != null) return false;
+        if (keyAttribute != that.keyAttribute) return false;
         return (valueType != null ? valueType.equals(that.valueType) : that.valueType == null);
 
     }
@@ -106,5 +111,13 @@ public class AttributeDefinition implements Serializable{
 
     public void setSource(String source) {
         this.source = source;
+    }
+
+    public boolean isKeyAttribute() {
+        return keyAttribute;
+    }
+
+    public void setKeyAttribute(boolean keyAttribute) {
+        this.keyAttribute = keyAttribute;
     }
 }

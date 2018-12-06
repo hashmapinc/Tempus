@@ -22,10 +22,13 @@ import com.hashmapinc.server.common.data.kv.MetaDataKvEntry;
 import com.hashmapinc.server.common.data.metadata.MetadataConfigId;
 
 import java.util.List;
+import java.util.UUID;
 
 public interface MetaDataIngestionDao {
 
-    ListenableFuture<Void> save(TenantId tenantId, MetadataConfigId metadataConfigId, String dataSourceName, MetaDataKvEntry metaDataKvEntry);
+    ListenableFuture<Void> save(TenantId tenantId, MetadataConfigId metadataConfigId, String dataSourceName, String attribute, MetaDataKvEntry metaDataKvEntry);
 
     ListenableFuture<List<MetaDataKvEntry>> findAll(MetadataConfigId metadataConfigId);
+
+    List<MetaDataKvEntry> findKvEntryByKeyAndTenantId(String key, TenantId tenantId);
 }

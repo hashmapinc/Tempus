@@ -23,8 +23,14 @@ import java.util.List;
 import java.util.UUID;
 
 public interface AttributeDefinitionDao {
+
     AttributeDefinition save(AttributeDefinition attributeDefinition);
+
     AttributeDefinition findByNameAndDataModelObjectId(String name, UUID id);
+
     List<AttributeDefinition> findByDataModelObjectId(DataModelObjectId dataModelObjectId);
+
     void removeByNameAndDataModelObjectId(String name,DataModelObjectId dataModelObjectId);
+
+    AttributeDefinition findKeyAttributeDefinitionByDataModelObjectId(DataModelObjectId dataModelObjectId);
 }

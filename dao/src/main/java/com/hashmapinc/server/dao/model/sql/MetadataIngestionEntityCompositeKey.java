@@ -29,5 +29,6 @@ public class MetadataIngestionEntityCompositeKey implements Serializable {
     private String tenantId;
     private String metadataConfigId;
     private String metadataSourceName;
+    private String attribute;
     private String key;
 }

@@ -1790,7 +1790,8 @@ export default angular.module('tempus.locale', [])
                     "queries-selected":"queries selected",
                     "query-name":"Query Name",
                     "no-query-found":"No query found",
-                    "delete-query":"Delete query"
+                    "delete-query":"Delete query",
+                    "attribute-name":"Attribute Name"
                 }
             }
         }

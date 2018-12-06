@@ -20,6 +20,8 @@ import com.google.common.collect.Lists;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.hashmapinc.server.common.data.MetadataIngestionEntries;
+import com.hashmapinc.server.common.data.Tenant;
+import com.hashmapinc.server.common.data.id.TenantId;
 import com.hashmapinc.server.common.data.kv.MetaDataKvEntry;
 import com.hashmapinc.server.common.data.metadata.MetadataConfigId;
 import com.hashmapinc.server.dao.exception.IncorrectParameterException;
@@ -38,13 +40,15 @@ public class MetaDataIngestionServiceImpl implements MetadataIngestionService {
     @Autowired
     private MetaDataIngestionDao metaDataIngestionDao;
 
+    private static final String INCORRECT_TENANT_ID = "Incorrect tenantId ";
+
     @Override
     public ListenableFuture<List<Void>> save(MetadataIngestionEntries ingestionEntries) {
         validate(ingestionEntries);
 
         List<ListenableFuture<Void>> futures = Lists.newArrayListWithExpectedSize(ingestionEntries.getMetaDataKvEntries().size());
         for (MetaDataKvEntry metaDataKvEntry : ingestionEntries.getMetaDataKvEntries()) {
-            futures.add(metaDataIngestionDao.save(ingestionEntries.getTenantId(), ingestionEntries.getMetadataConfigId(), ingestionEntries.getMetadataSourceName(), metaDataKvEntry));
+            futures.add(metaDataIngestionDao.save(ingestionEntries.getTenantId(), ingestionEntries.getMetadataConfigId(), ingestionEntries.getMetadataSourceName(), ingestionEntries.getAttribute(), metaDataKvEntry));
         }
         return Futures.allAsList(futures);
     }
@@ -53,6 +57,13 @@ public class MetaDataIngestionServiceImpl implements MetadataIngestionService {
     public ListenableFuture<List<MetaDataKvEntry>> findAll(MetadataConfigId metadataConfigId) {
         validateId(metadataConfigId, "Incorrect metadata config id " + metadataConfigId);
         return metaDataIngestionDao.findAll(metadataConfigId);
+    }
+
+    @Override
+    public List<MetaDataKvEntry> findKvEntryByKeyAttributeAndTenantId(String key, TenantId tenantId) {
+        log.trace("Executing findByKeyAttribute, Key : [{}], TenantId : [{}]", key, tenantId);
+        validateId(tenantId, INCORRECT_TENANT_ID + tenantId);
+        return metaDataIngestionDao.findKvEntryByKeyAndTenantId(key, tenantId);
     }
 
     private static void validate(MetadataIngestionEntries ingestionEntries) {

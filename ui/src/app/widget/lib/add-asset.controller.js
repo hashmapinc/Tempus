@@ -48,7 +48,6 @@ export default function AddAssetController (customerService, $state, dashboardSe
                         if(object_response.data.attributeDefinitions.length > 0){
                             vm.attributeList = object_response.data.attributeDefinitions;
                         }
-
                         if(object_response.data.parentId) {
                             var parentDetails = getDataModelObjectDetails(object_response.data.parentId.id);
                             parentDetails.then(function success(parentResponse) {

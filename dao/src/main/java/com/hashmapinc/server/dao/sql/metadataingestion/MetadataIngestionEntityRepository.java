@@ -28,4 +28,6 @@ import java.util.List;
 public interface MetadataIngestionEntityRepository extends CrudRepository<MetadataIngestionEntity, MetadataIngestionEntityCompositeKey> {
 
     List<MetadataIngestionEntity> findByMetadataConfigIdOrderByKeyAsc(String metadataConfigId);
+
+    List<MetadataIngestionEntity> findByKeyAndTenantId(String key, String tenantId);
 }

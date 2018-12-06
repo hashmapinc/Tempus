@@ -17,7 +17,7 @@
 
 
 /*@ngInject*/
-export default function QueryDialogController($mdDialog,types, metadata, metadataService, $q, metadataQuery, isReadOnly, isAdd) {
+export default function QueryDialogController($scope, $mdDialog,types, metadata, metadataService, $q, metadataQuery, isReadOnly, isAdd, selectedIndex) {
 
 
     var vm = this;
@@ -32,18 +32,30 @@ export default function QueryDialogController($mdDialog,types, metadata, metadat
     vm.displayAdd = true;
     vm.triggers=[{id:'CRON',name:'CRON'}]
     vm.regex="^\\s*($|#|\\w+\\s*=|(\\?|\\*|(?:[0-5]?\\d)(?:(?:-|\/|\\,)(?:[0-5]?\\d))?(?:,(?:[0-5]?\\d)(?:(?:-|\/|\\,)(?:[0-5]?\\d))?)*)\\s+(\\?|\\*|(?:[0-5]?\\d)(?:(?:-|\/|\\,)(?:[0-5]?\\d))?(?:,(?:[0-5]?\\d)(?:(?:-|\/|\\,)(?:[0-5]?\\d))?)*)\\s+(\\?|\\*|(?:[01]?\\d|2[0-3])(?:(?:-|\/|\\,)(?:[01]?\\d|2[0-3]))?(?:,(?:[01]?\\d|2[0-3])(?:(?:-|\/|\\,)(?:[01]?\\d|2[0-3]))?)*)\\s+(\\?|\\*|(?:0?[1-9]|[12]\\d|3[01])(?:(?:-|\/|\\,)(?:0?[1-9]|[12]\\d|3[01]))?(?:,(?:0?[1-9]|[12]\\d|3[01])(?:(?:-|\/|\\,)(?:0?[1-9]|[12]\\d|3[01]))?)*)\\s+(\\?|\\*|(?:[1-9]|1[012])(?:(?:-|\/|\\,)(?:[1-9]|1[012]))?(?:L|W)?(?:,(?:[1-9]|1[012])(?:(?:-|\/|\\,)(?:[1-9]|1[012]))?(?:L|W)?)*|\\?|\\*|(?:JAN|FEB|MAR|APR|MAY|JUN|JUL|AUG|SEP|OCT|NOV|DEC)(?:(?:-)(?:JAN|FEB|MAR|APR|MAY|JUN|JUL|AUG|SEP|OCT|NOV|DEC))?(?:,(?:JAN|FEB|MAR|APR|MAY|JUN|JUL|AUG|SEP|OCT|NOV|DEC)(?:(?:-)(?:JAN|FEB|MAR|APR|MAY|JUN|JUL|AUG|SEP|OCT|NOV|DEC))?)*)\\s+(\\?|\\*|(?:[0-6])(?:(?:-|\/|\\,|#)(?:[0-6]))?(?:L)?(?:,(?:[0-6])(?:(?:-|\/|\\,|#)(?:[0-6]))?(?:L)?)*|\\?|\\*|(?:MON|TUE|WED|THU|FRI|SAT|SUN)(?:(?:-)(?:MON|TUE|WED|THU|FRI|SAT|SUN))?(?:,(?:MON|TUE|WED|THU|FRI|SAT|SUN)(?:(?:-)(?:MON|TUE|WED|THU|FRI|SAT|SUN))?)*)(|\\s)+(\\?|\\*|(?:|\\d{4})(?:(?:-|\/|\\,)(?:|\\d{4}))?(?:,(?:|\\d{4})(?:(?:-|\/|\\,)(?:|\\d{4}))?)*))$";
-
+    vm.selectedIndex = selectedIndex;
+    initController();
+    function initController(){
+        if(vm.metadataQuery){
+            angular.forEach(vm.triggers, function (list) {
+                if (list.id === vm.metadataQuery.triggerType) {
+                    $scope.trigger = list;
+                }
+            });
+        }
+    }
     function close () {
         $mdDialog.hide();
     }
-    function save(){
-        var requestObject ={
+
+    function save(parameter){
+        var requestObject = {
            metadataConfigId:{
             id:metadata.id.id
            },
-           queryStmt:vm.metadataQuery.queryStmt,
-           triggerType:vm.metadataQuery.triggerType,
-           triggerSchedule:vm.metadataQuery.triggerSchedule
+           queryStmt:null,
+           triggerType:null,
+           triggerSchedule:vm.metadataQuery.triggerSchedule,
+           attribute:vm.metadataQuery.attribute
         }
         if(metadataQuery){
             requestObject.id;
@@ -52,6 +64,13 @@ export default function QueryDialogController($mdDialog,types, metadata, metadat
              }
         }
         var deferred = $q.defer();
+        if(parameter == 'generate'){
+            requestObject.triggerType = vm.metadataQuery.triggerType.id
+            requestObject.queryStmt = 'select '+vm.query.key+','+vm.query.value +' from '+ vm.query.tableName +' where '+vm.query.whereCondition+';';
+        }else {
+            requestObject.triggerType = $scope.trigger.id
+            requestObject.queryStmt = vm.metadataQuery.queryStmt;
+        }
         metadataService.saveMetadataQuery(requestObject).then(function success(response) {
             deferred.resolve(response.data);
         }, function fail(response) {

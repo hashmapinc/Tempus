@@ -176,8 +176,13 @@ export default function GlobalInterceptor($rootScope, $q, $injector) {
         } else if (!rejection.config.url.startsWith('/api/plugins/rpc')) {
             if (rejection.status === 404) {
                 if (!ignoreErrors) {
-                    getToast().showError(rejection.config.method + ": " + rejection.config.url + "<br/>" +
-                        rejection.status + ": " + rejection.statusText);
+                    if(rejection.config.url.startsWith('/api/metadata/attribute/ASSET/')){
+                        getToast().showError(rejection.data.message);
+                    }else {
+                        getToast().showError(rejection.config.method + ": " + rejection.config.url + "<br/>" +
+                                                rejection.status + ": " + rejection.statusText);
+                    }
+
                 }
             } else {
                 unhandled = true;

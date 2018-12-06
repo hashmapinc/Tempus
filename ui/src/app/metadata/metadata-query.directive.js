@@ -69,6 +69,7 @@ export default function MetadataQueryDirective($compile, $templateCache, $mdDial
                     metadata: scope.metadata,
                     metadataQuery:null,
                     isAdd: true,
+                    selectedIndex:0,
                     isReadOnly:false
                 },
                 targetEvent: $event,
@@ -103,6 +104,7 @@ export default function MetadataQueryDirective($compile, $templateCache, $mdDial
                 locals: {
                     metadata: scope.metadata,
                     metadataQuery: query,
+                    selectedIndex: 1,
                     isAdd: false,
                     isReadOnly:false
                 },

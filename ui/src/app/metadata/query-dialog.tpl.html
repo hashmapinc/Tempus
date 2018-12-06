@@ -16,12 +16,13 @@
     limitations under the License.
 
 -->
+
 <md-dialog  style="width:45%">
 
-    <form name="theForm" ng-submit="vm.save()">
+
         <md-toolbar>
             <div class="md-toolbar-tools">
-                <h2 translate> {{ (vm.isAdd ? 'action.add' : 'action.edit') | translate }} Query</h2>
+                <h2 translate>Add Query</h2>
                 <span flex></span>
                 <md-button class="md-icon-button" ng-click="vm.close()">
                     <ng-md-icon icon="close" aria-label="{{ 'dialog.close' | translate }}"></ng-md-icon>
@@ -35,62 +36,113 @@
 
         <md-dialog-content>
             <div class="md-dialog-content">
-                <!--<md-content class="md-padding" layout="column">
-
-                    <div layout-gt-sm="row">
-                        <md-input-container class="md-block" style="width: 100%;">
-                            <label>{{ 'metadataConfig.query' | translate }}</label>
-                            <textarea ng-model="vm.metadataQuery.queryStmt" rows="2" required></textarea>
-                        </md-input-container>
-                    </div>
-                    <div id="space-for-buttons"></div>
-                    <div layout-gt-sm="row">
-                        <md-input-container class="md-block" style="width: 50%;">
-                            <label>{{ 'metadataConfig.trigger-type' | translate }}</label>
-                            <md-select ng-model="vm.metadataQuery.triggerType">
-                                <md-option ng-value="trigger.id" ng-repeat="trigger in vm.triggers">{{ trigger.name }}</md-option>
-                            </md-select>
-                        </md-input-container>
-                        <md-input-container style="width: 50%;">
-                            <label>{{ 'metadataConfig.trigger-schedule' | translate }}</label>
-                            <input type="text" ng-model="vm.metadataQuery.triggerSchedule" ng-pattern="vm.regex" required>
-                        </md-input-container>
-                    </div>
-                </md-content>-->
                 <md-content class="md-padding" layout="column">
-                    <div layout-gt-sm="row">
-                        <md-input-container class="md-block" style="width: 100%;">
-                            <label>{{ 'metadataConfig.query' | translate }}</label>
-                            <textarea ng-model="vm.metadataQuery.queryStmt" rows="2" required></textarea>
-                        </md-input-container>
-                    </div>
-                    <div layout-gt-sm="row">
-                        <md-input-container class="md-block" style="width: 50%;">
-                            <label>{{ 'metadataConfig.trigger-type' | translate }}</label>
-                            <md-select ng-model="vm.metadataQuery.triggerType">
-                                <md-option ng-value="trigger.id" ng-repeat="trigger in vm.triggers">{{ trigger.name }}</md-option>
-                            </md-select>
-                        </md-input-container>
-                        <md-input-container style="width: 50%;">
-                            <label>{{ 'metadataConfig.trigger-schedule' | translate }}</label>
-                            <input type="text" ng-model="vm.metadataQuery.triggerSchedule" ng-pattern="vm.regex" required>
-                        </md-input-container>
-                    </div>
+                    <md-tabs md-selected="vm.selectedIndex" md-dynamic-height md-border-bottom >
+                        <md-tab label="build query">
+                            <form name="theForm" ng-submit="vm.save('generate')">
+                                <div layout-gt-sm="row">
+                                    <div class="md-block" style="width: 5%;margin: 28px;">
+                                        <label>Select</label>
+                                    </div>
+
+                                    <md-input-container class="md-block" style="width: 45%">
+                                        <input name="key" ng-model="vm.query.key" placeholder="Key" required>
+                                    </md-input-container>
+
+                                    <md-input-container class="md-block" style="width: 45%">
+                                        <input name="value" ng-model="vm.query.value" placeholder="Value" required>
+                                    </md-input-container>
+                                </div>
+                                <div layout-gt-sm="row" style="margin-top: -30px;">
+                                    <div class="md-block" style="width: 5%;margin: 28px;">
+                                        <label>From</label>
+                                    </div>
+                                    <md-input-container class="md-block" style="width: 95%">
+                                        <input name="table_name" ng-model="vm.query.tableName" placeholder="Table Name" required>
+                                    </md-input-container>
+                                </div>
+                                <div layout-gt-sm="row" style="margin-top: -30px;">
+                                    <div class="md-block" style="width: 5%;margin: 28px;">
+                                        <label>Where</label>
+                                    </div>
+                                    <md-input-container class="md-block" style="width: 95%">
+                                        <input name="whereCondition" ng-model="vm.query.whereCondition" placeholder=" Condition" required>
+                                    </md-input-container>
+                                </div>
+                                <div layout-gt-sm="row">
+                                    <md-input-container class="md-block" style="width: 50%;margin:28px;">
+                                        <label>Trigger Type</label>
+                                        <md-select ng-model="vm.metadataQuery.triggerType">
+                                            <md-option ng-value="trigger" ng-repeat="trigger in vm.triggers">{{ trigger.name }}</md-option>
+                                        </md-select>
+                                    </md-input-container>
+                                    <md-input-container style="width: 50%;margin:28px;">
+                                        <label>Trigger Schedule</label>
+                                        <input type="text" ng-model="vm.metadataQuery.triggerSchedule" ng-pattern="vm.regex" required>
+                                    </md-input-container>
+                                </div>
+                                <div layout-gt-sm="row" style="margin-top: -30px;">
+                                    <div class="md-block" style="width: 19%;margin: 28px;">
+                                        <label>Attribute Name </label>
+                                    </div>
+                                    <md-input-container class="md-block" style="width: 100%">
+                                        <input name="table_name" ng-model="vm.metadataQuery.attribute" placeholder="Attribute" required>
+                                    </md-input-container>
+                                </div>
+                                <div layout="row" style="float:right;">
+                                    <md-button type="submit"  ng-disabled="$root.loading || theForm.$invalid || !theForm.$dirty"
+                                               class="md-raised md-primary">
+                                        Add
+                                    </md-button>
+
+                                    <md-button ng-disabled="$root.loading" ng-click="vm.close()" style="margin-right:20px;">{{ 'action.cancel' | translate }}
+                                    </md-button>
+                                </div>
+                            </form>
+                        </md-tab>
+                        <md-tab label="input query" >
+                            <form name="theQueryForm" ng-submit="vm.save('input')">
+                                <div layout-gt-sm="row">
+                                    <md-input-container class="md-block" style="width: 100%;">
+                                        <label translate>Query</label>
+                                        <textarea ng-model="vm.metadataQuery.queryStmt" rows="2" required></textarea>
+                                    </md-input-container>
+                                </div>
+                                <div layout-gt-sm="row">
+                                    <md-input-container class="md-block" style="width: 50%;">
+                                        <label>Trigger Type</label>
+                                        <md-select ng-model="trigger">
+                                            <md-option ng-value="trigger" ng-repeat="trigger in vm.triggers">{{ trigger.name }}</md-option>
+                                        </md-select>
+                                    </md-input-container>
+                                    <md-input-container style="width: 50%;">
+                                        <label>Trigger Schedule</label>
+                                        <input type="text" ng-model="vm.metadataQuery.triggerSchedule" ng-pattern="vm.regex" required>
+                                    </md-input-container>
+                                </div>
+                                <div layout-gt-sm="row" style="margin-top: -30px;margin-left: -20px;">
+                                    <div class="md-block" style="width: 19%;margin: 28px;">
+                                        <label>Attribute Name </label>
+                                    </div>
+                                    <md-input-container class="md-block" style="width: 100%">
+                                        <input name="table_name" ng-model="vm.metadataQuery.attribute" placeholder="Attribute" required>
+                                    </md-input-container>
+                                </div>
+                                <div layout="row" style="float:right;">
+                                    <md-button type="submit"  ng-disabled="$root.loading || theQueryForm.$invalid || !theQueryForm.$dirty"
+                                               class="md-raised md-primary">
+                                        Add
+                                    </md-button>
+
+                                    <md-button ng-disabled="$root.loading" ng-click="vm.close()" style="margin-right:20px;">{{ 'action.cancel' | translate }}
+                                    </md-button>
+                                </div>
+                            </form>
+
+                        </md-tab>
+                    </md-tabs>
+
                 </md-content>
             </div>
         </md-dialog-content>
-
-        <md-dialog-actions layout="row">
-            <md-button ng-if="vm.isAdd == true" ng-disabled="$root.loading || theForm.$invalid || !theForm.$dirty" type="submit"
-                       class="md-raised md-primary">
-                {{ 'action.add'| translate }}
-            </md-button>
-            <md-button ng-if="vm.isAdd == false"  type="submit"
-                       class="md-raised md-primary">
-                {{'action.save' | translate }}
-            </md-button>
-            <md-button ng-disabled="$root.loading" ng-click="vm.close()" style="margin-right:20px;">{{ 'action.cancel' | translate }}
-            </md-button>
-        </md-dialog-actions>
-    </form>
 </md-dialog>

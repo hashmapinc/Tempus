@@ -72,12 +72,6 @@
 											   </md-tooltip>
 											   <ng-md-icon size="20" icon="{{action.icon}}"></ng-md-icon>
 									</md-button>
-									<md-button ng-if="widget.typeAlias=='device_list'" id="addAsset" class="md-icon-button" ng-click="addAsset($event)">
-											<md-icon id="addAsset">add</md-icon>
-											<md-tooltip md-direction="top">
-												{{ 'action.add' | translate }}
-											</md-tooltip>
-									</md-button>
 									<md-button id="expand-button"
 											   ng-show="!vm.isEdit && vm.enableWidgetFullscreen(widget)"
 											   aria-label="{{ 'fullscreen.fullscreen' | translate }}"
@@ -178,7 +172,8 @@
                             entity-id="vm.grid.operatingItem().id.id"
                             entity-type="{{vm.types.entityType.asset}}"
                             entity-name="vm.grid.operatingItem().name"
-                            default-attribute-scope="{{vm.types.attributesScope.server.value}}">
+                            default-attribute-scope="{{vm.types.attributesScope.server.value}}"
+							asset-landing-attribute-flag="true">
         </tb-attribute-table>
     </md-tab>
     <md-tab ng-if="!vm.grid.detailsConfig.isDetailsEditMode" md-on-select="vm.grid.triggerResize()" label="{{ 'attribute.latest-telemetry' | translate }}">

@@ -31,5 +31,6 @@ public class MetadataIngestionEntries {
     private TenantId tenantId;
     private MetadataConfigId metadataConfigId;
     private String metadataSourceName;
+    private String attribute;
     private List<MetaDataKvEntry> metaDataKvEntries;
 }

@@ -165,7 +165,11 @@
                     <td md-cell>{{attribute.key}}</td>
                     <td md-cell class="tb-value-cell" ng-click="editAttribute($event, attribute)">
                         <span>{{attribute.value}}</span>
+                        <span ng-show="!attributeScope.clientSide && assetLandingAttributeFlag && attribute.keyAttribute"  ng-click="importMetadataEntries($event, attribute)">
+                            <md-icon  style="float:right;" md-svg-src="/static/svg/metadata-black.svg" class="material-icons ng-scope md-themeDark-theme"></md-icon>
+                        </span>
                         <span ng-show="!attributeScope.clientSide"><ng-md-icon size="16" icon="edit"></ng-md-icon></span>
+
                     </td>
                 </tr>
                 </tbody>

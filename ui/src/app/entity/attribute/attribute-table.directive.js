@@ -34,7 +34,7 @@ import AliasController from '../../api/alias-controller';
 /*@ngInject*/
 export default function AttributeTableDirective($compile, $templateCache, $rootScope, $q, $mdEditDialog, $mdDialog,
                                                 $mdUtil, $document, $translate, $filter, utils, types, dashboardUtils,
-                                                dashboardService, entityService, attributeService, importExport, widgetService, $mdToast) {
+                                                dashboardService, entityService, attributeService, importExport, widgetService, $mdToast, metadataService, assetService, datamodelService) {
 
     var linker = function (scope, element, attrs) {
 
@@ -58,7 +58,24 @@ export default function AttributeTableDirective($compile, $templateCache, $rootS
 
         scope.types = types;
 
+
         scope.entityType = attrs.entityType;
+        scope.entityAttribute =  null;
+
+
+
+        function getEntityAttributesList(){
+            assetService.getAsset(scope.entityId).then(function success(response){
+                if(response && response.dataModelObjectId  && response && response.dataModelObjectId.id != '13814000-1dd2-11b2-8080-808080808080'){
+                    datamodelService.getDatamodelObject(response.dataModelObjectId.id).then(function success(response_data){
+                        if(response_data.data.attributeDefinitions){
+                            scope.entityAttribute = response_data.data.attributeDefinitions;
+                            scope.getEntityAttributes(false, true);
+                        }
+                    })
+                }
+            },function fail(){})
+        }
 
         if (scope.entityType === types.entityType.device) {
             scope.attributeScopes = types.attributesScope;
@@ -94,9 +111,17 @@ export default function AttributeTableDirective($compile, $templateCache, $rootS
         };
 
         scope.$watch("entityId", function(newVal) {
+            scope.attributes = {
+                count: 0,
+                data: []
+            };
             if (newVal) {
                 scope.resetFilter();
-                scope.getEntityAttributes(false, true);
+                if(scope.entityType === 'ASSET'){
+                    getEntityAttributesList();
+                }else {
+                    scope.getEntityAttributes(false, true);
+                }
             }
         });
 
@@ -132,7 +157,15 @@ export default function AttributeTableDirective($compile, $templateCache, $rootS
         });
 
         function success(attributes, update, apply) {
+            angular.forEach(attributes.data, function(value1,key1) {
+                angular.forEach(scope.entityAttribute, function(value2,key2) {
+                    if(attributes.data[key1].key === scope.entityAttribute[key2].name){
+                        attributes.data[key1].keyAttribute = scope.entityAttribute[key2].keyAttribute;
+                    }
+                });
+            });
             scope.attributes = attributes;
+
             if (!update) {
                 scope.selectedAttributes = [];
             }
@@ -209,6 +242,7 @@ export default function AttributeTableDirective($compile, $templateCache, $rootS
 
 
         scope.getEntityAttributes = function(forceUpdate, reset) {
+
             if (scope.attributesDeferred) {
                 scope.attributesDeferred.resolve();
             }
@@ -531,6 +565,33 @@ export default function AttributeTableDirective($compile, $templateCache, $rootS
             return $rootScope.loading;
         }
 
+         scope.importMetadataEntries = function($event, attribute) {
+            $event.stopPropagation();
+            var param ={
+                key:attribute.key,
+                value:attribute.value
+            }
+            metadataService.getMetadataEntries(scope.entityType, scope.entityId,param).then(
+                  function success(data) {
+                      var sharedAttributes = new Array();
+
+                      for (var attr =0; attr < data.length; attr++) {
+                          var updateAttribute = {};
+                          updateAttribute = angular.extend(updateAttribute, data[attr]);
+                          updateAttribute.key = updateAttribute.key;
+                          updateAttribute.value = data[attr].value;
+                          sharedAttributes.push(updateAttribute);
+                      }
+                      attributeService.saveEntityAttributes(scope.entityType, scope.entityId, types.attributesScope.server.value, sharedAttributes).then(
+                          function success() {
+                              scope.attributeScope = types.attributesScope.server;
+                              scope.getEntityAttributes(false, true);
+                          }
+                      );
+                  }
+            )
+         }
+
         $compile(element.contents())(scope);
     }
 
@@ -540,7 +601,8 @@ export default function AttributeTableDirective($compile, $templateCache, $rootS
         scope: {
             entityId: '=',
             entityName: '=',
-            disableAttributeScopeSelection: '@?'
+            disableAttributeScopeSelection: '@?',
+            assetLandingAttributeFlag: '='
         }
     };
 }
