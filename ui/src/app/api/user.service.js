@@ -23,7 +23,7 @@ export default angular.module('tempus.api.user', [tempusApiLogin,
     .name;
 
 /*@ngInject*/
-function UserService($http, $q, $log, $rootScope, adminService, dashboardService, loginService, toast, store, jwtHelper, $translate, $state, $location) {
+function UserService($http, $q, $rootScope, adminService, dashboardService, loginService, toast, store, jwtHelper, $translate, $state, $location) {
     var currentUser = null,
         currentUserDetails = null,
         lastPublicDashboardId = null,

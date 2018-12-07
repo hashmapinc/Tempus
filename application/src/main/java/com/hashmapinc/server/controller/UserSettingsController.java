@@ -181,8 +181,7 @@ public class UserSettingsController extends BaseController {
         checkParameter("tenantId", strTenantId);
         try {
             TenantId tenantId = new TenantId(toUUID(strTenantId));
-            log.info("tenant in controller{}",tenantId);
-            return tenantService.findLogoByTenantId(tenantId).toString();
+            return tenantService.findLogoByTenantId(tenantId);
         } catch (Exception e) {
             throw handleException(e);
         }

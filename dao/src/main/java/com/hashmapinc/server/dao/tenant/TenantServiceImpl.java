@@ -191,11 +191,15 @@ public class TenantServiceImpl extends AbstractEntityService implements TenantSe
     }
 
     @Override
-    public JsonObject findLogoByTenantId(TenantId tenantId) {
+    public String findLogoByTenantId(TenantId tenantId) {
         Validator.validateId(tenantId, INCORRECT_TENANT_ID + tenantId);
         String file = tenantDao.findById(tenantId.getId()).getLogo();
         JsonObject jsonObject = new JsonObject();
-        jsonObject.addProperty("logo",file);
-        return jsonObject;
+        if(file != null && !file.isEmpty()){
+            jsonObject.addProperty("logo",file);
+        }else {
+            jsonObject.addProperty("logo","");
+        }
+        return jsonObject.toString();
     }
 }

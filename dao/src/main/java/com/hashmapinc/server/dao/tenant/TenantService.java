@@ -39,5 +39,5 @@ public interface TenantService {
     
     void deleteTenants();
 
-    JsonObject findLogoByTenantId(TenantId tenantId);
+    String findLogoByTenantId(TenantId tenantId);
 }
