@@ -15,7 +15,7 @@
 # limitations under the License.
 #
 
-FROM openjdk:8-jre
+FROM openjdk:11-jre
 
 ADD run-application.sh /run-application.sh
 ADD tempus.deb /tempus.deb
