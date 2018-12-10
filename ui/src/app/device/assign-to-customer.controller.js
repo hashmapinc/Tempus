@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 /*@ngInject*/
-export default function AssignDeviceToCustomerController(customerService, entityRelationService,  datamodelService, deviceService, $mdDialog, $q, deviceIds, customers) {
+export default function AssignDeviceToCustomerController(customerService, types, entityRelationService,datamodelService, deviceService, $mdDialog, $q, deviceIds, customers) {
 
     var vm = this;
 
@@ -29,11 +29,8 @@ export default function AssignDeviceToCustomerController(customerService, entity
     vm.noData = noData;
     vm.searchCustomerTextUpdated = searchCustomerTextUpdated;
     vm.toggleCustomerSelection = toggleCustomerSelection;
-    vm.dmo = '';
-    vm.dataModelObject = '';
-    vm.getDataModelObjectParent = getDataModelObjectParent;
-    vm.parentObject = '';
-    vm.entityName = '';
+    vm.types = types;
+
 
     vm.theCustomers = {
         getItemAtIndex: function (index) {
@@ -84,56 +81,31 @@ export default function AssignDeviceToCustomerController(customerService, entity
     function assign() {
         var tasks = [];
         for (var i=0;i<deviceIds.length;i++) {
-         tasks.push(deviceService.assignDeviceToCustomer(vm.customers.selection.id.id, deviceIds[i]));
+          tasks.push(deviceService.assignDeviceToCustomer(vm.customers.selection.id.id, deviceIds[i]));
         }
 
 
        $q.all(tasks).then(function () {
-       for (var i=0;i<deviceIds.length;i++) {
-            if(angular.isDefined(vm.dataModelname)){
-                deviceService.getDevice(deviceIds[i]).then(function success(item){
-                item.dataModelObjectId.id = vm.selectDataModelId;
+        for (var i=0;i<deviceIds.length;i++) {
+          deviceService.getDevice(deviceIds[i]).then(function success(item){
+            if(item.customerId.id !== vm.types.id.nullUid) {
+                item.dataModelObjectId.id = vm.types.id.nullUid;
                 deviceService.saveDevice(item);
-                if(angular.isDefined(vm.entityName) && vm.entityName !== "") {
-                 var relation ={
-                       type:"Contains",
-                         from: {
-                           id: item.id.id,
-                           entityType: "DEVICE"
-                        },
-                         to:{
-                           entityType: "ASSET",
-                           id: vm.entityName
-                     }
-                  }
-                 entityRelationService.saveRelation(relation);
-
+                if(item.additionalInfo == null) {
+                    entityRelationService.findInfoByFrom(item.id.id,'DEVICE').then(function success(itemDevice) {
+                        if(itemDevice.length !== 0) {
+                            entityRelationService.deleteRelation(itemDevice[0].from.id, itemDevice[0].from.entityType, 'Contains', itemDevice[0].to.id, itemDevice[0].to.entityType);
+                        }
+                    });
                 }
-               })
-           }
+            }
+           })
         }
            $mdDialog.hide();
         });
     }
 
-    function getDataModelObjectParent() {
-        datamodelService.getDatamodelObject(vm.dataModelObject).then(function success(item){
-            vm.selectDataModelId = item.data.id.id;
-            if(angular.isDefined(item.data.parentId)) {
-               datamodelService.getDatamodelObject(item.data.parentId.id).then(function success(item){
-                vm.parentObject = item.data.name;
-                if(item.data.type.toLowerCase() == "asset") {
-                  vm.showEnt = true;
-                  datamodelService.getDatamodelObjectAttributes(item.data.id.id).then(function success(item){
-                    item.forEach(dmo => { //
-                       vm.entityList[dmo.id.id] = dmo.name;
-                    });
-                  })
-                 }
-               })
-            }
-        })
-    }
+
 
 
     function noData() {
@@ -146,36 +118,10 @@ export default function AssignDeviceToCustomerController(customerService, entity
 
     function toggleCustomerSelection($event, customer) {
         $event.stopPropagation();
-        vm.dmo ='';
-        vm.parentObject = '';
-        vm.dataModelObjectValues = {};
-        vm.entityList = {};
-        vm.showEnt = false;
-        vm.dataModelObject ='';
-        vm.selectDataModelId = '';
-
         if (vm.isCustomerSelected(customer)) {
             vm.customers.selection = null;
 
         } else {
-          if(customer.dataModelId.id !== "13814000-1dd2-11b2-8080-808080808080") {
-            var promise = datamodelService.getDatamodel(customer.dataModelId.id);
-            if(promise){
-                promise.then(function success(result) {
-                    vm.dataModelname = result.name;
-                    datamodelService.getDatamodelObjects(customer.dataModelId.id).then(function success(item){
-                        vm.dmo = item;
-                        vm.dmo.forEach(dmo => { //
-                          if (dmo.type.toLowerCase() == 'device') {
-                            vm.dataModelObjectValues[dmo.id.id] = dmo.name;
-                          }
-
-                        });
-
-                    })
-                })
-            }
-          }
             vm.customers.selection = customer;
         }
     }

@@ -19,6 +19,7 @@
 import addDeviceTemplate from './add-device.tpl.html';
 import deviceCard from './device-card.tpl.html';
 import assignToCustomerTemplate from './assign-to-customer.tpl.html';
+import assignDatamodelToDevice from './assign-datamodel-to-device.tpl.html';
 import addDevicesToCustomerTemplate from './add-devices-to-customer.tpl.html';
 import deviceCredentialsTemplate from './device-credentials.tpl.html';
 
@@ -45,6 +46,7 @@ export function DeviceCardController(types) {
         }
         return false;
     }
+
 }
 
 
@@ -121,6 +123,7 @@ export function DeviceController($rootScope,userService, deviceService, customer
 
     vm.devicesScope = $state.$current.data.devicesType;
 
+    vm.assignToDatamodel = assignToDatamodel;
     vm.assignToCustomer = assignToCustomer;
     vm.unassignFromCustomer = unassignFromCustomer;
     vm.manageCredentials = manageCredentials;
@@ -548,6 +551,27 @@ export function DeviceController($rootScope,userService, deviceService, customer
             });
     }
 
+
+    function assignToDatamodel($event, device) {
+        if ($event) {
+            $event.stopPropagation();
+        }
+        $mdDialog.show({
+           controller: 'AssignDatamodelToDeviceController',
+           controllerAs: 'vm',
+           templateUrl: assignDatamodelToDevice,
+           locals: {device: device[0]},
+           parent: angular.element($document[0].body),
+           fullscreen: true,
+                    targetEvent: $event
+           }).then(function () {
+                    vm.grid.refreshList();
+                    loadTableData();
+            }, function () {
+         });
+
+    }
+
     function addDevicesToCustomer($event) {
         if ($event) {
             $event.stopPropagation();
@@ -617,12 +641,16 @@ export function DeviceController($rootScope,userService, deviceService, customer
             .ok($translate.instant('action.yes'));
         $mdDialog.show(confirm).then(function () {
             deviceService.unassignDeviceFromCustomer(device.id.id).then(function success(item) {
-              if(item.dataModelObjectId.id !== "13814000-1dd2-11b2-8080-808080808080") {
-                item.dataModelObjectId.id = '13814000-1dd2-11b2-8080-808080808080';
+              if(item.dataModelObjectId.id !== vm.types.id.nullUid) {
+                item.dataModelObjectId.id = vm.types.id.nullUid;
                 deviceService.saveDevice(item);
-                entityRelationService.findInfoByFrom(item.id.id,'DEVICE').then(function success(itemDevice) {
-                    entityRelationService.deleteRelation(itemDevice[0].from.id, itemDevice[0].from.entityType, 'Contains', itemDevice[0].to.id, itemDevice[0].to.entityType);
-                });
+                if(item.additionalInfo == null) {
+                    entityRelationService.findInfoByFrom(item.id.id,'DEVICE').then(function success(itemDevice) {
+                        if(itemDevice.length > 0) {
+                            entityRelationService.deleteRelation(itemDevice[0].from.id, itemDevice[0].from.entityType, 'Contains', itemDevice[0].to.id, itemDevice[0].to.entityType);
+                        }
+                    });
+                }
               }
                 vm.grid.refreshList();
                 loadTableData();

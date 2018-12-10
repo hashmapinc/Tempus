@@ -23,6 +23,7 @@ import tempusApiCustomer from '../api/customer.service';
 import DeviceRoutes from './device.routes';
 import {DeviceController, DeviceCardController} from './device.controller';
 import AssignDeviceToCustomerController from './assign-to-customer.controller';
+import AssignDatamodelToDeviceController from './assign-datamodel-to-device.controller';
 import AddDevicesToCustomerController from './add-devices-to-customer.controller';
 import ManageDeviceCredentialsController from './device-credentials.controller';
 import DeviceDirective from './device.directive';
@@ -38,6 +39,7 @@ export default angular.module('tempus.device', [
     .controller('DeviceController', DeviceController)
     .controller('DeviceCardController', DeviceCardController)
     .controller('AssignDeviceToCustomerController', AssignDeviceToCustomerController)
+    .controller('AssignDatamodelToDeviceController',AssignDatamodelToDeviceController)
     .controller('AddDevicesToCustomerController', AddDevicesToCustomerController)
     .controller('ManageDeviceCredentialsController', ManageDeviceCredentialsController)
     .directive('tbDevice', DeviceDirective)

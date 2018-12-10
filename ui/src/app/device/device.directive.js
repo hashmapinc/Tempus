@@ -21,7 +21,7 @@ import deviceFieldsetTemplate from './device-fieldset.tpl.html';
 /* eslint-enable import/no-unresolved, import/default */
 
 /*@ngInject*/
-export default function DeviceDirective($compile, $templateCache, toast, $translate, types, clipboardService, deviceService, customerService) {
+export default function DeviceDirective($compile,$templateCache,datamodelService, toast, $translate, types, clipboardService, deviceService, customerService) {
     var linker = function (scope, element) {
         var template = $templateCache.get(deviceFieldsetTemplate);
         element.html(template);
@@ -30,6 +30,10 @@ export default function DeviceDirective($compile, $templateCache, toast, $transl
         scope.isAssignedToCustomer = false;
         scope.isPublic = false;
         scope.assignedCustomer = null;
+        scope.assignedDataModelObject = null;
+        scope.isAssignedToDataModel = false;
+        scope.assignedToDataModelObject = false;
+
 
         scope.$watch('device', function(newVal) {
             if (newVal) {
@@ -41,11 +45,34 @@ export default function DeviceDirective($compile, $templateCache, toast, $transl
                             scope.isPublic = customer.isPublic;
                         }
                     );
+                    customerService.getCustomer(scope.device.customerId.id).then(
+                        function success(customer) {
+                            if(customer.dataModelId.id !== types.id.nullUid) {
+                                scope.isAssignedToDataModel = true;
+                            } else {
+                            scope.isAssignedToDataModel = false;
+                            }
+                        }
+                   );
                 } else {
                     scope.isAssignedToCustomer = false;
                     scope.isPublic = false;
                     scope.assignedCustomer = null;
+                    scope.isAssignedToDataModel = false;
                 }
+
+                if(scope.device.dataModelObjectId && scope.device.dataModelObjectId.id !== types.id.nullUid) {
+                    scope.assignedToDataModelObject = true;
+                    datamodelService.getDatamodelObject(scope.device.dataModelObjectId.id).then(
+                        function success(dataModelObject) {
+                            scope.assignedDataModelObject = dataModelObject.data.name;
+                        }
+                    );
+                } else {
+                    scope.assignedToDataModelObject = false;
+                    scope.assignedDataModelObject = null;
+                }
+
             }
         });
 
@@ -80,6 +107,8 @@ export default function DeviceDirective($compile, $templateCache, toast, $transl
             deviceScope: '=',
             theForm: '=',
             onAssignToCustomer: '&',
+            onAssignToDatamodel: '&',
+            onMakePublic: '&',
             onUnassignFromCustomer: '&',
             onManageCredentials: '&',
             onDeleteDevice: '&'
