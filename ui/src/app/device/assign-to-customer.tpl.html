@@ -61,42 +61,13 @@
                                 </md-list-item>
                             </md-list>
                         </md-virtual-repeat-container>
-                        <div ng-hide ="vm.dmo == ''"><span translate>device.assign-datamodel-to-device</span> <span> {{vm.dataModelname}}</span></div>
-                        <span flex></span>
-                        <md-input-container ng-hide ="vm.dmo == ''" flex="40" class="md-block" md-is-error="theForm.entityType.$touched && theForm.entityType.$invalid">
-                            <label translate>policy.datamodel-object</label>
-
-                            <md-select ng-change ="vm.getDataModelObjectParent()"  required ng-model="vm.dataModelObject">
-                                <md-option ng-value="key" ng-repeat="(key,value) in vm.dataModelObjectValues">{{ value }}</md-option>
-                            </md-select>
-
-                            <div ng-messages="theForm.entityType.$error">
-                                <div translate ng-message="required">policy.field-required</div>
-                            </div>
-                        </md-input-container>
-                        <md-input-container class="md-block" ng-if ="vm.parentObject !== ''">
-                            <span translate>dataModels.child-of</span><span>: {{vm.parentObject}}</span>
-                        </md-input-container>
-                        <md-input-container ng-show ="vm.showEnt" flex="40" class="md-block" md-is-error="theForm.entityType.$touched && theForm.entityType.$invalid">
-                            <label translate>asset.asset</label>
-
-                            <md-select required ng-model="vm.entityName">
-                                <md-option ng-value="key" ng-repeat="(key,value) in vm.entityList">{{ value }}</md-option>
-                            </md-select>
-
-                            <div ng-messages="theForm.entityType.$error">
-                                <div translate ng-message="required">asset.name-required</div>
-                            </div>
-                        </md-input-container>
-
-
                     </div>
                 </fieldset>
             </div>
         </md-dialog-content>
         <md-dialog-actions layout="row">
             <span flex></span>
-            <md-button ng-disabled="$root.loading || vm.customers.selection==null || (vm.dataModelObject=='' && vm.dmo !== '' ||  vm.entityName == '')" type="submit" class="md-raised md-primary">
+            <md-button ng-disabled="$root.loading || vm.customers.selection==null" type="submit" class="md-raised md-primary">
                 {{ 'action.assign' | translate }}
             </md-button>
             <md-button ng-disabled="$root.loading" ng-click="vm.cancel()" style="margin-right:20px;">{{ 'action.cancel' |
