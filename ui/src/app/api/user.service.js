@@ -62,7 +62,8 @@ function UserService($http, $q, $rootScope, adminService, dashboardService, logi
         logout: logout,
         reloadUser: reloadUser,
         getActivetheme:getActiveTheme,
-        getLogo:getLogo
+        getLogo:getLogo,
+        getLogoForTenant:getLogoForTenant
     }
 
     reloadUser();
@@ -103,6 +104,21 @@ function UserService($http, $q, $rootScope, adminService, dashboardService, logi
         return deferred.promise;
 
     }
+
+
+    function getLogoForTenant(tenantId) {
+
+            var deferred = $q.defer();
+            var url = 'api/settings/'+tenantId+'/logo';
+            $http.get(url, null).then(function success(response) {
+                deferred.resolve(response);
+            }, function fail() {
+                deferred.reject();
+            });
+            return deferred.promise;
+
+    }
+
 
 
     function updateAndValidateToken(token, prefix, notify) {

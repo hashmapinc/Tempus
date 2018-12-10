@@ -77,6 +77,11 @@ public final class TenantEntity extends BaseSqlEntity<Tenant> implements SearchT
     @Column(name = ModelConstants.TENANT_ADDITIONAL_INFO_PROPERTY)
     private JsonNode additionalInfo;
 
+    @Column(name = ModelConstants.TENANT_LOGO_FILE)
+    private String logo;
+
+
+
     public TenantEntity() {
         super();
     }
@@ -96,6 +101,7 @@ public final class TenantEntity extends BaseSqlEntity<Tenant> implements SearchT
         this.phone = tenant.getPhone();
         this.email = tenant.getEmail();
         this.additionalInfo = tenant.getAdditionalInfo();
+        this.logo = tenant.getLogo();
     }
 
     @Override
@@ -127,6 +133,7 @@ public final class TenantEntity extends BaseSqlEntity<Tenant> implements SearchT
         tenant.setPhone(phone);
         tenant.setEmail(email);
         tenant.setAdditionalInfo(additionalInfo);
+        tenant.setLogo(logo);
         return tenant;
     }
 

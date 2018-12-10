@@ -17,10 +17,13 @@
 package com.hashmapinc.server.dao.tenant;
 
 import com.google.common.util.concurrent.ListenableFuture;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.hashmapinc.server.common.data.Tenant;
 import com.hashmapinc.server.common.data.id.TenantId;
 import com.hashmapinc.server.common.data.page.TextPageData;
 import com.hashmapinc.server.common.data.page.TextPageLink;
-import com.hashmapinc.server.common.data.Tenant;
+
 
 public interface TenantService {
 
@@ -35,4 +38,6 @@ public interface TenantService {
     TextPageData<Tenant> findTenants(TextPageLink pageLink);
     
     void deleteTenants();
+
+    String findLogoByTenantId(TenantId tenantId);
 }

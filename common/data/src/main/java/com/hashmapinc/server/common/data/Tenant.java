@@ -28,6 +28,18 @@ public class Tenant extends ContactBased<TenantId> implements HasName {
     private String title;
     private String region;
 
+    public void setLogo(String logo) {
+        this.logo = logo;
+    }
+
+    public String getLogo() {
+        return logo;
+    }
+
+    private String logo;
+
+
+
     public Tenant() {
         super();
     }
@@ -40,7 +52,9 @@ public class Tenant extends ContactBased<TenantId> implements HasName {
         super(tenant);
         this.title = tenant.getTitle();
         this.region = tenant.getRegion();
+        this.logo = tenant.getLogo();
     }
+
 
     public String getTitle() {
         return title;

@@ -18,7 +18,7 @@ import Flow from '@flowjs/ng-flow/dist/ng-flow-standalone.min';
 import UrlHandler from './url.handler';
 
 /*@ngInject*/
-export default function AppRun($rootScope, $window, $injector, $location, $log, $state, $mdDialog, $filter, loginService, userService, $translate) {
+export default function AppRun($rootScope, $window, $injector, $location, $state, $mdDialog, $filter, loginService, userService, $translate) {
 
     $window.Flow = Flow;
     var frame = null;
@@ -75,6 +75,12 @@ export default function AppRun($rootScope, $window, $injector, $location, $log, 
         }
     }
 
+    function getLogoForUser(currentUser) {
+         userService.getLogoForTenant(currentUser.tenantId).then(function success(item) {
+            $rootScope.tenantlogo = item.data.logo;
+         });
+    }
+
 
     function initWatchers() {
         $rootScope.unauthenticatedHandle = $rootScope.$on('unauthenticated', function (event, doLogout) {
@@ -96,6 +102,7 @@ export default function AppRun($rootScope, $window, $injector, $location, $log, 
         $rootScope.stateChangeStartHandle = $rootScope.$on('$stateChangeStart', function (evt, to, params) {
 
             function waitForUserLoaded() {
+
                 if ($rootScope.userLoadedHandle) {
                     $rootScope.userLoadedHandle();
                 }
@@ -123,6 +130,15 @@ export default function AppRun($rootScope, $window, $injector, $location, $log, 
 
             if (userService.isUserLoaded() === true) {
                 if (userService.isAuthenticated()) {
+
+                   $rootScope.authority = userService.getCurrentUser().authority;
+                   if(angular.isUndefined($rootScope.tenantlogo) || $rootScope.tenantlogo == null) {
+                     if($rootScope.authority !== "SYS_ADMIN") {
+                         var currentUser = userService.getCurrentUser();
+                         getLogoForUser(currentUser);
+                     }
+                   }
+
                     if (userService.isPublic()) {
                         if (userService.parsePublicId() !== publicId) {
                             evt.preventDefault();
@@ -151,6 +167,7 @@ export default function AppRun($rootScope, $window, $injector, $location, $log, 
                             $state.go(to.redirectTo, params)
                         }
                     }
+
                 } else {
                     if (publicId && publicId.length > 0) {
                         evt.preventDefault();

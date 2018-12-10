@@ -208,7 +208,8 @@ CREATE TABLE IF NOT EXISTS tenant (
     search_text varchar(255),
     state varchar(255),
     title varchar(255),
-    zip varchar(255)
+    zip varchar(255),
+    logo varchar(255)
 );
 
 CREATE TABLE IF NOT EXISTS ts_kv (
