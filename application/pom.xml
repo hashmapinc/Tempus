@@ -345,7 +345,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-install-plugin</artifactId>
-                <version>2.5.1</version>
+                <version>${maven-install-plugin.version}</version>
                 <configuration>
                     <groupId>codes.rafael.gradlemavenplugin</groupId>
                     <artifactId>gradle-maven-plugin</artifactId>
