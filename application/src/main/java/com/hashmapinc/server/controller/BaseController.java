@@ -708,8 +708,10 @@ public abstract class BaseController {
         auditLogService.logEntityAction(user.getTenantId(), customerId, user.getId(), user.getName(), entityId, entity, actionType, e, additionalInfo);
     }
 
-    protected TempusResourceCriteriaSpec getTempusResourceCriteriaSpec(SecurityUser user, EntityType entityType, DataModelObjectId dataModelObjectId) throws TempusException{
-        final TempusResourceCriteriaSpec tempusResourceCriteriaSpec = new TempusResourceCriteriaSpec(entityType, user.getTenantId(), dataModelObjectId);
+    /*protected TempusResourceCriteriaSpec getTempusResourceCriteriaSpec(SecurityUser user, EntityType entityType, DataModelObjectId dataModelObjectId) throws TempusException{
+        final TempusResourceCriteriaSpec tempusResourceCriteriaSpec = new TempusResourceCriteriaSpec(entityType, user.getTenantId());
+
+        tempusResourceCriteriaSpec.setDataModelObjectId(Optional.of(dataModelObjectId));
 
         if(isCustomerUser(user)){
             tempusResourceCriteriaSpec.setCustomerId(Optional.of(user.getCustomerId()));
@@ -732,7 +734,75 @@ public abstract class BaseController {
                 tempusResourceCriteriaSpec.setAccessibleIdsForGivenDataModelObject(accessibleResourceIdsForGivenDmo);
             }
         }
-        tempusResourceCriteriaSpec.setDataModelObjectId(dataModelObjectId);
+        return tempusResourceCriteriaSpec;
+    }*/
+
+    protected TempusResourceCriteriaSpec getTempusResourceCriteriaSpec(SecurityUser user, EntityType entityType, DataModelObjectId dataModelObjectId, DataModelId dataModelId, String type, String searchText) throws TempusException{
+        final TempusResourceCriteriaSpec tempusResourceCriteriaSpec = new TempusResourceCriteriaSpec(entityType, user.getTenantId());
+
+        if(type != null && !type.isEmpty()) {
+            tempusResourceCriteriaSpec.setType(Optional.of(type.trim()));
+        }
+
+        if(searchText != null && !searchText.isEmpty()) {
+            tempusResourceCriteriaSpec.setSearchText(Optional.of(searchText));
+        }
+
+        if(isCustomerUser(user)){
+            tempusResourceCriteriaSpec.setCustomerId(Optional.of(user.getCustomerId()));
+        }
+        final Supplier<Stream<UserPermission>> readableAndResourceAccessibleStream = getReadableAndResourceAccessibleStream(user, entityType);
+
+        final boolean hasPermOnAllResources =
+                readableAndResourceAccessibleStream.get().map(UserPermission::getResourceAttributes).anyMatch(Objects::isNull); //case: {USER}:*:READ
+
+        if(!hasPermOnAllResources) {
+            Set<DataModelObjectId> allowedDataModelObjectIds = new HashSet<>();
+            Set<EntityId> allowedEntityIds = new HashSet<>();
+            String entityTypeName = entityType.equals(EntityType.DEVICE) ? "Device" : "Asset";
+            final List<DataModelObjectId> dataModelObjectIds = (dataModelId != null) ?
+                    dataModelObjectService.findByDataModelIdAndType(dataModelId, entityTypeName).stream().map(DataModelObject::getId).collect(Collectors.toList()) :
+                    Collections.emptyList();
+
+            if(dataModelObjectIds.isEmpty()){
+                if(dataModelObjectId != null) {
+                    final boolean hasHierarchicalPermOnEntireDmo =
+                            hasHierarchicalPermOnEntireDataModel(readableAndResourceAccessibleStream, dataModelObjectId);  // case: {USER}:ASSET?dataModelId={dmoid}:READ where dmoid in (parent of given dmoid)
+
+                    if (!hasHierarchicalPermOnEntireDmo) {
+                        final boolean hasPermOnDmoWithResources =
+                                hasPermOnDmoWithResources(readableAndResourceAccessibleStream, dataModelObjectId); // case: {USER}:ASSET?dataModelId={dmoid}&id={resId}:READ where dmoid = dataModelObjectId
+                        if (!hasPermOnDmoWithResources) {
+                            throw new IncorrectParameterException(NO_PERMISSION_TO_READ);
+                        } else {
+                            final Set<EntityId> accessibleResourceIdsForGivenDmo = getAccessibleResourceIdsForGivenDmo(readableAndResourceAccessibleStream, entityType, dataModelObjectId);
+                            tempusResourceCriteriaSpec.setAccessibleIdsForGivenDataModelObject(accessibleResourceIdsForGivenDmo);
+                        }
+                    }
+                    tempusResourceCriteriaSpec.setDataModelObjectId(Optional.of(dataModelObjectId));
+                }
+            }else {
+                for (DataModelObjectId _dataModelObjectId : dataModelObjectIds) {
+                    final boolean hasHierarchicalPermOnEntireDmo =
+                            hasHierarchicalPermOnEntireDataModel(readableAndResourceAccessibleStream, _dataModelObjectId);  // case: {USER}:ASSET?dataModelId={dmoid}:READ where dmoid in (parent of given dmoid)
+
+                    if (!hasHierarchicalPermOnEntireDmo) {
+                        final boolean hasPermOnDmoWithResources =
+                                hasPermOnDmoWithResources(readableAndResourceAccessibleStream, _dataModelObjectId); // case: {USER}:ASSET?dataModelId={dmoid}&id={resId}:READ where dmoid = dataModelObjectId
+                        if (hasPermOnDmoWithResources) {
+                            final Set<EntityId> accessibleResourceIdsForGivenDmo = getAccessibleResourceIdsForGivenDmo(readableAndResourceAccessibleStream, entityType, _dataModelObjectId);
+                            allowedDataModelObjectIds.add(_dataModelObjectId);
+                            allowedEntityIds.addAll(accessibleResourceIdsForGivenDmo);
+                        }
+                    } else {
+                        allowedDataModelObjectIds.add(_dataModelObjectId);
+                    }
+                }
+                tempusResourceCriteriaSpec.setDataModelObjectIds(allowedDataModelObjectIds);
+                tempusResourceCriteriaSpec.setAccessibleIdsForGivenDataModelObject(allowedEntityIds);
+            }
+
+        }
         return tempusResourceCriteriaSpec;
     }
 

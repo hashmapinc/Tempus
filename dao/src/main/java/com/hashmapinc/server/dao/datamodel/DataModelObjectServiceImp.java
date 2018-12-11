@@ -109,6 +109,19 @@ public class DataModelObjectServiceImp implements DataModelObjectService {
     }
 
     @Override
+    public List<DataModelObject> findByDataModelIdAndType(DataModelId dataModelId, String type) {
+        validateId(dataModelId, INCORRECT_DATA_MODEL_ID + dataModelId);
+        List<DataModelObject> dataModelObjects = dataModelObjectDao.findByDataModelIdAndType(dataModelId, type);
+        dataModelObjects.stream().forEach(dataModelObject -> {
+            if(dataModelObject != null){
+                List<AttributeDefinition> attributeDefinitions = attributeDefinitionDao.findByDataModelObjectId(dataModelObject.getId());
+                dataModelObject.setAttributeDefinitions(attributeDefinitions);
+            }
+        });
+        return dataModelObjects;
+    }
+
+    @Override
     public Set<DataModelObjectId> getAllParentDataModelIdsOf(DataModelObjectId dataModelObjectId) {
         Set<DataModelObjectId> parents = new HashSet<>();
         DataModelObject dataModelObject = findById(dataModelObjectId);

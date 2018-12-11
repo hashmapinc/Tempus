@@ -17,14 +17,12 @@
 package com.hashmapinc.server.controller;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.hashmapinc.server.common.data.datamodel.AttributeDefinition;
 import com.hashmapinc.server.common.data.datamodel.DataModel;
 import com.hashmapinc.server.common.data.datamodel.DataModelObject;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -38,7 +36,7 @@ public class BaseDataModelControllerTest extends AbstractControllerTest {
     public void beforeTest() throws Exception {
         loginTenantAdmin();
         defaultDataModel = createDataModel();
-        defaultDataModelObj = createDataModelObject(defaultDataModel);
+        defaultDataModelObj = createDataModelObject(defaultDataModel, "Well", "Asset");
     }
 
     @Test

@@ -658,7 +658,8 @@ public abstract class BaseAssetServiceTest extends AbstractServiceTest {
         }
 
         TextPageLink pageLink1 = new TextPageLink(20, "ASSET_");
-        TempusResourceCriteriaSpec tempusResourceCriteriaSpec = new TempusResourceCriteriaSpec(EntityType.ASSET, tenantId1, dataModelObjectId1);
+        TempusResourceCriteriaSpec tempusResourceCriteriaSpec = new TempusResourceCriteriaSpec(EntityType.ASSET, tenantId1);
+        tempusResourceCriteriaSpec.setDataModelObjectId(Optional.of(dataModelObjectId1));
         tempusResourceCriteriaSpec.setCustomerId(Optional.of(customerId1));
         final TextPageData<Asset> page1 = assetService.findAll(tempusResourceCriteriaSpec, pageLink1);
         assertEquals(20, page1.getData().size());
@@ -669,7 +670,8 @@ public abstract class BaseAssetServiceTest extends AbstractServiceTest {
 
 
         TextPageLink pageLink11 = new TextPageLink(20, "ASSET_");
-        TempusResourceCriteriaSpec tempusResourceCriteriaSpec11 = new TempusResourceCriteriaSpec(EntityType.ASSET, tenantId1, dataModelObjectId1);
+        TempusResourceCriteriaSpec tempusResourceCriteriaSpec11 = new TempusResourceCriteriaSpec(EntityType.ASSET, tenantId1);
+        tempusResourceCriteriaSpec11.setDataModelObjectId(Optional.of(dataModelObjectId1));
         tempusResourceCriteriaSpec11.setCustomerId(Optional.of(customerId1));
         final HashSet<AssetId> accessibleIdsForGivenDataModelObject = new HashSet<>(allAssetIdsForTenant1.subList(0, 25));
         tempusResourceCriteriaSpec11.setAccessibleIdsForGivenDataModelObject(accessibleIdsForGivenDataModelObject);

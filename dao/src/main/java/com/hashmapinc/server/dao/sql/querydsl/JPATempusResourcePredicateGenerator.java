@@ -64,7 +64,7 @@ public class JPATempusResourcePredicateGenerator implements TempusResourcePredic
                     return new TempusResourcePredicate<>((path.like("%" + criteriaValue.toLowerCase() + "%")));
                 case CONTAINS:
                     final List<String> strings = Arrays.asList((String[]) resourceCriteria.getValue());
-                    return new TempusResourcePredicate<>((path.in(strings)));
+                    return new TempusResourcePredicate<>((path.lower().in(strings)));
                 case GREATER_THAN:
                     return new TempusResourcePredicate<>(path.gt(criteriaValue));
                 case LESS_THAN:

@@ -269,9 +269,9 @@ public class DeviceServiceImpl extends AbstractEntityService implements DeviceSe
     }
 
     @Override
-    public TextPageData<Device> findAll(TempusResourceCriteriaSpec tempusResourceCriteriaSpec, TextPageLink textPageLink){
+    public List<Device> findAll(TempusResourceCriteriaSpec tempusResourceCriteriaSpec, int limit, int pageNum){
         log.trace("Executing findAll [{}]", tempusResourceCriteriaSpec);
-        return new TextPageData<>(deviceDao.findAll(tempusResourceCriteriaSpec, textPageLink), textPageLink);
+        return deviceDao.findAll(tempusResourceCriteriaSpec, limit, pageNum);
     }
 
     private DataValidator<Device> deviceValidator =
