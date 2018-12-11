@@ -129,7 +129,9 @@ public interface DeviceDao extends Dao<Device> {
      * Find all device by tempusResourceCriteriaSpec object
      *
      * @param tempusResourceCriteriaSpec the tempusResourceCriteriaSpec
+     * @param limit
+     * @param pageNum
      * @return the list of device objects corresponding to tempusResourceCriteriaSpec
      */
-    List<Device> findAll(TempusResourceCriteriaSpec tempusResourceCriteriaSpec, TextPageLink textPageLink);
+    List<Device> findAll(TempusResourceCriteriaSpec tempusResourceCriteriaSpec, int limit, int pageNum);
 }

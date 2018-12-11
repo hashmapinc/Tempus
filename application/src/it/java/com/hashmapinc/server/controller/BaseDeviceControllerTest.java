@@ -22,10 +22,7 @@ import com.google.gson.JsonParser;
 import com.hashmapinc.server.common.data.*;
 import com.hashmapinc.server.common.data.datamodel.DataModel;
 import com.hashmapinc.server.common.data.datamodel.DataModelObject;
-import com.hashmapinc.server.common.data.id.CustomerId;
-import com.hashmapinc.server.common.data.id.DeviceCredentialsId;
-import com.hashmapinc.server.common.data.id.DeviceId;
-import com.hashmapinc.server.common.data.id.UserId;
+import com.hashmapinc.server.common.data.id.*;
 import com.hashmapinc.server.common.data.kv.*;
 import com.hashmapinc.server.common.data.page.TextPageData;
 import com.hashmapinc.server.common.data.page.TextPageLink;
@@ -45,6 +42,7 @@ import org.springframework.test.web.servlet.ResultActions;
 
 import java.util.*;
 import java.util.concurrent.ExecutionException;
+import java.util.stream.Collectors;
 
 import static org.hamcrest.Matchers.containsString;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -370,22 +368,39 @@ public abstract class BaseDeviceControllerTest extends AbstractControllerTest {
             device.setType("default");
             devices.add(doPost("/api/device", device, Device.class));
         }
+
         List<Device> loadedDevices = new ArrayList<>();
-        TextPageLink pageLink = new TextPageLink(23);
-        TextPageData<Device> pageData = null;
+        int pageNum = 0;
+        int pageLimit = 23;
+        List<Device> pageData;
         do {
-            pageData = doGetTypedWithPageLink("/api/tenant/devices?", 
-                    new TypeReference<TextPageData<Device>>(){}, pageLink);
-            loadedDevices.addAll(pageData.getData());
-            if (pageData.hasNext()) {
-                pageLink = pageData.getNextPageLink();
-            }
-        } while (pageData.hasNext());
-        
+            pageData = doGetTyped("/api/tenant/devices?limit="+pageLimit+"&pageNum=" + pageNum,
+                    new TypeReference<List<Device>>() {
+                    });
+            loadedDevices.addAll(pageData);
+            pageNum++;
+        } while (pageData.size() == pageLimit);
+
         Collections.sort(devices, idComparator);
         Collections.sort(loadedDevices, idComparator);
-        
         Assert.assertEquals(devices, loadedDevices);
+
+//        List<Device> loadedDevices = new ArrayList<>();
+//        TextPageLink pageLink = new TextPageLink(23);
+//        TextPageData<Device> pageData = null;
+//        do {
+//            pageData = doGetTypedWithPageLink("/api/tenant/devices?",
+//                    new TypeReference<TextPageData<Device>>(){}, pageLink);
+//            loadedDevices.addAll(pageData.getData());
+//            if (pageData.hasNext()) {
+//                pageLink = pageData.getNextPageLink();
+//            }
+//        } while (pageData.hasNext());
+//
+//        Collections.sort(devices, idComparator);
+//        Collections.sort(loadedDevices, idComparator);
+//
+//        Assert.assertEquals(devices, loadedDevices);
     }
     
     @Test
@@ -412,61 +427,60 @@ public abstract class BaseDeviceControllerTest extends AbstractControllerTest {
             device.setType("default");
             devicesTitle2.add(doPost("/api/device", device, Device.class));
         }
-        
+
         List<Device> loadedDevicesTitle1 = new ArrayList<>();
-        TextPageLink pageLink = new TextPageLink(15, title1);
-        TextPageData<Device> pageData = null;
+        int pageNum = 0;
+        int pageLimit = 15;
+        List<Device> pageData;
         do {
-            pageData = doGetTypedWithPageLink("/api/tenant/devices?", 
-                    new TypeReference<TextPageData<Device>>(){}, pageLink);
-            loadedDevicesTitle1.addAll(pageData.getData());
-            if (pageData.hasNext()) {
-                pageLink = pageData.getNextPageLink();
-            }
-        } while (pageData.hasNext());
-        
+            pageData = doGetTyped("/api/tenant/devices?limit="+pageLimit+"&pageNum=" + pageNum + "&textSearch="+ title1,
+                    new TypeReference<List<Device>>() {
+                    });
+            loadedDevicesTitle1.addAll(pageData);
+            pageNum++;
+        } while (pageData.size() == pageLimit);
+
         Collections.sort(devicesTitle1, idComparator);
         Collections.sort(loadedDevicesTitle1, idComparator);
-        
         Assert.assertEquals(devicesTitle1, loadedDevicesTitle1);
         
         List<Device> loadedDevicesTitle2 = new ArrayList<>();
-        pageLink = new TextPageLink(4, title2);
+        pageNum = 0;
+        pageLimit = 4;
         do {
-            pageData = doGetTypedWithPageLink("/api/tenant/devices?", 
-                    new TypeReference<TextPageData<Device>>(){}, pageLink);
-            loadedDevicesTitle2.addAll(pageData.getData());
-            if (pageData.hasNext()) {
-                pageLink = pageData.getNextPageLink();
-            }
-        } while (pageData.hasNext());
+            pageData = doGetTyped("/api/tenant/devices?limit="+pageLimit+"&pageNum=" + pageNum + "&textSearch="+ title2,
+                    new TypeReference<List<Device>>() {
+                    });
+            loadedDevicesTitle2.addAll(pageData);
+            pageNum++;
+        } while (pageData.size() == pageLimit);
 
         Collections.sort(devicesTitle2, idComparator);
         Collections.sort(loadedDevicesTitle2, idComparator);
-        
         Assert.assertEquals(devicesTitle2, loadedDevicesTitle2);
         
         for (Device device : loadedDevicesTitle1) {
             doDelete("/api/device/"+device.getId().getId().toString())
             .andExpect(status().isOk());
         }
-        
-        pageLink = new TextPageLink(4, title1);
-        pageData = doGetTypedWithPageLink("/api/tenant/devices?", 
-                new TypeReference<TextPageData<Device>>(){}, pageLink);
-        Assert.assertFalse(pageData.hasNext());
-        Assert.assertEquals(0, pageData.getData().size());
+
+        pageData = doGetTyped("/api/tenant/devices?limit=4&pageNum=0&textSearch="+title1,
+                new TypeReference<List<Device>>() {
+                });
+
+        Assert.assertEquals(0, pageData.size());
+
         
         for (Device device : loadedDevicesTitle2) {
             doDelete("/api/device/"+device.getId().getId().toString())
             .andExpect(status().isOk());
         }
-        
-        pageLink = new TextPageLink(4, title2);
-        pageData = doGetTypedWithPageLink("/api/tenant/devices?", 
-                new TypeReference<TextPageData<Device>>(){}, pageLink);
-        Assert.assertFalse(pageData.hasNext());
-        Assert.assertEquals(0, pageData.getData().size());
+
+        pageData = doGetTyped("/api/tenant/devices?limit=4&pageNum=0&textSearch="+title2,
+                new TypeReference<List<Device>>() {
+                });
+
+        Assert.assertEquals(0, pageData.size());
     }
 
     @Test
@@ -497,36 +511,34 @@ public abstract class BaseDeviceControllerTest extends AbstractControllerTest {
         }
 
         List<Device> loadedDevicesType1 = new ArrayList<>();
-        TextPageLink pageLink = new TextPageLink(15);
-        TextPageData<Device> pageData = null;
+        int pageNum = 0;
+        int pageLimit = 15;
+        List<Device> pageData;
         do {
-            pageData = doGetTypedWithPageLink("/api/tenant/devices?type={type}&",
-                    new TypeReference<TextPageData<Device>>(){}, pageLink, type1);
-            loadedDevicesType1.addAll(pageData.getData());
-            if (pageData.hasNext()) {
-                pageLink = pageData.getNextPageLink();
-            }
-        } while (pageData.hasNext());
+            pageData = doGetTyped("/api/tenant/devices?limit="+pageLimit+"&pageNum=" + pageNum + "&type="+type1,
+                    new TypeReference<List<Device>>() {
+                    });
+            loadedDevicesType1.addAll(pageData);
+            pageNum++;
+        } while (pageData.size() == pageLimit);
 
         Collections.sort(devicesType1, idComparator);
         Collections.sort(loadedDevicesType1, idComparator);
-
         Assert.assertEquals(devicesType1, loadedDevicesType1);
 
         List<Device> loadedDevicesType2 = new ArrayList<>();
-        pageLink = new TextPageLink(4);
+        pageNum = 0;
+        pageLimit = 4;
         do {
-            pageData = doGetTypedWithPageLink("/api/tenant/devices?type={type}&",
-                    new TypeReference<TextPageData<Device>>(){}, pageLink, type2);
-            loadedDevicesType2.addAll(pageData.getData());
-            if (pageData.hasNext()) {
-                pageLink = pageData.getNextPageLink();
-            }
-        } while (pageData.hasNext());
+            pageData = doGetTyped("/api/tenant/devices?limit="+pageLimit+"&pageNum=" + pageNum + "&type="+type2,
+                    new TypeReference<List<Device>>() {
+                    });
+            loadedDevicesType2.addAll(pageData);
+            pageNum++;
+        } while (pageData.size() == pageLimit);
 
         Collections.sort(devicesType2, idComparator);
         Collections.sort(loadedDevicesType2, idComparator);
-
         Assert.assertEquals(devicesType2, loadedDevicesType2);
 
         for (Device device : loadedDevicesType1) {
@@ -534,24 +546,26 @@ public abstract class BaseDeviceControllerTest extends AbstractControllerTest {
                     .andExpect(status().isOk());
         }
 
-        pageLink = new TextPageLink(4);
-        pageData = doGetTypedWithPageLink("/api/tenant/devices?type={type}&",
-                new TypeReference<TextPageData<Device>>(){}, pageLink, type1);
-        Assert.assertFalse(pageData.hasNext());
-        Assert.assertEquals(0, pageData.getData().size());
+        pageData = doGetTyped("/api/tenant/devices?limit=4&pageNum=0&textSearch="+title1+ "&type="+type1,
+                new TypeReference<List<Device>>() {
+                });
+
+        Assert.assertEquals(0, pageData.size());
 
         for (Device device : loadedDevicesType2) {
             doDelete("/api/device/"+device.getId().getId().toString())
                     .andExpect(status().isOk());
         }
 
-        pageLink = new TextPageLink(4);
-        pageData = doGetTypedWithPageLink("/api/tenant/devices?type={type}&",
-                new TypeReference<TextPageData<Device>>(){}, pageLink, type2);
-        Assert.assertFalse(pageData.hasNext());
-        Assert.assertEquals(0, pageData.getData().size());
+        pageData = doGetTyped("/api/tenant/devices?limit=4&pageNum=0&textSearch="+title1+ "&type="+type2,
+                new TypeReference<List<Device>>() {
+                });
+
+        Assert.assertEquals(0, pageData.size());
     }
-    
+
+
+
     @Test
     public void testFindCustomerDevices() throws Exception {
         Customer customer = new Customer();
@@ -570,17 +584,17 @@ public abstract class BaseDeviceControllerTest extends AbstractControllerTest {
         }
         
         List<Device> loadedDevices = new ArrayList<>();
-        TextPageLink pageLink = new TextPageLink(23);
-        TextPageData<Device> pageData = null;
+        int pageNum = 0;
+        int pageLimit = 23;
+        List<Device> pageData;
         do {
-            pageData = doGetTypedWithPageLink("/api/customer/" + customerId.getId().toString() + "/devices?", 
-                    new TypeReference<TextPageData<Device>>(){}, pageLink);
-            loadedDevices.addAll(pageData.getData());
-            if (pageData.hasNext()) {
-                pageLink = pageData.getNextPageLink();
-            }
-        } while (pageData.hasNext());
-        
+            pageData = doGetTyped("/api/customer/" + customerId.getId().toString() + "/devices?limit="+pageLimit+"&pageNum=" + pageNum,
+                    new TypeReference<List<Device>>() {
+                    });
+            loadedDevices.addAll(pageData);
+            pageNum++;
+        } while (pageData.size() == pageLimit);
+
         Collections.sort(devices, idComparator);
         Collections.sort(loadedDevices, idComparator);
         
@@ -622,32 +636,32 @@ public abstract class BaseDeviceControllerTest extends AbstractControllerTest {
         }
         
         List<Device> loadedDevicesTitle1 = new ArrayList<>();
-        TextPageLink pageLink = new TextPageLink(15, title1);
-        TextPageData<Device> pageData = null;
+        int pageNum = 0;
+        int pageLimit = 15;
+        List<Device> pageData;
         do {
-            pageData = doGetTypedWithPageLink("/api/customer/" + customerId.getId().toString() + "/devices?", 
-                    new TypeReference<TextPageData<Device>>(){}, pageLink);
-            loadedDevicesTitle1.addAll(pageData.getData());
-            if (pageData.hasNext()) {
-                pageLink = pageData.getNextPageLink();
-            }
-        } while (pageData.hasNext());
+            pageData = doGetTyped("/api/customer/" + customerId.getId().toString() + "/devices?limit="+pageLimit+"&pageNum=" + pageNum+"&textSearch="+title1,
+                    new TypeReference<List<Device>>() {
+                    });
+            loadedDevicesTitle1.addAll(pageData);
+            pageNum++;
+        } while (pageData.size() == pageLimit);
         
         Collections.sort(devicesTitle1, idComparator);
         Collections.sort(loadedDevicesTitle1, idComparator);
-        
         Assert.assertEquals(devicesTitle1, loadedDevicesTitle1);
         
+
         List<Device> loadedDevicesTitle2 = new ArrayList<>();
-        pageLink = new TextPageLink(4, title2);
+        pageNum = 0;
+        pageLimit = 4;
         do {
-            pageData = doGetTypedWithPageLink("/api/customer/" + customerId.getId().toString() + "/devices?", 
-                    new TypeReference<TextPageData<Device>>(){}, pageLink);
-            loadedDevicesTitle2.addAll(pageData.getData());
-            if (pageData.hasNext()) {
-                pageLink = pageData.getNextPageLink();
-            }
-        } while (pageData.hasNext());
+            pageData = doGetTyped("/api/customer/" + customerId.getId().toString() + "/devices?limit="+pageLimit+"&pageNum=" + pageNum+"&textSearch="+title2,
+                    new TypeReference<List<Device>>() {
+                    });
+            loadedDevicesTitle2.addAll(pageData);
+            pageNum++;
+        } while (pageData.size() == pageLimit);
 
         Collections.sort(devicesTitle2, idComparator);
         Collections.sort(loadedDevicesTitle2, idComparator);
@@ -658,23 +672,24 @@ public abstract class BaseDeviceControllerTest extends AbstractControllerTest {
             doDelete("/api/customer/device/" + device.getId().getId().toString())
             .andExpect(status().isOk());
         }
-        
-        pageLink = new TextPageLink(4, title1);
-        pageData = doGetTypedWithPageLink("/api/customer/" + customerId.getId().toString() + "/devices?", 
-                new TypeReference<TextPageData<Device>>(){}, pageLink);
-        Assert.assertFalse(pageData.hasNext());
-        Assert.assertEquals(0, pageData.getData().size());
+
+        pageData = doGetTyped("/api/customer/" + customerId.getId().toString() + "/devices?limit=4&pageNum=0&textSearch="+title1,
+                new TypeReference<List<Device>>() {
+                });
+
+        Assert.assertEquals(0, pageData.size());
         
         for (Device device : loadedDevicesTitle2) {
             doDelete("/api/customer/device/" + device.getId().getId().toString())
             .andExpect(status().isOk());
         }
-        
-        pageLink = new TextPageLink(4, title2);
-        pageData = doGetTypedWithPageLink("/api/customer/" + customerId.getId().toString() + "/devices?", 
-                new TypeReference<TextPageData<Device>>(){}, pageLink);
-        Assert.assertFalse(pageData.hasNext());
-        Assert.assertEquals(0, pageData.getData().size());
+
+
+        pageData = doGetTyped("/api/customer/" + customerId.getId().toString() + "/devices?limit=4&pageNum=0&textSearch="+title2,
+                new TypeReference<List<Device>>() {
+                });
+
+        Assert.assertEquals(0, pageData.size());
     }
 
     @Test
@@ -714,16 +729,17 @@ public abstract class BaseDeviceControllerTest extends AbstractControllerTest {
         }
 
         List<Device> loadedDevicesType1 = new ArrayList<>();
-        TextPageLink pageLink = new TextPageLink(15);
-        TextPageData<Device> pageData = null;
+        int pageNum = 0;
+        int pageLimit = 15;
+        List<Device> pageData = Collections.emptyList();
         do {
-            pageData = doGetTypedWithPageLink("/api/customer/" + customerId.getId().toString() + "/devices?type={type}&",
-                    new TypeReference<TextPageData<Device>>(){}, pageLink, type1);
-            loadedDevicesType1.addAll(pageData.getData());
-            if (pageData.hasNext()) {
-                pageLink = pageData.getNextPageLink();
-            }
-        } while (pageData.hasNext());
+            pageData = doGetTyped("/api/customer/" + customerId.getId().toString() + "/devices?limit="+pageLimit+"&pageNum=" + pageNum+"&type="+type1,
+                    new TypeReference<List<Device>>() {
+                    });
+            loadedDevicesType1.addAll(pageData);
+            pageNum++;
+
+        } while (pageData.size() == pageLimit);
 
         Collections.sort(devicesType1, idComparator);
         Collections.sort(loadedDevicesType1, idComparator);
@@ -731,15 +747,16 @@ public abstract class BaseDeviceControllerTest extends AbstractControllerTest {
         Assert.assertEquals(devicesType1, loadedDevicesType1);
 
         List<Device> loadedDevicesType2 = new ArrayList<>();
-        pageLink = new TextPageLink(4);
+        pageNum = 0;
+        pageLimit = 4;
         do {
-            pageData = doGetTypedWithPageLink("/api/customer/" + customerId.getId().toString() + "/devices?type={type}&",
-                    new TypeReference<TextPageData<Device>>(){}, pageLink, type2);
-            loadedDevicesType2.addAll(pageData.getData());
-            if (pageData.hasNext()) {
-                pageLink = pageData.getNextPageLink();
-            }
-        } while (pageData.hasNext());
+            pageData = doGetTyped("/api/customer/" + customerId.getId().toString() + "/devices?limit="+pageLimit+"&pageNum=" + pageNum+"&type="+type2,
+                    new TypeReference<List<Device>>() {
+                    });
+            loadedDevicesType2.addAll(pageData);
+            pageNum++;
+
+        } while (pageData.size() == pageLimit);
 
         Collections.sort(devicesType2, idComparator);
         Collections.sort(loadedDevicesType2, idComparator);
@@ -751,22 +768,22 @@ public abstract class BaseDeviceControllerTest extends AbstractControllerTest {
                     .andExpect(status().isOk());
         }
 
-        pageLink = new TextPageLink(4);
-        pageData = doGetTypedWithPageLink("/api/customer/" + customerId.getId().toString() + "/devices?type={type}&",
-                new TypeReference<TextPageData<Device>>(){}, pageLink, type1);
-        Assert.assertFalse(pageData.hasNext());
-        Assert.assertEquals(0, pageData.getData().size());
+        pageData = doGetTyped("/api/customer/" + customerId.getId().toString() + "/devices?limit=4&pageNum=0&type="+type1,
+                new TypeReference<List<Device>>() {
+                });
+
+        Assert.assertEquals(0, pageData.size());
 
         for (Device device : loadedDevicesType2) {
             doDelete("/api/customer/device/" + device.getId().getId().toString())
                     .andExpect(status().isOk());
         }
 
-        pageLink = new TextPageLink(4);
-        pageData = doGetTypedWithPageLink("/api/customer/" + customerId.getId().toString() + "/devices?type={type}&",
-                new TypeReference<TextPageData<Device>>(){}, pageLink, type2);
-        Assert.assertFalse(pageData.hasNext());
-        Assert.assertEquals(0, pageData.getData().size());
+        pageData = doGetTyped("/api/customer/" + customerId.getId().toString() + "/devices?limit=4&pageNum=0&type="+type2,
+                new TypeReference<List<Device>>() {
+                });
+
+        Assert.assertEquals(0, pageData.size());
     }
 
     @Test
@@ -851,7 +868,7 @@ public abstract class BaseDeviceControllerTest extends AbstractControllerTest {
     @Test
     public void findAllDevicesByDataModeObject() throws Exception{
         DataModel dataModel = createDataModel();
-        DataModelObject dataModelObject = createDataModelObject(dataModel);
+        DataModelObject dataModelObject = createDataModelObject(dataModel, "Well", "Asset");
 
         String policyNew1 = String.format("CUSTOMER_USER:DEVICE?%s=%s:READ",
                                           UserPermission.ResourceAttribute.DATA_MODEL_ID, dataModelObject.getId().getId().toString());
@@ -872,14 +889,17 @@ public abstract class BaseDeviceControllerTest extends AbstractControllerTest {
             createDevice(dataModelObject.getId(), customerUser.getCustomerId(), "Customer's device"+i);
         }
 
-        TextPageLink pageLink = new TextPageLink(15);
-        TextPageData<Device> pageData  = doGetTypedWithPageLink("/api/datamodelobject/devices/"+ dataModelObject.getId().getId().toString()+"?",
-                                                               new TypeReference<TextPageData<Device>>(){}, pageLink);
-        Assert.assertEquals(15, pageData.getData().size());
+        List<Device> pageData  = doGetTyped("/api/datamodelobject/devices/"+ dataModelObject.getId().getId().toString()+"?pageNum=0&limit=15&textSearch=",
+                new TypeReference<List<Device>>(){});
 
-        TextPageData<Device> pageData1  = doGetTypedWithPageLink("/api/datamodelobject/devices/"+ dataModelObject.getId().getId().toString()+"?",
-                                                                new TypeReference<TextPageData<Device>>(){}, pageData.getNextPageLink());
-        Assert.assertEquals(5, pageData1.getData().size());
+
+        Assert.assertEquals(15, pageData.size());
+
+        List<Device> pageData1  = doGetTyped("/api/datamodelobject/devices/"+ dataModelObject.getId().getId().toString()+"?pageNum=1&limit=15&textSearch=",
+                new TypeReference<List<Device>>(){});
+
+
+        Assert.assertEquals(5, pageData1.size());
         logout();
 
         unAssignUserFromGroup(savedCustomerGroup.getId(), customerUserId);
@@ -906,14 +926,15 @@ public abstract class BaseDeviceControllerTest extends AbstractControllerTest {
 
         logout();
         loginCustomerUser();
-        TextPageLink pageLink11 = new TextPageLink(7);
-        TextPageData<Device> pageData11  = doGetTypedWithPageLink("/api/datamodelobject/devices/"+ dataModelObject.getId().getId().toString()+"?",
-                                                                 new TypeReference<TextPageData<Device>>(){}, pageLink11);
-        Assert.assertEquals(7, pageData11.getData().size());
+        List<Device> pageData11  = doGetTyped("/api/datamodelobject/devices/"+ dataModelObject.getId().getId().toString()+"?pageNum=0&limit=7&textSearch=",
+                new TypeReference<List<Device>>(){});
 
-        TextPageData<Device> pageData12  = doGetTypedWithPageLink("/api/datamodelobject/devices/"+ dataModelObject.getId().getId().toString()+"?",
-                                                                 new TypeReference<TextPageData<Device>>(){}, pageData11.getNextPageLink());
-        Assert.assertEquals(3, pageData12.getData().size());
+        Assert.assertEquals(7, pageData11.size());
+
+        List<Device> pageData12  = doGetTyped("/api/datamodelobject/devices/"+ dataModelObject.getId().getId().toString()+"?pageNum=1&limit=7&textSearch=",
+                new TypeReference<List<Device>>(){});
+
+        Assert.assertEquals(3, pageData12.size());
         logout();
 
     }
@@ -965,10 +986,118 @@ public abstract class BaseDeviceControllerTest extends AbstractControllerTest {
     }
 
     @Test
+    public void testFindCustomerDevicesWithRestrictedPolicies() throws Exception {
+        DataModel dataModel = createDataModel();
+        final DataModelObject dataModelObject1 = createDataModelObject(dataModel, "Device1", "Device");
+        DataModelObjectId dataModelObjectId1 = dataModelObject1.getId();
+        final DataModelObject dataModelObject2 = createDataModelObject(dataModel, "Device2", "Device");
+        DataModelObjectId dataModelObjectId2 = dataModelObject2.getId();
+
+        Customer customerForCustomerUser = doGet("/api/customer/"+customerUser.getCustomerId().getId().toString(), Customer.class);
+        customerForCustomerUser.setDataModelId(dataModel.getId());
+        Customer customer = doPost("/api/customer", customerForCustomerUser, Customer.class);
+        CustomerId customerId = customer.getId();
+
+        List<Device> devices = new ArrayList<>();
+        for (int i=0;i<20;i++) {
+            Device device = new Device();
+            if((i & 1) == 0){ //even
+                device.setDataModelObjectId(dataModelObjectId1);
+            } else {
+                device.setDataModelObjectId(dataModelObjectId2);
+            }
+            device.setName("Device"+i);
+            device.setType("default");
+            device = doPost("/api/device", device, Device.class);
+            devices.add(doPost("/api/customer/" + customerId.getId().toString()
+                    + "/device/" + device.getId().getId().toString(), Device.class));
+        }
+
+        String policy = String.format("CUSTOMER_USER:DEVICE?%s=%s:READ",
+                UserPermission.ResourceAttribute.DATA_MODEL_ID, dataModelObjectId1.getId().toString());
+
+        List<String> policies = Collections.singletonList(policy);
+
+        CustomerGroup savedCustomerGroup = createGroupWithPolicies(policies, customerId, "My Customer Group");
+        String getPolicyUrl = "/api/customer/group/" + savedCustomerGroup.getId().getId().toString() + "/policy";
+
+        final Map<String, Map<String, String>> displayablePolicies = doGetTyped(getPolicyUrl, new TypeReference<Map<String, Map<String, String>>>() {
+        });
+
+        Assert.assertArrayEquals(policies.toArray(), displayablePolicies.keySet().toArray());
+        Assert.assertEquals(displayablePolicies.get(policy).get(UserPermission.ResourceAttribute.DATA_MODEL_ID.toString()), dataModelObject1.getName());
+
+        UserId customerUserId = getCustomerUserId();
+        assignUserToGroup(customerUserId, savedCustomerGroup);
+
+        logout();
+        loginCustomerUser();
+
+        List<Device> loadedDevices = new ArrayList<>();
+        int pageNum = 0;
+        int pageLimit = 5;
+        List<Device> pageData;
+        do {
+            pageData = doGetTyped("/api/customer/" + customerId.getId().toString() + "/devices?limit="+pageLimit+"&pageNum=" + pageNum,
+                    new TypeReference<List<Device>>() {
+                    });
+            loadedDevices.addAll(pageData);
+            pageNum++;
+        } while (pageData.size() == pageLimit);
+
+        final List<Device> devicesForDmo1 = devices.stream().filter(device -> device.getDataModelObjectId().equals(dataModelObjectId1)).collect(Collectors.toList());
+        Collections.sort(devicesForDmo1, idComparator);
+        Collections.sort(loadedDevices, idComparator);
+
+        Assert.assertEquals(devicesForDmo1, loadedDevices);
+        Assert.assertEquals(loadedDevices.size(), 10);
+        logout();
+
+        final List<Device> restrictedDevices = devicesForDmo1.subList(0, 7);
+
+        final List<String> newPolicices = restrictedDevices.stream().map(restrictedDevice -> String.format("CUSTOMER_USER:DEVICE?%s=%s&%s=%s:READ",
+                UserPermission.ResourceAttribute.ID, restrictedDevice.getId().getId().toString(),
+                UserPermission.ResourceAttribute.DATA_MODEL_ID, dataModelObjectId1.getId().toString())).collect(Collectors.toList());
+
+        updateGroupWithPolicies(newPolicices, savedCustomerGroup);
+
+
+        logout();
+        loginCustomerUser();
+
+        loadedDevices = new ArrayList<>();
+        pageNum = 0;
+        pageLimit = 5;
+        do {
+            pageData = doGetTyped("/api/customer/" + customerId.getId().toString() + "/devices?limit="+pageLimit+"&pageNum=" + pageNum,
+                    new TypeReference<List<Device>>() {
+                    });
+            loadedDevices.addAll(pageData);
+            pageNum++;
+        } while (pageData.size() == pageLimit);
+
+        Collections.sort(restrictedDevices, idComparator);
+        Collections.sort(loadedDevices, idComparator);
+
+        Assert.assertEquals(restrictedDevices, loadedDevices);
+        Assert.assertEquals(loadedDevices.size(), 7);
+        logout();
+
+
+        loginTenantAdmin();
+        for (Device device : devicesForDmo1) {
+            doDelete("/api/customer/device/" + device.getId().getId().toString())
+                    .andExpect(status().isOk());
+        }
+        logout();
+
+    }
+
+    @Test
     public void testPolicyForAsset() throws Exception {
 
         DataModel dataModel = createDataModel();
-        DataModelObject dataModelObject = createDataModelObject(dataModel);
+        DataModelObject dataModelObject = createDataModelObject(dataModel, "Well", "Asset");
         Device device = createDevice(dataModelObject.getId(), customerUser.getCustomerId(), "Tenant's device");
         String policy = String.format("CUSTOMER_USER:DEVICE?%s=%s&%s=%s:READ",
                 UserPermission.ResourceAttribute.ID, device.getId().getId().toString(),

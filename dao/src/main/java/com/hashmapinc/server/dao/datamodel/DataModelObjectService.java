@@ -32,6 +32,8 @@ public interface DataModelObjectService {
 
     List<DataModelObject> findByDataModelId(DataModelId dataModelId);
 
+    List<DataModelObject> findByDataModelIdAndType(DataModelId dataModelId, String type);
+
     Set<DataModelObjectId> getAllParentDataModelIdsOf(DataModelObjectId dataModelObjectId);
 
     List<DataModelObject> findByName(String name);

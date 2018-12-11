@@ -341,7 +341,7 @@ public class AssetController extends BaseController {
         checkParameter(DATA_MODEL_OBJECT_ID, strDataModelObjectId);
         try {
             DataModelObjectId dataModelObjectId = new DataModelObjectId(toUUID(strDataModelObjectId));
-            final TempusResourceCriteriaSpec tempusResourceCriteriaSpec = getTempusResourceCriteriaSpec(getCurrentUser(), EntityType.ASSET, dataModelObjectId);
+            final TempusResourceCriteriaSpec tempusResourceCriteriaSpec = getTempusResourceCriteriaSpec(getCurrentUser(), EntityType.ASSET, dataModelObjectId, null, null, null);
             TextPageLink pageLink = createPageLink(limit, textSearch, idOffset, textOffset);
             return assetService.findAll(tempusResourceCriteriaSpec, pageLink);
         } catch (Exception e) {

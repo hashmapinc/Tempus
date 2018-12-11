@@ -68,5 +68,5 @@ public interface DeviceService {
 
     List<Device> findDeviceByDataModelObjectId(DataModelObjectId dataModelObjectId);
 
-    TextPageData<Device> findAll(TempusResourceCriteriaSpec tempusResourceCriteriaSpec, TextPageLink textPageLink);
+    List<Device> findAll(TempusResourceCriteriaSpec tempusResourceCriteriaSpec, int limit, int pageNum);
 }

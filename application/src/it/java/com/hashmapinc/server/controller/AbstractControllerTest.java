@@ -777,9 +777,10 @@ public abstract class AbstractControllerTest {
         return savedDataModel;
     }
 
-    protected DataModelObject createDataModelObject(DataModel dataModel) throws Exception{
+    protected DataModelObject createDataModelObject(DataModel dataModel, String name, String type) throws Exception{
         DataModelObject dataModelObject = new DataModelObject();
-        dataModelObject.setName("Well");
+        dataModelObject.setName(name);
+        dataModelObject.setType(type);
 
         AttributeDefinition ad = new AttributeDefinition();
         ad.setValueType("STRING");

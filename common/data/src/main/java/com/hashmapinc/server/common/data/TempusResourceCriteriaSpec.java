@@ -30,12 +30,14 @@ import java.util.Set;
 public class TempusResourceCriteriaSpec {
     private EntityType entityType;
     private TenantId tenantId;
-    private DataModelObjectId dataModelObjectId;
+    private Optional<DataModelObjectId> dataModelObjectId = Optional.empty();
     private Optional<CustomerId> customerId = Optional.empty();
+    private Optional<String> type = Optional.empty();
+    private Optional<String> searchText = Optional.empty();
     private Set<? extends EntityId> accessibleIdsForGivenDataModelObject = new HashSet<>();
-    public TempusResourceCriteriaSpec(EntityType entityType, TenantId tenantId, DataModelObjectId dataModelObjectId) {
+    private Set<? extends EntityId> dataModelObjectIds = new HashSet<>();
+    public TempusResourceCriteriaSpec(EntityType entityType, TenantId tenantId) {
         this.entityType = entityType;
         this.tenantId = tenantId;
-        this.dataModelObjectId = dataModelObjectId;
     }
 }
