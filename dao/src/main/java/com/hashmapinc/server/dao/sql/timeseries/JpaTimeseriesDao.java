@@ -20,31 +20,27 @@ import com.google.common.base.Function;
 import com.google.common.collect.Lists;
 import com.google.common.util.concurrent.*;
 import com.hashmapinc.server.common.data.DeviceDataSet;
+import com.hashmapinc.server.common.data.UUIDConverter;
 import com.hashmapinc.server.common.data.id.EntityId;
 import com.hashmapinc.server.common.data.kv.*;
+import com.hashmapinc.server.dao.DaoUtil;
 import com.hashmapinc.server.dao.model.sql.TsKvEntity;
+import com.hashmapinc.server.dao.model.sql.TsKvLatestCompositeKey;
+import com.hashmapinc.server.dao.model.sql.TsKvLatestEntity;
 import com.hashmapinc.server.dao.sql.JpaAbstractDaoListeningExecutorService;
+import com.hashmapinc.server.dao.timeseries.TimeseriesDao;
 import com.hashmapinc.server.dao.timeseries.TsInsertExecutorType;
+import com.hashmapinc.server.dao.util.SqlDao;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Component;
-import com.hashmapinc.server.common.data.UUIDConverter;
-import com.hashmapinc.server.common.data.kv.*;
-import com.hashmapinc.server.dao.DaoUtil;
-import com.hashmapinc.server.dao.model.sql.TsKvLatestCompositeKey;
-import com.hashmapinc.server.dao.model.sql.TsKvLatestEntity;
-import com.hashmapinc.server.dao.timeseries.TimeseriesDao;
-import com.hashmapinc.server.dao.util.SqlDao;
 
 import javax.annotation.Nullable;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import java.util.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
@@ -233,7 +229,7 @@ public class JpaTimeseriesDao extends JpaAbstractDaoListeningExecutorService imp
                         entityId.getEntityType(),
                         fromTimeUUID(entityId.getId()),
                         key);
-        TsKvLatestEntity entry = tsKvLatestRepository.findOne(compositeKey);
+        TsKvLatestEntity entry = tsKvLatestRepository.findById(compositeKey).orElse(null);
         TsKvEntry result;
         if (entry != null) {
             result = DaoUtil.getData(entry);

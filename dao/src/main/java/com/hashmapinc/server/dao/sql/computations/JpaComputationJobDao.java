@@ -16,6 +16,7 @@
  */
 package com.hashmapinc.server.dao.sql.computations;
 
+import com.hashmapinc.server.common.data.UUIDConverter;
 import com.hashmapinc.server.common.data.computation.ComputationJob;
 import com.hashmapinc.server.common.data.id.ComputationId;
 import com.hashmapinc.server.common.data.id.ComputationJobId;
@@ -23,15 +24,14 @@ import com.hashmapinc.server.common.data.id.TenantId;
 import com.hashmapinc.server.common.data.page.TextPageLink;
 import com.hashmapinc.server.dao.DaoUtil;
 import com.hashmapinc.server.dao.computations.ComputationJobDao;
+import com.hashmapinc.server.dao.model.sql.ComputationJobEntity;
+import com.hashmapinc.server.dao.sql.JpaAbstractSearchTextDao;
 import com.hashmapinc.server.dao.util.SqlDao;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Component;
-import com.hashmapinc.server.common.data.UUIDConverter;
-import com.hashmapinc.server.dao.model.sql.ComputationJobEntity;
-import com.hashmapinc.server.dao.sql.JpaAbstractSearchTextDao;
 
 import java.util.Arrays;
 import java.util.List;
@@ -71,7 +71,7 @@ public class JpaComputationJobDao extends JpaAbstractSearchTextDao<ComputationJo
 
     @Override
     public void deleteByComputaionJobId(ComputationJobId computationJobId) {
-        computationJobRepository.delete(UUIDConverter. fromTimeUUID(computationJobId.getId()));
+        computationJobRepository.deleteById(UUIDConverter.fromTimeUUID(computationJobId.getId()));
     }
 
     @Override

@@ -16,14 +16,14 @@
  */
 package com.hashmapinc.server.dao.audit.sink;
 
+import com.hashmapinc.server.common.data.audit.AuditLog;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
-import com.hashmapinc.server.common.data.audit.AuditLog;
 
 @Slf4j
 @Component
-@ConditionalOnProperty(prefix = "audit_log.sink", value = "type", havingValue = "none")
+@ConditionalOnProperty(prefix = "audit-log.sink", value = "type", havingValue = "none")
 public class DummyAuditLogSink implements AuditLogSink {
 
     @Override

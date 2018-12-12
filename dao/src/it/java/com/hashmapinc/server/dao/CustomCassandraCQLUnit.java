@@ -16,18 +16,18 @@
  */
 package com.hashmapinc.server.dao;
 
+import com.datastax.driver.core.Cluster;
 import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Row;
+import com.datastax.driver.core.Session;
 import com.hashmapinc.server.dao.model.ModelConstants;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import org.apache.cassandra.config.DatabaseDescriptor;
 import org.cassandraunit.BaseCassandraUnit;
 import org.cassandraunit.CQLDataLoader;
 import org.cassandraunit.dataset.CQLDataSet;
 import org.cassandraunit.utils.EmbeddedCassandraServerHelper;
-
-import com.datastax.driver.core.Cluster;
-import com.datastax.driver.core.Session;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -77,6 +77,13 @@ public class CustomCassandraCQLUnit extends BaseCassandraUnit {
         this.dataSets = dataSets;
         this.configurationFileName = configurationFileName;
         this.readTimeoutMillis = readTimeoutMillis;
+    }
+
+    @Override
+    protected void before() throws Exception {
+        System.setProperty("cassandra.config", configurationFileName);
+        DatabaseDescriptor.daemonInitialization();
+        super.before();
     }
 
     @Override

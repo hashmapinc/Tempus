@@ -19,12 +19,12 @@ package com.hashmapinc.server.dao.sql;
 import com.datastax.driver.core.utils.UUIDs;
 import com.google.common.collect.Lists;
 import com.google.common.util.concurrent.ListenableFuture;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.repository.CrudRepository;
-import org.springframework.transaction.annotation.Transactional;
 import com.hashmapinc.server.dao.Dao;
 import com.hashmapinc.server.dao.DaoUtil;
 import com.hashmapinc.server.dao.model.BaseEntity;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.repository.CrudRepository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.UUID;
@@ -65,23 +65,23 @@ public abstract class JpaAbstractDao<E extends BaseEntity<D>, D>
     @Override
     public D findById(UUID key) {
         log.debug("Get entity by key {}", key);
-        E entity = getCrudRepository().findOne(fromTimeUUID(key));
+        E entity = getCrudRepository().findById(fromTimeUUID(key)).orElse(null);
         return DaoUtil.getData(entity);
     }
 
     @Override
     public ListenableFuture<D> findByIdAsync(UUID key) {
         log.debug("Get entity by key async {}", key);
-        return service.submit(() -> DaoUtil.getData(getCrudRepository().findOne(fromTimeUUID(key))));
+        return service.submit(() -> DaoUtil.getData(getCrudRepository().findById(fromTimeUUID(key)).orElse(null)));
     }
 
     @Override
     @Transactional
     public boolean removeById(UUID id) {
         String key = fromTimeUUID(id);
-        getCrudRepository().delete(key);
+        getCrudRepository().deleteById(key);
         log.debug("Remove request: {}", key);
-        return getCrudRepository().findOne(key) == null;
+        return getCrudRepository().findById(key).isEmpty();
     }
 
     @Override

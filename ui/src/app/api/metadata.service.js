@@ -134,7 +134,7 @@ function MetadataService($http, $q, $filter, utils) {
 
     function saveMetadataQuery(metadataQuery) {
             var deferred = $q.defer();
-            var url = '/api//metadata/query';
+            var url = '/api/metadata/query';
             $http.post(url, metadataQuery).then(function success(response) {
                 deferred.resolve(response.data);
             }, function fail() {

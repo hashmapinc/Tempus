@@ -17,16 +17,14 @@
 package com.hashmapinc.server.common.data.metadata.source.rest;
 
 import com.hashmapinc.server.common.data.metadata.source.MetadataSource;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
+import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Data
 @ToString
 @AllArgsConstructor
+@NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class RestMetadataSource extends MetadataSource {
 

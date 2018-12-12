@@ -54,7 +54,7 @@ public interface RelationRepository
     RelationEntity save(RelationEntity entity);
 
     @Transactional
-    void delete(RelationCompositeKey id);
+    void deleteById(RelationCompositeKey id);
 
     @Transactional
     void deleteByFromIdAndFromType(String fromId, String fromType);

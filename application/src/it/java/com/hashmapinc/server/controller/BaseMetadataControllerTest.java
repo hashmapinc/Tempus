@@ -18,7 +18,7 @@ package com.hashmapinc.server.controller;
 
 import com.datastax.driver.core.utils.UUIDs;
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.github.tomakehurst.wiremock.client.RemoteMappingBuilder;
+import com.github.tomakehurst.wiremock.client.MappingBuilder;
 import com.github.tomakehurst.wiremock.matching.StringValuePattern;
 import com.hashmapinc.server.common.data.UUIDConverter;
 import com.hashmapinc.server.common.data.metadata.*;
@@ -69,7 +69,7 @@ public abstract class BaseMetadataControllerTest extends AbstractControllerTest 
     @Test
     public void testUpdateMetadataConfig() throws Exception {
         String updatedName = "Updated name";
-        RemoteMappingBuilder stubMappingBuilder = setupStub(HttpMethod.PUT.name(),
+        MappingBuilder stubMappingBuilder = setupStub(HttpMethod.PUT.name(),
                 "/api/metaconfig",
                 matchingJsonPath(String.format("$[?(@.name == '%s')]", updatedName)),
                 json(getMetadataConfigResponse(updatedName)),
@@ -97,7 +97,7 @@ public abstract class BaseMetadataControllerTest extends AbstractControllerTest 
         metadataConfig.setId(null);
         String configNameForError = "Test Config Error";
         metadataConfig.setName(configNameForError);
-        RemoteMappingBuilder stubMappingBuilder = setupStub(HttpMethod.POST.name(),
+        MappingBuilder stubMappingBuilder = setupStub(HttpMethod.POST.name(),
                 "/api/metaconfig",
                 matchingJsonPath(String.format("$[?(@.name == '%s')]", configNameForError)),
                 INTERNAL_SERVER_ERROR_RESPONSE,
@@ -110,7 +110,7 @@ public abstract class BaseMetadataControllerTest extends AbstractControllerTest 
 
     @Test
     public void testGetMetadataConfigById() throws Exception {
-        RemoteMappingBuilder stubMappingBuilder = setupStub(HttpMethod.GET.name(),
+        MappingBuilder stubMappingBuilder = setupStub(HttpMethod.GET.name(),
                 "/api/metaconfig/" + metadataConfig.getId().getId(),
                 null,
                 json(getMetadataConfigResponse(metadataConfig.getName())),
@@ -134,7 +134,7 @@ public abstract class BaseMetadataControllerTest extends AbstractControllerTest 
     @Test
     public void testGetMetadataConfigByNonExistentId() throws Exception {
         String configId = "55f38250-aab3-11e8-b469-536b04774737";
-        RemoteMappingBuilder stubMappingBuilder = setupStub(HttpMethod.GET.name(),
+        MappingBuilder stubMappingBuilder = setupStub(HttpMethod.GET.name(),
                 "/api/metaconfig/" + configId,
                 null,
                 NOT_FOUND_RESPONSE,
@@ -149,7 +149,7 @@ public abstract class BaseMetadataControllerTest extends AbstractControllerTest 
     @Test
     public void testGetMetadataConfigForErrorFromMetadataService() throws Exception {
         String configId = "55f38250-aab3-11e8-b469-536b00000000";
-        RemoteMappingBuilder stubMappingBuilder = setupStub(HttpMethod.GET.name(),
+        MappingBuilder stubMappingBuilder = setupStub(HttpMethod.GET.name(),
                 "/api/metaconfig/" + configId,
                 null,
                 INTERNAL_SERVER_ERROR_RESPONSE,
@@ -163,7 +163,7 @@ public abstract class BaseMetadataControllerTest extends AbstractControllerTest 
 
     @Test
     public void testGetMetadataConfigsForTenant() throws Exception {
-        RemoteMappingBuilder stubMappingBuilder = setupStub(HttpMethod.GET.name(),
+        MappingBuilder stubMappingBuilder = setupStub(HttpMethod.GET.name(),
                 "/api/metaconfig/owner/" + metadataConfig.getOwnerId() + "?limit=1",
                 null,
                 json(new TextPageData<>(Arrays.asList(getMetadataConfigResponse(metadataConfig.getName())), new TextPageLink(1))),
@@ -187,7 +187,7 @@ public abstract class BaseMetadataControllerTest extends AbstractControllerTest 
 
     @Test
     public void testGetMetadataConfigsForTenantHavingNoConfig() throws Exception {
-        RemoteMappingBuilder stubMappingBuilder = setupStub(HttpMethod.GET.name(),
+        MappingBuilder stubMappingBuilder = setupStub(HttpMethod.GET.name(),
                 "/api/metaconfig/owner/" + metadataConfig.getOwnerId() + "?limit=1",
                 null,
                 NOT_FOUND_RESPONSE,
@@ -201,7 +201,7 @@ public abstract class BaseMetadataControllerTest extends AbstractControllerTest 
 
     @Test
     public void testGetMetadataConfigsForTenantWithErrorFromMetadataService() throws Exception {
-        RemoteMappingBuilder stubMappingBuilder = setupStub(HttpMethod.GET.name(),
+        MappingBuilder stubMappingBuilder = setupStub(HttpMethod.GET.name(),
                 "/api/metaconfig/owner/" + metadataConfig.getOwnerId() + "?limit=1",
                 null,
                 INTERNAL_SERVER_ERROR_RESPONSE,
@@ -215,7 +215,7 @@ public abstract class BaseMetadataControllerTest extends AbstractControllerTest 
 
     @Test
     public void testDeleteMetadataConfigById() throws Exception {
-        RemoteMappingBuilder stubMappingBuilder = setupStub(HttpMethod.DELETE.name(),
+        MappingBuilder stubMappingBuilder = setupStub(HttpMethod.DELETE.name(),
                 "/api/metaconfig/" + metadataConfig.getId().getId(),
                 null,
                 "{}",
@@ -236,7 +236,7 @@ public abstract class BaseMetadataControllerTest extends AbstractControllerTest 
 
     @Test
     public void testDeleteMetadataConfigForErrorFromMetadataService() throws Exception {
-        RemoteMappingBuilder stubMappingBuilder = setupStub(HttpMethod.DELETE.name(),
+        MappingBuilder stubMappingBuilder = setupStub(HttpMethod.DELETE.name(),
                 "/api/metaconfig/" + metadataConfig.getId().getId(),
                 null,
                 INTERNAL_SERVER_ERROR_RESPONSE,
@@ -250,7 +250,7 @@ public abstract class BaseMetadataControllerTest extends AbstractControllerTest 
 
     @Test
     public void testMetadataConfigConnectionById() throws Exception {
-        RemoteMappingBuilder stubMappingBuilder = setupStub(HttpMethod.GET.name(),
+        MappingBuilder stubMappingBuilder = setupStub(HttpMethod.GET.name(),
                 "/api/metaconfig/" + metadataConfig.getId().getId() + "/connection",
                 null,
                 CONNECTED_RESPONSE,
@@ -271,7 +271,7 @@ public abstract class BaseMetadataControllerTest extends AbstractControllerTest 
 
     @Test
     public void testGetMetadataConfigConnectionByNonExistentId() throws Exception {
-        RemoteMappingBuilder stubMappingBuilder = setupStub(HttpMethod.GET.name(),
+        MappingBuilder stubMappingBuilder = setupStub(HttpMethod.GET.name(),
                 "/api/metaconfig/" + metadataConfig.getId().getId() + "/connection",
                 null,
                 NOT_FOUND_RESPONSE,
@@ -285,7 +285,7 @@ public abstract class BaseMetadataControllerTest extends AbstractControllerTest 
 
     @Test
     public void testGetMetadataConfigConnectionForErrorFromMetadataService() throws Exception {
-        RemoteMappingBuilder stubMappingBuilder = setupStub(HttpMethod.GET.name(),
+        MappingBuilder stubMappingBuilder = setupStub(HttpMethod.GET.name(),
                 "/api/metaconfig/" + metadataConfig.getId().getId() + "/connection",
                 null,
                 INTERNAL_SERVER_ERROR_RESPONSE,
@@ -299,7 +299,7 @@ public abstract class BaseMetadataControllerTest extends AbstractControllerTest 
 
     @Test
     public void testGetMetadataConfigIngestById() throws Exception {
-        RemoteMappingBuilder stubMappingBuilder = setupStub(HttpMethod.GET.name(),
+        MappingBuilder stubMappingBuilder = setupStub(HttpMethod.GET.name(),
                 "/api/metaconfig/" + metadataConfig.getId().getId() + "/ingest",
                 null,
                 json(getMetadataConfigResponse(metadataConfig.getName())),
@@ -320,7 +320,7 @@ public abstract class BaseMetadataControllerTest extends AbstractControllerTest 
 
     @Test
     public void testGetMetadataConfigIngestByNonExistentId() throws Exception {
-        RemoteMappingBuilder stubMappingBuilder = setupStub(HttpMethod.GET.name(),
+        MappingBuilder stubMappingBuilder = setupStub(HttpMethod.GET.name(),
                 "/api/metaconfig/" + metadataConfig.getId().getId() + "/ingest",
                 null,
                 NOT_FOUND_RESPONSE,
@@ -334,7 +334,7 @@ public abstract class BaseMetadataControllerTest extends AbstractControllerTest 
 
     @Test
     public void testGetMetadataConfigIngestForErrorFromMetadataService() throws Exception {
-        RemoteMappingBuilder stubMappingBuilder = setupStub(HttpMethod.GET.name(),
+        MappingBuilder stubMappingBuilder = setupStub(HttpMethod.GET.name(),
                 "/api/metaconfig/" + metadataConfig.getId().getId() + "/ingest",
                 null,
                 INTERNAL_SERVER_ERROR_RESPONSE,
@@ -356,7 +356,7 @@ public abstract class BaseMetadataControllerTest extends AbstractControllerTest 
     public void testUpdateMetadataQuery() throws Exception {
         String updatedQuery = "Select * from new_table";
         metadataQuery.setQueryStmt(updatedQuery);
-        RemoteMappingBuilder stubMappingBuilder = setupStub(HttpMethod.PUT.name(),
+        MappingBuilder stubMappingBuilder = setupStub(HttpMethod.PUT.name(),
                 "/api/metaquery",
                 matchingJsonPath(String.format("$[?(@.queryStmt == '%s')]", updatedQuery)),
                 json(metadataQuery),
@@ -383,7 +383,7 @@ public abstract class BaseMetadataControllerTest extends AbstractControllerTest 
         metadataQuery.setId(null);
         String updatedQuery = "Query for error";
         metadataQuery.setQueryStmt(updatedQuery);
-        RemoteMappingBuilder stubMappingBuilder = setupStub(HttpMethod.POST.name(),
+        MappingBuilder stubMappingBuilder = setupStub(HttpMethod.POST.name(),
                 "/api/metaquery",
                 matchingJsonPath(String.format("$[?(@.queryStmt == '%s')]", updatedQuery)),
                 INTERNAL_SERVER_ERROR_RESPONSE,
@@ -396,7 +396,7 @@ public abstract class BaseMetadataControllerTest extends AbstractControllerTest 
 
     @Test
     public void testGetMetadataQueryById() throws Exception {
-        RemoteMappingBuilder stubMappingBuilder = setupStub(HttpMethod.GET.name(),
+        MappingBuilder stubMappingBuilder = setupStub(HttpMethod.GET.name(),
                 "/api/metaquery/" + metadataQuery.getId().getId(),
                 null,
                 json(metadataQuery),
@@ -419,7 +419,7 @@ public abstract class BaseMetadataControllerTest extends AbstractControllerTest 
 
     @Test
     public void testGetMetadataQueryByNonExistentId() throws Exception {
-        RemoteMappingBuilder stubMappingBuilder = setupStub(HttpMethod.GET.name(),
+        MappingBuilder stubMappingBuilder = setupStub(HttpMethod.GET.name(),
                 "/api/metaquery/" + metadataQuery.getId().getId(),
                 null,
                 NOT_FOUND_RESPONSE,
@@ -433,7 +433,7 @@ public abstract class BaseMetadataControllerTest extends AbstractControllerTest 
 
     @Test
     public void testGetMetadataQueryForErrorFromMetadataService() throws Exception {
-        RemoteMappingBuilder stubMappingBuilder = setupStub(HttpMethod.GET.name(),
+        MappingBuilder stubMappingBuilder = setupStub(HttpMethod.GET.name(),
                 "/api/metaquery/" + metadataQuery.getId().getId(),
                 null,
                 INTERNAL_SERVER_ERROR_RESPONSE,
@@ -447,7 +447,7 @@ public abstract class BaseMetadataControllerTest extends AbstractControllerTest 
 
     @Test
     public void testGetMetadataQueriesForConfig() throws Exception {
-        RemoteMappingBuilder stubMappingBuilder = setupStub(HttpMethod.GET.name(),
+        MappingBuilder stubMappingBuilder = setupStub(HttpMethod.GET.name(),
                 "/api/metaquery/metaconfig/" + metadataQuery.getMetadataConfigId().getId() + "?limit=1",
                 null,
                 json(new TextPageData<>(Arrays.asList(metadataQuery), new TextPageLink(1))),
@@ -471,7 +471,7 @@ public abstract class BaseMetadataControllerTest extends AbstractControllerTest 
 
     @Test
     public void testGetMetadataQueriesForConfigHavingNoConfig() throws Exception {
-        RemoteMappingBuilder stubMappingBuilder = setupStub(HttpMethod.GET.name(),
+        MappingBuilder stubMappingBuilder = setupStub(HttpMethod.GET.name(),
                 "/api/metaquery/metaconfig/" + metadataQuery.getMetadataConfigId().getId() + "?limit=1",
                 null,
                 NOT_FOUND_RESPONSE,
@@ -485,7 +485,7 @@ public abstract class BaseMetadataControllerTest extends AbstractControllerTest 
 
     @Test
     public void testGetMetadataQueriesForConfigWithErrorFromMetadataService() throws Exception {
-        RemoteMappingBuilder stubMappingBuilder = setupStub(HttpMethod.GET.name(),
+        MappingBuilder stubMappingBuilder = setupStub(HttpMethod.GET.name(),
                 "/api/metaquery/metaconfig/" + metadataQuery.getMetadataConfigId().getId() + "?limit=1",
                 null,
                 INTERNAL_SERVER_ERROR_RESPONSE,
@@ -499,7 +499,7 @@ public abstract class BaseMetadataControllerTest extends AbstractControllerTest 
 
     @Test
     public void testDeleteMetadataQueryById() throws Exception {
-        RemoteMappingBuilder stubMappingBuilder = setupStub(HttpMethod.DELETE.name(),
+        MappingBuilder stubMappingBuilder = setupStub(HttpMethod.DELETE.name(),
                 "/api/metaquery/" + metadataQuery.getId().getId(),
                 null,
                 "{}",
@@ -520,7 +520,7 @@ public abstract class BaseMetadataControllerTest extends AbstractControllerTest 
 
     @Test
     public void testDeleteMetadataQueryForErrorFromMetadataService() throws Exception {
-        RemoteMappingBuilder stubMappingBuilder = setupStub(HttpMethod.DELETE.name(),
+        MappingBuilder stubMappingBuilder = setupStub(HttpMethod.DELETE.name(),
                 "/api/metaquery/" + metadataQuery.getId().getId(),
                 null,
                 INTERNAL_SERVER_ERROR_RESPONSE,
@@ -569,7 +569,7 @@ public abstract class BaseMetadataControllerTest extends AbstractControllerTest 
         mc.setSink(new RestMetadataSource("http://localhost:8080/api/metadata", null, null));
         mc.setSource(new JdbcMetadataSource("jdbc:hsqldb:file:/tmp/tempusDb", "sa", ""));
 
-        RemoteMappingBuilder stubMappingBuilder = setupStub(HttpMethod.POST.name(),
+        MappingBuilder stubMappingBuilder = setupStub(HttpMethod.POST.name(),
                 "/api/metaconfig",
                 matchingJsonPath(String.format("$[?(@.name == '%s')]", configName)),
                 json(getMetadataConfigResponse(configName)),
@@ -594,7 +594,7 @@ public abstract class BaseMetadataControllerTest extends AbstractControllerTest 
         mq.setTriggerType(MetadataIngestionTriggerType.CRON);
 
 
-        RemoteMappingBuilder stubMappingBuilder = setupStub(HttpMethod.POST.name(),
+        MappingBuilder stubMappingBuilder = setupStub(HttpMethod.POST.name(),
                 "/api/metaquery",
                 matchingJsonPath(String.format("$[?(@.queryStmt == '%s')]", queryStmt)),
                 json(mq),
@@ -609,8 +609,8 @@ public abstract class BaseMetadataControllerTest extends AbstractControllerTest 
         return readResponse(resultActions, MetadataQuery.class);
     }
 
-    private RemoteMappingBuilder setupStub(String method, String path, StringValuePattern requestBodyPattern, String jsonResponseBody, int status) {
-        RemoteMappingBuilder stubMappingBuilder = request(method, urlEqualTo(path))
+    private MappingBuilder setupStub(String method, String path, StringValuePattern requestBodyPattern, String jsonResponseBody, int status) {
+        MappingBuilder stubMappingBuilder = request(method, urlEqualTo(path))
                 .willReturn(aResponse()
                         .withStatus(status)
                         .withHeader("Content-Type", "application/json")

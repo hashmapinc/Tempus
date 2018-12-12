@@ -16,13 +16,13 @@
  */
 package com.hashmapinc.server.dao.sql.datamodel;
 
-import com.hashmapinc.server.common.data.datamodel.DataModelObject;
 import com.hashmapinc.server.common.data.UUIDConverter;
+import com.hashmapinc.server.common.data.datamodel.DataModelObject;
 import com.hashmapinc.server.common.data.id.DataModelId;
 import com.hashmapinc.server.common.data.id.DataModelObjectId;
 import com.hashmapinc.server.dao.DaoUtil;
-import com.hashmapinc.server.dao.model.sql.DataModelObjectEntity;
 import com.hashmapinc.server.dao.datamodel.DataModelObjectDao;
+import com.hashmapinc.server.dao.model.sql.DataModelObjectEntity;
 import com.hashmapinc.server.dao.sql.JpaAbstractSearchTextDao;
 import com.hashmapinc.server.dao.util.SqlDao;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,7 +49,7 @@ public class JpaDataModelObjectDao extends JpaAbstractSearchTextDao<DataModelObj
 
     @Override
     public DataModelObject findById(DataModelObjectId id) {
-        DataModelObjectEntity entity = dataModelObjectRespository.findOne(UUIDConverter.fromTimeUUID(id.getId()));
+        DataModelObjectEntity entity = dataModelObjectRespository.findById(UUIDConverter.fromTimeUUID(id.getId())).orElse(null);
         return DaoUtil.getData(entity);
     }
 

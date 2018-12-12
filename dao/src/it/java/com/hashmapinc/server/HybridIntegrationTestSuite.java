@@ -22,6 +22,8 @@ import org.cassandraunit.dataset.CQLDataSet;
 import org.cassandraunit.dataset.cql.ClassPathCQLDataSet;
 import org.junit.ClassRule;
 import org.junit.extensions.cpsuite.ClasspathSuite;
+import org.junit.rules.RuleChain;
+import org.junit.rules.TestRule;
 import org.junit.runner.RunWith;
 
 import java.util.ArrayList;
@@ -35,7 +37,6 @@ import java.util.List;
 })
 public class HybridIntegrationTestSuite {
 
-    @ClassRule
     public static CustomSqlUnit sqlUnit = new CustomSqlUnit(
 
             Arrays.asList("sql/hsql/schema.sql", "sql/system-data.sql"),
@@ -43,7 +44,6 @@ public class HybridIntegrationTestSuite {
             "sql-test.properties",
             Collections.emptyList());
 
-    @ClassRule
     public static CustomCassandraCQLUnit cassandraUnit =
             new CustomCassandraCQLUnit(getDataSets(),
                     getUpgradeDataSets(),
@@ -59,4 +59,9 @@ public class HybridIntegrationTestSuite {
     private static List<CustomCassandraCQLUnit.NamedDataset> getUpgradeDataSets(){
         return Collections.emptyList();
     }
+
+
+    @ClassRule
+    public static TestRule ruleChain = RuleChain.outerRule(cassandraUnit)
+            .around(sqlUnit);
 }

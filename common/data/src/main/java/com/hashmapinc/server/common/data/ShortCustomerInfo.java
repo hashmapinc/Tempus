@@ -16,16 +16,18 @@
  */
 package com.hashmapinc.server.common.data;
 
+import com.hashmapinc.server.common.data.id.CustomerId;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
-import com.hashmapinc.server.common.data.id.CustomerId;
 
 /**
  * Created by igor on 2/27/18.
  */
 
 @AllArgsConstructor
+@NoArgsConstructor
 public class ShortCustomerInfo {
 
     @Getter @Setter

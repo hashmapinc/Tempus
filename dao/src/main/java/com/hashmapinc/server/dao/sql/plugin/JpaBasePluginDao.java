@@ -16,11 +16,6 @@
  */
 package com.hashmapinc.server.dao.sql.plugin;
 
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.repository.CrudRepository;
-import org.springframework.stereotype.Component;
 import com.hashmapinc.server.common.data.UUIDConverter;
 import com.hashmapinc.server.common.data.id.PluginId;
 import com.hashmapinc.server.common.data.id.TenantId;
@@ -31,6 +26,11 @@ import com.hashmapinc.server.dao.model.sql.PluginMetaDataEntity;
 import com.hashmapinc.server.dao.plugin.PluginDao;
 import com.hashmapinc.server.dao.sql.JpaAbstractSearchTextDao;
 import com.hashmapinc.server.dao.util.SqlDao;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.repository.CrudRepository;
+import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
 import java.util.List;
@@ -88,7 +88,7 @@ public class JpaBasePluginDao extends JpaAbstractSearchTextDao<PluginMetaDataEnt
     @Override
     public void deleteById(UUID id) {
         log.debug("Delete plugin meta-data entity by id [{}]", id);
-        pluginMetaDataRepository.delete(UUIDConverter. fromTimeUUID(id));
+        pluginMetaDataRepository.deleteById(UUIDConverter.fromTimeUUID(id));
     }
 
     @Override

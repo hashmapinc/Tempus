@@ -17,13 +17,6 @@
 package com.hashmapinc.server.dao.sql.relation;
 
 import com.google.common.util.concurrent.ListenableFuture;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.jpa.domain.Specification;
-import org.springframework.stereotype.Component;
 import com.hashmapinc.server.common.data.EntityType;
 import com.hashmapinc.server.common.data.UUIDConverter;
 import com.hashmapinc.server.common.data.id.EntityId;
@@ -37,13 +30,20 @@ import com.hashmapinc.server.dao.relation.RelationDao;
 import com.hashmapinc.server.dao.sql.JpaAbstractDaoListeningExecutorService;
 import com.hashmapinc.server.dao.sql.JpaAbstractSearchTimeDao;
 import com.hashmapinc.server.dao.util.SqlDao;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.stereotype.Component;
 
 import javax.persistence.criteria.Predicate;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.springframework.data.jpa.domain.Specifications.where;
 import static com.hashmapinc.server.common.data.UUIDConverter.fromTimeUUID;
+import static org.springframework.data.jpa.domain.Specifications.where;
 
 /**
  * Created by Valerii Sosliuk on 5/29/2017.
@@ -96,13 +96,13 @@ public class JpaRelationDao extends JpaAbstractDaoListeningExecutorService imple
     @Override
     public ListenableFuture<Boolean> checkRelation(EntityId from, EntityId to, String relationType, RelationTypeGroup typeGroup) {
         RelationCompositeKey key = getRelationCompositeKey(from, to, relationType, typeGroup);
-        return service.submit(() -> relationRepository.findOne(key) != null);
+        return service.submit(() -> relationRepository.findById(key).isPresent());
     }
 
     @Override
     public ListenableFuture<EntityRelation> getRelation(EntityId from, EntityId to, String relationType, RelationTypeGroup typeGroup) {
         RelationCompositeKey key = getRelationCompositeKey(from, to, relationType, typeGroup);
-        return service.submit(() -> DaoUtil.getData(relationRepository.findOne(key)));
+        return service.submit(() -> DaoUtil.getData(relationRepository.findById(key).orElse(null)));
     }
 
     private RelationCompositeKey getRelationCompositeKey(EntityId from, EntityId to, String relationType, RelationTypeGroup typeGroup) {
@@ -127,8 +127,8 @@ public class JpaRelationDao extends JpaAbstractDaoListeningExecutorService imple
     @Override
     public boolean deleteRelation(EntityRelation relation) {
         RelationCompositeKey key = new RelationCompositeKey(relation);
-        boolean relationExistsBeforeDelete = relationRepository.exists(key);
-        relationRepository.delete(key);
+        boolean relationExistsBeforeDelete = relationRepository.existsById(key);
+        relationRepository.deleteById(key);
         return relationExistsBeforeDelete;
     }
 
@@ -137,8 +137,8 @@ public class JpaRelationDao extends JpaAbstractDaoListeningExecutorService imple
         RelationCompositeKey key = new RelationCompositeKey(relation);
         return service.submit(
                 () -> {
-                    boolean relationExistsBeforeDelete = relationRepository.exists(key);
-                    relationRepository.delete(key);
+                    boolean relationExistsBeforeDelete = relationRepository.existsById(key);
+                    relationRepository.deleteById(key);
                     return relationExistsBeforeDelete;
                 });
     }
@@ -146,8 +146,8 @@ public class JpaRelationDao extends JpaAbstractDaoListeningExecutorService imple
     @Override
     public boolean deleteRelation(EntityId from, EntityId to, String relationType, RelationTypeGroup typeGroup) {
         RelationCompositeKey key = getRelationCompositeKey(from, to, relationType, typeGroup);
-        boolean relationExistsBeforeDelete = relationRepository.exists(key);
-        relationRepository.delete(key);
+        boolean relationExistsBeforeDelete = relationRepository.existsById(key);
+        relationRepository.deleteById(key);
         return relationExistsBeforeDelete;
     }
 
@@ -156,8 +156,8 @@ public class JpaRelationDao extends JpaAbstractDaoListeningExecutorService imple
         RelationCompositeKey key = getRelationCompositeKey(from, to, relationType, typeGroup);
         return service.submit(
                 () -> {
-                    boolean relationExistsBeforeDelete = relationRepository.exists(key);
-                    relationRepository.delete(key);
+                    boolean relationExistsBeforeDelete = relationRepository.existsById(key);
+                    relationRepository.deleteById(key);
                     return relationExistsBeforeDelete;
                 });
     }

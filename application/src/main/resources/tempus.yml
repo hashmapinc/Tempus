@@ -45,7 +45,7 @@ security:
       #grant-type: "${TEMPUS_CLIENT_GRANT_TYPE:password}"
       scope: ["server"]
     resource:
-      resource-id: "${TEMPUS_RESOURCE_API_ID:tempus-resource-server-rest-api}"
+      id: "${TEMPUS_RESOURCE_API_ID:tempus-resource-server-rest-api}"
       tokenInfoUri: "${TOKEN_INFO_URI:${IDENTITY_BASE_URL:http://localhost:9002/uaa}/oauth/check_token}"
 
 identity:
@@ -334,6 +334,8 @@ configurations:
   ui:
     depthSeries: "true"
 
+spring.main.allow-bean-definition-overriding: true
+
 # HSQLDB DAO Configuration
 #spring:
 #  data:
@@ -366,22 +368,22 @@ spring:
     username: "${SPRING_DATASOURCE_USERNAME:postgres}"
     password: "${SPRING_DATASOURCE_PASSWORD:postgres}"
 
-#max file and request size
-spring.http:
+##max file and request size
+spring.servlet:
   multipart:
-    max-file-size: -1
-    max-request-size: -1
+    max-file-size: 1GB
+    max-request-size: 1GB
 # Audit log parameters
-audit_log:
+audit-log:
   # Enable/disable audit log functionality.
   enabled: "${AUDIT_LOG_ENABLED:true}"
   # Specify partitioning size for audit log by tenant id storage. Example MINUTES, HOURS, DAYS, MONTHS
-  by_tenant_partitioning: "${AUDIT_LOG_BY_TENANT_PARTITIONING:MONTHS}"
+  by-tenant-partitioning: "${AUDIT_LOG_BY_TENANT_PARTITIONING:MONTHS}"
   # Number of days as history period if startTime and endTime are not specified
   default_query_period: "${AUDIT_LOG_DEFAULT_QUERY_PERIOD:30}"
   # Logging levels per each entity type.
   # Allowed values: OFF (disable), W (log write operations), RW (log read and write operations)
-  logging_level:
+  logging-level:
     mask:
       "device": "${AUDIT_LOG_MASK_DEVICE:W}"
       "asset": "${AUDIT_LOG_MASK_ASSET:W}"
@@ -398,7 +400,7 @@ audit_log:
     # Name of the index where audit logs stored
     # Index name could contain next placeholders (not mandatory):
     # @{TENANT} - substituted by tenant ID
-    # @{DATE} - substituted by current date in format provided in audit_log.sink.date_format
+    # @{DATE} - substituted by current date in format provided in audit-log.sink.date_format
     index_pattern: "${AUDIT_LOG_SINK_INDEX_PATTERN:@{TENANT}_AUDIT_LOG_@{DATE}}"
     # Date format. Details of the pattern could be found here:
     # https://docs.oracle.com/javase/8/docs/api/java/time/format/DateTimeFormatter.html

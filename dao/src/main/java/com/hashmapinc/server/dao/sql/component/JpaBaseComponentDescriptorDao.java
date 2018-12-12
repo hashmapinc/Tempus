@@ -17,23 +17,23 @@
 package com.hashmapinc.server.dao.sql.component;
 
 import com.datastax.driver.core.utils.UUIDs;
+import com.hashmapinc.server.common.data.UUIDConverter;
+import com.hashmapinc.server.common.data.id.ComponentDescriptorId;
 import com.hashmapinc.server.common.data.page.TextPageLink;
 import com.hashmapinc.server.common.data.plugin.ComponentDescriptor;
 import com.hashmapinc.server.common.data.plugin.ComponentScope;
 import com.hashmapinc.server.common.data.plugin.ComponentType;
 import com.hashmapinc.server.dao.DaoUtil;
+import com.hashmapinc.server.dao.component.ComponentDescriptorDao;
 import com.hashmapinc.server.dao.model.ModelConstants;
 import com.hashmapinc.server.dao.model.sql.ComponentDescriptorEntity;
+import com.hashmapinc.server.dao.sql.JpaAbstractSearchTextDao;
 import com.hashmapinc.server.dao.util.SqlDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-import com.hashmapinc.server.common.data.UUIDConverter;
-import com.hashmapinc.server.common.data.id.ComponentDescriptorId;
-import com.hashmapinc.server.dao.component.ComponentDescriptorDao;
-import com.hashmapinc.server.dao.sql.JpaAbstractSearchTextDao;
 
 import java.util.List;
 import java.util.Objects;
@@ -64,7 +64,7 @@ public class JpaBaseComponentDescriptorDao extends JpaAbstractSearchTextDao<Comp
         if (component.getId() == null) {
             component.setId(new ComponentDescriptorId(UUIDs.timeBased()));
         }
-        if (componentDescriptorRepository.findOne(UUIDConverter.fromTimeUUID(component.getId().getId())) == null) {
+        if (componentDescriptorRepository.findById(UUIDConverter.fromTimeUUID(component.getId().getId())).isEmpty()) {
             return Optional.of(save(component));
         }
         return Optional.empty();

@@ -18,20 +18,19 @@ package com.hashmapinc.server.dao.audit;
 
 import com.google.common.util.concurrent.ListenableFuture;
 import com.hashmapinc.server.common.data.BaseData;
-import com.hashmapinc.server.common.data.audit.ActionType;
-import com.hashmapinc.server.common.data.id.*;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.stereotype.Service;
 import com.hashmapinc.server.common.data.HasName;
+import com.hashmapinc.server.common.data.audit.ActionType;
 import com.hashmapinc.server.common.data.audit.AuditLog;
 import com.hashmapinc.server.common.data.id.*;
 import com.hashmapinc.server.common.data.page.TimePageData;
 import com.hashmapinc.server.common.data.page.TimePageLink;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
-@ConditionalOnProperty(prefix = "audit_log", value = "enabled", havingValue = "false")
+@ConditionalOnProperty(prefix = "audit-log", value = "enabled", havingValue = "false")
 public class DummyAuditLogServiceImpl implements AuditLogService {
 
     @Override

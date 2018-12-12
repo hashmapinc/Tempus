@@ -24,7 +24,5 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface LogoRepository extends CrudRepository<LogoEntity, String> {
 
-    LogoEntity findById(String id);
-
     LogoEntity findByName(String name);
 }

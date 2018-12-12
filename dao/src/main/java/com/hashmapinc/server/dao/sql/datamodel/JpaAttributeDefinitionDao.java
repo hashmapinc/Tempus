@@ -16,8 +16,8 @@
  */
 package com.hashmapinc.server.dao.sql.datamodel;
 
-import com.hashmapinc.server.common.data.datamodel.AttributeDefinition;
 import com.hashmapinc.server.common.data.UUIDConverter;
+import com.hashmapinc.server.common.data.datamodel.AttributeDefinition;
 import com.hashmapinc.server.common.data.id.DataModelObjectId;
 import com.hashmapinc.server.dao.DaoUtil;
 import com.hashmapinc.server.dao.datamodel.AttributeDefinitionDao;
@@ -57,7 +57,7 @@ public class JpaAttributeDefinitionDao implements AttributeDefinitionDao{
 
     @Override
     public void removeByNameAndDataModelObjectId(String name, DataModelObjectId dataModelObjectId) {
-        attributeDefinitionRepository.delete(createAttributeDefinitionCompositeKey(name, dataModelObjectId));
+        attributeDefinitionRepository.deleteById(createAttributeDefinitionCompositeKey(name, dataModelObjectId));
     }
 
     @Override

@@ -16,20 +16,20 @@
  */
 package com.hashmapinc.server.dao.sql.computations;
 
-import com.hashmapinc.server.dao.computations.ComputationsDao;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.stereotype.Service;
-import com.hashmapinc.server.common.data.computation.Computations;
 import com.hashmapinc.server.common.data.UUIDConverter;
+import com.hashmapinc.server.common.data.computation.Computations;
 import com.hashmapinc.server.common.data.id.ComputationId;
 import com.hashmapinc.server.common.data.id.TenantId;
 import com.hashmapinc.server.common.data.page.TextPageLink;
 import com.hashmapinc.server.dao.DaoUtil;
+import com.hashmapinc.server.dao.computations.ComputationsDao;
 import com.hashmapinc.server.dao.model.sql.ComputationsEntity;
 import com.hashmapinc.server.dao.sql.JpaAbstractDaoListeningExecutorService;
 import com.hashmapinc.server.dao.util.SqlDao;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.stereotype.Service;
 
 import java.util.*;
 
@@ -61,7 +61,7 @@ public class JpaComputationsDao extends JpaAbstractDaoListeningExecutorService i
 
     @Override
     public void deleteById(ComputationId computationId) {
-        computationsRepository.delete(UUIDConverter.fromTimeUUID(computationId.getId()));
+        computationsRepository.deleteById(UUIDConverter.fromTimeUUID(computationId.getId()));
     }
 
     @Override
@@ -84,7 +84,7 @@ public class JpaComputationsDao extends JpaAbstractDaoListeningExecutorService i
 
     @Override
     public Computations findById(UUID id) {
-        ComputationsEntity entity = computationsRepository.findOne(UUIDConverter.fromTimeUUID(id));
+        ComputationsEntity entity = computationsRepository.findById(UUIDConverter.fromTimeUUID(id)).orElse(null);
         return DaoUtil.getData(entity);
     }
 

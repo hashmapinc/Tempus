@@ -18,8 +18,9 @@ package com.hashmapinc.server.dao.model;
 
 public interface SearchTextEntity<D> extends BaseEntity<D> {
 
+    @com.datastax.driver.mapping.annotations.Transient
     String getSearchTextSource();
-    
+
     void setSearchText(String searchText);
     
 }

@@ -60,6 +60,10 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-context</artifactId>
+        </dependency>
+        <dependency>
             <groupId>com.hashmapinc</groupId>
             <artifactId>extensions-core</artifactId>
             <scope>provided</scope>
