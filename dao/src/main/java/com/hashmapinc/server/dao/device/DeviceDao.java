@@ -20,6 +20,7 @@ import com.google.common.util.concurrent.ListenableFuture;
 import com.hashmapinc.server.common.data.Device;
 import com.hashmapinc.server.common.data.EntitySubtype;
 import com.hashmapinc.server.common.data.TempusResourceCriteriaSpec;
+import com.hashmapinc.server.common.data.page.PaginatedResult;
 import com.hashmapinc.server.common.data.page.TextPageLink;
 import com.hashmapinc.server.dao.Dao;
 
@@ -131,7 +132,7 @@ public interface DeviceDao extends Dao<Device> {
      * @param tempusResourceCriteriaSpec the tempusResourceCriteriaSpec
      * @param limit
      * @param pageNum
-     * @return the list of device objects corresponding to tempusResourceCriteriaSpec
+     * @return the PaginatedResult of device objects corresponding to tempusResourceCriteriaSpec
      */
-    List<Device> findAll(TempusResourceCriteriaSpec tempusResourceCriteriaSpec, int limit, int pageNum);
+    PaginatedResult<Device> findAll(TempusResourceCriteriaSpec tempusResourceCriteriaSpec, int limit, int pageNum);
 }
