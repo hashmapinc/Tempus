@@ -163,6 +163,9 @@ public class JpaAssetDao extends JpaAbstractSearchTextDao<AssetEntity, Asset> im
         tempusResourceCriteriaSpec.getCustomerId().ifPresent(customerId ->
                 basicPredicateBuilder.with(new ResourceCriteria(ModelConstants.ASSET_CUSTOMER_ID_PROPERTY, ResourceCriteria.Operation.EQUALS, UUIDConverter.fromTimeUUID(customerId.getId()))));
 
+        tempusResourceCriteriaSpec.getType().ifPresent(type ->
+                basicPredicateBuilder.with(new ResourceCriteria(ModelConstants.ASSET_TYPE_PROPERTY, ResourceCriteria.Operation.EQUALS, type)));
+
         final ResourceCriteria idConstraint = getIdConstraint(tempusResourceCriteriaSpec);
         if(Objects.nonNull(idConstraint)){
             basicPredicateBuilder.with(idConstraint);

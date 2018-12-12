@@ -299,8 +299,7 @@ public class DeviceController extends BaseController {
         try {
             CustomerId customerId = new CustomerId(toUUID(strCustomerId));
             checkCustomerId(customerId);
-            final DataModelId dataModelId = customerService.findCustomerById(customerId).getDataModelId();
-            final TempusResourceCriteriaSpec tempusResourceCriteriaSpec = getTempusResourceCriteriaSpec(getCurrentUser(), EntityType.DEVICE, null, dataModelId, type, textSearch);
+            final TempusResourceCriteriaSpec tempusResourceCriteriaSpec = getTempusResourceCriteriaSpec(getCurrentUser(), EntityType.DEVICE, null, customerId, type, textSearch);
             tempusResourceCriteriaSpec.setCustomerId(Optional.of(customerId));
             return deviceService.findAll(tempusResourceCriteriaSpec, limit, pageNum);
         } catch (Exception e) {
