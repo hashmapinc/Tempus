@@ -76,7 +76,7 @@ export function DeviceController($rootScope,userService, deviceService, customer
 
     $scope.query = {
         order: 'name',
-        limit: 15,
+        limit: 5,
         page: 1,
         search: null
     };
@@ -155,7 +155,12 @@ export function DeviceController($rootScope,userService, deviceService, customer
 
         if (vm.devicesScope === 'tenant') {
             fetchDevicesFunction = function (pageLink, deviceType) {
-                return deviceService.getTenantDevices(pageLink, true, null, deviceType);
+                if($scope.query.page == 1){
+                    return deviceService.getTenantDevices($scope.query.limit, true, null, deviceType,0);
+                }else {
+                    return deviceService.getTenantDevices($scope.query.limit, true, null, deviceType,$scope.query.page - 1);
+                }
+
             };
             deleteDeviceFunction = function (deviceId) {
                 return deviceService.deleteDevice(deviceId);
@@ -327,17 +332,10 @@ export function DeviceController($rootScope,userService, deviceService, customer
     loadTableData();
 
     function loadTableData() {
-        var promise = vm.deviceGridConfig.fetchItemsFunc({limit: $scope.query.limit*$scope.query.page, textSearch: ''}, false);
+        var promise = vm.deviceGridConfig.fetchItemsFunc({limit: $scope.query.limit, textSearch: ''}, false);
         if(promise) {
-
             promise.then(function success(items) {
-
                 var deviceSortList = $filter('orderBy')(items.data, $scope.query.order);
-                var startIndex = $scope.query.limit * ($scope.query.page - 1);
-
-
-
-
                 if ($scope.query.search != null) {
 
                     deviceSortList = $filter('filter')(items.data, function(data) {
@@ -347,17 +345,14 @@ export function DeviceController($rootScope,userService, deviceService, customer
                             return true;
                         }
                     });
-                    //$scope.query.page =1;
                     deviceSortList = $filter('orderBy')(deviceSortList, $scope.query.order);
-                    if ($scope.query.search != '') {startIndex =0;}
                 }
 
 
 
-                var devicePaginatedata = deviceSortList.slice(startIndex, startIndex + $scope.query.limit);
-
+                var devicePaginatedata = deviceSortList;
                 $scope.devices = {
-                    count: 15,
+                    count: items.totalElements,
                     data: devicePaginatedata
                 };
                 },
@@ -404,11 +399,9 @@ export function DeviceController($rootScope,userService, deviceService, customer
         loadTableData();
     }
 
-    $scope.onPaginate = function() {
-
-        //var startIndex = $scope.query.limit * ($scope.query.page - 1);
+    $scope.onPaginate = function(page) {
+        $scope.query.page = page;
         loadTableData();
-
     }
 
     $scope.deleteDevice = function($event,item) {

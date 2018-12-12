@@ -47,9 +47,9 @@ function DeviceService($http, $q, $window, userService, attributeService, custom
 
     return service;
 
-    function getTenantDevices(pageLink, applyCustomersInfo, config, type) {
+    function getTenantDevices(pageLink, applyCustomersInfo, config, type, pageNum) {
         var deferred = $q.defer();
-        var url = '/api/tenant/devices?limit=' + pageLink.limit;
+        var url = '/api/tenant/devices?limit=' + pageLink + '&pageNum=' + pageNum;
         if (angular.isDefined(pageLink.textSearch)) {
             url += '&textSearch=' + pageLink.textSearch;
         }
