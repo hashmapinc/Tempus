@@ -737,19 +737,24 @@ public abstract class BaseController {
         return tempusResourceCriteriaSpec;
     }*/
 
-    protected TempusResourceCriteriaSpec getTempusResourceCriteriaSpec(SecurityUser user, EntityType entityType, DataModelObjectId dataModelObjectId, DataModelId dataModelId, String type, String searchText) throws TempusException{
+    protected TempusResourceCriteriaSpec getTempusResourceCriteriaSpec(SecurityUser user, EntityType entityType, DataModelObjectId dataModelObjectId, CustomerId customerId, String type, String searchText) throws TempusException{
         final TempusResourceCriteriaSpec tempusResourceCriteriaSpec = new TempusResourceCriteriaSpec(entityType, user.getTenantId());
 
-        if(type != null && !type.isEmpty()) {
+        if(type != null && !type.trim().isEmpty()) {
             tempusResourceCriteriaSpec.setType(Optional.of(type.trim()));
         }
 
-        if(searchText != null && !searchText.isEmpty()) {
+        if(searchText != null && !searchText.trim().isEmpty()) {
             tempusResourceCriteriaSpec.setSearchText(Optional.of(searchText));
         }
-
-        if(isCustomerUser(user)){
-            tempusResourceCriteriaSpec.setCustomerId(Optional.of(user.getCustomerId()));
+        CustomerId tempCustomerId = null;
+        if(isCustomerUser(user) && customerId != null){
+            tempCustomerId = user.getCustomerId();
+            tempusResourceCriteriaSpec.setCustomerId(Optional.of(tempCustomerId));
+        }
+        if(customerId != null) {
+            tempCustomerId = customerId;
+            tempusResourceCriteriaSpec.setCustomerId(Optional.of(tempCustomerId));
         }
         final Supplier<Stream<UserPermission>> readableAndResourceAccessibleStream = getReadableAndResourceAccessibleStream(user, entityType);
 
@@ -760,6 +765,8 @@ public abstract class BaseController {
             Set<DataModelObjectId> allowedDataModelObjectIds = new HashSet<>();
             Set<EntityId> allowedEntityIds = new HashSet<>();
             String entityTypeName = entityType.equals(EntityType.DEVICE) ? "Device" : "Asset";
+            final DataModelId dataModelId = tempCustomerId != null ? customerService.findCustomerById(tempCustomerId).getDataModelId() : null;
+
             final List<DataModelObjectId> dataModelObjectIds = (dataModelId != null) ?
                     dataModelObjectService.findByDataModelIdAndType(dataModelId, entityTypeName).stream().map(DataModelObject::getId).collect(Collectors.toList()) :
                     Collections.emptyList();

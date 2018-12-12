@@ -22,8 +22,6 @@ import com.hashmapinc.server.common.data.audit.ActionType;
 import com.hashmapinc.server.common.data.device.DeviceSearchQuery;
 import com.hashmapinc.server.common.data.id.*;
 import com.hashmapinc.server.common.data.page.PaginatedResult;
-import com.hashmapinc.server.common.data.page.TextPageData;
-import com.hashmapinc.server.common.data.page.TextPageLink;
 import com.hashmapinc.server.common.data.security.Authority;
 import com.hashmapinc.server.common.data.security.DeviceCredentials;
 import com.hashmapinc.server.dao.attributes.AttributesService;
@@ -41,7 +39,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PostFilter;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.access.prepost.PreFilter;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
@@ -301,8 +298,7 @@ public class DeviceController extends BaseController {
         try {
             CustomerId customerId = new CustomerId(toUUID(strCustomerId));
             checkCustomerId(customerId);
-            final DataModelId dataModelId = customerService.findCustomerById(customerId).getDataModelId();
-            final TempusResourceCriteriaSpec tempusResourceCriteriaSpec = getTempusResourceCriteriaSpec(getCurrentUser(), EntityType.DEVICE, null, dataModelId, type, textSearch);
+            final TempusResourceCriteriaSpec tempusResourceCriteriaSpec = getTempusResourceCriteriaSpec(getCurrentUser(), EntityType.DEVICE, null, customerId, type, textSearch);
             tempusResourceCriteriaSpec.setCustomerId(Optional.of(customerId));
             return deviceService.findAll(tempusResourceCriteriaSpec, limit, pageNum);
         } catch (Exception e) {
