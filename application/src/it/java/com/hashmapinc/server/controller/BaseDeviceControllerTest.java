@@ -24,6 +24,7 @@ import com.hashmapinc.server.common.data.datamodel.DataModel;
 import com.hashmapinc.server.common.data.datamodel.DataModelObject;
 import com.hashmapinc.server.common.data.id.*;
 import com.hashmapinc.server.common.data.kv.*;
+import com.hashmapinc.server.common.data.page.PaginatedResult;
 import com.hashmapinc.server.common.data.page.TextPageData;
 import com.hashmapinc.server.common.data.page.TextPageLink;
 import com.hashmapinc.server.common.data.security.Authority;
@@ -372,35 +373,18 @@ public abstract class BaseDeviceControllerTest extends AbstractControllerTest {
         List<Device> loadedDevices = new ArrayList<>();
         int pageNum = 0;
         int pageLimit = 23;
-        List<Device> pageData;
+        PaginatedResult<Device> pageData;
         do {
             pageData = doGetTyped("/api/tenant/devices?limit="+pageLimit+"&pageNum=" + pageNum,
-                    new TypeReference<List<Device>>() {
+                    new TypeReference<PaginatedResult<Device>>() {
                     });
-            loadedDevices.addAll(pageData);
+            loadedDevices.addAll(pageData.getData());
             pageNum++;
-        } while (pageData.size() == pageLimit);
+        } while (pageData.getData().size() == pageLimit);
 
         Collections.sort(devices, idComparator);
         Collections.sort(loadedDevices, idComparator);
         Assert.assertEquals(devices, loadedDevices);
-
-//        List<Device> loadedDevices = new ArrayList<>();
-//        TextPageLink pageLink = new TextPageLink(23);
-//        TextPageData<Device> pageData = null;
-//        do {
-//            pageData = doGetTypedWithPageLink("/api/tenant/devices?",
-//                    new TypeReference<TextPageData<Device>>(){}, pageLink);
-//            loadedDevices.addAll(pageData.getData());
-//            if (pageData.hasNext()) {
-//                pageLink = pageData.getNextPageLink();
-//            }
-//        } while (pageData.hasNext());
-//
-//        Collections.sort(devices, idComparator);
-//        Collections.sort(loadedDevices, idComparator);
-//
-//        Assert.assertEquals(devices, loadedDevices);
     }
     
     @Test
@@ -431,14 +415,14 @@ public abstract class BaseDeviceControllerTest extends AbstractControllerTest {
         List<Device> loadedDevicesTitle1 = new ArrayList<>();
         int pageNum = 0;
         int pageLimit = 15;
-        List<Device> pageData;
+        PaginatedResult<Device> pageData;
         do {
             pageData = doGetTyped("/api/tenant/devices?limit="+pageLimit+"&pageNum=" + pageNum + "&textSearch="+ title1,
-                    new TypeReference<List<Device>>() {
+                    new TypeReference<PaginatedResult<Device>>() {
                     });
-            loadedDevicesTitle1.addAll(pageData);
+            loadedDevicesTitle1.addAll(pageData.getData());
             pageNum++;
-        } while (pageData.size() == pageLimit);
+        } while (pageData.getData().size() == pageLimit);
 
         Collections.sort(devicesTitle1, idComparator);
         Collections.sort(loadedDevicesTitle1, idComparator);
@@ -449,11 +433,11 @@ public abstract class BaseDeviceControllerTest extends AbstractControllerTest {
         pageLimit = 4;
         do {
             pageData = doGetTyped("/api/tenant/devices?limit="+pageLimit+"&pageNum=" + pageNum + "&textSearch="+ title2,
-                    new TypeReference<List<Device>>() {
+                    new TypeReference<PaginatedResult<Device>>() {
                     });
-            loadedDevicesTitle2.addAll(pageData);
+            loadedDevicesTitle2.addAll(pageData.getData());
             pageNum++;
-        } while (pageData.size() == pageLimit);
+        } while (pageData.getData().size() == pageLimit);
 
         Collections.sort(devicesTitle2, idComparator);
         Collections.sort(loadedDevicesTitle2, idComparator);
@@ -465,10 +449,10 @@ public abstract class BaseDeviceControllerTest extends AbstractControllerTest {
         }
 
         pageData = doGetTyped("/api/tenant/devices?limit=4&pageNum=0&textSearch="+title1,
-                new TypeReference<List<Device>>() {
+                new TypeReference<PaginatedResult<Device>>() {
                 });
 
-        Assert.assertEquals(0, pageData.size());
+        Assert.assertEquals(0, pageData.getData().size());
 
         
         for (Device device : loadedDevicesTitle2) {
@@ -477,10 +461,10 @@ public abstract class BaseDeviceControllerTest extends AbstractControllerTest {
         }
 
         pageData = doGetTyped("/api/tenant/devices?limit=4&pageNum=0&textSearch="+title2,
-                new TypeReference<List<Device>>() {
+                new TypeReference<PaginatedResult<Device>>() {
                 });
 
-        Assert.assertEquals(0, pageData.size());
+        Assert.assertEquals(0, pageData.getData().size());
     }
 
     @Test
@@ -513,14 +497,14 @@ public abstract class BaseDeviceControllerTest extends AbstractControllerTest {
         List<Device> loadedDevicesType1 = new ArrayList<>();
         int pageNum = 0;
         int pageLimit = 15;
-        List<Device> pageData;
+        PaginatedResult<Device> pageData;
         do {
             pageData = doGetTyped("/api/tenant/devices?limit="+pageLimit+"&pageNum=" + pageNum + "&type="+type1,
-                    new TypeReference<List<Device>>() {
+                    new TypeReference<PaginatedResult<Device>>() {
                     });
-            loadedDevicesType1.addAll(pageData);
+            loadedDevicesType1.addAll(pageData.getData());
             pageNum++;
-        } while (pageData.size() == pageLimit);
+        } while (pageData.getData().size() == pageLimit);
 
         Collections.sort(devicesType1, idComparator);
         Collections.sort(loadedDevicesType1, idComparator);
@@ -531,11 +515,11 @@ public abstract class BaseDeviceControllerTest extends AbstractControllerTest {
         pageLimit = 4;
         do {
             pageData = doGetTyped("/api/tenant/devices?limit="+pageLimit+"&pageNum=" + pageNum + "&type="+type2,
-                    new TypeReference<List<Device>>() {
+                    new TypeReference<PaginatedResult<Device>>() {
                     });
-            loadedDevicesType2.addAll(pageData);
+            loadedDevicesType2.addAll(pageData.getData());
             pageNum++;
-        } while (pageData.size() == pageLimit);
+        } while (pageData.getData().size() == pageLimit);
 
         Collections.sort(devicesType2, idComparator);
         Collections.sort(loadedDevicesType2, idComparator);
@@ -547,10 +531,10 @@ public abstract class BaseDeviceControllerTest extends AbstractControllerTest {
         }
 
         pageData = doGetTyped("/api/tenant/devices?limit=4&pageNum=0&textSearch="+title1+ "&type="+type1,
-                new TypeReference<List<Device>>() {
+                new TypeReference<PaginatedResult<Device>>() {
                 });
 
-        Assert.assertEquals(0, pageData.size());
+        Assert.assertEquals(0, pageData.getData().size());
 
         for (Device device : loadedDevicesType2) {
             doDelete("/api/device/"+device.getId().getId().toString())
@@ -558,10 +542,10 @@ public abstract class BaseDeviceControllerTest extends AbstractControllerTest {
         }
 
         pageData = doGetTyped("/api/tenant/devices?limit=4&pageNum=0&textSearch="+title1+ "&type="+type2,
-                new TypeReference<List<Device>>() {
+                new TypeReference<PaginatedResult<Device>>() {
                 });
 
-        Assert.assertEquals(0, pageData.size());
+        Assert.assertEquals(0, pageData.getData().size());
     }
 
 
@@ -586,14 +570,14 @@ public abstract class BaseDeviceControllerTest extends AbstractControllerTest {
         List<Device> loadedDevices = new ArrayList<>();
         int pageNum = 0;
         int pageLimit = 23;
-        List<Device> pageData;
+        PaginatedResult<Device> pageData;
         do {
             pageData = doGetTyped("/api/customer/" + customerId.getId().toString() + "/devices?limit="+pageLimit+"&pageNum=" + pageNum,
-                    new TypeReference<List<Device>>() {
+                    new TypeReference<PaginatedResult<Device>>() {
                     });
-            loadedDevices.addAll(pageData);
+            loadedDevices.addAll(pageData.getData());
             pageNum++;
-        } while (pageData.size() == pageLimit);
+        } while (pageData.getData().size() == pageLimit);
 
         Collections.sort(devices, idComparator);
         Collections.sort(loadedDevices, idComparator);
@@ -638,30 +622,30 @@ public abstract class BaseDeviceControllerTest extends AbstractControllerTest {
         List<Device> loadedDevicesTitle1 = new ArrayList<>();
         int pageNum = 0;
         int pageLimit = 15;
-        List<Device> pageData;
+        PaginatedResult<Device> pageData;
         do {
             pageData = doGetTyped("/api/customer/" + customerId.getId().toString() + "/devices?limit="+pageLimit+"&pageNum=" + pageNum+"&textSearch="+title1,
-                    new TypeReference<List<Device>>() {
+                    new TypeReference<PaginatedResult<Device>>() {
                     });
-            loadedDevicesTitle1.addAll(pageData);
+            loadedDevicesTitle1.addAll(pageData.getData());
             pageNum++;
-        } while (pageData.size() == pageLimit);
+        } while (pageData.getData().size() == pageLimit);
         
         Collections.sort(devicesTitle1, idComparator);
         Collections.sort(loadedDevicesTitle1, idComparator);
         Assert.assertEquals(devicesTitle1, loadedDevicesTitle1);
-        
+
 
         List<Device> loadedDevicesTitle2 = new ArrayList<>();
         pageNum = 0;
         pageLimit = 4;
         do {
             pageData = doGetTyped("/api/customer/" + customerId.getId().toString() + "/devices?limit="+pageLimit+"&pageNum=" + pageNum+"&textSearch="+title2,
-                    new TypeReference<List<Device>>() {
+                    new TypeReference<PaginatedResult<Device>>() {
                     });
-            loadedDevicesTitle2.addAll(pageData);
+            loadedDevicesTitle2.addAll(pageData.getData());
             pageNum++;
-        } while (pageData.size() == pageLimit);
+        } while (pageData.getData().size() == pageLimit);
 
         Collections.sort(devicesTitle2, idComparator);
         Collections.sort(loadedDevicesTitle2, idComparator);
@@ -674,10 +658,10 @@ public abstract class BaseDeviceControllerTest extends AbstractControllerTest {
         }
 
         pageData = doGetTyped("/api/customer/" + customerId.getId().toString() + "/devices?limit=4&pageNum=0&textSearch="+title1,
-                new TypeReference<List<Device>>() {
+                new TypeReference<PaginatedResult<Device>>() {
                 });
 
-        Assert.assertEquals(0, pageData.size());
+        Assert.assertEquals(0, pageData.getData().size());
         
         for (Device device : loadedDevicesTitle2) {
             doDelete("/api/customer/device/" + device.getId().getId().toString())
@@ -686,10 +670,10 @@ public abstract class BaseDeviceControllerTest extends AbstractControllerTest {
 
 
         pageData = doGetTyped("/api/customer/" + customerId.getId().toString() + "/devices?limit=4&pageNum=0&textSearch="+title2,
-                new TypeReference<List<Device>>() {
+                new TypeReference<PaginatedResult<Device>>() {
                 });
 
-        Assert.assertEquals(0, pageData.size());
+        Assert.assertEquals(0, pageData.getData().size());
     }
 
     @Test
@@ -731,15 +715,15 @@ public abstract class BaseDeviceControllerTest extends AbstractControllerTest {
         List<Device> loadedDevicesType1 = new ArrayList<>();
         int pageNum = 0;
         int pageLimit = 15;
-        List<Device> pageData = Collections.emptyList();
+        PaginatedResult<Device> pageData;
         do {
             pageData = doGetTyped("/api/customer/" + customerId.getId().toString() + "/devices?limit="+pageLimit+"&pageNum=" + pageNum+"&type="+type1,
-                    new TypeReference<List<Device>>() {
+                    new TypeReference<PaginatedResult<Device>>() {
                     });
-            loadedDevicesType1.addAll(pageData);
+            loadedDevicesType1.addAll(pageData.getData());
             pageNum++;
 
-        } while (pageData.size() == pageLimit);
+        } while (pageData.getData().size() == pageLimit);
 
         Collections.sort(devicesType1, idComparator);
         Collections.sort(loadedDevicesType1, idComparator);
@@ -751,12 +735,12 @@ public abstract class BaseDeviceControllerTest extends AbstractControllerTest {
         pageLimit = 4;
         do {
             pageData = doGetTyped("/api/customer/" + customerId.getId().toString() + "/devices?limit="+pageLimit+"&pageNum=" + pageNum+"&type="+type2,
-                    new TypeReference<List<Device>>() {
+                    new TypeReference<PaginatedResult<Device>>() {
                     });
-            loadedDevicesType2.addAll(pageData);
+            loadedDevicesType2.addAll(pageData.getData());
             pageNum++;
 
-        } while (pageData.size() == pageLimit);
+        } while (pageData.getData().size() == pageLimit);
 
         Collections.sort(devicesType2, idComparator);
         Collections.sort(loadedDevicesType2, idComparator);
@@ -769,10 +753,10 @@ public abstract class BaseDeviceControllerTest extends AbstractControllerTest {
         }
 
         pageData = doGetTyped("/api/customer/" + customerId.getId().toString() + "/devices?limit=4&pageNum=0&type="+type1,
-                new TypeReference<List<Device>>() {
+                new TypeReference<PaginatedResult<Device>>() {
                 });
 
-        Assert.assertEquals(0, pageData.size());
+        Assert.assertEquals(0, pageData.getData().size());
 
         for (Device device : loadedDevicesType2) {
             doDelete("/api/customer/device/" + device.getId().getId().toString())
@@ -780,10 +764,10 @@ public abstract class BaseDeviceControllerTest extends AbstractControllerTest {
         }
 
         pageData = doGetTyped("/api/customer/" + customerId.getId().toString() + "/devices?limit=4&pageNum=0&type="+type2,
-                new TypeReference<List<Device>>() {
+                new TypeReference<PaginatedResult<Device>>() {
                 });
 
-        Assert.assertEquals(0, pageData.size());
+        Assert.assertEquals(0, pageData.getData().size());
     }
 
     @Test
@@ -889,17 +873,17 @@ public abstract class BaseDeviceControllerTest extends AbstractControllerTest {
             createDevice(dataModelObject.getId(), customerUser.getCustomerId(), "Customer's device"+i);
         }
 
-        List<Device> pageData  = doGetTyped("/api/datamodelobject/devices/"+ dataModelObject.getId().getId().toString()+"?pageNum=0&limit=15&textSearch=",
-                new TypeReference<List<Device>>(){});
+        PaginatedResult<Device> pageData  = doGetTyped("/api/datamodelobject/devices/"+ dataModelObject.getId().getId().toString()+"?pageNum=0&limit=15&textSearch=",
+                new TypeReference<PaginatedResult<Device>>(){});
 
 
-        Assert.assertEquals(15, pageData.size());
+        Assert.assertEquals(15, pageData.getData().size());
 
-        List<Device> pageData1  = doGetTyped("/api/datamodelobject/devices/"+ dataModelObject.getId().getId().toString()+"?pageNum=1&limit=15&textSearch=",
-                new TypeReference<List<Device>>(){});
+        PaginatedResult<Device> pageData1  = doGetTyped("/api/datamodelobject/devices/"+ dataModelObject.getId().getId().toString()+"?pageNum=1&limit=15&textSearch=",
+                new TypeReference<PaginatedResult<Device>>(){});
 
 
-        Assert.assertEquals(5, pageData1.size());
+        Assert.assertEquals(5, pageData1.getData().size());
         logout();
 
         unAssignUserFromGroup(savedCustomerGroup.getId(), customerUserId);
@@ -926,15 +910,15 @@ public abstract class BaseDeviceControllerTest extends AbstractControllerTest {
 
         logout();
         loginCustomerUser();
-        List<Device> pageData11  = doGetTyped("/api/datamodelobject/devices/"+ dataModelObject.getId().getId().toString()+"?pageNum=0&limit=7&textSearch=",
-                new TypeReference<List<Device>>(){});
+        PaginatedResult<Device> pageData11  = doGetTyped("/api/datamodelobject/devices/"+ dataModelObject.getId().getId().toString()+"?pageNum=0&limit=7&textSearch=",
+                new TypeReference<PaginatedResult<Device>>(){});
 
-        Assert.assertEquals(7, pageData11.size());
+        Assert.assertEquals(7, pageData11.getData().size());
 
-        List<Device> pageData12  = doGetTyped("/api/datamodelobject/devices/"+ dataModelObject.getId().getId().toString()+"?pageNum=1&limit=7&textSearch=",
-                new TypeReference<List<Device>>(){});
+        PaginatedResult<Device> pageData12  = doGetTyped("/api/datamodelobject/devices/"+ dataModelObject.getId().getId().toString()+"?pageNum=1&limit=7&textSearch=",
+                new TypeReference<PaginatedResult<Device>>(){});
 
-        Assert.assertEquals(3, pageData12.size());
+        Assert.assertEquals(3, pageData12.getData().size());
         logout();
 
     }
@@ -1036,14 +1020,14 @@ public abstract class BaseDeviceControllerTest extends AbstractControllerTest {
         List<Device> loadedDevices = new ArrayList<>();
         int pageNum = 0;
         int pageLimit = 5;
-        List<Device> pageData;
+        PaginatedResult<Device> pageData;
         do {
             pageData = doGetTyped("/api/customer/" + customerId.getId().toString() + "/devices?limit="+pageLimit+"&pageNum=" + pageNum,
-                    new TypeReference<List<Device>>() {
+                    new TypeReference<PaginatedResult<Device>>() {
                     });
-            loadedDevices.addAll(pageData);
+            loadedDevices.addAll(pageData.getData());
             pageNum++;
-        } while (pageData.size() == pageLimit);
+        } while (pageData.getData().size() == pageLimit);
 
         final List<Device> devicesForDmo1 = devices.stream().filter(device -> device.getDataModelObjectId().equals(dataModelObjectId1)).collect(Collectors.toList());
         Collections.sort(devicesForDmo1, idComparator);
@@ -1070,11 +1054,11 @@ public abstract class BaseDeviceControllerTest extends AbstractControllerTest {
         pageLimit = 5;
         do {
             pageData = doGetTyped("/api/customer/" + customerId.getId().toString() + "/devices?limit="+pageLimit+"&pageNum=" + pageNum,
-                    new TypeReference<List<Device>>() {
+                    new TypeReference<PaginatedResult<Device>>() {
                     });
-            loadedDevices.addAll(pageData);
+            loadedDevices.addAll(pageData.getData());
             pageNum++;
-        } while (pageData.size() == pageLimit);
+        } while (pageData.getData().size() == pageLimit);
 
         Collections.sort(restrictedDevices, idComparator);
         Collections.sort(loadedDevices, idComparator);

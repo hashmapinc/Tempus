@@ -21,6 +21,7 @@ import com.hashmapinc.server.common.data.*;
 import com.hashmapinc.server.common.data.audit.ActionType;
 import com.hashmapinc.server.common.data.device.DeviceSearchQuery;
 import com.hashmapinc.server.common.data.id.*;
+import com.hashmapinc.server.common.data.page.PaginatedResult;
 import com.hashmapinc.server.common.data.page.TextPageData;
 import com.hashmapinc.server.common.data.page.TextPageLink;
 import com.hashmapinc.server.common.data.security.Authority;
@@ -260,7 +261,7 @@ public class DeviceController extends BaseController {
     @PreAuthorize("hasAuthority('TENANT_ADMIN')")
     @GetMapping(value = "/tenant/devices", params = {"limit"})
     @ResponseBody
-    public List<Device> getTenantDevices(
+    public PaginatedResult<Device> getTenantDevices(
             @RequestParam int limit,
             @RequestParam int pageNum,
             @RequestParam(required = false) String type,
@@ -290,7 +291,7 @@ public class DeviceController extends BaseController {
     @PreAuthorize("hasAnyAuthority('TENANT_ADMIN', 'CUSTOMER_USER')")
     @GetMapping(value = "/customer/{customerId}/devices", params = {"limit"})
     @ResponseBody
-    public List<Device> getCustomerDevices(
+    public PaginatedResult<Device> getCustomerDevices(
             @PathVariable("customerId") String strCustomerId,
             @RequestParam int limit,
             @RequestParam int pageNum,
@@ -437,10 +438,10 @@ public class DeviceController extends BaseController {
     @PreAuthorize("hasAnyAuthority('TENANT_ADMIN', 'CUSTOMER_USER')")
     @GetMapping(value = "/datamodelobject/devices/{dataModelObjectId}")
     @ResponseBody
-    public List<Device> getDevicesByDataModelObjectId(@PathVariable(DATA_MODEL_OBJECT_ID) String strDataModelObjectId,
-                                                            @RequestParam int limit,
-                                                            @RequestParam int pageNum,
-                                                            @RequestParam(required = false) String textSearch) throws TempusException {
+    public PaginatedResult<Device> getDevicesByDataModelObjectId(@PathVariable(DATA_MODEL_OBJECT_ID) String strDataModelObjectId,
+                                                                 @RequestParam int limit,
+                                                                 @RequestParam int pageNum,
+                                                                 @RequestParam(required = false) String textSearch) throws TempusException {
         checkParameter(DATA_MODEL_OBJECT_ID, strDataModelObjectId);
         try {
             DataModelObjectId dataModelObjectId = new DataModelObjectId(toUUID(strDataModelObjectId));

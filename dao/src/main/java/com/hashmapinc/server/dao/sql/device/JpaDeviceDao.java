@@ -20,6 +20,7 @@ import com.google.common.util.concurrent.ListenableFuture;
 import com.hashmapinc.server.common.data.*;
 import com.hashmapinc.server.common.data.id.DeviceId;
 import com.hashmapinc.server.common.data.id.TenantId;
+import com.hashmapinc.server.common.data.page.PaginatedResult;
 import com.hashmapinc.server.common.data.page.TextPageLink;
 import com.hashmapinc.server.dao.DaoUtil;
 import com.hashmapinc.server.dao.device.DeviceDao;
@@ -31,6 +32,7 @@ import com.hashmapinc.server.dao.sql.JpaAbstractSearchTextDao;
 import com.hashmapinc.server.dao.sql.querydsl.JPATempusResourcePredicateBuilder;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.repository.CrudRepository;
@@ -135,11 +137,18 @@ public class JpaDeviceDao extends JpaAbstractSearchTextDao<DeviceEntity, Device>
     }
 
     @Override
-    public List<Device> findAll(TempusResourceCriteriaSpec tempusResourceCriteriaSpec, int limit, int pageNum) {
+    public PaginatedResult<Device> findAll(TempusResourceCriteriaSpec tempusResourceCriteriaSpec, int limit, int pageNum) {
         final List<BooleanExpression> predicates = getPredicates(tempusResourceCriteriaSpec);
         final Optional<BooleanExpression> finalPredicate = predicates.stream().reduce(BooleanExpression::and);
         final PageRequest pageable = new PageRequest(pageNum, limit, new Sort(new Sort.Order(Sort.Direction.ASC, ModelConstants.ID_PROPERTY)));
-        return finalPredicate.isPresent() ? DaoUtil.convertDataList(deviceRepository.findAll(finalPredicate.get(), pageable).getContent()) : Collections.emptyList();
+
+        final Page<DeviceEntity> page = finalPredicate.map(booleanExpression -> deviceRepository.findAll(booleanExpression, pageable)).orElse(null);
+        final List<Device> devices = page != null ? DaoUtil.convertDataList(page.getContent()) : Collections.emptyList();
+        final long totalElements = page != null ? page.getTotalElements() : 0;
+        final int totalPages = page != null ? page.getTotalPages() : 0;
+        final boolean hasNext = page != null && page.hasNext();
+        final boolean hasPrevious = page != null && page.hasPrevious();
+        return new PaginatedResult<>(devices, pageNum, totalElements, totalPages, hasNext, hasPrevious);
     }
 
     private List<BooleanExpression> getPredicates(TempusResourceCriteriaSpec tempusResourceCriteriaSpec) {
