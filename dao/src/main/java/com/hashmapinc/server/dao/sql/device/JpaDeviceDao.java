@@ -18,7 +18,9 @@ package com.hashmapinc.server.dao.sql.device;
 
 import com.google.common.util.concurrent.ListenableFuture;
 import com.hashmapinc.server.common.data.*;
+import com.hashmapinc.server.common.data.id.DataModelObjectId;
 import com.hashmapinc.server.common.data.id.DeviceId;
+import com.hashmapinc.server.common.data.id.EntityId;
 import com.hashmapinc.server.common.data.id.TenantId;
 import com.hashmapinc.server.common.data.page.PaginatedResult;
 import com.hashmapinc.server.common.data.page.TextPageLink;
@@ -138,9 +140,8 @@ public class JpaDeviceDao extends JpaAbstractSearchTextDao<DeviceEntity, Device>
 
     @Override
     public PaginatedResult<Device> findAll(TempusResourceCriteriaSpec tempusResourceCriteriaSpec, int limit, int pageNum) {
-        final List<BooleanExpression> predicates = getPredicates(tempusResourceCriteriaSpec);
-        final Optional<BooleanExpression> finalPredicate = predicates.stream().reduce(BooleanExpression::and);
-        final PageRequest pageable = new PageRequest(pageNum, limit, new Sort(new Sort.Order(Sort.Direction.ASC, ModelConstants.ID_PROPERTY)));
+        final Optional<BooleanExpression> finalPredicate = getFinalPredicate(tempusResourceCriteriaSpec);
+        final PageRequest pageable = PageRequest.of(pageNum, limit, new Sort(new Sort.Order(Sort.Direction.ASC, ModelConstants.ID_PROPERTY)));
 
         final Page<DeviceEntity> page = finalPredicate.map(booleanExpression -> deviceRepository.findAll(booleanExpression, pageable)).orElse(null);
         final List<Device> devices = page != null ? DaoUtil.convertDataList(page.getContent()) : Collections.emptyList();
@@ -151,13 +152,58 @@ public class JpaDeviceDao extends JpaAbstractSearchTextDao<DeviceEntity, Device>
         return new PaginatedResult<>(devices, pageNum, totalElements, totalPages, hasNext, hasPrevious);
     }
 
-    private List<BooleanExpression> getPredicates(TempusResourceCriteriaSpec tempusResourceCriteriaSpec) {
+    private Optional<BooleanExpression> getFinalPredicate(TempusResourceCriteriaSpec tempusResourceCriteriaSpec) {
+        final List<BooleanExpression> predicates = getBasicPredicates(tempusResourceCriteriaSpec);
+        final Optional<BooleanExpression> predicatesRight = getPredicatesRelatedWithDataModelObjects(tempusResourceCriteriaSpec);
+        return predicates.stream().reduce(BooleanExpression::and).map(expression -> {
+            if(predicatesRight.isPresent()){
+                return expression.and(predicatesRight.get());
+            } else {
+                return expression;
+            }
+        });
+    }
+
+    private Optional<BooleanExpression> getPredicatesRelatedWithDataModelObjects(TempusResourceCriteriaSpec tempusResourceCriteriaSpec) {
+        final JPATempusResourcePredicateBuilder predicateBuilder1 = new JPATempusResourcePredicateBuilder(getEntityClass());
+        final Map<DataModelObjectId, Set<? extends EntityId>> dataModelIdAndEntityIdSpec = tempusResourceCriteriaSpec.getDataModelIdAndEntityIdSpec();
+        final Set<DataModelObjectId> dataModelObjectIds = dataModelIdAndEntityIdSpec.entrySet().stream().filter(entrySet -> entrySet.getValue().isEmpty()).map(Map.Entry::getKey).collect(Collectors.toSet());
+
+        dataModelObjectIds.forEach(dataModelObjectId ->
+                predicateBuilder1.with(new ResourceCriteria(ModelConstants.DEVICE_DATA_MODEL_OBJECT_ID, ResourceCriteria.Operation.EQUALS, UUIDConverter.fromTimeUUID(dataModelObjectId.getId()))));
+
+
+        Optional<BooleanExpression> finalPredicate = predicateBuilder1.build().stream().map(TempusResourcePredicate::getValue).reduce(BooleanExpression::or);
+
+
+        for(Map.Entry<DataModelObjectId, Set<? extends EntityId>> dataModelIdAndEntityId : dataModelIdAndEntityIdSpec.entrySet()){
+            if(!dataModelIdAndEntityId.getValue().isEmpty()){
+                final JPATempusResourcePredicateBuilder tempPredicateBuilder = new JPATempusResourcePredicateBuilder(getEntityClass());
+                tempPredicateBuilder.with(new ResourceCriteria(ModelConstants.DEVICE_DATA_MODEL_OBJECT_ID, ResourceCriteria.Operation.EQUALS, UUIDConverter.fromTimeUUID(dataModelIdAndEntityId.getKey().getId())));
+                Set<? extends EntityId> accessibleTempusResourceIdsOnly = dataModelIdAndEntityId.getValue();
+                final String[] entityIds = accessibleTempusResourceIdsOnly.stream().map(id -> UUIDConverter.fromTimeUUID(id.getId())).toArray(String[]::new);
+                if(accessibleTempusResourceIdsOnly.size() == 1){
+                    tempPredicateBuilder.with(new ResourceCriteria(ModelConstants.ID_PROPERTY, ResourceCriteria.Operation.EQUALS,entityIds[0]));
+                } else if (accessibleTempusResourceIdsOnly.size() > 1) {
+                    tempPredicateBuilder.with(new ResourceCriteria(ModelConstants.ID_PROPERTY, ResourceCriteria.Operation.CONTAINS, entityIds));
+                }
+                final Optional<BooleanExpression> predicate = tempPredicateBuilder.build().stream().map(TempusResourcePredicate::getValue).reduce(BooleanExpression::and);
+                if(finalPredicate.isPresent()){
+                    if(predicate.isPresent()) {
+                        finalPredicate = finalPredicate.map(expression -> expression.or(predicate.get()));
+                    }
+                } else {
+                    finalPredicate = predicate;
+                }
+            }
+        }
+        return finalPredicate;
+    }
+
+    private List<BooleanExpression> getBasicPredicates(TempusResourceCriteriaSpec tempusResourceCriteriaSpec) {
 
         final JPATempusResourcePredicateBuilder basicPredicateBuilder = new JPATempusResourcePredicateBuilder(getEntityClass())
                 .with(new ResourceCriteria(ModelConstants.DEVICE_TENANT_ID_PROPERTY, ResourceCriteria.Operation.EQUALS, UUIDConverter.fromTimeUUID(tempusResourceCriteriaSpec.getTenantId().getId())));
-
-        tempusResourceCriteriaSpec.getDataModelObjectId().ifPresent(dataModelObjectId ->
-                basicPredicateBuilder.with(new ResourceCriteria(ModelConstants.DEVICE_DATA_MODEL_OBJECT_ID, ResourceCriteria.Operation.EQUALS, UUIDConverter.fromTimeUUID(dataModelObjectId.getId()))));
 
         tempusResourceCriteriaSpec.getSearchText().ifPresent(searchText ->
                 basicPredicateBuilder.with(new ResourceCriteria(ModelConstants.SEARCH_TEXT_PROPERTY, ResourceCriteria.Operation.LIKE, searchText)));
@@ -169,44 +215,10 @@ public class JpaDeviceDao extends JpaAbstractSearchTextDao<DeviceEntity, Device>
         tempusResourceCriteriaSpec.getCustomerId().ifPresent(customerId ->
                                                                      basicPredicateBuilder.with(new ResourceCriteria(ModelConstants.DEVICE_CUSTOMER_ID_PROPERTY, ResourceCriteria.Operation.EQUALS, UUIDConverter.fromTimeUUID(customerId.getId()))));
 
-        if(!tempusResourceCriteriaSpec.getAccessibleIdsForGivenDataModelObject().isEmpty()) {
-            final ResourceCriteria idConstraint = getIdConstraint(tempusResourceCriteriaSpec);
-            if (Objects.nonNull(idConstraint)) {
-                basicPredicateBuilder.with(idConstraint);
-            }
-        }
-        if(!tempusResourceCriteriaSpec.getDataModelObjectIds().isEmpty()) {
-            final ResourceCriteria dmoIdsConstraint = getDataModelObjectIdConstraint(tempusResourceCriteriaSpec);
-            if (Objects.nonNull(dmoIdsConstraint)) {
-                basicPredicateBuilder.with(dmoIdsConstraint);
-            }
-        }
-
         final List<TempusResourcePredicate<BooleanExpression>> tempusResourcePredicates = basicPredicateBuilder.build();
         return tempusResourcePredicates.stream().map(TempusResourcePredicate::getValue).collect(Collectors.toList());
     }
 
-    private ResourceCriteria getIdConstraint(TempusResourceCriteriaSpec tempusResourceCriteriaSpec) {
-        final Set<String> accessibleTempusResourceIdsOnly = tempusResourceCriteriaSpec.getAccessibleIdsForGivenDataModelObject().stream()
-                .filter(id -> id instanceof DeviceId)
-                .map(id -> UUIDConverter.fromTimeUUID(id.getId()))
-                .collect(Collectors.toSet());
-
-        if(accessibleTempusResourceIdsOnly.size() == 1){
-            return new ResourceCriteria(ModelConstants.ID_PROPERTY, ResourceCriteria.Operation.EQUALS, accessibleTempusResourceIdsOnly.toArray()[0]);
-        } else if (accessibleTempusResourceIdsOnly.size() > 1) {
-            return new ResourceCriteria(ModelConstants.ID_PROPERTY, ResourceCriteria.Operation.CONTAINS, accessibleTempusResourceIdsOnly.toArray(new String[0]));
-        }
-        return null;
-    }
-
-    private ResourceCriteria getDataModelObjectIdConstraint(TempusResourceCriteriaSpec tempusResourceCriteriaSpec) {
-        final Set<String> accessibleDMOIdsOnly = tempusResourceCriteriaSpec.getDataModelObjectIds().stream()
-                .map(id -> UUIDConverter.fromTimeUUID(id.getId()))
-                .collect(Collectors.toSet());
-
-        return new ResourceCriteria(ModelConstants.DEVICE_DATA_MODEL_OBJECT_ID, ResourceCriteria.Operation.CONTAINS, accessibleDMOIdsOnly.toArray(new String[0]));
-    }
 
     private List<EntitySubtype> convertTenantDeviceTypesToDto(UUID tenantId, List<String> types) {
         List<EntitySubtype> list = Collections.emptyList();
