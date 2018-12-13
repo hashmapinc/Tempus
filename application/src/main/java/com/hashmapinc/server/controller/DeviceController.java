@@ -23,6 +23,7 @@ import com.hashmapinc.server.common.data.device.DeviceSearchQuery;
 import com.hashmapinc.server.common.data.id.CustomerId;
 import com.hashmapinc.server.common.data.id.DeviceId;
 import com.hashmapinc.server.common.data.id.TenantId;
+import com.hashmapinc.server.common.data.kv.AttributeKvEntry;
 import com.hashmapinc.server.common.data.page.TextPageData;
 import com.hashmapinc.server.common.data.page.TextPageLink;
 import com.hashmapinc.server.common.data.security.Authority;
@@ -46,6 +47,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RestController
@@ -437,5 +439,23 @@ public class DeviceController extends BaseController {
         } catch (Exception e) {
             throw handleException(e);
         }
+    }
+
+    @PreAuthorize("#oauth2.isClient() and #oauth2.hasScope('server')")
+    @GetMapping(value = "/{deviceId}/attribute/mandatory-tags", produces = "application/json")
+    @ResponseBody
+    public String getMandatoryTags(@PathVariable("deviceId") String strDeviceId) throws TempusException {
+        try {
+            checkParameter(DEVICE_ID, strDeviceId);
+            DeviceId deviceId = new DeviceId(toUUID(strDeviceId));
+            String retVal = "";
+            Optional<AttributeKvEntry> attributeKvEntry = attributesService.find(deviceId, DataConstants.CLIENT_SCOPE, "mandatory_tags").get();
+            if (attributeKvEntry.isPresent())
+                retVal = attributeKvEntry.get().getValueAsString();
+            return retVal;
+        } catch (Exception e) {
+            throw handleException(e);
+        }
+
     }
 }
