@@ -16,6 +16,9 @@
  */
 package com.hashmapinc.server.extensions.core.utils;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.hashmapinc.server.common.data.TelemetryDataToKafka;
 import com.hashmapinc.server.common.data.kv.AttributeKvEntry;
 import com.hashmapinc.server.common.data.kv.BasicDsKvEntry;
 import com.hashmapinc.server.common.data.kv.BasicTsKvEntry;
@@ -118,8 +121,21 @@ public class VelocityUtils {
                 return new BasicTsKvEntry(k, v);
             }).collect(Collectors.toSet())));
         context.put("tags", allKeys);
+        pushTelemetryDataList(context, allKeys);
     }
 
+    private static void pushTelemetryDataList(VelocityContext context, Set<BasicTsKvEntry> basicTsKvEntries) {
+        ObjectMapper mapper = new ObjectMapper();
+        List<TelemetryDataToKafka> list = new ArrayList<>();
+        basicTsKvEntries.forEach(entry -> list.add(
+                new TelemetryDataToKafka(entry.getTs(), entry.getKey(), entry.getValueAsString())));
+        try {
+            String listStr = mapper.writeValueAsString(list);
+            context.put("tagList", listStr);
+        } catch (JsonProcessingException e) {
+            log.info("Json processing execption occured {}", e);
+        }
+    }
 
 
     private static void pushAttributes(VelocityContext context, Collection<AttributeKvEntry> deviceAttributes, String prefix) {
