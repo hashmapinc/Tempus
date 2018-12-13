@@ -20,7 +20,7 @@ import com.hashmapinc.server.dao.model.sql.DeviceEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.querydsl.QueryDslPredicateExecutor;
+import org.springframework.data.querydsl.QuerydslPredicateExecutor;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 import com.querydsl.core.types.Predicate;
@@ -32,7 +32,7 @@ import java.util.List;
  * Created by Valerii Sosliuk on 5/6/2017.
  */
 @Repository
-public interface DeviceRepository extends CrudRepository<DeviceEntity, String>, QueryDslPredicateExecutor<DeviceEntity> {
+public interface DeviceRepository extends CrudRepository<DeviceEntity, String>, QuerydslPredicateExecutor<DeviceEntity> {
 
 
     @Query("SELECT d FROM DeviceEntity d WHERE d.tenantId = :tenantId " +
