@@ -76,7 +76,7 @@ export function DeviceController($rootScope,userService, deviceService, customer
 
     $scope.query = {
         order: 'name',
-        limit: 5,
+        limit: 15,
         page: 1,
         search: null
     };
@@ -156,9 +156,9 @@ export function DeviceController($rootScope,userService, deviceService, customer
         if (vm.devicesScope === 'tenant') {
             fetchDevicesFunction = function (pageLink, deviceType) {
                 if($scope.query.page == 1){
-                    return deviceService.getTenantDevices($scope.query.limit, true, null, deviceType,0);
+                    return deviceService.getTenantDevices(pageLink, true, null, deviceType,0);
                 }else {
-                    return deviceService.getTenantDevices($scope.query.limit, true, null, deviceType,$scope.query.page - 1);
+                    return deviceService.getTenantDevices(pageLink, true, null, deviceType,$scope.query.page - 1);
                 }
 
             };
@@ -248,7 +248,12 @@ export function DeviceController($rootScope,userService, deviceService, customer
 
         } else if (vm.devicesScope === 'customer' || vm.devicesScope === 'customer_user') {
             fetchDevicesFunction = function (pageLink, deviceType) {
-                return deviceService.getCustomerDevices(customerId, pageLink, true, null, deviceType);
+                if($scope.query.page == 1){
+                    return deviceService.getCustomerDevices(customerId, pageLink, true, null, deviceType, 0);
+                }else{
+                    return deviceService.getCustomerDevices(customerId, pageLink, true, null, deviceType, $scope.query.page - 1);
+                }
+
             };
             deleteDeviceFunction = function (deviceId) {
                 return deviceService.unassignDeviceFromCustomer(deviceId);
@@ -347,8 +352,6 @@ export function DeviceController($rootScope,userService, deviceService, customer
                     });
                     deviceSortList = $filter('orderBy')(deviceSortList, $scope.query.order);
                 }
-
-
 
                 var devicePaginatedata = deviceSortList;
                 $scope.devices = {

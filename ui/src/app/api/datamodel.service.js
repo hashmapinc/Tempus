@@ -61,7 +61,7 @@ function DatamodelService($http, $q) {
 
     function getDatamodelObjectAttributesDeviceType(datamodelObjectID) {
         var deferred = $q.defer();
-        var url = '/api/datamodelobject/devices/' + datamodelObjectID +'?limit=30';
+        var url = '/api/datamodelobject/devices/' + datamodelObjectID +'?limit=30&pageNum=0';
         $http.get(url).then(function success(response) {
             deferred.resolve(response.data.data);
         }, function fail(response) {
