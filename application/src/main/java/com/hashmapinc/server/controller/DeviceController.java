@@ -20,9 +20,18 @@ import com.google.common.util.concurrent.ListenableFuture;
 import com.hashmapinc.server.common.data.*;
 import com.hashmapinc.server.common.data.audit.ActionType;
 import com.hashmapinc.server.common.data.device.DeviceSearchQuery;
+<<<<<<< d9862e2acb6148ea8981a8d454252fafff607a65
 import com.hashmapinc.server.common.data.id.*;
 import com.hashmapinc.server.common.data.kv.AttributeKvEntry;
 import com.hashmapinc.server.common.data.page.PaginatedResult;
+=======
+import com.hashmapinc.server.common.data.id.CustomerId;
+import com.hashmapinc.server.common.data.id.DeviceId;
+import com.hashmapinc.server.common.data.id.TenantId;
+import com.hashmapinc.server.common.data.kv.AttributeKvEntry;
+import com.hashmapinc.server.common.data.page.TextPageData;
+import com.hashmapinc.server.common.data.page.TextPageLink;
+>>>>>>> Added endpoint to fetch mandatory tags for device and some velocity utils changes.
 import com.hashmapinc.server.common.data.security.Authority;
 import com.hashmapinc.server.common.data.security.DeviceCredentials;
 import com.hashmapinc.server.dao.attributes.AttributesService;
@@ -461,6 +470,23 @@ public class DeviceController extends BaseController {
             DataModelObjectId dataModelObjectId = new DataModelObjectId(toUUID(strDataModelObjectId));
             final TempusResourceCriteriaSpec tempusResourceCriteriaSpec = getTempusResourceCriteriaSpec(getCurrentUser(), EntityType.DEVICE, dataModelObjectId, null, null, textSearch);
             return deviceService.findAll(tempusResourceCriteriaSpec, limit, pageNum);
+        } catch (Exception e) {
+            throw handleException(e);
+        }
+    }
+
+    @PreAuthorize("#oauth2.isClient() and #oauth2.hasScope('server')")
+    @GetMapping(value = "/{deviceId}/attribute/mandatory-tags", produces = "application/json")
+    @ResponseBody
+    public String getMandatoryTags(@PathVariable("deviceId") String strDeviceId) throws TempusException {
+        try {
+            checkParameter(DEVICE_ID, strDeviceId);
+            DeviceId deviceId = new DeviceId(toUUID(strDeviceId));
+            String retVal = "";
+            Optional<AttributeKvEntry> attributeKvEntry = attributesService.find(deviceId, DataConstants.CLIENT_SCOPE, "mandatory_tags").get();
+            if (attributeKvEntry.isPresent())
+                retVal = attributeKvEntry.get().getValueAsString();
+            return retVal;
         } catch (Exception e) {
             throw handleException(e);
         }
