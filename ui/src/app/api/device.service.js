@@ -49,7 +49,7 @@ function DeviceService($http, $q, $window, userService, attributeService, custom
 
     function getTenantDevices(pageLink, applyCustomersInfo, config, type, pageNum) {
         var deferred = $q.defer();
-        var url = '/api/tenant/devices?limit=' + pageLink + '&pageNum=' + pageNum;
+        var url = '/api/tenant/devices?limit=' + pageLink.limit + '&pageNum=' + pageNum;
         if (angular.isDefined(pageLink.textSearch)) {
             url += '&textSearch=' + pageLink.textSearch;
         }
@@ -82,9 +82,9 @@ function DeviceService($http, $q, $window, userService, attributeService, custom
         return deferred.promise;
     }
 
-    function getCustomerDevices(customerId, pageLink, applyCustomersInfo, config, type) {
+    function getCustomerDevices(customerId, pageLink, applyCustomersInfo, config, type, pageNum) {
         var deferred = $q.defer();
-        var url = '/api/customer/' + customerId + '/devices?limit=' + pageLink.limit;
+        var url = '/api/customer/' + customerId + '/devices?limit=' + pageLink.limit + '&pageNum=' + pageNum;
         if (angular.isDefined(pageLink.textSearch)) {
             url += '&textSearch=' + pageLink.textSearch;
         }
