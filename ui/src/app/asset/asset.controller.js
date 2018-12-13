@@ -103,7 +103,6 @@ export function AssetController($rootScope, userService, assetService, customerS
     vm.assetsScope = $state.$current.data.assetsType;
 
     vm.assignToCustomer = assignToCustomer;
-    vm.makePublic = makePublic;
     vm.unassignFromCustomer = unassignFromCustomer;
 
     initController();
@@ -141,18 +140,6 @@ export function AssetController($rootScope, userService, assetService, customerS
                 return {"topIndex": vm.topIndex};
             };
 
-            assetActionsList.push({
-                onAction: function ($event, item) {
-                    makePublic($event, item);
-                },
-                name: function() { return $translate.instant('action.share') },
-                details: function() { return $translate.instant('asset.make-public') },
-                icon: "share",
-                isEnabled: function(asset) {
-                    return asset && (!asset.customerId || asset.customerId.id === types.id.nullUid);
-                }
-            });
-
             assetActionsList.push(
                 {
                     onAction: function ($event, item) {
@@ -180,18 +167,6 @@ export function AssetController($rootScope, userService, assetService, customerS
                     }
                 }
             );
-
-            assetActionsList.push({
-                onAction: function ($event, item) {
-                    unassignFromCustomer($event, item, true);
-                },
-                name: function() { return $translate.instant('action.make-private') },
-                details: function() { return $translate.instant('asset.make-private') },
-                icon: "reply",
-                isEnabled: function(asset) {
-                    return asset && asset.customerId && asset.customerId.id !== types.id.nullUid && asset.assignedCustomer.isPublic;
-                }
-            });
 
             assetActionsList.push(
                 {
@@ -255,20 +230,6 @@ export function AssetController($rootScope, userService, assetService, customerS
                         }
                     }
                 );
-                assetActionsList.push(
-                    {
-                        onAction: function ($event, item) {
-                            unassignFromCustomer($event, item, true);
-                        },
-                        name: function() { return $translate.instant('action.make-private') },
-                        details: function() { return $translate.instant('asset.make-private') },
-                        icon: "reply",
-                        isEnabled: function(asset) {
-                            return asset && asset.assignedCustomer.isPublic;
-                        }
-                    }
-                );
-
                 assetGroupActionsList.push(
                     {
                         onAction: function ($event, items) {
@@ -484,24 +445,6 @@ export function AssetController($rootScope, userService, assetService, customerS
                 tasks.push(assetService.unassignAssetFromCustomer(id));
             }
             $q.all(tasks).then(function () {
-                vm.grid.refreshList();
-            });
-        });
-    }
-
-    function makePublic($event, asset) {
-        if ($event) {
-            $event.stopPropagation();
-        }
-        var confirm = $mdDialog.confirm()
-            .targetEvent($event)
-            .title($translate.instant('asset.make-public-asset-title', {assetName: asset.name}))
-            .htmlContent($translate.instant('asset.make-public-asset-text'))
-            .ariaLabel($translate.instant('asset.make-public'))
-            .cancel($translate.instant('action.no'))
-            .ok($translate.instant('action.yes'));
-        $mdDialog.show(confirm).then(function () {
-            assetService.makeAssetPublic(asset.id.id).then(function success() {
                 vm.grid.refreshList();
             });
         });

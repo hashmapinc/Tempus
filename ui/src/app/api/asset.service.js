@@ -28,7 +28,6 @@ function AssetService($http, $q, customerService, userService) {
         deleteAsset: deleteAsset,
         assignAssetToCustomer: assignAssetToCustomer,
         unassignAssetFromCustomer: unassignAssetFromCustomer,
-        makeAssetPublic: makeAssetPublic,
         getTenantAssets: getTenantAssets,
         getCustomerAssets: getCustomerAssets,
         findByQuery: findByQuery,
@@ -133,21 +132,6 @@ function AssetService($http, $q, customerService, userService) {
         }
         config = Object.assign(config, { ignoreErrors: ignoreErrors });
         $http.delete(url, config).then(function success(response) {
-            deferred.resolve(response.data);
-        }, function fail() {
-            deferred.reject();
-        });
-        return deferred.promise;
-    }
-
-    function makeAssetPublic(assetId, ignoreErrors, config) {
-        var deferred = $q.defer();
-        var url = '/api/customer/public/asset/' + assetId;
-        if (!config) {
-            config = {};
-        }
-        config = Object.assign(config, { ignoreErrors: ignoreErrors });
-        $http.post(url, null, config).then(function success(response) {
             deferred.resolve(response.data);
         }, function fail() {
             deferred.reject();

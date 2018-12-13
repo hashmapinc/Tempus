@@ -41,8 +41,6 @@ function DashboardService($rootScope, $http, $q, $location, $filter) {
         updateDashboardCustomers: updateDashboardCustomers,
         addDashboardCustomers: addDashboardCustomers,
         removeDashboardCustomers: removeDashboardCustomers,
-        makeDashboardPublic: makeDashboardPublic,
-        makeDashboardPrivate: makeDashboardPrivate,
         getPublicDashboardLink: getPublicDashboardLink,
         getAssetLandingDashboardByDataModelObjId:getAssetLandingDashboardByDataModelObjId
     }
@@ -233,28 +231,6 @@ function DashboardService($rootScope, $http, $q, $location, $filter) {
         var deferred = $q.defer();
         var url = '/api/dashboard/' + dashboardId + '/customers/remove';
         $http.post(url, customerIds).then(function success(response) {
-            deferred.resolve(prepareDashboard(response.data));
-        }, function fail() {
-            deferred.reject();
-        });
-        return deferred.promise;
-    }
-
-    function makeDashboardPublic(dashboardId) {
-        var deferred = $q.defer();
-        var url = '/api/customer/public/dashboard/' + dashboardId;
-        $http.post(url, null).then(function success(response) {
-            deferred.resolve(prepareDashboard(response.data));
-        }, function fail() {
-            deferred.reject();
-        });
-        return deferred.promise;
-    }
-
-    function makeDashboardPrivate(dashboardId) {
-        var deferred = $q.defer();
-        var url = '/api/customer/public/dashboard/' + dashboardId;
-        $http.delete(url).then(function success(response) {
             deferred.resolve(prepareDashboard(response.data));
         }, function fail() {
             deferred.reject();

@@ -78,15 +78,13 @@ function RelationTableController($scope, $q, $mdDialog, $document, $translate, $
         if (newVal && !angular.equals(newVal, prevVal)) {
             reloadRelations();
         }
-    });
-
-    initController();
-
-    function initController() {
         if($state.current.url == '/plugins' || $state.current.url == '/rules'){
-            reloadRelations();
+            if(vm.entityId){
+                reloadRelations();
+            }
+
         }
-    }
+    });
 
     $scope.$watch("vm.direction", function(newVal, prevVal) {
         if (newVal && !angular.equals(newVal, prevVal)) {

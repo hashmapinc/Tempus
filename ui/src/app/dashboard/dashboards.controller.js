@@ -19,7 +19,6 @@
 import addDashboardTemplate from './add-dashboard.tpl.html';
 import dashboardCard from './dashboard-card.tpl.html';
 import addDashboardsToCustomerTemplate from './add-dashboards-to-customer.tpl.html';
-import makeDashboardPublicDialogTemplate from './make-dashboard-public-dialog.tpl.html';
 import manageAssignedCustomersTemplate from './manage-assigned-customers.tpl.html';
 
 /* eslint-enable import/no-unresolved, import/default */
@@ -123,8 +122,6 @@ export function DashboardsController(userService, dashboardService, customerServ
 
     vm.dashboardsScope = $state.$current.data.dashboardsType;
 
-    vm.makePublic = makePublic;
-    vm.makePrivate = makePrivate;
     vm.manageAssignedCustomers = manageAssignedCustomers;
     vm.unassignFromCustomer = unassignFromCustomer;
     vm.exportDashboard = exportDashboard;
@@ -176,28 +173,6 @@ export function DashboardsController(userService, dashboardService, customerServ
                     icon: "file_download"
                 });
 
-            dashboardActionsList.push({
-                    onAction: function ($event, item) {
-                        makePublic($event, item);
-                    },
-                    name: function() { return $translate.instant('action.share') },
-                    details: function() { return $translate.instant('dashboard.make-public') },
-                    icon: "share",
-                    isEnabled: function(dashboard) {
-                        return dashboard && !dashboard.publicCustomerId;
-                    }
-                });
-            dashboardActionsList.push({
-                onAction: function ($event, item) {
-                    makePrivate($event, item);
-                },
-                name: function() { return $translate.instant('action.make-private') },
-                details: function() { return $translate.instant('dashboard.make-private') },
-                icon: "reply",
-                isEnabled: function(dashboard) {
-                    return dashboard && dashboard.publicCustomerId;
-                }
-            });
             dashboardActionsList.push({
                 onAction: function ($event, item) {
                     manageAssignedCustomers($event, item);
@@ -332,20 +307,6 @@ export function DashboardsController(userService, dashboardService, customerServ
                 dashboardActionsList.push(
                     {
                         onAction: function ($event, item) {
-                            makePrivate($event, item);
-                        },
-                        name: function() { return $translate.instant('action.make-private') },
-                        details: function() { return $translate.instant('dashboard.make-private') },
-                        icon: "reply",
-                        isEnabled: function(dashboard) {
-                            return dashboard && customerId == dashboard.publicCustomerId;
-                        }
-                    }
-                );
-
-                dashboardActionsList.push(
-                    {
-                        onAction: function ($event, item) {
                             unassignFromCustomer($event, item, customerId);
                         },
                         name: function() { return $translate.instant('action.unassign') },
@@ -389,29 +350,6 @@ export function DashboardsController(userService, dashboardService, customerServ
                                     details: function() { return $translate.instant('dashboard.export') },
                                     icon: "file_download"
                                 });
-
-                            dashboardActionsList.push({
-                                    onAction: function ($event, item) {
-                                        makePublic($event, item);
-                                    },
-                                    name: function() { return $translate.instant('action.share') },
-                                    details: function() { return $translate.instant('dashboard.make-public') },
-                                    icon: "share",
-                                    isEnabled: function(dashboard) {
-                                        return dashboard && !dashboard.publicCustomerId;
-                                    }
-                                });
-                            dashboardActionsList.push({
-                                onAction: function ($event, item) {
-                                    makePrivate($event, item);
-                                },
-                                name: function() { return $translate.instant('action.make-private') },
-                                details: function() { return $translate.instant('dashboard.make-private') },
-                                icon: "reply",
-                                isEnabled: function(dashboard) {
-                                    return dashboard && dashboard.publicCustomerId;
-                                }
-                            });
 
                               dashboardActionsList.push(
                                             {
@@ -620,45 +558,6 @@ export function DashboardsController(userService, dashboardService, customerServ
         });
     }
 
-    function makePublic($event, dashboard) {
-        if ($event) {
-            $event.stopPropagation();
-        }
-        dashboardService.makeDashboardPublic(dashboard.id.id).then(function success(dashboard) {
-            $mdDialog.show({
-                controller: 'MakeDashboardPublicDialogController',
-                controllerAs: 'vm',
-                templateUrl: makeDashboardPublicDialogTemplate,
-                locals: {dashboard: dashboard},
-                parent: angular.element($document[0].body),
-                fullscreen: true,
-                targetEvent: $event
-            }).then(function () {
-                vm.grid.refreshList();
-            });
-        });
-    }
-
-    function makePrivate($event, dashboard) {
-        if ($event) {
-            $event.stopPropagation();
-        }
-        var title = $translate.instant('dashboard.make-private-dashboard-title', {dashboardTitle: dashboard.title});
-        var content = $translate.instant('dashboard.make-private-dashboard-text');
-        var label = $translate.instant('dashboard.make-private-dashboard');
-        var confirm = $mdDialog.confirm()
-            .targetEvent($event)
-            .title(title)
-            .htmlContent(content)
-            .ariaLabel(label)
-            .cancel($translate.instant('action.no'))
-            .ok($translate.instant('action.yes'));
-        $mdDialog.show(confirm).then(function () {
-            dashboardService.makeDashboardPrivate(dashboard.id.id).then(function success() {
-                vm.grid.refreshList();
-            });
-        });
-    }
 
     function exportDashboard($event, dashboard) {
         $event.stopPropagation();

@@ -122,7 +122,6 @@ export function DeviceController($rootScope,userService, deviceService, customer
     vm.devicesScope = $state.$current.data.devicesType;
 
     vm.assignToCustomer = assignToCustomer;
-    vm.makePublic = makePublic;
     vm.unassignFromCustomer = unassignFromCustomer;
     vm.manageCredentials = manageCredentials;
     var user = userService.getCurrentUser();
@@ -162,18 +161,6 @@ export function DeviceController($rootScope,userService, deviceService, customer
                 return {"topIndex": vm.topIndex};
             };
 
-            deviceActionsList.push({
-                onAction: function ($event, item) {
-                    makePublic($event, item);
-                },
-                name: function() { return $translate.instant('action.share') },
-                details: function() { return $translate.instant('device.make-public') },
-                icon: "share",
-                isEnabled: function(device) {
-                    return device && (!device.customerId || device.customerId.id === types.id.nullUid);
-                }
-            });
-
             deviceActionsList.push(
                 {
                     onAction: function ($event, item) {
@@ -202,17 +189,6 @@ export function DeviceController($rootScope,userService, deviceService, customer
                 }
             );
 
-            deviceActionsList.push({
-                onAction: function ($event, item) {
-                    unassignFromCustomer($event, item, true);
-                },
-                name: function() { return $translate.instant('action.make-private') },
-                details: function() { return $translate.instant('device.make-private') },
-                icon: "reply",
-                isEnabled: function(device) {
-                    return device && device.customerId && device.customerId.id !== types.id.nullUid && device.assignedCustomer.isPublic;
-                }
-            });
 
             deviceActionsList.push(
                 {
@@ -287,19 +263,7 @@ export function DeviceController($rootScope,userService, deviceService, customer
                         }
                     }
                 );
-                deviceActionsList.push(
-                    {
-                        onAction: function ($event, item) {
-                            unassignFromCustomer($event, item, true);
-                        },
-                        name: function() { return $translate.instant('action.make-private') },
-                        details: function() { return $translate.instant('device.make-private') },
-                        icon: "reply",
-                        isEnabled: function(device) {
-                            return device && device.assignedCustomer.isPublic;
-                        }
-                    }
-                );
+
 
                 deviceActionsList.push(
                     {
@@ -673,24 +637,6 @@ export function DeviceController($rootScope,userService, deviceService, customer
                 tasks.push(deviceService.unassignDeviceFromCustomer(id));
             }
             $q.all(tasks).then(function () {
-                vm.grid.refreshList();
-            });
-        });
-    }
-
-    function makePublic($event, device) {
-        if ($event) {
-            $event.stopPropagation();
-        }
-        var confirm = $mdDialog.confirm()
-            .targetEvent($event)
-            .title($translate.instant('device.make-public-device-title', {deviceName: device.name}))
-            .htmlContent($translate.instant('device.make-public-device-text'))
-            .ariaLabel($translate.instant('device.make-public'))
-            .cancel($translate.instant('action.no'))
-            .ok($translate.instant('action.yes'));
-        $mdDialog.show(confirm).then(function () {
-            deviceService.makeDevicePublic(device.id.id).then(function success() {
                 vm.grid.refreshList();
             });
         });
