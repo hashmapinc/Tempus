@@ -1015,7 +1015,33 @@
             </dependency>
         </dependencies>
     </dependencyManagement>
+
+   <distributionManagement>
+        <repository>
+            <id>deployment</id>
+            <name>Internal Releases</name>
+            <url>https://repo.hashmapinc.com/repository/tempus-public/</url>
+        </repository>      
+    </distributionManagement>  
+
+
     <repositories>
+        <repository>
+            <id>tempus</id>
+            <name>tempus Repository</name>
+            <url>https://repo.hashmapinc.com/repository/tempus-public/</url>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
+        <repository>
+            <id>tempus-maven</id>
+            <name>maven-proxy</name>
+            <url>https://repo.hashmapinc.com/repository/maven-central/</url>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>            
         <repository>
             <id>central</id>
             <url>http://repo1.maven.org/maven2/</url>
