@@ -44,7 +44,7 @@ mvn validate'''
     stage('Deploy Artifacts') {
       steps {
         configFileProvider([configFile(fileId: 'global-maven-config', variable: 'MAVEN_SETTINGS_XML')]) {
-        sh 'mvn -s $MAVEN_SETTINGS_XML deploy'
+        sh 'mvn -s $MAVEN_SETTINGS_XML deploy:deploy'
         }
       }      
     }
