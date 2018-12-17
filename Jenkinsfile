@@ -44,7 +44,7 @@ mvn validate'''
     stage('Deploy Artifacts') {
       steps {
         configFileProvider([configFile(fileId: 'global-maven-config', variable: 'MAVEN_SETTINGS_XML')]) {
-        sh 'mvn -s $MAVEN_SETTINGS_XML deploy:deploy'
+        sh 'mvn -s $MAVEN_SETTINGS_XML -Dmaven.test.failure.ignore=true -DskipITs -DskipTests deploy'
         }
       }      
     }
