@@ -14,8 +14,7 @@ pipeline {
 echo M2_HOME = ${M2_HOME}
 mvn clean
 mvn validate'''
-        slackSend(message: 'Build Started for Branch: '+env.BRANCH_NAME+' for: '+env.CHANGE_AUTHOR+' on: '+env.BUILD_TAG, color: 'Green', channel: 'tempusbuild', botUser: true)
-      }
+        }
     }
     stage('Build') {
       steps {
@@ -39,6 +38,7 @@ mvn validate'''
       steps {
         junit '**/target/surefire-reports/**/*.xml,**/target/failsafe-reports/**/*.xml'
         archiveArtifacts 'application/target/*.jar,application/target/*.deb,application/target/*.zip,application/target/*.rpm'
+        nexusArtifactUploader artifacts: [[artifactId: 'tempus', classifier: 'dev', file: 'application/target/tempus-1.4.0.jar', type: 'jar']], credentialsId: 'nexus_creds', groupId: 'com.hashmapinc', nexusUrl: 'repo.hashmapinc.com', nexusVersion: 'nexus3', protocol: 'https', repository: 'tempus-public', version: '1.4.0'
       }
     }
     stage('Publish Image') {
@@ -57,11 +57,6 @@ sudo docker build $WORKSPACE/docker/database-setup/ -t hashmapinc/database-setup
         sh '''sudo docker push hashmapinc/tempus:dev
 sudo docker push hashmapinc/database-setup:dev
 '''
-      }
-    }
-    stage('Success Message') {
-      steps {
-        slackSend(message: 'Build Completed for Branch: '+env.BRANCH_NAME+' for: '+env.CHANGE_AUTHOR+' on: '+env.BUILD_TAG, channel: 'tempusbuild', color: 'Green')
       }
     }
   }
