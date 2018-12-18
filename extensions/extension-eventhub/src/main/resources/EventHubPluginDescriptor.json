@@ -1,0 +1,40 @@
+{
+  "schema": {
+    "title": "Event Hub Plugin Configuration",
+    "type": "object",
+    "properties": {
+      "eventHubNamespace": {
+        "title": "Event Hub namespace",
+        "type": "string",
+        "default": "Namespace"
+      },
+      "eventHubName": {
+        "title": "Event Hub Name",
+        "type": "string",
+        "default": "EventHubName"
+      },
+      "eventHubPolicyName": {
+        "title": "Event Hub Policy Name",
+        "type": "string",
+        "default": "PolicyName"
+      },
+      "eventHubSasKey": {
+        "title": "Event Hub SAS Key",
+        "type": "string",
+        "default": "PublicKey"
+      }
+    },
+    "required": [
+      "eventHubNamespace",
+      "eventHubName",
+      "eventHubPolicyName",
+      "eventHubSasKey"
+    ]
+  },
+  "form": [
+    "eventHubNamespace",
+    "eventHubName",
+    "eventHubPolicyName",
+    "eventHubSasKey"
+  ]
+}
