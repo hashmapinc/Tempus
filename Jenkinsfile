@@ -4,7 +4,6 @@ pipeline {
       image 'hashmapinc/tempusbuild:java-11'
       args '-u root -v /var/run/docker.sock:/var/run/docker.sock'
     }
-
   }
   stages {
     stage('Initialize') {
@@ -42,6 +41,9 @@ mvn validate'''
       }
     }
     stage('Deploy Artifacts') {
+      when {
+        branch 'dev'
+      }      
       steps {
         configFileProvider([configFile(fileId: 'global-maven-config', variable: 'MAVEN_SETTINGS_XML')]) {
         sh 'mvn -s $MAVEN_SETTINGS_XML -Dmaven.test.failure.ignore=true -DskipITs -DskipTests deploy'
@@ -66,6 +68,18 @@ sudo docker push hashmapinc/database-setup:dev
 '''
       }
     }
+    stage('Publish Master Image') {
+      when {
+        branch 'master'
+      }
+      steps {
+        withCredentials(bindings: [usernamePassword(credentialsId: 'docker_hub', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
+          sh 'sudo docker login -u $USERNAME -p $PASSWORD'
+        }
+          sh '''cd ./docker/tb/
+          make push'''
+      }
+    }    
     stage('Success Message') {
       steps {
         slackSend(message: 'Build Completed for Branch: '+env.BRANCH_NAME+' for: '+env.CHANGE_AUTHOR+' on: '+env.BUILD_TAG, channel: 'tempusbuild', color: 'Green')
@@ -75,8 +89,6 @@ sudo docker push hashmapinc/database-setup:dev
   post {
     always {
       sh 'chmod -R 777 .'
-
     }
-
   }
 }
