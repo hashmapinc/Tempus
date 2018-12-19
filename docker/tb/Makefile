@@ -1,6 +1,6 @@
 VERSION=1.4.0
-PROJECT=tempus
-APP=application
+PROJECT=hashmapinc
+APP=tempus
 
 build:
 	cp ../../application/target/tempus.deb .
