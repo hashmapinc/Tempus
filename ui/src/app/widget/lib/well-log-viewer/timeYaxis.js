@@ -38,7 +38,7 @@ var timeYaxis = function(timeConfig, data, state, index, width) {
 
     context = d3.select(this);
 
-    let margin = {top: 0, right: 10, bottom: 30, left: 30},
+    let margin = {top: 0, right: 10, bottom: 0, left: 30},
       w = o.width*110 - margin.right - margin.left,
       h = 700 - margin.top - margin.bottom;
 
