@@ -131,7 +131,7 @@ if(o.state === "init"){
 
     let $lineGraph = context.select('.linearGrid')
       .attr("width", w + margin.right + 1)
-      .attr("height", '100vh')
+      .attr("height", h)
       .append('g')
       .attr("class", 'linepath'+o.index)
       .append('path')
