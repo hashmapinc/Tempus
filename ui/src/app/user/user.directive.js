@@ -27,15 +27,25 @@ export default function UserDirective($compile, $templateCache/*, dashboardServi
     var linker = function (scope, element) {
         var template = $templateCache.get(userFieldsetTemplate);
         element.html(template);
-
         scope.isTenantAdmin = function() {
+            setFullScreenFlag();
             return scope.user && scope.user.authority === 'TENANT_ADMIN';
         }
 
         scope.isCustomerUser = function() {
+            setFullScreenFlag();
             return scope.user && scope.user.authority === 'CUSTOMER_USER';
         }
 
+        function setFullScreenFlag(){
+             if(scope.user && scope.user.additionalInfo) {
+                if(scope.user.additionalInfo.defaultDashboardFullscreen == 'true' || scope.user.additionalInfo.defaultDashboardFullscreen == true){
+                    scope.user.additionalInfo.defaultDashboardFullscreen = true;
+                }else{
+                    scope.user.additionalInfo.defaultDashboardFullscreen = false;
+                }
+             }
+        }
         $compile(element.contents())(scope);
     }
     return {

@@ -592,7 +592,8 @@ function UserService($http, $q, $rootScope, adminService, dashboardService, logi
         return (currentUser && currentUser.isPublic) ||
                (currentUserDetails.additionalInfo &&
                 currentUserDetails.additionalInfo.defaultDashboardFullscreen &&
-                currentUserDetails.additionalInfo.defaultDashboardFullscreen === true);
+                (currentUserDetails.additionalInfo.defaultDashboardFullscreen === true
+                || currentUserDetails.additionalInfo.defaultDashboardFullscreen === 'true'));
     }
 
     function userHasProfile() {

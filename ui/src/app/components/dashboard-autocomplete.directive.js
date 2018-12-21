@@ -50,7 +50,7 @@ function DashboardAutocomplete($compile, $templateCache, $q, dashboardService, u
             if (scope.dashboardsScope === 'customer' || userService.getAuthority() === 'CUSTOMER_USER') {
                 var customerId = userService.getCurrentUser().customerId;
                 if (customerId) {
-                    promise = dashboardService.getCustomerDashboards(customerId, pageLink, {ignoreLoading: true});
+                    promise = dashboardService.getCustomerDashboards(scope.customerId, pageLink, {ignoreLoading: true});
                 } else {
                     promise = $q.when({data: []});
                 }
