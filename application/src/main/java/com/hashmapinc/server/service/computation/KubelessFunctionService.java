@@ -59,11 +59,11 @@ public class KubelessFunctionService implements ComputationFunctionService {
     public static final String EXCEPTION = "Exception occured : {}";
     public static final String IO_EXECPTION = "IOExecption occured : {}";
 
-    @Value("${kubeless.cluster_mode_enabled}")
+    @Value("${kubernetes.cluster_mode_enabled}")
     private boolean clusterModeEnabled;
 
 
-    @Value("${kubeless.kube_config_path}")
+    @Value("${kubernetes.kube_config_path}")
     private String kublessConfigPath;
 
     private Base64.Decoder decoder = Base64.getDecoder();
@@ -308,8 +308,11 @@ public class KubelessFunctionService implements ComputationFunctionService {
         byte[] funcBytes = decoder.decode(md.getFunctionContent());
         String funcContent = new String(funcBytes);
         v1beta1FunctionSpec.setFunction(funcContent);
-        if(md.getDependencies() != null)
-            v1beta1FunctionSpec.dependencies(md.getDependencies());
+        if(md.getDependencies() != null) {
+            byte[] dependencyBytes = decoder.decode(md.getDependencies());
+            String dependencyContent = new String(dependencyBytes);
+            v1beta1FunctionSpec.dependencies(dependencyContent);
+        }
         v1beta1FunctionSpec.setHandler(md.getHandler());
         v1beta1FunctionSpec.setRuntime(md.getRuntime());
         v1beta1FunctionSpec.functionContentType("text");
