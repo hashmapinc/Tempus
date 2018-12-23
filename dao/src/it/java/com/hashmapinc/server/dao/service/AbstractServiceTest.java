@@ -29,8 +29,8 @@ import com.hashmapinc.server.common.data.asset.Asset;
 import com.hashmapinc.server.common.data.cluster.NodeMetric;
 import com.hashmapinc.server.common.data.cluster.NodeStatus;
 import com.hashmapinc.server.common.data.computation.ComputationType;
-import com.hashmapinc.server.common.data.computation.SparkComputationMetadata;
 import com.hashmapinc.server.common.data.computation.Computations;
+import com.hashmapinc.server.common.data.computation.SparkComputationMetadata;
 import com.hashmapinc.server.common.data.datamodel.AttributeDefinition;
 import com.hashmapinc.server.common.data.datamodel.DataModel;
 import com.hashmapinc.server.common.data.datamodel.DataModelObject;
@@ -68,6 +68,7 @@ import com.hashmapinc.server.dao.settings.UserSettingsService;
 import com.hashmapinc.server.dao.tenant.TenantService;
 import com.hashmapinc.server.dao.theme.ThemeService;
 import com.hashmapinc.server.dao.timeseries.TimeseriesService;
+import com.hashmapinc.server.dao.unitconversion.UnitConversionService;
 import com.hashmapinc.server.dao.user.UserService;
 import com.hashmapinc.server.dao.widget.WidgetTypeService;
 import com.hashmapinc.server.dao.widget.WidgetsBundleService;
@@ -182,6 +183,9 @@ public abstract class AbstractServiceTest {
 
     @Autowired
     protected AttributeDefinitionDao attributeDefinitionDao;
+
+    @Autowired
+    protected UnitConversionService unitConversionService;
 
     class IdComparator<D extends BaseData<? extends UUIDBased>> implements Comparator<D> {
         @Override
