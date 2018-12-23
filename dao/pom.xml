@@ -37,6 +37,10 @@
 
     <dependencies>
         <dependency>
+            <groupId>org.apache.poi</groupId>
+            <artifactId>poi-ooxml</artifactId>
+        </dependency>
+        <dependency>
             <groupId>com.hashmapinc.common</groupId>
             <artifactId>data</artifactId>
         </dependency>    
@@ -108,6 +112,10 @@
             <groupId>org.springframework</groupId>
             <artifactId>spring-web</artifactId>
             <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.hashmapinc.tempus</groupId>
+            <artifactId>tempus-unit-conversion</artifactId>
         </dependency>
 		<dependency>
 			<groupId>com.datastax.cassandra</groupId>
