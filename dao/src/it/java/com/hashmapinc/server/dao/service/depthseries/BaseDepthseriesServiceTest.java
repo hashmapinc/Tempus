@@ -46,7 +46,9 @@ public class BaseDepthseriesServiceTest extends AbstractServiceTest {
     JsonParser parser = new JsonParser();
     KvEntry stringKvEntry = new StringDataEntry(STRING_KEY, "value");
     KvEntry longKvEntry = new LongDataEntry(LONG_KEY, Long.MAX_VALUE);
+    KvEntry longKvEntryWithUnit = new LongDataEntry(LONG_KEY, "mm", Long.MAX_VALUE);
     KvEntry doubleKvEntry = new DoubleDataEntry(DOUBLE_KEY, Double.MAX_VALUE);
+    KvEntry doubleKvEntryWithUnit = new DoubleDataEntry(DOUBLE_KEY, "cm", Double.MAX_VALUE);
     KvEntry booleanKvEntry = new BooleanDataEntry(BOOLEAN_KEY, Boolean.TRUE);
     KvEntry jsonKvEntry = new JsonDataEntry(JSON_KEY, parser.parse("{\"tag\": \"value\"}").getAsJsonObject());
 
@@ -74,6 +76,32 @@ public class BaseDepthseriesServiceTest extends AbstractServiceTest {
         expected.add(toDsEntry(DS, doubleKvEntry));
         expected.add(toDsEntry(DS, booleanKvEntry));
         expected.add(toDsEntry(DS, jsonKvEntry));
+        Collections.sort(expected, (o1, o2) -> o1.getKey().compareTo(o2.getKey()));
+
+        assertEquals(expected.toString().trim(), dsList.toString().trim());
+    }
+
+    @Test
+    public void testFindAllLatestWithUnits() throws Exception {
+        DeviceId deviceId = new DeviceId(UUIDs.timeBased());
+
+        saveEntriesWithUnit(deviceId, DS - 200D);
+        saveEntriesWithUnit(deviceId, DS - 100D);
+        saveEntriesWithUnit(deviceId, DS);
+
+        List<DsKvEntry> dsList = dsService.findAllLatest(deviceId).get();
+
+        assertNotNull(dsList);
+        assertEquals(2, dsList.size());
+        for (int i = 0; i < dsList.size(); i++) {
+            assertEquals(DS, dsList.get(i).getDs());
+        }
+
+        Collections.sort(dsList, (o1, o2) -> o1.getKey().compareTo(o2.getKey()));
+
+        List<DsKvEntry> expected = new ArrayList<DsKvEntry>();
+        expected.add(toDsEntry(DS, longKvEntryWithUnit));
+        expected.add(toDsEntry(DS, doubleKvEntryWithUnit));
         Collections.sort(expected, (o1, o2) -> o1.getKey().compareTo(o2.getKey()));
 
         assertEquals(expected.toString().trim(), dsList.toString().trim());
@@ -197,6 +225,11 @@ public class BaseDepthseriesServiceTest extends AbstractServiceTest {
         dsService.save(deviceId, toDsEntry(ds, doubleKvEntry)).get();
         dsService.save(deviceId, toDsEntry(ds, booleanKvEntry)).get();
         dsService.save(deviceId, toDsEntry(ds, jsonKvEntry)).get();
+    }
+
+    private void saveEntriesWithUnit(DeviceId deviceId, Double ds) throws ExecutionException, InterruptedException {
+        dsService.save(deviceId, toDsEntry(ds, longKvEntryWithUnit)).get();
+        dsService.save(deviceId, toDsEntry(ds, doubleKvEntryWithUnit)).get();
     }
 
     private static DsKvEntry toDsEntry(Double ds, KvEntry entry) {

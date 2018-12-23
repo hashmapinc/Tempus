@@ -50,7 +50,9 @@ public abstract class BaseTimeseriesServiceTest extends AbstractServiceTest {
     JsonParser parser = new JsonParser();
     KvEntry stringKvEntry = new StringDataEntry(STRING_KEY, "value");
     KvEntry longKvEntry = new LongDataEntry(LONG_KEY, Long.MAX_VALUE);
+    KvEntry longKvEntryWithUnit = new LongDataEntry(LONG_KEY, "mm", Long.MAX_VALUE);
     KvEntry doubleKvEntry = new DoubleDataEntry(DOUBLE_KEY, Double.MAX_VALUE);
+    KvEntry doubleKvEntryWithUnit = new DoubleDataEntry(DOUBLE_KEY, "cm", Double.MAX_VALUE);
     KvEntry booleanKvEntry = new BooleanDataEntry(BOOLEAN_KEY, Boolean.TRUE);
     KvEntry jsonKvEntry = new JsonDataEntry(JSON_KEY, parser.parse("{\"tag\": \"value\"}").getAsJsonObject());
 
@@ -78,6 +80,32 @@ public abstract class BaseTimeseriesServiceTest extends AbstractServiceTest {
                 toTsEntry(TS, doubleKvEntry),
                 toTsEntry(TS, booleanKvEntry),
                 toTsEntry(TS, jsonKvEntry));
+        Collections.sort(expected, (o1, o2) -> o1.getKey().compareTo(o2.getKey()));
+
+        assertEquals(expected, tsList);
+    }
+
+    @Test
+    public void testFindAllLatestWithUnit() throws Exception {
+        DeviceId deviceId = new DeviceId(UUIDs.timeBased());
+
+        saveEntriesWithUnit(deviceId, TS - 2);
+        saveEntriesWithUnit(deviceId, TS - 1);
+        saveEntriesWithUnit(deviceId, TS);
+
+        List<TsKvEntry> tsList = tsService.findAllLatest(deviceId).get();
+
+        assertNotNull(tsList);
+        assertEquals(2, tsList.size());
+        for (int i = 0; i < tsList.size(); i++) {
+            assertEquals(TS, tsList.get(i).getTs());
+        }
+
+        Collections.sort(tsList, (o1, o2) -> o1.getKey().compareTo(o2.getKey()));
+
+        List<TsKvEntry> expected = Arrays.asList(
+                toTsEntry(TS, longKvEntryWithUnit),
+                toTsEntry(TS, doubleKvEntryWithUnit));
         Collections.sort(expected, (o1, o2) -> o1.getKey().compareTo(o2.getKey()));
 
         assertEquals(expected, tsList);
@@ -201,9 +229,12 @@ public abstract class BaseTimeseriesServiceTest extends AbstractServiceTest {
         tsService.save(deviceId, toTsEntry(ts, jsonKvEntry)).get();
     }
 
+    private void saveEntriesWithUnit(DeviceId deviceId, long ts) throws ExecutionException, InterruptedException {
+        tsService.save(deviceId, toTsEntry(ts, longKvEntryWithUnit)).get();
+        tsService.save(deviceId, toTsEntry(ts, doubleKvEntryWithUnit)).get();
+    }
+
     private static TsKvEntry toTsEntry(long ts, KvEntry entry) {
         return new BasicTsKvEntry(ts, entry);
     }
-
-
 }
