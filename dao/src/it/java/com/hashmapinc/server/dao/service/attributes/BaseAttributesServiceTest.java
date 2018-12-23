@@ -17,6 +17,7 @@
 package com.hashmapinc.server.dao.service.attributes;
 
 import com.datastax.driver.core.utils.UUIDs;
+import com.hashmapinc.server.common.data.kv.*;
 import com.hashmapinc.server.dao.attributes.AttributesService;
 import org.junit.Assert;
 import org.junit.Before;
@@ -24,10 +25,6 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.hashmapinc.server.common.data.DataConstants;
 import com.hashmapinc.server.common.data.id.DeviceId;
-import com.hashmapinc.server.common.data.kv.AttributeKvEntry;
-import com.hashmapinc.server.common.data.kv.BaseAttributeKvEntry;
-import com.hashmapinc.server.common.data.kv.KvEntry;
-import com.hashmapinc.server.common.data.kv.StringDataEntry;
 import com.hashmapinc.server.dao.service.AbstractServiceTest;
 
 import java.util.Collections;
@@ -84,6 +81,30 @@ public abstract class BaseAttributesServiceTest extends AbstractServiceTest {
         KvEntry attrANewValue = new StringDataEntry("A", "value2");
         AttributeKvEntry attrANew = new BaseAttributeKvEntry(attrANewValue, 73L);
         KvEntry attrBNewValue = new StringDataEntry("B", "value3");
+        AttributeKvEntry attrBNew = new BaseAttributeKvEntry(attrBNewValue, 73L);
+
+        attributesService.save(deviceId, DataConstants.CLIENT_SCOPE, Collections.singletonList(attrAOld)).get();
+        attributesService.save(deviceId, DataConstants.CLIENT_SCOPE, Collections.singletonList(attrANew)).get();
+        attributesService.save(deviceId, DataConstants.CLIENT_SCOPE, Collections.singletonList(attrBNew)).get();
+
+        List<AttributeKvEntry> saved = attributesService.findAll(deviceId, DataConstants.CLIENT_SCOPE).get();
+
+        Assert.assertNotNull(saved);
+        Assert.assertEquals(2, saved.size());
+
+        Assert.assertEquals(attrANew, saved.get(0));
+        Assert.assertEquals(attrBNew, saved.get(1));
+    }
+
+    @Test
+    public void findAllWithUnit() throws Exception {
+        DeviceId deviceId = new DeviceId(UUIDs.timeBased());
+
+        KvEntry attrAOldValue = new DoubleDataEntry("A", "m",10.0);
+        AttributeKvEntry attrAOld = new BaseAttributeKvEntry(attrAOldValue, 42L);
+        KvEntry attrANewValue = new DoubleDataEntry("A", "m",634.2);
+        AttributeKvEntry attrANew = new BaseAttributeKvEntry(attrANewValue, 73L);
+        KvEntry attrBNewValue = new DoubleDataEntry("B", "kg",93.1);
         AttributeKvEntry attrBNew = new BaseAttributeKvEntry(attrBNewValue, 73L);
 
         attributesService.save(deviceId, DataConstants.CLIENT_SCOPE, Collections.singletonList(attrAOld)).get();
