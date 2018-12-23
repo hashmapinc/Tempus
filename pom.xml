@@ -95,6 +95,8 @@
         <commons-collections4.version>4.2</commons-collections4.version>
         <snakeyaml.version>1.23</snakeyaml.version>
         <maven-install-plugin.version>2.5.1</maven-install-plugin.version>
+        <unit-converion.version>1.0.3</unit-converion.version>
+        <poi-ooxml.version>4.0.1</poi-ooxml.version>
     </properties>
 
     <modules>
@@ -498,6 +500,16 @@
                 <groupId>com.hashmapinc.transport</groupId>
                 <artifactId>mqtt</artifactId>
                 <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.hashmapinc.tempus</groupId>
+                <artifactId>tempus-unit-conversion</artifactId>
+                <version>${unit-converion.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.poi</groupId>
+                <artifactId>poi-ooxml</artifactId>
+                <version>${poi-ooxml.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.hashmapinc</groupId>
