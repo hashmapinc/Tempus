@@ -190,6 +190,7 @@ function AttributeService($http, $q, $filter, types, telemetryWebsocketService) 
                 var attrData = data[key][0];
                 attribute.lastUpdateTs = attrData[0];
                 attribute.value = attrData[1];
+                attribute.unit = attrData[2];
             }
             if (entityAttributesSubscription.subscriptionCallback) {
                 entityAttributesSubscription.subscriptionCallback(attributes);

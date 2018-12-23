@@ -305,6 +305,7 @@ export default angular.module('tempus.locale', [])
                     "last-update-depth": "Last update depth",
                     "key-required": "Attribute key is required.",
                     "value": "Value",
+                    "unit": "Unit",
                     "value-required": "Attribute value is required.",
                     "delete-attributes-title": "Are you sure you want to delete { count, select, 1 {1 attribute} other {# attributes} }?",
                     "delete-attributes-text": "Be careful, after the confirmation all selected attributes will be removed.",

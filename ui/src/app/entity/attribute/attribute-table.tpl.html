@@ -156,6 +156,7 @@
                     <th md-column md-order-by="lastUpdateTs" ng-if="attributeScope.value != types.latestDepthSeries.value"><span translate>attribute.last-update-time</span></th>
                     <th md-column md-order-by="key"><span translate>attribute.key</span></th>
                     <th md-column><span translate>attribute.value</span></th>
+                    <th md-column><span translate>attribute.unit</span></th>
                 </tr>
                 </thead>
                 <tbody md-body>
@@ -171,6 +172,7 @@
                         <span ng-show="!attributeScope.clientSide"><ng-md-icon size="16" icon="edit"></ng-md-icon></span>
 
                     </td>
+                    <td md-cell>{{attribute.unit}}</td>
                 </tr>
                 </tbody>
             </table>
