@@ -222,6 +222,7 @@ public class JpaDepthSeriesDao extends JpaAbstractDaoListeningExecutorService im
         entity.setLongValue(dsKvEntry.getLongValue().orElse(null));
         entity.setBooleanValue(dsKvEntry.getBooleanValue().orElse(null));
         entity.setJsonValue(dsKvEntry.getJsonValue().orElse(null));
+        entity.setUnit(dsKvEntry.getUnit().orElse(null));
         return service.submit(() -> {
             dsKvRepository.save(entity);
             return null;
@@ -245,6 +246,7 @@ public class JpaDepthSeriesDao extends JpaAbstractDaoListeningExecutorService im
         latestEntity.setLongValue(dsKvEntry.getLongValue().orElse(null));
         latestEntity.setBooleanValue(dsKvEntry.getBooleanValue().orElse(null));
         latestEntity.setJsonValue(dsKvEntry.getJsonValue().orElse(null));
+        latestEntity.setUnit(dsKvEntry.getUnit().orElse(null));
         return service.submit(() -> {
             dsKvLatestRepository.save(latestEntity);
             return null;

@@ -33,7 +33,7 @@ public interface AttributeKvRepository extends CrudRepository<AttributeKvEntity,
                                                                            String entityId,
                                                                            String attributeType);
 
-    @Query("SELECT akv.lastUpdateTs, akv.attributeKey, akv.booleanValue, akv.strValue, akv.longValue, akv.doubleValue, akv.jsonValue FROM AttributeKvEntity akv WHERE akv.entityId = :entityId " +
+    @Query("SELECT akv.lastUpdateTs, akv.attributeKey, akv.booleanValue, akv.strValue, akv.longValue, akv.doubleValue, akv.jsonValue, akv.unit FROM AttributeKvEntity akv WHERE akv.entityId = :entityId " +
             "AND akv.entityType = :entityType ORDER BY akv.lastUpdateTs DESC")
     List<Object[]> findAllByEntityTypeAndEntityId(@Param("entityId") String entityId, @Param("entityType") EntityType entityType);
 }
