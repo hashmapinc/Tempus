@@ -34,9 +34,10 @@ public class DepthSubscriptionUpdate {
         this.data = new TreeMap<>();
         for (DsKvEntry dsEntry : data) {
             List<Object> values = this.data.computeIfAbsent(dsEntry.getKey(), k -> new ArrayList<>());
-            Object[] value = new Object[2];
+            Object[] value = new Object[3];
             value[0] = dsEntry.getDs();
             value[1] = dsEntry.getValueAsString();
+            value[2] = dsEntry.getUnit().orElse("");
             values.add(value);
         }
     }
