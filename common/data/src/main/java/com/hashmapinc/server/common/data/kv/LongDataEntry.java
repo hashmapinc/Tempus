@@ -66,6 +66,7 @@ public class LongDataEntry extends BasicKvEntry {
     public String toString() {
         return "LongDataEntry{" +
                 "value=" + value +
+                ", unit=" + super.getUnit().orElse(null) +
                 "} " + super.toString();
     }
     

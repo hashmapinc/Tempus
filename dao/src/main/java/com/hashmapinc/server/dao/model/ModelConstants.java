@@ -484,6 +484,8 @@ public class ModelConstants {
     public static final String KEY_COLUMN = "key";
     public static final String TS_COLUMN = "ts";
     public static final String DS_COLUMN = "ds";
+    public static final String UNIT_COLUMN = "unit";
+
 
     /**
      * modelObject constants.
