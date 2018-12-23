@@ -32,7 +32,7 @@ CREATE TABLE IF NOT exists tempus.ts_kv_cf (
     long_v bigint,
     dbl_v double,
     json_v text,
-    ts_diff bigint,
+    unit text,
     PRIMARY KEY (( entity_type, entity_id, key, partition ), ts)
 );
 
@@ -55,6 +55,7 @@ CREATE TABLE IF NOT exists tempus.ts_kv_latest_cf (
     long_v bigint,
     dbl_v double,
     json_v text,
+    unit text,
     PRIMARY KEY (( entity_type, entity_id ), key)
 ) WITH compaction = { 'class' :  'LeveledCompactionStrategy'  };
 
@@ -69,7 +70,7 @@ CREATE TABLE IF NOT exists tempus.ds_kv_cf (
     long_v bigint,
     dbl_v double,
     json_v text,
-    ds_diff double,
+    unit text,
     PRIMARY KEY (( entity_type, entity_id, key, partition ), ds)
 );
 
@@ -92,6 +93,7 @@ CREATE TABLE IF NOT exists tempus.ds_kv_latest_cf (
     long_v bigint,
     dbl_v double,
     json_v text,
+    unit text,
     PRIMARY KEY (( entity_type, entity_id ), key)
 ) WITH compaction = { 'class' :  'LeveledCompactionStrategy'  };
 
@@ -106,6 +108,7 @@ CREATE TABLE IF NOT exists tempus.attributes_kv_cf (
     dbl_v double,
     json_v text,
     last_update_ts bigint,
+    unit text,
     PRIMARY KEY ((entity_type, entity_id, attribute_type), attribute_key)
 ) WITH compaction = { 'class' :  'LeveledCompactionStrategy'  };
 
