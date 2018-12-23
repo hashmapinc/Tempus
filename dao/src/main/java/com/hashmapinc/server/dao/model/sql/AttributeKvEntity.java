@@ -25,7 +25,6 @@ import com.hashmapinc.server.dao.util.mapping.JsonStringType;
 import lombok.Data;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
-import com.hashmapinc.server.common.data.kv.*;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -73,17 +72,20 @@ public class AttributeKvEntity implements ToData<AttributeKvEntry>, Serializable
     @Column(name = ModelConstants.LAST_UPDATE_TS_COLUMN)
     private Long lastUpdateTs;
 
+    @Column(name = ModelConstants.UNIT_COLUMN)
+    private String unit;
+
     @Override
     public AttributeKvEntry toData() {
         KvEntry kvEntry = null;
         if (strValue != null) {
-            kvEntry = new StringDataEntry(attributeKey, strValue);
+            kvEntry = new StringDataEntry(attributeKey, unit, strValue);
         } else if (booleanValue != null) {
-            kvEntry = new BooleanDataEntry(attributeKey, booleanValue);
+            kvEntry = new BooleanDataEntry(attributeKey, unit, booleanValue);
         } else if (doubleValue != null) {
-            kvEntry = new DoubleDataEntry(attributeKey, doubleValue);
+            kvEntry = new DoubleDataEntry(attributeKey, unit, doubleValue);
         } else if (longValue != null) {
-            kvEntry = new LongDataEntry(attributeKey, longValue);
+            kvEntry = new LongDataEntry(attributeKey, unit, longValue);
         } else if (jsonValue != null) {
             kvEntry = new JsonDataEntry(attributeKey, jsonValue);
         }
