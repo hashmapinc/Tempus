@@ -33,6 +33,7 @@ import com.hashmapinc.server.extensions.api.plugins.PluginApiCallSecurityContext
 import com.hashmapinc.server.extensions.api.plugins.PluginContext;
 import com.hashmapinc.server.extensions.api.plugins.msg.*;
 import com.hashmapinc.server.extensions.api.plugins.rpc.PluginRpcMsg;
+import com.hashmapinc.tempus.model.Quantity;
 import lombok.extern.slf4j.Slf4j;
 import com.hashmapinc.server.common.data.plugin.PluginMetaData;
 import com.hashmapinc.server.common.data.relation.EntityRelation;
@@ -88,8 +89,9 @@ public final class PluginProcessingContext implements PluginContext {
 
     @Override
     public void saveAttributes(final TenantId tenantId, final EntityId entityId, final String scope, final List<AttributeKvEntry> attributes, final PluginCallback<Void> callback) {
+        List<AttributeKvEntry> siAttributes = convertAttributeKvEntryToSi(attributes);
         validate(entityId, new ValidationCallback(callback, ctx -> {
-            ListenableFuture<List<Void>> futures = pluginCtx.attributesService.save(entityId, scope, attributes);
+            ListenableFuture<List<Void>> futures = pluginCtx.attributesService.save(entityId, scope, siAttributes);
             Futures.addCallback(futures, getListCallback(callback, v -> {
                 if (entityId.getEntityType() == EntityType.DEVICE) {
                     onDeviceAttributesChanged(tenantId, new DeviceId(entityId.getId()), scope, attributes);
@@ -154,8 +156,9 @@ public final class PluginProcessingContext implements PluginContext {
 
     @Override
     public void saveTsData(final TenantId tenantId, final EntityId entityId, final TsKvEntry entry, final PluginCallback<Void> callback) {
+        List<TsKvEntry> siTsKvEntries = convertTsKvEntryToSi(new ArrayList<>(Collections.singletonList(entry)));
         validate(entityId, new ValidationCallback(callback, ctx -> {
-            ListenableFuture<List<Void>> rsListFuture = pluginCtx.tsService.save(entityId, entry);
+            ListenableFuture<List<Void>> rsListFuture = pluginCtx.tsService.save(entityId, siTsKvEntries.get(0));
             Futures.addCallback(rsListFuture, getListCallback(callback, v -> null), executor);
         }));
     }
@@ -167,8 +170,9 @@ public final class PluginProcessingContext implements PluginContext {
 
     @Override
     public void saveTsData(final TenantId tenantId, final EntityId entityId, final List<TsKvEntry> entries, long ttl, final PluginCallback<Void> callback) {
+        List<TsKvEntry> siTsKvEntries = convertTsKvEntryToSi(entries);
         validate(entityId, new ValidationCallback(callback, ctx -> {
-            ListenableFuture<List<Void>> rsListFuture = pluginCtx.tsService.save(entityId, entries, ttl);
+            ListenableFuture<List<Void>> rsListFuture = pluginCtx.tsService.save(entityId, siTsKvEntries, ttl);
             Futures.addCallback(rsListFuture, getListCallback(callback, v -> {
                 if (entityId.getEntityType() == EntityType.DEVICE) {
                     onDeviceTelemetryChanged(tenantId, new DeviceId(entityId.getId()), entries);
@@ -180,8 +184,9 @@ public final class PluginProcessingContext implements PluginContext {
 
     @Override
     public void saveDsData(final EntityId entityId, final List<DsKvEntry> entries, long ttl, final PluginCallback<Void> callback) {
+        List<DsKvEntry> siDsKvEntries = convertDsKvEntryToSi(entries);
         validate(entityId, new ValidationCallback(callback, ctx -> {
-            ListenableFuture<List<Void>> rsListFuture = pluginCtx.dsService.save(entityId, entries, ttl);
+            ListenableFuture<List<Void>> rsListFuture = pluginCtx.dsService.save(entityId, siDsKvEntries, ttl);
             Futures.addCallback(rsListFuture, getListCallback(callback, v -> null), executor);
         }));
     }
@@ -602,5 +607,65 @@ public final class PluginProcessingContext implements PluginContext {
                     return result;
                 }, executor);
         Futures.addCallback(future, getCallback(callback, v -> v), executor);
+    }
+
+    public List<AttributeKvEntry> convertAttributeKvEntryToSi(List<AttributeKvEntry> attributeKvEntries) {
+        List<AttributeKvEntry> siAttributeKvEntries = new ArrayList<>();
+        for (AttributeKvEntry attributeKvEntry:  attributeKvEntries) {
+            if (checkDataTypeAndIsUnitPresent(attributeKvEntry)) {
+                Double value = getDoubleValue(attributeKvEntry);
+                DoubleDataEntry dataEntry = convertToSiUnit(attributeKvEntry.getKey(), value, attributeKvEntry.getUnit().orElse(null));
+                AttributeKvEntry siAttributeKvEntry = new BaseAttributeKvEntry(dataEntry, attributeKvEntry.getLastUpdateTs());
+                siAttributeKvEntries.add(siAttributeKvEntry);
+            } else {
+                siAttributeKvEntries.add(attributeKvEntry);
+            }
+        }
+        return siAttributeKvEntries;
+    }
+
+    public List<TsKvEntry> convertTsKvEntryToSi(List<TsKvEntry> tsKvEntries) {
+        List<TsKvEntry> siTsKvEntries = new ArrayList<>();
+        for (TsKvEntry tsKvEntry:  tsKvEntries) {
+            if (checkDataTypeAndIsUnitPresent(tsKvEntry)) {
+                Double value = getDoubleValue(tsKvEntry);
+                DoubleDataEntry dataEntry = convertToSiUnit(tsKvEntry.getKey(), value, tsKvEntry.getUnit().orElse(null));
+                TsKvEntry siTsKvEntry = new BasicTsKvEntry(tsKvEntry.getTs(), dataEntry);
+                siTsKvEntries.add(siTsKvEntry);
+            } else {
+                siTsKvEntries.add(tsKvEntry);
+            }
+        }
+        return siTsKvEntries;
+    }
+
+    public List<DsKvEntry> convertDsKvEntryToSi(List<DsKvEntry> dsKvEntries) {
+        List<DsKvEntry> siDsKvEntries = new ArrayList<>();
+        for (DsKvEntry dsKvEntry:  dsKvEntries) {
+            if (checkDataTypeAndIsUnitPresent(dsKvEntry)) {
+                Double value = getDoubleValue(dsKvEntry);
+                DoubleDataEntry dataEntry = convertToSiUnit(dsKvEntry.getKey(), value, dsKvEntry.getUnit().orElse(null));
+                DsKvEntry siDsKvEntry = new BasicDsKvEntry(dsKvEntry.getDs(), dataEntry);
+                siDsKvEntries.add(siDsKvEntry);
+            } else {
+                siDsKvEntries.add(dsKvEntry);
+            }
+        }
+        return siDsKvEntries;
+    }
+
+    private Double getDoubleValue(KvEntry kvEntry) {
+        if (kvEntry.getDataType() == DataType.LONG) {
+            return ((Long)(kvEntry.getValue())).doubleValue();
+        } else {
+            return (Double) kvEntry.getValue();
+        }
+    }
+    private boolean checkDataTypeAndIsUnitPresent(KvEntry kvEntry) {
+        return ((kvEntry.getDataType() == DataType.DOUBLE || kvEntry.getDataType() == DataType.LONG) && kvEntry.getUnit().isPresent());
+    }
+    private DoubleDataEntry convertToSiUnit(String key, Double value, String unit) {
+        Quantity quantity = pluginCtx.unitConversionService.convertToSiUnit(new Quantity(value, unit));
+        return new DoubleDataEntry(key, quantity.getUnit(), quantity.getValue());
     }
 }
