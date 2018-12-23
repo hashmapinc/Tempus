@@ -1,3 +1,4 @@
+
 /**
  * Copyright © 2016-2018 The Thingsboard Authors
  * Modifications © 2017-2018 Hashmap, Inc
@@ -90,6 +91,7 @@ public class JpaAttributeDao extends JpaAbstractDaoListeningExecutorService impl
         entity.setLongValue(attribute.getLongValue().orElse(null));
         entity.setBooleanValue(attribute.getBooleanValue().orElse(null));
         entity.setJsonValue(attribute.getJsonValue().orElse(null));
+        entity.setUnit(attribute.getUnit().orElse(null));
         return service.submit(() -> {
             attributeKvRepository.save(entity);
             return null;

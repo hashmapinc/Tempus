@@ -66,6 +66,7 @@ public class DoubleDataEntry extends BasicKvEntry {
     public String toString() {
         return "DoubleDataEntry{" +
                 "value=" + value +
+                ", unit=" + super.getUnit().orElse(null) +
                 "} " + super.toString();
     }
     
