@@ -34,6 +34,7 @@ import com.hashmapinc.server.dao.relation.RelationService;
 import com.hashmapinc.server.dao.rule.RuleService;
 import com.hashmapinc.server.dao.tenant.TenantService;
 import com.hashmapinc.server.dao.timeseries.TimeseriesService;
+import com.hashmapinc.server.dao.unitconversion.UnitConversionService;
 import com.hashmapinc.server.extensions.api.device.DeviceAttributesEventNotificationMsg;
 import com.hashmapinc.server.extensions.api.device.DeviceTelemetryEventNotificationMsg;
 import com.hashmapinc.server.extensions.api.plugins.msg.TimeoutMsg;
@@ -61,6 +62,7 @@ public final class SharedPluginProcessingContext {
     final CustomerService customerService;
     final TenantService tenantService;
     final TimeseriesService tsService;
+    final UnitConversionService unitConversionService;
     final DepthSeriesService dsService;
     final AttributesService attributesService;
     final ClusterRpcService rpcService;
@@ -92,6 +94,7 @@ public final class SharedPluginProcessingContext {
         this.tenantService = sysContext.getTenantService();
         this.relationService = sysContext.getRelationService();
         this.auditLogService = sysContext.getAuditLogService();
+        unitConversionService = sysContext.getUnitConversionService();
     }
 
     public PluginId getPluginId() {
