@@ -201,7 +201,7 @@ public class JsonConverter {
         } else {
             try {
                 long longValue = value.asLong();
-                result.add(new LongDataEntry(key, longValue));
+                result.add(new LongDataEntry(key, unit, longValue));
             } catch (NumberFormatException e) {
                 throw new JsonSyntaxException("Big integer values are not supported!");
             }
