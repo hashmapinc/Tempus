@@ -777,9 +777,10 @@ public abstract class AbstractControllerTest {
         return savedDataModel;
     }
 
-    protected DataModelObject createDataModelObject(DataModel dataModel) throws Exception{
+    protected DataModelObject createDataModelObject(DataModel dataModel, String name, String type) throws Exception{
         DataModelObject dataModelObject = new DataModelObject();
-        dataModelObject.setName("Well");
+        dataModelObject.setName(name);
+        dataModelObject.setType(type);
 
         AttributeDefinition ad = new AttributeDefinition();
         ad.setValueType("STRING");
@@ -826,4 +827,30 @@ public abstract class AbstractControllerTest {
                 .andExpect(status().isOk());
     }
 
+    protected Device createDevice(DataModelObjectId dataModelObjectId, CustomerId customerId, String deviceName) throws Exception {
+        Device device = new Device();
+        device.setName(deviceName);
+        device.setType("default");
+        device.setDataModelObjectId(dataModelObjectId);
+        device.setTenantId(tenantId);
+        device.setCustomerId(customerId);
+        Device savedDevice = doPost("/api/device", device, Device.class);
+        Assert.assertNotNull(savedDevice);
+        Assert.assertNotNull(savedDevice.getId());
+        Assert.assertTrue(savedDevice.getCreatedTime() > 0);
+        Assert.assertEquals(savedTenant.getId(), savedDevice.getTenantId());
+        Assert.assertNotNull(savedDevice.getCustomerId());
+        if(customerId == null){
+            Assert.assertEquals(NULL_UUID, savedDevice.getCustomerId().getId());
+        }else{
+            Assert.assertEquals(customerId, savedDevice.getCustomerId());
+        }
+        Assert.assertEquals(device.getName(), savedDevice.getName());
+        return savedDevice;
+    }
+
+    protected void deleteDevice(DeviceId deviceId) throws Exception {
+        doDelete("/api/device/"+deviceId.getId().toString())
+                .andExpect(status().isOk());
+    }
 }

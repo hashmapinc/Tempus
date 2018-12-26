@@ -135,7 +135,8 @@ CREATE TABLE IF NOT EXISTS device (
     type varchar(255),
     name varchar(255),
     search_text varchar(255),
-    tenant_id varchar(31)
+    tenant_id varchar(31),
+    data_model_object_id varchar(31) DEFAULT '1b21dd2138140008080808080808080'
 );
 
 CREATE TABLE IF NOT EXISTS device_credentials (

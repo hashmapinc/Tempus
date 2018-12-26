@@ -60,6 +60,12 @@ public class JpaDataModelObjectDao extends JpaAbstractSearchTextDao<DataModelObj
     }
 
     @Override
+    public List<DataModelObject> findByDataModelIdAndType(DataModelId dataModelId, String type) {
+        List<DataModelObjectEntity> entities = dataModelObjectRespository.findByDataModelIdAndType(UUIDConverter.fromTimeUUID(dataModelId.getId()), type);
+        return DaoUtil.convertDataList(entities);
+    }
+
+    @Override
     public DataModelObject findByDataModeIdAndName(DataModelObject dataModelObject) {
         return DaoUtil.getData(dataModelObjectRespository.findByDataModelIdAndName(UUIDConverter.fromTimeUUID(dataModelObject.getDataModelId().getId())
                 ,dataModelObject.getName()));

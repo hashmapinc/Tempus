@@ -19,6 +19,7 @@
 import addDeviceTemplate from './add-device.tpl.html';
 import deviceCard from './device-card.tpl.html';
 import assignToCustomerTemplate from './assign-to-customer.tpl.html';
+import assignDatamodelToDevice from './assign-datamodel-to-device.tpl.html';
 import addDevicesToCustomerTemplate from './add-devices-to-customer.tpl.html';
 import deviceCredentialsTemplate from './device-credentials.tpl.html';
 
@@ -45,12 +46,13 @@ export function DeviceCardController(types) {
         }
         return false;
     }
+
 }
 
 
 /*@ngInject*/
 export function DeviceController($rootScope,userService, deviceService, customerService, $state, $stateParams,
-                                 $document, $mdDialog, $q, $translate, types, $scope, $filter) {
+                                 $document, $mdDialog, $q, $translate, types, $scope, $filter, entityRelationService) {
 
     var customerId = $stateParams.customerId;
 
@@ -121,6 +123,7 @@ export function DeviceController($rootScope,userService, deviceService, customer
 
     vm.devicesScope = $state.$current.data.devicesType;
 
+    vm.assignToDatamodel = assignToDatamodel;
     vm.assignToCustomer = assignToCustomer;
     vm.unassignFromCustomer = unassignFromCustomer;
     vm.manageCredentials = manageCredentials;
@@ -152,7 +155,12 @@ export function DeviceController($rootScope,userService, deviceService, customer
 
         if (vm.devicesScope === 'tenant') {
             fetchDevicesFunction = function (pageLink, deviceType) {
-                return deviceService.getTenantDevices(pageLink, true, null, deviceType);
+                if($scope.query.page == 1){
+                    return deviceService.getTenantDevices(pageLink, true, null, deviceType,0);
+                }else {
+                    return deviceService.getTenantDevices(pageLink, true, null, deviceType,$scope.query.page - 1);
+                }
+
             };
             deleteDeviceFunction = function (deviceId) {
                 return deviceService.deleteDevice(deviceId);
@@ -240,7 +248,12 @@ export function DeviceController($rootScope,userService, deviceService, customer
 
         } else if (vm.devicesScope === 'customer' || vm.devicesScope === 'customer_user') {
             fetchDevicesFunction = function (pageLink, deviceType) {
-                return deviceService.getCustomerDevices(customerId, pageLink, true, null, deviceType);
+                if($scope.query.page == 1){
+                    return deviceService.getCustomerDevices(customerId, pageLink, true, null, deviceType, 0);
+                }else{
+                    return deviceService.getCustomerDevices(customerId, pageLink, true, null, deviceType, $scope.query.page - 1);
+                }
+
             };
             deleteDeviceFunction = function (deviceId) {
                 return deviceService.unassignDeviceFromCustomer(deviceId);
@@ -324,17 +337,10 @@ export function DeviceController($rootScope,userService, deviceService, customer
     loadTableData();
 
     function loadTableData() {
-        var promise = vm.deviceGridConfig.fetchItemsFunc({limit: $scope.query.limit*$scope.query.page, textSearch: ''}, false);
+        var promise = vm.deviceGridConfig.fetchItemsFunc({limit: $scope.query.limit, textSearch: ''}, false);
         if(promise) {
-
             promise.then(function success(items) {
-
                 var deviceSortList = $filter('orderBy')(items.data, $scope.query.order);
-                var startIndex = $scope.query.limit * ($scope.query.page - 1);
-
-
-
-
                 if ($scope.query.search != null) {
 
                     deviceSortList = $filter('filter')(items.data, function(data) {
@@ -344,17 +350,12 @@ export function DeviceController($rootScope,userService, deviceService, customer
                             return true;
                         }
                     });
-                    //$scope.query.page =1;
                     deviceSortList = $filter('orderBy')(deviceSortList, $scope.query.order);
-                    if ($scope.query.search != '') {startIndex =0;}
                 }
 
-
-
-                var devicePaginatedata = deviceSortList.slice(startIndex, startIndex + $scope.query.limit);
-
+                var devicePaginatedata = deviceSortList;
                 $scope.devices = {
-                    count: 15,
+                    count: items.totalElements,
                     data: devicePaginatedata
                 };
                 },
@@ -401,11 +402,9 @@ export function DeviceController($rootScope,userService, deviceService, customer
         loadTableData();
     }
 
-    $scope.onPaginate = function() {
-
-        //var startIndex = $scope.query.limit * ($scope.query.page - 1);
+    $scope.onPaginate = function(page) {
+        $scope.query.page = page;
         loadTableData();
-
     }
 
     $scope.deleteDevice = function($event,item) {
@@ -548,6 +547,27 @@ export function DeviceController($rootScope,userService, deviceService, customer
             });
     }
 
+
+    function assignToDatamodel($event, device) {
+        if ($event) {
+            $event.stopPropagation();
+        }
+        $mdDialog.show({
+           controller: 'AssignDatamodelToDeviceController',
+           controllerAs: 'vm',
+           templateUrl: assignDatamodelToDevice,
+           locals: {device: device[0]},
+           parent: angular.element($document[0].body),
+           fullscreen: true,
+                    targetEvent: $event
+           }).then(function () {
+                    vm.grid.refreshList();
+                    loadTableData();
+            }, function () {
+         });
+
+    }
+
     function addDevicesToCustomer($event) {
         if ($event) {
             $event.stopPropagation();
@@ -616,7 +636,18 @@ export function DeviceController($rootScope,userService, deviceService, customer
             .cancel($translate.instant('action.no'))
             .ok($translate.instant('action.yes'));
         $mdDialog.show(confirm).then(function () {
-            deviceService.unassignDeviceFromCustomer(device.id.id).then(function success() {
+            deviceService.unassignDeviceFromCustomer(device.id.id).then(function success(item) {
+              if(item.dataModelObjectId.id !== vm.types.id.nullUid) {
+                item.dataModelObjectId.id = vm.types.id.nullUid;
+                deviceService.saveDevice(item);
+                if(item.additionalInfo == null) {
+                    entityRelationService.findInfoByFrom(item.id.id,'DEVICE').then(function success(itemDevice) {
+                        if(itemDevice.length > 0) {
+                            entityRelationService.deleteRelation(itemDevice[0].from.id, itemDevice[0].from.entityType, 'Contains', itemDevice[0].to.id, itemDevice[0].to.entityType);
+                        }
+                    });
+                }
+              }
                 vm.grid.refreshList();
                 loadTableData();
             });

@@ -49,7 +49,7 @@
                           ng-show="vm.noData()">customer.no-customers-text</span>
                         <md-virtual-repeat-container ng-show="vm.hasData()"
                                                      tb-scope-element="repeatContainer" md-top-index="vm.topIndex" flex
-                                                     style='min-height: 150px; width: 100%;'>
+                                                     style='min-height: 150px; width: 100%; margin-bottom: 23px;'>
                             <md-list>
                                 <md-list-item md-virtual-repeat="customer in vm.theCustomers" md-on-demand
                                               class="repeated-item" flex>
@@ -57,6 +57,7 @@
                                                  aria-label="{{ 'item.selected' | translate }}"
                                                  ng-checked="vm.isCustomerSelected(customer)"></md-checkbox>
                                     <span> {{ customer.title }} </span>
+
                                 </md-list-item>
                             </md-list>
                         </md-virtual-repeat-container>

@@ -22,8 +22,7 @@ import com.hashmapinc.server.common.data.EntitySubtype;
 import com.hashmapinc.server.common.data.TempusResourceCriteriaSpec;
 import com.hashmapinc.server.common.data.asset.Asset;
 import com.hashmapinc.server.common.data.audit.ActionType;
-import com.hashmapinc.server.common.data.id.DataModelObjectId;
-import com.hashmapinc.server.common.data.id.TenantId;
+import com.hashmapinc.server.common.data.id.*;
 import com.hashmapinc.server.common.data.page.TextPageData;
 import com.hashmapinc.server.common.data.page.TextPageLink;
 import com.hashmapinc.server.service.security.model.SecurityUser;
@@ -33,13 +32,10 @@ import org.springframework.security.access.prepost.PostFilter;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import com.hashmapinc.server.common.data.EntityType;
-import com.hashmapinc.server.common.data.id.AssetId;
-import com.hashmapinc.server.common.data.id.CustomerId;
 import com.hashmapinc.server.common.data.asset.AssetSearchQuery;
 import com.hashmapinc.server.common.data.security.Authority;
 import com.hashmapinc.server.dao.exception.IncorrectParameterException;
 import com.hashmapinc.server.dao.model.ModelConstants;
-import com.hashmapinc.server.exception.TempusErrorCode;
 import com.hashmapinc.server.exception.TempusException;
 
 import java.util.ArrayList;
@@ -213,13 +209,9 @@ public class AssetController extends BaseController {
             @RequestParam(required = false) String idOffset,
             @RequestParam(required = false) String textOffset) throws TempusException {
         try {
-            TenantId tenantId = getCurrentUser().getTenantId();
+            final TempusResourceCriteriaSpec tempusResourceCriteriaSpec = getTempusResourceCriteriaSpec(getCurrentUser(), EntityType.ASSET, null, null, type, null);
             TextPageLink pageLink = createPageLink(limit, textSearch, idOffset, textOffset);
-            if (type != null && type.trim().length()>0) {
-                return checkNotNull(assetService.findAssetsByTenantIdAndType(tenantId, type, pageLink));
-            } else {
-                return checkNotNull(assetService.findAssetsByTenantId(tenantId, pageLink));
-            }
+            return assetService.findAll(tempusResourceCriteriaSpec, pageLink);
         } catch (Exception e) {
             throw handleException(e);
         }
@@ -239,8 +231,6 @@ public class AssetController extends BaseController {
     }
 
     @PreAuthorize("hasAnyAuthority('TENANT_ADMIN', 'CUSTOMER_USER')")
-//    @PostFilter("hasPermission(filterObject, 'ASSET_READ')")
-    // TODO return type should be collection of Asset.
     @GetMapping(value = "/customer/{customerId}/assets", params = {"limit"})
     @ResponseBody
     public TextPageData<Asset> getCustomerAssets(
@@ -252,15 +242,11 @@ public class AssetController extends BaseController {
             @RequestParam(required = false) String textOffset) throws TempusException {
         checkParameter("customerId", strCustomerId);
         try {
-            TenantId tenantId = getCurrentUser().getTenantId();
             CustomerId customerId = new CustomerId(toUUID(strCustomerId));
             checkCustomerId(customerId);
+            final TempusResourceCriteriaSpec tempusResourceCriteriaSpec = getTempusResourceCriteriaSpec(getCurrentUser(), EntityType.ASSET, null, customerId, type, null);
             TextPageLink pageLink = createPageLink(limit, textSearch, idOffset, textOffset);
-            if (type != null && type.trim().length()>0) {
-                return checkNotNull(assetService.findAssetsByTenantIdAndCustomerIdAndType(tenantId, customerId, type, pageLink));
-            } else {
-                return checkNotNull(assetService.findAssetsByTenantIdAndCustomerId(tenantId, customerId, pageLink));
-            }
+            return assetService.findAll(tempusResourceCriteriaSpec, pageLink);
         } catch (Exception e) {
             throw handleException(e);
         }
@@ -341,7 +327,7 @@ public class AssetController extends BaseController {
         checkParameter(DATA_MODEL_OBJECT_ID, strDataModelObjectId);
         try {
             DataModelObjectId dataModelObjectId = new DataModelObjectId(toUUID(strDataModelObjectId));
-            final TempusResourceCriteriaSpec tempusResourceCriteriaSpec = getTempusResourceCriteriaSpec(getCurrentUser(), EntityType.ASSET, dataModelObjectId);
+            final TempusResourceCriteriaSpec tempusResourceCriteriaSpec = getTempusResourceCriteriaSpec(getCurrentUser(), EntityType.ASSET, dataModelObjectId, null, null, null);
             TextPageLink pageLink = createPageLink(limit, textSearch, idOffset, textOffset);
             return assetService.findAll(tempusResourceCriteriaSpec, pageLink);
         } catch (Exception e) {

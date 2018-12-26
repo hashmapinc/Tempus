@@ -32,7 +32,8 @@ function DatamodelService($http, $q) {
         deleteDatamodelObject:  deleteDatamodelObject,
         getDatamodelObjectAttributes: getDatamodelObjectAttributes,
         getDatamodelObject:     getDatamodelObject,
-        deleteDatamodel:        deleteDatamodel
+        deleteDatamodel:        deleteDatamodel,
+        getDatamodelObjectAttributesDeviceType:getDatamodelObjectAttributesDeviceType
     }
 
     // loads the datamodel objects for the datamodel with ID = datamodelID
@@ -49,7 +50,18 @@ function DatamodelService($http, $q) {
 
     function getDatamodelObjectAttributes(datamodelObjectID) {
         var deferred = $q.defer();
-        var url = '/api/datamodelobject/assets/' + datamodelObjectID + '?limit=30';
+        var url = '/api/datamodelobject/assets/' + datamodelObjectID +'?limit=30';
+        $http.get(url).then(function success(response) {
+            deferred.resolve(response.data.data);
+        }, function fail(response) {
+            deferred.reject(response.data);
+        });
+        return deferred.promise;
+    }
+
+    function getDatamodelObjectAttributesDeviceType(datamodelObjectID) {
+        var deferred = $q.defer();
+        var url = '/api/datamodelobject/devices/' + datamodelObjectID +'?limit=30&pageNum=0';
         $http.get(url).then(function success(response) {
             deferred.resolve(response.data.data);
         }, function fail(response) {

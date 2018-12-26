@@ -246,7 +246,7 @@ public abstract class BaseCustomerGroupControllerTest extends AbstractController
     public void testGetDisplayablePoliciesForGroup() throws Exception {
 
         DataModel dataModel = createDataModel();
-        DataModelObject dataModelObject = createDataModelObject(dataModel);
+        DataModelObject dataModelObject = createDataModelObject(dataModel, "Well", "Asset");
         Asset asset = createAsset(dataModelObject.getId(), null, "My asset");
 
         try {

@@ -19,16 +19,13 @@ package com.hashmapinc.server.dao.service;
 import com.datastax.driver.core.utils.UUIDs;
 import com.hashmapinc.server.common.data.*;
 import com.hashmapinc.server.common.data.asset.Asset;
-import com.hashmapinc.server.common.data.id.AssetId;
-import com.hashmapinc.server.common.data.id.DataModelObjectId;
+import com.hashmapinc.server.common.data.id.*;
 import com.hashmapinc.server.common.data.page.TextPageLink;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import com.hashmapinc.server.common.data.id.CustomerId;
-import com.hashmapinc.server.common.data.id.TenantId;
 import com.hashmapinc.server.common.data.page.TextPageData;
 import com.hashmapinc.server.dao.exception.DataValidationException;
 
@@ -658,7 +655,12 @@ public abstract class BaseAssetServiceTest extends AbstractServiceTest {
         }
 
         TextPageLink pageLink1 = new TextPageLink(20, "ASSET_");
-        TempusResourceCriteriaSpec tempusResourceCriteriaSpec = new TempusResourceCriteriaSpec(EntityType.ASSET, tenantId1, dataModelObjectId1);
+        TempusResourceCriteriaSpec tempusResourceCriteriaSpec = new TempusResourceCriteriaSpec(EntityType.ASSET, tenantId1);
+
+        HashMap<DataModelObjectId, Set<? extends EntityId>> dataModelIdAndEntityIdSpec = new HashMap<>();
+        dataModelIdAndEntityIdSpec.put(dataModelObjectId1, Collections.emptySet());
+        tempusResourceCriteriaSpec.setDataModelIdAndEntityIdSpec(dataModelIdAndEntityIdSpec);
+
         tempusResourceCriteriaSpec.setCustomerId(Optional.of(customerId1));
         final TextPageData<Asset> page1 = assetService.findAll(tempusResourceCriteriaSpec, pageLink1);
         assertEquals(20, page1.getData().size());
@@ -669,10 +671,14 @@ public abstract class BaseAssetServiceTest extends AbstractServiceTest {
 
 
         TextPageLink pageLink11 = new TextPageLink(20, "ASSET_");
-        TempusResourceCriteriaSpec tempusResourceCriteriaSpec11 = new TempusResourceCriteriaSpec(EntityType.ASSET, tenantId1, dataModelObjectId1);
+        TempusResourceCriteriaSpec tempusResourceCriteriaSpec11 = new TempusResourceCriteriaSpec(EntityType.ASSET, tenantId1);
         tempusResourceCriteriaSpec11.setCustomerId(Optional.of(customerId1));
         final HashSet<AssetId> accessibleIdsForGivenDataModelObject = new HashSet<>(allAssetIdsForTenant1.subList(0, 25));
-        tempusResourceCriteriaSpec11.setAccessibleIdsForGivenDataModelObject(accessibleIdsForGivenDataModelObject);
+
+        dataModelIdAndEntityIdSpec = new HashMap<>();
+        dataModelIdAndEntityIdSpec.put(dataModelObjectId1, accessibleIdsForGivenDataModelObject);
+        tempusResourceCriteriaSpec11.setDataModelIdAndEntityIdSpec(dataModelIdAndEntityIdSpec);
+
         final TextPageData<Asset> page11 = assetService.findAll(tempusResourceCriteriaSpec11, pageLink11);
         assertEquals(20, page11.getData().size());
 

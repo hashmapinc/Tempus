@@ -20,11 +20,8 @@ import com.google.common.util.concurrent.ListenableFuture;
 import com.hashmapinc.server.common.data.*;
 import com.hashmapinc.server.common.data.audit.ActionType;
 import com.hashmapinc.server.common.data.device.DeviceSearchQuery;
-import com.hashmapinc.server.common.data.id.CustomerId;
-import com.hashmapinc.server.common.data.id.DeviceId;
-import com.hashmapinc.server.common.data.id.TenantId;
-import com.hashmapinc.server.common.data.page.TextPageData;
-import com.hashmapinc.server.common.data.page.TextPageLink;
+import com.hashmapinc.server.common.data.id.*;
+import com.hashmapinc.server.common.data.page.PaginatedResult;
 import com.hashmapinc.server.common.data.security.Authority;
 import com.hashmapinc.server.common.data.security.DeviceCredentials;
 import com.hashmapinc.server.dao.attributes.AttributesService;
@@ -39,6 +36,8 @@ import com.opencsv.CSVWriter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PostAuthorize;
+import org.springframework.security.access.prepost.PostFilter;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -46,6 +45,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RestController
@@ -54,6 +54,8 @@ import java.util.stream.Collectors;
 public class DeviceController extends BaseController {
 
     public static final String DEVICE_ID = "deviceId";
+    public static final String DATA_MODEL_OBJECT_ID = "dataModelObjectId";
+
 
     @Autowired
     protected TimeseriesService timeseriesService;
@@ -64,7 +66,7 @@ public class DeviceController extends BaseController {
     @Autowired
     protected AttributesService attributesService;
 
-    @PreAuthorize("hasAnyAuthority('TENANT_ADMIN', 'CUSTOMER_USER')")
+    @PostAuthorize("hasPermission(returnObject, 'DEVICE_READ')")
     @GetMapping(value = "/device/{deviceId}")
     @ResponseBody
     public Device getDeviceById(@PathVariable(DEVICE_ID) String strDeviceId) throws TempusException {
@@ -77,7 +79,7 @@ public class DeviceController extends BaseController {
         }
     }
 
-    @PreAuthorize("hasAnyAuthority('TENANT_ADMIN', 'CUSTOMER_USER')")
+    @PreAuthorize("hasPermission(#device, 'DEVICE_CREATE') or hasPermission(#device, 'DEVICE_UPDATE')")
     @PostMapping(value = "/device")
     @ResponseBody
     public Device saveDevice(@RequestBody Device device) throws TempusException {
@@ -107,7 +109,7 @@ public class DeviceController extends BaseController {
         }
     }
 
-    @PreAuthorize("hasAuthority('TENANT_ADMIN')")
+    @PreAuthorize("hasPermission(#strDeviceId, 'DEVICE', 'DEVICE_DELETE')")
     @DeleteMapping(value = "/device/{deviceId}")
     @ResponseStatus(value = HttpStatus.OK)
     public void deleteDevice(@PathVariable(DEVICE_ID) String strDeviceId) throws TempusException {
@@ -130,7 +132,7 @@ public class DeviceController extends BaseController {
         }
     }
 
-    @PreAuthorize("hasAnyAuthority('TENANT_ADMIN', 'CUSTOMER_USER')")
+    @PreAuthorize("hasPermission(#strDeviceId, 'DEVICE', 'DEVICE_ASSIGN')")
     @PostMapping(value = "/customer/{customerId}/device/{deviceId}")
     @ResponseBody
     public Device assignDeviceToCustomer(@PathVariable("customerId") String strCustomerId,
@@ -159,7 +161,7 @@ public class DeviceController extends BaseController {
         }
     }
 
-    @PreAuthorize("hasAuthority('TENANT_ADMIN')")
+    @PreAuthorize("hasPermission(#strDeviceId, 'DEVICE', 'DEVICE_ASSIGN')")
     @DeleteMapping(value = "/customer/device/{deviceId}")
     @ResponseBody
     public Device unassignDeviceFromCustomer(@PathVariable(DEVICE_ID) String strDeviceId) throws TempusException {
@@ -187,7 +189,7 @@ public class DeviceController extends BaseController {
         }
     }
 
-    @PreAuthorize("hasAuthority('TENANT_ADMIN')")
+    @PreAuthorize("hasPermission(#strDeviceId, 'DEVICE', 'DEVICE_ASSIGN')")
     @PostMapping(value = "/customer/public/device/{deviceId}")
     @ResponseBody
     public Device assignDeviceToPublicCustomer(@PathVariable(DEVICE_ID) String strDeviceId) throws TempusException {
@@ -211,7 +213,7 @@ public class DeviceController extends BaseController {
         }
     }
 
-    @PreAuthorize("hasAnyAuthority('TENANT_ADMIN', 'CUSTOMER_USER')")
+    @PreAuthorize("hasPermission(#strDeviceId, 'DEVICE', 'DEVICE_READ')")
     @GetMapping(value = "/device/{deviceId}/credentials")
     @ResponseBody
     public DeviceCredentials getDeviceCredentialsByDeviceId(@PathVariable(DEVICE_ID) String strDeviceId) throws TempusException {
@@ -232,7 +234,7 @@ public class DeviceController extends BaseController {
         }
     }
 
-    @PreAuthorize("hasAuthority('TENANT_ADMIN')")
+    @PreAuthorize("hasPermission((#deviceCredentials.getDeviceId() != null ? #deviceCredentials.getDeviceId().getId().toString() : null), 'DEVICE', 'DEVICE_UPDATE')")
     @PostMapping(value = "/device/credentials")
     @ResponseBody
     public DeviceCredentials saveDeviceCredentials(@RequestBody DeviceCredentials deviceCredentials) throws TempusException {
@@ -256,20 +258,15 @@ public class DeviceController extends BaseController {
     @PreAuthorize("hasAuthority('TENANT_ADMIN')")
     @GetMapping(value = "/tenant/devices", params = {"limit"})
     @ResponseBody
-    public TextPageData<Device> getTenantDevices(
+    public PaginatedResult<Device> getTenantDevices(
             @RequestParam int limit,
+            @RequestParam int pageNum,
             @RequestParam(required = false) String type,
-            @RequestParam(required = false) String textSearch,
-            @RequestParam(required = false) String idOffset,
-            @RequestParam(required = false) String textOffset) throws TempusException {
+            @RequestParam(required = false) String textSearch) throws TempusException {
         try {
-            TenantId tenantId = getCurrentUser().getTenantId();
-            TextPageLink pageLink = createPageLink(limit, textSearch, idOffset, textOffset);
-            if (type != null && type.trim().length() > 0) {
-                return checkNotNull(deviceService.findDevicesByTenantIdAndType(tenantId, type, pageLink));
-            } else {
-                return checkNotNull(deviceService.findDevicesByTenantId(tenantId, pageLink));
-            }
+            final TempusResourceCriteriaSpec tempusResourceCriteriaSpec = getTempusResourceCriteriaSpec(getCurrentUser(), EntityType.DEVICE, null, null, type, textSearch);
+            return deviceService.findAll(tempusResourceCriteriaSpec, limit, pageNum);
+
         } catch (Exception e) {
             throw handleException(e);
         }
@@ -291,30 +288,25 @@ public class DeviceController extends BaseController {
     @PreAuthorize("hasAnyAuthority('TENANT_ADMIN', 'CUSTOMER_USER')")
     @GetMapping(value = "/customer/{customerId}/devices", params = {"limit"})
     @ResponseBody
-    public TextPageData<Device> getCustomerDevices(
+    public PaginatedResult<Device> getCustomerDevices(
             @PathVariable("customerId") String strCustomerId,
             @RequestParam int limit,
+            @RequestParam int pageNum,
             @RequestParam(required = false) String type,
-            @RequestParam(required = false) String textSearch,
-            @RequestParam(required = false) String idOffset,
-            @RequestParam(required = false) String textOffset) throws TempusException {
+            @RequestParam(required = false) String textSearch) throws TempusException {
         checkParameter("customerId", strCustomerId);
         try {
-            TenantId tenantId = getCurrentUser().getTenantId();
             CustomerId customerId = new CustomerId(toUUID(strCustomerId));
             checkCustomerId(customerId);
-            TextPageLink pageLink = createPageLink(limit, textSearch, idOffset, textOffset);
-            if (type != null && type.trim().length() > 0) {
-                return checkNotNull(deviceService.findDevicesByTenantIdAndCustomerIdAndType(tenantId, customerId, type, pageLink));
-            } else {
-                return checkNotNull(deviceService.findDevicesByTenantIdAndCustomerId(tenantId, customerId, pageLink));
-            }
+            final TempusResourceCriteriaSpec tempusResourceCriteriaSpec = getTempusResourceCriteriaSpec(getCurrentUser(), EntityType.DEVICE, null, customerId, type, textSearch);
+            tempusResourceCriteriaSpec.setCustomerId(Optional.of(customerId));
+            return deviceService.findAll(tempusResourceCriteriaSpec, limit, pageNum);
         } catch (Exception e) {
             throw handleException(e);
         }
     }
 
-    @PreAuthorize("hasAnyAuthority('TENANT_ADMIN', 'CUSTOMER_USER')")
+    @PostFilter("hasPermission(filterObject, 'DEVICE_READ')")
     @GetMapping(value = "/devices", params = {"deviceIds"})
     @ResponseBody
     public List<Device> getDevicesByIds(
@@ -340,7 +332,7 @@ public class DeviceController extends BaseController {
         }
     }
 
-    @PreAuthorize("hasAnyAuthority('TENANT_ADMIN', 'CUSTOMER_USER')")
+    @PreAuthorize("hasPermission(#strDeviceId, 'DEVICE', 'DEVICE_READ')")
     @GetMapping(value = "/download/deviceAttributesData")
     @ResponseBody
     public void downloadAttributesDataAsCsv(HttpServletResponse response, @RequestParam("deviceId") String strDeviceId) throws IOException {
@@ -365,7 +357,7 @@ public class DeviceController extends BaseController {
         csvWriter.close();
     }
 
-    @PreAuthorize("hasAnyAuthority('TENANT_ADMIN', 'CUSTOMER_USER')")
+    @PreAuthorize("hasPermission(#strDeviceId, 'DEVICE', 'DEVICE_READ')")
     @GetMapping(value = "/download/deviceSeriesData")
     @ResponseBody
     public void downloadTimeSeriesOrDepthSeriesDataAsCSV(HttpServletResponse response,
@@ -401,7 +393,7 @@ public class DeviceController extends BaseController {
     }
 
 
-    @PreAuthorize("hasAnyAuthority('TENANT_ADMIN', 'CUSTOMER_USER')")
+    @PostFilter("hasPermission(filterObject, 'DEVICE_READ')")
     @PostMapping(value = "/devices")
     @ResponseBody
     public List<Device> findByQuery(@RequestBody DeviceSearchQuery query) throws TempusException {
@@ -434,6 +426,23 @@ public class DeviceController extends BaseController {
             TenantId tenantId = user.getTenantId();
             ListenableFuture<List<EntitySubtype>> deviceTypes = deviceService.findDeviceTypesByTenantId(tenantId);
             return checkNotNull(deviceTypes.get());
+        } catch (Exception e) {
+            throw handleException(e);
+        }
+    }
+
+    @PreAuthorize("hasAnyAuthority('TENANT_ADMIN', 'CUSTOMER_USER')")
+    @GetMapping(value = "/datamodelobject/devices/{dataModelObjectId}")
+    @ResponseBody
+    public PaginatedResult<Device> getDevicesByDataModelObjectId(@PathVariable(DATA_MODEL_OBJECT_ID) String strDataModelObjectId,
+                                                                 @RequestParam int limit,
+                                                                 @RequestParam int pageNum,
+                                                                 @RequestParam(required = false) String textSearch) throws TempusException {
+        checkParameter(DATA_MODEL_OBJECT_ID, strDataModelObjectId);
+        try {
+            DataModelObjectId dataModelObjectId = new DataModelObjectId(toUUID(strDataModelObjectId));
+            final TempusResourceCriteriaSpec tempusResourceCriteriaSpec = getTempusResourceCriteriaSpec(getCurrentUser(), EntityType.DEVICE, dataModelObjectId, null, null, textSearch);
+            return deviceService.findAll(tempusResourceCriteriaSpec, limit, pageNum);
         } catch (Exception e) {
             throw handleException(e);
         }

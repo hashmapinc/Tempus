@@ -20,6 +20,8 @@ import com.datastax.driver.core.utils.UUIDs;
 import com.hashmapinc.server.common.data.Customer;
 import com.hashmapinc.server.common.data.Device;
 import com.hashmapinc.server.common.data.EntitySubtype;
+import com.hashmapinc.server.common.data.datamodel.DataModel;
+import com.hashmapinc.server.common.data.datamodel.DataModelObject;
 import com.hashmapinc.server.common.data.id.TenantId;
 import com.hashmapinc.server.common.data.page.TextPageData;
 import com.hashmapinc.server.common.data.page.TextPageLink;
@@ -644,4 +646,31 @@ public abstract class BaseDeviceServiceTest extends AbstractServiceTest {
         customerService.deleteCustomer(customerId);
     }
 
+    @Test
+    public void testFindDeviceByDataModelObject() {
+
+        DataModel dataModel = createDataModel(tenantId);
+        DataModelObject dataModelObject = createDataModelObject(dataModel);
+
+        Device device = new Device();
+        device.setTenantId(tenantId);
+        device.setName("My_device_1");
+        device.setType("default");
+        device.setDataModelObjectId(dataModelObject.getId());
+        Device savedDevice1 = deviceService.saveDevice(device);
+
+
+        device.setTenantId(tenantId);
+        device.setName("My_device_2");
+        device.setType("default");
+        device.setDataModelObjectId(dataModelObject.getId());
+        Device savedDevice2 =deviceService.saveDevice(device);
+
+        List<Device> devices = deviceService.findDeviceByDataModelObjectId(dataModelObject.getId());
+        Assert.assertEquals(2,devices.size());
+
+        deviceService.deleteDevice(savedDevice1.getId());
+        deviceService.deleteDevice(savedDevice2.getId());
+        dataModelService.deleteById(dataModel.getId());
+    }
 }

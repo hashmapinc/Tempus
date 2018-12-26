@@ -708,31 +708,76 @@ public abstract class BaseController {
         auditLogService.logEntityAction(user.getTenantId(), customerId, user.getId(), user.getName(), entityId, entity, actionType, e, additionalInfo);
     }
 
-    protected TempusResourceCriteriaSpec getTempusResourceCriteriaSpec(SecurityUser user, EntityType entityType, DataModelObjectId dataModelObjectId) throws TempusException{
-        final TempusResourceCriteriaSpec tempusResourceCriteriaSpec = new TempusResourceCriteriaSpec(entityType, user.getTenantId(), dataModelObjectId);
+    protected TempusResourceCriteriaSpec getTempusResourceCriteriaSpec(SecurityUser user, EntityType entityType, DataModelObjectId dataModelObjectId, CustomerId customerId, String type, String searchText) throws TempusException{
+        final TempusResourceCriteriaSpec tempusResourceCriteriaSpec = new TempusResourceCriteriaSpec(entityType, user.getTenantId());
 
-        if(isCustomerUser(user)){
-            tempusResourceCriteriaSpec.setCustomerId(Optional.of(user.getCustomerId()));
+        if(type != null && !type.trim().isEmpty()) {
+            tempusResourceCriteriaSpec.setType(Optional.of(type.trim()));
         }
+
+        if(searchText != null && !searchText.trim().isEmpty()) {
+            tempusResourceCriteriaSpec.setSearchText(Optional.of(searchText));
+        }
+
         final Supplier<Stream<UserPermission>> readableAndResourceAccessibleStream = getReadableAndResourceAccessibleStream(user, entityType);
 
         final boolean hasPermOnAllResources =
                 readableAndResourceAccessibleStream.get().map(UserPermission::getResourceAttributes).anyMatch(Objects::isNull); //case: {USER}:*:READ
 
-        final boolean hasHierarchicalPermOnEntireDmo =
-                hasHierarchicalPermOnEntireDataModel(readableAndResourceAccessibleStream, dataModelObjectId);  // case: {USER}:ASSET?dataModelId={dmoid}:READ where dmoid in (parent of given dmoid)
+        Map<DataModelObjectId, Set<? extends EntityId>> dataModelIdAndEntityIdSpec = new HashMap<>();
 
-        if(!hasPermOnAllResources && !hasHierarchicalPermOnEntireDmo){
-            final boolean hasPermOnDmoWithResources =
-                    hasPermOnDmoWithResources(readableAndResourceAccessibleStream, dataModelObjectId); // case: {USER}:ASSET?dataModelId={dmoid}&id={resId}:READ where dmoid = dataModelObjectId
-            if(!hasPermOnDmoWithResources) {
-                throw new IncorrectParameterException(NO_PERMISSION_TO_READ);
+        if(dataModelObjectId != null) {
+            if(!hasPermOnAllResources){
+                final boolean hasHierarchicalPermOnEntireDmo =
+                        hasHierarchicalPermOnEntireDataModel(readableAndResourceAccessibleStream, dataModelObjectId);  // case: {USER}:ASSET?dataModelId={dmoid}:READ where dmoid in (parent of given dmoid)
+
+                if (!hasHierarchicalPermOnEntireDmo) {
+                    final boolean hasPermOnDmoWithResources =
+                            hasPermOnDmoWithResources(readableAndResourceAccessibleStream, dataModelObjectId); // case: {USER}:ASSET?dataModelId={dmoid}&id={resId}:READ where dmoid = dataModelObjectId
+                    if (!hasPermOnDmoWithResources) {
+                        throw new IncorrectParameterException(NO_PERMISSION_TO_READ);
+                    } else {
+                        final Set<EntityId> accessibleResourceIdsForGivenDmo = getAccessibleResourceIdsForGivenDmo(readableAndResourceAccessibleStream, entityType, dataModelObjectId);
+                        accessibleResourceIdsForGivenDmo.addAll(dataModelIdAndEntityIdSpec.getOrDefault(dataModelObjectId, new HashSet<>()));
+                        dataModelIdAndEntityIdSpec.put(dataModelObjectId, accessibleResourceIdsForGivenDmo);
+                    }
+                } else {
+                    dataModelIdAndEntityIdSpec.put(dataModelObjectId, Collections.emptySet());
+                }
             } else {
-                final Set<EntityId> accessibleResourceIdsForGivenDmo = getAccessibleResourceIdsForGivenDmo(readableAndResourceAccessibleStream, entityType, dataModelObjectId);
-                tempusResourceCriteriaSpec.setAccessibleIdsForGivenDataModelObject(accessibleResourceIdsForGivenDmo);
+                dataModelIdAndEntityIdSpec.put(dataModelObjectId, Collections.emptySet());
             }
         }
-        tempusResourceCriteriaSpec.setDataModelObjectId(dataModelObjectId);
+
+        if(customerId != null) {
+            if(!hasPermOnAllResources){
+                String entityTypeName = entityType.equals(EntityType.DEVICE) ? "Device" : "Asset";
+                final DataModelId dataModelId = customerService.findCustomerById(customerId).getDataModelId();
+                final List<DataModelObjectId> dataModelObjectIds = (dataModelId != null) ?
+                        dataModelObjectService.findByDataModelIdAndType(dataModelId, entityTypeName).stream().map(DataModelObject::getId).collect(Collectors.toList()) :
+                        Collections.emptyList();
+                if(!dataModelObjectIds.isEmpty()){
+                    for (DataModelObjectId _dataModelObjectId : dataModelObjectIds) {
+                        final boolean hasHierarchicalPermOnEntireDmo =
+                                hasHierarchicalPermOnEntireDataModel(readableAndResourceAccessibleStream, _dataModelObjectId);  // case: {USER}:ASSET?dataModelId={dmoid}:READ where dmoid in (parent of given dmoid)
+
+                        if (!hasHierarchicalPermOnEntireDmo) {
+                            final boolean hasPermOnDmoWithResources =
+                                    hasPermOnDmoWithResources(readableAndResourceAccessibleStream, _dataModelObjectId); // case: {USER}:ASSET?dataModelId={dmoid}&id={resId}:READ where dmoid = dataModelObjectId
+                            if (hasPermOnDmoWithResources) {
+                                final Set<EntityId> accessibleResourceIdsForGivenDmo = getAccessibleResourceIdsForGivenDmo(readableAndResourceAccessibleStream, entityType, _dataModelObjectId);
+                                accessibleResourceIdsForGivenDmo.addAll(dataModelIdAndEntityIdSpec.getOrDefault(_dataModelObjectId, new HashSet<>()));
+                                dataModelIdAndEntityIdSpec.put(_dataModelObjectId, accessibleResourceIdsForGivenDmo);
+                            }
+                        } else {
+                            dataModelIdAndEntityIdSpec.put(_dataModelObjectId, Collections.emptySet());
+                        }
+                    }
+                }
+            }
+            tempusResourceCriteriaSpec.setCustomerId(Optional.of(customerId));
+        }
+        tempusResourceCriteriaSpec.setDataModelIdAndEntityIdSpec(dataModelIdAndEntityIdSpec);
         return tempusResourceCriteriaSpec;
     }
 
@@ -795,10 +840,6 @@ public abstract class BaseController {
             }
             return false;
         });
-    }
-
-    private boolean isCustomerUser(SecurityUser user) {
-        return user.getAuthorities().stream().anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals(Authority.CUSTOMER_USER.name()));
     }
 
 }

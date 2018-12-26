@@ -536,7 +536,7 @@ public abstract class BaseAssetControllerTest extends AbstractControllerTest {
 
         List<Asset> loadedAssetsType1 = new ArrayList<>();
         TextPageLink pageLink = new TextPageLink(15);
-        TextPageData<Asset> pageData = null;
+        TextPageData<Asset> pageData ;
         do {
             pageData = doGetTypedWithPageLink("/api/customer/" + customerId.getId().toString() + "/assets?type={type}&",
                     new TypeReference<TextPageData<Asset>>(){}, pageLink, type1);
@@ -594,7 +594,7 @@ public abstract class BaseAssetControllerTest extends AbstractControllerTest {
     public void testPolicyForAsset() throws Exception {
 
         DataModel dataModel = createDataModel();
-        DataModelObject dataModelObject = createDataModelObject(dataModel);
+        DataModelObject dataModelObject = createDataModelObject(dataModel, "Well", "Asset");
         Asset asset = createAsset(dataModelObject.getId(), customerUser.getCustomerId(), "Tenant's asset");
         String policy = String.format("CUSTOMER_USER:ASSET?%s=%s&%s=%s:READ",
                 UserPermission.ResourceAttribute.ID, asset.getId().getId().toString(),
@@ -660,7 +660,7 @@ public abstract class BaseAssetControllerTest extends AbstractControllerTest {
     @Test
     public void findAllAssetsByDataModeObject() throws Exception{
         DataModel dataModel = createDataModel();
-        DataModelObject dataModelObject = createDataModelObject(dataModel);
+        DataModelObject dataModelObject = createDataModelObject(dataModel, "Well", "Asset");
 
         String policyNew1 = String.format("CUSTOMER_USER:ASSET?%s=%s:READ",
                 UserPermission.ResourceAttribute.DATA_MODEL_ID, dataModelObject.getId().getId().toString());

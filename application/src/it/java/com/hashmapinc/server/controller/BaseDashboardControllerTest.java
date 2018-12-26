@@ -37,7 +37,6 @@ import com.hashmapinc.server.common.data.security.Authority;
 import com.hashmapinc.server.dao.computations.ComputationsService;
 import com.hashmapinc.server.extensions.core.plugin.telemetry.TelemetryStoragePlugin;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -366,7 +365,7 @@ public abstract class BaseDashboardControllerTest extends AbstractControllerTest
         dashboard.setType(DashboardType.ASSET_LANDING_PAGE);
 
         DataModel dataModel = createDataModel();
-        DataModelObject dataModelObject = createDataModelObject(dataModel);
+        DataModelObject dataModelObject = createDataModelObject(dataModel, "Well", "Asset");
 
         AssetLandingInfo ald = new AssetLandingInfo();
         ald.setDataModelId(dataModel.getId());

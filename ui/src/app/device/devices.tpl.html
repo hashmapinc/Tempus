@@ -119,6 +119,7 @@
                        device-scope="vm.devicesScope"
                        the-form="vm.grid.detailsForm"
                        on-assign-to-customer="vm.assignToCustomer(event, [ vm.grid.detailsConfig.currentItem.id.id ])"
+                       on-assign-to-datamodel="vm.assignToDatamodel(event, [ vm.grid.detailsConfig.currentItem])"
                        on-make-public="vm.makePublic(event, vm.grid.detailsConfig.currentItem)"
                        on-unassign-from-customer="vm.unassignFromCustomer(event, vm.grid.detailsConfig.currentItem, isPublic)"
                        on-manage-credentials="vm.manageCredentials(event, vm.grid.detailsConfig.currentItem)"
@@ -180,8 +181,8 @@
         </md-tab>
         <md-tab ng-if="!vm.grid.detailsConfig.isDetailsEditMode && vm.grid.isTenantAdmin()" md-on-select="vm.grid.triggerResize()" label="{{ 'audit-log.audit-logs' | translate }}">
             <tb-audit-log-table flex entity-type="vm.types.entityType.device"
-                            entity-id="vm.grid.operatingItem().id.id"
-                            audit-log-mode="{{vm.types.auditLogMode.entity}}">
+                                entity-id="vm.grid.operatingItem().id.id"
+                                audit-log-mode="{{vm.types.auditLogMode.entity}}">
             </tb-audit-log-table>
         </md-tab>
 </tb-grid>

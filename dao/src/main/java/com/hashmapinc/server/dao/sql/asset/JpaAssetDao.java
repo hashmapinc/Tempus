@@ -23,6 +23,8 @@ import com.hashmapinc.server.common.data.TempusResourceCriteriaSpec;
 import com.hashmapinc.server.common.data.UUIDConverter;
 import com.hashmapinc.server.common.data.asset.Asset;
 import com.hashmapinc.server.common.data.id.AssetId;
+import com.hashmapinc.server.common.data.id.DataModelObjectId;
+import com.hashmapinc.server.common.data.id.EntityId;
 import com.hashmapinc.server.common.data.id.TenantId;
 import com.hashmapinc.server.common.data.page.TextPageLink;
 import com.hashmapinc.server.dao.DaoUtil;
@@ -139,19 +141,66 @@ public class JpaAssetDao extends JpaAbstractSearchTextDao<AssetEntity, Asset> im
 
     @Override
     public List<Asset> findAll(TempusResourceCriteriaSpec tempusResourceCriteriaSpec, TextPageLink textPageLink) {
-        final List<BooleanExpression> predicates = getPredicates(tempusResourceCriteriaSpec, textPageLink);
-        final Optional<BooleanExpression> finalPredicate = predicates.stream().reduce(BooleanExpression::and);
-        final PageRequest pageable = new PageRequest(0, textPageLink.getLimit(), new Sort(new Sort.Order(Sort.Direction.ASC, ModelConstants.ID_PROPERTY)));
+        final Optional<BooleanExpression> finalPredicate = getFinalPredicate(tempusResourceCriteriaSpec, textPageLink);
+        final PageRequest pageable = PageRequest.of(0, textPageLink.getLimit(), new Sort(new Sort.Order(Sort.Direction.ASC, ModelConstants.ID_PROPERTY)));
         return finalPredicate.isPresent() ? DaoUtil.convertDataList(assetRepository.findAll(finalPredicate.get(), pageable).getContent()) : Collections.emptyList();
     }
 
-    private List<BooleanExpression> getPredicates(TempusResourceCriteriaSpec tempusResourceCriteriaSpec, TextPageLink textPageLink) {
+    private Optional<BooleanExpression> getFinalPredicate(TempusResourceCriteriaSpec tempusResourceCriteriaSpec, TextPageLink textPageLink) {
+        final List<BooleanExpression> predicates = getBasicPredicates(tempusResourceCriteriaSpec, textPageLink);
+        final Optional<BooleanExpression> predicatesRight = getPredicatesRelatedWithDataModelObjects(tempusResourceCriteriaSpec);
+        return predicates.stream().reduce(BooleanExpression::and).map(expression -> {
+            if(predicatesRight.isPresent()){
+                return expression.and(predicatesRight.get());
+            } else {
+                return expression;
+            }
+        });
+    }
+
+    private Optional<BooleanExpression> getPredicatesRelatedWithDataModelObjects(TempusResourceCriteriaSpec tempusResourceCriteriaSpec) {
+        final JPATempusResourcePredicateBuilder predicateBuilder1 = new JPATempusResourcePredicateBuilder(getEntityClass());
+        final Map<DataModelObjectId, Set<? extends EntityId>> dataModelIdAndEntityIdSpec = tempusResourceCriteriaSpec.getDataModelIdAndEntityIdSpec();
+        final Set<DataModelObjectId> dataModelObjectIds = dataModelIdAndEntityIdSpec.entrySet().stream().filter(entrySet -> entrySet.getValue().isEmpty()).map(Map.Entry::getKey).collect(Collectors.toSet());
+
+        dataModelObjectIds.forEach(dataModelObjectId ->
+                predicateBuilder1.with(new ResourceCriteria(ModelConstants.ASSET_DATA_MODEL_OBJECT_ID, ResourceCriteria.Operation.EQUALS, UUIDConverter.fromTimeUUID(dataModelObjectId.getId()))));
+
+
+        Optional<BooleanExpression> finalPredicate = predicateBuilder1.build().stream().map(TempusResourcePredicate::getValue).reduce(BooleanExpression::or);
+
+
+        for(Map.Entry<DataModelObjectId, Set<? extends EntityId>> dataModelIdAndEntityId : dataModelIdAndEntityIdSpec.entrySet()){
+            if(!dataModelIdAndEntityId.getValue().isEmpty()){
+                final JPATempusResourcePredicateBuilder tempPredicateBuilder = new JPATempusResourcePredicateBuilder(getEntityClass());
+                tempPredicateBuilder.with(new ResourceCriteria(ModelConstants.ASSET_DATA_MODEL_OBJECT_ID, ResourceCriteria.Operation.EQUALS, UUIDConverter.fromTimeUUID(dataModelIdAndEntityId.getKey().getId())));
+                Set<? extends EntityId> accessibleTempusResourceIdsOnly = dataModelIdAndEntityId.getValue();
+                final String[] entityIds = accessibleTempusResourceIdsOnly.stream().map(id -> UUIDConverter.fromTimeUUID(id.getId())).toArray(String[]::new);
+                if(accessibleTempusResourceIdsOnly.size() == 1){
+                    tempPredicateBuilder.with(new ResourceCriteria(ModelConstants.ID_PROPERTY, ResourceCriteria.Operation.EQUALS,entityIds[0]));
+                } else if (accessibleTempusResourceIdsOnly.size() > 1) {
+                    tempPredicateBuilder.with(new ResourceCriteria(ModelConstants.ID_PROPERTY, ResourceCriteria.Operation.CONTAINS, entityIds));
+                }
+                final Optional<BooleanExpression> predicate = tempPredicateBuilder.build().stream().map(TempusResourcePredicate::getValue).reduce(BooleanExpression::and);
+                if(finalPredicate.isPresent()){
+                    if(predicate.isPresent()) {
+                        finalPredicate = finalPredicate.map(expression -> expression.or(predicate.get()));
+                    }
+                } else {
+                    finalPredicate = predicate;
+                }
+            }
+        }
+        return finalPredicate;
+    }
+
+    private List<BooleanExpression> getBasicPredicates(TempusResourceCriteriaSpec tempusResourceCriteriaSpec, TextPageLink textPageLink) {
+
         final String idOffset = textPageLink.getIdOffset() == null ? ModelConstants.NULL_UUID_STR : UUIDConverter.fromTimeUUID(textPageLink.getIdOffset());
 
         final JPATempusResourcePredicateBuilder basicPredicateBuilder = new JPATempusResourcePredicateBuilder(getEntityClass())
                 .with(new ResourceCriteria(ModelConstants.ID_PROPERTY, ResourceCriteria.Operation.GREATER_THAN, idOffset))
-                .with(new ResourceCriteria(ModelConstants.ASSET_TENANT_ID_PROPERTY, ResourceCriteria.Operation.EQUALS, UUIDConverter.fromTimeUUID(tempusResourceCriteriaSpec.getTenantId().getId())))
-                .with(new ResourceCriteria(ModelConstants.ASSET_DATA_MODEL_OBJECT_ID, ResourceCriteria.Operation.EQUALS, UUIDConverter.fromTimeUUID(tempusResourceCriteriaSpec.getDataModelObjectId().getId())));
+                .with(new ResourceCriteria(ModelConstants.ASSET_TENANT_ID_PROPERTY, ResourceCriteria.Operation.EQUALS, UUIDConverter.fromTimeUUID(tempusResourceCriteriaSpec.getTenantId().getId())));
 
         if(textPageLink.getTextSearch() != null){
             basicPredicateBuilder.with(new ResourceCriteria(ModelConstants.SEARCH_TEXT_PROPERTY, ResourceCriteria.Operation.LIKE, textPageLink.getTextSearch()));
@@ -160,27 +209,13 @@ public class JpaAssetDao extends JpaAbstractSearchTextDao<AssetEntity, Asset> im
         tempusResourceCriteriaSpec.getCustomerId().ifPresent(customerId ->
                 basicPredicateBuilder.with(new ResourceCriteria(ModelConstants.ASSET_CUSTOMER_ID_PROPERTY, ResourceCriteria.Operation.EQUALS, UUIDConverter.fromTimeUUID(customerId.getId()))));
 
-        final ResourceCriteria idConstraint = getIdConstraint(tempusResourceCriteriaSpec);
-        if(Objects.nonNull(idConstraint)){
-            basicPredicateBuilder.with(idConstraint);
-        }
+        tempusResourceCriteriaSpec.getType().ifPresent(type ->
+                basicPredicateBuilder.with(new ResourceCriteria(ModelConstants.ASSET_TYPE_PROPERTY, ResourceCriteria.Operation.EQUALS, type)));
+
         final List<TempusResourcePredicate<BooleanExpression>> tempusResourcePredicates = basicPredicateBuilder.build();
         return tempusResourcePredicates.stream().map(TempusResourcePredicate::getValue).collect(Collectors.toList());
     }
 
-    private ResourceCriteria getIdConstraint(TempusResourceCriteriaSpec tempusResourceCriteriaSpec) {
-        final Set<String> accessibleTempusResourceIdsOnly = tempusResourceCriteriaSpec.getAccessibleIdsForGivenDataModelObject().stream()
-                .filter(id -> id instanceof AssetId)
-                .map(id -> UUIDConverter.fromTimeUUID(id.getId()))
-                .collect(Collectors.toSet());
-
-        if(accessibleTempusResourceIdsOnly.size() == 1){
-            return new ResourceCriteria(ModelConstants.ID_PROPERTY, ResourceCriteria.Operation.EQUALS, accessibleTempusResourceIdsOnly.toArray()[0]);
-        } else if (accessibleTempusResourceIdsOnly.size() > 1) {
-            return new ResourceCriteria(ModelConstants.ID_PROPERTY, ResourceCriteria.Operation.CONTAINS, accessibleTempusResourceIdsOnly.toArray(new String[0]));
-        }
-        return null;
-    }
 
     private List<EntitySubtype> convertTenantAssetTypesToDto(UUID tenantId, List<String> types) {
         List<EntitySubtype> list = Collections.emptyList();

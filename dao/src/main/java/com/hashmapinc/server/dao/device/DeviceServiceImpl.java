@@ -21,9 +21,8 @@ import com.google.common.util.concurrent.AsyncFunction;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.hashmapinc.server.common.data.*;
-import com.hashmapinc.server.common.data.id.DeviceId;
-import com.hashmapinc.server.common.data.id.EntityId;
-import com.hashmapinc.server.common.data.id.TenantId;
+import com.hashmapinc.server.common.data.id.*;
+import com.hashmapinc.server.common.data.page.PaginatedResult;
 import com.hashmapinc.server.common.data.page.TextPageData;
 import com.hashmapinc.server.common.data.page.TextPageLink;
 import com.hashmapinc.server.common.data.security.DeviceCredentials;
@@ -43,7 +42,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import com.hashmapinc.server.common.data.*;
 import com.hashmapinc.server.common.data.device.DeviceSearchQuery;
-import com.hashmapinc.server.common.data.id.CustomerId;
 import com.hashmapinc.server.common.data.relation.EntityRelation;
 import com.hashmapinc.server.common.data.relation.EntitySearchDirection;
 import com.hashmapinc.server.common.data.security.DeviceCredentialsType;
@@ -66,6 +64,9 @@ public class DeviceServiceImpl extends AbstractEntityService implements DeviceSe
     public static final String INCORRECT_PAGE_LINK = "Incorrect page link ";
     public static final String INCORRECT_CUSTOMER_ID = "Incorrect customerId ";
     public static final String INCORRECT_DEVICE_ID = "Incorrect deviceId ";
+    public static final String INCORRECT_DATA_MODEL_OBJECT_ID = "Incorrect dataModelObjectId ";
+
+
     @Autowired
     private DeviceDao deviceDao;
 
@@ -261,6 +262,19 @@ public class DeviceServiceImpl extends AbstractEntityService implements DeviceSe
                 });
     }
 
+    @Override
+    public List<Device> findDeviceByDataModelObjectId(DataModelObjectId dataModelObjectId) {
+        log.trace("Executing findDeviceByDataModelObjectId [{}]", dataModelObjectId);
+        validateId(dataModelObjectId, INCORRECT_DATA_MODEL_OBJECT_ID + dataModelObjectId);
+        return deviceDao.findDeviceByDataModelObjectId(dataModelObjectId.getId());
+    }
+
+    @Override
+    public PaginatedResult<Device> findAll(TempusResourceCriteriaSpec tempusResourceCriteriaSpec, int limit, int pageNum){
+        log.trace("Executing findAll [{}]", tempusResourceCriteriaSpec);
+        return deviceDao.findAll(tempusResourceCriteriaSpec, limit, pageNum);
+    }
+
     private DataValidator<Device> deviceValidator =
             new DataValidator<Device>() {
 
@@ -310,6 +324,9 @@ public class DeviceServiceImpl extends AbstractEntityService implements DeviceSe
                         if (!customer.getTenantId().getId().equals(device.getTenantId().getId())) {
                             throw new DataValidationException("Can't assign device to customer from different tenant!");
                         }
+                    }
+                    if (device.getDataModelObjectId() == null) {
+                        device.setDataModelObjectId(new DataModelObjectId(NULL_UUID));
                     }
                 }
             };
