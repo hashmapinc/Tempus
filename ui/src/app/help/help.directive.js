@@ -27,7 +27,7 @@ export default angular.module('tempus.directives.help', [tempusHelpLinks])
 /* eslint-disable angular/angularelement */
 
 /*@ngInject*/
-function Help($compile, $window) {
+function Help($compile, $window, helpLinks) {
 
     var linker = function (scope, element, attrs) {
 
@@ -35,7 +35,7 @@ function Help($compile, $window) {
             if ($event) {
                 $event.stopPropagation();
             }
-            var helpUrl = 'https://tempus.readthedocs.io/en/latest/admin/'+scope.helpLinkId +'.html';
+            var helpUrl = helpLinks.linksMap[scope.helpLinkId];
             if (helpUrl) {
                 $window.open(helpUrl, '_blank');
             }
