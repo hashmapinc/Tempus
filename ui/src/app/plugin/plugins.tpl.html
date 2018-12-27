@@ -17,7 +17,7 @@
 
 -->
 <tb-grid grid-configuration="vm.pluginGridConfig">
-    <details-buttons tb-help="'plugins'" help-container-id="help-container">
+    <details-buttons tb-help="vm.helpLinkIdForPlugin()" help-container-id="help-container">
         <div id="help-container"></div>
     </details-buttons>
     <md-tabs ng-class="{'tb-headless': (vm.grid.detailsConfig.isDetailsEditMode || !vm.isPluginEditable(vm.grid.operatingItem()))}"
