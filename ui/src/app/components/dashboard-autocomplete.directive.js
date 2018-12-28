@@ -31,7 +31,7 @@ export default angular.module('tempus.directives.dashboardAutocomplete', [tempus
     .name;
 
 /*@ngInject*/
-function DashboardAutocomplete($compile, $templateCache, $q, dashboardService, userService) {
+function DashboardAutocomplete($compile, $templateCache, $q, dashboardService, userService, customerService, datamodelService) {
 
     var linker = function (scope, element, attrs, ngModelCtrl) {
         var template = $templateCache.get(dashboardAutocompleteTemplate);
@@ -47,6 +47,9 @@ function DashboardAutocomplete($compile, $templateCache, $q, dashboardService, u
             var deferred = $q.defer();
 
             var promise;
+            var assetLandingDashboards = new Array();
+
+            var customerDetails = customerService.getCustomer(scope.customerId);
             if (scope.dashboardsScope === 'customer' || userService.getAuthority() === 'CUSTOMER_USER') {
                 var customerId = userService.getCurrentUser().customerId;
                 if (customerId) {
@@ -65,14 +68,31 @@ function DashboardAutocomplete($compile, $templateCache, $q, dashboardService, u
                     promise = dashboardService.getTenantDashboards(pageLink, {ignoreLoading: true});
                 }
             }
-
+            customerDetails.then(function success(result) {
+                if(result.dataModelId.id){
+                    datamodelService.getDatamodelObjects(result.dataModelId.id).then(function success(result) {
+                        if(result.length > 0){
+                            angular.forEach(result, function (datamodelObject) {
+                                dashboardService.getAssetLandingDashboardByDataModelObjId(datamodelObject).
+                                    then(function success(result) {
+                                        if(result[0] && result[0].hasOwnProperty('name')){
+                                            assetLandingDashboards.push(result[0]);
+                                        }
+                                });
+                            });
+                        }
+                    });
+                }
+            });
             promise.then(function success(result) {
-                deferred.resolve(result.data);
+                var i;
+                for(i=0;i<result.data.length;i++){
+                    assetLandingDashboards.push(result.data[i]);
+                }
             }, function fail() {
                 deferred.reject();
             });
-
-            return deferred.promise;
+            return assetLandingDashboards;
         }
 
         scope.dashboardSearchTextChanged = function() {
