@@ -40,15 +40,11 @@ function DashboardAutocomplete($compile, $templateCache, $q, dashboardService, u
         scope.tbRequired = angular.isDefined(scope.tbRequired) ? scope.tbRequired : false;
         scope.dashboard = null;
         scope.dashboardSearchText = '';
-
-        scope.fetchDashboards = function(searchText) {
-            var pageLink = {limit: 50, textSearch: searchText};
-
-            var deferred = $q.defer();
-
+        scope.fetchDashboards = [];
+        fetchDashboards();
+        function fetchDashboards(searchText) {
             var promise;
-            var assetLandingDashboards = new Array();
-
+            var pageLink = {limit: 50, textSearch: searchText};
             var customerDetails = customerService.getCustomer(scope.customerId);
             if (scope.dashboardsScope === 'customer' || userService.getAuthority() === 'CUSTOMER_USER') {
                 var customerId = userService.getCurrentUser().customerId;
@@ -76,7 +72,7 @@ function DashboardAutocomplete($compile, $templateCache, $q, dashboardService, u
                                 dashboardService.getAssetLandingDashboardByDataModelObjId(datamodelObject).
                                     then(function success(result) {
                                         if(result[0] && result[0].hasOwnProperty('name')){
-                                            assetLandingDashboards.push(result[0]);
+                                            scope.fetchDashboards.push(result[0]);
                                         }
                                 });
                             });
@@ -87,14 +83,11 @@ function DashboardAutocomplete($compile, $templateCache, $q, dashboardService, u
             promise.then(function success(result) {
                 var i;
                 for(i=0;i<result.data.length;i++){
-                    assetLandingDashboards.push(result.data[i]);
+                    scope.fetchDashboards.push(result.data[i]);
                 }
             }, function fail() {
-                deferred.reject();
             });
-            return assetLandingDashboards;
         }
-
         scope.dashboardSearchTextChanged = function() {
         }
 
