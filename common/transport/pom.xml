@@ -46,6 +46,10 @@
             <artifactId>message</artifactId>
         </dependency>
         <dependency>
+            <groupId>com.hashmapinc.tempus</groupId>
+            <artifactId>tempus-unit-conversion</artifactId>
+        </dependency>
+        <dependency>
             <groupId>com.google.code.gson</groupId>
             <artifactId>gson</artifactId>
         </dependency>

@@ -23,6 +23,7 @@ import com.google.gson.*;
 import com.hashmapinc.server.common.data.kv.*;
 import com.hashmapinc.server.common.msg.core.*;
 import com.hashmapinc.server.common.msg.kv.AttributesKVMsg;
+import com.hashmapinc.tempus.model.Quantity;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
@@ -196,12 +197,15 @@ public class JsonConverter {
     }
 
     private static void parseNumericValue(List<KvEntry> result, String key, String unit, JsonNode value) {
+        Quantity quantity;
         if (value.asText().contains(".")) {
-            result.add(new DoubleDataEntry(key, unit, value.asDouble()));
+            quantity = UnitConverter.convertToSiUnit(new Quantity(value.asDouble() , unit));
+            result.add(new DoubleDataEntry(key, quantity.getUnit(), quantity.getValue()));
         } else {
             try {
                 long longValue = value.asLong();
-                result.add(new LongDataEntry(key, unit, longValue));
+                quantity = UnitConverter.convertToSiUnit(new Quantity(((Long)longValue).doubleValue(), unit));
+                result.add(new DoubleDataEntry(key, quantity.getUnit(), quantity.getValue()));
             } catch (NumberFormatException e) {
                 throw new JsonSyntaxException("Big integer values are not supported!");
             }
