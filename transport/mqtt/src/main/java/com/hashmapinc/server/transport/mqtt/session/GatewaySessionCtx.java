@@ -22,10 +22,14 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
+import com.hashmapinc.server.common.data.DataConstants;
 import com.hashmapinc.server.common.data.Device;
+import com.hashmapinc.server.common.data.asset.Asset;
 import com.hashmapinc.server.common.data.id.SessionId;
+import com.hashmapinc.server.common.data.kv.AttributeKvEntry;
 import com.hashmapinc.server.common.data.kv.BaseAttributeKvEntry;
 import com.hashmapinc.server.common.data.relation.EntityRelation;
+import com.hashmapinc.server.common.data.relation.RelationTypeGroup;
 import com.hashmapinc.server.common.msg.core.*;
 import com.hashmapinc.server.common.msg.exception.TempusRuntimeException;
 import com.hashmapinc.server.common.msg.session.BasicAdaptorToSessionActorMsg;
@@ -34,6 +38,8 @@ import com.hashmapinc.server.common.msg.session.ctrl.SessionCloseMsg;
 import com.hashmapinc.server.common.transport.adaptor.AdaptorException;
 import com.hashmapinc.server.common.transport.adaptor.JsonConverter;
 import com.hashmapinc.server.common.transport.auth.DeviceAuthService;
+import com.hashmapinc.server.dao.asset.AssetService;
+import com.hashmapinc.server.dao.attributes.AttributesService;
 import com.hashmapinc.server.dao.device.DeviceService;
 import com.hashmapinc.server.dao.relation.RelationService;
 import com.hashmapinc.server.transport.mqtt.sparkplug.data.SparkPlugDecodedMsg;
@@ -62,22 +68,27 @@ public class GatewaySessionCtx {
     public static final String CAN_T_PARSE_VALUE = "Can't parse value: ";
     public static final String DEVICE_PROPERTY = "device";
     private static final String SPARKPLUG_DEVICE_TYPE = "sparkplug";
+    public static final String PARENT_ASSET = "parent_asset";
     private final Device gateway;
     private final SessionId gatewaySessionId;
     private final SessionMsgProcessor processor;
     private final DeviceService deviceService;
     private final DeviceAuthService authService;
     private final RelationService relationService;
+    private final AttributesService attributesService;
+    private final AssetService assetService;
     private final Map<String, GatewayDeviceSessionCtx> devices;
     private ChannelHandlerContext channel;
 
-    public GatewaySessionCtx(SessionMsgProcessor processor, DeviceService deviceService, DeviceAuthService authService, RelationService relationService, DeviceSessionCtx gatewaySessionCtx) {
+    public GatewaySessionCtx(SessionMsgProcessor processor, DeviceService deviceService, DeviceAuthService authService, RelationService relationService, DeviceSessionCtx gatewaySessionCtx, AttributesService attributesService , AssetService assetService) {
         this.processor = processor;
         this.deviceService = deviceService;
         this.authService = authService;
         this.relationService = relationService;
         this.gateway = gatewaySessionCtx.getDevice();
         this.gatewaySessionId = gatewaySessionCtx.getSessionId();
+        this.attributesService = attributesService;
+        this.assetService = assetService;
         this.devices = new HashMap<>();
     }
 
@@ -97,6 +108,8 @@ public class GatewaySessionCtx {
                 device.setTenantId(gateway.getTenantId());
                 device.setName(deviceName);
                 device.setType(deviceType);
+                device.setCustomerId(gateway.getCustomerId());
+                device.setDataModelObjectId(gateway.getDataModelObjectId());
                 device = deviceService.saveDevice(device);
                 relationService.saveRelationAsync(new EntityRelation(gateway.getId(), device.getId(), "Created"));
             }
@@ -249,6 +262,20 @@ public class GatewaySessionCtx {
                 BasicUpdateAttributesRequest request = new BasicUpdateAttributesRequest(requestId);
                 JsonObject deviceData = deviceEntry.getValue().getAsJsonObject();
                 request.add(JsonConverter.parseValues(deviceData).stream().map(kv -> new BaseAttributeKvEntry(kv, ts)).collect(Collectors.toList()));
+                Set<AttributeKvEntry> attributeKvEntries = request.getAttributes();
+
+                Optional<AttributeKvEntry> parentAssetAttribute = findParentAssetAttribute(attributeKvEntries);
+                if(parentAssetAttribute.isPresent()) {
+                    Device device = deviceService.findDeviceByTenantIdAndName(gateway.getTenantId(), deviceName);
+                    try {
+                        Optional<AttributeKvEntry> savedParentAssetAttribute = attributesService.find(device.getId(), DataConstants.CLIENT_SCOPE, PARENT_ASSET).get();
+                        savedParentAssetAttribute.ifPresent(attributeKvEntry -> deleteParentAssetRelation(device, attributeKvEntry));
+                        createParentAssetRelationWithDevice(device,parentAssetAttribute.get().getValueAsString());
+                    }
+                    catch(Exception exp) {
+                        log.warn("Failed to fetch parentAssetAttribute : [{}]", parentAssetAttribute.get().getKey());                    }
+                }
+
                 GatewayDeviceSessionCtx deviceSessionCtx = devices.get(deviceName);
                 processor.process(new BasicToDeviceActorSessionMsg(deviceSessionCtx.getDevice(),
                         new BasicAdaptorToSessionActorMsg(deviceSessionCtx, request)));
@@ -256,6 +283,19 @@ public class GatewaySessionCtx {
         } else {
             throw new JsonSyntaxException(CAN_T_PARSE_VALUE + json);
         }
+    }
+
+    private void createParentAssetRelationWithDevice(Device device,String assetName) {
+        Optional<Asset> asset = assetService.findAssetByTenantIdAndName(gateway.getTenantId(),assetName);
+        asset.ifPresent(asset1 -> {
+            EntityRelation relation = new EntityRelation(device.getId(), asset1.getId(), EntityRelation.CONTAINS_TYPE);
+            relationService.saveRelation(relation);
+        });
+    }
+
+    private void deleteParentAssetRelation(Device device ,AttributeKvEntry  parentAssetAttribute) {
+        Optional<Asset> savedAsset = assetService.findAssetByTenantIdAndName(gateway.getTenantId(), parentAssetAttribute.getValueAsString());
+        savedAsset.ifPresent(asset -> relationService.deleteRelation(device.getId(), asset.getId(), EntityRelation.CONTAINS_TYPE, RelationTypeGroup.COMMON));
     }
 
     public void onDeviceAttributesRequest(MqttPublishMessage msg) throws AdaptorException {
@@ -348,6 +388,15 @@ public class GatewaySessionCtx {
 
     void writeAndFlush(MqttMessage mqttMessage) {
         channel.writeAndFlush(mqttMessage);
+    }
+
+    private Optional<AttributeKvEntry> findParentAssetAttribute(Set<AttributeKvEntry> attributeKvEntries){
+        for (AttributeKvEntry attributeKvEntry : attributeKvEntries) {
+            if(attributeKvEntry.getKey().equals(PARENT_ASSET)){
+                return Optional.of(attributeKvEntry);
+            }
+        }
+        return Optional.empty();
     }
 
 }
