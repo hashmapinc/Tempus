@@ -18,6 +18,7 @@ package com.hashmapinc.server.dao.datamodel;
 
 import com.hashmapinc.server.common.data.Dashboard;
 import com.hashmapinc.server.common.data.DashboardType;
+import com.hashmapinc.server.common.data.Device;
 import com.hashmapinc.server.common.data.asset.Asset;
 import com.hashmapinc.server.common.data.datamodel.AttributeDefinition;
 import com.hashmapinc.server.common.data.datamodel.DataModel;
@@ -27,6 +28,7 @@ import com.hashmapinc.server.common.data.id.DataModelObjectId;
 import com.hashmapinc.server.common.data.kv.DataType;
 import com.hashmapinc.server.dao.asset.AssetDao;
 import com.hashmapinc.server.dao.dashboard.DashboardService;
+import com.hashmapinc.server.dao.device.DeviceService;
 import com.hashmapinc.server.dao.exception.DataValidationException;
 import com.hashmapinc.server.dao.service.DataValidator;
 import com.hashmapinc.server.dao.service.Validator;
@@ -66,6 +68,9 @@ public class DataModelObjectServiceImp implements DataModelObjectService {
 
     @Autowired
     DashboardService dashboardService;
+
+    @Autowired
+    DeviceService deviceService;
 
     @Override
     public DataModelObject save(DataModelObject dataModelObject) {
@@ -143,11 +148,13 @@ public class DataModelObjectServiceImp implements DataModelObjectService {
             List<Asset> assets = assetDao.findAssetsByDataModelObjectId(dataModelObject.getId().getId());
             if (!assets.isEmpty())
                 throw new DataValidationException("Cannot delete dataModelObject because one or more assets are associated with it");
-            else {
-                removeAttributeDefinitions(dataModelObject);
-                removeAssetLandingDashboard(dataModelObjectId);
-                dataModelObjectDao.removeById(dataModelObjectId.getId());
-            }
+            List<Device> devices = deviceService.findDeviceByDataModelObjectId(dataModelObjectId);
+            if(!devices.isEmpty())
+                throw new DataValidationException("Cannot delete dataModelObject because one or more devices are associated with it");
+
+            removeAttributeDefinitions(dataModelObject);
+            removeAssetLandingDashboard(dataModelObjectId);
+            dataModelObjectDao.removeById(dataModelObjectId.getId());
         }
     }
 
