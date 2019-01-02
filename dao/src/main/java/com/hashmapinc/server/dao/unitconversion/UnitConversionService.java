@@ -14,37 +14,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.hashmapinc.server.common.data.kv;
+package com.hashmapinc.server.dao.unitconversion;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import com.hashmapinc.tempus.model.Quantity;
 
-import java.io.Serializable;
-import java.util.Optional;
+import java.util.Map;
+import java.util.Set;
 
-/**
- * Represents attribute or any other KV data entry
- *
- * @author ashvayka
- */
-public interface KvEntry extends Serializable {
+public interface UnitConversionService {
 
-    String getKey();
+    Quantity convertToSiUnit(Quantity quantity);
 
-    DataType getDataType();
+    Quantity convertToTargetUnit(Quantity quantity, String targetUnit);
 
-    Optional<String> getStrValue();
+    Set<String> getAllQuantityClass();
 
-    Optional<Long> getLongValue();
+    Map<String, Set<String>> getMemberUnitsForAllQuantityClass();
 
-    Optional<Boolean> getBooleanValue();
-
-    Optional<Double> getDoubleValue();
-
-    Optional<JsonNode> getJsonValue();
-
-    String getValueAsString();
-
-    Object getValue();
-
-    Optional<String> getUnit();
+    Set<String> getMemberUnitsForQuantityClass(String quantityClass);
 }

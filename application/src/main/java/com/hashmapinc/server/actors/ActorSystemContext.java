@@ -47,6 +47,7 @@ import com.hashmapinc.server.dao.relation.RelationService;
 import com.hashmapinc.server.dao.rule.RuleService;
 import com.hashmapinc.server.dao.tenant.TenantService;
 import com.hashmapinc.server.dao.timeseries.TimeseriesService;
+import com.hashmapinc.server.dao.unitconversion.UnitConversionService;
 import com.hashmapinc.server.service.cluster.discovery.DiscoveryService;
 import com.hashmapinc.server.service.cluster.routing.ClusterRoutingService;
 import com.hashmapinc.server.service.cluster.rpc.ClusterRpcService;
@@ -138,6 +139,9 @@ public class ActorSystemContext {
 
     @Autowired
     @Getter private S3BucketService s3BucketService;
+
+    @Autowired
+    @Getter private UnitConversionService unitConversionService;
 
     @Autowired
     @Getter private ComputationFunctionService computationFunctionService;

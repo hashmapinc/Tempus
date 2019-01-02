@@ -66,7 +66,7 @@ export default function AttributeTableDirective($compile, $templateCache, $rootS
 
         function getEntityAttributesList(){
             assetService.getAsset(scope.entityId).then(function success(response){
-                if(response && response.dataModelObjectId  && response && response.dataModelObjectId.id != '13814000-1dd2-11b2-8080-808080808080'){
+                if(response && response.dataModelObjectId  && response && response.dataModelObjectId.id !== '13814000-1dd2-11b2-8080-808080808080'){
                     datamodelService.getDatamodelObject(response.dataModelObjectId.id).then(function success(response_data){
                         if(response_data.data.attributeDefinitions){
                             scope.entityAttribute = response_data.data.attributeDefinitions;
@@ -88,8 +88,8 @@ export default function AttributeTableDirective($compile, $templateCache, $rootS
 
         scope.attributeScope = getAttributeScopeByValue(attrs.defaultAttributeScope);
 
-        if (scope.entityType != types.entityType.device) {
-            if (scope.attributeScope != types.latestTelemetry && scope.attributeScope != types.latestDepthSeries) {
+        if (scope.entityType !== types.entityType.device) {
+            if (scope.attributeScope !== types.latestTelemetry && scope.attributeScope !== types.latestDepthSeries) {
                 scope.attributeScope = scope.attributeScopes.server;
             }
         }
@@ -191,11 +191,11 @@ export default function AttributeTableDirective($compile, $templateCache, $rootS
             };
             $event.stopPropagation();
 
-            if(type.attributeScope.value == "CLIENT_SCOPE" || type.attributeScope.value == "SERVER_SCOPE" || type.attributeScope.value == "SHARED_SCOPE") {
+            if(type.attributeScope.value === "CLIENT_SCOPE" || type.attributeScope.value === "SERVER_SCOPE" || type.attributeScope.value === "SHARED_SCOPE") {
                 scope.downloadAttribute(headers);
-            } else if(type.attributeScope.value == "LATEST_TELEMETRY") {
+            } else if(type.attributeScope.value === "LATEST_TELEMETRY") {
                 scope.downloadTelementry(headers, $event);
-            } else if(type.attributeScope.value == "LATEST_DEPTH_SERIES") {
+            } else if(type.attributeScope.value === "LATEST_DEPTH_SERIES") {
                 scope.downloadDepthSeries(headers, $event);
             }
         }
@@ -272,10 +272,10 @@ export default function AttributeTableDirective($compile, $templateCache, $rootS
 
         scope.checkSubscription = function() {
             var newSubscriptionId = null;
-            if (scope.entityId && scope.entityType && scope.attributeScope.clientSide && scope.mode != 'widget') {
+            if (scope.entityId && scope.entityType && scope.attributeScope.clientSide && scope.mode !== 'widget') {
                 newSubscriptionId = attributeService.subscribeForEntityAttributes(scope.entityType, scope.entityId, scope.attributeScope.value);
             }
-            if (scope.subscriptionId && scope.subscriptionId != newSubscriptionId) {
+            if (scope.subscriptionId && scope.subscriptionId !== newSubscriptionId) {
                 attributeService.unsubscribeForEntityAttributes(scope.subscriptionId);
             }
             scope.subscriptionId = newSubscriptionId;
@@ -463,7 +463,7 @@ export default function AttributeTableDirective($compile, $templateCache, $rootS
             }
 
             scope.widgetsIndexWatch = scope.$watch('widgetsCarousel.index', function(newVal, prevVal) {
-                if (scope.mode === 'widget' && (newVal != prevVal)) {
+                if (scope.mode === 'widget' && (newVal !== prevVal)) {
                     var index = scope.widgetsCarousel.index;
                     for (var i = 0; i < scope.widgetsList.length; i++) {
                         scope.widgetsList[i].splice(0, scope.widgetsList[i].length);
@@ -475,7 +475,7 @@ export default function AttributeTableDirective($compile, $templateCache, $rootS
             });
 
             scope.widgetsBundleWatch = scope.$watch('widgetsBundle', function(newVal, prevVal) {
-                if (scope.mode === 'widget' && (scope.firstBundle === true || newVal != prevVal)) {
+                if (scope.mode === 'widget' && (scope.firstBundle === true || newVal !== prevVal)) {
                     scope.widgetsList = [];
                     scope.widgetsListCache = [];
                     scope.widgetsCarousel.index = 0;

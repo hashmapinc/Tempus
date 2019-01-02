@@ -43,7 +43,7 @@ public interface TsKvRepository extends CrudRepository<TsKvEntity, TsKvComposite
                                       @Param("endTs") long endTs,
                                       Pageable pageable);
 
-    @Query("SELECT tskv.ts, tskv.key, tskv.booleanValue, tskv.strValue, tskv.longValue, tskv.doubleValue, tskv.jsonValue FROM TsKvEntity tskv WHERE tskv.entityId = :entityId " +
+    @Query("SELECT tskv.ts, tskv.key, tskv.booleanValue, tskv.strValue, tskv.longValue, tskv.doubleValue, tskv.jsonValue, tskv.unit FROM TsKvEntity tskv WHERE tskv.entityId = :entityId " +
             "AND tskv.entityType = :entityType " +
             "AND tskv.ts >= :startTs AND tskv.ts <= :endTs ORDER BY tskv.ts DESC")
     List<Object[]> findSelected(@Param("entityId") String entityId,

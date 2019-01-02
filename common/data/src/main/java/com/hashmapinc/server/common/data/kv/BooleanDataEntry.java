@@ -65,6 +65,7 @@ public class BooleanDataEntry extends BasicKvEntry {
     public String toString() {
         return "BooleanDataEntry{" +
                 "value=" + value +
+                ", unit=" + super.getUnit().orElse(null) +
                 "} " + super.toString();
     }
 

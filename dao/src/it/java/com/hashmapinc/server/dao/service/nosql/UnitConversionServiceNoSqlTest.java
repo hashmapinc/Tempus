@@ -14,37 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.hashmapinc.server.common.data.kv;
+package com.hashmapinc.server.dao.service.nosql;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import com.hashmapinc.server.dao.service.BaseUnitConversionServiceTest;
+import com.hashmapinc.server.dao.service.DaoNoSqlTest;
 
-import java.io.Serializable;
-import java.util.Optional;
-
-/**
- * Represents attribute or any other KV data entry
- *
- * @author ashvayka
- */
-public interface KvEntry extends Serializable {
-
-    String getKey();
-
-    DataType getDataType();
-
-    Optional<String> getStrValue();
-
-    Optional<Long> getLongValue();
-
-    Optional<Boolean> getBooleanValue();
-
-    Optional<Double> getDoubleValue();
-
-    Optional<JsonNode> getJsonValue();
-
-    String getValueAsString();
-
-    Object getValue();
-
-    Optional<String> getUnit();
+@DaoNoSqlTest
+public class UnitConversionServiceNoSqlTest extends BaseUnitConversionServiceTest {
 }

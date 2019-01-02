@@ -70,17 +70,20 @@ public final class TsKvLatestEntity implements ToData<TsKvEntry> {
     @Column(name = ModelConstants.JSON_VALUE_COLUMN)
     private JsonNode jsonValue;
 
+    @Column(name = ModelConstants.UNIT_COLUMN)
+    private String unit;
+
     @Override
     public TsKvEntry toData() {
         KvEntry kvEntry = null;
         if (strValue != null) {
-            kvEntry = new StringDataEntry(key, strValue);
+            kvEntry = new StringDataEntry(key, unit, strValue);
         } else if (longValue != null) {
-            kvEntry = new LongDataEntry(key, longValue);
+            kvEntry = new LongDataEntry(key, unit, longValue);
         } else if (doubleValue != null) {
-            kvEntry = new DoubleDataEntry(key, doubleValue);
+            kvEntry = new DoubleDataEntry(key, unit, doubleValue);
         } else if (booleanValue != null) {
-            kvEntry = new BooleanDataEntry(key, booleanValue);
+            kvEntry = new BooleanDataEntry(key, unit, booleanValue);
         } else if (jsonValue != null) {
             kvEntry = new JsonDataEntry(key, jsonValue);
         }

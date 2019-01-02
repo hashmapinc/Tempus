@@ -235,9 +235,7 @@ public class MetadataController extends BaseController {
             } else {
                 DeviceId deviceId = new DeviceId(toUUID(entityId));
                 Device device = checkDeviceId(deviceId);
-                /* TODO : Remove this comment when we have Device and DataModelObject mapping
                 dataModelObjectId = device.getDataModelObjectId();
-                */
             }
             checkDataModelObjectId(dataModelObjectId);
             keyAttribute = dataModelObjectService.findKeyAttributeByDataModelObjectId(dataModelObjectId);

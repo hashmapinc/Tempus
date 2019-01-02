@@ -34,9 +34,10 @@ public class SubscriptionUpdate {
         this.data = new TreeMap<>();
         for (TsKvEntry tsEntry : data) {
             List<Object> values = this.data.computeIfAbsent(tsEntry.getKey(), k -> new ArrayList<>());
-            Object[] value = new Object[2];
+            Object[] value = new Object[3];
             value[0] = tsEntry.getTs();
             value[1] = tsEntry.getValueAsString();
+            value[2] = tsEntry.getUnit().orElse("");
             values.add(value);
         }
     }
@@ -47,9 +48,10 @@ public class SubscriptionUpdate {
         this.data = new TreeMap<>();
         for (TsKvEntry tsEntry : data) {
             List<Object> values = this.data.computeIfAbsent(tsEntry.getKey(), k -> new ArrayList<>());
-            Object[] value = new Object[2];
+            Object[] value = new Object[3];
             value[0] = tsEntry.getTs() + timeZoneDiff;
             value[1] = tsEntry.getValueAsString();
+            value[2] = tsEntry.getUnit().orElse("");
             values.add(value);
         }
     }
