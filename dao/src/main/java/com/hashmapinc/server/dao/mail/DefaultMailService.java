@@ -21,6 +21,9 @@ import com.hashmapinc.server.common.data.User;
 import com.hashmapinc.server.common.data.UserSettings;
 import com.hashmapinc.server.common.data.exception.TempusErrorCode;
 import com.hashmapinc.server.common.data.exception.TempusException;
+import com.hashmapinc.server.common.data.id.TenantId;
+import com.hashmapinc.server.common.data.page.TextPageData;
+import com.hashmapinc.server.common.data.page.TextPageLink;
 import com.hashmapinc.server.dao.exception.IncorrectParameterException;
 import com.hashmapinc.server.dao.settings.UserSettingsService;
 import com.hashmapinc.server.dao.user.UserService;
@@ -41,6 +44,7 @@ import org.springframework.stereotype.Service;
 import javax.annotation.PostConstruct;
 import javax.mail.internet.MimeMessage;
 import java.io.StringWriter;
+import java.util.List;
 import java.util.Locale;
 import java.util.Properties;
 
@@ -82,8 +86,8 @@ public class DefaultMailService implements MailService {
         Properties properties = new Properties();
         properties.setProperty("input.encoding", "UTF-8");
         properties.setProperty("output.encoding", "UTF-8");
-        properties.setProperty("resource.loader", "class");
-        properties.setProperty("class.resource.loader.class", "org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader");
+        properties.setProperty("resource.loader", "classpath");
+        properties.setProperty("classpath.resource.loader.class", "org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader");
         VelocityEngine velocityEngine = new VelocityEngine(properties);
         return velocityEngine;
     }
@@ -206,10 +210,41 @@ public class DefaultMailService implements MailService {
         sendMail(mailSender, mailFrom, email, subject, message); 
     }
 
+    @Override
+    public void sendAttributeMissingMail(String deviceName, TenantId tenantId) throws TempusException {
+        TextPageData<User> userTextPageData = userService.findTenantAdmins(tenantId,new TextPageLink(300));
+        List<User> users = userTextPageData.getData();
+
+        String subject = messages.getMessage("attribute.missing.subject", null, Locale.US);
+
+        for (User user : users) {
+            String email = user.getEmail();
+            VelocityContext velocityContext = new VelocityContext();
+            velocityContext.put(TARGET_EMAIL, email);
+            //Need to add velocity template for the message
+            sendMail(mailSender, mailFrom, email, subject, "message");
+        }
+    }
+
+    @Override
+    public void sendAssetNotPresentMail(String deviceName, TenantId tenantId) throws TempusException {
+        TextPageData<User> userTextPageData = userService.findTenantAdmins(tenantId,new TextPageLink(300));
+        List<User> users = userTextPageData.getData();
+
+        String subject = messages.getMessage("asset.message.subject", null, Locale.US);
+
+        for (User user : users) {
+            String email = user.getEmail();
+            VelocityContext velocityContext = new VelocityContext();
+            velocityContext.put(TARGET_EMAIL, email);
+            //Need to add velocity template for the message
+            sendMail(mailSender, mailFrom, email, subject, "message");
+        }
+    }
 
     private void sendMail(JavaMailSenderImpl mailSender,
-            String mailFrom, String email,
-            String subject, String message) throws TempusException {
+                          String mailFrom, String email,
+                          String subject, String message) throws TempusException {
         try {
             MimeMessage mimeMsg = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(mimeMsg, UTF_8);
