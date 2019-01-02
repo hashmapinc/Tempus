@@ -30,8 +30,8 @@ import com.hashmapinc.server.common.data.page.TextPageLink;
 import com.hashmapinc.server.common.data.plugin.ComponentLifecycleEvent;
 import com.hashmapinc.server.common.data.security.Authority;
 import com.hashmapinc.server.dao.model.ModelConstants;
-import com.hashmapinc.server.exception.TempusErrorCode;
-import com.hashmapinc.server.exception.TempusException;
+import com.hashmapinc.server.common.data.exception.TempusErrorCode;
+import com.hashmapinc.server.common.data.exception.TempusException;
 import com.hashmapinc.server.service.computation.ComputationDiscoveryService;
 import com.hashmapinc.server.service.computation.ComputationFunctionService;
 import com.hashmapinc.server.service.computation.S3BucketService;
@@ -58,7 +58,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static com.hashmapinc.server.dao.service.Validator.validateId;
-import static com.hashmapinc.server.exception.TempusErrorCode.ITEM_NOT_FOUND;
+import static com.hashmapinc.server.common.data.exception.TempusErrorCode.ITEM_NOT_FOUND;
 
 @Slf4j
 @RestController

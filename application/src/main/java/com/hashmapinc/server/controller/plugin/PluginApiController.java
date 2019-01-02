@@ -23,7 +23,7 @@ import com.hashmapinc.server.common.data.id.UserId;
 import com.hashmapinc.server.common.data.plugin.PluginMetaData;
 import com.hashmapinc.server.controller.BaseController;
 import com.hashmapinc.server.dao.model.ModelConstants;
-import com.hashmapinc.server.exception.TempusException;
+import com.hashmapinc.server.common.data.exception.TempusException;
 import com.hashmapinc.server.extensions.api.plugins.PluginApiCallSecurityContext;
 import com.hashmapinc.server.extensions.api.plugins.PluginConstants;
 import com.hashmapinc.server.extensions.api.plugins.rest.BasicPluginRestMsg;

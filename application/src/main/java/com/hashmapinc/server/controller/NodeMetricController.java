@@ -17,7 +17,7 @@
 package com.hashmapinc.server.controller;
 
 import com.hashmapinc.server.common.data.cluster.NodeMetric;
-import com.hashmapinc.server.exception.TempusException;
+import com.hashmapinc.server.common.data.exception.TempusException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;

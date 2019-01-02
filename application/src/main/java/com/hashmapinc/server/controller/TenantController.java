@@ -25,7 +25,7 @@ import com.hashmapinc.server.common.data.Tenant;
 import com.hashmapinc.server.common.data.id.TenantId;
 import com.hashmapinc.server.common.data.page.TextPageData;
 import com.hashmapinc.server.dao.tenant.TenantService;
-import com.hashmapinc.server.exception.TempusException;
+import com.hashmapinc.server.common.data.exception.TempusException;
 
 @RestController
 @RequestMapping("/api")

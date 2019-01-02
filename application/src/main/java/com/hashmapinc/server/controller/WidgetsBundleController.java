@@ -23,7 +23,7 @@ import com.hashmapinc.server.common.data.page.TextPageLink;
 import com.hashmapinc.server.common.data.security.Authority;
 import com.hashmapinc.server.common.data.widget.WidgetsBundle;
 import com.hashmapinc.server.dao.model.ModelConstants;
-import com.hashmapinc.server.exception.TempusException;
+import com.hashmapinc.server.common.data.exception.TempusException;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;

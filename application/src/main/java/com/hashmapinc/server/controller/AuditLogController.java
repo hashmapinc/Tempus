@@ -25,7 +25,7 @@ import com.hashmapinc.server.common.data.id.CustomerId;
 import com.hashmapinc.server.common.data.id.EntityIdFactory;
 import com.hashmapinc.server.common.data.id.UserId;
 import com.hashmapinc.server.common.data.page.TimePageData;
-import com.hashmapinc.server.exception.TempusException;
+import com.hashmapinc.server.common.data.exception.TempusException;
 
 import java.util.UUID;
 

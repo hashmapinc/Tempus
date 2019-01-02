@@ -16,6 +16,7 @@
  */
 package com.hashmapinc.server.exception;
 
+import com.hashmapinc.server.common.data.exception.TempusErrorCode;
 import org.springframework.http.HttpStatus;
 
 import java.util.Date;

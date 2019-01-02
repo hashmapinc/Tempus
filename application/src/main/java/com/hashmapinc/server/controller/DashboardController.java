@@ -16,7 +16,6 @@
  */
 package com.hashmapinc.server.controller;
 
-import com.datastax.driver.core.utils.UUIDs;
 import com.hashmapinc.server.common.data.*;
 import com.hashmapinc.server.common.data.audit.ActionType;
 import com.hashmapinc.server.common.data.id.CustomerId;
@@ -28,7 +27,7 @@ import com.hashmapinc.server.common.data.page.TextPageLink;
 import com.hashmapinc.server.common.data.page.TimePageData;
 import com.hashmapinc.server.common.data.page.TimePageLink;
 import com.hashmapinc.server.common.data.security.Authority;
-import com.hashmapinc.server.exception.TempusException;
+import com.hashmapinc.server.common.data.exception.TempusException;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
