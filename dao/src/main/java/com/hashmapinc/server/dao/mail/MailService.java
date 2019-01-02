@@ -14,26 +14,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.hashmapinc.server.service.mail;
-
-import com.hashmapinc.server.exception.TempusException;
+package com.hashmapinc.server.dao.mail;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.hashmapinc.server.common.data.exception.TempusException;
 
 public interface MailService {
 
     void updateMailConfiguration();
 
     void sendEmail(String email, String subject, String message) throws TempusException;
-    
+
     void sendTestMail(JsonNode config, String email) throws TempusException;
-    
+
     void sendActivationEmail(String activationLink, String email) throws TempusException;
-    
+
     void sendAccountActivatedEmail(String loginLink, String email) throws TempusException;
-    
+
     void sendResetPasswordEmail(String passwordResetLink, String email) throws TempusException;
-    
+
     void sendPasswordWasResetEmail(String loginLink, String email) throws TempusException;
-    
+
 }

@@ -14,16 +14,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.hashmapinc.server.service.mail;
+package com.hashmapinc.server.dao.mail;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.hashmapinc.server.common.data.User;
 import com.hashmapinc.server.common.data.UserSettings;
+import com.hashmapinc.server.common.data.exception.TempusErrorCode;
+import com.hashmapinc.server.common.data.exception.TempusException;
 import com.hashmapinc.server.dao.exception.IncorrectParameterException;
 import com.hashmapinc.server.dao.settings.UserSettingsService;
 import com.hashmapinc.server.dao.user.UserService;
-import com.hashmapinc.server.exception.TempusErrorCode;
-import com.hashmapinc.server.exception.TempusException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.velocity.VelocityContext;
@@ -207,8 +207,8 @@ public class DefaultMailService implements MailService {
     }
 
 
-    private void sendMail(JavaMailSenderImpl mailSender, 
-            String mailFrom, String email, 
+    private void sendMail(JavaMailSenderImpl mailSender,
+            String mailFrom, String email,
             String subject, String message) throws TempusException {
         try {
             MimeMessage mimeMsg = mailSender.createMimeMessage();
