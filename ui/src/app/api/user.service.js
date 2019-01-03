@@ -536,6 +536,7 @@ function UserService($http, $q, $rootScope, adminService, dashboardService, logi
     }
 
     function forceDefaultPlace(to, params) {
+
         if (currentUser && isAuthenticated()) {
             if (currentUser.authority === 'TENANT_ADMIN' || currentUser.authority === 'CUSTOMER_USER') {
                 if ((userHasDefaultDashboard() && $rootScope.forceFullscreen) || isPublic()) {
@@ -546,9 +547,9 @@ function UserService($http, $q, $rootScope, adminService, dashboardService, logi
                             return true;
                         }
                     } else if (to.name === 'home.dashboards.dashboard' && allowedDashboardIds.indexOf(params.dashboardId) > -1) {
-                        return true;
+                        return false;
                     } else {
-                        return true;
+                        return false;
                     }
                 }
             }
