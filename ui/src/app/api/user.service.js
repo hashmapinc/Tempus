@@ -546,7 +546,7 @@ function UserService($http, $q, $rootScope, adminService, dashboardService, logi
                             return true;
                         }
                     } else if (to.name === 'home.dashboards.dashboard' && allowedDashboardIds.indexOf(params.dashboardId) > -1) {
-                        return false;
+                        return true;
                     } else {
                         return true;
                     }
