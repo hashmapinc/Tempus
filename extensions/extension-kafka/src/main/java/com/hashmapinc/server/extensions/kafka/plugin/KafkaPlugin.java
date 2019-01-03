@@ -34,7 +34,7 @@ import java.util.Properties;
 public class KafkaPlugin extends AbstractPlugin<KafkaPluginConfiguration> {
 
     private KafkaMsgHandler handler;
-    private Producer<?, String> producer;
+    private Producer<String, String> producer;
     private final Properties properties = new Properties();
 
     @Override
@@ -56,7 +56,7 @@ public class KafkaPlugin extends AbstractPlugin<KafkaPluginConfiguration> {
 
     private void init() {
         try {
-            this.producer = new KafkaProducer<>(properties);
+            this.producer = new KafkaProducer<String, String>(properties);
             this.handler = new KafkaMsgHandler(producer);
         } catch (Exception e) {
             log.error("Failed to start kafka producer", e);
