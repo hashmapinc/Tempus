@@ -721,8 +721,16 @@ public abstract class BaseController {
 
         final Supplier<Stream<UserPermission>> readableAndResourceAccessibleStream = getReadableAndResourceAccessibleStream(user, entityType);
 
+        final long count = readableAndResourceAccessibleStream.get().map(UserPermission::getResourceAttributes).count();
+
+        if(count == 0){ //case: {USER}::READ
+            throw new IncorrectParameterException(NO_PERMISSION_TO_READ);
+        }
+
         final boolean hasPermOnAllResources =
-                readableAndResourceAccessibleStream.get().map(UserPermission::getResourceAttributes).anyMatch(Objects::isNull); //case: {USER}:*:READ
+                readableAndResourceAccessibleStream.get().map(UserPermission::getResourceAttributes)
+                        .filter(map -> !Objects.isNull(map))
+                        .anyMatch(Map::isEmpty); //case: {USER}:*:READ
 
         Map<DataModelObjectId, Set<? extends EntityId>> dataModelIdAndEntityIdSpec = new HashMap<>();
 

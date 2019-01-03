@@ -62,8 +62,14 @@ public class UserPermission {
 
         String[] resourcesExpression = expressionTokens[1].split("\\?", 2);
 
-        if(resourcesExpression[0].trim().equals("*"))
+        if(resourcesExpression[0].trim().equals("*")) {
             this.resources = Arrays.asList(EntityType.values());
+            this.resourceAttributes = Collections.emptyMap();
+        }
+        else if(resourcesExpression[0].trim().equals("")) {
+            this.resources = null;
+            this.resourceAttributes = null;
+        }
         else {
             this.resources = Collections.singletonList(new EnumUtil<>(EntityType.class).parse(resourcesExpression[0]));
             this.resourceAttributes = (resourcesExpression.length == 2) ? getQueryAttributes(resourcesExpression[1]) : Collections.emptyMap();
