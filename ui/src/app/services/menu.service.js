@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import tempusApiUser from '../api/user.service';
+import tempusApiUser from '../api/user.service'; 
 import tempusApiDatamodel from '../api/datamodel.service';
 import tempusApiCustomer from '../api/customer.service';
 import tempusApiDashboard from '../api/dashboard.service';
@@ -460,17 +460,7 @@ function Menu(userService, $state, $rootScope, $log,datamodelService,customerSer
                     });
 
                     homeSections =
-                        [{
-                            name: 'asset.view-assets',
-                            places: [
-                                {
-                                    name: 'asset.assets',
-                                    icon: 'domain',
-                                    state: 'home.assets',
-                                    link: '/static/svg/assetslightgray.svg'
-                                }
-                            ]
-                        },
+                        [
                             {
                                 name: 'device.view-devices',
                                 places: [
