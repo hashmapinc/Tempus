@@ -18,8 +18,10 @@ package com.hashmapinc.server.transport.mqtt;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.hashmapinc.server.common.data.Device;
+import com.hashmapinc.server.common.data.Event;
 import com.hashmapinc.server.common.data.security.DeviceTokenCredentials;
 import com.hashmapinc.server.common.data.security.DeviceX509Credentials;
+import com.hashmapinc.server.common.msg.core.DeviceEventUploadRequest;
 import com.hashmapinc.server.common.msg.session.AdaptorToSessionActorMsg;
 import com.hashmapinc.server.common.msg.session.BasicToDeviceActorSessionMsg;
 import com.hashmapinc.server.common.msg.session.MsgType;
@@ -32,26 +34,26 @@ import com.hashmapinc.server.dao.EncryptionUtil;
 import com.hashmapinc.server.dao.asset.AssetService;
 import com.hashmapinc.server.dao.attributes.AttributesService;
 import com.hashmapinc.server.dao.device.DeviceService;
+import com.hashmapinc.server.dao.event.EventService;
 import com.hashmapinc.server.dao.mail.MailService;
 import com.hashmapinc.server.dao.relation.RelationService;
 import com.hashmapinc.server.transport.mqtt.adaptors.MqttTransportAdaptor;
 import com.hashmapinc.server.transport.mqtt.session.DeviceSessionCtx;
 import com.hashmapinc.server.transport.mqtt.session.GatewaySessionCtx;
+import com.hashmapinc.server.transport.mqtt.sparkplug.SparkPlugDecodeService;
 import com.hashmapinc.server.transport.mqtt.sparkplug.SparkPlugMsgTypes;
+import com.hashmapinc.server.transport.mqtt.sparkplug.SparkPlugUtils;
+import com.hashmapinc.server.transport.mqtt.sparkplug.data.SparkPlugMetaData;
 import com.hashmapinc.server.transport.mqtt.util.SslUtil;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.handler.codec.mqtt.*;
-import io.netty.handler.codec.mqtt.MqttConnectReturnCode;
-import io.netty.handler.codec.mqtt.MqttQoS;
 import io.netty.handler.ssl.SslHandler;
 import io.netty.util.concurrent.Future;
 import io.netty.util.concurrent.GenericFutureListener;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.StringUtils;
-import com.hashmapinc.server.transport.mqtt.sparkplug.data.SparkPlugMetaData;
-import com.hashmapinc.server.transport.mqtt.sparkplug.SparkPlugDecodeService;
-import com.hashmapinc.server.transport.mqtt.sparkplug.SparkPlugUtils;
+
 import javax.net.ssl.SSLPeerUnverifiedException;
 import javax.security.cert.X509Certificate;
 import java.net.InetSocketAddress;
@@ -83,6 +85,7 @@ public class MqttTransportHandler extends ChannelInboundHandlerAdapter implement
     private final AssetService assetService;
     private final SslHandler sslHandler;
     private final MailService mailService;
+    private final EventService eventService;
     private static final String SPARK_PLUG_NAME_SPACE = "spBv1.0";
     private volatile boolean connected;
     private volatile GatewaySessionCtx gatewaySessionCtx;
@@ -90,7 +93,8 @@ public class MqttTransportHandler extends ChannelInboundHandlerAdapter implement
     private SparkPlugUtils sparkPlugUtils;
 
     public MqttTransportHandler(SessionMsgProcessor processor, DeviceService deviceService, DeviceAuthService authService, RelationService relationService,
-                                MqttTransportAdaptor adaptor, SslHandler sslHandler, QuotaService quotaService , AttributesService attributesService ,AssetService assetService, MailService mailService) {
+                                MqttTransportAdaptor adaptor, SslHandler sslHandler, QuotaService quotaService , AttributesService attributesService,
+                                AssetService assetService, EventService eventService, MailService mailService) {
         this.processor = processor;
         this.deviceService = deviceService;
         this.relationService = relationService;
@@ -103,6 +107,7 @@ public class MqttTransportHandler extends ChannelInboundHandlerAdapter implement
         this.attributesService = attributesService;
         this.assetService = assetService;
         this.mailService = mailService;
+        this.eventService = eventService;
     }
 
     @Override
@@ -207,11 +212,12 @@ public class MqttTransportHandler extends ChannelInboundHandlerAdapter implement
         try {
             if (topicName.equals(MqttTopics.DEVICE_TELEMETRY_TOPIC)) {
                 msg = adaptor.convertToActorMsg(deviceSessionCtx, MsgType.POST_TELEMETRY_REQUEST, mqttMsg);
-            }else if(topicName.equals(MqttTopics.DEVICE_DEPTH_TELEMETRY_TOPIC)){
+            } else if (topicName.equals(MqttTopics.DEVICE_DEPTH_TELEMETRY_TOPIC)){
                 msg = adaptor.convertToActorMsg(deviceSessionCtx, MsgType.POST_TELEMETRY_REQUEST_DEPTH, mqttMsg);
-            }
-            else if (topicName.equals(MqttTopics.DEVICE_ATTRIBUTES_TOPIC)) {
+            } else if (topicName.equals(MqttTopics.DEVICE_ATTRIBUTES_TOPIC)) {
                 msg = adaptor.convertToActorMsg(deviceSessionCtx, MsgType.POST_ATTRIBUTES_REQUEST, mqttMsg);
+            } else if (topicName.equals(MqttTopics.DEVICE_EVENT_TOPIC)) {
+                saveEventForDevice(adaptor.convertToActorMsg(deviceSessionCtx, MsgType.POST_DEVICE_EVENT, mqttMsg));
             } else if (topicName.startsWith(MqttTopics.DEVICE_ATTRIBUTES_REQUEST_TOPIC_PREFIX)) {
                 msg = adaptor.convertToActorMsg(deviceSessionCtx, MsgType.GET_ATTRIBUTES_REQUEST, mqttMsg);
                 if (msgId >= 0) {
@@ -237,6 +243,16 @@ public class MqttTransportHandler extends ChannelInboundHandlerAdapter implement
             log.info("[{}] Closing current session due to invalid publish msg [{}][{}]", sessionId, topicName, msgId);
             ctx.close();
         }
+    }
+
+    private void saveEventForDevice(AdaptorToSessionActorMsg msg) {
+        Event event = new Event();
+        Device device = deviceSessionCtx.getDevice();
+        event.setEntityId(device.getId());
+        event.setTenantId(device.getTenantId());
+        event.setType("LC_EVENT");
+        event.setBody(((DeviceEventUploadRequest)msg.getMsg()).getEventInfo());
+        eventService.save(event);
     }
 
     private void processSubscribe(ChannelHandlerContext ctx, MqttSubscribeMessage mqttMsg) {

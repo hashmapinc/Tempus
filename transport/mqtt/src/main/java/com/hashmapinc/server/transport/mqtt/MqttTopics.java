@@ -32,6 +32,7 @@ public class MqttTopics {
     public static final String DEVICE_TELEMETRY_TOPIC = BASE_DEVICE_API_TOPIC + "/telemetry";
     public static final String DEVICE_ATTRIBUTES_TOPIC = BASE_DEVICE_API_TOPIC + "/attributes";
     public static final String DEVICE_DEPTH_TELEMETRY_TOPIC = BASE_DEVICE_API_TOPIC + "/depth/telemetry";
+    public static final String DEVICE_EVENT_TOPIC = BASE_DEVICE_API_TOPIC + "/events";
 
     public static final String BASE_GATEWAY_API_TOPIC = "v1/gateway";
     public static final String GATEWAY_CONNECT_TOPIC = BASE_GATEWAY_API_TOPIC + "/connect";

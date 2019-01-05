@@ -17,6 +17,7 @@
 package com.hashmapinc.server.transport.mqtt.adaptors;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
@@ -43,6 +44,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import com.hashmapinc.server.transport.mqtt.MqttTransportHandler;
 import com.hashmapinc.server.transport.mqtt.sparkplug.SparkPlugEncodeService;
+
+import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.*;
 
@@ -97,6 +100,9 @@ public class JsonMqttAdaptor implements MqttTransportAdaptor {
                 break;
             case TO_SERVER_RPC_REQUEST:
                 msg = convertToServerRpcRequest(ctx, (MqttPublishMessage) inbound);
+                break;
+            case POST_DEVICE_EVENT:
+                msg = convertToDeviceEventMsg(ctx, (MqttPublishMessage) inbound);
                 break;
             default:
                 log.warn("[{}] Unsupported msg type: {}!", ctx.getSessionId(), type);
@@ -318,6 +324,19 @@ public class JsonMqttAdaptor implements MqttTransportAdaptor {
             Integer requestId = Integer.valueOf(topicName.substring(MqttTopics.DEVICE_RPC_REQUESTS_TOPIC.length()));
             return JsonConverter.convertToServerRpcRequest(new JsonParser().parse(payload), requestId);
         } catch (IllegalStateException | JsonSyntaxException ex) {
+            throw new AdaptorException(ex);
+        }
+    }
+
+    private FromDeviceMsg convertToDeviceEventMsg(DeviceSessionCtx ctx, MqttPublishMessage inbound) throws AdaptorException {
+        String payload = validatePayload(ctx.getSessionId(), inbound.payload());
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            JsonNode eventInfo = mapper.readTree(payload);
+            DeviceEventUploadRequest request = new DeviceEventUploadRequest(inbound.variableHeader().packetId());
+            request.setEventInfo(eventInfo);
+            return request;
+        } catch (IOException ex) {
             throw new AdaptorException(ex);
         }
     }
