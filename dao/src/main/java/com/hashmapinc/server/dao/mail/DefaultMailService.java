@@ -55,6 +55,8 @@ public class DefaultMailService implements MailService {
     public static final String MAIL_PROP = "mail.";
     public static final String TARGET_EMAIL = "targetEmail";
     public static final String UTF_8 = "UTF-8";
+    private static final String DEVICE_NAME = "deviceName";
+    private static final String ASSET_NAME = "assetName";
     @Autowired
     private MessageSource messages;
     
@@ -149,7 +151,7 @@ public class DefaultMailService implements MailService {
         VelocityContext velocityContext = new VelocityContext();
         velocityContext.put(TARGET_EMAIL, email);
 
-        String message = mergeVelocityTemplate("test.vm", velocityContext);
+        String message = mergeVelocityTemplate("templates/test.vm", velocityContext);
 
         sendMail(testMailSender, from, email, subject, message);
     }
@@ -163,7 +165,7 @@ public class DefaultMailService implements MailService {
         velocityContext.put("activationLink", activationLink);
         velocityContext.put(TARGET_EMAIL, email);
 
-        String message = mergeVelocityTemplate("activation.vm", velocityContext);
+        String message = mergeVelocityTemplate("templates/activation.vm", velocityContext);
 
         sendMail(mailSender, mailFrom, email, subject, message); 
     }
@@ -177,7 +179,7 @@ public class DefaultMailService implements MailService {
         velocityContext.put("loginLink", loginLink);
         velocityContext.put(TARGET_EMAIL, email);
 
-        String message = mergeVelocityTemplate("account.activated.vm", velocityContext);
+        String message = mergeVelocityTemplate("templates/account.activated.vm", velocityContext);
 
         sendMail(mailSender, mailFrom, email, subject, message); 
     }
@@ -191,7 +193,7 @@ public class DefaultMailService implements MailService {
         velocityContext.put("passwordResetLink", passwordResetLink);
         velocityContext.put(TARGET_EMAIL, email);
 
-        String message = mergeVelocityTemplate("reset.password.vm", velocityContext);
+        String message = mergeVelocityTemplate("templates/reset.password.vm", velocityContext);
 
         sendMail(mailSender, mailFrom, email, subject, message); 
     }
@@ -205,7 +207,7 @@ public class DefaultMailService implements MailService {
         velocityContext.put("loginLink", loginLink);
         velocityContext.put(TARGET_EMAIL, email);
 
-        String message = mergeVelocityTemplate("password.was.reset.vm", velocityContext);
+        String message = mergeVelocityTemplate("templates/password.was.reset.vm", velocityContext);
 
         sendMail(mailSender, mailFrom, email, subject, message); 
     }
@@ -216,29 +218,36 @@ public class DefaultMailService implements MailService {
         List<User> users = userTextPageData.getData();
 
         String subject = messages.getMessage("attribute.missing.subject", null, Locale.US);
+        subject = subject + " of " + deviceName + " missing";
 
         for (User user : users) {
             String email = user.getEmail();
             VelocityContext velocityContext = new VelocityContext();
+            velocityContext.put(DEVICE_NAME,deviceName);
             velocityContext.put(TARGET_EMAIL, email);
-            //Need to add velocity template for the message
-            sendMail(mailSender, mailFrom, email, subject, "message");
+            String message = mergeVelocityTemplate("templates/attribute.missing.vm", velocityContext);
+
+            sendMail(mailSender, mailFrom, email, subject, message);
         }
     }
 
     @Override
-    public void sendAssetNotPresentMail(String deviceName, TenantId tenantId) throws TempusException {
+    public void sendAssetNotPresentMail(String deviceName, String assetName , TenantId tenantId) throws TempusException {
         TextPageData<User> userTextPageData = userService.findTenantAdmins(tenantId,new TextPageLink(300));
         List<User> users = userTextPageData.getData();
 
         String subject = messages.getMessage("asset.message.subject", null, Locale.US);
+        subject = subject + " " + assetName + " of " + deviceName + " is absent";
 
         for (User user : users) {
             String email = user.getEmail();
             VelocityContext velocityContext = new VelocityContext();
             velocityContext.put(TARGET_EMAIL, email);
-            //Need to add velocity template for the message
-            sendMail(mailSender, mailFrom, email, subject, "message");
+            velocityContext.put(DEVICE_NAME,deviceName);
+            velocityContext.put(ASSET_NAME,assetName);
+            String message = mergeVelocityTemplate("templates/asset.absent.vm", velocityContext);
+
+            sendMail(mailSender, mailFrom, email, subject, message);
         }
     }
 

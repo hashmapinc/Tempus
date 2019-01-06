@@ -270,22 +270,32 @@ public class GatewaySessionCtx {
                 Set<AttributeKvEntry> attributeKvEntries = request.getAttributes();
 
                 Optional<AttributeKvEntry> parentAssetAttribute = findParentAssetAttribute(attributeKvEntries);
-                if(parentAssetAttribute.isPresent()) {
-                    Device device = deviceService.findDeviceByTenantIdAndName(gateway.getTenantId(), deviceName);
-                    try {
-                        Optional<AttributeKvEntry> savedParentAssetAttribute = attributesService.find(device.getId(), DataConstants.CLIENT_SCOPE, PARENT_ASSET).get();
-                        savedParentAssetAttribute.ifPresent(attributeKvEntry -> deleteParentAssetRelation(device, attributeKvEntry));
-                        createParentAssetRelationWithDevice(device,parentAssetAttribute.get().getValueAsString());
+
+                Device device = deviceService.findDeviceByTenantIdAndName(gateway.getTenantId(), deviceName);
+                try {
+                    Optional<AttributeKvEntry> savedParentAssetAttribute = attributesService.find(device.getId(), DataConstants.CLIENT_SCOPE, PARENT_ASSET).get();
+
+
+                    if (parentAssetAttribute.isPresent()) {
+                        try {
+                            savedParentAssetAttribute.ifPresent(attributeKvEntry -> deleteParentAssetRelation(device, attributeKvEntry));
+                            createParentAssetRelationWithDevice(device, parentAssetAttribute.get().getValueAsString());
+                        } catch (Exception exp) {
+                            log.warn("Failed to fetch parentAssetAttribute : [{}]", parentAssetAttribute.get().getKey());
+                        }
+                    } else {
+                        if (savedParentAssetAttribute.isEmpty()) {
+                            try {
+                                sendParentAssetMissingEmail(deviceName, gateway.getTenantId());
+                            } catch (Exception ex) {
+                                //Need to lod the exception exception
+                                log.warn("Failed to send the  parentAssetAttributeMissingEmail of deviceName: [{}]", deviceName);
+                            }
+                        }
                     }
-                    catch(Exception exp) {
-                        log.warn("Failed to fetch parentAssetAttribute : [{}]", parentAssetAttribute.get().getKey());                    }
-                }else {
-                    try {
-                        sendParentAssetMissingEmail(deviceName, gateway.getTenantId());
-                    }catch (Exception ex){
-                        //Need to lod the exception exception
-                        log.warn("Failed to send the  parentAssetAttributeMissingEmail of deviceName: [{}]",deviceName) ;
-                    }
+                }catch (Exception exp){
+                    log.warn("Failed to fetch parentAssetAttribute : [{}]", parentAssetAttribute.get().getKey());
+
                 }
 
                 GatewayDeviceSessionCtx deviceSessionCtx = devices.get(deviceName);
@@ -300,6 +310,7 @@ public class GatewaySessionCtx {
 
     private void sendParentAssetMissingEmail(String deviceName , TenantId tenantId) throws TempusException {
         mailService.sendAttributeMissingMail(deviceName,tenantId);
+
     }
 
     private void createParentAssetRelationWithDevice(Device device,String assetName) {
@@ -311,7 +322,7 @@ public class GatewaySessionCtx {
 
         if(asset.isEmpty()){
             try {
-                sendAssetNotPresentEmail(device.getName(), gateway.getTenantId());
+                sendAssetNotPresentEmail(device.getName(),assetName, gateway.getTenantId());
             }catch (Exception ex){
                 //Need to lod the exception exception
                 log.warn("Failed to send the  parentAssetAttributeMissingEmail of deviceName: [{}]",device.getName()) ;
@@ -319,8 +330,8 @@ public class GatewaySessionCtx {
         }
     }
 
-    private void sendAssetNotPresentEmail(String deviceName , TenantId tenantId) throws TempusException {
-        mailService.sendAssetNotPresentMail(deviceName,tenantId);
+    private void sendAssetNotPresentEmail(String deviceName ,String assetName, TenantId tenantId) throws TempusException {
+        mailService.sendAssetNotPresentMail(deviceName,assetName,tenantId);
     }
 
     private void deleteParentAssetRelation(Device device ,AttributeKvEntry  parentAssetAttribute) {

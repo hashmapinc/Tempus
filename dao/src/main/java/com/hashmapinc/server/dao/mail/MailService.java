@@ -38,5 +38,5 @@ public interface MailService {
 
     void sendAttributeMissingMail(String deviceName , TenantId tenantId) throws TempusException;
 
-    void sendAssetNotPresentMail(String deviceName , TenantId tenantId) throws TempusException;
+    void sendAssetNotPresentMail(String deviceName ,String assetName, TenantId tenantId) throws TempusException;
 }
