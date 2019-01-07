@@ -536,6 +536,7 @@ function UserService($http, $q, $rootScope, adminService, dashboardService, logi
     }
 
     function forceDefaultPlace(to, params) {
+
         if (currentUser && isAuthenticated()) {
             if (currentUser.authority === 'TENANT_ADMIN' || currentUser.authority === 'CUSTOMER_USER') {
                 if ((userHasDefaultDashboard() && $rootScope.forceFullscreen) || isPublic()) {
@@ -548,7 +549,7 @@ function UserService($http, $q, $rootScope, adminService, dashboardService, logi
                     } else if (to.name === 'home.dashboards.dashboard' && allowedDashboardIds.indexOf(params.dashboardId) > -1) {
                         return false;
                     } else {
-                        return true;
+                        return false;
                     }
                 }
             }
@@ -592,7 +593,8 @@ function UserService($http, $q, $rootScope, adminService, dashboardService, logi
         return (currentUser && currentUser.isPublic) ||
                (currentUserDetails.additionalInfo &&
                 currentUserDetails.additionalInfo.defaultDashboardFullscreen &&
-                currentUserDetails.additionalInfo.defaultDashboardFullscreen === true);
+                (currentUserDetails.additionalInfo.defaultDashboardFullscreen === true
+                || currentUserDetails.additionalInfo.defaultDashboardFullscreen === 'true'));
     }
 
     function userHasProfile() {
