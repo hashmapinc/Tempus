@@ -313,6 +313,14 @@ function Menu(userService, $state, $rootScope, $log,datamodelService,customerSer
                             type: 'link',
                             state: 'home.gateway',
                             icon: 'settings_applications'
+                        },
+
+                        {
+                            name: 'templateEditor.templateEditor',
+                            type: 'link',
+                            state: 'home.templateeditor',
+                            icon: 'template_editor',
+                            link: '/static/svg/computationslightgray.svg'
                         }
 
                         ];

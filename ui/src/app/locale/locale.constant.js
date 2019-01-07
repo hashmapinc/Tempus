@@ -345,6 +345,13 @@ export default angular.module('tempus.locale', [])
                     "crash":"Crashed"
 
                 },
+                "templateEditor" :{
+
+                    "templateEditor":"Template Editor",
+                    "title":"Template Editor",
+                    "add-template-text": "Add New Template"
+
+                },
                 "audit-log": {
                     "audit": "Audit",
                     "audit-logs": "Audit Logs",
