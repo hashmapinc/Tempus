@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.hashmapinc.server.dao.service.mail;
+package mail;
 
 import com.hashmapinc.server.common.data.User;
 import com.hashmapinc.server.common.data.exception.TempusException;
@@ -22,8 +22,8 @@ import com.hashmapinc.server.common.data.id.TenantId;
 import com.hashmapinc.server.common.data.page.TextPageData;
 import com.hashmapinc.server.common.data.page.TextPageLink;
 import com.hashmapinc.server.common.data.security.Authority;
+import com.hashmapinc.server.dao.exception.IncorrectParameterException;
 import com.hashmapinc.server.dao.mail.DefaultMailService;
-import com.hashmapinc.server.dao.service.AbstractServiceTest;
 import com.hashmapinc.server.dao.user.UserService;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.VelocityEngine;
@@ -48,7 +48,7 @@ import java.util.UUID;
 import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
-public abstract class BaseMailServiceTest extends AbstractServiceTest {
+public  class MailServiceTest {
 
     @InjectMocks
     private DefaultMailService defaultMailService;
@@ -65,6 +65,9 @@ public abstract class BaseMailServiceTest extends AbstractServiceTest {
 
     private TenantId tenantId;
     private User tenantAdmin1;
+    private User tenantAdmin2;
+
+    public static final String INCORRECT_TENANT_ID = "Incorrect tenantId ";
 
     @Before
     public void setup(){
@@ -75,10 +78,15 @@ public abstract class BaseMailServiceTest extends AbstractServiceTest {
         tenantAdmin1.setAuthority(Authority.TENANT_ADMIN);
         tenantAdmin1.setTenantId(tenantId);
         tenantAdmin1.setEmail("tenant1@tempus.org");
+
+        tenantAdmin2 = new User();
+        tenantAdmin2.setAuthority(Authority.TENANT_ADMIN);
+        tenantAdmin2.setTenantId(tenantId);
+        tenantAdmin2.setEmail("tenant1@tempus.org");
     }
 
     @Test
-    public void testMailService() throws TempusException {
+    public void testSendAttributeMissingMailWithOneTenantUser() throws TempusException {
         List<User> users = new ArrayList<>();
         users.add(tenantAdmin1);
         TextPageData< User > userTextPageData = new TextPageData<>(users,null,false);
@@ -92,6 +100,40 @@ public abstract class BaseMailServiceTest extends AbstractServiceTest {
         defaultMailService.sendAttributeMissingMail("device_1",tenantId);
 
         Mockito.verify(mailSender,times(1)).send(Mockito.any(MimeMessage.class));
+    }
+
+    @Test
+    public void testSendAttributeMissingMailWithTwoTenantUser() throws TempusException {
+        List<User> users = new ArrayList<>();
+        users.add(tenantAdmin1);
+        users.add(tenantAdmin2);
+        TextPageData< User > userTextPageData = new TextPageData<>(users,null,false);
+
+        when(userService.findTenantAdmins(Mockito.any(TenantId.class),Mockito.any(TextPageLink.class))).thenReturn(userTextPageData);
+        when(messages.getMessage("attribute.missing.subject", null, Locale.US)).thenReturn("Tempus - parent_asset attribute");
+        when(engine.mergeTemplate(Mockito.anyString(), Mockito.anyString(), Mockito.any(VelocityContext.class), Mockito.any(StringWriter.class))).thenReturn(true);
+        when(mailSender.createMimeMessage()).thenReturn(mimeMessage);
+        doNothing().when(mailSender).send(Mockito.any(MimeMessage.class));
+
+        defaultMailService.sendAttributeMissingMail("device_1",tenantId);
+
+        Mockito.verify(mailSender,times(2)).send(Mockito.any(MimeMessage.class));
+    }
+
+    @Test(expected = IncorrectParameterException.class)
+    public void testSendAttributeMissingMailWithInvalidTenantId() throws TempusException {
+        List<User> users = new ArrayList<>();
+        users.add(tenantAdmin1);
+
+        TextPageData< User > userTextPageData = new TextPageData<>(users,null,false);
+
+        tenantId = null;
+        String exceptionMessage = INCORRECT_TENANT_ID + tenantId;
+        when(userService.findTenantAdmins(Mockito.any(TenantId.class),Mockito.any(TextPageLink.class))).thenThrow(new IncorrectParameterException(exceptionMessage));
+
+        defaultMailService.sendAttributeMissingMail("device_1",tenantId);
+
+        Mockito.verify(mailSender,times(0)).send(Mockito.any(MimeMessage.class));
     }
 
 }
