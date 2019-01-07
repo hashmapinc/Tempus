@@ -275,27 +275,15 @@ public class GatewaySessionCtx {
                 try {
                     Optional<AttributeKvEntry> savedParentAssetAttribute = attributesService.find(device.getId(), DataConstants.CLIENT_SCOPE, PARENT_ASSET).get();
 
-
                     if (parentAssetAttribute.isPresent()) {
-                        try {
-                            savedParentAssetAttribute.ifPresent(attributeKvEntry -> deleteParentAssetRelation(device, attributeKvEntry));
-                            createParentAssetRelationWithDevice(device, parentAssetAttribute.get().getValueAsString());
-                        } catch (Exception exp) {
-                            log.warn("Failed to fetch parentAssetAttribute : [{}]", parentAssetAttribute.get().getKey());
-                        }
-                    } else {
-                        if (savedParentAssetAttribute.isEmpty()) {
-                            try {
-                                sendParentAssetMissingEmail(deviceName, gateway.getTenantId());
-                            } catch (Exception ex) {
-                                //Need to lod the exception exception
-                                log.warn("Failed to send the  parentAssetAttributeMissingEmail of deviceName: [{}]", deviceName);
-                            }
-                        }
+                        savedParentAssetAttribute.ifPresent(attributeKvEntry -> deleteParentAssetRelation(device, attributeKvEntry));
+                        createParentAssetRelationWithDevice(device, parentAssetAttribute.get().getValueAsString());
                     }
+                    else if (savedParentAssetAttribute.isEmpty())
+                        sendParentAssetMissingEmail(deviceName, gateway.getTenantId());
+
                 }catch (Exception exp){
                     log.warn("Failed to fetch parentAssetAttribute : [{}]", parentAssetAttribute.get().getKey());
-
                 }
 
                 GatewayDeviceSessionCtx deviceSessionCtx = devices.get(deviceName);
@@ -309,8 +297,11 @@ public class GatewaySessionCtx {
 
 
     private void sendParentAssetMissingEmail(String deviceName , TenantId tenantId) throws TempusException {
-        mailService.sendAttributeMissingMail(deviceName,tenantId);
-
+        try {
+            mailService.sendAttributeMissingMail(deviceName,tenantId);
+        }catch (TempusException tempusException) {
+            log.warn(tempusException.getMessage());
+        }
     }
 
     private void createParentAssetRelationWithDevice(Device device,String assetName) {
