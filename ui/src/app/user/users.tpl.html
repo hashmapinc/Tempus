@@ -1,6 +1,7 @@
 <!--
 
-    Copyright © 2016-2017 The Thingsboard Authors
+    Copyright © 2016-2018 The Thingsboard Authors
+    Modifications © 2017-2018 Hashmap, Inc
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -19,10 +20,26 @@
 	<details-buttons tb-help="'users'" help-container-id="help-container">
 		<div id="help-container"></div>
 	</details-buttons>
-	<tb-user user="vm.grid.operatingItem()"
-			 is-edit="vm.grid.detailsConfig.isDetailsEditMode"
-			 the-form="vm.grid.detailsForm"
-			 on-display-activation-link="vm.displayActivationLink(event, vm.grid.detailsConfig.currentItem)"
-			 on-resend-activation="vm.resendActivation(vm.grid.detailsConfig.currentItem)"
-			 on-delete-user="vm.grid.deleteItem(event, vm.grid.detailsConfig.currentItem)"></tb-user>
+	<md-tabs ng-class="{'tb-headless': vm.grid.detailsConfig.isDetailsEditMode}"
+			 id="tabs" md-border-bottom flex class="tb-absolute-fill">
+		<md-tab label="{{ 'user.details' | translate }}">
+			<tb-user user="vm.grid.operatingItem()"
+					 is-edit="vm.grid.detailsConfig.isDetailsEditMode"
+					 the-form="vm.grid.detailsForm"
+					 on-display-activation-link="vm.displayActivationLink(event, vm.grid.detailsConfig.currentItem)"
+					 on-resend-activation="vm.resendActivation(vm.grid.detailsConfig.currentItem)"
+					 on-delete-user="vm.grid.deleteItem(event, vm.grid.detailsConfig.currentItem)"></tb-user>
+		</md-tab>
+		<md-tab ng-if="!vm.grid.detailsConfig.isDetailsEditMode && vm.grid.isTenantAdmin()" md-on-select="vm.grid.triggerResize()" label="{{ 'audit-log.audit-logs' | translate }}">
+			<tb-audit-log-table flex user-id="vm.grid.operatingItem().id.id"
+								audit-log-mode="{{vm.types.auditLogMode.user}}">
+			</tb-audit-log-table>
+		</md-tab>
+		<md-tab ng-if="vm.grid.isTenantAdmin()" label="{{ 'user.assigned-group-tab' | translate }}">
+
+			<tb-assign-user-group-detail flex user-id="vm.grid.operatingItem().id.id" ent-type="user"></tb-assign-user-group-detail>
+
+		</md-tab>
+
+	</md-tabs>
 </tb-grid>

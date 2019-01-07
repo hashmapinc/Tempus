@@ -1,5 +1,6 @@
 /*
- * Copyright © 2016-2017 The Thingsboard Authors
+ * Copyright © 2016-2018 The Thingsboard Authors
+ * Modifications © 2017-2018 Hashmap, Inc
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-export default angular.module('thingsboard.api.alarm', [])
+export default angular.module('tempus.api.alarm', [])
     .factory('alarmService', AlarmService)
     .name;
 
@@ -295,9 +296,8 @@ function AlarmService($http, $q, $interval, $filter, $timeout, utils, types) {
                     if (alarmSourceListener.lastUpdateTs) {
                         var interval = now - alarmSourceListener.lastUpdateTs;
                         alarmSourceListener.alarmsQuery.startTime += interval;
-                    } else {
-                        alarmSourceListener.lastUpdateTs = now;
                     }
+                    alarmSourceListener.lastUpdateTs = now;
                 }
                 alarmSourceListener.alarmsUpdated(alarms, false);
             }

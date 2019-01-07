@@ -1,5 +1,6 @@
 /*
- * Copyright © 2016-2017 The Thingsboard Authors
+ * Copyright © 2016-2018 The Thingsboard Authors
+ * Modifications © 2017-2018 Hashmap, Inc
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -46,122 +47,170 @@ export default function AppConfig($provide,
     $urlRouterProvider.otherwise(UrlHandler);
     storeProvider.setCaching(false);
 
-    $translateProvider.useSanitizeValueStrategy('sce');
-    $translateProvider.preferredLanguage('en_US');
-    $translateProvider.useLocalStorage();
+    $translateProvider.useSanitizeValueStrategy(null);
     $translateProvider.useMissingTranslationHandler('tbMissingTranslationHandler');
     $translateProvider.addInterpolation('$translateMessageFormatInterpolation');
+    $translateProvider.fallbackLanguage('en_US');
 
     addLocaleKorean(locales);
     addLocaleChinese(locales);
     addLocaleRussian(locales);
     addLocaleSpanish(locales);
 
-    var $window = angular.injector(['ng']).get('$window');
-    var lang = $window.navigator.language || $window.navigator.userLanguage;
-    if (lang === 'ko') {
-        $translateProvider.useSanitizeValueStrategy(null);
-        $translateProvider.preferredLanguage('ko_KR');
-    } else if (lang === 'zh') {
-        $translateProvider.useSanitizeValueStrategy(null);
-        $translateProvider.preferredLanguage('zh_CN');
-    } else if (lang === 'es') {
-        $translateProvider.useSanitizeValueStrategy(null);
-        $translateProvider.preferredLanguage('es_ES');
-    }
-
     for (var langKey in locales) {
         var translationTable = locales[langKey];
         $translateProvider.translations(langKey, translationTable);
+    }
+
+    var lang = $translateProvider.resolveClientLocale();
+    if (lang) {
+        lang = lang.toLowerCase();
+        if (lang.startsWith('ko')) {
+            $translateProvider.preferredLanguage('ko_KR');
+        } else if (lang.startsWith('zh')) {
+            $translateProvider.preferredLanguage('zh_CN');
+        } else if (lang.startsWith('es')) {
+            $translateProvider.preferredLanguage('es_ES');
+        } else if (lang.startsWith('ru')) {
+            $translateProvider.preferredLanguage('ru_RU');
+        } else {
+            $translateProvider.preferredLanguage('en_US');
+        }
+    } else {
+        $translateProvider.preferredLanguage('en_US');
     }
 
     $httpProvider.interceptors.push('globalInterceptor');
 
     $provide.decorator("$exceptionHandler", ['$delegate', '$injector', function ($delegate/*, $injector*/) {
         return function (exception, cause) {
-/*            var rootScope = $injector.get("$rootScope");
-            var $window = $injector.get("$window");
-            var utils = $injector.get("utils");
-            if (rootScope.widgetEditMode) {
-                var parentScope = $window.parent.angular.element($window.frameElement).scope();
-                var data = utils.parseException(exception);
-                parentScope.$emit('widgetException', data);
-                parentScope.$apply();
-            }*/
+            /*            var rootScope = $injector.get("$rootScope");
+                        var $window = $injector.get("$window");
+                        var utils = $injector.get("utils");
+                        if (rootScope.widgetEditMode) {
+                            var parentScope = $window.parent.angular.element($window.frameElement).scope();
+                            var data = utils.parseException(exception);
+                            parentScope.$emit('widgetException', data);
+                            parentScope.$apply();
+                        }*/
             $delegate(exception, cause);
         };
     }]);
 
     $mdIconProvider.iconSet('mdi', mdiIconSet);
 
-    configureTheme();
+    // configureTheme();
+    //
+    // function blueGrayTheme() {
+    //     var tbPrimaryPalette = $mdThemingProvider.extendPalette('blue-grey');
+    //     var tbAccentPalette = $mdThemingProvider.extendPalette('orange', {
+    //         'contrastDefaultColor': 'light'
+    //     });
+    //
+    //     $mdThemingProvider.definePalette('tb-primary', tbPrimaryPalette);
+    //     $mdThemingProvider.definePalette('tb-accent', tbAccentPalette);
+    //
+    //     $mdThemingProvider.theme('default')
+    //         .primaryPalette('tb-primary')
+    //         .accentPalette('tb-accent');
+    //
+    //     $mdThemingProvider.theme('tb-dark')
+    //         .primaryPalette('tb-primary')
+    //         .accentPalette('tb-accent')
+    //         .backgroundPalette('tb-primary')
+    //         .dark();
+    // }
+    //
+    // function indigoTheme() {
+    //     var tbPrimaryPalette = $mdThemingProvider.extendPalette('indigo', {
+    //         '500': PRIMARY_BACKGROUND_COLOR,
+    //         '600': SECONDARY_BACKGROUND_COLOR,
+    //         'A100': HUE3_COLOR
+    //     });
+    //
+    //     var tbAccentPalette = $mdThemingProvider.extendPalette('deep-orange');
+    //
+    //     $mdThemingProvider.definePalette('tb-primary', tbPrimaryPalette);
+    //     $mdThemingProvider.definePalette('tb-accent', tbAccentPalette);
+    //
+    //     var tbDarkPrimaryPalette = $mdThemingProvider.extendPalette('tb-primary', {
+    //         '500': '#9fa8da'
+    //     });
+    //
+    //     var tbDarkPrimaryBackgroundPalette = $mdThemingProvider.extendPalette('tb-primary', {
+    //         '800': PRIMARY_BACKGROUND_COLOR
+    //     });
+    //
+    //     $mdThemingProvider.definePalette('tb-dark-primary', tbDarkPrimaryPalette);
+    //     $mdThemingProvider.definePalette('tb-dark-primary-background', tbDarkPrimaryBackgroundPalette);
+    //
+    //     $mdThemingProvider.theme('default')
+    //         .primaryPalette('tb-primary')
+    //         .accentPalette('tb-accent');
+    //
+    //     $mdThemingProvider.theme('tb-dark')
+    //         .primaryPalette('tb-dark-primary')
+    //         .accentPalette('tb-accent')
+    //         .backgroundPalette('tb-dark-primary-background')
+    //         .dark();
+    // }
 
-    function blueGrayTheme() {
-        var tbPrimaryPalette = $mdThemingProvider.extendPalette('blue-grey');
-        var tbAccentPalette = $mdThemingProvider.extendPalette('orange', {
-            'contrastDefaultColor': 'light'
-        });
+    // function configureTheme() {
+    //
+    //     var theme = 'indigo';
+    //
+    //     if (theme === 'blueGray') {
+    //         blueGrayTheme();
+    //     } else {
+    //         indigoTheme();
+    //     }
+    //
+    //     $mdThemingProvider.setDefaultTheme('default');
+    //     $mdThemingProvider.alwaysWatchTheme(true);
+    // }
 
-        $mdThemingProvider.definePalette('tb-primary', tbPrimaryPalette);
-        $mdThemingProvider.definePalette('tb-accent', tbAccentPalette);
+    var tbPrimaryPalette = $mdThemingProvider.extendPalette('indigo', {
+        '500': PRIMARY_BACKGROUND_COLOR,
+        '600': SECONDARY_BACKGROUND_COLOR,
+        'A100': HUE3_COLOR
+    });
 
-        $mdThemingProvider.theme('default')
-            .primaryPalette('tb-primary')
-            .accentPalette('tb-accent');
+    var tbAccentPalette = $mdThemingProvider.extendPalette('deep-orange');
 
-        $mdThemingProvider.theme('tb-dark')
-            .primaryPalette('tb-primary')
-            .accentPalette('tb-accent')
-            .backgroundPalette('tb-primary')
-            .dark();
-    }
+    $mdThemingProvider.definePalette('tb-primary', tbPrimaryPalette);
+    $mdThemingProvider.definePalette('tb-accent', tbAccentPalette);
 
-    function indigoTheme() {
-        var tbPrimaryPalette = $mdThemingProvider.extendPalette('indigo', {
-            '500': PRIMARY_BACKGROUND_COLOR,
-            '600': SECONDARY_BACKGROUND_COLOR,
-            'A100': HUE3_COLOR
-        });
+    var tbDarkPrimaryPalette = $mdThemingProvider.extendPalette('tb-primary', {
+        '500': '#9fa8da'
+    });
 
-        var tbAccentPalette = $mdThemingProvider.extendPalette('deep-orange');
+    var tbDarkPrimaryBackgroundPalette = $mdThemingProvider.extendPalette('tb-primary', {
+        '800': PRIMARY_BACKGROUND_COLOR
+    });
 
-        $mdThemingProvider.definePalette('tb-primary', tbPrimaryPalette);
-        $mdThemingProvider.definePalette('tb-accent', tbAccentPalette);
+    $mdThemingProvider.definePalette('tb-dark-primary', tbDarkPrimaryPalette);
+    $mdThemingProvider.definePalette('tb-dark-primary-background', tbDarkPrimaryBackgroundPalette);
 
-        var tbDarkPrimaryPalette = $mdThemingProvider.extendPalette('tb-primary', {
-            '500': '#9fa8da'
-        });
+    $mdThemingProvider.theme('themeDark')
+        .primaryPalette('tb-primary')
+        .accentPalette('tb-accent')
 
-        var tbDarkPrimaryBackgroundPalette = $mdThemingProvider.extendPalette('tb-primary', {
-            '800': PRIMARY_BACKGROUND_COLOR
-        });
+    $mdThemingProvider.theme('tb-dark')
+        .primaryPalette('tb-primary')
+        .accentPalette('tb-dark-primary')
+        .backgroundPalette('tb-dark-primary-background')
+        .dark();
 
-        $mdThemingProvider.definePalette('tb-dark-primary', tbDarkPrimaryPalette);
-        $mdThemingProvider.definePalette('tb-dark-primary-background', tbDarkPrimaryBackgroundPalette);
 
-        $mdThemingProvider.theme('default')
-            .primaryPalette('tb-primary')
-            .accentPalette('tb-accent');
+    $mdThemingProvider.theme('themeBlue')
+        .primaryPalette('deep-purple')
+        .accentPalette('tb-accent')
 
-        $mdThemingProvider.theme('tb-dark')
-            .primaryPalette('tb-dark-primary')
-            .accentPalette('tb-accent')
-            .backgroundPalette('tb-dark-primary-background')
-            .dark();
-    }
 
-    function configureTheme() {
 
-        var theme = 'indigo';
 
-        if (theme === 'blueGray') {
-            blueGrayTheme();
-        } else {
-            indigoTheme();
-        }
 
-        $mdThemingProvider.setDefaultTheme('default');
-        //$mdThemingProvider.alwaysWatchTheme(true);
-    }
+    //$mdThemingProvider.setDefaultTheme('default');
+    $mdThemingProvider.alwaysWatchTheme(true);
 
 }

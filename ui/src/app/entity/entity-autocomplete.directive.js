@@ -1,5 +1,6 @@
 /*
- * Copyright © 2016-2017 The Thingsboard Authors
+ * Copyright © 2016-2018 The Thingsboard Authors
+ * Modifications © 2017-2018 Hashmap, Inc
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,19 +35,40 @@ export default function EntityAutocomplete($compile, $templateCache, $q, $filter
 
         scope.fetchEntities = function(searchText) {
             var deferred = $q.defer();
-            var limit = 50;
+            var limit = 50,targetRelationFlag;
+            var entities = [];
             if (scope.excludeEntityIds && scope.excludeEntityIds.length) {
                 limit += scope.excludeEntityIds.length;
             }
-            entityService.getEntitiesByNameFilter(scope.entityType, searchText, limit, null, scope.entitySubtype).then(function success(result) {
+            var targetType = scope.entityType;
+            if (targetType == types.aliasEntityType.current_customer) {
+                targetType = types.entityType.customer;
+            }
+
+            targetRelationFlag = isTargetRelationDeviceOrAsset(targetType);
+            entityService.getEntitiesByNameFilter(targetType, searchText, limit, {ignoreLoading: true}, scope.entitySubtype).then(function success(result) {
                 if (result) {
+
                     if (scope.excludeEntityIds && scope.excludeEntityIds.length) {
-                        var entities = [];
                         result.forEach(function(entity) {
                             if (scope.excludeEntityIds.indexOf(entity.id.id) == -1) {
                                 entities.push(entity);
                             }
                         });
+                        deferred.resolve(entities);
+                    } else if(
+                        ((scope.relation.to &&
+                            (scope.relation.to.entityType === 'DEVICE' || scope.relation.to.entityType === 'ASSET' ))
+                        || (scope.relation.from &&
+                            (scope.relation.from.entityType === 'DEVICE' || scope.relation.from.entityType === 'ASSET' )))
+                        && scope.entityDetail.customerId && scope.entityDetail.customerId.id !=='13814000-1dd2-11b2-8080-808080808080'
+                        && targetRelationFlag) {
+                        result.forEach(function(entity) {
+                            if (scope.entityDetail.customerId.id === entity.customerId.id) {
+                                entities.push(entity);
+                            }
+                        });
+
                         deferred.resolve(entities);
                     } else {
                         deferred.resolve(result);
@@ -60,18 +82,28 @@ export default function EntityAutocomplete($compile, $templateCache, $q, $filter
             return deferred.promise;
         }
 
+        function isTargetRelationDeviceOrAsset(entityType){
+             return entityType !== 'TENANT' && entityType !== 'CUSTOMER'
+                 && entityType !== 'RULE' && entityType !== 'PLUGIN'
+                 && entityType !== 'DASHBOARD';
+        }
+
         scope.entitySearchTextChanged = function() {
         }
 
         scope.updateView = function () {
             if (!scope.disabled) {
-                ngModelCtrl.$setViewValue(scope.entity ? scope.entity.id.id : null);
+                ngModelCtrl.$setViewValue(scope.entity ? scope.entity: null);
             }
         }
 
         ngModelCtrl.$render = function () {
             if (ngModelCtrl.$viewValue) {
-                entityService.getEntity(scope.entityType, ngModelCtrl.$viewValue).then(
+                var targetType = scope.entityType;
+                if (targetType == types.aliasEntityType.current_customer) {
+                    targetType = types.entityType.customer;
+                }
+                entityService.getEntity(targetType, ngModelCtrl.$viewValue).then(
                     function success(entity) {
                         scope.entity = entity;
                     },
@@ -114,55 +146,61 @@ export default function EntityAutocomplete($compile, $templateCache, $q, $filter
                     scope.selectEntityText = 'asset.select-asset';
                     scope.entityText = 'asset.asset';
                     scope.noEntitiesMatchingText = 'asset.no-assets-matching';
-                    scope.entityRequiredText = 'asset.asset-required'
+                    scope.entityRequiredText = 'asset.asset-required';
                     break;
                 case types.entityType.device:
                     scope.selectEntityText = 'device.select-device';
                     scope.entityText = 'device.device';
                     scope.noEntitiesMatchingText = 'device.no-devices-matching';
-                    scope.entityRequiredText = 'device.device-required'
+                    scope.entityRequiredText = 'device.device-required';
                     break;
                 case types.entityType.rule:
                     scope.selectEntityText = 'rule.select-rule';
                     scope.entityText = 'rule.rule';
                     scope.noEntitiesMatchingText = 'rule.no-rules-matching';
-                    scope.entityRequiredText = 'rule.rule-required'
+                    scope.entityRequiredText = 'rule.rule-required';
                     break;
                 case types.entityType.plugin:
                     scope.selectEntityText = 'plugin.select-plugin';
                     scope.entityText = 'plugin.plugin';
                     scope.noEntitiesMatchingText = 'plugin.no-plugins-matching';
-                    scope.entityRequiredText = 'plugin.plugin-required'
+                    scope.entityRequiredText = 'plugin.plugin-required';
                     break;
                 case types.entityType.tenant:
                     scope.selectEntityText = 'tenant.select-tenant';
                     scope.entityText = 'tenant.tenant';
                     scope.noEntitiesMatchingText = 'tenant.no-tenants-matching';
-                    scope.entityRequiredText = 'tenant.tenant-required'
+                    scope.entityRequiredText = 'tenant.tenant-required';
                     break;
                 case types.entityType.customer:
                     scope.selectEntityText = 'customer.select-customer';
                     scope.entityText = 'customer.customer';
                     scope.noEntitiesMatchingText = 'customer.no-customers-matching';
-                    scope.entityRequiredText = 'customer.customer-required'
+                    scope.entityRequiredText = 'customer.customer-required';
                     break;
                 case types.entityType.user:
                     scope.selectEntityText = 'user.select-user';
                     scope.entityText = 'user.user';
                     scope.noEntitiesMatchingText = 'user.no-users-matching';
-                    scope.entityRequiredText = 'user.user-required'
+                    scope.entityRequiredText = 'user.user-required';
                     break;
                 case types.entityType.dashboard:
                     scope.selectEntityText = 'dashboard.select-dashboard';
                     scope.entityText = 'dashboard.dashboard';
                     scope.noEntitiesMatchingText = 'dashboard.no-dashboards-matching';
-                    scope.entityRequiredText = 'dashboard.dashboard-required'
+                    scope.entityRequiredText = 'dashboard.dashboard-required';
                     break;
                 case types.entityType.alarm:
                     scope.selectEntityText = 'alarm.select-alarm';
                     scope.entityText = 'alarm.alarm';
                     scope.noEntitiesMatchingText = 'alarm.no-alarms-matching';
-                    scope.entityRequiredText = 'alarm.alarm-required'
+                    scope.entityRequiredText = 'alarm.alarm-required';
+                    break;
+                case types.aliasEntityType.current_customer:
+                    scope.selectEntityText = 'customer.select-default-customer';
+                    scope.entityText = 'customer.default-customer';
+                    scope.noEntitiesMatchingText = 'customer.no-customers-matching';
+                    scope.entityRequiredText = 'customer.default-customer-required';
                     break;
             }
             if (scope.entity && scope.entity.id.entityType != scope.entityType) {
@@ -184,7 +222,9 @@ export default function EntityAutocomplete($compile, $templateCache, $q, $filter
             disabled:'=ngDisabled',
             entityType: '=',
             entitySubtype: '=?',
-            excludeEntityIds: '=?'
+            excludeEntityIds: '=?',
+            entityDetail: '=',
+            relation:'='
         }
     };
 }

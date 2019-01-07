@@ -1,5 +1,6 @@
 /*
- * Copyright © 2016-2017 The Thingsboard Authors
+ * Copyright © 2016-2018 The Thingsboard Authors
+ * Modifications © 2017-2018 Hashmap, Inc
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,25 +15,25 @@
  * limitations under the License.
  */
 import uiRouter from 'angular-ui-router';
-import thingsboardGrid from '../components/grid.directive';
-import thingsboardPluginSelect from '../components/plugin-select.directive';
-import thingsboardComponent from '../component';
-import thingsboardApiRule from '../api/rule.service';
-import thingsboardApiPlugin from '../api/plugin.service';
-import thingsboardApiComponentDescriptor from '../api/component-descriptor.service';
+import tempusGrid from '../components/grid.directive';
+import tempusPluginSelect from '../components/plugin-select.directive';
+import tempusComponent from '../component';
+import tempusApiRule from '../api/rule.service';
+import tempusApiPlugin from '../api/plugin.service';
+import tempusApiComponentDescriptor from '../api/component-descriptor.service';
 
 import RuleRoutes from './rule.routes';
 import RuleController from './rule.controller';
 import RuleDirective from './rule.directive';
 
-export default angular.module('thingsboard.rule', [
+export default angular.module('tempus.rule', [
     uiRouter,
-    thingsboardGrid,
-    thingsboardPluginSelect,
-    thingsboardComponent,
-    thingsboardApiRule,
-    thingsboardApiPlugin,
-    thingsboardApiComponentDescriptor
+    tempusGrid,
+    tempusPluginSelect,
+    tempusComponent,
+    tempusApiRule,
+    tempusApiPlugin,
+    tempusApiComponentDescriptor
 ])
     .config(RuleRoutes)
     .controller('RuleController', RuleController)

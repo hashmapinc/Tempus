@@ -1,5 +1,6 @@
 /*
- * Copyright © 2016-2017 The Thingsboard Authors
+ * Copyright © 2016-2018 The Thingsboard Authors
+ * Modifications © 2017-2018 Hashmap, Inc
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -175,8 +176,13 @@ export default function GlobalInterceptor($rootScope, $q, $injector) {
         } else if (!rejection.config.url.startsWith('/api/plugins/rpc')) {
             if (rejection.status === 404) {
                 if (!ignoreErrors) {
-                    getToast().showError(rejection.config.method + ": " + rejection.config.url + "<br/>" +
-                        rejection.status + ": " + rejection.statusText);
+                    if(rejection.config.url.startsWith('/api/metadata/attribute/ASSET/')){
+                        getToast().showError(rejection.data.message);
+                    }else {
+                        getToast().showError(rejection.config.method + ": " + rejection.config.url + "<br/>" +
+                                                rejection.status + ": " + rejection.statusText);
+                    }
+
                 }
             } else {
                 unhandled = true;

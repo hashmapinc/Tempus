@@ -1,5 +1,7 @@
+
 /*
- * Copyright © 2016-2017 The Thingsboard Authors
+ * Copyright © 2016-2018 The Thingsboard Authors
+ * Modifications © 2017-2018 Hashmap, Inc
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,56 +28,38 @@ export default function ComputationJobDirective($compile, $templateCache, $trans
     var linker = function (scope, element) {
         var template = $templateCache.get(computationJobFieldsetTemplate);
         element.html(template);
-
+        scope.types = types;
         scope.showComputationJobConfig = false;
-
-        scope.computationJobConfiguration = {
-            data: null
-        };
-
         if (scope.computation) {
             scope.showComputationJobConfig = true;
-            scope.computationDescriptor = scope.computation.jsonDescriptor;
-        } 
+            if (scope.computation.type == types.computationType.spark)
+                scope.computationDescriptor = scope.computation.computationMetadata.jsonDescriptor;
+        }
         else{
             computationService.getComputation($stateParams.computationId).then(
                 function success(computation) {
                     scope.computation = computation;
-                    scope.showComputationJobConfig = true;
-                    scope.computationDescriptor = computation.jsonDescriptor;
+                    if (scope.computation.type == types.computationType.spark)
+                        scope.computationDescriptor = computation.computationMetadata.jsonDescriptor;
+                    scope.flag=true
+                    $compile(element.contents())(scope);
                 },
                 function fail() {
                 }
             );
         }
 
-        scope.$watch('computationjob', function(newValue, oldValue) {
-            if (newValue && !angular.equals(newValue, oldValue)) {
-                scope.computationJobConfiguration.data = null;
-                scope.computationjob = newValue;
-                scope.computationJobConfiguration.data = angular.copy(newValue.argParameters);
-            }
-        });
-
         scope.$watch('computation', function(newValue, oldValue) {
             if(newValue && !angular.equals(newValue, oldValue)){
                 scope.showComputationJobConfig = true;
-                scope.computationDescriptor = newValue.jsonDescriptor;
-            } 
-        }, true);
-
-
-        if (scope.computationjob && !scope.computationjob.argParameters) {
-            scope.computationjob.argParameters = {};
-        }
-
-        scope.$watch("computationJobConfiguration.data", function (newValue, prevValue) {
-            if (newValue && !angular.equals(newValue, prevValue)) {
-                if(scope.computationjob !=null && angular.isDefined(scope.computationjob)){
-                     scope.computationjob.argParameters = angular.copy(scope.computationJobConfiguration.data);
-                }
+                if (newValue.type == types.computationType.spark)
+                    scope.computationDescriptor = newValue.computationMetadata.jsonDescriptor;
             }
-        }, true);
+        });
+
+        if (scope.computationjob && !scope.computationjob.configuration) {
+            scope.computationjob.configuration = {};
+        }
 
         scope.onComputationJobIdCopied = function() {
             toast.showSuccess($translate.instant('computationJob.idCopiedMessage'), 750, angular.element(element).parent().parent(), 'bottom left');
@@ -87,7 +71,7 @@ export default function ComputationJobDirective($compile, $templateCache, $trans
         restrict: "E",
         link: linker,
         scope: {
-            computationjob: '=',
+            computationjob: '=?',
             computation: '=?',
             isEdit: '=',
             isReadOnly: '=',

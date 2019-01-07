@@ -1,5 +1,6 @@
 /*
- * Copyright © 2016-2017 The Thingsboard Authors
+ * Copyright © 2016-2018 The Thingsboard Authors
+ * Modifications © 2017-2018 Hashmap, Inc
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,8 +25,9 @@ import entityAliasesTemplate from '../entity/alias/entity-aliases.tpl.html';
 /* eslint-disable no-undef, angular/window-service, angular/document-service */
 
 /*@ngInject*/
-export default function ImportExport($log, $translate, $q, $mdDialog, $document, itembuffer, utils, types, dashboardUtils,
-                                     entityService, dashboardService, pluginService, ruleService, widgetService, computationService, toast, $window) {
+export default function ImportExport($log, $translate, $q, $mdDialog, $document, $http, itembuffer, utils, types,
+                                     dashboardUtils, entityService, dashboardService, adminService, pluginService, ruleService,
+                                     widgetService, toast, attributeService,computationService, $window) {
 
 
     var service = {
@@ -41,8 +43,14 @@ export default function ImportExport($log, $translate, $q, $mdDialog, $document,
         importWidgetType: importWidgetType,
         exportWidgetsBundle: exportWidgetsBundle,
         importWidgetsBundle: importWidgetsBundle,
-        importComputation: importComputation
-    }
+        importComputation: importComputation,
+        exportExtension: exportExtension,
+        importExtension: importExtension,
+        exportToPc: exportToPc,
+        importLogo:importLogo,
+        exportAttribute:exportAttribute,
+        convertToCSV:convertToCSV
+    };
 
     return service;
 
@@ -234,6 +242,30 @@ export default function ImportExport($log, $translate, $q, $mdDialog, $document,
             }
         );
     }
+
+    function importLogo($event) {
+        var deferred = $q.defer();
+        openImportDialog($event, 'admin.import', 'admin.logo-file').then(
+            function success(importData) {
+                //return false;
+                adminService.uploadLogo(importData.file).then(
+                    function success(response) {
+
+                        deferred.resolve(response);
+
+                    },
+                    function fail() {
+                        deferred.reject();
+                    }
+                );
+            },
+            function fail() {
+                deferred.reject();
+            }
+        );
+        return deferred.promise;
+    }
+
 
     function importRule($event) {
         var deferred = $q.defer();
@@ -558,7 +590,7 @@ export default function ImportExport($log, $translate, $q, $mdDialog, $document,
             function success(dashboard) {
                 var name = dashboard.title;
                 name = name.toLowerCase().replace(/\W/g,"_");
-                exportToPc(prepareExport(dashboard), name + '.json');
+                exportToPc(prepareDashboardExport(dashboard), name + '.json');
             },
             function fail(rejection) {
                 var message = rejection;
@@ -568,6 +600,15 @@ export default function ImportExport($log, $translate, $q, $mdDialog, $document,
                 toast.showError($translate.instant('dashboard.export-failed-error', {error: message}));
             }
         );
+    }
+
+    function prepareDashboardExport(dashboard) {
+        dashboard = prepareExport(dashboard);
+        delete dashboard.assignedCustomers;
+        delete dashboard.publicCustomerId;
+        delete dashboard.assignedCustomersText;
+        delete dashboard.assignedCustomersIds;
+        return dashboard;
     }
 
     function importDashboard($event) {
@@ -631,6 +672,84 @@ export default function ImportExport($log, $translate, $q, $mdDialog, $document,
 
     function validateImportedDashboard(dashboard) {
         if (angular.isUndefined(dashboard.title) || angular.isUndefined(dashboard.configuration)) {
+            return false;
+        }
+        return true;
+    }
+
+
+
+    function exportExtension(extensionId) {
+
+        getExtension(extensionId)
+            .then(
+                function success(extension) {
+                    var name = extension.title;
+                    name = name.toLowerCase().replace(/\W/g,"_");
+                    exportToPc(prepareExport(extension), name + '.json');
+                },
+                function fail(rejection) {
+                    var message = rejection;
+                    if (!message) {
+                        message = $translate.instant('error.unknown-error');
+                    }
+                    toast.showError($translate.instant('extension.export-failed-error', {error: message}));
+                }
+            );
+
+        function getExtension(extensionId) {
+            var deferred = $q.defer();
+            var url = '/api/plugins/telemetry/DEVICE/' + extensionId;
+            $http.get(url, null)
+                .then(function success(response) {
+                    deferred.resolve(response.data);
+                }, function fail() {
+                    deferred.reject();
+                });
+            return deferred.promise;
+        }
+
+    }
+
+    function importExtension($event, options) {
+        var deferred = $q.defer();
+        openImportDialog($event, 'extension.import-extensions', 'extension.file')
+            .then(
+                function success(extension) {
+                    if (!validateImportedExtension(extension)) {
+                        toast.showError($translate.instant('extension.invalid-file-error'));
+                        deferred.reject();
+                    } else {
+                        attributeService
+                            .saveEntityAttributes(
+                                options.entityType,
+                                options.entityId,
+                                types.attributesScope.shared.value,
+                                [{
+                                    key: "configuration",
+                                    value: angular.toJson(extension)
+                                }]
+                            )
+                            .then(function success() {
+                                options.successFunc();
+                            });
+                    }
+                },
+                function fail() {
+                    deferred.reject();
+                }
+            );
+        return deferred.promise;
+    }
+
+    function validateImportedExtension(configuration) {
+        if (configuration.length) {
+            for (let i = 0; i < configuration.length; i++) {
+                if (angular.isUndefined(configuration[i].configuration) || angular.isUndefined(configuration[i].id )|| angular.isUndefined(configuration[i].type)) {
+                    return false;
+                }
+            }
+        } else {
             return false;
         }
         return true;
@@ -750,6 +869,71 @@ export default function ImportExport($log, $translate, $q, $mdDialog, $document,
         }
     }
 
+    function exportAttribute(data, headers, filename) {
+        if (!data) {
+            $log.error('No data');
+            return;
+        }
+
+        if (headers) {
+            data.unshift(headers);
+        }
+
+        if (!filename) {
+            filename = 'download.csv';
+        }
+
+         var jsonObject = angular.toJson(data);
+
+         var csv = convertToCSV(jsonObject);
+        var blob = new Blob([csv], {type: 'text/csv'});
+
+        // FOR IE:
+
+        if (window.navigator && window.navigator.msSaveOrOpenBlob) {
+            window.navigator.msSaveOrOpenBlob(blob, filename);
+        }
+        else{
+            var e = document.createEvent('MouseEvents'),
+                a = document.createElement('a');
+
+            a.download = filename;
+            a.href = window.URL.createObjectURL(blob);
+            a.dataset.downloadurl = ['text/csv', a.download, a.href].join(':');
+            e.initEvent('click', true, false, window,
+                0, 0, 0, 0, 0, false, false, false, false, 0, null);
+            a.dispatchEvent(e);
+        }
+    }
+
+
+    function convertToCSV(objArray) {
+        var array = typeof objArray != 'object' ? angular.fromJson(objArray) : objArray;
+        var str = '';
+
+        for (var i = 0; i < array.length; i++) {
+            var line = '';
+            for (var index in array[i]) {
+                if (line != '') line += ','
+
+                //var value = array[i][index];
+               // if(value.toString().indexOf("{") == 0) {
+
+                   var value = array[i][index] + "";
+                   line += '"' + value.replace(/"/g, '""') + '",';
+
+               /// } else {
+
+                   //  line += value;
+               // }
+
+            }
+
+            str += line + '\r\n';
+        }
+
+        return str;
+    }
     function openImportDialog($event, importTitle, importFileLabel) {
         var deferred = $q.defer();
         $mdDialog.show({

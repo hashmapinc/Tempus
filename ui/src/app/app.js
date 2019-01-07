@@ -1,5 +1,6 @@
 /*
- * Copyright © 2016-2017 The Thingsboard Authors
+ * Copyright © 2016-2018 The Thingsboard Authors
+ * Modifications © 2017-2018 Hashmap, Inc
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 import './ie.support';
 
 import 'event-source-polyfill';
@@ -39,6 +39,7 @@ import uiRouter from 'angular-ui-router';
 import angularJwt from 'angular-jwt';
 import 'angular-drag-and-drop-lists';
 import mdDataTable from 'angular-material-data-table';
+import 'angular-material-expansion-panel';
 import ngTouch from 'angular-touch';
 import 'angular-carousel';
 import 'clipboard';
@@ -50,33 +51,37 @@ import 'react-schema-form';
 import react from 'ngreact';
 import '@flowjs/ng-flow/dist/ng-flow-standalone.min';
 
-import thingsboardLocales from './locale/locale.constant';
-import thingsboardLogin from './login';
-import thingsboardDialogs from './components/datakey-config-dialog.controller';
-import thingsboardMenu from './services/menu.service';
-import thingsboardRaf from './common/raf.provider';
-import thingsboardUtils from './common/utils.service';
-import thingsboardDashboardUtils from './common/dashboard-utils.service';
-import thingsboardTypes from './common/types.constant';
-import thingsboardApiTime from './api/time.service';
-import thingsboardApiDepth from './api/depth.service';
-import thingsboardKeyboardShortcut from './components/keyboard-shortcut.filter';
-import thingsboardHelp from './help/help.directive';
-import thingsboardToast from './services/toast';
-import thingsboardHome from './layout';
-import thingsboardApiLogin from './api/login.service';
-import thingsboardApiDevice from './api/device.service';
-import thingsboardApiUser from './api/user.service';
-import thingsboardApiEntityRelation from './api/entity-relation.service';
-import thingsboardApiAsset from './api/asset.service';
-import thingsboardApiAttribute from './api/attribute.service';
-import thingsboardApiEntity from './api/entity.service';
-import thingsboardApiAlarm from './api/alarm.service';
-import thingsboardApiUiConfiguration from './api/ui-configuration.service';
-import thingsboardApiComputation from './api/computation.service';
-import thingsboardApiComputationJob from './api/computation-job.service';
-import thingsboardTempusboard from './tempusboard';
-import thingsboardApplications from './applications';
+import tempusLocales from './locale/locale.constant';
+import tempusLogin from './login';
+import tempusDialogs from './components/datakey-config-dialog.controller';
+import tempusMenu from './services/menu.service';
+import tempusRaf from './common/raf.provider';
+import tempusUtils from './common/utils.service';
+import tempusDashboardUtils from './common/dashboard-utils.service';
+import tempusTypes from './common/types.constant';
+import tempusApiTime from './api/time.service';
+import tempusApiDepth from './api/depth.service';
+import tempusKeyboardShortcut from './components/keyboard-shortcut.filter';
+import tempusHelp from './help/help.directive';
+import tempusToast from './services/toast';
+import tempusClipboard from './services/clipboard.service';
+import tempusHome from './layout';
+import tempusApiLogin from './api/login.service';
+import tempusApiDevice from './api/device.service';
+import tempusApiUser from './api/user.service';
+import tempusApiEntityRelation from './api/entity-relation.service';
+import tempusApiAsset from './api/asset.service';
+import tempusApiAttribute from './api/attribute.service';
+import tempusApiEntity from './api/entity.service';
+import tempusApiAlarm from './api/alarm.service';
+import tempusApiUiConfiguration from './api/ui-configuration.service';
+import tempusClusterInfo from './api/cluster-info.service';
+import tempusApiComputation from './api/computation.service';
+import tempusApiComputationJob from './api/computation-job.service';
+import tempusDataModels from './data_models';
+import tempusgateway from './tempusgateway';
+import tempusMetadata from './metadata';
+import tempusApiAuditLog from './api/audit-log.service';
 
 import 'typeface-roboto';
 import 'font-awesome/css/font-awesome.min.css';
@@ -88,13 +93,14 @@ import 'md-color-picker/dist/mdColorPicker.min.css';
 import 'mdPickers/dist/mdPickers.min.css';
 import 'angular-hotkeys/build/hotkeys.min.css';
 import 'angular-carousel/dist/angular-carousel.min.css';
+import 'angular-material-expansion-panel/dist/md-expansion-panel.min.css';
 import '../scss/main.scss';
 
 import AppConfig from './app.config';
 import GlobalInterceptor from './global-interceptor.service';
 import AppRun from './app.run';
 
-angular.module('thingsboard', [
+angular.module('tempus', [
     ngMaterial,
     ngMdIcons,
     ngCookies,
@@ -109,38 +115,43 @@ angular.module('thingsboard', [
     angularJwt,
     'dndLists',
     mdDataTable,
+    'material.components.expansionPanels',
     ngTouch,
     'angular-carousel',
     'ngclipboard',
     react.name,
     'flow',
-    thingsboardLocales,
-    thingsboardLogin,
-    thingsboardDialogs,
-    thingsboardMenu,
-    thingsboardRaf,
-    thingsboardUtils,
-    thingsboardDashboardUtils,
-    thingsboardTypes,
-    thingsboardApiTime,
-    thingsboardApiDepth,
-    thingsboardKeyboardShortcut,
-    thingsboardHelp,
-    thingsboardToast,
-    thingsboardHome,
-    thingsboardApiLogin,
-    thingsboardApiDevice,
-    thingsboardApiUser,
-    thingsboardApiEntityRelation,
-    thingsboardApiAsset,
-    thingsboardApiAttribute,
-    thingsboardApiEntity,
-    thingsboardApiAlarm,
-    thingsboardApiUiConfiguration,
-    thingsboardApiComputation,
-    thingsboardApiComputationJob,
-    thingsboardTempusboard,
-    thingsboardApplications,
+    tempusLocales,
+    tempusLogin,
+    tempusDialogs,
+    tempusMenu,
+    tempusRaf,
+    tempusUtils,
+    tempusDashboardUtils,
+    tempusTypes,
+    tempusApiTime,
+    tempusApiDepth,
+    tempusKeyboardShortcut,
+    tempusHelp,
+    tempusToast,
+    tempusClipboard,
+    tempusHome,
+    tempusApiLogin,
+    tempusApiDevice,
+    tempusApiUser,
+    tempusApiEntityRelation,
+    tempusApiAsset,
+    tempusApiAttribute,
+    tempusApiEntity,
+    tempusApiAlarm,
+    tempusApiUiConfiguration,
+    tempusClusterInfo,
+    tempusApiComputation,
+    tempusApiComputationJob,
+    tempusDataModels,
+    tempusgateway,
+    tempusMetadata,
+    tempusApiAuditLog,
     uiRouter])
     .config(AppConfig)
     .factory('globalInterceptor', GlobalInterceptor)

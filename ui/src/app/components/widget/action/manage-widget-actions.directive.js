@@ -1,8 +1,24 @@
+/*
+ * Copyright © 2016-2018 The Thingsboard Authors
+ * Modifications © 2017-2018 Hashmap, Inc
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 /**
  * Created by igor on 6/20/17.
  */
 /*
- * Copyright © 2016-2017 The Thingsboard Authors
+ * Copyright © 2016-2017 Hashmap, Inc
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +35,7 @@
 
 import './manage-widget-actions.scss';
 
-import thingsboardMaterialIconSelect from '../../material-icon-select.directive';
+import tempusMaterialIconSelect from '../../material-icon-select.directive';
 
 import WidgetActionDialogController from './widget-action-dialog.controller';
 
@@ -30,7 +46,7 @@ import widgetActionDialogTemplate from './widget-action-dialog.tpl.html';
 
 /* eslint-enable import/no-unresolved, import/default */
 
-export default angular.module('thingsboard.directives.widgetActions', [thingsboardMaterialIconSelect])
+export default angular.module('tempus.directives.widgetActions', [tempusMaterialIconSelect])
     .controller('WidgetActionDialogController', WidgetActionDialogController)
     .directive('tbManageWidgetActions', ManageWidgetActions)
     .name;

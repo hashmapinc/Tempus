@@ -1,5 +1,6 @@
 /*
- * Copyright © 2016-2017 The Thingsboard Authors
+ * Copyright © 2016-2018 The Thingsboard Authors
+ * Modifications © 2017-2018 Hashmap, Inc
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +24,7 @@ import computationJobCard from './computation-job-card.tpl.html';
 /* eslint-enable import/no-unresolved, import/default */
 
 /*@ngInject*/
-export default function ComputationController(computationService, computationJobService, userService, importExport, $state, $stateParams, $translate, types) {
+export default function ComputationController(computationService, computationJobService, userService, $state, $stateParams, $translate, types) {
 
     var computationActionsList = [
         {
@@ -33,21 +34,6 @@ export default function ComputationController(computationService, computationJob
             name: function() { return $translate.instant('action.delete') },
             details: function() { return $translate.instant('computation.delete') },
             icon: "delete",
-        }
-    ];
-
-    var computationAddItemActionsList = [
-        {
-            onAction: function ($event) {
-                importExport.importComputation($event).then(
-                    function() {
-                        vm.grid.refreshList();
-                    }
-                );
-            },
-            name: function() { return $translate.instant('action.import') },
-            details: function() { return $translate.instant('computation.import') },
-            icon: "file_upload"
         }
     ];
 
@@ -71,12 +57,11 @@ export default function ComputationController(computationService, computationJob
         parentCtl: vm,
 
         actionsList: computationActionsList,
-        addItemActions: computationAddItemActionsList,
 
         onGridInited: gridInited,
 
         addItemTemplateUrl: addComputationTemplate,
-
+        addItemController: 'AddComputationController',
         addItemText: function() { return $translate.instant('computation.add-computation-text') },
         noItemsText: function() { return $translate.instant('computation.no-computations-text') },
 
@@ -95,7 +80,6 @@ export default function ComputationController(computationService, computationJob
     }
 
     function fetchComputations(pageLink) {
-
         return computationService.getAllComputations(pageLink);
     }
 
@@ -112,7 +96,7 @@ export default function ComputationController(computationService, computationJob
             $event.stopPropagation();
         }
 
-        $state.transitionTo ('.', {computationId: computation.id.id}, { location: false, relative: $state.$current, reload: false, notify: false }) 
+        $state.transitionTo ('.', {computationId: computation.id.id}, { location: false, relative: $state.$current, reload: false, notify: false })
 
                 vm.computation = computation;
                 vm.viewComputations = false;
@@ -185,14 +169,6 @@ export default function ComputationController(computationService, computationJob
         }
     ];
 
-    //var vm = this;
-    
-
-    //vm.types = types;
-
-    //vm.helpLinkIdForComputationJob = helpLinkIdForComputationJob;
-
-
     vm.computationJobGridConfig = {
 
         refreshParamsFunc: null,
@@ -200,7 +176,6 @@ export default function ComputationController(computationService, computationJob
         deleteItemTitleFunc: deleteComputationJobTitle,
         deleteItemContentFunc: deleteComputationJobText,
         deleteItemsTitleFunc: deleteComputationJobsTitle,
-        //deleteItemsActionTitleFunc: deleteComputationJobsActionTitle,
         deleteItemsContentFunc: deleteComputationJobsText,
 
         fetchItemsFunc: fetchComputationJobs,
@@ -257,30 +232,21 @@ export default function ComputationController(computationService, computationJob
         return $translate.instant('computationJob.delete-computationJobs-title', {count: selectedCount}, 'messageformat');
     }
 
-    /*function deleteComputationJobsActionTitle(selectedCount) {
-        return $translate.instant('computationJob.delete-computationJobs-action-title', {count: selectedCount}, 'messageformat');
-    }*/
-
     function deleteComputationJobsText() {
         return $translate.instant('computationJob.delete-computationJobs-text');
     }
 
-    // function gridInited(grid) {
-    //     vm.grid = grid;
-    // }
-
     function fetchComputationJobs(pageLink) {
         if(vm.computation != null){
-                    return computationJobService.getAllComputationJobs(pageLink, vm.computation.id.id);
+            return computationJobService.getAllComputationJobs(pageLink, vm.computation.id.id);
         }
         else {
-                computationService.getComputation($stateParams.computationId).then(
-                function success(computation) {
-                    //vm.computation = computation;
-                    return computationJobService.getAllComputationJobs(pageLink, computation.id.id)
-                },
-                function fail() {
-                }
+            computationService.getComputation($stateParams.computationId).then(
+            function success(computation) {
+                return computationJobService.getAllComputationJobs(pageLink, computation.id.id)
+            },
+            function fail() {
+            }
             );
         }
     }

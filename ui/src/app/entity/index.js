@@ -1,5 +1,6 @@
 /*
- * Copyright © 2016-2017 The Thingsboard Authors
+ * Copyright © 2016-2018 The Thingsboard Authors
+ * Modifications © 2017-2018 Hashmap, Inc
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 import EntityAliasesController from './alias/entity-aliases.controller';
 import EntityAliasDialogController from './alias/entity-alias-dialog.controller';
 import EntityTypeSelectDirective from './entity-type-select.directive';
@@ -35,7 +35,7 @@ import RelationFiltersDirective from './relation/relation-filters.directive';
 import RelationTableDirective from './relation/relation-table.directive';
 import RelationTypeAutocompleteDirective from './relation/relation-type-autocomplete.directive';
 
-export default angular.module('thingsboard.entity', [])
+export default angular.module('tempus.entity', [])
     .controller('EntityAliasesController', EntityAliasesController)
     .controller('EntityAliasDialogController', EntityAliasDialogController)
     .controller('AliasesEntitySelectPanelController', AliasesEntitySelectPanelController)

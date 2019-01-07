@@ -1,5 +1,6 @@
 /*
- * Copyright © 2016-2017 The Thingsboard Authors
+ * Copyright © 2016-2018 The Thingsboard Authors
+ * Modifications © 2017-2018 Hashmap, Inc
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,8 +18,8 @@ import './json-form.scss';
 
 import React from 'react';
 import getMuiTheme from 'material-ui/styles/getMuiTheme';
-import thingsboardTheme from './styles/thingsboardTheme';
-import ThingsboardSchemaForm from './json-form-schema-form.jsx';
+import tempusTheme from './styles/TempusTheme';
+import TempusSchemaForm from './json-form-schema-form.jsx';
 
 class ReactSchemaForm extends React.Component {
 
@@ -31,13 +32,13 @@ class ReactSchemaForm extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            muiTheme: getMuiTheme(thingsboardTheme)
+            muiTheme: getMuiTheme(tempusTheme)
         };
     }
 
     render () {
         if (this.props.form.length > 0) {
-            return <ThingsboardSchemaForm {...this.props} />;
+            return <TempusSchemaForm {...this.props} />;
         } else {
             return <div></div>;
         }

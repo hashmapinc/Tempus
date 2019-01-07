@@ -1,185 +1,198 @@
+<!--
+
+    Copyright © 2017-2018 Hashmap, Inc
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+        http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+
 <img src="https://github.com/hashmapinc/hashmap.github.io/blob/master/images/tempus/TempusLogoBlack2.png" width="910" height="245" alt="Hashmap, Inc Tempus"/>
 
-[![License](http://img.shields.io/:license-Apache%202-blue.svg)](http://www.apache.org/licenses/LICENSE-2.0.txt)
-
-Tempus is an Apache 2.0 licensed IIoT framework for industrial data ingestion and analysis.
-
-
-# Depth Data Support 
-
-Thingsboard can now support depthseries data also. Earlier thingsboard supported timeseries data i.e timestamp based telemetry data, but there is a need for the support of depthseries data also i.e depth based telemetry data.
-
-## Configurations
-
-1. There is only one configuration to be made, it is in thingsboard.yml. Under the heading UI Related configuration set depthSeries to true like:
-```
-#UI Related Configuration
-  configurations:
-    ui:
-      depthSeries: "true"
-```
-
-## Build
-
-1. Checkout branch "save_depthdata_to_thingsboardDb".
-2. Do : mvn clean install -DskipTests
-
-## Add a rule for depthseries data
-
-1. Create a new rule similar to system telemetry rule with message type filter, just set the message types as "POST_TELEMETRY_DEPTH" for filter. Save and start the rule.
-
-## Publish Depthseries Data to tempus
-
-1. Presently depthseries data can be published to tempus via MQTT only. The MQTT topic for publishing depthseries data is:
-   **v1/devices/me/depth/telemetry**
-
-2. The JSON format to publish depthseries data to above topic
-
-* Depth data as JSON array.
-```json
-   [{"ds":3000.1,"values":{"viscosity":0.5, "humidity":72.0}}, {"ds":3000.2,"values":{"viscosity":0.7, "humidity":69.0}}]
-```
-* Depth data as JSON object.
-```json
-   {"ds":5844.23,"values":{"viscosity":0.1, "humidity":22.0}}
-```
-   **Note:** the json has ds for depth instead of ts which is for timestamp.
-
-3. Now depthseries data can be published to tempus similar to timeseries telemetry data using mqtt publish.
-
-## Visualize depthseries data
-
-### LATEST depthseries data
-
-1. Latest values can be seen on the respective devices on which the depthseries data has been published.
-2. It can also be visualized on widgets: analog and digital gauges.
-* For that create/use a new/existing dashboard. Use the following link for that
-  -[Getting Started](https://thingsboard.io/docs/getting-started-guides/helloworld/)
-  Go to the heading "Create new dashboard to visualize the data".
-
-### REALTIME OR HISTORICAL depthseries data
-
-1. Go to the the dashboard created/used in the previous step.
-2. Create a new widget of chart type as "new depthseries flot".
-3. Add datasources with Entity alias as device name and then select from depthseries keys.
-4. Click add. A "new depthseries flot" would get displayed on dashboard for realtime depthseries data for the selected key(s)(It needs realtime depthseries data being published to thingsboard).
-5. For historical data go to history tab of the depthwindow panel present at top right of the dashboard(A clock icon).
-6. Set the required range of depth and click update.
-7. Now the depthseries data for the specified range and the selected key(s) would get plotted on the "new depthseries flot".
-**Note:** Keep data aggregation function in depthwindow panel as "None".
+[![License](http://img.shields.io/:license-Apache%202-blue.svg)](http://www.apache.org/licenses/LICENSE-2.0.txt) [![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fhashmapinc%2FTempus.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Fhashmapinc%2FTempus?ref=badge_shield)
+[![Build Status](https://travis-ci.org/hashmapinc/Tempus.svg?branch=dev)](https://travis-ci.org/hashmapinc/Tempus)
+[![Docker pulls](https://img.shields.io/docker/pulls/hashmapinc/tempus.svg)](https://hub.docker.com/r/hashmapinc/tempus/)
+[![CLA assistant](https://cla-assistant.io/readme/badge/hashmapinc/Tempus)](https://cla-assistant.io/hashmapinc/Tempus)
+[![Quality Gate](https://sonarcloud.io/api/project_badges/measure?project=com.hashmapinc%3Atempus&metric=coverage)](https://sonarcloud.io/dashboard?id=com.hashmapinc%3Atempus)
+[![Slack](https://now-examples-slackin-sdipawcoxa.now.sh/badge.svg)](https://now-examples-slackin-sdipawcoxa.now.sh)
+[![Documentation Status](https://readthedocs.org/projects/tempus/badge/?version=latest)](http://tempus.readthedocs.io/?badge=latest)
+[![SSL Rating](https://sslbadge.org/?domain=tempus.hashmapinc.com)](https://www.ssllabs.com/ssltest/analyze.html?d=tempus.hashmapinc.com)
 
 
-## Enabling LDAP Security
+[Tempus](https://www.hashmapinc.com/tempuscloud) is an IIoT framework for industrial data ingestion and analysis.
 
-The default installation doesn't use LDAP security.  However, It can be changed to use LDAP server for authentication and tempus to authorize the user based on the authentication.
-
-To enable LDAP authentication change the value of flag 'authentication-enabled' under 'ldap' in thingsboard.yml to 'true'. Other settings under ldap also needs to be changed accordingly to point to the right ldap server, dn etc.
-
-The corresponding code can be found in class ThingsboardSecurityConfiguration.java and RestAuthenticationProvider.java. Please refer the official oracle documentation on how LDAP security has been implemented - [LDAP authentication in Java](https://docs.oracle.com/javase/jndi/tutorial/ldap/security/ldap.html)
-
-## SCHEMA MODIFICATION
-
-To upgrade the schema(modify the existing tables), Put the upgrade scripts in upgrade folder under resources in "dao" module. there are different folders "sql" and "cassandra" for corresponding database. Note that the naming format of the upgrade script needs to be - [Name].[Extension] Where name can only be number[anything else other then number in name will cause an ERROR] and upgrades will be applied in the order of names sorted numerically by name and extension can be either sql or cql
-
-example - 1.sql, 5.sql, 4.sql, 3.sql, 2.sql (or extension cql for cassandra)
-
-in the example above the order in which scripts will be applied is - 1.sql, 2.sql, 3.sql, 4.sql, 5.sql
+[![Tempus Video](https://img.youtube.com/vi/BQ8QG5S3-Fc/0.jpg)](https://www.youtube.com/watch?v=BQ8QG5S3-Fc)
 
 
-# Spark Annotations
+### Table of Contents
 
-## Introduction
+- [Features](#features)
+- [Requirements](#requirements)
+- [Getting Started](#getting-started)
+- [Getting Help](#getting-help)
+- [Documentation](#documentation)
+- [License](#license)
+- [Export Control](#export-control)
 
-This feature allows to add Plugin actions dynamically for Spark Computation Plugin, once Spark application jar annotated with [annotations](https://github.com/hashmapinc/TempusSparkAnnotations) is placed in configured directory. ComputationDiscoveryService is configured to scan these jars for create/modify/delete events and process them.
+## Features
 
-### Configurations
+Tempus was made to simplify ingest/analysis/storage/visualization of your IIoT data. The key features include:
 
-For polling 2 configurations need to be made.
-1. SPARK_COMPUTATIONS_PATH : Directory to poll for jar files
-2. DIRECTORY_POLLING_INTERVAL : Polling interval to scan jars from directory, in seconds.
+- Device Management
+  - Configure and Control your edge devices and acquistion conifigurations
+  - This can range from simple data ingestion to complex data analysis and transformation
+- Security
+  - Data transmission via MQTT over TLS
+  - Device authorization via Tokens or X.509 certificates
+  - Supports LDAP or built in authentication
+- IIoT protocol support
+  - Support for:
+    - CoAP
+    - MQTT
+    - HTTP(S)
+    - OPC-UA
+    - WITSML 1.3.1.1/1.4.1.1 (as a client)
+    - Sparkplug B
+    - Apache NiFi (via any flow, using the Tempus supplied NAR files to transmit data to the system via MQTT)
+- Built in Rules engine for Data flow
+  - Using visually-created rules, data can be routed where it needs to go, when it needs to go
+  - Data formatting provided by Apache Velocity
+- Designed for extensiblity
+  - Ability to integrate with any system on the backend. Out of the box support for:
+    - Apache Kafka
+    - AWS SQS/SNS
+    - AWS Kinesis Data Stream/Firehose Delivery Stream
+    - Kudu
+    - HBase
+    - MQTT
+    - REST API endpoints
+- Comprehensive Visualization System
+  - Ability to create drill down and specific views that include
+    - Charts
+    - Maps
+    - Gauges
+    - Digital I/O
+    - and more
+- Scalable
+  - Scales with a zero-master clustering model (orchestrated by Zookeeper)
+- Configurable Storage
+  - Built in data store support for:
+    - HSQLDB (Demos/Development/Testing)
+    - PostgreSQL
+    - Cassandra (recommended for production)
+  - Caching support via Redis
 
-### Annotations
+## Requirements
 
-Spark application jar should contain a class with below annotations to be added as a dynamic action for Plugin
-1. **SparkAction** : Main annotation which will be used to build Action class, with below configurable settings.
+* JDK 1.8 or newer
+* Apache Maven 3.1.0 or newer
+* Git Client
 
-```java
-  @SparkAction(applicationKey = "TEST_APPLICATION", name = "Test Application", actionClass = "TestSparkAction", descriptor = "TestAppActionDescriptor.json")
-```
+## Getting Started
 
-  * *name* : Name to be displayed on UI for action.
+- Read through the [Tempus Developer Quickstart](https://tempus.readthedocs.io/development/quickstart.html/).
+  It will include a section on how to build the local development environment via Docker to get you up and running quickly.
 
-  * *actionClass* : Absolute Class name of an action without package e.g. TestSparkComputationAction.
+To build:
+- Execute `mvn clean install` or for parallel build execute `mvn -T 2.0C clean install`. On a
+  modest development laptop that is a couple of years old, the latter build takes a bit under fifteen
+  minutes. After a large amount of output you should eventually see a success message.
 
-  * *applicationKey* : Application name string to be used as identifier to identitify which spark applications are running.
+      [INFO] ------------------------------------------------------------------------
+      [INFO] Reactor Summary:
+      [INFO] 
+      [INFO] Tempus ............................................. SUCCESS
+      [INFO] Tempus Server Commons .............................. SUCCESS
+      [INFO] Tempus Server Common Data .......................... SUCCESS
+      [INFO] Tempus Server Common Messages ...................... SUCCESS
+      [INFO] Tempus Server Common Transport components .......... SUCCESS
+      [INFO] Tempus Server DAO Layer ............................ SUCCESS
+      [INFO] Tempus Server Extensions API ....................... SUCCESS
+      [INFO] Tempus Server Core Extensions ...................... SUCCESS
+      [INFO] Tempus Extensions .................................. SUCCESS
+      [INFO] Tempus Server RabbitMQ Extension ................... SUCCESS
+      [INFO] Tempus Server REST API Call Extension .............. SUCCESS
+      [INFO] Tempus Server Kafka Extension ...................... SUCCESS
+      [INFO] Tempus Server MQTT Extension ....................... SUCCESS
+      [INFO] Tempus Server Livy Extension ....................... SUCCESS
+      [INFO] Tempus Server SQS Extension ........................ SUCCESS
+      [INFO] Tempus Server SNS Extension ........................ SUCCESS
+      [INFO] Tempus Server Kinesis Extension .................... SUCCESS
+      [INFO] Tempus Server Transport Modules .................... SUCCESS
+      [INFO] Tempus HTTP Transport .............................. SUCCESS
+      [INFO] Tempus COAP Transport .............................. SUCCESS
+      [INFO] Tempus MQTT Transport .............................. SUCCESS 
+      [INFO] Tempus Server UI ................................... SUCCESS
+      [INFO] Tempus Server Tools ................................ SUCCESS 
+      [INFO] Tempus Server Application .......................... SUCCESS 
+      [INFO] ------------------------------------------------------------------------
+      [INFO] BUILD SUCCESS
+      [INFO] ------------------------------------------------------------------------
+      [INFO] Total time: 26:17 min
+      [INFO] Finished at: 2018-04-22T02:01:32Z
+      [INFO] Final Memory: 146M/2153M
+      [INFO] ------------------------------------------------------------------------
 
-  * *descriptor* : Option field pointing to React JSON schema file for configuring Spark input parameters. (This json file if customized should be present under resources folder).
- 
-2. **Configurations** : This annotation will be used to generate Configuration class to hold spark application paramteres eneterd through action descriptor. Once generated class it will extend to *SparkComputationPluginActionConfiguration*
+## Getting Help
+If you have questions, you can join our slack channel using the link above or [here](https://now-examples-slackin-sdipawcoxa.now.sh).
 
- * *className* : Absolute class name to be generated e.g. TestSparkComputationActionConfiguration.
- 
- * *mappings* : Optional array of ConfigurationMappings to map field names to Java Types, see below.
- 
-3. **ConfigurationMappings** : Hold information of each member variable of Configuration Class.
+You can also submit issues or questions via GitHub Issues [here](https://github.com/hashmapinc/Tempus/issues)
 
- * *field* : Name of a member variable to add to Configuration class generated, e.g. zkUrl, kafkaBrokers etc.
- 
- * *type* : java.lang.Class type field which will be used as data type for above field, e.g. String.class, Integer.class etc.
- 
- ```java
- @Configurations(className = "TestAppConfiguration", mappings = {
-        @ConfigurationMapping(field = "zkUrl", type = String.class),
-        @ConfigurationMapping(field = "kafkaBrokers", type = String.class),
-        @ConfigurationMapping(field = "window", type = Long.class)
-})
- ```
- 
-4. **SparkRequest** : Annotation used to get information to build a request to be posted to start a Spark application from plugin. In will be used to build SparkComputationRequest.
+## Documentation
 
- * *main* : Canonical name of a spark application main class which will be used to trigger Spark application.
- 
- * *jar* : Name of jar(without group id) containing this main class e.g. arima-model-0.1.jar
- 
- * *args* : Array of strings used by spark job. e.g. 
- ```java
- @SparkRequest(main = "com.hashmap.app.SparkApp", jar = "sample-spark-computation-1.0-SNAPSHOT",
-        args = {"--window", "Long.toString(configuration.getWindow())", "--mqttbroker", "configuration.getEndpoint()",
-                "--kafka", "configuration.getKafkaBrokers()", "--token", "configuration.getGatewayApiToken()"})
- ```
- 
- ***These are all Type annotations, Processed by AnnotationsProcessor. Also package name for action and configuration is defaulted to package name of class having those annotations. e.g. Annotations are placed on class com.hashmap.tempus.app.TestSparkApp then classes generated will have the same package i.e. com.hashmap.tempus.app***
- 
-### Computations Discovery
+See [The Documentation Here](https://tempus.readthedocs.io) for the latest updates.
 
-#### Motivation
+## License
 
-*As a user if i want to add new Spark computation capability in tempus, i don't want to create a new Action for Spark computation plugin and i want a mechanism so that i should be able to register spark computation application without taking tempus down*
+Except as otherwise noted this software is licensed under the
+[Apache License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0.html)
 
-#### Implementation
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
 
-1. **File system monitor** : It polls configured directory for given interval to identify changes like File create, modify or delete. This is started as soon as serve is started.
+  http://www.apache.org/licenses/LICENSE-2.0
 
-2. **Create** : When new jar is added with annotations, it's classes are scanned for annotations explained above. Then it goes through series of steps as below
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
 
-* *Generate source* : Using velocity templates (action.vm and config.vm) and annotation values Java source is generated and written to temporary directory(Prefix spark, directory "java.io.tmpdir" system property) by AnnotationsProcessor, for debugging purposes. This directory is added to ClassPath of Application ClassLoader so that running application can access them runtime.
+## Export Control
 
-* *Compile Generated Source* : Using javax.tools.JavaCompiler API from JDK tools.jar API generated sources are compiled at the same location as sources and added to application ClassLoader as directory is on Classpath already.
+This distribution includes cryptographic software. The country in which you
+currently reside may have restrictions on the import, possession, use, and/or
+re-export to another country, of encryption software. BEFORE using any
+encryption software, please check your country's laws, regulations and
+policies concerning the import, possession, or use, and re-export of encryption
+software, to see if this is permitted. See <http://www.wassenaar.org/> for more
+information.
 
-* *Persist Components* : ComponentDiscoveryService needs to be notified about newly generated Actions to get persisted in DB and associated with Plugin, so that when request comes from UI for actions against Plugin it can return newly added actions as well.
+The U.S. Government Department of Commerce, Bureau of Industry and Security
+(BIS), has classified this software as Export Commodity Control Number (ECCN)
+5D002.C.1, which includes information security software using or performing
+cryptographic functions with asymmetric algorithms. The form and manner of this
+distribution makes it eligible for export under the
+License Exception ENC Technology Software Unrestricted (TSU) exception (see the
+BIS Export Administration Regulations, Section 740.13) for both object code and
+source code.
 
-3. **Modify** : It goes through all the steps again as listed in Create section, so if there are any changes made to annotations those will be updated to DB and Plugins as well.
+The following provides more details on the included cryptographic software:
 
-***It's highly discouraged to change the class or package name of Action and Configuration. Because application will not delete old one but add new entries for newly generated classes*** 
+Tempus uses BouncyCastle and the built-in
+java cryptography libraries for SSL, SSH. See
+http://bouncycastle.org/about.html
+http://www.oracle.com/us/products/export/export-regulations-345813.html
+for more details on each of these libraries cryptography features.
 
-4. **Delete**
-
-* *Suspend and Delete Rule actors* : As Spark computation plugin is a tenant plugin, all existing tenant rule actors associated with the actions needs to be suspended and then deleted. Once that's completed same Rules from DB are also deleted along with any attributes stored against them.
-
-* *Delete Component Descriptors* : ComponentDescriptors associated with those actions are deleted. Remember generated action and configuration classes are not deleted, so that in case of error in any of the earlier stage that rule will still be available.
-
-***In case jars are deleted when thingsbord server is stopped, nothing mentioned above will be triggered. You have to be careful while deleting existing spark computations***
-
-## Licenses
-
-This project is released under [Apache 2.0 License](./LICENSE).
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fhashmapinc%2FTempus.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Fhashmapinc%2FTempus?ref=badge_large)

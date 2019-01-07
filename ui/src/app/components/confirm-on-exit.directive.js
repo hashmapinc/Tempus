@@ -1,5 +1,6 @@
 /*
- * Copyright © 2016-2017 The Thingsboard Authors
+ * Copyright © 2016-2018 The Thingsboard Authors
+ * Modifications © 2017-2018 Hashmap, Inc
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,22 +14,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-export default angular.module('thingsboard.directives.confirmOnExit', [])
+export default angular.module('tempus.directives.confirmOnExit', [])
     .directive('tbConfirmOnExit', ConfirmOnExit)
     .name;
 
 /*@ngInject*/
-function ConfirmOnExit($state, $mdDialog, $window, $filter) {
+function ConfirmOnExit($state, $mdDialog, $window, $filter, userService) {
     return {
         link: function ($scope) {
 
             $window.onbeforeunload = function () {
-                if (($scope.confirmForm && $scope.confirmForm.$dirty) || $scope.isDirty) {
+                if (userService.isAuthenticated() && (($scope.confirmForm && $scope.confirmForm.$dirty) || $scope.isDirty)) {
                     return $filter('translate')('confirm-on-exit.message');
                 }
             }
             $scope.$on('$stateChangeStart', function (event, next, current, params) {
-                if (($scope.confirmForm && $scope.confirmForm.$dirty) || $scope.isDirty) {
+                if (userService.isAuthenticated() && (($scope.confirmForm && $scope.confirmForm.$dirty) || $scope.isDirty)) {
                     event.preventDefault();
                     var confirm = $mdDialog.confirm()
                         .title($filter('translate')('confirm-on-exit.title'))

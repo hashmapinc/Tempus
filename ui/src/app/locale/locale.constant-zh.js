@@ -1,5 +1,6 @@
 /*
- * Copyright © 2016-2017 The Thingsboard Authors
+ * Copyright © 2016-2018 The Thingsboard Authors
+ * Modifications © 2017-2018 Hashmap, Inc
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 export default function addLocaleChinese(locales) {
     var zh_CN = {
         "access": {
@@ -401,8 +401,8 @@ export default function addLocaleChinese(locales) {
             "make-private-dashboard-title": "您确定要将仪表板 '{{dashboardTitle}}' 设为私有吗？",
             "make-private-dashboard-text": "确认后，仪表板将被设为私有，不能被其他人访问。",
             "make-private-dashboard": "仪表板设为私有",
-            "socialshare-text": "'{{dashboardTitle}}' 由Thingsboard提供支持",
-            "socialshare-title": "'{{dashboardTitle}}' 由Thingsboard提供支持",
+            "socialshare-text": "'{{dashboardTitle}}' 由tempus提供支持",
+            "socialshare-title": "'{{dashboardTitle}}' 由tempus提供支持",
             "select-dashboard": "选择仪表板",
             "no-dashboards-matching": "找不到符合 '{{entity}}' 的仪表板。",
             "dashboard-required": "仪表板必填。",

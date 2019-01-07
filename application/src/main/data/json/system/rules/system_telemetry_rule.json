@@ -5,20 +5,21 @@
   "pluginToken": "telemetry",
   "filters": [
     {
-      "clazz": "org.thingsboard.server.extensions.core.filter.MsgTypeFilter",
+      "clazz": "com.hashmapinc.server.extensions.core.filter.MsgTypeFilter",
       "name": "TelemetryFilter",
       "configuration": {
         "messageTypes": [
           "POST_TELEMETRY",
           "POST_ATTRIBUTES",
-          "GET_ATTRIBUTES"
+          "GET_ATTRIBUTES",
+          "POST_TELEMETRY_DEPTH"
         ]
       }
     }
   ],
   "processor": null,
   "action": {
-    "clazz": "org.thingsboard.server.extensions.core.action.telemetry.TelemetryPluginAction",
+    "clazz": "com.hashmapinc.server.extensions.core.action.telemetry.TelemetryPluginAction",
     "name": "TelemetryMsgConverterAction",
     "configuration": {
       "timeUnit": "DAYS",

@@ -1,5 +1,6 @@
 /*
- * Copyright © 2016-2017 The Thingsboard Authors
+ * Copyright © 2016-2018 The Thingsboard Authors
+ * Modifications © 2017-2018 Hashmap, Inc
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,9 +19,9 @@ import './datasource-func.scss';
 import 'md-color-picker';
 import tinycolor from 'tinycolor2';
 import $ from 'jquery';
-import thingsboardTypes from '../common/types.constant';
-import thingsboardUtils from '../common/utils.service';
-import thingsboardDatakeyConfigDialog from './datakey-config-dialog.controller';
+import tempusTypes from '../common/types.constant';
+import tempusUtils from '../common/utils.service';
+import tempusDatakeyConfigDialog from './datakey-config-dialog.controller';
 
 /* eslint-disable import/no-unresolved, import/default */
 
@@ -31,7 +32,7 @@ import datakeyConfigDialogTemplate from './datakey-config-dialog.tpl.html';
 
 /* eslint-disable angular/angularelement */
 
-export default angular.module('thingsboard.directives.datasourceFunc', [thingsboardTypes, thingsboardUtils, thingsboardDatakeyConfigDialog])
+export default angular.module('tempus.directives.datasourceFunc', [tempusTypes, tempusUtils, tempusDatakeyConfigDialog])
     .directive('tbDatasourceFunc', DatasourceFunc)
     .name;
 
@@ -44,7 +45,6 @@ function DatasourceFunc($compile, $templateCache, $mdDialog, $window, $document,
 
         scope.ngModelCtrl = ngModelCtrl;
         scope.types = types;
-
         scope.functionTypes = utils.getPredefinedFunctionsList();
         scope.alarmFields = [];
         for (var alarmField in types.alarmFields) {
@@ -56,7 +56,8 @@ function DatasourceFunc($compile, $templateCache, $mdDialog, $window, $document,
 
         scope.selectedAlarmDataKey = null;
         scope.alarmDataKeySearchText = null;
-
+        
+    
         scope.updateValidity = function () {
             if (ngModelCtrl.$viewValue) {
                 var value = ngModelCtrl.$viewValue;
@@ -83,6 +84,7 @@ function DatasourceFunc($compile, $templateCache, $mdDialog, $window, $document,
             updateDataKeys();
         }, true);
 
+
         function updateDataKeys() {
             if (ngModelCtrl.$viewValue) {
                 var dataKeys = [];
@@ -100,6 +102,7 @@ function DatasourceFunc($compile, $templateCache, $mdDialog, $window, $document,
             }
         });
 
+       
         ngModelCtrl.$render = function () {
             if (ngModelCtrl.$viewValue) {
                 var funcDataKeys = [];
@@ -228,7 +231,8 @@ function DatasourceFunc($compile, $templateCache, $mdDialog, $window, $document,
             maxDataKeys: '=',
             optDataKeys: '=',
             generateDataKey: '&',
-            datakeySettingsSchema: '='
+            datakeySettingsSchema: '=',
+            widgetInfo: '='
         },
         link: linker
     };

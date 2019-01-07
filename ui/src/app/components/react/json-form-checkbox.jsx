@@ -1,5 +1,6 @@
 /*
- * Copyright © 2016-2017 The Thingsboard Authors
+ * Copyright © 2016-2018 The Thingsboard Authors
+ * Modifications © 2017-2018 Hashmap, Inc
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,10 +15,10 @@
  * limitations under the License.
  */
 import React from 'react';
-import ThingsboardBaseComponent from './json-form-base-component.jsx';
+import TempusBaseComponent from './json-form-base-component.jsx';
 import Checkbox from 'material-ui/Checkbox';
 
-class ThingsboardCheckbox extends React.Component {
+class TempusCheckbox extends React.Component {
     render() {
         return (
             <Checkbox
@@ -33,4 +34,4 @@ class ThingsboardCheckbox extends React.Component {
     }
 }
 
-export default ThingsboardBaseComponent(ThingsboardCheckbox);
+export default TempusBaseComponent(TempusCheckbox);

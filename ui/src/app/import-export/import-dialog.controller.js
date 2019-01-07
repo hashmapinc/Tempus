@@ -1,5 +1,6 @@
 /*
- * Copyright © 2016-2017 The Thingsboard Authors
+ * Copyright © 2016-2018 The Thingsboard Authors
+ * Modifications © 2017-2018 Hashmap, Inc
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,7 +34,7 @@ export default function ImportDialogController($scope, $log, $mdDialog, toast, i
         $mdDialog.cancel();
     }
 
-    function fileAdded($file) {
+    function fileAdded($file) {$log.log($file.getType());
         if ($file.getExtension() === 'json') {
             var reader = new FileReader();
             reader.onload = function(event) {
@@ -59,9 +60,16 @@ export default function ImportDialogController($scope, $log, $mdDialog, toast, i
         else if ($file.getExtension() === 'jar') {
             $scope.$apply(function() {
                 $scope.theForm.$setDirty();
-                    vm.importData = $file;
-                    vm.fileName = $file.name;
+                vm.importData = $file;
+                vm.fileName = $file.name;
             })
+        } else if($file.getExtension() === 'png' || $file.getExtension() === 'jpeg' || $file.getExtension() === 'svg' || $file.getExtension() === 'jpg') {
+            $scope.$apply(function() {
+                $scope.theForm.$setDirty();
+                vm.importData = $file;
+                vm.fileName = $file.name;
+            })
+
         }
 
     }

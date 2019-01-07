@@ -1,6 +1,7 @@
 <!--
 
-    Copyright © 2016-2017 The Thingsboard Authors
+    Copyright © 2016-2018 The Thingsboard Authors
+    Modifications © 2017-2018 Hashmap, Inc
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -16,7 +17,7 @@
 
 -->
 <!DOCTYPE html>
-<html ng-app="thingsboard" ng-strict-di>
+<html ng-app="tempus" ng-strict-di style="width: 100%;">
   <head>
     <title ng-bind="pageTitle"></title>
     <base href="/" />
@@ -28,7 +29,7 @@
           type="image/x-icon"
           href="static/tempus.ico" />
   </head>
-  <body>
+  <body md-theme="{{theme}}" md-theme-watch = "true">
     <ui-view layout="row" layout-fill>
     </ui-view>
   </body>

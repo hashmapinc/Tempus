@@ -1,5 +1,6 @@
 /*
- * Copyright © 2016-2017 The Thingsboard Authors
+ * Copyright © 2016-2018 The Thingsboard Authors
+ * Modifications © 2017-2018 Hashmap, Inc
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,6 +29,30 @@ export default function TenantDirective($compile, $templateCache, $translate, to
         scope.onTenantIdCopied = function() {
             toast.showSuccess($translate.instant('tenant.idCopiedMessage'), 750, angular.element(element).parent().parent(), 'bottom left');
         };
+
+        scope.fileAdded = function($file) {
+            var reader = new FileReader();
+            reader.onload = function(event) {
+                scope.$apply(function() {
+                    if(event.target.result) {
+                        var addedFile = event.target.result;
+                        if (addedFile && addedFile.length > 0) {
+                            if($file.getExtension() === 'png' || $file.getExtension() === 'jpeg' || $file.getExtension() === 'svg' || $file.getExtension() === 'jpg'){
+                                scope.tenant.logo = addedFile;
+                                scope.tenant.logoFileName = $file.name;
+                            }
+                        }
+                    }
+                });
+            };
+            reader.readAsDataURL($file.file);
+
+        };
+
+        scope.clearFile = function() {
+            scope.tenant.logoFileName = null;
+            scope.tenant.logo = null;
+        }
 
         $compile(element.contents())(scope);
     }

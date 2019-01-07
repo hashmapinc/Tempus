@@ -1,5 +1,6 @@
 /*
- * Copyright © 2016-2017 The Thingsboard Authors
+ * Copyright © 2016-2018 The Thingsboard Authors
+ * Modifications © 2017-2018 Hashmap, Inc
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +18,7 @@
 
 import generalSettingsTemplate from '../admin/general-settings.tpl.html';
 import outgoingMailSettingsTemplate from '../admin/outgoing-mail-settings.tpl.html';
+import themeSettingsTemplate from '../admin/theme-settings.tpl.html';
 
 /* eslint-enable import/no-unresolved, import/default */
 
@@ -69,5 +71,25 @@ export default function AdminRoutes($stateProvider) {
             ncyBreadcrumb: {
                 label: '{"icon": "mail", "label": "admin.outgoing-mail"}'
             }
-        });
+        }).state('home.settings.ui-config',{
+
+        url: '/theming',
+        module: 'private',
+        auth: ['SYS_ADMIN'],
+        views: {
+            "content@home": {
+                templateUrl: themeSettingsTemplate,
+                controllerAs: 'vm',
+                controller: 'AdminController'
+            }
+        },
+        data: {
+            key: 'mail',
+            pageTitle: 'admin.ui-configuration'
+        },
+        ncyBreadcrumb: {
+            label: '{"icon": "settings_applications", "label": "admin.ui-configuration"}'
+        }
+    });
+
 }

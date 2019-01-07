@@ -1,5 +1,6 @@
 /*
- * Copyright © 2016-2017 The Thingsboard Authors
+ * Copyright © 2016-2018 The Thingsboard Authors
+ * Modifications © 2017-2018 Hashmap, Inc
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,12 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 import ManageDashboardLayoutsController from './manage-dashboard-layouts.controller';
 import SelectTargetLayoutController from './select-target-layout.controller';
 import DashboardLayoutDirective from './dashboard-layout.directive';
 
-export default angular.module('thingsboard.dashboard.layouts', [])
+export default angular.module('tempus.dashboard.layouts', [])
     .controller('ManageDashboardLayoutsController', ManageDashboardLayoutsController)
     .controller('SelectTargetLayoutController', SelectTargetLayoutController)
     .directive('tbDashboardLayout', DashboardLayoutDirective)

@@ -1,5 +1,6 @@
 /*
- * Copyright © 2016-2017 The Thingsboard Authors
+ * Copyright © 2016-2018 The Thingsboard Authors
+ * Modifications © 2017-2018 Hashmap, Inc
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,9 +16,9 @@
  */
 import './datakey-config.scss';
 
-import thingsboardJsonForm from "./json-form.directive";
-import thingsboardTypes from '../common/types.constant';
-import thingsboardJsFunc from './js-func.directive';
+import tempusJsonForm from "./json-form.directive";
+import tempusTypes from '../common/types.constant';
+import tempusJsFunc from './js-func.directive';
 
 /* eslint-disable import/no-unresolved, import/default */
 
@@ -25,7 +26,7 @@ import datakeyConfigTemplate from './datakey-config.tpl.html';
 
 /* eslint-enable import/no-unresolved, import/default */
 
-export default angular.module('thingsboard.directives.datakeyConfig', [thingsboardTypes, thingsboardJsFunc, thingsboardJsonForm])
+export default angular.module('tempus.directives.datakeyConfig', [tempusTypes, tempusJsFunc, tempusJsonForm])
     .directive('tbDatakeyConfig', DatakeyConfig)
     .name;
 

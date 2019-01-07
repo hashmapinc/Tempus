@@ -1,6 +1,7 @@
 <!--
 
-    Copyright © 2016-2017 The Thingsboard Authors
+    Copyright © 2016-2018 The Thingsboard Authors
+    Modifications © 2017-2018 Hashmap, Inc
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -31,12 +32,30 @@
         <span style="min-height: 5px;" flex="" ng-show="!loading"></span>
         <md-dialog-content>
             <div class="md-dialog-content">
-                <tb-computation computation="vm.item" is-edit="true" the-form="theForm"></tb-computation>
+                <md-content class="md-padding" layout="column">
+                    <fieldset ng-disabled="$root.loading">
+                        <section flex layout="row">
+                            <md-input-container flex="100" class="md-block" md-is-error="theForm.computationType.$touched && theForm.computationType.$invalid">
+                                <label translate>computation.type</label>
+                                <md-select required name="computationType" ng-change="vm.computationTypeChange()" ng-model="vm.item.type">
+                                    <md-option ng-repeat="(key,value) in vm.types.computationType" ng-value="value">
+                                        {{value}}
+                                    </md-option>
+                                </md-select>
+                                <div ng-messages="theForm.computationType.$error">
+                                    <div translate ng-message="required">computation.type-required</div>
+                                </div>
+                            </md-input-container>
+                        </section>
+                        <div tb-computation-form-spark model="vm.item" ng-if="vm.item.type && vm.item.type == vm.types.computationType.spark"></div>
+                        <div tb-computation-form-kubeless model="vm.item" ng-if="vm.item.type && vm.item.type == vm.types.computationType.kubeless"></div>
+                    </fieldset>
+                </md-content>
             </div>
         </md-dialog-content>
         <md-dialog-actions layout="row">
             <span flex></span>
-            <md-button ng-disabled="loading || theForm.$invalid || !theForm.$dirty" type="submit"
+            <md-button ng-disabled="loading || theForm.$invalid || !theForm.$dirty || (vm.item.type == vm.types.computationType.spark && !vm.item.importData)" type="submit"
                        class="md-raised md-primary">
                 {{ 'action.add' | translate }}
             </md-button>

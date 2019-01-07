@@ -1,5 +1,7 @@
+
 #
-# Copyright © 2016-2017 The Thingsboard Authors
+# Copyright © 2016-2018 The Thingsboard Authors
+# Modifications © 2017-2018 Hashmap, Inc
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -26,11 +28,30 @@ server:
     # Path to the key store that holds the SSL certificate
     key-store: "${SSL_KEY_STORE:classpath:keystore/keystore.p12}"
     # Password used to access the key store
-    key-store-password: "${SSL_KEY_STORE_PASSWORD:thingsboard}"
+    key-store-password: "${SSL_KEY_STORE_PASSWORD:tempus}"
     # Type of the key store
     key-store-type: "${SSL_KEY_STORE_TYPE:PKCS12}"
     # Alias that identifies the key in the key store
     key-alias: "${SSL_KEY_ALIAS:tomcat}"
+
+
+security:
+  oauth2:
+    client:
+      clientId: "${TEMPUS_CLIENT_ID:tempus}"
+      clientSecret: "${TEMPUS_CLIENT_SECRET:tempus}"
+      accessTokenUri: "${ACCESS_TOKEN_URI:${IDENTITY_BASE_URL:http://localhost:9002/uaa}/oauth/token}"
+      user-authorization-uri: "${AUTHORIZATION_URI:${IDENTITY_BASE_URL:http://localhost:9002/uaa}/oauth/authorize}"
+      #grant-type: "${TEMPUS_CLIENT_GRANT_TYPE:password}"
+      scope: ["server"]
+    resource:
+      id: "${TEMPUS_RESOURCE_API_ID:tempus-resource-server-rest-api}"
+      tokenInfoUri: "${TOKEN_INFO_URI:${IDENTITY_BASE_URL:http://localhost:9002/uaa}/oauth/check_token}"
+
+identity:
+  url: "${IDENTITY_SERVICE_URL:${IDENTITY_BASE_URL:http://localhost:9002/uaa}/users}"
+
+#security.jwt.tokenSigningKey: "${JWT_TOKEN_SIGNING_KEY:hashmapIncDefaultSigningKey}"
 
 ldap:
   authentication-enabled: "${LDAP_AUTHENTICATION_ENABLED:false}"
@@ -52,7 +73,7 @@ zk:
   # Zookeeper session timeout in milliseconds
   session_timeout_ms: "${ZOOKEEPER_SESSION_TIMEOUT_MS:3000}"
   # Name of the directory in zookeeper 'filesystem'
-  zk_dir: "${ZOOKEEPER_NODES_DIR:/thingsboard}"
+  zk_dir: "${ZOOKEEPER_NODES_DIR:/tempus}"
 
 # RPC connection parameters. Used only in cluster mode only.
 rpc:
@@ -69,18 +90,23 @@ cluster:
 # Plugins configuration parameters
 plugins:
   # Comma seperated package list used during classpath scanning for plugins
-  scan_packages: "${PLUGINS_SCAN_PACKAGES:org.thingsboard.server.extensions}"
+  scan_packages: "${PLUGINS_SCAN_PACKAGES:com.hashmapinc.server.extensions}"
 
 spark:
-  jar_path: "${SPARK_COMPUTATIONS_PATH:/Users/jay/Poller}"
-  polling_interval: "${DIRECTORY_POLLING_INTERVAL:10}" # Number of Seconds
+  jar_path: "${SPARK_COMPUTATIONS_PATH:${java.io.tmpdir}}"
+  livy_host: "${LIVY_HOST:spark-master}"
+  livy_port: "${LIVY_PORT:8998}"
+
+aws:
+  access_key: "${AWS_ACCESS_KEY:access_key}"
+  secret_key: "${AWS_SECRET_KEY:secret_key}"
 
 # JWT Token parameters
 security.jwt:
-  tokenExpirationTime: "${JWT_TOKEN_EXPIRATION_TIME:9000000}" # Number of seconds (15 mins)
-  refreshTokenExpTime: "${JWT_REFRESH_TOKEN_EXPIRATION_TIME:36000000}" # Seconds (1 hour)
-  tokenIssuer: "${JWT_TOKEN_ISSUER:thingsboard.io}"
-  tokenSigningKey: "${JWT_TOKEN_SIGNING_KEY:thingsboardDefaultSigningKey}"
+  tokenExpirationTime: "${JWT_TOKEN_EXPIRATION_TIME:900}" # Number of seconds (15 mins)
+  refreshTokenExpTime: "${JWT_REFRESH_TOKEN_EXPIRATION_TIME:3600}" # Seconds (1 hour)
+  tokenIssuer: "${JWT_TOKEN_ISSUER:tempus.io}"
+  tokenSigningKey: "${JWT_TOKEN_SIGNING_KEY:tempusDefaultSigningKey}"
 
 # Device communication protocol parameters
 http:
@@ -88,12 +114,14 @@ http:
 
 # MQTT server parameters
 mqtt:
+  # Enable/disable mqtt transport protocol.
+  enabled: "${MQTT_ENABLED:true}"
   bind_address: "${MQTT_BIND_ADDRESS:0.0.0.0}"
   bind_port: "${MQTT_BIND_PORT:1883}"
   adaptor: "${MQTT_ADAPTOR_NAME:JsonMqttAdaptor}"
   timeout: "${MQTT_TIMEOUT:10000}"
   netty:
-    leak_detector_level: "${NETTY_LEASK_DETECTOR_LVL:DISABLED}"
+    leak_detector_level: "${NETTY_LEAK_DETECTOR_LVL:DISABLED}"
     boss_group_thread_count: "${NETTY_BOSS_GROUP_THREADS:1}"
     worker_group_thread_count: "${NETTY_WORKER_GROUP_THREADS:12}"
   # MQTT SSL configuration
@@ -113,20 +141,44 @@ mqtt:
 
 # CoAP server parameters
 coap:
+  # Enable/disable coap transport protocol.
+  enabled: "${COAP_ENABLED:true}"
   bind_address: "${COAP_BIND_ADDRESS:0.0.0.0}"
   bind_port: "${COAP_BIND_PORT:5683}"
   adaptor:  "${COAP_ADAPTOR_NAME:JsonCoapAdaptor}"
   timeout: "${COAP_TIMEOUT:10000}"
 
+#Quota parameters
+quota:
+  host:
+    # Max allowed number of API requests in interval for single host
+    limit: "${QUOTA_HOST_LIMIT:10000}"
+    # Interval duration
+    intervalMs: "${QUOTA_HOST_INTERVAL_MS:60000}"
+    # Maximum silence duration for host after which Host removed from QuotaService. Must be bigger than intervalMs
+    ttlMs: "${QUOTA_HOST_TTL_MS:60000}"
+    # Interval for scheduled task that cleans expired records. TTL is used for expiring
+    cleanPeriodMs: "${QUOTA_HOST_CLEAN_PERIOD_MS:300000}"
+    # Enable Host API Limits
+    enabled: "${QUOTA_HOST_ENABLED:false}"
+    # Array of whitelist hosts
+    whitelist: "${QUOTA_HOST_WHITELIST:localhost,127.0.0.1}"
+    # Array of blacklist hosts
+    blacklist: "${QUOTA_HOST_BLACKLIST:}"
+  log:
+    topSize: 10
+    intervalMin: 2
+
+#Telementry database type option
 database:
-  type: "${DATABASE_TYPE:sql}" # cassandra OR sql
+  type: "${DATABASE_TYPE:cassandra}" # cassandra OR sql
 
 # Cassandra driver configuration parameters
 cassandra:
-  # Thingsboard cluster name
-  cluster_name: "${CASSANDRA_CLUSTER_NAME:Thingsboard Cluster}"
-  # Thingsboard keyspace name
-  keyspace_name: "${CASSANDRA_KEYSPACE_NAME:thingsboard}"
+  # tempus cluster name
+  cluster_name: "${CASSANDRA_CLUSTER_NAME:tempus Cluster}"
+  # tempus keyspace name
+  keyspace_name: "${CASSANDRA_KEYSPACE_NAME:tempus}"
   # Specify node list
   url: "${CASSANDRA_URL:127.0.0.1:9042}"
   # Enable/disable secure connection
@@ -168,6 +220,27 @@ cassandra:
     # Specify partitioning size for timestamp key-value storage. Example MINUTES, HOURS, DAYS, MONTHS
     ts_key_value_partitioning: "${TS_KV_PARTITIONING:MONTHS}"
 
+# SQL configuration parameters
+sql:
+    # Specify executor service type used to perform timeseries insert tasks: SINGLE FIXED CACHED
+    ts_inserts_executor_type: "${SQL_TS_INSERTS_EXECUTOR_TYPE:fixed}"
+    # Specify thread pool size for FIXED executor service type
+    ts_inserts_fixed_thread_pool_size: "${SQL_TS_INSERTS_FIXED_THREAD_POOL_SIZE:10}"
+
+metadata-ingestion:
+    config:
+        service_url: "${METADATA_CONFIG_URL:${METADATA_BASE_URL:http://localhost:9003/api}/metaconfig}"
+        owner_path: "${METADATA_CONFIG_GET_BY_OWNER_URL:owner}"
+        ingest_path: "${METADATA_CONFIG_START_INGESTION_URL:ingest}"
+        connect_path: "${METADATA_CONFIG_TEST_CONNECTION_URL:connection}"
+    query:
+        service_url: "${METADATA_QUERY_URL:${METADATA_BASE_URL:http://localhost:9003/api}/metaquery}"
+        config_path: "${METADATA_QUERY_GET_BY_CONFIG_URL:metaconfig}"
+    # Specify executor service type used to perform metadata insert tasks: SINGLE FIXED CACHED
+    inserts_executor_type: "${SQL_METADATA_INSERTS_EXECUTOR_TYPE:fixed}"
+    # Specify thread pool size for FIXED executor service type
+    inserts_fixed_thread_pool_size: "${SQL_METADATA_INSERTS_FIXED_THREAD_POOL_SIZE:10}"
+
 # Actor system parameters
 actors:
   tenant:
@@ -201,30 +274,36 @@ actors:
     enabled: "${ACTORS_STATISTICS_ENABLED:true}"
     persist_frequency: "${ACTORS_STATISTICS_PERSIST_FREQUENCY:3600000}"
 
-# Cache parameters
 cache:
-  # Enable/disable cache functionality.
-  enabled: "${CACHE_ENABLED:false}"
-  device_credentials:
-    # Default time to store device credentials in cache, in seconds
-    time_to_live: "${CACHE_DEVICE_CREDENTIAL_TTL:3600}"
-    # Maximum size of the map. When maximum size is reached, the map is evicted based on the policy defined.
-    max_size:
-      # Max size policy options:
-      # PER_NODE: Maximum number of map entries in each JVM.
-      # PER_PARTITION: Maximum number of map entries within each partition.
-      # USED_HEAP_SIZE: Maximum used heap size in megabytes for each JVM.
-      # USED_HEAP_PERCENTAGE: Maximum used heap size percentage for each JVM.
-      # FREE_HEAP_SIZE: Minimum free heap size in megabytes for each JVM.
-      # FREE_HEAP_PERCENTAGE: Minimum free heap size percentage for each JVM.
-      policy: "${CACHE_DEVICE_CREDENTIAL_MAX_SIZE_POLICY:PER_NODE}"
-      size: "${CACHE_DEVICE_CREDENTIAL_MAX_SIZE_SIZE:1000000}"
+  # caffeine or redis
+  type: "${CACHE_TYPE:caffeine}"
+
+caffeine:
+  specs:
+    relations:
+      timeToLiveInMinutes: 1440
+      maxSize: 100000
+    deviceCredentials:
+      timeToLiveInMinutes: 1440
+      maxSize: 100000
+    devices:
+      timeToLiveInMinutes: 1440
+      maxSize: 100000
+
+redis:
+  # standalone or cluster
+  connection:
+    type: standalone
+    host: "${REDIS_HOST:localhost}"
+    port: "${REDIS_PORT:6379}"
+    db: "${REDIS_DB:0}"
+    password: "${REDIS_PASSWORD:}"
 
 # Check new version updates parameters
 updates:
   # Enable/disable updates checking.
   enabled: "${UPDATES_ENABLED:true}"
-  
+
 # spring CORS configuration
 spring.mvc.cors:
    mappings:
@@ -252,24 +331,9 @@ configurations:
   ui:
     depthSeries: "true"
 
+spring.main.allow-bean-definition-overriding: true
+
 # HSQLDB DAO Configuration
-spring:
-  data:
-    jpa:
-      repositories:
-        enabled: "true"
-  jpa:
-    hibernate:
-      ddl-auto: "validate"
-    database-platform: "${SPRING_JPA_DATABASE_PLATFORM:org.hibernate.dialect.HSQLDialect}"
-  datasource:
-    driverClassName: "${SPRING_DRIVER_CLASS_NAME:org.hsqldb.jdbc.JDBCDriver}"
-    url: "${SPRING_DATASOURCE_URL:jdbc:hsqldb:file:${SQL_DATA_FOLDER:/tmp}/thingsboardDb;sql.enforce_size=false}"
-    username: "${SPRING_DATASOURCE_USERNAME:sa}"
-    password: "${SPRING_DATASOURCE_PASSWORD:}"
-
-
-# PostgreSQL DAO Configuration
 #spring:
 #  data:
 #    jpa:
@@ -278,15 +342,88 @@ spring:
 #  jpa:
 #    hibernate:
 #      ddl-auto: "validate"
-#    database-platform: "${SPRING_JPA_DATABASE_PLATFORM:org.hibernate.dialect.PostgreSQLDialect}"
+#    database-platform: "${SPRING_JPA_DATABASE_PLATFORM:org.hibernate.dialect.HSQLDialect}"
 #  datasource:
-#    driverClassName: "${SPRING_DRIVER_CLASS_NAME:org.postgresql.Driver}"
-#    url: "${SPRING_DATASOURCE_URL:jdbc:postgresql://postgres:5432/thingsboard}"
-#    username: "${SPRING_DATASOURCE_USERNAME:postgres}"
-#    password: "${SPRING_DATASOURCE_PASSWORD:postgres}"
+#    driverClassName: "${SPRING_DRIVER_CLASS_NAME:org.hsqldb.jdbc.JDBCDriver}"
+#    url: "${SPRING_DATASOURCE_URL:jdbc:hsqldb:file:${SQL_DATA_FOLDER:/tmp}/tempusDb;sql.enforce_size=false}"
+#    username: "${SPRING_DATASOURCE_USERNAME:sa}"
+#    password: "${SPRING_DATASOURCE_PASSWORD:}"
 
-#max file and request size
-spring.http:
+# PostgreSQL DAO Configuration
+spring:
+  data:
+    jpa:
+      repositories:
+        enabled: "true"
+  jpa:
+    hibernate:
+      ddl-auto: "validate"
+    database-platform: "${SPRING_JPA_DATABASE_PLATFORM:org.hibernate.dialect.PostgreSQLDialect}"
+  datasource:
+    driverClassName: "${SPRING_DRIVER_CLASS_NAME:org.postgresql.Driver}"
+    url: "${SPRING_DATASOURCE_URL:jdbc:postgresql://postgres:5432/tempus}"
+    username: "${SPRING_DATASOURCE_USERNAME:postgres}"
+    password: "${SPRING_DATASOURCE_PASSWORD:postgres}"
+
+##max file and request size
+spring.servlet:
   multipart:
-    max-file-size: -1
-    max-request-size: -1
+    max-file-size: 1GB
+    max-request-size: 1GB
+# Audit log parameters
+audit-log:
+  # Enable/disable audit log functionality.
+  enabled: "${AUDIT_LOG_ENABLED:true}"
+  # Specify partitioning size for audit log by tenant id storage. Example MINUTES, HOURS, DAYS, MONTHS
+  by-tenant-partitioning: "${AUDIT_LOG_BY_TENANT_PARTITIONING:MONTHS}"
+  # Number of days as history period if startTime and endTime are not specified
+  default_query_period: "${AUDIT_LOG_DEFAULT_QUERY_PERIOD:30}"
+  # Logging levels per each entity type.
+  # Allowed values: OFF (disable), W (log write operations), RW (log read and write operations)
+  logging-level:
+    mask:
+      "device": "${AUDIT_LOG_MASK_DEVICE:W}"
+      "asset": "${AUDIT_LOG_MASK_ASSET:W}"
+      "dashboard": "${AUDIT_LOG_MASK_DASHBOARD:W}"
+      "customer": "${AUDIT_LOG_MASK_CUSTOMER:W}"
+      "user": "${AUDIT_LOG_MASK_USER:W}"
+      "rule": "${AUDIT_LOG_MASK_RULE:W}"
+      "plugin": "${AUDIT_LOG_MASK_PLUGIN:W}"
+      "computation": "${AUDIT_LOG_MASK_PLUGIN:W}"
+      "computation_job": "${AUDIT_LOG_MASK_PLUGIN:W}"
+  sink:
+    # Type of external sink. possible options: none, elasticsearch
+    type: "${AUDIT_LOG_SINK_TYPE:none}"
+    # Name of the index where audit logs stored
+    # Index name could contain next placeholders (not mandatory):
+    # @{TENANT} - substituted by tenant ID
+    # @{DATE} - substituted by current date in format provided in audit-log.sink.date_format
+    index_pattern: "${AUDIT_LOG_SINK_INDEX_PATTERN:@{TENANT}_AUDIT_LOG_@{DATE}}"
+    # Date format. Details of the pattern could be found here:
+    # https://docs.oracle.com/javase/8/docs/api/java/time/format/DateTimeFormatter.html
+    date_format: "${AUDIT_LOG_SINK_DATE_FORMAT:YYYY.MM.DD}"
+    scheme_name: "${AUDIT_LOG_SINK_SCHEME_NAME:http}" # http or https
+    host: "${AUDIT_LOG_SINK_HOST:localhost}"
+    port: "${AUDIT_LOG_SINK_POST:9200}"
+    user_name: "${AUDIT_LOG_SINK_USER_NAME:}"
+    password: "${AUDIT_LOG_SINK_PASSWORD:}"
+
+authorization.rules.filePath: "default-rules.json"
+
+#Tempus Gateway
+gateway:
+  image: "${TEMPUS_GATEWAY_IMAGE:hashmapinc/tempus-gateway}"
+  host: "${GATEWAY_HOST:tempus-svc}"
+  port: "${GATEWAY_PORT:9095}"
+  commands:
+    - "sh"
+    - "-c"
+    - "/run-application.sh"
+
+#Kubernetes Configuration
+kubernetes:
+  cluster_mode_enabled: "${CLUSTER_MODE_ENABLED:true}"
+  kube_config_path: "${KUBE_CONFIG_PATH:/home/.kube/config}"
+
+logging.level.org.springframework.boot.autoconfigure.security: OFF
+

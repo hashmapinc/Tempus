@@ -1,5 +1,6 @@
 /*
- * Copyright © 2016-2017 The Thingsboard Authors
+ * Copyright © 2016-2018 The Thingsboard Authors
+ * Modifications © 2017-2018 Hashmap, Inc
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,20 +14,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-export default angular.module('thingsboard.api.ui_configuration', [])
+export default angular.module('tempus.api.ui_configuration', [])
   .factory('uiConfigurationService', UiConfiguration)
   .name;
 
 /*@ngInject*/
-function UiConfiguration($http, $q, $log) {
+function UiConfiguration($http, $q, $log, $timeout) {
     var configs;
 
     var service = {
       getUiConfiguration : getUiConfiguration,
       isDepthSeriesEnabled: isDepthSeriesEnabled
     }
-
-    getUiConfiguration();
+    $timeout( function(){
+        getUiConfiguration();
+    }, 1000 );
     return service;
 
     function getUiConfiguration() {

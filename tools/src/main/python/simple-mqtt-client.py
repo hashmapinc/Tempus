@@ -1,6 +1,6 @@
-# -*- coding: utf-8 -*-
 #
-# Copyright © 2016-2017 The Thingsboard Authors
+# Copyright © 2016-2018 The Thingsboard Authors
+# Modifications © 2017-2018 Hashmap, Inc
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -30,11 +30,11 @@ def on_connect(client, userdata, rc, *extra_params):
 
 # The callback for when a PUBLISH message is received from the server.
 def on_message(client, userdata, msg):
-   print 'Topic: ' + msg.topic + '\nMessage: ' + str(msg.payload)
+   print('Topic: ' + msg.topic + '\nMessage: ' + str(msg.payload))
    if msg.topic.startswith( 'v1/devices/me/rpc/request/'):
-       requestId = msg.topic[len('v1/devices/me/rpc/request/'):len(msg.topic)]
-       print 'This is a RPC call. RequestID: ' + requestId + '. Going to reply now!'
-       client.publish('v1/devices/me/rpc/response/' + requestId, "{\"value1\":\"A\", \"value2\":\"B\"}", 1)
+       request_id = msg.topic[len('v1/devices/me/rpc/request/'):len(msg.topic)]
+       print('This is a RPC call. RequestID: ' + request_id + '. Going to reply now!')
+       client.publish('v1/devices/me/rpc/response/' + request_id, "{\"value1\":\"A\", \"value2\":\"B\"}", 1)
 
 
 client = mqtt.Client()
@@ -43,7 +43,7 @@ client.on_message = on_message
 client.publish('v1/devices/me/attributes/request/1', "{\"clientKeys\":\"model\"}", 1)
 
 client.username_pw_set("B1_TEST_TOKEN")
-client.connect('127.0.0.1', 1883, 1)
+client.connect('127.0.0.1', 1883, 1)  #NOSONAR
 
 # Blocking call that processes network traffic, dispatches callbacks and
 # handles reconnecting.

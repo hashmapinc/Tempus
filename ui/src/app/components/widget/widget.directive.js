@@ -1,5 +1,6 @@
 /*
- * Copyright © 2016-2017 The Thingsboard Authors
+ * Copyright © 2016-2018 The Thingsboard Authors
+ * Modifications © 2017-2018 Hashmap, Inc
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,16 +14,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 import './widget.scss';
 
-import thingsboardLegend from '../legend.directive';
-import thingsboardTypes from '../../common/types.constant';
-import thingsboardApiDatasource from '../../api/datasource.service';
+import tempusLegend from '../legend.directive';
+import tempusTypes from '../../common/types.constant';
+import tempusApiDatasource from '../../api/datasource.service';
 
 import WidgetController from './widget.controller';
 
-export default angular.module('thingsboard.directives.widget', [thingsboardLegend, thingsboardTypes, thingsboardApiDatasource])
+export default angular.module('tempus.directives.widget', [tempusLegend, tempusTypes, tempusApiDatasource])
     .controller('WidgetController', WidgetController)
     .directive('tbWidget', Widget)
     .name;
@@ -69,7 +69,28 @@ function Widget($controller, widgetService) {
                 }
             );
 
-            function loadFromWidgetInfo(widgetInfo) {
+            function loadFromWidgetInfo(widgetInfo) { 
+
+                if(widgetInfo.alias === 'welllogviewer'){
+                    var dk = [];
+                    locals.widget.config.datasources.forEach(function(dkeys){
+                        dkeys.dataKeys.forEach(function(datakey){
+
+                            dk.push({"value": datakey.label, "label": datakey.label});
+                        })
+                    })
+                    widgetInfo.typeSettingsSchema.form[0].items.forEach(function(item){
+                        if(angular.isDefined(item.items)){
+                            item.items.forEach(function(component){
+                                if(component.key === "Track[].component[].dataSource"){
+                                     component.items = dk;
+                                 }
+                            })
+                        }
+                        
+                    })
+                    
+                }
 
                 scope.loadingData = true;
 

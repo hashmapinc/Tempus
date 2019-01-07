@@ -1,5 +1,6 @@
 /*
- * Copyright © 2016-2017 The Thingsboard Authors
+ * Copyright © 2016-2018 The Thingsboard Authors
+ * Modifications © 2017-2018 Hashmap, Inc
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -60,7 +61,7 @@ module.exports = {
             allChunks: true,
         }),
         new webpack.DefinePlugin({
-            THINGSBOARD_VERSION: JSON.stringify(require('./package.json').version),
+            TEMPUS_VERSION: JSON.stringify(require('./package.json').version),
             '__DEVTOOLS__': false,
             'process.env': {
                 NODE_ENV: JSON.stringify('production'),
@@ -69,9 +70,16 @@ module.exports = {
     ],
     node: {
         tls: "empty",
-        fs: "empty"
+        fs: "empty",
+        child_process: 'empty'
     },
     module: {
+        rules: [
+            {
+                test: /\.js$/,
+                loader: 'ify-loader'
+            }
+        ],
         loaders: [
             {
                 test: /\.jsx$/,
@@ -118,6 +126,10 @@ module.exports = {
                     'img?minimize'
                 ]
             },
+            {
+                test: /\.json$/,
+                loaders: ['json-loader']
+            }
         ],
     },
     'html-minifier-loader': {

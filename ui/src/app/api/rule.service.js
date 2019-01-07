@@ -1,5 +1,6 @@
 /*
- * Copyright © 2016-2017 The Thingsboard Authors
+ * Copyright © 2016-2018 The Thingsboard Authors
+ * Modifications © 2017-2018 Hashmap, Inc
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-export default angular.module('thingsboard.api.rule', [])
+export default angular.module('tempus.api.rule', [])
     .factory('ruleService', RuleService).name;
 
 /*@ngInject*/
@@ -47,11 +48,11 @@ function RuleService($http, $q, $rootScope, $filter, types, utils) {
         tenantRules = undefined;
     }
 
-    function loadRulesCache() {
+    function loadRulesCache(config) {
         var deferred = $q.defer();
         if (!allRules) {
             var url = '/api/rules';
-            $http.get(url, null).then(function success(response) {
+            $http.get(url, config).then(function success(response) {
                 allRules = response.data;
                 systemRules = [];
                 tenantRules = [];
@@ -100,9 +101,9 @@ function RuleService($http, $q, $rootScope, $filter, types, utils) {
         return deferred.promise;
     }
 
-    function getAllRules(pageLink) {
+    function getAllRules(pageLink, config) {
         var deferred = $q.defer();
-        loadRulesCache().then(
+        loadRulesCache(config).then(
             function success() {
                 utils.filterSearchTextEntities(allRules, 'name', pageLink, deferred);
             },
@@ -124,10 +125,10 @@ function RuleService($http, $q, $rootScope, $filter, types, utils) {
         return deferred.promise;
     }
 
-    function getRule(ruleId) {
+    function getRule(ruleId, config) {
         var deferred = $q.defer();
         var url = '/api/rule/' + ruleId;
-        $http.get(url, null).then(function success(response) {
+        $http.get(url, config).then(function success(response) {
             deferred.resolve(response.data);
         }, function fail(response) {
             deferred.reject(response.data);
@@ -139,6 +140,7 @@ function RuleService($http, $q, $rootScope, $filter, types, utils) {
         var deferred = $q.defer();
         var url = '/api/rule';
         $http.post(url, rule).then(function success(response) {
+            invalidateRulesCache();
             deferred.resolve(response.data);
         }, function fail(response) {
             deferred.reject(response.data);
@@ -150,6 +152,7 @@ function RuleService($http, $q, $rootScope, $filter, types, utils) {
         var deferred = $q.defer();
         var url = '/api/rule/' + ruleId;
         $http.delete(url).then(function success() {
+            invalidateRulesCache();
             deferred.resolve();
         }, function fail(response) {
             deferred.reject(response.data);
@@ -161,6 +164,7 @@ function RuleService($http, $q, $rootScope, $filter, types, utils) {
         var deferred = $q.defer();
         var url = '/api/rule/' + ruleId + '/activate';
         $http.post(url, null).then(function success(response) {
+            invalidateRulesCache();
             deferred.resolve(response.data);
         }, function fail(response) {
             deferred.reject(response.data);
@@ -172,6 +176,7 @@ function RuleService($http, $q, $rootScope, $filter, types, utils) {
         var deferred = $q.defer();
         var url = '/api/rule/' + ruleId + '/suspend';
         $http.post(url, null).then(function success(response) {
+            invalidateRulesCache();
             deferred.resolve(response.data);
         }, function fail(response) {
             deferred.reject(response.data);

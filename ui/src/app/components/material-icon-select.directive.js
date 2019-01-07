@@ -1,5 +1,6 @@
 /*
- * Copyright © 2016-2017 The Thingsboard Authors
+ * Copyright © 2016-2018 The Thingsboard Authors
+ * Modifications © 2017-2018 Hashmap, Inc
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 import './material-icon-select.scss';
 
 import MaterialIconsDialogController from './material-icons-dialog.controller';
@@ -26,7 +26,7 @@ import materialIconsDialogTemplate from './material-icons-dialog.tpl.html';
 /* eslint-enable import/no-unresolved, import/default */
 
 
-export default angular.module('thingsboard.directives.materialIconSelect', [])
+export default angular.module('tempus.directives.materialIconSelect', [])
     .controller('MaterialIconsDialogController', MaterialIconsDialogController)
     .directive('tbMaterialIconSelect', MaterialIconSelect)
     .name;

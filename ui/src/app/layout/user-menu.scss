@@ -1,5 +1,6 @@
 /**
- * Copyright © 2016-2017 The Thingsboard Authors
+ * Copyright © 2016-2018 The Thingsboard Authors
+ * Modifications © 2017-2018 Hashmap, Inc
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 div.tb-user-info {
   line-height: 3;
   span {
@@ -24,6 +24,7 @@ div.tb-user-info {
     font-size: 0.800rem;
     font-weight: 300;
     letter-spacing: 0.008em;
+    margin-bottom:-11%
   }
   span.tb-user-authority {
     font-size: 0.800rem;

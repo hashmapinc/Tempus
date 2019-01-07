@@ -1,5 +1,6 @@
 /*
- * Copyright © 2016-2017 The Thingsboard Authors
+ * Copyright © 2016-2018 The Thingsboard Authors
+ * Modifications © 2017-2018 Hashmap, Inc
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,13 +15,13 @@
  * limitations under the License.
  */
 import React from 'react';
-import ThingsboardAceEditor from './json-form-ace-editor.jsx';
+import TempusAceEditor from './json-form-ace-editor.jsx';
 import 'brace/mode/json';
 import beautify from 'js-beautify';
 
 const js_beautify = beautify.js;
 
-class ThingsboardJson extends React.Component {
+class TempusJson extends React.Component {
 
     constructor(props) {
         super(props);
@@ -33,9 +34,9 @@ class ThingsboardJson extends React.Component {
 
     render() {
         return (
-            <ThingsboardAceEditor {...this.props} mode='json' onTidy={this.onTidyJson} {...this.state}></ThingsboardAceEditor>
+            <TempusAceEditor {...this.props} mode='json' onTidy={this.onTidyJson} {...this.state}></TempusAceEditor>
         );
     }
 }
 
-export default ThingsboardJson;
+export default TempusJson;

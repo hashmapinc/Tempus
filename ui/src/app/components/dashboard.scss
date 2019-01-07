@@ -1,5 +1,6 @@
 /**
- * Copyright © 2016-2017 The Thingsboard Authors
+ * Copyright © 2016-2018 The Thingsboard Authors
+ * Modifications © 2017-2018 Hashmap, Inc
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -79,7 +80,6 @@ div.tb-widget.tb-not-highlighted {
 }
 
 tb-dashboard {
-  position: relative;
   top: 0;
   left: 0;
   right: 0;
@@ -111,4 +111,7 @@ md-content.tb-dashboard-content {
   font-size: 16px;
   word-wrap: break-word;
   padding: 5px;
+}
+span.dashset {
+    display:none !important;
 }

@@ -1,0 +1,98 @@
+#
+# Copyright © 2016-2018 The Thingsboard Authors
+# Modifications © 2017-2018 Hashmap, Inc
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+# Default values for tempus-aws.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+discovery:
+  name: redtail-api-discovery
+  replicaCount: 1
+  image:
+    repository: hashmapinc/redtail-api-discovery
+    tag: latest
+    pullPolicy: Always
+  app:
+    port: 8761
+  service:
+    type: ClusterIP
+    port: 80
+  pdb:
+    minAvailable: 1
+
+identity:
+  name: redtail-identity-service
+  replicaCount: 1
+  image:
+    repository: hashmapinc/redtail-identity-service
+    tag: latest
+    pullPolicy: Always
+  app:
+    port: 9002
+  service:
+    type: ClusterIP
+    port: 80
+  pdb:
+    minAvailable: 1
+  db:
+    host: postgresql
+    port: 5432
+    name: identity
+    user: identity
+    ## TODO We need to extract secrets from here
+    password: identity
+
+metadata:
+  name: redtail-metadata-api
+  replicaCount: 1
+  image:
+    repository: hashmapinc/redtail-metadata-api
+    tag: latest
+    pullPolicy: Always
+  app:
+    port: 9003
+  service:
+    type: ClusterIP
+    port: 80
+  pdb:
+    minAvailable: 1
+  ## Using same db as identity for now, we can change these values later if we want a separate db instance for metadata-api
+  db:
+    host: postgresql
+    port: 5432
+    name: identity
+    user: identity
+    ## TODO We need to extract secrets from here
+    password: identity
+
+resources: {}
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  # limits:
+  #  cpu: 100m
+  #  memory: 128Mi
+  # requests:
+  #  cpu: 100m
+  #  memory: 128Mi
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}

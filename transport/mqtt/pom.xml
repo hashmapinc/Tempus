@@ -1,6 +1,7 @@
 <!--
 
-    Copyright © 2016-2017 The Thingsboard Authors
+    Copyright © 2016-2018 The Thingsboard Authors
+    Modifications © 2017-2018 Hashmap, Inc
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -19,25 +20,55 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>org.thingsboard</groupId>
-        <version>1.3.1-SNAPSHOT</version>
+        <groupId>com.hashmapinc</groupId>
+        <version>1.4.0</version>
         <artifactId>transport</artifactId>
     </parent>
-    <groupId>org.thingsboard.transport</groupId>
+    <groupId>com.hashmapinc.transport</groupId>
     <artifactId>mqtt</artifactId>
     <packaging>jar</packaging>
 
     <name>Tempus MQTT Transport</name>
-    <url>http://thingsboard.org</url>
+    <url>https://hashmapinc.com</url>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <main.dir>${basedir}/../..</main.dir>
     </properties>
-
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-install-plugin</artifactId>
+                <version>2.5.1</version>
+                <configuration>
+                    <groupId>com.cirruslink.sparkplug</groupId>
+                    <artifactId>sparkplug-java</artifactId>
+                    <version>1.1.13</version>
+                    <packaging>jar</packaging>
+                    <file>${basedir}/lib/sparkplug-java-1.1.13.jar</file>
+                    <generatePom>true</generatePom>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>install-jar-lib</id>
+                        <goals>
+                            <goal>install-file</goal>
+                        </goals>
+                        <phase>validate</phase>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
     <dependencies>
         <dependency>
-            <groupId>org.thingsboard.common</groupId>
+            <groupId>com.cirruslink.sparkplug</groupId>
+            <artifactId>sparkplug-java</artifactId>
+            <version>1.1.13</version>
+        </dependency>
+        <dependency>
+            <groupId>com.hashmapinc.common</groupId>
             <artifactId>transport</artifactId>
         </dependency>
         <dependency>

@@ -1,5 +1,6 @@
 /*
- * Copyright © 2016-2017 The Thingsboard Authors
+ * Copyright © 2016-2018 The Thingsboard Authors
+ * Modifications © 2017-2018 Hashmap, Inc
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,22 +18,22 @@ import './dashboard.scss';
 
 import uiRouter from 'angular-ui-router';
 
-import thingsboardGrid from '../components/grid.directive';
-import thingsboardApiWidget from '../api/widget.service';
-import thingsboardApiUser from '../api/user.service';
-import thingsboardApiDashboard from '../api/dashboard.service';
-import thingsboardApiCustomer from '../api/customer.service';
-import thingsboardDetailsSidenav from '../components/details-sidenav.directive';
-import thingsboardWidgetConfig from '../components/widget/widget-config.directive';
-import thingsboardDashboardSelect from '../components/dashboard-select.directive';
-import thingsboardRelatedEntityAutocomplete from '../components/related-entity-autocomplete.directive';
-import thingsboardDashboard from '../components/dashboard.directive';
-import thingsboardExpandFullscreen from '../components/expand-fullscreen.directive';
-import thingsboardWidgetsBundleSelect from '../components/widgets-bundle-select.directive';
-import thingsboardSocialsharePanel from '../components/socialshare-panel.directive';
-import thingsboardTypes from '../common/types.constant';
-import thingsboardItemBuffer from '../services/item-buffer.service';
-import thingsboardImportExport from '../import-export';
+import tempusGrid from '../components/grid.directive';
+import tempusApiWidget from '../api/widget.service';
+import tempusApiUser from '../api/user.service';
+import tempusApiDashboard from '../api/dashboard.service';
+import tempusApiCustomer from '../api/customer.service';
+import tempusDetailsSidenav from '../components/details-sidenav.directive';
+import tempusWidgetConfig from '../components/widget/widget-config.directive';
+import tempusDashboardSelect from '../components/dashboard-select.directive';
+import tempusRelatedEntityAutocomplete from '../components/related-entity-autocomplete.directive';
+import tempusDashboard from '../components/dashboard.directive';
+import tempusExpandFullscreen from '../components/expand-fullscreen.directive';
+import tempusWidgetsBundleSelect from '../components/widgets-bundle-select.directive';
+import tempusSocialsharePanel from '../components/socialshare-panel.directive';
+import tempusTypes from '../common/types.constant';
+import tempusItemBuffer from '../services/item-buffer.service';
+import tempusImportExport from '../import-export';
 import dashboardLayouts from './layouts';
 import dashboardStates from './states';
 
@@ -41,31 +42,31 @@ import DashboardRoutes from './dashboard.routes';
 import {DashboardsController, DashboardCardController, MakeDashboardPublicDialogController} from './dashboards.controller';
 import DashboardController from './dashboard.controller';
 import DashboardSettingsController from './dashboard-settings.controller';
-import AssignDashboardToCustomerController from './assign-to-customer.controller';
 import AddDashboardsToCustomerController from './add-dashboards-to-customer.controller';
+import ManageAssignedCustomersController from './manage-assigned-customers.controller';
 import AddWidgetController from './add-widget.controller';
 import DashboardDirective from './dashboard.directive';
 import EditWidgetDirective from './edit-widget.directive';
 import DashboardToolbar from './dashboard-toolbar.directive';
 
-export default angular.module('thingsboard.dashboard', [
+export default angular.module('tempus.dashboard', [
     uiRouter,
-    thingsboardTypes,
-    thingsboardItemBuffer,
-    thingsboardImportExport,
-    thingsboardGrid,
-    thingsboardApiWidget,
-    thingsboardApiUser,
-    thingsboardApiDashboard,
-    thingsboardApiCustomer,
-    thingsboardDetailsSidenav,
-    thingsboardWidgetConfig,
-    thingsboardDashboardSelect,
-    thingsboardRelatedEntityAutocomplete,
-    thingsboardDashboard,
-    thingsboardExpandFullscreen,
-    thingsboardWidgetsBundleSelect,
-    thingsboardSocialsharePanel,
+    tempusTypes,
+    tempusItemBuffer,
+    tempusImportExport,
+    tempusGrid,
+    tempusApiWidget,
+    tempusApiUser,
+    tempusApiDashboard,
+    tempusApiCustomer,
+    tempusDetailsSidenav,
+    tempusWidgetConfig,
+    tempusDashboardSelect,
+    tempusRelatedEntityAutocomplete,
+    tempusDashboard,
+    tempusExpandFullscreen,
+    tempusWidgetsBundleSelect,
+    tempusSocialsharePanel,
     dashboardLayouts,
     dashboardStates
 ])
@@ -75,8 +76,8 @@ export default angular.module('thingsboard.dashboard', [
     .controller('MakeDashboardPublicDialogController', MakeDashboardPublicDialogController)
     .controller('DashboardController', DashboardController)
     .controller('DashboardSettingsController', DashboardSettingsController)
-    .controller('AssignDashboardToCustomerController', AssignDashboardToCustomerController)
     .controller('AddDashboardsToCustomerController', AddDashboardsToCustomerController)
+    .controller('ManageAssignedCustomersController', ManageAssignedCustomersController)
     .controller('AddWidgetController', AddWidgetController)
     .directive('tbDashboardDetails', DashboardDirective)
     .directive('tbEditWidget', EditWidgetDirective)

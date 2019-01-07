@@ -1,0 +1,22 @@
+{
+  "schema": {
+    "title": "Event Hub Action Configuration",
+    "type": "object",
+    "properties": {
+      "template": {
+        "title": "Body Template",
+        "type": "string"
+      }
+    },
+    "required": [
+      "template"
+    ]
+  },
+  "form": [
+    {
+      "key": "template",
+      "type": "textarea",
+      "rows": 5
+    }
+  ]
+}

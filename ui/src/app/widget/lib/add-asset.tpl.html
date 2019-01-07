@@ -1,0 +1,87 @@
+<!--
+
+    Copyright © 2016-2018 The Thingsboard Authors
+    Modifications © 2017-2018 Hashmap, Inc
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+        http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<md-dialog aria-label="{{ 'asset.add' | translate }}" tb-help="'assets'" help-container-id="help-container" class="assetWidth">
+    <form name="theForm" ng-submit="vm.addAsset()">
+        <md-toolbar>
+            <div class="md-toolbar-tools">
+                <h2 >Add {{vm.name}}</h2>
+                <span flex></span>
+                <div id="help-container"></div>
+                <md-button class="md-icon-button" ng-click="vm.cancel()">
+                    <ng-md-icon icon="close" aria-label="{{ 'dialog.close' | translate }}"></ng-md-icon>
+                </md-button>
+            </div>
+        </md-toolbar>
+        <md-progress-linear class="md-warn" md-mode="indeterminate" ng-disabled="!$root.loading" ng-show="$root.loading"></md-progress-linear>
+        <span style="min-height: 5px;" flex="" ng-show="!$root.loading"></span>
+        <md-dialog-content>
+            <md-tabs md-dynamic-height md-border-bottom>
+                <md-tab label="Details">
+                  <md-content class="md-padding">
+                        <fieldset>
+                                <md-input-container class="md-block">
+                                    <label translate>asset.name</label>
+                                    <input required name="name" ng-model="vm.asset_name">
+                                    <div ng-messages="theForm.name.$error">
+                                        <div translate ng-message="required">asset.name-required</div>
+                                    </div>
+                                </md-input-container>
+                                <md-input-container class="md-block">
+                                    <label translate>asset.description</label>
+                                    <textarea  rows="2" ng-model="vm.description"></textarea>
+                                </md-input-container>
+                                <md-input-container class="md-block" ng-if="vm.showCustList" >
+                                    <md-select required placeholder="Assign Business Unit" ng-model="vm.user"  style="min-width: 200px;" ng-disabled="vm.disableFlag">
+                                        <md-option ng-value="user" ng-repeat="user in vm.users">{{user.name}}</md-option>
+                                      </md-select>
+                                </md-input-container>
+                                <md-input-container class="md-block" ng-if="vm.showChildOf" style="margin-top: 30px;">
+                                    <label style="margin-bottom: 10px;">Child of : {{vm.parentName}} </label>
+                                </md-input-container>
+                                <md-input-container class="md-block" ng-if="vm.showParent">
+                                        <md-select  placeholder="Assign relation" md-on-open="vm.loadrelationModel()" ng-model="vm.associatedAsset" style="min-width: 200px;margin-top: 20px">
+                                                <md-option ng-value="asset" ng-repeat="asset in vm.assetList">{{asset.name}}</md-option>
+                                        </md-select>
+                                </md-input-container>
+                                
+                            </fieldset>
+                  </md-content>
+                </md-tab>
+                <md-tab label="attribute" ng-if="vm.attributeList.length > 0">
+                  <md-content class="md-padding">                     
+                        <div ng-repeat="attribute in vm.attributeList">
+                            <md-input-container class="md-block">
+                                <label>{{attribute.name}}</label>
+                                <input ng-model="vm.attributes[attribute.name]" ng-required="attribute.keyAttribute">
+                            </md-input-container>
+                        </div>
+                  </md-content>
+                </md-tab>
+
+              </md-tabs>
+        </md-dialog-content>
+        <md-dialog-actions layout="row">
+            <span flex></span>
+            <md-button  type="submit" class="md-raised md-primary" ng-disabled="theForm.$invalid">
+                {{ 'action.add' | translate }}
+            </md-button>
+            <md-button  ng-click="vm.cancel()" style="margin-right:20px;">{{ 'action.cancel' | translate }}</md-button>
+        </md-dialog-actions>
+    </form>
+</md-dialog>

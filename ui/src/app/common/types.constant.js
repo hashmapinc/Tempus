@@ -1,5 +1,6 @@
 /*
- * Copyright © 2016-2017 The Thingsboard Authors
+ * Copyright © 2016-2018 The Thingsboard Authors
+ * Modifications © 2017-2018 Hashmap, Inc
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-export default angular.module('thingsboard.types', [])
+export default angular.module('tempus.types', [])
     .constant('types',
         {
             serverErrorCode: {
@@ -156,6 +157,63 @@ export default angular.module('thingsboard.types', [])
                     color: "green"
                 }
             },
+            auditLogActionType: {
+                "ADDED": {
+                    name: "audit-log.type-added"
+                },
+                "DELETED": {
+                    name: "audit-log.type-deleted"
+                },
+                "UPDATED": {
+                    name: "audit-log.type-updated"
+                },
+                "ATTRIBUTES_UPDATED": {
+                    name: "audit-log.type-attributes-updated"
+                },
+                "ATTRIBUTES_DELETED": {
+                    name: "audit-log.type-attributes-deleted"
+                },
+                "RPC_CALL": {
+                    name: "audit-log.type-rpc-call"
+                },
+                "CREDENTIALS_UPDATED": {
+                    name: "audit-log.type-credentials-updated"
+                },
+                "ASSIGNED_TO_CUSTOMER": {
+                    name: "audit-log.type-assigned-to-customer"
+                },
+                "UNASSIGNED_FROM_CUSTOMER": {
+                    name: "audit-log.type-unassigned-from-customer"
+                },
+                "ACTIVATED": {
+                    name: "audit-log.type-activated"
+                },
+                "SUSPENDED": {
+                    name: "audit-log.type-suspended"
+                },
+                "CREDENTIALS_READ": {
+                    name: "audit-log.type-credentials-read"
+                },
+                "ATTRIBUTES_READ": {
+                    name: "audit-log.type-attributes-read"
+                }
+            },
+            auditLogActionStatus: {
+                "SUCCESS": {
+                    value: "SUCCESS",
+                    name: "audit-log.status-success"
+                },
+                "FAILURE": {
+                    value: "FAILURE",
+                    name: "audit-log.status-failure"
+                }
+            },
+            auditLogMode: {
+                tenant: "tenant",
+                entity: "entity",
+                user: "user",
+                customer: "customer"
+            },
             aliasFilterType: {
                 singleEntity: {
                     value: 'singleEntity',
@@ -240,7 +298,12 @@ export default angular.module('thingsboard.types', [])
                 user: "USER",
                 dashboard: "DASHBOARD",
                 alarm: "ALARM",
-                application:"APPLICATION"
+                computation:"COMPUTATION",
+                computationJob:"COMPUTATION_JOB"
+
+            },
+            aliasEntityType: {
+                current_customer: "CURRENT_CUSTOMER"
             },
             entityTypeTranslations: {
                 "DEVICE": {
@@ -297,11 +360,22 @@ export default angular.module('thingsboard.types', [])
                     list: 'entity.list-of-alarms',
                     nameStartsWith: 'entity.alarm-name-starts-with'
                 },
-                "APPLICATION": {
-                    type: 'entity.type-application',
-                    typePlural: 'entity.type-applications',
-                    list: 'entity.list-of-applications',
-                    nameStartsWith: 'entity.application-name-starts-with'
+                "COMPUTATION": {
+                    type: 'entity.type-computation',
+                    typePlural: 'entity.type-computations',
+                    list: 'entity.list-of-computations',
+                    nameStartsWith: 'entity.computation-name-starts-with'
+                },
+                "COMPUTATION_JOB": {
+                    type: 'entity.type-computationJob',
+                    typePlural: 'entity.type-computationJobs',
+                    list: 'entity.list-of-computationJobs',
+                    nameStartsWith: 'entity.computationJob-name-starts-with'
+                },
+
+                "CURRENT_CUSTOMER": {
+                    type: 'entity.type-current-customer',
+                    list: 'entity.type-current-customer'
                 }
             },
             entitySearchDirection: {
@@ -325,6 +399,110 @@ export default angular.module('thingsboard.types', [])
                     value: "STATS",
                     name: "event.type-stats"
                 }
+            },
+            extensionType: {
+                http: "HTTP",
+                mqtt: "MQTT",
+                opc: "OPC UA",
+                wits: "WITS",
+                witsml: "WITSML",
+                modbus: "MODBUS"
+            },
+            permissionType: {
+                '*':"ALL",
+                'ASSIGN': "ASSIGN",
+                'CREATE': "CREATE",
+                'DELETE': "DELETE",
+                'READ': "READ",
+                'UPDATE': "UPDATE",
+            },
+           entityTypes: {
+                'ALL':'ALL',
+                'ASSET': "ASSET",
+                'DEVICE':"DEVICE"
+            },
+           userTypes: {
+                'CUSTOMER_USER':'CUSTOMER_USER',
+                'SYSADMIN_USER': "SYSADMIN_USER",
+                'TENANT_USER': "TENANT_USER"
+            },
+            extensionValueType: {
+                string: 'value.string',
+                long: 'value.long',
+                double: 'value.double',
+                boolean: 'value.boolean'
+            },
+            extensionTransformerType: {
+                toDouble: 'extension.to-double',
+                custom: 'extension.custom'
+            },
+            mqttConverterTypes: {
+                json: 'extension.converter-json',
+                custom: 'extension.custom'
+            },
+            extensionModbusFunctionCodes: {
+                1: "Read Coils (1)",
+                2: "Read Discrete Inputs (2)",
+                3: "Read Multiple Holding Registers (3)",
+                4: "Read Input Registers (4)"
+            },
+            extensionModbusTransports: {
+                tcp: "TCP",
+                udp: "UDP",
+                rtu: "RTU"
+            },
+            extensionModbusRtuParities: {
+                none: "none",
+                even: "even",
+                odd: "odd"
+            },
+            extensionModbusRtuEncodings: {
+                ascii: "ascii",
+                rtu: "rtu"
+            },
+            mqttCredentialTypes: {
+                anonymous:  {
+                    value: "anonymous",
+                    name: "extension.anonymous"
+                },
+                basic: {
+                    value: "basic",
+                    name: "extension.basic"
+                },
+                pem: {
+                    value: "cert.PEM",
+                    name: "extension.pem"
+                }
+            },
+            witsmlVersions: {
+              v1411: "1.4.1.1",
+              v1311: "1.3.1.1"
+            },
+            witsmlObjectTypes: {
+              wellbore: "Wellbore",
+                log: "Logs",
+                mudLogs: "Mudlogs",
+                message: "Messages",
+                rig: "Rig",
+                trajectory: "Trajectory"
+            },
+            witsmlWellStatus: {
+                active: "Active",
+                drilling: "Drilling"
+            },
+            extensionOpcSecurityTypes: {
+                Basic128Rsa15: "Basic128Rsa15",
+                Basic256: "Basic256",
+                Basic256Sha256: "Basic256Sha256",
+                None: "None"
+            },
+            extensionIdentityType: {
+                anonymous: "extension.anonymous",
+                username: "extension.username"
+            },
+            extensionKeystoreType: {
+                PKCS12: "PKCS12",
+                JKS: "JKS"
             },
             latestTelemetry: {
                 value: "LATEST_TELEMETRY",
@@ -456,6 +634,53 @@ export default angular.module('thingsboard.types', [])
             },
             translate: {
                 customTranslationsPrefix: "custom."
+            },
+            computationType: {
+                spark: "SPARK",
+                kubeless: "KUBELESS"
+            },
+            runtimeTypes: {
+                python27: {
+                    name: "Python 2.7",
+                    value: "python2.7"
+                },
+                python34: {
+                    name: "Python 3.4",
+                    value: "python3.4"
+                },
+                python36: {
+                    name: "Python 3.6",
+                    value: "python3.6"
+                },
+                nodejs6: {
+                    name: "Node.js 6",
+                    value: "nodejs6"
+                },
+                nodejs8: {
+                    name: "Node.js 8",
+                    value: "nodejs8"
+                },
+                ruby24: {
+                    name: "Ruby 2.4",
+                    value: "ruby2.4"
+                },
+                go110: {
+                    name: "Go 1.10",
+                    value: "go1.10"
+                },
+                java18: {
+                    name: "Java 1.8",
+                    value: "java1.8"
+                }
+            },
+            triggerTypes: {
+                Kafka: "KUBELESS-KAFKA"
+            },
+            metadataSourceType: {
+                jdbc: "JDBC"
+            },
+            metadataSinkType: {
+                rest: "REST"
             }
         }
     ).name;

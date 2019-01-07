@@ -1,5 +1,6 @@
 /*
- * Copyright © 2016-2017 The Thingsboard Authors
+ * Copyright © 2016-2018 The Thingsboard Authors
+ * Modifications © 2017-2018 Hashmap, Inc
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,7 +33,8 @@ export default function RelationTable() {
         scope: true,
         bindToController: {
             entityId: '=',
-            entityType: '@'
+            entityType: '@',
+            entityDetail:'='
         },
         controller: RelationTableController,
         controllerAs: 'vm',
@@ -41,9 +43,10 @@ export default function RelationTable() {
 }
 
 /*@ngInject*/
-function RelationTableController($scope, $q, $mdDialog, $document, $translate, $filter, utils, types, entityRelationService) {
+function RelationTableController($scope, $q, $mdDialog, $document, $translate, $filter, utils, types, entityRelationService, $state) {
 
     let vm = this;
+
 
     vm.types = types;
 
@@ -71,10 +74,15 @@ function RelationTableController($scope, $q, $mdDialog, $document, $translate, $
     vm.deleteRelations = deleteRelations;
     vm.reloadRelations = reloadRelations;
     vm.updateRelations = updateRelations;
-
     $scope.$watch("vm.entityId", function(newVal, prevVal) {
         if (newVal && !angular.equals(newVal, prevVal)) {
             reloadRelations();
+        }
+        if($state.current.url == '/plugins' || $state.current.url == '/rules'){
+            if(vm.entityId){
+                reloadRelations();
+            }
+
         }
     });
 
@@ -150,7 +158,8 @@ function RelationTableController($scope, $q, $mdDialog, $document, $translate, $
             locals: { isAdd: isAdd,
                       direction: vm.direction,
                       relation: relation,
-                      showingCallback: onShowingCallback},
+                      showingCallback: onShowingCallback,
+                      entityDetail:vm.entityDetail},
             targetEvent: $event,
             fullscreen: true,
             skipHide: true,

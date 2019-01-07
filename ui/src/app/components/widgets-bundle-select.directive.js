@@ -1,5 +1,6 @@
 /*
- * Copyright © 2016-2017 The Thingsboard Authors
+ * Copyright © 2016-2018 The Thingsboard Authors
+ * Modifications © 2017-2018 Hashmap, Inc
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +16,7 @@
  */
 import './widgets-bundle-select.scss';
 
-import thingsboardApiWidget from '../api/widget.service';
+import tempusApiWidget from '../api/widget.service';
 
 /* eslint-disable import/no-unresolved, import/default */
 
@@ -24,7 +25,7 @@ import widgetsBundleSelectTemplate from './widgets-bundle-select.tpl.html';
 /* eslint-enable import/no-unresolved, import/default */
 
 
-export default angular.module('thingsboard.directives.widgetsBundleSelect', [thingsboardApiWidget])
+export default angular.module('tempus.directives.widgetsBundleSelect', [tempusApiWidget])
     .directive('tbWidgetsBundleSelect', WidgetsBundleSelect)
     .name;
 
@@ -48,7 +49,7 @@ function WidgetsBundleSelect($compile, $templateCache, widgetService, types) {
             }
         }
 
-        widgetsBundleFetchFunction().then(
+        widgetsBundleFetchFunction({ignoreLoading: true}).then(
             function success(widgetsBundles) {
                 scope.widgetsBundles = widgetsBundles;
                 if (scope.selectFirstBundle) {

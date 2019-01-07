@@ -1,5 +1,6 @@
 /*
- * Copyright © 2016-2017 The Thingsboard Authors
+ * Copyright © 2016-2018 The Thingsboard Authors
+ * Modifications © 2017-2018 Hashmap, Inc
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +15,7 @@
  * limitations under the License.
  */
 /*@ngInject*/
-export default function AssignDeviceToCustomerController(customerService, deviceService, $mdDialog, $q, deviceIds, customers) {
+export default function AssignDeviceToCustomerController(customerService, types, entityRelationService,datamodelService, deviceService, $mdDialog, $q, deviceIds, customers) {
 
     var vm = this;
 
@@ -28,6 +29,8 @@ export default function AssignDeviceToCustomerController(customerService, device
     vm.noData = noData;
     vm.searchCustomerTextUpdated = searchCustomerTextUpdated;
     vm.toggleCustomerSelection = toggleCustomerSelection;
+    vm.types = types;
+
 
     vm.theCustomers = {
         getItemAtIndex: function (index) {
@@ -77,13 +80,33 @@ export default function AssignDeviceToCustomerController(customerService, device
 
     function assign() {
         var tasks = [];
-        for (var deviceId in deviceIds) {
-            tasks.push(deviceService.assignDeviceToCustomer(vm.customers.selection.id.id, deviceIds[deviceId]));
+        for (var i=0;i<deviceIds.length;i++) {
+          tasks.push(deviceService.assignDeviceToCustomer(vm.customers.selection.id.id, deviceIds[i]));
         }
-        $q.all(tasks).then(function () {
-            $mdDialog.hide();
+
+
+       $q.all(tasks).then(function () {
+        for (var i=0;i<deviceIds.length;i++) {
+          deviceService.getDevice(deviceIds[i]).then(function success(item){
+            if(item.customerId.id !== vm.types.id.nullUid) {
+                item.dataModelObjectId.id = vm.types.id.nullUid;
+                deviceService.saveDevice(item);
+                if(item.additionalInfo == null) {
+                    entityRelationService.findInfoByFrom(item.id.id,'DEVICE').then(function success(itemDevice) {
+                        if(itemDevice.length !== 0) {
+                            entityRelationService.deleteRelation(itemDevice[0].from.id, itemDevice[0].from.entityType, 'Contains', itemDevice[0].to.id, itemDevice[0].to.entityType);
+                        }
+                    });
+                }
+            }
+           })
+        }
+           $mdDialog.hide();
         });
     }
+
+
+
 
     function noData() {
         return vm.customers.data.length == 0 && !vm.customers.hasNext;
@@ -97,6 +120,7 @@ export default function AssignDeviceToCustomerController(customerService, device
         $event.stopPropagation();
         if (vm.isCustomerSelected(customer)) {
             vm.customers.selection = null;
+
         } else {
             vm.customers.selection = customer;
         }

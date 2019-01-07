@@ -20,4 +20,7 @@ Administration
     plugins
     widgets
     dashboards
+    cluster
     mail
+    whitelabeling
+    agent

@@ -1,5 +1,6 @@
 /*
- * Copyright © 2016-2017 The Thingsboard Authors
+ * Copyright © 2016-2018 The Thingsboard Authors
+ * Modifications © 2017-2018 Hashmap, Inc
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
  export default function addLocaleSpanish(locales) {
     var es_ES = {
           "access": {
@@ -232,8 +232,8 @@
               "make-private-dashboard-title": "¿Estás seguro que quieres hacer el panel '{{dashboardTitle}}' privado?",
               "make-private-dashboard-text": "Luego de confirmar, el panel será privado y no podrá ser accesible por otros.",
               "make-private-dashboard": "Hacer panel privado",
-              "socialshare-text": "'{{dashboardTitle}}' powered by ThingsBoard",
-              "socialshare-title": "'{{dashboardTitle}}' powered by ThingsBoard",
+              "socialshare-text": "'{{dashboardTitle}}' powered by tempus",
+              "socialshare-title": "'{{dashboardTitle}}' powered by tempus",
               "select-dashboard": "Seleccionar panel",
               "no-dashboards-matching": "Panel '{{entity}}' no encontrado.",
               "dashboard-required": "Panel requerido.",

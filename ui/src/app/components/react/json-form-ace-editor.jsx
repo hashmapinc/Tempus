@@ -1,5 +1,6 @@
 /*
- * Copyright © 2016-2017 The Thingsboard Authors
+ * Copyright © 2016-2018 The Thingsboard Authors
+ * Modifications © 2017-2018 Hashmap, Inc
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,14 +17,14 @@
 import './json-form-ace-editor.scss';
 
 import React from 'react';
-import ThingsboardBaseComponent from './json-form-base-component.jsx';
+import TempusBaseComponent from './json-form-base-component.jsx';
 import reactCSS from 'reactcss';
 import AceEditor from 'react-ace';
 import FlatButton from 'material-ui/FlatButton';
 import 'brace/ext/language_tools';
 import 'brace/theme/github';
 
-class ThingsboardAceEditor extends React.Component {
+class TempusAceEditor extends React.Component {
 
     constructor(props) {
         super(props);
@@ -120,7 +121,7 @@ class ThingsboardAceEditor extends React.Component {
                                name={this.props.form.title}
                                value={this.state.value}
                                readOnly={this.props.form.readonly}
-                               editorProps={{$blockScrolling: true}}
+                               editorProps={{$blockScrolling: Infinity}}
                                enableBasicAutocompletion={true}
                                enableSnippets={true}
                                enableLiveAutocompletion={true}
@@ -133,4 +134,4 @@ class ThingsboardAceEditor extends React.Component {
     }
 }
 
-export default ThingsboardBaseComponent(ThingsboardAceEditor);
+export default TempusBaseComponent(TempusAceEditor);

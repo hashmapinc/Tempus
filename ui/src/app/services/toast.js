@@ -1,5 +1,6 @@
 /*
- * Copyright © 2016-2017 The Thingsboard Authors
+ * Copyright © 2016-2018 The Thingsboard Authors
+ * Modifications © 2017-2018 Hashmap, Inc
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +19,7 @@ import './toast.scss';
 import Toast from './toast.service';
 import ToastController from './toast.controller';
 
-export default angular.module('thingsboard.toast', [])
+export default angular.module('tempus.toast', [])
     .factory('toast', Toast)
     .controller('ToastController', ToastController)
     .name;

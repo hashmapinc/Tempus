@@ -1,5 +1,6 @@
 /*
- * Copyright © 2016-2017 The Thingsboard Authors
+ * Copyright © 2016-2018 The Thingsboard Authors
+ * Modifications © 2017-2018 Hashmap, Inc
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,10 +15,10 @@
  * limitations under the License.
  */
 import React from 'react';
-import ThingsboardBaseComponent from './json-form-base-component.jsx';
+import TempusBaseComponent from './json-form-base-component.jsx';
 import DatePicker from 'material-ui/DatePicker/DatePicker';
 
-class ThingsboardDate extends React.Component {
+class TempusDate extends React.Component {
 
     constructor(props) {
         super(props);
@@ -57,4 +58,4 @@ class ThingsboardDate extends React.Component {
     }
 }
 
-export default ThingsboardBaseComponent(ThingsboardDate);
+export default TempusBaseComponent(TempusDate);

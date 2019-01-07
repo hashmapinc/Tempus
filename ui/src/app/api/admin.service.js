@@ -1,5 +1,6 @@
 /*
- * Copyright © 2016-2017 The Thingsboard Authors
+ * Copyright © 2016-2018 The Thingsboard Authors
+ * Modifications © 2017-2018 Hashmap, Inc
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-export default angular.module('thingsboard.api.admin', [])
+export default angular.module('tempus.api.admin', [])
     .factory('adminService', AdminService)
     .name;
 
@@ -24,14 +25,17 @@ function AdminService($http, $q) {
         getAdminSettings: getAdminSettings,
         saveAdminSettings: saveAdminSettings,
         sendTestMail: sendTestMail,
-        checkUpdates: checkUpdates
+        checkUpdates: checkUpdates,
+        getAllThemes:getAllThemes,
+        saveThemeSettings:saveThemeSettings,
+        uploadLogo:uploadLogo
     }
 
     return service;
 
     function getAdminSettings(key) {
         var deferred = $q.defer();
-        var url = '/api/admin/settings/' + key;
+        var url = '/api/settings/' + key;
         $http.get(url, null).then(function success(response) {
             deferred.resolve(response.data);
         }, function fail() {
@@ -40,9 +44,25 @@ function AdminService($http, $q) {
         return deferred.promise;
     }
 
+    function uploadLogo(file) {
+        var deferred = $q.defer();
+        var url = '/api/settings/uploadLogo';
+        var fd = new FormData();
+        fd.append("file", file);
+        $http.post(url, fd, {
+            transformRequest: angular.identity,
+            headers: {'Content-Type': undefined}
+        }).then(function success(response) {
+            deferred.resolve(response.data);
+        }, function fail(response) {
+            deferred.reject(response.data);
+        });
+        return deferred.promise;
+    }
+
     function saveAdminSettings(settings) {
         var deferred = $q.defer();
-        var url = '/api/admin/settings';
+        var url = '/api/settings';
         $http.post(url, settings).then(function success(response) {
             deferred.resolve(response.data);
         }, function fail(response) {
@@ -53,7 +73,7 @@ function AdminService($http, $q) {
 
     function sendTestMail(settings) {
         var deferred = $q.defer();
-        var url = '/api/admin/settings/testMail';
+        var url = '/api/settings/testMail';
         $http.post(url, settings).then(function success() {
             deferred.resolve();
         }, function fail(response) {
@@ -64,7 +84,7 @@ function AdminService($http, $q) {
 
     function checkUpdates() {
         var deferred = $q.defer();
-        var url = '/api/admin/updates';
+        var url = '/api/updates';
         $http.get(url, null).then(function success(response) {
             deferred.resolve(response.data);
         }, function fail() {
@@ -72,4 +92,29 @@ function AdminService($http, $q) {
         });
         return deferred.promise;
     }
+
+    function getAllThemes() {
+
+        var deferred = $q.defer();
+        var url = '/api/settings/themes';
+        $http.get(url, null).then(function success(response) {
+            deferred.resolve(response.data);
+        }, function fail() {
+            deferred.reject();
+        });
+        return deferred.promise;
+
+    }
+
+    function saveThemeSettings(themeData) {
+        var deferred = $q.defer();
+        var url = '/api/settings/theme';
+        $http.post(url, themeData).then(function success(response) {
+            deferred.resolve(response.data);
+        }, function fail(response) {
+            deferred.reject(response.data);
+        });
+        return deferred.promise;
+    }
+
 }

@@ -1,5 +1,6 @@
 --
--- Copyright © 2016-2017 The Thingsboard Authors
+-- Copyright © 2016-2018 The Thingsboard Authors
+-- Modifications © 2017-2018 Hashmap, Inc
 --
 -- Licensed under the Apache License, Version 2.0 (the "License");
 -- you may not use this file except in compliance with the License.
@@ -14,26 +15,15 @@
 -- limitations under the License.
 --
 
-/** SYSTEM **/
-
-/** System admin **/
-INSERT INTO tb_user ( id, tenant_id, customer_id, email, search_text, authority )
-VALUES ( '1e746125a797660a91992ebcb67fe33', '1b21dd2138140008080808080808080', '1b21dd2138140008080808080808080', 'sysadmin@thingsboard.org',
-         'sysadmin@thingsboard.org', 'SYS_ADMIN' );
-
-INSERT INTO user_credentials ( id, user_id, enabled, password )
-VALUES ( '1e7461261441950a91992ebcb67fe33', '1e746125a797660a91992ebcb67fe33', true,
-         '$2a$10$5JTB8/hxWc9WAy62nCGSxeefl3KWmipA9nFpVdDa0/xfIseeBB4Bu' );
-
 /** System settings **/
-INSERT INTO admin_settings ( id, key, json_value )
+INSERT INTO user_settings ( id, key, json_value, user_id )
 VALUES ( '1e746126a2266e4a91992ebcb67fe33', 'general', '{
 	"baseUrl": "http://localhost:8080"
-}' );
+}',  '1e7461259eab8808080808080808080' );
 
-INSERT INTO admin_settings ( id, key, json_value )
+INSERT INTO user_settings ( id, key, json_value, user_id )
 VALUES ( '1e746126eaaefa6a91992ebcb67fe33', 'mail', '{
-	"mailFrom": "Thingsboard <sysadmin@localhost.localdomain>",
+	"mailFrom": "tempus <sysadmin@localhost.localdomain>",
 	"smtpProtocol": "smtp",
 	"smtpHost": "localhost",
 	"smtpPort": "25",
@@ -41,24 +31,31 @@ VALUES ( '1e746126eaaefa6a91992ebcb67fe33', 'mail', '{
 	"enableTls": "false",
 	"username": "",
 	"password": ""
-}' );
+}', '1e7461259eab8808080808080808080' );
 
 /** System plugins and rules **/
 INSERT INTO plugin ( id, tenant_id, name, state, search_text, api_token, plugin_class, public_access, configuration )
 VALUES ( '1e7461160cb2da2a91992ebcb67fe33', '1b21dd2138140008080808080808080', 'System Telemetry Plugin', 'ACTIVE',
          'system telemetry plugin', 'telemetry',
-         'org.thingsboard.server.extensions.core.plugin.telemetry.TelemetryStoragePlugin', true, '{}' );
+         'com.hashmapinc.server.extensions.core.plugin.telemetry.TelemetryStoragePlugin', true, '{}' );
 
 INSERT INTO rule ( id, tenant_id, name, plugin_token, state, search_text, weight, filters, processor, action )
 VALUES ( '1e7461165abad4ca91992ebcb67fe33', '1b21dd2138140008080808080808080', 'System Telemetry Rule', 'telemetry', 'ACTIVE',
          'system telemetry rule', 0,
-         '[{"clazz":"org.thingsboard.server.extensions.core.filter.MsgTypeFilter", "name":"TelemetryFilter", "configuration": {"messageTypes":["POST_TELEMETRY","POST_ATTRIBUTES","GET_ATTRIBUTES"]}}]',
+         '[{"clazz":"com.hashmapinc.server.extensions.core.filter.MsgTypeFilter", "name":"TelemetryFilter", "configuration": {"messageTypes":["POST_TELEMETRY","POST_ATTRIBUTES","GET_ATTRIBUTES","POST_TELEMETRY_DEPTH"]}}]',
          null,
-         '{"clazz":"org.thingsboard.server.extensions.core.action.telemetry.TelemetryPluginAction", "name":"TelemetryMsgConverterAction", "configuration":{}}'
+         '{"clazz":"com.hashmapinc.server.extensions.core.action.telemetry.TelemetryPluginAction", "name":"TelemetryMsgConverterAction", "configuration":{}}'
 );
 
 INSERT INTO plugin ( id, tenant_id, name, state, search_text, api_token, plugin_class, public_access, configuration )
 VALUES ( '1e746116b3b8994a91992ebcb67fe33', '1b21dd2138140008080808080808080', 'System RPC Plugin', 'ACTIVE',
-         'system rpc plugin', 'rpc', 'org.thingsboard.server.extensions.core.plugin.rpc.RpcPlugin', true, '{
+         'system rpc plugin', 'rpc', 'com.hashmapinc.server.extensions.core.plugin.rpc.RpcPlugin', true, '{
        "defaultTimeout": 20000
      }' );
+
+INSERT INTO CUSTOMER_GROUP (id, title, tenant_id, customer_id, additional_info, search_text)
+VALUES ('1e856116b3b8994a91992ebcb67fe33', 'sys_group', '1b21dd2138140008080808080808080', '1b21dd2138140008080808080808080', null , 'sys_group');
+
+INSERT INTO user_groups(user_id, group_id) VALUES ('1e7461259eab8808080808080808080', '1e856116b3b8994a91992ebcb67fe33');
+
+INSERT INTO customer_group_policy (group_id, policy) VALUES ('1e856116b3b8994a91992ebcb67fe33', 'SYS_ADMIN:*:*');

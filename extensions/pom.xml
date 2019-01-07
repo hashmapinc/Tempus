@@ -1,6 +1,7 @@
 <!--
 
-    Copyright © 2016-2017 The Thingsboard Authors
+    Copyright © 2016-2018 The Thingsboard Authors
+    Modifications © 2017-2018 Hashmap, Inc
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -19,16 +20,15 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>org.thingsboard</groupId>
-        <version>1.3.1-SNAPSHOT</version>
-        <artifactId>thingsboard</artifactId>
+        <groupId>com.hashmapinc</groupId>
+        <version>1.4.0</version>
+        <artifactId>tempus</artifactId>
     </parent>
-    <groupId>org.thingsboard</groupId>
     <artifactId>extensions</artifactId>
     <packaging>pom</packaging>
 
     <name>Tempus Extensions</name>
-    <url>http://thingsboard.org</url>
+    <url>https://hashmapinc.com</url>
 
     <properties>
         <main.dir>${basedir}/..</main.dir>
@@ -38,8 +38,12 @@
         <module>extension-rabbitmq</module>
         <module>extension-rest-api-call</module>
         <module>extension-kafka</module>
+        <module>extension-eventhub</module>
         <module>extension-mqtt</module>
         <module>extension-spark-computation</module>
+        <module>extension-sqs</module>
+        <module>extension-sns</module>
+        <module>extension-kinesis</module>
     </modules>
 
 </project>

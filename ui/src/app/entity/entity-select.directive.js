@@ -1,5 +1,6 @@
 /*
- * Copyright © 2016-2017 The Thingsboard Authors
+ * Copyright © 2016-2018 The Thingsboard Authors
+ * Modifications © 2017-2018 Hashmap, Inc
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,7 +31,6 @@ export default function EntitySelect($compile, $templateCache) {
 
         scope.tbRequired = angular.isDefined(scope.tbRequired) ? scope.tbRequired : false;
         scope.model = {};
-
         scope.updateView = function () {
             if (!scope.disabled) {
                 var value = ngModelCtrl.$viewValue;
@@ -45,6 +45,7 @@ export default function EntitySelect($compile, $templateCache) {
                     ngModelCtrl.$setViewValue(null);
                 }
             }
+
         }
 
         ngModelCtrl.$render = function () {
@@ -105,7 +106,10 @@ export default function EntitySelect($compile, $templateCache) {
         scope: {
             theForm: '=?',
             tbRequired: '=?',
-            disabled:'=ngDisabled'
+            disabled:'=ngDisabled',
+            useAliasEntityTypes: "=?",
+            entityDetail:'=',
+            relation:'='
         }
     };
 }

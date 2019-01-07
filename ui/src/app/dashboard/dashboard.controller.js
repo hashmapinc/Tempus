@@ -1,5 +1,6 @@
 /*
- * Copyright © 2016-2017 The Thingsboard Authors
+ * Copyright © 2016-2018 The Thingsboard Authors
+ * Modifications © 2017-2018 Hashmap, Inc
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,11 +26,13 @@ import selectTargetLayoutTemplate from './layouts/select-target-layout.tpl.html'
 /* eslint-enable import/no-unresolved, import/default */
 
 import AliasController from '../api/alias-controller';
+import addAssetTemplate from '../widget/lib/add-asset.tpl.html'
+import AddAssetController from '../widget/lib/add-asset.controller.js';
 
 /*@ngInject*/
 export default function DashboardController(types, utils, dashboardUtils, widgetService, userService,
                                             dashboardService, timeService, depthService, entityService, itembuffer, importExport, hotkeys, $window, $rootScope,
-                                            $scope, $element, $state, $stateParams, $mdDialog, $mdMedia, $timeout, $document, $q, $translate, $filter) {
+                                            $scope, $element, $state, $stateParams, $mdDialog, $mdMedia, $timeout, $document, $q, $translate, $filter, userGroupService) {
 
     var vm = this;
 
@@ -52,11 +55,16 @@ export default function DashboardController(types, utils, dashboardUtils, widget
     vm.staticWidgetTypes = [];
     vm.widgetEditMode = $state.$current.data.widgetEditMode;
     vm.iframeMode = $rootScope.iframeMode;
+    vm.addAsset = addAsset;
     vm.types = types;
 
     vm.isToolbarOpened = false;
+    vm.displayAddAsset = false;
+    vm.displayAddAssetBasedPermission = false;
 
-    vm.thingsboardVersion = THINGSBOARD_VERSION; //eslint-disable-line
+    vm.tempusVersion = TEMPUS_VERSION; //eslint-disable-line
+
+
 
     vm.currentDashboardId = $stateParams.dashboardId;
     if ($stateParams.customerId) {
@@ -70,7 +78,7 @@ export default function DashboardController(types, utils, dashboardUtils, widget
     Object.defineProperty(vm, 'toolbarOpened', {
         get: function() {
             return !vm.widgetEditMode &&
-                (toolbarAlwaysOpen() || $scope.forceFullscreen || vm.isToolbarOpened || vm.isEdit || vm.showRightLayoutSwitch()); },
+                (toolbarAlwaysOpen() || vm.isToolbarOpened || vm.isEdit || vm.showRightLayoutSwitch()); },
         set: function() { }
     });
 
@@ -116,7 +124,7 @@ export default function DashboardController(types, utils, dashboardUtils, widget
     }
 
     vm.showCloseToolbar = function() {
-        return !vm.toolbarAlwaysOpen() && !$scope.forceFullscreen && !vm.isEdit && !vm.showRightLayoutSwitch();
+        return !vm.toolbarAlwaysOpen() && !vm.isEdit && !vm.showRightLayoutSwitch();
     }
 
     vm.toolbarAlwaysOpen = toolbarAlwaysOpen;
@@ -172,7 +180,6 @@ export default function DashboardController(types, utils, dashboardUtils, widget
         }
     }
 
-    vm.getServerTimeDiff = getServerTimeDiff;
     vm.addWidget = addWidget;
     vm.addWidgetFromType = addWidgetFromType;
     vm.exportDashboard = exportDashboard;
@@ -180,6 +187,7 @@ export default function DashboardController(types, utils, dashboardUtils, widget
     vm.isPublicUser = isPublicUser;
     vm.isTenantAdmin = isTenantAdmin;
     vm.isSystemAdmin = isSystemAdmin;
+    vm.isCustomerUser = isCustomerUser;
     vm.dashboardConfigurationError = dashboardConfigurationError;
     vm.showDashboardToolbar = showDashboardToolbar;
     vm.onAddWidgetClosed = onAddWidgetClosed;
@@ -286,7 +294,13 @@ export default function DashboardController(types, utils, dashboardUtils, widget
 
             widgetService.getBundleWidgetTypes(bundleAlias, isSystem).then(
                 function (widgetTypes) {
-
+                    angular.forEach(widgetTypes, function(value,key) {
+                      if(value.alias == 'device_list'){
+                        if(vm.dashboard.type != 'ASSET_LANDING_PAGE') {
+                            widgetTypes.splice(key, 1);
+                        }
+                      }
+                    });
                     widgetTypes = $filter('orderBy')(widgetTypes, ['-createdTime']);
 
                     var top = 0;
@@ -340,10 +354,6 @@ export default function DashboardController(types, utils, dashboardUtils, widget
         }
     }
 
-    function getServerTimeDiff() {
-        return dashboardService.getServerTimeDiff();
-    }
-
     function loadDashboard() {
         if (vm.widgetEditMode) {
             var widget = {
@@ -373,6 +383,9 @@ export default function DashboardController(types, utils, dashboardUtils, widget
         } else {
             dashboardService.getDashboard($stateParams.dashboardId)
                 .then(function success(dashboard) {
+                    if(dashboard.type === 'ASSET_LANDING_PAGE') {
+                        vm.displayAddAsset = true;
+                    }
                     vm.dashboard = dashboardUtils.validateAndUpdateDashboard(dashboard);
                     vm.dashboardConfiguration = vm.dashboard.configuration;
                     vm.dashboardCtx.dashboard = vm.dashboard;
@@ -384,8 +397,28 @@ export default function DashboardController(types, utils, dashboardUtils, widget
                     vm.configurationError = true;
                 });
         }
+        if(vm.user.authority != 'SYS_ADMIN') {
+            if(vm.user.authority === 'TENANT_ADMIN') {
+                vm.displayAddAssetBasedPermission = true;
+            }else{
+                getUserPermission();
+            }
+        }
     }
 
+    function getUserPermission(){
+        userGroupService.getUserPermissions(vm.user.id)
+            .then(function success(permissions) {
+                for(var i=0;i<permissions.length;i++){
+                    if(permissions[i].includes(vm.dashboard && vm.dashboard.assetLandingInfo && vm.dashboard.assetLandingInfo.dataModelObjectId.id)){
+                        if(permissions[i].includes('CREATE')) {
+                            vm.displayAddAssetBasedPermission = true
+                        }
+                    }
+                }
+            }, function fail() {
+            });
+    }
     function openDashboardState(state, openRightLayout) {
         var layoutsData = dashboardUtils.getStateLayoutsData(vm.dashboard, state);
         if (layoutsData) {
@@ -447,6 +480,10 @@ export default function DashboardController(types, utils, dashboardUtils, widget
 
     function isSystemAdmin() {
         return vm.user.authority === 'SYS_ADMIN';
+    }
+
+    function isCustomerUser() {
+        return vm.user.authority === 'CUSTOMER_USER';
     }
 
     function dashboardConfigurationError() {
@@ -624,6 +661,9 @@ export default function DashboardController(types, utils, dashboardUtils, widget
     }
 
     function widgetClicked($event, layoutCtx, widget) {
+        if(widget.typeAlias == 'device_list' && $event.target.id == 'addAsset'){
+            $rootScope.$emit("addAssetByEntity", [$event]);
+        }
         if (vm.isEditingWidget) {
             editWidget($event, layoutCtx, widget);
         }
@@ -1050,6 +1090,20 @@ export default function DashboardController(types, utils, dashboardUtils, widget
 
     function toggleDashboardEditMode() {
         setEditMode(!vm.isEdit, true);
+    }
+
+    function addAsset($event) {
+        $mdDialog.show({
+            controller: AddAssetController,
+            controllerAs: 'vm',
+            templateUrl: addAssetTemplate,
+            parent: angular.element($document[0].body),
+            fullscreen: true,
+            targetEvent: $event
+        }).then(function () {
+        }, function () {
+            $rootScope.$emit("displayAsset", $event);
+        });
     }
 
     function saveDashboard() {

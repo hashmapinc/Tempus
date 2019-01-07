@@ -1,5 +1,6 @@
 #
-# Copyright © 2016-2017 The Thingsboard Authors
+# Copyright © 2016-2018 The Thingsboard Authors
+# Modifications © 2017-2018 Hashmap, Inc
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,19 +13,20 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
-
-#kind: StorageClass
-#apiVersion: storage.k8s.io/v1
-#metadata:
-#  name: gold
-#provisioner: kubernetes.io/cinder
-#parameters:
-#  type: fast
+#
 
 kind: StorageClass
 apiVersion: storage.k8s.io/v1
 metadata:
-  name: gold
-provisioner: kubernetes.io/no-provisioner
-#volumeBindingMode: WaitForFirstConsumer
+  name: tempus
+  annotations:
+    storageclass.kubernetes.io/is-default-class: "true"
+provisioner: kubernetes.io/cinder
+parameters:
+  type: standard
+reclaimPolicy: Retain
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: ns-tempus

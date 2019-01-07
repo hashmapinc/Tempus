@@ -1,5 +1,6 @@
 /*
- * Copyright © 2016-2017 The Thingsboard Authors
+ * Copyright © 2016-2018 The Thingsboard Authors
+ * Modifications © 2017-2018 Hashmap, Inc
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,8 +16,8 @@
  */
 import './grid.scss';
 
-import thingsboardScopeElement from './scope-element.directive';
-import thingsboardDetailsSidenav from './details-sidenav.directive';
+import tempusScopeElement from './scope-element.directive';
+import tempusDetailsSidenav from './details-sidenav.directive';
 
 /* eslint-disable import/no-unresolved, import/default */
 
@@ -24,7 +25,7 @@ import gridTemplate from './grid.tpl.html';
 
 /* eslint-enable import/no-unresolved, import/default */
 
-export default angular.module('thingsboard.directives.grid', [thingsboardScopeElement, thingsboardDetailsSidenav])
+export default angular.module('tempus.directives.grid', [tempusScopeElement, tempusDetailsSidenav])
     .directive('tbGrid', Grid)
     .controller('AddItemController', AddItemController)
     .controller('ItemCardController', ItemCardController)
@@ -125,7 +126,7 @@ function Grid() {
 }
 
 /*@ngInject*/
-function GridController(applicationService, $scope, $state, $mdDialog, $document, $q, $timeout, $translate, $mdMedia, $templateCache, $window) {
+function GridController($scope, $rootScope, $state, $mdDialog, $document, $q, $mdUtil, $timeout, $translate, $mdMedia, $templateCache, $window, userService) {
 
     var vm = this;
 
@@ -157,6 +158,7 @@ function GridController(applicationService, $scope, $state, $mdDialog, $document
     vm.saveItem = saveItem;
     vm.toggleItemSelection = toggleItemSelection;
     vm.triggerResize = triggerResize;
+    vm.isTenantAdmin = isTenantAdmin;
 
     $scope.$watch(function () {
         return $mdMedia('xs') || $mdMedia('sm');
@@ -229,6 +231,7 @@ function GridController(applicationService, $scope, $state, $mdDialog, $document
                                     $window.localStorage.removeItem('currentApp');
                                     $window.localStorage.removeItem('currentTab');
                                 }
+                                if(items.data && items.data.length > 0) {
                                 if(items.data[0].id.entityType == 'DASHBOARD' && angular.isDefined(vm.config.parentCtl.currentApplication) && (angular.isDefined(vm.config.parentCtl.currentApplication.miniDashboardId) || angular.isDefined(vm.config.parentCtl.currentApplication.dashboardId))){
                                     if(vm.config.parentCtl.showAppMini){
                                         items.data.forEach(function(miniDashboard){
@@ -279,6 +282,8 @@ function GridController(applicationService, $scope, $state, $mdDialog, $document
                                      var endIndex = vm.items.data.length;
                                 }
 
+                                }
+
                                 for (var i = startIndex; i < endIndex; i++) {
                                     var item = vm.items.data[i];
                                     item.index = i;
@@ -300,6 +305,11 @@ function GridController(applicationService, $scope, $state, $mdDialog, $document
                                     vm.openItem(null, vm.newApp);
                                     $window.localStorage.removeItem('currentApp');
                                 }
+
+                                if (vm.items.loadCallback) {
+                                    vm.items.loadCallback();
+                                    vm.items.loadCallback = null;
+                                 }
                             }
                         },
                         function fail() {
@@ -350,6 +360,8 @@ function GridController(applicationService, $scope, $state, $mdDialog, $document
         vm.config = vm.gridConfiguration();
 
         vm.itemHeight = vm.config.itemHeight || 199;
+
+        vm.addIcon = vm.config.addIcon || "add";
 
         vm.refreshParamsFunc = vm.config.refreshParamsFunc || function () {
                 return {"topIndex": vm.topIndex};
@@ -442,14 +454,19 @@ function GridController(applicationService, $scope, $state, $mdDialog, $document
                 return $translate.instant('grid.add-item-text');
             };
 
-        vm.addItemAction = vm.config.addItemAction || {
-                onAction: function ($event) {
-                    addItem($event);
-                },
-                name: function() { return $translate.instant('action.add') },
-                details: function() { return vm.addItemText() },
-                icon: "add"
-            };
+
+            if(vm.config.itemCardController != 'AssetLandingCardController' ){
+                vm.addItemAction = vm.config.addItemAction && vm.config.itemCardController != 'AssetLandingCardController' || {
+                    onAction: function ($event) {
+                        addItem($event);
+                    },
+                    name: function() { return $translate.instant('action.add') },
+                    details: function() { return vm.addItemText() },
+                    icon: vm.addIcon
+                };
+            }
+
+
 
         vm.addItemActionsOpen = false;
 
@@ -507,6 +524,12 @@ function GridController(applicationService, $scope, $state, $mdDialog, $document
         reload();
     });
 
+   var gridTableDevice = $rootScope.$on("CallTableDetailDevice", function($event, data){
+       vm.clickItemFunc(data[0],data[1]);
+    });
+
+    $scope.$on('$destroy', gridTableDevice);
+
     vm.onGridInited(vm);
 
     vm.itemRows.getItemAtIndex(pageSize);
@@ -532,7 +555,25 @@ function GridController(applicationService, $scope, $state, $mdDialog, $document
     }
 
     function refreshList() {
-        $state.go($state.current, vm.refreshParamsFunc(), {reload: true});
+        let preservedTopIndex = vm.topIndex;
+        vm.items.data.length = 0;
+        vm.items.rowData.length = 0;
+        vm.items.nextPageLink = {
+            limit: preservedTopIndex + pageSize,
+            textSearch: $scope.searchConfig.searchText
+        };
+        vm.items.selections = {};
+        vm.items.selectedCount = 0;
+        vm.items.hasNext = true;
+        vm.items.pending = false;
+        vm.detailsConfig.isDetailsOpen = false;
+        vm.items.reloadPending = false;
+        vm.items.loadCallback = () => {
+            $mdUtil.nextTick(() => {
+                moveToIndex(preservedTopIndex);
+            });
+        };
+        vm.itemRows.getItemAtIndex(preservedTopIndex+pageSize);
     }
 
     function addItem($event) {
@@ -560,6 +601,7 @@ function GridController(applicationService, $scope, $state, $mdDialog, $document
                 return;
             }
         }
+
         vm.loadItemDetailsFunc(item).then(function success(detailsItem) {
             if(angular.isDefined(vm.config.parentCtl)){
                 if((angular.isFunction(vm.config.parentCtl.currentApp) || angular.isObject(vm.config.parentCtl.currentApp)) && detailsItem.id.entityType == 'APPLICATION')
@@ -596,6 +638,24 @@ function GridController(applicationService, $scope, $state, $mdDialog, $document
     function onCloseDetails() {
         vm.detailsConfig.currentItem = null;
         $window.localStorage.removeItem('currentApp')
+        $window.localStorage.removeItem('currentTab')
+        if(angular.isDefined(vm.parentCtl.currentApplication)){
+           
+            vm.parentCtl.appSliderOpen = false;
+            vm.parentCtl.currentApplication = null;
+            vm.parentCtl.showAppMini = false;
+            vm.parentCtl.showAppMain = false;
+            vm.parentCtl.showAppRules = false;
+            vm.parentCtl.showComputations = false;
+            vm.parentCtl.showComputationJobs = false;
+            vm.parentCtl.showAppDetails = true; 
+            vm.parentCtl.tabSelectedIndex = 0;
+            vm.detailsConfig.isDetailsOpen = false;
+            $timeout( function(){
+                vm.parentCtl.appSliderOpen = true;
+            }, 100 ); 
+
+        }
     }
 
     function operatingItem() {
@@ -631,6 +691,9 @@ function GridController(applicationService, $scope, $state, $mdDialog, $document
             vm.saveItemFunc(vm.detailsConfig.editingItem).then(function success(item) {
             theForm.$setPristine();
             vm.detailsConfig.isDetailsEditMode = false;
+            if(angular.isDefined(vm.parentCtl.loadTableData)) {
+                vm.parentCtl.loadTableData();
+            }
             var index = vm.detailsConfig.currentItem.index;
             item.index = index;
             vm.detailsConfig.currentItem = item;
@@ -639,12 +702,17 @@ function GridController(applicationService, $scope, $state, $mdDialog, $document
             var itemRow = vm.items.rowData[row];
             var column = index % vm.columns;
             itemRow[column] = item;
+
         });
         }
 
     }
 
-    function deleteDialogue($event, item){
+    function deleteItem($event, item) {
+        if ($event) {
+            $event.stopPropagation();
+        }
+
         var confirm = $mdDialog.confirm()
             .targetEvent($event)
             .title(vm.deleteItemTitleFunc(item))
@@ -656,87 +724,10 @@ function GridController(applicationService, $scope, $state, $mdDialog, $document
             vm.deleteItemFunc(item.id.id).then(function success() {
                 refreshList();
             });
-        },
-        function () {
-        });
-    } 
-    function deleteItem($event, item) {
-        if ($event) {
-            $event.stopPropagation();
-        }
-        if(item.id.entityType === "RULE"){
-            applicationService.getApplicationsByRuleId(item.id.id).then(
-                function success(application){
-                    if(application){
-                        item.rulesAppname = application[0];
-                    }
-                    deleteDialogue($event, item);
-                }
-            );
-        }
-        if(item.id.entityType === "DASHBOARD"){
-            applicationService.getApplicationsByDashboardId(item.id.id).then(
-                function success(application){
-                    if(application){
-                        item.dashboardsAppname = application[0];
-                    }
-                    deleteDialogue($event, item);
-                }
-            );
-        }
-        else {
-            var confirm = $mdDialog.confirm()
-                .targetEvent($event)
-                .title(vm.deleteItemTitleFunc(item))
-                .htmlContent(vm.deleteItemContentFunc(item))
-                .ariaLabel($translate.instant('grid.delete-item'))
-                .cancel($translate.instant('action.no'))
-                .ok($translate.instant('action.yes'));
-            $mdDialog.show(confirm).then(function () {
-                vm.deleteItemFunc(item.id.id).then(function success() {
-                    refreshList();
-                });
-            },
-            function () {
-            });
-        }
+        }, function () {});
     }
 
     function deleteItems($event) {
-        // var appNames = [];
-        // if(vm.items.data[0].id.entityType === "RULE"){
-        //     var arr = Object.keys(vm.items.selections);
-        //     applicationService.getApplicationsByRuleId(arr[0]).then(
-        //         function success(application){
-        //             if(application.length > 0){
-        //                 appNames.push(application[0]);
-        //             }
-        //             else {
-        //                 appNames = vm.items.selectedCount;
-        //             }
-        //             var confirm = $mdDialog.confirm()
-        //                 .targetEvent($event)
-        //                 .title(vm.deleteItemsTitleFunc(appNames))
-        //                 .htmlContent(vm.deleteItemsContentFunc())
-        //                 .ariaLabel($translate.instant('grid.delete-items'))
-        //                 .cancel($translate.instant('action.no'))
-        //                 .ok($translate.instant('action.yes'));
-        //             $mdDialog.show(confirm).then(function () {
-        //                     var tasks = [];
-        //                     for (var id in vm.items.selections) {
-        //                         tasks.push(vm.deleteItemFunc(id));
-        //                     }
-        //                     $q.all(tasks).then(function () {
-        //                         refreshList();
-        //                     });
-        //                 },
-        //                 function () {
-        //                 });
-        //         }
-        //     );
-            
-        // }
-        // else {
             var confirm = $mdDialog.confirm()
                 .targetEvent($event)
                 .title(vm.deleteItemsTitleFunc(vm.items.selectedCount))
@@ -755,8 +746,6 @@ function GridController(applicationService, $scope, $state, $mdDialog, $document
                 },
                 function () {
                 });
-      //  }
-
     }
 
 
@@ -776,6 +765,10 @@ function GridController(applicationService, $scope, $state, $mdDialog, $document
     function triggerResize() {
         var w = angular.element($window);
         w.triggerHandler('resize');
+    }
+
+    function isTenantAdmin() {
+        return userService.getAuthority() == 'TENANT_ADMIN';
     }
 
     function moveToTop() {
@@ -836,7 +829,6 @@ function GridController(applicationService, $scope, $state, $mdDialog, $document
 function AddItemController($scope, $mdDialog, saveItemFunction, helpLinks) {
 
     var vm = this;
-
     vm.helpLinks = helpLinks;
     vm.item = {};
 

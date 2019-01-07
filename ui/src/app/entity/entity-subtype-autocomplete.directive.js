@@ -1,5 +1,6 @@
 /*
- * Copyright © 2016-2017 The Thingsboard Authors
+ * Copyright © 2016-2018 The Thingsboard Authors
+ * Modifications © 2017-2018 Hashmap, Inc
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -93,9 +94,9 @@ export default function EntitySubtypeAutocomplete($compile, $templateCache, $q, 
             if (!scope.entitySubtypes) {
                 var entitySubtypesPromise;
                 if (scope.entityType == types.entityType.asset) {
-                    entitySubtypesPromise = assetService.getAssetTypes();
+                    entitySubtypesPromise = assetService.getAssetTypes({ignoreLoading: true});
                 } else if (scope.entityType == types.entityType.device) {
-                    entitySubtypesPromise = deviceService.getDeviceTypes();
+                    entitySubtypesPromise = deviceService.getDeviceTypes({ignoreLoading: true});
                 }
                 if (entitySubtypesPromise) {
                     entitySubtypesPromise.then(

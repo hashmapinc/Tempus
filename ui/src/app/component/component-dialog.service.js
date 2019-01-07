@@ -1,5 +1,6 @@
 /*
- * Copyright © 2016-2017 The Thingsboard Authors
+ * Copyright © 2016-2018 The Thingsboard Authors
+ * Modifications © 2017-2018 Hashmap, Inc
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +21,7 @@ import componentDialogTemplate from './component-dialog.tpl.html';
 /* eslint-enable import/no-unresolved, import/default */
 
 /*@ngInject*/
-export default function ComponentDialogService($mdDialog, $document, $q) {
+export default function ComponentDialogService($mdDialog, $document, $q,$log) {
 
     var service = {
         openComponentDialog: openComponentDialog
@@ -29,6 +30,7 @@ export default function ComponentDialogService($mdDialog, $document, $q) {
     return service;
 
     function openComponentDialog($event, isAdd, readOnly, title, type, pluginClazz, component) {
+    $log.log(title);
         var deferred = $q.defer();
         var componentInfo = {
             title: title,

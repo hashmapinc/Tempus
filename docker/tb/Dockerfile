@@ -1,5 +1,6 @@
 #
-# Copyright © 2016-2017 The Thingsboard Authors
+# Copyright © 2016-2018 The Thingsboard Authors
+# Modifications © 2017-2018 Hashmap, Inc
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,7 +15,7 @@
 # limitations under the License.
 #
 
-FROM openjdk:8-jre
+FROM openjdk:11-jre
 
 ADD run-application.sh /run-application.sh
 ADD tempus.deb /tempus.deb

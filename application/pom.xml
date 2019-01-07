@@ -1,6 +1,7 @@
 <!--
 
-    Copyright © 2016-2017 The Thingsboard Authors
+    Copyright © 2016-2018 The Thingsboard Authors
+    Modifications © 2017-2018 Hashmap, Inc
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -19,16 +20,15 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>org.thingsboard</groupId>
-        <version>1.3.1-SNAPSHOT</version>
-        <artifactId>thingsboard</artifactId>
+        <groupId>com.hashmapinc</groupId>
+        <version>1.4.0</version>
+        <artifactId>tempus</artifactId>
     </parent>
-    <groupId>org.thingsboard</groupId>
     <artifactId>application</artifactId>
     <packaging>jar</packaging>
 
     <name>Tempus Server Application</name>
-    <url>https://thingsboard.io</url>
+    <url>https://hashmapinc.com</url>
     <description>Open-source IoT Platform - Device management, data collection, processing and visualization
     </description>
 
@@ -50,40 +50,50 @@
             <classifier>linux-x86_64</classifier>
         </dependency>
         <dependency>
-            <groupId>org.thingsboard</groupId>
+            <groupId>com.hashmapinc</groupId>
             <artifactId>extensions-api</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.thingsboard</groupId>
+            <groupId>com.hashmapinc</groupId>
             <artifactId>extensions-core</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.thingsboard.extensions</groupId>
+            <groupId>com.hashmapinc.extensions</groupId>
             <artifactId>extension-spark-computation</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.thingsboard.common</groupId>
+            <groupId>com.hashmapinc.extensions</groupId>
+            <artifactId>extension-eventhub</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.hashmapinc.common</groupId>
             <artifactId>transport</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.thingsboard.transport</groupId>
+            <groupId>com.hashmapinc.clients</groupId>
+            <artifactId>kubeless-client</artifactId>
+            <version>1.4.0</version>
+        </dependency>
+        <dependency>
+            <groupId>com.hashmapinc.transport</groupId>
             <artifactId>http</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.thingsboard.transport</groupId>
+            <groupId>com.hashmapinc.transport</groupId>
             <artifactId>coap</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.thingsboard.transport</groupId>
+            <groupId>com.hashmapinc.transport</groupId>
             <artifactId>mqtt</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.thingsboard</groupId>
+            <groupId>com.hashmapinc</groupId>
             <artifactId>dao</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.thingsboard</groupId>
+            <groupId>com.hashmapinc</groupId>
             <artifactId>dao</artifactId>
             <type>test-jar</type>
             <scope>test</scope>
@@ -92,6 +102,14 @@
             <groupId>com.opencsv</groupId>
             <artifactId>opencsv</artifactId>
             <version>4.0</version>
+        </dependency>
+        <dependency>
+            <groupId>com.hashmapinc.tempus</groupId>
+            <artifactId>tempus-unit-conversion</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.poi</groupId>
+            <artifactId>poi-ooxml</artifactId>
         </dependency>
         <dependency>
             <groupId>io.takari.junit</groupId>
@@ -114,7 +132,7 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.thingsboard</groupId>
+            <groupId>com.hashmapinc</groupId>
             <artifactId>ui</artifactId>
             <version>${project.version}</version>
             <scope>runtime</scope>
@@ -122,6 +140,10 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-security</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.security.oauth</groupId>
+            <artifactId>spring-security-oauth2</artifactId>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -132,6 +154,16 @@
             <artifactId>spring-boot-starter-websocket</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.glassfish.tyrus</groupId>
+            <artifactId>tyrus-client</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.glassfish.tyrus</groupId>
+            <artifactId>tyrus-container-jdk-client</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-autoconfigure</artifactId>
         </dependency>
@@ -139,7 +171,7 @@
             <groupId>io.jsonwebtoken</groupId>
             <artifactId>jjwt</artifactId>
         </dependency>
-        <dependency>
+	   <dependency>
             <groupId>joda-time</groupId>
             <artifactId>joda-time</artifactId>
         </dependency>
@@ -227,7 +259,7 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>org.thingsboard</groupId>
+            <groupId>com.hashmapinc</groupId>
             <artifactId>tools</artifactId>
             <scope>test</scope>
         </dependency>
@@ -280,18 +312,41 @@
             <artifactId>annotation-detector</artifactId>
         </dependency>
         <dependency>
+            <groupId>io.minio</groupId>
+            <artifactId>minio</artifactId>
+        </dependency>
+        <dependency>
             <groupId>com.hashmapinc.tempus</groupId>
             <artifactId>tempus-spark-annotations</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.sun</groupId>
-            <artifactId>tools</artifactId>
-            <version>1.8</version>
-            <scope>system</scope>
-            <systemPath>${java.home}/../lib/tools.jar</systemPath>
+            <groupId>net.javacrumbs.future-converter</groupId>
+            <artifactId>future-converter-spring-guava</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-contract-stub-runner</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.kubernetes</groupId>
+            <artifactId>client-java</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.yaml</groupId>
+                    <artifactId>snakeyaml</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.yaml</groupId>
+            <artifactId>snakeyaml</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-collections4</artifactId>
         </dependency>
     </dependencies>
-
     <build>
         <finalName>${pkg.name}-${project.version}</finalName>
         <resources>
@@ -302,15 +357,52 @@
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-install-plugin</artifactId>
+                <version>${maven-install-plugin.version}</version>
+                <configuration>
+                    <groupId>codes.rafael.gradlemavenplugin</groupId>
+                    <artifactId>gradle-maven-plugin</artifactId>
+                    <version>1.0.11-SNAPSHOT</version>
+                    <packaging>jar</packaging>
+                    <file>${basedir}/lib/gradle-maven-plugin-1.0.11-SNAPSHOT.jar</file>
+                    <pomFile>${basedir}/lib/gradle-maven-plugin-1.0.11-SNAPSHOT.pom</pomFile>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>install-jar-lib</id>
+                        <goals>
+                            <goal>install-file</goal>
+                        </goals>
+                        <phase>validate</phase>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>${surfire.version}</version>
                 <configuration>
+                    <argLine>-Xmx1024m -Xms1024m -XX:MaxPermSize=512m
+                        -Djdk.net.URLClassPath.disableClassPathURLCheck=true
+                    </argLine>
                     <systemPropertyVariables>
                         <spring.config.name>tempus</spring.config.name>
                     </systemPropertyVariables>
                     <includes>
                         <include>**/*TestSuite.java</include>
                     </includes>
+                    <excludes>
+                        <exclude>**/*IntegrationTestSuite.java</exclude>
+                    </excludes>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-failsafe-plugin</artifactId>
+                <configuration>
+                    <systemPropertyVariables>
+                        <spring.config.name>tempus</spring.config.name>
+                    </systemPropertyVariables>
                 </configuration>
             </plugin>
             <plugin>
@@ -374,7 +466,7 @@
                                 <resource>
                                     <directory>src/main/conf</directory>
                                     <excludes>
-                                        <exclude>thingsboard.conf</exclude>
+                                        <exclude>tempus.conf</exclude>
                                     </excludes>
                                     <filtering>true</filtering>
                                 </resource>
@@ -506,28 +598,48 @@
                             <outputDirectory>${project.build.directory}/extensions</outputDirectory>
                             <artifactItems>
                                 <artifactItem>
-                                    <groupId>org.thingsboard.extensions</groupId>
+                                    <groupId>com.hashmapinc.extensions</groupId>
                                     <artifactId>extension-rabbitmq</artifactId>
                                     <classifier>extension</classifier>
                                 </artifactItem>
                                 <artifactItem>
-                                    <groupId>org.thingsboard.extensions</groupId>
+                                    <groupId>com.hashmapinc.extensions</groupId>
                                     <artifactId>extension-rest-api-call</artifactId>
                                     <classifier>extension</classifier>
                                 </artifactItem>
                                 <artifactItem>
-                                    <groupId>org.thingsboard.extensions</groupId>
+                                    <groupId>com.hashmapinc.extensions</groupId>
                                     <artifactId>extension-kafka</artifactId>
                                     <classifier>extension</classifier>
                                 </artifactItem>
                                 <artifactItem>
-                                    <groupId>org.thingsboard.extensions</groupId>
+                                    <groupId>com.hashmapinc.extensions</groupId>
+                                    <artifactId>extension-eventhub</artifactId>
+                                    <classifier>extension</classifier>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>com.hashmapinc.extensions</groupId>
                                     <artifactId>extension-mqtt</artifactId>
                                     <classifier>extension</classifier>
                                 </artifactItem>
                                 <artifactItem>
-                                    <groupId>org.thingsboard.extensions</groupId>
+                                    <groupId>com.hashmapinc.extensions</groupId>
                                     <artifactId>extension-spark-computation</artifactId>
+                                    <classifier>extension</classifier>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>com.hashmapinc.extensions</groupId>
+                                    <artifactId>extension-sqs</artifactId>
+                                    <classifier>extension</classifier>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>com.hashmapinc.extensions</groupId>
+                                    <artifactId>extension-sns</artifactId>
+                                    <classifier>extension</classifier>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>com.hashmapinc.extensions</groupId>
+                                    <artifactId>extension-kinesis</artifactId>
                                     <classifier>extension</classifier>
                                 </artifactItem>
                             </artifactItems>
@@ -573,7 +685,7 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <configuration>
-                    <mainClass>org.thingsboard.server.ThingsboardServerApplication</mainClass>
+                    <mainClass>com.hashmapinc.server.TempusServerApplication</mainClass>
                     <classifier>boot</classifier>
                     <layout>ZIP</layout>
                     <executable>true</executable>
@@ -595,9 +707,10 @@
                 </executions>
             </plugin>
             <plugin>
-                <groupId>org.fortasoft</groupId>
+                <groupId>codes.rafael.gradlemavenplugin</groupId>
                 <artifactId>gradle-maven-plugin</artifactId>
                 <configuration>
+                    <gradleVersion>4.10.2</gradleVersion>
                     <tasks>
                         <task>build</task>
                         <task>buildDeb</task>
@@ -606,7 +719,8 @@
                     <args>
                         <arg>-PprojectBuildDir=${project.build.directory}</arg>
                         <arg>-PprojectVersion=${project.version}</arg>
-                        <arg>-PmainJar=${project.build.directory}/${project.build.finalName}-boot.${project.packaging}</arg>
+                        <arg>-PmainJar=${project.build.directory}/${project.build.finalName}-boot.${project.packaging}
+                        </arg>
                         <arg>-PpkgName=${pkg.name}</arg>
                         <arg>-PpkgInstallFolder=${pkg.installFolder}</arg>
                         <arg>-PpkgLogFolder=${pkg.unixLogFolder}</arg>

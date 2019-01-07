@@ -1,5 +1,6 @@
 /*
- * Copyright © 2016-2017 The Thingsboard Authors
+ * Copyright © 2016-2018 The Thingsboard Authors
+ * Modifications © 2017-2018 Hashmap, Inc
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +17,6 @@
 /* eslint-disable import/no-unresolved, import/default */
 
 import entityAliasDialogTemplate from '../entity/alias/entity-alias-dialog.tpl.html';
-
 /* eslint-enable import/no-unresolved, import/default */
 
 /*@ngInject*/
@@ -29,7 +29,6 @@ export default function AddWidgetController($scope, widgetService, entityService
     vm.aliasController = aliasController;
     vm.widget = widget;
     vm.widgetInfo = widgetInfo;
-
     vm.functionsOnly = false;
 
     vm.helpLinkIdForWidgetType = helpLinkIdForWidgetType;
@@ -93,10 +92,10 @@ export default function AddWidgetController($scope, widgetService, entityService
     function cancel () {
         $mdDialog.cancel();
     }
-
     function add () {
         if ($scope.theForm.$valid) {
             $scope.theForm.$setPristine();
+            $scope.theForm.widgetInfo = vm.widgetInfo;
             vm.widget.config = vm.widgetConfig.config;
             vm.widget.config.mobileOrder = vm.widgetConfig.layout.mobileOrder;
             vm.widget.config.mobileHeight = vm.widgetConfig.layout.mobileHeight;
@@ -110,7 +109,7 @@ export default function AddWidgetController($scope, widgetService, entityService
             function success(aliasInfo) {
                 var entity = aliasInfo.currentEntity;
                 if (entity) {
-                    entityService.getEntityKeys(entity.entityType, entity.id, query, type).then(
+                    entityService.getEntityKeys(entity.entityType, entity.id, query, type, {ignoreLoading: true}).then(
                         function success(keys) {
                             deferred.resolve(keys);
                         },

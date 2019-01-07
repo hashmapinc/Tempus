@@ -1,5 +1,6 @@
 /*
- * Copyright © 2016-2017 The Thingsboard Authors
+ * Copyright © 2016-2018 The Thingsboard Authors
+ * Modifications © 2017-2018 Hashmap, Inc
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,14 +14,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 import ManageDashboardStatesController from './manage-dashboard-states.controller';
 import DashboardStateDialogController from './dashboard-state-dialog.controller';
 import SelectTargetStateController from './select-target-state.controller';
 import StatesComponentDirective from './states-component.directive';
 import StatesControllerService from './states-controller.service';
 
-export default angular.module('thingsboard.dashboard.states', [])
+export default angular.module('tempus.dashboard.states', [])
     .controller('ManageDashboardStatesController', ManageDashboardStatesController)
     .controller('DashboardStateDialogController', DashboardStateDialogController)
     .controller('SelectTargetStateController', SelectTargetStateController)

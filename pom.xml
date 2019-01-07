@@ -1,6 +1,7 @@
 <!--
 
-    Copyright © 2016-2017 The Thingsboard Authors
+    Copyright © 2016-2018 The Thingsboard Authors
+    Modifications © 2017-2018 Hashmap, Inc
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -18,40 +19,44 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <groupId>org.thingsboard</groupId>
-    <artifactId>thingsboard</artifactId>
-    <version>1.3.1-SNAPSHOT</version>
+    <groupId>com.hashmapinc</groupId>
+    <artifactId>tempus</artifactId>
+    <version>1.4.0</version>
     <packaging>pom</packaging>
 
     <name>Tempus</name>
-    <url>https://thingsboard.io</url>
-    <inceptionYear>2016</inceptionYear>
+    <url>https://hashmapinc.com</url>
+    <inceptionYear>2017</inceptionYear>
 
     <properties>
         <main.dir>${basedir}</main.dir>
-        <spring-boot.version>1.4.3.RELEASE</spring-boot.version>
-        <spring.version>4.3.4.RELEASE</spring.version>
-        <spring-security.version>4.2.0.RELEASE</spring-security.version>
+        <spring-boot.version>2.1.0.RELEASE</spring-boot.version>
+        <spring.version>5.1.2.RELEASE</spring.version>
+        <spring-security.version>5.1.1.RELEASE</spring-security.version>
+        <!--<spring-security-oauth2.version>2.3.3.RELEASE</spring-security-oauth2.version>-->
+        <spring-security-oauth2.version>2.2.1.RELEASE</spring-security-oauth2.version>
+        <spring-data-redis.version>2.1.2.RELEASE</spring-data-redis.version>
+        <jedis.version>2.9.0</jedis.version>
         <jjwt.version>0.7.0</jjwt.version>
-        <joda-time.version>2.4</joda-time.version>
         <json-path.version>2.2.0</json-path.version>
         <junit.version>4.12</junit.version>
         <slf4j.version>1.7.7</slf4j.version>
         <logback.version>1.2.3</logback.version>
         <mockito.version>1.9.5</mockito.version>
         <rat.version>0.10</rat.version>
-        <cassandra.version>3.0.0</cassandra.version>
-        <cassandra-unit.version>3.0.0.1</cassandra-unit.version>
+        <cassandra.version>3.5.0</cassandra.version>
+        <cassandra-unit.version>3.5.0.1</cassandra-unit.version>
         <takari-cpsuite.version>1.2.7</takari-cpsuite.version>
         <guava.version>18.0</guava.version>
+        <caffeine.version>2.6.1</caffeine.version>
         <commons-lang3.version>3.4</commons-lang3.version>
         <commons-validator.version>1.5.0</commons-validator.version>
         <commons-io.version>2.5</commons-io.version>
         <commons-csv.version>1.4</commons-csv.version>
-        <jackson.version>2.8.8.1</jackson.version>
+        <jackson.version>2.9.7</jackson.version>
         <json-schema-validator.version>2.2.6</json-schema-validator.version>
         <scala.version>2.11</scala.version>
-        <akka.version>2.4.2</akka.version>
+        <akka.version>2.5.18</akka.version>
         <californium.version>1.0.2</californium.version>
         <gson.version>2.6.2</gson.version>
         <velocity.version>1.7</velocity.version>
@@ -60,15 +65,16 @@
         <curator.version>2.11.0</curator.version>
         <protobuf.version>3.0.2</protobuf.version>
         <grpc.version>1.0.0</grpc.version>
-        <lombok.version>1.16.10</lombok.version>
+        <lombok.version>1.18.4</lombok.version>
         <paho.client.version>1.1.0</paho.client.version>
-        <netty.version>4.1.3.Final</netty.version>
+        <netty.version>4.1.22.Final</netty.version>
         <os-maven-plugin.version>1.5.0</os-maven-plugin.version>
         <rabbitmq.version>3.6.5</rabbitmq.version>
-        <kafka.version>0.9.0.0</kafka.version>
+        <kafka.version>0.11.0.2</kafka.version>
         <hazelcast.version>3.6.6</hazelcast.version>
         <hazelcast-zookeeper.version>3.6.1</hazelcast-zookeeper.version>
-        <surfire.version>2.19.1</surfire.version>
+        <surfire.version>2.22.1</surfire.version>
+        <failsafe.version>2.22.1</failsafe.version>
         <jar-plugin.version>3.0.2</jar-plugin.version>
         <springfox-swagger.version>2.6.1</springfox-swagger.version>
         <bouncycastle.version>1.56</bouncycastle.version>
@@ -78,6 +84,19 @@
         <spring-test-dbunit.version>1.2.1</spring-test-dbunit.version>
         <postgresql.driver.version>9.4.1211</postgresql.driver.version>
         <tempus.annotations.version>0.2.1</tempus.annotations.version>
+        <sonar.exclusions>com.hashmapinc/server/gen/**/*, com.hashmapinc/server/extensions/core/plugin/telemetry/gen/**/*</sonar.exclusions>
+        <elasticsearch.version>5.0.2</elasticsearch.version>
+        <joda-time.version>2.4</joda-time.version>
+        <kubernetes.client.version>1.0.0</kubernetes.client.version>
+        <querydsl.version>4.2.1</querydsl.version>
+        <apt-maven-plugin.version>1.1.3</apt-maven-plugin.version>
+        <spring-cloud.version>2.0.2.RELEASE</spring-cloud.version>
+        <javax.annotation.version>1.3.2</javax.annotation.version>
+        <commons-collections4.version>4.2</commons-collections4.version>
+        <snakeyaml.version>1.23</snakeyaml.version>
+        <maven-install-plugin.version>2.5.1</maven-install-plugin.version>
+        <unit-converion.version>1.0.3</unit-converion.version>
+        <poi-ooxml.version>4.0.1</poi-ooxml.version>
     </properties>
 
     <modules>
@@ -89,6 +108,7 @@
         <module>transport</module>
         <module>ui</module>
         <module>tools</module>
+        <module>clients</module>
         <module>application</module>
     </modules>
 
@@ -114,10 +134,10 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
-                    <version>2.5.1</version>
+                    <version>3.8.0</version>
                     <configuration>
-                        <source>1.8</source>
-                        <target>1.8</target>
+                        <forceJavacCompilerUse>true</forceJavacCompilerUse>
+                        <release>11</release>
                     </configuration>
                 </plugin>
                 <plugin>
@@ -146,9 +166,9 @@
                     <version>${spring-boot.version}</version>
                 </plugin>
                 <plugin>
-                    <groupId>org.fortasoft</groupId>
+                    <groupId>codes.rafael.gradlemavenplugin</groupId>
                     <artifactId>gradle-maven-plugin</artifactId>
-                    <version>1.0.8</version>
+                    <version>1.0.11-SNAPSHOT</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -219,7 +239,58 @@
                                 </sources>
                             </configuration>
                         </execution>
+                        <execution>
+                            <id>add-integration-test-sources</id>
+                            <phase>generate-test-sources</phase>
+                            <goals>
+                                <goal>add-test-source</goal>
+                            </goals>
+                            <configuration>
+                                <sources>
+                                    <source>src/it/java</source>
+                                </sources>
+                            </configuration>
+                        </execution>
+                        <execution>
+                            <id>add-integration-test-resources</id>
+                            <phase>generate-test-resources</phase>
+                            <goals>
+                                <goal>add-test-resource</goal>
+                            </goals>
+                            <configuration>
+                                <resources>
+                                    <resource>
+                                        <directory>src/it/resources</directory>
+                                    </resource>
+                                </resources>
+                            </configuration>
+                        </execution>
                     </executions>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-failsafe-plugin</artifactId>
+                    <version>${failsafe.version}</version>
+                    <executions>
+                        <execution>
+                            <id>integration-test</id>
+                            <goals>
+                                <goal>integration-test</goal>
+                            </goals>
+                        </execution>
+                        <execution>
+                            <id>verify</id>
+                            <goals>
+                                <goal>verify</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                    <configuration>
+                        <includes>
+                            <include>**/*IntegrationTestSuite.java</include>
+                        </includes>
+                        <reuseForks>false</reuseForks>
+                    </configuration>
                 </plugin>
                 <plugin>
                     <groupId>org.eclipse.m2e</groupId>
@@ -256,9 +327,9 @@
                     <artifactId>license-maven-plugin</artifactId>
                     <version>3.0</version>
                     <configuration>
-                        <!--<header>${main.dir}/license-header-template.txt</header>-->
+                        <header>${main.dir}/license-header-template.txt</header>
                         <properties>
-                            <owner>The Thingsboard Authors</owner>
+                            <owner>Hashmap, Inc</owner>
                         </properties>
                         <excludes>
                             <exclude>**/.env</exclude>
@@ -273,11 +344,19 @@
                             <exclude>node_modules/**</exclude>
                             <exclude>**/*.properties</exclude>
                             <exclude>src/test/resources/**</exclude>
+                            <exclude>src/it/resources/**</exclude>
                             <exclude>src/vendor/**</exclude>
                             <exclude>src/font/**</exclude>
                             <exclude>src/sh/**</exclude>
                             <exclude>src/main/scripts/control/**</exclude>
                             <exclude>src/main/scripts/windows/**</exclude>
+                            <exclude>docs/**</exclude>
+                            <exclude>**/Makefile</exclude>
+                            <exclude>**/*.env</exclude>
+                            <exclude>**/*.deb</exclude>
+                            <exclude>**/.helmignore</exclude>
+                            <exclude>**/.m2/*</exclude>
+                            <exclude>**/lib/*</exclude>
                         </excludes>
                         <mapping>
                             <proto>JAVADOC_STYLE</proto>
@@ -317,92 +396,161 @@
     <dependencyManagement>
         <dependencies>
             <dependency>
-                <groupId>org.thingsboard</groupId>
+                <groupId>com.hashmapinc</groupId>
                 <artifactId>extensions-api</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.thingsboard</groupId>
+                <groupId>com.hashmapinc</groupId>
                 <artifactId>extensions-core</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.thingsboard.extensions</groupId>
+                <groupId>org.glassfish.tyrus</groupId>
+                <artifactId>tyrus-client</artifactId>
+                <version>1.13</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.glassfish.tyrus</groupId>
+                <artifactId>tyrus-container-jdk-client</artifactId>
+                <version>1.12</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.hashmapinc.extensions</groupId>
                 <artifactId>extension-rabbitmq</artifactId>
                 <classifier>extension</classifier>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.thingsboard.extensions</groupId>
+                <groupId>com.hashmapinc.extensions</groupId>
                 <artifactId>extension-rest-api-call</artifactId>
                 <classifier>extension</classifier>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.thingsboard.extensions</groupId>
+                <groupId>com.hashmapinc.extensions</groupId>
                 <artifactId>extension-kafka</artifactId>
                 <classifier>extension</classifier>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.thingsboard.extensions</groupId>
+                <groupId>com.hashmapinc.extensions</groupId>
+                <artifactId>extension-eventhub</artifactId>
+                <classifier>extension</classifier>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.hashmapinc.extensions</groupId>
                 <artifactId>extension-mqtt</artifactId>
                 <classifier>extension</classifier>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.thingsboard.extensions</groupId>
+                <groupId>com.hashmapinc.extensions</groupId>
                 <artifactId>extension-spark-computation</artifactId>
                 <classifier>extension</classifier>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.thingsboard.common</groupId>
+                <groupId>com.hashmapinc.extensions</groupId>
+                <artifactId>extension-sqs</artifactId>
+                <classifier>extension</classifier>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.hashmapinc.extensions</groupId>
+                <artifactId>extension-sns</artifactId>
+               <classifier>extension</classifier>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.hashmapinc.extensions</groupId>
+                <artifactId>extension-kinesis</artifactId>
+                <classifier>extension</classifier>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.hashmapinc.common</groupId>
                 <artifactId>data</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.thingsboard.common</groupId>
+                <groupId>com.hashmapinc.common</groupId>
                 <artifactId>message</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.thingsboard.common</groupId>
+                <groupId>com.hashmapinc.common</groupId>
                 <artifactId>transport</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.thingsboard.transport</groupId>
+                <groupId>com.hashmapinc.transport</groupId>
                 <artifactId>http</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.thingsboard.transport</groupId>
+                <groupId>com.hashmapinc.transport</groupId>
                 <artifactId>coap</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.thingsboard.transport</groupId>
+                <groupId>com.hashmapinc.transport</groupId>
                 <artifactId>mqtt</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.thingsboard</groupId>
+                <groupId>com.hashmapinc.tempus</groupId>
+                <artifactId>tempus-unit-conversion</artifactId>
+                <version>${unit-converion.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.poi</groupId>
+                <artifactId>poi-ooxml</artifactId>
+                <version>${poi-ooxml.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.hashmapinc</groupId>
                 <artifactId>dao</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.thingsboard</groupId>
+                <groupId>com.hashmapinc</groupId>
                 <artifactId>tools</artifactId>
                 <version>${project.version}</version>
                 <scope>test</scope>
             </dependency>
             <dependency>
-                <groupId>org.thingsboard</groupId>
+                <groupId>com.hashmapinc</groupId>
                 <artifactId>dao</artifactId>
                 <version>${project.version}</version>
                 <type>test-jar</type>
                 <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.security.oauth</groupId>
+                <artifactId>spring-security-oauth2</artifactId>
+                <version>${spring-security-oauth2.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.springframework</groupId>
+                        <artifactId>spring-core</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.springframework</groupId>
+                        <artifactId>spring-webmvc</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.springframework</groupId>
+                        <artifactId>spring-beans</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.springframework.security</groupId>
+                        <artifactId>spring-security-core</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
             <dependency>
                 <groupId>org.springframework.boot</groupId>
@@ -428,6 +576,12 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-starter-test</artifactId>
                 <version>${spring-boot.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-starter-contract-stub-runner</artifactId>
+                <version>${spring-cloud.version}</version>
                 <scope>test</scope>
             </dependency>
             <dependency>
@@ -590,6 +744,11 @@
                 <version>${jackson.version}</version>
             </dependency>
             <dependency>
+                <groupId>com.fasterxml.jackson.dataformat</groupId>
+                <artifactId>jackson-dataformat-cbor</artifactId>
+                <version>${jackson.version}</version>
+            </dependency>
+            <dependency>
                 <groupId>com.github.fge</groupId>
                 <artifactId>json-schema-validator</artifactId>
                 <version>${json-schema-validator.version}</version>
@@ -643,6 +802,11 @@
                 <groupId>com.google.guava</groupId>
                 <artifactId>guava</artifactId>
                 <version>${guava.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.github.ben-manes.caffeine</groupId>
+                <artifactId>caffeine</artifactId>
+                <version>${caffeine.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.google.protobuf</groupId>
@@ -708,7 +872,7 @@
             </dependency>
             <dependency>
                 <groupId>org.apache.kafka</groupId>
-                <artifactId>kafka_2.10</artifactId>
+                <artifactId>kafka_2.11</artifactId>
                 <version>${kafka.version}</version>
                 <exclusions>
                     <exclusion>
@@ -783,6 +947,16 @@
                 <scope>test</scope>
             </dependency>
             <dependency>
+                <groupId>org.springframework.data</groupId>
+                <artifactId>spring-data-redis</artifactId>
+                <version>${spring-data-redis.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>redis.clients</groupId>
+                <artifactId>jedis</artifactId>
+                <version>${jedis.version}</version>
+            </dependency>
+            <dependency>
                 <groupId>com.sun.winsw</groupId>
                 <artifactId>winsw</artifactId>
                 <version>${winsw.version}</version>
@@ -799,11 +973,71 @@
                 <groupId>com.hashmapinc.tempus</groupId>
                 <artifactId>tempus-spark-annotations</artifactId>
                 <version>${tempus.annotations.version}</version>
+           </dependency>
+            <dependency>
+                <groupId>org.elasticsearch.client</groupId>
+                <artifactId>rest</artifactId>
+                <version>${elasticsearch.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.kubernetes</groupId>
+                <artifactId>client-java</artifactId>
+                <version>${kubernetes.client.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>net.javacrumbs.future-converter</groupId>
+                <artifactId>future-converter-spring-guava</artifactId>
+                <version>1.1.0</version>
+            </dependency>
+            <dependency>
+                <groupId>com.querydsl</groupId>
+                <artifactId>querydsl-apt</artifactId>
+                <version>${querydsl.version}</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.querydsl</groupId>
+                <artifactId>querydsl-jpa</artifactId>
+                <version>${querydsl.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.minio</groupId>
+                <artifactId>minio</artifactId>
+                <version>5.0.2</version>
+            </dependency>
+            <dependency>
+                <groupId>javax.annotation</groupId>
+                <artifactId>javax.annotation-api</artifactId>
+                <version>${javax.annotation.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.security.oauth.boot</groupId>
+                <artifactId>spring-security-oauth2-autoconfigure</artifactId>
+                <version>${spring-boot.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-collections4</artifactId>
+                <version>${commons-collections4.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.yaml</groupId>
+                <artifactId>snakeyaml</artifactId>
+                <version>${snakeyaml.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
 
-    <repositories>
+   <distributionManagement>
+        <repository>
+            <id>deployment</id>
+            <name>Internal Releases</name>
+            <url>https://repo.hashmapinc.com/repository/tempus-public/</url>
+        </repository>      
+    </distributionManagement>  
+
+
+    <repositories>        
         <repository>
             <id>central</id>
             <url>http://repo1.maven.org/maven2/</url>
@@ -834,5 +1068,4 @@
             <url>https://oss.sonatype.org/content/groups/public</url>
         </repository>
     </repositories>
-
 </project>

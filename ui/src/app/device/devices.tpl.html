@@ -1,6 +1,7 @@
 <!--
 
-    Copyright © 2016-2017 The Thingsboard Authors
+    Copyright © 2016-2018 The Thingsboard Authors
+    Modifications © 2017-2018 Hashmap, Inc
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -15,7 +16,98 @@
     limitations under the License.
 
 -->
-<tb-grid grid-configuration="vm.deviceGridConfig">
+<section layout="row" layout-align="center center" style="margin-left: 80%;">
+    <label class="tb-small" translate>Grid View</label>
+    <md-switch ng-change ="resetFilter();"class="device-switch" ng-model="tableView" aria-label="predefined-switcher" style="
+    margin-left: 4px;
+    margin-right: -5px;
+">
+    </md-switch>
+    <label class="tb-small" translate>Tabular View</label>
+</section>
+
+<md-toolbar class="md-table-toolbar tb-device-toolbar md-default" ng-show="tableView && query.search != null">
+    <div class="md-toolbar-tools">
+        <md-button class="md-icon-button" aria-label="{{ 'action.search' | translate }}">
+            <md-icon aria-label="{{ 'action.search' | translate }}" class="material-icons">search</md-icon>
+            <md-tooltip md-direction="top">
+                {{ 'action.search' | translate }}
+            </md-tooltip>
+        </md-button>
+        <md-input-container flex>
+            <label>&nbsp;</label>
+            <input ng-model="query.search" placeholder="{{ 'common.enter-search' | translate }}"/>
+        </md-input-container>
+        <md-button class="md-icon-button" aria-label="{{ 'action.back' | translate }}" ng-click="exitFilterMode()">
+            <md-icon aria-label="{{ 'action.close' | translate }}" class="material-icons">close</md-icon>
+            <md-tooltip md-direction="top">
+                {{ 'action.close' | translate }}
+            </md-tooltip>
+        </md-button>
+    </div>
+</md-toolbar>
+<md-toolbar class="md-table-toolbar tb-device-toolbar md-default " ng-show="tableView && query.search === null">
+
+    <div class="md-toolbar-tools">
+        <span flex></span>
+        <md-button class="md-icon-button" ng-click="addDevice($event)">
+            <md-icon>add</md-icon>
+            <md-tooltip md-direction="top">
+                {{ 'action.add' | translate }}
+            </md-tooltip>
+        </md-button>
+        <md-button class="md-icon-button" ng-click="enterFilterMode()">
+            <md-icon>search</md-icon>
+            <md-tooltip md-direction="top">
+                {{ 'action.search' | translate }}
+            </md-tooltip>
+        </md-button>
+        <md-button  class="md-icon-button" ng-click="resetFilter()">
+            <md-icon>refresh</md-icon>
+            <md-tooltip md-direction="top">
+                {{ 'action.refresh' | translate }}
+            </md-tooltip>
+        </md-button>
+    </div>
+</md-toolbar>
+
+<md-table-container ng-show="tableView" class ="tb-device-container">
+    <table class="tb-device-table" md-table>
+        <thead md-head md-order="query.order" md-on-reorder="onReorder">
+        <tr md-row>
+            <th md-column md-order-by="name"><span translate>device.name</span></th>
+            <th md-column md-order-by="type"><span translate>device.device-type</span></th>
+            <th md-column><span translate>device.description</span></th>
+            <th md-column><span translate>device.businessUnit</span></th>
+            <th md-column><span translate>device.status</span></th>
+            <th md-column><span translate>device.age</span></th>
+            <th md-column><span translate>device.lastTimeRecived</span></th>
+
+        </tr>
+        </thead>
+        <tbody md-body>
+        <tr md-row  ng-repeat="device in devices.data">
+            <td md-cell><a href ng-click="deviceDetailFunc($event,device)">{{device.name}}</a></td>
+            <td md-cell style="text-transform: uppercase">{{device.type}}</td>
+            <td md-cell style="width:40%;">{{device.additionalInfo.description}}</td>
+            <td md-cell>{{device.assignedCustomer.title}}</td>
+            <td md-cell>NA</td>
+            <td md-cell>NA</td>
+            <td md-cell>{{device.createdTime | date :  'yyyy-MM-dd HH:mm:ss'}}</td>
+            <td ng-show = "vm.devicesScope != 'customer_user'" md-cell class="tb-value-cell" ng-click="deleteDevice($event, device)">
+                <span><ng-md-icon size="16" icon="delete"></ng-md-icon></span>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</md-table-container>
+<md-table-pagination class ="tb-device-container" ng-show="tableView" md-limit="query.limit" md-limit-options="[5, 10, 15]"
+                     md-page="query.page" md-total="{{devices.count}}"
+                     md-on-paginate="onPaginate" md-page-select>
+</md-table-pagination>
+
+
+<tb-grid grid-configuration="vm.deviceGridConfig" class="device-grid">
     <details-buttons tb-help="'devices'" help-container-id="help-container">
         <div id="help-container"></div>
     </details-buttons>
@@ -27,6 +119,7 @@
                        device-scope="vm.devicesScope"
                        the-form="vm.grid.detailsForm"
                        on-assign-to-customer="vm.assignToCustomer(event, [ vm.grid.detailsConfig.currentItem.id.id ])"
+                       on-assign-to-datamodel="vm.assignToDatamodel(event, [ vm.grid.detailsConfig.currentItem])"
                        on-make-public="vm.makePublic(event, vm.grid.detailsConfig.currentItem)"
                        on-unassign-from-customer="vm.unassignFromCustomer(event, vm.grid.detailsConfig.currentItem, isPublic)"
                        on-manage-credentials="vm.manageCredentials(event, vm.grid.detailsConfig.currentItem)"
@@ -75,7 +168,21 @@
         <md-tab ng-if="!vm.grid.detailsConfig.isDetailsEditMode" md-on-select="vm.grid.triggerResize()" label="{{ 'relation.relations' | translate }}">
             <tb-relation-table flex
                                entity-id="vm.grid.operatingItem().id.id"
-                               entity-type="{{vm.types.entityType.device}}">
+                               entity-type="{{vm.types.entityType.device}}"
+                               entity-detail="vm.grid.operatingItem()">
             </tb-relation-table>
+        </md-tab>
+        <md-tab ng-if="!vm.grid.detailsConfig.isDetailsEditMode && vm.grid.operatingItem().additionalInfo.gateway" md-on-select="vm.grid.triggerResize()" label="{{ 'extension.extensions' | translate }}">
+            <tb-extension-table flex
+                                entity-id="vm.grid.operatingItem().id.id"
+                                entity-name="vm.grid.operatingItem().name"
+                                entity-type="{{vm.types.entityType.device}}">
+            </tb-extension-table>
+        </md-tab>
+        <md-tab ng-if="!vm.grid.detailsConfig.isDetailsEditMode && vm.grid.isTenantAdmin()" md-on-select="vm.grid.triggerResize()" label="{{ 'audit-log.audit-logs' | translate }}">
+            <tb-audit-log-table flex entity-type="vm.types.entityType.device"
+                                entity-id="vm.grid.operatingItem().id.id"
+                                audit-log-mode="{{vm.types.auditLogMode.entity}}">
+            </tb-audit-log-table>
         </md-tab>
 </tb-grid>

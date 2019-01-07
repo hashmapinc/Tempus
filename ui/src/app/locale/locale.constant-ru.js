@@ -1,5 +1,6 @@
 /*
- * Copyright © 2016-2017 The Thingsboard Authors
+ * Copyright © 2016-2018 The Thingsboard Authors
+ * Modifications © 2017-2018 Hashmap, Inc
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 export default function addLocaleRussian(locales) {
     var ru_RU = {
         "access": {
@@ -232,8 +232,8 @@ export default function addLocaleRussian(locales) {
             "make-private-dashboard-title": "Вы точно хотите закрыть общий доступ к дашборду '{{dashboardTitle}}'?",
             "make-private-dashboard-text": "После подтверждения дашборд будет закрыт для общего доступа.",
             "make-private-dashboard": "Закрыть дашборд для общего доступа",
-            "socialshare-text": "'{{dashboardTitle}}' сделано ThingsBoard",
-            "socialshare-title": "'{{dashboardTitle}}' сделано ThingsBoard",
+            "socialshare-text": "'{{dashboardTitle}}' сделано tempus",
+            "socialshare-title": "'{{dashboardTitle}}' сделано tempus",
             "select-dashboard": "Выберите дашборд",
             "no-dashboards-matching": "Дашборд '{{entity}}' не найден.",
             "dashboard-required": "Дашборд обязателен.",

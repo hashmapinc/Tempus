@@ -1,5 +1,6 @@
 /*
- * Copyright © 2016-2017 The Thingsboard Authors
+ * Copyright © 2016-2018 The Thingsboard Authors
+ * Modifications © 2017-2018 Hashmap, Inc
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 import $ from 'jquery';
 
 /* eslint-disable import/no-unresolved, import/default */
@@ -26,12 +26,11 @@ import logoSvg from '../../svg/Tempus_Logo_E_TagLineExtended_vectorized.svg';
 
 /*@ngInject*/
 export default function HomeController(types, loginService, userService, deviceService, Fullscreen, $scope, $element, $rootScope, $document, $state,
-                                       $window, $log, $mdMedia, $animate, $timeout) {
+                                       $window, $mdMedia, $animate, $timeout) {
 
     var siteSideNav = $('.tb-site-sidenav', $element);
 
     var vm = this;
-
     vm.Fullscreen = Fullscreen;
     vm.logoSvg = logoSvg;
 
@@ -45,6 +44,7 @@ export default function HomeController(types, loginService, userService, deviceS
             searchEntitySubtype: ""
         };
     }
+
 
     vm.isShowSidenav = false;
     vm.isLockSidenav = false;
@@ -112,6 +112,7 @@ export default function HomeController(types, loginService, userService, deviceS
             });
         }
     }
+
 
     function displaySearchMode() {
         return $scope.searchConfig.searchEnabled &&

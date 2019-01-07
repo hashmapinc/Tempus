@@ -1,6 +1,7 @@
 <!--
 
-    Copyright © 2016-2017 The Thingsboard Authors
+    Copyright © 2016-2018 The Thingsboard Authors
+    Modifications © 2017-2018 Hashmap, Inc
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -16,20 +17,26 @@
 
 -->
 <md-content flex class="md-padding tb-absolute-fill" layout="column">
-    <section layout="row" ng-show="!disableAttributeScopeSelection">
+    <section ng-show="!disableAttributeScopeSelection">
         <md-input-container class="md-block" style="width: 200px;">
             <label translate>attribute.attributes-scope</label>
-            <md-select ng-model="attributeScope" ng-disabled="loading() || attributeScopeSelectionReadonly">
+            <md-select ng-model="attributeScope" ng-disabled="$root.loading || attributeScopeSelectionReadonly">
                 <md-option ng-repeat="scope in attributeScopes" ng-value="scope">
                     {{scope.name | translate}}
                 </md-option>
             </md-select>
+
         </md-input-container>
+
     </section>
-    <div layout="column" class="md-whiteframe-z1" ng-class="{flex: mode==='widget'}">
+
+
+    <div class="md-whiteframe-z1" ng-class="{flex: mode==='widget'}">
+
         <md-toolbar class="md-table-toolbar md-default" ng-show="mode==='default'
                                                                  && !selectedAttributes.length
                                                                  && query.search === null">
+
             <div class="md-toolbar-tools">
                 <span translate>{{ attributeScope.name }}</span>
                 <span flex></span>
@@ -53,6 +60,8 @@
                 </md-button>
             </div>
         </md-toolbar>
+
+
         <md-toolbar class="md-table-toolbar md-default" ng-show="mode==='default'
                                                                  && !selectedAttributes.length
                                                                  && query.search != null">
@@ -75,6 +84,7 @@
                 </md-button>
             </div>
         </md-toolbar>
+
         <md-toolbar class="md-table-toolbar alternate" ng-show="mode==='default' && selectedAttributes.length">
             <div class="md-toolbar-tools">
                 <span translate="{{attributeScope === types.latestTelemetry
@@ -106,6 +116,7 @@
                 </md-button>
             </div>
         </md-toolbar>
+
         <md-toolbar class="md-table-toolbar alternate" ng-show="mode==='widget'">
             <div class="md-toolbar-tools">
                 <div flex layout="row" layout-align="start">
@@ -132,6 +143,11 @@
                 </md-button>
             </div>
         </md-toolbar>
+        <md-button ng-hide="mode==='widget'" ng-if ="entityType == 'DEVICE'"  style="left: 83%;margin-top: 3px;"ng-disabled="$root.loading" ng-click="download($event,{attributeScope})"
+                   class="md-raised md-primary"><span translate>attribute.download-button</span>
+        </md-button>
+
+
         <md-table-container ng-show="mode!='widget'">
             <table class="tb-attribute-table" md-table md-row-select multiple="" ng-model="selectedAttributes" md-progress="attributesDeferred.promise">
                 <thead md-head md-order="query.order" md-on-reorder="onReorder">
@@ -140,6 +156,7 @@
                     <th md-column md-order-by="lastUpdateTs" ng-if="attributeScope.value != types.latestDepthSeries.value"><span translate>attribute.last-update-time</span></th>
                     <th md-column md-order-by="key"><span translate>attribute.key</span></th>
                     <th md-column><span translate>attribute.value</span></th>
+                    <th md-column><span translate>attribute.unit</span></th>
                 </tr>
                 </thead>
                 <tbody md-body>
@@ -149,8 +166,13 @@
                     <td md-cell>{{attribute.key}}</td>
                     <td md-cell class="tb-value-cell" ng-click="editAttribute($event, attribute)">
                         <span>{{attribute.value}}</span>
+                        <span ng-show="!attributeScope.clientSide && assetLandingAttributeFlag && attribute.keyAttribute"  ng-click="importMetadataEntries($event, attribute)">
+                            <md-icon  style="float:right;" md-svg-src="/static/svg/metadata-black.svg" class="material-icons ng-scope md-themeDark-theme"></md-icon>
+                        </span>
                         <span ng-show="!attributeScope.clientSide"><ng-md-icon size="16" icon="edit"></ng-md-icon></span>
+
                     </td>
+                    <td md-cell>{{attribute.unit}}</td>
                 </tr>
                 </tbody>
             </table>
@@ -168,7 +190,6 @@
                 <tb-dashboard
                         alias-controller="aliasController"
                         widgets="widgets"
-                        get-st-diff="getServerTimeDiff()"
                         columns="20"
                         is-edit="false"
                         is-mobile-disabled="true"

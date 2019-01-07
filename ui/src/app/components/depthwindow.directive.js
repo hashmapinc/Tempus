@@ -1,5 +1,6 @@
 /*
- * Copyright © 2016-2017 The Thingsboard Authors
+ * Copyright © 2016-2018 The Thingsboard Authors
+ * Modifications © 2017-2018 Hashmap, Inc
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,8 +18,8 @@
 import './depthwindow.scss';
 
 import $ from 'jquery';
-import thingsboardDepthinterval from './depthinterval.directive';
-import thingsboardDepthPeriod from './depth-period.directive';
+import tempusDepthinterval from './depthinterval.directive';
+import tempusDepthPeriod from './depth-period.directive';
 
 /* eslint-disable import/no-unresolved, import/default */
 
@@ -30,7 +31,7 @@ import depthwindowPanelTemplate from './depthwindow-panel.tpl.html';
 
 import DepthwindowPanelController from './depthwindow-panel.controller';
 
-export default angular.module('thingsboard.directives.depthwindow', [thingsboardDepthinterval, thingsboardDepthPeriod])
+export default angular.module('tempus.directives.depthwindow', [tempusDepthinterval, tempusDepthPeriod])
     .controller('DepthwindowPanelController', DepthwindowPanelController)
     .directive('tbDepthwindow', Depthwindow)
     .name;

@@ -1,5 +1,6 @@
 /*
- * Copyright © 2016-2017 The Thingsboard Authors
+ * Copyright © 2016-2018 The Thingsboard Authors
+ * Modifications © 2017-2018 Hashmap, Inc
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +24,7 @@ import ruleFieldsetTemplate from './rule-fieldset.tpl.html';
 
 /*@ngInject*/
 export default function RuleDirective($compile, $templateCache, $mdDialog, $document, $q, $translate, pluginService,
-                                      componentDialogService, componentDescriptorService, types, toast) {
+                                      componentDialogService, componentDescriptorService, types, toast,$log) {
     var linker = function (scope, element) {
         var template = $templateCache.get(ruleFieldsetTemplate);
         element.html(template);
@@ -31,7 +32,8 @@ export default function RuleDirective($compile, $templateCache, $mdDialog, $docu
         scope.plugin = null;
         scope.types = types;
         scope.filters = [];
-
+        $log.log("types.componentType.filter")
+        $log.log(types.componentType.filter)
         scope.addFilter = function($event) {
             componentDialogService.openComponentDialog($event, true, false,
                 'rule.filter', types.componentType.filter).then(

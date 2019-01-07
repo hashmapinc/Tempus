@@ -1,5 +1,6 @@
 /**
- * Copyright © 2016-2017 The Thingsboard Authors
+ * Copyright © 2016-2018 The Thingsboard Authors
+ * Modifications © 2017-2018 Hashmap, Inc
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +17,7 @@
 syntax = "proto3";
 package telemetry;
 
-option java_package = "org.thingsboard.server.extensions.core.plugin.telemetry.gen";
+option java_package = "com.hashmapinc.server.extensions.core.plugin.telemetry.gen";
 option java_outer_classname = "TelemetryPluginProtos";
 
 message SubscriptionProto {
@@ -27,6 +28,7 @@ message SubscriptionProto {
   string type = 5;
   bool allKeys = 6;
   repeated SubscriptionKetStateProto keyStates = 7;
+  string scope = 8;
 }
 
 message SubscriptionUpdateProto {

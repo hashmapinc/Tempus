@@ -1,5 +1,6 @@
 /*
- * Copyright © 2016-2017 The Thingsboard Authors
+ * Copyright © 2016-2018 The Thingsboard Authors
+ * Modifications © 2017-2018 Hashmap, Inc
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +18,7 @@
 
 import dashboardsTemplate from './dashboards.tpl.html';
 import dashboardTemplate from './dashboard.tpl.html';
+import dashboardBlankTemplate from './blankDashboard.tpl.html';
 
 /* eslint-enable import/no-unresolved, import/default */
 
@@ -96,6 +98,24 @@ export default function DashboardRoutes($stateProvider) {
                     templateUrl: dashboardTemplate,
                     controller: 'DashboardController',
                     controllerAs: 'vm'
+                }
+            },
+            data: {
+                searchEnabled: false,
+                pageTitle: 'customer.dashboard'
+            },
+            ncyBreadcrumb: {
+                label: '{"icon": "dashboard", "label": "customer.dashboard", "link": "/static/svg/dashboardlightgray.svg"}'
+            }
+        })
+
+        .state('home.dashboards.blank', {
+            reloadOnSearch: false,
+            module: 'private',
+            auth: ['TENANT_ADMIN', 'CUSTOMER_USER'],
+            views: {
+                "content@home": {
+                    templateUrl: dashboardBlankTemplate,
                 }
             },
             data: {

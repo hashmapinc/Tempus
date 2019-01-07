@@ -1,5 +1,6 @@
 /*
- * Copyright © 2016-2017 The Thingsboard Authors
+ * Copyright © 2016-2018 The Thingsboard Authors
+ * Modifications © 2017-2018 Hashmap, Inc
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-export default angular.module('thingsboard.api.tenant', [])
+export default angular.module('tempus.api.tenant', [])
     .factory('tenantService', TenantService)
     .name;
 
@@ -29,7 +30,7 @@ function TenantService($http, $q) {
 
     return service;
 
-    function getTenants (pageLink) {
+    function getTenants (pageLink, config) {
         var deferred = $q.defer();
         var url = '/api/tenants?limit=' + pageLink.limit;
         if (angular.isDefined(pageLink.textSearch)) {
@@ -41,7 +42,7 @@ function TenantService($http, $q) {
         if (angular.isDefined(pageLink.textOffset)) {
             url += '&textOffset=' + pageLink.textOffset;
         }
-        $http.get(url, null).then(function success(response) {
+        $http.get(url, config).then(function success(response) {
             deferred.resolve(response.data);
         }, function fail() {
             deferred.reject();
@@ -49,10 +50,10 @@ function TenantService($http, $q) {
         return deferred.promise;
     }
 
-    function getTenant (tenantId) {
+    function getTenant (tenantId, config) {
         var deferred = $q.defer();
         var url = '/api/tenant/' + tenantId;
-        $http.get(url, null).then(function success(response) {
+        $http.get(url, config).then(function success(response) {
             deferred.resolve(response.data);
         }, function fail(response) {
             deferred.reject(response.data);

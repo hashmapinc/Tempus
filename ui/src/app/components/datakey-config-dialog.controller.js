@@ -1,5 +1,6 @@
 /*
- * Copyright © 2016-2017 The Thingsboard Authors
+ * Copyright © 2016-2018 The Thingsboard Authors
+ * Modifications © 2017-2018 Hashmap, Inc
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,9 +14,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import thingsboardDatakeyConfig from './datakey-config.directive';
+import tempusDatakeyConfig from './datakey-config.directive';
 
-export default angular.module('thingsboard.dialogs.datakeyConfigDialog', [thingsboardDatakeyConfig])
+export default angular.module('tempus.dialogs.datakeyConfigDialog', [tempusDatakeyConfig])
     .controller('DatakeyConfigDialogController', DatakeyConfigDialogController)
     .name;
 
@@ -43,7 +44,7 @@ function DatakeyConfigDialogController($scope, $mdDialog, $q, entityService, dat
             function success(aliasInfo) {
                 var entity = aliasInfo.currentEntity;
                 if (entity) {
-                    entityService.getEntityKeys(entity.entityType, entity.id, query, type).then(
+                    entityService.getEntityKeys(entity.entityType, entity.id, query, type, {ignoreLoading: true}).then(
                         function success(keys) {
                             deferred.resolve(keys);
                         },

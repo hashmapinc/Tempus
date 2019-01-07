@@ -1,5 +1,6 @@
 /*
- * Copyright © 2016-2017 The Thingsboard Authors
+ * Copyright © 2016-2018 The Thingsboard Authors
+ * Modifications © 2017-2018 Hashmap, Inc
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,14 +18,23 @@ import Flow from '@flowjs/ng-flow/dist/ng-flow-standalone.min';
 import UrlHandler from './url.handler';
 
 /*@ngInject*/
-export default function AppRun($rootScope, $window, $injector, $location, $log, $state, $mdDialog, $filter, loginService, userService, $translate) {
+export default function AppRun($rootScope, $window, $injector, $location, $state, $mdDialog, $filter, loginService, userService, $translate) {
 
     $window.Flow = Flow;
-    var frame = $window.frameElement;
+    var frame = null;
+    try {
+        frame = $window.frameElement;
+    } catch(e) {
+        // ie11 fix
+    }
+
     var unauthorizedDialog = null;
     var forbiddenDialog = null;
 
     $rootScope.iframeMode = false;
+    $rootScope.logo = '';
+    $rootScope.fileType = '';
+
 
     if (frame) {
         $rootScope.iframeMode = true;
@@ -34,9 +44,44 @@ export default function AppRun($rootScope, $window, $injector, $location, $log, 
             $rootScope.widgetEditMode = true;
         }
     }
-
+    getdefaultTheme();
     initWatchers();
-    
+    getLogo();
+
+    function getdefaultTheme() {
+        var promise =  userService.getActivetheme();
+        if(promise) {
+            promise.then(function success(theme) {
+                 $rootScope.theme = theme.themeValue;
+                 $rootScope.themeName = theme.themeName;
+                }
+            )
+        }
+    }
+
+    function getLogo() {
+        var promise =  userService.getLogo();
+        if(promise) {
+            promise.then(function success(logo) {
+
+                    if(logo != '') {
+                        $rootScope.logo = logo.file;
+                        $rootScope.fileType = angular.lowercase(logo.name.substr(logo.name.lastIndexOf('.')+1));
+
+                    }
+
+                },
+            )
+        }
+    }
+
+    function getLogoForUser(currentUser) {
+         userService.getLogoForTenant(currentUser.tenantId).then(function success(item) {
+            $rootScope.tenantlogo = item.data.logo;
+         });
+    }
+
+
     function initWatchers() {
         $rootScope.unauthenticatedHandle = $rootScope.$on('unauthenticated', function (event, doLogout) {
             if (doLogout) {
@@ -57,6 +102,7 @@ export default function AppRun($rootScope, $window, $injector, $location, $log, 
         $rootScope.stateChangeStartHandle = $rootScope.$on('$stateChangeStart', function (evt, to, params) {
 
             function waitForUserLoaded() {
+
                 if ($rootScope.userLoadedHandle) {
                     $rootScope.userLoadedHandle();
                 }
@@ -72,6 +118,8 @@ export default function AppRun($rootScope, $window, $injector, $location, $log, 
                 userService.reloadUser();
             }
 
+
+
             var locationSearch = $location.search();
             var publicId = locationSearch.publicId;
             var activateToken = locationSearch.activateToken;
@@ -82,6 +130,15 @@ export default function AppRun($rootScope, $window, $injector, $location, $log, 
 
             if (userService.isUserLoaded() === true) {
                 if (userService.isAuthenticated()) {
+
+                   $rootScope.authority = userService.getCurrentUser().authority;
+                   if(angular.isUndefined($rootScope.tenantlogo) || $rootScope.tenantlogo == null) {
+                     if($rootScope.authority !== "SYS_ADMIN") {
+                         var currentUser = userService.getCurrentUser();
+                         getLogoForUser(currentUser);
+                     }
+                   }
+
                     if (userService.isPublic()) {
                         if (userService.parsePublicId() !== publicId) {
                             evt.preventDefault();
@@ -110,6 +167,7 @@ export default function AppRun($rootScope, $window, $injector, $location, $log, 
                             $state.go(to.redirectTo, params)
                         }
                     }
+
                 } else {
                     if (publicId && publicId.length > 0) {
                         evt.preventDefault();
@@ -130,7 +188,6 @@ export default function AppRun($rootScope, $window, $injector, $location, $log, 
         })
 
         $rootScope.pageTitle = 'Tempus';
-
         $rootScope.stateChangeSuccessHandle = $rootScope.$on('$stateChangeSuccess', function (evt, to, params) {
             if (userService.isPublic() && to.name === 'home.dashboards.dashboard') {
                 $location.search('publicId', userService.getPublicId());

@@ -11,11 +11,6 @@
 *.zip
 *.tar.gz
 *.rar
-
-# virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
-hs_err_pid*
-
-
 *.toDelete
 output/**
 *.class
@@ -50,10 +45,9 @@ pom.xml.versionsBackup
 **/target
 **/Californium.properties
 **/.env
-.instance_id
-<<<<<<< Updated upstream
+.instance_idm
 .vscode/
 docs/_build
-=======
-
->>>>>>> Stashed changes
+docs/developerQS/_build
+.factorypath
+.java-version

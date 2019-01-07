@@ -1,6 +1,7 @@
 <!--
 
-    Copyright © 2016-2017 The Thingsboard Authors
+    Copyright © 2016-2018 The Thingsboard Authors
+    Modifications © 2017-2018 Hashmap, Inc
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -29,7 +30,7 @@
 </div>
 
 <md-content class="md-padding" layout="column">
-	<fieldset ng-disabled="loading || !isEdit">
+	<fieldset ng-disabled="$root.loading || !isEdit">
 		<md-input-container class="md-block">
 			<label translate>tenant.title</label>
 			<input required name="title" ng-model="tenant.title">	
@@ -42,5 +43,33 @@
 			<textarea ng-model="tenant.additionalInfo.description" rows="2"></textarea>
 		</md-input-container>
 		<tb-contact contact="tenant" the-form="theForm" is-edit="isEdit"></tb-contact>
+		<md-input-container class="md-block">
+			<div class="tb-container"><div ng-if ="tenant.logo"><img class="" style="width: 28%; margin-top: 6%;"ng-src="{{tenant.logo}}"></div>
+				<label class="tb-label" translate>tenant.logo</label>
+				<div ng-show ="isEdit" style="margin-top: 27px;" flow-init="{singleFile:true}" flow-file-added='fileAdded($file)' class="tb-file-select-container">
+					<div class="tb-file-clear-container">
+						<md-button ng-click='clearFile()' class="tb-file-clear-btn md-icon-button md-primary" aria-label="{{ 'action.remove' | translate }}">
+							<md-tooltip md-direction="top">
+								{{ 'action.remove' | translate }}
+							</md-tooltip>
+							<md-icon aria-label="{{ 'action.remove' | translate }}" class="material-icons">close</md-icon>
+						</md-button>
+					</div>
+
+					<div class="alert tb-flow-drop" flow-drop>
+
+						<label for="select" translate>import.drop-file</label>
+						<input flow-attrs="{accept:'.jpg,.png,.svg,.jpeg'}"
+							   class="file-input"
+							   flow-btn id="select"
+							   ng-model="tenant.logoFileName"
+						>
+					</div>
+				</div>
+			</div>
+			<div>
+			</div>
+		</md-input-container>
+
 	</fieldset>
 </md-content>

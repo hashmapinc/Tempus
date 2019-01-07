@@ -1,5 +1,6 @@
 /*
- * Copyright © 2016-2017 The Thingsboard Authors
+ * Copyright © 2016-2018 The Thingsboard Authors
+ * Modifications © 2017-2018 Hashmap, Inc
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,19 +21,58 @@ import customerFieldsetTemplate from './customer-fieldset.tpl.html';
 /* eslint-enable import/no-unresolved, import/default */
 
 /*@ngInject*/
-export default function CustomerDirective($compile, $templateCache, $translate, toast) {
+export default function CustomerDirective($compile, $templateCache, $translate, toast, datamodelService, $timeout, $state, $mdDialog) {
     var linker = function (scope, element) {
         var template = $templateCache.get(customerFieldsetTemplate);
         element.html(template);
 
         scope.isPublic = false;
+                       datamodelService.listDatamodels().then(
+                            function success(dataModels) {
+                                var dataModelList = [];
+                                for (var i = 0; i < dataModels.length; i++ ){
+                                    var dataModel = {};
+                                    dataModel.key = dataModels[i].name;
+                                    dataModel.value = dataModels[i].id;
+                                    dataModelList.push(dataModel);
+                                }
 
-        scope.onCustomerIdCopied = function() {
+                                scope.dataModels = '';
+                                scope.dataModels = dataModelList;
+
+                            },
+                            function fail() {
+                            }
+                            );
+       scope.onCustomerIdCopied = function() {
             toast.showSuccess($translate.instant('customer.idCopiedMessage'), 750, angular.element(element).parent().parent(), 'bottom left');
         };
 
         scope.$watch('customer', function(newVal) {
+
             if (newVal) {
+
+                    if(!scope.isEdit) {
+                        datamodelService.listDatamodels().then(
+                            function success(dataModels) {
+                                var dataModelList = [];
+                                for (var i = 0; i < dataModels.length; i++ ){
+                                    var dataModel = {};
+                                    dataModel.key = dataModels[i].name;
+                                    dataModel.value = dataModels[i].id;
+                                    dataModelList.push(dataModel);
+                                }
+
+                                scope.dataModels = '';
+                                $timeout( function(){ scope.dataModels = dataModelList; }, 500);
+
+                            },
+                            function fail() {
+                            }
+                            );
+                }
+
+
                 if (scope.customer.additionalInfo) {
                     scope.isPublic = scope.customer.additionalInfo.isPublic;
                 } else {
@@ -40,6 +80,11 @@ export default function CustomerDirective($compile, $templateCache, $translate, 
                 }
             }
         });
+
+        scope.createNewDataModel = function () {
+            $mdDialog.cancel();
+            $state.go('home.data_models');
+        };
 
         $compile(element.contents())(scope);
 
@@ -51,6 +96,7 @@ export default function CustomerDirective($compile, $templateCache, $translate, 
             customer: '=',
             isEdit: '=',
             theForm: '=',
+            dataModels: "@",
             onManageUsers: '&',
             onManageAssets: '&',
             onManageDevices: '&',

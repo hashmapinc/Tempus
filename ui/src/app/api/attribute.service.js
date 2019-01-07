@@ -1,5 +1,6 @@
 /*
- * Copyright © 2016-2017 The Thingsboard Authors
+ * Copyright © 2016-2018 The Thingsboard Authors
+ * Modifications © 2017-2018 Hashmap, Inc
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-export default angular.module('thingsboard.api.attribute', [])
+export default angular.module('tempus.api.attribute', [])
     .factory('attributeService', AttributeService)
     .name;
 
@@ -30,12 +31,31 @@ function AttributeService($http, $q, $filter, types, telemetryWebsocketService) 
         subscribeForEntityAttributes: subscribeForEntityAttributes,
         unsubscribeForEntityAttributes: unsubscribeForEntityAttributes,
         saveEntityAttributes: saveEntityAttributes,
-        deleteEntityAttributes: deleteEntityAttributes
+        deleteEntityAttributes: deleteEntityAttributes,
+        downloadTelementryData:downloadTelementryData
     }
 
     return service;
 
-    function getEntityKeys(entityType, entityId, query, type) {
+    function downloadTelementryData(entityType, entityId, attributeScope,startDate,endDate) {
+
+
+       var deferred = $q.defer();
+       var url = '/api/device/telementry';
+       url += '?deviceId=' + entityId;
+       url += '&startValue=' + startDate;
+       url += '&endValue=' + endDate;
+
+       $http.get(url, null).then(function success(response) {
+            deferred.resolve(response.data);
+       }, function fail(response) {
+            deferred.reject(response.data);
+       });
+        return deferred.promise;
+
+    }
+
+    function getEntityKeys(entityType, entityId, query, type, config) {
         var deferred = $q.defer();
         var url = '/api/plugins/telemetry/' + entityType + '/' + entityId + '/keys/';
         if (type === types.dataKeyType.timeseries) {
@@ -45,7 +65,7 @@ function AttributeService($http, $q, $filter, types, telemetryWebsocketService) 
         } else if (type === types.dataKeyType.depthSeries) {
             url += 'depthseries';
         }
-        $http.get(url, null).then(function success(response) {
+        $http.get(url, config).then(function success(response) {
             var result = [];
             if (response.data) {
                 if (query) {
@@ -110,6 +130,7 @@ function AttributeService($http, $q, $filter, types, telemetryWebsocketService) 
         }
         var startIndex = query.limit * (query.page - 1);
         responseData.data = attributes.slice(startIndex, startIndex + query.limit);
+        responseData.fullData = attributes;
         successCallback(responseData, update, apply);
         if (deferred) {
             deferred.resolve();
@@ -169,6 +190,7 @@ function AttributeService($http, $q, $filter, types, telemetryWebsocketService) 
                 var attrData = data[key][0];
                 attribute.lastUpdateTs = attrData[0];
                 attribute.value = attrData[1];
+                attribute.unit = attrData[2];
             }
             if (entityAttributesSubscription.subscriptionCallback) {
                 entityAttributesSubscription.subscriptionCallback(attributes);

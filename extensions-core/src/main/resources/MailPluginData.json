@@ -1,8 +1,8 @@
 {
   "host": "smtp.ukr.net",
   "port": 465,
-  "username": "thingsboard@ukr.net",
-  "password": "thingsboard123",
+  "username": "tempus@ukr.net",
+  "password": "tempus123",
   "otherProperties": [
     {
       "key":"mailsmtp.auth",

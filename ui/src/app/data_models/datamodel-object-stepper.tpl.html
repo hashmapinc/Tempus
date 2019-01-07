@@ -1,0 +1,249 @@
+<!--
+
+    Copyright © 2016-2018 The Thingsboard Authors
+    Modifications © 2017-2018 Hashmap, Inc
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+        http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<md-dialog aria-label="New Datamodel Object" style="min-width: 600px;" tb-help="'datamodel_object_creation'" help-container-id="help-container">
+  <form name="theForm" ng-submit="vm.onStepperSubmit()">
+    <md-toolbar>
+      <div class="md-toolbar-tools">
+        <h2>New Datamodel Object</h2>
+        <span flex></span>
+        <div id="help-container"></div>
+        <md-button class="md-icon-button" ng-click="vm.cancel()">
+          <ng-md-icon icon="close" aria-label="{{ 'dialog.close' | translate }}"></ng-md-icon>
+        </md-button>
+      </div>
+    </md-toolbar>
+    <md-dialog-content>
+      <md-tabs md-dynamic-height md-stretch-tabs="always" md-border-bottom md-selected="vm.stepperState">
+        <md-tab label="Object Information" ng-click="vm.stepperState = 0">
+          <md-content class="md-padding">
+            <md-input-container class="md-block" ng-keypress="$event.keyCode === 13 && vm.onStepperEnter();">
+              <label>Object Name</label>
+              <input md-maxlength="256" required="" name="Object Name" ng-model="vm.stepperData.name">
+              <div ng-messages="objectStepper.name.$error">
+                <div ng-message="required">This is required.</div>
+                <div ng-message="md-maxlength">The description must be less than 256 characters long.</div>
+              </div>
+            </md-input-container>
+
+            <md-input-container class="md-block" ng-keypress="$event.keyCode === 13 && vm.onStepperEnter();">
+              <label>Description</label>
+              <input md-maxlength="500" md-no-asterisk="" name="description" ng-model="vm.stepperData.desc">
+              <div ng-messages="objectStepper.desc.$error">
+                <div ng-message="required">This is required.</div>
+                <div ng-message="md-maxlength">The description must be less than 500 characters long.</div>
+              </div>
+            </md-input-container>
+
+            <md-input-container style="width:100%;" ng-keypress="$event.keyCode === 13 && vm.onStepperEnter();">
+              <label>Tempus Type</label>
+              <md-select name="tempusType" ng-model="vm.stepperData.type" required>
+                <md-option value="Device">Device</md-option>
+                <md-option value="Asset">Asset</md-option>
+              </md-select>
+              <div class="errors" ng-messages="theForm.favoriteColor.$error">
+                <div ng-message="required">Required</div>
+              </div>
+            </md-input-container>
+
+            <md-input-container ng-hide ="vm.stepperData.type == 'Device'" class="md-block" ng-keypress="$event.keyCode === 13 && vm.onStepperEnter();">
+              <div class="tb-container">
+                <label class="tb-label" translate>Icon</label>
+                <div style="margin-top: 27px;" flow-init="{singleFile:true}" flow-file-added='vm.fileAdded($file)' class="tb-file-select-container">
+                  <div class="tb-file-clear-container">
+                    <md-button ng-click='vm.clearFile()' class="tb-file-clear-btn md-icon-button md-primary" aria-label="{{ 'action.remove' | translate }}">
+                      <md-tooltip md-direction="top">
+                        {{ 'action.remove' | translate }}
+                      </md-tooltip>
+                      <md-icon aria-label="{{ 'action.remove' | translate }}" class="material-icons">close</md-icon>
+                    </md-button>
+                  </div>
+
+                  <div class="alert tb-flow-drop" flow-drop>
+
+                    <label for="select" translate>import.drop-file</label>
+                    <input flow-attrs="{accept:'.jpg,.png,.svg,.jpeg'}"
+                           class="file-input"
+                           flow-btn id="select"
+                           ng-model="vm.stepperData.logoFileName"
+                    >
+                  </div>
+                </div>
+              </div>
+              <div>
+              </div>
+            </md-input-container>
+            <div ng-hide ="vm.stepperData.type == 'Device'">Note:- If No Icon Uploaded Then Default Icon Of Assets Will Be Applied.</div>
+          </md-content>
+        </md-tab>
+
+        <md-tab label="Attributes" ng-click="vm.stepperState = 1" ng-disabled="!vm.stepperData.name || !vm.stepperData.type">
+          <md-content class="md-padding">
+
+
+            <v-accordion class="vAccordion--default">
+
+              <!-- add expanded attribute to open the section -->
+              <v-pane expanded>
+                <v-pane-header>
+                  Attributes
+                </v-pane-header>
+
+                <v-pane-content>
+                  <div flex layout="row" layout-align="start center">
+                    <div flex layout="row" layout-align="start center"
+                         style="padding: 0 0 0 10px; margin: 5px;">
+                      <span translate flex="50">Attribute Name</span>
+                      <span translate flex="50">Key Attribute</span>
+                      <span style="min-width: 80px; margin: 0 12px;"></br></span>
+                    </div>
+                  </div>
+                 <div class="md-whiteframe-4dp" flex layout="row" layout-align="start center"
+                             style="padding: 0 0 0 10px; margin: 5px;height: 40px;" ng-repeat="attrib in vm.stepperData.attributes">
+                   <md-input-container  flex="40" class="md-block" ng-keypress="$event.keyCode === 13 && vm.onStepperEnter();" style="width:45%">
+                     <input ng-disabled="!vm.enableEditing[{{$index}}]"  md-no-asterisk="" name="attribute" ng-model="attrib.name" ng-keypress="$event.keyCode === 13 && alert('c')">
+                   </md-input-container>
+                    <span flex="40" ng-show="!vm.enableEditing[{{$index}}]" style="margin-left:40px;">
+                        <md-icon class="material-icons" ng-if="attrib.keyAttribute" style="color:green !important;">done</md-icon>
+                    </span>
+                   <md-input-container flex="40" class="md-block" ng-show="vm.enableEditing[{{$index}}]" style="margin-left: 35px;margin-top: 31px;">
+                     <md-checkbox name="tos" ng-model="attrib.keyAttribute" ng-change="vm.setKeyAttribute(attrib,$index)">
+                     </md-checkbox>
+                   </md-input-container>
+                     <div flex="20">
+                       <ng-md-icon ng-show="!vm.enableEditing[{{$index}}]" size="20" icon="edit" style="left:100% !important" ng-click="vm.enableEditAttribute($index)" ></ng-md-icon>
+                       <ng-md-icon ng-show="!vm.enableEditing[{{$index}}]" size="20" icon="delete" style="left:100% !important" ng-click="vm.deleteAttribute($index)" ></ng-md-icon>
+                       <ng-md-icon ng-show="vm.enableEditing[{{$index}}]" size="20" icon="done" style="left:100% !important" ng-click="vm.updateAttribute(attrib, $index)"></ng-md-icon>
+                     </div>
+                </div>
+                </v-pane-content>
+              </v-pane>
+            </v-accordion>
+            <div layout-gt-sm="row">
+              <md-input-container class="md-block" ng-keypress="$event.keyCode === 13 && vm.onStepperEnter();" style="width:70%;margin-left:10px">
+                <label>Attribute Name</label>
+                <input md-maxlength="256" md-no-asterisk="" name="attribute" ng-model="vm.stepperData.currentAttribute.name" ng-keypress="$event.keyCode === 13 && alert('c')">
+                <div ng-messages="objectStepper.attrib.$error">
+                  <div ng-message="md-maxlength">The description must be less than 256 characters long.</div>
+                </div>
+              </md-input-container>
+              <md-input-container class="md-block" style="width:30%">
+                <md-checkbox name="tos" ng-model="vm.stepperData.currentAttribute.keyAttribute">
+                  Key Attribute
+                </md-checkbox>
+              </md-input-container>
+            </div>
+
+              <!--<ng-md-icon ng-show="!editing" size="20" icon="edit" style="left:100% !important" ng-click="editing = true" ></ng-md-icon>
+              <ng-md-icon ng-show="!editing" size="20" icon="delete" style="left:100% !important" ng-click="vm.deleteAttribute($index)" ></ng-md-icon>
+              <ng-md-icon   ng-show="editing" size="20" icon="done" style="left:100% !important" ng-click="vm.updateAttribute(attrib, $index)"></ng-md-icon>-->
+           <!-- </md-list-item>-->
+
+
+
+            <!--<md-input-container class="md-block" ng-keypress="$event.keyCode === 13 && vm.onStepperEnter();">
+              <label>Attribute Name</label>
+              <input md-maxlength="256" md-no-asterisk="" name="attribute" ng-model="vm.stepperData.currentAttribute" ng-keypress="$event.keyCode === 13 && alert('c')">
+              <div ng-messages="objectStepper.attrib.$error">
+                <div ng-message="md-maxlength">The description must be less than 256 characters long.</div>
+              </div>
+            </md-input-container>-->
+.
+
+            <md-button id="stepperAddAttrButton" ng-click="vm.addDatamodelObjectAttribute()">
+              Add
+            </md-button>
+          </md-content>
+        </md-tab>
+
+        <md-tab label="Relationships" ng-click="vm.stepperState = 2" ng-disabled="!vm.stepperData.name || !vm.stepperData.type">
+          <md-content class="md-padding">
+            <md-input-container class="md-block" ng-keypress="$event.keyCode === 13 && vm.onStepperEnter();">
+              <label>Parent</label>
+              <md-select  name="tempusType" ng-model="vm.stepperData.parent_node_id" ng-init="nodes = vm.getNodes()">
+                <md-option ng-value="null">None</md-option>
+                <md-option  ng-repeat="node in nodes" ng-if="vm.stepperData.child_node_id == undefined || vm.stepperData.child_node_id.indexOf(node.id) == -1 " ng-value="node.id">{{node.label}}</md-option>
+              </md-select>
+            </md-input-container>
+
+          </md-content>
+
+          <md-content class="md-padding">
+            <md-input-container class="md-block" ng-keypress="$event.keyCode === 13 && vm.onStepperEnter();">
+              <label>Child</label>
+              <md-select multiple="{{false}}" name="tempusType" ng-model="vm.stepperData.child_node_id" ng-init="nodes = vm.getNodes()">
+                <md-option ng-repeat="node in nodes" ng-if ="vm.stepperData.parent_node_id !== node.id" ng-value="node.id">{{node.label}}</md-option>
+              </md-select>
+            </md-input-container>
+          </md-content>
+
+        </md-tab>
+
+        <md-tab label="Review" ng-click="vm.stepperState = 3" ng-disabled="!vm.stepperData.name || !vm.stepperData.type">
+          <md-content class="md-padding">
+            <md-subheader class="md-no-sticky reviewHeader">Datamodel Object</md-subheader>
+            <md-list-item>
+              <label>Name: {{ vm.stepperData.name }} </label>
+            </md-list-item>
+            <md-list-item>
+              <labelp>Description: {{ vm.stepperData.desc }} </labelp>
+            </md-list-item>
+            <md-list-item>
+              <label>Type: {{ vm.stepperData.type }} </label>
+            </md-list-item>
+
+            <md-subheader class="md-no-sticky reviewHeader">Object Attributes</md-subheader>
+            <md-list-item ng-repeat="attrib in vm.stepperData.attributes">
+              <label> {{ attrib.name }}  <span ng-if="attrib.keyAttribute"> &nbsp;&nbsp;:: Key Attribute</span> </label>
+            </md-list-item>
+
+            <md-subheader class="md-no-sticky reviewHeader">Relationships</md-subheader>
+            <md-list-item>
+              <label>Parent: {{vm.stepperData.parent_node_id ? vm.nodes.get(vm.stepperData.parent_node_id).label : "--"}}</label>
+            </md-list-item>
+            <md-list-item>
+              <p class="dmoFont"><span translate>dataModels.child</span>: <span class="datamodel-value">{{vm.childNode.length > 0 ? vm.childName : "None"}}</span></p>
+            </md-list-item>
+            <md-subheader class="md-no-sticky reviewHeader">Image</md-subheader>
+
+            <md-list-item>
+              <label>Icon:<img class="" style="width: 98%; margin-top: -1%;"ng-src="{{vm.stepperData.logoFile}}"></label>
+            </md-list-item>
+
+          </md-content>
+        </md-tab>
+      </md-tabs>
+    </md-dialog-content>
+
+    <md-dialog-actions layout="row">
+      <span flex></span>
+      <md-button ng-click="vm.onStepperDelete()" style="margin-right:20px;" ng-if="vm.stepperMode === 'EDIT'" id="stepperDelete" class="md-warn md-raised">
+        Delete
+      </md-button>
+      <md-button ng-click="vm.stepperState = vm.stepperState - 1" ng-if="vm.stepperState > 0" id="stepperBack">
+        Back
+      </md-button>
+      <md-button ng-click="vm.stepperState = vm.stepperState + 1" style="margin-right:20px;" ng-if="3 > vm.stepperState" ng-disabled="!vm.stepperData.name || !vm.stepperData.type" id="stepperNext">
+        Next
+      </md-button>
+      <md-button ng-disabled="$root.loading || !theForm.$valid" type="submit" style="margin-right:20px;" ng-if="3 === vm.stepperState" id="stepperSubmit">
+        Submit
+      </md-button>
+    </md-dialog-actions>
+  </form>
+</md-dialog>

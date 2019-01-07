@@ -1,6 +1,7 @@
 <!--
 
-    Copyright © 2016-2017 The Thingsboard Authors
+    Copyright © 2016-2018 The Thingsboard Authors
+    Modifications © 2017-2018 Hashmap, Inc
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -36,7 +37,8 @@
                                 entity-id="vm.grid.operatingItem().id.id"
                                 entity-type="{{vm.types.entityType.asset}}"
                                 entity-name="vm.grid.operatingItem().name"
-                                default-attribute-scope="{{vm.types.attributesScope.server.value}}">
+                                default-attribute-scope="{{vm.types.attributesScope.server.value}}"
+                                asset-landing-attribute-flag="true">
             </tb-attribute-table>
         </md-tab>
         <md-tab ng-if="!vm.grid.detailsConfig.isDetailsEditMode" md-on-select="vm.grid.triggerResize()" label="{{ 'attribute.latest-telemetry' | translate }}">
@@ -63,7 +65,14 @@
         <md-tab ng-if="!vm.grid.detailsConfig.isDetailsEditMode" md-on-select="vm.grid.triggerResize()" label="{{ 'relation.relations' | translate }}">
             <tb-relation-table flex
                                 entity-id="vm.grid.operatingItem().id.id"
-                                entity-type="{{vm.types.entityType.asset}}">
+                                entity-type="{{vm.types.entityType.asset}}"
+                                entity-detail="vm.grid.operatingItem()">
             </tb-relation-table>
+        </md-tab>
+        <md-tab ng-if="!vm.grid.detailsConfig.isDetailsEditMode && vm.grid.isTenantAdmin()" md-on-select="vm.grid.triggerResize()" label="{{ 'audit-log.audit-logs' | translate }}">
+            <tb-audit-log-table flex entity-type="vm.types.entityType.asset"
+                                entity-id="vm.grid.operatingItem().id.id"
+                                audit-log-mode="{{vm.types.auditLogMode.entity}}">
+            </tb-audit-log-table>
         </md-tab>
 </tb-grid>

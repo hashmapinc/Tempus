@@ -84,7 +84,7 @@ SET installDir=%BASE%\data
 
 PUSHD %BASE%\conf
 
-java -cp %jarfile% -Dloader.main=org.thingsboard.server.ThingsboardInstallApplication^
+java -cp %jarfile% -Dloader.main=com.hashmapinc.server.TempusInstallApplication^
                     -Dinstall.data_dir=%installDir%^
                     -Dinstall.load_demo=%loadDemo%^
                     -Dspring.jpa.hibernate.ddl-auto=none^
@@ -93,7 +93,7 @@ java -cp %jarfile% -Dloader.main=org.thingsboard.server.ThingsboardInstallApplic
                     org.springframework.boot.loader.PropertiesLauncher
 
 if errorlevel 1 (
-   @echo ThingsBoard installation failed!
+   @echo Tempus installation failed!
    POPD
    exit /b %errorlevel%
 )
@@ -101,7 +101,7 @@ POPD
 
 %BASE%${pkg.name}.exe install
 
-@ECHO ThingsBoard installed successfully!
+@ECHO Tempus installed successfully!
 
 GOTO END
 

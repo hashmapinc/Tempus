@@ -1,5 +1,6 @@
 /*
- * Copyright © 2016-2017 The Thingsboard Authors
+ * Copyright © 2016-2018 The Thingsboard Authors
+ * Modifications © 2017-2018 Hashmap, Inc
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,49 +17,49 @@
 import React from 'react';
 import { utils } from 'react-schema-form';
 
-import ThingsboardArray from './json-form-array.jsx';
-import ThingsboardJavaScript from './json-form-javascript.jsx';
-import ThingsboardJson from './json-form-json.jsx';
-import ThingsboardHtml from './json-form-html.jsx';
-import ThingsboardCss from './json-form-css.jsx';
-import ThingsboardColor from './json-form-color.jsx'
-import ThingsboardRcSelect from './json-form-rc-select.jsx';
-import ThingsboardNumber from './json-form-number.jsx';
-import ThingsboardText from './json-form-text.jsx';
+import TempusArray from './json-form-array.jsx';
+import TempusJavaScript from './json-form-javascript.jsx';
+import TempusJson from './json-form-json.jsx';
+import TempusHtml from './json-form-html.jsx';
+import TempusCss from './json-form-css.jsx';
+import TempusColor from './json-form-color.jsx'
+import TempusRcSelect from './json-form-rc-select.jsx';
+import TempusNumber from './json-form-number.jsx';
+import TempusText from './json-form-text.jsx';
 import Select from 'react-schema-form/lib/Select';
 import Radios from 'react-schema-form/lib/Radios';
-import ThingsboardDate from './json-form-date.jsx';
-import ThingsboardImage from './json-form-image.jsx';
-import ThingsboardCheckbox from './json-form-checkbox.jsx';
+import TempusDate from './json-form-date.jsx';
+import TempusImage from './json-form-image.jsx';
+import TempusCheckbox from './json-form-checkbox.jsx';
 import Help from 'react-schema-form/lib/Help';
-import ThingsboardFieldSet from './json-form-fieldset.jsx';
+import TempusFieldSet from './json-form-fieldset.jsx';
 
 import _ from 'lodash';
 
-class ThingsboardSchemaForm extends React.Component {
+class TempusSchemaForm extends React.Component {
 
     constructor(props) {
         super(props);
 
         this.mapper = {
-            'number': ThingsboardNumber,
-            'text': ThingsboardText,
-            'password': ThingsboardText,
-            'textarea': ThingsboardText,
+            'number': TempusNumber,
+            'text': TempusText,
+            'password': TempusText,
+            'textarea': TempusText,
             'select': Select,
             'radios': Radios,
-            'date': ThingsboardDate,
-            'image': ThingsboardImage,
-            'checkbox': ThingsboardCheckbox,
+            'date': TempusDate,
+            'image': TempusImage,
+            'checkbox': TempusCheckbox,
             'help': Help,
-            'array': ThingsboardArray,
-            'javascript': ThingsboardJavaScript,
-            'json': ThingsboardJson,
-            'html': ThingsboardHtml,
-            'css': ThingsboardCss,
-            'color': ThingsboardColor,
-            'rc-select': ThingsboardRcSelect,
-            'fieldset': ThingsboardFieldSet
+            'array': TempusArray,
+            'javascript': TempusJavaScript,
+            'json': TempusJson,
+            'html': TempusHtml,
+            'css': TempusCss,
+            'color': TempusColor,
+            'rc-select': TempusRcSelect,
+            'fieldset': TempusFieldSet
         };
 
         this.onChange = this.onChange.bind(this);
@@ -84,6 +85,7 @@ class ThingsboardSchemaForm extends React.Component {
         if(form.condition && eval(form.condition) === false) {
             return null;
         }
+
         return <Field model={model} form={form} key={index} onChange={onChange} onColorClick={onColorClick} mapper={mapper} builder={this.builder}/>
     }
 
@@ -102,4 +104,4 @@ class ThingsboardSchemaForm extends React.Component {
         );
     }
 }
-export default ThingsboardSchemaForm;
+export default TempusSchemaForm;

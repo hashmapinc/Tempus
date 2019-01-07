@@ -1,5 +1,6 @@
 /*
- * Copyright © 2016-2017 The Thingsboard Authors
+ * Copyright © 2016-2018 The Thingsboard Authors
+ * Modifications © 2017-2018 Hashmap, Inc
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,13 +19,13 @@ import './json-form-color.scss';
 import $ from 'jquery';
 import React from 'react';
 import ReactDOM from 'react-dom';
-import ThingsboardBaseComponent from './json-form-base-component.jsx';
+import TempusBaseComponent from './json-form-base-component.jsx';
 import reactCSS from 'reactcss';
 import tinycolor from 'tinycolor2';
 import TextField from 'material-ui/TextField';
 import IconButton from 'material-ui/IconButton';
 
-class ThingsboardColor extends React.Component {
+class TempusColor extends React.Component {
 
     constructor(props) {
         super(props);
@@ -158,4 +159,4 @@ class ThingsboardColor extends React.Component {
     }
 }
 
-export default ThingsboardBaseComponent(ThingsboardColor);
+export default TempusBaseComponent(TempusColor);

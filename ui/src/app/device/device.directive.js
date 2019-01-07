@@ -1,5 +1,6 @@
 /*
- * Copyright © 2016-2017 The Thingsboard Authors
+ * Copyright © 2016-2018 The Thingsboard Authors
+ * Modifications © 2017-2018 Hashmap, Inc
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +21,7 @@ import deviceFieldsetTemplate from './device-fieldset.tpl.html';
 /* eslint-enable import/no-unresolved, import/default */
 
 /*@ngInject*/
-export default function DeviceDirective($compile, $templateCache, toast, $translate, types, deviceService, customerService) {
+export default function DeviceDirective($compile,$templateCache,datamodelService, toast, $translate, types, clipboardService, deviceService, customerService) {
     var linker = function (scope, element) {
         var template = $templateCache.get(deviceFieldsetTemplate);
         element.html(template);
@@ -29,18 +30,13 @@ export default function DeviceDirective($compile, $templateCache, toast, $transl
         scope.isAssignedToCustomer = false;
         scope.isPublic = false;
         scope.assignedCustomer = null;
+        scope.assignedDataModelObject = null;
+        scope.isAssignedToDataModel = false;
+        scope.assignedToDataModelObject = false;
 
-        scope.deviceCredentials = null;
 
         scope.$watch('device', function(newVal) {
             if (newVal) {
-                if (scope.device.id) {
-                    deviceService.getDeviceCredentials(scope.device.id.id).then(
-                        function success(credentials) {
-                            scope.deviceCredentials = credentials;
-                        }
-                    );
-                }
                 if (scope.device.customerId && scope.device.customerId.id !== types.id.nullUid) {
                     scope.isAssignedToCustomer = true;
                     customerService.getShortCustomerInfo(scope.device.customerId.id).then(
@@ -49,11 +45,34 @@ export default function DeviceDirective($compile, $templateCache, toast, $transl
                             scope.isPublic = customer.isPublic;
                         }
                     );
+                    customerService.getCustomer(scope.device.customerId.id).then(
+                        function success(customer) {
+                            if(customer.dataModelId.id !== types.id.nullUid) {
+                                scope.isAssignedToDataModel = true;
+                            } else {
+                            scope.isAssignedToDataModel = false;
+                            }
+                        }
+                   );
                 } else {
                     scope.isAssignedToCustomer = false;
                     scope.isPublic = false;
                     scope.assignedCustomer = null;
+                    scope.isAssignedToDataModel = false;
                 }
+
+                if(scope.device.dataModelObjectId && scope.device.dataModelObjectId.id !== types.id.nullUid) {
+                    scope.assignedToDataModelObject = true;
+                    datamodelService.getDatamodelObject(scope.device.dataModelObjectId.id).then(
+                        function success(dataModelObject) {
+                            scope.assignedDataModelObject = dataModelObject.data.name;
+                        }
+                    );
+                } else {
+                    scope.assignedToDataModelObject = false;
+                    scope.assignedDataModelObject = null;
+                }
+
             }
         });
 
@@ -61,8 +80,20 @@ export default function DeviceDirective($compile, $templateCache, toast, $transl
             toast.showSuccess($translate.instant('device.idCopiedMessage'), 750, angular.element(element).parent().parent(), 'bottom left');
         };
 
-        scope.onAccessTokenCopied = function() {
-            toast.showSuccess($translate.instant('device.accessTokenCopiedMessage'), 750, angular.element(element).parent().parent(), 'bottom left');
+        scope.copyAccessToken = function(e) {
+            const trigger = e.delegateTarget || e.currentTarget;
+            if (scope.device.id) {
+                deviceService.getDeviceCredentials(scope.device.id.id, true).then(
+                    function success(credentials) {
+                        var credentialsId = credentials.credentialsId;
+                        clipboardService.copyToClipboard(trigger, credentialsId).then(
+                            () => {
+                                toast.showSuccess($translate.instant('device.accessTokenCopiedMessage'), 750, angular.element(element).parent().parent(), 'bottom left');
+                            }
+                        );
+                    }
+                );
+            }
         };
 
         $compile(element.contents())(scope);
@@ -76,6 +107,7 @@ export default function DeviceDirective($compile, $templateCache, toast, $transl
             deviceScope: '=',
             theForm: '=',
             onAssignToCustomer: '&',
+            onAssignToDatamodel: '&',
             onMakePublic: '&',
             onUnassignFromCustomer: '&',
             onManageCredentials: '&',

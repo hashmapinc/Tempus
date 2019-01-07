@@ -1,5 +1,6 @@
 /**
- * Copyright © 2016-2017 The Thingsboard Authors
+ * Copyright © 2016-2018 The Thingsboard Authors
+ * Modifications © 2017-2018 Hashmap, Inc
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -69,6 +70,13 @@ md-icon.tb-logo-title {
   flex-shrink: 0;
   z-index: 2;
   white-space: nowrap;
+  .md-toolbar-tools {
+    flex-basis: auto;
+  }
+}
+
+.tb-side-menu-toolbar {
+  overflow-y: auto;
 }
 
 .tb-side-menu-toolbar {
@@ -81,4 +89,15 @@ md-icon.tb-logo-title {
 
 .tb-entity-search {
   margin-top: 34px;
+}
+
+.themeDarkSideMenu{
+  background: linear-gradient(180deg,#0c3483 0,transparent 200%),url(/static/images/LoginPage_Background_Image.png);
+}
+
+.themeBlueSideMenu {
+  background: linear-gradient(180deg,#673AB7 0,transparent 200%),url(/static/images/LoginPage_Background_Image.png);
+}
+.metadata-icon {
+ padding-top :14px;
 }

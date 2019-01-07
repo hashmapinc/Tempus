@@ -1,5 +1,6 @@
 /*
- * Copyright © 2016-2017 The Thingsboard Authors
+ * Copyright © 2016-2018 The Thingsboard Authors
+ * Modifications © 2017-2018 Hashmap, Inc
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,18 +14,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import thingsboardApiUser from '../api/user.service';
+import tempusApiUser from '../api/user.service'; 
+import tempusApiDatamodel from '../api/datamodel.service';
+import tempusApiCustomer from '../api/customer.service';
+import tempusApiDashboard from '../api/dashboard.service';
 
-export default angular.module('thingsboard.menu', [thingsboardApiUser])
+export default angular.module('tempus.menu', [tempusApiUser,tempusApiDatamodel,tempusApiCustomer,tempusApiDashboard])
     .factory('menu', Menu)
     .name;
 
 /*@ngInject*/
-function Menu(userService, $state, $rootScope) {
+function Menu(userService, $state, $rootScope, $log,datamodelService,customerService,dashboardService) {
 
     var authority = '';
     var sections = [];
     var homeSections = [];
+    var generatedSectionTree = {};
+
 
     if (userService.isUserLoaded() === true) {
         buildMenu();
@@ -39,8 +45,9 @@ function Menu(userService, $state, $rootScope) {
         getHomeSections: getHomeSections,
         getSections: getSections,
         sectionHeight: sectionHeight,
-        sectionActive: sectionActive
-    }
+        sectionActive: sectionActive,
+        getGeneratedSectionTree: getGeneratedSectionTree
+    };
 
     return service;
 
@@ -48,6 +55,10 @@ function Menu(userService, $state, $rootScope) {
         return sections;
     }
 
+    function getGeneratedSectionTree() {
+        return generatedSectionTree;
+    }
+    
     function getHomeSections() {
         return homeSections;
     }
@@ -94,10 +105,17 @@ function Menu(userService, $state, $rootScope) {
                             link: '/static/svg/widgetslightgray.svg'
                         },
                         {
+                            name: 'cluster.cluster-info',
+                            type: 'link',
+                            state: 'home.nodes',
+                            icon: 'now_widgets'
+                        },
+
+                        {
                             name: 'admin.system-settings',
                             type: 'toggle',
                             state: 'home.settings',
-                            height: '80px',
+                            height: '120px',
                             icon: 'settings',
                             pages: [
                                 {
@@ -109,9 +127,19 @@ function Menu(userService, $state, $rootScope) {
                                     name: 'admin.outgoing-mail',
                                     type: 'link',
                                     state: 'home.settings.outgoing-mail',
-                                    icon: 'mail'                                }
+                                    icon: 'mail'                                },
+
+                                {
+                                    name: 'admin.ui-configuration',
+                                    type: 'link',
+                                    state: 'home.settings.ui-config',
+                                    icon: 'settings_applications'                                }
+
                             ]
                         }];
+
+                    generatedSectionTree = {};
+
                     homeSections =
                         [{
                             name: 'rule-plugin.management',
@@ -130,16 +158,16 @@ function Menu(userService, $state, $rootScope) {
                                 }
                             ]
                         },
-                        {
-                            name: 'tenant.management',
-                            places: [
-                                {
-                                    name: 'tenant.tenants',
-                                    icon: 'supervisor_account',
-                                    state: 'home.tenants'
-                                }
-                            ]
-                        },
+                            {
+                                name: 'tenant.management',
+                                places: [
+                                    {
+                                        name: 'tenant.tenants',
+                                        icon: 'supervisor_account',
+                                        state: 'home.tenants'
+                                    }
+                                ]
+                            },
                             {
                                 name: 'widget.management',
                                 places: [
@@ -165,7 +193,30 @@ function Menu(userService, $state, $rootScope) {
                                         state: 'home.settings.outgoing-mail',
                                     }
                                 ]
-                            }];
+                            },
+                            {
+                                name: 'admin.ui-configuration',
+                                places: [
+                                    {
+                                        name: 'admin.look-feel',
+                                        icon: 'settings_applications',
+                                        state: 'home.settings.ui-config'
+                                    }
+                                ]
+                            },
+                            {
+                                name: 'cluster.management',
+                                places: [
+                                    {
+                                        name: 'cluster.cluster-info',
+                                        icon: 'now_widgets',
+                                        state: 'home.nodes',
+                                    }
+                                ]
+                            }
+
+
+                        ];
                 } else if (authority === 'TENANT_ADMIN') {
                     sections = [
                         {
@@ -173,20 +224,6 @@ function Menu(userService, $state, $rootScope) {
                             type: 'link',
                             state: 'home.links',
                             icon: 'home'
-                        },  
-                        {
-                            name: 'Applications',
-                            type: 'link',
-                            state: 'home.applications',
-                            icon: 'dashboards',
-                            link: '/static/svg/applicationslightgray.svg'
-                        }, 
-                        {
-                            name: 'Tempusboard',
-                            type: 'link',
-                            state: 'home.tempusboard',
-                            icon: 'dashboards',
-                            link: '/static/svg/tempusboardlightgray.svg'
                         },
                         {
                             name: 'plugin.plugins',
@@ -231,6 +268,21 @@ function Menu(userService, $state, $rootScope) {
                             link: '/static/svg/widgetslightgray.svg'
                         },
                         {
+                            name: 'data_model.data_models',
+                            type: 'link',
+                            state: 'home.data_models',
+                            icon: 'data_models',
+                            link: '/static/svg/data-models-icon.svg'
+                        },
+                        {
+                            name: 'metadata.metadata',
+                            type: 'link',
+                            state: 'home.metadata',
+                            icon: 'metadata',
+                            link: '/static/svg/metadata-icon.svg'
+                        },
+
+                        {
                             name: 'dashboard.dashboards',
                             type: 'link',
                             state: 'home.dashboards',
@@ -243,7 +295,23 @@ function Menu(userService, $state, $rootScope) {
                             state: 'home.computations',
                             icon: 'dashboards',
                             link: '/static/svg/computationslightgray.svg'
-                        }];
+                        },
+                        {
+                            name: 'audit-log.audit-logs',
+                            type: 'link',
+                            state: 'home.auditLogs',
+                            icon: 'track_changes'
+                        },
+                        {
+                            name: 'gateway.configuration',
+                            type: 'link',
+                            state: 'home.gateway',
+                            icon: 'settings_applications'
+                        }
+
+                        ];
+
+                    generatedSectionTree = {};
 
                     homeSections =
                         [{
@@ -264,17 +332,17 @@ function Menu(userService, $state, $rootScope) {
                                 }
                             ]
                         },
-                        {
-                            name: 'customer.management',
-                            places: [
-                                {
-                                    name: 'customer.customers',
-                                    icon: 'supervisor_account',
-                                    state: 'home.customers',
-                                    link: '/static/svg/businessunitslightgray.svg'
-                                }
-                            ]
-                        },
+                            {
+                                name: 'customer.management',
+                                places: [
+                                    {
+                                        name: 'customer.customers',
+                                        icon: 'supervisor_account',
+                                        state: 'home.customers',
+                                        link: '/static/svg/businessunitslightgray.svg'
+                                    }
+                                ]
+                            },
                             {
                                 name: 'asset.management',
                                 places: [
@@ -287,13 +355,12 @@ function Menu(userService, $state, $rootScope) {
                                 ]
                             },
                             {
-                                name: 'Tempusboard',
+                                name: 'audit-log.audit',
                                 places: [
                                     {
-                                        name: 'Tempusboard',
-                                        icon: 'dashboard',
-                                        state: 'home.tempusboard',
-                                        link: '/static/svg/tempusboardlightgray.svg'
+                                        name: 'audit-log.audit-logs',
+                                        icon: 'track_changes',
+                                        state: 'home.auditLogs'
                                     }
                                 ]
                             },
@@ -324,7 +391,32 @@ function Menu(userService, $state, $rootScope) {
                                         link: '/static/svg/dashboardlightgray.svg'
                                     }
                                 ]
-                            }];
+                            },
+                            {
+                                name: 'metadata.metadata',
+                                places: [
+                                    {
+                                        name: 'metadata.metadata',
+                                        icon: 'metadata',
+                                        link: '/static/svg/metadata-icon.svg',
+                                        state: 'home.metadata'
+                                    }
+                                ]
+                            },
+
+                            {
+                                 name: 'gateway.configurationLabel',
+                                 places: [
+                                     {
+                                        name: 'gateway.configuration',
+                                        type: 'link',
+                                        state: 'home.gateway',
+                                        icon: 'settings_applications'
+                                    }
+                                 ]
+                             }
+
+                        ];
 
                 } else if (authority === 'CUSTOMER_USER') {
                     sections = [
@@ -333,13 +425,6 @@ function Menu(userService, $state, $rootScope) {
                             type: 'link',
                             state: 'home.links',
                             icon: 'home'
-                        },
-                        {
-                            name: 'Tempusboard',
-                            type: 'link',
-                            icon: 'dashboard',
-                            state: 'home.tempusboard',
-                            link: '/static/svg/tempusboardlightgray.svg'
                         },
                         {
                             name: 'device.devices',
@@ -352,60 +437,148 @@ function Menu(userService, $state, $rootScope) {
                             name: 'dashboard.dashboards',
                             type: 'link',
                             state: 'home.dashboards',
-                            icon: 'dashboard',                            
+                            icon: 'dashboard',
                             link: '/static/svg/dashboardlightgray.svg'
                         }];
 
+                    var dataModelsOfAssetType = [];
+
+                    var customer = customerService.getCustomer(user.customerId, {ignoreLoading: true});
+
+                    customer.then(function (data) {
+                        var dataModelObjects = datamodelService.getDatamodelObjects(data.dataModelId.id);
+
+                        dataModelObjects.then(function(modelObjects){
+                            dataModelsOfAssetType = getDataModelObjectsOfTypeAsset(modelObjects);
+                            generatedSectionTree.children = buildGeneratedSectionTree(dataModelsOfAssetType);
+
+                        }, function (error){
+                            $log.error(error);
+                        })
+                    }, function (error) {
+                        $log.error(error);
+                    });
+
                     homeSections =
-                        [{
-                            name: 'asset.view-assets',
-                            places: [
-                                {
-                                    name: 'asset.assets',
-                                    icon: 'domain',
-                                    state: 'home.assets',
-                                    link: '/static/svg/assetslightgray.svg'
-                                }
-                            ]
-                        },
-                        {
-                            name: 'device.view-devices',
-                            places: [
-                                {
-                                    name: 'device.devices',
-                                    icon: 'devices_other',
-                                    state: 'home.devices',                                        
-                                    link: '/static/svg/deviceslightgray.svg'
-                                }
-                            ]
-                        },
+                        [
+                            {
+                                name: 'device.view-devices',
+                                places: [
+                                    {
+                                        name: 'device.devices',
+                                        icon: 'devices_other',
+                                        state: 'home.devices',
+                                        link: '/static/svg/deviceslightgray.svg'
+                                    }
+                                ]
+                            },
                             {
                                 name: 'dashboard.view-dashboards',
                                 places: [
                                     {
                                         name: 'dashboard.dashboards',
                                         icon: 'dashboard',
-                                        state: 'home.dashboards',                            
+                                        state: 'home.dashboards',
                                         link: '/static/svg/dashboardlightgray.svg'
                                     }
                                 ]
-                            },
-                            {
-                                name: 'tempusboard.view-tempusboard',
-                                places: [
-                                    {
-                                        name: 'Tempusboard',
-                                        icon: 'dashboard',
-                                        state: 'home.tempusboard',
-                                        link: '/static/svg/tempusboardlightgray.svg'
-                                    }
-                                ]
                             }
-                            ];
+                        ];
                 }
             }
         }
     }
+
+
+    function getDataModelObjectsOfTypeAsset(dataModelObjects){
+
+        var dataModels = [];
+
+        angular.forEach(dataModelObjects, function (dataModelObject) {
+
+            if (dataModelObject.type === "Asset") {
+                    var sec = {
+                        id : dataModelObject.id.id,
+                        type: 'link',
+                        name:dataModelObject.name,
+                        state: 'home.dashboards.blank', //if assetLanding dashboard page is not created for current dataModelObject
+                        icon: 'domain',
+                        link: '/static/svg/assetslightgray.svg',
+                        logoFile: dataModelObject.logoFile,
+                        dashboardId: null                       //if assetLanding dashboard page is not created for current dataModelObject
+                    };
+
+                    if(dataModelObject.parentId != null)
+                        sec['parentId'] =  dataModelObject.parentId.id;
+                    else
+                        sec['parentId'] = null;
+
+               dashboardService.getAssetLandingDashboardByDataModelObjId(dataModelObject).then(function(response){
+                        sec.dashboardId = response[0].id.id;
+                        sec.state = 'home.dashboards.dashboard';
+                    },
+                    function (error){
+                        $log.error(error);
+                    });
+
+                dataModels.push(sec);
+            }
+        });
+        return dataModels;
+    }
+
+
+    function buildSectionTreeList(id, parentId, children, list) {
+        if (!id) id = 'id';
+        if (!parentId) parentId = 'parentId';
+        if (!children) children = 'children';
+        var treeList = [];
+        var lookup = {};
+        list.forEach(function (obj) {
+            lookup[obj.id] = obj;
+            obj[children] = [];
+
+        });
+
+
+        list.forEach(function (obj) {
+            if (obj[parentId] != null) {
+                lookup[obj[parentId]][children].push(obj);
+            } else {
+                treeList.push(obj);
+            }
+        });
+        return treeList;
+    }
+
+
+    function addToggleAndLevelToGeneratedSectionTree(parent,level) {
+
+        var children = parent.children;
+
+        if (children.length === 0){
+            parent.type = 'link';
+        }else {
+            parent.type = 'toggle';
+        }
+
+        for (var i = 0, len = children.length; i < len; i++) {
+            addToggleAndLevelToGeneratedSectionTree(children[i],level+1);
+        }
+
+        parent.level = level;
+    }
+
+    function buildGeneratedSectionTree(list, id, parentId, children) {
+        var generatedSectionTreeList = buildSectionTreeList(id, parentId, children, list);
+        var startingLevel = 1;
+        if(generatedSectionTreeList.length > 0) {
+            addToggleAndLevelToGeneratedSectionTree(generatedSectionTreeList[0],startingLevel);
+        }
+
+        return generatedSectionTreeList;
+    }
+
 
     function sectionHeight(section) {
         if ($state.includes(section.state)) {

@@ -1,5 +1,6 @@
 /*
- * Copyright © 2016-2017 The Thingsboard Authors
+ * Copyright © 2016-2018 The Thingsboard Authors
+ * Modifications © 2017-2018 Hashmap, Inc
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +23,7 @@ import ReactSchemaForm from './react/json-form-react.jsx';
 import jsonFormTemplate from './json-form.tpl.html';
 import { utils } from 'react-schema-form';
 
-export default angular.module('thingsboard.directives.jsonForm', [])
+export default angular.module('tempus.directives.jsonForm', [])
     .directive('tbJsonForm', JsonForm)
     .value('ReactSchemaForm', ReactSchemaForm)
     .name;

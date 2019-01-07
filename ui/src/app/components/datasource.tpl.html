@@ -1,6 +1,7 @@
 <!--
 
-    Copyright © 2016-2017 The Thingsboard Authors
+    Copyright © 2016-2018 The Thingsboard Authors
+    Modifications © 2017-2018 Hashmap, Inc
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -23,6 +24,7 @@
             </md-option>
         </md-select>
     </md-input-container>
+
     <section flex class="datasource" ng-switch on="model.type">
         <tb-datasource-func flex
                             ng-switch-default
@@ -32,7 +34,8 @@
                             datakey-settings-schema="datakeySettingsSchema"
                             ng-required="model.type === types.datasourceType.function"
                             widget-type="widgetType"
-                            generate-data-key="generateDataKey({chip: chip, type: type})">
+                            generate-data-key="generateDataKey({chip: chip, type: type})"
+                            widget-info= "widgetInfo">
         </tb-datasource-func>
         <tb-datasource-entity flex
                               ng-model="model"
