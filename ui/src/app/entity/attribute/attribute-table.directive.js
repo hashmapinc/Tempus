@@ -158,14 +158,18 @@ export default function AttributeTableDirective($compile, $templateCache, $rootS
 
         function success(attributes, update, apply) {
             angular.forEach(attributes.data, function(value1,key1) {
-                angular.forEach(scope.entityAttribute, function(value2,key2) {
-                    if(attributes.data[key1].key === scope.entityAttribute[key2].name){
-                        attributes.data[key1].keyAttribute = scope.entityAttribute[key2].keyAttribute;
-                    }
-                });
+                if(value1.key === types.extensionFilter.extensionFilterConfiguration){
+                     attributes.data.splice(key1, 1);
+                }else {
+                    angular.forEach(scope.entityAttribute, function(value2,key2) {
+                        if(attributes.data[key1].key === scope.entityAttribute[key2].name){
+                            attributes.data[key1].keyAttribute = scope.entityAttribute[key2].keyAttribute;
+                        }
+                    });
+                }
             });
-            scope.attributes = attributes;
 
+            scope.attributes = attributes;
             if (!update) {
                 scope.selectedAttributes = [];
             }
@@ -242,7 +246,6 @@ export default function AttributeTableDirective($compile, $templateCache, $rootS
 
 
         scope.getEntityAttributes = function(forceUpdate, reset) {
-
             if (scope.attributesDeferred) {
                 scope.attributesDeferred.resolve();
             }
@@ -486,7 +489,6 @@ export default function AttributeTableDirective($compile, $templateCache, $rootS
                         var isSystem = scope.widgetsBundle.tenantId.id === types.id.nullUid;
                         widgetService.getBundleWidgetTypes(scope.widgetsBundle.alias, isSystem).then(
                             function success(widgetTypes) {
-
                                 widgetTypes = $filter('orderBy')(widgetTypes, ['-descriptor.type','-createdTime']);
 
                                 for (var i = 0; i < widgetTypes.length; i++) {
