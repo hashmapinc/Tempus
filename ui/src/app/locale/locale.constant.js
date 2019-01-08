@@ -342,14 +342,26 @@ export default angular.module('tempus.locale', [])
                     "total-replica":"Total Replica",
                     "ready":"Ready",
                     "in-progress":"In Progress",
-                    "crash":"Crashed"
+                    "crash":"Crashed",
+                    "delete":""
 
                 },
                 "templateEditor" :{
 
-                    "templateEditor":"Template Editor",
-                    "title":"Template Editor",
-                    "add-template-text": "Add New Template"
+                    "templateEditor":"Templates",
+                    "title":"Templates",
+                    "add-template-text": "Add New Template",
+                    "name":"Name",
+                    "templateBody":"Template Body",
+                    "name-required":"Name is required",
+                    "grid":"Grid",
+                    "table":"Tabular",
+                    "delete":"Delete Template",
+                    "copy":"Copy Template",
+                    "templateDetails":"Template Details",
+                    "action":"Actions",
+                    "body-required":"Template Body is Required"
+
 
                 },
                 "audit-log": {

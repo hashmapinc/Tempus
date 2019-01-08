@@ -16,13 +16,31 @@
  */
 /* eslint-disable import/no-unresolved, import/default, no-unused-vars */
 import './gateway.scss';
+import addTemplateEditor from './add-template-editor.tpl.html';
 
 /*@ngInject*/
-export function TemplateEditorController($scope,userGroupService, $translate) {
+export function TemplateEditorController($scope,userGroupService, $translate, customerService, $mdDialog, $document, $stateParams, userService, $log) {
 
     var vm = this;
+    vm.addEditor = addEditor;
+    vm.AddTemplateModelController = 'AddTemplateModelController';
+    var customerId = $stateParams.customerId;
 
     var editorActionsList = [];
+
+     editorActionsList.push({
+          onAction: function($event, item) {
+              vm.grid.deleteItem($event, item);
+          },
+          name: function() {
+              return $translate.instant('action.delete')
+          },
+          details: function() {
+              return $translate.instant('templateEditor.copy')
+          },
+          icon: "content_copy"
+      });
+
 
     editorActionsList.push({
         onAction: function($event, item) {
@@ -32,10 +50,14 @@ export function TemplateEditorController($scope,userGroupService, $translate) {
             return $translate.instant('action.delete')
         },
         details: function() {
-            return $translate.instant('customer.usergroupdelete')
+            return $translate.instant('templateEditor.delete')
         },
         icon: "delete"
     });
+
+
+
+    $scope.tableView = false;
 
     vm.templateEditorGridConfig = {
 
@@ -44,13 +66,13 @@ export function TemplateEditorController($scope,userGroupService, $translate) {
         deleteItemsTitleFunc: deleteEditorsTitle,
         deleteItemsActionTitleFunc: deleteEditorsActionTitle,
         deleteItemsContentFunc: deleteEditorsText,
-
+        addItemController: 'AddTemplateModelController',
         deleteItemFunc: deleteEditor,
+        addItemTemplateUrl: addTemplateEditor,
         parentCtl: vm,
         addIcon:"add",
-
+        getItemTitleFunc: getTemplateTitle,
         actionsList: editorActionsList,
-
         onGridInited: gridInited,
         noItemsText: function() {
             return $translate.instant('customer.no-groups-text')
@@ -65,10 +87,31 @@ export function TemplateEditorController($scope,userGroupService, $translate) {
 
     }
 
+    initController();
+
+     function initController() {
+            var fetchTemplateFunction = null;
+            var refreshUsersGroupParamsFunction = null;
+            var saveUserGroupFunction = null;
+             fetchTemplateFunction = function(pageLink) {
+                    var currentUser = userService.getCurrentUser();
+                    $log.log(currentUser);
+                    return customerService.getCustomers(pageLink)
+             };
+
+            vm.templateEditorGridConfig.fetchItemsFunc = fetchTemplateFunction;
+
+     }
 
     function deleteEditor(userGroupId) {
         return userGroupService.deleteUserGroup(userGroupId);
     }
+
+
+    function getTemplateTitle(customer) {
+            return customer ? customer.title : '';
+    }
+
 
     function deleteEditorTitle(usergroup) {
         return $translate.instant('user.delete-usergroup-title', {
@@ -91,6 +134,23 @@ export function TemplateEditorController($scope,userGroupService, $translate) {
             count: selectedCount
         }, 'messageformat');
     }
+
+    function addEditor($event, id) {
+
+            $mdDialog.show({
+                controller: vm.AddTemplateModelController,
+                controllerAs: 'vm',
+                templateUrl: addTemplateEditor,
+                parent: angular.element($document[0].body),
+                locals: {
+                    saveItemFunction: vm.saveGroup,
+                    customerId: id
+                },
+                fullscreen: true,
+                targetEvent: $event
+            }).then(function() {}, function() {});
+     }
+
 
     function deleteEditorsText() {
         return $translate.instant('user.delete-groups-text');
