@@ -17,11 +17,11 @@
 package com.hashmapinc.server.transport.mqtt;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hashmapinc.server.common.data.Device;
 import com.hashmapinc.server.common.data.Event;
 import com.hashmapinc.server.common.data.security.DeviceTokenCredentials;
 import com.hashmapinc.server.common.data.security.DeviceX509Credentials;
-import com.hashmapinc.server.common.msg.core.DeviceEventUploadRequest;
 import com.hashmapinc.server.common.msg.session.AdaptorToSessionActorMsg;
 import com.hashmapinc.server.common.msg.session.BasicToDeviceActorSessionMsg;
 import com.hashmapinc.server.common.msg.session.MsgType;
@@ -37,6 +37,7 @@ import com.hashmapinc.server.dao.device.DeviceService;
 import com.hashmapinc.server.dao.event.EventService;
 import com.hashmapinc.server.dao.mail.MailService;
 import com.hashmapinc.server.dao.relation.RelationService;
+import com.hashmapinc.server.transport.mqtt.adaptors.JsonMqttAdaptor;
 import com.hashmapinc.server.transport.mqtt.adaptors.MqttTransportAdaptor;
 import com.hashmapinc.server.transport.mqtt.session.DeviceSessionCtx;
 import com.hashmapinc.server.transport.mqtt.session.GatewaySessionCtx;
@@ -56,6 +57,7 @@ import org.springframework.util.StringUtils;
 
 import javax.net.ssl.SSLPeerUnverifiedException;
 import javax.security.cert.X509Certificate;
+import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
 import java.util.List;
@@ -189,8 +191,10 @@ public class MqttTransportHandler extends ChannelInboundHandlerAdapter implement
         try {
             if (topicName.equals(MqttTopics.GATEWAY_TELEMETRY_TOPIC)) {
                 gatewaySessionCtx.onDeviceTelemetry(mqttMsg);
-            }else if (topicName.equals(MqttTopics.GATEWAY_DEPTH_TELEMETRY_TOPIC)) {
+            } else if (topicName.equals(MqttTopics.GATEWAY_DEPTH_TELEMETRY_TOPIC)) {
                 gatewaySessionCtx.onDeviceDepthTelemetry(mqttMsg);
+            } else if (topicName.equals(MqttTopics.GATEWAY_EVENTS_TOPIC)) {
+                gatewaySessionCtx.onDeviceEventMsg(mqttMsg);
             } else if (topicName.equals(MqttTopics.GATEWAY_ATTRIBUTES_TOPIC)) {
                 gatewaySessionCtx.onDeviceAttributes(mqttMsg);
             } else if (topicName.equals(MqttTopics.GATEWAY_ATTRIBUTES_REQUEST_TOPIC)) {
@@ -217,7 +221,7 @@ public class MqttTransportHandler extends ChannelInboundHandlerAdapter implement
             } else if (topicName.equals(MqttTopics.DEVICE_ATTRIBUTES_TOPIC)) {
                 msg = adaptor.convertToActorMsg(deviceSessionCtx, MsgType.POST_ATTRIBUTES_REQUEST, mqttMsg);
             } else if (topicName.equals(MqttTopics.DEVICE_EVENT_TOPIC)) {
-                saveEventForDevice(adaptor.convertToActorMsg(deviceSessionCtx, MsgType.POST_DEVICE_EVENT, mqttMsg));
+                saveEventForDevice(mqttMsg);//adaptor.convertToActorMsg(deviceSessionCtx, MsgType.POST_DEVICE_EVENT, mqttMsg));
             } else if (topicName.startsWith(MqttTopics.DEVICE_ATTRIBUTES_REQUEST_TOPIC_PREFIX)) {
                 msg = adaptor.convertToActorMsg(deviceSessionCtx, MsgType.GET_ATTRIBUTES_REQUEST, mqttMsg);
                 if (msgId >= 0) {
@@ -245,14 +249,23 @@ public class MqttTransportHandler extends ChannelInboundHandlerAdapter implement
         }
     }
 
-    private void saveEventForDevice(AdaptorToSessionActorMsg msg) {
-        Event event = new Event();
-        Device device = deviceSessionCtx.getDevice();
-        event.setEntityId(device.getId());
-        event.setTenantId(device.getTenantId());
-        event.setType("LC_EVENT");
-        event.setBody(((DeviceEventUploadRequest)msg.getMsg()).getEventInfo());
-        eventService.save(event);
+    private void saveEventForDevice(MqttPublishMessage inbound) throws AdaptorException {
+        String payload = JsonMqttAdaptor.validatePayload(deviceSessionCtx.getSessionId(), inbound.payload());
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            JsonNode eventInfo = mapper.readTree(payload);
+            Event event = new Event();
+            Device device = deviceSessionCtx.getDevice();
+            event.setEntityId(device.getId());
+            event.setTenantId(device.getTenantId());
+            event.setType("QUALITY_EVENT");
+            event.setBody(eventInfo);
+            eventService.save(event);
+
+        } catch (IOException ex) {
+            log.info("Execption occurred : {}", ex);
+            throw new AdaptorException(ex);
+        }
     }
 
     private void processSubscribe(ChannelHandlerContext ctx, MqttSubscribeMessage mqttMsg) {
@@ -475,7 +488,8 @@ public class MqttTransportHandler extends ChannelInboundHandlerAdapter implement
             JsonNode gatewayNode = infoNode.get("gateway");
             JsonNode topic = infoNode.get(TOPIC);
             if (gatewayNode != null && gatewayNode.asBoolean()) {
-                gatewaySessionCtx = new GatewaySessionCtx(processor, deviceService, authService, relationService, deviceSessionCtx,attributesService,assetService, mailService);
+                gatewaySessionCtx = new GatewaySessionCtx(processor, deviceService, authService, relationService, eventService,
+                        deviceSessionCtx, attributesService, assetService, mailService);
                 if((msg.payload().willTopic() != null) && msg.payload().willTopic().startsWith(SPARK_PLUG_NAME_SPACE)){
                     sparkPlugDecodeService = new SparkPlugDecodeService();
                 }
