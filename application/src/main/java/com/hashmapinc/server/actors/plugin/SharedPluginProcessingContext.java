@@ -32,7 +32,6 @@ import com.hashmapinc.server.dao.device.DeviceService;
 import com.hashmapinc.server.dao.plugin.PluginService;
 import com.hashmapinc.server.dao.relation.RelationService;
 import com.hashmapinc.server.dao.rule.RuleService;
-import com.hashmapinc.server.dao.settings.UserSettingsService;
 import com.hashmapinc.server.dao.tenant.TenantService;
 import com.hashmapinc.server.dao.timeseries.TimeseriesService;
 import com.hashmapinc.server.dao.unitconversion.UnitConversionService;
@@ -72,7 +71,6 @@ public final class SharedPluginProcessingContext {
     final AuditLogService auditLogService;
     final PluginId pluginId;
     final TenantId tenantId;
-    final UserSettingsService userSettingsService;
 
     public SharedPluginProcessingContext(ActorSystemContext sysContext, TenantId tenantId, PluginId pluginId,
                                          ActorRef parentActor, ActorRef self) {
@@ -97,7 +95,6 @@ public final class SharedPluginProcessingContext {
         this.relationService = sysContext.getRelationService();
         this.auditLogService = sysContext.getAuditLogService();
         this.unitConversionService = sysContext.getUnitConversionService();
-        this.userSettingsService = sysContext.getUserSettingsService();
     }
 
     public PluginId getPluginId() {

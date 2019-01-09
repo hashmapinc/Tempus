@@ -50,5 +50,4 @@ public class JpaUserSettingsDao extends JpaAbstractDao<UserSettingsEntity, UserS
     public UserSettings findByKeyAndUserId(String key, UUID userId) {
         return DaoUtil.getData(userSettingsRepository.findByKeyAndUserId(key, UUIDConverter.fromTimeUUID(userId)));
     }
-
 }

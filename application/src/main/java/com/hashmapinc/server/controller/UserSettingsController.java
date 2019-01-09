@@ -59,8 +59,6 @@ public class UserSettingsController extends BaseController {
     @Autowired
     private TenantService tenantService;
 
-    private static final String USER_ID = "userId";
-
 
     @PreAuthorize("hasAnyAuthority('TENANT_ADMIN', 'CUSTOMER_USER', 'SYS_ADMIN')")
     @GetMapping(value = "/settings/{key}")

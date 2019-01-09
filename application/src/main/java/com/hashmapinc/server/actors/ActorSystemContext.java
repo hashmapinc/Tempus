@@ -148,9 +148,6 @@ public class ActorSystemContext {
     @Getter private ComputationFunctionService computationFunctionService;
 
     @Autowired
-    @Getter private UserSettingsService userSettingsService;
-
-    @Autowired
     @Getter @Setter private PluginWebSocketMsgEndpoint wsMsgEndpoint;
 
     @Value("${actors.session.sync.timeout}")
