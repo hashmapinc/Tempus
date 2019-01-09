@@ -16,13 +16,9 @@
  */
 package com.hashmapinc.server.controller;
 
-import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import com.hashmapinc.server.common.data.Logo;
-import com.hashmapinc.server.common.data.Tenant;
-import com.hashmapinc.server.common.data.Theme;
-import com.hashmapinc.server.common.data.UserSettings;
+import com.hashmapinc.server.common.data.*;
 import com.hashmapinc.server.common.data.id.UserId;
 import com.hashmapinc.server.common.data.security.Authority;
 import com.hashmapinc.server.dao.logo.LogoService;
@@ -63,6 +59,8 @@ public class UserSettingsController extends BaseController {
     @Autowired
     private TenantService tenantService;
 
+    private static final String USER_ID = "userId";
+
 
     @PreAuthorize("hasAnyAuthority('TENANT_ADMIN', 'CUSTOMER_USER', 'SYS_ADMIN')")
     @GetMapping(value = "/settings/{key}")
@@ -71,6 +69,36 @@ public class UserSettingsController extends BaseController {
         try {
             UserId userId = getCurrentUser().getId();
             return userSettingsService.findUserSettingsByKeyAndUserId(key, userId);
+        } catch (Exception e) {
+            throw handleException(e);
+        }
+    }
+
+    @PreAuthorize("hasAnyAuthority('TENANT_ADMIN')")
+    @GetMapping(value = "/unit-system/user/{userId}")
+    @ResponseBody
+    public String getUserUnitSystem(@PathVariable(USER_ID) String strUserId) throws TempusException {
+        checkParameter(USER_ID, strUserId);
+        try {
+            UserId userId = new UserId(toUUID(strUserId));
+            checkUserId(userId);
+            return userSettingsService.findUnitSystemByUserId(userId);
+
+        } catch (Exception e) {
+            throw handleException(e);
+        }
+    }
+
+    @PreAuthorize("hasAnyAuthority('TENANT_ADMIN')")
+    @PostMapping(value = "/unit-system/user/{userId}")
+    @ResponseBody
+    public void saveUserUnitSystem(@PathVariable(USER_ID) String strUserId, @RequestBody String unitSystem) throws TempusException {
+        checkParameter(USER_ID, strUserId);
+        try {
+            UserId userId = new UserId(toUUID(strUserId));
+            checkUserId(userId);
+            userSettingsService.saveUnitSystem(unitSystem, userId);
+
         } catch (Exception e) {
             throw handleException(e);
         }

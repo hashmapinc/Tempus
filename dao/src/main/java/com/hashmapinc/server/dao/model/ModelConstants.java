@@ -108,6 +108,11 @@ public class ModelConstants {
     public static final String DATA_MODEL_ADDITIONAL_INFO_PROPERTY = ADDITIONAL_INFO_PROPERTY;
     public static final String USER_GROUP_TABLE_NAME = "user_groups";
 
+    /**
+     * Unit System Constants
+     */
+    public static final String UNIT_SYSTEM_TABLE = "user_unit_system";
+    public static final String UNIT_SYSTEM_PROPERTY = "unit_system";
 
     /**
      * Device constants.

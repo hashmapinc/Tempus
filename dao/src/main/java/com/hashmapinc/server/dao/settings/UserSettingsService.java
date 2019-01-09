@@ -27,5 +27,11 @@ public interface UserSettingsService {
     UserSettings findUserSettingsByKeyAndUserId(String key, UserId userId);
     
     UserSettings saveUserSettings(UserSettings userSettings);
+
+    void saveUnitSystem(String unitSystem, UserId userId);
+
+    String findUnitSystemByUserId(UserId userId);
+
+    void deleteUnitSystemByUserId(UserId userId);
     
 }
