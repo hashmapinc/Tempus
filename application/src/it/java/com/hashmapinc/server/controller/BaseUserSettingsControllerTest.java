@@ -238,4 +238,28 @@ public abstract class BaseUserSettingsControllerTest extends AbstractControllerT
         String logo = doGet("/api/settings/"+tenantId.getId()+"/logo", String.class);
         Assert.assertEquals(logo.contains("TEST LOGO"),true);
     }
+
+    @Test
+    public void testSaveAndGetUnitSystem() throws Exception {
+        loginTenantAdmin();
+        doPost("/api/unit-system/user/"+ tenantAdmin.getId(), "UK",String.class);
+        String unitSystem = doGet("/api/unit-system/user/"+ tenantAdmin.getId(), String.class);
+        Assert.assertEquals("{\"unit-system\":\"UK\"}", unitSystem);
+    }
+
+    @Test
+    public void testUpdateUnitSystem() throws Exception {
+        loginTenantAdmin();
+        doPost("/api/unit-system/user/"+ tenantAdmin.getId(), "UK",String.class);
+        doPost("/api/unit-system/user/"+ tenantAdmin.getId(), "SI",String.class);
+        String unitSystem = doGet("/api/unit-system/user/"+ tenantAdmin.getId(), String.class);
+        Assert.assertEquals("{\"unit-system\":\"SI\"}", unitSystem);
+    }
+
+    @Test
+    public void testGetDefaultUnitSystem() throws Exception {
+        loginTenantAdmin();
+        String unitSystem = doGet("/api/unit-system/user/"+ tenantAdmin.getId(), String.class);
+        Assert.assertEquals("{\"unit-system\":\"SI\"}", unitSystem);
+    }
 }

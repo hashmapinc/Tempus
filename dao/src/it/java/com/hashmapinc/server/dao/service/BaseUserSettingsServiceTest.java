@@ -16,7 +16,6 @@
  */
 package com.hashmapinc.server.dao.service;
 
-import com.datastax.driver.core.utils.UUIDs;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.hashmapinc.server.common.data.UUIDConverter;
@@ -25,11 +24,9 @@ import com.hashmapinc.server.common.data.UserSettings;
 import com.hashmapinc.server.common.data.id.UserId;
 import com.hashmapinc.server.common.data.security.Authority;
 import com.hashmapinc.server.dao.exception.DataValidationException;
-import com.hashmapinc.server.dao.settings.UserSettingsDao;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 
 public abstract class BaseUserSettingsServiceTest extends AbstractServiceTest {
 
@@ -59,6 +56,46 @@ public abstract class BaseUserSettingsServiceTest extends AbstractServiceTest {
         UserSettings foundUserSettings = userSettingsService.findUserSettingsById(userSettings.getId());
         Assert.assertNotNull(foundUserSettings);
         Assert.assertEquals(userSettings, foundUserSettings);
+    }
+
+    @Test
+    public void testSaveUserUnitSystem() {
+        userSettingsService.saveUnitSystem("UK", admin.getId());
+        String unitSystem = userSettingsService.findUnitSystemByUserId(admin.getId());
+        Assert.assertEquals("{\"unit-system\":\"UK\"}", unitSystem);
+        Assert.assertNotNull(unitSystem);
+        userSettingsService.deleteUnitSystemByUserId(admin.getId());
+    }
+
+    @Test
+    public void testFindUnitSystemByUserId() {
+        userSettingsService.saveUnitSystem("UK", admin.getId());
+        String unitSystemByUserId = userSettingsService.findUnitSystemByUserId(admin.getId());
+        Assert.assertNotNull(unitSystemByUserId);
+        Assert.assertEquals("{\"unit-system\":\"UK\"}", unitSystemByUserId);
+        userSettingsService.deleteUnitSystemByUserId(admin.getId());
+    }
+
+    @Test
+    public void testFindUnitSystemByUserIdNotPresentShouldReturnSi() {
+        String unitSystemByUserId = userSettingsService.findUnitSystemByUserId(new UserId(UUIDConverter.fromString("1e7461259eab8808080808080818181")));
+        Assert.assertNotNull(unitSystemByUserId);
+        Assert.assertEquals("{\"unit-system\":\"SI\"}", unitSystemByUserId);
+    }
+
+    @Test
+    public void testUpdateUnitSystemByUserId() {
+        UserId userId = new UserId(UUIDConverter.fromString("1e7461259eab8808080808081818181"));
+        userSettingsService.saveUnitSystem("UK", userId);
+        String unitSystemByUserId = userSettingsService.findUnitSystemByUserId(userId);
+        Assert.assertNotNull(unitSystemByUserId);
+        Assert.assertEquals("{\"unit-system\":\"UK\"}", unitSystemByUserId);
+
+        userSettingsService.saveUnitSystem("US", userId);
+        String updatedUnitSystem = userSettingsService.findUnitSystemByUserId(userId);
+        Assert.assertNotNull(updatedUnitSystem);
+        Assert.assertEquals("{\"unit-system\":\"US\"}", updatedUnitSystem);
+        userSettingsService.deleteUnitSystemByUserId(userId);
     }
     
     @Test
