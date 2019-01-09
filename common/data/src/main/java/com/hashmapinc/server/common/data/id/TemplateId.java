@@ -14,34 +14,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.hashmapinc.server.common.data.template;
+package com.hashmapinc.server.common.data.id;
 
-import com.hashmapinc.server.common.data.HasName;
-import com.hashmapinc.server.common.data.SearchTextBased;
-import com.hashmapinc.server.common.data.id.TemplateId;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.hashmapinc.server.common.data.EntityType;
 
-@Slf4j
-@Data
-@NoArgsConstructor
-public class TemplateMetadata extends SearchTextBased<TemplateId> implements HasName {
+import java.util.UUID;
 
-    private String name;
-    private String body;
+public class TemplateId extends UUIDBased implements EntityId {
 
-    public TemplateMetadata(TemplateId id) {
+    @JsonCreator
+    public TemplateId(@JsonProperty("id") UUID id) {
         super(id);
     }
 
     @Override
-    public String getName() {
-        return name;
-    }
-
-    @Override
-    public String getSearchText() {
-        return name;
+    public EntityType getEntityType() {
+        return EntityType.TEMPLATE;
     }
 }

@@ -16,47 +16,42 @@
  */
 package com.hashmapinc.server.dao.template;
 
-import com.datastax.driver.core.utils.UUIDs;
+import com.hashmapinc.server.common.data.id.TemplateId;
+import com.hashmapinc.server.common.data.page.TextPageData;
+import com.hashmapinc.server.common.data.page.TextPageLink;
 import com.hashmapinc.server.common.data.template.TemplateMetadata;
-import com.hashmapinc.server.dao.model.sql.TemplateMetadataEntity;
-import com.hashmapinc.server.dao.sql.template.TemplateRepository;
+import com.hashmapinc.server.dao.sql.template.JpaBaseTemplateDao;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
 @Service
 @Slf4j
 public class TemplateService {
 
     @Autowired
-    private TemplateRepository templateRepository;
+    private JpaBaseTemplateDao dao;
 
-    public TemplateMetadata getTemplate(String id) {
-        return templateRepository.findById(id)
-                .map(TemplateMetadataEntity::toData)
-                .orElse(null);
+    public TemplateMetadata getTemplate(TemplateId id) {
+        return dao.findById(id.getId());
+    }
+
+    public TextPageData<TemplateMetadata> getTemplate(TextPageLink pageLink) {
+        return new TextPageData<>(dao.findByPageLink(pageLink), pageLink);
     }
 
     public List<TemplateMetadata> getAllTemplates() {
-        return StreamSupport.stream(templateRepository.findAll().spliterator(), false)
-                .map(TemplateMetadataEntity::toData)
-                .collect(Collectors.toList());
+        return dao.find();
     }
 
     public TemplateMetadata save(TemplateMetadata templateMetadata) {
-        TemplateMetadataEntity freshEntity = new TemplateMetadataEntity(templateMetadata);
-        if (freshEntity.getId() == null) {
-            freshEntity.setId(UUIDs.timeBased());
-        }
-        return templateRepository.save(freshEntity).toData();
+        return dao.save(templateMetadata);
     }
 
-    public void delete(String id) {
-        templateRepository.deleteById(id);
+    public void delete(TemplateId id) {
+        dao.removeById(id.getId());
     }
 
 

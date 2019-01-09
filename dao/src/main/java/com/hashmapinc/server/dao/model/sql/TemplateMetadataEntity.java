@@ -16,6 +16,7 @@
  */
 package com.hashmapinc.server.dao.model.sql;
 
+import com.hashmapinc.server.common.data.id.TemplateId;
 import com.hashmapinc.server.common.data.template.TemplateMetadata;
 import com.hashmapinc.server.dao.model.BaseSqlEntity;
 import com.hashmapinc.server.dao.model.ModelConstants;
@@ -41,9 +42,10 @@ public class TemplateMetadataEntity extends BaseSqlEntity<TemplateMetadata> impl
     @Column(name = ModelConstants.TEMPLATE_BODY_PROPERTY)
     private String body;
 
-
     public TemplateMetadataEntity(TemplateMetadata templateMetadata) {
-        this.id = templateMetadata.getId();
+        if (templateMetadata.getId() != null) {
+            this.setId(templateMetadata.getId().getId());
+        }
         this.name = templateMetadata.getName();
         this.body = templateMetadata.getBody();
     }
@@ -60,6 +62,9 @@ public class TemplateMetadataEntity extends BaseSqlEntity<TemplateMetadata> impl
 
     @Override
     public TemplateMetadata toData() {
-        return new TemplateMetadata(id, name, body);
+        TemplateMetadata templateMetadata = new TemplateMetadata(new TemplateId(getId()));
+        templateMetadata.setName(name);
+        templateMetadata.setBody(body);
+        return templateMetadata;
     }
 }

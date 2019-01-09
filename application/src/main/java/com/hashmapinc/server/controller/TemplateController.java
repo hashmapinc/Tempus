@@ -16,6 +16,9 @@
  */
 package com.hashmapinc.server.controller;
 
+import com.hashmapinc.server.common.data.id.TemplateId;
+import com.hashmapinc.server.common.data.page.TextPageData;
+import com.hashmapinc.server.common.data.page.TextPageLink;
 import com.hashmapinc.server.common.data.template.TemplateMetadata;
 import com.hashmapinc.server.dao.template.TemplateService;
 import com.hashmapinc.server.exception.TempusException;
@@ -50,7 +53,7 @@ public class TemplateController extends BaseController {
     @DeleteMapping(value = "/templates/delete")
     public void delete(@RequestParam String id) throws TempusException {
         try {
-            templateService.delete(id);
+            templateService.delete(new TemplateId(toUUID(id)));
         } catch (Exception e) {
             throw handleException(e);
         }
@@ -61,7 +64,22 @@ public class TemplateController extends BaseController {
     @ResponseBody
     public TemplateMetadata get(@RequestParam String id) throws TempusException {
         try {
-            return templateService.getTemplate(id);
+            return templateService.getTemplate(new TemplateId(toUUID(id)));
+        } catch (Exception e) {
+            throw handleException(e);
+        }
+    }
+
+    @PreAuthorize("hasAuthority('TENANT_ADMIN')")
+    @GetMapping(value = "/templates/getTemplates", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public TextPageData<TemplateMetadata> getTemplates(@RequestParam int limit,
+                                             @RequestParam(required = false) String textSearch,
+                                             @RequestParam(required = false) String idOffset,
+                                             @RequestParam(required = false) String textOffset) throws TempusException {
+        try {
+            TextPageLink pageLink = createPageLink(limit, textSearch, idOffset, textOffset);
+            return templateService.getTemplate(pageLink);
         } catch (Exception e) {
             throw handleException(e);
         }

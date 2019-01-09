@@ -17,7 +17,10 @@
 package com.hashmapinc.server.dao.sql.template;
 
 import com.hashmapinc.server.dao.model.sql.TemplateMetadataEntity;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -27,4 +30,8 @@ public interface TemplateRepository extends CrudRepository<TemplateMetadataEntit
 
     List<TemplateMetadataEntity> findByName(String name);
 
+    @Query("SELECT t FROM TemplateMetadataEntity t WHERE LOWER(t.name) LIKE LOWER(CONCAT(:searchText, '%')) AND t.id > :idOffset ORDER BY t.id")
+    List<TemplateMetadataEntity> findTemplate(@Param("searchText") String searchText,
+                                              @Param("idOffset") String idOffset,
+                                              Pageable pageable);
 }
