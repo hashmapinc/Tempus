@@ -77,12 +77,10 @@ public abstract class AbstractMqttAttributeIntegrationTest extends AbstractContr
         loginTenantAdmin();
 
         dataModel = createDataModel();
-        dataModelObjectOfTypeAsset = createDataModelObject(dataModel.getId() , "well", "Asset", null);
-        dataModelObjectOfTypeDevice = createDataModelObject(dataModel.getId(), "Temperature_Device", "Device", dataModelObjectOfTypeAsset.getId());
+        dataModelObjectOfTypeAsset = createDataModelObjectWithParentDMOId(dataModel , "well", "Asset", null);
+        dataModelObjectOfTypeDevice = createDataModelObjectWithParentDMOId(dataModel, "Temperature_Device", "Device", dataModelObjectOfTypeAsset.getId());
 
         customerId = createCustomer("My customer", dataModel.getId(),tenantId).getId();
-
-        CustomerGroup savedCustomerGroup = createCustomerGroup("My Customer Group", customerId, tenantId);
 
         asset = createAsset(dataModelObjectOfTypeAsset.getId(), customerId, "well123");
 
@@ -229,52 +227,6 @@ public abstract class AbstractMqttAttributeIntegrationTest extends AbstractContr
         customer.setDataModelId(dataModelId);
         customer.setTenantId(tenantId);
         return doPost("/api/customer", customer, Customer.class);
-    }
-
-    private CustomerGroup createCustomerGroup(String title, CustomerId customerId, TenantId tenantId) throws Exception{
-        CustomerGroup customerGroup = new CustomerGroup();
-        customerGroup.setTitle(title);
-        customerGroup.setTenantId(tenantId);
-        customerGroup.setCustomerId(customerId);
-        CustomerGroup savedCustomerGroup = doPost("/api/customer/group", customerGroup, CustomerGroup.class);
-
-        assertNotNull(savedCustomerGroup);
-        assertNotNull(savedCustomerGroup.getId());
-        Assert.assertTrue(savedCustomerGroup.getCreatedTime() > 0);
-        assertEquals(customerGroup.getTitle(), savedCustomerGroup.getTitle());
-        return savedCustomerGroup;
-    }
-
-    private Device createGatewayDevice(String name , String deviceType , DataModelObjectId dataModelObjectId , CustomerId customerId ) throws Exception{
-        Device gatewayDevice = new Device();
-        gatewayDevice.setName(name);
-        gatewayDevice.setType(deviceType);
-        gatewayDevice.setDataModelObjectId(dataModelObjectId);
-        gatewayDevice.setCustomerId(customerId);
-        ObjectMapper mapper = new ObjectMapper();
-        JsonNode additionalInfo = mapper.readTree("{\"gateway\":true}");
-        gatewayDevice.setAdditionalInfo(additionalInfo);
-        savedGatewayDevice = doPost("/api/device", gatewayDevice, Device.class);
-        return savedGatewayDevice;
-    }
-    private DataModelObject createDataModelObject(DataModelId dataModelId , String name , String type ,DataModelObjectId parentId) throws Exception {
-        DataModelObject dataModelObject = new DataModelObject();
-        dataModelObject.setName(name);
-        dataModelObject.setDataModelId(dataModelId);
-        dataModelObject.setType(type);
-        dataModelObject.setParentId(parentId);
-        DataModelObject savedDataModelObject = doPost("/api/data-model/" + dataModel.getId().toString() + "/objects", dataModelObject, DataModelObject.class);
-        assertNotNull(savedDataModelObject);
-        assertNotNull(savedDataModelObject.getId());
-        Assert.assertTrue(savedDataModelObject.getCreatedTime() > 0);
-        assertNotNull(savedDataModelObject.getCustomerId());
-        if(customerId == null){
-            assertEquals(NULL_UUID, savedDataModelObject.getCustomerId().getId());
-        }else{
-            assertEquals(customerId, savedDataModelObject.getCustomerId());
-        }
-        assertEquals(dataModelObject.getName(), savedDataModelObject.getName());
-        return savedDataModelObject;
     }
 
 }

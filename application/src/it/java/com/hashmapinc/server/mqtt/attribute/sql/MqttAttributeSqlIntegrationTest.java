@@ -22,6 +22,5 @@ import org.junit.Ignore;
 
 
 @DaoSqlTest
-@Ignore
 public class MqttAttributeSqlIntegrationTest extends AbstractMqttAttributeIntegrationTest {
 }
