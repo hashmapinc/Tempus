@@ -108,7 +108,7 @@ public class DataModelServiceImpl extends AbstractEntityService implements DataM
                     throw new DataValidationException("Cannot delete the dataModel because one or more assets are associated with it's dataModelObjects");
                 List<Device> devices = deviceService.findDeviceByDataModelObjectId(dataModelObject.getId());
                 if(!devices.isEmpty())
-                    throw new DataValidationException("Cannot delete dataModelObject because one or more devices are associated with it");
+                    throw new DataValidationException("Cannot delete dataModel because one or more devices are associated with it");
 
             }
         });
