@@ -332,6 +332,13 @@ public class ModelConstants {
     public static final String RULE_ACTION = "action";
 
     /**
+     * Template metadata constants.
+     */
+    public static final String TEMPLATE_COLUMN_FAMILY_NAME = "templates";
+    public static final String TEMPLATE_NAME_PROPERTY = "name";
+    public static final String TEMPLATE_BODY_PROPERTY = "body";
+
+    /**
      * Event constants.
      */
     public static final String EVENT_COLUMN_FAMILY_NAME = "event";
