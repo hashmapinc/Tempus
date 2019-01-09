@@ -86,5 +86,35 @@ public class TenantController extends BaseController {
             throw handleException(e);
         }
     }
+
+    @PreAuthorize("hasAnyAuthority('TENANT_ADMIN', 'CUSTOMER_USER')")
+    @GetMapping(value = "/unit-system/tenant/{tenantId}")
+    @ResponseBody
+    public String getUserUnitSystem(@PathVariable("tenantId") String strUserId) throws TempusException {
+        checkParameter("tenantId", strUserId);
+        try {
+            TenantId tenantId = new TenantId(toUUID(strUserId));
+            checkTenantId(tenantId);
+            return tenantService.findUnitSystemByTenantId(tenantId);
+
+        } catch (Exception e) {
+            throw handleException(e);
+        }
+    }
+
+    @PreAuthorize("hasAnyAuthority('TENANT_ADMIN')")
+    @PostMapping(value = "/unit-system/tenant/{tenantId}")
+    @ResponseBody
+    public void saveUserUnitSystem(@PathVariable("tenantId") String strUserId, @RequestBody String unitSystem) throws TempusException {
+        checkParameter("tenantId", strUserId);
+        try {
+            TenantId tenantId = new TenantId(toUUID(strUserId));
+            checkTenantId(tenantId);
+            tenantService.saveUnitSystem(unitSystem, tenantId);
+
+        } catch (Exception e) {
+            throw handleException(e);
+        }
+    }
     
 }

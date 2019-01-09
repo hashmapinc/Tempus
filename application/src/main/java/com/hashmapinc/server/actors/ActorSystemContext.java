@@ -45,6 +45,7 @@ import com.hashmapinc.server.dao.event.EventService;
 import com.hashmapinc.server.dao.plugin.PluginService;
 import com.hashmapinc.server.dao.relation.RelationService;
 import com.hashmapinc.server.dao.rule.RuleService;
+import com.hashmapinc.server.dao.settings.UserSettingsService;
 import com.hashmapinc.server.dao.tenant.TenantService;
 import com.hashmapinc.server.dao.timeseries.TimeseriesService;
 import com.hashmapinc.server.dao.unitconversion.UnitConversionService;
@@ -145,6 +146,9 @@ public class ActorSystemContext {
 
     @Autowired
     @Getter private ComputationFunctionService computationFunctionService;
+
+    @Autowired
+    @Getter private UserSettingsService userSettingsService;
 
     @Autowired
     @Getter @Setter private PluginWebSocketMsgEndpoint wsMsgEndpoint;

@@ -415,7 +415,7 @@ CREATE TABLE IF NOT EXISTS kubeless_computation_meta_data (
     checksum varchar
 );
 
-CREATE TABLE IF NOT EXISTS user_unit_system (
-    user_id varchar(31) NOT NULL CONSTRAINT user_unit_system_pkey PRIMARY KEY,
+CREATE TABLE IF NOT EXISTS tenant_unit_system (
+    tenant_id varchar(31) NOT NULL CONSTRAINT tenant_unit_system_pkey PRIMARY KEY,
     unit_system varchar
 );

@@ -111,7 +111,7 @@ public class ModelConstants {
     /**
      * Unit System Constants
      */
-    public static final String UNIT_SYSTEM_TABLE = "user_unit_system";
+    public static final String TENANT_UNIT_SYSTEM_TABLE = "tenant_unit_system";
     public static final String UNIT_SYSTEM_PROPERTY = "unit_system";
 
     /**

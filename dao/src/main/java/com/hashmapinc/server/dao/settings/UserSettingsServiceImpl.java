@@ -16,17 +16,16 @@
  */
 package com.hashmapinc.server.dao.settings;
 
-import com.google.gson.JsonObject;
 import com.hashmapinc.server.common.data.UserSettings;
 import com.hashmapinc.server.common.data.id.UserId;
 import com.hashmapinc.server.common.data.id.UserSettingsId;
+import com.hashmapinc.server.dao.exception.DataValidationException;
 import com.hashmapinc.server.dao.service.DataValidator;
+import com.hashmapinc.server.dao.service.Validator;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import com.hashmapinc.server.dao.exception.DataValidationException;
-import com.hashmapinc.server.dao.service.Validator;
 
 
 @Service
@@ -35,9 +34,6 @@ public class UserSettingsServiceImpl implements UserSettingsService {
     
     @Autowired
     private UserSettingsDao userSettingsDao;
-
-    private static final String INCORRECT_USERID = "Incorrect UserId ";
-    private static final String DEFAULT_UNIT_SYSTEM = "SI";
 
     @Override
     public UserSettings findUserSettingsById(UserSettingsId userSettingsId) {
@@ -58,38 +54,6 @@ public class UserSettingsServiceImpl implements UserSettingsService {
         log.trace("Executing saveUserSettings [{}]", userSettings);
         adminSettingsValidator.validate(userSettings);
         return userSettingsDao.save(userSettings);
-    }
-
-    @Override
-    public void saveUnitSystem(String unitSystem , UserId userId) {
-        log.trace("Executing saveUnitSystem, unitSystem [{}], userId [{}]", unitSystem, userId);
-        Validator.validateEntityId(userId, INCORRECT_USERID + userId);
-        String foundUnitSystem = userSettingsDao.findUnitSystemByUserId(userId.getId());
-        if (foundUnitSystem == null) {
-            userSettingsDao.saveUnitSystem(unitSystem , userId.getId());
-        } else if (!foundUnitSystem.equals(unitSystem)) {
-            userSettingsDao.updateUnitSystem(unitSystem, userId.getId());
-        }
-    }
-
-    @Override
-    public String findUnitSystemByUserId(UserId userId) {
-        log.trace("Executing findUnitSystemByUserId, userId [{}]", userId);
-        Validator.validateEntityId(userId, INCORRECT_USERID + userId);
-        String unitSystemByUserId = userSettingsDao.findUnitSystemByUserId(userId.getId());
-        if (unitSystemByUserId == null) {
-            unitSystemByUserId = DEFAULT_UNIT_SYSTEM;
-        }
-        JsonObject jsonObject = new JsonObject();
-        jsonObject.addProperty("unit-system",unitSystemByUserId);
-        return jsonObject.toString();
-    }
-
-    @Override
-    public void deleteUnitSystemByUserId(UserId userId) {
-        log.trace("Executing deleteUnitSystemByUserId, userId [{}]", userId);
-        Validator.validateEntityId(userId, INCORRECT_USERID + userId);
-        userSettingsDao.deleteUnitSystemByUserId(userId.getId());
     }
 
     private DataValidator<UserSettings> adminSettingsValidator =

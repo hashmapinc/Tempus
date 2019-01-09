@@ -25,30 +25,16 @@ import com.hashmapinc.server.dao.sql.JpaAbstractDao;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.repository.CrudRepository;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
-import java.sql.ResultSet;
-import java.util.List;
 import java.util.UUID;
-
-import static com.hashmapinc.server.dao.model.ModelConstants.*;
 
 @Component
 @Slf4j
 public class JpaUserSettingsDao extends JpaAbstractDao<UserSettingsEntity, UserSettings> implements UserSettingsDao {
 
-    private static final String INSERT_USER_UNIT_SYSTEM = String.format("INSERT INTO %s  (%s, %s) VALUES (?, ?)", UNIT_SYSTEM_TABLE, USER_ID_PROPERTY, UNIT_SYSTEM_PROPERTY);
-    private static final String UPDATE_USER_UNIT_SYSTEM = String.format("UPDATE %s SET %s = ? WHERE %s = ?", UNIT_SYSTEM_TABLE, UNIT_SYSTEM_PROPERTY, USER_ID_PROPERTY);
-    private static final String SELECT_USER_SYSTEM_FOR_USER_ID = String.format("SELECT DISTINCT %s FROM %s WHERE %s = ?", UNIT_SYSTEM_PROPERTY, UNIT_SYSTEM_TABLE, USER_ID_PROPERTY);
-    private static final String DELETE_USER_SYSTEM_FOR_USER_ID = String.format("DELETE FROM %s WHERE %s = ?", UNIT_SYSTEM_TABLE, USER_ID_PROPERTY);
-
-
     @Autowired
     private UserSettingsRepository userSettingsRepository;
-
-    @Autowired
-    JdbcTemplate jdbcTemplate;
 
     @Override
     protected Class<UserSettingsEntity> getEntityClass() {
@@ -65,29 +51,4 @@ public class JpaUserSettingsDao extends JpaAbstractDao<UserSettingsEntity, UserS
         return DaoUtil.getData(userSettingsRepository.findByKeyAndUserId(key, UUIDConverter.fromTimeUUID(userId)));
     }
 
-    @Override
-    public void saveUnitSystem(String unitSystem , UUID userId) {
-        jdbcTemplate.update(INSERT_USER_UNIT_SYSTEM , UUIDConverter.fromTimeUUID(userId) , unitSystem);
-    }
-
-    @Override
-    public String findUnitSystemByUserId(UUID userId) {
-        List<String> unitList  = jdbcTemplate.query(SELECT_USER_SYSTEM_FOR_USER_ID, new Object[]{UUIDConverter.fromTimeUUID(userId)},
-                (ResultSet rs, int rowNum) -> (rs.getString(UNIT_SYSTEM_PROPERTY)));
-        if (unitList.size() == 1) {
-            return unitList.get(0);
-        } else {
-            return null;
-        }
-    }
-
-    @Override
-    public void deleteUnitSystemByUserId(UUID userId) {
-        jdbcTemplate.update(DELETE_USER_SYSTEM_FOR_USER_ID, UUIDConverter.fromTimeUUID(userId));
-    }
-
-    @Override
-    public void updateUnitSystem(String unitSystem , UUID userId) {
-        jdbcTemplate.update(UPDATE_USER_UNIT_SYSTEM, unitSystem, UUIDConverter.fromTimeUUID(userId));
-    }
 }

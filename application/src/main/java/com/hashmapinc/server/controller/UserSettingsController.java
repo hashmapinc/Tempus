@@ -74,36 +74,6 @@ public class UserSettingsController extends BaseController {
         }
     }
 
-    @PreAuthorize("hasAnyAuthority('TENANT_ADMIN')")
-    @GetMapping(value = "/unit-system/user/{userId}")
-    @ResponseBody
-    public String getUserUnitSystem(@PathVariable(USER_ID) String strUserId) throws TempusException {
-        checkParameter(USER_ID, strUserId);
-        try {
-            UserId userId = new UserId(toUUID(strUserId));
-            checkUserId(userId);
-            return userSettingsService.findUnitSystemByUserId(userId);
-
-        } catch (Exception e) {
-            throw handleException(e);
-        }
-    }
-
-    @PreAuthorize("hasAnyAuthority('TENANT_ADMIN')")
-    @PostMapping(value = "/unit-system/user/{userId}")
-    @ResponseBody
-    public void saveUserUnitSystem(@PathVariable(USER_ID) String strUserId, @RequestBody String unitSystem) throws TempusException {
-        checkParameter(USER_ID, strUserId);
-        try {
-            UserId userId = new UserId(toUUID(strUserId));
-            checkUserId(userId);
-            userSettingsService.saveUnitSystem(unitSystem, userId);
-
-        } catch (Exception e) {
-            throw handleException(e);
-        }
-    }
-
     @PreAuthorize("hasAnyAuthority('TENANT_ADMIN', 'CUSTOMER_USER', 'SYS_ADMIN')")
     @PostMapping(value = "/settings")
     @ResponseBody 

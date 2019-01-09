@@ -39,13 +39,4 @@ public interface UserSettingsDao extends Dao<UserSettings> {
      * @return the user settings object
      */
     UserSettings findByKeyAndUserId(String key, UUID userId);
-
-    void saveUnitSystem(String unitSystem, UUID userId);
-
-    String findUnitSystemByUserId(UUID userId);
-
-    void deleteUnitSystemByUserId(UUID userId);
-
-    void updateUnitSystem(String unitSystem, UUID userId);
-
 }

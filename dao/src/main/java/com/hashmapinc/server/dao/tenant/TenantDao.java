@@ -21,6 +21,7 @@ import com.hashmapinc.server.common.data.Tenant;
 import com.hashmapinc.server.dao.Dao;
 
 import java.util.List;
+import java.util.UUID;
 
 public interface TenantDao extends Dao<Tenant> {
 
@@ -40,5 +41,13 @@ public interface TenantDao extends Dao<Tenant> {
      * @return the list of tenant objects
      */
     List<Tenant> findTenantsByRegion(String region, TextPageLink pageLink);
-    
+
+    void saveUnitSystem(String unitSystem, UUID tenantId);
+
+    String findUnitSystemByTenantId(UUID tenantId);
+
+    void deleteUnitSystemByTenantId(UUID tenantId);
+
+    void updateUnitSystem(String unitSystem, UUID tenantId);
+
 }
