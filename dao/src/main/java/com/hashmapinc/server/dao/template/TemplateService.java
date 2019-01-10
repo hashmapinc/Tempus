@@ -17,6 +17,7 @@
 package com.hashmapinc.server.dao.template;
 
 import com.hashmapinc.server.common.data.id.TemplateId;
+import com.hashmapinc.server.common.data.page.PaginatedResult;
 import com.hashmapinc.server.common.data.page.TextPageData;
 import com.hashmapinc.server.common.data.page.TextPageLink;
 import com.hashmapinc.server.common.data.template.TemplateMetadata;
@@ -55,4 +56,7 @@ public class TemplateService {
     }
 
 
+    public PaginatedResult<TemplateMetadata> getTemplatesByPage(int limit, int pageNum, String textSearch) {
+        return dao.findByPageNumber(limit, pageNum, textSearch);
+    }
 }

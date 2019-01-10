@@ -17,6 +17,7 @@
 package com.hashmapinc.server.controller;
 
 import com.hashmapinc.server.common.data.id.TemplateId;
+import com.hashmapinc.server.common.data.page.PaginatedResult;
 import com.hashmapinc.server.common.data.page.TextPageData;
 import com.hashmapinc.server.common.data.page.TextPageLink;
 import com.hashmapinc.server.common.data.template.TemplateMetadata;
@@ -74,12 +75,25 @@ public class TemplateController extends BaseController {
     @GetMapping(value = "/templates", produces = MediaType.APPLICATION_JSON_VALUE, params = "limit")
     @ResponseBody
     public TextPageData<TemplateMetadata> getTemplates(@RequestParam int limit,
-                                             @RequestParam(required = false) String textSearch,
-                                             @RequestParam(required = false) String idOffset,
-                                             @RequestParam(required = false) String textOffset) throws TempusException {
+                                                       @RequestParam(required = false) String textSearch,
+                                                       @RequestParam(required = false) String idOffset,
+                                                       @RequestParam(required = false) String textOffset) throws TempusException {
         try {
             TextPageLink pageLink = createPageLink(limit, textSearch, idOffset, textOffset);
             return templateService.getTemplate(pageLink);
+        } catch (Exception e) {
+            throw handleException(e);
+        }
+    }
+
+    @PreAuthorize("hasAuthority('TENANT_ADMIN')")
+    @GetMapping(value = "/templates", produces = MediaType.APPLICATION_JSON_VALUE, params = {"limit", "pageNum"})
+    @ResponseBody
+    public PaginatedResult<TemplateMetadata> getTemplatesByPage(@RequestParam int limit,
+                                                                @RequestParam(required = false) int pageNum,
+                                                                @RequestParam(required = false) String textSearch) throws TempusException {
+        try {
+            return templateService.getTemplatesByPage(limit, pageNum, textSearch);
         } catch (Exception e) {
             throw handleException(e);
         }

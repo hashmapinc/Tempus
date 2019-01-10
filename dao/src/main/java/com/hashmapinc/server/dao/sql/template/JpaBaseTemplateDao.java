@@ -17,6 +17,7 @@
 package com.hashmapinc.server.dao.sql.template;
 
 import com.hashmapinc.server.common.data.UUIDConverter;
+import com.hashmapinc.server.common.data.page.PaginatedResult;
 import com.hashmapinc.server.common.data.page.TextPageLink;
 import com.hashmapinc.server.common.data.template.TemplateMetadata;
 import com.hashmapinc.server.dao.DaoUtil;
@@ -24,10 +25,13 @@ import com.hashmapinc.server.dao.model.ModelConstants;
 import com.hashmapinc.server.dao.model.sql.TemplateMetadataEntity;
 import com.hashmapinc.server.dao.sql.JpaAbstractSearchTextDao;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Component;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -53,5 +57,17 @@ public class JpaBaseTemplateDao extends JpaAbstractSearchTextDao<TemplateMetadat
                                 pageLink.getIdOffset() == null ? ModelConstants.NULL_UUID_STR : UUIDConverter.fromTimeUUID(pageLink.getIdOffset()),
                                 PageRequest.of(0, pageLink.getLimit())));
 
+    }
+
+    public PaginatedResult<TemplateMetadata> findByPageNumber(int limit, int pageNum, String searchText) {
+        PageRequest pageable = PageRequest.of(pageNum, limit, Sort.by(new Sort.Order(Sort.Direction.ASC, ModelConstants.ID_PROPERTY)));
+        Page<TemplateMetadataEntity> resultPage = templateRepository.findAll(searchText, pageable);
+        if(resultPage == null) {
+            return new PaginatedResult<>(Collections.emptyList(), pageNum, 0, 0, false, false);
+        }
+
+        List<TemplateMetadata> templates = DaoUtil.convertDataList(resultPage.getContent());
+        return new PaginatedResult<>(templates, pageNum, resultPage.getTotalElements(),
+                resultPage.getTotalPages(), resultPage.hasNext(), resultPage.hasPrevious());
     }
 }
