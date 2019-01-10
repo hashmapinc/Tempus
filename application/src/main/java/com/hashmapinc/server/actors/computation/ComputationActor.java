@@ -32,7 +32,7 @@ import com.hashmapinc.server.common.data.page.PageDataIterable;
 import com.hashmapinc.server.common.data.plugin.ComponentLifecycleEvent;
 import com.hashmapinc.server.common.data.plugin.ComponentLifecycleState;
 import com.hashmapinc.server.common.msg.plugin.ComponentLifecycleMsg;
-import com.hashmapinc.server.service.computation.ComputationFunctionService;
+import com.hashmapinc.server.service.computation.ServerlessFunctionService;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -72,7 +72,7 @@ public class ComputationActor extends ContextAwareActor {
     }
 
     private void checkOrDeployKubelessFunction() {
-        boolean functionPresent = systemContext.getComputationFunctionService().checkKubelessFunction(computation);
+        boolean functionPresent = systemContext.getKubelessFunctionService().checkFunction(computation);
         if (!functionPresent) {
             KubelessComputationMetadata md = (KubelessComputationMetadata) computation.getComputationMetadata();
             try {
@@ -81,9 +81,23 @@ public class ComputationActor extends ContextAwareActor {
                     throw new ComputationInitializationException("Kubeless Computation function not found!");
                 } else {
                     md.setFunctionContent(functionContent);
-                    if(!systemContext.getComputationFunctionService().deployKubelessFunction(computation))
+                    if(!systemContext.getKubelessFunctionService().deployFunction(computation))
                         systemContext.getComputationsService().deleteById(computationId);
                 }
+            } catch (Exception e ){
+                logger.info("Exeption occured while deploying kubeless function : ", e);
+            }
+        }
+    }
+
+    private void checkOrDeployLambdaFunction() {
+        boolean functionPresent = systemContext.getKubelessFunctionService().checkFunction(computation);
+        if (!functionPresent) {
+            try {
+                if(!systemContext.getAwsLambdaFunctionService().deployFunction(computation)){
+                    systemContext.getComputationsService().deleteById(computationId);
+                }
+
             } catch (Exception e ){
                 logger.info("Exeption occured while deploying kubeless function : ", e);
             }
@@ -148,7 +162,13 @@ public class ComputationActor extends ContextAwareActor {
         if (computation != null && computation.getType() == ComputationType.KUBELESS) {
             checkOrDeployKubelessFunction();
         }
+        if (computation != null && computation.getType() == ComputationType.LAMBDA) {
+            checkOrDeployLambdaFunction();
+        }
     }
+
+
+
 
     private void handleComponentLifecycleMsgForExistingComputation(ComponentLifecycleMsg msg, ComputationJobId jobId) {
         ActorRef target;
@@ -172,8 +192,13 @@ public class ComputationActor extends ContextAwareActor {
 
     private void handleDeleteMsgForComputationType() {
         if (computation != null && computation.getType() == ComputationType.KUBELESS) {
-            ComputationFunctionService service = systemContext.getComputationFunctionService();
-            if (service.deleteKubelessFunction(computation))
+            ServerlessFunctionService service = systemContext.getKubelessFunctionService();
+            if (service.deleteFunction(computation))
+                systemContext.getComputationsService().deleteById(computationId);
+        }
+        if (computation != null && computation.getType() == ComputationType.LAMBDA) {
+            ServerlessFunctionService service = systemContext.getAwsLambdaFunctionService();
+            if (service.deleteFunction(computation))
                 systemContext.getComputationsService().deleteById(computationId);
         }
     }
@@ -188,6 +213,12 @@ public class ComputationActor extends ContextAwareActor {
         else if(this.type == ComputationType.KUBELESS){
             actorRef = computationJobActors.computeIfAbsent(computationJobId, k ->
                     context().actorOf(Props.create(new KubelessComputationJobActor.ActorCreator(systemContext, tenantId, computation, computationJobId))
+                            .withDispatcher(DefaultActorService.CORE_DISPATCHER_NAME), computationJobId.toString()));
+
+        }
+        else if(this.type == ComputationType.LAMBDA){
+            actorRef = computationJobActors.computeIfAbsent(computationJobId, k ->
+                    context().actorOf(Props.create(new AWSLambdaComputationJobActor.ActorCreator(systemContext, tenantId, computation, computationJobId))
                             .withDispatcher(DefaultActorService.CORE_DISPATCHER_NAME), computationJobId.toString()));
 
         }

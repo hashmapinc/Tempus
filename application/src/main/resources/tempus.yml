@@ -101,6 +101,10 @@ aws:
   access_key: "${AWS_ACCESS_KEY:access_key}"
   secret_key: "${AWS_SECRET_KEY:secret_key}"
 
+computations.lambda:
+    enabled: "${AWS_LAMBDA_ENABLED:true}"
+    zip_path: "${LAMBDA_COMPUTATIONS_PATH:${java.io.tmpdir}}"
+
 # JWT Token parameters
 security.jwt:
   tokenExpirationTime: "${JWT_TOKEN_EXPIRATION_TIME:900}" # Number of seconds (15 mins)

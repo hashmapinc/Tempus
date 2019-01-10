@@ -52,7 +52,8 @@ import com.hashmapinc.server.service.cluster.discovery.DiscoveryService;
 import com.hashmapinc.server.service.cluster.routing.ClusterRoutingService;
 import com.hashmapinc.server.service.cluster.rpc.ClusterRpcService;
 import com.hashmapinc.server.service.component.ComponentDiscoveryService;
-import com.hashmapinc.server.service.computation.ComputationFunctionService;
+import com.hashmapinc.server.service.computation.AWSLambdaFunctionService;
+import com.hashmapinc.server.service.computation.KubelessFunctionService;
 import com.hashmapinc.server.service.computation.S3BucketService;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
@@ -144,7 +145,10 @@ public class ActorSystemContext {
     @Getter private UnitConversionService unitConversionService;
 
     @Autowired
-    @Getter private ComputationFunctionService computationFunctionService;
+    @Getter private KubelessFunctionService kubelessFunctionService;
+
+    @Autowired
+    @Getter private AWSLambdaFunctionService awsLambdaFunctionService;
 
     @Autowired
     @Getter @Setter private PluginWebSocketMsgEndpoint wsMsgEndpoint;

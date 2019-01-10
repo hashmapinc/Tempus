@@ -46,7 +46,7 @@ import java.util.Map;
 
 @Slf4j
 @Service
-public class KubelessFunctionService implements ComputationFunctionService {
+public class KubelessFunctionService implements ServerlessFunctionService {
 
     public static final String DEFAULT_NAMESPACE = "default";
     public static final String TXT = "txt";
@@ -69,7 +69,7 @@ public class KubelessFunctionService implements ComputationFunctionService {
     private Base64.Decoder decoder = Base64.getDecoder();
 
     @Override
-    public boolean deployKubelessFunction(Computations computation) {
+    public boolean deployFunction(Computations computation) {
         try {
             KubelessV1beta1FunctionApi functionApi = KubelessConnectionCache.getInstance(KubelessV1beta1FunctionApi.class.getName(),
                     clusterModeEnabled, kublessConfigPath, DEFAULT_NAMESPACE);
@@ -110,7 +110,7 @@ public class KubelessFunctionService implements ComputationFunctionService {
     }
 
     @Override
-    public boolean checkKubelessFunction(Computations computation) {
+    public boolean checkFunction(Computations computation) {
         try {
             KubelessComputationMetadata md = (KubelessComputationMetadata)(computation.getComputationMetadata());
             KubelessV1beta1FunctionApi functionApi = KubelessConnectionCache.getInstance(KubelessV1beta1FunctionApi.class.getName(),
@@ -132,7 +132,7 @@ public class KubelessFunctionService implements ComputationFunctionService {
     }
 
     @Override
-    public boolean deleteKubelessFunction(Computations computation) {
+    public boolean deleteFunction(Computations computation) {
         try {
             KubelessComputationMetadata md = (KubelessComputationMetadata)(computation.getComputationMetadata());
             KubelessV1beta1FunctionApi functionApi = KubelessConnectionCache.getInstance(KubelessV1beta1FunctionApi.class.getName(),

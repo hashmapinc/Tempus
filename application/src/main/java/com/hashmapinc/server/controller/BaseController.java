@@ -76,10 +76,18 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.mail.MessagingException;
+import javax.mail.Multipart;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.File;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.*;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -848,6 +856,23 @@ public abstract class BaseController {
             }
             return false;
         });
+    }
+
+    protected String getUploadedFilePath(MultipartFile file, String uploadPath) throws Exception {
+        try(Stream<Path> filesStream = Files.list(Paths.get(uploadPath))) {
+            List<String> filesAtDestination = filesStream.map(f -> f.getFileName().toString()).collect(Collectors.toList());
+            if(filesAtDestination.contains(file.getOriginalFilename())) {
+                throw new TempusException("Cant upload the same computation artifact again. Delete the existing computation first to upload it again" , TempusErrorCode.GENERAL);
+            }
+            String path = uploadPath + File.separator + file.getOriginalFilename();
+            File destinationFile = new File(path);
+            try (InputStream input = file.getInputStream()) {
+                Files.copy(input, Paths.get(destinationFile.toURI()), StandardCopyOption.REPLACE_EXISTING);
+            }
+            return path;
+        } catch (Exception e) {
+            throw e;
+        }
     }
 
 }
