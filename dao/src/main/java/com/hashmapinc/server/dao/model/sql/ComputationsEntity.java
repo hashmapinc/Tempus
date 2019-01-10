@@ -90,7 +90,9 @@ public class ComputationsEntity extends BaseSqlEntity<Computations> implements S
            } else if(computations.getType() == ComputationType.KUBELESS){
                computationMetadataEntity = new KubelessComputationMetadataEntity((KubelessComputationMetadata) computations.getComputationMetadata());
            }
-
+           else if(computations.getType() == ComputationType.LAMBDA){
+               computationMetadataEntity = new AWSLambdaComputationMetadataEntity((AWSLambdaComputationMetadata) computations.getComputationMetadata());
+           }
         }
 
     }
@@ -113,6 +115,8 @@ public class ComputationsEntity extends BaseSqlEntity<Computations> implements S
             computations.setComputationMetadata(((SparkComputationMetadataEntity)this.computationMetadataEntity).toData());
         else if(this.type.contentEquals(ComputationType.KUBELESS.name()))
             computations.setComputationMetadata(((KubelessComputationMetadataEntity)this.computationMetadataEntity).toData());
+        else if(this.type.contentEquals(ComputationType.LAMBDA.name()))
+            computations.setComputationMetadata(((AWSLambdaComputationMetadataEntity)this.computationMetadataEntity).toData());
 
         return computations;
     }
