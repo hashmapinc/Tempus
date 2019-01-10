@@ -52,6 +52,7 @@ import tempusDashboard from '../dashboard';
 import tempusPlugin from '../plugin';
 import tempusRule from '../rule';
 import tempusComputation from '../computations';
+import tempusPreferences from '../preferences';
 
 import tempusJsonForm from '../jsonform';
 
@@ -94,7 +95,8 @@ export default angular.module('tempus.home', [
     tempusOnFinishRender,
     tempusSideMenu,
     tempusDashboardAutocomplete,
-    tempusComputation
+    tempusComputation,
+    tempusPreferences
 ])
     .config(HomeRoutes)
     .controller('HomeController', HomeController)
