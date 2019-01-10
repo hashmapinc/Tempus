@@ -11,7 +11,7 @@ public class KinesisLambdaTrigger extends ComputationJobConfiguration {
     private static final long serialVersionUID = -7910153605304892262L;
 
     private String functionName;
-    private String eventSourceArn;
+    private String streamName;
     private String region;
     private String startingPositions;
     private int batchSize;
