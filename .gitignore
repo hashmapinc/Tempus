@@ -50,3 +50,5 @@ pom.xml.versionsBackup
 docs/_build
 docs/developerQS/_build
 .factorypath
+.javaversion
+
