@@ -35,10 +35,10 @@ export default function PreferencesRoutes($stateProvider) {
                 }
             },
             data: {
-                pageTitle: 'Preferences'
+                pageTitle: 'preferences.preferences'
             },
             ncyBreadcrumb: {
-                label: '{"icon": "settings", "label": "Preferences"}'
+                label: '{"icon": "settings", "label": "preferences.preferences"}'
             }
         });
 

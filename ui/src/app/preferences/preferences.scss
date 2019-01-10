@@ -1,4 +1,4 @@
-/*
+/**
  * Copyright © 2016-2018 The Thingsboard Authors
  * Modifications © 2017-2018 Hashmap, Inc
  *
@@ -15,18 +15,12 @@
  * limitations under the License.
  */
 
-/* eslint-disable import/no-unresolved, import/default */
-import './preferences.scss';
-import uiRouter from 'angular-ui-router';
-import PreferencesController from './preferences.controller';
-import PreferencesRoutes from './preferences.routes';
-import tempusApiPreferences from '../api/preferences.service';
-/* eslint-enable import/no-unresolved, import/default */
-
-export default angular.module('tempus.preferences', [
-    uiRouter,
-    tempusApiPreferences
-])
-    .config(PreferencesRoutes)
-    .controller('PreferencesController', PreferencesController)
-    .name;
+.header-prefer {
+    margin-top: 3%;
+    margin-left: 3%;
+    margin-right: 3%;
+}
+.pane-header {
+    margin-left: 5%;
+    margin-top: 3%;
+}

@@ -16,7 +16,7 @@
  */
 
 /*@ngInject*/
-export default function PreferencesController($scope, preferencesService, userService, toast) {
+export default function PreferencesController($scope, preferencesService, userService, toast, $translate) {
 
 
     var vm = this;
@@ -54,7 +54,8 @@ export default function PreferencesController($scope, preferencesService, userSe
 
     function saveDetails() {
         preferencesService.saveUnitSystem(user.tenantId, vm.selectedUnit).then(
-           function success(info) {
-            toast.showSuccess("Unit Preferences saved successfully");
+           function success() {
+                toast.showSuccess($translate.instant('preferences.save-preferences-success'));
+           });
     }
 }

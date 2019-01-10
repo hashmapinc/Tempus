@@ -17,22 +17,20 @@
 
 -->
 
-<section style="margin-top: 3%;
-    margin-left: 3%;
-    margin-right: 3%;">
+<section class="header-prefer">
     <v-accordion id="preferences-accordion" class="vAccordion--default"
                  ng-class="{'tb-readonly-label' : (!isEdit || isReadOnly)}" style="width:90%;"
                  onexpand="vm.expandCallback()" oncollapse="vm.collapseCallback()">
         <v-pane id="unit-pane">
             <v-pane-header>
-                Units
+                {{ 'preferences.units' | translate }}
             </v-pane-header>
-            <v-pane-content style="margin-left: 5%;margin-top: 3%;">
+            <v-pane-content class="pane-header">
                 <div>
                     <md-radio-group ng-model="vm.selectedUnit" >
-                        <md-radio-button value="SI" class="md-primary"> SI-metric system </md-radio-button>
-                        <md-radio-button value="Uk" class="md-primary"> Imperials Units </md-radio-button>
-                        <md-radio-button value="US" class="md-primary"> US customary units </md-radio-button>
+                        <md-radio-button value="SI" class="md-primary"> {{ 'preferences.si-metric-system' | translate }} </md-radio-button>
+                        <md-radio-button value="UK" class="md-primary"> {{ 'preferences.imperials-units' | translate }} </md-radio-button>
+                        <md-radio-button value="US" class="md-primary"> {{ 'preferences.us-customary-units' | translate }} </md-radio-button>
                     </md-radio-group>
                 </div>
             </v-pane-content>
