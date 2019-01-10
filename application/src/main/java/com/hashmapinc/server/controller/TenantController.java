@@ -102,7 +102,7 @@ public class TenantController extends BaseController {
         }
     }
 
-    @PreAuthorize("hasAnyAuthority('TENANT_ADMIN')")
+    @PreAuthorize("hasAuthority('TENANT_ADMIN')")
     @PostMapping(value = "/unit-system/tenant/{tenantId}")
     @ResponseBody
     public void saveUserUnitSystem(@PathVariable("tenantId") String strUserId, @RequestBody String unitSystem) throws TempusException {
