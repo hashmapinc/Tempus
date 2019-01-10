@@ -10,11 +10,12 @@ import lombok.EqualsAndHashCode;
 @JsonTypeName("LAMBDA")
 public class AWSLambdaComputationMetadata extends ComputationMetadata {
     private String filePath;
+    private String functionName;
     private String functionHandler;
+    private String runtime;
     private String description;
-    private long timeout;
-    private long memorySize;
-    private String roleArn;
+    private int timeout;
+    private int memorySize;
     private String region;
 
     public AWSLambdaComputationMetadata() {
