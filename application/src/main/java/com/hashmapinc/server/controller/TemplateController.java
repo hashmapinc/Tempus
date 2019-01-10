@@ -39,7 +39,7 @@ public class TemplateController extends BaseController {
     private TemplateService templateService;
 
     @PreAuthorize("hasAuthority('TENANT_ADMIN')")
-    @PostMapping(value = "/templates/save", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/template", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     public TemplateMetadata save(@RequestBody TemplateMetadata source) throws TempusException {
         try {
@@ -50,8 +50,8 @@ public class TemplateController extends BaseController {
     }
 
     @PreAuthorize("hasAuthority('TENANT_ADMIN')")
-    @DeleteMapping(value = "/templates/delete")
-    public void delete(@RequestParam String id) throws TempusException {
+    @DeleteMapping(value = "/template/{id}")
+    public void delete(@PathVariable String id) throws TempusException {
         try {
             templateService.delete(new TemplateId(toUUID(id)));
         } catch (Exception e) {
@@ -60,9 +60,9 @@ public class TemplateController extends BaseController {
     }
 
     @PreAuthorize("hasAuthority('TENANT_ADMIN')")
-    @GetMapping(value = "/templates/get", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/template/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
-    public TemplateMetadata get(@RequestParam String id) throws TempusException {
+    public TemplateMetadata get(@PathVariable String id) throws TempusException {
         try {
             return templateService.getTemplate(new TemplateId(toUUID(id)));
         } catch (Exception e) {
@@ -71,7 +71,7 @@ public class TemplateController extends BaseController {
     }
 
     @PreAuthorize("hasAuthority('TENANT_ADMIN')")
-    @GetMapping(value = "/templates/getTemplates", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/templates", produces = MediaType.APPLICATION_JSON_VALUE, params = "limit")
     @ResponseBody
     public TextPageData<TemplateMetadata> getTemplates(@RequestParam int limit,
                                              @RequestParam(required = false) String textSearch,
@@ -86,7 +86,7 @@ public class TemplateController extends BaseController {
     }
 
     @PreAuthorize("hasAuthority('TENANT_ADMIN')")
-    @GetMapping(value = "/templates/getAll", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/templates", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     public List<TemplateMetadata> getAll() throws TempusException {
         try {
