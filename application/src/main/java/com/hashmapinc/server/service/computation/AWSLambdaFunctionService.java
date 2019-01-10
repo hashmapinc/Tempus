@@ -78,7 +78,7 @@ public class AWSLambdaFunctionService implements ServerlessFunctionService {
 
             final CreateEventSourceMappingResult eventSourceMapping = awsLambda.createEventSourceMapping(new CreateEventSourceMappingRequest()
                     .withFunctionName(triggerConfig.getFunctionName())
-                    .withEventSourceArn(triggerConfig.getEventSourceArn())
+                    .withEventSourceArn(triggerConfig.getFunctionName())
                     .withBatchSize(triggerConfig.getBatchSize())
                     .withEnabled(true)
             );
