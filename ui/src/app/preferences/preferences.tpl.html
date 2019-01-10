@@ -1,0 +1,72 @@
+<!--
+
+    Copyright © 2016-2018 The Thingsboard Authors
+    Modifications © 2017-2018 Hashmap, Inc
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+        http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+
+<section style="margin-top: 3%;
+    margin-left: 3%;
+    margin-right: 3%;">
+    <v-accordion id="preferences-accordion" class="vAccordion--default"
+                 ng-class="{'tb-readonly-label' : (!isEdit || isReadOnly)}" style="width:90%;"
+                 onexpand="vm.expandCallback()" oncollapse="vm.collapseCallback()">
+        <v-pane id="unit-pane">
+            <v-pane-header>
+                Units
+            </v-pane-header>
+            <v-pane-content style="margin-left: 5%;margin-top: 3%;">
+                <div>
+                    <md-radio-group ng-model="vm.selectedUnit" >
+                        <md-radio-button value="SI" class="md-primary"> SI-metric system </md-radio-button>
+                        <md-radio-button value="Uk" class="md-primary"> Imperials Units </md-radio-button>
+                        <md-radio-button value="US" class="md-primary"> US customary units </md-radio-button>
+                    </md-radio-group>
+                </div>
+            </v-pane-content>
+        </v-pane>
+    </v-accordion>
+</section>
+<section layout="row" layout-wrap class="tb-footer-buttons md-fab" layout-align="start end">
+<md-button ng-show="vm.displaySave && !$root.loading" ng-disabled="$root.loading"
+           class="tb-btn-footer md-accent md-hue-2 md-fab"
+           aria-label="{{ 'action.apply' | translate }}"
+           ng-click="vm.saveDetails()">
+    <md-tooltip md-direction="top">
+        {{ 'action.apply-changes' | translate }}
+    </md-tooltip>
+    <ng-md-icon icon="done"></ng-md-icon>
+</md-button>
+</section>
+
+<!--<div class="panel">
+<details>
+    <summary>
+        <ul>
+            <li class="titleName">Units</li>
+            <li></li>
+        </ul>
+    </summary>
+    <div class="content">
+        <div>
+            <md-radio-group ng-change="setUnit(selectedUnit)" ng-model="selectedUnit" >
+                <md-radio-button value="si" class="md-primary"> SI-metric system </md-radio-button>
+                <md-radio-button value="im" class="md-primary"> Imperials Units </md-radio-button>
+                <md-radio-button value="us" class="md-primary"> US customary units </md-radio-button>
+            </md-radio-group>
+        </div>
+    </div>
+</details>
+</div>-->
