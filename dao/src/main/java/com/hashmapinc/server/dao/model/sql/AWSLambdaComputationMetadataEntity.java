@@ -44,10 +44,10 @@ public class AWSLambdaComputationMetadataEntity extends ComputationMetadataEntit
     private String runtime;
 
     @Column(name = ModelConstants.AWS_LAMBDA_TIMEOUT)
-    private String timeout;
+    private int timeout;
 
     @Column(name = ModelConstants.AWS_LAMBDA_MEMORY_SIZE)
-    private String memorySize;
+    private int memorySize;
 
     @Enumerated(EnumType.STRING)
     @Column(name = ModelConstants.AWS_LAMBDA_REGION)
@@ -76,12 +76,8 @@ public class AWSLambdaComputationMetadataEntity extends ComputationMetadataEntit
         if(awsLambdaComputationMetadata.getRuntime() != null){
             this.runtime = awsLambdaComputationMetadata.getRuntime();
         }
-        if(awsLambdaComputationMetadata.getTimeout() != null){
-            this.timeout = awsLambdaComputationMetadata.getTimeout();
-        }
-        if(awsLambdaComputationMetadata.getMemorySize() != null){
-            this.memorySize = awsLambdaComputationMetadata.getMemorySize();
-        }
+        this.timeout = awsLambdaComputationMetadata.getTimeout();
+        this.memorySize = awsLambdaComputationMetadata.getMemorySize();
         if(awsLambdaComputationMetadata.getRegion() != null){
             this.region = awsLambdaComputationMetadata.getRegion();
         }

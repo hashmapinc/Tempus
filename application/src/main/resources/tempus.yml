@@ -336,6 +336,7 @@ spring.mvc.cors:
 configurations:
   ui:
     depthSeries: "true"
+    awsLambda: "true"
 
 spring.main.allow-bean-definition-overriding: true
 
