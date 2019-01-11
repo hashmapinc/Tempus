@@ -16,6 +16,7 @@
  */
 package com.hashmapinc.server.dao.model.sql;
 
+import com.datastax.driver.core.utils.UUIDs;
 import com.hashmapinc.server.common.data.id.TemplateId;
 import com.hashmapinc.server.common.data.template.TemplateMetadata;
 import com.hashmapinc.server.dao.model.BaseSqlEntity;
@@ -65,6 +66,7 @@ public class TemplateMetadataEntity extends BaseSqlEntity<TemplateMetadata> impl
         TemplateMetadata templateMetadata = new TemplateMetadata(new TemplateId(getId()));
         templateMetadata.setName(name);
         templateMetadata.setBody(body);
+        templateMetadata.setCreatedTime(UUIDs.unixTimestamp(getId()));
         return templateMetadata;
     }
 }
