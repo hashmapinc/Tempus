@@ -1,0 +1,13 @@
+version: '2'
+services:
+  dockerhub:
+    image: maccyber/dockerhub-webhook
+    # build: .
+    ports:
+      - "3000:3000"
+    env_file: dockerhub.env
+    volumes:
+      - ./scripts:/src/scripts
+      - /var/run/docker.sock:/var/run/docker.sock
+      # Path to docker-compose files who are triggered by scripts:
+      # - /srv:/srv
