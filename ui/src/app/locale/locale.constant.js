@@ -1804,9 +1804,9 @@ export default angular.module('tempus.locale', [])
                     "save-preferences-success":"Unit Preferences saved successfully",
                     "preferences":"Preferences",
                     "units":"Units",
-                    "si-metric-system" :"SI-metric system",
-                    "imperials-units":"Imperials Units",
-                    "us-customary-units":"US customary units"
+                    "si-metric-system" :"SI-Metric System",
+                    "imperials-units":"Imperials System",
+                    "us-customary-units":"US-Customary System"
                 }
             }
         }

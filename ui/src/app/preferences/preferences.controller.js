@@ -22,7 +22,7 @@ export default function PreferencesController($scope, preferencesService, userSe
     var vm = this;
 
     vm.displaySave = false;
-    vm.selectedUnit = null;
+    vm.selectedUnit = 'SI';
     vm.saveDetails = saveDetails;
     vm.setUnit = setUnit;
     vm.expandCallback = expandCallback;
