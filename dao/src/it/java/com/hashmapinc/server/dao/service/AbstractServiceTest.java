@@ -60,6 +60,7 @@ import com.hashmapinc.server.dao.device.DeviceService;
 import com.hashmapinc.server.dao.event.EventService;
 import com.hashmapinc.server.dao.gatewayconfiguration.TempusGatewayConfigurationService;
 import com.hashmapinc.server.dao.logo.LogoService;
+import com.hashmapinc.server.dao.mail.DefaultMailService;
 import com.hashmapinc.server.dao.metadataingestion.MetadataIngestionService;
 import com.hashmapinc.server.dao.plugin.PluginService;
 import com.hashmapinc.server.dao.relation.RelationService;
@@ -72,12 +73,14 @@ import com.hashmapinc.server.dao.unitconversion.UnitConversionService;
 import com.hashmapinc.server.dao.user.UserService;
 import com.hashmapinc.server.dao.widget.WidgetTypeService;
 import com.hashmapinc.server.dao.widget.WidgetsBundleService;
+import jnr.ffi.annotations.Meta;
 import org.junit.Assert;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.FilterType;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
@@ -95,7 +98,9 @@ import static com.hashmapinc.server.dao.model.ModelConstants.NULL_UUID;
 @ContextConfiguration(classes = {AbstractServiceTest.class, UserServiceTestConfiguration.class}, loader = AnnotationConfigContextLoader.class)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 @Configuration
-@ComponentScan("com.hashmapinc.server")
+@ComponentScan(basePackages = {"com.hashmapinc.server"} ,excludeFilters =
+@ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, value = DefaultMailService.class))
+
 public abstract class AbstractServiceTest {
 
     protected ObjectMapper mapper = new ObjectMapper();
