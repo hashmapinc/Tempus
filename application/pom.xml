@@ -350,6 +350,10 @@
             <groupId>com.amazonaws</groupId>
             <artifactId>aws-java-sdk-lambda</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.amazonaws</groupId>
+            <artifactId>aws-java-sdk-kinesis</artifactId>
+        </dependency>
     </dependencies>
     <build>
         <finalName>${pkg.name}-${project.version}</finalName>
