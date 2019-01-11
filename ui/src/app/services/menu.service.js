@@ -297,6 +297,12 @@ function Menu(userService, $state, $rootScope, $log,datamodelService,customerSer
                             link: '/static/svg/computationslightgray.svg'
                         },
                         {
+                            name: 'Preferences',
+                            type: 'link',
+                            state: 'home.preferences',
+                            icon: 'settings'
+                        },
+                        {
                             name: 'audit-log.audit-logs',
                             type: 'link',
                             state: 'home.auditLogs',

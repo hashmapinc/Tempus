@@ -1799,6 +1799,14 @@ export default angular.module('tempus.locale', [])
                     "no-query-found":"No query found",
                     "delete-query":"Delete query",
                     "attribute-name":"Attribute Name"
+                },
+                "preferences": {
+                    "save-preferences-success":"Unit Preferences saved successfully",
+                    "preferences":"Preferences",
+                    "units":"Units",
+                    "si-metric-system" :"SI-Metric System",
+                    "imperials-units":"Imperials System",
+                    "us-customary-units":"US-Customary System"
                 }
             }
         }

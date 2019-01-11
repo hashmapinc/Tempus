@@ -94,7 +94,7 @@ public final class SharedPluginProcessingContext {
         this.tenantService = sysContext.getTenantService();
         this.relationService = sysContext.getRelationService();
         this.auditLogService = sysContext.getAuditLogService();
-        unitConversionService = sysContext.getUnitConversionService();
+        this.unitConversionService = sysContext.getUnitConversionService();
     }
 
     public PluginId getPluginId() {
