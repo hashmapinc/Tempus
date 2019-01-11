@@ -16,13 +16,12 @@
  */
 package com.hashmapinc.server.dao.model.sql;
 
+import com.hashmapinc.server.common.data.RegionType;
 import com.hashmapinc.server.common.data.computation.AWSLambdaComputationMetadata;
 import com.hashmapinc.server.common.data.id.ComputationId;
 import com.hashmapinc.server.dao.model.ModelConstants;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 
 @Entity
@@ -31,18 +30,28 @@ public class AWSLambdaComputationMetadataEntity extends ComputationMetadataEntit
 
     @Column(name = ModelConstants.AWS_LAMBDA_FILE_PATH)
     private String filePath;
+
+    @Column(name = ModelConstants.AWS_LAMBDA_FUNCTION_NAME)
+    private String functionName;
+
     @Column(name = ModelConstants.AWS_LAMBDA_FUNCTION_HANDLER)
     private String functionHandler;
+
     @Column(name = ModelConstants.AWS_LAMBDA_DESCRIPTION)
     private String description;
+
+    @Column(name = ModelConstants.AWS_LAMBDA_RUNTIME)
+    private String runtime;
+
     @Column(name = ModelConstants.AWS_LAMBDA_TIMEOUT)
     private String timeout;
+
     @Column(name = ModelConstants.AWS_LAMBDA_MEMORY_SIZE)
     private String memorySize;
-    @Column(name = ModelConstants.AWS_LAMBDA_ROLE_ARN)
-    private String roleArn;
+
+    @Enumerated(EnumType.STRING)
     @Column(name = ModelConstants.AWS_LAMBDA_REGION)
-    private String region;
+    private RegionType region;
 
     public AWSLambdaComputationMetadataEntity(){
         super();
@@ -55,20 +64,23 @@ public class AWSLambdaComputationMetadataEntity extends ComputationMetadataEntit
         if(awsLambdaComputationMetadata.getFilePath() != null){
             this.filePath = awsLambdaComputationMetadata.getFilePath();
         }
+        if(awsLambdaComputationMetadata.getFunctionName() != null){
+            this.functionName = awsLambdaComputationMetadata.getFunctionName();
+        }
         if(awsLambdaComputationMetadata.getFunctionHandler() != null){
             this.functionHandler = awsLambdaComputationMetadata.getFunctionHandler();
         }
         if(awsLambdaComputationMetadata.getDescription() != null){
             this.description = awsLambdaComputationMetadata.getDescription();
         }
+        if(awsLambdaComputationMetadata.getRuntime() != null){
+            this.runtime = awsLambdaComputationMetadata.getRuntime();
+        }
         if(awsLambdaComputationMetadata.getTimeout() != null){
             this.timeout = awsLambdaComputationMetadata.getTimeout();
         }
         if(awsLambdaComputationMetadata.getMemorySize() != null){
             this.memorySize = awsLambdaComputationMetadata.getMemorySize();
-        }
-        if(awsLambdaComputationMetadata.getRoleArn() != null){
-            this.roleArn = awsLambdaComputationMetadata.getRoleArn();
         }
         if(awsLambdaComputationMetadata.getRegion() != null){
             this.region = awsLambdaComputationMetadata.getRegion();
@@ -80,13 +92,13 @@ public class AWSLambdaComputationMetadataEntity extends ComputationMetadataEntit
         AWSLambdaComputationMetadata awsLambdaComputationMetadata = new AWSLambdaComputationMetadata();
         awsLambdaComputationMetadata.setId(new ComputationId(getId()));
         awsLambdaComputationMetadata.setFilePath(this.filePath);
+        awsLambdaComputationMetadata.setFunctionName(this.functionName);
         awsLambdaComputationMetadata.setFunctionHandler(this.functionHandler);
+        awsLambdaComputationMetadata.setRuntime(this.runtime);
         awsLambdaComputationMetadata.setDescription(this.description);
         awsLambdaComputationMetadata.setTimeout(this.timeout);
         awsLambdaComputationMetadata.setMemorySize(this.memorySize);
-        awsLambdaComputationMetadata.setRoleArn(this.roleArn);
         awsLambdaComputationMetadata.setRegion(this.region);
-        awsLambdaComputationMetadata.setTimeout(this.timeout);
 
         return awsLambdaComputationMetadata;
     }
