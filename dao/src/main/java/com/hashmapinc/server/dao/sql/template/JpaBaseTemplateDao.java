@@ -21,6 +21,7 @@ import com.hashmapinc.server.common.data.page.PaginatedResult;
 import com.hashmapinc.server.common.data.page.TextPageLink;
 import com.hashmapinc.server.common.data.template.TemplateMetadata;
 import com.hashmapinc.server.dao.DaoUtil;
+import com.hashmapinc.server.dao.exception.DataValidationException;
 import com.hashmapinc.server.dao.model.ModelConstants;
 import com.hashmapinc.server.dao.model.sql.TemplateMetadataEntity;
 import com.hashmapinc.server.dao.sql.JpaAbstractSearchTextDao;
@@ -34,6 +35,7 @@ import org.springframework.stereotype.Component;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.StreamSupport;
 
 @Component
 public class JpaBaseTemplateDao extends JpaAbstractSearchTextDao<TemplateMetadataEntity, TemplateMetadata> {
@@ -49,6 +51,12 @@ public class JpaBaseTemplateDao extends JpaAbstractSearchTextDao<TemplateMetadat
     @Override
     protected CrudRepository<TemplateMetadataEntity, String> getCrudRepository() {
         return templateRepository;
+    }
+
+    @Override
+    public TemplateMetadata save(TemplateMetadata templateMetadata) {
+        validateForDuplicateName(templateMetadata);
+        return super.save(templateMetadata);
     }
 
     public List<TemplateMetadata> findByPageLink(TextPageLink pageLink) {
@@ -69,5 +77,14 @@ public class JpaBaseTemplateDao extends JpaAbstractSearchTextDao<TemplateMetadat
         List<TemplateMetadata> templates = DaoUtil.convertDataList(resultPage.getContent());
         return new PaginatedResult<>(templates, pageNum, resultPage.getTotalElements(),
                 resultPage.getTotalPages(), resultPage.hasNext(), resultPage.hasPrevious());
+    }
+
+    private void validateForDuplicateName(TemplateMetadata templateMetadata) {
+        boolean duplicateNamePresent = StreamSupport.stream(templateRepository.findAll().spliterator(), false)
+                .map(TemplateMetadataEntity::getName)
+                .anyMatch(t -> Objects.equals(t, templateMetadata.getName()));
+        if(duplicateNamePresent) {
+            throw new DataValidationException("Name already present! Provide a different name");
+        }
     }
 }
