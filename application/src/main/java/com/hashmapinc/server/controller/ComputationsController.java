@@ -144,7 +144,7 @@ public class ComputationsController extends BaseController {
     }
 
     @PreAuthorize("hasAuthority('TENANT_ADMIN')")
-    @PostMapping(value = "/computations", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/computations/lambda", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     public Computations addComputations(@RequestBody Computations computation, @RequestParam("file") MultipartFile file) throws TempusException {
 
