@@ -32,6 +32,7 @@ import com.hashmapinc.server.exception.TempusErrorCode;
 import com.hashmapinc.server.exception.TempusException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
@@ -46,6 +47,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+@Service
 public class AWSLambdaComputationsFunctionService implements ComputationsFunctionService {
 
     @Value("${computations.lambda.zip_path}")
