@@ -30,6 +30,7 @@ import com.hashmapinc.server.common.data.security.Authority;
 import com.hashmapinc.server.common.data.security.DeviceCredentials;
 import com.hashmapinc.server.dao.attributes.AttributesService;
 import com.hashmapinc.server.dao.depthseries.DepthSeriesService;
+import com.hashmapinc.server.dao.device.DeviceCredentialsService;
 import com.hashmapinc.server.dao.exception.IncorrectParameterException;
 import com.hashmapinc.server.dao.model.ModelConstants;
 import com.hashmapinc.server.dao.timeseries.TimeseriesService;
@@ -69,6 +70,9 @@ public class DeviceController extends BaseController {
 
     @Autowired
     protected AttributesService attributesService;
+
+    @Autowired
+    protected DeviceCredentialsService deviceCredentialsService;
 
     @PostAuthorize("hasPermission(returnObject, 'DEVICE_READ')")
     @GetMapping(value = "/device/{deviceId}")
@@ -436,17 +440,20 @@ public class DeviceController extends BaseController {
     }
 
     @PreAuthorize("#oauth2.isClient() and #oauth2.hasScope('server')")
-    @GetMapping(value = "/{deviceId}/attribute/mandatory-tags", produces = "application/json")
+    @GetMapping(value = "/device/{deviceId}/data-quality-meta-data", produces = "application/json")
     @ResponseBody
-    public String getMandatoryTags(@PathVariable("deviceId") String strDeviceId) throws TempusException {
+    public DataQualityMetaData getDataQualityMetaData(@PathVariable("deviceId") String strDeviceId) throws TempusException {
         try {
             checkParameter(DEVICE_ID, strDeviceId);
+
             DeviceId deviceId = new DeviceId(toUUID(strDeviceId));
-            String retVal = "";
-            Optional<AttributeKvEntry> attributeKvEntry = attributesService.find(deviceId, DataConstants.CLIENT_SCOPE, "mandatory_tags").get();
+            String mandatoryTags = "";
+            Optional<AttributeKvEntry> attributeKvEntry = attributesService.find(deviceId, DataConstants.SHARED_SCOPE, "mandatory_tags").get();
             if (attributeKvEntry.isPresent())
-                retVal = attributeKvEntry.get().getValueAsString();
-            return retVal;
+                mandatoryTags = attributeKvEntry.get().getValueAsString();
+
+            DeviceCredentials credentials = deviceCredentialsService.findDeviceCredentialsByDeviceId(deviceId);
+            return new DataQualityMetaData(credentials.getCredentialsId(), mandatoryTags);
         } catch (Exception e) {
             throw handleException(e);
         }
