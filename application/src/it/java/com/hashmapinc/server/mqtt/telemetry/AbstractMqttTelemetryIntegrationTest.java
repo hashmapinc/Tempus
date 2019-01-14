@@ -144,7 +144,7 @@ public abstract class AbstractMqttTelemetryIntegrationTest extends AbstractContr
         String getTelemetryValuesUrl = "/api/plugins/telemetry/DEVICE/" + deviceId +  "/values/timeseries?keys=" + java.lang.String.join(",", actualKeySet);
         Map<String, List<Map<String, String>>> values = doGetAsync(getTelemetryValuesUrl, Map.class);
 
-        assertEquals("15.616", values.get("humidity").get(0).get("value"));
+        assertEquals("0.15616", values.get("humidity").get(0).get("value"));
         assertEquals("0.158", values.get("viscosity").get(0).get("value"));
     }
 
