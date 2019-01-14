@@ -1,3 +1,19 @@
+/**
+ * Copyright © 2016-2018 The Thingsboard Authors
+ * Modifications © 2017-2018 Hashmap, Inc
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.hashmapinc.server.service.computation;
 
 import com.amazonaws.auth.AWSStaticCredentialsProvider;
@@ -37,7 +53,7 @@ public class AWSLambdaFunctionService implements ServerlessFunctionService {
         AWSLambdaComputationMetadata metadata = (AWSLambdaComputationMetadata)computations.getComputationMetadata();
 
         try {
-            AWSLambda awsLambda = getAwsLambdaClient(metadata.getRegion());
+            AWSLambda awsLambda = getAwsLambdaClient(metadata.getRegion().getRegionName());
 
             final CreateFunctionResult lambdaFunction = awsLambda.createFunction(new CreateFunctionRequest()
                     .withFunctionName(metadata.getFunctionName())
@@ -61,7 +77,7 @@ public class AWSLambdaFunctionService implements ServerlessFunctionService {
     public boolean checkFunction(Computations computations) {
         AWSLambdaComputationMetadata metadata = (AWSLambdaComputationMetadata)computations.getComputationMetadata();
         try {
-            AWSLambda awsLambda = getAwsLambdaClient(metadata.getRegion());
+            AWSLambda awsLambda = getAwsLambdaClient(metadata.getRegion().getRegionName());
             final GetFunctionResult functionResult = awsLambda.getFunction(new GetFunctionRequest().withFunctionName(metadata.getFunctionName()));
             return functionResult != null;
         } catch (Exception e) {
@@ -74,7 +90,7 @@ public class AWSLambdaFunctionService implements ServerlessFunctionService {
     public boolean deleteFunction(Computations computations) {
         AWSLambdaComputationMetadata metadata = (AWSLambdaComputationMetadata)computations.getComputationMetadata();
         try {
-            AWSLambda awsLambda = getAwsLambdaClient(metadata.getRegion());
+            AWSLambda awsLambda = getAwsLambdaClient(metadata.getRegion().getRegionName());
             final DeleteFunctionResult deleteFunctionResult = awsLambda.deleteFunction(new DeleteFunctionRequest().withFunctionName(metadata.getFunctionName()));
             return deleteFunctionResult != null;
         } catch (Exception e) {
