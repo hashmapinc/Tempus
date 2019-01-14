@@ -17,6 +17,7 @@
 package com.hashmapinc.server.common.data.computation;
 
 import com.fasterxml.jackson.annotation.JsonTypeName;
+import com.hashmapinc.server.common.data.RegionType;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -28,7 +29,7 @@ public class KinesisLambdaTrigger extends ComputationJobConfiguration {
 
     private String functionName;
     private String streamName;
-    private String region;
+    private RegionType region;
     private String startingPositions;
     private int batchSize;
 }

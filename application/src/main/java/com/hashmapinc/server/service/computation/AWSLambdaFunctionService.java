@@ -103,9 +103,9 @@ public class AWSLambdaFunctionService implements ServerlessFunctionService {
     public boolean createTrigger(ComputationJob computationJob) {
         KinesisLambdaTrigger triggerConfig = (KinesisLambdaTrigger)computationJob.getConfiguration();
         try{
-            AWSLambda awsLambda = getAwsLambdaClient(triggerConfig.getRegion());
+            AWSLambda awsLambda = getAwsLambdaClient(triggerConfig.getRegion().getRegionName());
 
-            final AmazonKinesisAsync amazonKinesisAsync = AmazonKinesisAsyncClientBuilder.standard().withRegion(Regions.fromName(triggerConfig.getRegion()))
+            final AmazonKinesisAsync amazonKinesisAsync = AmazonKinesisAsyncClientBuilder.standard().withRegion(Regions.fromName(triggerConfig.getRegion().getRegionName()))
                     .withCredentials(new AWSStaticCredentialsProvider(awsCreds)).build();
 
             final String streamARN = amazonKinesisAsync.describeStream(triggerConfig.getStreamName()).getStreamDescription().getStreamARN();
@@ -129,7 +129,7 @@ public class AWSLambdaFunctionService implements ServerlessFunctionService {
 
         KinesisLambdaTrigger triggerConfig = (KinesisLambdaTrigger)computationJob.getConfiguration();
         try{
-            AWSLambda awsLambda = getAwsLambdaClient(triggerConfig.getRegion());
+            AWSLambda awsLambda = getAwsLambdaClient(triggerConfig.getRegion().getRegionName());
 
             final ListEventSourceMappingsResult listEventSourceMappingsResult =
                     awsLambda.listEventSourceMappings(new ListEventSourceMappingsRequest().withFunctionName(triggerConfig.getFunctionName()));
@@ -148,7 +148,7 @@ public class AWSLambdaFunctionService implements ServerlessFunctionService {
     public boolean deleteTrigger(ComputationJob computationJob) {
         KinesisLambdaTrigger triggerConfig = (KinesisLambdaTrigger)computationJob.getConfiguration();
         try{
-            AWSLambda awsLambda = getAwsLambdaClient(triggerConfig.getRegion());
+            AWSLambda awsLambda = getAwsLambdaClient(triggerConfig.getRegion().getRegionName());
 
             final ListEventSourceMappingsResult listEventSourceMappingsResult =
                     awsLambda.listEventSourceMappings(new ListEventSourceMappingsRequest().withFunctionName(triggerConfig.getFunctionName()));
