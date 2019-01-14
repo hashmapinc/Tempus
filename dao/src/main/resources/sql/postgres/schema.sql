@@ -423,3 +423,15 @@ CREATE TABLE IF NOT EXISTS kubeless_computation_meta_data (
     timeout varchar,
     checksum varchar
 );
+
+CREATE TABLE IF NOT EXISTS aws_lambda_computation_meta_data (
+    id varchar(31) NOT NULL CONSTRAINT aws_lambda_computations_pkey PRIMARY KEY,
+    file_path varchar,
+    function_name varchar,
+    function_handler varchar,
+    runtime varchar,
+    description varchar,
+    timeout integer,
+    memory_size integer,
+    region varchar
+);
