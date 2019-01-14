@@ -52,7 +52,7 @@ export function DeviceCardController(types) {
 
 /*@ngInject*/
 export function DeviceController($rootScope,userService, deviceService, customerService, $state, $stateParams,
-                                 $document, $mdDialog, $q, $translate, types, $scope, $filter, entityRelationService) {
+                                 $document, $mdDialog, $q, $translate, types, $scope, $filter, entityRelationService, $log) {
 
     var customerId = $stateParams.customerId;
 
@@ -154,7 +154,10 @@ export function DeviceController($rootScope,userService, deviceService, customer
         }
 
         if (vm.devicesScope === 'tenant') {
-            fetchDevicesFunction = function (pageLink, deviceType) {
+            fetchDevicesFunction = function (pageLink, deviceType,pageNumber) {
+                $log.log("fetchDevicesFunction")
+                $log.log($scope.query.page)
+                $log.log(pageNumber)
                 if($scope.query.page == 1){
                     return deviceService.getTenantDevices(pageLink, true, null, deviceType,0);
                 }else {
@@ -337,9 +340,12 @@ export function DeviceController($rootScope,userService, deviceService, customer
     loadTableData();
 
     function loadTableData() {
+        $log.log("loadTableData")
         var promise = vm.deviceGridConfig.fetchItemsFunc({limit: $scope.query.limit, textSearch: ''}, false);
         if(promise) {
             promise.then(function success(items) {
+                $log.log(items)
+                $scope.devices.data = [];
                 var deviceSortList = $filter('orderBy')(items.data, $scope.query.order);
                 if ($scope.query.search != null) {
 
