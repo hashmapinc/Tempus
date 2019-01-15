@@ -1,0 +1,87 @@
+#
+# Copyright © 2016-2018 The Thingsboard Authors
+# Modifications © 2017-2018 Hashmap, Inc
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: livy
+  labels:
+    app: livy
+spec:
+  ports:
+    - port: 8998
+      name: livy-rest
+  selector:
+    component: livy
+  type: LoadBalancer
+---
+apiVersion: apps/v1beta2 # for versions before 1.8.0 use apps/v1beta1
+kind: Deployment
+metadata:
+  name: livy
+  labels:
+    component: livy
+spec:
+  selector:
+    matchLabels:
+      component: livy
+  strategy:
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        component: livy
+    spec:
+      containers:
+      - image: gnut3ll4/livy-k8s:latest
+        name: livy
+        env:
+        - name: K8S_API_HOST
+          value: localhost
+        - name: SPARK_KUBERNETES_IMAGE
+          value: "gnut3ll4/spark:v1.0.14"
+        - name: AWS_ACCESS_KEY
+          valueFrom:
+            secretKeyRef:
+              name: aws
+              key: accesskey
+        - name: AWS_SECRET_KEY
+          valueFrom:
+            secretKeyRef:
+              name: aws
+              key: secretkey
+        - name: AZURE_STORAGE_ACCOUNT
+          valueFrom:
+            secretKeyRef:
+              name: azure
+              key: storageaccount
+        - name: AZURE_STORAGE_ACCESS_KEY
+          valueFrom:
+            secretKeyRef:
+              name: azure
+              key: storageaccesskey
+        ports:
+        - containerPort: 8998
+          name: livy-rest
+        command: [ "/entrypoint.sh" ]
+        args: ["livy-server"]
+      - image: gnut3ll4/kubectl-sidecar:latest
+        name: kubectl
+        ports:
+        - containerPort: 8443
+          name: k8s-api
+        command: ["/usr/local/bin/kubectl", "proxy", "--port", "8443"]
