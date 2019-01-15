@@ -1,0 +1,108 @@
+<!--
+
+    Copyright © 2016-2018 The Thingsboard Authors
+    Modifications © 2017-2018 Hashmap, Inc
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+        http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<md-card flex>
+    <md-card-title>
+        <md-card-title-text>
+            <span translate class="md-headline" ng-class="{'tb-readonly-label' : ($root.loading || !isEdit || isReadOnly)}">computation.function-configurations</span>
+        </md-card-title-text>
+    </md-card-title>
+    <md-content class="md-padding" layout="column" style="overflow-x: hidden">
+        <fieldset ng-disabled="$root.loading">
+            <section flex layout="row" style="height: 70px;">
+                <md-input-container flex class="md-block" md-is-error="theForm.functionName.$touched && theForm.functionName.$invalid">
+                    <label translate>computation.function-name</label>
+                    <input required name="functionName" ng-model="model.computationMetadata.functionName">
+                    <div ng-messages="theForm.functionName.$error">
+                        <div translate ng-message="required">computation.name-required</div>
+                    </div>
+                </md-input-container>
+            </section>
+            <section flex layout="row" style="height: 70px;">
+                <md-input-container flex class="md-block" md-is-error="theForm.handler.$touched && theForm.handler.$invalid">
+                    <label translate>computation.function-handler</label>
+                    <input required name="handler" ng-model="model.computationMetadata.functionHandler">
+                    <div ng-messages="theForm.handler.$error">
+                        <div translate ng-message="required">computation.handler-required</div>
+                    </div>
+                </md-input-container>
+            </section>
+            <section flex layout="row" style="height: 70px;">
+                <md-input-container flex="50" class="md-block">
+                    <label translate>computation.runtime</label>
+                    <md-select required name="runtimeType" ng-model="model.computationMetadata.runtime">
+                        <md-option ng-repeat="runtimeType in types.lmbdaRuntimeTypes" ng-value="runtimeType.value">
+                            {{ runtimeType.name }}
+                        </md-option>
+                    </md-select>
+                    <div ng-messages="theForm.runtimeType.$error">
+                        <div translate ng-message="required">computation.runtime-required</div>
+                    </div>
+                </md-input-container>
+                <md-input-container flex="50" class="md-block" md-is-error="theForm.region.$touched && theForm.region.$invalid">
+                    <label translate>computation.region</label>
+                    <input required name="region" ng-model="model.computationMetadata.region">
+                    <div ng-messages="theForm.region.$error">
+                        <div translate ng-message="required">computation.region-required</div>
+                    </div>
+                </md-input-container>
+            </section>
+            <section class="dropdown-section" style="margin-bottom: 40px">
+                <div class="tb-container" ng-class="{'ng-invalid':!model.importData}">
+                    <label class="tb-label" translate>computation.upload-zip</label>
+                    <div flow-init="{singleFile:true}" flow-file-added='fileAdded($file)' class="tb-file-select-container">
+                        <div class="tb-file-clear-container">
+                            <md-button ng-click='clearFile()' class="tb-file-clear-btn md-icon-button md-primary" aria-label="{{ 'action.remove' | translate }}">
+                                <md-tooltip md-direction="top">
+                                    {{ 'action.remove' | translate }}
+                                </md-tooltip>
+                                <md-icon aria-label="{{ 'action.remove' | translate }}" class="material-icons">close</md-icon>
+                            </md-button>
+                        </div>
+                        <div class="alert tb-flow-drop" flow-drop>
+                            <label for="select" translate>import.drop-file</label>
+                            <input class="file-input" flow-btn flow-attrs="{accept:'.zip,application/zip'}" id="select">
+                        </div>
+                    </div>
+                </div>
+                <div class="dropdown-messages">
+                    <!--<div ng-if="!model.computationMetadata.functionFileName" class="tb-error-message" translate>computation.no-function</div>
+                    <div ng-if="model.computationMetadata.functionFileName">{{model.computationMetadata.functionFileName}}</div>-->
+                    <div ng-if="!model.importData" class="tb-error-message" translate>import.no-file</div>
+                    <div ng-if="model.fileName">{{model.fileName}}</div>
+                </div>
+            </section>
+            <section flex layout="row" style="height: 70px;">
+                <md-input-container flex="50" class="md-block" md-is-error="theForm.timeout.$touched && theForm.timeout.$invalid">
+                    <label translate>computation.timeout</label>
+                    <input required type="number" min="3" max="900" name="timeout" ng-model="model.computationMetadata.timeout">
+                    <div ng-messages="theForm.handler.$error">
+                        <div translate ng-message="required">computation.timeout-required</div>
+                    </div>
+                </md-input-container>
+                <md-input-container flex="50" class="md-block" md-is-error="theForm.memorySize.$touched && theForm.memorySize.$invalid">
+                    <label translate>computation.memorySize</label>
+                    <input required type="number" min="128" max="3008" step="64" name="memorySize" ng-model="model.computationMetadata.memorySize">
+                    <div ng-messages="theForm.handler.$error">
+                        <div translate ng-message="required">computation.memorySize-required</div>
+                    </div>
+                </md-input-container>
+            </section>
+        </fieldset>
+    </md-content>
+</md-card>

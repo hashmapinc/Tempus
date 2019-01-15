@@ -25,6 +25,7 @@ import ComputationJobDirective from './computation-job.directive';
 import ComputationRoutes from './computation.routes';
 import ComputationFormSparkDirective from './computation-forms/computation-form-spark.directive';
 import ComputationFormKubelessDirective from './computation-forms/computation-form-kubeless.directive';
+import ComputationFormLambdaDirective from './computation-forms/computation-form-lambda.directive';
 import ComputationJobKubelessDirective from './computation-job-forms/form-kubeless.directive';
 import ComputationJobSparkDirective from './computation-job-forms/form-spark.directive';
 /* eslint-enable import/no-unresolved, import/default */
@@ -40,6 +41,7 @@ export default angular.module('tempus.computation', [
     .directive('tbComputation',ComputationDirective)
     .directive('tbComputationFormSpark',ComputationFormSparkDirective)
     .directive('tbComputationFormKubeless',ComputationFormKubelessDirective)
+    .directive('tbComputationFormLambda',ComputationFormLambdaDirective)
     .directive('tbComputationJob',ComputationJobDirective)
     .directive('tbComputationJobKubeless',ComputationJobKubelessDirective)
     .directive('tbComputationJobSpark',ComputationJobSparkDirective)

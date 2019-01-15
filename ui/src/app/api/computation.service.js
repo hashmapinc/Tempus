@@ -20,11 +20,12 @@
 
 
 /*@ngInject*/
-function ComputationService($http, $q, $filter, utils) {
+function ComputationService($http, $q, $filter, utils, $log) {
 
     var service = {
         upload: upload,
         saveComputation: saveComputation,
+        saveLambdaComputation: saveLambdaComputation,
         getAllComputations: getAllComputations,
         getComputation: getComputation,
         deleteComputation: deleteComputation
@@ -49,10 +50,32 @@ function ComputationService($http, $q, $filter, utils) {
     }
 
     function saveComputation(computation){
+        $log.log(computation);
         var deferred = $q.defer();
         computation.name = computation.computationMetadata.function;
         var url = '/api/computations';
         $http.post(url, computation).then(function success(response) {
+            deferred.resolve(response.data);
+        }, function fail() {
+            deferred.reject();
+        });
+        return deferred.promise;
+    }
+
+    function saveLambdaComputation(computation, file){
+        $log.log(computation);
+        var deferred = $q.defer();
+        var fd = new FormData();
+        fd.append("computation", computation);
+        fd.append("file", file);
+        var url = '/api/computations/lambda';
+        $http.post(url, fd, {
+            transformRequest: angular.identity,
+            headers: {
+                'Content-Type': undefined,
+                'Accept':'application/json'
+            }
+        }).then(function success(response) {
             deferred.resolve(response.data);
         }, function fail() {
             deferred.reject();

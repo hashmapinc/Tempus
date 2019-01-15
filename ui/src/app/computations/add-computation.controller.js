@@ -34,10 +34,16 @@ export default function AddComputationController($scope, $mdDialog, types, helpL
         if (vm.item.type === vm.types.computationType.spark) {
             vm.item.importData = null;
             vm.item.fileName = null;
-        }else if (vm.item.type === vm.types.computationType.kubeless) {
+        } else if (vm.item.type === vm.types.computationType.kubeless) {
             vm.item = {
                 type: vm.types.computationType.kubeless
             };
+        } else if (vm.item.type === vm.types.computationType.lambda) {
+            vm.item = {
+                type: vm.types.computationType.lambda
+            };
+            vm.item.importData = null;
+            vm.item.fileName = null;
         }
     };
 
@@ -54,7 +60,7 @@ export default function AddComputationController($scope, $mdDialog, types, helpL
                     deferred.reject();
                 }
             );
-        }else if(vm.item.type === vm.types.computationType.kubeless){
+        } else if(vm.item.type === vm.types.computationType.kubeless){
             computationService.saveComputation(vm.item).then(
                 function success() {
                     deferred.resolve();
@@ -62,6 +68,15 @@ export default function AddComputationController($scope, $mdDialog, types, helpL
                 function fail() {
                     deferred.reject();
                 }
+            );
+        } else if (vm.item.type === vm.types.computationType.lambda) {
+            computationService.saveLambdaComputation(vm.item, vm.item.importData.file).then(
+              function success() {
+                  deferred.resolve();
+              },
+              function fail() {
+                  deferred.reject();
+              }
             );
         }
         return deferred.promise;

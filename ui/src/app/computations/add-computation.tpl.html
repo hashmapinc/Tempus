@@ -49,6 +49,7 @@
                         </section>
                         <div tb-computation-form-spark model="vm.item" ng-if="vm.item.type && vm.item.type == vm.types.computationType.spark"></div>
                         <div tb-computation-form-kubeless model="vm.item" ng-if="vm.item.type && vm.item.type == vm.types.computationType.kubeless"></div>
+                        <div tb-computation-form-lambda model="vm.item" ng-if="vm.item.type && vm.item.type == vm.types.computationType.lambda"></div>
                     </fieldset>
                 </md-content>
             </div>

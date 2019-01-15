@@ -637,7 +637,8 @@ export default angular.module('tempus.types', [])
             },
             computationType: {
                 spark: "SPARK",
-                kubeless: "KUBELESS"
+                kubeless: "KUBELESS",
+                lambda: "AWS-LAMBDA"
             },
             runtimeTypes: {
                 python27: {
@@ -671,6 +672,64 @@ export default angular.module('tempus.types', [])
                 java18: {
                     name: "Java 1.8",
                     value: "java1.8"
+                }
+            },
+            lmbdaRuntimeTypes: {
+                java18: {
+                    name: "Java 1.8",
+                    value: "java8"
+                },
+                python27: {
+                    name: "Python 2.7",
+                    value: "python2.7"
+                },
+                python34: {
+                    name: "Python 3.7",
+                    value: "python3.7"
+                },
+                python36: {
+                    name: "Python 3.6",
+                    value: "python3.6"
+                },
+                nodejs: {
+                    name: "Node.js",
+                    value: "nodejs"
+                },
+                nodejs43: {
+                    name: "Node.js 4.3",
+                    value: "nodejs4.3"
+                },
+                nodejs61: {
+                    name: "Node.js 6.10",
+                    value: "nodejs6.10"
+                },
+                nodejs81: {
+                    name: "Node.js 8.10",
+                    value: "nodejs8.10"
+                },
+                nodejs43edge: {
+                    name: "Node.js 4.3-edge",
+                    value: "nodejs4.3-edge"
+                },
+                dotnet21: {
+                    name: "Dot Net 2.1",
+                    value: "dotnetcore2.1"
+                },
+                dotnet20: {
+                    name: "Dot Net 2.0",
+                    value: "dotnetcore2.0"
+                },
+                dotnet10: {
+                    name: "Dot Net 1.0",
+                    value: "dotnetcore1.0"
+                },
+                ruby25: {
+                    name: "Ruby 2.5",
+                    value: "ruby2.5"
+                },
+                go110: {
+                    name: "Go 1.10",
+                    value: "go1.10"
                 }
             },
             triggerTypes: {
