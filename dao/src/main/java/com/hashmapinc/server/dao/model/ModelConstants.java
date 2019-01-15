@@ -192,12 +192,12 @@ public class ModelConstants {
     public static final String KUBELESS_COMPUTATION_CHECKSUM = "checksum";
     public static final String KUBELESS_COMPUTATION_RUNTIME = "runtime";
 
-    public static final String AWS_LAMBDA_COMPUTATIONS_META_DATA = "aws_lambda_computation_meta_data";
+    public static final String AWS_LAMBDA_COMPUTATIONS_META_DATA = "lambda_computation_meta_data";
     public static final String AWS_LAMBDA_FILE_PATH = "file_path";
     public static final String AWS_LAMBDA_FUNCTION_HANDLER = "function_handler";
     public static final String AWS_LAMBDA_FUNCTION_NAME = "function_name";
     public static final String AWS_LAMBDA_DESCRIPTION = "description";
-    public static final String AWS_LAMBDA_TIMEOUT = "timeout";
+    public static final String AWS_LAMBDA_TIMEOUT = "lambda_timeout";
     public static final String AWS_LAMBDA_MEMORY_SIZE = "memory_size";
     public static final String AWS_LAMBDA_RUNTIME = "runtime";
     public static final String AWS_LAMBDA_REGION = "region";

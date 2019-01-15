@@ -49,9 +49,8 @@ public class AWSLambdaComputationMetadataEntity extends ComputationMetadataEntit
     @Column(name = ModelConstants.AWS_LAMBDA_MEMORY_SIZE)
     private int memorySize;
 
-    @Enumerated(EnumType.STRING)
     @Column(name = ModelConstants.AWS_LAMBDA_REGION)
-    private RegionType region;
+    private String region;
 
     public AWSLambdaComputationMetadataEntity(){
         super();
@@ -79,7 +78,7 @@ public class AWSLambdaComputationMetadataEntity extends ComputationMetadataEntit
         this.timeout = awsLambdaComputationMetadata.getTimeout();
         this.memorySize = awsLambdaComputationMetadata.getMemorySize();
         if(awsLambdaComputationMetadata.getRegion() != null){
-            this.region = awsLambdaComputationMetadata.getRegion();
+            this.region = awsLambdaComputationMetadata.getRegion().getRegionName();
         }
     }
 
@@ -94,7 +93,7 @@ public class AWSLambdaComputationMetadataEntity extends ComputationMetadataEntit
         awsLambdaComputationMetadata.setDescription(this.description);
         awsLambdaComputationMetadata.setTimeout(this.timeout);
         awsLambdaComputationMetadata.setMemorySize(this.memorySize);
-        awsLambdaComputationMetadata.setRegion(this.region);
+        awsLambdaComputationMetadata.setRegion(RegionType.valueOf(this.region));
 
         return awsLambdaComputationMetadata;
     }

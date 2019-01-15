@@ -21,7 +21,6 @@ import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.regions.Regions;
 import com.amazonaws.services.kinesis.AmazonKinesisAsync;
 import com.amazonaws.services.kinesis.AmazonKinesisAsyncClientBuilder;
-import com.amazonaws.services.kinesis.model.DescribeStreamResult;
 import com.amazonaws.services.lambda.AWSLambda;
 import com.amazonaws.services.lambda.AWSLambdaClientBuilder;
 import com.amazonaws.services.lambda.model.*;
@@ -47,8 +46,6 @@ public class AWSLambdaFunctionService implements ServerlessFunctionService {
 
     @Value("${aws.lambda.role_arn}")
     private String lambdaRoleArn;
-
-    BasicAWSCredentials awsCreds = new BasicAWSCredentials(awsAccesskey, awsSecretKey);
 
     @Override
     public boolean deployFunction(Computations computations) {
@@ -105,6 +102,7 @@ public class AWSLambdaFunctionService implements ServerlessFunctionService {
     public boolean createTrigger(ComputationJob computationJob) {
         KinesisLambdaTrigger triggerConfig = (KinesisLambdaTrigger)computationJob.getConfiguration();
         try{
+            BasicAWSCredentials awsCreds = new BasicAWSCredentials(awsAccesskey, awsSecretKey);
             AWSLambda awsLambda = getAwsLambdaClient(triggerConfig.getRegion().getRegionName());
 
             final AmazonKinesisAsync amazonKinesisAsync = AmazonKinesisAsyncClientBuilder.standard().withRegion(Regions.fromName(triggerConfig.getRegion().getRegionName()))
@@ -172,6 +170,7 @@ public class AWSLambdaFunctionService implements ServerlessFunctionService {
     }
 
     private AWSLambda getAwsLambdaClient(String regionName) {
+        BasicAWSCredentials awsCreds = new BasicAWSCredentials(awsAccesskey, awsSecretKey);
         return AWSLambdaClientBuilder.standard()
                 .withRegion(Regions.fromName(regionName))
                 .withCredentials(new AWSStaticCredentialsProvider(awsCreds)).build();
