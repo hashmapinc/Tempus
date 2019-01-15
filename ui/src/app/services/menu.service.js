@@ -440,7 +440,7 @@ function Menu(userService, $state, $rootScope, $log,datamodelService,customerSer
                                          type: 'link',
                                          state: 'home.templateeditor',
                                          icon: 'template_editor',
-                                         link: '/static/svg/template_1.svg'
+                                         link: '/static/svg/template.svg'
 
                                      }
                                   ]
