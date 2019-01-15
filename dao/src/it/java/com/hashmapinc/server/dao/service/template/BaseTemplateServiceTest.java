@@ -28,7 +28,7 @@ public abstract class BaseTemplateServiceTest extends AbstractServiceTest {
 
     @Test
     public void saveTemplate() {
-        TemplateMetadata givenTemplateMetadata = getTemplateMetadata();
+        TemplateMetadata givenTemplateMetadata = getTemplateMetadata("1");
         TemplateMetadata savedTemplateMetaData = templateService.save(givenTemplateMetadata);
         Assert.assertNotNull(savedTemplateMetaData.getId());
 
@@ -41,7 +41,7 @@ public abstract class BaseTemplateServiceTest extends AbstractServiceTest {
 
     @Test
     public void deleteTemplate() {
-        TemplateMetadata givenTemplateMetadata = getTemplateMetadata();
+        TemplateMetadata givenTemplateMetadata = getTemplateMetadata("1");
         TemplateMetadata savedTemplateMetadata = templateService.save(givenTemplateMetadata);
         Assert.assertNotNull(savedTemplateMetadata.getId());
 
@@ -52,13 +52,13 @@ public abstract class BaseTemplateServiceTest extends AbstractServiceTest {
 
     @Test
     public void getTemplates() {
-        TemplateMetadata givenTemplateMetadata1 = getTemplateMetadata();
+        TemplateMetadata givenTemplateMetadata1 = getTemplateMetadata("1");
         TemplateMetadata savedTemplateMetadata1 = templateService.save(givenTemplateMetadata1);
         Assert.assertNotNull(savedTemplateMetadata1.getId());
-        TemplateMetadata givenTemplateMetadata2 = getTemplateMetadata();
+        TemplateMetadata givenTemplateMetadata2 = getTemplateMetadata("2");
         TemplateMetadata savedTemplateMetadata2 = templateService.save(givenTemplateMetadata2);
         Assert.assertNotNull(savedTemplateMetadata2.getId());
-        TemplateMetadata givenTemplateMetadata3 = getTemplateMetadata();
+        TemplateMetadata givenTemplateMetadata3 = getTemplateMetadata("3");
         TemplateMetadata savedTemplateMetadata3 = templateService.save(givenTemplateMetadata3);
         Assert.assertNotNull(savedTemplateMetadata3.getId());
 
@@ -69,9 +69,9 @@ public abstract class BaseTemplateServiceTest extends AbstractServiceTest {
         Assert.assertEquals(1, templateMetadataPage.getData().size());
     }
 
-    private TemplateMetadata getTemplateMetadata() {
+    private TemplateMetadata getTemplateMetadata(String suffix) {
         TemplateMetadata templateMetadata = new TemplateMetadata();
-        templateMetadata.setName("templatename");
+        templateMetadata.setName("templatename" + suffix);
         templateMetadata.setBody("{templatebody}");
         return templateMetadata;
     }
