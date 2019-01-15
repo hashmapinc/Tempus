@@ -16,18 +16,21 @@
  */
 
 
-.tb-gateway-container{
-  margin-left: 1%;
-  margin-right: 3%;
-  width: 92.9%;
-}
-
-.tb-gateway-table{
-  width: 64% !important;
+.tb-template-table {
   background-color: white;
 }
 
-.tb-gateway-toolbar {
-  margin-left: 1%;
-  width: 959px;
+.tb-template-container{
+  margin-left: 3%;
+  margin-right: 3%;
+  width:93.9%
+}
+
+.tb-template-toolbar {
+  margin-left: 3%;
+  width:93.9%
+}
+
+.template-grid #tb-vertical-container{
+  top: 30px !important;
 }

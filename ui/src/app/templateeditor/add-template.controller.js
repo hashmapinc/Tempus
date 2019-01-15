@@ -21,13 +21,10 @@
 
 
 /*@ngInject*/
-export default function AddTemplateController($state, $stateParams, $scope, types, $mdDialog, saveItemFunction, helpLinks) {
+export default function AddTemplateController($scope, types, $mdDialog, saveItemFunction) {
 
     var vm = this;
-    vm.helpLinks = helpLinks;
     vm.item = {};
-    var customerId = $stateParams.customerId;
-
     vm.add = add;
     vm.cancel = cancel;
 
@@ -35,15 +32,8 @@ export default function AddTemplateController($state, $stateParams, $scope, type
         $mdDialog.cancel();
     }
 
-
     function add() {
-
-          vm.item.customerId = {
-               entityType: types.entityType.customer,
-               id: customerId
-           };
-
-        saveItemFunction(vm.item).then(function success(item) {
+       saveItemFunction(vm.item).then(function success(item) {
             vm.item = item;
             $scope.theForm.$setPristine();
             $mdDialog.hide();

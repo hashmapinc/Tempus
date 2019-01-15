@@ -16,29 +16,20 @@
  */
 
 import uiRouter from 'angular-ui-router';
-import tempusApiUserGroup from '../api/user-group.service';
-import tempusApiUser from '../api/user.service';
-import tempusApiCustomer from '../api/customer.service';
+import tempusApiTemplate from '../api/template.service';
 import tempusGrid from '../components/grid.directive';
-
-import TemplateeditorRoutes from './templateeditor.routes';
-import {TemplateEditorController} from './template_editor.controller';
+import TemplateRoutes from './template.routes';
+import {TemplateController} from './template.controller';
 import AddTemplateModelController from './add-template.controller';
-import EditorDirective from './editor.directive';
+import TemplateDirective from './template.directive';
 
-//import AddTemplateEditorController from './add_template_editor.controller';
-
-
-export default angular.module('tempus.gateway', [
+export default angular.module('tempus.templates', [
     uiRouter,
-    tempusApiUserGroup,
-    tempusApiUser,
-    tempusApiCustomer,
+    tempusApiTemplate,
     tempusGrid
 ])
-    .config(TemplateeditorRoutes)
-    .controller('TemplateEditorController',TemplateEditorController)
+    .config(TemplateRoutes)
+    .controller('TemplateController',TemplateController)
     .controller('AddTemplateModelController', AddTemplateModelController)
-    .directive('tbEditor', EditorDirective)
-    //.config('AddTemplateEditorController',AddTemplateEditorController)
+    .directive('tbTemplate', TemplateDirective)
     .name;

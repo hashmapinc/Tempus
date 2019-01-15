@@ -20,7 +20,7 @@
     <fieldset ng-disabled="loading || !isEdit">
         <md-input-container class="md-block">
             <label translate>templateEditor.name</label>
-            <input required name="name" ng-model="data.title">
+            <input required name="name" ng-model="data.name">
             <div ng-messages="theForm.name.$error">
                 <div translate ng-message="required">templateEditor.name-required</div>
             </div>
@@ -28,7 +28,7 @@
 
         <md-input-container class="md-block">
             <label translate>templateEditor.templateBody</label>
-            <textarea required ng-model="data.templateBody" rows="5" style="height: 120px; width: 100%; resize: none; font: inherit; padding: 0px; cursor: inherit; position: relative; border: none; outline: none; background-color: rgba(0, 0, 0, 0); color: rgb(33, 33, 33); -webkit-tap-highlight-color: rgba(0, 0, 0, 0); margin-top: 36px; margin-bottom: -36px; box-sizing: border-box;"></textarea>
+            <textarea required ng-model="data.body" rows="5"></textarea>
             <div ng-messages="theForm.name.$error">
                 <div translate ng-message="required">templateEditor.body-required</div>
             </div>

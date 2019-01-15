@@ -16,28 +16,10 @@
     limitations under the License.
 
 -->
-<!--
-
-    Copyright © 2016-2018 The Thingsboard Authors
-    Modifications © 2017-2018 Hashmap, Inc
-
-    Licensed under the Apache License, Version 2.0 (the "License");
-    you may not use this file except in compliance with the License.
-    You may obtain a copy of the License at
-
-        http://www.apache.org/licenses/LICENSE-2.0
-
-    Unless required by applicable law or agreed to in writing, software
-    distributed under the License is distributed on an "AS IS" BASIS,
-    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-    See the License for the specific language governing permissions and
-    limitations under the License.
-
--->
 
 <section layout="row" layout-align="center center" style="margin-left: 80%;">
 	<label class="tb-small" translate>templateEditor.grid</label>
-	<md-switch ng-change ="resetFilter();"class="device-switch" ng-model="tableView" aria-label="predefined-switcher" style="
+	<md-switch ng-change ="resetFilter();" ng-model="tableView" aria-label="predefined-switcher" style="
     margin-left: 4px;
     margin-right: -5px;
 ">
@@ -65,11 +47,11 @@
 		</md-button>
 	</div>
 </md-toolbar>
-<md-toolbar class="md-table-toolbar tb-device-toolbar md-default " ng-show="tableView && query.search === null">
+<md-toolbar class="md-table-toolbar tb-template-toolbar md-default " ng-show="tableView && query.search === null">
 
 	<div class="md-toolbar-tools">
 		<span flex></span>
-		<md-button class="md-icon-button" ng-click="addDevice($event)">
+		<md-button class="md-icon-button" ng-click="vm.addTemplate($event)">
 			<md-icon>add</md-icon>
 			<md-tooltip md-direction="top">
 				{{ 'action.add' | translate }}
@@ -91,46 +73,40 @@
 </md-toolbar>
 
 
-<md-table-container ng-show="tableView" class ="tb-device-container">
-	<table class="tb-device-table" md-table>
+<md-table-container ng-show="tableView" class ="tb-template-container">
+	<table class="tb-template-table" md-table>
 		<thead md-head md-order="query.order" md-on-reorder="onReorder">
 		<tr md-row>
 			<th md-column md-order-by="name"><span translate>templateEditor.name</span></th>
-			<th md-column md-order-by="type"><span translate>templateEditor.templateBody</span></th>
+			<th md-column><span translate>templateEditor.createdDate</span></th>
 
 		</tr>
 		</thead>
 		<tbody md-body>
-		<tr md-row >
-			<td md-cell><a href ng-click="deviceDetailFunc($event,device)">Name 1</a></td>
-			<td md-cell style="text-transform: uppercase">Decs 2</td>
+		<tr md-row  ng-repeat="template in templates.data">
+			<td md-cell><a href ng-click="templateDetailFunc($event,template)">{{template.name}}</a></td>
+			<td md-cell>{{template.createdTime | date :  'yyyy-MM-dd HH:mm:ss'}}</td>
 			<td md-cell>
-			 <span ng-click="deleteDevice($event, device)"> <ng-md-icon size="16" icon="delete"></ng-md-icon></span>  <span ng-click="deleteDevice($event, device)"><ng-md-icon size="16" icon="content_copy"></ng-md-icon></span>
+				<span title="Delete" style="cursor: pointer;" ng-click="vm.deletetemplate($event, template)"><ng-md-icon size="16" icon="delete"></ng-md-icon></span><span title="Copy" style="cursor: pointer;" ng-click="vm.copyEditor($event, template)"><ng-md-icon size="16" icon="content_copy"></ng-md-icon></span><span title="Edit" style="cursor: pointer;" ng-click="templateDetailFunc($event,template)"> <ng-md-icon size="16" icon="edit"></ng-md-icon></span>
 			</td>
-		</tr>
-		<tr md-row >
-			<td md-cell><a href ng-click="deviceDetailFunc($event,device)">Name 2</a></td>
-			<td md-cell style="text-transform: uppercase">Decs 2</td>
-			<td md-cell>
-				<span ng-click="deleteDevice($event, device)">  <ng-md-icon size="16" icon="delete"></ng-md-icon></span>  <span ng-click="deleteDevice($event, device)"><ng-md-icon size="16" icon="content_copy"></ng-md-icon></span>
-			</td>
+
 		</tr>
 
 		</tbody>
 	</table>
 </md-table-container>
 
-<md-table-pagination class ="tb-device-container" ng-show="tableView" md-limit="query.limit" md-limit-options="[5, 10, 15]"
-					 md-page="query.page" md-total="{{devices.count}}"
+<md-table-pagination class ="tb-template-container" ng-show="tableView && templates.data.length > 0" md-limit="query.limit" md-limit-options="[5, 10, 15]"
+					 md-page="query.page" md-total="{{templates.count}}"
 					 md-on-paginate="onPaginate" md-page-select>
 </md-table-pagination>
-<tb-grid grid-configuration="vm.templateEditorGridConfig" class="device-grid">
+<tb-grid  grid-configuration="vm.templateEditorGridConfig" class="template-grid">
 	<md-tabs ng-class="{'tb-headless': vm.grid.detailsConfig.isDetailsEditMode}"
 			 id="tabs" md-border-bottom flex class="tb-absolute-fill">
 		<md-tab label="{{ 'templateEditor.templateDetails' | translate }}">
-			<tb-editor data="vm.grid.operatingItem()"
+			<tb-template data="vm.grid.operatingItem()"
 						  is-edit="vm.grid.detailsConfig.isDetailsEditMode"
-						  the-form="vm.grid.detailsForm"></tb-editor>
+						  the-form="vm.grid.detailsForm"></tb-template>
 
 		</md-tab>
 	</md-tabs>

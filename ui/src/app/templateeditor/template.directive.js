@@ -16,32 +16,28 @@
  */
 /* eslint-disable import/no-unresolved, import/default */
 
-import editorTemplate from './editor.tpl.html';
+import templateFieldsetTemplate from './template-fieldset.tpl.html';
 
 /* eslint-enable import/no-unresolved, import/default */
 
 /*@ngInject*/
-export default function TemplateeditorRoutes($stateProvider) {
-    $stateProvider
-        .state('home.templateeditor', {
-            url: '/editor',
-            params: {'topIndex': 0},
-            module: 'private',
-            auth: ['TENANT_ADMIN'],
-            views: {
-                "content@home": {
-                    templateUrl: editorTemplate,
-                    controller: 'TemplateEditorController',
-                    controllerAs: 'vm'
-                }
-            }
-            ,
-             data: {
-                pageTitle: 'templateEditor.title'
-            },
-            ncyBreadcrumb: {
-                label: '{"icon": "template_editor", "label": "templateEditor.title"}'
-            }
-        })
+export default function TemplateDirective($compile, $templateCache) {
+    var linker = function (scope, element) {
+        var template = $templateCache.get(templateFieldsetTemplate);
+        element.html(template);
 
+        $compile(element.contents())(scope);
+    }
+    return {
+        restrict: "E",
+        link: linker,
+        scope: {
+            data: '=',
+            isEdit: '=',
+            applicationScope: '=',
+            theForm: '=',
+        }
+    };
 }
+
+
