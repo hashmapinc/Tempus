@@ -81,7 +81,7 @@ export function DeviceController($rootScope,userService, deviceService, customer
         search: null
     };
 
-
+    var pageNumber = 1;
     vm.deviceGridConfig = {
         deleteItemTitleFunc: deleteDeviceTitle,
         deleteItemContentFunc: deleteDeviceText,
@@ -156,14 +156,13 @@ export function DeviceController($rootScope,userService, deviceService, customer
         if (vm.devicesScope === 'tenant') {
             fetchDevicesFunction = function (pageLink, deviceType,pageNumber) {
                 $log.log("fetchDevicesFunction")
-                $log.log($scope.query.page)
                 $log.log(pageNumber)
-                if($scope.query.page == 1){
+                if(pageNumber == 1){
                     return deviceService.getTenantDevices(pageLink, true, null, deviceType,0);
                 }else {
-                    return deviceService.getTenantDevices(pageLink, true, null, deviceType,$scope.query.page - 1);
+                    return deviceService.getTenantDevices(pageLink, true, null, deviceType,pageNumber - 1);
                 }
-
+                //return deviceService.getTenantDevices(pageLink, true, null, deviceType,pageNumber);
             };
             deleteDeviceFunction = function (deviceId) {
                 return deviceService.deleteDevice(deviceId);
@@ -337,14 +336,16 @@ export function DeviceController($rootScope,userService, deviceService, customer
 
     }
 
-    loadTableData();
+    if($scope.tableView){
+        loadTableData();
+    }
+
 
     function loadTableData() {
         $log.log("loadTableData")
-        var promise = vm.deviceGridConfig.fetchItemsFunc({limit: $scope.query.limit, textSearch: ''}, false);
+        var promise = vm.deviceGridConfig.fetchItemsFunc({limit: $scope.query.limit, textSearch: ''}, false, pageNumber);
         if(promise) {
             promise.then(function success(items) {
-                $log.log(items)
                 $scope.devices.data = [];
                 var deviceSortList = $filter('orderBy')(items.data, $scope.query.order);
                 if ($scope.query.search != null) {
@@ -384,15 +385,22 @@ export function DeviceController($rootScope,userService, deviceService, customer
     }
 
     $scope.resetFilter = function() {
-
         $scope.query = {
             order: 'name',
             limit: $scope.query.limit,
             page: 1,
             search: null
         };
+        if($scope.tableView) {
+            loadTableData();
+        }/*else {
+            initController();
+            vm.deviceGridConfig.fetchItemsFunc = fetchDevicesFunction;
+            var promise = vm.deviceGridConfig.fetchItemsFunc({limit: $scope.query.limit, textSearch: ''}, false);
 
-        loadTableData();
+            $log.log(promise)
+            //vm.deviceGridConfig.fetchItemsFunc({limit: $scope.query.limit, textSearch: ''}, false);
+        }*/
     }
 
     vm.loadTableData = loadTableData;
@@ -409,7 +417,9 @@ export function DeviceController($rootScope,userService, deviceService, customer
     }
 
     $scope.onPaginate = function(page) {
+
         $scope.query.page = page;
+        pageNumber = page;
         loadTableData();
     }
 

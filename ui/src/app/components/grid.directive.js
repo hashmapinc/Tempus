@@ -140,7 +140,7 @@ function GridController($scope, $rootScope, $state, $mdDialog, $document, $q, $m
     }
 
     var pageSize = 2 * columns;
-    var pageNumber = 0;
+    var pageNumber = 1;
 
     vm.columns = columns;
 
@@ -218,7 +218,9 @@ function GridController($scope, $rootScope, $state, $mdDialog, $document, $q, $m
                     promise.then(
                         function success(items) {
                             $log.log("herer")
-                            $log.log(vm.items)
+                            $log.log(items)
+                            $log.log(vm.items.data);
+                            pageNumber = pageNumber + 1;
                             if (vm.items.reloadPending) {
                                 vm.items.pending = false;
                                 reload();
@@ -562,6 +564,7 @@ function GridController($scope, $rootScope, $state, $mdDialog, $document, $q, $m
         $log.log("refreshList")
         let preservedTopIndex = vm.topIndex;
         vm.items.data.length = 0;
+        pageNumber = 0;
         vm.items.rowData.length = 0;
         vm.items.nextPageLink = {
             limit: preservedTopIndex + pageSize,
