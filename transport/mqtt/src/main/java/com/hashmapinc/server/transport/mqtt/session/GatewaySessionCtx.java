@@ -296,11 +296,11 @@ public class GatewaySessionCtx {
     }
 
 
-    private void sendParentAssetMissingEmail(String deviceName , TenantId tenantId) throws TempusException {
+    private void sendParentAssetMissingEmail(String deviceName , TenantId tenantId) {
         try {
             mailService.sendAttributeMissingMail(deviceName,tenantId);
         }catch (TempusException tempusException) {
-            log.warn(tempusException.getMessage());
+            log.warn("Failed to send the  parentAssetMissingEmail of deviceName: [{}]",deviceName);
         }
     }
 
@@ -314,8 +314,7 @@ public class GatewaySessionCtx {
         if(asset.isEmpty()){
             try {
                 sendAssetNotPresentEmail(device.getName(),assetName, gateway.getTenantId());
-            }catch (Exception ex){
-                //Need to lod the exception exception
+            }catch (TempusException tempsuException){
                 log.warn("Failed to send the  parentAssetAttributeMissingEmail of deviceName: [{}]",device.getName()) ;
             }
         }

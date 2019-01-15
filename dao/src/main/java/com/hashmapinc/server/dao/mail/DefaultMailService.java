@@ -55,8 +55,8 @@ public class DefaultMailService implements MailService {
     public static final String MAIL_PROP = "mail.";
     public static final String TARGET_EMAIL = "targetEmail";
     public static final String UTF_8 = "UTF-8";
-    private static final String DEVICE_NAME = "deviceName";
-    private static final String ASSET_NAME = "assetName";
+    public static final String DEVICE_NAME = "deviceName";
+    public static final String ASSET_NAME = "assetName";
     @Autowired
     private MessageSource messages;
     
