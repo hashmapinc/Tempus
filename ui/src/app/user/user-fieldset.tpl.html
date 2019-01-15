@@ -50,7 +50,7 @@
             <label translate>user.description</label>
             <textarea ng-model="user.additionalInfo.description" rows="2"></textarea>
         </md-input-container>
-        <section class="tb-default-dashboard" flex layout="column" ng-if="user.id">
+        <section class="tb-default-dashboard" flex layout="column" ng-if="user.id && userAuthority != 'SYS_ADMIN'">
             <span class="tb-default-dashboard-label" ng-class="{'tb-disabled-label': $root.loading || !isEdit}" translate>user.default-dashboard</span>
             <section flex layout="column" layout-gt-sm="row">
                 <tb-dashboard-autocomplete ng-if="isTenantAdmin()"

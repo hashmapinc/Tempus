@@ -16,6 +16,8 @@
  */
 package com.hashmapinc.server.requests;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hashmapinc.server.common.data.User;
 import com.hashmapinc.server.common.data.id.CustomerId;
 import com.hashmapinc.server.common.data.id.TenantId;
@@ -40,7 +42,7 @@ public class IdentityUser {
     private String lastName;
     private List<String> authorities;
     private String clientId;
-    private Map<String, String> additionalDetails;
+    private Map<String, Object> additionalDetails;
     private boolean enabled;
 
     public IdentityUser(){}
@@ -64,8 +66,20 @@ public class IdentityUser {
         this.firstName = user.getFirstName();
         this.lastName = user.getLastName();
         this.enabled = user.isEnabled();
+        this.additionalDetails = convertJsonNode(user.getAdditionalInfo());
     }
 
+    private Map<String,Object> convertJsonNode(JsonNode additionalInfo) {
+        ObjectMapper mapper = new ObjectMapper();
+        Map<String, Object> additionalDetails = mapper.convertValue(additionalInfo, Map.class);
+        return  additionalDetails;
+    }
+
+    private JsonNode convertMapToJsonNode(Map<String, Object> additionalDetails){
+        ObjectMapper mapper = new ObjectMapper();
+        JsonNode jsonNodeMap = mapper.convertValue(additionalDetails, JsonNode.class);
+        return jsonNodeMap;
+    }
     public User toUser(){
         User user = new User();
         user.setId(new UserId(id));
@@ -80,6 +94,7 @@ public class IdentityUser {
         }
         user.setAuthority(Authority.parse(authorities.get(0)));
         user.setEnabled(enabled);
+        user.setAdditionalInfo(convertMapToJsonNode(additionalDetails));
         return user;
     }
 }

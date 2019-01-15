@@ -16,13 +16,9 @@
  */
 package com.hashmapinc.server.controller;
 
-import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import com.hashmapinc.server.common.data.Logo;
-import com.hashmapinc.server.common.data.Tenant;
-import com.hashmapinc.server.common.data.Theme;
-import com.hashmapinc.server.common.data.UserSettings;
+import com.hashmapinc.server.common.data.*;
 import com.hashmapinc.server.common.data.id.UserId;
 import com.hashmapinc.server.common.data.security.Authority;
 import com.hashmapinc.server.dao.logo.LogoService;

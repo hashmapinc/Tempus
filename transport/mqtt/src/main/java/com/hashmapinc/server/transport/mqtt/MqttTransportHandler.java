@@ -29,6 +29,8 @@ import com.hashmapinc.server.common.transport.adaptor.AdaptorException;
 import com.hashmapinc.server.common.transport.auth.DeviceAuthService;
 import com.hashmapinc.server.common.transport.quota.QuotaService;
 import com.hashmapinc.server.dao.EncryptionUtil;
+import com.hashmapinc.server.dao.asset.AssetService;
+import com.hashmapinc.server.dao.attributes.AttributesService;
 import com.hashmapinc.server.dao.device.DeviceService;
 import com.hashmapinc.server.dao.relation.RelationService;
 import com.hashmapinc.server.transport.mqtt.adaptors.MqttTransportAdaptor;
@@ -76,6 +78,8 @@ public class MqttTransportHandler extends ChannelInboundHandlerAdapter implement
     private final DeviceAuthService authService;
     private final RelationService relationService;
     private final QuotaService quotaService;
+    private final AttributesService attributesService;
+    private final AssetService assetService;
     private final SslHandler sslHandler;
     private static final String SPARK_PLUG_NAME_SPACE = "spBv1.0";
     private volatile boolean connected;
@@ -84,7 +88,7 @@ public class MqttTransportHandler extends ChannelInboundHandlerAdapter implement
     private SparkPlugUtils sparkPlugUtils;
 
     public MqttTransportHandler(SessionMsgProcessor processor, DeviceService deviceService, DeviceAuthService authService, RelationService relationService,
-                                MqttTransportAdaptor adaptor, SslHandler sslHandler, QuotaService quotaService) {
+                                MqttTransportAdaptor adaptor, SslHandler sslHandler, QuotaService quotaService , AttributesService attributesService ,AssetService assetService) {
         this.processor = processor;
         this.deviceService = deviceService;
         this.relationService = relationService;
@@ -94,6 +98,8 @@ public class MqttTransportHandler extends ChannelInboundHandlerAdapter implement
         this.sessionId = deviceSessionCtx.getSessionId().toUidStr();
         this.sslHandler = sslHandler;
         this.quotaService = quotaService;
+        this.attributesService = attributesService;
+        this.assetService = assetService;
     }
 
     @Override
@@ -450,7 +456,7 @@ public class MqttTransportHandler extends ChannelInboundHandlerAdapter implement
             JsonNode gatewayNode = infoNode.get("gateway");
             JsonNode topic = infoNode.get(TOPIC);
             if (gatewayNode != null && gatewayNode.asBoolean()) {
-                gatewaySessionCtx = new GatewaySessionCtx(processor, deviceService, authService, relationService, deviceSessionCtx);
+                gatewaySessionCtx = new GatewaySessionCtx(processor, deviceService, authService, relationService, deviceSessionCtx,attributesService,assetService);
                 if((msg.payload().willTopic() != null) && msg.payload().willTopic().startsWith(SPARK_PLUG_NAME_SPACE)){
                     sparkPlugDecodeService = new SparkPlugDecodeService();
                 }

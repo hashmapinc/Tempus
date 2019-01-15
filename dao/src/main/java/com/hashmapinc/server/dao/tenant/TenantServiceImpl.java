@@ -17,7 +17,6 @@
 package com.hashmapinc.server.dao.tenant;
 
 import com.google.common.util.concurrent.ListenableFuture;
-import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.hashmapinc.server.common.data.CustomerGroup;
 import com.hashmapinc.server.common.data.DataConstants;
@@ -61,6 +60,7 @@ public class TenantServiceImpl extends AbstractEntityService implements TenantSe
 
     private static final String DEFAULT_TENANT_REGION = "Global";
     public static final String INCORRECT_TENANT_ID = "Incorrect tenantId ";
+    private static final String DEFAULT_UNIT_SYSTEM = "SI";
 
     @Autowired
     private TenantDao tenantDao;
@@ -201,5 +201,37 @@ public class TenantServiceImpl extends AbstractEntityService implements TenantSe
             jsonObject.addProperty("logo","");
         }
         return jsonObject.toString();
+    }
+
+    @Override
+    public void saveUnitSystem(String unitSystem , TenantId tenantId) {
+        log.trace("Executing saveUnitSystem, unitSystem [{}], tenantId [{}]", unitSystem, tenantId);
+        Validator.validateEntityId(tenantId, INCORRECT_TENANT_ID + tenantId);
+        String foundUnitSystem = tenantDao.findUnitSystemByTenantId(tenantId.getId());
+        if (foundUnitSystem == null) {
+            tenantDao.saveUnitSystem(unitSystem , tenantId.getId());
+        } else if (!foundUnitSystem.equals(unitSystem)) {
+            tenantDao.updateUnitSystem(unitSystem, tenantId.getId());
+        }
+    }
+
+    @Override
+    public String findUnitSystemByTenantId(TenantId tenantId) {
+        log.trace("Executing findUnitSystemByTenantId, tenantId [{}]", tenantId);
+        Validator.validateEntityId(tenantId, INCORRECT_TENANT_ID + tenantId);
+        String unitSystemByUserId = tenantDao.findUnitSystemByTenantId(tenantId.getId());
+        if (unitSystemByUserId == null) {
+            unitSystemByUserId = DEFAULT_UNIT_SYSTEM;
+        }
+        JsonObject jsonObject = new JsonObject();
+        jsonObject.addProperty("unit_system",unitSystemByUserId);
+        return jsonObject.toString();
+    }
+
+    @Override
+    public void deleteUnitSystemByTenantId(TenantId tenantId) {
+        log.trace("Executing deleteUnitSystemByTenantId, tenantId [{}]", tenantId);
+        Validator.validateEntityId(tenantId, INCORRECT_TENANT_ID + tenantId);
+        tenantDao.deleteUnitSystemByTenantId(tenantId.getId());
     }
 }

@@ -80,7 +80,7 @@
                 ng-model="device.type"
                 entity-type="types.entityType.device">
         </tb-entity-subtype-autocomplete>
-        <md-input-container class="md-block">
+        <md-input-container class="md-block" ng-if = "authority !== 'CUSTOMER_USER'">
             <md-checkbox ng-disabled="$root.loading || !isEdit" flex aria-label="{{ 'device.is-gateway' | translate }}"
                          ng-model="device.additionalInfo.gateway">{{ 'device.is-gateway' | translate }}
             </md-checkbox>

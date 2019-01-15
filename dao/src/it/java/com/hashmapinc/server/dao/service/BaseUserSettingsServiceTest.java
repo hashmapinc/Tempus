@@ -16,7 +16,6 @@
  */
 package com.hashmapinc.server.dao.service;
 
-import com.datastax.driver.core.utils.UUIDs;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.hashmapinc.server.common.data.UUIDConverter;
@@ -25,11 +24,9 @@ import com.hashmapinc.server.common.data.UserSettings;
 import com.hashmapinc.server.common.data.id.UserId;
 import com.hashmapinc.server.common.data.security.Authority;
 import com.hashmapinc.server.dao.exception.DataValidationException;
-import com.hashmapinc.server.dao.settings.UserSettingsDao;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 
 public abstract class BaseUserSettingsServiceTest extends AbstractServiceTest {
 
