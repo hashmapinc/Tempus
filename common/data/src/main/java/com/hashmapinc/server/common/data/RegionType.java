@@ -47,6 +47,6 @@ public enum RegionType {
     }
 
     public String getRegionName() {
-        return regionName;
+        return this.regionName;
     }
 }

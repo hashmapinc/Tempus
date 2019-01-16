@@ -158,13 +158,6 @@ public class ComputationsController extends BaseController {
                                         @RequestPart("file") MultipartFile file) throws TempusException {
 
         try {
-            /*log.error("Inside {}", computationStr);
-
-            ObjectMapper mapper = new ObjectMapper();
-            Computations computation = mapper.readValue(computationStr, Computations.class);
-            log.error(computationStr);*/
-
-
             Computations computation = new Computations();
             computation.setName(functionName);
             computation.setTenantId(getCurrentUser().getTenantId());
@@ -180,7 +173,6 @@ public class ComputationsController extends BaseController {
                 computation.setComputationMetadata(md);
 
             }
-            log.error("{}", computation);
             final String uploadedFilePath = getUploadedFilePath(file, uploadPathLambda);
             ((AWSLambdaComputationMetadata)computation.getComputationMetadata()).setFilePath(uploadedFilePath);
             return awsLambdaComputationsFunctionService.add(computation, getCurrentUser().getTenantId());
