@@ -17,7 +17,6 @@
 package com.hashmapinc.server.transport.mqtt.adaptors;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
@@ -30,22 +29,16 @@ import com.hashmapinc.server.common.msg.session.*;
 import com.hashmapinc.server.common.transport.adaptor.AdaptorException;
 import com.hashmapinc.server.common.transport.adaptor.JsonConverter;
 import com.hashmapinc.server.transport.mqtt.MqttTopics;
+import com.hashmapinc.server.transport.mqtt.MqttTransportHandler;
 import com.hashmapinc.server.transport.mqtt.session.DeviceSessionCtx;
+import com.hashmapinc.server.transport.mqtt.sparkplug.SparkPlugEncodeService;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;
 import io.netty.buffer.UnpooledByteBufAllocator;
-import io.netty.handler.codec.mqtt.MqttPublishMessage;
-import io.netty.handler.codec.mqtt.MqttMessage;
-import io.netty.handler.codec.mqtt.MqttFixedHeader;
-import io.netty.handler.codec.mqtt.MqttQoS;
-import io.netty.handler.codec.mqtt.MqttMessageType;
-import io.netty.handler.codec.mqtt.MqttPublishVariableHeader;
+import io.netty.handler.codec.mqtt.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-import com.hashmapinc.server.transport.mqtt.MqttTransportHandler;
-import com.hashmapinc.server.transport.mqtt.sparkplug.SparkPlugEncodeService;
 
-import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.*;
 

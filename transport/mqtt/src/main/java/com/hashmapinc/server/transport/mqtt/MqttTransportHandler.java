@@ -221,7 +221,7 @@ public class MqttTransportHandler extends ChannelInboundHandlerAdapter implement
             } else if (topicName.equals(MqttTopics.DEVICE_ATTRIBUTES_TOPIC)) {
                 msg = adaptor.convertToActorMsg(deviceSessionCtx, MsgType.POST_ATTRIBUTES_REQUEST, mqttMsg);
             } else if (topicName.equals(MqttTopics.DEVICE_EVENT_TOPIC)) {
-                saveEventForDevice(mqttMsg);//adaptor.convertToActorMsg(deviceSessionCtx, MsgType.POST_DEVICE_EVENT, mqttMsg));
+                saveEventForDevice(mqttMsg);
             } else if (topicName.startsWith(MqttTopics.DEVICE_ATTRIBUTES_REQUEST_TOPIC_PREFIX)) {
                 msg = adaptor.convertToActorMsg(deviceSessionCtx, MsgType.GET_ATTRIBUTES_REQUEST, mqttMsg);
                 if (msgId >= 0) {
