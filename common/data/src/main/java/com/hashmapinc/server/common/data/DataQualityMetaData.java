@@ -25,5 +25,5 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class DataQualityMetaData {
     private String token;
-    private String mandatoryTags;
+    private String metaData;
 }

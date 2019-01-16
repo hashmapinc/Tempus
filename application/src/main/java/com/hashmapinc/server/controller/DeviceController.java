@@ -447,13 +447,13 @@ public class DeviceController extends BaseController {
             checkParameter(DEVICE_ID, strDeviceId);
 
             DeviceId deviceId = new DeviceId(toUUID(strDeviceId));
-            String mandatoryTags = "";
-            Optional<AttributeKvEntry> attributeKvEntry = attributesService.find(deviceId, DataConstants.SHARED_SCOPE, "mandatory_tags").get();
+            String metaData = "";
+            Optional<AttributeKvEntry> attributeKvEntry = attributesService.find(deviceId, DataConstants.SHARED_SCOPE, "quality_meta_data").get();
             if (attributeKvEntry.isPresent())
-                mandatoryTags = attributeKvEntry.get().getValueAsString();
+                metaData = attributeKvEntry.get().getValueAsString();
 
             DeviceCredentials credentials = deviceCredentialsService.findDeviceCredentialsByDeviceId(deviceId);
-            return new DataQualityMetaData(credentials.getCredentialsId(), mandatoryTags);
+            return new DataQualityMetaData(credentials.getCredentialsId(), metaData);
         } catch (Exception e) {
             throw handleException(e);
         }
