@@ -66,6 +66,7 @@ import com.hashmapinc.server.dao.plugin.PluginService;
 import com.hashmapinc.server.dao.relation.RelationService;
 import com.hashmapinc.server.dao.rule.RuleService;
 import com.hashmapinc.server.dao.settings.UserSettingsService;
+import com.hashmapinc.server.dao.template.TemplateService;
 import com.hashmapinc.server.dao.tenant.TenantService;
 import com.hashmapinc.server.dao.theme.ThemeService;
 import com.hashmapinc.server.dao.timeseries.TimeseriesService;
@@ -146,6 +147,9 @@ public abstract class AbstractServiceTest {
 
     @Autowired
     protected PluginService pluginService;
+
+    @Autowired
+    protected TemplateService templateService;
 
     @Autowired
     protected RuleService ruleService;

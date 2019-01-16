@@ -74,6 +74,8 @@ public class EntityIdFactory {
                 return new CustomerGroupId(uuid);
             case TEMPUS_GATEWAY_CONFIGURATION:
                 return new TempusGatewayConfigurationId(uuid);
+            case TEMPLATE:
+                return new TemplateId(uuid);
         }
         throw new IllegalArgumentException("EntityType " + type + " is not supported!");
     }

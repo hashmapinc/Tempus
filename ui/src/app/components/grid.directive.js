@@ -538,7 +538,13 @@ function GridController($scope, $rootScope, $state, $mdDialog, $document, $q, $m
        vm.clickItemFunc(data[0],data[1]);
     });
 
+   var gridTableTemplate = $rootScope.$on("CallTableDetailTemplate", function($event, data){
+          vm.clickItemFunc(data[0],data[1]);
+   });
+
+
     $scope.$on('$destroy', gridTableDevice);
+    $scope.$on('$destroy', gridTableTemplate);
 
     vm.onGridInited(vm);
 
@@ -628,6 +634,7 @@ function GridController($scope, $rootScope, $state, $mdDialog, $document, $q, $m
             vm.detailsConfig.currentItem = detailsItem;
             vm.detailsConfig.isDetailsEditMode = false;
             vm.detailsConfig.isDetailsOpen = true;
+
         });
     }
 
@@ -706,14 +713,15 @@ function GridController($scope, $rootScope, $state, $mdDialog, $document, $q, $m
                 vm.parentCtl.loadTableData();
             }
             var index = vm.detailsConfig.currentItem.index;
-            item.index = index;
-            vm.detailsConfig.currentItem = item;
-            vm.items.data[index] = item;
-            var row = Math.floor(index / vm.columns);
-            var itemRow = vm.items.rowData[row];
-            var column = index % vm.columns;
-            itemRow[column] = item;
-
+            if(angular.isDefined(index)) {
+                item.index = index;
+                vm.detailsConfig.currentItem = item;
+                vm.items.data[index] = item;
+                var row = Math.floor(index / vm.columns);
+                var itemRow = vm.items.rowData[row];
+                var column = index % vm.columns;
+                itemRow[column] = item;
+            }
         });
         }
 

@@ -14,10 +14,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.hashmapinc.server.common.data;
 
 
-public enum EntityType {
-    TENANT, CUSTOMER, USER, RULE, PLUGIN, DASHBOARD, ASSET, DEVICE, ALARM, COMPUTATION, COMPUTATION_JOB, NODE_METRIC, THEME, LOGO,
-    DATA_MODEL_OBJECT, DATA_MODEL, CUSTOMER_GROUP, TEMPUS_GATEWAY_CONFIGURATION, TEMPLATE
+.tb-template-table {
+  background-color: white;
+}
+
+.tb-template-container{
+  margin-left: 3%;
+  margin-right: 3%;
+  width:93.9%
+}
+
+.tb-template-toolbar {
+  margin-left: 3%;
+  width:93.9%
+}
+
+.template-grid #tb-vertical-container{
+  top: 30px !important;
 }

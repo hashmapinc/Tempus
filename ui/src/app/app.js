@@ -79,9 +79,11 @@ import tempusClusterInfo from './api/cluster-info.service';
 import tempusApiComputation from './api/computation.service';
 import tempusApiComputationJob from './api/computation-job.service';
 import tempusDataModels from './data_models';
+import tempusTemplates from './templateeditor';
 import tempusgateway from './tempusgateway';
 import tempusMetadata from './metadata';
 import tempusApiAuditLog from './api/audit-log.service';
+
 
 import 'typeface-roboto';
 import 'font-awesome/css/font-awesome.min.css';
@@ -152,6 +154,7 @@ angular.module('tempus', [
     tempusgateway,
     tempusMetadata,
     tempusApiAuditLog,
+    tempusTemplates,
     uiRouter])
     .config(AppConfig)
     .factory('globalInterceptor', GlobalInterceptor)
