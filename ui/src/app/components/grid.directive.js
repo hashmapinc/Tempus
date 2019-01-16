@@ -140,6 +140,7 @@ function GridController($scope, $rootScope, $state, $mdDialog, $document, $q, $m
     }
 
     var pageSize = 10 * columns;
+    var pageNumber = 1;
 
     vm.columns = columns;
 
@@ -210,11 +211,18 @@ function GridController($scope, $rootScope, $state, $mdDialog, $document, $q, $m
 
         fetchMoreItems_: function () {
             if (vm.items.hasNext && !vm.items.pending) {
-                var promise = vm.fetchItemsFunc(vm.items.nextPageLink, $scope.searchConfig.searchEntitySubtype);
+                var promise;
+                //Pagination is implmented for device only
+                if(angular.isDefined(vm.config.entityType) && vm.config.entityType === 'device'){
+                    promise = vm.fetchItemsFunc(vm.items.nextPageLink, $scope.searchConfig.searchEntitySubtype,pageNumber);
+                } else  {
+                    promise = vm.fetchItemsFunc(vm.items.nextPageLink, $scope.searchConfig.searchEntitySubtype);
+                }
                 if (promise) {
                     vm.items.pending = true;
                     promise.then(
                         function success(items) {
+                            pageNumber = pageNumber + 1;
                             if (vm.items.reloadPending) {
                                 vm.items.pending = false;
                                 reload();
@@ -295,7 +303,9 @@ function GridController($scope, $rootScope, $state, $mdDialog, $document, $q, $m
                                     }
                                     itemRow.push(item);
                                 }
-                                vm.items.nextPageLink = items.nextPageLink;
+                                if(items.nextPageLink) {
+                                    vm.items.nextPageLink = items.nextPageLink;
+                                }
                                 vm.items.hasNext = items.hasNext;
                                 if (vm.items.hasNext) {
                                     vm.items.nextPageLink.limit = pageSize;
@@ -557,6 +567,7 @@ function GridController($scope, $rootScope, $state, $mdDialog, $document, $q, $m
     function refreshList() {
         let preservedTopIndex = vm.topIndex;
         vm.items.data.length = 0;
+        pageNumber = 1;
         vm.items.rowData.length = 0;
         vm.items.nextPageLink = {
             limit: preservedTopIndex + pageSize,
