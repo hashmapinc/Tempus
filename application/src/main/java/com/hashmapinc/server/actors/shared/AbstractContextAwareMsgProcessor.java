@@ -121,7 +121,12 @@ public abstract class AbstractContextAwareMsgProcessor {
 
     public <C> C decode(String configuration, Class<C> configurationClazz) throws IOException {
         logger.info("Initializing using configuration: {}", configuration);
-        return mapper.readValue(configuration, configurationClazz);
+        try {
+            return mapper.readValue(configuration, configurationClazz);
+        } catch (Exception e) {
+            logger.info("Object mapping exception occurred {}", e);
+        }
+        return null;
     }
 
     @Data

@@ -79,6 +79,21 @@ metadata:
     ## TODO We need to extract secrets from here
     password: identity
 
+dataquality:
+  name: redtail-data-quality-service
+  replicaCount: 1
+  image:
+    repository: hashmapinc/redtail-data-quality-service
+    tag: latest
+    pullPolicy: Always
+  app:
+    port: 9004
+  service:
+    type: ClusterIP
+    port: 80
+  pdb:
+    minAvailable: 1
+
 resources: {}
   # We usually recommend not to specify default resources and to leave this as a conscious
   # choice for the user. This also increases chances charts run on environments with little

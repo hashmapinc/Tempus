@@ -28,6 +28,7 @@ import com.hashmapinc.server.extensions.kafka.action.KafkaActionMsg;
 import com.hashmapinc.server.extensions.kafka.action.KafkaActionPayload;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.kafka.clients.producer.Callback;
 import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 
@@ -35,7 +36,7 @@ import org.apache.kafka.clients.producer.ProducerRecord;
 @Slf4j
 public class KafkaMsgHandler implements RuleMsgHandler {
 
-    private final Producer<?, String> producer;
+    private final Producer<String, String> producer;
 
     @Override
     public void process(PluginContext ctx, TenantId tenantId, RuleId ruleId, RuleToPluginMsg<?> msg) throws RuleException {
@@ -45,18 +46,18 @@ public class KafkaMsgHandler implements RuleMsgHandler {
         KafkaActionPayload payload = ((KafkaActionMsg) msg).getPayload();
         log.debug("Processing kafka payload: {}", payload);
         try {
-            producer.send(new ProducerRecord<>(payload.getTopic(), payload.getMsgBody()),
-                    (metadata, e) -> {
-                        if (payload.isSync()) {
-                            if (metadata != null) {
-                                ctx.reply(new ResponsePluginToRuleMsg(msg.getUid(), tenantId, ruleId,
-                                        BasicStatusCodeResponse.onSuccess(payload.getMsgType(), payload.getRequestId())));
-                            } else {
-                                ctx.reply(new ResponsePluginToRuleMsg(msg.getUid(), tenantId, ruleId,
-                                        BasicStatusCodeResponse.onError(payload.getMsgType(), payload.getRequestId(), e)));
-                            }
-                        }
-                    });
+            Callback callback = (metadata, e) -> {
+                if (payload.isSync()) {
+                    if (metadata != null) {
+                        ctx.reply(new ResponsePluginToRuleMsg(msg.getUid(), tenantId, ruleId,
+                                BasicStatusCodeResponse.onSuccess(payload.getMsgType(), payload.getRequestId())));
+                    } else {
+                        ctx.reply(new ResponsePluginToRuleMsg(msg.getUid(), tenantId, ruleId,
+                                BasicStatusCodeResponse.onError(payload.getMsgType(), payload.getRequestId(), e)));
+                    }
+                }
+            };
+            producer.send(new ProducerRecord<String, String>(payload.getTopic(), msg.getDeviceId().toString(), payload.getMsgBody()), callback);
         } catch (Exception e) {
             throw new RuleException(e.getMessage(), e);
         }
