@@ -14,20 +14,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.hashmapinc.server.extensions.core.filter;
+package com.hashmapinc.server.common.data;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.AllArgsConstructor;
 import lombok.Data;
-
+import lombok.NoArgsConstructor;
 
 @Data
-public class JsFilterConfiguration {
-
-    private final String filter;
-
-    @JsonCreator
-    public JsFilterConfiguration(@JsonProperty(value = "filter", required = true) String filter) {
-        this.filter = filter;
-    }
+@AllArgsConstructor
+public class TelemetryDataToKafka {
+    private Long ts;
+    private String tag;
+    private String value;
 }

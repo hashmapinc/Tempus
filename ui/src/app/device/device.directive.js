@@ -21,7 +21,6 @@ import deviceFieldsetTemplate from './device-fieldset.tpl.html';
 /* eslint-enable import/no-unresolved, import/default */
 
 /*@ngInject*/
-
 export default function DeviceDirective($compile,$rootScope,$templateCache,datamodelService, toast, $translate, types, clipboardService, deviceService, customerService) {
     var linker = function (scope, element) {
         var template = $templateCache.get(deviceFieldsetTemplate);
@@ -34,6 +33,7 @@ export default function DeviceDirective($compile,$rootScope,$templateCache,datam
         scope.assignedDataModelObject = null;
         scope.isAssignedToDataModel = false;
         scope.assignedToDataModelObject = false;
+
 
         scope.authority = $rootScope.authority;
 
@@ -74,7 +74,6 @@ export default function DeviceDirective($compile,$rootScope,$templateCache,datam
                     scope.assignedToDataModelObject = false;
                     scope.assignedDataModelObject = null;
                 }
-
             }
         });
 
