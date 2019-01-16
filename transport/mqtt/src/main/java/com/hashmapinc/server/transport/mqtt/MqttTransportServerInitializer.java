@@ -18,6 +18,7 @@ package com.hashmapinc.server.transport.mqtt;
 
 import com.hashmapinc.server.dao.asset.AssetService;
 import com.hashmapinc.server.dao.attributes.AttributesService;
+import com.hashmapinc.server.dao.mail.MailService;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.socket.SocketChannel;
@@ -45,10 +46,11 @@ public class MqttTransportServerInitializer extends ChannelInitializer<SocketCha
     private final QuotaService quotaService;
     private final AttributesService attributesService;
     private final AssetService assetService;
+    private final MailService mailService;
 
     public MqttTransportServerInitializer(SessionMsgProcessor processor, DeviceService deviceService, DeviceAuthService authService, RelationService relationService,
                                           MqttTransportAdaptor adaptor, MqttSslHandlerProvider sslHandlerProvider,
-                                          QuotaService quotaService, AttributesService attributesService ,AssetService assetService) {
+                                          QuotaService quotaService, AttributesService attributesService ,AssetService assetService,MailService mailService) {
         this.processor = processor;
         this.deviceService = deviceService;
         this.authService = authService;
@@ -58,6 +60,7 @@ public class MqttTransportServerInitializer extends ChannelInitializer<SocketCha
         this.quotaService = quotaService;
         this.attributesService = attributesService;
         this.assetService = assetService;
+        this.mailService = mailService;
     }
 
     @Override
@@ -72,7 +75,7 @@ public class MqttTransportServerInitializer extends ChannelInitializer<SocketCha
         pipeline.addLast("encoder", MqttEncoder.INSTANCE);
 
         MqttTransportHandler handler = new MqttTransportHandler(processor, deviceService, authService, relationService,
-                adaptor, sslHandler, quotaService, attributesService, assetService);
+                adaptor, sslHandler, quotaService, attributesService, assetService, mailService);
 
         pipeline.addLast(handler);
         ch.closeFuture().addListener(handler);

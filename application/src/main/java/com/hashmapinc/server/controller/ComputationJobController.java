@@ -22,7 +22,7 @@ import com.hashmapinc.server.common.data.computation.ComputationJob;
 import com.hashmapinc.server.common.data.id.ComputationId;
 import com.hashmapinc.server.common.data.id.ComputationJobId;
 import com.hashmapinc.server.common.data.plugin.ComponentLifecycleEvent;
-import com.hashmapinc.server.exception.TempusException;
+import com.hashmapinc.server.common.data.exception.TempusException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -30,7 +30,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-import static com.hashmapinc.server.exception.TempusErrorCode.ITEM_NOT_FOUND;
+import static com.hashmapinc.server.common.data.exception.TempusErrorCode.ITEM_NOT_FOUND;
 
 @Slf4j
 @RestController

@@ -25,7 +25,9 @@ import com.google.gson.JsonSyntaxException;
 import com.hashmapinc.server.common.data.DataConstants;
 import com.hashmapinc.server.common.data.Device;
 import com.hashmapinc.server.common.data.asset.Asset;
+import com.hashmapinc.server.common.data.exception.TempusException;
 import com.hashmapinc.server.common.data.id.SessionId;
+import com.hashmapinc.server.common.data.id.TenantId;
 import com.hashmapinc.server.common.data.kv.AttributeKvEntry;
 import com.hashmapinc.server.common.data.kv.BaseAttributeKvEntry;
 import com.hashmapinc.server.common.data.relation.EntityRelation;
@@ -41,6 +43,7 @@ import com.hashmapinc.server.common.transport.auth.DeviceAuthService;
 import com.hashmapinc.server.dao.asset.AssetService;
 import com.hashmapinc.server.dao.attributes.AttributesService;
 import com.hashmapinc.server.dao.device.DeviceService;
+import com.hashmapinc.server.dao.mail.MailService;
 import com.hashmapinc.server.dao.relation.RelationService;
 import com.hashmapinc.server.transport.mqtt.sparkplug.data.SparkPlugDecodedMsg;
 import io.netty.channel.ChannelHandlerContext;
@@ -77,10 +80,11 @@ public class GatewaySessionCtx {
     private final RelationService relationService;
     private final AttributesService attributesService;
     private final AssetService assetService;
+    private final MailService mailService;
     private final Map<String, GatewayDeviceSessionCtx> devices;
     private ChannelHandlerContext channel;
 
-    public GatewaySessionCtx(SessionMsgProcessor processor, DeviceService deviceService, DeviceAuthService authService, RelationService relationService, DeviceSessionCtx gatewaySessionCtx, AttributesService attributesService , AssetService assetService) {
+    public GatewaySessionCtx(SessionMsgProcessor processor, DeviceService deviceService, DeviceAuthService authService, RelationService relationService, DeviceSessionCtx gatewaySessionCtx, AttributesService attributesService , AssetService assetService, MailService mailService) {
         this.processor = processor;
         this.deviceService = deviceService;
         this.authService = authService;
@@ -89,6 +93,7 @@ public class GatewaySessionCtx {
         this.gatewaySessionId = gatewaySessionCtx.getSessionId();
         this.attributesService = attributesService;
         this.assetService = assetService;
+        this.mailService = mailService;
         this.devices = new HashMap<>();
     }
 
@@ -265,15 +270,20 @@ public class GatewaySessionCtx {
                 Set<AttributeKvEntry> attributeKvEntries = request.getAttributes();
 
                 Optional<AttributeKvEntry> parentAssetAttribute = findParentAssetAttribute(attributeKvEntries);
-                if(parentAssetAttribute.isPresent()) {
-                    Device device = deviceService.findDeviceByTenantIdAndName(gateway.getTenantId(), deviceName);
-                    try {
-                        Optional<AttributeKvEntry> savedParentAssetAttribute = attributesService.find(device.getId(), DataConstants.CLIENT_SCOPE, PARENT_ASSET).get();
+
+                Device device = deviceService.findDeviceByTenantIdAndName(gateway.getTenantId(), deviceName);
+                try {
+                    Optional<AttributeKvEntry> savedParentAssetAttribute = attributesService.find(device.getId(), DataConstants.CLIENT_SCOPE, PARENT_ASSET).get();
+
+                    if (parentAssetAttribute.isPresent()) {
                         savedParentAssetAttribute.ifPresent(attributeKvEntry -> deleteParentAssetRelation(device, attributeKvEntry));
-                        createParentAssetRelationWithDevice(device,parentAssetAttribute.get().getValueAsString());
+                        createParentAssetRelationWithDevice(device, parentAssetAttribute.get().getValueAsString());
                     }
-                    catch(Exception exp) {
-                        log.warn("Failed to fetch parentAssetAttribute : [{}]", parentAssetAttribute.get().getKey());                    }
+                    else if (savedParentAssetAttribute.isEmpty())
+                        sendParentAssetMissingEmail(deviceName, gateway.getTenantId());
+
+                }catch (Exception exp){
+                    log.warn("Failed to fetch parentAssetAttribute : [{}]", parentAssetAttribute.get().getKey());
                 }
 
                 GatewayDeviceSessionCtx deviceSessionCtx = devices.get(deviceName);
@@ -285,12 +295,33 @@ public class GatewaySessionCtx {
         }
     }
 
+
+    private void sendParentAssetMissingEmail(String deviceName , TenantId tenantId) {
+        try {
+            mailService.sendAttributeMissingMail(deviceName,tenantId);
+        }catch (TempusException tempusException) {
+            log.warn("Failed to send the  parentAssetMissingEmail of deviceName: [{}]",deviceName);
+        }
+    }
+
     private void createParentAssetRelationWithDevice(Device device,String assetName) {
         Optional<Asset> asset = assetService.findAssetByTenantIdAndName(gateway.getTenantId(),assetName);
         asset.ifPresent(asset1 -> {
             EntityRelation relation = new EntityRelation(device.getId(), asset1.getId(), EntityRelation.CONTAINS_TYPE);
             relationService.saveRelation(relation);
         });
+
+        if(asset.isEmpty()){
+            try {
+                sendAssetNotPresentEmail(device.getName(),assetName, gateway.getTenantId());
+            }catch (TempusException tempsuException){
+                log.warn("Failed to send the  parentAssetAttributeMissingEmail of deviceName: [{}]",device.getName()) ;
+            }
+        }
+    }
+
+    private void sendAssetNotPresentEmail(String deviceName ,String assetName, TenantId tenantId) throws TempusException {
+        mailService.sendAssetNotPresentMail(deviceName,assetName,tenantId);
     }
 
     private void deleteParentAssetRelation(Device device ,AttributeKvEntry  parentAssetAttribute) {

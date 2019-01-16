@@ -18,6 +18,7 @@ package com.hashmapinc.server.transport.mqtt;
 
 import com.hashmapinc.server.dao.asset.AssetService;
 import com.hashmapinc.server.dao.attributes.AttributesService;
+import com.hashmapinc.server.dao.mail.MailService;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.EventLoopGroup;
@@ -73,6 +74,9 @@ public class MqttTransportService {
     @Autowired(required = false)
     private AssetService assetService;
 
+    @Autowired(required = false)
+    private MailService mailService;
+
     @Value("${mqtt.bind_address}")
     private String host;
     @Value("${mqtt.bind_port}")
@@ -108,7 +112,7 @@ public class MqttTransportService {
         b.group(bossGroup, workerGroup)
                 .channel(NioServerSocketChannel.class)
                 .childHandler(new MqttTransportServerInitializer(processor, deviceService, authService, relationService,
-                        adaptor, sslHandlerProvider, quotaService,attributesService, assetService));
+                        adaptor, sslHandlerProvider, quotaService,attributesService, assetService,mailService));
 
         serverChannel = b.bind(host, port).sync().channel();
         log.info("Mqtt transport started!");

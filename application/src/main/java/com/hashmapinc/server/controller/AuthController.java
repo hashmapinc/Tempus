@@ -41,9 +41,9 @@ import org.springframework.security.oauth2.client.token.grant.password.ResourceO
 import org.springframework.web.bind.annotation.*;
 import com.hashmapinc.server.common.data.User;
 import com.hashmapinc.server.common.data.security.UserCredentials;
-import com.hashmapinc.server.exception.TempusErrorCode;
-import com.hashmapinc.server.exception.TempusException;
-import com.hashmapinc.server.service.mail.MailService;
+import com.hashmapinc.server.common.data.exception.TempusErrorCode;
+import com.hashmapinc.server.common.data.exception.TempusException;
+import com.hashmapinc.server.dao.mail.MailService;
 import com.hashmapinc.server.service.security.model.SecurityUser;
 import org.springframework.web.client.RestTemplate;
 import javax.servlet.http.HttpServletRequest;

@@ -14,11 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.hashmapinc.server.service.mail;
-
-import com.hashmapinc.server.exception.TempusException;
+package com.hashmapinc.server.dao.mail;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.hashmapinc.server.common.data.exception.TempusException;
+import com.hashmapinc.server.common.data.id.TenantId;
 
 public interface MailService {
 
@@ -35,5 +35,8 @@ public interface MailService {
     void sendResetPasswordEmail(String passwordResetLink, String email) throws TempusException;
     
     void sendPasswordWasResetEmail(String loginLink, String email) throws TempusException;
-    
+
+    void sendAttributeMissingMail(String deviceName , TenantId tenantId) throws TempusException;
+
+    void sendAssetNotPresentMail(String deviceName ,String assetName, TenantId tenantId) throws TempusException;
 }
