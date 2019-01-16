@@ -52,7 +52,7 @@ export function DeviceCardController(types) {
 
 /*@ngInject*/
 export function DeviceController($rootScope,userService, deviceService, customerService, $state, $stateParams,
-                                 $document, $mdDialog, $q, $translate, types, $scope, $filter, entityRelationService, $log) {
+                                 $document, $mdDialog, $q, $translate, types, $scope, $filter, entityRelationService) {
 
     var customerId = $stateParams.customerId;
 
@@ -76,7 +76,7 @@ export function DeviceController($rootScope,userService, deviceService, customer
 
     $scope.query = {
         order: 'name',
-        limit: 5,
+        limit: 15,
         page: 1,
         search: null
     };
@@ -156,8 +156,6 @@ export function DeviceController($rootScope,userService, deviceService, customer
 
         if (vm.devicesScope === 'tenant') {
             fetchDevicesFunction = function (pageLink, deviceType,pageNumber) {
-                $log.log("fetchDevicesFunction")
-                $log.log(pageNumber)
                 if(pageNumber == 1){
                     return deviceService.getTenantDevices(pageLink, true, null, deviceType,0);
                 }else {
@@ -392,14 +390,7 @@ export function DeviceController($rootScope,userService, deviceService, customer
         };
         if($scope.tableView) {
             loadTableData();
-        }/*else {
-            initController();
-            vm.deviceGridConfig.fetchItemsFunc = fetchDevicesFunction;
-            var promise = vm.deviceGridConfig.fetchItemsFunc({limit: $scope.query.limit, textSearch: ''}, false);
-
-            $log.log(promise)
-            //vm.deviceGridConfig.fetchItemsFunc({limit: $scope.query.limit, textSearch: ''}, false);
-        }*/
+        }
     }
 
     vm.loadTableData = loadTableData;
@@ -416,7 +407,6 @@ export function DeviceController($rootScope,userService, deviceService, customer
     }
 
     $scope.onPaginate = function(page) {
-
         $scope.query.page = page;
         pageNumber = page;
         loadTableData();

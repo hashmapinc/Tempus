@@ -139,7 +139,7 @@ function GridController($scope, $rootScope, $state, $mdDialog, $document, $q, $m
         columns = 4;
     }
 
-    var pageSize = 2 * columns;
+    var pageSize = 10 * columns;
     var pageNumber = 1;
 
     vm.columns = columns;
@@ -524,7 +524,6 @@ function GridController($scope, $rootScope, $state, $mdDialog, $document, $q, $m
             currentItem: null,
             editingItem: null
         };
-        //vm.entityType =
     }
 
     $scope.$on('searchTextUpdated', function () {
