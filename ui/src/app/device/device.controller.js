@@ -156,11 +156,7 @@ export function DeviceController($rootScope,userService, deviceService, customer
 
         if (vm.devicesScope === 'tenant') {
             fetchDevicesFunction = function (pageLink, deviceType,pageNumber) {
-                if(pageNumber == 1){
-                    return deviceService.getTenantDevices(pageLink, true, null, deviceType,0);
-                }else {
-                    return deviceService.getTenantDevices(pageLink, true, null, deviceType,pageNumber - 1);
-                }
+                return deviceService.getTenantDevices(pageLink, true, null, deviceType,pageNumber - 1);
             };
             deleteDeviceFunction = function (deviceId) {
                 return deviceService.deleteDevice(deviceId);
@@ -248,12 +244,7 @@ export function DeviceController($rootScope,userService, deviceService, customer
 
         } else if (vm.devicesScope === 'customer' || vm.devicesScope === 'customer_user') {
             fetchDevicesFunction = function (pageLink, deviceType,pageNumber) {
-                if(pageNumber == 1){
-                    return deviceService.getCustomerDevices(customerId, pageLink, true, null, deviceType, 0);
-                }else{
-                    return deviceService.getCustomerDevices(customerId, pageLink, true, null, deviceType, pageNumber - 1);
-                }
-
+               return deviceService.getCustomerDevices(customerId, pageLink, true, null, deviceType, pageNumber - 1);
             };
             deleteDeviceFunction = function (deviceId) {
                 return deviceService.unassignDeviceFromCustomer(deviceId);
