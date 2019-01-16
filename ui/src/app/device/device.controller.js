@@ -76,7 +76,7 @@ export function DeviceController($rootScope,userService, deviceService, customer
 
     $scope.query = {
         order: 'name',
-        limit: 15,
+        limit: 5,
         page: 1,
         search: null
     };

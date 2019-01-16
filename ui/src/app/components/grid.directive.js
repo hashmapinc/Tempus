@@ -211,7 +211,8 @@ function GridController($scope, $rootScope, $state, $mdDialog, $document, $q, $m
 
         fetchMoreItems_: function () {
             if (vm.items.hasNext && !vm.items.pending) {
-                $log.log("111")
+                $log.log("111");
+                $log.log($scope)
                 var promise = vm.fetchItemsFunc(vm.items.nextPageLink, $scope.searchConfig.searchEntitySubtype,pageNumber);
                 if (promise) {
                     vm.items.pending = true;
@@ -564,7 +565,7 @@ function GridController($scope, $rootScope, $state, $mdDialog, $document, $q, $m
         $log.log("refreshList")
         let preservedTopIndex = vm.topIndex;
         vm.items.data.length = 0;
-        pageNumber = 0;
+        pageNumber = 1;
         vm.items.rowData.length = 0;
         vm.items.nextPageLink = {
             limit: preservedTopIndex + pageSize,
