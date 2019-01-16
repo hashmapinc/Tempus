@@ -18,33 +18,33 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ .Values.data-quality.name }}
+  name: {{ .Values.dataquality.name }}
   labels:
-    app: {{ .Values.data-quality.name }}
+    app: {{ .Values.dataquality.name }}
 spec:
-  type: {{ .Values.data-quality.service.type }}
+  type: {{ .Values.dataquality.service.type }}
   ports:
-    - port: {{ .Values.data-quality.service.port }}
+    - port: {{ .Values.dataquality.service.port }}
       targetPort: http
       protocol: TCP
       name: http
   selector:
-    app: {{ .Values.data-quality.name }}
+    app: {{ .Values.dataquality.name }}
 ---
 apiVersion: policy/v1beta1
 kind: PodDisruptionBudget
 metadata:
-  name: {{ .Values.data-quality.name }}
+  name: {{ .Values.dataquality.name }}
 spec:
   selector:
     matchLabels:
-      app: {{ .Values.data-quality.name }}
-  minAvailable: {{ .Values.data-quality.pdb.minAvailable }}
+      app: {{ .Values.dataquality.name }}
+  minAvailable: {{ .Values.dataquality.pdb.minAvailable }}
 ---
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: {{ .Values.data-quality.name }}
+  name: {{ .Values.dataquality.name }}
 data:
   identity.base.url: "http://{{ .Values.identity.name }}:{{ .Values.identity.service.port }}/uaa"
   tempus.url: "http://{{ .Values.identity.name }}:{{ .Values.identity.service.port }}/uaa"
@@ -53,40 +53,40 @@ data:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ .Values.data-quality.name }}
+  name: {{ .Values.dataquality.name }}
   labels:
-    app: {{ .Values.data-quality.name }}
+    app: {{ .Values.dataquality.name }}
 spec:
-  replicas: {{ .Values.data-quality.replicaCount }}
+  replicas: {{ .Values.dataquality.replicaCount }}
   selector:
     matchLabels:
-      app: {{ .Values.data-quality.name }}
+      app: {{ .Values.dataquality.name }}
   template:
     metadata:
       labels:
-        app: {{ .Values.data-quality.name }}
+        app: {{ .Values.dataquality.name }}
     spec:
       containers:
-        - name: {{ .Values.data-quality.name }}
-          image: "{{ .Values.data-quality.image.repository }}:{{ .Values.data-quality.image.tag }}"
-          imagePullPolicy: {{ .Values.data-quality.image.pullPolicy }}
-          ports:
-            - name: http
-              containerPort: {{ .Values.data-quality.app.port }}
-              protocol: TCP
-          env:
-            - name: IDENTITY_BASE_URL
-              valueFrom:
-                configMapKeyRef:
-                  name: {{ .Values.data-quality.name }}
-                  key: identity.base.url
-            - name: TEMPUS_MQTT_URL
-              valueFrom:
-                configMapKeyRef:
-                  name: {{ .Values.data-quality.name }}
-                  key: mqtt.url
-            - name: TEMPUS_URL
-                valueFrom:
-                  configMapKeyRef:
-                    name: {{ .Values.data-quality.name }}
-                    key: mqtt.url
+      - name: {{ .Values.dataquality.name }}
+        image: "{{ .Values.dataquality.image.repository }}:{{ .Values.dataquality.image.tag }}"
+        imagePullPolicy: {{ .Values.dataquality.image.pullPolicy }}
+        ports:
+        - name: http
+          containerPort: {{ .Values.dataquality.app.port }}
+          protocol: TCP
+        env:
+        - name: IDENTITY_BASE_URL
+          valueFrom:
+            configMapKeyRef:
+              name: {{ .Values.dataquality.name }}
+              key: identity.base.url
+        - name: TEMPUS_MQTT_URL
+          valueFrom:
+            configMapKeyRef:
+              name: {{ .Values.dataquality.name }}
+              key: mqtt.url
+        - name: TEMPUS_URL
+          valueFrom:
+            configMapKeyRef:
+              name: {{ .Values.dataquality.name }}
+              key: mqtt.url

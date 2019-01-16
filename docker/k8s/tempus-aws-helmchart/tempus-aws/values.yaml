@@ -79,7 +79,7 @@ metadata:
     ## TODO We need to extract secrets from here
     password: identity
 
-data-quality:
+dataquality:
   name: redtail-data-quality-service
   replicaCount: 1
   image:
