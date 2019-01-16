@@ -235,7 +235,7 @@ export function TemplateController($scope, userGroupService, $filter, $rootScope
            var count = copyCount(template, vm.templateName);
             copyName = "("+(count.highestcopy+1)+")";
              vm.item ={
-               name:template.name.replace(/(\[.*?\]|\(.*?\)) */g, "") +copyName,
+               name:template.name.replace(/\(.*\)/, '')+copyName,
                body:template.body
              }
 
@@ -256,7 +256,7 @@ export function TemplateController($scope, userGroupService, $filter, $rootScope
         var regex = /\([^)]*\)/g;
 
         for (var i = 0; i < templateList.length; i++) {
-            if (templateList[i].replace(/(\[.*?\]|\(.*?\)) */g, "") === template.name.replace(/(\[.*?\]|\(.*?\)) */g, "")) {
+            if (templateList[i].replace(/\(.*\)/, '') === template.name.replace(/\(.*\)/, '')) {
                 count++;
                 var matches = regExp.exec(templateList[i]);
                 if(matches == null){
