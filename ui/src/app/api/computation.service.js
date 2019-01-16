@@ -66,7 +66,12 @@ function ComputationService($http, $q, $filter, utils, $log) {
         $log.log(computation);
         var deferred = $q.defer();
         var fd = new FormData();
-        fd.append("computation", computation);
+        delete(computation.importData);
+        delete(computation.fileName);
+        //delete(computation.computationMetadata.type);
+        //fd.append("computation", angular.toJson(computation));
+        var obj = computation.computationMetadata;
+        obj.type = computation.type;
         fd.append("file", file);
         var url = '/api/computations/lambda';
         $http.post(url, fd, {
@@ -74,7 +79,8 @@ function ComputationService($http, $q, $filter, utils, $log) {
             headers: {
                 'Content-Type': undefined,
                 'Accept':'application/json'
-            }
+            },
+            params: obj
         }).then(function success(response) {
             deferred.resolve(response.data);
         }, function fail() {

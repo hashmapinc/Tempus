@@ -638,7 +638,7 @@ export default angular.module('tempus.types', [])
             computationType: {
                 spark: "SPARK",
                 kubeless: "KUBELESS",
-                lambda: "AWS-LAMBDA"
+                lambda: "LAMBDA"
             },
             runtimeTypes: {
                 python27: {

@@ -37,4 +37,18 @@ public class AWSLambdaComputationMetadata extends ComputationMetadata {
     public AWSLambdaComputationMetadata() {
         super();
     }
+
+    public AWSLambdaComputationMetadata(AWSLambdaComputationMetadata md) {
+        super(md);
+        this.filePath = md.filePath;
+        this.functionName = md.functionName;
+        this.functionHandler = md.functionHandler;
+        this.runtime = md.runtime;
+        this.description = md.description;
+        this.timeout = md.timeout;
+        this.memorySize = md.memorySize;
+        this.region = md.region;
+    }
+
+
 }

@@ -18,6 +18,7 @@ package com.hashmapinc.server.controller;
 
 import com.datastax.driver.core.utils.UUIDs;
 import com.hashmapinc.server.common.data.EntityType;
+import com.hashmapinc.server.common.data.RegionType;
 import com.hashmapinc.server.common.data.audit.ActionType;
 import com.hashmapinc.server.common.data.computation.*;
 import com.hashmapinc.server.common.data.id.ComputationId;
@@ -32,6 +33,7 @@ import com.hashmapinc.server.exception.TempusException;
 import com.hashmapinc.server.service.computation.*;
 import com.hashmapinc.server.service.security.model.SecurityUser;
 import lombok.extern.slf4j.Slf4j;
+import org.codehaus.jackson.map.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
@@ -146,14 +148,44 @@ public class ComputationsController extends BaseController {
     @PreAuthorize("hasAuthority('TENANT_ADMIN')")
     @PostMapping(value = "/computations/lambda", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
-    public Computations addComputations(@RequestParam("computation") Computations computation, @RequestParam("file") MultipartFile file) throws TempusException {
+    public Computations addComputations(@RequestParam("type") String type,
+                                        @RequestParam("functionHandler") String functionHandler,
+                                        @RequestParam("functionName") String functionName,
+                                        @RequestParam("region") String region,
+                                        @RequestParam("runtime") String runtime,
+                                        @RequestParam("memorySize") int memorySize,
+                                        @RequestParam("timeout") int timeout,
+                                        @RequestPart("file") MultipartFile file) throws TempusException {
 
         try {
+            /*log.error("Inside {}", computationStr);
+
+            ObjectMapper mapper = new ObjectMapper();
+            Computations computation = mapper.readValue(computationStr, Computations.class);
+            log.error(computationStr);*/
+
+
+            Computations computation = new Computations();
+            computation.setName(functionName);
+            computation.setTenantId(getCurrentUser().getTenantId());
+            computation.setType(ComputationType.valueOf(type));
+
+            if(ComputationType.valueOf(type).equals(ComputationType.LAMBDA)) {
+                AWSLambdaComputationMetadata md = new AWSLambdaComputationMetadata();
+                md.setFunctionName(functionName);
+                md.setFunctionHandler(functionHandler);
+                md.setRuntime(runtime);
+                md.setTimeout(timeout);
+                md.setRegion(RegionType.valueOf(region));
+                computation.setComputationMetadata(md);
+
+            }
+            log.error("{}", computation);
             final String uploadedFilePath = getUploadedFilePath(file, uploadPathLambda);
             ((AWSLambdaComputationMetadata)computation.getComputationMetadata()).setFilePath(uploadedFilePath);
             return awsLambdaComputationsFunctionService.add(computation, getCurrentUser().getTenantId());
         } catch (Exception e) {
-            logEntityAction(emptyId(EntityType.COMPUTATION), computation, null,
+            logEntityAction(emptyId(EntityType.COMPUTATION), null, null,
                     ActionType.ADDED, e);
             log.info("Exception is : " + e);
             throw handleException(e);
