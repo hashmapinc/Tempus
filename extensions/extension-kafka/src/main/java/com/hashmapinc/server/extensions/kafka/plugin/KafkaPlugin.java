@@ -17,14 +17,14 @@
 package com.hashmapinc.server.extensions.kafka.plugin;
 
 import com.hashmapinc.server.common.msg.exception.TempusRuntimeException;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.kafka.clients.producer.KafkaProducer;
-import org.apache.kafka.clients.producer.Producer;
 import com.hashmapinc.server.extensions.api.component.Plugin;
 import com.hashmapinc.server.extensions.api.plugins.AbstractPlugin;
 import com.hashmapinc.server.extensions.api.plugins.PluginContext;
 import com.hashmapinc.server.extensions.api.plugins.handlers.RuleMsgHandler;
 import com.hashmapinc.server.extensions.kafka.action.KafkaPluginAction;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.kafka.clients.producer.KafkaProducer;
+import org.apache.kafka.clients.producer.Producer;
 
 import java.util.Properties;
 
@@ -34,7 +34,7 @@ import java.util.Properties;
 public class KafkaPlugin extends AbstractPlugin<KafkaPluginConfiguration> {
 
     private KafkaMsgHandler handler;
-    private Producer<?, String> producer;
+    private Producer<String, String> producer;
     private final Properties properties = new Properties();
 
     @Override
@@ -56,7 +56,7 @@ public class KafkaPlugin extends AbstractPlugin<KafkaPluginConfiguration> {
 
     private void init() {
         try {
-            this.producer = new KafkaProducer<>(properties);
+            this.producer = new KafkaProducer<String, String>(properties);
             this.handler = new KafkaMsgHandler(producer);
         } catch (Exception e) {
             log.error("Failed to start kafka producer", e);
