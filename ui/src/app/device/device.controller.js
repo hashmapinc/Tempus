@@ -90,6 +90,7 @@ export function DeviceController($rootScope,userService, deviceService, customer
         deleteItemsContentFunc: deleteDevicesText,
 
         saveItemFunc: saveDevice,
+        entityType: 'device',
 
         getItemTitleFunc: getDeviceTitle,
 
@@ -162,7 +163,6 @@ export function DeviceController($rootScope,userService, deviceService, customer
                 }else {
                     return deviceService.getTenantDevices(pageLink, true, null, deviceType,pageNumber - 1);
                 }
-                //return deviceService.getTenantDevices(pageLink, true, null, deviceType,pageNumber);
             };
             deleteDeviceFunction = function (deviceId) {
                 return deviceService.deleteDevice(deviceId);
@@ -249,11 +249,11 @@ export function DeviceController($rootScope,userService, deviceService, customer
 
 
         } else if (vm.devicesScope === 'customer' || vm.devicesScope === 'customer_user') {
-            fetchDevicesFunction = function (pageLink, deviceType) {
-                if($scope.query.page == 1){
+            fetchDevicesFunction = function (pageLink, deviceType,pageNumber) {
+                if(pageNumber == 1){
                     return deviceService.getCustomerDevices(customerId, pageLink, true, null, deviceType, 0);
                 }else{
-                    return deviceService.getCustomerDevices(customerId, pageLink, true, null, deviceType, $scope.query.page - 1);
+                    return deviceService.getCustomerDevices(customerId, pageLink, true, null, deviceType, pageNumber - 1);
                 }
 
             };
@@ -342,7 +342,6 @@ export function DeviceController($rootScope,userService, deviceService, customer
 
 
     function loadTableData() {
-        $log.log("loadTableData")
         var promise = vm.deviceGridConfig.fetchItemsFunc({limit: $scope.query.limit, textSearch: ''}, false, pageNumber);
         if(promise) {
             promise.then(function success(items) {

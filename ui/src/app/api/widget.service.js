@@ -56,7 +56,7 @@ export default angular.module('tempus.api.widget', ['oc.lazyLoad', tempusLedLigh
     .name;
 
 /*@ngInject*/
-function WidgetService($rootScope, $http, $q, $filter, $ocLazyLoad, $window, $translate, types, utils, $log) {
+function WidgetService($rootScope, $http, $q, $filter, $ocLazyLoad, $window, $translate, types, utils) {
 
     $window.$ = $;
     $window.jQuery = $;
@@ -317,8 +317,6 @@ function WidgetService($rootScope, $http, $q, $filter, $ocLazyLoad, $window, $tr
         if (!allWidgetsBundles) {
             var url = '/api/widgetsBundles';
             $http.get(url, config).then(function success(response) {
-                $log.log("wudgett service");
-                $log.log(response);
                 allWidgetsBundles = response.data;
                 systemWidgetsBundles = [];
                 tenantWidgetsBundles = [];
