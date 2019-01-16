@@ -24,12 +24,14 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
 import com.hashmapinc.server.common.data.DataConstants;
 import com.hashmapinc.server.common.data.Device;
+import com.hashmapinc.server.common.data.Event;
 import com.hashmapinc.server.common.data.asset.Asset;
 import com.hashmapinc.server.common.data.exception.TempusException;
 import com.hashmapinc.server.common.data.id.SessionId;
 import com.hashmapinc.server.common.data.id.TenantId;
 import com.hashmapinc.server.common.data.kv.AttributeKvEntry;
 import com.hashmapinc.server.common.data.kv.BaseAttributeKvEntry;
+import com.hashmapinc.server.common.data.kv.KvEntry;
 import com.hashmapinc.server.common.data.relation.EntityRelation;
 import com.hashmapinc.server.common.data.relation.RelationTypeGroup;
 import com.hashmapinc.server.common.msg.core.*;
@@ -37,23 +39,23 @@ import com.hashmapinc.server.common.msg.exception.TempusRuntimeException;
 import com.hashmapinc.server.common.msg.session.BasicAdaptorToSessionActorMsg;
 import com.hashmapinc.server.common.msg.session.BasicToDeviceActorSessionMsg;
 import com.hashmapinc.server.common.msg.session.ctrl.SessionCloseMsg;
+import com.hashmapinc.server.common.transport.SessionMsgProcessor;
 import com.hashmapinc.server.common.transport.adaptor.AdaptorException;
 import com.hashmapinc.server.common.transport.adaptor.JsonConverter;
 import com.hashmapinc.server.common.transport.auth.DeviceAuthService;
 import com.hashmapinc.server.dao.asset.AssetService;
 import com.hashmapinc.server.dao.attributes.AttributesService;
 import com.hashmapinc.server.dao.device.DeviceService;
+import com.hashmapinc.server.dao.event.EventService;
 import com.hashmapinc.server.dao.mail.MailService;
 import com.hashmapinc.server.dao.relation.RelationService;
+import com.hashmapinc.server.transport.mqtt.MqttTransportHandler;
 import com.hashmapinc.server.transport.mqtt.sparkplug.data.SparkPlugDecodedMsg;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.mqtt.MqttMessage;
 import io.netty.handler.codec.mqtt.MqttPublishMessage;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.StringUtils;
-import com.hashmapinc.server.common.transport.SessionMsgProcessor;
-import com.hashmapinc.server.transport.mqtt.MqttTransportHandler;
-import com.hashmapinc.server.common.data.kv.KvEntry;
 
 import java.io.IOException;
 import java.util.*;
@@ -83,12 +85,16 @@ public class GatewaySessionCtx {
     private final MailService mailService;
     private final Map<String, GatewayDeviceSessionCtx> devices;
     private ChannelHandlerContext channel;
+    private final EventService eventService;
 
-    public GatewaySessionCtx(SessionMsgProcessor processor, DeviceService deviceService, DeviceAuthService authService, RelationService relationService, DeviceSessionCtx gatewaySessionCtx, AttributesService attributesService , AssetService assetService, MailService mailService) {
+    public GatewaySessionCtx(SessionMsgProcessor processor, DeviceService deviceService, DeviceAuthService authService,
+                             RelationService relationService, EventService eventService, DeviceSessionCtx gatewaySessionCtx,
+                             AttributesService attributesService , AssetService assetService, MailService mailService) {
         this.processor = processor;
         this.deviceService = deviceService;
         this.authService = authService;
         this.relationService = relationService;
+        this.eventService = eventService;
         this.gateway = gatewaySessionCtx.getDevice();
         this.gatewaySessionId = gatewaySessionCtx.getSessionId();
         this.attributesService = attributesService;
@@ -235,6 +241,36 @@ public class GatewaySessionCtx {
             }
         } else {
             throw new JsonSyntaxException(CAN_T_PARSE_VALUE + json);
+        }
+    }
+
+    public void onDeviceEventMsg(MqttPublishMessage mqttMsg) throws AdaptorException {
+        JsonElement json = validateJsonPayload(gatewaySessionId, mqttMsg.payload());
+        if (json.isJsonObject()) {
+            JsonObject jsonObj = json.getAsJsonObject();
+            for (Map.Entry<String, JsonElement> deviceEntry : jsonObj.entrySet()) {
+                Device device = deviceService.findDeviceByTenantIdAndName(gateway.getTenantId(), deviceEntry.getKey());
+                if (device != null) {
+                    saveDeviceEventInfo(device, deviceEntry.getValue().toString());
+                }
+            }
+        } else {
+            throw new JsonSyntaxException(CAN_T_PARSE_VALUE + json);
+        }
+    }
+
+    public void saveDeviceEventInfo(Device device, String strEventInfo) {
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            JsonNode eventInfo = mapper.readTree(strEventInfo);
+            Event event = new Event();
+            event.setEntityId(device.getId());
+            event.setTenantId(device.getTenantId());
+            event.setType("QUALITY_EVENT");
+            event.setBody(eventInfo);
+            eventService.save(event);
+        } catch (IOException e) {
+            log.info("Object mapping execption {}", e);
         }
     }
 

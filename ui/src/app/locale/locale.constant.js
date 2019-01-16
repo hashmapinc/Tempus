@@ -882,6 +882,7 @@ export default angular.module('tempus.locale', [])
                     "type-error": "Error",
                     "type-lc-event": "Lifecycle event",
                     "type-stats": "Statistics",
+                    "type-quality-issue": "Quality Issue",
                     "no-events-prompt": "No events found",
                     "error": "Error",
                     "alarm": "Alarm",
@@ -894,7 +895,9 @@ export default angular.module('tempus.locale', [])
                     "success": "Success",
                     "failed": "Failed",
                     "messages-processed": "Messages processed",
-                    "errors-occurred": "Errors occurred"
+                    "errors-occurred": "Errors occurred",
+                    "issue": "Issue",
+                    "value": "Value"
                 },
                 "extension": {
                     "extensions": "Extensions",

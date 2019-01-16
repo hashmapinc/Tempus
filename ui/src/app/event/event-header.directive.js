@@ -19,6 +19,7 @@
 import eventHeaderLcEventTemplate from './event-header-lc-event.tpl.html';
 import eventHeaderStatsTemplate from './event-header-stats.tpl.html';
 import eventHeaderErrorTemplate from './event-header-error.tpl.html';
+import eventHeaderQualityTemplate from './event-header-quality-issue.tpl.html';
 
 /* eslint-enable import/no-unresolved, import/default */
 
@@ -38,6 +39,9 @@ export default function EventHeaderDirective($compile, $templateCache, types) {
                     break;
                 case types.eventType.error.value:
                     template = eventHeaderErrorTemplate;
+                    break;
+                case types.eventType.qualityEvent.value:
+                    template = eventHeaderQualityTemplate;
                     break;
             }
             return $templateCache.get(template);
