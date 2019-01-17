@@ -99,9 +99,7 @@ import static com.hashmapinc.server.dao.model.ModelConstants.NULL_UUID;
 @ContextConfiguration(classes = {AbstractServiceTest.class, UserServiceTestConfiguration.class}, loader = AnnotationConfigContextLoader.class)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 @Configuration
-@ComponentScan(basePackages = {"com.hashmapinc.server"} ,excludeFilters =
-@ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, value = DefaultMailService.class))
-
+@ComponentScan("com.hashmapinc.server")
 public abstract class AbstractServiceTest {
 
     protected ObjectMapper mapper = new ObjectMapper();
