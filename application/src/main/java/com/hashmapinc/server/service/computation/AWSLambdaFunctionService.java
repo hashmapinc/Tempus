@@ -29,9 +29,13 @@ import com.hashmapinc.server.common.data.computation.ComputationJob;
 import com.hashmapinc.server.common.data.computation.Computations;
 import com.hashmapinc.server.common.data.computation.KinesisLambdaTrigger;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.io.FileInputStream;
+import java.io.InputStream;
+import java.nio.ByteBuffer;
 import java.util.List;
 
 @Service
@@ -53,12 +57,14 @@ public class AWSLambdaFunctionService implements ServerlessFunctionService {
 
         try {
             AWSLambda awsLambda = getAwsLambdaClient(metadata.getRegion());
+            final ByteBuffer fileByteBuffer = ByteBuffer.wrap(IOUtils.toByteArray(new FileInputStream(metadata.getFilePath())));
 
             final CreateFunctionResult lambdaFunction = awsLambda.createFunction(new CreateFunctionRequest()
                     .withFunctionName(metadata.getFunctionName())
                     .withDescription(metadata.getDescription())
                     .withHandler(metadata.getFunctionHandler())
                     .withRuntime(metadata.getRuntime())
+                    .withCode(new FunctionCode().withZipFile(fileByteBuffer))
                     .withRole(lambdaRoleArn)
                     .withMemorySize(metadata.getMemorySize())
                     .withTimeout(metadata.getTimeout())
@@ -138,7 +144,10 @@ public class AWSLambdaFunctionService implements ServerlessFunctionService {
             log.info("AWS Kinesis trigger exists");
             return eventSourceMappings.size() == 1;
 
-        }catch (Exception e){
+        }catch (ResourceNotFoundException e){
+            log.info("Function not found ", e);
+            return false;
+        } catch (Exception e) {
             log.error("Error while checking AWS Kinesis trigger ", e);
             return false;
         }

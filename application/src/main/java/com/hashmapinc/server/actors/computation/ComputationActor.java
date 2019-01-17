@@ -91,16 +91,16 @@ public class ComputationActor extends ContextAwareActor {
     }
 
     private void checkOrDeployLambdaFunction() {
-        boolean functionPresent = systemContext.getKubelessFunctionService().checkFunction(computation);
-        if (!functionPresent) {
-            try {
-                if(!systemContext.getAwsLambdaFunctionService().deployFunction(computation)){
-                    systemContext.getComputationsService().deleteById(computationId);
-                }
-
-            } catch (Exception e ){
-                logger.info("Exeption occured while deploying kubeless function : ", e);
+        try {
+            boolean functionPresent = systemContext.getAwsLambdaFunctionService().checkFunction(computation);
+            if (!functionPresent) {
+                    if(!systemContext.getAwsLambdaFunctionService().deployFunction(computation)){
+                        systemContext.getComputationsService().deleteById(computationId);
+                    }
             }
+        } catch (Exception e ){
+            systemContext.getComputationsService().deleteById(computationId);
+            logger.info("Exeption occured while deploying kubeless function : ", e);
         }
     }
 
