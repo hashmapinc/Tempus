@@ -16,6 +16,8 @@
  */
 package com.hashmapinc.server.dao.computations;
 
+import com.hashmapinc.server.common.data.computation.AWSLambdaComputationMetadata;
+import com.hashmapinc.server.common.data.computation.ComputationType;
 import com.hashmapinc.server.common.data.page.TextPageLink;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +28,7 @@ import com.hashmapinc.server.common.data.id.TenantId;
 import com.hashmapinc.server.common.data.page.TextPageData;
 import com.hashmapinc.server.dao.entity.AbstractEntityService;
 
+import java.io.File;
 import java.util.List;
 import java.util.Optional;
 
@@ -69,6 +72,13 @@ public class BaseComputationsService extends AbstractEntityService implements Co
 
     @Override
     public void deleteById(ComputationId computationId) {
+        Computations computations = findById(computationId);
+        if (computations != null && computations.getType().equals(ComputationType.LAMBDA)) {
+            AWSLambdaComputationMetadata computationMetadata = (AWSLambdaComputationMetadata) computations.getComputationMetadata();
+            String filePath = computationMetadata.getFilePath();
+            File file = new File(filePath);
+            file.delete();
+        }
         computationsDao.deleteById(computationId);
     }
 

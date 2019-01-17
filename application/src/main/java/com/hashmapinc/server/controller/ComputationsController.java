@@ -18,7 +18,6 @@ package com.hashmapinc.server.controller;
 
 import com.datastax.driver.core.utils.UUIDs;
 import com.hashmapinc.server.common.data.EntityType;
-import com.hashmapinc.server.common.data.RegionType;
 import com.hashmapinc.server.common.data.audit.ActionType;
 import com.hashmapinc.server.common.data.computation.*;
 import com.hashmapinc.server.common.data.id.ComputationId;
@@ -33,7 +32,6 @@ import com.hashmapinc.server.exception.TempusException;
 import com.hashmapinc.server.service.computation.*;
 import com.hashmapinc.server.service.security.model.SecurityUser;
 import lombok.extern.slf4j.Slf4j;
-import org.codehaus.jackson.map.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
@@ -169,7 +167,8 @@ public class ComputationsController extends BaseController {
                 md.setFunctionHandler(functionHandler);
                 md.setRuntime(runtime);
                 md.setTimeout(timeout);
-                md.setRegion(RegionType.valueOf(region));
+                md.setRegion(region);
+                md.setMemorySize(memorySize);
                 computation.setComputationMetadata(md);
 
             }

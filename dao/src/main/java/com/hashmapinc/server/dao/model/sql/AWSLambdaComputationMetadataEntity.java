@@ -16,12 +16,13 @@
  */
 package com.hashmapinc.server.dao.model.sql;
 
-import com.hashmapinc.server.common.data.RegionType;
 import com.hashmapinc.server.common.data.computation.AWSLambdaComputationMetadata;
 import com.hashmapinc.server.common.data.id.ComputationId;
 import com.hashmapinc.server.dao.model.ModelConstants;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Table;
 
 
 @Entity
@@ -78,7 +79,7 @@ public class AWSLambdaComputationMetadataEntity extends ComputationMetadataEntit
         this.timeout = awsLambdaComputationMetadata.getTimeout();
         this.memorySize = awsLambdaComputationMetadata.getMemorySize();
         if(awsLambdaComputationMetadata.getRegion() != null){
-            this.region = awsLambdaComputationMetadata.getRegion().getRegionName();
+            this.region = awsLambdaComputationMetadata.getRegion();
         }
     }
 
@@ -93,7 +94,7 @@ public class AWSLambdaComputationMetadataEntity extends ComputationMetadataEntit
         awsLambdaComputationMetadata.setDescription(this.description);
         awsLambdaComputationMetadata.setTimeout(this.timeout);
         awsLambdaComputationMetadata.setMemorySize(this.memorySize);
-        awsLambdaComputationMetadata.setRegion(RegionType.valueOf(this.region));
+        awsLambdaComputationMetadata.setRegion(this.region);
 
         return awsLambdaComputationMetadata;
     }
