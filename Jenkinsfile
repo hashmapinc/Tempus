@@ -42,7 +42,8 @@ mvn validate'''
           SonarQube: {
             withSonarQubeEnv('SonarCloud') {
                 sh 'mvn -Dsonar.organization=hashmapinc-github -Dsonar.branch.name=$BRANCH_NAME sonar:sonar'
-          },
+              }
+            },
           ReportArchive: {
             junit '**/target/surefire-reports/**/*.xml,**/target/failsafe-reports/**/*.xml'
             archiveArtifacts 'application/target/*.jar,application/target/*.deb,application/target/*.zip,application/target/*.rpm'
