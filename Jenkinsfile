@@ -13,8 +13,7 @@ pipeline {
 echo M2_HOME = ${M2_HOME}
 mvn clean
 mvn validate'''
-        slackSend(message: 'Build Started for Branch: '+env.BRANCH_NAME+' for: '+env.CHANGE_AUTHOR+' on: '+env.BUILD_TAG, color: 'Green', channel: 'tempusbuild', botUser: true)
-      }
+        }
     }
     stage('Build') {
       steps {
@@ -27,19 +26,6 @@ mvn validate'''
         sh 'mvn failsafe:verify'
       }
     }
-    stage('SonarQube analysis') {
-        steps {
-            withSonarQubeEnv('SonarCloud') {
-                sh 'mvn -Dsonar.organization=hashmapinc-github -Dsonar.branch.name=$BRANCH_NAME sonar:sonar'
-            }
-        }
-    }
-    stage('Report and Archive') {
-      steps {
-        junit '**/target/surefire-reports/**/*.xml,**/target/failsafe-reports/**/*.xml'
-        archiveArtifacts 'application/target/*.jar,application/target/*.deb,application/target/*.zip,application/target/*.rpm'
-      }
-    }
     stage('Deploy Artifacts') {
       when {
         branch 'dev'
@@ -49,6 +35,20 @@ mvn validate'''
         sh 'mvn -s $MAVEN_SETTINGS_XML -Dmaven.test.failure.ignore=true -DskipITs -DskipTests deploy'
         }
       }      
+    }
+    stage(test){
+      steps{
+        parallel(
+          SonarQube: {
+            withSonarQubeEnv('SonarCloud') {
+                sh 'mvn -Dsonar.organization=hashmapinc-github -Dsonar.branch.name=$BRANCH_NAME sonar:sonar'
+          },
+          ReportArchive: {
+            junit '**/target/surefire-reports/**/*.xml,**/target/failsafe-reports/**/*.xml'
+            archiveArtifacts 'application/target/*.jar,application/target/*.deb,application/target/*.zip,application/target/*.rpm'
+          }
+        )        
+      }
     }
     stage('Publish Image') {
       when {
