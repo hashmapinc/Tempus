@@ -27,7 +27,7 @@ spec:
       name: livy-rest
   selector:
     component: livy
-  type: LoadBalancer
+  type: ClusterIP
 ---
 apiVersion: apps/v1beta2 # for versions before 1.8.0 use apps/v1beta1
 kind: Deployment
