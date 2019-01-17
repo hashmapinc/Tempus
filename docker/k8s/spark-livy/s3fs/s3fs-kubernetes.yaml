@@ -43,7 +43,7 @@ spec:
               name: aws
               key: secretkey
         - name: S3_BUCKET
-          value: pfe-ttauveron
+          value: tempus-spark-jars
 ---
 apiVersion: v1
 kind: Service

@@ -47,7 +47,7 @@ spec:
         component: livy
     spec:
       containers:
-      - image: gnut3ll4/livy-k8s:latest
+      - image: hashmapinc/livy-k8s:latest
         name: livy
         env:
         - name: K8S_API_HOST
@@ -64,16 +64,6 @@ spec:
             secretKeyRef:
               name: aws
               key: secretkey
-        - name: AZURE_STORAGE_ACCOUNT
-          valueFrom:
-            secretKeyRef:
-              name: azure
-              key: storageaccount
-        - name: AZURE_STORAGE_ACCESS_KEY
-          valueFrom:
-            secretKeyRef:
-              name: azure
-              key: storageaccesskey
         ports:
         - containerPort: 8998
           name: livy-rest
