@@ -46,7 +46,7 @@
                 <md-input-container flex="50" class="md-block">
                     <label translate>computation.runtime</label>
                     <md-select required name="runtimeType" ng-model="model.computationMetadata.runtime">
-                        <md-option ng-repeat="runtimeType in types.lmbdaRuntimeTypes" ng-value="runtimeType.value">
+                        <md-option ng-repeat="runtimeType in types.lambdaRuntimeTypes" ng-value="runtimeType.value">
                             {{ runtimeType.name }}
                         </md-option>
                     </md-select>
@@ -54,9 +54,13 @@
                         <div translate ng-message="required">computation.runtime-required</div>
                     </div>
                 </md-input-container>
-                <md-input-container flex="50" class="md-block" md-is-error="theForm.region.$touched && theForm.region.$invalid">
+                <md-input-container flex="50" class="md-block">
                     <label translate>computation.region</label>
-                    <input required name="region" ng-model="model.computationMetadata.region">
+                    <md-select required name="region" ng-model="model.computationMetadata.region">
+                        <md-option ng-repeat="region in types.lambdaRegions" ng-value="region.value">
+                            {{ region.name }}
+                        </md-option>
+                    </md-select>
                     <div ng-messages="theForm.region.$error">
                         <div translate ng-message="required">computation.region-required</div>
                     </div>
@@ -81,8 +85,6 @@
                     </div>
                 </div>
                 <div class="dropdown-messages">
-                    <!--<div ng-if="!model.computationMetadata.functionFileName" class="tb-error-message" translate>computation.no-function</div>
-                    <div ng-if="model.computationMetadata.functionFileName">{{model.computationMetadata.functionFileName}}</div>-->
                     <div ng-if="!model.importData" class="tb-error-message" translate>import.no-file</div>
                     <div ng-if="model.fileName">{{model.fileName}}</div>
                 </div>

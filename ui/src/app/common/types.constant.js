@@ -674,7 +674,7 @@ export default angular.module('tempus.types', [])
                     value: "java1.8"
                 }
             },
-            lmbdaRuntimeTypes: {
+            lambdaRuntimeTypes: {
                 java18: {
                     name: "Java 1.8",
                     value: "java8"
@@ -731,6 +731,89 @@ export default angular.module('tempus.types', [])
                     name: "Go 1.10",
                     value: "go1.10"
                 }
+            },
+            lambdaRegions: {
+                govCloud: {
+                    name: "Government Cloud",
+                    value: "us-gov-west-1"
+                },
+                usGovEast1: {
+                    name: "US Gov East 1",
+                    value: "us-gov-east-1"
+                },
+                usEast1: {
+                    name: "US East 1",
+                    value: "us-east-1"
+                },
+                usEast2: {
+                    name: "US East 2",
+                    value: "us-east-2"
+                },
+                usWest1: {
+                    name: "US West 1",
+                    value: "us-west-1"
+                },
+                usWest2: {
+                    name: "US West 2",
+                    value: "us-west-2"
+                },
+                euWest1: {
+                    name: "EU West 1",
+                    value: "eu-west-1"
+                },
+                euWest2: {
+                    name: "EU West 2",
+                    value: "eu-west-2"
+                },
+                euWest3: {
+                    name: "EU West 3",
+                    value: "eu-west-3"
+                },
+                euCentral1: {
+                    name: "EU Central 1",
+                    value: "eu-central-1"
+                },
+                euNorth1: {
+                    name: "EU North 1",
+                    value: "eu-north-1"
+                },
+                apSouth1: {
+                    name: "AP South 1",
+                    value: "ap-south-1"
+                },
+                apSouthEast1: {
+                    name: "AP Southeast 1",
+                    value: "ap-southeast-1"
+                },
+                apSouthEast2: {
+                    name: "AP Southeast 2",
+                    value: "ap-southeast-2"
+                },
+                apNorthEast1: {
+                    name: "AP Northeast 1",
+                    value: "ap-northeast-1"
+                },
+                apNorthEast2: {
+                    name: "AP Northeast 2",
+                    value: "ap-northeast-2"
+                },
+                saEast1: {
+                    name: "SA East 1",
+                    value: "sa-east-1"
+                },
+                cnNorth1: {
+                    name: "CN North 1",
+                    value: "cn-north-1"
+                },
+                cnNorthWest1: {
+                    name: "CN Northwest 1",
+                    value: "cn-northwest-1"
+                },
+                caCentral1: {
+                    name: "CA Central 1",
+                    value: "ca-central-1"
+                }
+
             },
             triggerTypes: {
                 Kafka: "KUBELESS-KAFKA"

@@ -20,7 +20,7 @@
 
 
 /*@ngInject*/
-function ComputationService($http, $q, $filter, utils, $log) {
+function ComputationService($http, $q, $filter, utils) {
 
     var service = {
         upload: upload,
@@ -50,7 +50,6 @@ function ComputationService($http, $q, $filter, utils, $log) {
     }
 
     function saveComputation(computation){
-        $log.log(computation);
         var deferred = $q.defer();
         computation.name = computation.computationMetadata.function;
         var url = '/api/computations';
@@ -63,13 +62,8 @@ function ComputationService($http, $q, $filter, utils, $log) {
     }
 
     function saveLambdaComputation(computation, file){
-        $log.log(computation);
         var deferred = $q.defer();
         var fd = new FormData();
-        delete(computation.importData);
-        delete(computation.fileName);
-        //delete(computation.computationMetadata.type);
-        //fd.append("computation", angular.toJson(computation));
         var obj = computation.computationMetadata;
         obj.type = computation.type;
         fd.append("file", file);

@@ -41,12 +41,10 @@ export default function ComputationFormLambdaDirective($compile, $templateCache,
         scope.fileAdded = function($file) {
             scope.theForm.$setDirty();
             scope.model.importData = $file;
-            scope.model.fileName = $file.name;
         };
 
         scope.clearFile = function() {
             scope.theForm.$setDirty();
-            scope.model.fileName = null;
             scope.model.importData = null;
         };
 
