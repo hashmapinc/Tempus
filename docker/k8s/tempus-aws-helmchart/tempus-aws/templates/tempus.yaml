@@ -90,7 +90,7 @@ spec:
       serviceAccountName: tempus
       containers:
       - name: tempus
-        image: hashmapinc/tempus:latest
+        image: hashmapinc/tempus:dev
         imagePullPolicy: Always
         ports:
         - containerPort: 8080

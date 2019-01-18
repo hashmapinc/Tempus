@@ -7,7 +7,7 @@ This guide describes how to install `Tempus Cloud <https://www.hashmapinc.com/te
 Choose AMI type, instance type and region
 =========================================
 
-AMI is based on the microservices version of `Tempus Cloud <https://www.hashmapinc.com/tempuscloud>`_. The microservices are deployed as docker containers using docker-compose inside the CentOS7 VM. This AMI to simplify the deployment and getting started process. We recommend to use the AMI as a trial environment and move to `Tempus Cloud on EKS <https://tempus.hashmapinc.com/login>`_ once you plan a production deployment.
+AMI is based on the microservices version of `Tempus Cloud <https://www.hashmapinc.com/tempuscloud>`_. The microservices are deployed as docker containers using docker-compose on the Amazon Linux 2 OS. This AMI to simplify the deployment and getting started process. We recommend to use the AMI as a trial environment and move to `Tempus Cloud on EKS <https://tempus.hashmapinc.com/login>`_ once you plan a production deployment.
 For Tempus Cloud AMI you can choose any instance type with at least 4GB of RAM. The AMI is available only in the N. Virginia zone.
 
 Use the following link to start the installation of AMIs:
