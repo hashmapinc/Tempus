@@ -47,7 +47,11 @@ public class BitOnBottom {
                 Data inputData = new Gson().fromJson(inputJson, Data.class);
 
                 Map<String, String> data = new HashMap<String, String>();
-                if ((inputData.holeDepth - inputData.ds) < maxDelta) {
+                if((inputData.holeDepth - inputData.ds) < ( -0.3048)) {
+                    data.put("BONB", "-1");
+                    data.put("BONBTEXT", "Bit deeper than hole depth");
+                }
+                else if ((inputData.holeDepth - inputData.ds) < maxDelta) {
                     data.put("BONB", "1");
                     data.put("BONBTEXT", "yes");
                 } else {
