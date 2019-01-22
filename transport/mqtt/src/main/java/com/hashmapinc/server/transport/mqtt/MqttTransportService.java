@@ -16,6 +16,16 @@
  */
 package com.hashmapinc.server.transport.mqtt;
 
+import com.hashmapinc.server.common.transport.SessionMsgProcessor;
+import com.hashmapinc.server.common.transport.auth.DeviceAuthService;
+import com.hashmapinc.server.common.transport.quota.QuotaService;
+import com.hashmapinc.server.dao.asset.AssetService;
+import com.hashmapinc.server.dao.attributes.AttributesService;
+import com.hashmapinc.server.dao.device.DeviceService;
+import com.hashmapinc.server.dao.event.EventService;
+import com.hashmapinc.server.dao.mail.MailService;
+import com.hashmapinc.server.dao.relation.RelationService;
+import com.hashmapinc.server.transport.mqtt.adaptors.MqttTransportAdaptor;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.EventLoopGroup;
@@ -28,12 +38,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
-import com.hashmapinc.server.common.transport.SessionMsgProcessor;
-import com.hashmapinc.server.common.transport.auth.DeviceAuthService;
-import com.hashmapinc.server.common.transport.quota.QuotaService;
-import com.hashmapinc.server.dao.device.DeviceService;
-import com.hashmapinc.server.dao.relation.RelationService;
-import com.hashmapinc.server.transport.mqtt.adaptors.MqttTransportAdaptor;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -60,10 +64,22 @@ public class MqttTransportService {
     private RelationService relationService;
 
     @Autowired(required = false)
+    private EventService eventService;
+
+    @Autowired(required = false)
     private MqttSslHandlerProvider sslHandlerProvider;
 
     @Autowired(required = false)
     private QuotaService quotaService;
+
+    @Autowired(required = false)
+    private AttributesService attributesService;
+
+    @Autowired(required = false)
+    private AssetService assetService;
+
+    @Autowired(required = false)
+    private MailService mailService;
 
     @Value("${mqtt.bind_address}")
     private String host;
@@ -100,7 +116,7 @@ public class MqttTransportService {
         b.group(bossGroup, workerGroup)
                 .channel(NioServerSocketChannel.class)
                 .childHandler(new MqttTransportServerInitializer(processor, deviceService, authService, relationService,
-                        adaptor, sslHandlerProvider, quotaService));
+                        adaptor, sslHandlerProvider, quotaService,attributesService, assetService, eventService, mailService));
 
         serverChannel = b.bind(host, port).sync().channel();
         log.info("Mqtt transport started!");

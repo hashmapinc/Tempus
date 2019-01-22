@@ -22,7 +22,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.*;
-import com.hashmapinc.server.exception.TempusException;
+import com.hashmapinc.server.common.data.exception.TempusException;
 
 import java.util.HashMap;
 import java.util.Map;

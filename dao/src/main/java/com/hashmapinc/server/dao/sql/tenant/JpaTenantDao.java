@@ -26,12 +26,15 @@ import com.hashmapinc.server.dao.tenant.TenantDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.repository.CrudRepository;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
+import java.sql.ResultSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.UUID;
 
-import static com.hashmapinc.server.dao.model.ModelConstants.NULL_UUID_STR;
+import static com.hashmapinc.server.dao.model.ModelConstants.*;
 
 /**
  * Created by Valerii Sosliuk on 4/30/2017.
@@ -39,8 +42,17 @@ import static com.hashmapinc.server.dao.model.ModelConstants.NULL_UUID_STR;
 @Component
 public class JpaTenantDao extends JpaAbstractSearchTextDao<TenantEntity, Tenant> implements TenantDao {
 
+    private static final String INSERT_USER_UNIT_SYSTEM = String.format("INSERT INTO %s  (%s, %s) VALUES (?, ?)", TENANT_UNIT_SYSTEM_TABLE , TENANT_ID_PROPERTY, UNIT_SYSTEM_PROPERTY);
+    private static final String UPDATE_USER_UNIT_SYSTEM = String.format("UPDATE %s SET %s = ? WHERE %s = ?", TENANT_UNIT_SYSTEM_TABLE , UNIT_SYSTEM_PROPERTY, TENANT_ID_PROPERTY);
+    private static final String SELECT_USER_SYSTEM_FOR_USER_ID = String.format("SELECT DISTINCT %s FROM %s WHERE %s = ?", UNIT_SYSTEM_PROPERTY, TENANT_UNIT_SYSTEM_TABLE , TENANT_ID_PROPERTY);
+    private static final String DELETE_USER_SYSTEM_FOR_USER_ID = String.format("DELETE FROM %s WHERE %s = ?", TENANT_UNIT_SYSTEM_TABLE , TENANT_ID_PROPERTY);
+
+
     @Autowired
     private TenantRepository tenantRepository;
+
+    @Autowired
+    JdbcTemplate jdbcTemplate;
 
     @Override
     protected Class<TenantEntity> getEntityClass() {
@@ -60,5 +72,31 @@ public class JpaTenantDao extends JpaAbstractSearchTextDao<TenantEntity, Tenant>
                         Objects.toString(pageLink.getTextSearch(), ""),
                         pageLink.getIdOffset() == null ? NULL_UUID_STR : UUIDConverter.fromTimeUUID(pageLink.getIdOffset()),
                         new PageRequest(0, pageLink.getLimit())));
+    }
+
+    @Override
+    public void saveUnitSystem(String unitSystem , UUID userId) {
+        jdbcTemplate.update(INSERT_USER_UNIT_SYSTEM , UUIDConverter.fromTimeUUID(userId) , unitSystem);
+    }
+
+    @Override
+    public String findUnitSystemByTenantId(UUID userId) {
+        List<String> unitList  = jdbcTemplate.query(SELECT_USER_SYSTEM_FOR_USER_ID, new Object[]{UUIDConverter.fromTimeUUID(userId)},
+                (ResultSet rs, int rowNum) -> (rs.getString(UNIT_SYSTEM_PROPERTY)));
+        if (unitList.size() == 1) {
+            return unitList.get(0);
+        } else {
+            return null;
+        }
+    }
+
+    @Override
+    public void deleteUnitSystemByTenantId(UUID userId) {
+        jdbcTemplate.update(DELETE_USER_SYSTEM_FOR_USER_ID, UUIDConverter.fromTimeUUID(userId));
+    }
+
+    @Override
+    public void updateUnitSystem(String unitSystem , UUID userId) {
+        jdbcTemplate.update(UPDATE_USER_UNIT_SYSTEM, unitSystem, UUIDConverter.fromTimeUUID(userId));
     }
 }

@@ -96,6 +96,8 @@ import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static com.github.tomakehurst.wiremock.client.WireMock.get;
 import static com.hashmapinc.server.common.data.DataConstants.*;
 import static com.hashmapinc.server.dao.model.ModelConstants.NULL_UUID;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
@@ -852,5 +854,32 @@ public abstract class AbstractControllerTest {
     protected void deleteDevice(DeviceId deviceId) throws Exception {
         doDelete("/api/device/"+deviceId.getId().toString())
                 .andExpect(status().isOk());
+    }
+
+    protected DataModelObject createDataModelObjectWithParentDMOId(DataModel dataModel , String name , String type , DataModelObjectId parentId) throws Exception {
+        DataModelObject dataModelObject = new DataModelObject();
+        dataModelObject.setName(name);
+        dataModelObject.setDataModelId(dataModel.getId());
+        dataModelObject.setType(type);
+        dataModelObject.setParentId(parentId);
+        DataModelObject savedDataModelObject = doPost("/api/data-model/" + dataModel.getId().toString() + "/objects", dataModelObject, DataModelObject.class);
+        assertNotNull(savedDataModelObject);
+        assertNotNull(savedDataModelObject.getId());
+        Assert.assertTrue(savedDataModelObject.getCreatedTime() > 0);
+        assertNotNull(savedDataModelObject.getCustomerId());
+        assertEquals(dataModelObject.getName(), savedDataModelObject.getName());
+        return savedDataModelObject;
+    }
+
+    protected Device createGatewayDevice(String name , String deviceType , DataModelObjectId dataModelObjectId , CustomerId customerId ) throws Exception{
+        Device gatewayDevice = new Device();
+        gatewayDevice.setName(name);
+        gatewayDevice.setType(deviceType);
+        gatewayDevice.setDataModelObjectId(dataModelObjectId);
+        gatewayDevice.setCustomerId(customerId);
+        ObjectMapper mapper = new ObjectMapper();
+        JsonNode additionalInfo = mapper.readTree("{\"gateway\":true}");
+        gatewayDevice.setAdditionalInfo(additionalInfo);
+        return doPost("/api/device", gatewayDevice, Device.class);
     }
 }

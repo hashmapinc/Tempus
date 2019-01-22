@@ -423,3 +423,14 @@ CREATE TABLE IF NOT EXISTS kubeless_computation_meta_data (
     timeout varchar,
     checksum varchar
 );
+
+CREATE TABLE IF NOT EXISTS tenant_unit_system (
+    tenant_id varchar(31) NOT NULL CONSTRAINT tenant_unit_system_pkey PRIMARY KEY,
+    unit_system varchar
+);
+
+CREATE TABLE IF NOT EXISTS templates (
+    id varchar(31) NOT NULL CONSTRAINT templates_pkey PRIMARY KEY,
+    name varchar,
+    body varchar
+);

@@ -16,6 +16,8 @@
  */
 package com.hashmapinc.server.extensions.core.filter;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
 
@@ -23,4 +25,9 @@ import lombok.Data;
 public class JsFilterConfiguration {
 
     private final String filter;
+
+    @JsonCreator
+    public JsFilterConfiguration(@JsonProperty(value = "filter", required = true) String filter) {
+        this.filter = filter;
+    }
 }

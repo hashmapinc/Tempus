@@ -17,7 +17,7 @@
 package com.hashmapinc.server.controller;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.hashmapinc.server.exception.TempusException;
+import com.hashmapinc.server.common.data.exception.TempusException;
 import com.hashmapinc.server.service.security.auth.jwt.RefreshTokenRequest;
 import com.hashmapinc.server.service.security.auth.rest.LoginRequest;
 import com.hashmapinc.server.service.security.auth.rest.LoginResponseToken;

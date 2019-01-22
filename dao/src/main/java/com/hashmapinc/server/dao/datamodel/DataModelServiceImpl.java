@@ -17,6 +17,7 @@
 package com.hashmapinc.server.dao.datamodel;
 
 
+import com.hashmapinc.server.common.data.Device;
 import com.hashmapinc.server.common.data.asset.Asset;
 import com.hashmapinc.server.common.data.datamodel.DataModel;
 import com.hashmapinc.server.common.data.Tenant;
@@ -26,6 +27,7 @@ import com.hashmapinc.server.common.data.id.DataModelObjectId;
 import com.hashmapinc.server.common.data.id.TenantId;
 import com.hashmapinc.server.dao.asset.AssetDao;
 import com.hashmapinc.server.dao.dashboard.DashboardService;
+import com.hashmapinc.server.dao.device.DeviceService;
 import com.hashmapinc.server.dao.entity.AbstractEntityService;
 import com.hashmapinc.server.dao.exception.DataValidationException;
 import com.hashmapinc.server.dao.service.DataValidator;
@@ -60,6 +62,9 @@ public class DataModelServiceImpl extends AbstractEntityService implements DataM
 
     @Autowired
     private DashboardService dashboardService;
+
+    @Autowired
+    private DeviceService deviceService;
 
     private Map<UUID,Boolean> marked;
     private Stack<UUID> topologicalOrder; //NOSONAR (Needed synchronous deletion of DataModelObject
@@ -101,6 +106,10 @@ public class DataModelServiceImpl extends AbstractEntityService implements DataM
                 List<Asset> assets = assetDao.findAssetsByDataModelObjectId(dataModelObject.getId().getId());
                 if(!assets.isEmpty())
                     throw new DataValidationException("Cannot delete the dataModel because one or more assets are associated with it's dataModelObjects");
+                List<Device> devices = deviceService.findDeviceByDataModelObjectId(dataModelObject.getId());
+                if(!devices.isEmpty())
+                    throw new DataValidationException("Cannot delete dataModel because one or more devices are associated with it");
+
             }
         });
 

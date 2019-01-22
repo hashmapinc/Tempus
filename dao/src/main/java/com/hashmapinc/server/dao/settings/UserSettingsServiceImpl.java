@@ -19,13 +19,13 @@ package com.hashmapinc.server.dao.settings;
 import com.hashmapinc.server.common.data.UserSettings;
 import com.hashmapinc.server.common.data.id.UserId;
 import com.hashmapinc.server.common.data.id.UserSettingsId;
+import com.hashmapinc.server.dao.exception.DataValidationException;
 import com.hashmapinc.server.dao.service.DataValidator;
+import com.hashmapinc.server.dao.service.Validator;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import com.hashmapinc.server.dao.exception.DataValidationException;
-import com.hashmapinc.server.dao.service.Validator;
 
 
 @Service
@@ -55,7 +55,7 @@ public class UserSettingsServiceImpl implements UserSettingsService {
         adminSettingsValidator.validate(userSettings);
         return userSettingsDao.save(userSettings);
     }
-    
+
     private DataValidator<UserSettings> adminSettingsValidator =
             new DataValidator<UserSettings>() {
 

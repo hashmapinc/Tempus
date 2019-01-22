@@ -40,4 +40,10 @@ public interface TenantService {
     void deleteTenants();
 
     String findLogoByTenantId(TenantId tenantId);
+
+    void saveUnitSystem(String unitSystem, TenantId tenantId);
+
+    String findUnitSystemByTenantId(TenantId tenantId);
+
+    void deleteUnitSystemByTenantId(TenantId tenantId);
 }

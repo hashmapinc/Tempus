@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright © 2016-2018 The Thingsboard Authors
  * Modifications © 2017-2018 Hashmap, Inc
  *
@@ -14,30 +14,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.hashmapinc.server.exception;
+/* eslint-disable import/no-unresolved, import/default */
 
-import com.fasterxml.jackson.annotation.JsonValue;
+import templateFieldsetTemplate from './template-fieldset.tpl.html';
 
-public enum TempusErrorCode {
+/* eslint-enable import/no-unresolved, import/default */
 
-    GENERAL(2),
-    AUTHENTICATION(10),
-    JWT_TOKEN_EXPIRED(11),
-    PERMISSION_DENIED(20),
-    INVALID_ARGUMENTS(30),
-    BAD_REQUEST_PARAMS(31),
-    ITEM_NOT_FOUND(32),
-    CONFLICT_ITEM(33);
+/*@ngInject*/
+export default function TemplateDirective($compile, $templateCache) {
+    var linker = function (scope, element) {
+        var template = $templateCache.get(templateFieldsetTemplate);
+        element.html(template);
 
-    private int errorCode;
-
-    TempusErrorCode(int errorCode) {
-        this.errorCode = errorCode;
+        $compile(element.contents())(scope);
     }
-
-    @JsonValue
-    public int getErrorCode() {
-        return errorCode;
-    }
-
+    return {
+        restrict: "E",
+        link: linker,
+        scope: {
+            data: '=',
+            isEdit: '=',
+            applicationScope: '=',
+            theForm: '=',
+        }
+    };
 }
+
+

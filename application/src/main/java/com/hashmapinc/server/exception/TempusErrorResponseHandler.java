@@ -17,6 +17,8 @@
 package com.hashmapinc.server.exception;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.hashmapinc.server.common.data.exception.TempusErrorCode;
+import com.hashmapinc.server.common.data.exception.TempusException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;

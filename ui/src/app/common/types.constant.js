@@ -398,6 +398,10 @@ export default angular.module('tempus.types', [])
                 stats: {
                     value: "STATS",
                     name: "event.type-stats"
+                },
+                qualityEvent: {
+                    value: "QUALITY_EVENT",
+                    name: "event.type-quality-issue"
                 }
             },
             extensionType: {

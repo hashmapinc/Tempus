@@ -342,7 +342,33 @@ export default angular.module('tempus.locale', [])
                     "total-replica":"Total Replica",
                     "ready":"Ready",
                     "in-progress":"In Progress",
-                    "crash":"Crashed"
+                    "crash":"Crashed",
+                    "delete":""
+
+                },
+                "templateEditor" :{
+
+                    "templateEditor":"Templates",
+                    "title":"Templates",
+                    "add-template-text": "Add New Template",
+                    "name":"Name",
+                    "templateBody":"Template Body",
+                    "name-required":"Name is required",
+                    "grid":"Grid",
+                    "table":"Tabular",
+                    "delete":"Delete Template",
+                    "copy":"Copy Template",
+                    "templateDetails":"Template Details",
+                    "action":"Actions",
+                    "body-required":"Template Body is Required",
+                    "delete-template-title": "Are you sure you want to delete the template '{{template}}'?",
+                    "delete-template-text": "Be careful, after the confirmation the group and all related data will become unrecoverable.",
+                    "delete-templates-title":"Are you sure you want to delete { count, select, 1 {1 template} other {# templates} }?",
+                    "delete-templates-action-title":"Delete { count, select, 1 {1 template} other {# templates} }",
+                    "delete-templates-text": "Be careful, after the confirmation all selected templates will be removed.",
+                    "no-template-text":"No Templates Available",
+                    "createdDate":"Created Date"
+
 
                 },
                 "audit-log": {
@@ -882,6 +908,7 @@ export default angular.module('tempus.locale', [])
                     "type-error": "Error",
                     "type-lc-event": "Lifecycle event",
                     "type-stats": "Statistics",
+                    "type-quality-issue": "Quality Issue",
                     "no-events-prompt": "No events found",
                     "error": "Error",
                     "alarm": "Alarm",
@@ -894,7 +921,9 @@ export default angular.module('tempus.locale', [])
                     "success": "Success",
                     "failed": "Failed",
                     "messages-processed": "Messages processed",
-                    "errors-occurred": "Errors occurred"
+                    "errors-occurred": "Errors occurred",
+                    "issue": "Issue",
+                    "value": "Value"
                 },
                 "extension": {
                     "extensions": "Extensions",
@@ -1799,6 +1828,14 @@ export default angular.module('tempus.locale', [])
                     "no-query-found":"No query found",
                     "delete-query":"Delete query",
                     "attribute-name":"Attribute Name"
+                },
+                "preferences": {
+                    "save-preferences-success":"Unit Preferences saved successfully",
+                    "preferences":"Preferences",
+                    "units":"Units",
+                    "si-metric-system" :"SI-Metric System",
+                    "imperials-units":"Imperials System",
+                    "us-customary-units":"US-Customary System"
                 }
             }
         }
