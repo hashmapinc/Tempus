@@ -804,6 +804,9 @@ export default angular.module('tempus.locale', [])
                     "lastTimeRecived" :"Last Time Received",
                     "businessUnit":"Business Unit"
                 },
+                "file-upload":{
+                    "upload": "Upload"
+                },
                 "dialog": {
                     "close": "Close dialog"
                 },

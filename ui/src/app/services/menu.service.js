@@ -267,6 +267,14 @@ function Menu(userService, $state, $rootScope, $log,datamodelService,customerSer
                             icon: 'now_widgets',
                             link: '/static/svg/widgetslightgray.svg'
                         },
+
+                        {
+                            name: 'file-upload.upload',
+                            type: 'link',
+                            state: 'home.file-upload',
+                            icon: 'now_upload',
+                            link: '/static/svg/baseline-cloud_upload.svg'
+                        },
                         {
                             name: 'data_model.data_models',
                             type: 'link',

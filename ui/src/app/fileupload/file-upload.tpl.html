@@ -1,0 +1,96 @@
+<!--
+
+    Copyright © 2016-2018 The Thingsboard Authors
+    Modifications © 2017-2018 Hashmap, Inc
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+        http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+
+<br>
+<br>
+<br>
+<md-toolbar class="md-table-toolbar tb-device-toolbar md-default ">
+
+    <div class="md-toolbar-tools">
+        <span flex></span>
+        <md-button class="md-icon-button" ng-click="addFile($event)">
+            <md-icon>add</md-icon>
+            <md-tooltip md-direction="top">
+                {{ 'action.add' | translate }}
+            </md-tooltip>
+        </md-button>
+        <md-button class="md-icon-button" ng-click="enterFilterMode()">
+            <md-icon>search</md-icon>
+            <md-tooltip md-direction="top">
+                {{ 'action.search' | translate }}
+            </md-tooltip>
+        </md-button>
+        <md-button  class="md-icon-button" ng-click="resetFilter()">
+            <md-icon>refresh</md-icon>
+            <md-tooltip md-direction="top">
+                {{ 'action.refresh' | translate }}
+            </md-tooltip>
+        </md-button>
+    </div>
+</md-toolbar>
+<md-table-container class ="tb-device-container">
+    <table class="tb-device-table" md-table>
+        <thead md-head md-order="query.order" md-on-reorder="onReorder">
+        <tr md-row>
+            <th md-column style=""><span translate>File Name</span></th>
+            <th md-column><span translate>Created On</span></th>
+            <th md-column ><span translate>File Type</span></th>
+            <th md-column><span translate>File Size</span></th>
+
+        </tr>
+        </thead>
+        <tbody md-body>
+        <tr md-row >
+            <td md-cell > file1.pdf</a></td>
+            <td md-cell style="text-transform: uppercase"> 29/12/2005</td>
+            <td md-cell style="width:40%;">pdf</td>
+            <td md-cell>780 kb</td>
+            <td md-cell class="tb-value-cell"><span><ng-md-icon icon="file_download" ><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24"><path d="M19 9h-4V3H9v6H5l7 7 7-7z"></path><path d="M5 18v2h14v-2H5z"></path></svg></ng-md-icon></span></td>
+            <td md-cell class="tb-value-cell" ng-click="deleteDevice($event, device)">
+                <span><ng-md-icon size="20" icon="delete"></ng-md-icon></span>
+            </td>
+
+        </tr>
+        </tbody>
+    </table>
+</md-table-container>
+
+<br>
+
+
+    <!--<table >-->
+        <!--<thead >-->
+        <!--<tr >-->
+            <!--<th style="border: 1px solid #dddddd;text-align: left; padding: 8px;"><span translate>File Name</span></th>-->
+            <!--<th style="border: 1px solid #dddddd;text-align: left; padding: 8px;"><span translate>Created On</span></th>-->
+            <!--<th style="border: 1px solid #dddddd;text-align: left; padding: 8px;"><span translate>File Type</span></th>-->
+            <!--<th style="border: 1px solid #dddddd;text-align: left; padding: 8px;"><span translate>File Size</span></th>-->
+
+        <!--</tr>-->
+        <!--</thead>-->
+        <!--<tbody >-->
+        <!--<tr  >-->
+            <!--<td style="border: 1px solid #dddddd;text-align: left; padding: 8px;"> file1.pdf</a></td>-->
+            <!--<td  style="border: 1px solid #dddddd;text-align: left; padding: 8px;"> 29/12/2005</td>-->
+            <!--<td style="border: 1px solid #dddddd;text-align: left; padding: 8px;">pdf</td>-->
+            <!--<td style="border: 1px solid #dddddd;text-align: left; padding: 8px;">780 kb</td>-->
+
+        <!--</tr>-->
+        <!--</tbody>-->
+    <!--</table>-->
