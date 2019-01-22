@@ -1,0 +1,99 @@
+<!--
+
+    Copyright © 2016-2018 The Thingsboard Authors
+    Modifications © 2017-2018 Hashmap, Inc
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+        http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<md-content layout="row" layout-align="center center" class="hm-background-{{theme}} layout-align-center-center layout-row">
+    <md-card style="background: transparent;height: 100%;
+    max-height: 850px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    box-shadow:inset 0 0 10px #000000;" flex="initial" class="tb-login-card">
+        <md-card-title>
+            <md-card-title-text>
+                <!--                 <span translate class="md-headline">login.sign-in</span>
+                 -->            </md-card-title-text>
+            <!--  <img src="{{vm.logoSvg}}" aria-label="logo" class="tb-login-logo"/>-->
+        </md-card-title>
+        <md-progress-linear class="md-warn" style="z-index: 1; max-height: 0px; width: inherit;"
+                            md-mode="indeterminate" ng-disabled="!$root.loading" ng-show="$root.loading"></md-progress-linear>
+        <md-card-content>
+
+            <md-icon ng-show ="fileType != ''" ng-switch on="fileType" class="material-icons hm-login-logo" style="">
+                <img ng-switch-when="svg" class="" style="width: 101%; margin-top: 1%;"ng-src="data:image/svg+xml;base64,{{logo}}">
+                <img ng-switch-default class="" style="width: 101%; margin-top: 1%;"ng-src="data:image/JPEG;base64,{{logo}}">
+            </md-icon>
+            <md-icon style="margin-left:35%;margin-bottom: 5%;" ng-show ="fileType == ''" md-svg-src="/static/svg/Tempus_Logo_E_TagLineExtended_vectorized.svg" class="material-icons hm-login-logo" style=""></md-icon><br/>
+            <span style="color: white;font-size: 23px;">Sign up to get your own personal account for Free !</span>
+            <form class="login-form" ng-submit="vm.signup()">
+                <div layout="row">
+                    <md-input-container flex="50">
+                        <label style="color:white !important;">First Name</label>
+                        <input required name="firstName" ng-model="vm.signupRequest.firstName" style="border-color:white;">
+                        <div ng-messages="vm.user.firstName.$error">
+                            <div ng-message="required">This is required.</div>
+                        </div>
+                    </md-input-container>
+
+                    <md-input-container flex="50">
+                        <label style="color:white !important;">Last Name</label>
+                        <input required name="firstName" ng-model="vm.signupRequest.lastName" style="border-color:white;">
+                        <div ng-messages="vm.user.lastName.$error">
+                            <div ng-message="required">This is required.</div>
+                        </div>
+                    </md-input-container>
+                </div>
+                <div>
+                    <md-input-container class="md-block md-icon-left">
+                        <label style="color:white !important;" translate="" class="ng-scope" for="email-input" style="color:white !important;">Email</label>
+                        <md-icon aria-label="Email" class="material-icons md-tb-dark-theme" role="img"> email </md-icon>
+                        <input required id="email-input" type="email" ng-model="vm.signupRequest.email"  onblur="validateEmail(this);" class="md-input" aria-invalid="true" style="border-color:white;">
+                        <div class="md-errors-spacer"></div>
+                    </md-input-container>
+                </div>
+                <div>
+                    <md-input-container class="md-block md-icon-left">
+                        <label style="color:white !important;" translate="" class="ng-scope" for="email-input">Phone</label>
+                        <md-icon aria-label="Phone" class="material-icons md-tb-dark-theme" role="img"> call </md-icon>
+                        <input required id="phone-input" ng-model="vm.signupRequest.phone" pattern="[1-9]{1}[0-9]{9}" class="md-input" aria-invalid="true" style="border-color:white;">
+                        <div class="md-errors-spacer"></div>
+                    </md-input-container>
+                </div>
+                <div>
+                    <md-input-container class="md-block md-icon-left">
+                        <label style="color:white !important;" translate="" class="ng-scope" for="email-input">Company Name</label>
+                        <md-icon aria-label="Company" class="material-icons md-tb-dark-theme" role="img"> home </md-icon>
+                        <input required id="company-input" ng-model="vm.signupRequest.CompanyName"  class="md-input" aria-invalid="true" style="border-color:white;">
+                        <div class="md-errors-spacer"></div>
+                    </md-input-container>
+                </div>
+                <div
+                        vc-recaptcha
+                        ng-model="myFields.myRecaptchaResponse"
+                        key="''"
+                ></div>
+                <div style="margin-top:20px;margin-bottom: 20px;">
+                    <md-checkbox style="color: white;font-size: 20px;" class="red" aria-label="Accept Privacy Policy" ng-model="vm.acceptPrivacyPolicy">
+                        Accept <a>Privacy Policy</a>
+                    </md-checkbox>
+                </div>
+                <md-button class="md-raised" type="submit" style="margin-bottom: 30px;border-radius: 16px;background-color: palegoldenrod;width: 90%;padding: 8px;margin-left: 5%;">Submit</md-button>
+
+                <a style="font-size: 23px;color: white;margin-left: 30%;">Already have an account?</a>
+            </form>
+        </md-card-content>
+    </md-card>
+</md-content>
