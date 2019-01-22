@@ -15,13 +15,17 @@
  * limitations under the License.
  */
 /*@ngInject*/
-export default function ComponentDialogController($mdDialog, $q, $scope, componentDescriptorService, types, utils, helpLinks, isAdd, isReadOnly, componentInfo) {
+export default function ComponentDialogController($mdDialog, $q, templateService, $scope, $translate, componentDescriptorService, types, utils, helpLinks, isAdd, isReadOnly, componentInfo) {
 
     var vm = this;
 
     vm.isReadOnly = isReadOnly;
     vm.isAdd = isAdd;
     vm.componentInfo = componentInfo;
+    vm.getTemplates = getTemplates;
+    vm.getTemplateBody = getTemplateBody;
+    vm.selectedTemplate = 'null';
+    vm.templates = {};
     if (isAdd) {
         vm.componentInfo.component = {};
     }
@@ -32,7 +36,9 @@ export default function ComponentDialogController($mdDialog, $q, $scope, compone
     if (vm.componentInfo.component && !vm.componentInfo.component.configuration) {
         vm.componentInfo.component.configuration = {};
     }
-
+    if(vm.componentInfo.title == "rule.plugin-action") {
+        vm.getTemplates();
+    }
     vm.helpLinkIdForComponent = helpLinkIdForComponent;
     vm.save = save;
     vm.cancel = cancel;
@@ -67,6 +73,7 @@ export default function ComponentDialogController($mdDialog, $q, $scope, compone
         if (vm.componentInfo.component.clazz) {
             componentDescriptorService.getComponentDescriptorByClazz(vm.componentInfo.component.clazz).then(
                 function success(componentDescriptor) {
+
                     vm.componentDescriptor = componentDescriptor;
                     vm.componentHasSchema = utils.isDescriptorSchemaNotEmpty(vm.componentDescriptor.configurationDescriptor);
                 },
@@ -77,6 +84,48 @@ export default function ComponentDialogController($mdDialog, $q, $scope, compone
             vm.componentHasSchema = false;
         }
     }
+
+    function getTemplates() {
+       vm.templates['null'] = $translate.instant('templateEditor.copyFrom');
+       templateService.getAllTemplates().then(
+           function success(templates) {
+              templates.forEach(tempVal => { //
+               if (vm.componentInfo.component) {
+                 if(angular.isDefined(vm.componentInfo.component.configuration.deviceIdTemplate)) {
+                       if(vm.componentInfo.component.configuration.rpcCallBodyTemplate == tempVal.body) {
+                         vm.selectedTemplate = tempVal.id.id;
+                         vm.template = tempVal.id.id;
+                       }
+                } else {
+                      if(vm.componentInfo.component.configuration.template == tempVal.body) {
+                        vm.selectedTemplate = tempVal.id.id;
+                        vm.template = tempVal.id.id;
+                      }
+                 }
+
+               }
+                vm.templates[tempVal.id.id] = tempVal.name;
+             });
+           }
+       );
+    }
+
+    function getTemplateBody(){
+        if(angular.isDefined(vm.template) && vm.template !== 'null') {
+           templateService.getTemplateDetail(vm.template).then(
+               function success(template) {
+                 vm.selectedTemplate = vm.template;
+                 if(angular.isDefined(vm.componentInfo.component.configuration.deviceIdTemplate)) {
+                        vm.componentInfo.component.configuration.rpcCallBodyTemplate = template.body;
+                 } else {
+                    vm.componentInfo.component.configuration.template = template.body;
+
+                 }
+
+               }
+           );
+        }
+      }
 
     function helpLinkIdForComponent() {
         switch (vm.componentInfo.type) {
