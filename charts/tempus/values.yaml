@@ -27,11 +27,6 @@ global:
     create: true
 #    pspEnabled: true
 
-image:
-  repository: nginx
-  tag: stable
-  pullPolicy: IfNotPresent
-
 nameOverride: ""
 fullnameOverride: ""
 
@@ -39,13 +34,49 @@ serviceAccount:
   create: true
   name: ""
 
+image:
+  repository: hashmapinc/tempus
+  tag: dev
+  pullPolicy: Always
+
+ConfigMapData:
+  zookeeper.enabled: "true"
+  zookeeper.url: "zk-cs:2181"
+  cassandra.url: "cassandra-headless:9042"
+  cassandra.host: "cassandra-headless"
+  cassandra.port: "9042"
+  database.type: "cassandra"
+  postgres.host: "postgres"
+  postgres.port: "5432"
+  schema.data: "false"
+  demo.data: "false"
+  mqtt.address: "0.0.0.0"
+  mqtt.port: "1883"
+  coap.address: "0.0.0.0"
+  coap.port: "5683"
+  spark.path: "/tmp"
+  http.port: "8080"
+  spark.home: "livy"
+  spring.datasource.url: "jdbc:postgresql://postgresql:5432/identity"
+  spring.datasource.username: "identity"
+  spring.datasource.password: "identity"
+
+
 role:
   kubeless: true
   java: true   
   
 service:
-  type: ClusterIP
-  port: 80
+  type: NodePort
+  ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: 8080
+      name: https
+    - protocol: TCP
+      port: 1883
+      targetPort: 1883
+      name: mqtt  
 
 ingress:
   enabled: false
@@ -59,6 +90,133 @@ ingress:
   #  - secretName: chart-example-tls
   #    hosts:
   #      - chart-example.local
+
+
+
+
+
+
+
+
+
+
+# Configuration of other essential services 
+discovery:
+  name: redtail-api-discovery
+  replicaCount: 1
+  image:
+    repository: hashmapinc/redtail-api-discovery
+    tag: latest
+    pullPolicy: Always
+  app:
+    port: 8761
+  service:
+    type: ClusterIP
+    port: 80
+  pdb:
+    minAvailable: 1
+
+identity:
+  name: redtail-identity-service
+  replicaCount: 1
+  image:
+    repository: hashmapinc/redtail-identity-service
+    tag: latest
+    pullPolicy: Always
+  app:
+    port: 9002
+  service:
+    type: ClusterIP
+    port: 80
+  pdb:
+    minAvailable: 1
+  db:
+    host: postgresql
+    port: 5432
+    name: identity
+    user: identity
+    ## TODO We need to extract secrets from here
+    password: identity
+
+metadata:
+  name: redtail-metadata-api
+  replicaCount: 1
+  image:
+    repository: hashmapinc/redtail-metadata-api
+    tag: latest
+    pullPolicy: Always
+  app:
+    port: 9003
+  service:
+    type: ClusterIP
+    port: 80
+  pdb:
+    minAvailable: 1
+  ## Using same db as identity for now, we can change these values later if we want a separate db instance for metadata-api
+  db:
+    host: postgresql
+    port: 5432
+    name: identity
+    user: identity
+    ## TODO We need to extract secrets from here
+    password: identity
+
+dataquality:
+  name: redtail-data-quality-service
+  replicaCount: 1
+  image:
+    repository: hashmapinc/redtail-data-quality-service
+    tag: latest
+    pullPolicy: Always
+  app:
+    port: 9004
+  service:
+    type: ClusterIP
+    port: 80
+  pdb:
+    minAvailable: 1
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 resources: {}
   # We usually recommend not to specify default resources and to leave this as a conscious

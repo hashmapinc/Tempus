@@ -15,7 +15,8 @@
 # limitations under the License.
 #
 
-apiVersion: v1
+{{- /*
+ apiVersion: v1
 kind: Service
 metadata:
   name: {{ include "tempus.fullname" . }}
@@ -34,3 +35,5 @@ spec:
   selector:
     app.kubernetes.io/name: {{ include "tempus.name" . }}
     app.kubernetes.io/instance: {{ .Release.Name }}
+ 
+*/ -}}

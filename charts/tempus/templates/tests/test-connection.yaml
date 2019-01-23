@@ -15,7 +15,8 @@
 # limitations under the License.
 #
 
-apiVersion: v1
+{{- /*
+ apiVersion: v1
 kind: Pod
 metadata:
   name: "{{ include "tempus.fullname" . }}-test-connection"
@@ -32,4 +33,5 @@ spec:
       image: busybox
       command: ['wget']
       args:  ['{{ include "tempus.fullname" . }}:{{ .Values.service.port }}']
-  restartPolicy: Never
+  restartPolicy: Never 
+*/ -}}
