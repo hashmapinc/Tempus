@@ -51,9 +51,6 @@ mvn validate'''
       }      
     }
     stage('Publish Image') {
-      when {
-        branch 'dev'
-      }
       steps {
         sh '''cp $WORKSPACE/application/target/tempus.deb $WORKSPACE/docker/tb/tempus.deb
 cp $WORKSPACE/application/target/tempus.deb $WORKSPACE/docker/database-setup/tempus.deb'''
@@ -61,10 +58,10 @@ cp $WORKSPACE/application/target/tempus.deb $WORKSPACE/docker/database-setup/tem
           sh 'sudo docker login -u $USERNAME -p $PASSWORD'
         }
 
-        sh '''sudo docker build $WORKSPACE/docker/tb/ -t hashmapinc/tempus:dev
-sudo docker build $WORKSPACE/docker/database-setup/ -t hashmapinc/database-setup:dev'''
-        sh '''sudo docker push hashmapinc/tempus:dev
-sudo docker push hashmapinc/database-setup:dev
+        sh '''sudo docker build $WORKSPACE/docker/tb/ -t hashmapinc/tempus:helm
+sudo docker build $WORKSPACE/docker/database-setup/ -t hashmapinc/database-setup:helm'''
+        sh '''sudo docker push hashmapinc/tempus:helm
+sudo docker push hashmapinc/database-setup:helm
 '''
       }
     }
