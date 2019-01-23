@@ -23,14 +23,14 @@ import com.hashmapinc.server.common.data.id.TenantId;
 import com.hashmapinc.server.dao.tenant.TenantService;
 import io.minio.MinioClient;
 import io.minio.Result;
-import io.minio.errors.InvalidEndpointException;
-import io.minio.errors.InvalidPortException;
-import io.minio.errors.MinioException;
+import io.minio.errors.*;
 import io.minio.messages.Item;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 import org.xmlpull.v1.XmlPullParserException;
 
 import java.io.ByteArrayInputStream;
@@ -54,7 +54,7 @@ public class MinioService implements S3BucketService {
     public static final String SHA_256 = "SHA-256";
     private static volatile  MinioClient minioClient;
 
-    private static final String FUNCTION_URL_FORMAT = "%s/%s.%s";
+    private static final String FILE_URL_FORMAT = "%s/%s.%s";
     private static final String AMAZON_S3_URL = "https://s3.amazonaws.com";
     private Base64.Encoder encoder = Base64.getEncoder();
 
@@ -67,6 +67,7 @@ public class MinioService implements S3BucketService {
     @Autowired
     private TenantService tenantService;
 
+    @Override
     public boolean uploadKubelessFunction(Computations computation, TenantId tenantId) throws IOException, NoSuchAlgorithmException, InvalidKeyException, XmlPullParserException{
         boolean status = false;
         try {
@@ -76,19 +77,14 @@ public class MinioService implements S3BucketService {
                 return false;
 
             MinioClient client = getMinioClientInstance();
-
-            Tenant tenant = tenantService.findTenantById(tenantId);
-            String bucketName = getBucketName(tenant, tenantId.toString());
-
-            boolean isPresent = client.bucketExists(bucketName);
-            if(!isPresent) {
-                client.makeBucket(bucketName);
+            BucketInfo bucketInfo = getBucketInfo(tenantId, client);
+            if(!bucketInfo.isPresent) {
+                client.makeBucket(bucketInfo.bucketName);
             }
             byte[] functionContent = md.getFunctionContent().getBytes();
             ByteArrayInputStream byteArrayInputStream =  new ByteArrayInputStream(functionContent);
             String functionObjectUrl = createFunctionObjectUrl(computation);
-
-            client.putObject(bucketName, functionObjectUrl, byteArrayInputStream, md.getFunctionContentType());
+            client.putObject(bucketInfo.bucketName, functionObjectUrl, byteArrayInputStream, md.getFunctionContentType());
             return true;
         }
         catch(MinioException e) {
@@ -102,21 +98,24 @@ public class MinioService implements S3BucketService {
         return tenant.getName().replaceAll(" ", "-").toLowerCase().concat(tenantId);
     }
 
+    @Override
     public List<String> getAllKubelessFunctionsForTenant(TenantId tenantId) throws IOException, NoSuchAlgorithmException, InvalidKeyException, XmlPullParserException {
+        return getObjectResourceByTenantAndType(tenantId, "functions");
+    }
+
+    private List<String> getObjectResourceByTenantAndType(TenantId tenantId, String type) throws NoSuchAlgorithmException, IOException, InvalidKeyException, XmlPullParserException {
         try {
             MinioClient client = getMinioClientInstance();
-            Tenant tenant = tenantService.findTenantById(tenantId);
-            String bucketName = getBucketName(tenant, tenantId.toString());
-            boolean isPresent = client.bucketExists(bucketName);
-            List<String> functionNames = new ArrayList<>();
-            if(isPresent){
-                Iterable<Result<Item>> functionObjects = client.listObjects(bucketName);
-                for (Result<Item> result : functionObjects) {
+            BucketInfo bucketInfo = getBucketInfo(tenantId, client);
+            List<String> resourceNames = new ArrayList<>();
+            if(bucketInfo.isPresent){
+                Iterable<Result<Item>> resourceObjects = client.listObjects(bucketInfo.bucketName, type, true);
+                for (Result<Item> result : resourceObjects) {
                     Item item = result.get();
-                    functionNames.add(item.name);
+                    resourceNames.add(item.name);
                 }
             }
-            return functionNames;
+            return resourceNames;
         }
         catch (MinioException e) {
             log.info(MINIO_EXECPTION, e);
@@ -124,6 +123,13 @@ public class MinioService implements S3BucketService {
         return Collections.emptyList();
     }
 
+    private BucketInfo getBucketInfo(TenantId tenantId, MinioClient client) throws InvalidBucketNameException, NoSuchAlgorithmException, InsufficientDataException, IOException, InvalidKeyException, NoResponseException, XmlPullParserException, ErrorResponseException, InternalException {
+        Tenant tenant = tenantService.findTenantById(tenantId);
+        String bucketName = getBucketName(tenant, tenantId.toString());
+        return new BucketInfo(bucketName, client.bucketExists(bucketName));
+    }
+
+    @Override
     public String getFunctionObjByTenantAndUrl(TenantId tenantId, Computations computation) throws IOException, NoSuchAlgorithmException, InvalidKeyException, XmlPullParserException {
         try {
             String functionObjectUrl = createFunctionObjectUrl(computation);
@@ -153,14 +159,54 @@ public class MinioService implements S3BucketService {
         try {
             String functionObjectUrl = createFunctionObjectUrl(computation);
             MinioClient client = getMinioClientInstance();
-            Tenant tenant = tenantService.findTenantById(computation.getTenantId());
-            String bucketName = getBucketName(tenant, computation.getTenantId().toString());
-            client.removeObject(bucketName, functionObjectUrl);
+            BucketInfo bucketInfo = getBucketInfo(computation.getTenantId(), client);
+            if (bucketInfo.isPresent)
+                client.removeObject(bucketInfo.bucketName, functionObjectUrl);
             return true;
         } catch (MinioException e) {
             log.info(MINIO_EXECPTION, e);
         }
         return false;
+    }
+
+    @Override
+    public boolean uploadFile(MultipartFile file, TenantId tenantId) throws IOException, NoSuchAlgorithmException, InvalidKeyException, XmlPullParserException{
+        try {
+            MinioClient client = getMinioClientInstance();
+            BucketInfo bucketInfo = getBucketInfo(tenantId, client);
+            if(!bucketInfo.isPresent) {
+                client.makeBucket(bucketInfo.bucketName);
+            }
+            byte[] fileContent = file.getBytes();
+            ByteArrayInputStream byteArrayInputStream =  new ByteArrayInputStream(fileContent);
+
+            String fileObjectUrl = String.format(FILE_URL_FORMAT, "files", file.getName(), file.getContentType());
+            client.putObject(bucketInfo.bucketName, fileObjectUrl, byteArrayInputStream, file.getContentType());
+            return true;
+        } catch (MinioException e) {
+            log.info(MINIO_EXECPTION, e);
+        }
+        return false;
+    }
+
+    @Override
+    public boolean deleteFile(TenantId tenantId, String fileName, String fileType) throws IOException, NoSuchAlgorithmException, InvalidKeyException, XmlPullParserException {
+        try {
+            String fileObjectUrl = String.format(FILE_URL_FORMAT, "files", fileName, fileType);
+            MinioClient client = getMinioClientInstance();
+            BucketInfo bucketInfo = getBucketInfo(tenantId, client);
+            if (bucketInfo.isPresent)
+                client.removeObject(bucketInfo.bucketName, fileObjectUrl);
+            return true;
+        } catch (MinioException e) {
+            log.info(MINIO_EXECPTION, e);
+        }
+        return false;
+    }
+
+    @Override
+    public List<String> getAllFilesForTenant(TenantId tenantId) throws IOException, NoSuchAlgorithmException, InvalidKeyException, XmlPullParserException {
+        return getObjectResourceByTenantAndType(tenantId, "files");
     }
 
     private boolean checksum(KubelessComputationMetadata md) {
@@ -186,9 +232,9 @@ public class MinioService implements S3BucketService {
         String functionObjUrl;
         String folderName = computation.getName().replace(" ","-").toLowerCase();
         if(type.contains("zip"))
-            functionObjUrl = String.format(FUNCTION_URL_FORMAT, folderName, functionName, "zip");
+            functionObjUrl = String.format(FILE_URL_FORMAT, folderName, functionName, "zip");
         else
-            functionObjUrl = String.format(FUNCTION_URL_FORMAT, folderName, functionName, type);
+            functionObjUrl = String.format(FILE_URL_FORMAT, folderName, functionName, type);
         return functionObjUrl;
     }
 
@@ -203,6 +249,12 @@ public class MinioService implements S3BucketService {
             }
         }
         return minioClient;
+    }
+
+    @AllArgsConstructor
+    private class BucketInfo {
+        String bucketName;
+        boolean isPresent;
     }
     
 }
