@@ -76,7 +76,7 @@ public class ComputationActor extends ContextAwareActor {
         if (!functionPresent) {
             KubelessComputationMetadata md = (KubelessComputationMetadata) computation.getComputationMetadata();
             try {
-                String functionContent = systemContext.getS3BucketService().getFunctionObjByTenantAndUrl(tenantId, computation);
+                String functionContent = systemContext.getKubelessService().getFunctionObjByTenantAndUrl(computation);
                 if (functionContent == null) {
                     throw new ComputationInitializationException("Kubeless Computation function not found!");
                 } else {
