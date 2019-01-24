@@ -20,6 +20,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hashmapinc.server.common.data.CustomerGroup;
 import com.hashmapinc.server.common.data.EntityType;
+import com.hashmapinc.server.common.data.Tenant;
 import com.hashmapinc.server.common.data.User;
 import com.hashmapinc.server.common.data.audit.ActionType;
 import com.hashmapinc.server.common.data.id.*;
@@ -30,6 +31,7 @@ import com.hashmapinc.server.common.data.security.UserCredentials;
 import com.hashmapinc.server.dao.model.ModelConstants;
 import com.hashmapinc.server.common.data.exception.TempusErrorCode;
 import com.hashmapinc.server.common.data.exception.TempusException;
+import com.hashmapinc.server.dao.tenant.TenantService;
 import com.hashmapinc.server.requests.CreateUserRequest;
 import com.hashmapinc.server.requests.IdentityUser;
 import com.hashmapinc.server.dao.mail.MailService;
@@ -70,6 +72,9 @@ public class UserController extends BaseController {
     @Autowired
     @Qualifier("clientRestTemplate")
     private RestTemplate restTemplate;
+
+    @Autowired
+    private TenantService tenantService;
 
     @PreAuthorize("hasAnyAuthority('SYS_ADMIN', 'TENANT_ADMIN', 'CUSTOMER_USER')")
     @GetMapping(value = "/user/{userId}")
@@ -130,6 +135,36 @@ public class UserController extends BaseController {
 
             throw handleException(e);
         }
+    }
+
+    @PostMapping(value = "/noauth/user")
+    @ResponseBody
+    public User saveTrialUser(@RequestBody User newUser,
+                         HttpServletRequest request) throws TempusException {
+        Tenant savedTenant = null;
+        try {
+            if (newUser.getAuthority() == Authority.TENANT_ADMIN) {
+                savedTenant = checkNotNull(createTenant(newUser));
+                newUser.setTenantId(savedTenant.getId());
+            }
+            User savedUser;
+            savedUser = createUser(newUser, "mail", request);
+
+            if (savedUser != null) {
+                assignDefaultGroupToTenantUser(savedUser.getTenantId(), savedUser.getId());
+            }
+            return savedUser;
+        } catch (Exception e) {
+            if(savedTenant != null)
+                tenantService.deleteTenant(savedTenant.getId());
+            throw handleException(e);
+        }
+    }
+
+    private Tenant createTenant(User newUser) {
+        Tenant tenant = new Tenant();
+        tenant.setTitle(newUser.getEmail());
+        return tenantService.saveTenant(tenant);
     }
 
     private void assignDefaultGroupToTenantUser(TenantId tenantId, UserId userId) {
