@@ -22,7 +22,7 @@ import defaultLogoSvg from '../../svg/Tempus_Logo_E_TagLineExtended_vectorized.s
 /* eslint-enable import/no-unresolved, import/default */
 
 /*@ngInject*/
-export default function SignUpController(toast, loginService, userService,$state) {
+export default function SignUpController(toast, loginService, userService,$state,signUpService, $log) {
     var vm = this;
 
     vm.logoSvg = logoSvg;
@@ -44,7 +44,15 @@ export default function SignUpController(toast, loginService, userService,$state
             return true;
     }
     function signup(){
-     $state.go('activation-link');
+     //$state.go('activation-link');
+     $log.log("vm.user")
+     $log.log(vm.signupRequest)
+     vm.signupRequest.authority = 'TENANT_ADMIN';
+     signUpService.saveTrialUser(vm.signupRequest).then(
+         function success(info) {
+             $log.log(info)
+         }
+     );
     }
 
 

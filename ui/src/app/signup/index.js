@@ -19,13 +19,15 @@ import uiRouter from 'angular-ui-router';
 
 import SignUpRoutes from './sign-up.routes';
 import SignUpController from './sign-up.controller';
+import tempusApiSignup from '../api/sign-up.service';
 import ActivationLinkController from './activation-link.controller'
 import 'angular-recaptcha';
 
 
 export default angular.module('tempus.signup', [
     uiRouter,
-    'vcRecaptcha'
+    'vcRecaptcha',
+    tempusApiSignup
 ])
     .config(SignUpRoutes)
     .controller('SignUpController', SignUpController)
