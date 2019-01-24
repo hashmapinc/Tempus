@@ -1177,7 +1177,7 @@ export default angular.module('tempus.locale', [])
                     "sign-in": "Please sign in",
                     "username": "Username (email)",
                     "remember-me": "Remember me",
-                    "forgot-password": "Forgot Password?",
+                    "forgot-credential": "Forgot Password?",
                     "password-reset": "Password reset",
                     "new-password": "New password",
                     "new-password-again": "New password again",
