@@ -53,7 +53,8 @@ import com.hashmapinc.server.service.cluster.routing.ClusterRoutingService;
 import com.hashmapinc.server.service.cluster.rpc.ClusterRpcService;
 import com.hashmapinc.server.service.component.ComponentDiscoveryService;
 import com.hashmapinc.server.service.computation.ComputationFunctionService;
-import com.hashmapinc.server.service.computation.S3BucketService;
+import com.hashmapinc.server.service.computation.KubelessService;
+import com.hashmapinc.server.service.computation.CloudStorageService;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 import lombok.Getter;
@@ -138,7 +139,10 @@ public class ActorSystemContext {
     @Getter private NodeMetricService nodeMetricService;
 
     @Autowired
-    @Getter private S3BucketService s3BucketService;
+    @Getter private CloudStorageService cloudStorageService;
+
+    @Autowired
+    @Getter private KubelessService kubelessService;
 
     @Autowired
     @Getter private UnitConversionService unitConversionService;

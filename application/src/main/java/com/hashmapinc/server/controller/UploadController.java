@@ -17,14 +17,15 @@
 package com.hashmapinc.server.controller;
 
 import com.hashmapinc.server.common.data.exception.TempusException;
-import com.hashmapinc.server.service.computation.S3BucketService;
+import com.hashmapinc.server.common.data.upload.FileObject;
+import com.hashmapinc.server.service.computation.CloudStorageService;
+import com.hashmapinc.server.service.upload.UploadService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.Collections;
 import java.util.List;
 
 @RestController
@@ -33,40 +34,57 @@ import java.util.List;
 public class UploadController extends BaseController {
 
     @Autowired
-    private S3BucketService s3BucketService;
+    private CloudStorageService cloudStorageService;
+
+    @Autowired
+    private UploadService uploadService;
 
     @PreAuthorize("hasAuthority('TENANT_ADMIN')")
     @PostMapping(value = "/file")
     @ResponseBody
-    public void upload(@RequestParam("file") MultipartFile file) throws TempusException {
+    public FileObject upload(@RequestParam("file") MultipartFile file) throws TempusException {
         try {
-            if(!s3BucketService.uploadFile(file, getCurrentUser().getTenantId()))
-                log.info("multipart file upload unsuccessful !!");
+            FileObject savedFileObject = checkNotNull(uploadService.uploadFile(file, getCurrentUser().getTenantId()));
+            return savedFileObject;
         } catch (Exception e) {
             log.info("Exception occurred {}", e);
+            throw handleException(e);
         }
     }
 
     @PreAuthorize("hasAuthority('TENANT_ADMIN')")
-    @GetMapping(value = "/files")
+    @GetMapping(value = "/file")
     @ResponseBody
-    public List<String> getFileList() {
+    public List<FileObject> getFileList() throws TempusException {
         try {
-            s3BucketService.getAllFilesForTenant(getCurrentUser().getTenantId());
+            return uploadService.getFileList(getCurrentUser().getTenantId());
         } catch (Exception e) {
             log.info("Exception occurred {}", e);
+            throw handleException(e);
         }
-        return Collections.emptyList();
     }
 
     @PreAuthorize("hasAuthority('TENANT_ADMIN')")
-    @DeleteMapping(value = "/file")
+    @GetMapping(value = "/file/{name}")
     @ResponseBody
-    public void deleteFile(@RequestParam String fileName, @RequestParam String fileType) {
+    public byte[] downloadFile(@PathVariable("name") String name) throws TempusException {
         try {
-            s3BucketService.deleteFile(getCurrentUser().getTenantId(), fileName, fileType);
+            return uploadService.downloadFile(name, getCurrentUser().getTenantId());
         } catch (Exception e) {
             log.info("Exception occurred {}", e);
+            throw handleException(e);
+        }
+    }
+
+    @PreAuthorize("hasAuthority('TENANT_ADMIN')")
+    @DeleteMapping(value = "/file/{name}")
+    @ResponseBody
+    public void deleteFile(@PathVariable("name") String name) throws TempusException {
+        try {
+            uploadService.deleteFile(name, getCurrentUser().getTenantId());
+        } catch (Exception e) {
+            log.info("Exception occurred {}", e);
+            throw handleException(e);
         }
     }
 }

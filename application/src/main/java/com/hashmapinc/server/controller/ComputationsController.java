@@ -23,6 +23,8 @@ import com.hashmapinc.server.common.data.computation.ComputationJob;
 import com.hashmapinc.server.common.data.computation.ComputationType;
 import com.hashmapinc.server.common.data.computation.Computations;
 import com.hashmapinc.server.common.data.computation.SparkComputationMetadata;
+import com.hashmapinc.server.common.data.exception.TempusErrorCode;
+import com.hashmapinc.server.common.data.exception.TempusException;
 import com.hashmapinc.server.common.data.id.ComputationId;
 import com.hashmapinc.server.common.data.id.TenantId;
 import com.hashmapinc.server.common.data.page.TextPageData;
@@ -30,11 +32,10 @@ import com.hashmapinc.server.common.data.page.TextPageLink;
 import com.hashmapinc.server.common.data.plugin.ComponentLifecycleEvent;
 import com.hashmapinc.server.common.data.security.Authority;
 import com.hashmapinc.server.dao.model.ModelConstants;
-import com.hashmapinc.server.common.data.exception.TempusErrorCode;
-import com.hashmapinc.server.common.data.exception.TempusException;
 import com.hashmapinc.server.service.computation.ComputationDiscoveryService;
 import com.hashmapinc.server.service.computation.ComputationFunctionService;
-import com.hashmapinc.server.service.computation.S3BucketService;
+import com.hashmapinc.server.service.computation.KubelessService;
+import com.hashmapinc.server.service.computation.CloudStorageService;
 import com.hashmapinc.server.service.security.model.SecurityUser;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,8 +58,8 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static com.hashmapinc.server.dao.service.Validator.validateId;
 import static com.hashmapinc.server.common.data.exception.TempusErrorCode.ITEM_NOT_FOUND;
+import static com.hashmapinc.server.dao.service.Validator.validateId;
 
 @Slf4j
 @RestController
@@ -74,7 +75,10 @@ public class ComputationsController extends BaseController {
     private ComputationDiscoveryService computationDiscoveryService;
 
     @Autowired
-    private S3BucketService s3BucketService;
+    private CloudStorageService cloudStorageService;
+
+    @Autowired
+    private KubelessService kubelessService;
 
     @Autowired
     private ComputationFunctionService computationFunctionService;
@@ -122,7 +126,7 @@ public class ComputationsController extends BaseController {
                 ComputationId computationId = new ComputationId(UUIDs.timeBased());
                 computation.setId(computationId);
                 computation.getComputationMetadata().setId(computationId);
-                if (s3BucketService.uploadKubelessFunction(computation, tenantId)) {
+                if (kubelessService.uploadKubelessFunction(computation)) {
                     computationsService.save(computation);
                     actorService.onComputationStateChange(tenantId, computation.getId(), ComponentLifecycleEvent.CREATED);
                 }
@@ -161,7 +165,7 @@ public class ComputationsController extends BaseController {
             }
             else if (computation.getType() == ComputationType.KUBELESS) {
                 actorService.onComputationStateChange(computation.getTenantId(), computation.getId(), ComponentLifecycleEvent.DELETED);
-                s3BucketService.deleteKubelessFunction(computation);
+                kubelessService.deleteKubelessFunction(computation);
             }
             logEntityAction(computationId,computation,getCurrentUser().getCustomerId(),
                     ActionType.DELETED, null, strComputationId);
