@@ -24,12 +24,35 @@
 
     <div class="md-toolbar-tools">
         <span flex></span>
-        <md-button class="md-icon-button" ng-click="addFile($event)">
+
+        <input type="file" id="file" style="display:none;" />
+        <md-button class="md-icon-button" ng-click="thisFileUpload()">
             <md-icon>add</md-icon>
             <md-tooltip md-direction="top">
                 {{ 'action.add' | translate }}
             </md-tooltip>
         </md-button>
+
+        <!--<div class="image-upload">-->
+            <!--<label for="file-input">-->
+                <!--<img src="placeholder.jpg"/>-->
+            <!--</label>-->
+
+            <!--<input id="file-input" type="file"/>-->
+        <!--</div>-->
+       <!-- <div class="choose_file">
+            <input name="img" type="file" accept="image/*" />
+        </div>
+
+        <md-button for="file-input" class="md-icon-button">
+            <md-icon >add</md-icon>
+            <md-tooltip md-direction="top">
+                {{ 'action.add' | translate }}
+            </md-tooltip>
+
+        </md-button>-->
+
+
         <md-button class="md-icon-button" ng-click="enterFilterMode()">
             <md-icon>search</md-icon>
             <md-tooltip md-direction="top">
@@ -56,12 +79,14 @@
         </tr>
         </thead>
         <tbody md-body>
-        <tr md-row >
-            <td md-cell > file1.pdf</a></td>
-            <td md-cell style="text-transform: uppercase"> 29/12/2005</td>
-            <td md-cell style="width:40%;">pdf</td>
-            <td md-cell>780 kb</td>
-            <td md-cell class="tb-value-cell"><span><ng-md-icon icon="file_download" ><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24"><path d="M19 9h-4V3H9v6H5l7 7 7-7z"></path><path d="M5 18v2h14v-2H5z"></path></svg></ng-md-icon></span></td>
+        <tr md-row ng-repeat="file in files">
+            <td md-cell >{{file.fileName}}</td>
+            <td md-cell >{{file.lastModified}}</td>
+            <td md-cell >{{file.fileType}}</td>
+            <td md-cell >{{file.fileSize}}</td>
+            <td md-cell class="tb-value-cell">
+                <span><ng-md-icon icon="file_download" ><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24"><path d="M19 9h-4V3H9v6H5l7 7 7-7z"></path><path d="M5 18v2h14v-2H5z"></path></svg></ng-md-icon></span>
+            </td>
             <td md-cell class="tb-value-cell" ng-click="deleteDevice($event, device)">
                 <span><ng-md-icon size="20" icon="delete"></ng-md-icon></span>
             </td>
@@ -71,26 +96,3 @@
     </table>
 </md-table-container>
 
-<br>
-
-
-    <!--<table >-->
-        <!--<thead >-->
-        <!--<tr >-->
-            <!--<th style="border: 1px solid #dddddd;text-align: left; padding: 8px;"><span translate>File Name</span></th>-->
-            <!--<th style="border: 1px solid #dddddd;text-align: left; padding: 8px;"><span translate>Created On</span></th>-->
-            <!--<th style="border: 1px solid #dddddd;text-align: left; padding: 8px;"><span translate>File Type</span></th>-->
-            <!--<th style="border: 1px solid #dddddd;text-align: left; padding: 8px;"><span translate>File Size</span></th>-->
-
-        <!--</tr>-->
-        <!--</thead>-->
-        <!--<tbody >-->
-        <!--<tr  >-->
-            <!--<td style="border: 1px solid #dddddd;text-align: left; padding: 8px;"> file1.pdf</a></td>-->
-            <!--<td  style="border: 1px solid #dddddd;text-align: left; padding: 8px;"> 29/12/2005</td>-->
-            <!--<td style="border: 1px solid #dddddd;text-align: left; padding: 8px;">pdf</td>-->
-            <!--<td style="border: 1px solid #dddddd;text-align: left; padding: 8px;">780 kb</td>-->
-
-        <!--</tr>-->
-        <!--</tbody>-->
-    <!--</table>-->

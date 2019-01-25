@@ -15,13 +15,14 @@
  * limitations under the License.
  */
 import uiRouter from 'angular-ui-router';
-
+import tempusApiFileUpload from '../api/file-upload.service';
 
 import FileUploadRoutes from './file-upload.routes';
 import FileUploadController from './file-upload.controller';
 
 export default angular.module('tempus.fileUpload', [
-    uiRouter
+    uiRouter,
+    tempusApiFileUpload
 ])
     .config(FileUploadRoutes)
     .controller('FileUploadController', FileUploadController)
