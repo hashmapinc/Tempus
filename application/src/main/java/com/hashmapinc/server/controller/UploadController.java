@@ -44,6 +44,7 @@ public class UploadController extends BaseController {
     @ResponseBody
     public FileObject upload(@RequestParam("file") MultipartFile file) throws TempusException {
         try {
+            log.info("Upload hit" );
             FileObject savedFileObject = checkNotNull(uploadService.uploadFile(file, getCurrentUser().getTenantId()));
             return savedFileObject;
         } catch (Exception e) {
