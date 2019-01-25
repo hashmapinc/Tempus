@@ -52,8 +52,8 @@ import com.hashmapinc.server.service.cluster.discovery.DiscoveryService;
 import com.hashmapinc.server.service.cluster.routing.ClusterRoutingService;
 import com.hashmapinc.server.service.cluster.rpc.ClusterRpcService;
 import com.hashmapinc.server.service.component.ComponentDiscoveryService;
-import com.hashmapinc.server.service.computation.ComputationFunctionService;
-import com.hashmapinc.server.service.computation.KubelessService;
+import com.hashmapinc.server.service.computation.KubelessDeploymentService;
+import com.hashmapinc.server.service.computation.KubelessStorageService;
 import com.hashmapinc.server.service.computation.CloudStorageService;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
@@ -142,13 +142,13 @@ public class ActorSystemContext {
     @Getter private CloudStorageService cloudStorageService;
 
     @Autowired
-    @Getter private KubelessService kubelessService;
+    @Getter private KubelessStorageService kubelessStorageService;
 
     @Autowired
     @Getter private UnitConversionService unitConversionService;
 
     @Autowired
-    @Getter private ComputationFunctionService computationFunctionService;
+    @Getter private KubelessDeploymentService kubelessDeploymentService;
 
     @Autowired
     @Getter @Setter private PluginWebSocketMsgEndpoint wsMsgEndpoint;

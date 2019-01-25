@@ -14,23 +14,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.hashmapinc.server.service;
+package com.hashmapinc.server.common.data.upload;
 
-import com.hashmapinc.server.common.data.Tenant;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 
-public class CloudStorageServiceUtils {
+import java.io.InputStream;
 
-    private static final String FILE_URL_FORMAT = "/%s/%s";
-    private static final String FOLDER_URL_FORMAT = "/%s";
-
-    public static String createBucketName(Tenant tenant) {
-        return tenant.getName().toLowerCase().replace(" ", "-");
-    }
-
-    public static String createObjectUrl(String fileName, String type) {
-        if (fileName.contentEquals(""))
-            return String.format(FOLDER_URL_FORMAT, type);
-        return String.format(FILE_URL_FORMAT, type, fileName.toLowerCase().replace(" ", "-"));
-    }
-
+@AllArgsConstructor
+@Data
+public class InputStreamWrapper {
+    private InputStream inputStream;
+    private String contentType;
 }
