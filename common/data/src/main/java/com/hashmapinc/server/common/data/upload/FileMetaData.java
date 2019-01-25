@@ -14,16 +14,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.hashmapinc.server.service.computation;
+package com.hashmapinc.server.common.data.upload;
 
-import com.hashmapinc.server.common.data.computation.ComputationJob;
-import com.hashmapinc.server.common.data.computation.Computations;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-public interface ComputationFunctionService {
-    boolean deployKubelessFunction(Computations computations);
-    boolean checkKubelessFunction(Computations computation);
-    boolean deleteKubelessFunction(Computations computation);
-    boolean createTrigger(ComputationJob computationJob);
-    boolean checkTrigger(ComputationJob computationJob);
-    boolean deleteTrigger(ComputationJob computationJob);
+import java.util.Date;
+
+@NoArgsConstructor
+@AllArgsConstructor
+@Data
+public class FileMetaData {
+    private String fileName;
+    private String extension;
+    private Date lastUpdated;
+    private long size;
 }

@@ -32,7 +32,7 @@ import com.hashmapinc.server.common.data.page.PageDataIterable;
 import com.hashmapinc.server.common.data.plugin.ComponentLifecycleEvent;
 import com.hashmapinc.server.common.data.plugin.ComponentLifecycleState;
 import com.hashmapinc.server.common.msg.plugin.ComponentLifecycleMsg;
-import com.hashmapinc.server.service.computation.ComputationFunctionService;
+import com.hashmapinc.server.service.computation.KubelessDeploymentService;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -72,16 +72,16 @@ public class ComputationActor extends ContextAwareActor {
     }
 
     private void checkOrDeployKubelessFunction() {
-        boolean functionPresent = systemContext.getComputationFunctionService().checkKubelessFunction(computation);
+        boolean functionPresent = systemContext.getKubelessDeploymentService().checkKubelessFunction(computation);
         if (!functionPresent) {
             KubelessComputationMetadata md = (KubelessComputationMetadata) computation.getComputationMetadata();
             try {
-                String functionContent = systemContext.getKubelessService().getFunctionObjByTenantAndUrl(computation);
+                String functionContent = systemContext.getKubelessStorageService().getFunction(computation);
                 if (functionContent == null) {
                     throw new ComputationInitializationException("Kubeless Computation function not found!");
                 } else {
                     md.setFunctionContent(functionContent);
-                    if(!systemContext.getComputationFunctionService().deployKubelessFunction(computation))
+                    if(!systemContext.getKubelessDeploymentService().deployKubelessFunction(computation))
                         systemContext.getComputationsService().deleteById(computationId);
                 }
             } catch (Exception e ){
@@ -172,7 +172,7 @@ public class ComputationActor extends ContextAwareActor {
 
     private void handleDeleteMsgForComputationType() {
         if (computation != null && computation.getType() == ComputationType.KUBELESS) {
-            ComputationFunctionService service = systemContext.getComputationFunctionService();
+            KubelessDeploymentService service = systemContext.getKubelessDeploymentService();
             if (service.deleteKubelessFunction(computation))
                 systemContext.getComputationsService().deleteById(computationId);
         }

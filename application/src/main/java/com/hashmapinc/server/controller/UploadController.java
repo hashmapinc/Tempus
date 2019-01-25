@@ -17,15 +17,18 @@
 package com.hashmapinc.server.controller;
 
 import com.hashmapinc.server.common.data.exception.TempusException;
-import com.hashmapinc.server.common.data.upload.FileObject;
+import com.hashmapinc.server.common.data.upload.InputStreamWrapper;
+import com.hashmapinc.server.common.data.upload.FileMetaData;
 import com.hashmapinc.server.service.computation.CloudStorageService;
 import com.hashmapinc.server.service.upload.UploadService;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 
 @RestController
@@ -42,11 +45,10 @@ public class UploadController extends BaseController {
     @PreAuthorize("hasAuthority('TENANT_ADMIN')")
     @PostMapping(value = "/file")
     @ResponseBody
-    public FileObject upload(@RequestParam("file") MultipartFile file) throws TempusException {
+    public FileMetaData upload(@RequestParam("file") MultipartFile file) throws TempusException {
         try {
-            log.info("Upload hit" );
-            FileObject savedFileObject = checkNotNull(uploadService.uploadFile(file, getCurrentUser().getTenantId()));
-            return savedFileObject;
+            FileMetaData savedFileMetaData = checkNotNull(uploadService.uploadFile(file, getCurrentUser().getTenantId()));
+            return savedFileMetaData;
         } catch (Exception e) {
             log.info("Exception occurred {}", e);
             throw handleException(e);
@@ -56,7 +58,7 @@ public class UploadController extends BaseController {
     @PreAuthorize("hasAuthority('TENANT_ADMIN')")
     @GetMapping(value = "/file")
     @ResponseBody
-    public List<FileObject> getFileList() throws TempusException {
+    public List<FileMetaData> getFileList() throws TempusException {
         try {
             return uploadService.getFileList(getCurrentUser().getTenantId());
         } catch (Exception e) {
@@ -68,9 +70,13 @@ public class UploadController extends BaseController {
     @PreAuthorize("hasAuthority('TENANT_ADMIN')")
     @GetMapping(value = "/file/{name}")
     @ResponseBody
-    public byte[] downloadFile(@PathVariable("name") String name) throws TempusException {
+    public void downloadFile(@PathVariable("name") String name, HttpServletResponse response) throws TempusException {
         try {
-            return uploadService.downloadFile(name, getCurrentUser().getTenantId());
+            InputStreamWrapper inputStreamWrapper = uploadService.downloadFile(name, getCurrentUser().getTenantId());
+            response.addHeader("Content-disposition", "attachment;filename=" + name);
+            response.setContentType(inputStreamWrapper.getContentType());
+            IOUtils.copy(inputStreamWrapper.getInputStream(), response.getOutputStream());
+            response.flushBuffer();
         } catch (Exception e) {
             log.info("Exception occurred {}", e);
             throw handleException(e);

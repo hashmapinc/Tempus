@@ -33,9 +33,8 @@ import com.hashmapinc.server.common.data.plugin.ComponentLifecycleEvent;
 import com.hashmapinc.server.common.data.security.Authority;
 import com.hashmapinc.server.dao.model.ModelConstants;
 import com.hashmapinc.server.service.computation.ComputationDiscoveryService;
-import com.hashmapinc.server.service.computation.ComputationFunctionService;
-import com.hashmapinc.server.service.computation.KubelessService;
-import com.hashmapinc.server.service.computation.CloudStorageService;
+import com.hashmapinc.server.service.computation.KubelessDeploymentService;
+import com.hashmapinc.server.service.computation.KubelessStorageService;
 import com.hashmapinc.server.service.security.model.SecurityUser;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -75,13 +74,10 @@ public class ComputationsController extends BaseController {
     private ComputationDiscoveryService computationDiscoveryService;
 
     @Autowired
-    private CloudStorageService cloudStorageService;
+    private KubelessStorageService kubelessStorageService;
 
     @Autowired
-    private KubelessService kubelessService;
-
-    @Autowired
-    private ComputationFunctionService computationFunctionService;
+    private KubelessDeploymentService kubelessDeploymentService;
 
     @PreAuthorize("hasAuthority('TENANT_ADMIN')")
     @PostMapping(value = "/computations/upload", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -126,7 +122,7 @@ public class ComputationsController extends BaseController {
                 ComputationId computationId = new ComputationId(UUIDs.timeBased());
                 computation.setId(computationId);
                 computation.getComputationMetadata().setId(computationId);
-                if (kubelessService.uploadKubelessFunction(computation)) {
+                if (kubelessStorageService.uploadFunction(computation)) {
                     computationsService.save(computation);
                     actorService.onComputationStateChange(tenantId, computation.getId(), ComponentLifecycleEvent.CREATED);
                 }
@@ -165,7 +161,7 @@ public class ComputationsController extends BaseController {
             }
             else if (computation.getType() == ComputationType.KUBELESS) {
                 actorService.onComputationStateChange(computation.getTenantId(), computation.getId(), ComponentLifecycleEvent.DELETED);
-                kubelessService.deleteKubelessFunction(computation);
+                kubelessStorageService.deleteFunction(computation);
             }
             logEntityAction(computationId,computation,getCurrentUser().getCustomerId(),
                     ActionType.DELETED, null, strComputationId);
@@ -209,7 +205,7 @@ public class ComputationsController extends BaseController {
                 while(itr.hasNext()){
                     Computations computation = (Computations) itr.next();
                     if(computation.getType() == ComputationType.KUBELESS &&
-                            (!computationFunctionService.checkKubelessFunction(computation))) {
+                            (!kubelessDeploymentService.checkKubelessFunction(computation))) {
                         itr.remove();
                     }
                 }
@@ -229,7 +225,7 @@ public class ComputationsController extends BaseController {
             ComputationId computationId = new ComputationId(toUUID(strComputationId));
             Computations computation = checkNotNull(computationsService.findById(computationId));
             if(computation.getType() == ComputationType.KUBELESS
-                    && !computationFunctionService.checkKubelessFunction(computation)) {
+                    && !kubelessDeploymentService.checkKubelessFunction(computation)) {
                 throw new TempusException("Kubeless fuction not present in kubernetes cluster ", ITEM_NOT_FOUND);
             }
             log.info(" returning Computations by id {} ", computation);

@@ -46,7 +46,7 @@ import java.util.Map;
 
 @Slf4j
 @Service
-public class KubelessFunctionService implements ComputationFunctionService {
+public class KubelessFunctionService implements KubelessDeploymentService {
 
     public static final String DEFAULT_NAMESPACE = "default";
     public static final String TXT = "txt";

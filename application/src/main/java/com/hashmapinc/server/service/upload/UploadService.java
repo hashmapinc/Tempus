@@ -17,7 +17,9 @@
 package com.hashmapinc.server.service.upload;
 
 import com.hashmapinc.server.common.data.id.TenantId;
-import com.hashmapinc.server.common.data.upload.FileObject;
+import com.hashmapinc.server.common.data.upload.InputStreamWrapper;
+import com.hashmapinc.server.common.data.upload.FileMetaData;
+import com.hashmapinc.server.common.data.upload.StorageTypes;
 import com.hashmapinc.server.dao.tenant.TenantService;
 import com.hashmapinc.server.service.CloudStorageServiceUtils;
 import com.hashmapinc.server.service.computation.CloudStorageService;
@@ -39,44 +41,45 @@ public class UploadService {
     @Autowired
     private TenantService tenantService;
 
-    public FileObject uploadFile(MultipartFile file, TenantId tenantId) throws Exception {
-        String bucketName = CloudStorageServiceUtils.createBucketName(tenantId, tenantService);
-        String s3ObjectUrl = CloudStorageServiceUtils.createObjectUrl(file.getName(), "files");
-        if(cloudStorageService.upload(bucketName, s3ObjectUrl, file.getBytes())) {
+    public FileMetaData uploadFile(MultipartFile file, TenantId tenantId) throws Exception {
+        String bucketName = CloudStorageServiceUtils.createBucketName(tenantService.findTenantById(tenantId));
+        String objectUrl = CloudStorageServiceUtils.createObjectUrl(file.getOriginalFilename(), StorageTypes.FILES);
+        if(cloudStorageService.upload(bucketName, objectUrl, file.getInputStream(), file.getContentType())) {
             log.info("File uploaded to cloud storage ");
-            List<FileObject> fileObjects = new ArrayList<>();
-            List<Item> items = cloudStorageService.getAllFiles(bucketName, s3ObjectUrl);
-            items.forEach(item -> addFileObjects(fileObjects, item));
-            return fileObjects.get(0);
+            List<FileMetaData> fileMetaDataList = new ArrayList<>();
+            List<Item> items = cloudStorageService.getAllFiles(bucketName, StorageTypes.FILES + "/" + file.getOriginalFilename());
+            items.forEach(item -> addFileObjects(fileMetaDataList, item));
+            return fileMetaDataList.get(0);
         }
         return null;
     }
 
-    public List<FileObject> getFileList(TenantId tenantId) throws Exception{
-        String bucketName = CloudStorageServiceUtils.createBucketName(tenantId, tenantService);
-        List<FileObject> fileObjects = new ArrayList<>();
-        List<Item> items = cloudStorageService.getAllFiles(bucketName, "files");
-        items.forEach(item -> addFileObjects(fileObjects, item));
-        return fileObjects;
+    public List<FileMetaData> getFileList(TenantId tenantId) throws Exception{
+        String bucketName = CloudStorageServiceUtils.createBucketName(tenantService.findTenantById(tenantId));
+        List<FileMetaData> fileMetaDataList = new ArrayList<>();
+        List<Item> items = cloudStorageService.getAllFiles(bucketName, StorageTypes.FILES);
+        items.forEach(item -> addFileObjects(fileMetaDataList, item));
+        return fileMetaDataList;
     }
 
-    public byte[] downloadFile(String fileName, TenantId tenantId) throws Exception {
-        String bucketName = CloudStorageServiceUtils.createBucketName(tenantId, tenantService);
-        String s3ObjectUrl = CloudStorageServiceUtils.createObjectUrl(fileName, "files");
-        return cloudStorageService.getFile(bucketName, s3ObjectUrl).getBytes();
+    public InputStreamWrapper downloadFile(String fileName, TenantId tenantId) throws Exception {
+        String bucketName = CloudStorageServiceUtils.createBucketName(tenantService.findTenantById(tenantId));
+        String s3ObjectUrl = CloudStorageServiceUtils.createObjectUrl(fileName, StorageTypes.FILES);
+        return cloudStorageService.getFile(bucketName, s3ObjectUrl);
     }
 
     public void deleteFile(String fileName, TenantId tenantId) throws Exception {
-        String bucketName = CloudStorageServiceUtils.createBucketName(tenantId, tenantService);
-        String s3ObjectUrl = CloudStorageServiceUtils.createObjectUrl(fileName, "files");
+        String bucketName = CloudStorageServiceUtils.createBucketName(tenantService.findTenantById(tenantId));
+        String s3ObjectUrl = CloudStorageServiceUtils.createObjectUrl(fileName, StorageTypes.FILES);
         cloudStorageService.delete(bucketName, s3ObjectUrl);
     }
 
-    private boolean addFileObjects(List<FileObject> fileObjects, Item item) {
+    private boolean addFileObjects(List<FileMetaData> fileMetaData, Item item) {
         String[] arrList = item.objectName().split("/");
-        String[] arrList2 = arrList[arrList.length - 1].split(".");
+        String fileName = arrList[arrList.length -1];
+        String[] arrList2 = fileName.split("\\.");
         if (arrList2.length == 2)
-            return fileObjects.add(new FileObject(arrList[arrList.length - 1], arrList2[1], item.lastModified(), item.objectSize()));
-        return fileObjects.add(new FileObject(arrList[arrList.length - 1], "NA", item.lastModified(), item.objectSize()));
+            return fileMetaData.add(new FileMetaData(fileName, arrList2[1], item.lastModified(), item.objectSize()));
+        return fileMetaData.add(new FileMetaData(fileName, "NA", item.lastModified(), item.objectSize()));
     }
 }

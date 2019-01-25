@@ -16,24 +16,33 @@
  */
 package com.hashmapinc.server.service.computation;
 
+import com.hashmapinc.server.common.data.Tenant;
 import com.hashmapinc.server.common.data.computation.Computations;
 import com.hashmapinc.server.common.data.computation.KubelessComputationMetadata;
+import com.hashmapinc.server.common.data.upload.InputStreamWrapper;
+import com.hashmapinc.server.common.data.upload.StorageTypes;
 import com.hashmapinc.server.dao.tenant.TenantService;
 import com.hashmapinc.server.service.CloudStorageServiceUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Base64;
 
 @Service
 @Slf4j
-public class KubelessService {
+public class KubelessStorageService {
 
     private Base64.Encoder encoder = Base64.getEncoder();
-    public static final String SHA_256 = "SHA-256";
+
+    static final String SHA_256 = "SHA-256";
+
+    public static final int BUFFER_SIZE = 16384;
 
     @Autowired
     MinioService minioService;
@@ -41,24 +50,39 @@ public class KubelessService {
     @Autowired
     TenantService tenantService;
 
-    public boolean uploadKubelessFunction(Computations computation) throws Exception {
+
+    public boolean uploadFunction(Computations computation) throws Exception {
         KubelessComputationMetadata md = (KubelessComputationMetadata) computation.getComputationMetadata();
         if (!checksum(md))
             return false;
-        String bucketName = CloudStorageServiceUtils.createBucketName(computation.getTenantId(), tenantService);
-        String objectUrl = CloudStorageServiceUtils.createObjectUrl(computation.getName(), "function");
-        return minioService.upload(bucketName, objectUrl, md.getFunctionContent().getBytes());
+        Tenant tenant = tenantService.findTenantById(computation.getTenantId());
+        String bucketName = CloudStorageServiceUtils.createBucketName(tenant);
+        String objectUrl = CloudStorageServiceUtils.createObjectUrl(computation.getName(), StorageTypes.FUNCTIONS);
+        ByteArrayInputStream byteArrayInputStream =  new ByteArrayInputStream(md.getFunctionContent().getBytes());
+        return minioService.upload(bucketName, objectUrl, byteArrayInputStream, md.getFunctionContentType());
     }
 
-    public String getFunctionObjByTenantAndUrl(Computations computation) throws Exception{
-        String bucketName = CloudStorageServiceUtils.createBucketName(computation.getTenantId(), tenantService);
-        String objectUrl = CloudStorageServiceUtils.createObjectUrl(computation.getName(), "function");
-        return minioService.getFile(bucketName, objectUrl);
+    public String getFunction(Computations computation) throws Exception{
+        Tenant tenant = tenantService.findTenantById(computation.getTenantId());
+        String bucketName = CloudStorageServiceUtils.createBucketName(tenant);
+        String objectUrl = CloudStorageServiceUtils.createObjectUrl(computation.getName(), StorageTypes.FUNCTIONS);
+
+        InputStreamWrapper inputStreamWrapper = minioService.getFile(bucketName, objectUrl);
+        InputStream stream = inputStreamWrapper.getInputStream();
+        byte[] buf = new byte[BUFFER_SIZE];
+        int bytesRead;
+        StringBuilder fileContent = new StringBuilder();
+        while ((bytesRead = stream.read(buf, 0, buf.length)) >= 0) {
+            fileContent.append(new String(buf, 0, bytesRead, StandardCharsets.UTF_8));
+        }
+        stream.close();
+        return fileContent.toString();
     }
 
-    public boolean deleteKubelessFunction(Computations computation) throws Exception{
-        String bucketName = CloudStorageServiceUtils.createBucketName(computation.getTenantId(), tenantService);
-        String objectUrl = CloudStorageServiceUtils.createObjectUrl(computation.getName(), "function");
+    public boolean deleteFunction(Computations computation) throws Exception{
+        Tenant tenant = tenantService.findTenantById(computation.getTenantId());
+        String bucketName = CloudStorageServiceUtils.createBucketName(tenant);
+        String objectUrl = CloudStorageServiceUtils.createObjectUrl(computation.getName(), StorageTypes.FUNCTIONS);
         return minioService.delete(bucketName, objectUrl);
     }
 
