@@ -367,7 +367,8 @@ export default angular.module('tempus.locale', [])
                     "delete-templates-action-title":"Delete { count, select, 1 {1 template} other {# templates} }",
                     "delete-templates-text": "Be careful, after the confirmation all selected templates will be removed.",
                     "no-template-text":"No Templates Available",
-                    "createdDate":"Created Date"
+                    "createdDate":"Created Date",
+                    "copyFrom":"Copy From Existing Template"
 
 
                 },
@@ -1434,7 +1435,8 @@ export default angular.module('tempus.locale', [])
                     "idCopiedMessage": "Rule Id has been copied to clipboard",
                     "select-rule": "Select rule",
                     "no-rules-matching": "No rules matching '{{entity}}' were found.",
-                    "rule-required": "Rule is required"
+                    "rule-required": "Rule is required",
+                    "templates":"Templates"
                 },
                 "rule-plugin": {
                     "management": "Rules and plugins management"
