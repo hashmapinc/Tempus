@@ -69,6 +69,7 @@ import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.mock.http.MockHttpInputMessage;
 import org.springframework.mock.http.MockHttpOutputMessage;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.oauth2.common.DefaultOAuth2AccessToken;
 import org.springframework.security.oauth2.common.DefaultOAuth2RefreshToken;
 import org.springframework.test.annotation.DirtiesContext;
@@ -80,9 +81,11 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.ResultMatcher;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.naming.Context;
 import javax.naming.directory.*;
@@ -144,6 +147,8 @@ public abstract class AbstractControllerTest {
     protected MediaType contentType = new MediaType(MediaType.APPLICATION_JSON.getType(),
             MediaType.APPLICATION_JSON.getSubtype(),
             Charset.forName("utf8"));
+
+    protected MediaType contentTypeFile = new MediaType(MediaType.MULTIPART_FORM_DATA.getType());
 
     protected MockMvc mockMvc;
 
@@ -612,6 +617,10 @@ public abstract class AbstractControllerTest {
         return readResponse(doPost(urlTemplate, content, params).andExpect(status().isOk()), responseClass);
     }
 
+    protected <T, R> R doPostFile(String urlTemplate, T content, Class<R> responseClass, String... params) throws Exception {
+        return readResponse(doPostFile(urlTemplate, content, params).andExpect(status().isOk()), responseClass);
+    }
+
     protected <T, R> R doPostWithDifferentResponse(String urlTemplate, T content, Class<R> responseClass, String... params) throws Exception {
         return readResponse(doPost(urlTemplate, content, params).andExpect(status().isOk()), responseClass);
     }
@@ -647,6 +656,12 @@ public abstract class AbstractControllerTest {
         return mockMvc.perform(postRequest);
     }
 
+    protected <T> ResultActions doPostFile(String urlTemplate, T content, String... params) throws Exception {
+        MockMultipartFile file = (MockMultipartFile) content;
+        MockHttpServletRequestBuilder postRequest = MockMvcRequestBuilders.multipart(urlTemplate).file(file);
+        setJwtToken(postRequest);
+        return mockMvc.perform(postRequest);
+    }
 
     protected <T> ResultActions doPut(String urlTemplate, T content, String... params) throws Exception {
         MockHttpServletRequestBuilder postRequest = put(urlTemplate);
