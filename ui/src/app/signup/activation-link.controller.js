@@ -31,11 +31,12 @@ export default function ActivationLinkController(signUpService, $stateParams, to
              function success() {
                  vm.buttonDisabled = true;
                 toast.showSuccess($translate.instant('signup.emailSuccess'));
+                $timeout(function(){
+                        vm.buttonDisabled = false;
+                    },50000);
              }
          );
 
     }
-    $timeout(function(){
-        vm.buttonDisabled = false;
-    },50000);
+
 }
