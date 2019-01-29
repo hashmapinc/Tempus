@@ -110,7 +110,7 @@ export default function ExtensionDialogController($scope, $mdDialog, $translate,
                     vm.entityType,
                     vm.entityId,
                     types.attributesScope.shared.value,
-                    [{key:"configuration", value:editedValue}]
+                    [{key:types.extensionFilter.extensionFilterConfiguration, value:editedValue}]
                 )
                 .then(function success() {
                 });
