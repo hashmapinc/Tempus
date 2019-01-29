@@ -18,7 +18,7 @@
 -->
 <md-content layout="row" layout-align="center center" class="hm-background-{{theme}} layout-align-center-center layout-row">
     <md-card style="background: transparent;height: 100%;
-    max-height: 750px;
+    max-height: 850px;
     overflow-y: auto;
     overflow-x: hidden;
     box-shadow:inset 0 0 10px #000000;" flex="initial" class="tb-login-card">
@@ -42,7 +42,7 @@
                 <div layout="row">
                     <md-input-container flex="50">
                         <label style="color:white !important;">First Name</label>
-                        <input required name="firstName" ng-model="vm.signupRequest.firstName" style="border-color:white;">
+                        <input required name="firstName" ng-model="vm.signupRequest.firstName" style="border-color:white;color:white !important;">
                         <div ng-messages="vm.user.firstName.$error">
                             <div ng-message="required">This is required.</div>
                         </div>
@@ -50,7 +50,7 @@
 
                     <md-input-container flex="50">
                         <label style="color:white !important;">Last Name</label>
-                        <input required name="firstName" ng-model="vm.signupRequest.lastName" style="border-color:white;">
+                        <input required name="firstName" ng-model="vm.signupRequest.lastName" style="border-color:white;color:white !important;">
                         <div ng-messages="vm.user.lastName.$error">
                             <div ng-message="required">This is required.</div>
                         </div>
@@ -60,7 +60,7 @@
                     <md-input-container class="md-block md-icon-left">
                         <label style="color:white !important;" translate="" class="ng-scope" for="email-input" style="color:white !important;">Email</label>
                         <md-icon aria-label="Email" class="material-icons md-tb-dark-theme" role="img"> email </md-icon>
-                        <input required id="email-input" type="email" ng-model="vm.signupRequest.email"  onblur="validateEmail(this);" class="md-input" aria-invalid="true" style="border-color:white;">
+                        <input required id="email-input" type="email" ng-model="vm.signupRequest.email"  onblur="vm.validateEmail(this);" class="md-input" aria-invalid="true" style="border-color:white;color:white !important;">
                         <div class="md-errors-spacer"></div>
                     </md-input-container>
                 </div>
@@ -68,7 +68,7 @@
                     <md-input-container class="md-block md-icon-left">
                         <label style="color:white !important;" translate="" class="ng-scope" for="email-input">Phone</label>
                         <md-icon aria-label="Phone" class="material-icons md-tb-dark-theme" role="img"> call </md-icon>
-                        <input required id="phone-input" ng-model="vm.signupRequest.additionalInfo.phone" pattern="[1-9]{1}[0-9]{9}" class="md-input" aria-invalid="true" style="border-color:white;">
+                        <input required id="phone-input" ng-model="vm.signupRequest.additionalInfo.phone" pattern="[1-9]{1}[0-9]{9}" class="md-input" aria-invalid="true" style="border-color:white;color:white !important;">
                         <div class="md-errors-spacer"></div>
                     </md-input-container>
                 </div>
@@ -76,14 +76,14 @@
                     <md-input-container class="md-block md-icon-left">
                         <label style="color:white !important;" translate="" class="ng-scope" for="email-input">Company Name</label>
                         <md-icon aria-label="Company" class="material-icons md-tb-dark-theme" role="img"> home </md-icon>
-                        <input required id="company-input" ng-model="vm.signupRequest.additionalInfo.CompanyName"  class="md-input" aria-invalid="true" style="border-color:white;">
+                        <input required id="company-input" ng-model="vm.signupRequest.additionalInfo.CompanyName"  class="md-input" aria-invalid="true" style="border-color:white;color:white !important;">
                         <div class="md-errors-spacer"></div>
                     </md-input-container>
                 </div>
                 <div
                         vc-recaptcha
-                        ng-model="myFields.myRecaptchaResponse"
-                        key="''"
+                        ng-model="vm.signupRequest.recaptchaResponse"
+                        key="'6LdEZIsUAAAAAFJOlDefH6nfXaVKjnAuReChO2CJ'"
                 ></div>
                 <div style="margin-top:20px;margin-bottom: 20px;">
                     <md-checkbox style="color: white;font-size: 20px;" class="red" aria-label="Accept Privacy Policy" ng-model="vm.acceptPrivacyPolicy">
@@ -92,7 +92,7 @@
                 </div>
                 <md-button class="md-raised" type="submit" style="margin-bottom: 30px;border-radius: 16px;background-color: palegoldenrod;width: 90%;padding: 8px;margin-left: 5%;">Submit</md-button>
 
-                <a style="font-size: 23px;color: white;margin-left: 30%;">Already have an account?</a>
+                <a style="font-size: 23px;color: white;margin-left: 30%;" href="#" ng-click="vm.redirectToURL()">Already have an account?</a>
             </form>
         </md-card-content>
     </md-card>

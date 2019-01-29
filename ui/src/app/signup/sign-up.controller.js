@@ -30,32 +30,37 @@ export default function SignUpController(toast, loginService, userService,$state
 
     vm.validateEmail = validateEmail;
     vm.signup = signup;
-
+    vm.redirectToURL = redirectToURL;
+    vm.acceptPrivacyPolicy = false;
 
     function validateEmail(emailField){
-            var reg = /^([A-Za-z0-9_\-\.])+\@([A-Za-z0-9_\-\.])+\.([A-Za-z]{2,4})$/;
+        var reg = /^([A-Za-z0-9_\-\.])+\@([A-Za-z0-9_\-\.])+\.([A-Za-z]{2,4})$/;
 
-            if (reg.test(emailField.value) == false)
-            {
-                alert('Invalid Email Address');
-                return false;
-            }
+        if (reg.test(emailField.value) == false)
+        {
+            toast.showError('Invalid Email Address');
+            return false;
+        }
 
-            return true;
+        return true;
     }
-    function signup(){
-     //$state.go('activation-link');
-     $log.log("vm.user")
-     $log.log(vm.signupRequest)
-     vm.signupRequest.authority = 'TENANT_ADMIN';
-     signUpService.saveTrialUser(vm.signupRequest).then(
-         function success(info) {
-             $log.log(info)
+
+    function signup() {
+         $log.log(vm.signupRequest.recaptchaResponse)
+         if(vm.acceptPrivacyPolicy && vm.signupRequest.recaptchaResponse){
+            vm.signupRequest.authority = 'TENANT_ADMIN';
+                 signUpService.saveTrialUser(vm.signupRequest).then(
+                     function success() {
+                         $state.go('activation-link');
+                     }
+                 );
+         } else {
+            toast.showError("Please accept privacy policy");
          }
-     );
+
     }
 
-
-
-
+    function redirectToURL(){
+        $state.go('login');
+    }
 }
