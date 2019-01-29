@@ -16,5 +16,26 @@
  */
 /* eslint-disable import/no-unresolved, import/default */
 
-export default function ActivationLinkController() {
+
+/* eslint-enable import/no-unresolved, import/default */
+
+/*@ngInject*/
+export default function ActivationLinkController(signUpService, $stateParams, toast, $translate, $timeout) {
+    var vm = this;
+    vm.reSendLink = reSendLink;
+    vm.buttonDisabled = false;
+
+
+    function reSendLink() {
+        signUpService.resentEmailLink($stateParams.email).then(
+             function success() {
+                 vm.buttonDisabled = true;
+                toast.showSuccess($translate.instant('signup.emailSuccess'));
+             }
+         );
+
+    }
+    $timeout(function(){
+        vm.buttonDisabled = false;
+    },50000);
 }

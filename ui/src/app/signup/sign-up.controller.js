@@ -22,7 +22,7 @@ import defaultLogoSvg from '../../svg/Tempus_Logo_E_TagLineExtended_vectorized.s
 /* eslint-enable import/no-unresolved, import/default */
 
 /*@ngInject*/
-export default function SignUpController(toast, loginService, userService,$state,signUpService, $log) {
+export default function SignUpController(toast, loginService, userService,$state,signUpService, $translate) {
     var vm = this;
 
     vm.logoSvg = logoSvg;
@@ -38,7 +38,7 @@ export default function SignUpController(toast, loginService, userService,$state
 
         if (reg.test(emailField.value) == false)
         {
-            toast.showError('Invalid Email Address');
+            toast.showError($translate.instant('signup.invalid-email'));
             return false;
         }
 
@@ -46,16 +46,16 @@ export default function SignUpController(toast, loginService, userService,$state
     }
 
     function signup() {
-         $log.log(vm.signupRequest.recaptchaResponse)
          if(vm.acceptPrivacyPolicy && vm.signupRequest.recaptchaResponse){
             vm.signupRequest.authority = 'TENANT_ADMIN';
+            vm.signupRequest.additionalInfo.trialAccount = true;
                  signUpService.saveTrialUser(vm.signupRequest).then(
                      function success() {
-                         $state.go('activation-link');
+                         $state.go('activation-link', {email: vm.signupRequest.email});
                      }
                  );
          } else {
-            toast.showError("Please accept privacy policy");
+            toast.showError($translate.instant('signup.accept-privacy'));
          }
 
     }

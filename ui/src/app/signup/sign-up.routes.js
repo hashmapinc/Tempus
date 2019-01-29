@@ -39,6 +39,7 @@ export default function SignUpRoutes($stateProvider) {
     }).state('activation-link', {
               url: '/activation-link',
               module: 'public',
+              params: {'email': ''},
               views: {
                   "@": {
                       controller: 'ActivationLinkController',

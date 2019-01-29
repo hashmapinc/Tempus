@@ -20,10 +20,11 @@ export default angular.module('tempus.api.signup', [])
     .name;
 
 /*@ngInject*/
-function SignUpService($http, $q, $window, userService, attributeService, $log) {
+function SignUpService($http, $q) {
 
     var service = {
-        saveTrialUser: saveTrialUser
+        saveTrialUser: saveTrialUser,
+        resentEmailLink: resentEmailLink
     }
 
     return service;
@@ -34,7 +35,19 @@ function SignUpService($http, $q, $window, userService, attributeService, $log) 
         var url = '/api/noauth/user';
 
         $http.post(url, signupRequest).then(function success(response) {
-                $log.log(response)
+                deferred.resolve(response.data);
+
+        }, function fail() {
+            deferred.reject();
+        });
+        return deferred.promise;
+    }
+    function resentEmailLink(email) {
+        var deferred = $q.defer();
+
+        var url = '/api/noauth/user/resendActivationMail?email=' + email;
+
+        $http.post(url).then(function success(response) {
                 deferred.resolve(response.data);
 
         }, function fail() {
