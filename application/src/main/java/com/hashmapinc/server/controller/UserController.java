@@ -16,6 +16,7 @@
  */
 package com.hashmapinc.server.controller;
 
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hashmapinc.server.common.data.CustomerGroup;
@@ -50,8 +51,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.List;
-import java.util.UUID;
+import java.time.Instant;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @RestController
@@ -139,17 +140,17 @@ public class UserController extends BaseController {
 
     @PostMapping(value = "/noauth/user")
     @ResponseBody
-    public User saveTrialUser(@RequestBody User newUser,
+    public User saveTrialUser(@RequestBody User user,
                          HttpServletRequest request) throws TempusException {
         Tenant savedTenant = null;
         try {
-            if (newUser.getAuthority() == Authority.TENANT_ADMIN) {
-                savedTenant = checkNotNull(createTenant(newUser));
-                newUser.setTenantId(savedTenant.getId());
+            if (user.getAuthority() == Authority.TENANT_ADMIN) {
+                savedTenant = checkNotNull(createTenant(user));
+                user.setTenantId(savedTenant.getId());
             }
-            User savedUser;
-            savedUser = createUser(newUser, "mail", request);
+            user = setCurrentTimeInUser(user);
 
+            User savedUser = createUser(user, "mail", request);
             if (savedUser != null) {
                 assignDefaultGroupToTenantUser(savedUser.getTenantId(), savedUser.getId());
             }
@@ -159,6 +160,19 @@ public class UserController extends BaseController {
                 tenantService.deleteTenant(savedTenant.getId());
             throw handleException(e);
         }
+    }
+
+    private User setCurrentTimeInUser(User user) {
+        Map<String,String> additionalInfo =  new HashMap<>();
+
+        Date currentTime = Date.from(Instant.now());
+        long time = currentTime.getTime();
+        additionalInfo.put("date",Long.toString(time));
+        ObjectMapper mapper = new ObjectMapper();
+        JsonNode jsonNode = mapper.convertValue(additionalInfo, JsonNode.class);
+        user.setAdditionalInfo(jsonNode);
+
+        return user;
     }
 
     private Tenant createTenant(User newUser) {
@@ -224,6 +238,28 @@ public class UserController extends BaseController {
             HttpServletRequest request) throws TempusException {
         try {
             User user = checkNotNull(userService.findUserByEmail(email));
+            UserCredentials userCredentials = userService.findUserCredentialsByUserId(user.getId());
+            if (!userCredentials.isEnabled()) {
+                String baseUrl = constructBaseUrl(request);
+                String activateUrl = String.format(ACTIVATE_URL_PATTERN, baseUrl,
+                        userCredentials.getActivateToken());
+                mailService.sendActivationEmail(activateUrl, email);
+            } else {
+                throw new TempusException("User is already active!", TempusErrorCode.BAD_REQUEST_PARAMS);
+            }
+        } catch (Exception e) {
+            throw handleException(e);
+        }
+    }
+
+
+    @PostMapping(value = "/noauth/user/resendActivationMail")
+    @ResponseStatus(value = HttpStatus.OK)
+    public void resendActivationEmail(
+            @RequestParam(value = "email") String email,
+            HttpServletRequest request) throws TempusException {
+        try {
+            User user = checkNotNull(userService.findUserByEmail(email)); //add the trial user check if not then send exception with you don't have permission
             UserCredentials userCredentials = userService.findUserCredentialsByUserId(user.getId());
             if (!userCredentials.isEnabled()) {
                 String baseUrl = constructBaseUrl(request);
