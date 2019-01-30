@@ -1,0 +1,100 @@
+# Default values for tempus-data.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+storageClass:
+  create: false
+  name: nfs
+  annotations:
+    storageclass.kubernetes.io/is-default-class: "true"
+  provisioner: "kubernetes.io/aws-ebs"
+  parameters:
+    type: "gp2"
+  reclaimPolicy: "Retain"
+
+telemetryDB: 
+  name: "cassandra"
+
+postgresql:
+  name: "postgresql"
+  replicaCount: 1
+  image:
+    repository: postgres
+    tag: 9.6.2
+    pullPolicy: Always
+  postgresUser: identity
+  postgresDatabase: identity
+  ## TODO We need to extract secrets from here
+  postgresPassword: identity
+  persistence:
+    name: data
+    accessMode: ReadWriteOnce
+    size: 3Gi
+    mountPath: /var/lib/postgresql/data/pgdata
+    subPath: "postgresql-db"
+  probes:
+    liveness:
+      initialDelay: 60
+      timeoutSeconds: 5
+      failureThreshold: 6
+    readiness:
+      initialDelay: 30
+      timeoutSeconds: 3
+      periodSeconds: 5
+
+cassandra:
+  create: true
+  name: cassandra
+  replicaCount: 2
+  image:
+    repository: hashmapinc/cassandra
+    tag: dev
+    pullPolicy: Always
+  persistence:
+    data:
+      name: data
+      accessMode: ReadWriteOnce
+      size: 3Gi
+      mountPath: /var/lib/cassandra/data
+    commitlog:
+      name: commitlog
+      accessMode: ReadWriteOnce
+      size: 3Gi
+      mountPath: /var/lib/cassandra/commitlog    
+  env:
+    cassandraClusterName: "tempus-Cluster"
+    cassandraDC: "DC1-tempus-Cluster"
+    cassandraRack: "Rack-tempus-Cluster"
+
+databaseSetup: 
+  enabled: false
+  name: "db-setup"
+  image:
+    repository: hashmapinc/database-setup
+    tag: helm
+    pullPolicy: Always 
+  identity:
+    host: "redtail-identity-service"
+    url: "http://redtail-identity-service/uaa"
+    port: "80"
+
+
+
+
+resources: {}
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  # limits:
+  #  cpu: 100m
+  #  memory: 128Mi
+  # requests:
+  #  cpu: 100m
+  #  memory: 128Mi
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}

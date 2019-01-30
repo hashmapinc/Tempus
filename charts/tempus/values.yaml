@@ -15,7 +15,7 @@
 # limitations under the License.
 #
 
-# Default values for tempus.
+# Default values for tempus-aws.
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
@@ -30,26 +30,28 @@ global:
 nameOverride: ""
 fullnameOverride: ""
 
+storageclass: nfs
+
 serviceAccount:
   create: true
   name: ""
 
 image:
   repository: hashmapinc/tempus
-  tag: dev
+  tag: helm
   pullPolicy: Always
 
+externaldb: true
+
 ConfigMapData:
-  zookeeper.enabled: "true"
-  zookeeper.url: "zk-cs:2181"
-  cassandra.url: "cassandra-headless:9042"
-  cassandra.host: "cassandra-headless"
+  cassandra.url: "aws-tempus-data-cassandra:9042"
+  cassandra.host: "aws-tempus-data-cassandra"
   cassandra.port: "9042"
   database.type: "cassandra"
-  postgres.host: "postgres"
+  postgres.host: "aws-tempus-data-postgresql"
   postgres.port: "5432"
   schema.data: "false"
-  demo.data: "false"
+  demo.data: "true"
   mqtt.address: "0.0.0.0"
   mqtt.port: "1883"
   coap.address: "0.0.0.0"
@@ -57,9 +59,11 @@ ConfigMapData:
   spark.path: "/tmp"
   http.port: "8080"
   spark.home: "livy"
-  spring.datasource.url: "jdbc:postgresql://postgresql:5432/identity"
+  spring.datasource.url: "jdbc:postgresql://aws-tempus-data-postgresql:5432/identity"
   spring.datasource.username: "identity"
   spring.datasource.password: "identity"
+  spring.jpa.db: "org.hibernate.dialect.PostgreSQLDialect"
+  spring.jpa.driver: "org.postgresql.Driver"  
 
 
 role:
@@ -96,12 +100,35 @@ ingress:
 
 
 
-
-
-
-
 # Configuration of other essential services 
+
+databaseSetup: 
+  enabled: true
+  name: "db-setup"
+  image:
+    repository: hashmapinc/database-setup
+    tag: helm
+    pullPolicy: Always  
+
+nifi:
+  enabled: true
+  name: nifi-svc
+  serviceType: NodePort
+  image:
+    repository: apache/nifi
+    tag: 1.6.0 
+
+zookeeper:
+  enabled: true
+  name: zk
+  image:
+    repository: hashmapinc/zk
+    tag: "1.0"
+    pullPolicy: Always
+  replicas: 1
+
 discovery:
+  enabled: true
   name: redtail-api-discovery
   replicaCount: 1
   image:
@@ -117,8 +144,10 @@ discovery:
     minAvailable: 1
 
 identity:
+  enabled: true
   name: redtail-identity-service
   replicaCount: 1
+  externaldb: true  
   image:
     repository: hashmapinc/redtail-identity-service
     tag: latest
@@ -130,16 +159,17 @@ identity:
     port: 80
   pdb:
     minAvailable: 1
-  db:
-    host: postgresql
-    port: 5432
-    name: identity
-    user: identity
-    ## TODO We need to extract secrets from here
-    password: identity
+  ConfigMapData:
+    spring.jpa.db: "org.hibernate.dialect.PostgreSQLDialect"
+    spring.jpa.driver: "org.postgresql.Driver"
+    spring.ds.url: "jdbc:postgresql://aws-tempus-data-postgresql:5432/identity"
+    spring.ds.username: identity
+    spring.ds.password: identity 
 
 metadata:
+  enabled: true
   name: redtail-metadata-api
+  externaldb: true
   replicaCount: 1
   image:
     repository: hashmapinc/redtail-metadata-api
@@ -153,15 +183,15 @@ metadata:
   pdb:
     minAvailable: 1
   ## Using same db as identity for now, we can change these values later if we want a separate db instance for metadata-api
-  db:
-    host: postgresql
-    port: 5432
-    name: identity
-    user: identity
-    ## TODO We need to extract secrets from here
-    password: identity
+  ConfigMapData:
+    spring.jpa.db: "org.hibernate.dialect.PostgreSQLDialect"
+    spring.jpa.driver: "org.postgresql.Driver"
+    spring.ds.url: "jdbc:postgresql://aws-tempus-data-postgresql:5432/identity"
+    spring.ds.username: identity
+    spring.ds.password: identity 
 
 dataquality:
+  enabled: true
   name: redtail-data-quality-service
   replicaCount: 1
   image:

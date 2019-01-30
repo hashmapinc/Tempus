@@ -1,0 +1,226 @@
+#
+# Copyright © 2016-2018 The Thingsboard Authors
+# Modifications © 2017-2018 Hashmap, Inc
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+kind: Service
+apiVersion: v1
+metadata:
+  name: {{ include "tempus.fullname" . }}
+  labels:
+    app.kubernetes.io/name: {{ include "tempus.name" . }}
+    helm.sh/chart: {{ include "tempus.chart" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}     
+    app: {{ include "tempus.name" . }}
+spec:
+  type: {{ .Values.service.type }}
+  selector:
+    app: {{ include "tempus.name" . }}
+  {{- with .Values.service.ports }}
+  ports: 
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+---
+apiVersion: policy/v1beta1
+kind: PodDisruptionBudget
+metadata:
+  name: {{ include "tempus.fullname" . }}-budget
+spec:
+  selector:
+    matchLabels:
+      app: {{ include "tempus.name" . }}
+  minAvailable: 1
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "tempus.fullname" . }}-config
+{{- with .Values.ConfigMapData }} 
+data:
+  {{ toYaml . | nindent 2 }} 
+{{- end }}
+  zookeeper.enabled: "{{ .Values.zookeeper.enabled }}"
+  zookeeper.url: "{{ include "tempus.fullname" . }}-{{ .Values.zookeeper.name }}-cs:2181"
+  identity.base.url: "http://{{ .Values.identity.name }}:{{ .Values.identity.service.port }}/uaa"
+  metadata.base.url: "http://{{ .Values.metadata.name }}:{{ .Values.metadata.service.port }}/api"  
+---
+apiVersion: "apps/v1beta1"
+kind: StatefulSet
+metadata:
+  name: {{ include "tempus.fullname" . }}
+  labels:
+    app.kubernetes.io/name: {{ include "tempus.name" . }}
+    helm.sh/chart: {{ include "tempus.chart" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}    
+spec:
+  selector:
+    matchLabels:
+      app: {{ include "tempus.name" . }}
+  serviceName: {{ include "tempus.fullname" . }}
+  replicas: 1
+  updateStrategy:
+    type: RollingUpdate
+  podManagementPolicy: Parallel
+  template:
+    metadata:
+      labels:
+        app: {{ include "tempus.name" . }}
+    spec:
+      serviceAccountName: {{ template "tempus.serviceAccountName" . }}
+      containers:
+      - name: {{ include "tempus.fullname" . }}
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy }}      
+        ports:
+        - containerPort: 8080
+          name: ui
+        - containerPort: 1883
+          name: mqtt
+        - containerPort: 5683
+          protocol: UDP
+          name: coap
+        - containerPort: 9001
+          name: rpc
+        - containerPort: 9999
+          name: tempus-port
+        env:
+{{- if .Values.externaldb }}
+        - name: SPRING_DRIVER_CLASS_NAME
+          valueFrom:
+            configMapKeyRef:
+              name: {{ include "tempus.fullname" . }}-config
+              key: spring.jpa.driver
+        - name: SPRING_JPA_DATABASE_PLATFORM
+          valueFrom:
+            configMapKeyRef:
+              name: {{ include "tempus.fullname" . }}-config
+              key: spring.jpa.db                     
+        - name: SPRING_DATASOURCE_URL
+          valueFrom:
+            configMapKeyRef:
+              name: {{ include "tempus.fullname" . }}-config
+              key: spring.datasource.url
+        - name : SPRING_DATASOURCE_USERNAME
+          valueFrom:
+            configMapKeyRef:
+              name: {{ include "tempus.fullname" . }}-config
+              key: spring.datasource.username
+        - name : SPRING_DATASOURCE_PASSWORD
+          valueFrom:
+            configMapKeyRef:
+              name: {{ include "tempus.fullname" . }}-config
+              key: spring.datasource.password
+{{- end }}
+        - name: IDENTITY_BASE_URL
+          valueFrom:
+            configMapKeyRef:
+              name: {{ include "tempus.fullname" . }}-config
+              key: identity.base.url
+        - name: SPARK_HOME
+          valueFrom:
+            configMapKeyRef:
+              name: {{ include "tempus.fullname" . }}-config
+              key: spark.home
+        - name: METADATA_BASE_URL
+          valueFrom:
+            configMapKeyRef:
+              name: {{ include "tempus.fullname" . }}-config
+              key: metadata.base.url
+        - name: SPARK_COMPUTATIONS_PATH
+          valueFrom:
+            configMapKeyRef:
+              name: {{ include "tempus.fullname" . }}-config
+              key: spark.path
+        - name: HTTP_BIND_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: {{ include "tempus.fullname" . }}-config
+              key: http.port
+        - name: MQTT_BIND_ADDRESS
+          valueFrom:
+            configMapKeyRef:
+              name: {{ include "tempus.fullname" . }}-config
+              key: mqtt.address
+        - name: MQTT_BIND_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: {{ include "tempus.fullname" . }}-config
+              key: mqtt.port
+        - name: COAP_BIND_ADDRESS
+          valueFrom:
+            configMapKeyRef:
+              name: {{ include "tempus.fullname" . }}-config
+              key: coap.address
+        - name: COAP_BIND_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: {{ include "tempus.fullname" . }}-config
+              key: coap.port
+        - name: DATABASE_TYPE
+          valueFrom:
+            configMapKeyRef:
+              name: {{ include "tempus.fullname" . }}-config
+              key: database.type
+        - name: ZOOKEEPER_ENABLED
+          valueFrom:
+            configMapKeyRef:
+              name: {{ include "tempus.fullname" . }}-config
+              key: zookeeper.enabled
+        - name: ZOOKEEPER_URL
+          valueFrom:
+            configMapKeyRef:
+              name: {{ include "tempus.fullname" . }}-config
+              key: zookeeper.url
+        - name: CASSANDRA_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: {{ include "tempus.fullname" . }}-config
+              key: cassandra.host
+        - name: CASSANDRA_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: {{ include "tempus.fullname" . }}-config
+              key: cassandra.port
+        - name: CASSANDRA_URL
+          valueFrom:
+            configMapKeyRef:
+              name: {{ include "tempus.fullname" . }}-config
+              key: cassandra.url
+        - name: POSTGRES_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: {{ include "tempus.fullname" . }}-config
+              key: postgres.host
+        - name: POSTGRES_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: {{ include "tempus.fullname" . }}-config
+              key: postgres.port
+        - name: ADD_SCHEMA_AND_SYSTEM_DATA
+          valueFrom:
+            configMapKeyRef:
+              name: {{ include "tempus.fullname" . }}-config
+              key: schema.data
+        - name: ADD_DEMO_DATA
+          valueFrom:
+            configMapKeyRef:
+              name: {{ include "tempus.fullname" . }}-config
+              key: demo.data
+        command:
+        - sh
+        - -c
+        - /run-application.sh

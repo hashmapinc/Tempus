@@ -1,0 +1,100 @@
+#
+# Copyright © 2016-2018 The Thingsboard Authors
+# Modifications © 2017-2018 Hashmap, Inc
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+{{- if .Values.zookeeper.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "tempus.fullname" . }}-{{ .Values.zookeeper.name }}-hs
+  labels:
+    app: {{ .Values.zookeeper.name }}
+spec:
+  ports:
+  - port: 2888
+    name: server
+  - port: 3888
+    name: leader-election
+  clusterIP: None
+  selector:
+    app: {{ .Values.zookeeper.name }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "tempus.fullname" . }}-{{ .Values.zookeeper.name }}-cs
+  labels:
+    app: {{ .Values.zookeeper.name }}
+spec:
+  ports:
+  - port: 2181
+    name: client
+    targetPort: 2181
+  selector:
+    app: {{ .Values.zookeeper.name }}
+---
+apiVersion: policy/v1beta1
+kind: PodDisruptionBudget
+metadata:
+  name: {{ include "tempus.fullname" . }}-{{ .Values.zookeeper.name }}-pdb
+spec:
+  selector:
+    matchLabels:
+      app: {{ .Values.zookeeper.name }}
+  maxUnavailable: 1
+---
+apiVersion: "apps/v1beta1"
+kind: StatefulSet
+metadata:
+  name: {{ include "tempus.fullname" . }}-{{ .Values.zookeeper.name }}
+spec:
+  selector:
+    matchLabels:
+      app: {{ .Values.zookeeper.name }}
+  serviceName: {{ include "tempus.fullname" . }}-{{ .Values.zookeeper.name }}-hs
+  replicas: {{ .Values.zookeeper.replicas }}
+  updateStrategy:
+    type: RollingUpdate
+  podManagementPolicy: Parallel
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.zookeeper.name }}
+    spec:
+      containers:
+      - name: {{ .Values.zookeeper.name }}
+        image: "{{ .Values.zookeeper.image.repository }}:{{ .Values.zookeeper.image.tag }}"
+        imagePullPolicy: {{ .Values.zookeeper.image.pullPolicy }}
+        ports:
+        - containerPort: 2181
+          name: client
+        - containerPort: 2888
+          name: server
+        - containerPort: 3888
+          name: leader-election
+        volumeMounts:
+        - name: {{ .Values.zookeeper.name }}-datadir
+          mountPath: /var/lib/zookeeper
+  volumeClaimTemplates:
+  - metadata:
+      name: {{ .Values.zookeeper.name }}-datadir
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: 1Gi
+      storageClassName: {{ .Values.storageclass }}
+{{- end }}      

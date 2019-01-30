@@ -1,0 +1,65 @@
+#
+# Copyright © 2016-2018 The Thingsboard Authors
+# Modifications © 2017-2018 Hashmap, Inc
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+{{- if .Values.databaseSetup.enabled }}
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: "{{ include "tempus-data.fullname" . }}-{{ .Values.databaseSetup.name }}"
+  annotations:
+    "helm.sh/hook": post-install
+    "helm.sh/hook-weight": "1"
+    "helm.sh/hook-delete-policy": hook-succeeded
+spec:
+  template:
+    metadata:
+      name: "{{ .Values.databaseSetup.name }}"
+    spec:
+      restartPolicy: Never
+      containers:
+      - name: {{ .Values.databaseSetup.name }}
+        image: "{{ .Values.databaseSetup.image.repository }}:{{ .Values.databaseSetup.image.tag }}"
+        imagePullPolicy: {{ .Values.databaseSetup.image.pullPolicy }}   
+        env:                  
+        - name: SPRING_DATASOURCE_URL
+          value: "jdbc:postgresql://{{ include "tempus-data.fullname" . }}-{{ .Values.postgresql.name }}:5432/{{ .Values.postgresql.postgresDatabase }}"
+        - name : SPRING_DATASOURCE_USERNAME
+          value: {{ .Values.postgresql.postgresUser }}
+        - name : SPRING_DATASOURCE_PASSWORD
+          value: {{ .Values.postgresql.postgresPassword }}
+        - name: CASSANDRA_HOST
+          value: {{ include "tempus-data.fullname" . }}-{{ .Values.cassandra.name }}
+        - name: CASSANDRA_PORT
+          value: "9042"
+        - name: CASSANDRA_URL
+          value: "{{ include "tempus-data.fullname" . }}-{{ .Values.cassandra.name }}:9042"
+        - name: ADD_DEMO_DATA
+          value: "true"
+        - name: DATABASE_TYPE
+          value: "{{ .Values.telemetryDB.name }} "                   
+        - name: IDENTITY_BASE_URL
+          value: "{{ .Values.databaseSetup.identity.url }}"
+        - name: IDENTITY_HOST
+          value: "{{ .Values.databaseSetup.identity.host }}"
+        - name: IDENTITY_PORT
+          value: "{{ .Values.databaseSetup.identity.port }}"
+        command:
+        - sh
+        - -c
+        - /install.sh
+      restartPolicy: Never
+{{- end }}
