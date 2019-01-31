@@ -21,7 +21,7 @@ export default angular.module('tempus.api.fileUpload', [tempusTypes])
     .name;
 
 /*@ngInject*/
-function FileUploadService($http, $q, $log, types) {
+function FileUploadService($http, $q, $log, types, $translate, $window, $document) {
 
     var vm = this;
 
@@ -31,50 +31,11 @@ function FileUploadService($http, $q, $log, types) {
 
         getAllFile: getAllFile,
         uploadFile: uploadFile,
-        deleteFile: deleteFile
+        deleteFile: deleteFile,
+        exportFile: exportFile
     }
 
     return service;
-
-//    function getAllFiles(pageLink, config, type, pageNum) {
-//        var deferred = $q.defer();
-//        if(angular.isDefined(type) && type == 'Gateway') {
-//          pageNum = 0;
-//        }
-//        var url = '/api/tenant/file?limit=' + pageLink.limit + '&pageNum=' + pageNum;
-//        if (angular.isDefined(pageLink.textSearch)) {
-//            url += '&textSearch=' + pageLink.textSearch;
-//        }
-//        if (angular.isDefined(pageLink.idOffset)) {
-//            url += '&idOffset=' + pageLink.idOffset;
-//        }
-//        if (angular.isDefined(pageLink.textOffset)) {
-//            url += '&textOffset=' + pageLink.textOffset;
-//        }
-//        if (angular.isDefined(type) && type.length) {
-//            url += '&type=' + type;
-//        }
-//        $http.get(url, config).then(function success(response) {
-//
-//                        deferred.resolve(response.data);
-//                    },
-//                    function fail() {
-//                        deferred.reject();
-//                    }
-//                );
-//        return deferred.promise;
-//    }
-
-//    function saveFile(file) {
-//        var deferred = $q.defer();
-//        var url = '/api/file';
-//        $http.post(url, file).then(function success(response) {
-//            deferred.resolve(response.data);
-//        }, function fail() {
-//            deferred.reject();
-//        });
-//        return deferred.promise;
-//    }
 
     function uploadFile(file) {
         var deferred = $q.defer();
@@ -92,12 +53,88 @@ function FileUploadService($http, $q, $log, types) {
         return deferred.promise;
     }
 
+    function exportFile(fileName) {
+            var name = fileName;
+            getFile(fileName).then(
+                function success(file) {
+                    exportToPc(prepareExport(file), name);
+                },
+                function fail(rejection) {
+                    var message = rejection;
+                    if (!message) {
+                        message = $translate.instant('error.unknown-error');
+                    }
+
+                }
+            );
+        }
+
+    function prepareExport(data) {
+            var exportedData = angular.copy(data);
+            if (angular.isDefined(exportedData.id)) {
+                delete exportedData.id;
+            }
+            if (angular.isDefined(exportedData.createdTime)) {
+                delete exportedData.createdTime;
+            }
+            if (angular.isDefined(exportedData.tenantId)) {
+                delete exportedData.tenantId;
+            }
+            if (angular.isDefined(exportedData.customerId)) {
+                delete exportedData.customerId;
+            }
+            return exportedData;
+    }
+    function exportToPc(data, filename) {
+        if (!data) {
+            $log.error('No data');
+            return;
+        }
+
+        if (!filename) {
+            filename = 'downloaded file';
+        }
+
+        if (angular.isObject(data)) {
+            data = angular.toJson(data, 2);
+        }
+
+        var blob = new Blob([data]);
+
+        // FOR IE:
+
+        if ($window.navigator && $window.navigator.msSaveOrOpenBlob) {
+            $window.navigator.msSaveOrOpenBlob(blob, filename);
+        }
+        else{
+            var e = $document[0].createEvent('MouseEvents'),
+                a = $document[0].createElement('a');
+
+            a.download = filename;
+            a.href = $window.URL.createObjectURL(blob);
+            a.dataset.downloadurl = [ a.download, a.href].join(':');
+            e.initEvent('click', true, false, $window,
+                0, 0, 0, 0, 0, false, false, false, false, 0, null);
+            a.dispatchEvent(e);
+        }
+    }
+    function getFile(fileName) {
+         var deferred = $q.defer();
+         var url = '/api/file/' + fileName;
+         $http.get(url).then(function success(response) {
+            deferred.resolve(response.data);
+         }, function fail(response) {
+            deferred.reject(response.data);
+         });
+         return deferred.promise;
+    }
+
+
     function getAllFile() {
         var deferred = $q.defer();
         var url = '/api/file';
         $http.get(url).then(function success(response) {
             deferred.resolve(response.data);
-            $log.log(response.data);
         }, function fail() {
             deferred.reject();
         });
@@ -105,7 +142,7 @@ function FileUploadService($http, $q, $log, types) {
     }
     function deleteFile(fileName) {
         var deferred = $q.defer();
-        var url = '/api/file' + fileName;
+        var url = '/api/file/' + fileName;
         $http.delete(url).then(function success() {
             deferred.resolve();
         }, function fail() {
@@ -113,5 +150,7 @@ function FileUploadService($http, $q, $log, types) {
         });
         return deferred.promise;
     }
+
+
 
 }

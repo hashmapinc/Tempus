@@ -25,33 +25,14 @@
     <div class="md-toolbar-tools">
         <span flex></span>
 
-        <input type="file" id="file" style="display:none;" />
-        <md-button class="md-icon-button" ng-click="thisFileUpload()">
+
+        <md-button class="md-icon-button" ng-click="openFileDialog()">
             <md-icon>add</md-icon>
             <md-tooltip md-direction="top">
                 {{ 'action.add' | translate }}
             </md-tooltip>
         </md-button>
-
-        <!--<div class="image-upload">-->
-            <!--<label for="file-input">-->
-                <!--<img src="placeholder.jpg"/>-->
-            <!--</label>-->
-
-            <!--<input id="file-input" type="file"/>-->
-        <!--</div>-->
-       <!-- <div class="choose_file">
-            <input name="img" type="file" accept="image/*" />
-        </div>
-
-        <md-button for="file-input" class="md-icon-button">
-            <md-icon >add</md-icon>
-            <md-tooltip md-direction="top">
-                {{ 'action.add' | translate }}
-            </md-tooltip>
-
-        </md-button>-->
-
+        <input type="file" id="inputFile" onchange="angular.element(this).scope().thisFileUpload(this)" style="display:none;" />
 
         <md-button class="md-icon-button" ng-click="enterFilterMode()">
             <md-icon>search</md-icon>
@@ -71,26 +52,25 @@
     <table class="tb-device-table" md-table>
         <thead md-head md-order="query.order" md-on-reorder="onReorder">
         <tr md-row>
-            <th md-column style=""><span translate>File Name</span></th>
-            <th md-column><span translate>Created On</span></th>
-            <th md-column ><span translate>File Type</span></th>
-            <th md-column><span translate>File Size</span></th>
+            <th md-column style=""><span translate>file-upload.fileName</span></th>
+            <th md-column><span translate>file-upload.createdOn</span></th>
+            <th md-column ><span translate>file-upload.fileType</span></th>
+            <th md-column><span translate>file-upload.fileSize</span></th>
 
         </tr>
         </thead>
         <tbody md-body>
         <tr md-row ng-repeat="file in files">
-            <td md-cell >{{file.fileName}}</td>
-            <td md-cell >{{file.lastModified}}</td>
-            <td md-cell >{{file.fileType}}</td>
-            <td md-cell >{{file.fileSize}}</td>
+            <td md-cell ><b>{{file.fileName}}</b></td>
+            <td md-cell >{{file.lastUpdated}}</td>
+            <td md-cell >{{file.extension}}</td>
+            <td md-cell >{{file.size}}</td>
             <td md-cell class="tb-value-cell">
-                <span><ng-md-icon icon="file_download" ><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24"><path d="M19 9h-4V3H9v6H5l7 7 7-7z"></path><path d="M5 18v2h14v-2H5z"></path></svg></ng-md-icon></span>
+                <span><ng-md-icon icon="file_download" ng-click="downloadFile($event, file)"></ng-md-icon></span>
             </td>
-            <td md-cell class="tb-value-cell" ng-click="deleteDevice($event, device)">
+            <td md-cell class="tb-value-cell" ng-click="deleteFile($event, file)">
                 <span><ng-md-icon size="20" icon="delete"></ng-md-icon></span>
             </td>
-
         </tr>
         </tbody>
     </table>

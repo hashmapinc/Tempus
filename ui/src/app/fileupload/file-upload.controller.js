@@ -20,58 +20,55 @@
 /* eslint-enable import/no-unresolved, import/default */
 
 /*@ngInject*/
-export default function FileUploadController(types, $scope, $log,$document, fileUploadService, $q, $timeout) {
+export default function FileUploadController(types, $scope, $log,$document, fileUploadService, $q, $timeout, $translate, $mdDialog) {
 
     var vm = this;
 
     vm.types = types;
 
     $scope.files = [];
-    $scope.thisFileUpload = function() {
-           $log.log('samds');
-           angular.element($document[0].getElementById('file').click())
-           var x = angular.element($document[0].getElementById('file'));
-
-           $timeout(function(){
-
-           $log.log(x);
-
-           var fileName ="";
-           var fileSize ="";
-           var fileType = "";
-           var lastModified = "";
-
-           fileName = x[0].files[0].name;
-           fileSize = x[0].files[0].size;
-           fileType = x[0].files[0].type;
-           lastModified = x[0].files[0].lastModifiedDate.getTime();
-
-          // $log.log(fileUploadService.getAllFile());
-           $log.log(fileName);
-           $log.log(fileSize);
-           $log.log(fileType);
-
-           var fileToAdd = {};
-
-           fileToAdd = {fileName:fileName, lastModified: lastModified, fileSize:fileSize, fileType:fileType};
 
 
-           $scope.files.push(fileToAdd);
+    function loadTableData() {
+            var promise = fileUploadService.getAllFile();
 
-           var file = saveFile(x[0].files[0]);
-           $log.log(file);
-           }, 2000);
+            if(promise) {
+                promise.then(function success(items) {$log.log(items);
+                    $scope.files = items;
+                    },
+                )
+                $log.log($scope.files,'asdasdasdas');
+            }
+     }
 
+     loadTableData();
+
+
+    $scope.openFileDialog = function() {
+           angular.element($document[0].getElementById('inputFile').click());
         };
 
-function saveFile(file) {
-$log.log(file);
+    $scope.thisFileUpload = function(ele) {
+
+           var fileToBeUploaded = ele.files;
+
+           if(fileToBeUploaded.length > 0 ){
+                $log.log("save");
+                saveFile(fileToBeUploaded[0]);
+
+           }
+
+
+    };
+
+    function saveFile(file) {
+        $log.log(file);
         var deferred = $q.defer();
         fileUploadService.uploadFile(file).then(
             function success(savedFile) {
-
-                var files = [ savedFile ];
-                return files;
+                $scope.files.push(savedFile);
+                loadTableData();
+                return savedFile;
             },
             function fail() {
                 deferred.reject();
@@ -79,44 +76,48 @@ $log.log(file);
         );
         return deferred.promise;
     }
-//    $scope.addFile = function($event) {
-//
-//
-//     var x = angular.element("file-input");
-//      var txt = "";
-//      if ('files' in x) {
-//        if (x.files.length == 0) {
-//          txt = "Select one or more files.";
-//        } else {
-//          for (var i = 0; i < x.files.length; i++) {
-//            txt += "<br><strong>" + (i+1) + ". file</strong><br>";
-//            var file = x.files[i];
-//            if ('name' in file) {
-//              txt += "name: " + file.name + "<br>";
-//            }
-//            if ('size' in file) {
-//              txt += "size: " + file.size + " bytes <br>";
-//            }
-//          }
-//        }
-//      }
-//      else {
-//        if (x.value == "") {
-//          txt += "Select one or more files.";
-//        } else {
-//          txt += "The files property is not supported by your browser!";
-//          txt  += "<br>The path of the selected file: " + x.value; // If the browser does not support the files property, it will return the path of the selected file instead.
-//        }
-//      }
-//
-//        $log.log($event);
-//        $log.log(txt);
-//        $log.log(file.size);
-//       }
-//
-//       $scope.handleFiles =  function (file){
-//           $log.log("in handle");
-//           $log.log(file);
-//      }
 
+    $scope.downloadFile = function($event, file) {
+        $event.stopPropagation();
+        fileUploadService.exportFile(file.fileName);
+    }
+
+
+
+    $scope.deleteFile = function($event,file) {
+    $log.log("file " + angular.toJson(file));
+    $log.log(file.fileName);
+    $log.log($event);
+    var confirm = $mdDialog.confirm()
+        .targetEvent($event)
+        .title(deleteFileTitle(file))
+        .htmlContent(deleteFileText())
+        .ariaLabel($translate.instant('grid.delete-item'))
+        .cancel($translate.instant('action.no'))
+        .ok($translate.instant('action.yes'));
+        $mdDialog.show(confirm).then(function () {
+        fileUploadService.deleteFile(file.fileName).then(function success() {
+            $scope.resetFilter();
+
+        });
+    },
+    function () {
+    });
+    }
+
+    $scope.resetFilter = function() {
+        loadTableData();
+    }
+
+    function deleteFileTitle(file) {
+        return $translate.instant('file-upload.delete-file-title', {fileName: file.fileName});
+    }
+
+    function deleteFileText() {
+        return $translate.instant('file-upload.delete-file-text');
+    }
+
+    $scope.enterFilterMode = function() {
+            $scope.query.search = '';
+    }
    }
