@@ -33,7 +33,7 @@ export default function ActivationLinkController(signUpService, $stateParams, to
                 toast.showSuccess($translate.instant('signup.emailSuccess'));
                 $timeout(function(){
                         vm.buttonDisabled = false;
-                    },50000);
+                },60000);
              }
          );
 

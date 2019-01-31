@@ -22,7 +22,7 @@ import defaultLogoSvg from '../../svg/Tempus_Logo_E_TagLineExtended_vectorized.s
 /* eslint-enable import/no-unresolved, import/default */
 
 /*@ngInject*/
-export default function SignUpController(toast, loginService, userService,$state,signUpService, $translate) {
+export default function SignUpController(toast, loginService, userService,$state,signUpService, $translate, $window) {
     var vm = this;
 
     vm.logoSvg = logoSvg;
@@ -31,6 +31,7 @@ export default function SignUpController(toast, loginService, userService,$state
     vm.validateEmail = validateEmail;
     vm.signup = signup;
     vm.redirectToURL = redirectToURL;
+    vm.redirectToPolicy = redirectToPolicy;
     vm.acceptPrivacyPolicy = false;
 
     function validateEmail(emailField){
@@ -47,8 +48,6 @@ export default function SignUpController(toast, loginService, userService,$state
 
     function signup() {
          if(vm.acceptPrivacyPolicy && vm.signupRequest.recaptchaResponse){
-            vm.signupRequest.authority = 'TENANT_ADMIN';
-            vm.signupRequest.additionalInfo.trialAccount = true;
                  signUpService.saveTrialUser(vm.signupRequest).then(
                      function success() {
                          $state.go('activation-link', {email: vm.signupRequest.email});
@@ -63,4 +62,10 @@ export default function SignUpController(toast, loginService, userService,$state
     function redirectToURL(){
         $state.go('login');
     }
+
+    function redirectToPolicy(){
+        var url = $state.href('policy');
+            $window.open(url,'_blank');
+    }
+
 }

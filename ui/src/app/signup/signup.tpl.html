@@ -38,7 +38,7 @@
             <md-icon ng-show ="fileType == ''" md-svg-src="/static/svg/Tempus_Logo_E_TagLineExtended_vectorized.svg" class="material-icons hm-login-logo icon"></md-icon><br/>
             <span class="sign-span">{{ 'signup.sign-up' | translate }}</span>
             <form  ng-submit="vm.signup()" style="margin-top: 7%;">
-                <md-progress-linear class="md-warn progress-linear"
+                <md-progress-linear style="margin-top:5px;margin-bottom:19px !important;" class="md-warn progress-linear"
                                     md-mode="indeterminate" ng-disabled="!$root.loading" ng-show="$root.loading"></md-progress-linear>
                 <div layout="row">
                     <md-input-container flex="50">
@@ -61,7 +61,7 @@
                     <md-input-container class="md-block md-icon-left">
                         <label class="label-color" translate="" class="ng-scope" for="email-input" style="color:white !important;">{{ 'signup.email' | translate }}</label>
                         <md-icon aria-label="Email" class="material-icons md-tb-dark-theme label-color" role="img"> {{ 'signup.email-icon' | translate }} </md-icon>
-                        <input required id="email-input" type="email" ng-model="vm.signupRequest.email"  onblur="vm.validateEmail(this);" class="md-input input-cls" aria-invalid="true">
+                        <input required id="email-input" type="email" ng-model="vm.signupRequest.email" class="md-input input-cls" aria-invalid="true">
                         <div class="md-errors-spacer"></div>
                     </md-input-container>
                 </div>
@@ -88,7 +88,7 @@
                 ></div>
                 <div class="policy">
                     <md-checkbox class="md-check" class="red" aria-label="{{ 'signup.accept-privacy-policy' | translate }}" ng-model="vm.acceptPrivacyPolicy">
-                        {{ 'signup.accept' | translate }} <a>{{ 'signup.privacy-policy' | translate }}</a>
+                        {{ 'signup.accept' | translate }} <a  href="#" ng-click="vm.redirectToPolicy()" style="color:aquamarine !important;">{{ 'signup.privacy-policy' | translate }}</a>
                     </md-checkbox>
                 </div>
                 <md-button class="md-raised btn-submit" type="submit">{{ 'signup.submit' | translate }}</md-button>

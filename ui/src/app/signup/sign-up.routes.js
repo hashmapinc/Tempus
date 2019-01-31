@@ -18,7 +18,7 @@
 
 import signUpTemplate from './signup.tpl.html';
 import activationLinkTemplate from './activation-link.tpl.html'
-
+import policyTemplate from './policy.tpl.html'
 /* eslint-enable import/no-unresolved, import/default */
 
 /*@ngInject*/
@@ -36,19 +36,30 @@ export default function SignUpRoutes($stateProvider) {
         data: {
             pageTitle: 'Sign Up'
         }
-    }).state('activation-link', {
-              url: '/activation-link',
-              module: 'public',
-              params: {'email': ''},
-              views: {
-                  "@": {
-                      controller: 'ActivationLinkController',
-                      controllerAs: 'vm',
-                      templateUrl: activationLinkTemplate
-                  }
-              },
-              data: {
-                  pageTitle: 'Activation Link'
+    }).state('activationLink', {
+        url: '/activationLink',
+        module: 'public',
+        params: {'email': ''},
+        views: {
+              "@": {
+                  controller: 'ActivationLinkController',
+                  controllerAs: 'vm',
+                  templateUrl: activationLinkTemplate
               }
+        },
+        data: {
+              pageTitle: 'Activation Link'
+        }
+    }).state('policy', {
+        url: '/policy',
+        module: 'public',
+        views: {
+            "@": {
+                templateUrl: policyTemplate
+            }
+        },
+        data: {
+            pageTitle: 'Privacy Policy'
+        }
     });
 }
