@@ -83,6 +83,7 @@ import tempusTemplates from './templateeditor';
 import tempusgateway from './tempusgateway';
 import tempusMetadata from './metadata';
 import tempusApiAuditLog from './api/audit-log.service';
+import tempusSignup from './signup';
 
 
 import 'typeface-roboto';
@@ -155,6 +156,7 @@ angular.module('tempus', [
     tempusMetadata,
     tempusApiAuditLog,
     tempusTemplates,
+    tempusSignup,
     uiRouter])
     .config(AppConfig)
     .factory('globalInterceptor', GlobalInterceptor)

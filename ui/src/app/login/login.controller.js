@@ -22,7 +22,7 @@ import defaultLogoSvg from '../../svg/Tempus_Logo_E_TagLineExtended_vectorized.s
 /* eslint-enable import/no-unresolved, import/default */
 
 /*@ngInject*/
-export default function LoginController(toast, loginService, userService/*, $rootScope, $log, $translate*/) {
+export default function LoginController(toast, loginService, userService/*, $rootScope, $log, $translate*/,$state) {
     var vm = this;
 
     vm.logoSvg = logoSvg;
@@ -34,6 +34,7 @@ export default function LoginController(toast, loginService, userService/*, $roo
     };
 
     vm.login = login;
+    vm.signup = signup;
 
 
 
@@ -56,5 +57,9 @@ export default function LoginController(toast, loginService, userService/*, $roo
 
     function login() {
         doLogin();
+    }
+
+    function signup(){
+        $state.go('signup');
     }
 }
