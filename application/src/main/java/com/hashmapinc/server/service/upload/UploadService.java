@@ -17,8 +17,8 @@
 package com.hashmapinc.server.service.upload;
 
 import com.hashmapinc.server.common.data.id.TenantId;
-import com.hashmapinc.server.common.data.upload.InputStreamWrapper;
 import com.hashmapinc.server.common.data.upload.FileMetaData;
+import com.hashmapinc.server.common.data.upload.InputStreamWrapper;
 import com.hashmapinc.server.common.data.upload.StorageTypes;
 import com.hashmapinc.server.dao.tenant.TenantService;
 import com.hashmapinc.server.service.CloudStorageServiceUtils;
@@ -29,8 +29,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -46,20 +46,17 @@ public class UploadService {
         String objectUrl = CloudStorageServiceUtils.createObjectUrl(file.getOriginalFilename(), StorageTypes.FILES);
         if(cloudStorageService.upload(bucketName, objectUrl, file.getInputStream(), file.getContentType())) {
             log.info("File uploaded to cloud storage ");
-            List<FileMetaData> fileMetaDataList = new ArrayList<>();
-            List<Item> items = cloudStorageService.getAllFiles(bucketName, StorageTypes.FILES + "/" + file.getOriginalFilename());
-            items.forEach(item -> addFileObjects(fileMetaDataList, item));
-            return fileMetaDataList.get(0);
+            List<Item> items = cloudStorageService.getAllFiles(bucketName, CloudStorageServiceUtils.createPrefix(file.getOriginalFilename(),
+                    StorageTypes.FILES));
+            return items.stream().map(this::addFileMetaData).collect(Collectors.toList()).get(0);
         }
         return null;
     }
 
     public List<FileMetaData> getFileList(TenantId tenantId) throws Exception{
         String bucketName = CloudStorageServiceUtils.createBucketName(tenantService.findTenantById(tenantId));
-        List<FileMetaData> fileMetaDataList = new ArrayList<>();
         List<Item> items = cloudStorageService.getAllFiles(bucketName, StorageTypes.FILES);
-        items.forEach(item -> addFileObjects(fileMetaDataList, item));
-        return fileMetaDataList;
+        return items.stream().map(this::addFileMetaData).collect(Collectors.toList());
     }
 
     public InputStreamWrapper downloadFile(String fileName, TenantId tenantId) throws Exception {
@@ -74,12 +71,12 @@ public class UploadService {
         cloudStorageService.delete(bucketName, s3ObjectUrl);
     }
 
-    private boolean addFileObjects(List<FileMetaData> fileMetaData, Item item) {
+    private FileMetaData addFileMetaData(Item item) {
         String[] arrList = item.objectName().split("/");
         String fileName = arrList[arrList.length -1];
         String[] arrList2 = fileName.split("\\.");
         if (arrList2.length == 2)
-            return fileMetaData.add(new FileMetaData(fileName, arrList2[1], item.lastModified(), item.objectSize()));
-        return fileMetaData.add(new FileMetaData(fileName, "NA", item.lastModified(), item.objectSize()));
+            return new FileMetaData(fileName, arrList2[1], item.lastModified(), item.objectSize());
+        return new FileMetaData(fileName, "NA", item.lastModified(), item.objectSize());
     }
 }

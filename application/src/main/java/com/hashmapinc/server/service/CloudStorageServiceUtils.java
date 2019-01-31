@@ -22,6 +22,7 @@ public class CloudStorageServiceUtils {
 
     private static final String FILE_URL_FORMAT = "/%s/%s";
     private static final String FOLDER_URL_FORMAT = "/%s";
+    private static final String PREFIX_FORMAT = "%s/%s";
 
     public static String createBucketName(Tenant tenant) {
         return tenant.getName().toLowerCase().replace(" ", "-");
@@ -31,6 +32,10 @@ public class CloudStorageServiceUtils {
         if (fileName.contentEquals(""))
             return String.format(FOLDER_URL_FORMAT, type);
         return String.format(FILE_URL_FORMAT, type, fileName.toLowerCase().replace(" ", "-"));
+    }
+
+    public static String createPrefix(String fileName, String type) {
+        return String.format(PREFIX_FORMAT, type, fileName.toLowerCase().replace(" ", "-"));
     }
 
 }
