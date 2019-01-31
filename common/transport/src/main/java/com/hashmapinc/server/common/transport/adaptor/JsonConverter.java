@@ -172,9 +172,9 @@ public class JsonConverter {
         boolean unitPresent = false;
         if (value.has(VALUE) && value.has("unit")){
             if(value.get(VALUE).getNodeType() == JsonNodeType.BOOLEAN){
-                result.add(new BooleanDataEntry(key, value.get("unit").asText(), value.get(VALUE).asBoolean()));
+                result.add(new BooleanDataEntry(key, value.get("unit").asText(), value.get("unit").asText(), value.get(VALUE).asBoolean()));
             }else if(value.get(VALUE).getNodeType() == JsonNodeType.STRING){
-                result.add(new StringDataEntry(key, value.get("unit").asText(), value.get(VALUE).asText()));
+                result.add(new StringDataEntry(key, value.get("unit").asText(), value.get("unit").asText(), value.get(VALUE).asText()));
             }else if(value.get(VALUE).getNodeType() == JsonNodeType.NUMBER){
                 parseNumericValueAndConvertToSi(result, key, value.get("unit").asText(), value.get(VALUE));
             }
@@ -200,12 +200,12 @@ public class JsonConverter {
         Quantity quantity;
         if (value.asText().contains(".")) {
             quantity = UnitConverter.convertToSiUnit(new Quantity(value.asDouble() , unit));
-            result.add(new DoubleDataEntry(key, quantity.getUnit(), quantity.getValue()));
+            result.add(new DoubleDataEntry(key, quantity.getUnit(), unit, quantity.getValue()));
         } else {
             try {
                 long longValue = value.asLong();
                 quantity = UnitConverter.convertToSiUnit(new Quantity(((Long)longValue).doubleValue(), unit));
-                result.add(new DoubleDataEntry(key, quantity.getUnit(), quantity.getValue()));
+                result.add(new DoubleDataEntry(key, quantity.getUnit(), unit, quantity.getValue()));
             } catch (NumberFormatException e) {
                 throw new JsonSyntaxException("Big integer values are not supported!");
             }
