@@ -38,5 +38,5 @@ public class SqlIntegrationTestSuite {
             Arrays.asList("sql/hsql/schema.sql", "sql/system-data.sql"),
             "sql/drop-all-tables.sql",
             "sql-test.properties",
-            Collections.emptyList());
+            Arrays.asList("sql/hsql/upgrade/1.sql"));
 }
