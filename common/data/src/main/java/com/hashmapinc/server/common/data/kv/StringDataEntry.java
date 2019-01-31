@@ -29,8 +29,8 @@ public class StringDataEntry extends BasicKvEntry {
         this.value = value;
     }
 
-    public StringDataEntry(String key, String unit, String value) {
-        super(key, unit);
+    public StringDataEntry(String key, String unit, String sourceUnit, String value) {
+        super(key, unit, sourceUnit);
         this.value = value;
     }
 
@@ -71,6 +71,7 @@ public class StringDataEntry extends BasicKvEntry {
         return "StringDataEntry{"
                 + "value='" + getValueAsString() + '\'' +
                 ", unit=" + super.getUnit().orElse(null) +
+                ", sourceUnit=" + super.getSourceUnit().orElse(null) +
                 "} " + super.toString();
     }
     

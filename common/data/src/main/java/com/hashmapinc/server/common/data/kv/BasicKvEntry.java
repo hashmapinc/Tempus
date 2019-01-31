@@ -27,17 +27,24 @@ public abstract class BasicKvEntry implements KvEntry {
 
     private String unit;
 
+    private String sourceUnit;
+
     protected BasicKvEntry(String key) {
         this.key = key;
     }
 
-    protected BasicKvEntry(String key, String unit) {
+    protected BasicKvEntry(String key, String unit, String sourceUnit) {
         this.key = key;
         this.unit = unit;
+        this.sourceUnit = sourceUnit;
     }
 
     public Optional<String> getUnit() {
         return Optional.ofNullable(unit);
+    }
+
+    public Optional<String> getSourceUnit() {
+        return Optional.ofNullable(sourceUnit);
     }
 
     @Override

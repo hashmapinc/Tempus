@@ -75,17 +75,20 @@ public class AttributeKvEntity implements ToData<AttributeKvEntry>, Serializable
     @Column(name = ModelConstants.UNIT_COLUMN)
     private String unit;
 
+    @Column(name = ModelConstants.SOURCE_UNIT_COLUMN)
+    private String sourceUnit;
+
     @Override
     public AttributeKvEntry toData() {
         KvEntry kvEntry = null;
         if (strValue != null) {
-            kvEntry = new StringDataEntry(attributeKey, unit, strValue);
+            kvEntry = new StringDataEntry(attributeKey, unit, sourceUnit, strValue);
         } else if (booleanValue != null) {
-            kvEntry = new BooleanDataEntry(attributeKey, unit, booleanValue);
+            kvEntry = new BooleanDataEntry(attributeKey, unit, sourceUnit, booleanValue);
         } else if (doubleValue != null) {
-            kvEntry = new DoubleDataEntry(attributeKey, unit, doubleValue);
+            kvEntry = new DoubleDataEntry(attributeKey, unit, sourceUnit, doubleValue);
         } else if (longValue != null) {
-            kvEntry = new LongDataEntry(attributeKey, unit, longValue);
+            kvEntry = new LongDataEntry(attributeKey, unit, sourceUnit, longValue);
         } else if (jsonValue != null) {
             kvEntry = new JsonDataEntry(attributeKey, jsonValue);
         }

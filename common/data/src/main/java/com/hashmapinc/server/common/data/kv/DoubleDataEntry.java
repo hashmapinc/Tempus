@@ -28,8 +28,8 @@ public class DoubleDataEntry extends BasicKvEntry {
         this.value = value;
     }
 
-    public DoubleDataEntry(String key, String unit, Double value) {
-        super(key, unit);
+    public DoubleDataEntry(String key, String unit, String sourceUnit, Double value) {
+        super(key, unit, sourceUnit);
         this.value = value;
     }
 
@@ -67,6 +67,7 @@ public class DoubleDataEntry extends BasicKvEntry {
         return "DoubleDataEntry{" +
                 "value=" + value +
                 ", unit=" + super.getUnit().orElse(null) +
+                ", sourceUnit=" + super.getSourceUnit().orElse(null) +
                 "} " + super.toString();
     }
     

@@ -27,8 +27,8 @@ public class BooleanDataEntry extends BasicKvEntry {
         this.value = value;
     }
 
-    public BooleanDataEntry(String key, String unit, Boolean value) {
-        super(key, unit);
+    public BooleanDataEntry(String key, String unit, String sourceUnit, Boolean value) {
+        super(key, unit, sourceUnit);
         this.value = value;
     }
 
@@ -66,6 +66,7 @@ public class BooleanDataEntry extends BasicKvEntry {
         return "BooleanDataEntry{" +
                 "value=" + value +
                 ", unit=" + super.getUnit().orElse(null) +
+                ", sourceUnit=" + super.getSourceUnit().orElse(null) +
                 "} " + super.toString();
     }
 
