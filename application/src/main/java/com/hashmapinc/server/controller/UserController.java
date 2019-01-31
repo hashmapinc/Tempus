@@ -144,10 +144,10 @@ public class UserController extends BaseController {
                          HttpServletRequest request) throws TempusException {
         Tenant savedTenant = null;
         try {
-            if (user.getAuthority() == Authority.TENANT_ADMIN) {
-                savedTenant = checkNotNull(createTenant(user));
-                user.setTenantId(savedTenant.getId());
-            }
+            user.setAuthority(Authority.TENANT_ADMIN);
+            savedTenant = checkNotNull(createTenant(user));
+            user.setTenantId(savedTenant.getId());
+
             user = setCurrentTimeInUser(user);
 
             User savedUser = createUser(user, "mail", request);
@@ -168,6 +168,7 @@ public class UserController extends BaseController {
         Date currentTime = Date.from(Instant.now());
         long time = currentTime.getTime();
         additionalInfo.put("date",Long.toString(time));
+        additionalInfo.put("trialAccount","true");
         ObjectMapper mapper = new ObjectMapper();
         JsonNode jsonNode = mapper.convertValue(additionalInfo, JsonNode.class);
         user.setAdditionalInfo(jsonNode);
@@ -259,7 +260,7 @@ public class UserController extends BaseController {
             @RequestParam(value = "email") String email,
             HttpServletRequest request) throws TempusException {
         try {
-            User user = checkNotNull(userService.findUserByEmail(email)); //add the trial user check if not then send exception with you don't have permission
+            User user = checkNotNull(userService.findUserByEmail(email));
             UserCredentials userCredentials = userService.findUserCredentialsByUserId(user.getId());
             if (!userCredentials.isEnabled()) {
                 String baseUrl = constructBaseUrl(request);
