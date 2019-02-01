@@ -23,6 +23,7 @@ import FileUploadController from './file-upload.controller';
 export default angular.module('tempus.fileUpload', [
     uiRouter,
     tempusApiFileUpload
+
 ])
     .config(FileUploadRoutes)
     .controller('FileUploadController', FileUploadController)
