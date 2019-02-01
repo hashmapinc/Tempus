@@ -52,6 +52,17 @@
                                 <div translate ng-message="required">rule.component-type-required</div>
                             </div>
                         </md-input-container>
+
+                    </section>
+                    <section ng-if ="vm.componentInfo.title == 'rule.plugin-action' && (vm.componentInfo.component.configuration.sync !== undefined || vm.componentInfo.component.configuration.deviceIdTemplate !== undefined)">
+                        <md-input-container flex class="md-block">
+                            <label translate>rule.templates</label>
+                            <md-select ng-change ="vm.getTemplateBody()"  ng-model="vm.template">
+                                <md-option ng-repeat="(key,value) in vm.templates" ng-value="key" ng-selected="key == vm.selectedTemplate" >
+                                    {{value}}
+                                </md-option>
+                            </md-select>
+                        </md-input-container>
                     </section>
                     <md-card flex class="plugin-config" ng-if="vm.componentHasSchema">
                         <md-card-content>

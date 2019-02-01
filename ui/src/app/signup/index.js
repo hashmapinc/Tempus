@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright © 2016-2018 The Thingsboard Authors
  * Modifications © 2017-2018 Hashmap, Inc
  *
@@ -14,24 +14,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.hashmapinc.server.service.install;
+import './signup.scss';
+import uiRouter from 'angular-ui-router';
 
-import com.hashmapinc.server.exception.TempusApplicationException;
+import SignUpRoutes from './sign-up.routes';
+import SignUpController from './sign-up.controller';
+import tempusApiSignup from '../api/sign-up.service';
+import ActivationLinkController from './activation-link.controller'
+import 'angular-recaptcha';
 
-public interface SystemDataLoaderService {
 
-    void createSysAdminWithGroupAndSettings() throws TempusApplicationException;
-
-    void loadSystemWidgets() throws TempusApplicationException;
-
-    void loadSystemPlugins() throws TempusApplicationException;
-
-    void loadSystemRules() throws TempusApplicationException;
-
-    void loadSystemThemes() throws TempusApplicationException;
-
-    void loadDemoData() throws TempusApplicationException;
-
-    void deleteSystemWidgetBundle(String bundleAlias) throws TempusApplicationException;
-
-}
+export default angular.module('tempus.signup', [
+    uiRouter,
+    'vcRecaptcha',
+    tempusApiSignup
+])
+    .config(SignUpRoutes)
+    .controller('SignUpController', SignUpController)
+    .controller('ActivationLinkController', ActivationLinkController)
+    .name;

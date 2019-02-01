@@ -508,6 +508,9 @@ export default angular.module('tempus.types', [])
                 PKCS12: "PKCS12",
                 JKS: "JKS"
             },
+            extensionFilter: {
+                extensionFilterConfiguration: "configuration"
+            },
             latestTelemetry: {
                 value: "LATEST_TELEMETRY",
                 name: "attribute.scope-latest-telemetry",

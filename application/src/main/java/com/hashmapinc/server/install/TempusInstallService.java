@@ -150,9 +150,7 @@ public class TempusInstallService {
                 componentDiscoveryService.discoverComponents();
 
                 systemDataLoaderService.loadSystemThemes();
-                systemDataLoaderService.createSysAdminGroup();
-                systemDataLoaderService.createSysAdmin();
-                systemDataLoaderService.createAdminSettings();
+                systemDataLoaderService.createSysAdminWithGroupAndSettings();
                 systemDataLoaderService.loadSystemWidgets();
                 systemDataLoaderService.loadSystemPlugins();
                 systemDataLoaderService.loadSystemRules();

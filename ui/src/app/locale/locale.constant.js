@@ -367,7 +367,8 @@ export default angular.module('tempus.locale', [])
                     "delete-templates-action-title":"Delete { count, select, 1 {1 template} other {# templates} }",
                     "delete-templates-text": "Be careful, after the confirmation all selected templates will be removed.",
                     "no-template-text":"No Templates Available",
-                    "createdDate":"Created Date"
+                    "createdDate":"Created Date",
+                    "copyFrom":"Copy From Existing Template"
 
 
                 },
@@ -1185,7 +1186,7 @@ export default angular.module('tempus.locale', [])
                     "sign-in": "Please sign in",
                     "username": "Username (email)",
                     "remember-me": "Remember me",
-                    "forgot-password": "Forgot Password?",
+                    "forgot-credential": "Forgot Password?",
                     "password-reset": "Password reset",
                     "new-password": "New password",
                     "new-password-again": "New password again",
@@ -1443,7 +1444,8 @@ export default angular.module('tempus.locale', [])
                     "idCopiedMessage": "Rule Id has been copied to clipboard",
                     "select-rule": "Select rule",
                     "no-rules-matching": "No rules matching '{{entity}}' were found.",
-                    "rule-required": "Rule is required"
+                    "rule-required": "Rule is required",
+                    "templates":"Templates"
                 },
                 "rule-plugin": {
                     "management": "Rules and plugins management"
@@ -1845,6 +1847,30 @@ export default angular.module('tempus.locale', [])
                     "si-metric-system" :"SI-Metric System",
                     "imperials-units":"Imperials System",
                     "us-customary-units":"US-Customary System"
+                },
+                "signup": {
+                    "activation-msg" : "An activation link has been sent to your register email address." ,
+                    "activation-msgText": "If you dont see an email from us, please check your spam folder or click on 'RESEND LINK' button." ,
+                    "resend-link": "RESEND LINK",
+                    "invalid-email": "Invalid Email Address",
+                    "accept-privacy": "Please accept privacy policy",
+                    "login-text": "Already have an account?",
+                    "submit" :"Submit",
+                    "privacy-policy": "Privacy Policy",
+                    "accept": "Accept",
+                    "accept-privacy-policy": "Accept Privacy Policy",
+                    "company-name":"Company Name",
+                    "home":"home",
+                    "phone": "Phone",
+                    "call":"call",
+                    "email":"Email",
+                    "email-icon":"email",
+                    "last-name": "Last Name",
+                    "required-field" : "This is required.",
+                    "first-name": "First Name",
+                    "sign-up": "Sign up to get your own personal account for Free !",
+                    "emailSuccess": "Email is sent on your email id.Please check."
+
                 }
             }
         }

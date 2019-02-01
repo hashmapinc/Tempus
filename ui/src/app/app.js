@@ -83,8 +83,8 @@ import tempusTemplates from './templateeditor';
 import tempusgateway from './tempusgateway';
 import tempusMetadata from './metadata';
 import tempusApiAuditLog from './api/audit-log.service';
+import tempusSignup from './signup';
 import tempusFileUpload from './fileupload'
-
 
 import 'typeface-roboto';
 import 'font-awesome/css/font-awesome.min.css';
@@ -156,6 +156,7 @@ angular.module('tempus', [
     tempusMetadata,
     tempusApiAuditLog,
     tempusTemplates,
+    tempusSignup,
     tempusFileUpload,
     uiRouter])
     .config(AppConfig)
