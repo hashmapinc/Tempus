@@ -205,7 +205,7 @@ public class ComputationsController extends BaseController {
                 while(itr.hasNext()){
                     Computations computation = (Computations) itr.next();
                     if(computation.getType() == ComputationType.KUBELESS &&
-                            (!kubelessDeploymentService.checkKubelessFunction(computation))) {
+                            (!kubelessDeploymentService.functionExists(computation))) {
                         itr.remove();
                     }
                 }
@@ -225,7 +225,7 @@ public class ComputationsController extends BaseController {
             ComputationId computationId = new ComputationId(toUUID(strComputationId));
             Computations computation = checkNotNull(computationsService.findById(computationId));
             if(computation.getType() == ComputationType.KUBELESS
-                    && !kubelessDeploymentService.checkKubelessFunction(computation)) {
+                    && !kubelessDeploymentService.functionExists(computation)) {
                 throw new TempusException("Kubeless fuction not present in kubernetes cluster ", ITEM_NOT_FOUND);
             }
             log.info(" returning Computations by id {} ", computation);

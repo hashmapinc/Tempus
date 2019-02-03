@@ -116,7 +116,7 @@ public class KubelessComputationJobActorMessageProcessor extends ComponentMsgPro
     }
 
     private void checkAndCreateTrigger(){
-        if(!systemContext.getKubelessDeploymentService().checkTrigger(job) &&
+        if(!systemContext.getKubelessDeploymentService().triggerExists(job) &&
                 !systemContext.getKubelessDeploymentService().createTrigger(job)) {
             systemContext.getComputationJobService().suspendComputationJobById(job.getId());
         }
@@ -124,7 +124,7 @@ public class KubelessComputationJobActorMessageProcessor extends ComponentMsgPro
 
     private void suspendJob(){
         ComputationJob savedJob = systemContext.getComputationJobService().findComputationJobById(job.getId());
-        if (savedJob != null && systemContext.getKubelessDeploymentService().checkTrigger(job) &&
+        if (savedJob != null && systemContext.getKubelessDeploymentService().triggerExists(job) &&
                 systemContext.getKubelessDeploymentService().deleteTrigger(job)) {
             systemContext.getComputationJobService().suspendComputationJobById(job.getId());
         }

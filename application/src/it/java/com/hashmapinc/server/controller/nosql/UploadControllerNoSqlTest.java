@@ -14,16 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.hashmapinc.server.service.computation;
+package com.hashmapinc.server.controller.nosql;
 
-import com.hashmapinc.server.common.data.computation.ComputationJob;
-import com.hashmapinc.server.common.data.computation.Computations;
+import com.hashmapinc.server.controller.BaseUploadControllerTest;
+import com.hashmapinc.server.dao.service.DaoNoSqlTest;
 
-public interface KubelessDeploymentService {
-    boolean deployFunction(Computations computations);
-    boolean functionExists(Computations computation);
-    boolean deleteFunction(Computations computation);
-    boolean createTrigger(ComputationJob computationJob);
-    boolean triggerExists(ComputationJob computationJob);
-    boolean deleteTrigger(ComputationJob computationJob);
+@DaoNoSqlTest
+public class UploadControllerNoSqlTest extends BaseUploadControllerTest {
 }

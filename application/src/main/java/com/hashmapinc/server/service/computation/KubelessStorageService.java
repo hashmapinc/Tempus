@@ -45,10 +45,10 @@ public class KubelessStorageService {
     public static final int BUFFER_SIZE = 16384;
 
     @Autowired
-    MinioService minioService;
+    private CloudStorageService cloudStorageService;
 
     @Autowired
-    TenantService tenantService;
+    private TenantService tenantService;
 
 
     public boolean uploadFunction(Computations computation) throws Exception {
@@ -59,7 +59,7 @@ public class KubelessStorageService {
         String bucketName = CloudStorageServiceUtils.createBucketName(tenant);
         String objectUrl = CloudStorageServiceUtils.createObjectUrl(computation.getName(), StorageTypes.FUNCTIONS);
         ByteArrayInputStream byteArrayInputStream =  new ByteArrayInputStream(md.getFunctionContent().getBytes());
-        return minioService.upload(bucketName, objectUrl, byteArrayInputStream, md.getFunctionContentType());
+        return cloudStorageService.upload(bucketName, objectUrl, byteArrayInputStream, md.getFunctionContentType());
     }
 
     public String getFunction(Computations computation) throws Exception{
@@ -67,7 +67,7 @@ public class KubelessStorageService {
         String bucketName = CloudStorageServiceUtils.createBucketName(tenant);
         String objectUrl = CloudStorageServiceUtils.createObjectUrl(computation.getName(), StorageTypes.FUNCTIONS);
 
-        InputStreamWrapper inputStreamWrapper = minioService.getFile(bucketName, objectUrl);
+        InputStreamWrapper inputStreamWrapper = cloudStorageService.getFile(bucketName, objectUrl);
         InputStream stream = inputStreamWrapper.getInputStream();
         byte[] buf = new byte[BUFFER_SIZE];
         int bytesRead;
@@ -83,7 +83,7 @@ public class KubelessStorageService {
         Tenant tenant = tenantService.findTenantById(computation.getTenantId());
         String bucketName = CloudStorageServiceUtils.createBucketName(tenant);
         String objectUrl = CloudStorageServiceUtils.createObjectUrl(computation.getName(), StorageTypes.FUNCTIONS);
-        return minioService.delete(bucketName, objectUrl);
+        return cloudStorageService.delete(bucketName, objectUrl);
     }
 
 

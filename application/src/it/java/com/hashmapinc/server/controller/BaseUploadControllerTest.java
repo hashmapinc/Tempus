@@ -19,17 +19,22 @@ package com.hashmapinc.server.controller;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.hashmapinc.server.common.data.upload.FileMetaData;
 import com.hashmapinc.server.common.data.upload.InputStreamWrapper;
+import com.hashmapinc.server.common.data.upload.StorageTypes;
+import com.hashmapinc.server.service.computation.CloudStorageService;
 import com.hashmapinc.server.service.upload.UploadService;
+import io.minio.messages.Item;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileInputStream;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -38,22 +43,56 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 public abstract class BaseUploadControllerTest extends AbstractControllerTest {
 
-    @MockBean
-    protected UploadService uploadService;
+    @Autowired
+    private UploadService uploadService;
 
-    protected MultipartFile multipartFile = null;
+    @Autowired
+    private CloudStorageService cloudStorageService;
+
+    private MultipartFile multipartFile = null;
+
+    private List<Item> items = new ArrayList<>();
 
     @Before
     public void beforeTest() throws Exception {
         loginTenantAdmin();
+
+        ClassLoader classLoader = this.getClass().getClassLoader();
+        multipartFile = new MockMultipartFile("file", new FileInputStream(new File(classLoader.
+                getResource("file.txt").getFile())));
+
+        String objectName1 = StorageTypes.FILES + "/" + "temp.txt";
+        String objectName2 = StorageTypes.FILES + "/" + "temp2";
+        Item item = new Item(objectName1, false);
+        item.putIfAbsent("LastModified", "2019-02-02T05:06:10.249Z");
+        item.putIfAbsent("Size", 1);
+        Item item2 = new Item(objectName2, false);
+        item2.putIfAbsent("LastModified", "2019-02-02T05:06:10.249Z");
+        item2.putIfAbsent("Size", 1);
+        items.add(item);
+        items.add(item2);
+    }
+
+    @Test
+    public void uploadFile() throws Exception {
+        when(cloudStorageService.upload(any(), any(), any(), any())).thenReturn(true);
+        when(cloudStorageService.getAllFiles(any(), any())).thenReturn(items);
+        uploadService.uploadFile(multipartFile, tenantId);
+        FileMetaData retFileMetaData = doPostFile("/api/file", multipartFile, FileMetaData.class);
+        Assert.assertNotNull(retFileMetaData);
+        Assert.assertEquals("temp.txt", retFileMetaData.getFileName());
+    }
+
+    @Test
+    public void uploadFileReturnsNotFoundException() throws Exception {
+        when(cloudStorageService.upload(any(), any(), any(), any())).thenReturn(false);
+        doPostFile("/api/file", multipartFile).andExpect(status().isNotFound());
     }
 
     @Test
     public void getAllFiles() throws Exception {
         List<FileMetaData> list = new ArrayList<>();
-        list.add(new FileMetaData("temp", "txt", new Date(), 1));
-        list.add(new FileMetaData("temp2", "txt", new Date(), 1));
-        when(uploadService.getFileList(any())).thenReturn(list);
+        when(cloudStorageService.getAllFiles(any(), any())).thenReturn(items);
         List<FileMetaData> retFileMetaDataList = doGetTyped("/api/file", new TypeReference<List<FileMetaData>>() {
         });
         Assert.assertEquals(2, retFileMetaDataList.size());
@@ -62,7 +101,7 @@ public abstract class BaseUploadControllerTest extends AbstractControllerTest {
     @Test
     public void downloadFile() throws Exception {
         InputStreamWrapper streamWrapper = new InputStreamWrapper(new ByteArrayInputStream("xtz".getBytes()), "txt");
-        when(uploadService.downloadFile(any(), any())).thenReturn(streamWrapper);
+        when(cloudStorageService.getFile(any(), any())).thenReturn(streamWrapper);
         ResultActions resultActions = doGet("/api/file/" +
                 "image.jpg");
         Assert.assertEquals(200, resultActions.andReturn().getResponse().getStatus());
@@ -71,7 +110,7 @@ public abstract class BaseUploadControllerTest extends AbstractControllerTest {
     @Test
     public void downloadFileThrowsInternalServerError() throws Exception {
         InputStreamWrapper streamWrapper = null;
-        when(uploadService.downloadFile(any(), any())).thenReturn(streamWrapper);
+        when(cloudStorageService.getFile(any(), any())).thenReturn(streamWrapper);
         doGet("/api/file/image.jpg").andExpect(status().isInternalServerError());
     }
 }

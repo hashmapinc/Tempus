@@ -72,7 +72,7 @@ public class ComputationActor extends ContextAwareActor {
     }
 
     private void checkOrDeployKubelessFunction() {
-        boolean functionPresent = systemContext.getKubelessDeploymentService().checkKubelessFunction(computation);
+        boolean functionPresent = systemContext.getKubelessDeploymentService().functionExists(computation);
         if (!functionPresent) {
             KubelessComputationMetadata md = (KubelessComputationMetadata) computation.getComputationMetadata();
             try {
@@ -81,7 +81,7 @@ public class ComputationActor extends ContextAwareActor {
                     throw new ComputationInitializationException("Kubeless Computation function not found!");
                 } else {
                     md.setFunctionContent(functionContent);
-                    if(!systemContext.getKubelessDeploymentService().deployKubelessFunction(computation))
+                    if(!systemContext.getKubelessDeploymentService().deployFunction(computation))
                         systemContext.getComputationsService().deleteById(computationId);
                 }
             } catch (Exception e ){
@@ -173,7 +173,7 @@ public class ComputationActor extends ContextAwareActor {
     private void handleDeleteMsgForComputationType() {
         if (computation != null && computation.getType() == ComputationType.KUBELESS) {
             KubelessDeploymentService service = systemContext.getKubelessDeploymentService();
-            if (service.deleteKubelessFunction(computation))
+            if (service.deleteFunction(computation))
                 systemContext.getComputationsService().deleteById(computationId);
         }
     }

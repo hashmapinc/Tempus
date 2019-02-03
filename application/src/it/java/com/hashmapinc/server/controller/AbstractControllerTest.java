@@ -37,6 +37,7 @@ import com.hashmapinc.server.requests.ActivateUserRequest;
 import com.hashmapinc.server.requests.CreateUserRequest;
 import com.hashmapinc.server.requests.IdentityUser;
 import com.hashmapinc.server.requests.IdentityUserCredentials;
+import com.hashmapinc.server.service.computation.CloudStorageService;
 import com.hashmapinc.server.service.mail.TestMailService;
 import com.hashmapinc.server.service.security.auth.jwt.RefreshTokenRequest;
 import com.hashmapinc.server.service.security.auth.rest.LoginRequest;
@@ -56,12 +57,15 @@ import org.junit.rules.TestRule;
 import org.junit.rules.TestWatcher;
 import org.junit.runner.Description;
 import org.junit.runner.RunWith;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootContextLoader;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
@@ -289,6 +293,12 @@ public abstract class AbstractControllerTest {
             deleteLDAPEntry(CUSTOMER_USER_EMAIL);
         }
         log.info("Executed teardown");
+    }
+
+    @Bean
+    @Primary
+    public CloudStorageService nameService() {
+        return Mockito.mock(CloudStorageService.class);
     }
 
     protected void stubUser(User user, String password) throws IOException {
