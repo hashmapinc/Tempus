@@ -15,7 +15,8 @@
 # limitations under the License.
 #
 
-{{- if .Values.ingress.enabled -}}
+{{- /*
+ {{- if .Values.ingress.enabled -}}
 {{- $fullName := include "tempus.fullname" . -}}
 {{- $ingressPaths := .Values.ingress.paths -}}
 apiVersion: extensions/v1beta1
@@ -54,4 +55,5 @@ spec:
               servicePort: http
 	{{- end }}
   {{- end }}
-{{- end }}
+{{- end }} 
+*/ -}}

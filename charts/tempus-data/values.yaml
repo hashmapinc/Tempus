@@ -67,6 +67,7 @@ cassandra:
     repository: hashmapinc/cassandra
     tag: dev
     pullPolicy: Always
+  affinity: false  
   persistence:
     data:
       name: data

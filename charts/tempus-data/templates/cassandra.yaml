@@ -41,6 +41,19 @@ spec:
     metadata:
       labels:
         app: {{ .Values.cassandra.name }}
+{{- if .Values.cassandra.affinity }}        
+    spec:
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                  - key: "app"
+                    operator: In
+                    values:
+                    - {{ .Values.cassandra.name }}
+              topologyKey: "kubernetes.io/hostname"  
+{{- end }}                    
     spec:
       containers:
       - name: {{ .Values.cassandra.name }}

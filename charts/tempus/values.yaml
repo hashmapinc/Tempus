@@ -38,7 +38,7 @@ serviceAccount:
 
 image:
   repository: hashmapinc/tempus
-  tag: helm
+  tag: dev
   pullPolicy: Always
 
 externaldb: true
@@ -83,22 +83,18 @@ service:
       name: mqtt  
 
 ingress:
-  enabled: false
-  annotations: {}
-    # kubernetes.io/ingress.class: nginx
+  enabled: true
+  tls: false
+  hostname: tempus-qa.hashmapinc.com
+  annotations: 
+    kubernetes.io/ingress.class: nginx
+    ingress.kubernetes.io/rewrite-target: /
     # kubernetes.io/tls-acme: "true"
-  paths: []
-  hosts:
-    - chart-example.local
-  tls: []
+  #paths: []
+  # tls: []
   #  - secretName: chart-example-tls
   #    hosts:
   #      - chart-example.local
-
-
-
-
-
 
 # Configuration of other essential services 
 
@@ -107,7 +103,7 @@ databaseSetup:
   name: "db-setup"
   image:
     repository: hashmapinc/database-setup
-    tag: helm
+    tag: dev
     pullPolicy: Always  
 
 nifi:
@@ -206,47 +202,15 @@ dataquality:
   pdb:
     minAvailable: 1
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+spark:
+  enabled: true
+  name: livy
+  image: hashmapinc/livy-k8s:latest
+  s3connector: 
+    enabled: true
+    name: s3fs
+    image: gnut3ll4/s3fsweb:latest
+    s3bucket: tempus-spark-jars
 
 resources: {}
   # We usually recommend not to specify default resources and to leave this as a conscious
