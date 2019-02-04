@@ -33,6 +33,11 @@ public class DoubleDataEntry extends BasicKvEntry {
         this.value = value;
     }
 
+    public DoubleDataEntry(String key, String sourceUnit, Double value) {
+        super(key, sourceUnit);
+        this.value = value;
+    }
+
     @Override
     public DataType getDataType() {
         return DataType.DOUBLE;

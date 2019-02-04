@@ -34,6 +34,11 @@ public class StringDataEntry extends BasicKvEntry {
         this.value = value;
     }
 
+    public StringDataEntry(String key, String sourceUnit, String value) {
+        super(key, sourceUnit);
+        this.value = value;
+    }
+
     @Override
     public DataType getDataType() {
         return DataType.STRING;

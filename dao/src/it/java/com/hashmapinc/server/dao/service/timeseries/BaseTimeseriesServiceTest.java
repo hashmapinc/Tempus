@@ -50,9 +50,9 @@ public abstract class BaseTimeseriesServiceTest extends AbstractServiceTest {
     JsonParser parser = new JsonParser();
     KvEntry stringKvEntry = new StringDataEntry(STRING_KEY, "value");
     KvEntry longKvEntry = new LongDataEntry(LONG_KEY, Long.MAX_VALUE);
-    KvEntry longKvEntryWithUnit = new LongDataEntry(LONG_KEY, "mm", "mm", Long.MAX_VALUE);
+    KvEntry longKvEntryWithUnit = new LongDataEntry(LONG_KEY, "mm", Long.MAX_VALUE);
     KvEntry doubleKvEntry = new DoubleDataEntry(DOUBLE_KEY, Double.MAX_VALUE);
-    KvEntry doubleKvEntryWithUnit = new DoubleDataEntry(DOUBLE_KEY, "cm", "cm", Double.MAX_VALUE);
+    KvEntry doubleKvEntryWithUnit = new DoubleDataEntry(DOUBLE_KEY, "cm", Double.MAX_VALUE);
     KvEntry booleanKvEntry = new BooleanDataEntry(BOOLEAN_KEY, Boolean.TRUE);
     KvEntry jsonKvEntry = new JsonDataEntry(JSON_KEY, parser.parse("{\"tag\": \"value\"}").getAsJsonObject());
 

@@ -33,6 +33,11 @@ public class LongDataEntry extends BasicKvEntry {
         this.value = value;
     }
 
+    public LongDataEntry(String key, String sourceUnit, Long value) {
+        super(key, sourceUnit);
+        this.value = value;
+    }
+
     @Override
     public DataType getDataType() {
         return DataType.LONG;

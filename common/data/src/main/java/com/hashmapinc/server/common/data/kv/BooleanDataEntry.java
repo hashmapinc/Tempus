@@ -32,6 +32,11 @@ public class BooleanDataEntry extends BasicKvEntry {
         this.value = value;
     }
 
+    public BooleanDataEntry(String key, String sourceUnit, Boolean value) {
+        super(key, sourceUnit);
+        this.value = value;
+    }
+
     @Override
     public DataType getDataType() {
         return DataType.BOOLEAN;

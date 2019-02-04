@@ -39,6 +39,10 @@ public abstract class BasicKvEntry implements KvEntry {
         this.sourceUnit = sourceUnit;
     }
 
+    protected BasicKvEntry(String key, String sourceUnit) {
+        this(key, sourceUnit, sourceUnit);
+    }
+
     public Optional<String> getUnit() {
         return Optional.ofNullable(unit);
     }
