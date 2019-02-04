@@ -135,4 +135,14 @@ public interface PluginContext {
     ListenableFuture<List<EntityRelation>> findByFromAndType(EntityId from, String relationType);
 
     ListenableFuture<List<EntityRelation>> findByToAndType(EntityId from, String relationType);
+
+    /**
+     * Unit Conversion API
+     */
+    List<AttributeKvEntry> convertAttributeKvEntriesToUnitSystemByTenantId(List<AttributeKvEntry> attributeKvEntries, TenantId tenantId);
+
+    List<TsKvEntry> convertTsKvEntriesToUnitSystemByTenantId(List<TsKvEntry> tsKvEntries, TenantId tenantId);
+
+    List<DsKvEntry> convertDsKvEntriesToUnitSystemByTenantId(List<DsKvEntry> dsKvEntries, TenantId tenantId);
+
 }

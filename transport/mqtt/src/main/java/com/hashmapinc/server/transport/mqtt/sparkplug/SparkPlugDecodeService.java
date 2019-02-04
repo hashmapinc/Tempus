@@ -115,13 +115,13 @@ public class SparkPlugDecodeService extends SparkPlugUtils {
     private void createKvEntryByDatatype(Metric metric, String unit, List<KvEntry> kvEntryList){
         MetricDataType dataType = metric.getDataType();
         if(dataType.getClazz() == String.class){
-            kvEntryList.add(new StringDataEntry(metric.getName(), unit, unit, (String) metric.getValue()));
+            kvEntryList.add(new StringDataEntry(metric.getName(), unit, (String) metric.getValue()));
         }else if(dataType.getClazz() == Long.class){
-            kvEntryList.add(new LongDataEntry(metric.getName(), unit, unit, (Long) metric.getValue()));
+            kvEntryList.add(new LongDataEntry(metric.getName(), unit, (Long) metric.getValue()));
         }else if(dataType.getClazz() == Double.class){
-            kvEntryList.add(new DoubleDataEntry(metric.getName(), unit,unit, (Double) metric.getValue()));
+            kvEntryList.add(new DoubleDataEntry(metric.getName(), unit, (Double) metric.getValue()));
         }else if(dataType.getClazz() == Boolean.class){
-            kvEntryList.add(new BooleanDataEntry(metric.getName(), unit, unit, (Boolean)metric.getValue()));
+            kvEntryList.add(new BooleanDataEntry(metric.getName(), unit, (Boolean)metric.getValue()));
         }
     }
 

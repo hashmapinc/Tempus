@@ -24,6 +24,7 @@ import com.hashmapinc.server.common.data.EntityType;
 import com.hashmapinc.server.common.data.id.DeviceId;
 import com.hashmapinc.server.common.data.id.EntityId;
 import com.hashmapinc.server.common.data.id.EntityIdFactory;
+import com.hashmapinc.server.common.data.id.TenantId;
 import com.hashmapinc.server.common.data.kv.*;
 import com.hashmapinc.server.common.msg.core.TelemetryUploadRequest;
 import com.hashmapinc.server.common.transport.adaptor.JsonConverter;
@@ -276,12 +277,14 @@ public class TelemetryRestMsgHandler extends DefaultRestMsgHandler {
                 if (attributes.isEmpty()) {
                     throw new IllegalArgumentException("No attributes data found in request body!");
                 }
-                ctx.saveAttributes(ctx.getSecurityCtx().orElseThrow(IllegalArgumentException::new).getTenantId(), entityId, scope, attributes, new PluginCallback<Void>() {
+                TenantId tenantId = ctx.getSecurityCtx().orElseThrow(IllegalArgumentException::new).getTenantId();
+                List<AttributeKvEntry> attributeKvEntries = ctx.convertAttributeKvEntriesToUnitSystemByTenantId(attributes, tenantId);
+                ctx.saveAttributes(tenantId, entityId, scope, attributes, new PluginCallback<Void>() {
                     @Override
                     public void onSuccess(PluginContext ctx, Void value) {
                         ctx.logAttributesUpdated(msg.getSecurityCtx(), entityId, scope, attributes, null);
                         msg.getResponseHolder().setResult(new ResponseEntity<>(HttpStatus.OK));
-                        subscriptionManager.onAttributesUpdateFromServer(ctx, entityId, scope, attributes);
+                        subscriptionManager.onAttributesUpdateFromServer(ctx, entityId, scope, attributeKvEntries);
                     }
 
                     @Override
@@ -342,11 +345,13 @@ public class TelemetryRestMsgHandler extends DefaultRestMsgHandler {
         if (entries.isEmpty()) {
             throw new IllegalArgumentException("No timeseries data found in request body!");
         }
-        ctx.saveTsData(ctx.getSecurityCtx().orElseThrow(IllegalArgumentException::new).getTenantId(), entityId, entries, ttl, new PluginCallback<Void>() {
+        TenantId tenantId = ctx.getSecurityCtx().orElseThrow(IllegalArgumentException::new).getTenantId();
+        List<TsKvEntry> tsKvEntries = ctx.convertTsKvEntriesToUnitSystemByTenantId(entries, tenantId);
+        ctx.saveTsData(tenantId, entityId, entries, ttl, new PluginCallback<Void>() {
             @Override
             public void onSuccess(PluginContext ctx, Void value) {
                 msg.getResponseHolder().setResult(new ResponseEntity<>(HttpStatus.OK));
-                subscriptionManager.onTimeseriesUpdateFromServer(ctx, entityId, entries);
+                subscriptionManager.onTimeseriesUpdateFromServer(ctx, entityId, tsKvEntries);
             }
 
             @Override
