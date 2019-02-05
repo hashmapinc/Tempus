@@ -18,6 +18,7 @@ package com.hashmapinc.server.dao.user;
 
 import com.google.common.util.concurrent.ListenableFuture;
 import com.hashmapinc.server.common.data.User;
+import com.hashmapinc.server.common.data.exception.TempusException;
 import com.hashmapinc.server.common.data.id.CustomerGroupId;
 import com.hashmapinc.server.common.data.id.CustomerId;
 import com.hashmapinc.server.common.data.id.TenantId;
@@ -29,7 +30,7 @@ import com.hashmapinc.server.common.data.security.UserCredentials;
 import java.util.List;
 
 public interface UserService {
-	
+
 	User findUserById(UserId userId);
 
 	TextPageData<User> findUsersByIds(List<UserId> userIds, TextPageLink pageLink);
@@ -43,28 +44,33 @@ public interface UserService {
 	User saveExternalUser(User user);
 
 	UserCredentials findUserCredentialsByUserId(UserId userId);
-	
+
 	UserCredentials findUserCredentialsByActivateToken(String activateToken);
 
 	UserCredentials findUserCredentialsByResetToken(String resetToken);
 
 	UserCredentials saveUserCredentials(UserCredentials userCredentials);
-	
+
 	UserCredentials activateUserCredentials(String activateToken, String password);
-	
+
 	UserCredentials requestPasswordReset(String email);
 
 	void deleteUser(UserId userId);
-	
+
 	TextPageData<User> findTenantAdmins(TenantId tenantId, TextPageLink pageLink);
-	
+
 	void deleteTenantAdmins(TenantId tenantId);
-	
+
 	TextPageData<User> findCustomerUsers(TenantId tenantId, CustomerId customerId, TextPageLink pageLink);
-	    
+
 	void deleteCustomerUsers(TenantId tenantId, CustomerId customerId);
 
-	User assignGroups(UserId userId , List<CustomerGroupId> customerGroupIds);
+	User assignGroups(UserId userId, List<CustomerGroupId> customerGroupIds);
 
-	User unassignGroups(UserId userId , List<CustomerGroupId> customerGroupIds);
+	User unassignGroups(UserId userId, List<CustomerGroupId> customerGroupIds);
+
+	List<User> findUsersByClientIdAndAuthority(String clientId, String authority) throws TempusException;
+
+	List<User> findUsersTenantId(String  tenantId) throws TempusException;
 }
+
