@@ -14,18 +14,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import tempusTypes from '../common/types.constant';
 
-export default angular.module('tempus.api.fileUpload', [tempusTypes])
+
+export default angular.module('tempus.api.fileUpload', [])
     .factory('fileUploadService', FileUploadService)
     .name;
 
 /*@ngInject*/
-function FileUploadService($http, $q, $log, types, $translate, $window, $document) {
-
-    var vm = this;
-
-    vm.types = types;
+function FileUploadService($http, $q, $log, $translate, $window, $document) {
 
     var service = {
 
@@ -87,17 +83,16 @@ function FileUploadService($http, $q, $log, types, $translate, $window, $documen
     }
     function exportToPc(data, filename) {
         if (!data) {
-            $log.error('No data');
             return;
+        }
+        else if (angular.isObject(data)) {
+            data = angular.toJson(data, 2);
         }
 
         if (!filename) {
             filename = 'downloaded file';
         }
 
-        if (angular.isObject(data)) {
-            data = angular.toJson(data, 2);
-        }
 
         var blob = new Blob([data]);
 

@@ -17,16 +17,13 @@
 
 -->
 
-<br>
-<br>
-<br>
 <md-toolbar class="md-table-toolbar tb-device-toolbar md-default ">
 
     <div class="md-toolbar-tools">
         <span flex></span>
 
 
-        <md-button class="md-icon-button" ng-click="openFileDialog()">
+        <md-button class="md-icon-button" ng-click="vm.openFileDialog()">
             <md-icon>add</md-icon>
             <md-tooltip md-direction="top">
                 {{ 'action.add' | translate }}
@@ -40,7 +37,7 @@
                 {{ 'action.search' | translate }}
             </md-tooltip>
         </md-button>
-        <md-button  class="md-icon-button" ng-click="resetFilter()">
+        <md-button  class="md-icon-button" ng-click="vm.resetFilter()">
             <md-icon>refresh</md-icon>
             <md-tooltip md-direction="top">
                 {{ 'action.refresh' | translate }}
@@ -60,15 +57,15 @@
         </tr>
         </thead>
         <tbody md-body>
-        <tr md-row ng-repeat="file in files">
+        <tr md-row ng-repeat="file in vm.files">
             <td md-cell ><b>{{file.fileName}}</b></td>
             <td md-cell >{{file.lastUpdated}}</td>
             <td md-cell >{{file.extension}}</td>
             <td md-cell >{{file.size}}</td>
             <td md-cell class="tb-value-cell">
-                <span><ng-md-icon icon="file_download" ng-click="downloadFile($event, file)"></ng-md-icon></span>
+                <span><ng-md-icon icon="file_download" ng-click="vm.downloadFile($event, file)"></ng-md-icon></span>
             </td>
-            <td md-cell class="tb-value-cell" ng-click="deleteFile($event, file)">
+            <td md-cell class="tb-value-cell" ng-click="vm.deleteFile($event, file)">
                 <span><ng-md-icon size="20" icon="delete"></ng-md-icon></span>
             </td>
         </tr>

@@ -20,31 +20,34 @@
 /* eslint-enable import/no-unresolved, import/default */
 
 /*@ngInject*/
-export default function FileUploadController(types, $scope, $log,$document, fileUploadService, $q, $timeout, $translate, $mdDialog) {
+export default function FileUploadController(toast, $scope, $injector,$document, fileUploadService, $q, $timeout, $translate, $mdDialog) {
 
     var vm = this;
 
-    vm.types = types;
-
-    $scope.files = [];
-
+    vm.files = [];
+    var types;
 
     function loadTableData() {
             var promise = fileUploadService.getAllFile();
 
             if(promise) {
-                promise.then(function success(items) {$log.log(items);
-                    $scope.files = items;
+                promise.then(function success(items) {
+                    vm.files = items;
                     },
                 )
-                $log.log($scope.files,'asdasdasdas');
             }
      }
 
      loadTableData();
 
+    function getTypes() {
+            if (!types) {
+                types = $injector.get("types");
+            }
+            return types;
+        }
 
-    $scope.openFileDialog = function() {
+    vm.openFileDialog = function() {
            angular.element($document[0].getElementById('inputFile').click());
         };
 
@@ -53,20 +56,20 @@ export default function FileUploadController(types, $scope, $log,$document, file
            var fileToBeUploaded = ele.files;
 
            if(fileToBeUploaded.length > 0 ){
-                $log.log("save");
+                if(fileToBeUploaded[0].size <= getTypes().fileUpload.maxSize){
                 saveFile(fileToBeUploaded[0]);
-
+                }
+                else{
+                toast.showError($translate.instant('file-upload.fileSizeError'));
+                }
            }
-
-
     };
 
     function saveFile(file) {
-        $log.log(file);
         var deferred = $q.defer();
         fileUploadService.uploadFile(file).then(
             function success(savedFile) {
-                $scope.files.push(savedFile);
+                vm.files.push(savedFile);
                 loadTableData();
                 return savedFile;
             },
@@ -77,17 +80,14 @@ export default function FileUploadController(types, $scope, $log,$document, file
         return deferred.promise;
     }
 
-    $scope.downloadFile = function($event, file) {
+    vm.downloadFile = function($event, file) {
         $event.stopPropagation();
         fileUploadService.exportFile(file.fileName);
     }
 
 
 
-    $scope.deleteFile = function($event,file) {
-    $log.log("file " + angular.toJson(file));
-    $log.log(file.fileName);
-    $log.log($event);
+    vm.deleteFile = function($event,file) {
     var confirm = $mdDialog.confirm()
         .targetEvent($event)
         .title(deleteFileTitle(file))
@@ -97,7 +97,7 @@ export default function FileUploadController(types, $scope, $log,$document, file
         .ok($translate.instant('action.yes'));
         $mdDialog.show(confirm).then(function () {
         fileUploadService.deleteFile(file.fileName).then(function success() {
-            $scope.resetFilter();
+            vm.resetFilter();
 
         });
     },
@@ -105,7 +105,7 @@ export default function FileUploadController(types, $scope, $log,$document, file
     });
     }
 
-    $scope.resetFilter = function() {
+    vm.resetFilter = function() {
         loadTableData();
     }
 
@@ -117,7 +117,4 @@ export default function FileUploadController(types, $scope, $log,$document, file
         return $translate.instant('file-upload.delete-file-text');
     }
 
-    $scope.enterFilterMode = function() {
-            $scope.query.search = '';
-    }
    }

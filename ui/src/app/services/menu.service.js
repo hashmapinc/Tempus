@@ -272,7 +272,7 @@ function Menu(userService, $state, $rootScope, $log,datamodelService,customerSer
                             name: 'file-upload.upload',
                             type: 'link',
                             state: 'home.file-upload',
-                            icon: 'now_upload',
+                            icon: 'file_upload_icon',
                             link: '/static/svg/baseline-cloud_upload.svg'
                         },
                         {
