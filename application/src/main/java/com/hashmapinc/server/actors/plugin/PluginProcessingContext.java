@@ -122,8 +122,22 @@ public final class PluginProcessingContext implements PluginContext {
     public void loadAttribute(EntityId entityId, String attributeType, String attributeKey, final PluginCallback<Optional<AttributeKvEntry>> callback) {
         validate(entityId, new ValidationCallback(callback, ctx -> {
             ListenableFuture<Optional<AttributeKvEntry>> future = pluginCtx.attributesService.find(entityId, attributeType, attributeKey);
+            final ListenableFuture<Optional<AttributeKvEntry>> transform = Futures.transform(future, transformAttributeKvEntryUnits());
             Futures.addCallback(future, getCallback(callback, v -> v), executor);
         }));
+    }
+
+    private Function<Optional<AttributeKvEntry>, Optional<AttributeKvEntry>> transformAttributeKvEntryUnits() {
+        return entry -> {
+            List<AttributeKvEntry> collect;
+            if (entry.isPresent()) {
+                collect = Collections.singletonList(entry.get());
+                List<AttributeKvEntry> attributeKvEntries = convertAttributeKvEntriesToUnitSystem(collect);
+                if (attributeKvEntries != null && !attributeKvEntries.isEmpty())
+                    return Optional.ofNullable(attributeKvEntries.get(0));
+            }
+            return Optional.empty();
+        };
     }
 
     @Override
