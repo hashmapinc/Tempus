@@ -100,8 +100,6 @@ export default function FileUploadController(toast, $scope, $injector,$document,
             vm.resetFilter();
 
         });
-    },
-    function () {
     });
     }
 
