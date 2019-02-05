@@ -427,3 +427,8 @@ kubernetes:
 
 logging.level.org.springframework.boot.autoconfigure.security: OFF
 
+# User parameters
+user.trial:
+  expirationTime: 21600 # Number of minutes (15 days)
+  reminderMailTime : 18720 # Number of minutes (13 days)
+  purgeCronExpression: 0 0 0 * * * # 12 midnight
