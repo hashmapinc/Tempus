@@ -16,10 +16,11 @@
  */
 /* eslint-disable import/no-unresolved, import/default */
 
+import renameFileNameTemplate from './rename-file.tpl.html'
 /* eslint-enable import/no-unresolved, import/default */
 
 /*@ngInject*/
-export default function FileUploadController(toast,$log, $scope, $injector,$document, fileUploadService, $q, $timeout, $translate, $mdDialog) {
+export default function FileUploadController(toast, $scope, $injector,$document, fileUploadService, $q, $timeout, $translate, $mdDialog) {
 
     var vm = this;
 
