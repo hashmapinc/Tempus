@@ -23,10 +23,7 @@ import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import com.hashmapinc.server.common.data.Customer;
-import com.hashmapinc.server.common.data.Device;
-import com.hashmapinc.server.common.data.EntityType;
-import com.hashmapinc.server.common.data.Tenant;
+import com.hashmapinc.server.common.data.*;
 import com.hashmapinc.server.common.data.asset.Asset;
 import com.hashmapinc.server.common.data.audit.ActionType;
 import com.hashmapinc.server.common.data.id.*;
@@ -68,6 +65,7 @@ public final class PluginProcessingContext implements PluginContext {
     private final SharedPluginProcessingContext pluginCtx;
     private final Optional<PluginApiCallSecurityContext> securityCtx;
     private final String UNIT_SYSTEM_KEY = "unit_system";
+    private final TenantId nullTenantId = new TenantId(UUIDConverter.fromString("1e7461259eab8808080808080808080"));
 
     public PluginProcessingContext(SharedPluginProcessingContext pluginCtx, PluginApiCallSecurityContext securityCtx) {
         super();
@@ -123,7 +121,7 @@ public final class PluginProcessingContext implements PluginContext {
         validate(entityId, new ValidationCallback(callback, ctx -> {
             ListenableFuture<Optional<AttributeKvEntry>> future = pluginCtx.attributesService.find(entityId, attributeType, attributeKey);
             final ListenableFuture<Optional<AttributeKvEntry>> transform = Futures.transform(future, transformAttributeKvEntryUnits());
-            Futures.addCallback(future, getCallback(callback, v -> v), executor);
+            Futures.addCallback(transform, getCallback(callback, v -> v), executor);
         }));
     }
 
@@ -247,7 +245,7 @@ public final class PluginProcessingContext implements PluginContext {
 
     @Override
     public void logAttributesUpdated(PluginApiCallSecurityContext ctx, EntityId entityId, String attributeType,
-                                                                     List<AttributeKvEntry> attributes, Exception e) {
+                                     List<AttributeKvEntry> attributes, Exception e) {
         pluginCtx.auditLogService.logEntityAction(
                 ctx.getTenantId(),
                 ctx.getCustomerId(),
@@ -645,7 +643,11 @@ public final class PluginProcessingContext implements PluginContext {
     }
 
     private List<AttributeKvEntry> convertAttributeKvEntriesToUnitSystem(List<AttributeKvEntry> attributeKvEntries) {
-        return convertAttributeKvEntriesToUnitSystemByTenantId(attributeKvEntries, securityCtx.get().getTenantId());
+        if (securityCtx.isPresent()) {
+            return convertAttributeKvEntriesToUnitSystemByTenantId(attributeKvEntries , securityCtx.get().getTenantId());
+        } else {
+            return convertAttributeKvEntriesToUnitSystemByTenantId(attributeKvEntries, nullTenantId);
+        }
     }
 
     @Override
@@ -665,7 +667,11 @@ public final class PluginProcessingContext implements PluginContext {
     }
 
     private List<TsKvEntry> convertTsKvEntriesToUnitSystem(List<TsKvEntry> tsKvEntries) {
-        return convertTsKvEntriesToUnitSystemByTenantId(tsKvEntries, securityCtx.get().getTenantId());
+        if (securityCtx.isPresent()) {
+            return convertTsKvEntriesToUnitSystemByTenantId(tsKvEntries , securityCtx.get().getTenantId());
+        } else {
+            return convertTsKvEntriesToUnitSystemByTenantId(tsKvEntries , nullTenantId);
+        }
     }
 
     @Override
@@ -685,7 +691,11 @@ public final class PluginProcessingContext implements PluginContext {
     }
 
     private List<DsKvEntry> convertDsKvEntriesToUnitSystem(List<DsKvEntry> dsKvEntries) {
-        return convertDsKvEntriesToUnitSystemByTenantId(dsKvEntries, securityCtx.get().getTenantId());
+        if (securityCtx.isPresent()) {
+            return convertDsKvEntriesToUnitSystemByTenantId(dsKvEntries , securityCtx.get().getTenantId());
+        } else {
+            return convertDsKvEntriesToUnitSystemByTenantId(dsKvEntries , nullTenantId);
+        }
     }
 
     @Override
