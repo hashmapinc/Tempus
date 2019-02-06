@@ -400,6 +400,7 @@ export function DeviceController($rootScope,userService, deviceService, customer
     $scope.onPaginate = function(page) {
         $scope.query.page = page;
         pageNumber = page;
+        pageNumber = page;
         loadTableData();
     }
 

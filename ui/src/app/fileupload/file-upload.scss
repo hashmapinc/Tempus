@@ -1,4 +1,4 @@
-/*
+/**
  * Copyright © 2016-2018 The Thingsboard Authors
  * Modifications © 2017-2018 Hashmap, Inc
  *
@@ -14,18 +14,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import uiRouter from 'angular-ui-router';
-import tempusApiFileUpload from '../api/file-upload.service';
-import './file-upload.scss';
+@import "~compass-sass-mixins/lib/compass";
+@import '../../scss/constants';
 
-import FileUploadRoutes from './file-upload.routes';
-import FileUploadController from './file-upload.controller';
-
-export default angular.module('tempus.fileUpload', [
-    uiRouter,
-    tempusApiFileUpload
-
-])
-    .config(FileUploadRoutes)
-    .controller('FileUploadController', FileUploadController)
-    .name;
+.md-upload-button{
+    display: none;
+}

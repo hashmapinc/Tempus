@@ -29,7 +29,7 @@
                 {{ 'action.add' | translate }}
             </md-tooltip>
         </md-button>
-        <input type="file" id="inputFile" onchange="angular.element(this).scope().thisFileUpload(this)" style="display:none;" />
+        <input type="file" id="inputFile" accept="[everything but .exe and .app]" onchange="angular.element(this).scope().thisFileUpload(this)" class="md-upload-button" />
 
         <md-button class="md-icon-button" ng-click="enterFilterMode()">
             <md-icon>search</md-icon>
@@ -49,9 +49,9 @@
     <table class="tb-device-table" md-table>
         <thead md-head md-order="query.order" md-on-reorder="onReorder">
         <tr md-row>
-            <th md-column style=""><span translate>file-upload.fileName</span></th>
+            <th md-column><span translate>file-upload.fileName</span></th>
             <th md-column><span translate>file-upload.createdOn</span></th>
-            <th md-column ><span translate>file-upload.fileType</span></th>
+            <th md-column><span translate>file-upload.fileType</span></th>
             <th md-column><span translate>file-upload.fileSize</span></th>
 
         </tr>
@@ -62,8 +62,10 @@
             <td md-cell >{{file.lastUpdated}}</td>
             <td md-cell >{{file.extension}}</td>
             <td md-cell >{{file.size}}</td>
+
             <td md-cell class="tb-value-cell">
-                <span><ng-md-icon icon="file_download" ng-click="vm.downloadFile($event, file)"></ng-md-icon></span>
+                <span><ng-md-icon icon="file_download" ng-click="downloadFile($event, file)"></ng-md-icon></span>
+
             </td>
             <td md-cell class="tb-value-cell" ng-click="vm.deleteFile($event, file)">
                 <span><ng-md-icon size="20" icon="delete"></ng-md-icon></span>

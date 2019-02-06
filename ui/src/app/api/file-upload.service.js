@@ -21,7 +21,7 @@ export default angular.module('tempus.api.fileUpload', [])
     .name;
 
 /*@ngInject*/
-function FileUploadService($http, $q, $log, $translate, $window, $document) {
+function FileUploadService($http, $q, $translate, $window, $document) {
 
     var service = {
 
@@ -145,7 +145,5 @@ function FileUploadService($http, $q, $log, $translate, $window, $document) {
         });
         return deferred.promise;
     }
-
-
 
 }

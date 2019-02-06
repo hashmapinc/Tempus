@@ -16,15 +16,15 @@
  */
 /* eslint-disable import/no-unresolved, import/default */
 
-
 /* eslint-enable import/no-unresolved, import/default */
 
 /*@ngInject*/
-export default function FileUploadController(toast, $scope, $injector,$document, fileUploadService, $q, $timeout, $translate, $mdDialog) {
+export default function FileUploadController(toast,$log, $scope, $injector,$document, fileUploadService, $q, $timeout, $translate, $mdDialog) {
 
     var vm = this;
 
     vm.files = [];
+    vm.cancel = cancel;
     var types;
 
     function loadTableData() {
@@ -114,5 +114,6 @@ export default function FileUploadController(toast, $scope, $injector,$document,
     function deleteFileText() {
         return $translate.instant('file-upload.delete-file-text');
     }
+
 
    }
