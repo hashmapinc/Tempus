@@ -98,8 +98,8 @@ spark:
   livy_port: "${LIVY_PORT:8998}"
 
 aws:
-  access_key: "${AWS_ACCESS_KEY:access_key}"
-  secret_key: "${AWS_SECRET_KEY:secret_key}"
+  access_key: "${AWS_ACCESS_KEY:AKIAJPWLNHIOCZMLPWTQ}"
+  secret_key: "${AWS_SECRET_KEY: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}"
 
 # JWT Token parameters
 security.jwt:

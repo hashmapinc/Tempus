@@ -26,6 +26,10 @@ export default angular.module('tempus.types', [])
                 badRequestParams: 31,
                 itemNotFound: 32
             },
+
+            fileUpload: {
+                    maxSize : 1048576
+            },
             entryPoints: {
                 login: "/api/auth/login",
                 tokenRefresh: "/api/auth/token",

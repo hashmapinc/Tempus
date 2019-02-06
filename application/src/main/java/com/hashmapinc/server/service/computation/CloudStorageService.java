@@ -16,18 +16,19 @@
  */
 package com.hashmapinc.server.service.computation;
 
-import com.hashmapinc.server.common.data.computation.Computations;
-import com.hashmapinc.server.common.data.id.TenantId;
+import com.hashmapinc.server.common.data.upload.InputStreamWrapper;
+import io.minio.messages.Item;
 import org.xmlpull.v1.XmlPullParserException;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
 
-public interface S3BucketService {
-    boolean uploadKubelessFunction(Computations computation, TenantId tenantId) throws IOException, NoSuchAlgorithmException, InvalidKeyException, XmlPullParserException;
-    List<String> getAllKubelessFunctionsForTenant (TenantId tenantId) throws IOException, NoSuchAlgorithmException, InvalidKeyException, XmlPullParserException;
-    String getFunctionObjByTenantAndUrl(TenantId tenantId, Computations computations) throws IOException, NoSuchAlgorithmException, InvalidKeyException, XmlPullParserException;
-    boolean deleteKubelessFunction(Computations computation) throws IOException, NoSuchAlgorithmException, InvalidKeyException, XmlPullParserException;
+public interface CloudStorageService {
+    boolean upload(String bucketName, String objectUrl, InputStream inputStream, String contentType) throws IOException, NoSuchAlgorithmException, InvalidKeyException, XmlPullParserException;
+    boolean delete(String bucketName, String objectUrl) throws IOException, NoSuchAlgorithmException, InvalidKeyException, XmlPullParserException;
+    List<Item> getAllFiles(String bucketName, String prefix) throws IOException, NoSuchAlgorithmException, InvalidKeyException, XmlPullParserException;
+    InputStreamWrapper getFile(String bucketName, String objectUrl) throws IOException, NoSuchAlgorithmException, InvalidKeyException, XmlPullParserException;
 }

@@ -23,6 +23,8 @@ import com.hashmapinc.server.common.data.computation.ComputationJob;
 import com.hashmapinc.server.common.data.computation.ComputationType;
 import com.hashmapinc.server.common.data.computation.Computations;
 import com.hashmapinc.server.common.data.computation.SparkComputationMetadata;
+import com.hashmapinc.server.common.data.exception.TempusErrorCode;
+import com.hashmapinc.server.common.data.exception.TempusException;
 import com.hashmapinc.server.common.data.id.ComputationId;
 import com.hashmapinc.server.common.data.id.TenantId;
 import com.hashmapinc.server.common.data.page.TextPageData;
@@ -30,11 +32,9 @@ import com.hashmapinc.server.common.data.page.TextPageLink;
 import com.hashmapinc.server.common.data.plugin.ComponentLifecycleEvent;
 import com.hashmapinc.server.common.data.security.Authority;
 import com.hashmapinc.server.dao.model.ModelConstants;
-import com.hashmapinc.server.common.data.exception.TempusErrorCode;
-import com.hashmapinc.server.common.data.exception.TempusException;
 import com.hashmapinc.server.service.computation.ComputationDiscoveryService;
-import com.hashmapinc.server.service.computation.ComputationFunctionService;
-import com.hashmapinc.server.service.computation.S3BucketService;
+import com.hashmapinc.server.service.computation.KubelessDeploymentService;
+import com.hashmapinc.server.service.computation.KubelessStorageService;
 import com.hashmapinc.server.service.security.model.SecurityUser;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,8 +57,8 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static com.hashmapinc.server.dao.service.Validator.validateId;
 import static com.hashmapinc.server.common.data.exception.TempusErrorCode.ITEM_NOT_FOUND;
+import static com.hashmapinc.server.dao.service.Validator.validateId;
 
 @Slf4j
 @RestController
@@ -74,10 +74,10 @@ public class ComputationsController extends BaseController {
     private ComputationDiscoveryService computationDiscoveryService;
 
     @Autowired
-    private S3BucketService s3BucketService;
+    private KubelessStorageService kubelessStorageService;
 
     @Autowired
-    private ComputationFunctionService computationFunctionService;
+    private KubelessDeploymentService kubelessDeploymentService;
 
     @PreAuthorize("hasAuthority('TENANT_ADMIN')")
     @PostMapping(value = "/computations/upload", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -122,7 +122,7 @@ public class ComputationsController extends BaseController {
                 ComputationId computationId = new ComputationId(UUIDs.timeBased());
                 computation.setId(computationId);
                 computation.getComputationMetadata().setId(computationId);
-                if (s3BucketService.uploadKubelessFunction(computation, tenantId)) {
+                if (kubelessStorageService.uploadFunction(computation)) {
                     computationsService.save(computation);
                     actorService.onComputationStateChange(tenantId, computation.getId(), ComponentLifecycleEvent.CREATED);
                 }
@@ -161,7 +161,7 @@ public class ComputationsController extends BaseController {
             }
             else if (computation.getType() == ComputationType.KUBELESS) {
                 actorService.onComputationStateChange(computation.getTenantId(), computation.getId(), ComponentLifecycleEvent.DELETED);
-                s3BucketService.deleteKubelessFunction(computation);
+                kubelessStorageService.deleteFunction(computation);
             }
             logEntityAction(computationId,computation,getCurrentUser().getCustomerId(),
                     ActionType.DELETED, null, strComputationId);
@@ -205,7 +205,7 @@ public class ComputationsController extends BaseController {
                 while(itr.hasNext()){
                     Computations computation = (Computations) itr.next();
                     if(computation.getType() == ComputationType.KUBELESS &&
-                            (!computationFunctionService.checkKubelessFunction(computation))) {
+                            (!kubelessDeploymentService.functionExists(computation))) {
                         itr.remove();
                     }
                 }
@@ -225,7 +225,7 @@ public class ComputationsController extends BaseController {
             ComputationId computationId = new ComputationId(toUUID(strComputationId));
             Computations computation = checkNotNull(computationsService.findById(computationId));
             if(computation.getType() == ComputationType.KUBELESS
-                    && !computationFunctionService.checkKubelessFunction(computation)) {
+                    && !kubelessDeploymentService.functionExists(computation)) {
                 throw new TempusException("Kubeless fuction not present in kubernetes cluster ", ITEM_NOT_FOUND);
             }
             log.info(" returning Computations by id {} ", computation);

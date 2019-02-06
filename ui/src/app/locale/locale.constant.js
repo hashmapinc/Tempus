@@ -804,6 +804,17 @@ export default angular.module('tempus.locale', [])
                     "lastTimeRecived" :"Last Time Received",
                     "businessUnit":"Business Unit"
                 },
+                "file-upload":{
+                    "upload": "Upload",
+                    "fileName": "File Name",
+                    "createdOn": "Created On",
+                    "fileType": "File Type",
+                    "renameDoc": "Rename File",
+                    "fileSize": "File Size(In Bytes)",
+                    "fileSizeError": "File size should be less than or equal to 100 MB",
+                    "delete-file-title": "Are you sure you want to delete the file '{{fileName}}'?",
+                    "delete-file-text": "Be careful, after the confirmation the file and all related data will become unrecoverable."
+                },
                 "dialog": {
                     "close": "Close dialog"
                 },
