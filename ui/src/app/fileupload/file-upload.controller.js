@@ -16,7 +16,6 @@
  */
 /* eslint-disable import/no-unresolved, import/default */
 
-import renameFileNameTemplate from './rename-file.tpl.html'
 /* eslint-enable import/no-unresolved, import/default */
 
 /*@ngInject*/
@@ -25,7 +24,6 @@ export default function FileUploadController(toast, $scope, $injector,$document,
     var vm = this;
 
     vm.files = [];
-    vm.cancel = cancel;
     var types;
 
     function loadTableData() {
