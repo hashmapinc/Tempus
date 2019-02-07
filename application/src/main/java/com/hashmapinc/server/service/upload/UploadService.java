@@ -71,6 +71,15 @@ public class UploadService {
         cloudStorageService.delete(bucketName, s3ObjectName);
     }
 
+    public void renameFile(String oldFileName, String newFileName, TenantId tenantId) throws Exception{
+        String bucketName = CloudStorageServiceUtils.createBucketName(tenantService.findTenantById(tenantId));
+        String oldS3ObjectUrl = CloudStorageServiceUtils.createObjectUrl(oldFileName, StorageTypes.FILES);
+        String newS3ObjectUrl = CloudStorageServiceUtils.createObjectUrl(newFileName, StorageTypes.FILES);
+        if(cloudStorageService.copyFile(bucketName, oldS3ObjectUrl, newS3ObjectUrl)) {
+            cloudStorageService.delete(bucketName, oldS3ObjectUrl);
+        }
+    }
+
     private FileMetaData addFileMetaData(Item item) {
         String[] arrList = item.objectName().split("/");
         String fileName = arrList[arrList.length -1];

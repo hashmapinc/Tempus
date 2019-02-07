@@ -129,6 +129,20 @@ public class MinioService implements CloudStorageService {
         return null;
     }
 
+    @Override
+    public boolean copyFile(String bucketName, String srcObjectUrl, String destObjectUrl) throws IOException, NoSuchAlgorithmException, InvalidKeyException, XmlPullParserException {
+        try {
+            MinioClient client = getMinioClientInstance();
+            if (client.bucketExists(bucketName)) {
+                client.copyObject(bucketName, srcObjectUrl, bucketName, destObjectUrl);
+                return true;
+            }
+        } catch (MinioException e) {
+            log.info(MINIO_EXECPTION, e);
+        }
+        return false;
+    }
+
     private MinioClient getMinioClientInstance() throws InvalidEndpointException, InvalidPortException
     {
         if (minioClient == null) {

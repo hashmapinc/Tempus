@@ -94,4 +94,16 @@ public class UploadController extends BaseController {
             throw handleException(e);
         }
     }
+
+    @PreAuthorize("hasAuthority('TENANT_ADMIN')")
+    @PostMapping(value = "/file/{oldName}/rename/{newName}")
+    @ResponseBody
+    public void changeFileName(@PathVariable("oldName") String oldName, @PathVariable("newName") String newName) throws TempusException {
+        try {
+            uploadService.renameFile(oldName, newName, getCurrentUser().getTenantId());
+        } catch (Exception e) {
+            log.info("Exception occurred {}", e);
+            throw handleException(e);
+        }
+    }
 }
