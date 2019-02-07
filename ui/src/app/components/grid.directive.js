@@ -835,7 +835,11 @@ function GridController($scope, $rootScope, $state, $mdDialog, $document, $q, $m
     }
 
     function noData() {
+        if(vm.config.isEntityList){
+            return false;
+        }else{
         return vm.items.data.length == 0 && !vm.items.hasNext;
+        }
     }
 
     function hasData() {
