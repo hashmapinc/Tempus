@@ -27,6 +27,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.List;
 
 public interface CloudStorageService {
+
     boolean upload(String bucketName, String objectName, InputStream inputStream, String contentType) throws IOException, NoSuchAlgorithmException, InvalidKeyException, XmlPullParserException;
 
     boolean delete(String bucketName, String objectName) throws IOException, NoSuchAlgorithmException, InvalidKeyException, XmlPullParserException;
