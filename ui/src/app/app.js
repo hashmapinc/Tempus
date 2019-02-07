@@ -124,6 +124,7 @@ angular.module('tempus', [
     'ngclipboard',
     react.name,
     'flow',
+    'ngSanitize',
     tempusLocales,
     tempusLogin,
     tempusDialogs,

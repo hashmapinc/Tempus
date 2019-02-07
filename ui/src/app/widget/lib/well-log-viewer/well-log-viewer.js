@@ -30,8 +30,7 @@ export default class WellLogViewer {
      }
 
      init() {
-		//loadLogViewer(this.ctx, "init");
-        //alert(test);
+		//loadLogViewier(this.ctx, "init");
         //alert("test.test");
      }
 
@@ -164,7 +163,7 @@ export default class WellLogViewer {
 			                        }
 			                 	}
 			             	}		                 			               
-			            }       	          
+			            }
 			        }
 			      }
 			    }

@@ -23,6 +23,7 @@ import tempusDepthwindow from '../depthwindow.directive';
 import tempusLegendConfig from '../legend-config.directive';
 import tempusJsonForm from '../json-form.directive';
 import tempusManageWidgetActions from './action/manage-widget-actions.directive';
+import tempusWellLogViewerTrack from '../../widget/lib/well-log-viewer/well-log-track.directive';
 import 'angular-ui-ace';
 
 import './widget-config.scss';
@@ -44,12 +45,13 @@ export default angular.module('tempus.directives.widgetConfig', [tempusTypes,
     tempusDepthwindow,
     tempusLegendConfig,
     tempusManageWidgetActions,
+    tempusWellLogViewerTrack,
     'ui.ace'])
     .directive('tbWidgetConfig', WidgetConfig)
     .name;
 
 /*@ngInject*/
-function WidgetConfig($compile, $templateCache, $rootScope, $translate, $timeout, types, utils) {
+function WidgetConfig($compile, $templateCache, $rootScope, $translate, $timeout, types, utils, $log) {
 
     var linker = function (scope, element, attrs, ngModelCtrl) {
         
@@ -186,6 +188,8 @@ function WidgetConfig($compile, $templateCache, $rootScope, $translate, $timeout
         }
 
         scope.updateSchemaForm = function() {
+            $log.log('update schema form');
+            $log.log(scope.currentSettings)
             if (scope.widgetSettingsSchema && scope.widgetSettingsSchema.schema) {
                 scope.currentSettingsSchema = scope.widgetSettingsSchema.schema;
                 scope.currentSettingsForm = scope.widgetSettingsSchema.form || angular.copy(scope.defaultSettingsForm);
