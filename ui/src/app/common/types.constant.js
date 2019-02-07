@@ -816,7 +816,12 @@ export default angular.module('tempus.types', [])
 
             },
             triggerTypes: {
-                Kafka: "KUBELESS-KAFKA"
+                kubeless: {
+                    kafka: "KUBELESS-KAFKA"
+                },
+                lambda: {
+                    kinesis: "LAMBDA-KINESIS"
+                }
             },
             metadataSourceType: {
                 jdbc: "JDBC"

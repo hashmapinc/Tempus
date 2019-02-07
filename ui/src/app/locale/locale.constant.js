@@ -1299,7 +1299,16 @@ export default angular.module('tempus.locale', [])
                         "functionSelector-value": "Selector",
                         "field-required": "Field is required",
                         "add-map": "Add Selector",
-                        "type": "Trigger Type"
+                        "type": "Trigger Type",
+                        "type-required": "Type is required"
+                    },
+                    "lambda": {
+                        "functionSelector-key": "Label",
+                        "functionSelector-value": "Selector",
+                        "field-required": "Field is required",
+                        "add-map": "Add Selector",
+                        "type": "Trigger Type",
+                        "type-required": "Type is required"
                     }
                 },
                 "position": {

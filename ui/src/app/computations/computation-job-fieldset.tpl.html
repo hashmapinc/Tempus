@@ -59,6 +59,10 @@
                 <tb-computation-job-kubeless is-edit="isEdit" is-read-only="isReadOnly"
                                              config="computationjob.configuration" the-form="theForm"></tb-computation-job-kubeless>
             </div>
+            <div ng-if='computation.type == types.computationType.lambda' >
+                <tb-computation-job-lambda is-edit="isEdit" is-read-only="isReadOnly"
+                                             config="computationjob.configuration" the-form="theForm"></tb-computation-job-lambda>
+            </div>
         </md-card>
     </fieldset>
 </md-content>

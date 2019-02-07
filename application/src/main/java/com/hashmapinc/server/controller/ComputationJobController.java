@@ -18,7 +18,7 @@ package com.hashmapinc.server.controller;
 
 import com.hashmapinc.server.common.data.EntityType;
 import com.hashmapinc.server.common.data.audit.ActionType;
-import com.hashmapinc.server.common.data.computation.ComputationJob;
+import com.hashmapinc.server.common.data.computation.*;
 import com.hashmapinc.server.common.data.id.ComputationId;
 import com.hashmapinc.server.common.data.id.ComputationJobId;
 import com.hashmapinc.server.common.data.plugin.ComponentLifecycleEvent;
@@ -30,6 +30,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+import static com.hashmapinc.server.dao.model.ModelConstants.LAMBDA_KINESIS_BATCH_SIZE;
+import static com.hashmapinc.server.dao.model.ModelConstants.LAMBDA_KINESIS_STARTING_OFFSET;
 import static com.hashmapinc.server.exception.TempusErrorCode.ITEM_NOT_FOUND;
 
 @Slf4j
@@ -52,7 +54,20 @@ public class ComputationJobController extends BaseController{
         try {
             boolean created = source.getId() == null;
             source.setTenantId(getCurrentUser().getTenantId());
-            source.setComputationId(new ComputationId(toUUID(strComputationId)));
+            final ComputationId computationId = new ComputationId(toUUID(strComputationId));
+            source.setComputationId(computationId);
+
+            final Computations computations = computationsService.findById(computationId);
+            if(computations.getType().equals(ComputationType.LAMBDA)) {
+                final KinesisLambdaTrigger configuration = (KinesisLambdaTrigger) source.getConfiguration();
+                final AWSLambdaComputationMetadata awsLambdaComputationMetadata = (AWSLambdaComputationMetadata) computations.getComputationMetadata();
+                configuration.setRegion(awsLambdaComputationMetadata.getRegion());
+                configuration.setStartingPositions(LAMBDA_KINESIS_STARTING_OFFSET);
+                configuration.setBatchSize(LAMBDA_KINESIS_BATCH_SIZE);
+                configuration.setFunctionName(awsLambdaComputationMetadata.getFunctionName());
+                source.setConfiguration(configuration);
+            }
+
             computationJob = checkNotNull(computationJobService.saveComputationJob(source));
             actorService.onComputationJobStateChange(computationJob.getTenantId(), computationJob.getComputationId(),
                     computationJob.getId(), created ? ComponentLifecycleEvent.CREATED : ComponentLifecycleEvent.UPDATED);

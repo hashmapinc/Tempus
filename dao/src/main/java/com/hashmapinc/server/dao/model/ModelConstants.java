@@ -680,4 +680,8 @@ public class ModelConstants {
                 throw new TempusRuntimeException("Aggregation type: " + aggregation + " is not supported!");
         }
     }
+
+    public static final String LAMBDA_KINESIS_STARTING_OFFSET = "LATEST";
+    public static final int LAMBDA_KINESIS_BATCH_SIZE = 200;
+
 }

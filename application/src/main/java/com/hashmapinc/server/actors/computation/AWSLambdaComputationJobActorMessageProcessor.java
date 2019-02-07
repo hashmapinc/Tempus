@@ -116,8 +116,8 @@ public class AWSLambdaComputationJobActorMessageProcessor extends ComponentMsgPr
     }
 
     private void checkAndCreateTrigger(){
-        if(!systemContext.getKubelessFunctionService().checkTrigger(job) &&
-                !systemContext.getKubelessFunctionService().createTrigger(job)) {
+        if(!systemContext.getAwsLambdaFunctionService().checkTrigger(job) &&
+                !systemContext.getAwsLambdaFunctionService().createTrigger(job)) {
             systemContext.getComputationJobService().suspendComputationJobById(job.getId());
         }
     }

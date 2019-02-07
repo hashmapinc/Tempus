@@ -120,6 +120,7 @@ public class AWSLambdaFunctionService implements ServerlessFunctionService {
                     .withFunctionName(triggerConfig.getFunctionName())
                     .withEventSourceArn(streamARN)
                     .withBatchSize(triggerConfig.getBatchSize())
+                    .withStartingPosition(triggerConfig.getStartingPositions())
                     .withEnabled(true)
             );
             log.info("Created AWS lambda function kinesis trigger{}", eventSourceMapping);
