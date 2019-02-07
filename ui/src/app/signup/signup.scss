@@ -65,8 +65,8 @@ md-checkbox.md-themeDark-theme:not(.md-checked) .md-icon  {
 }
 .sign-span {
     color: white;
-    font-size: 23px;
-    margin-left:10%;
+    font-size: 21px;
+    margin-left:6%;
 }
 .progress-linear{
     z-index: 1;
@@ -83,6 +83,25 @@ md-checkbox.md-themeDark-theme:not(.md-checked) .md-icon  {
 .md-check{
     color: white;
     font-size: 20px;
+}
+md-card.tb-signup-card {
+  width: 330px !important;
+  @media (min-width: $layout-breakpoint-sm) {
+    width: 550px !important;
+  }
+  md-card-title {
+    img.tb-login-logo {
+      height: 50px;
+    }
+  }
+  md-card-content {
+    margin-top: -50px;
+  }
+}
+.hm-login-logo {
+	margin-left: 25%;
+	min-height: 110px;
+	min-width: 250px;
 }
 .btn-submit {
     margin-bottom: 30px !important;
