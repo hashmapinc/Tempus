@@ -36,4 +36,6 @@ public interface CloudStorageService {
     InputStreamWrapper getFile(String bucketName, String objectName) throws IOException, NoSuchAlgorithmException, InvalidKeyException, XmlPullParserException;
 
     String getObjectUrl(String bucketName, String objectName) throws XmlPullParserException, NoSuchAlgorithmException, InvalidKeyException, IOException;
+
+    boolean copyFile(String bucketName, String srcObjectUrl, String destObjectUrl) throws IOException, NoSuchAlgorithmException, InvalidKeyException, XmlPullParserException;
 }

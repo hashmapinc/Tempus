@@ -113,4 +113,11 @@ public abstract class BaseUploadControllerTest extends AbstractControllerTest {
         when(cloudStorageService.getFile(any(), any())).thenReturn(streamWrapper);
         doGet("/api/file/image.jpg").andExpect(status().isInternalServerError());
     }
+
+    @Test
+    public void renameFile() throws Exception {
+        when(cloudStorageService.copyFile(any(), any(), any())).thenReturn(true);
+        when(cloudStorageService.delete(any(), any())).thenReturn(true);
+        doPost("/api/file/image.jpg/rename/image2.jpg").andExpect(status().isOk());
+    }
 }
