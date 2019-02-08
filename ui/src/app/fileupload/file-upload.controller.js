@@ -42,15 +42,34 @@ export default function FileUploadController(toast, $scope,$document, fileUpload
 
     $scope.thisFileUpload = function(element) {
 
+        checkFile(element);
+
+    }
+
+    function checkFile(element){
         var fileToBeUploaded = element.files;
-
-        if(fileToBeUploaded.length > 0){
+        var deferred = $q.defer();
+        fileUploadService.searchFile(fileToBeUploaded[0].name).then(
+            function success(searchItems) {
+            if(searchItems.length == 0){
             if(fileUploadService.fileValidation(fileToBeUploaded)=== true){
-            saveFile(fileToBeUploaded[0]);
-            }
-        }
-    };
+                                saveFile(fileToBeUploaded[0]);
 
+                            }
+            }
+            else{
+                replaceFile(element, fileToBeUploaded[0]);
+                return;
+                     }
+            },
+            function fail() {
+                deferred.reject();
+            }
+        );
+
+        return deferred.promise;
+
+    }
 
     function saveFile(file) {
         var deferred = $q.defer();
@@ -116,6 +135,29 @@ export default function FileUploadController(toast, $scope,$document, fileUpload
 
             });
 
-        }
+    }
+
+    function replaceFile($event, file){
+        var confirm = $mdDialog.confirm()
+            .targetEvent($event)
+            .title(replaceFileTitle(file))
+            .htmlContent(replaceFileText())
+            .ariaLabel($translate.instant('file-upload.replace-'))
+            .cancel($translate.instant('action.no'))
+            .ok($translate.instant('action.yes'));
+            $mdDialog.show(confirm).then(function () {
+            saveFile(file).then(function success() {
+                vm.resetFilter();
+            });
+        });
+    }
+
+
+    function replaceFileTitle(file) {
+        return $translate.instant('file-upload.replace-file-title', {fileName: file.fileName});
+    }
+    function replaceFileText() {
+        return $translate.instant('file-upload.replace-file-text');
+    }
 
    }

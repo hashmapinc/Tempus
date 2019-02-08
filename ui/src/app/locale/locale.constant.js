@@ -813,11 +813,14 @@ export default angular.module('tempus.locale', [])
                     "fileSize": "File Size(In Bytes)",
                     "renameDoc": "Rename File",
                     "fileNameNew": "New File Name",
+                    "replace-file": "Replace file",
                     "fileSizeError": "File size should be less than or equal to 100 MB",
                     "fileRenameError": "Name extension can not be compressed or executable file, Please provide name in valid format",
                     "fileExtensionError": "File type is not supported to upload",
                     "delete-file-title": "Are you sure you want to delete the file '{{fileName}}'?",
-                    "delete-file-text": "Be careful, after the confirmation the file and all related data will become unrecoverable."
+                    "delete-file-text": "Be careful, after the confirmation the file and all related data will become unrecoverable.",
+                    "replace-file-title": "Are you sure you want to replace the file '{{fileName}}'?",
+                    "replace-file-text": "Be careful, after the confirmation the file and all related data will become unrecoverable."
                 },
 
                 "dialog": {
