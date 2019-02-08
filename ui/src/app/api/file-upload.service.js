@@ -21,14 +21,18 @@ export default angular.module('tempus.api.fileUpload', [])
     .name;
 
 /*@ngInject*/
-function FileUploadService($http, $q, $translate, $window, $document) {
+function FileUploadService(toast,$http, $q, $translate, $window, $document, $injector) {
 
     var service = {
 
         getAllFile: getAllFile,
         uploadFile: uploadFile,
         deleteFile: deleteFile,
-        exportFile: exportFile
+        exportFile: exportFile,
+        renameFile: renameFile,
+        fileValidation: fileValidation,
+        extensionValidation: extensionValidation
+
     }
 
     return service;
@@ -146,4 +150,51 @@ function FileUploadService($http, $q, $translate, $window, $document) {
         return deferred.promise;
     }
 
+
+    function renameFile(oldFileName, newFileName) {
+            var deferred = $q.defer();
+            var url = '/api/file/' + oldFileName+"/rename/"+ newFileName;
+            $http.post(url, {
+                        transformRequest: angular.identity,
+                        headers: {'Content-Type': undefined}
+                    }).then(function success(response) {
+                          deferred.resolve(response.data);
+                      }, function fail(response) {
+                          deferred.reject(response.data);
+                      });
+            return deferred.promise;
+    }
+
+
+    function fileValidation(fileToBeUploaded){
+
+         if(extensionValidation(fileToBeUploaded[0].name)=== true){
+             if(fileToBeUploaded[0].size <= getTypes().fileUpload.maxSize){
+                 return true;
+             }
+             else{
+                 toast.showError($translate.instant('file-upload.fileSizeError'));
+             }
+         }
+         else{
+             toast.showError($translate.instant('file-upload.fileExtensionError'));
+         }
+    }
+
+    function getTypes() {
+        return $injector.get("types");
+    }
+
+    function extensionValidation(fileName){
+        var ext = fileName.split(".");
+        var listOfExtension = getTypes().fileUpload.listOfExtension;
+        var extension = ext[ext.length-1];
+        if(listOfExtension.indexOf(extension) > -1){
+           return false;
+        }
+        else{
+           return true;
+          }
+
+    }
 }

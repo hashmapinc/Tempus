@@ -19,57 +19,44 @@
 /* eslint-enable import/no-unresolved, import/default */
 
 /*@ngInject*/
-export default function FileUploadController(toast, $scope, $injector,$document, fileUploadService, $q, $timeout, $translate, $mdDialog) {
+export default function FileUploadController(toast, $scope,$document, fileUploadService, $q, $timeout, $translate, $mdDialog) {
 
     var vm = this;
-
     vm.files = [];
-    var types;
-
     function loadTableData() {
             var promise = fileUploadService.getAllFile();
 
             if(promise) {
                 promise.then(function success(items) {
                     vm.files = items;
-                    },
+                    }
                 )
             }
      }
 
      loadTableData();
 
-    function getTypes() {
-            if (!types) {
-                types = $injector.get("types");
-            }
-            return types;
-        }
-
     vm.openFileDialog = function() {
            angular.element($document[0].getElementById('inputFile').click());
         };
 
-    $scope.thisFileUpload = function(ele) {
+    $scope.thisFileUpload = function(element) {
 
-           var fileToBeUploaded = ele.files;
+        var fileToBeUploaded = element.files;
 
-           if(fileToBeUploaded.length > 0 ){
-                if(fileToBeUploaded[0].size <= getTypes().fileUpload.maxSize){
-                saveFile(fileToBeUploaded[0]);
-                }
-                else{
-                toast.showError($translate.instant('file-upload.fileSizeError'));
-                }
-           }
+        if(fileToBeUploaded.length > 0){
+            if(fileUploadService.fileValidation(fileToBeUploaded)=== true){
+            saveFile(fileToBeUploaded[0]);
+            }
+        }
     };
+
 
     function saveFile(file) {
         var deferred = $q.defer();
         fileUploadService.uploadFile(file).then(
             function success(savedFile) {
                 vm.files.push(savedFile);
-                loadTableData();
                 return savedFile;
             },
             function fail() {
@@ -114,5 +101,21 @@ export default function FileUploadController(toast, $scope, $injector,$document,
         return $translate.instant('file-upload.delete-file-text');
     }
 
+    vm.renameFileName = function($event, file) {
+            $mdDialog.show({
+                controller: 'RenameFileController',
+                controllerAs:'vm',
+                templateUrl: renameFileNameTemplate,
+                parent: angular.element($document[0].body),
+                locals: {oldFileName:file.fileName},
+                fullscreen: true,
+                targetEvent: $event
+            }).then(function () {
+
+            vm.resetFilter();
+
+            });
+
+        }
 
    }
