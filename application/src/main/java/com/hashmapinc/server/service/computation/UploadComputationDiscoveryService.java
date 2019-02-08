@@ -25,18 +25,28 @@ import com.hashmapinc.server.common.data.id.TenantId;
 import com.hashmapinc.server.common.data.page.TextPageData;
 import com.hashmapinc.server.common.data.page.TextPageLink;
 import com.hashmapinc.server.common.msg.computation.ComputationRequestCompiled;
+import com.hashmapinc.server.dao.computations.ComputationsService;
+import com.hashmapinc.server.exception.TempusApplicationException;
+import com.hashmapinc.server.service.computation.annotation.AnnotationsProcessor;
 import com.hashmapinc.server.service.computation.classloader.RuntimeJavaCompiler;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import com.hashmapinc.server.dao.computations.ComputationsService;
-import com.hashmapinc.server.service.computation.annotation.AnnotationsProcessor;
+import org.xmlpull.v1.XmlPullParserException;
 
 import javax.annotation.PreDestroy;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.*;
+import java.nio.file.Paths;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
 
 @Service("uploadComputationDiscoveryService")
 @Slf4j
@@ -46,22 +56,86 @@ UploadComputationDiscoveryService implements ComputationDiscoveryService{
     @Autowired
     private ComputationsService computationsService;
 
+    @Value("${aws.spark_jars_bucket}")
+    private String sparkJarsBucket;
+
     @Autowired
     private MinioService minioService;
 
     private RuntimeJavaCompiler compiler;
+
+    @Override
+    public TextPageData<Computations> findTenantComputations(TenantId tenantId, TextPageLink pageLink) {
+        return computationsService.findTenantComputations(tenantId, pageLink);
+    }
+
+    @Override
+    public void deleteComputationAndJar(Computations computation) throws TempusApplicationException {
+        deleteJar(computation);
+        computationsService.deleteById(computation.getId());
+    }
+
+    @Override
+    public Computations onJarUpload(String path, TenantId tenantId) throws TempusApplicationException {
+        return onFileCreate(new File(path), tenantId);
+    }
+
+    @PreDestroy
+    public void destroy() {
+        log.debug("Cleaning up resources from Computation discovery service");
+        try {
+            if (compiler != null) {
+                compiler.destroy();
+            }
+        } catch (Exception e) {
+            log.error("Error while cleaning up resources for Directory Polling service");
+        }
+    }
+
+    private void deleteJar(Computations computation) throws TempusApplicationException {
+        SparkComputationMetadata computationMetadata = (SparkComputationMetadata) computation.getComputationMetadata();
+        try {
+            if (useCloudStorage()) {
+                minioService.delete(sparkJarsBucket, computationMetadata.getJarName());
+            } else {
+                Files.deleteIfExists(Paths.get(computationMetadata.getJarPath()));
+            }
+        } catch (IOException | NoSuchAlgorithmException | InvalidKeyException | XmlPullParserException e) {
+            log.error("Error while deleting file [{}]. Exception is: {}", computationMetadata.getJarPath(), e.getMessage());
+            throw new TempusApplicationException(e);
+        }
+    }
 
     private boolean isJar(Path jarPath) throws IOException {
         File file = jarPath.toFile();
         return file.getCanonicalPath().endsWith(".jar") && file.canRead();
     }
 
-    public Computations onFileCreate(File file, TenantId tenantId) {
+    private Computations onFileCreate(File file, TenantId tenantId) throws TempusApplicationException {
         log.debug("File {} is created", file.getAbsolutePath());
-        return processComponent(file, tenantId);
+        String filePath = useCloudStorage() ? uploadToCloud(file) : file.toPath().toString();
+        Computations computations = processComponent(file, filePath, tenantId);
+        if (useCloudStorage())
+            file.delete();
+
+        return computations;
     }
 
-    private Computations processComponent(File file, TenantId tenantId) {
+    private String uploadToCloud(File file) throws TempusApplicationException {
+        try {
+            minioService.upload(sparkJarsBucket, file.getName(), new FileInputStream(file), "application/zip");
+            return minioService.getObjectUrl(sparkJarsBucket, file.getName());
+        } catch (IOException | NoSuchAlgorithmException | InvalidKeyException | XmlPullParserException e) {
+            log.error("Error while uploading file [{}] to cloud. Exception is: {}", file.getName(), e.getMessage());
+            throw new TempusApplicationException(e);
+        }
+    }
+
+    private boolean useCloudStorage() {
+        return !sparkJarsBucket.isEmpty();
+    }
+
+    private Computations processComponent(File file, String filePath, TenantId tenantId) {
         Computations savedComputations = null;
         Path j = file.toPath();
         try{
@@ -78,7 +152,7 @@ UploadComputationDiscoveryService implements ComputationDiscoveryService{
 
                         sparkComputationMetadata.setMainClass(computationRequestCompiled.getMainClazz());
                         sparkComputationMetadata.setArgsformat(args);
-                        sparkComputationMetadata.setJarPath(j.toString());
+                        sparkComputationMetadata.setJarPath(filePath);
                         sparkComputationMetadata.setArgsType(computationRequestCompiled.getArgsType());
                         sparkComputationMetadata.setJarName(j.getFileName().toString());
                         sparkComputationMetadata.setJsonDescriptor(computationRequestCompiled.getConfigurationDescriptor());
@@ -105,27 +179,5 @@ UploadComputationDiscoveryService implements ComputationDiscoveryService{
             log.error("Error while accessing jar to scan dynamic components", e);
         }
         return savedComputations;
-    }
-
-    @Override
-    public TextPageData<Computations> findTenantComputations(TenantId tenantId, TextPageLink pageLink) {
-        return computationsService.findTenantComputations(tenantId, pageLink);
-    }
-
-    @Override
-    public Computations onJarUpload(String path, TenantId tenantId) {
-        return onFileCreate(new File(path), tenantId);
-    }
-
-    @PreDestroy
-    public void destroy(){
-        log.debug("Cleaning up resources from Computation discovery service");
-        try {
-            if(compiler != null){
-                compiler.destroy();
-            }
-        } catch (Exception e) {
-            log.error("Error while cleaning up resources for Directory Polling service");
-        }
     }
 }

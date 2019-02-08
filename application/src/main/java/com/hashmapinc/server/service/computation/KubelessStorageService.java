@@ -57,17 +57,17 @@ public class KubelessStorageService {
             return false;
         Tenant tenant = tenantService.findTenantById(computation.getTenantId());
         String bucketName = CloudStorageServiceUtils.createBucketName(tenant);
-        String objectUrl = CloudStorageServiceUtils.createObjectUrl(computation.getName(), StorageTypes.FUNCTIONS);
+        String objectName = CloudStorageServiceUtils.createObjectName(computation.getName(), StorageTypes.FUNCTIONS);
         ByteArrayInputStream byteArrayInputStream =  new ByteArrayInputStream(md.getFunctionContent().getBytes());
-        return cloudStorageService.upload(bucketName, objectUrl, byteArrayInputStream, md.getFunctionContentType());
+        return cloudStorageService.upload(bucketName, objectName, byteArrayInputStream, md.getFunctionContentType());
     }
 
     public String getFunction(Computations computation) throws Exception{
         Tenant tenant = tenantService.findTenantById(computation.getTenantId());
         String bucketName = CloudStorageServiceUtils.createBucketName(tenant);
-        String objectUrl = CloudStorageServiceUtils.createObjectUrl(computation.getName(), StorageTypes.FUNCTIONS);
+        String objectName = CloudStorageServiceUtils.createObjectName(computation.getName(), StorageTypes.FUNCTIONS);
 
-        InputStreamWrapper inputStreamWrapper = cloudStorageService.getFile(bucketName, objectUrl);
+        InputStreamWrapper inputStreamWrapper = cloudStorageService.getFile(bucketName, objectName);
         InputStream stream = inputStreamWrapper.getInputStream();
         byte[] buf = new byte[BUFFER_SIZE];
         int bytesRead;
@@ -82,8 +82,8 @@ public class KubelessStorageService {
     public boolean deleteFunction(Computations computation) throws Exception{
         Tenant tenant = tenantService.findTenantById(computation.getTenantId());
         String bucketName = CloudStorageServiceUtils.createBucketName(tenant);
-        String objectUrl = CloudStorageServiceUtils.createObjectUrl(computation.getName(), StorageTypes.FUNCTIONS);
-        return cloudStorageService.delete(bucketName, objectUrl);
+        String objectName = CloudStorageServiceUtils.createObjectName(computation.getName(), StorageTypes.FUNCTIONS);
+        return cloudStorageService.delete(bucketName, objectName);
     }
 
 

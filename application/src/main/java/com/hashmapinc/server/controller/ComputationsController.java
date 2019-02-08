@@ -19,7 +19,10 @@ package com.hashmapinc.server.controller;
 import com.datastax.driver.core.utils.UUIDs;
 import com.hashmapinc.server.common.data.EntityType;
 import com.hashmapinc.server.common.data.audit.ActionType;
-import com.hashmapinc.server.common.data.computation.*;
+import com.hashmapinc.server.common.data.computation.AWSLambdaComputationMetadata;
+import com.hashmapinc.server.common.data.computation.ComputationJob;
+import com.hashmapinc.server.common.data.computation.ComputationType;
+import com.hashmapinc.server.common.data.computation.Computations;
 import com.hashmapinc.server.common.data.exception.TempusErrorCode;
 import com.hashmapinc.server.common.data.exception.TempusException;
 import com.hashmapinc.server.common.data.id.ComputationId;
@@ -29,7 +32,10 @@ import com.hashmapinc.server.common.data.page.TextPageLink;
 import com.hashmapinc.server.common.data.plugin.ComponentLifecycleEvent;
 import com.hashmapinc.server.common.data.security.Authority;
 import com.hashmapinc.server.dao.model.ModelConstants;
-import com.hashmapinc.server.service.computation.*;
+import com.hashmapinc.server.service.computation.AWSLambdaFunctionService;
+import com.hashmapinc.server.service.computation.ComputationDiscoveryService;
+import com.hashmapinc.server.service.computation.KubelessFunctionService;
+import com.hashmapinc.server.service.computation.KubelessStorageService;
 import com.hashmapinc.server.service.security.model.SecurityUser;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,7 +46,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
-import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -197,7 +202,7 @@ public class ComputationsController extends BaseController {
     @PreAuthorize("hasAuthority('TENANT_ADMIN')")
     @DeleteMapping(value = "/computations/{computationId}")
     @ResponseBody
-    public void delete(@PathVariable(COMPUTATION_ID) String strComputationId) throws TempusException, IOException {
+    public void delete(@PathVariable(COMPUTATION_ID) String strComputationId) throws TempusException {
 
         checkParameter(COMPUTATION_ID, strComputationId);
         try
@@ -213,8 +218,7 @@ public class ComputationsController extends BaseController {
 
             switch (computation.getType()) {
                 case SPARK:
-                    Files.deleteIfExists(Paths.get(((SparkComputationMetadata) computation.getComputationMetadata()).getJarPath()));
-                    computationsService.deleteById(computation.getId());
+                    computationDiscoveryService.deleteComputationAndJar(computation);
                     break;
                 case KUBELESS:
                     actorService.onComputationStateChange(computation.getTenantId(), computation.getId(), ComponentLifecycleEvent.DELETED);

@@ -20,8 +20,11 @@ import com.hashmapinc.server.common.data.computation.Computations;
 import com.hashmapinc.server.common.data.id.TenantId;
 import com.hashmapinc.server.common.data.page.TextPageData;
 import com.hashmapinc.server.common.data.page.TextPageLink;
+import com.hashmapinc.server.exception.TempusApplicationException;
 
 public interface ComputationDiscoveryService {
-    Computations onJarUpload(String path, TenantId tenantId);
+    Computations onJarUpload(String path, TenantId tenantId) throws TempusApplicationException;
     TextPageData<Computations> findTenantComputations(TenantId tenantId, TextPageLink pageLink);
+
+    void deleteComputationAndJar(Computations computation) throws TempusApplicationException;
 }

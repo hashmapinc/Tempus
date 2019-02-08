@@ -98,6 +98,7 @@ spark:
   livy_port: "${LIVY_PORT:8998}"
 
 aws:
+  spark_jars_bucket: "${SPARK_JARS_BUCKET:}"
   access_key: "${AWS_ACCESS_KEY:AWS_ACCESS_KEY}"
   secret_key: "${AWS_SECRET_KEY:AWS_SECRET_KEY}"
   lambda:
@@ -274,7 +275,7 @@ actors:
     error_persist_frequency: "${ACTORS_COMPUTATION_ERROR_FREQUENCY:3000}"
     status_check.delay: "${ACTORS_COMPUTATION_STATUS_CHECK_DELAY:10}"
     status_check.frequency: "${ACTORS_COMPUTATION_STATUS_CHECK_FREQUENCY:6000}"
-    location: "${ACTORS_COMPUTATION_LOCATION:/usr/livy-server-0.3.0/upload/}"
+    location: "${ACTORS_COMPUTATION_LOCATION:/opt/livy/upload/}"
   statistics:
     # Enable/disable actor statistics
     enabled: "${ACTORS_STATISTICS_ENABLED:true}"
