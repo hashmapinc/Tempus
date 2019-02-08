@@ -53,6 +53,7 @@
             <th md-column><span translate>file-upload.createdOn</span></th>
             <th md-column><span translate>file-upload.fileType</span></th>
             <th md-column><span translate>file-upload.fileSize</span></th>
+            <th md-column><span translate>file-upload.renameDoc</span></th>
 
         </tr>
         </thead>
@@ -64,8 +65,11 @@
             <td md-cell >{{file.size}}</td>
 
             <td md-cell class="tb-value-cell">
-                <span><ng-md-icon icon="file_download" ng-click="downloadFile($event, file)"></ng-md-icon></span>
+                <span><ng-md-icon size="20" icon="edit" ng-click="vm.renameFileName($event, file)"></ng-md-icon></span>
+            </td>
 
+            <td md-cell class="tb-value-cell" ng-click="vm.downloadFile($event, file)">
+                <span><ng-md-icon size="20" icon="file_download"></ng-md-icon></span>
             </td>
             <td md-cell class="tb-value-cell" ng-click="vm.deleteFile($event, file)">
                 <span><ng-md-icon size="20" icon="delete"></ng-md-icon></span>
