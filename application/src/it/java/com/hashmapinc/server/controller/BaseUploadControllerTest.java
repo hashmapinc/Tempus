@@ -117,9 +117,8 @@ public abstract class BaseUploadControllerTest extends AbstractControllerTest {
 
     @Test
     public void renameFile() throws Exception {
-        FileMetaData fileMetaData = new FileMetaData("image2.jpg", "jpg", new Date(), 1);
         when(cloudStorageService.copyFile(any(), any(), any())).thenReturn(true);
         when(cloudStorageService.delete(any(), any())).thenReturn(true);
-        doPut("/api/file/image.jpg", fileMetaData).andExpect(status().isOk());
+        doPut("/api/file/image.jpg", "image2.jpg").andExpect(status().isOk());
     }
 }
