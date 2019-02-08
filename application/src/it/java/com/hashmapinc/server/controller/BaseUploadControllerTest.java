@@ -35,6 +35,7 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -116,8 +117,9 @@ public abstract class BaseUploadControllerTest extends AbstractControllerTest {
 
     @Test
     public void renameFile() throws Exception {
+        FileMetaData fileMetaData = new FileMetaData("image2.jpg", "jpg", new Date(), 1);
         when(cloudStorageService.copyFile(any(), any(), any())).thenReturn(true);
         when(cloudStorageService.delete(any(), any())).thenReturn(true);
-        doPost("/api/file/image.jpg/rename/image2.jpg").andExpect(status().isOk());
+        doPut("/api/file/image.jpg", fileMetaData).andExpect(status().isOk());
     }
 }

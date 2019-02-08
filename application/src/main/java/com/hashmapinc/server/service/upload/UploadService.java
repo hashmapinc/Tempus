@@ -35,6 +35,7 @@ import java.util.stream.Collectors;
 @Service
 @Slf4j
 public class UploadService {
+
     @Autowired
     private CloudStorageService cloudStorageService;
 
@@ -61,22 +62,22 @@ public class UploadService {
 
     public InputStreamWrapper downloadFile(String fileName, TenantId tenantId) throws Exception {
         String bucketName = CloudStorageServiceUtils.createBucketName(tenantService.findTenantById(tenantId));
-        String s3ObjectName = CloudStorageServiceUtils.createObjectName(fileName, StorageTypes.FILES);
-        return cloudStorageService.getFile(bucketName, s3ObjectName);
+        String objectUrl = CloudStorageServiceUtils.createObjectName(fileName, StorageTypes.FILES);
+        return cloudStorageService.getFile(bucketName, objectUrl);
     }
 
     public void deleteFile(String fileName, TenantId tenantId) throws Exception {
         String bucketName = CloudStorageServiceUtils.createBucketName(tenantService.findTenantById(tenantId));
-        String s3ObjectName = CloudStorageServiceUtils.createObjectName(fileName, StorageTypes.FILES);
-        cloudStorageService.delete(bucketName, s3ObjectName);
+        String objectUrl = CloudStorageServiceUtils.createObjectName(fileName, StorageTypes.FILES);
+        cloudStorageService.delete(bucketName, objectUrl);
     }
 
     public void renameFile(String oldFileName, String newFileName, TenantId tenantId) throws Exception{
         String bucketName = CloudStorageServiceUtils.createBucketName(tenantService.findTenantById(tenantId));
-        String oldS3ObjectUrl = CloudStorageServiceUtils.createObjectUrl(oldFileName, StorageTypes.FILES);
-        String newS3ObjectUrl = CloudStorageServiceUtils.createObjectUrl(newFileName, StorageTypes.FILES);
-        if(cloudStorageService.copyFile(bucketName, oldS3ObjectUrl, newS3ObjectUrl)) {
-            cloudStorageService.delete(bucketName, oldS3ObjectUrl);
+        String oldObjectUrl = CloudStorageServiceUtils.createObjectName(oldFileName, StorageTypes.FILES);
+        String newObjectUrl = CloudStorageServiceUtils.createObjectName(newFileName, StorageTypes.FILES);
+        if(cloudStorageService.copyFile(bucketName, oldObjectUrl, newObjectUrl)) {
+            cloudStorageService.delete(bucketName, oldObjectUrl);
         }
     }
 
