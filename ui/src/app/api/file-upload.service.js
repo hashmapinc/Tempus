@@ -33,6 +33,7 @@ function FileUploadService(toast,$http, $q, $translate, $window, $document, $inj
         fileValidation: fileValidation,
         extensionValidation: extensionValidation,
         searchFile: searchFile
+        extensionValidation: extensionValidation
 
     }
 
