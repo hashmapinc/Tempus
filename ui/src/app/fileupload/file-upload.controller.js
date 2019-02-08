@@ -125,7 +125,6 @@ export default function FileUploadController(toast, $scope,$document, fileUpload
             vm.resetFilter();
 
             });
-
     }
 
     function replaceFile($event, file){
@@ -151,4 +150,4 @@ export default function FileUploadController(toast, $scope,$document, fileUpload
         return $translate.instant('file-upload.replace-file-text');
     }
 
-   }
+}
