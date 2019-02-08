@@ -43,8 +43,8 @@ public class UploadService {
 
     public FileMetaData uploadFile(MultipartFile file, TenantId tenantId) throws Exception {
         String bucketName = CloudStorageServiceUtils.createBucketName(tenantService.findTenantById(tenantId));
-        String objectUrl = CloudStorageServiceUtils.createObjectUrl(file.getOriginalFilename(), StorageTypes.FILES);
-        if(cloudStorageService.upload(bucketName, objectUrl, file.getInputStream(), file.getContentType())) {
+        String objectName = CloudStorageServiceUtils.createObjectName(file.getOriginalFilename(), StorageTypes.FILES);
+        if(cloudStorageService.upload(bucketName, objectName, file.getInputStream(), file.getContentType())) {
             log.info("File uploaded to cloud storage ");
             List<Item> items = cloudStorageService.getAllFiles(bucketName, CloudStorageServiceUtils.createPrefix(file.getOriginalFilename(),
                     StorageTypes.FILES));
@@ -61,14 +61,14 @@ public class UploadService {
 
     public InputStreamWrapper downloadFile(String fileName, TenantId tenantId) throws Exception {
         String bucketName = CloudStorageServiceUtils.createBucketName(tenantService.findTenantById(tenantId));
-        String s3ObjectUrl = CloudStorageServiceUtils.createObjectUrl(fileName, StorageTypes.FILES);
-        return cloudStorageService.getFile(bucketName, s3ObjectUrl);
+        String s3ObjectName = CloudStorageServiceUtils.createObjectName(fileName, StorageTypes.FILES);
+        return cloudStorageService.getFile(bucketName, s3ObjectName);
     }
 
     public void deleteFile(String fileName, TenantId tenantId) throws Exception {
         String bucketName = CloudStorageServiceUtils.createBucketName(tenantService.findTenantById(tenantId));
-        String s3ObjectUrl = CloudStorageServiceUtils.createObjectUrl(fileName, StorageTypes.FILES);
-        cloudStorageService.delete(bucketName, s3ObjectUrl);
+        String s3ObjectName = CloudStorageServiceUtils.createObjectName(fileName, StorageTypes.FILES);
+        cloudStorageService.delete(bucketName, s3ObjectName);
     }
 
     private FileMetaData addFileMetaData(Item item) {

@@ -27,8 +27,13 @@ import java.security.NoSuchAlgorithmException;
 import java.util.List;
 
 public interface CloudStorageService {
-    boolean upload(String bucketName, String objectUrl, InputStream inputStream, String contentType) throws IOException, NoSuchAlgorithmException, InvalidKeyException, XmlPullParserException;
-    boolean delete(String bucketName, String objectUrl) throws IOException, NoSuchAlgorithmException, InvalidKeyException, XmlPullParserException;
+    boolean upload(String bucketName, String objectName, InputStream inputStream, String contentType) throws IOException, NoSuchAlgorithmException, InvalidKeyException, XmlPullParserException;
+
+    boolean delete(String bucketName, String objectName) throws IOException, NoSuchAlgorithmException, InvalidKeyException, XmlPullParserException;
+
     List<Item> getAllFiles(String bucketName, String prefix) throws IOException, NoSuchAlgorithmException, InvalidKeyException, XmlPullParserException;
-    InputStreamWrapper getFile(String bucketName, String objectUrl) throws IOException, NoSuchAlgorithmException, InvalidKeyException, XmlPullParserException;
+
+    InputStreamWrapper getFile(String bucketName, String objectName) throws IOException, NoSuchAlgorithmException, InvalidKeyException, XmlPullParserException;
+
+    String getObjectUrl(String bucketName, String objectName) throws XmlPullParserException, NoSuchAlgorithmException, InvalidKeyException, IOException;
 }

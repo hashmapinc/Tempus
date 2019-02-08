@@ -28,7 +28,7 @@ public class CloudStorageServiceUtils {
         return tenant.getName().toLowerCase().replace(" ", "-");
     }
 
-    public static String createObjectUrl(String fileName, String type) {
+    public static String createObjectName(String fileName, String type) {
         if (fileName.contentEquals(""))
             return String.format(FOLDER_URL_FORMAT, type);
         return String.format(FILE_URL_FORMAT, type, fileName.toLowerCase().replace(" ", "-"));
