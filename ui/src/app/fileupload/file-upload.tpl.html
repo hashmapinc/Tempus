@@ -29,7 +29,7 @@
                 {{ 'action.add' | translate }}
             </md-tooltip>
         </md-button>
-        <input type="file" id="inputFile" accept="[everything but .exe and .app]" onchange="angular.element(this).scope().thisFileUpload(this)" class="md-upload-button" />
+        <input type="file" id="inputFile" onchange="angular.element(this).scope().thisFileUpload(this)" class="md-upload-button" />
 
         <md-button class="md-icon-button" ng-click="enterFilterMode()">
             <md-icon>search</md-icon>

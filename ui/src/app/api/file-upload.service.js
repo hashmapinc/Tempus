@@ -31,7 +31,8 @@ function FileUploadService(toast,$http, $q, $translate, $window, $document, $inj
         exportFile: exportFile,
         renameFile: renameFile,
         fileValidation: fileValidation,
-        extensionValidation: extensionValidation
+        extensionValidation: extensionValidation,
+        searchFile: searchFile
 
     }
 
@@ -153,8 +154,8 @@ function FileUploadService(toast,$http, $q, $translate, $window, $document, $inj
 
     function renameFile(oldFileName, newFileName) {
             var deferred = $q.defer();
-            var url = '/api/file/' + oldFileName+"/rename/"+ newFileName;
-            $http.post(url, {
+            var url = '/api/file/' + oldFileName;
+            $http.put(url, newFileName, {
                         transformRequest: angular.identity,
                         headers: {'Content-Type': undefined}
                     }).then(function success(response) {
@@ -165,6 +166,19 @@ function FileUploadService(toast,$http, $q, $translate, $window, $document, $inj
             return deferred.promise;
     }
 
+    function searchFile(fileName){
+            var deferred = $q.defer();
+            var url = '/api/file';
+            $http.get(url, fileName, {
+                    transformRequest: angular.identity,
+                    headers: {'Content-Type': undefined}
+                }).then(function success(response) {
+                deferred.resolve(response.data);
+            }, function fail(response) {
+                deferred.reject(response.data);
+            });
+            return deferred.promise;
+    }
 
     function fileValidation(fileToBeUploaded){
 
