@@ -60,7 +60,6 @@ export default function FileUploadController(toast, $scope,$document, fileUpload
             }
         );
         return deferred.promise;
-
     }
 
     function saveFile(file) {
