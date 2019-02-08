@@ -98,9 +98,9 @@ public class UploadController extends BaseController {
     @PreAuthorize("hasAuthority('TENANT_ADMIN')")
     @PutMapping(value = "/file/{oldName}")
     @ResponseBody
-    public void changeFileName(@PathVariable("oldName") String oldName, @RequestBody FileMetaData newFileMetaData) throws TempusException {
+    public void changeFileName(@PathVariable("oldName") String oldName, @RequestBody String newFileName) throws TempusException {
         try {
-            uploadService.renameFile(oldName, newFileMetaData.getFileName(), getCurrentUser().getTenantId());
+            uploadService.renameFile(oldName, newFileName, getCurrentUser().getTenantId());
         } catch (Exception e) {
             log.info("Exception occurred {}", e);
             throw handleException(e);
