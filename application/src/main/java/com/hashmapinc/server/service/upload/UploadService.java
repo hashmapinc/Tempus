@@ -27,6 +27,7 @@ import io.minio.messages.Item;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
@@ -54,9 +55,12 @@ public class UploadService {
         return null;
     }
 
-    public List<FileMetaData> getFileList(TenantId tenantId) throws Exception{
+    public List<FileMetaData> getFileList(TenantId tenantId, String fileName) throws Exception{
         String bucketName = CloudStorageServiceUtils.createBucketName(tenantService.findTenantById(tenantId));
-        List<Item> items = cloudStorageService.getAllFiles(bucketName, StorageTypes.FILES);
+        String fileSearchPrefix = StorageTypes.FILES;
+        if (!StringUtils.isEmpty(fileName))
+            fileSearchPrefix = CloudStorageServiceUtils.createPrefix(fileName, StorageTypes.FILES);
+        List<Item> items = cloudStorageService.getAllFiles(bucketName, fileSearchPrefix);
         return items.stream().map(this::addFileMetaData).collect(Collectors.toList());
     }
 

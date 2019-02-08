@@ -17,8 +17,8 @@
 package com.hashmapinc.server.controller;
 
 import com.hashmapinc.server.common.data.exception.TempusException;
-import com.hashmapinc.server.common.data.upload.InputStreamWrapper;
 import com.hashmapinc.server.common.data.upload.FileMetaData;
+import com.hashmapinc.server.common.data.upload.InputStreamWrapper;
 import com.hashmapinc.server.service.computation.CloudStorageService;
 import com.hashmapinc.server.service.upload.UploadService;
 import lombok.extern.slf4j.Slf4j;
@@ -58,9 +58,9 @@ public class UploadController extends BaseController {
     @PreAuthorize("hasAuthority('TENANT_ADMIN')")
     @GetMapping(value = "/file")
     @ResponseBody
-    public List<FileMetaData> getFileList() throws TempusException {
+    public List<FileMetaData> getFileList(@RequestParam(value = "fileName", required = false) String fileName) throws TempusException {
         try {
-            return uploadService.getFileList(getCurrentUser().getTenantId());
+            return uploadService.getFileList(getCurrentUser().getTenantId(), fileName);
         } catch (Exception e) {
             log.info("Exception occurred {}", e);
             throw handleException(e);
@@ -94,6 +94,8 @@ public class UploadController extends BaseController {
             throw handleException(e);
         }
     }
+
+
 
     @PreAuthorize("hasAuthority('TENANT_ADMIN')")
     @PutMapping(value = "/file/{oldName}")
