@@ -72,5 +72,7 @@ public interface UserService {
 	List<User> findUsersByClientIdAndAuthority(String clientId, String authority) throws TempusException;
 
 	List<User> findUsersTenantId(String  tenantId) throws TempusException;
+
+	List<User> findTrialUserByClientIdAndAuthority(String clientId, String authority) throws TempusException;
 }
 

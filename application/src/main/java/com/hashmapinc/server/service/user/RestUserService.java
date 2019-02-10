@@ -55,7 +55,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
@@ -386,6 +385,19 @@ public class RestUserService extends AbstractEntityService implements UserServic
         return users;
     }
 
+    @Override
+    public List<User> findTrialUserByClientIdAndAuthority(String  clientId, String authority) throws TempusException {
+        Validator.validateString(clientId,INCORRECT_CLIENT_ID + clientId);
+        Validator.validateString(authority, INCORRECT_AUTHORITY + authority);
+        ResponseEntity<IdentityUser []> response = restTemplate.getForEntity(identityUrl + "/list" + "/"+clientId + "/" +authority + "/trialAccount",IdentityUser[].class);
+        List<User> users = null;
+        if(response.getStatusCode().equals(HttpStatus.OK)) {
+            users = Arrays.stream(response.getBody()).map(IdentityUser::toUser).collect(Collectors.toList());
+        }else
+            throw new TempusException(response.getBody().toString(), TempusErrorCode.GENERAL);
+
+        return users;
+    }
 
     private TextPageData<User> findUsers(TenantId tenantId, CustomerId customerId, TextPageLink pageLink){
         UUID idOffset = pageLink.getIdOffset() != null ? pageLink.getIdOffset() : ModelConstants.NULL_UUID;

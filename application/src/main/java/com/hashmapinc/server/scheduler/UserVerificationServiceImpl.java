@@ -47,7 +47,7 @@ public class UserVerificationServiceImpl implements UserVerificationService {
     @Override
     public void disableAllExpiredUser(final int expiryTimeInMinutes, final int reminderMailTimeInMinutes) {
         try {
-            List<User> tenantAdminUsers = userService.findUsersByClientIdAndAuthority("tempus",TENANT_ADMIN);
+            List<User> tenantAdminUsers = userService.findTrialUserByClientIdAndAuthority("tempus",TENANT_ADMIN);
 
             for (User user : tenantAdminUsers) {
                 if(user.isEnabled()) {
