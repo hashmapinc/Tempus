@@ -16,14 +16,12 @@
  */
 package com.hashmapinc.server.service.computation;
 
-import com.hashmapinc.server.common.data.computation.ComputationJob;
 import com.hashmapinc.server.common.data.computation.Computations;
+import com.hashmapinc.server.common.data.id.TenantId;
+import org.springframework.stereotype.Service;
 
-public interface KubelessDeploymentService {
-    boolean deployFunction(Computations computations);
-    boolean functionExists(Computations computation);
-    boolean deleteFunction(Computations computation);
-    boolean createTrigger(ComputationJob computationJob);
-    boolean triggerExists(ComputationJob computationJob);
-    boolean deleteTrigger(ComputationJob computationJob);
+@Service
+public interface ComputationsFunctionService {
+    Computations add(Computations computation, TenantId tenantId) throws Exception;
+    Computations delete(Computations computations) throws Exception;
 }

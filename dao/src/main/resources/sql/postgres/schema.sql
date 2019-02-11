@@ -434,3 +434,15 @@ CREATE TABLE IF NOT EXISTS templates (
     name varchar,
     body varchar
 );
+
+CREATE TABLE IF NOT EXISTS lambda_computation_meta_data (
+    id varchar(31) NOT NULL CONSTRAINT lambda_computations_pkey PRIMARY KEY,
+    file_path varchar,
+    function_name varchar,
+    function_handler varchar,
+    runtime varchar,
+    description varchar,
+    lambda_timeout integer,
+    memory_size integer,
+    region varchar
+);

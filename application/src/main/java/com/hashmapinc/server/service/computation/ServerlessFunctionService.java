@@ -14,8 +14,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.hashmapinc.server.common.data.computation;
+package com.hashmapinc.server.service.computation;
 
-public enum ComputationType {
-    SPARK, KUBELESS, LAMBDA
+import com.hashmapinc.server.common.data.computation.ComputationJob;
+import com.hashmapinc.server.common.data.computation.Computations;
+
+public interface ServerlessFunctionService {
+    boolean deployFunction(Computations computations);
+    boolean functionExists(Computations computation);
+    boolean deleteFunction(Computations computation);
+    boolean createTrigger(ComputationJob computationJob);
+    boolean triggerExists(ComputationJob computationJob);
+    boolean deleteTrigger(ComputationJob computationJob);
 }

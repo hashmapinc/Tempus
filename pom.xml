@@ -97,6 +97,7 @@
         <maven-install-plugin.version>2.5.1</maven-install-plugin.version>
         <unit-converion.version>1.0.4</unit-converion.version>
         <poi-ooxml.version>4.0.1</poi-ooxml.version>
+        <aws-java-sdk-bom.version>1.11.478</aws-java-sdk-bom.version>
     </properties>
 
     <modules>
@@ -1024,6 +1025,13 @@
                 <groupId>org.yaml</groupId>
                 <artifactId>snakeyaml</artifactId>
                 <version>${snakeyaml.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.amazonaws</groupId>
+                <artifactId>aws-java-sdk-bom</artifactId>
+                <version>${aws-java-sdk-bom.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
             </dependency>
         </dependencies>
     </dependencyManagement>
