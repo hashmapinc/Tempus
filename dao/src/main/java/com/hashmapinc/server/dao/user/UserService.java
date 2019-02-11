@@ -69,8 +69,6 @@ public interface UserService {
 
 	User unassignGroups(UserId userId, List<CustomerGroupId> customerGroupIds);
 
-	List<User> findUsersByClientIdAndAuthority(String clientId, String authority) throws TempusException;
-
 	List<User> findUsersTenantId(String  tenantId) throws TempusException;
 
 	List<User> findTrialUserByClientIdAndAuthority(String clientId, String authority) throws TempusException;

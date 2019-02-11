@@ -359,20 +359,6 @@ public class RestUserService extends AbstractEntityService implements UserServic
     }
 
     @Override
-    public List<User> findUsersByClientIdAndAuthority(String  clientId, String authority) throws TempusException {
-        Validator.validateString(clientId,INCORRECT_CLIENT_ID + clientId);
-        Validator.validateString(authority, INCORRECT_AUTHORITY + authority);
-        ResponseEntity<IdentityUser []> response = restTemplate.getForEntity(identityUrl + "/list" + "/"+clientId + "/" +authority,IdentityUser[].class);
-        List<User> users = null;
-        if(response.getStatusCode().equals(HttpStatus.OK)) {
-            users = Arrays.stream(response.getBody()).map(IdentityUser::toUser).collect(Collectors.toList());
-        }else
-            throw new TempusException(response.getBody().toString(), TempusErrorCode.GENERAL);
-
-        return users;
-    }
-
-    @Override
     public List<User> findUsersTenantId(String  tenantId) throws TempusException {
         Validator.validateString(tenantId, INCORRECT_AUTHORITY + tenantId);
         ResponseEntity<IdentityUser []> response = restTemplate.getForEntity(identityUrl + "/list" + "/"+tenantId ,IdentityUser[].class);
