@@ -92,11 +92,22 @@ public abstract class BaseUploadControllerTest extends AbstractControllerTest {
 
     @Test
     public void getAllFiles() throws Exception {
-        List<FileMetaData> list = new ArrayList<>();
         when(cloudStorageService.getAllFiles(any(), any())).thenReturn(items);
-        List<FileMetaData> retFileMetaDataList = doGetTyped("/api/file", new TypeReference<List<FileMetaData>>() {
-        });
+        List<FileMetaData> retFileMetaDataList = doGetTyped("/api/file", new TypeReference<>() {});
         Assert.assertEquals(2, retFileMetaDataList.size());
+    }
+
+    @Test
+    public void getFilesForPrefix() throws Exception {
+        List<Item> items = new ArrayList<>();
+        String objectName = StorageTypes.FILES + "/" + "image.jpg";
+        Item item = new Item(objectName, false);
+        item.putIfAbsent("LastModified", "2019-02-02T05:06:10.249Z");
+        item.putIfAbsent("Size", 1);
+        items.add(item);
+        when(cloudStorageService.getAllFiles(any(), any())).thenReturn(items);
+        List<FileMetaData> retFileMetaDataList = doGetTyped("/api/file?fileName=image.jpg", new TypeReference<>() {});
+        Assert.assertEquals(1, retFileMetaDataList.size());
     }
 
     @Test

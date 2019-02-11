@@ -101,8 +101,6 @@ function FileUploadService(toast,$http, $q, $translate, $window, $document, $inj
 
         var blob = new Blob([data]);
 
-        // FOR IE:
-
         if ($window.navigator && $window.navigator.msSaveOrOpenBlob) {
             $window.navigator.msSaveOrOpenBlob(blob, filename);
         }
@@ -168,8 +166,8 @@ function FileUploadService(toast,$http, $q, $translate, $window, $document, $inj
 
     function searchFile(fileName){
             var deferred = $q.defer();
-            var url = '/api/file';
-            $http.get(url, fileName, {
+            var url = '/api/file?fileName=' + fileName;
+            $http.get(url, {
                     transformRequest: angular.identity,
                     headers: {'Content-Type': undefined}
                 }).then(function success(response) {
