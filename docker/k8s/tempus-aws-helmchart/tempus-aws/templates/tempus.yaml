@@ -69,7 +69,7 @@ data:
   identity.base.url: "http://{{ .Values.identity.name }}:{{ .Values.identity.service.port }}/uaa"
   metadata.base.url: "http://{{ .Values.metadata.name }}:{{ .Values.metadata.service.port }}/api"
   spark.jars.bucket: "tempus-spark-jars"
-  computation.location: "http://s3fs/"
+  computation.location: "http://s3fs"
 ---
 apiVersion: "apps/v1beta1"
 kind: StatefulSet
