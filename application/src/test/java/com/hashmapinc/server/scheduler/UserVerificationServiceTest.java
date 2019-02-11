@@ -60,7 +60,7 @@ public class UserVerificationServiceTest {
         User user = createUser("trialUser@hashmapinc.com",new TenantId(NULL_UUID),Authority.TENANT_ADMIN,true);
         foundTenantAdminsUsers.add(user);
 
-        when(userService.findUsersByClientIdAndAuthority("tempus",Authority.TENANT_ADMIN.toString())).thenReturn(foundTenantAdminsUsers);
+        when(userService.findTrialUserByClientIdAndAuthority("tempus",Authority.TENANT_ADMIN.toString())).thenReturn(foundTenantAdminsUsers);
 
         User disabledUser = new User(user) ;
         disabledUser.setEnabled(false);
@@ -70,7 +70,7 @@ public class UserVerificationServiceTest {
         doNothing().when(mailService).sendExpiryRemainderMailToUser(Mockito.anyString());
         doNothing().when(mailService).sendAccountExpiryMail(Mockito.anyString());
 
-        userVerificationService.disableAllExpiredUser(0,0);
+        userVerificationService.disableAllExpiredTrialUser(0,0);
 
         Mockito.verify(userService,times(1)).saveUser(disabledUser);
         Mockito.verify(userService,times(1)).findUsersTenantId(TENANT_ID);
@@ -82,9 +82,9 @@ public class UserVerificationServiceTest {
         User user = createUser("demo@hashmapinc.com",new TenantId(NULL_UUID),Authority.TENANT_ADMIN,false);
         foundTenantAdminsUsers.add(user);
 
-        when(userService.findUsersByClientIdAndAuthority("tempus",Authority.TENANT_ADMIN.toString())).thenReturn(foundTenantAdminsUsers);
+        when(userService.findTrialUserByClientIdAndAuthority("tempus",Authority.TENANT_ADMIN.toString())).thenReturn(foundTenantAdminsUsers);
 
-        userVerificationService.disableAllExpiredUser(0,0);
+        userVerificationService.disableAllExpiredTrialUser(0,0);
 
         Mockito.verify(userService,times(0)).findUsersTenantId(TENANT_ID);
         Mockito.verify(userService,times(0)).saveUser(user);
@@ -95,7 +95,7 @@ public class UserVerificationServiceTest {
         List<User> foundTenantAdminsUsers = new ArrayList<>();
         User tenantUser = createUser("trialUser@hashmapinc.com",new TenantId(NULL_UUID),Authority.TENANT_ADMIN,true);
         foundTenantAdminsUsers.add(tenantUser);
-        when(userService.findUsersByClientIdAndAuthority("tempus",Authority.TENANT_ADMIN.toString())).thenReturn(foundTenantAdminsUsers);
+        when(userService.findTrialUserByClientIdAndAuthority("tempus",Authority.TENANT_ADMIN.toString())).thenReturn(foundTenantAdminsUsers);
 
         User disabledTenantUser = new User(tenantUser) ;
         disabledTenantUser.setEnabled(false);
@@ -110,7 +110,7 @@ public class UserVerificationServiceTest {
         doNothing().when(mailService).sendExpiryRemainderMailToUser(Mockito.anyString());
         doNothing().when(mailService).sendAccountExpiryMail(Mockito.anyString());
 
-        userVerificationService.disableAllExpiredUser(0,0);
+        userVerificationService.disableAllExpiredTrialUser(0,0);
 
         Mockito.verify(userService,times(1)).findUsersTenantId(TENANT_ID);
         Mockito.verify(userService,times(1)).saveUser(tenantUser);
@@ -123,9 +123,9 @@ public class UserVerificationServiceTest {
         User user = createUser("trialUser@hashmapinc.com",new TenantId(NULL_UUID),Authority.TENANT_ADMIN,true);
         foundTenantAdminsUsers.add(user);
 
-        when(userService.findUsersByClientIdAndAuthority("tempus",Authority.TENANT_ADMIN.toString())).thenReturn(foundTenantAdminsUsers);
+        when(userService.findTrialUserByClientIdAndAuthority("tempus",Authority.TENANT_ADMIN.toString())).thenReturn(foundTenantAdminsUsers);
 
-        userVerificationService.disableAllExpiredUser(2880,2880);
+        userVerificationService.disableAllExpiredTrialUser(2880,2880);
 
         Mockito.verify(userService,times(0)).saveUser(user);
         Mockito.verify(userService,times(0)).findUsersTenantId(TENANT_ID);

@@ -42,6 +42,6 @@ public class UserPurgeTask {
     @Scheduled(cron = "${user.trial.purgeCronExpression}")
     public void purgeExpiredUsers() {
         log.trace("Executing purgeExpiredUsers");
-        userVerificationService.disableAllExpiredUser(expiryTimeInMinutes,reminderMailTimeInMinutes);
+        userVerificationService.disableAllExpiredTrialUser(expiryTimeInMinutes,reminderMailTimeInMinutes);
     }
 }

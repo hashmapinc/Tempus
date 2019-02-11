@@ -17,5 +17,5 @@
 package com.hashmapinc.server.scheduler;
 
 public interface UserVerificationService {
-     void disableAllExpiredUser(final int expiryTimeInMinutes ,final int reminderMailTimeInMinutes);
+     void disableAllExpiredTrialUser(final int expiryTimeInMinutes , final int reminderMailTimeInMinutes);
 }
