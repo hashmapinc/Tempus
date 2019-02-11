@@ -26,10 +26,13 @@ import com.hashmapinc.server.common.data.page.TextPageData;
 import com.hashmapinc.server.common.data.page.TextPageLink;
 import com.hashmapinc.server.common.msg.computation.ComputationRequestCompiled;
 import com.hashmapinc.server.dao.computations.ComputationsService;
+import com.hashmapinc.server.dao.tenant.TenantService;
 import com.hashmapinc.server.exception.TempusApplicationException;
+import com.hashmapinc.server.service.CloudStorageServiceUtils;
 import com.hashmapinc.server.service.computation.annotation.AnnotationsProcessor;
 import com.hashmapinc.server.service.computation.classloader.RuntimeJavaCompiler;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -62,6 +65,9 @@ UploadComputationDiscoveryService implements ComputationDiscoveryService{
     @Autowired
     private MinioService minioService;
 
+    @Autowired
+    private TenantService tenantService;
+
     private RuntimeJavaCompiler compiler;
 
     @Override
@@ -92,6 +98,33 @@ UploadComputationDiscoveryService implements ComputationDiscoveryService{
         }
     }
 
+    private boolean isJar(Path jarPath) throws IOException {
+        File file = jarPath.toFile();
+        return file.getCanonicalPath().endsWith(".jar") && file.canRead();
+    }
+
+    private Computations onFileCreate(File file, TenantId tenantId) throws TempusApplicationException {
+        log.debug("File {} is created", file.getAbsolutePath());
+        ImmutablePair<String, String> storedFileDetails = useCloudStorage() ? uploadToCloud(file, tenantId) : new ImmutablePair<>(file.getName(), file.toPath().toString());
+        Computations computations = processComponent(file, storedFileDetails, tenantId);
+        if (useCloudStorage())
+            file.delete();
+
+        return computations;
+    }
+
+    private ImmutablePair uploadToCloud(File file, TenantId tenantId) throws TempusApplicationException {
+        try {
+            String objectName = getObjectNameForTenant(file.getName(), tenantId);
+            minioService.upload(sparkJarsBucket, objectName, new FileInputStream(file), "application/zip");
+            String objectUrl = minioService.getObjectUrl(sparkJarsBucket, objectName);
+            return new ImmutablePair<>(objectName, objectUrl);
+        } catch (IOException | NoSuchAlgorithmException | InvalidKeyException | XmlPullParserException e) {
+            log.error("Error while uploading file [{}] to cloud. Exception is: {}", file.getName(), e.getMessage());
+            throw new TempusApplicationException(e);
+        }
+    }
+
     private void deleteJar(Computations computation) throws TempusApplicationException {
         SparkComputationMetadata computationMetadata = (SparkComputationMetadata) computation.getComputationMetadata();
         try {
@@ -106,36 +139,16 @@ UploadComputationDiscoveryService implements ComputationDiscoveryService{
         }
     }
 
-    private boolean isJar(Path jarPath) throws IOException {
-        File file = jarPath.toFile();
-        return file.getCanonicalPath().endsWith(".jar") && file.canRead();
-    }
-
-    private Computations onFileCreate(File file, TenantId tenantId) throws TempusApplicationException {
-        log.debug("File {} is created", file.getAbsolutePath());
-        String filePath = useCloudStorage() ? uploadToCloud(file) : file.toPath().toString();
-        Computations computations = processComponent(file, filePath, tenantId);
-        if (useCloudStorage())
-            file.delete();
-
-        return computations;
-    }
-
-    private String uploadToCloud(File file) throws TempusApplicationException {
-        try {
-            minioService.upload(sparkJarsBucket, file.getName(), new FileInputStream(file), "application/zip");
-            return minioService.getObjectUrl(sparkJarsBucket, file.getName());
-        } catch (IOException | NoSuchAlgorithmException | InvalidKeyException | XmlPullParserException e) {
-            log.error("Error while uploading file [{}] to cloud. Exception is: {}", file.getName(), e.getMessage());
-            throw new TempusApplicationException(e);
-        }
+    private String getObjectNameForTenant(String fileName, TenantId tenantId) {
+        String folder = CloudStorageServiceUtils.createBucketName(tenantService.findTenantById(tenantId));
+        return CloudStorageServiceUtils.createObjectName(fileName, folder);
     }
 
     private boolean useCloudStorage() {
         return !sparkJarsBucket.isEmpty();
     }
 
-    private Computations processComponent(File file, String filePath, TenantId tenantId) {
+    private Computations processComponent(File file, ImmutablePair<String, String> storedFileDetails, TenantId tenantId) {
         Computations savedComputations = null;
         Path j = file.toPath();
         try{
@@ -152,9 +165,9 @@ UploadComputationDiscoveryService implements ComputationDiscoveryService{
 
                         sparkComputationMetadata.setMainClass(computationRequestCompiled.getMainClazz());
                         sparkComputationMetadata.setArgsformat(args);
-                        sparkComputationMetadata.setJarPath(filePath);
+                        sparkComputationMetadata.setJarPath(storedFileDetails.getRight());
                         sparkComputationMetadata.setArgsType(computationRequestCompiled.getArgsType());
-                        sparkComputationMetadata.setJarName(j.getFileName().toString());
+                        sparkComputationMetadata.setJarName(storedFileDetails.getLeft());
                         sparkComputationMetadata.setJsonDescriptor(computationRequestCompiled.getConfigurationDescriptor());
 
                         computations.setComputationMetadata(sparkComputationMetadata);

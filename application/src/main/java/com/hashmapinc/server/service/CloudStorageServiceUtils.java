@@ -25,13 +25,13 @@ public class CloudStorageServiceUtils {
     private static final String PREFIX_FORMAT = "%s/%s";
 
     public static String createBucketName(Tenant tenant) {
-        return tenant.getName().toLowerCase().replace(" ", "-");
+        return (tenant.getName() + "-" + tenant.getId().getId()).toLowerCase().replace(" ", "-");
     }
 
-    public static String createObjectName(String fileName, String type) {
+    public static String createObjectName(String fileName, String folder) {
         if (fileName.contentEquals(""))
-            return String.format(FOLDER_URL_FORMAT, type);
-        return String.format(FILE_URL_FORMAT, type, fileName.toLowerCase().replace(" ", "-"));
+            return String.format(FOLDER_URL_FORMAT, folder);
+        return String.format(FILE_URL_FORMAT, folder, fileName.toLowerCase().replace(" ", "-"));
     }
 
     public static String createPrefix(String fileName, String type) {
