@@ -24,26 +24,22 @@ export default function FileUploadController(toast, $scope,$document, fileUpload
     var vm = this;
     vm.files = [];
     function loadTableData() {
-            var promise = fileUploadService.getAllFile();
+        var promise = fileUploadService.getAllFile();
+        if(promise) {
+            promise.then(function success(items) {
+                vm.files = items;
+            })
+        }
+    }
 
-            if(promise) {
-                promise.then(function success(items) {
-                    vm.files = items;
-                    }
-                )
-            }
-     }
-
-     loadTableData();
+    loadTableData();
 
     vm.openFileDialog = function() {
-           angular.element($document[0].getElementById('inputFile').click());
-        };
+        angular.element($document[0].getElementById('inputFile').click());
+    };
 
     $scope.thisFileUpload = function(element) {
-
         checkFile(element);
-
     }
 
     function checkFile(element){
@@ -51,22 +47,18 @@ export default function FileUploadController(toast, $scope,$document, fileUpload
         var deferred = $q.defer();
         fileUploadService.searchFile(fileToBeUploaded[0].name).then(
             function success(searchItems) {
-            if(searchItems.length == 0){
-            if(fileUploadService.fileValidation(fileToBeUploaded)=== true){
-                                saveFile(fileToBeUploaded[0]);
-
-                            }
-            }
-            else{
-                replaceFile(element, fileToBeUploaded[0]);
-                return;
-                     }
+                if(searchItems.length == 0){
+                    if(fileUploadService.fileValidation(fileToBeUploaded)=== true){
+                        saveFile(fileToBeUploaded[0]);
+                    }
+                } else {
+                    replaceFile(element, fileToBeUploaded[0]);
+                }
             },
             function fail() {
                 deferred.reject();
             }
         );
-
         return deferred.promise;
 
     }
@@ -75,7 +67,6 @@ export default function FileUploadController(toast, $scope,$document, fileUpload
         var deferred = $q.defer();
         fileUploadService.uploadFile(file).then(
             function success(savedFile) {
-                vm.files.push(savedFile);
                 return savedFile;
             },
             function fail() {

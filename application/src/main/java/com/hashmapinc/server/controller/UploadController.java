@@ -95,8 +95,6 @@ public class UploadController extends BaseController {
         }
     }
 
-
-
     @PreAuthorize("hasAuthority('TENANT_ADMIN')")
     @PutMapping(value = "/file/{oldName}")
     @ResponseBody
