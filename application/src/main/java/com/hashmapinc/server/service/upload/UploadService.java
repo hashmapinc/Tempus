@@ -89,8 +89,12 @@ public class UploadService {
         String[] arrList = item.objectName().split("/");
         String fileName = arrList[arrList.length -1];
         String[] arrList2 = fileName.split("\\.");
-        if (arrList2.length == 2)
-            return new FileMetaData(fileName, arrList2[1], item.lastModified(), item.objectSize());
-        return new FileMetaData(fileName, "NA", item.lastModified(), item.objectSize());
+        if (arrList2.length >= 2) {
+            String fileNameWithoutExt = fileName.substring(0, fileName.lastIndexOf("."));
+            return new FileMetaData(fileNameWithoutExt, arrList2[arrList2.length - 1], item.lastModified().toInstant().getEpochSecond(),
+                    item.objectSize() / 1024);
+        }
+        return new FileMetaData(fileName, "NA", item.lastModified().toInstant().getEpochSecond(),
+                item.objectSize() / 1024);
     }
 }

@@ -28,6 +28,6 @@ import java.util.Date;
 public class FileMetaData {
     private String fileName;
     private String extension;
-    private Date lastUpdated;
+    private long lastUpdated;
     private long size;
 }

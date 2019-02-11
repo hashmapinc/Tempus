@@ -81,7 +81,7 @@ public abstract class BaseUploadControllerTest extends AbstractControllerTest {
         uploadService.uploadFile(multipartFile, tenantId);
         FileMetaData retFileMetaData = doPostFile("/api/file", multipartFile, FileMetaData.class);
         Assert.assertNotNull(retFileMetaData);
-        Assert.assertEquals("temp.txt", retFileMetaData.getFileName());
+        Assert.assertEquals("temp", retFileMetaData.getFileName());
     }
 
     @Test
