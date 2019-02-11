@@ -21,10 +21,9 @@ import com.google.common.base.Function;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
-import com.hashmapinc.server.common.data.Customer;
-import com.hashmapinc.server.common.data.Device;
-import com.hashmapinc.server.common.data.EntityType;
-import com.hashmapinc.server.common.data.Tenant;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import com.hashmapinc.server.common.data.*;
 import com.hashmapinc.server.common.data.asset.Asset;
 import com.hashmapinc.server.common.data.audit.ActionType;
 import com.hashmapinc.server.common.data.id.*;
@@ -45,6 +44,7 @@ import com.hashmapinc.server.extensions.api.plugins.rpc.PluginRpcMsg;
 import com.hashmapinc.server.extensions.api.plugins.rpc.RpcMsg;
 import com.hashmapinc.server.extensions.api.plugins.ws.PluginWebsocketSessionRef;
 import com.hashmapinc.server.extensions.api.plugins.ws.msg.PluginWebsocketMsg;
+import com.hashmapinc.tempus.model.Quantity;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.annotation.Nullable;
@@ -64,6 +64,8 @@ public final class PluginProcessingContext implements PluginContext {
 
     private final SharedPluginProcessingContext pluginCtx;
     private final Optional<PluginApiCallSecurityContext> securityCtx;
+    private final String UNIT_SYSTEM_KEY = "unit_system";
+    private final TenantId nullTenantId = new TenantId(UUIDConverter.fromString("1e7461259eab8808080808080808080"));
 
     public PluginProcessingContext(SharedPluginProcessingContext pluginCtx, PluginApiCallSecurityContext securityCtx) {
         super();
@@ -118,15 +120,30 @@ public final class PluginProcessingContext implements PluginContext {
     public void loadAttribute(EntityId entityId, String attributeType, String attributeKey, final PluginCallback<Optional<AttributeKvEntry>> callback) {
         validate(entityId, new ValidationCallback(callback, ctx -> {
             ListenableFuture<Optional<AttributeKvEntry>> future = pluginCtx.attributesService.find(entityId, attributeType, attributeKey);
-            Futures.addCallback(future, getCallback(callback, v -> v), executor);
+            final ListenableFuture<Optional<AttributeKvEntry>> transform = Futures.transform(future, transformAttributeKvEntryUnits());
+            Futures.addCallback(transform, getCallback(callback, v -> v), executor);
         }));
+    }
+
+    private Function<Optional<AttributeKvEntry>, Optional<AttributeKvEntry>> transformAttributeKvEntryUnits() {
+        return entry -> {
+            List<AttributeKvEntry> collect;
+            if (entry.isPresent()) {
+                collect = Collections.singletonList(entry.get());
+                List<AttributeKvEntry> attributeKvEntries = convertKvEntriesToUnitSystem(collect, BaseAttributeKvEntry.class);
+                if (attributeKvEntries != null && !attributeKvEntries.isEmpty())
+                    return Optional.ofNullable(attributeKvEntries.get(0));
+            }
+            return Optional.empty();
+        };
     }
 
     @Override
     public void loadAttributes(EntityId entityId, String attributeType, Collection<String> attributeKeys, final PluginCallback<List<AttributeKvEntry>> callback) {
         validate(entityId, new ValidationCallback(callback, ctx -> {
             ListenableFuture<List<AttributeKvEntry>> future = pluginCtx.attributesService.find(entityId, attributeType, attributeKeys);
-            Futures.addCallback(future, getCallback(callback, v -> v), executor);
+            ListenableFuture<List<AttributeKvEntry>> transformedKvEntries = Futures.transform(future , (Function<List<AttributeKvEntry>, List<AttributeKvEntry>>)entries -> convertKvEntriesToUnitSystem(entries, BaseAttributeKvEntry.class));
+            Futures.addCallback(transformedKvEntries, getCallback(callback, v -> v), executor);
         }));
     }
 
@@ -134,7 +151,8 @@ public final class PluginProcessingContext implements PluginContext {
     public void loadAttributes(EntityId entityId, String attributeType, PluginCallback<List<AttributeKvEntry>> callback) {
         validate(entityId, new ValidationCallback(callback, ctx -> {
             ListenableFuture<List<AttributeKvEntry>> future = pluginCtx.attributesService.findAll(entityId, attributeType);
-            Futures.addCallback(future, getCallback(callback, v -> v), executor);
+            ListenableFuture<List<AttributeKvEntry>> transformedKvEntries = Futures.transform(future , (Function<List<AttributeKvEntry>, List<AttributeKvEntry>>) entries -> convertKvEntriesToUnitSystem(entries, BaseAttributeKvEntry.class));
+            Futures.addCallback(transformedKvEntries, getCallback(callback, v -> v), executor);
         }));
     }
 
@@ -142,7 +160,11 @@ public final class PluginProcessingContext implements PluginContext {
     public void loadAttributes(final EntityId entityId, final Collection<String> attributeTypes, final PluginCallback<List<AttributeKvEntry>> callback) {
         validate(entityId, new ValidationCallback(callback, ctx -> {
             List<ListenableFuture<List<AttributeKvEntry>>> futures = new ArrayList<>();
-            attributeTypes.forEach(attributeType -> futures.add(pluginCtx.attributesService.findAll(entityId, attributeType)));
+            attributeTypes.forEach(attributeType -> {
+                ListenableFuture<List<AttributeKvEntry>> future = pluginCtx.attributesService.findAll(entityId , attributeType);
+                ListenableFuture<List<AttributeKvEntry>> transformedKvEntries = Futures.transform(future , (Function<List<AttributeKvEntry>, List<AttributeKvEntry>>) entries -> convertKvEntriesToUnitSystem(entries, BaseAttributeKvEntry.class));
+                futures.add(transformedKvEntries);
+            });
             convertFuturesAndAddCallback(callback, futures);
         }));
     }
@@ -151,7 +173,11 @@ public final class PluginProcessingContext implements PluginContext {
     public void loadAttributes(final EntityId entityId, final Collection<String> attributeTypes, final Collection<String> attributeKeys, final PluginCallback<List<AttributeKvEntry>> callback) {
         validate(entityId, new ValidationCallback(callback, ctx -> {
             List<ListenableFuture<List<AttributeKvEntry>>> futures = new ArrayList<>();
-            attributeTypes.forEach(attributeType -> futures.add(pluginCtx.attributesService.find(entityId, attributeType, attributeKeys)));
+            attributeTypes.forEach(attributeType -> {
+                ListenableFuture<List<AttributeKvEntry>> future = pluginCtx.attributesService.find(entityId , attributeType , attributeKeys);
+                ListenableFuture<List<AttributeKvEntry>> transformedKvEntries = Futures.transform(future , (Function<List<AttributeKvEntry>, List<AttributeKvEntry>>) entries -> convertKvEntriesToUnitSystem(entries, BaseAttributeKvEntry.class));
+                futures.add(transformedKvEntries);
+            });
             convertFuturesAndAddCallback(callback, futures);
         }));
     }
@@ -194,7 +220,8 @@ public final class PluginProcessingContext implements PluginContext {
     public void loadTimeseries(final EntityId entityId, final List<TsKvQuery> queries, final PluginCallback<List<TsKvEntry>> callback) {
         validate(entityId, new ValidationCallback(callback, ctx -> {
             ListenableFuture<List<TsKvEntry>> future = pluginCtx.tsService.findAll(entityId, queries);
-            Futures.addCallback(future, getCallback(callback, v -> v), executor);
+            ListenableFuture<List<TsKvEntry>> transformedKvEntries = Futures.transform(future , (Function<List<TsKvEntry>, List<TsKvEntry>>) entries -> convertKvEntriesToUnitSystem(entries, BasicTsKvEntry.class));
+            Futures.addCallback(transformedKvEntries, getCallback(callback, v -> v), executor);
         }));
     }
 
@@ -202,7 +229,8 @@ public final class PluginProcessingContext implements PluginContext {
     public void loadDepthSeries(final EntityId entityId, final List<DsKvQuery> queries, final PluginCallback<List<DsKvEntry>> callback) {
         validate(entityId, new ValidationCallback(callback, ctx -> {
             ListenableFuture<List<DsKvEntry>> future = pluginCtx.dsService.findAll(entityId, queries);
-            Futures.addCallback(future, getCallback(callback, v -> v), executor);
+            ListenableFuture<List<DsKvEntry>> transformedKvEntries = Futures.transform(future , (Function<List<DsKvEntry>, List<DsKvEntry>>) entries -> convertKvEntriesToUnitSystem(entries, BasicDsKvEntry.class));
+            Futures.addCallback(transformedKvEntries, getCallback(callback, v -> v), executor);
         }));
     }
 
@@ -210,13 +238,14 @@ public final class PluginProcessingContext implements PluginContext {
     public void loadLatestTimeseries(final EntityId entityId, final PluginCallback<List<TsKvEntry>> callback) {
         validate(entityId, new ValidationCallback(callback, ctx -> {
             ListenableFuture<List<TsKvEntry>> future = pluginCtx.tsService.findAllLatest(entityId);
-            Futures.addCallback(future, getCallback(callback, v -> v), executor);
+            ListenableFuture<List<TsKvEntry>> transformedKvEntries = Futures.transform(future , (Function<List<TsKvEntry>, List<TsKvEntry>>) entries -> convertKvEntriesToUnitSystem(entries, BasicTsKvEntry.class));
+            Futures.addCallback(transformedKvEntries, getCallback(callback, v -> v), executor);
         }));
     }
 
     @Override
     public void logAttributesUpdated(PluginApiCallSecurityContext ctx, EntityId entityId, String attributeType,
-                                                                     List<AttributeKvEntry> attributes, Exception e) {
+                                     List<AttributeKvEntry> attributes, Exception e) {
         pluginCtx.auditLogService.logEntityAction(
                 ctx.getTenantId(),
                 ctx.getCustomerId(),
@@ -264,7 +293,8 @@ public final class PluginProcessingContext implements PluginContext {
     public void loadLatestTimeseries(final EntityId entityId, final Collection<String> keys, final PluginCallback<List<TsKvEntry>> callback) {
         validate(entityId, new ValidationCallback(callback, ctx -> {
             ListenableFuture<List<TsKvEntry>> rsListFuture = pluginCtx.tsService.findLatest(entityId, keys);
-            Futures.addCallback(rsListFuture, getCallback(callback, v -> v), executor);
+            ListenableFuture<List<TsKvEntry>> transformedKvEntries = Futures.transform(rsListFuture , (Function<List<TsKvEntry>, List<TsKvEntry>>) entries -> convertKvEntriesToUnitSystem(entries, BasicTsKvEntry.class));
+            Futures.addCallback(transformedKvEntries, getCallback(callback, v -> v), executor);
         }));
     }
 
@@ -276,7 +306,8 @@ public final class PluginProcessingContext implements PluginContext {
         }
         validate(entityId, new ValidationCallback(callback, ctx -> {
             ListenableFuture<List<TsKvEntry>> rsListFuture = pluginCtx.tsService.findLatest(entityId, keys);
-            Futures.addCallback(rsListFuture, getCallback(callback, v -> v), executor);
+            ListenableFuture<List<TsKvEntry>> transformedKvEntries = Futures.transform(rsListFuture , (Function<List<TsKvEntry>, List<TsKvEntry>>) entries -> convertKvEntriesToUnitSystem(entries, BasicTsKvEntry.class));
+            Futures.addCallback(transformedKvEntries, getCallback(callback, v -> v), executor);
         }));
     }
 
@@ -284,7 +315,8 @@ public final class PluginProcessingContext implements PluginContext {
     public void loadLatestDepthSeries(final EntityId entityId, final PluginCallback<List<DsKvEntry>> callback) {
         validate(entityId, new ValidationCallback(callback, ctx -> {
             ListenableFuture<List<DsKvEntry>> future = pluginCtx.dsService.findAllLatest(entityId);
-            Futures.addCallback(future, getCallback(callback, v -> v), executor);
+            ListenableFuture<List<DsKvEntry>> transformedKvEntries = Futures.transform(future , (Function<List<DsKvEntry>, List<DsKvEntry>>) entries -> convertKvEntriesToUnitSystem(entries, BasicDsKvEntry.class));
+            Futures.addCallback(transformedKvEntries, getCallback(callback, v -> v), executor);
         }));
     }
 
@@ -292,7 +324,8 @@ public final class PluginProcessingContext implements PluginContext {
     public void loadLatestDepthSeries(final EntityId entityId, final Collection<String> keys, final PluginCallback<List<DsKvEntry>> callback) {
         validate(entityId, new ValidationCallback(callback, ctx -> {
             ListenableFuture<List<DsKvEntry>> rsListFuture = pluginCtx.dsService.findLatest(entityId, keys);
-            Futures.addCallback(rsListFuture, getCallback(callback, v -> v), executor);
+            ListenableFuture<List<DsKvEntry>> transformedKvEntries = Futures.transform(rsListFuture , (Function<List<DsKvEntry>, List<DsKvEntry>>) entries -> convertKvEntriesToUnitSystem(entries, BasicDsKvEntry.class));
+            Futures.addCallback(transformedKvEntries, getCallback(callback, v -> v), executor);
         }));
     }
 
@@ -304,7 +337,8 @@ public final class PluginProcessingContext implements PluginContext {
         }
         validate(entityId, new ValidationCallback(callback, ctx -> {
             ListenableFuture<List<DsKvEntry>> rsListFuture = pluginCtx.dsService.findLatest(entityId, keys);
-            Futures.addCallback(rsListFuture, getCallback(callback, v -> v), executor);
+            ListenableFuture<List<DsKvEntry>> transformedKvEntries = Futures.transform(rsListFuture , (Function<List<DsKvEntry>, List<DsKvEntry>>) entries -> convertKvEntriesToUnitSystem(entries, BasicDsKvEntry.class));
+            Futures.addCallback(transformedKvEntries, getCallback(callback, v -> v), executor);
         }));
     }
 
@@ -606,5 +640,60 @@ public final class PluginProcessingContext implements PluginContext {
                     return result;
                 }, executor);
         Futures.addCallback(future, getCallback(callback, v -> v), executor);
+    }
+
+    private <E extends KvEntry, T extends E> List<E> convertKvEntriesToUnitSystem(List<E> kvEntries, Class<T> tClass) {
+        if (securityCtx.isPresent()) {
+            return convertKvEntriesToUnitSystemByTenantId(kvEntries , securityCtx.get().getTenantId(), tClass);
+        } else {
+            return convertKvEntriesToUnitSystemByTenantId(kvEntries , nullTenantId, tClass);
+        }
+    }
+
+    @Override
+    public <E extends KvEntry, T extends E> List<E> convertKvEntriesToUnitSystemByTenantId(List<E> kvEntries , TenantId tenantId , Class<T> tClass) {
+        List<E> unitSystemKvEntries = new ArrayList<>();
+        String unitSystem = getUnitSystem(tenantId);
+        for (E kvEntry:  kvEntries) {
+            if (checkDataTypeAndIsUnitPresent(kvEntry)) {
+                Double value = getDoubleValue(kvEntry);
+                DoubleDataEntry dataEntry = convert(unitSystem, kvEntry.getKey(), value, kvEntry.getUnit().orElse(null), kvEntry.getSourceUnit().orElse(null));
+                if (tClass.isAssignableFrom(BasicDsKvEntry.class)) {
+                    unitSystemKvEntries.add((E)new BasicDsKvEntry(((DsKvEntry)kvEntry).getDs(), dataEntry));
+                } else if (tClass.isAssignableFrom(BasicTsKvEntry.class)) {
+                    unitSystemKvEntries.add((E)new BasicTsKvEntry(((TsKvEntry) kvEntry).getTs() , dataEntry));
+                } else if (tClass.isAssignableFrom(BaseAttributeKvEntry.class)) {
+                    unitSystemKvEntries.add((E)new BaseAttributeKvEntry(dataEntry, ((AttributeKvEntry)kvEntry).getLastUpdateTs()));
+                }
+            } else {
+                unitSystemKvEntries.add(kvEntry);
+            }
+        }
+        return unitSystemKvEntries;
+    }
+
+    private Double getDoubleValue(KvEntry kvEntry) {
+        if (kvEntry.getDataType() == DataType.LONG) {
+            return ((Long)(kvEntry.getValue())).doubleValue();
+        } else {
+            return (Double) kvEntry.getValue();
+        }
+    }
+
+    private boolean checkDataTypeAndIsUnitPresent(KvEntry kvEntry) {
+        return ((kvEntry.getDataType() == DataType.DOUBLE || kvEntry.getDataType() == DataType.LONG) && kvEntry.getUnit().isPresent());
+    }
+
+    private DoubleDataEntry convert(String unitSystem, String key, Double value, String unit, String sourceUnit) {
+        String targetUnit = pluginCtx.unitConversionService.getUnitFor(unitSystem, sourceUnit);
+        Quantity quantity = pluginCtx.unitConversionService.convertToTargetUnit(new Quantity(value, unit), targetUnit);
+        return new DoubleDataEntry(key, quantity.getUnit(), unit, quantity.getValue());
+    }
+
+    private String getUnitSystem(TenantId tenantId) {
+        String unitSystemJson = pluginCtx.tenantService.findUnitSystemByTenantId(tenantId);
+        System.out.println("unitSystemJson : " + unitSystemJson);
+        JsonObject unitSytemJsonObj = new JsonParser().parse(unitSystemJson).getAsJsonObject();
+        return unitSytemJsonObj.get(UNIT_SYSTEM_KEY).getAsString().toUpperCase();
     }
 }

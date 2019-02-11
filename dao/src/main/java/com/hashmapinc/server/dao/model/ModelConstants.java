@@ -366,6 +366,7 @@ public class ModelConstants {
     public static final String TS_COLUMN = "ts";
     public static final String DS_COLUMN = "ds";
     public static final String UNIT_COLUMN = "unit";
+    public static final String SOURCE_UNIT_COLUMN = "source_unit";
 
 
     /**

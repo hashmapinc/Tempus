@@ -207,9 +207,9 @@ public abstract class BaseTenantServiceTest extends AbstractServiceTest {
     @Test
     public void testSaveUserUnitSystem() {
         TenantId tenantId = new TenantId(UUIDConverter.fromString("1e7461259eab8808080808080808080"));
-        tenantService.saveUnitSystem("UK", tenantId);
+        tenantService.saveUnitSystem("English", tenantId);
         String unitSystem = tenantService.findUnitSystemByTenantId(tenantId);
-        Assert.assertEquals("{\"unit_system\":\"UK\"}", unitSystem);
+        Assert.assertEquals("{\"unit_system\":\"English\"}", unitSystem);
         Assert.assertNotNull(unitSystem);
         tenantService.deleteUnitSystemByTenantId(tenantId);
     }
@@ -217,10 +217,10 @@ public abstract class BaseTenantServiceTest extends AbstractServiceTest {
     @Test
     public void testFindUnitSystemByUserId() {
         TenantId tenantId = new TenantId(UUIDConverter.fromString("1e7461259eab8808080808080808080"));
-        tenantService.saveUnitSystem("UK", tenantId);
+        tenantService.saveUnitSystem("English", tenantId);
         String unitSystemByUserId = tenantService.findUnitSystemByTenantId(tenantId);
         Assert.assertNotNull(unitSystemByUserId);
-        Assert.assertEquals("{\"unit_system\":\"UK\"}", unitSystemByUserId);
+        Assert.assertEquals("{\"unit_system\":\"English\"}", unitSystemByUserId);
         tenantService.deleteUnitSystemByTenantId(tenantId);
     }
 
@@ -228,21 +228,21 @@ public abstract class BaseTenantServiceTest extends AbstractServiceTest {
     public void testFindUnitSystemByUserIdNotPresentShouldReturnSi() {
         String unitSystemByUserId = tenantService.findUnitSystemByTenantId(new TenantId(UUIDConverter.fromString("1e7461259eab8808080808080818181")));
         Assert.assertNotNull(unitSystemByUserId);
-        Assert.assertEquals("{\"unit_system\":\"SI\"}", unitSystemByUserId);
+        Assert.assertEquals("{\"unit_system\":\"Metric\"}", unitSystemByUserId);
     }
 
     @Test
     public void testUpdateUnitSystemByUserId() {
         TenantId tenantId = new TenantId(UUIDConverter.fromString("1e7461259eab8808080808081818181"));
-        tenantService.saveUnitSystem("UK", tenantId);
+        tenantService.saveUnitSystem("English", tenantId);
         String unitSystemByUserId = tenantService.findUnitSystemByTenantId(tenantId);
         Assert.assertNotNull(unitSystemByUserId);
-        Assert.assertEquals("{\"unit_system\":\"UK\"}", unitSystemByUserId);
+        Assert.assertEquals("{\"unit_system\":\"English\"}", unitSystemByUserId);
 
-        tenantService.saveUnitSystem("US", tenantId);
+        tenantService.saveUnitSystem("Canadian", tenantId);
         String updatedUnitSystem = tenantService.findUnitSystemByTenantId(tenantId);
         Assert.assertNotNull(updatedUnitSystem);
-        Assert.assertEquals("{\"unit_system\":\"US\"}", updatedUnitSystem);
+        Assert.assertEquals("{\"unit_system\":\"Canadian\"}", updatedUnitSystem);
         tenantService.deleteUnitSystemByTenantId(tenantId);
     }
 }

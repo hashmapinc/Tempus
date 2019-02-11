@@ -1846,9 +1846,9 @@ export default angular.module('tempus.locale', [])
                     "save-preferences-success":"Unit Preferences saved successfully",
                     "preferences":"Preferences",
                     "units":"Units",
-                    "si-metric-system" :"SI-Metric System",
-                    "imperials-units":"Imperials System",
-                    "us-customary-units":"US-Customary System"
+                    "metric-system" :"Metric Unit System",
+                    "english-system":"English Unit System",
+                    "canadian-system":"Canadian Unit System"
                 },
                 "signup": {
                     "activation-msg" : "An activation link has been sent to your register email address." ,
@@ -1872,7 +1872,6 @@ export default angular.module('tempus.locale', [])
                     "first-name": "First Name",
                     "sign-up": "Sign up to get your own personal account for Free !",
                     "emailSuccess": "Email is sent on your email id.Please check."
-
                 }
             }
         }

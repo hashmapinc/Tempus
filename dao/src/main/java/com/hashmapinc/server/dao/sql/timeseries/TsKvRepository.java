@@ -16,16 +16,15 @@
  */
 package com.hashmapinc.server.dao.sql.timeseries;
 
+import com.hashmapinc.server.common.data.EntityType;
+import com.hashmapinc.server.dao.model.sql.TsKvCompositeKey;
 import com.hashmapinc.server.dao.model.sql.TsKvEntity;
+import com.hashmapinc.server.dao.util.SqlDao;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.scheduling.annotation.Async;
-import com.hashmapinc.server.common.data.EntityType;
-import com.hashmapinc.server.dao.model.sql.TsKvCompositeKey;
-import com.hashmapinc.server.dao.util.SqlDao;
-import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -43,7 +42,7 @@ public interface TsKvRepository extends CrudRepository<TsKvEntity, TsKvComposite
                                       @Param("endTs") long endTs,
                                       Pageable pageable);
 
-    @Query("SELECT tskv.ts, tskv.key, tskv.booleanValue, tskv.strValue, tskv.longValue, tskv.doubleValue, tskv.jsonValue, tskv.unit FROM TsKvEntity tskv WHERE tskv.entityId = :entityId " +
+    @Query("SELECT tskv.ts, tskv.key, tskv.booleanValue, tskv.strValue, tskv.longValue, tskv.doubleValue, tskv.jsonValue, tskv.unit, tskv.sourceUnit FROM TsKvEntity tskv WHERE tskv.entityId = :entityId " +
             "AND tskv.entityType = :entityType " +
             "AND tskv.ts >= :startTs AND tskv.ts <= :endTs ORDER BY tskv.ts DESC")
     List<Object[]> findSelected(@Param("entityId") String entityId,

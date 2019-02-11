@@ -57,17 +57,16 @@ public class HybridIntegrationTestSuite {
     }
 
     private static List<CustomCassandraCQLUnit.NamedDataset> getUpgradeDataSets(){
-        /*List<CustomCassandraCQLUnit.NamedDataset> dataSets = new ArrayList<>();
+        List<CustomCassandraCQLUnit.NamedDataset> dataSets = new ArrayList<>();
         dataSets.add(new CustomCassandraCQLUnit.NamedDataset("1.cql", new ClassPathCQLDataSet("cassandra/upgrade/1.cql" , false, false)));
-        return dataSets;*/
-        return Collections.emptyList();
+        return dataSets;
     }
 
     private static CustomSqlUnit sqlUnit = new CustomSqlUnit(
             Arrays.asList("sql/hsql/schema.sql", "sql/system-data.sql"),
             "sql/drop-all-tables.sql",
             "sql-test.properties",
-            Collections.emptyList());
+            Arrays.asList("sql/hsql/upgrade/1.sql"));
 
 
     @ClassRule

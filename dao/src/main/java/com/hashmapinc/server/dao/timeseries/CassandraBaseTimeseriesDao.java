@@ -340,10 +340,11 @@ public class CassandraBaseTimeseriesDao extends CassandraAbstractAsyncDao implem
                 .setString(2, tsKvEntry.getKey())
                 .setLong(3, partition)
                 .setLong(4, tsKvEntry.getTs())
-                .setString(6, tsKvEntry.getUnit().orElse(null));
+                .setString(6, tsKvEntry.getUnit().orElse(null))
+                .setString(7, tsKvEntry.getSourceUnit().orElse(null));
         addValue(tsKvEntry, stmt, 5);
         if (ttl > 0) {
-            stmt.setInt(7, (int) ttl);
+            stmt.setInt(8, (int) ttl);
         }
         return getFuture(executeAsyncWrite(stmt), rs -> null);
     }
@@ -371,7 +372,8 @@ public class CassandraBaseTimeseriesDao extends CassandraAbstractAsyncDao implem
                 .setUUID(1, entityId.getId())
                 .setString(2, tsKvEntry.getKey())
                 .setLong(3, tsKvEntry.getTs())
-                .setString(5, tsKvEntry.getUnit().orElse(null));
+                .setString(5, tsKvEntry.getUnit().orElse(null))
+                .setString(6, tsKvEntry.getSourceUnit().orElse(null));
         addValue(tsKvEntry, stmt, 4);
         return getFuture(executeAsyncWrite(stmt), rs -> null);
     }
@@ -415,17 +417,18 @@ public class CassandraBaseTimeseriesDao extends CassandraAbstractAsyncDao implem
 
     public static KvEntry toKvEntry(Row row, String key) {
         String unit = row.get(UNIT_COLUMN, String.class);
+        String sourceUnit = row.get(SOURCE_UNIT_COLUMN, String.class);
         if (row.get(STRING_VALUE_COLUMN, String.class) != null) {
-            return new StringDataEntry(key, unit, row.get(STRING_VALUE_COLUMN, String.class));
+            return new StringDataEntry(key, unit, sourceUnit, row.get(STRING_VALUE_COLUMN, String.class));
         }
         if (row.get(LONG_VALUE_COLUMN, Long.class) != null) {
-            return new LongDataEntry(key, unit, row.get(LONG_VALUE_COLUMN, Long.class));
+            return new LongDataEntry(key, unit, sourceUnit, row.get(LONG_VALUE_COLUMN, Long.class));
         }
         if (row.get(DOUBLE_VALUE_COLUMN, Double.class) != null) {
-            return new DoubleDataEntry(key, unit, row.get(DOUBLE_VALUE_COLUMN, Double.class));
+            return new DoubleDataEntry(key, unit, sourceUnit, row.get(DOUBLE_VALUE_COLUMN, Double.class));
         }
         if (row.get(BOOLEAN_VALUE_COLUMN, Boolean.class) != null) {
-            return new BooleanDataEntry(key, unit, row.get(BOOLEAN_VALUE_COLUMN, Boolean.class));
+            return new BooleanDataEntry(key, unit, sourceUnit, row.get(BOOLEAN_VALUE_COLUMN, Boolean.class));
         }
         if (row.get(JSON_VALUE_COLUMN, JsonNode.class) != null) {
             return new JsonDataEntry(key, row.get(JSON_VALUE_COLUMN, JsonNode.class));
@@ -465,8 +468,9 @@ public class CassandraBaseTimeseriesDao extends CassandraAbstractAsyncDao implem
                         "," + ModelConstants.PARTITION_COLUMN +
                         "," + TS_COLUMN +
                         "," + getColumnName(type) +
-                        "," + UNIT_COLUMN + ")" +
-                        " VALUES(?, ?, ?, ?, ?, ?, ?)");
+                        "," + UNIT_COLUMN +
+                        "," + SOURCE_UNIT_COLUMN +
+                        ")" + " VALUES(?, ?, ?, ?, ?, ?, ?, ?)");
             }
         }
         return saveStmts[dataType.ordinal()];
@@ -483,8 +487,9 @@ public class CassandraBaseTimeseriesDao extends CassandraAbstractAsyncDao implem
                         "," + ModelConstants.PARTITION_COLUMN +
                         "," + TS_COLUMN +
                         "," + getColumnName(type) +
-                        "," + UNIT_COLUMN + ")" +
-                        " VALUES(?, ?, ?, ?, ?, ?, ?) USING TTL ?");
+                        "," + UNIT_COLUMN +
+                        "," + SOURCE_UNIT_COLUMN +
+                        ")" + " VALUES(?, ?, ?, ?, ?, ?, ?, ?) USING TTL ?");
             }
         }
         return saveTtlStmts[dataType.ordinal()];
@@ -524,8 +529,9 @@ public class CassandraBaseTimeseriesDao extends CassandraAbstractAsyncDao implem
                         "," + KEY_COLUMN +
                         "," + TS_COLUMN +
                         "," + getColumnName(type) +
-                        "," + UNIT_COLUMN + ")" +
-                        " VALUES(?, ?, ?, ?, ?, ?)");
+                        "," + UNIT_COLUMN +
+                        "," + SOURCE_UNIT_COLUMN +
+                        ")" + " VALUES(?, ?, ?, ?, ?, ?, ?)");
             }
         }
         return latestInsertStmts[dataType.ordinal()];
@@ -567,7 +573,8 @@ public class CassandraBaseTimeseriesDao extends CassandraAbstractAsyncDao implem
                     ModelConstants.LONG_VALUE_COLUMN + "," +
                     ModelConstants.DOUBLE_VALUE_COLUMN + "," +
                     ModelConstants.JSON_VALUE_COLUMN + "," +
-                    ModelConstants.UNIT_COLUMN + " " +
+                    ModelConstants.UNIT_COLUMN + "," +
+                    ModelConstants.SOURCE_UNIT_COLUMN + " " +
                     "FROM " + ModelConstants.TS_KV_LATEST_CF + " " +
                     "WHERE " + ModelConstants.ENTITY_TYPE_COLUMN + EQUALS_PARAM +
                     "AND " + ModelConstants.ENTITY_ID_COLUMN + EQUALS_PARAM +
@@ -586,7 +593,8 @@ public class CassandraBaseTimeseriesDao extends CassandraAbstractAsyncDao implem
                     ModelConstants.LONG_VALUE_COLUMN + "," +
                     ModelConstants.DOUBLE_VALUE_COLUMN + "," +
                     ModelConstants.JSON_VALUE_COLUMN + "," +
-                    ModelConstants.UNIT_COLUMN + " " +
+                    ModelConstants.UNIT_COLUMN + "," +
+                    ModelConstants.SOURCE_UNIT_COLUMN + " " +
                     "FROM " + ModelConstants.TS_KV_LATEST_CF + " " +
                     "WHERE " + ModelConstants.ENTITY_TYPE_COLUMN + EQUALS_PARAM +
                     "AND " + ModelConstants.ENTITY_ID_COLUMN + EQUALS_PARAM);
