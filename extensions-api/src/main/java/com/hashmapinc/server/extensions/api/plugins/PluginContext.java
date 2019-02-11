@@ -139,10 +139,6 @@ public interface PluginContext {
     /**
      * Unit Conversion API
      */
-    List<AttributeKvEntry> convertAttributeKvEntriesToUnitSystemByTenantId(List<AttributeKvEntry> attributeKvEntries, TenantId tenantId);
-
-    List<TsKvEntry> convertTsKvEntriesToUnitSystemByTenantId(List<TsKvEntry> tsKvEntries, TenantId tenantId);
-
-    List<DsKvEntry> convertDsKvEntriesToUnitSystemByTenantId(List<DsKvEntry> dsKvEntries, TenantId tenantId);
+    <E extends KvEntry, T extends E> List<E> convertKvEntriesToUnitSystemByTenantId(List<E> kvEntries, TenantId tenantId, Class<T> tClass);
 
 }

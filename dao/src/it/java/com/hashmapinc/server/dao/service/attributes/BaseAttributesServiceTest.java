@@ -100,12 +100,12 @@ public abstract class BaseAttributesServiceTest extends AbstractServiceTest {
     public void findAllWithUnit() throws Exception {
         DeviceId deviceId = new DeviceId(UUIDs.timeBased());
 
-        KvEntry attrAOldValue = new DoubleDataEntry("A", "m", 10.0);
-        AttributeKvEntry attrAOld = new BaseAttributeKvEntry(attrAOldValue, 42L);
-        KvEntry attrANewValue = new DoubleDataEntry("A", "m", 634.2);
-        AttributeKvEntry attrANew = new BaseAttributeKvEntry(attrANewValue, 73L);
-        KvEntry attrBNewValue = new DoubleDataEntry("B", "kg", 93.1);
-        AttributeKvEntry attrBNew = new BaseAttributeKvEntry(attrBNewValue, 73L);
+        KvEntry attrAOldValue = new DoubleDataEntry("A", "m",10.0);
+        AttributeKvEntry attrAOld = new BaseAttributeKvEntry(attrAOldValue,42L);
+        KvEntry attrANewValue = new DoubleDataEntry("A", "m",634.2);
+        AttributeKvEntry attrANew = new BaseAttributeKvEntry(attrANewValue,73L);
+        KvEntry attrBNewValue = new DoubleDataEntry("B", "kg",93.1);
+        AttributeKvEntry attrBNew = new BaseAttributeKvEntry(attrBNewValue,73L);
 
         attributesService.save(deviceId, DataConstants.CLIENT_SCOPE, Collections.singletonList(attrAOld)).get();
         attributesService.save(deviceId, DataConstants.CLIENT_SCOPE, Collections.singletonList(attrANew)).get();

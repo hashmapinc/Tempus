@@ -172,9 +172,9 @@ public class JsonConverter {
         boolean unitPresent = false;
         if (value.has(VALUE) && value.has("unit")){
             if(value.get(VALUE).getNodeType() == JsonNodeType.BOOLEAN){
-                result.add(new BooleanDataEntry(key, value.get("unit").asText(), value.get("unit").asText(), value.get(VALUE).asBoolean()));
+                result.add(new BooleanDataEntry(key, value.get("unit").asText(), value.get(VALUE).asBoolean()));
             }else if(value.get(VALUE).getNodeType() == JsonNodeType.STRING){
-                result.add(new StringDataEntry(key, value.get("unit").asText(), value.get("unit").asText(), value.get(VALUE).asText()));
+                result.add(new StringDataEntry(key, value.get("unit").asText(), value.get(VALUE).asText()));
             }else if(value.get(VALUE).getNodeType() == JsonNodeType.NUMBER){
                 parseNumericValueAndConvertToSi(result, key, value.get("unit").asText(), value.get(VALUE));
             }

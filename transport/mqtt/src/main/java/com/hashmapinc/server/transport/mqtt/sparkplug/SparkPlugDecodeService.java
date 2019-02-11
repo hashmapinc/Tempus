@@ -119,7 +119,7 @@ public class SparkPlugDecodeService extends SparkPlugUtils {
         }else if(dataType.getClazz() == Long.class){
             kvEntryList.add(new LongDataEntry(metric.getName(), unit, (Long) metric.getValue()));
         }else if(dataType.getClazz() == Double.class){
-            kvEntryList.add(new DoubleDataEntry(metric.getName(), unit, (Double) metric.getValue()));
+            kvEntryList.add(new DoubleDataEntry(metric.getName(), unit,(Double) metric.getValue()));
         }else if(dataType.getClazz() == Boolean.class){
             kvEntryList.add(new BooleanDataEntry(metric.getName(), unit, (Boolean)metric.getValue()));
         }

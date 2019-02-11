@@ -278,10 +278,10 @@ public class TelemetryRestMsgHandler extends DefaultRestMsgHandler {
                     throw new IllegalArgumentException("No attributes data found in request body!");
                 }
                 TenantId tenantId = ctx.getSecurityCtx().orElseThrow(IllegalArgumentException::new).getTenantId();
-                List<AttributeKvEntry> attributeKvEntries = ctx.convertAttributeKvEntriesToUnitSystemByTenantId(attributes, tenantId);
                 ctx.saveAttributes(tenantId, entityId, scope, attributes, new PluginCallback<Void>() {
                     @Override
                     public void onSuccess(PluginContext ctx, Void value) {
+                        List<AttributeKvEntry> attributeKvEntries = ctx.convertKvEntriesToUnitSystemByTenantId(attributes, tenantId, BaseAttributeKvEntry.class);
                         ctx.logAttributesUpdated(msg.getSecurityCtx(), entityId, scope, attributes, null);
                         msg.getResponseHolder().setResult(new ResponseEntity<>(HttpStatus.OK));
                         subscriptionManager.onAttributesUpdateFromServer(ctx, entityId, scope, attributeKvEntries);
@@ -346,10 +346,10 @@ public class TelemetryRestMsgHandler extends DefaultRestMsgHandler {
             throw new IllegalArgumentException("No timeseries data found in request body!");
         }
         TenantId tenantId = ctx.getSecurityCtx().orElseThrow(IllegalArgumentException::new).getTenantId();
-        List<TsKvEntry> tsKvEntries = ctx.convertTsKvEntriesToUnitSystemByTenantId(entries, tenantId);
         ctx.saveTsData(tenantId, entityId, entries, ttl, new PluginCallback<Void>() {
             @Override
             public void onSuccess(PluginContext ctx, Void value) {
+                List<TsKvEntry> tsKvEntries = ctx.convertKvEntriesToUnitSystemByTenantId(entries, tenantId, BasicTsKvEntry.class);
                 msg.getResponseHolder().setResult(new ResponseEntity<>(HttpStatus.OK));
                 subscriptionManager.onTimeseriesUpdateFromServer(ctx, entityId, tsKvEntries);
             }

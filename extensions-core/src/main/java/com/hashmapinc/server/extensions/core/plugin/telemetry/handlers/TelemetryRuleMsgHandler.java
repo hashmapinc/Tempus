@@ -114,7 +114,7 @@ public class TelemetryRuleMsgHandler extends DefaultRuleMsgHandler {
                 }
             }
         }
-        return ctx.convertTsKvEntriesToUnitSystemByTenantId(subscriptionUpdate, tenantId);
+        return ctx.convertKvEntriesToUnitSystemByTenantId(subscriptionUpdate, tenantId, BasicTsKvEntry.class);
     }
 
     @Override
@@ -152,7 +152,7 @@ public class TelemetryRuleMsgHandler extends DefaultRuleMsgHandler {
                 }
             }
         }
-        return ctx.convertDsKvEntriesToUnitSystemByTenantId(subscriptionUpdate, tenantId);
+        return ctx.convertKvEntriesToUnitSystemByTenantId(subscriptionUpdate, tenantId, BasicDsKvEntry.class);
     }
 
     @Override
@@ -164,7 +164,7 @@ public class TelemetryRuleMsgHandler extends DefaultRuleMsgHandler {
                     public void onSuccess(PluginContext ctx, Void value) {
                         ctx.reply(new ResponsePluginToRuleMsg(msg.getUid(), tenantId, ruleId, BasicStatusCodeResponse.onSuccess(request.getMsgType(), request.getRequestId())));
 
-                        List<AttributeKvEntry> attributeKvEntries = ctx.convertAttributeKvEntriesToUnitSystemByTenantId(new ArrayList<>(request.getAttributes()), msg.getTenantId());
+                        List<AttributeKvEntry> attributeKvEntries = ctx.convertKvEntriesToUnitSystemByTenantId(new ArrayList<>(request.getAttributes()), msg.getTenantId(), BaseAttributeKvEntry.class);
                         subscriptionManager.onLocalSubscriptionUpdate(ctx, msg.getDeviceId(), SubscriptionType.ATTRIBUTES, s -> {
                             List<TsKvEntry> subscriptionUpdate = new ArrayList<>();
                             for (AttributeKvEntry kv : attributeKvEntries) {
