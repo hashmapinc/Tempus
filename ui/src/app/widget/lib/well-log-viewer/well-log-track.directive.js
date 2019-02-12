@@ -19,6 +19,7 @@
 import wellLogViewerTrackFieldsetTemplate from './well-log-track.tpl.html';
 import wellTrackComponent from './well-log-component.tpl.html'
 import WellLogViewerTrackDirective from './well-log-component.directive.js'
+import WellLogComponentsDirective from './well-log-components.directive.js'
 
 /* eslint-enable import/no-unresolved, import/default */
 
@@ -45,6 +46,7 @@ import WellLogViewerTrackDirective from './well-log-component.directive.js'
 export default angular.module('tempus.directives.wellLogViewerTrack', [])
     .directive('tbWellLogViewerTrack', WellLogViewerTrack)
     .directive('tbWellLogComponent', WellLogViewerTrackDirective)
+    .directive('tbWellLogComponents', WellLogComponentsDirective)
     .name;
 
 /*@ngInject*/
@@ -78,8 +80,11 @@ function WellLogTrackController($scope, $log, $sce) {
 
     function addTrack(){
         vm.count = vm.count + 1;
-        vm.addTrack = 'Track'+vm.count
-        vm.trackList.push(vm.addTrack);
+        var insertDetail = {
+            id: vm.count,
+            details: []
+        }
+        vm.trackList.push(insertDetail);
         $log.log(vm.trackList);
     }
      $scope.deliberatelyTrustDangerousSnippet = function() {

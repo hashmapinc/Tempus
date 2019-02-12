@@ -1,0 +1,154 @@
+<!--
+
+    Copyright © 2016-2018 The Thingsboard Authors
+    Modifications © 2017-2018 Hashmap, Inc
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+        http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<md-content class="md-padding" layout="column">
+    <md-card>
+        <div style="margin-left: 2%;margin-right: 2%;">
+<lable>Component {{trackComponent.id}}</lable>
+<md-button class="md-icon-button md-primary"
+           style="min-width: 40px;"
+
+           aria-label="{{ 'action.remove' | translate }}">
+    <md-tooltip md-direction="top">
+        {{ 'action.remove' | translate }}
+    </md-tooltip>
+    <md-icon aria-label="{{ 'action.delete' | translate }}"
+             class="material-icons">
+        close
+    </md-icon>
+</md-button>
+<div>
+    <md-input-container class="md-block">
+        <md-select ng-model="trackComponent.componentDetail.componentType" placeholder="Select Component">
+            <md-option ng-value="component" ng-repeat="component in componentTypes">{{ component }}</md-option>
+        </md-select>
+    </md-input-container>
+</div>
+<div>
+    <md-input-container class="md-block">
+        <md-select ng-model="trackComponent.componentDetail.datasource" placeholder="Datasource">
+            <md-option ng-value="datasource" ng-repeat="datasource in trackComponent.componentDetail.datasourceList">{{ datasource }}</md-option>
+        </md-select>
+    </md-input-container>
+</div>
+<div flex
+     md-color-picker
+     ng-model="color"
+     label="Color"
+     icon="format_color_fill"
+     default="rgba(0, 0, 0, 0.87)"
+     md-color-clear-button="false"
+     open-on-input="true"
+     md-color-generic-palette="false"
+     md-color-history="false"
+></div>
+<div>
+    <md-input-container class="md-block">
+        <label translate>Line Width</label>
+        <input  name="lineWidth" ng-model="trackComponent.componentDetail.lineWidth">
+    </md-input-container>
+</div>
+<div>
+    <md-checkbox ng-model="trackComponent.componentDetail.hasHeader" aria-label="Checkbox 1">
+        Has Header
+    </md-checkbox>
+    <br/>
+    <fieldset ng-if="trackComponent.componentDetail.hasHeader">
+        <md-input-container class="md-block">
+            <label translate>Header Minimum</label>
+            <input  name="name" ng-model="trackComponent.componentDetail.minimumHeader">
+        </md-input-container>
+        <md-input-container class="md-block">
+            <label translate>Header Maximum</label>
+            <input  name="name" ng-model="trackComponent.componentDetail.maximumHeader">
+        </md-input-container>
+        <md-input-container class="md-block">
+            <label translate>Header Name</label>
+            <input  name="name" ng-model="trackComponent.componentDetail.headerName">
+        </md-input-container>
+    </fieldset>
+</div>
+<div>
+    <md-checkbox ng-model="trackComponent.componentDetail.areaFill" aria-label="Checkbox 1">
+        Enable Area Fill
+    </md-checkbox>
+    <br/>
+    <fieldset ng-if="trackComponent.componentDetail.areaFill">
+        <md-input-container class="md-block">
+        <md-select ng-model="trackComponent.componentDetail.fillType" placeholder="Select Area Fill">
+            <md-option ng-value="fill" ng-repeat="fill in fillTypes">{{ fill }}</md-option>
+        </md-select>
+        </md-input-container>
+        <div flex
+             md-color-picker
+             ng-model="trackComponent.componentDetail.fillColor"
+             label="Fill Color"
+             icon="format_color_fill"
+             default="rgba(0, 0, 0, 0.87)"
+             md-color-clear-button="false"
+             open-on-input="true"
+             md-color-generic-palette="false"
+             md-color-history="false"
+        ></div>
+        <md-input-container class="md-block">
+            <label translate>File opacity</label>
+            <input  name="name" ng-model="trackComponent.componentDetail.fillOpacity">
+        </md-input-container>
+    </fieldset>
+</div>
+<div>
+    <md-checkbox ng-model="trackComponent.componentDetail.girdMinorLines" aria-label="Checkbox 1">
+        Grid minor lines
+    </md-checkbox>
+    <br/>
+    <fieldset ng-if="trackComponent.componentDetail.girdMinorLines">
+        <md-input-container class="md-block">
+            <label translate>Number of lines</label>
+            <input  name="name" ng-model="trackComponent.componentDetail.girdMinorNoLines">
+        </md-input-container>
+        <md-input-container class="md-block">
+            <label translate>Line weight</label>
+            <input  name="name" ng-model="trackComponent.componentDetail.girdMinorLinesWeight">
+        </md-input-container>
+        <md-input-container class="md-block">
+            <md-select ng-model="trackComponent.componentDetail.girdMinorLinesStyle" placeholder="Style">
+                <md-option ng-value="style" ng-repeat="style in styleTypes">{{ style }}</md-option>
+            </md-select>
+        </md-input-container>
+    </fieldset>
+</div>
+<div>
+    <md-checkbox ng-model="trackComponent.componentDetail.girdMajorLines" aria-label="Checkbox 1">
+        Grid major lines
+    </md-checkbox>
+    <br/>
+    <fieldset ng-if="trackComponent.componentDetail.girdMajorLines">
+        <md-input-container class="md-block">
+            <label translate>Number of lines</label>
+            <input  name="name" ng-model="trackComponent.componentDetail.girdMajorNoLines">
+        </md-input-container>
+        <md-input-container class="md-block">
+            <label translate>Line weight</label>
+            <input  name="name" ng-model="trackComponent.componentDetail.girdMajorLinesWeight">
+        </md-input-container>
+    </fieldset>
+</div>
+        </div>
+    </md-card>
+</md-content>
+

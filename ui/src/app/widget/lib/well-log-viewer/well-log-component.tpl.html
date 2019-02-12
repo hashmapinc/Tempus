@@ -19,7 +19,7 @@
 <md-content class="md-padding" layout="column">
     <md-card>
         <div style="margin-left: 2%;margin-right: 2%;">
-            <lable>Track 1</lable>
+            <lable>Track {{trackDetail.id}}</lable>
             <md-button class="md-icon-button md-primary"
                        style="min-width: 40px;"
 
@@ -34,21 +34,36 @@
             </md-button>
             <br>
             <md-input-container class="md-block">
-                <md-select ng-model="someModel" placeholder="Track Width">
-                    <md-option ng-value="width" ng-repeat="width in vm.trackWidth">{{ width }}</md-option>
+                <md-select ng-model="trackDetail.details.width" placeholder="Track Width">
+                    <md-option ng-value="width" ng-repeat="width in trackWidth">{{ width }}</md-option>
                 </md-select>
             </md-input-container>
             <br/>
-            <md-button ng-disabled="$root.loading" ng-click="vm.addTrack($event)" class="md-raised md-primary md-button md-ink-ripple md-themeDark-theme" aria-label="Add Track">
+            <!--<md-button ng-disabled="$root.loading" ng-click="addComponent($event)" class="md-raised md-primary md-button md-ink-ripple md-themeDark-theme" aria-label="Add Track">
                 <md-tooltip>
                     Add Component
                 </md-tooltip>
                 Add Component
 
-            </md-button>
+            </md-button>-->
             <br>
-            <div layout="row">
-                <lable>Component 1</lable>
+            <div>
+                <div ng-repeat="component in trackDetail.details.component">
+                    <tb-well-log-components
+                            track-component="component"
+                    ></tb-well-log-components>
+                </div>
+                <br/>
+                <md-button ng-disabled="$root.loading" ng-click="addComponent($event)" class="md-raised md-primary md-button md-ink-ripple md-themeDark-theme" aria-label="Add Track">
+                    <md-tooltip>
+                        Add Component
+                    </md-tooltip>
+                    Add Component
+
+                </md-button>
+
+
+<!--
                 <md-button class="md-icon-button md-primary"
                            style="min-width: 40px;"
 
@@ -61,8 +76,9 @@
                         close
                     </md-icon>
                 </md-button>
+-->
             </div>
-            <div>
+        <!--    <div>
                 <md-input-container class="md-block">
                     <md-select ng-model="someModel" placeholder="Select Component">
                         <md-option ng-value="width" ng-repeat="width in vm.trackWidth">{{ width }}</md-option>
@@ -176,7 +192,7 @@
                     </md-input-container>
                 </fieldset>
             </div>
-        </div>
+        -->
         </div>
     </md-card>
 </md-content>
