@@ -397,7 +397,7 @@
                         <spring.config.name>tempus</spring.config.name>
                     </systemPropertyVariables>
                     <includes>
-                        <include>**/*TestSuite.java</include>
+                        <include>**/*UnitTest.java</include>
                     </includes>
                     <excludes>
                         <exclude>**/*IntegrationTestSuite.java</exclude>

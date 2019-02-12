@@ -22,5 +22,5 @@ import org.junit.runner.RunWith;
 
 @RunWith(ClasspathSuite.class)
 @ClasspathSuite.ClassnameFilters({"com.hashmapinc.server.actors.*Test"})
-public class ActorsTestSuite {
+public class ActorsUnitTest {
 }

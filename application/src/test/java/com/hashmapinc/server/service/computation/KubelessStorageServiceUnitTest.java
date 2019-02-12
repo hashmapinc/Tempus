@@ -52,9 +52,9 @@ import static org.mockito.Mockito.when;
 @ActiveProfiles("kubeless-storage-test")
 @RunWith(SpringRunner.class)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
-@ContextConfiguration(classes = KubelessStorageServiceTest.class, loader = SpringBootContextLoader.class)
+@ContextConfiguration(classes = KubelessStorageServiceUnitTest.class, loader = SpringBootContextLoader.class)
 @ComponentScan({"com.hashmapinc.server.service.computation"})
-public class KubelessStorageServiceTest {
+public class KubelessStorageServiceUnitTest {
     @Autowired
     TenantService tenantService;
 
