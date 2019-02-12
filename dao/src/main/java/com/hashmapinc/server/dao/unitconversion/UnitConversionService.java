@@ -32,4 +32,6 @@ public interface UnitConversionService {
     Map<String, Set<String>> getMemberUnitsForAllQuantityClass();
 
     Set<String> getMemberUnitsForQuantityClass(String quantityClass);
+
+    String getUnitFor(String unitSystem, String sourceUnit);
 }

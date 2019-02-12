@@ -14,13 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.hashmapinc.server.actors;
+package com.hashmapinc.server.controller.nosql;
 
-import org.junit.extensions.cpsuite.ClasspathSuite;
-import org.junit.runner.RunWith;
+import com.hashmapinc.server.controller.BaseUploadControllerTest;
+import com.hashmapinc.server.dao.service.DaoNoSqlTest;
 
-
-@RunWith(ClasspathSuite.class)
-@ClasspathSuite.ClassnameFilters({"com.hashmapinc.server.actors.*Test"})
-public class ActorsTestSuite {
+@DaoNoSqlTest
+public class UploadControllerNoSqlTest extends BaseUploadControllerTest {
 }

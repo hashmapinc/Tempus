@@ -14,16 +14,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.hashmapinc.server.service.computation;
+@import "~compass-sass-mixins/lib/compass";
+@import '../../scss/constants';
 
-import com.hashmapinc.server.common.data.computation.ComputationJob;
-import com.hashmapinc.server.common.data.computation.Computations;
-
-public interface ComputationFunctionService {
-    boolean deployKubelessFunction(Computations computations);
-    boolean checkKubelessFunction(Computations computation);
-    boolean deleteKubelessFunction(Computations computation);
-    boolean createTrigger(ComputationJob computationJob);
-    boolean checkTrigger(ComputationJob computationJob);
-    boolean deleteTrigger(ComputationJob computationJob);
+.md-upload-button{
+    display: none;
 }

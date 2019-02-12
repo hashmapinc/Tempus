@@ -99,7 +99,7 @@ public class KubelessComputationJobActorMessageProcessor extends ComponentMsgPro
     @Override
     public void onStop(ActorContext context) throws TempusApplicationException {
         logger.info("[{}] Going to process onStop computation job.", entityId);
-        if(systemContext.getComputationFunctionService().deleteTrigger(job)) {
+        if(systemContext.getKubelessFunctionService().deleteTrigger(job)) {
             scheduleMsgWithDelay(new ComputationJobTerminationMsg(entityId), systemContext.getComputationActorTerminationDelay(), parent);
             scheduleMsgWithDelay(new ComputationJobTerminationMsg(entityId), systemContext.getComputationActorTerminationDelay(), self);
         }
@@ -116,16 +116,16 @@ public class KubelessComputationJobActorMessageProcessor extends ComponentMsgPro
     }
 
     private void checkAndCreateTrigger(){
-        if(!systemContext.getComputationFunctionService().checkTrigger(job) &&
-                !systemContext.getComputationFunctionService().createTrigger(job)) {
+        if(!systemContext.getKubelessFunctionService().triggerExists(job) &&
+                !systemContext.getKubelessFunctionService().createTrigger(job)) {
             systemContext.getComputationJobService().suspendComputationJobById(job.getId());
         }
     }
 
     private void suspendJob(){
         ComputationJob savedJob = systemContext.getComputationJobService().findComputationJobById(job.getId());
-        if (savedJob != null && systemContext.getComputationFunctionService().checkTrigger(job) &&
-                systemContext.getComputationFunctionService().deleteTrigger(job)) {
+        if (savedJob != null && systemContext.getKubelessFunctionService().triggerExists(job) &&
+                systemContext.getKubelessFunctionService().deleteTrigger(job)) {
             systemContext.getComputationJobService().suspendComputationJobById(job.getId());
         }
     }
