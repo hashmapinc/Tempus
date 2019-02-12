@@ -28,8 +28,9 @@ export default angular.module('tempus.types', [])
             },
 
             fileUpload: {
-                    maxSize : 104857600,
-                    listOfExtension: ["apk", "bat", "bin", "cgi", "com", "exe", "gadget", "jar", "py", "wsf", "7z", "arj", "deb", "pkg", "rar", "rpm", "tar", "gz", "z", "zip"]
+                    maxSize : 102400,
+                    listOfExtension: ["apk", "bat", "bin", "cgi", "com", "exe", "gadget", "jar", "py", "wsf", "7z", "arj", "deb", "pkg", "rar", "rpm", "tar", "gz", "z", "zip", "dmg"],
+                    na: "NA"
             },
             entryPoints: {
                 login: "/api/auth/login",

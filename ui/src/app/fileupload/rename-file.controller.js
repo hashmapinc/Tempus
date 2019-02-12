@@ -19,28 +19,52 @@
 /* eslint-enable import/no-unresolved, import/default */
 
 /*@ngInject*/
-export default function RenameFileController($mdDialog, fileUploadService, $scope, oldFileName, toast, $translate) {
+export default function RenameFileController($mdDialog, fileUploadService, $scope, oldFileName, extension, $q, toast, $translate) {
 
-    var vm = this;
-    vm.newFileName = oldFileName;
-    vm.oldFileName = oldFileName;
+	var vm = this;
+	vm.newFileName = oldFileName;
+	vm.oldFileName = oldFileName;
 
-     vm.rename = function(){
-        if(fileUploadService.extensionValidation(vm.newFileName)=== true){
-        fileUploadService.renameFile(vm.oldFileName, vm.newFileName).then(function success(item) {
-        vm.item = item;
-            $scope.theForm.$setPristine();
-            $mdDialog.hide();
-              });
+	vm.rename = function () {
+		var deferred = $q.defer();
+		fileUploadService.searchFile(vm.newFileName, extension).then(
+			function success(searchItems) {
+				var existFile = 0;
+				if (searchItems.length == 0) {
 
-              }
-              else{
-                 toast.showError($translate.instant('file-upload.fileRenameError'));
-              }
-     }
+					existFile = 0;
+				} else {
 
-     vm.cancel = function(){
-            $mdDialog.cancel();
-     }
+					for (var i = 0; i < searchItems.length; i++) {
+						if (searchItems[i].fileName == vm.newFileName) {
+							existFile++;
+						}
+					}
+					if (existFile > 0) {
+						toast.showError($translate.instant('file-upload.fileNameError'));
+						return false;
+					}
+				}
 
-   }
+				if (existFile == 0) {
+					fileUploadService.renameFile(vm.oldFileName, vm.newFileName, extension).then(function success(item) {
+						vm.item = item;
+						$scope.theForm.$setPristine();
+						$mdDialog.hide();
+					});
+
+				}
+			},
+			function fail() {
+				deferred.reject();
+			}
+		);
+		return deferred.promise;
+	}
+
+
+	vm.cancel = function () {
+		$mdDialog.cancel();
+	}
+
+}

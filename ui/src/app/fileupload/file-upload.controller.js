@@ -19,134 +19,156 @@
 /* eslint-enable import/no-unresolved, import/default */
 
 /*@ngInject*/
-export default function FileUploadController(toast, $scope,$document, fileUploadService, $q, $timeout, $translate, $mdDialog) {
+export default function FileUploadController(toast, $scope, $document, fileUploadService, $q, $timeout, $translate, $mdDialog) {
 
-    var vm = this;
-    vm.files = [];
-    function loadTableData() {
-        var promise = fileUploadService.getAllFile();
-        if(promise) {
-            promise.then(function success(items) {
-                vm.files = items;
-            })
-        }
-    }
+	var vm = this;
+	vm.files = [];
 
-    loadTableData();
+	function loadTableData() {
+		var promise = fileUploadService.getAllFile();
+		if (promise) {
+			promise.then(function success(items) {
+				vm.files = items;
+			})
+		}
+	}
 
-    vm.openFileDialog = function() {
-        angular.element($document[0].getElementById('inputFile').click());
-    };
+	loadTableData();
 
-    $scope.thisFileUpload = function(element) {
-        checkFile(element);
-    }
+	vm.openFileDialog = function () {
+		angular.element($document[0].getElementById('inputFile').click());
+	};
 
-    function checkFile(element){
-        var fileToBeUploaded = element.files;
-        var deferred = $q.defer();
-        fileUploadService.searchFile(fileToBeUploaded[0].name).then(
-            function success(searchItems) {
-                if(searchItems.length == 0){
-                    if(fileUploadService.fileValidation(fileToBeUploaded)=== true){
-                        saveFile(fileToBeUploaded[0]);
-                    }
-                } else {
-                    replaceFile(element, fileToBeUploaded[0]);
-                }
-            },
-            function fail() {
-                deferred.reject();
-            }
-        );
-        return deferred.promise;
-    }
+	$scope.fileUpload = function (element) {
+		checkFile(element);
+	}
 
-    function saveFile(file) {
-        var deferred = $q.defer();
-        fileUploadService.uploadFile(file).then(
-            function success(savedFile) {
-                return savedFile;
-            },
-            function fail() {
-                deferred.reject();
-            }
-        );
-        return deferred.promise;
-    }
+	function checkFile(element) {
+		var fileToBeUploaded = element.files;
+		var deferred = $q.defer();
+		fileUploadService.searchFile(fileToBeUploaded[0].name, fileToBeUploaded[0].type).then(
+			function success(searchItems) {
 
-    vm.downloadFile = function($event, file) {
-        $event.stopPropagation();
-        fileUploadService.exportFile(file.fileName);
-    }
+				if (searchItems.length == 0) {
+					if (fileUploadService.fileValidation(fileToBeUploaded) === true) {
+						saveFile(fileToBeUploaded[0]).then(
 
+							function success() {
 
+								angular.element(element).val(null);
+							}
+						);
 
-    vm.deleteFile = function($event,file) {
-    var confirm = $mdDialog.confirm()
-        .targetEvent($event)
-        .title(deleteFileTitle(file))
-        .htmlContent(deleteFileText())
-        .ariaLabel($translate.instant('grid.delete-item'))
-        .cancel($translate.instant('action.no'))
-        .ok($translate.instant('action.yes'));
-        $mdDialog.show(confirm).then(function () {
-        fileUploadService.deleteFile(file.fileName).then(function success() {
-            vm.resetFilter();
+					}
+				}
 
-        });
-    });
-    }
+				if (searchItems.length != 0) {
+					replaceFile(element, fileToBeUploaded[0]);
 
-    vm.resetFilter = function() {
-        loadTableData();
-    }
+				}
+			},
+			function fail() {
+				deferred.reject();
+			}
+		);
+		return deferred.promise;
+	}
 
-    function deleteFileTitle(file) {
-        return $translate.instant('file-upload.delete-file-title', {fileName: file.fileName});
-    }
+	function saveFile(file) {
+		var deferred = $q.defer();
+		fileUploadService.uploadFile(file).then(
+			function success(savedFile) {
+				loadTableData();
+				toast.showSuccess($translate.instant('file-upload.fileSuccess'));
+				return savedFile;
+			},
+			function fail() {
+				deferred.reject();
+			}
+		);
+		return deferred.promise;
+	}
 
-    function deleteFileText() {
-        return $translate.instant('file-upload.delete-file-text');
-    }
-
-    vm.renameFileName = function($event, file) {
-            $mdDialog.show({
-                controller: 'RenameFileController',
-                controllerAs:'vm',
-                templateUrl: renameFileNameTemplate,
-                parent: angular.element($document[0].body),
-                locals: {oldFileName:file.fileName},
-                fullscreen: true,
-                targetEvent: $event
-            }).then(function () {
-
-            vm.resetFilter();
-
-            });
-    }
-
-    function replaceFile($event, file){
-        var confirm = $mdDialog.confirm()
-            .targetEvent($event)
-            .title(replaceFileTitle(file))
-            .htmlContent(replaceFileText())
-            .ariaLabel($translate.instant('file-upload.replace-'))
-            .cancel($translate.instant('action.no'))
-            .ok($translate.instant('action.yes'));
-            $mdDialog.show(confirm).then(function () {
-            saveFile(file).then(function success() {
-                vm.resetFilter();
-            });
-        });
-    }
+	vm.downloadFile = function ($event, file) {
+		$event.stopPropagation();
+		fileUploadService.exportFile(file.fileName, file.extension);
+	}
 
 
-    function replaceFileTitle(file) {
-        return $translate.instant('file-upload.replace-file-title', {fileName: file.fileName});
-    }
-    function replaceFileText() {
-        return $translate.instant('file-upload.replace-file-text');
-    }
+	vm.deleteFile = function ($event, file) {
+		var confirm = $mdDialog.confirm()
+			.targetEvent($event)
+			.title(deleteFileTitle(file))
+			.htmlContent(deleteFileText())
+			.ariaLabel($translate.instant('grid.delete-item'))
+			.cancel($translate.instant('action.no'))
+			.ok($translate.instant('action.yes'));
+		$mdDialog.show(confirm).then(function () {
+			fileUploadService.deleteFile(file.fileName, file.extension).then(function success() {
+				vm.resetFilter();
+
+			});
+		});
+	}
+
+	vm.resetFilter = function () {
+		loadTableData();
+	}
+
+	function deleteFileTitle(file) {
+		return $translate.instant('file-upload.delete-file-title', {
+			fileName: file.fileName
+		});
+	}
+
+	function deleteFileText() {
+		return $translate.instant('file-upload.delete-file-text');
+	}
+
+	vm.renameFileName = function ($event, file) {
+		$mdDialog.show({
+			controller: 'RenameFileController',
+			controllerAs: 'vm',
+			templateUrl: renameFileNameTemplate,
+			parent: angular.element($document[0].body),
+			locals: {
+				oldFileName: file.fileName,
+				extension: file.extension
+			},
+			fullscreen: true,
+			targetEvent: $event
+		}).then(function () {
+
+			vm.resetFilter();
+
+		});
+
+	}
+
+	function replaceFile($event, file) {
+		var confirm = $mdDialog.confirm()
+			.targetEvent($event)
+			.title(replaceFileTitle(file))
+			.htmlContent(replaceFileText())
+			.ariaLabel($translate.instant('file-upload.replace-file'))
+			.cancel($translate.instant('action.no'))
+			.ok($translate.instant('action.yes'));
+		$mdDialog.show(confirm).then(function () {
+			saveFile(file).then(function success() {
+				vm.resetFilter();
+			});
+		});
+	}
+
+
+	function replaceFileTitle(file) {
+		return $translate.instant('file-upload.replace-file-title', {
+			fileName: file.fileName
+		});
+	}
+
+	function replaceFileText() {
+		return $translate.instant('file-upload.replace-file-text');
+	}
 
 }
