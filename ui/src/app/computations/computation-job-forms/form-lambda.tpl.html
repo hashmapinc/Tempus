@@ -16,23 +16,22 @@
     limitations under the License.
 
 -->
-
 <md-card-content>
     <fieldset ng-disabled="$root.loading || !isEdit || isReadOnly">
         <section flex layout="row">
             <md-input-container flex="100" class="md-block" md-is-error="theForm.computationJobType.$touched && theForm.computationJobType.$invalid">
-                <label translate>computationJob.kubeless.type</label>
+                <label translate>computationJob.lambda.type</label>
                 <md-select required name="computationJobType" ng-model="config.type"
                            ng-disabled="$root.loading || !isEdit || isReadOnly">
-                    <md-option ng-repeat="(key,value) in types.triggerTypes.kubeless" ng-value="value">
+                    <md-option ng-repeat="(key,value) in types.triggerTypes.lambda" ng-value="value">
                         {{key}}
                     </md-option>
                 </md-select>
                 <div ng-messages="theForm.computationJobType.$error">
-                    <div translate ng-message="required">computationJob.kubeless.type-required</div>
+                    <div translate ng-message="required">computationJob.lambda.type-required</div>
                 </div>
             </md-input-container>
         </section>
-        <ng-include ng-if="config.type === types.triggerTypes.kubeless.kafka" src="'computations/computation-job-forms/triggers/trigger-kafka.tpl.html'"/>
+        <ng-include ng-if="config.type === types.triggerTypes.lambda.kinesis" src="'computations/computation-job-forms/triggers/trigger-kinesis.tpl.html'"/>
     </fieldset>
 </md-card-content>

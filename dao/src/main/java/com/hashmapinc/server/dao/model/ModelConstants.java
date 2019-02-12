@@ -433,6 +433,19 @@ public class ModelConstants {
     public static final String TEMPUS_GATEWAY_CONFIGURATION_REPLICAS = "replicas";
     public static final String TEMPUS_GATEWAY_CONFIGURATION_GATEWAY_TOKEN = "gateway_token";
 
+    public static final String AWS_LAMBDA_COMPUTATIONS_META_DATA = "lambda_computation_meta_data";
+    public static final String AWS_LAMBDA_FILE_PATH = "file_path";
+    public static final String AWS_LAMBDA_FUNCTION_HANDLER = "function_handler";
+    public static final String AWS_LAMBDA_FUNCTION_NAME = "function_name";
+    public static final String AWS_LAMBDA_DESCRIPTION = "description";
+    public static final String AWS_LAMBDA_TIMEOUT = "lambda_timeout";
+    public static final String AWS_LAMBDA_MEMORY_SIZE = "memory_size";
+    public static final String AWS_LAMBDA_RUNTIME = "runtime";
+    public static final String AWS_LAMBDA_REGION = "region";
+
+    public static final String LAMBDA_KINESIS_STARTING_OFFSET = "LATEST";
+    public static final int LAMBDA_KINESIS_BATCH_SIZE = 200;
+
 
     protected static final String[] NONE_AGGREGATION_COLUMNS = new String[]{LONG_VALUE_COLUMN, DOUBLE_VALUE_COLUMN, BOOLEAN_VALUE_COLUMN, STRING_VALUE_COLUMN, JSON_VALUE_COLUMN, KEY_COLUMN, TS_COLUMN};
     protected static final String[] NONE_DS_AGGREGATION_COLUMNS = new String[]{LONG_VALUE_COLUMN, DOUBLE_VALUE_COLUMN, BOOLEAN_VALUE_COLUMN, STRING_VALUE_COLUMN, JSON_VALUE_COLUMN, KEY_COLUMN, DS_COLUMN};

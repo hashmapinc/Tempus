@@ -25,6 +25,7 @@ function ComputationService($http, $q, $filter, utils) {
     var service = {
         upload: upload,
         saveComputation: saveComputation,
+        saveLambdaComputation: saveLambdaComputation,
         getAllComputations: getAllComputations,
         getComputation: getComputation,
         deleteComputation: deleteComputation
@@ -59,6 +60,28 @@ function ComputationService($http, $q, $filter, utils) {
         });
         return deferred.promise;
     }
+
+    function saveLambdaComputation(computation, file){
+            var deferred = $q.defer();
+            var fd = new FormData();
+            var obj = computation.computationMetadata;
+            obj.type = computation.type;
+            fd.append("file", file);
+            var url = '/api/computations/lambda';
+            $http.post(url, fd, {
+                transformRequest: angular.identity,
+                headers: {
+                    'Content-Type': undefined,
+                    'Accept':'application/json'
+                },
+                params: obj
+            }).then(function success(response) {
+                deferred.resolve(response.data);
+            }, function fail() {
+                deferred.reject();
+            });
+            return deferred.promise;
+        }
 
     function getAllComputations(pageLink) {
         var deferred = $q.defer();

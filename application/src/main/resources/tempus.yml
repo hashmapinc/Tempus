@@ -100,6 +100,12 @@ spark:
 aws:
   access_key: "${AWS_ACCESS_KEY:AWS_ACCESS_KEY}"
   secret_key: "${AWS_SECRET_KEY:AWS_SECRET_KEY}"
+  lambda:
+    role_arn: "${AWS_LAMBDA_ROLE_ARN:AWS_LAMBDA_ROLE_ARN}"
+
+computations.lambda:
+  enabled: "${AWS_LAMBDA_ENABLED:true}"
+  zip_path: "${LAMBDA_COMPUTATIONS_PATH:${java.io.tmpdir}}"
 
 # JWT Token parameters
 security.jwt:
@@ -330,6 +336,7 @@ spring.mvc.cors:
 configurations:
   ui:
     depthSeries: "true"
+    awsLambda: "true"
 
 spring.main.allow-bean-definition-overriding: true
 

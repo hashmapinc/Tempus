@@ -121,6 +121,7 @@ export default angular.module('tempus.locale', [])
                     "metadata" : "Metadata",
                     "name" : "Name",
                     "name-required":"This feild is required",
+                    "region-required": "AWS Region is required.",
                     "add-metadata" : "Add New Metadata",
                     "add" : "Add Metadata",
                     "source-type" : "Source Type",
@@ -1278,7 +1279,6 @@ export default angular.module('tempus.locale', [])
                     "copyId": "Copy computation Id",
                     "idCopiedMessage": "Computation Id has been copied to clipboard",
                     "function-configurations": "Function Configurations",
-                    "function-name": "Function Name",
                     "runtime": "Runtime",
                     "runtime-required": "Runtime is required",
                     "import-function": "Import Function",
@@ -1287,7 +1287,13 @@ export default angular.module('tempus.locale', [])
                     "no-dependencies": "No dependency file selected",
                     "function-handler": "Function handler",
                     "timeout": "Function timeout (Seconds)",
-                    "handler-required": "Function handler is required"
+                    "function-name": "Function Name",
+                    "region": "Region",
+                    "upload-zip": "Upload Zip",
+                    "memorySize": "Function memory (MB)",
+                    "handler-required": "Function handler is required",
+                    "memorySize-required": "Function Memory Size is required",
+                    "timeout-required": "Function Timeout is required"
                 },
                 "computationJob": {
                     "computationJobs": "Computation Jobs",
@@ -1334,7 +1340,16 @@ export default angular.module('tempus.locale', [])
                         "functionSelector-value": "Selector",
                         "field-required": "Field is required",
                         "add-map": "Add Selector",
-                        "type": "Trigger Type"
+                        "type": "Trigger Type",
+                        "type-required": "Type is required"
+                    },
+                    "lambda": {
+                        "functionSelector-key": "Label",
+                        "functionSelector-value": "Selector",
+                        "field-required": "Field is required",
+                        "add-map": "Add Selector",
+                        "type": "Trigger Type",
+                        "type-required": "Type is required"
                     }
                 },
                 "position": {

@@ -34,7 +34,8 @@ import java.io.Serializable;
 @JsonSubTypes({
         @JsonSubTypes.Type(value = KafkaKubelessTrigger.class, name = "KUBELESS-KAFKA"),
         @JsonSubTypes.Type(value = CronKubelessTrigger.class, name = "KUBELESS-CRON"),
-        @JsonSubTypes.Type(value = SparkComputationJob.class, name = "SPARK")
+        @JsonSubTypes.Type(value = SparkComputationJob.class, name = "SPARK"),
+        @JsonSubTypes.Type(value = KinesisLambdaTrigger.class, name = "LAMBDA-KINESIS")
 })
 public abstract class ComputationJobConfiguration implements Serializable {
 
