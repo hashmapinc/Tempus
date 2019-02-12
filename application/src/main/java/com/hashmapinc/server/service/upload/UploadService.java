@@ -25,6 +25,7 @@ import com.hashmapinc.server.service.CloudStorageServiceUtils;
 import com.hashmapinc.server.service.computation.CloudStorageService;
 import io.minio.messages.Item;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.math3.util.Precision;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -91,10 +92,11 @@ public class UploadService {
         String[] arrList2 = fileName.split("\\.");
         if (arrList2.length >= 2) {
             String fileNameWithoutExt = fileName.substring(0, fileName.lastIndexOf("."));
-            return new FileMetaData(fileNameWithoutExt, arrList2[arrList2.length - 1], item.lastModified().toInstant().getEpochSecond(),
-                    item.objectSize() / 1024);
+            return new FileMetaData(fileNameWithoutExt, arrList2[arrList2.length - 1],
+                    item.lastModified().toInstant().getEpochSecond() * 1000,
+                    Precision.round(item.objectSize() / 1024.0, 4));
         }
-        return new FileMetaData(fileName, "NA", item.lastModified().toInstant().getEpochSecond(),
-                item.objectSize() / 1024);
+        return new FileMetaData(fileName, "NA", item.lastModified().toInstant().getEpochSecond() * 1000,
+                Precision.round(item.objectSize() / 1024.0, 4));
     }
 }
