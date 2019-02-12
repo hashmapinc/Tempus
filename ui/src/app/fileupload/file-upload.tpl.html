@@ -29,7 +29,7 @@
                 {{ 'action.add' | translate }}
             </md-tooltip>
         </md-button>
-        <input type="file" id="inputFile" onchange="angular.element(this).scope().thisFileUpload(this)" class="md-upload-button" />
+        <input type="file" id="inputFile" onclick ="this.value = null" onchange="angular.element(this).scope().fileUpload(this)" class="md-upload-button" />
 
         <md-button class="md-icon-button" ng-click="enterFilterMode()">
             <md-icon>search</md-icon>
@@ -54,13 +54,15 @@
             <th md-column><span translate>file-upload.fileType</span></th>
             <th md-column><span translate>file-upload.fileSize</span></th>
             <th md-column><span translate>file-upload.renameDoc</span></th>
+            <th md-column><span translate>file-upload.download</span></th>
+            <th md-column><span translate>file-upload.delete</span></th>
 
         </tr>
         </thead>
         <tbody md-body>
         <tr md-row ng-repeat="file in vm.files">
             <td md-cell ><b>{{file.fileName}}</b></td>
-            <td md-cell >{{file.lastUpdated}}</td>
+            <td md-cell >{{file.lastUpdated | date :  'yyyy-MM-dd HH:mm:ss'}}</td>
             <td md-cell >{{file.extension}}</td>
             <td md-cell >{{file.size}}</td>
 
@@ -68,11 +70,11 @@
                 <span><ng-md-icon size="20" icon="edit" ng-click="vm.renameFileName($event, file)"></ng-md-icon></span>
             </td>
 
-            <td md-cell class="tb-value-cell" ng-click="vm.downloadFile($event, file)">
-                <span><ng-md-icon size="20" icon="file_download"></ng-md-icon></span>
+            <td md-cell class="tb-value-cell" >
+                <span><ng-md-icon size="20" icon="file_download" ng-click="vm.downloadFile($event, file)"></ng-md-icon></span>
             </td>
-            <td md-cell class="tb-value-cell" ng-click="vm.deleteFile($event, file)">
-                <span><ng-md-icon size="20" icon="delete"></ng-md-icon></span>
+            <td md-cell class="tb-value-cell">
+                <span><ng-md-icon size="20" icon="delete"  ng-click="vm.deleteFile($event, file)" ></ng-md-icon></span>
             </td>
         </tr>
         </tbody>
