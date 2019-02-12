@@ -221,34 +221,34 @@ public abstract class BaseTenantControllerTest extends AbstractControllerTest {
     @Test
     public void testSaveAndGetUnitSystem() throws Exception {
         loginTenantAdmin();
-        doPost("/api/unit-system/tenant/"+ tenantAdmin.getTenantId(), "UK",String.class);
+        doPost("/api/unit-system/tenant/"+ tenantAdmin.getTenantId(), "English",String.class);
         String unitSystem = doGet("/api/unit-system/tenant/"+ tenantAdmin.getTenantId(), String.class);
-        Assert.assertEquals("{\"unit_system\":\"UK\"}", unitSystem);
+        Assert.assertEquals("{\"unit_system\":\"English\"}", unitSystem);
     }
 
     @Test
     public void testUpdateUnitSystem() throws Exception {
         loginTenantAdmin();
-        doPost("/api/unit-system/tenant/"+ tenantAdmin.getTenantId(), "UK",String.class);
-        doPost("/api/unit-system/tenant/"+ tenantAdmin.getTenantId(), "SI",String.class);
+        doPost("/api/unit-system/tenant/"+ tenantAdmin.getTenantId(), "English",String.class);
+        doPost("/api/unit-system/tenant/"+ tenantAdmin.getTenantId(), "Metric",String.class);
         String unitSystem = doGet("/api/unit-system/tenant/"+ tenantAdmin.getTenantId(), String.class);
-        Assert.assertEquals("{\"unit_system\":\"SI\"}", unitSystem);
+        Assert.assertEquals("{\"unit_system\":\"Metric\"}", unitSystem);
     }
 
     @Test
     public void testGetDefaultUnitSystem() throws Exception {
         loginTenantAdmin();
         String unitSystem = doGet("/api/unit-system/tenant/"+ tenantAdmin.getTenantId(), String.class);
-        Assert.assertEquals("{\"unit_system\":\"SI\"}", unitSystem);
+        Assert.assertEquals("{\"unit_system\":\"Metric\"}", unitSystem);
     }
 
     @Test
     public void testGetUnitSystemForCustomerUser() throws Exception {
         loginTenantAdmin();
-        doPost("/api/unit-system/tenant/"+ tenantAdmin.getTenantId(), "UK",String.class);
+        doPost("/api/unit-system/tenant/"+ tenantAdmin.getTenantId(), "Canadian",String.class);
         logout();
         loginCustomerUser();
         String unitSystem = doGet("/api/unit-system/tenant/"+ customerUser.getTenantId(), String.class);
-        Assert.assertEquals("{\"unit_system\":\"UK\"}", unitSystem);
+        Assert.assertEquals("{\"unit_system\":\"Canadian\"}", unitSystem);
     }
 }

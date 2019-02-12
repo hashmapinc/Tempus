@@ -51,9 +51,9 @@ import static com.hashmapinc.server.common.data.DataConstants.*;
 @ActiveProfiles("permission-test")
 @RunWith(SpringRunner.class)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
-@ContextConfiguration(classes = AttributeBasedPermissionEvaluatorTest.class, loader = SpringBootContextLoader.class)
+@ContextConfiguration(classes = AttributeBasedPermissionEvaluatorUnitTest.class, loader = SpringBootContextLoader.class)
 @ComponentScan({"com.hashmapinc.server.service.security.auth"})
-public class AttributeBasedPermissionEvaluatorTest {
+public class AttributeBasedPermissionEvaluatorUnitTest {
 
     @Autowired
     private AttributeBasedPermissionEvaluator evaluator;

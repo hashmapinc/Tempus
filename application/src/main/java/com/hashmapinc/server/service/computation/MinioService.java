@@ -60,13 +60,13 @@ public class MinioService implements CloudStorageService {
     private TenantService tenantService;
 
     @Override
-    public boolean upload(String bucketName, String objectUrl, InputStream inputStream, String contentType) throws IOException, NoSuchAlgorithmException, InvalidKeyException, XmlPullParserException {
+    public boolean upload(String bucketName, String objectName, InputStream inputStream, String contentType) throws IOException, NoSuchAlgorithmException, InvalidKeyException, XmlPullParserException {
         try {
             MinioClient client = getMinioClientInstance();
             if(!client.bucketExists(bucketName)) {
                 client.makeBucket(bucketName);
             }
-            client.putObject(bucketName, objectUrl, inputStream, contentType);
+            client.putObject(bucketName, objectName, inputStream, contentType);
             return true;
         } catch (MinioException e) {
             log.info(MINIO_EXECPTION, e);
@@ -75,11 +75,11 @@ public class MinioService implements CloudStorageService {
     }
 
     @Override
-    public boolean delete(String bucketName, String objectUrl) throws IOException, NoSuchAlgorithmException, InvalidKeyException, XmlPullParserException {
+    public boolean delete(String bucketName, String objectName) throws IOException, NoSuchAlgorithmException, InvalidKeyException, XmlPullParserException {
         try {
             MinioClient client = getMinioClientInstance();
             if (client.bucketExists(bucketName))
-                client.removeObject(bucketName, objectUrl);
+                client.removeObject(bucketName, objectName);
             return true;
         } catch (MinioException e) {
             log.info(MINIO_EXECPTION, e);
@@ -107,11 +107,22 @@ public class MinioService implements CloudStorageService {
     }
 
     @Override
-    public InputStreamWrapper getFile(String bucketName, String objectUrl) throws IOException, NoSuchAlgorithmException, InvalidKeyException, XmlPullParserException {
+    public InputStreamWrapper getFile(String bucketName, String objectName) throws IOException, NoSuchAlgorithmException, InvalidKeyException, XmlPullParserException {
         try {
             MinioClient client = getMinioClientInstance();
-            ObjectStat stat = client.statObject(bucketName, objectUrl);
-            return new InputStreamWrapper(client.getObject(bucketName, objectUrl), stat.contentType());
+            ObjectStat stat = client.statObject(bucketName, objectName);
+            return new InputStreamWrapper(client.getObject(bucketName, objectName), stat.contentType());
+        } catch (MinioException e) {
+            log.info(MINIO_EXECPTION, e);
+        }
+        return null;
+    }
+
+    @Override
+    public String getObjectUrl(String bucketName, String objectName) throws IOException, NoSuchAlgorithmException, InvalidKeyException, XmlPullParserException {
+        try {
+            MinioClient client = getMinioClientInstance();
+            return client.getObjectUrl(bucketName, objectName);
         } catch (MinioException e) {
             log.info(MINIO_EXECPTION, e);
         }

@@ -14,16 +14,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.hashmapinc.server.service.computation;
+package com.hashmapinc.server.common.data.computation;
 
-import com.hashmapinc.server.common.data.computation.ComputationJob;
-import com.hashmapinc.server.common.data.computation.Computations;
+import com.fasterxml.jackson.annotation.JsonTypeName;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 
-public interface KubelessDeploymentService {
-    boolean deployFunction(Computations computations);
-    boolean functionExists(Computations computation);
-    boolean deleteFunction(Computations computation);
-    boolean createTrigger(ComputationJob computationJob);
-    boolean triggerExists(ComputationJob computationJob);
-    boolean deleteTrigger(ComputationJob computationJob);
+@Data
+@EqualsAndHashCode(callSuper = true)
+@JsonTypeName("LAMBDA-KINESIS")
+public class KinesisLambdaTrigger extends ComputationJobConfiguration {
+    private static final long serialVersionUID = -7910153605304892262L;
+
+    private String functionName;
+    private String streamName;
+    private String region;
+    private String startingPositions;
+    private int batchSize;
 }

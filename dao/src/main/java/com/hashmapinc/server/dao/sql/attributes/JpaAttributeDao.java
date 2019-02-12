@@ -92,6 +92,7 @@ public class JpaAttributeDao extends JpaAbstractDaoListeningExecutorService impl
         entity.setBooleanValue(attribute.getBooleanValue().orElse(null));
         entity.setJsonValue(attribute.getJsonValue().orElse(null));
         entity.setUnit(attribute.getUnit().orElse(null));
+        entity.setSourceUnit(attribute.getSourceUnit().orElse(null));
         return service.submit(() -> {
             attributeKvRepository.save(entity);
             return null;

@@ -33,7 +33,6 @@ import com.hashmapinc.server.extensions.core.plugin.telemetry.sub.SubscriptionTy
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Slf4j
 public class TelemetryRuleMsgHandler extends DefaultRuleMsgHandler {
@@ -94,7 +93,7 @@ public class TelemetryRuleMsgHandler extends DefaultRuleMsgHandler {
             public void onSuccess(PluginContext ctx, Void data) {
                 ctx.reply(new ResponsePluginToRuleMsg(msg.getUid(), tenantId, ruleId, BasicStatusCodeResponse.onSuccess(request.getMsgType(), request.getRequestId())));
                 subscriptionManager.onLocalSubscriptionUpdate(ctx, msg.getDeviceId(), SubscriptionType.TIMESERIES, s ->
-                        prepareSubscriptionUpdate(request, s)
+                        prepareSubscriptionUpdate(request, s, ctx, msg.getTenantId())
                 );
             }
 
@@ -106,7 +105,7 @@ public class TelemetryRuleMsgHandler extends DefaultRuleMsgHandler {
         });
     }
 
-    private List<TsKvEntry> prepareSubscriptionUpdate(TelemetryUploadRequest request, Subscription s) {
+    private List<TsKvEntry> prepareSubscriptionUpdate(TelemetryUploadRequest request, Subscription s, PluginContext ctx, TenantId tenantId) {
         List<TsKvEntry> subscriptionUpdate = new ArrayList<>();
         for (Map.Entry<Long, List<KvEntry>> entry : request.getData().entrySet()) {
             for (KvEntry kv : entry.getValue()) {
@@ -115,7 +114,7 @@ public class TelemetryRuleMsgHandler extends DefaultRuleMsgHandler {
                 }
             }
         }
-        return subscriptionUpdate;
+        return ctx.convertKvEntriesToUnitSystemByTenantId(subscriptionUpdate, tenantId, BasicTsKvEntry.class);
     }
 
     @Override
@@ -133,7 +132,7 @@ public class TelemetryRuleMsgHandler extends DefaultRuleMsgHandler {
                 log.debug(" ctx.saveDsData On success");
                 ctx.reply(new ResponsePluginToRuleMsg(msg.getUid(), tenantId, ruleId, BasicStatusCodeResponse.onSuccess(request.getMsgType(), request.getRequestId())));
                 subscriptionManager.onLocalSubscriptionUpdateForDepth(ctx, msg.getDeviceId(), SubscriptionType.DEPTHSERIES, s ->
-                        prepareSubscriptionUpdate(request, s));
+                        prepareSubscriptionUpdate(request, s, ctx, msg.getTenantId()));
             }
 
             @Override
@@ -144,7 +143,7 @@ public class TelemetryRuleMsgHandler extends DefaultRuleMsgHandler {
         });
     }
 
-    private List<DsKvEntry> prepareSubscriptionUpdate(DepthTelemetryUploadRequest request, Subscription s){
+    private List<DsKvEntry> prepareSubscriptionUpdate(DepthTelemetryUploadRequest request, Subscription s, PluginContext ctx, TenantId tenantId){
         List<DsKvEntry> subscriptionUpdate = new ArrayList<>();
         for (Map.Entry<Double, List<KvEntry>> entry : request.getData().entrySet()) {
             for (KvEntry kv : entry.getValue()) {
@@ -153,21 +152,22 @@ public class TelemetryRuleMsgHandler extends DefaultRuleMsgHandler {
                 }
             }
         }
-        return subscriptionUpdate;
+        return ctx.convertKvEntriesToUnitSystemByTenantId(subscriptionUpdate, tenantId, BasicDsKvEntry.class);
     }
 
     @Override
     public void handleUpdateAttributesRequest(PluginContext ctx, TenantId tenantId, RuleId ruleId, UpdateAttributesRequestRuleToPluginMsg msg) {
         UpdateAttributesRequest request = msg.getPayload();
-        ctx.saveAttributes(msg.getTenantId(), msg.getDeviceId(), DataConstants.CLIENT_SCOPE, request.getAttributes().stream().collect(Collectors.toList()),
+        ctx.saveAttributes(msg.getTenantId(), msg.getDeviceId(), DataConstants.CLIENT_SCOPE, new ArrayList<>(request.getAttributes()) ,
                 new PluginCallback<Void>() {
                     @Override
                     public void onSuccess(PluginContext ctx, Void value) {
                         ctx.reply(new ResponsePluginToRuleMsg(msg.getUid(), tenantId, ruleId, BasicStatusCodeResponse.onSuccess(request.getMsgType(), request.getRequestId())));
 
+                        List<AttributeKvEntry> attributeKvEntries = ctx.convertKvEntriesToUnitSystemByTenantId(new ArrayList<>(request.getAttributes()), msg.getTenantId(), BaseAttributeKvEntry.class);
                         subscriptionManager.onLocalSubscriptionUpdate(ctx, msg.getDeviceId(), SubscriptionType.ATTRIBUTES, s -> {
                             List<TsKvEntry> subscriptionUpdate = new ArrayList<>();
-                            for (AttributeKvEntry kv : request.getAttributes()) {
+                            for (AttributeKvEntry kv : attributeKvEntries) {
                                 if (s.isAllKeys() || s.getKeyStates().containsKey(kv.getKey())) {
                                     subscriptionUpdate.add(new BasicTsKvEntry(kv.getLastUpdateTs(), kv));
                                 }

@@ -28,10 +28,9 @@
             <v-pane-content class="pane-header">
                 <div>
                     <md-radio-group ng-model="vm.selectedUnit" >
-                        <md-radio-button value="SI" class="md-primary"> {{ 'preferences.si-metric-system' | translate }} </md-radio-button>
-                        <!--TODO : Remove these after having support for Imperial and US-Customary Unit System-->
-                        <!--<md-radio-button value="UK" class="md-primary"> {{ 'preferences.imperials-units' | translate }} </md-radio-button>
-                        <md-radio-button value="US" class="md-primary"> {{ 'preferences.us-customary-units' | translate }} </md-radio-button>-->
+                        <md-radio-button value="Metric" class="md-primary"> {{ 'preferences.metric-system' | translate }} </md-radio-button>
+                        <md-radio-button value="English" class="md-primary"> {{ 'preferences.english-system' | translate }} </md-radio-button>
+                        <md-radio-button value="Canadian" class="md-primary"> {{ 'preferences.canadian-system' | translate }} </md-radio-button>
                     </md-radio-group>
                 </div>
             </v-pane-content>

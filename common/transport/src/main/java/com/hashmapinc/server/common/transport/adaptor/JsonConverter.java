@@ -196,16 +196,16 @@ public class JsonConverter {
         }
     }
 
-    private static void parseNumericValueAndConvertToSi(List<KvEntry> result, String key, String unit, JsonNode value) {
+    private static void parseNumericValueAndConvertToSi(List<KvEntry> result, String key, String sourceUnit, JsonNode value) {
         Quantity quantity;
         if (value.asText().contains(".")) {
-            quantity = UnitConverter.convertToSiUnit(new Quantity(value.asDouble() , unit));
-            result.add(new DoubleDataEntry(key, quantity.getUnit(), quantity.getValue()));
+            quantity = UnitConverter.convertToSiUnit(new Quantity(value.asDouble() , sourceUnit));
+            result.add(new DoubleDataEntry(key, quantity.getUnit(), sourceUnit, quantity.getValue()));
         } else {
             try {
                 long longValue = value.asLong();
-                quantity = UnitConverter.convertToSiUnit(new Quantity(((Long)longValue).doubleValue(), unit));
-                result.add(new DoubleDataEntry(key, quantity.getUnit(), quantity.getValue()));
+                quantity = UnitConverter.convertToSiUnit(new Quantity(((Long)longValue).doubleValue(), sourceUnit));
+                result.add(new DoubleDataEntry(key, quantity.getUnit(), sourceUnit, quantity.getValue()));
             } catch (NumberFormatException e) {
                 throw new JsonSyntaxException("Big integer values are not supported!");
             }

@@ -52,9 +52,7 @@ import com.hashmapinc.server.service.cluster.discovery.DiscoveryService;
 import com.hashmapinc.server.service.cluster.routing.ClusterRoutingService;
 import com.hashmapinc.server.service.cluster.rpc.ClusterRpcService;
 import com.hashmapinc.server.service.component.ComponentDiscoveryService;
-import com.hashmapinc.server.service.computation.KubelessDeploymentService;
-import com.hashmapinc.server.service.computation.KubelessStorageService;
-import com.hashmapinc.server.service.computation.CloudStorageService;
+import com.hashmapinc.server.service.computation.*;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 import lombok.Getter;
@@ -148,7 +146,10 @@ public class ActorSystemContext {
     @Getter private UnitConversionService unitConversionService;
 
     @Autowired
-    @Getter private KubelessDeploymentService kubelessDeploymentService;
+    @Getter private KubelessFunctionService kubelessFunctionService;
+
+    @Autowired
+    @Getter private AWSLambdaFunctionService awsLambdaFunctionService;
 
     @Autowired
     @Getter @Setter private PluginWebSocketMsgEndpoint wsMsgEndpoint;

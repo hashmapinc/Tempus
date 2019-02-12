@@ -24,7 +24,7 @@
                 <label translate>computationJob.kubeless.type</label>
                 <md-select required name="computationJobType" ng-model="config.type"
                            ng-disabled="$root.loading || !isEdit || isReadOnly">
-                    <md-option ng-repeat="(key,value) in types.triggerTypes" ng-value="value">
+                    <md-option ng-repeat="(key,value) in types.triggerTypes.kubeless" ng-value="value">
                         {{key}}
                     </md-option>
                 </md-select>
@@ -33,6 +33,6 @@
                 </div>
             </md-input-container>
         </section>
-        <ng-include ng-if="config.type === types.triggerTypes.Kafka" src="'computations/computation-job-forms/triggers/trigger-kafka.tpl.html'"/>
+        <ng-include ng-if="config.type === types.triggerTypes.kubeless.kafka" src="'computations/computation-job-forms/triggers/trigger-kafka.tpl.html'"/>
     </fieldset>
 </md-card-content>

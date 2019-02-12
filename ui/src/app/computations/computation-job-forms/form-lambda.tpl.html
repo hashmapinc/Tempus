@@ -1,0 +1,37 @@
+<!--
+
+    Copyright © 2016-2018 The Thingsboard Authors
+    Modifications © 2017-2018 Hashmap, Inc
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+        http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<md-card-content>
+    <fieldset ng-disabled="$root.loading || !isEdit || isReadOnly">
+        <section flex layout="row">
+            <md-input-container flex="100" class="md-block" md-is-error="theForm.computationJobType.$touched && theForm.computationJobType.$invalid">
+                <label translate>computationJob.lambda.type</label>
+                <md-select required name="computationJobType" ng-model="config.type"
+                           ng-disabled="$root.loading || !isEdit || isReadOnly">
+                    <md-option ng-repeat="(key,value) in types.triggerTypes.lambda" ng-value="value">
+                        {{key}}
+                    </md-option>
+                </md-select>
+                <div ng-messages="theForm.computationJobType.$error">
+                    <div translate ng-message="required">computationJob.lambda.type-required</div>
+                </div>
+            </md-input-container>
+        </section>
+        <ng-include ng-if="config.type === types.triggerTypes.lambda.kinesis" src="'computations/computation-job-forms/triggers/trigger-kinesis.tpl.html'"/>
+    </fieldset>
+</md-card-content>
