@@ -164,16 +164,25 @@ public class UserController extends BaseController {
 
     private User setCurrentTimeInUser(User user) {
         Map<String,String> additionalInfo =  new HashMap<>();
-
-        Date currentTime = Date.from(Instant.now());
-        long time = currentTime.getTime();
-        additionalInfo.put("date",Long.toString(time));
+        additionalInfo.put("date",Long.toString(atStartOfDay().getTime()));
         additionalInfo.put("trialAccount","true");
         ObjectMapper mapper = new ObjectMapper();
         JsonNode jsonNode = mapper.convertValue(additionalInfo, JsonNode.class);
         user.setAdditionalInfo(jsonNode);
 
         return user;
+    }
+
+    private Date atStartOfDay() {
+        Calendar calendar = Calendar.getInstance();
+        Date currentDate = Date.from(Instant.now());
+        long currentDateTime = currentDate.getTime();
+        calendar.setTimeInMillis(currentDateTime);
+        calendar.set(Calendar.HOUR_OF_DAY, 0);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+        calendar.set(Calendar.MILLISECOND, 0);
+        return calendar.getTime();
     }
 
     private Tenant createTenant(User newUser) {
