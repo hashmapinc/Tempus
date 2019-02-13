@@ -69,7 +69,8 @@
                     <md-input-container class="md-block md-icon-left">
                         <label class="label-color" translate="" class="ng-scope" for="email-input">{{ 'signup.phone' | translate }}</label>
                         <md-icon aria-label="Phone" class="material-icons md-tb-dark-theme label-color" role="img"> {{ 'signup.call' | translate }} </md-icon>
-                        <input required id="phone-input" ng-model="vm.signupRequest.additionalInfo.phone" pattern="[1-9]{1}[0-9]{9}" class="md-input input-cls " aria-invalid="true">
+                        <input required id="phone-input" ng-model="vm.signupRequest.additionalInfo.phone" pattern="[1-9]{1}[0-9]{9}" class="md-input input-cls " aria-invalid="true"
+                               ng-keypress="vm.filterValue($event)">
                         <div class="md-errors-spacer"></div>
                     </md-input-container>
                 </div>

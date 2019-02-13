@@ -33,6 +33,7 @@ export default function SignUpController(toast, loginService, userService,$state
     vm.redirectToURL = redirectToURL;
     vm.redirectToPolicy = redirectToPolicy;
     vm.acceptPrivacyPolicy = false;
+    vm.filterValue = filterValue;
 
     function validateEmail(emailField){
         var reg = /^([A-Za-z0-9_\-\.])+\@([A-Za-z0-9_\-\.])+\.([A-Za-z]{2,4})$/;
@@ -46,11 +47,20 @@ export default function SignUpController(toast, loginService, userService,$state
         return true;
     }
 
+
+    function filterValue($event){
+        if(isNaN(String.fromCharCode($event.keyCode))){
+            $event.preventDefault();
+        }
+    }
+
     function signup() {
          if(vm.acceptPrivacyPolicy && vm.signupRequest.recaptchaResponse){
                  signUpService.saveTrialUser(vm.signupRequest).then(
                      function success() {
                          $state.go('activation-link', {email: vm.signupRequest.email});
+                     },function error(error){
+                         toast.showError(error);
                      }
                  );
          } else {
