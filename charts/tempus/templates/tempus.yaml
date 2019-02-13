@@ -130,11 +130,16 @@ spec:
             configMapKeyRef:
               name: {{ include "tempus.fullname" . }}-config
               key: identity.base.url
-        - name: SPARK_HOME
+        - name: LIVY_HOST
           valueFrom:
             configMapKeyRef:
               name: {{ include "tempus.fullname" . }}-config
-              key: spark.home
+              key: livy.host
+        - name: LIVY_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: {{ include "tempus.fullname" . }}-config
+              key: livy.port           
         - name: METADATA_BASE_URL
           valueFrom:
             configMapKeyRef:
