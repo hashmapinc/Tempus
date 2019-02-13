@@ -1,0 +1,70 @@
+rbac:
+  enabled: true
+#--------------------------------------------------------
+kibana:
+  name: kibana
+  replicaCount: 1
+  image:
+    repository: docker.elastic.co/kibana/kibana
+    tag: 6.2.4
+    pullPolicy: IfNotPresent
+  service:
+    type: ClusterIP
+    port: 5601
+  ingress:
+    enabled: true
+    annotations: 
+       kubernetes.io/ingress.class: nginx
+       kubernetes.io/tls-acme: "true"
+       ingress.kubernetes.io/rewrite-target: "/"
+    path: /
+    hosts:
+      - demo.tempus.hashmapinc.com
+    tls: 
+      - secretName: tempus-cert
+        hosts:
+          - demo.tempus.hashmapinc.com
+  resources:
+    limits:
+      cpu: 1000m
+    requests:
+      cpu: 100m
+  nodeSelector: {}
+  tolerations: []
+  affinity: {}
+#--------------------------------------------------------
+elasticsearch:
+  name: elasticsearch
+  replicaCount: 1
+  image:
+    repository: docker.elastic.co/elasticsearch/elasticsearch
+    tag: 6.2.4
+    pullPolicy: IfNotPresent
+  service:
+    type: ClusterIP
+    port: 9200
+  resources:
+    limits:
+      cpu: 1000m
+    requests:
+      cpu: 100m
+  nodeSelector: {}
+  tolerations: []
+  affinity: {}
+#--------------------------------------------------------
+fluentdElasticsearch:
+  name: fluentd-elasticsearch
+  image:
+    repository: k8s.gcr.io/fluentd-elasticsearch
+    tag: v2.1.0
+    pullPolicy: IfNotPresent
+  resources:
+    limits:
+      memory: 500Mi
+    requests:
+      cpu: 100m
+      memory: 200Mi
+  nodeSelector: {}
+  tolerations: []
+  affinity: {}
+  dockerContainersPath: /var/lib/docker/containers

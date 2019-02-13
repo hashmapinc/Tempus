@@ -1,0 +1,59 @@
+apiVersion: apps/v1beta2
+kind: Deployment
+metadata:
+  name: {{ template "fullname.kibana" . }}
+  labels:
+    app: {{ template "name.kibana" . }}
+    chart: {{ template "chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+spec:
+  replicas: {{ .Values.kibana.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ template "name.kibana" . }}
+      release: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app: {{ template "name.kibana" . }}
+        release: {{ .Release.Name }}
+    spec:
+      containers:
+        - name: {{ template "fullname.kibana" . }}
+          image: "{{ .Values.kibana.image.repository }}:{{ .Values.kibana.image.tag }}"
+          imagePullPolicy: {{ .Values.kibana.image.pullPolicy }}
+          env:
+            - name: ELASTICSEARCH_URL
+              value: http://{{ .Release.Name }}-{{ .Values.elasticsearch.name }}:{{ .Values.elasticsearch.service.port }}
+          ports:
+            - name: kibana-ui
+              containerPort: 5601
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /
+              port: kibana-ui
+            initialDelaySeconds: 45
+          readinessProbe:
+            httpGet:
+              path: /
+              port: kibana-ui
+            initialDelaySeconds: 40
+          resources:
+{{ toYaml .Values.kibana.resources | indent 12 }}
+    {{- with .Values.kibana.nodeSelector }}
+      nodeSelector:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+    {{- with .Values.kibana.affinity }}
+      affinity:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+    {{- with .Values.kibana.tolerations }}
+      tolerations:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+
+
+
