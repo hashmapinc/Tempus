@@ -21,7 +21,7 @@ label.md-required:after {
     color:white !important;
 }
 
-md-checkbox.md-themeDark-theme:not(.md-checked) .md-icon  {
+#signupCheck .md-icon  {
  border-color: white;
 }
 .tb-activation-card{
@@ -65,8 +65,8 @@ md-checkbox.md-themeDark-theme:not(.md-checked) .md-icon  {
 }
 .sign-span {
     color: white;
-    font-size: 23px;
-    margin-left:10%;
+    font-size: 21px;
+    margin-left:6%;
 }
 .progress-linear{
     z-index: 1;
@@ -84,6 +84,25 @@ md-checkbox.md-themeDark-theme:not(.md-checked) .md-icon  {
     color: white;
     font-size: 20px;
 }
+md-card.tb-signup-card {
+  width: 330px !important;
+  @media (min-width: $layout-breakpoint-sm) {
+    width: 550px !important;
+  }
+  md-card-title {
+    img.tb-login-logo {
+      height: 50px;
+    }
+  }
+  md-card-content {
+    margin-top: -50px;
+  }
+}
+.hm-login-logo {
+	margin-left: 25%;
+	min-height: 110px;
+	min-width: 250px;
+}
 .btn-submit {
     margin-bottom: 30px !important;
     border-radius: 16px !important;
@@ -93,9 +112,10 @@ md-checkbox.md-themeDark-theme:not(.md-checked) .md-icon  {
     margin-left: 5% !important;
 }
 .redirect {
-    font-size: 23px;
+    font-size: 18px;
+    font-weight:500;
     color: white;
-    margin-left: 30%;
+    margin-left: 29%;
 }
 .input-cls {
     border-color:white !important;

@@ -29,7 +29,7 @@ function UiConfiguration($http, $q, $log, $timeout) {
     }
     $timeout( function(){
         getUiConfiguration();
-    }, 1000 );
+    }, 5000 );
     return service;
 
     function getUiConfiguration() {

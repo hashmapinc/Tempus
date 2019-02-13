@@ -18,10 +18,10 @@
 -->
 <md-content layout="row" layout-align="center center" class="hm-background-{{theme}} layout-align-center-center layout-row">
     <md-card style="background: transparent;height: 100%;
-    max-height: 850px;
+    max-height: 800px;
     overflow-y: auto;
     overflow-x: hidden;
-    box-shadow:inset 0 0 10px #000000;" flex="initial" class="tb-login-card">
+    border: 1px solid gray;box-shadow: 9px 9px 1px 0px #000000" flex="initial" class="tb-signup-card">
         <md-card-title>
             <md-card-title-text>
                 <!--                 <span translate class="md-headline">login.sign-in</span>
@@ -69,7 +69,8 @@
                     <md-input-container class="md-block md-icon-left">
                         <label class="label-color" translate="" class="ng-scope" for="email-input">{{ 'signup.phone' | translate }}</label>
                         <md-icon aria-label="Phone" class="material-icons md-tb-dark-theme label-color" role="img"> {{ 'signup.call' | translate }} </md-icon>
-                        <input required id="phone-input" ng-model="vm.signupRequest.additionalInfo.phone" pattern="[1-9]{1}[0-9]{9}" class="md-input input-cls " aria-invalid="true">
+                        <input required id="phone-input" ng-model="vm.signupRequest.additionalInfo.phone" pattern="[1-9]{1}[0-9]{9}" class="md-input input-cls " aria-invalid="true"
+                               ng-keypress="vm.filterValue($event)">
                         <div class="md-errors-spacer"></div>
                     </md-input-container>
                 </div>
@@ -87,11 +88,11 @@
                         key="'6LdxkI0UAAAAAAeQ0v8H8wUAPaAYyn1CdSbpjV_w'"
                 ></div>
                 <div class="policy">
-                    <md-checkbox class="md-check" class="red" aria-label="{{ 'signup.accept-privacy-policy' | translate }}" ng-model="vm.acceptPrivacyPolicy">
+                    <md-checkbox class="md-check " id="signupCheck" class="red" aria-label="{{ 'signup.accept-privacy-policy' | translate }}" ng-model="vm.acceptPrivacyPolicy">
                         {{ 'signup.accept' | translate }} <a  href="#" ng-click="vm.redirectToPolicy()" style="color:aquamarine !important;">{{ 'signup.privacy-policy' | translate }}</a>
                     </md-checkbox>
                 </div>
-                <md-button class="md-raised btn-submit" type="submit">{{ 'signup.submit' | translate }}</md-button>
+                <md-button class="md-raised btn-submit" type="submit" style="line-height: 25px;">{{ 'signup.submit' | translate }}</md-button>
 
                 <a class="redirect" href="#" ng-click="vm.redirectToURL()">{{ 'signup.login-text' | translate }}</a>
             </form>

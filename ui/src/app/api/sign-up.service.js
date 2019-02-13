@@ -32,7 +32,7 @@ function SignUpService($http, $q) {
     function saveTrialUser(signupRequest) {
         var deferred = $q.defer();
 
-        var url = '/api/noauth/user';
+        var url = '/api/noauth/user?recaptchaResponse='+signupRequest.recaptchaResponse ;
 
         $http.post(url, signupRequest).then(function success(response) {
                 deferred.resolve(response.data);
