@@ -16,7 +16,7 @@
  */
 /* eslint-disable import/no-unresolved, import/default */
 
-/* eslint-enable import/no-unresolved, import/default */
+import renameFileNameTemplate from './rename-file.tpl.html';
 
 /*@ngInject*/
 export default function FileUploadController(toast, $scope, $document, fileUploadService, $q, $timeout, $translate, $mdDialog) {
@@ -46,7 +46,10 @@ export default function FileUploadController(toast, $scope, $document, fileUploa
 	function checkFile(element) {
 		var fileToBeUploaded = element.files;
 		var deferred = $q.defer();
-		fileUploadService.searchFile(fileToBeUploaded[0].name, fileToBeUploaded[0].type).then(
+		var fullFileName = fileToBeUploaded[0].name;
+		var fileName = fullFileName.substring(0, fullFileName.lastIndexOf("."));
+		var extension = fullFileName.split('.').pop();
+		fileUploadService.searchFile(fileName, extension).then(
 			function success(searchItems) {
 
 				if (searchItems.length == 0) {
