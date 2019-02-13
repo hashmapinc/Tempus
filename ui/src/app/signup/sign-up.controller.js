@@ -60,7 +60,7 @@ export default function SignUpController(toast, loginService, userService,$state
                      function success() {
                          $state.go('activation-link', {email: vm.signupRequest.email});
                      },function error(error){
-                         toast.showError(error);
+                         toast.showError(error.message);
                      }
                  );
          } else {
