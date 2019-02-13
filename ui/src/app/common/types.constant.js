@@ -829,7 +829,7 @@ export default angular.module('tempus.types', [])
             },
             triggerTypes: {
                 kubeless: {
-                    kafka: "KUBELESS-KAFKA"
+                    kafka: "KUBELESS-KAFKA".
                 },
                 lambda: {
                     kinesis: "LAMBDA-KINESIS"

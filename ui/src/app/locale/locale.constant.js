@@ -1303,9 +1303,9 @@ export default angular.module('tempus.locale', [])
                     "region": "Region",
                     "upload-zip": "Upload Zip",
                     "memorySize": "Function memory (MB)",
-                    "handler-required": "Function handler is required",
                     "memorySize-required": "Function Memory Size is required",
-                    "timeout-required": "Function Timeout is required"
+                    "timeout-required": "Function Timeout is required",
+                    "handler-required": "Function handler is required"
                 },
                 "computationJob": {
                     "computationJobs": "Computation Jobs",
