@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.hashmapinc.server.scheduler;
+package com.hashmapinc.server.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -27,7 +27,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupp
 import java.util.concurrent.Executor;
 
 @Configuration
-public class AppContext extends WebMvcConfigurationSupport {
+public class SchedulerConfiguration  {
     @Bean
     public TaskScheduler taskScheduler() {
         return new ConcurrentTaskScheduler();
