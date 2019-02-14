@@ -16,7 +16,7 @@
  */
 package com.hashmapinc.server.controller;
 
-import com.fasterxml.jackson.databind.JsonMappingException;
+import org.apache.commons.lang.StringUtils;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hashmapinc.server.common.data.CustomerGroup;
@@ -36,6 +36,7 @@ import com.hashmapinc.server.dao.tenant.TenantService;
 import com.hashmapinc.server.requests.CreateUserRequest;
 import com.hashmapinc.server.requests.IdentityUser;
 import com.hashmapinc.server.dao.mail.MailService;
+import com.hashmapinc.server.service.recaptcha.RecaptchaService;
 import com.hashmapinc.server.service.security.model.SecurityUser;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,7 +47,6 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
@@ -76,6 +76,9 @@ public class UserController extends BaseController {
 
     @Autowired
     private TenantService tenantService;
+
+    @Autowired
+    private RecaptchaService captchaService;
 
     @PreAuthorize("hasAnyAuthority('SYS_ADMIN', 'TENANT_ADMIN', 'CUSTOMER_USER')")
     @GetMapping(value = "/user/{userId}")
@@ -138,10 +141,20 @@ public class UserController extends BaseController {
         }
     }
 
+
     @PostMapping(value = "/noauth/user")
     @ResponseBody
-    public User saveTrialUser(@RequestBody User user,
+    public User saveTrialUser(@RequestBody User user, @RequestParam String recaptchaResponse,
                          HttpServletRequest request) throws TempusException {
+
+        String captchaVerifyMessage =
+                captchaService.verifyRecaptcha(recaptchaResponse);
+
+        if (StringUtils.isNotEmpty(captchaVerifyMessage)) {
+            throw new TempusException("Invalid captcha . Please sign up again",
+                    TempusErrorCode.BAD_REQUEST_PARAMS);
+        }
+
         Tenant savedTenant = null;
         try {
             user.setAuthority(Authority.TENANT_ADMIN);
