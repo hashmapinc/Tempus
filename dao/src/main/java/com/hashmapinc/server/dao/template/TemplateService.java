@@ -21,12 +21,16 @@ import com.hashmapinc.server.common.data.page.PaginatedResult;
 import com.hashmapinc.server.common.data.page.TextPageData;
 import com.hashmapinc.server.common.data.page.TextPageLink;
 import com.hashmapinc.server.common.data.template.TemplateMetadata;
+import com.hashmapinc.server.dao.exception.DataValidationException;
+import com.hashmapinc.server.dao.service.DataValidator;
 import com.hashmapinc.server.dao.sql.template.JpaBaseTemplateDao;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @Slf4j
@@ -48,6 +52,7 @@ public class TemplateService {
     }
 
     public TemplateMetadata save(TemplateMetadata templateMetadata) {
+        templateValidator.validate(templateMetadata);
         return dao.save(templateMetadata);
     }
 
@@ -59,4 +64,24 @@ public class TemplateService {
     public PaginatedResult<TemplateMetadata> getTemplatesByPage(int limit, int pageNum, String textSearch) {
         return dao.findByPageNumber(limit, pageNum, textSearch);
     }
+
+    private DataValidator<TemplateMetadata> templateValidator =
+            new DataValidator<TemplateMetadata>() {
+                @Override
+                protected void validateDataImpl(TemplateMetadata template) {
+                    if (StringUtils.isEmpty(template.getName())) {
+                        throw new DataValidationException("Template name should be specified!.");
+                    }
+                }
+
+                @Override
+                protected void validateCreate(TemplateMetadata template) {
+                    boolean duplicateNamePresent = dao.findAll().stream()
+                            .map(TemplateMetadata::getName)
+                            .anyMatch(t -> Objects.equals(t, template.getName()));
+                    if(duplicateNamePresent) {
+                        throw new DataValidationException("Template is already created for name " + template.getName());
+                    }
+                }
+            };
 }
