@@ -16,20 +16,22 @@
  */
 package com.hashmapinc.server.transport.mqtt;
 
+import com.hashmapinc.server.common.transport.SessionMsgProcessor;
+import com.hashmapinc.server.common.transport.auth.DeviceAuthService;
+import com.hashmapinc.server.common.transport.quota.QuotaService;
 import com.hashmapinc.server.dao.asset.AssetService;
 import com.hashmapinc.server.dao.attributes.AttributesService;
+import com.hashmapinc.server.dao.device.DeviceService;
+import com.hashmapinc.server.dao.event.EventService;
+import com.hashmapinc.server.dao.mail.MailService;
+import com.hashmapinc.server.dao.relation.RelationService;
+import com.hashmapinc.server.transport.mqtt.adaptors.MqttTransportAdaptor;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.handler.codec.mqtt.MqttDecoder;
 import io.netty.handler.codec.mqtt.MqttEncoder;
 import io.netty.handler.ssl.SslHandler;
-import com.hashmapinc.server.common.transport.SessionMsgProcessor;
-import com.hashmapinc.server.common.transport.auth.DeviceAuthService;
-import com.hashmapinc.server.common.transport.quota.QuotaService;
-import com.hashmapinc.server.dao.device.DeviceService;
-import com.hashmapinc.server.dao.relation.RelationService;
-import com.hashmapinc.server.transport.mqtt.adaptors.MqttTransportAdaptor;
 
 
 public class MqttTransportServerInitializer extends ChannelInitializer<SocketChannel> {
@@ -45,10 +47,12 @@ public class MqttTransportServerInitializer extends ChannelInitializer<SocketCha
     private final QuotaService quotaService;
     private final AttributesService attributesService;
     private final AssetService assetService;
+    private final MailService mailService;
+    private final EventService eventService;
 
     public MqttTransportServerInitializer(SessionMsgProcessor processor, DeviceService deviceService, DeviceAuthService authService, RelationService relationService,
-                                          MqttTransportAdaptor adaptor, MqttSslHandlerProvider sslHandlerProvider,
-                                          QuotaService quotaService, AttributesService attributesService ,AssetService assetService) {
+                                          MqttTransportAdaptor adaptor, MqttSslHandlerProvider sslHandlerProvider, QuotaService quotaService,
+                                          AttributesService attributesService ,AssetService assetService, EventService eventService, MailService mailService) {
         this.processor = processor;
         this.deviceService = deviceService;
         this.authService = authService;
@@ -58,6 +62,8 @@ public class MqttTransportServerInitializer extends ChannelInitializer<SocketCha
         this.quotaService = quotaService;
         this.attributesService = attributesService;
         this.assetService = assetService;
+        this.mailService = mailService;
+        this.eventService = eventService;
     }
 
     @Override
@@ -72,7 +78,7 @@ public class MqttTransportServerInitializer extends ChannelInitializer<SocketCha
         pipeline.addLast("encoder", MqttEncoder.INSTANCE);
 
         MqttTransportHandler handler = new MqttTransportHandler(processor, deviceService, authService, relationService,
-                adaptor, sslHandler, quotaService, attributesService, assetService);
+                adaptor, sslHandler, quotaService, attributesService, assetService, eventService, mailService);
 
         pipeline.addLast(handler);
         ch.closeFuture().addListener(handler);

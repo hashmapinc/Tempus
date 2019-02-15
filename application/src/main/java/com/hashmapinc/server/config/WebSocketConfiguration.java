@@ -19,8 +19,8 @@ package com.hashmapinc.server.config;
 import java.util.Map;
 
 import com.hashmapinc.server.service.security.model.SecurityUser;
-import com.hashmapinc.server.exception.TempusErrorCode;
-import com.hashmapinc.server.exception.TempusException;
+import com.hashmapinc.server.common.data.exception.TempusErrorCode;
+import com.hashmapinc.server.common.data.exception.TempusException;
 import com.hashmapinc.server.controller.plugin.PluginWebSocketHandler;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;

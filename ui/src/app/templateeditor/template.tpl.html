@@ -1,0 +1,115 @@
+<!--
+
+    Copyright © 2016-2018 The Thingsboard Authors
+    Modifications © 2017-2018 Hashmap, Inc
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+        http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+
+<section layout="row" layout-align="center center" style="margin-left: 80%;">
+	<label class="tb-small" translate>templateEditor.grid</label>
+	<md-switch ng-change ="resetFilter();" ng-model="tableView" aria-label="predefined-switcher" style="
+    margin-left: 4px;
+    margin-right: -5px;
+">
+	</md-switch>
+	<label class="tb-small" translate>templateEditor.table</label>
+</section>
+
+<md-toolbar class="md-table-toolbar tb-device-toolbar md-default" ng-show="tableView && query.search != null">
+	<div class="md-toolbar-tools">
+		<md-button class="md-icon-button" aria-label="{{ 'action.search' | translate }}">
+			<md-icon aria-label="{{ 'action.search' | translate }}" class="material-icons">search</md-icon>
+			<md-tooltip md-direction="top">
+				{{ 'action.search' | translate }}
+			</md-tooltip>
+		</md-button>
+		<md-input-container flex>
+			<label>&nbsp;</label>
+			<input ng-model="query.search" placeholder="{{ 'common.enter-search' | translate }}"/>
+		</md-input-container>
+		<md-button class="md-icon-button" aria-label="{{ 'action.back' | translate }}" ng-click="exitFilterMode()">
+			<md-icon aria-label="{{ 'action.close' | translate }}" class="material-icons">close</md-icon>
+			<md-tooltip md-direction="top">
+				{{ 'action.close' | translate }}
+			</md-tooltip>
+		</md-button>
+	</div>
+</md-toolbar>
+<md-toolbar class="md-table-toolbar tb-template-toolbar md-default " ng-show="tableView && query.search === null">
+
+	<div class="md-toolbar-tools">
+		<span flex></span>
+		<md-button class="md-icon-button" ng-click="vm.addTemplate($event)">
+			<md-icon>add</md-icon>
+			<md-tooltip md-direction="top">
+				{{ 'action.add' | translate }}
+			</md-tooltip>
+		</md-button>
+		<md-button class="md-icon-button" ng-click="enterFilterMode()">
+			<md-icon>search</md-icon>
+			<md-tooltip md-direction="top">
+				{{ 'action.search' | translate }}
+			</md-tooltip>
+		</md-button>
+		<md-button  class="md-icon-button" ng-click="resetFilter()">
+			<md-icon>refresh</md-icon>
+			<md-tooltip md-direction="top">
+				{{ 'action.refresh' | translate }}
+			</md-tooltip>
+		</md-button>
+	</div>
+</md-toolbar>
+
+
+<md-table-container ng-show="tableView" class ="tb-template-container">
+	<table class="tb-template-table" md-table>
+		<thead md-head md-order="query.order" md-on-reorder="onReorder">
+		<tr md-row>
+			<th md-column md-order-by="name"><span translate>templateEditor.name</span></th>
+			<th md-column><span translate>templateEditor.createdDate</span></th>
+
+		</tr>
+		</thead>
+		<tbody md-body>
+		<tr md-row  ng-repeat="template in templates.data">
+			<td md-cell><a href ng-click="templateDetailFunc($event,template)">{{template.name}}</a></td>
+			<td md-cell>{{template.createdTime | date :  'yyyy-MM-dd HH:mm:ss'}}</td>
+			<td md-cell>
+				<span title="Delete" style="cursor: pointer;" ng-click="vm.deletetemplate($event, template)"><ng-md-icon size="16" icon="delete"></ng-md-icon></span><span title="Copy" style="cursor: pointer;" ng-click="vm.copyEditor($event, template)"><ng-md-icon size="16" icon="content_copy"></ng-md-icon></span><span title="Edit" style="cursor: pointer;" ng-click="templateDetailFunc($event,template)"> <ng-md-icon size="16" icon="edit"></ng-md-icon></span>
+			</td>
+
+		</tr>
+
+		</tbody>
+	</table>
+</md-table-container>
+
+<md-table-pagination class ="tb-template-container" ng-show="tableView && templates.data.length > 0" md-limit="query.limit" md-limit-options="[5, 10, 15]"
+					 md-page="query.page" md-total="{{templates.count}}"
+					 md-on-paginate="onPaginate" md-page-select>
+</md-table-pagination>
+<tb-grid  grid-configuration="vm.templateEditorGridConfig" class="template-grid">
+	<md-tabs ng-class="{'tb-headless': vm.grid.detailsConfig.isDetailsEditMode}"
+			 id="tabs" md-border-bottom flex class="tb-absolute-fill">
+		<md-tab label="{{ 'templateEditor.templateDetails' | translate }}">
+			<tb-template data="vm.grid.operatingItem()"
+						  is-edit="vm.grid.detailsConfig.isDetailsEditMode"
+						  the-form="vm.grid.detailsForm"></tb-template>
+
+		</md-tab>
+	</md-tabs>
+</tb-grid>
+
+

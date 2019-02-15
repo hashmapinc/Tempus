@@ -53,7 +53,7 @@ public interface DsKvRepository extends CrudRepository<DsKvEntity, DsKvComposite
                                           @Param("endDs") Double endDs);
 
 
-    @Query("SELECT dskv.ds, dskv.key, dskv.booleanValue, dskv.strValue, dskv.longValue, dskv.doubleValue, dskv.jsonValue, dskv.unit FROM DsKvEntity dskv WHERE dskv.entityId = :entityId " +
+    @Query("SELECT dskv.ds, dskv.key, dskv.booleanValue, dskv.strValue, dskv.longValue, dskv.doubleValue, dskv.jsonValue, dskv.unit, dskv.sourceUnit FROM DsKvEntity dskv WHERE dskv.entityId = :entityId " +
             "AND dskv.entityType = :entityType " +
             "AND dskv.ds >= :startDs AND dskv.ds <= :endDs ORDER BY dskv.ds DESC")
     List<Object[]> findSelected(@Param("entityId") String entityId,

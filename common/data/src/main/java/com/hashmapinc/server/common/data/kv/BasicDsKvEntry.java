@@ -78,6 +78,11 @@ public class BasicDsKvEntry implements DsKvEntry{
     }
 
     @Override
+    public Optional<String> getSourceUnit() {
+        return kv.getSourceUnit();
+    }
+
+    @Override
     public Double getDs() {
         return ds;
     }

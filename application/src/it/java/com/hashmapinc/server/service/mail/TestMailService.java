@@ -16,7 +16,8 @@
  */
 package com.hashmapinc.server.service.mail;
 
-import com.hashmapinc.server.exception.TempusException;
+import com.hashmapinc.server.common.data.exception.TempusException;
+import com.hashmapinc.server.dao.mail.MailService;
 import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;

@@ -135,7 +135,9 @@ function DashboardController($scope, $rootScope, $element, $timeout, $mdMedia, $
         isDetailsReadOnly: isCustomerUser,
         isSelectionEnabled: function () {
             return !isCustomerUser();
-        }
+        },
+        isEntityList:true
+
     };
     
     var entityTableDevice = $rootScope.$on("CallTableDetailDeviceOnDashboard", function($event, data){

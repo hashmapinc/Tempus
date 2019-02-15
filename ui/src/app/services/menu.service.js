@@ -58,7 +58,7 @@ function Menu(userService, $state, $rootScope, $log,datamodelService,customerSer
     function getGeneratedSectionTree() {
         return generatedSectionTree;
     }
-    
+
     function getHomeSections() {
         return homeSections;
     }
@@ -267,6 +267,14 @@ function Menu(userService, $state, $rootScope, $log,datamodelService,customerSer
                             icon: 'now_widgets',
                             link: '/static/svg/widgetslightgray.svg'
                         },
+
+                        {
+                            name: 'file-upload.upload',
+                            type: 'link',
+                            state: 'home.file-upload',
+                            icon: 'file_upload_icon',
+                            link: '/static/svg/baseline-cloud_upload.svg'
+                        },
                         {
                             name: 'data_model.data_models',
                             type: 'link',
@@ -296,6 +304,15 @@ function Menu(userService, $state, $rootScope, $log,datamodelService,customerSer
                             icon: 'dashboards',
                             link: '/static/svg/computationslightgray.svg'
                         },
+
+                        {
+                            name: 'templateEditor.templateEditor',
+                            type: 'link',
+                            state: 'home.templateeditor',
+                            icon: 'template_editor',
+                            link: '/static/svg/template.svg'
+                        },
+
                         {
                             name: 'Preferences',
                             type: 'link',
@@ -420,7 +437,23 @@ function Menu(userService, $state, $rootScope, $log,datamodelService,customerSer
                                         icon: 'settings_applications'
                                     }
                                  ]
-                             }
+                             },
+
+                              {
+
+                                  name: 'templateEditor.templateEditor',
+                                  places: [
+                                      {
+                                         name: 'templateEditor.templateEditor',
+                                         type: 'link',
+                                         state: 'home.templateeditor',
+                                         icon: 'template_editor',
+                                         link: '/static/svg/template.svg'
+
+                                     }
+                                  ]
+                               },
+
 
                         ];
 

@@ -87,6 +87,11 @@ public class BaseAttributeKvEntry implements AttributeKvEntry {
     }
 
     @Override
+    public Optional<String> getSourceUnit() {
+        return kv.getSourceUnit();
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;

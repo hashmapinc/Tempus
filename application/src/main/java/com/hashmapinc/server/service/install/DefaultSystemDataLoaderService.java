@@ -25,6 +25,7 @@ import com.hashmapinc.server.common.data.id.TenantId;
 import com.hashmapinc.server.common.data.kv.AttributeKvEntry;
 import com.hashmapinc.server.common.data.kv.BaseAttributeKvEntry;
 import com.hashmapinc.server.common.data.kv.StringDataEntry;
+import com.hashmapinc.server.common.data.page.TextPageLink;
 import com.hashmapinc.server.common.data.plugin.ComponentLifecycleState;
 import com.hashmapinc.server.common.data.plugin.PluginMetaData;
 import com.hashmapinc.server.common.data.rule.RuleMetaData;
@@ -33,13 +34,14 @@ import com.hashmapinc.server.common.data.security.DeviceCredentials;
 import com.hashmapinc.server.common.data.security.UserCredentials;
 import com.hashmapinc.server.common.data.widget.WidgetType;
 import com.hashmapinc.server.common.data.widget.WidgetsBundle;
-import com.hashmapinc.server.common.msg.exception.TempusRuntimeException;
 import com.hashmapinc.server.dao.attributes.AttributesService;
 import com.hashmapinc.server.dao.customer.CustomerService;
 import com.hashmapinc.server.dao.customergroup.CustomerGroupService;
 import com.hashmapinc.server.dao.dashboard.DashboardService;
 import com.hashmapinc.server.dao.device.DeviceCredentialsService;
 import com.hashmapinc.server.dao.device.DeviceService;
+import com.hashmapinc.server.dao.exception.DataValidationException;
+import com.hashmapinc.server.dao.exception.IncorrectParameterException;
 import com.hashmapinc.server.dao.model.ModelConstants;
 import com.hashmapinc.server.dao.plugin.PluginService;
 import com.hashmapinc.server.dao.rule.RuleService;
@@ -65,6 +67,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static com.hashmapinc.server.common.data.DataConstants.*;
 
@@ -145,26 +148,26 @@ public class DefaultSystemDataLoaderService implements SystemDataLoaderService {
     @Value("${ldap.authentication-enabled}")
     private boolean isLdapEnabled;
 
-    private User adminUser;
-    private CustomerGroup adminGroup;
-
     @Override
-    public void createSysAdminGroup() throws TempusApplicationException {
-        adminGroup = createGroup(SYS_ADMIN_GROUP, Collections.singletonList(SYS_ADMIN_DEFAULT_PERMISSION) , null, null);
-    }
+    public void createSysAdminWithGroupAndSettings() {
+        if (userService.findUserByEmail(adminEmail) != null) {
+            log.info("System admin already exists !!");
+            return;
+        }
 
-    @Override
-    public void createSysAdmin() {
+        CustomerGroup adminGroup = createGroup(SYS_ADMIN_GROUP, Collections.singletonList(SYS_ADMIN_DEFAULT_PERMISSION), null, null);
+
+        User adminUser;
         if(isLdapEnabled) {
             adminUser = createUser(Authority.SYS_ADMIN,null, null, adminEmail, null, true);
         } else {
             adminUser = createUser(Authority.SYS_ADMIN,null, null, adminEmail, "sysadmin", false);
         }
-        customerGroupService.assignUsers(adminGroup.getId(), Collections.singletonList(adminUser.getId()));
+        assignUserToGroup(adminGroup, adminUser);
+        createAdminSettings(adminUser);
     }
 
-    @Override
-    public void createAdminSettings() throws TempusApplicationException {
+    private void createAdminSettings(User adminUser) {
         UserSettings generalSettings = new UserSettings();
         generalSettings.setKey("general");
         ObjectNode node = objectMapper.createObjectNode();
@@ -223,23 +226,32 @@ public class DefaultSystemDataLoaderService implements SystemDataLoaderService {
                             JsonNode widgetsBundleDescriptorJson = objectMapper.readTree(path.toFile());
                             JsonNode widgetsBundleJson = widgetsBundleDescriptorJson.get("widgetsBundle");
                             WidgetsBundle widgetsBundle = objectMapper.treeToValue(widgetsBundleJson, WidgetsBundle.class);
-                            WidgetsBundle savedWidgetsBundle = widgetsBundleService.saveWidgetsBundle(widgetsBundle);
+                            if (widgetsBundle.getTenantId() == null) {
+                                widgetsBundle.setTenantId(new TenantId(ModelConstants.NULL_UUID));
+                            }
+                            WidgetsBundle existingWB = widgetsBundleService.findWidgetsBundleByTenantIdAndAlias(widgetsBundle.getTenantId(), widgetsBundle.getAlias());
+                            WidgetsBundle savedWidgetsBundle = existingWB != null ? existingWB : widgetsBundleService.saveWidgetsBundle(widgetsBundle);
                             JsonNode widgetTypesArrayJson = widgetsBundleDescriptorJson.get("widgetTypes");
                             widgetTypesArrayJson.forEach(
                                     widgetTypeJson -> {
                                         try {
                                             WidgetType widgetType = objectMapper.treeToValue(widgetTypeJson, WidgetType.class);
                                             widgetType.setBundleAlias(savedWidgetsBundle.getAlias());
-                                            widgetTypeService.saveWidgetType(widgetType);
+                                            if (widgetType.getTenantId() == null) {
+                                                widgetType.setTenantId(new TenantId(ModelConstants.NULL_UUID));
+                                            }
+                                            WidgetType existingWT = widgetTypeService.findWidgetTypeByTenantIdBundleAliasAndAlias(widgetType.getTenantId(), savedWidgetsBundle.getAlias(), widgetType.getAlias());
+                                            if (existingWT == null)
+                                                widgetTypeService.saveWidgetType(widgetType);
+                                            else
+                                                log.info("Widget type '[{}]', already loaded from json: [{}]", widgetType.getName(), path.toString());
                                         } catch (Exception e) {
                                             log.error("Unable to load widget type from json: [{}]", path.toString());
-                                            throw new TempusRuntimeException("Unable to load widget type from json", e);
                                         }
                                     }
                             );
                         } catch (Exception e) {
                             log.error("Unable to load widgets bundle from json: [{}]", path.toString());
-                            throw new TempusRuntimeException("Unable to load widgets bundle from json", e);
                         }
                     }
             );
@@ -261,7 +273,7 @@ public class DefaultSystemDataLoaderService implements SystemDataLoaderService {
     @Override
     public void loadSystemRules() throws TempusApplicationException {
         try {
-            loadRules(Paths.get(dataDir, JSON_DIR, SYSTEM_DIR, RULES_DIR), null);
+            loadRules(Paths.get(dataDir, JSON_DIR, SYSTEM_DIR, RULES_DIR), new TenantId(ModelConstants.NULL_UUID));
         } catch (IOException e) {
             throw new TempusApplicationException(e);
         }
@@ -269,19 +281,14 @@ public class DefaultSystemDataLoaderService implements SystemDataLoaderService {
 
     @Override
     public void loadDemoData() throws TempusApplicationException {
-        Tenant demoTenant = new Tenant();
-        demoTenant.setRegion("Global");
-        demoTenant.setTitle("DemoTenant");
-        demoTenant = tenantService.saveTenant(demoTenant);
+        Tenant demoTenant = createDemoTenant();
 
         CustomerGroup tenantGroup = createGroup(TENANT_GROUP, Collections.singletonList(TENANT_ADMIN_DEFAULT_PERMISSION) , demoTenant.getId(), null);
         User tenantUser = createUser(Authority.TENANT_ADMIN, demoTenant.getId(), null, "demo@hashmapinc.com", "tenant", false);
-        customerGroupService.assignUsers(tenantGroup.getId(), Collections.singletonList(tenantUser.getId()));
 
-        Customer customerA = new Customer();
-        customerA.setTenantId(demoTenant.getId());
-        customerA.setTitle("Drilling Team");
-        customerA = customerService.saveCustomer(customerA);
+        assignUserToGroup(tenantGroup, tenantUser);
+
+        Customer customerA = createCustomer(demoTenant, "Drilling Team");
 
         List<String> customerPermissions = Arrays.asList(
                 CUSTOMER_USER_DEFAULT_ASSET_READ_PERMISSION,
@@ -291,7 +298,7 @@ public class DefaultSystemDataLoaderService implements SystemDataLoaderService {
         );
         CustomerGroup customerGroupA = createGroup("Driller Group", customerPermissions, demoTenant.getId(), customerA.getId());
         User bobJones = createUser(Authority.CUSTOMER_USER, demoTenant.getId(), customerA.getId(), "bob.jones@hashmapinc.com", "driller", false);
-        customerGroupService.assignUsers(customerGroupA.getId(), Collections.singletonList(bobJones.getId()));
+        assignUserToGroup(customerGroupA, bobJones);
 
         List<AttributeKvEntry> attributesTank123 = new ArrayList<>();
         attributesTank123.add(new BaseAttributeKvEntry(new StringDataEntry("latitude", "52.330732"), DateTime.now().getMillis()));
@@ -306,14 +313,9 @@ public class DefaultSystemDataLoaderService implements SystemDataLoaderService {
         createDevice(new DeviceUser(demoTenant.getId(), customerA.getId(), "GATEWAY_ACCESS_TOKEN"), "Gateway", "Spark Analytics Gateway", null, true, null);
         createDevice(new DeviceUser(demoTenant.getId(), customerA.getId(), "DEVICE_GATEWAY_TOKEN"), "Gateway", "Device Gateway", null, true, null);
 
-        Customer customerB = new Customer();
-        customerB.setTenantId(demoTenant.getId());
-        customerB.setTitle("Customer B");
-        customerB = customerService.saveCustomer(customerB);
-        Customer customerC = new Customer();
-        customerC.setTenantId(demoTenant.getId());
-        customerC.setTitle("Customer C");
-        customerC = customerService.saveCustomer(customerC);
+        Customer customerB = createCustomer(demoTenant, "Customer B");
+        Customer customerC = createCustomer(demoTenant, "Customer C");
+
         createDevice(demoTenant.getId(), customerA.getId(), DEFAULT_DEVICE_TYPE, "Test Device A1", "A1_TEST_TOKEN", null);
         createDevice(demoTenant.getId(), customerA.getId(), DEFAULT_DEVICE_TYPE, "Test Device A2", "A2_TEST_TOKEN", null);
         createDevice(demoTenant.getId(), customerA.getId(), DEFAULT_DEVICE_TYPE, "Test Device A3", "A3_TEST_TOKEN", null);
@@ -336,6 +338,43 @@ public class DefaultSystemDataLoaderService implements SystemDataLoaderService {
         }
     }
 
+    private Tenant createDemoTenant() {
+        Tenant demoTenant = new Tenant();
+        String demoTenantName = "DemoTenant";
+        List<Tenant> demoTenants = tenantService.findTenants(new TextPageLink(1, demoTenantName)).getData();
+        if (demoTenants.size() == 0) {
+            demoTenant.setRegion("Global");
+            demoTenant.setTitle(demoTenantName);
+            demoTenant = tenantService.saveTenant(demoTenant);
+        } else {
+            log.info("Tenant [{}] already exists !!", demoTenantName);
+            demoTenant = demoTenants.get(0);
+        }
+        return demoTenant;
+    }
+
+    private Customer createCustomer(Tenant tenant, String title) {
+        Optional<Customer> existingCustomer = customerService.findCustomerByTenantIdAndTitle(tenant.getId(), title);
+        if (existingCustomer.isPresent()) {
+            log.info("Customer [{}] already exists !!", title);
+            return existingCustomer.get();
+        }
+
+        Customer customer = new Customer();
+        customer.setTenantId(tenant.getId());
+        customer.setTitle(title);
+        customer = customerService.saveCustomer(customer);
+        return customer;
+    }
+
+    private void assignUserToGroup(CustomerGroup group, User user) {
+        List<CustomerGroup> groups = customerGroupService.findByUserId(user.getId(), new TextPageLink(100, group.getSearchText())).getData().stream().filter(cg -> cg.getId().equals(group.getId())).collect(Collectors.toList());
+        if (groups.size() == 0)
+            customerGroupService.assignUsers(group.getId(), Collections.singletonList(user.getId()));
+        else
+            log.info("User [{}] already assigned to Group [{}] !!", user.getEmail(), group.getName());
+    }
+
     @Override
     public void deleteSystemWidgetBundle(String bundleAlias) throws TempusApplicationException {
         WidgetsBundle widgetsBundle = widgetsBundleService.findWidgetsBundleByTenantIdAndAlias(new TenantId(ModelConstants.NULL_UUID), bundleAlias);
@@ -345,12 +384,21 @@ public class DefaultSystemDataLoaderService implements SystemDataLoaderService {
     }
 
     private CustomerGroup createGroup(String title, List<String> permissions , TenantId tenantId , CustomerId customerId) {
-        CustomerGroup customerGroup = new CustomerGroup();
-        customerGroup.setTitle(title);
-        customerGroup.setTenantId(tenantId);
-        customerGroup.setCustomerId(customerId);
-        customerGroup.setPolicies(permissions);
-        return customerGroupService.saveCustomerGroup(customerGroup);
+        TenantId tenantIdForFind = tenantId == null ? new TenantId(ModelConstants.NULL_UUID) : tenantId;
+        CustomerId customerIdForFind = customerId == null ? new CustomerId(ModelConstants.NULL_UUID) : customerId;
+        Optional<CustomerGroup> existingGroup = customerGroupService.findCustomerByTenantIdAndCustomerIdAndTitle(tenantIdForFind, customerIdForFind, title);
+
+        if (existingGroup.isPresent()) {
+            log.info("Customer Group [{}] already exists !!", title);
+            return existingGroup.get();
+        } else {
+            CustomerGroup customerGroup = new CustomerGroup();
+            customerGroup.setTitle(title);
+            customerGroup.setTenantId(tenantId);
+            customerGroup.setCustomerId(customerId);
+            customerGroup.setPolicies(permissions);
+            return customerGroupService.saveCustomerGroup(customerGroup);
+        }
     }
 
     private User createUser(Authority authority,
@@ -359,6 +407,13 @@ public class DefaultSystemDataLoaderService implements SystemDataLoaderService {
                             String email,
                             String password,
                             boolean isExternalUser) {
+
+        User userByEmail = userService.findUserByEmail(email);
+        if (userByEmail != null) {
+            log.info("User with email id [{}] already created !!", email);
+            return userByEmail;
+        }
+
         User user = new User();
         user.setAuthority(authority);
         user.setEmail(email);
@@ -382,6 +437,12 @@ public class DefaultSystemDataLoaderService implements SystemDataLoaderService {
                                 String description,
                                 Boolean isGateway,
                                 List<AttributeKvEntry> attributes) {
+
+        Device existingDevice = deviceService.findDeviceByTenantIdAndName(deviceUser.getTenantId(), name);
+        if (existingDevice != null) {
+            log.info("Device [{}] already created !!", name);
+            return existingDevice;
+        }
         Device device = new Device();
         device.setTenantId(deviceUser.getTenantId());
         device.setCustomerId(deviceUser.getCustomerId());
@@ -433,9 +494,10 @@ public class DefaultSystemDataLoaderService implements SystemDataLoaderService {
                             } else {
                                 pluginService.savePlugin(plugin);
                             }
+                        } catch (IncorrectParameterException e) {
+                            log.info("Plugin already loaded: [{}]", path.toString());
                         } catch (Exception e) {
                             log.error("Unable to load plugin from json: [{}]", path.toString());
-                            throw new TempusRuntimeException("Unable to load plugin from json", e);
                         }
                     }
             );
@@ -450,16 +512,20 @@ public class DefaultSystemDataLoaderService implements SystemDataLoaderService {
                             JsonNode ruleJson = objectMapper.readTree(path.toFile());
                             RuleMetaData rule = objectMapper.treeToValue(ruleJson, RuleMetaData.class);
                             rule.setTenantId(tenantId);
-                            if (rule.getState() == ComponentLifecycleState.ACTIVE) {
-                                rule.setState(ComponentLifecycleState.SUSPENDED);
-                                RuleMetaData savedRule = ruleService.saveRule(rule);
-                                ruleService.activateRuleById(savedRule.getId());
+                            List<RuleMetaData> existingRule = ruleService.findAllTenantRulesByTenantId(tenantId).stream().filter(r -> r.getName().equals(rule.getName())).collect(Collectors.toList());
+                            if (existingRule.isEmpty()) {
+                                if (rule.getState() == ComponentLifecycleState.ACTIVE) {
+                                    rule.setState(ComponentLifecycleState.SUSPENDED);
+                                    RuleMetaData savedRule = ruleService.saveRule(rule);
+                                    ruleService.activateRuleById(savedRule.getId());
+                                } else {
+                                    ruleService.saveRule(rule);
+                                }
                             } else {
-                                ruleService.saveRule(rule);
+                                log.info("Rule already loaded: [{}]", path.toString());
                             }
                         } catch (Exception e) {
                             log.error("Unable to load rule from json: [{}]", path.toString());
-                            throw new TempusRuntimeException("Unable to load rule from json", e);
                         }
                     }
             );
@@ -478,9 +544,10 @@ public class DefaultSystemDataLoaderService implements SystemDataLoaderService {
                             if (customerId != null && !customerId.isNullUid()) {
                                 dashboardService.assignDashboardToCustomer(savedDashboard.getId(), customerId);
                             }
+                        } catch (DataValidationException e) {
+                            log.info("Dashboard already loaded: [{}]", path.toString());
                         } catch (Exception e) {
                             log.error("Unable to load dashboard from json: [{}]", path.toString());
-                            throw new TempusRuntimeException("Unable to load dashboard from json", e);
                         }
                     }
             );

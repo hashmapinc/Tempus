@@ -39,3 +39,5 @@ DROP TABLE IF EXISTS metadata_entries;
 DROP TABLE IF EXISTS spark_computation_meta_data;
 DROP TABLE IF EXISTS tempus_gateway_configuration;
 DROP TABLE IF EXISTS tenant_unit_system;
+DROP TABLE IF EXISTS templates;
+DROP TABLE IF EXISTS lambda_computation_meta_data;

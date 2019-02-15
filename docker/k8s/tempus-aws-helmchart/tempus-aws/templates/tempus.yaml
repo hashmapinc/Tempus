@@ -68,6 +68,8 @@ data:
   http.port: "8080"
   identity.base.url: "http://{{ .Values.identity.name }}:{{ .Values.identity.service.port }}/uaa"
   metadata.base.url: "http://{{ .Values.metadata.name }}:{{ .Values.metadata.service.port }}/api"
+  spark.jars.bucket: "tempus-spark-jars"
+  computation.location: "http://s3fs"
 ---
 apiVersion: "apps/v1beta1"
 kind: StatefulSet
@@ -211,6 +213,26 @@ spec:
             configMapKeyRef:
               name: tempus-config
               key: demo.data
+        - name: SPARK_JARS_BUCKET
+          valueFrom:
+            configMapKeyRef:
+              name: tempus-config
+              key: spark.jars.bucket
+        - name: ACTORS_COMPUTATION_LOCATION
+          valueFrom:
+            configMapKeyRef:
+              name: tempus-config
+              key: computation.location
+        - name: AWS_ACCESS_KEY
+          valueFrom:
+            secretKeyRef:
+              name: aws
+              key: accesskey
+        - name: AWS_SECRET_KEY
+          valueFrom:
+            secretKeyRef:
+              name: aws
+              key: secretkey
         command:
         - sh
         - -c

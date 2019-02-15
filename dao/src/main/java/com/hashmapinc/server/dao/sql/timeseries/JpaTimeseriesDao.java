@@ -261,6 +261,7 @@ public class JpaTimeseriesDao extends JpaAbstractDaoListeningExecutorService imp
         entity.setBooleanValue(tsKvEntry.getBooleanValue().orElse(null));
         entity.setJsonValue(tsKvEntry.getJsonValue().orElse(null));
         entity.setUnit(tsKvEntry.getUnit().orElse(null));
+        entity.setSourceUnit(tsKvEntry.getSourceUnit().orElse(null));
         log.trace("Saving entity: {}", entity);
         return insertService.submit(() -> {
             tsKvRepository.save(entity);
@@ -286,6 +287,7 @@ public class JpaTimeseriesDao extends JpaAbstractDaoListeningExecutorService imp
         latestEntity.setBooleanValue(tsKvEntry.getBooleanValue().orElse(null));
         latestEntity.setJsonValue(tsKvEntry.getJsonValue().orElse(null));
         latestEntity.setUnit(tsKvEntry.getUnit().orElse(null));
+        latestEntity.setSourceUnit(tsKvEntry.getSourceUnit().orElse(null));
         return insertService.submit(() -> {
             tsKvLatestRepository.save(latestEntity);
             return null;
