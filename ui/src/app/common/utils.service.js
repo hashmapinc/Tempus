@@ -43,7 +43,7 @@ function Utils($mdColorPalette, $rootScope, $window, $translate, $q, $timeout, t
 
     var commonMaterialIcons = [ 'more_horiz', 'more_vert', 'open_in_new', 'visibility', 'play_arrow', 'arrow_back', 'arrow_downward',
         'arrow_forward', 'arrow_upwards', 'close', 'refresh', 'menu', 'show_chart', 'multiline_chart', 'pie_chart', 'insert_chart', 'people',
-        'person', 'domain', 'devices_other', 'now_widgets', 'dashboards', 'map', 'pin_drop', 'my_location', 'extension', 'search',
+        'person', 'domain', 'devices_other', 'now_widgets','file_upload', 'dashboards', 'map', 'pin_drop', 'my_location', 'extension', 'search',
         'settings', 'notifications', 'notifications_active', 'info', 'info_outline', 'warning', 'list', 'file_download', 'import_export',
         'share', 'add', 'edit', 'done' ];
 

@@ -16,10 +16,12 @@
  */
 package com.hashmapinc.server.controller;
 
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hashmapinc.server.common.data.CustomerGroup;
 import com.hashmapinc.server.common.data.EntityType;
+import com.hashmapinc.server.common.data.Tenant;
 import com.hashmapinc.server.common.data.User;
 import com.hashmapinc.server.common.data.audit.ActionType;
 import com.hashmapinc.server.common.data.id.*;
@@ -30,6 +32,7 @@ import com.hashmapinc.server.common.data.security.UserCredentials;
 import com.hashmapinc.server.dao.model.ModelConstants;
 import com.hashmapinc.server.common.data.exception.TempusErrorCode;
 import com.hashmapinc.server.common.data.exception.TempusException;
+import com.hashmapinc.server.dao.tenant.TenantService;
 import com.hashmapinc.server.requests.CreateUserRequest;
 import com.hashmapinc.server.requests.IdentityUser;
 import com.hashmapinc.server.dao.mail.MailService;
@@ -48,8 +51,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.List;
-import java.util.UUID;
+import java.time.Instant;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @RestController
@@ -70,6 +73,9 @@ public class UserController extends BaseController {
     @Autowired
     @Qualifier("clientRestTemplate")
     private RestTemplate restTemplate;
+
+    @Autowired
+    private TenantService tenantService;
 
     @PreAuthorize("hasAnyAuthority('SYS_ADMIN', 'TENANT_ADMIN', 'CUSTOMER_USER')")
     @GetMapping(value = "/user/{userId}")
@@ -132,6 +138,59 @@ public class UserController extends BaseController {
         }
     }
 
+    @PostMapping(value = "/noauth/user")
+    @ResponseBody
+    public User saveTrialUser(@RequestBody User user,
+                         HttpServletRequest request) throws TempusException {
+        Tenant savedTenant = null;
+        try {
+            user.setAuthority(Authority.TENANT_ADMIN);
+            savedTenant = checkNotNull(createTenant(user));
+            user.setTenantId(savedTenant.getId());
+
+            user = setCurrentTimeInUser(user);
+
+            User savedUser = createUser(user, "mail", request);
+            if (savedUser != null) {
+                assignDefaultGroupToTenantUser(savedUser.getTenantId(), savedUser.getId());
+            }
+            return savedUser;
+        } catch (Exception e) {
+            if(savedTenant != null)
+                tenantService.deleteTenant(savedTenant.getId());
+            throw handleException(e);
+        }
+    }
+
+    private User setCurrentTimeInUser(User user) {
+        Map<String,String> additionalInfo =  new HashMap<>();
+        additionalInfo.put("date",Long.toString(atStartOfDay().getTime()));
+        additionalInfo.put("trialAccount","true");
+        ObjectMapper mapper = new ObjectMapper();
+        JsonNode jsonNode = mapper.convertValue(additionalInfo, JsonNode.class);
+        user.setAdditionalInfo(jsonNode);
+
+        return user;
+    }
+
+    private Date atStartOfDay() {
+        Calendar calendar = Calendar.getInstance();
+        Date currentDate = Date.from(Instant.now());
+        long currentDateTime = currentDate.getTime();
+        calendar.setTimeInMillis(currentDateTime);
+        calendar.set(Calendar.HOUR_OF_DAY, 0);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+        calendar.set(Calendar.MILLISECOND, 0);
+        return calendar.getTime();
+    }
+
+    private Tenant createTenant(User newUser) {
+        Tenant tenant = new Tenant();
+        tenant.setTitle(newUser.getEmail());
+        return tenantService.saveTenant(tenant);
+    }
+
     private void assignDefaultGroupToTenantUser(TenantId tenantId, UserId userId) {
         TextPageData<CustomerGroup> customerGroupByTenant =
                 customerGroupService.findCustomerGroupsByTenantIdAndCustomerId(tenantId, new CustomerId(ModelConstants.NULL_UUID), new TextPageLink(1));
@@ -185,6 +244,28 @@ public class UserController extends BaseController {
     @PostMapping(value = "/user/sendActivationMail")
     @ResponseStatus(value = HttpStatus.OK)
     public void sendActivationEmail(
+            @RequestParam(value = "email") String email,
+            HttpServletRequest request) throws TempusException {
+        try {
+            User user = checkNotNull(userService.findUserByEmail(email));
+            UserCredentials userCredentials = userService.findUserCredentialsByUserId(user.getId());
+            if (!userCredentials.isEnabled()) {
+                String baseUrl = constructBaseUrl(request);
+                String activateUrl = String.format(ACTIVATE_URL_PATTERN, baseUrl,
+                        userCredentials.getActivateToken());
+                mailService.sendActivationEmail(activateUrl, email);
+            } else {
+                throw new TempusException("User is already active!", TempusErrorCode.BAD_REQUEST_PARAMS);
+            }
+        } catch (Exception e) {
+            throw handleException(e);
+        }
+    }
+
+
+    @PostMapping(value = "/noauth/user/resendActivationMail")
+    @ResponseStatus(value = HttpStatus.OK)
+    public void resendActivationEmail(
             @RequestParam(value = "email") String email,
             HttpServletRequest request) throws TempusException {
         try {

@@ -60,7 +60,7 @@ public class TenantServiceImpl extends AbstractEntityService implements TenantSe
 
     private static final String DEFAULT_TENANT_REGION = "Global";
     public static final String INCORRECT_TENANT_ID = "Incorrect tenantId ";
-    private static final String DEFAULT_UNIT_SYSTEM = "SI";
+    private static final String DEFAULT_UNIT_SYSTEM = "Metric";
 
     @Autowired
     private TenantDao tenantDao;

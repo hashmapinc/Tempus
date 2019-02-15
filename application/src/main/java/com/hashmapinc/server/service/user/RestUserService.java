@@ -28,6 +28,8 @@ import com.google.common.util.concurrent.ListenableFuture;
 import com.hashmapinc.server.common.data.Customer;
 import com.hashmapinc.server.common.data.Tenant;
 import com.hashmapinc.server.common.data.User;
+import com.hashmapinc.server.common.data.exception.TempusErrorCode;
+import com.hashmapinc.server.common.data.exception.TempusException;
 import com.hashmapinc.server.common.data.id.*;
 import com.hashmapinc.server.common.data.page.TextPageData;
 import com.hashmapinc.server.common.data.page.TextPageLink;
@@ -66,6 +68,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import javax.annotation.Nullable;
 import javax.annotation.PostConstruct;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Base64;
 import java.util.List;
 import java.util.UUID;
@@ -88,6 +91,9 @@ public class RestUserService extends AbstractEntityService implements UserServic
 
     public static final String INCORRECT_USER_ID = "Incorrect userId ";
     public static final String INCORRECT_TENANT_ID = "Incorrect tenantId ";
+    public static final String INCORRECT_CLIENT_ID = "Incorrect clientId ";
+    public static final String INCORRECT_AUTHORITY = "Incorrect authority ";
+
 
     @Autowired
     private TenantDao tenantDao;
@@ -352,6 +358,33 @@ public class RestUserService extends AbstractEntityService implements UserServic
         return findUserById(userId);
     }
 
+    @Override
+    public List<User> findUsersTenantId(String  tenantId) throws TempusException {
+        Validator.validateString(tenantId, INCORRECT_AUTHORITY + tenantId);
+        ResponseEntity<IdentityUser []> response = restTemplate.getForEntity(identityUrl + "/list" + "/"+tenantId ,IdentityUser[].class);
+        List<User> users = null;
+        if(response.getStatusCode().equals(HttpStatus.OK)) {
+            users = Arrays.stream(response.getBody()).map(IdentityUser::toUser).collect(Collectors.toList());
+        }else
+            throw new TempusException(response.getBody().toString(), TempusErrorCode.GENERAL);
+
+        return users;
+    }
+
+    @Override
+    public List<User> findTrialUserByClientIdAndAuthority(String  clientId, String authority) throws TempusException {
+        Validator.validateString(clientId,INCORRECT_CLIENT_ID + clientId);
+        Validator.validateString(authority, INCORRECT_AUTHORITY + authority);
+        ResponseEntity<IdentityUser []> response = restTemplate.getForEntity(identityUrl + "/list" + "/"+clientId + "/" +authority + "/trialAccount",IdentityUser[].class);
+        List<User> users = null;
+        if(response.getStatusCode().equals(HttpStatus.OK)) {
+            users = Arrays.stream(response.getBody()).map(IdentityUser::toUser).collect(Collectors.toList());
+        }else
+            throw new TempusException(response.getBody().toString(), TempusErrorCode.GENERAL);
+
+        return users;
+    }
+
     private TextPageData<User> findUsers(TenantId tenantId, CustomerId customerId, TextPageLink pageLink){
         UUID idOffset = pageLink.getIdOffset() != null ? pageLink.getIdOffset() : ModelConstants.NULL_UUID;
         UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(identityUrl + "/list")
@@ -378,6 +411,8 @@ public class RestUserService extends AbstractEntityService implements UserServic
         }
         return null;
     }
+
+
 
     private DataValidator<User> userValidator =
             new DataValidator<User>() {

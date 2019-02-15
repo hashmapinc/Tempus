@@ -20,9 +20,12 @@ import com.hashmapinc.tempus.UnitConvertorContext;
 import com.hashmapinc.tempus.exception.QuantityClassSetException;
 import com.hashmapinc.tempus.exception.UnitConvertorContextException;
 import com.hashmapinc.tempus.exception.UnitConvertorException;
+import com.hashmapinc.tempus.exception.UnitSystemSetException;
 import com.hashmapinc.tempus.model.Quantity;
 import com.hashmapinc.tempus.service.QuantityClassSetService;
 import com.hashmapinc.tempus.service.UnitConvertorService;
+import com.hashmapinc.tempus.service.UnitSystem;
+import com.hashmapinc.tempus.service.UnitSystemService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -38,11 +41,13 @@ public class UnitConversionServiceImpl implements UnitConversionService {
 
     private UnitConvertorService unitConvertorService;
     private QuantityClassSetService quantityClassSetService;
+    private UnitSystemService unitSystemService;
 
     @PostConstruct
     public void init() throws UnitConvertorContextException {
         unitConvertorService = UnitConvertorContext.getInstanceOfUnitConvertorService();
         quantityClassSetService = UnitConvertorContext.getInstanceOfQuantityClassSetService();
+        unitSystemService = UnitConvertorContext.getInstanceOfUnitSystemService();
     }
 
     @Override
@@ -93,5 +98,16 @@ public class UnitConversionServiceImpl implements UnitConversionService {
             log.info(ex.getMessage());
         }
         return Collections.emptySet();
+    }
+
+    @Override
+    public String getUnitFor(String unitSystem , String sourceUnit) {
+        UnitSystem system = UnitSystem.valueOf(unitSystem);
+        try {
+            return unitSystemService.getUnitFor(system, sourceUnit);
+        } catch (UnitSystemSetException e) {
+            log.debug(e.getMessage());
+        }
+        return sourceUnit;
     }
 }

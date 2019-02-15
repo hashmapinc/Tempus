@@ -14,13 +14,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.hashmapinc.server.actors;
+package com.hashmapinc.server.common.data.upload;
 
-import org.junit.extensions.cpsuite.ClasspathSuite;
-import org.junit.runner.RunWith;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-
-@RunWith(ClasspathSuite.class)
-@ClasspathSuite.ClassnameFilters({"com.hashmapinc.server.actors.*Test"})
-public class ActorsTestSuite {
+@NoArgsConstructor
+@AllArgsConstructor
+@Data
+public class FileMetaData {
+    private String fileName;
+    private String extension;
+    private long lastUpdated;
+    private double size;
 }

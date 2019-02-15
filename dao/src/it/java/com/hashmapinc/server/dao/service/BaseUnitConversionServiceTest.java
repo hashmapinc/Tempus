@@ -17,6 +17,7 @@
 package com.hashmapinc.server.dao.service;
 
 import com.hashmapinc.tempus.model.Quantity;
+import com.hashmapinc.tempus.service.UnitSystem;
 import org.junit.Test;
 import org.junit.Assert;
 
@@ -81,5 +82,15 @@ public class BaseUnitConversionServiceTest extends AbstractServiceTest {
     public void getMemberUnitsForQuantityClassForMass() {
         Set masses = unitConversionService.getMemberUnitsForQuantityClass("mass");
         Assert.assertNotNull(masses);
+    }
+
+    @Test
+    public void getUnitForDogLegAngleGradient() {
+        Assert.assertEquals("deg/100ft", unitConversionService.getUnitFor("ENGLISH", "deg/30m"));
+    }
+
+    @Test
+    public void getUnitForMassPerTimePerArea() {
+        Assert.assertEquals("lbm/(ft2.s)", unitConversionService.getUnitFor("ENGLISH", "kg/(m2.s)"));
     }
 }

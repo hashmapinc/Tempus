@@ -44,15 +44,15 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
-import static com.hashmapinc.server.service.security.auth.permissions.PermissionMatcherTest.PERMISSION_TO_TEST.PERMISSION_TO_ACCESS;
-import static com.hashmapinc.server.service.security.auth.permissions.PermissionMatcherTest.PERMISSION_TO_TEST.PERMISSION_TO_ACT;
+import static com.hashmapinc.server.service.security.auth.permissions.PermissionMatcherUnitTest.PERMISSION_TO_TEST.PERMISSION_TO_ACCESS;
+import static com.hashmapinc.server.service.security.auth.permissions.PermissionMatcherUnitTest.PERMISSION_TO_TEST.PERMISSION_TO_ACT;
 
 @ActiveProfiles("permission-attr-test")
 @RunWith(Parameterized.class)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
-@ContextConfiguration(classes = PermissionMatcherTest.class, loader = SpringBootContextLoader.class)
+@ContextConfiguration(classes = PermissionMatcherUnitTest.class, loader = SpringBootContextLoader.class)
 @ComponentScan({"com.hashmapinc.server.service.security.auth.permissions"})
-public class PermissionMatcherTest {
+public class PermissionMatcherUnitTest {
 
     @ClassRule
     public static final SpringClassRule SPRING_CLASS_RULE = new SpringClassRule();

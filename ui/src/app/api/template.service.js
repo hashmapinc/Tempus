@@ -26,7 +26,8 @@ function TemplateService($q, $http) {
       saveTemplate: saveTemplate,
       getTemplates: getTemplates,
       deleteTemplate: deleteTemplate,
-      getAllTemplates: getAllTemplates
+      getAllTemplates: getAllTemplates,
+      getTemplateDetail: getTemplateDetail
     }
 
     return service;
@@ -83,6 +84,19 @@ function TemplateService($q, $http) {
 
         var deferred = $q.defer();
         var url = '/api/templates';
+        $http.get(url, null).then(function success(response) {
+            deferred.resolve(response.data);
+        }, function fail() {
+            deferred.reject();
+        });
+        return deferred.promise;
+    }
+
+
+    function getTemplateDetail(templateId){
+
+        var deferred = $q.defer();
+        var url = '/api/template/'+templateId;
         $http.get(url, null).then(function success(response) {
             deferred.resolve(response.data);
         }, function fail() {
