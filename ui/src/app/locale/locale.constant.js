@@ -121,6 +121,7 @@ export default angular.module('tempus.locale', [])
                     "metadata" : "Metadata",
                     "name" : "Name",
                     "name-required":"This feild is required",
+                    "region-required": "AWS Region is required.",
                     "add-metadata" : "Add New Metadata",
                     "add" : "Add Metadata",
                     "source-type" : "Source Type",
@@ -367,7 +368,8 @@ export default angular.module('tempus.locale', [])
                     "delete-templates-action-title":"Delete { count, select, 1 {1 template} other {# templates} }",
                     "delete-templates-text": "Be careful, after the confirmation all selected templates will be removed.",
                     "no-template-text":"No Templates Available",
-                    "createdDate":"Created Date"
+                    "createdDate":"Created Date",
+                    "copyFrom":"Copy From Existing Template"
 
 
                 },
@@ -803,6 +805,29 @@ export default angular.module('tempus.locale', [])
                     "lastTimeRecived" :"Last Time Received",
                     "businessUnit":"Business Unit"
                 },
+                "file-upload":{
+                    "upload": "Upload",
+                    "fileName": "File Name",
+                    "createdOn": "Created On",
+                    "fileType": "File Type",
+                    "fileSize": "File Size(In KB)",
+                    "renameDoc": "Rename File",
+                    "download": "Download",
+                    "delete": "Delete",
+                    "fileNameNew": "New File Name",
+                    "replace-file": "Replace file",
+                    "fileSizeError": "File size should be less than or equal to 100 MB",
+                    "fileRenameError": "Name extension can not be compressed or executable file, Please provide name in valid format",
+                    "fileExtensionError": "File type is not supported to upload",
+                    "fileNameError": "Given file name is already existing file name",
+                    "fileSuccess": "File has been successfully uploaded",
+                    "deleteSuccess": "File has been successfully deleted",
+                    "delete-file-title": "Are you sure you want to delete the file '{{fileName}}'?",
+                    "delete-file-text": "Be careful, after confirmation the file and all related data will become unrecoverable.",
+                    "replace-file-title": "Are you sure you want to replace the file '{{fileName}}'?",
+                    "replace-file-text": "Be careful, after the confirmation the file and all related data will become unrecoverable."
+                },
+
                 "dialog": {
                     "close": "Close dialog"
                 },
@@ -1176,7 +1201,7 @@ export default angular.module('tempus.locale', [])
                     "sign-in": "Please sign in",
                     "username": "Username (email)",
                     "remember-me": "Remember me",
-                    "forgot-password": "Forgot Password?",
+                    "forgot-credential": "Forgot Password?",
                     "password-reset": "Password reset",
                     "new-password": "New password",
                     "new-password-again": "New password again",
@@ -1266,7 +1291,6 @@ export default angular.module('tempus.locale', [])
                     "copyId": "Copy computation Id",
                     "idCopiedMessage": "Computation Id has been copied to clipboard",
                     "function-configurations": "Function Configurations",
-                    "function-name": "Function Name",
                     "runtime": "Runtime",
                     "runtime-required": "Runtime is required",
                     "import-function": "Import Function",
@@ -1275,6 +1299,12 @@ export default angular.module('tempus.locale', [])
                     "no-dependencies": "No dependency file selected",
                     "function-handler": "Function handler",
                     "timeout": "Function timeout (Seconds)",
+                    "function-name": "Function Name",
+                    "region": "Region",
+                    "upload-zip": "Upload Zip",
+                    "memorySize": "Function memory (MB)",
+                    "memorySize-required": "Function Memory Size is required",
+                    "timeout-required": "Function Timeout is required",
                     "handler-required": "Function handler is required"
                 },
                 "computationJob": {
@@ -1322,7 +1352,16 @@ export default angular.module('tempus.locale', [])
                         "functionSelector-value": "Selector",
                         "field-required": "Field is required",
                         "add-map": "Add Selector",
-                        "type": "Trigger Type"
+                        "type": "Trigger Type",
+                        "type-required": "Type is required"
+                    },
+                    "lambda": {
+                        "functionSelector-key": "Label",
+                        "functionSelector-value": "Selector",
+                        "field-required": "Field is required",
+                        "add-map": "Add Selector",
+                        "type": "Trigger Type",
+                        "type-required": "Type is required"
                     }
                 },
                 "position": {
@@ -1434,7 +1473,8 @@ export default angular.module('tempus.locale', [])
                     "idCopiedMessage": "Rule Id has been copied to clipboard",
                     "select-rule": "Select rule",
                     "no-rules-matching": "No rules matching '{{entity}}' were found.",
-                    "rule-required": "Rule is required"
+                    "rule-required": "Rule is required",
+                    "templates":"Templates"
                 },
                 "rule-plugin": {
                     "management": "Rules and plugins management"
@@ -1833,9 +1873,32 @@ export default angular.module('tempus.locale', [])
                     "save-preferences-success":"Unit Preferences saved successfully",
                     "preferences":"Preferences",
                     "units":"Units",
-                    "si-metric-system" :"SI-Metric System",
-                    "imperials-units":"Imperials System",
-                    "us-customary-units":"US-Customary System"
+                    "metric-system" :"Metric Unit System",
+                    "english-system":"English Unit System",
+                    "canadian-system":"Canadian Unit System"
+                },
+                "signup": {
+                    "activation-msg" : "An activation link has been sent to your register email address." ,
+                    "activation-msgText": "If you dont see an email from us, please check your spam folder or click on 'RESEND LINK' button." ,
+                    "resend-link": "RESEND LINK",
+                    "invalid-email": "Invalid Email Address",
+                    "accept-privacy": "Please accept privacy policy",
+                    "login-text": "Already have an account?",
+                    "submit" :"Submit",
+                    "privacy-policy": "Privacy Policy",
+                    "accept": "Accept",
+                    "accept-privacy-policy": "Accept Privacy Policy",
+                    "company-name":"Company Name",
+                    "home":"home",
+                    "phone": "Phone",
+                    "call":"call",
+                    "email":"Email",
+                    "email-icon":"email",
+                    "last-name": "Last Name",
+                    "required-field" : "This is required.",
+                    "first-name": "First Name",
+                    "sign-up": "Sign up to get your own personal account for Free !",
+                    "emailSuccess": "Email is sent on your email id.Please check."
                 }
             }
         }

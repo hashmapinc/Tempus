@@ -1,0 +1,123 @@
+/**
+ * Copyright © 2016-2018 The Thingsboard Authors
+ * Modifications © 2017-2018 Hashmap, Inc
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+@import '../../scss/constants';
+
+
+label.md-required:after {
+    color:white !important;
+}
+
+#signupCheck .md-icon  {
+ border-color: white;
+}
+.tb-activation-card{
+ width:45% !important;
+}
+.action-msg {
+    margin-top: 9%;
+    margin-bottom: 4%;
+    margin-left: 4%;
+    color: white;
+    font-size: 22px;
+}
+.activation-msgText{
+    margin-left: 4%;
+    color: white;
+    font-size: 22px;
+    margin-bottom: 4%;
+}
+.resend-link{
+    margin-bottom: 30px !important;
+    border-radius: 16px !important;
+    background-color: white !important;
+    width: 30%;
+    padding: 8px !important;
+    margin-left: 37% !important;
+}
+.signup-card {
+    background: transparent;height: 100%;
+    max-height: 850px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    box-shadow:inset 0 0 10px #000000;
+}
+.img {
+    width: 100%;
+    margin-top: 1%;
+}
+.icon {
+    margin-left:35%;
+    margin-bottom: 2%;
+}
+.sign-span {
+    color: white;
+    font-size: 21px;
+    margin-left:6%;
+}
+.progress-linear{
+    z-index: 1;
+    max-height: 0px;
+    width: inherit;
+}
+.label-color {
+    color:white !important;
+}
+.policy {
+    margin-top:20px;
+    margin-bottom: 20px;
+}
+.md-check{
+    color: white;
+    font-size: 20px;
+}
+md-card.tb-signup-card {
+  width: 330px !important;
+  @media (min-width: $layout-breakpoint-sm) {
+    width: 550px !important;
+  }
+  md-card-title {
+    img.tb-login-logo {
+      height: 50px;
+    }
+  }
+  md-card-content {
+    margin-top: -50px;
+  }
+}
+.hm-login-logo {
+	margin-left: 25%;
+	min-height: 110px;
+	min-width: 250px;
+}
+.btn-submit {
+    margin-bottom: 30px !important;
+    border-radius: 16px !important;
+    background-color: palegoldenrod !important;
+    width: 90% !important;
+    padding: 8px !important;
+    margin-left: 5% !important;
+}
+.redirect {
+    font-size: 18px;
+    font-weight:500;
+    color: white;
+    margin-left: 29%;
+}
+.input-cls {
+    border-color:white !important;
+    color:white !important;
+}

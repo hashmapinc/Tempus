@@ -253,6 +253,30 @@ public class DefaultMailService implements MailService {
         }
     }
 
+    @Override
+    public void sendExpiryRemainderMailToUser(String email) throws TempusException{
+        String subject = messages.getMessage("account.deactivate.reminder.subject", null, Locale.US);
+
+        VelocityContext velocityContext = new VelocityContext();
+        velocityContext.put(TARGET_EMAIL, email);
+
+        String message = mergeVelocityTemplate("templates/account.deactivate.reminder.vm", velocityContext);
+
+        sendMail(mailSender, mailFrom, email, subject, message);
+    }
+
+    @Override
+    public void sendAccountExpiryMail(String email) throws TempusException {
+        String subject = messages.getMessage("account.deactivate.subject", null, Locale.US);
+
+        VelocityContext velocityContext = new VelocityContext();
+        velocityContext.put(TARGET_EMAIL, email);
+
+        String message = mergeVelocityTemplate("templates/account.deactivate.vm", velocityContext);
+
+        sendMail(mailSender, mailFrom, email, subject, message);
+    }
+
     private void sendMail(JavaMailSenderImpl mailSender,
                           String mailFrom, String email,
                           String subject, String message) throws TempusException {

@@ -1,0 +1,101 @@
+<!--
+
+    Copyright © 2016-2018 The Thingsboard Authors
+    Modifications © 2017-2018 Hashmap, Inc
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+        http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<md-content layout="row" layout-align="center center" class="hm-background-{{theme}} layout-align-center-center layout-row">
+    <md-card style="background: transparent;height: 100%;
+    max-height: 800px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    border: 1px solid gray;box-shadow: 9px 9px 1px 0px #000000" flex="initial" class="tb-signup-card">
+        <md-card-title>
+            <md-card-title-text>
+                <!--                 <span translate class="md-headline">login.sign-in</span>
+                 -->            </md-card-title-text>
+            <!--  <img src="{{vm.logoSvg}}" aria-label="logo" class="tb-login-logo"/>-->
+        </md-card-title>
+
+        <md-card-content>
+
+            <md-icon ng-show ="fileType != ''" ng-switch on="fileType" class="material-icons hm-login-logo" style="">
+                <img ng-switch-when="svg" class="img" ng-src="data:image/svg+xml;base64,{{logo}}">
+                <img ng-switch-default class="img" ng-src="data:image/JPEG;base64,{{logo}}">
+            </md-icon>
+            <md-icon ng-show ="fileType == ''" md-svg-src="/static/svg/Tempus_Logo_E_TagLineExtended_vectorized.svg" class="material-icons hm-login-logo icon"></md-icon><br/>
+            <span class="sign-span">{{ 'signup.sign-up' | translate }}</span>
+            <form  ng-submit="vm.signup()" style="margin-top: 7%;">
+                <md-progress-linear style="margin-top:5px;margin-bottom:19px !important;" class="md-warn progress-linear"
+                                    md-mode="indeterminate" ng-disabled="!$root.loading" ng-show="$root.loading"></md-progress-linear>
+                <div layout="row">
+                    <md-input-container flex="50">
+                        <label class="label-color">{{ 'signup.first-name' | translate }}</label>
+                        <input required name="firstName" ng-model="vm.signupRequest.firstName" class="input-cls">
+                        <div ng-messages="vm.user.firstName.$error">
+                            <div ng-message="required">{{ 'signup.required-field' | translate }}</div>
+                        </div>
+                    </md-input-container>
+
+                    <md-input-container flex="50">
+                        <label class="label-color">{{ 'signup.last-name' | translate }}</label>
+                        <input required name="firstName" ng-model="vm.signupRequest.lastName" class="input-cls">
+                        <div ng-messages="vm.user.lastName.$error">
+                            <div ng-message="required">{{ 'signup.required-field' | translate }}</div>
+                        </div>
+                    </md-input-container>
+                </div>
+                <div>
+                    <md-input-container class="md-block md-icon-left">
+                        <label class="label-color" translate="" class="ng-scope" for="email-input" style="color:white !important;">{{ 'signup.email' | translate }}</label>
+                        <md-icon aria-label="Email" class="material-icons md-tb-dark-theme label-color" role="img"> {{ 'signup.email-icon' | translate }} </md-icon>
+                        <input required id="email-input" type="email" ng-model="vm.signupRequest.email" class="md-input input-cls" aria-invalid="true">
+                        <div class="md-errors-spacer"></div>
+                    </md-input-container>
+                </div>
+                <div>
+                    <md-input-container class="md-block md-icon-left">
+                        <label class="label-color" translate="" class="ng-scope" for="email-input">{{ 'signup.phone' | translate }}</label>
+                        <md-icon aria-label="Phone" class="material-icons md-tb-dark-theme label-color" role="img"> {{ 'signup.call' | translate }} </md-icon>
+                        <input required id="phone-input" ng-model="vm.signupRequest.additionalInfo.phone" pattern="[1-9]{1}[0-9]{9}" class="md-input input-cls " aria-invalid="true"
+                               ng-keypress="vm.filterValue($event)">
+                        <div class="md-errors-spacer"></div>
+                    </md-input-container>
+                </div>
+                <div>
+                    <md-input-container class="md-block md-icon-left">
+                        <label class="label-color" translate="" class="ng-scope" for="email-input">{{ 'signup.company-name' | translate }}</label>
+                        <md-icon aria-label="Company" class="material-icons md-tb-dark-theme label-color" role="img"> {{ 'signup.home' | translate }} </md-icon>
+                        <input required id="company-input" ng-model="vm.signupRequest.additionalInfo.CompanyName"  class="md-input input-cls" aria-invalid="true">
+                        <div class="md-errors-spacer"></div>
+                    </md-input-container>
+                </div>
+                <div
+                        vc-recaptcha
+                        ng-model="vm.signupRequest.recaptchaResponse"
+                        key="'6LdxkI0UAAAAAAeQ0v8H8wUAPaAYyn1CdSbpjV_w'"
+                ></div>
+                <div class="policy">
+                    <md-checkbox class="md-check " id="signupCheck" class="red" aria-label="{{ 'signup.accept-privacy-policy' | translate }}" ng-model="vm.acceptPrivacyPolicy">
+                        {{ 'signup.accept' | translate }} <a  href="#" ng-click="vm.redirectToPolicy()" style="color:aquamarine !important;">{{ 'signup.privacy-policy' | translate }}</a>
+                    </md-checkbox>
+                </div>
+                <md-button class="md-raised btn-submit" type="submit" style="line-height: 25px;">{{ 'signup.submit' | translate }}</md-button>
+
+                <a class="redirect" href="#" ng-click="vm.redirectToURL()">{{ 'signup.login-text' | translate }}</a>
+            </form>
+        </md-card-content>
+    </md-card>
+</md-content>

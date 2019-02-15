@@ -47,4 +47,6 @@ public interface KvEntry extends Serializable {
     Object getValue();
 
     Optional<String> getUnit();
+
+    Optional<String> getSourceUnit();
 }

@@ -346,6 +346,14 @@
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-collections4</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.amazonaws</groupId>
+            <artifactId>aws-java-sdk-lambda</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.amazonaws</groupId>
+            <artifactId>aws-java-sdk-kinesis</artifactId>
+        </dependency>
     </dependencies>
     <build>
         <finalName>${pkg.name}-${project.version}</finalName>
@@ -389,7 +397,7 @@
                         <spring.config.name>tempus</spring.config.name>
                     </systemPropertyVariables>
                     <includes>
-                        <include>**/*TestSuite.java</include>
+                        <include>**/*UnitTest.java</include>
                     </includes>
                     <excludes>
                         <exclude>**/*IntegrationTestSuite.java</exclude>

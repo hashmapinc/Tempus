@@ -257,10 +257,11 @@ public class CassandraBaseDepthSeriesDao extends CassandraAbstractAsyncDao imple
                 .setString(2, dsKvEntry.getKey())
                 .setDouble(3, partition)
                 .setDouble(4, dsKvEntry.getDs())
-                .setString(6, dsKvEntry.getUnit().orElse(null));
+                .setString(6, dsKvEntry.getUnit().orElse(null))
+                .setString(7, dsKvEntry.getSourceUnit().orElse(null));
         addValue(dsKvEntry, stmt, 5);
         if (ttl > 0) {
-            stmt.setInt(7, (int) ttl);
+            stmt.setInt(8, (int) ttl);
         }
         return getFuture(executeAsyncWrite(stmt), rs -> null);
     }
@@ -288,7 +289,8 @@ public class CassandraBaseDepthSeriesDao extends CassandraAbstractAsyncDao imple
                 .setUUID(1, entityId.getId())
                 .setString(2, dsKvEntry.getKey())
                 .setDouble(3, dsKvEntry.getDs())
-                .setString(5, dsKvEntry.getUnit().orElse(null));
+                .setString(5, dsKvEntry.getUnit().orElse(null))
+                .setString(6, dsKvEntry.getSourceUnit().orElse(null));
         addValue(dsKvEntry, stmt, 4);
         return getFuture(executeAsyncWrite(stmt), rs -> null);
     }
@@ -407,17 +409,18 @@ public class CassandraBaseDepthSeriesDao extends CassandraAbstractAsyncDao imple
 
     public static KvEntry toKvEntry(Row row, String key) {
         String unit = row.get(ModelConstants.UNIT_COLUMN, String.class);
+        String sourceUnit = row.get(ModelConstants.SOURCE_UNIT_COLUMN, String.class);
         if (row.get(ModelConstants.STRING_VALUE_COLUMN, String.class) != null) {
-            return new StringDataEntry(key, unit, row.get(ModelConstants.STRING_VALUE_COLUMN, String.class));
+            return new StringDataEntry(key, unit, sourceUnit, row.get(ModelConstants.STRING_VALUE_COLUMN, String.class));
         }
         if (row.get(ModelConstants.LONG_VALUE_COLUMN, Long.class) != null) {
-            return new LongDataEntry(key, unit, row.get(ModelConstants.LONG_VALUE_COLUMN, Long.class));
+            return new LongDataEntry(key, unit, sourceUnit, row.get(ModelConstants.LONG_VALUE_COLUMN, Long.class));
         }
         if (row.get(ModelConstants.DOUBLE_VALUE_COLUMN, Double.class) != null) {
-            return new DoubleDataEntry(key, unit, row.get(ModelConstants.DOUBLE_VALUE_COLUMN, Double.class));
+            return new DoubleDataEntry(key, unit, sourceUnit, row.get(ModelConstants.DOUBLE_VALUE_COLUMN, Double.class));
         }
         if (row.get(ModelConstants.BOOLEAN_VALUE_COLUMN, Boolean.class) != null) {
-            return new BooleanDataEntry(key, unit, row.get(ModelConstants.BOOLEAN_VALUE_COLUMN, Boolean.class));
+            return new BooleanDataEntry(key, unit, sourceUnit, row.get(ModelConstants.BOOLEAN_VALUE_COLUMN, Boolean.class));
         }
         if (row.get(ModelConstants.JSON_VALUE_COLUMN, JsonNode.class) != null) {
             return new JsonDataEntry(key, row.get(ModelConstants.JSON_VALUE_COLUMN, JsonNode.class));
@@ -449,8 +452,9 @@ public class CassandraBaseDepthSeriesDao extends CassandraAbstractAsyncDao imple
                         "," + ModelConstants.PARTITION_COLUMN +
                         "," + ModelConstants.DS_COLUMN +
                         "," + getColumnName(type) +
-                        "," + ModelConstants.UNIT_COLUMN + ")" +
-                        " VALUES(?, ?, ?, ?, ?, ?, ?)");
+                        "," + ModelConstants.UNIT_COLUMN +
+                        "," + ModelConstants.SOURCE_UNIT_COLUMN + ")" +
+                        " VALUES(?, ?, ?, ?, ?, ?, ?, ?)");
             }
         }
         return saveStmts[dataType.ordinal()];
@@ -467,8 +471,9 @@ public class CassandraBaseDepthSeriesDao extends CassandraAbstractAsyncDao imple
                         "," + ModelConstants.PARTITION_COLUMN +
                         "," + ModelConstants.DS_COLUMN +
                         "," + getColumnName(type) +
-                        "," + ModelConstants.UNIT_COLUMN + ")" +
-                        " VALUES(?, ?, ?, ?, ?, ?, ?) USING TTL ?");
+                        "," + ModelConstants.UNIT_COLUMN +
+                        "," + ModelConstants.SOURCE_UNIT_COLUMN + ")" +
+                        " VALUES(?, ?, ?, ?, ?, ?, ?, ?) USING TTL ?");
             }
         }
         return saveTtlStmts[dataType.ordinal()];
@@ -508,8 +513,9 @@ public class CassandraBaseDepthSeriesDao extends CassandraAbstractAsyncDao imple
                         "," + ModelConstants.KEY_COLUMN +
                         "," + ModelConstants.DS_COLUMN +
                         "," + getColumnName(type) +
-                        "," + ModelConstants.UNIT_COLUMN + ")" +
-                        " VALUES(?, ?, ?, ?, ?, ?)");
+                        "," + ModelConstants.UNIT_COLUMN +
+                        "," + ModelConstants.SOURCE_UNIT_COLUMN + ")" +
+                        " VALUES(?, ?, ?, ?, ?, ?, ?)");
             }
         }
         return latestInsertStmts[dataType.ordinal()];
@@ -551,7 +557,8 @@ public class CassandraBaseDepthSeriesDao extends CassandraAbstractAsyncDao imple
                     ModelConstants.LONG_VALUE_COLUMN + "," +
                     ModelConstants.DOUBLE_VALUE_COLUMN + "," +
                     ModelConstants.JSON_VALUE_COLUMN + "," +
-                    ModelConstants.UNIT_COLUMN + " " +
+                    ModelConstants.UNIT_COLUMN + "," +
+                    ModelConstants.SOURCE_UNIT_COLUMN + " " +
                     "FROM " + ModelConstants.DS_KV_LATEST_CF + " " +
                     "WHERE " + ModelConstants.ENTITY_TYPE_COLUMN + EQUAL_PLACEHOLDER +
                     "AND " + ModelConstants.ENTITY_ID_COLUMN + EQUAL_PLACEHOLDER +
@@ -570,7 +577,8 @@ public class CassandraBaseDepthSeriesDao extends CassandraAbstractAsyncDao imple
                     ModelConstants.LONG_VALUE_COLUMN + "," +
                     ModelConstants.DOUBLE_VALUE_COLUMN + "," +
                     ModelConstants.JSON_VALUE_COLUMN + "," +
-                    ModelConstants.UNIT_COLUMN + " " +
+                    ModelConstants.UNIT_COLUMN + "," +
+                    ModelConstants.SOURCE_UNIT_COLUMN + " " +
                     "FROM " + ModelConstants.DS_KV_LATEST_CF + " " +
                     "WHERE " + ModelConstants.ENTITY_TYPE_COLUMN + EQUAL_PLACEHOLDER +
                     "AND " + ModelConstants.ENTITY_ID_COLUMN + EQUAL_PLACEHOLDER);

@@ -76,6 +76,11 @@ public class BasicTsKvEntry implements TsKvEntry {
     }
 
     @Override
+    public Optional<String> getSourceUnit() {
+        return kv.getSourceUnit();
+    }
+
+    @Override
     public long getTs() {
         return ts;
     }

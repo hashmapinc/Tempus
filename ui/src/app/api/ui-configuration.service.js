@@ -24,11 +24,12 @@ function UiConfiguration($http, $q, $log, $timeout) {
 
     var service = {
       getUiConfiguration : getUiConfiguration,
-      isDepthSeriesEnabled: isDepthSeriesEnabled
+      isDepthSeriesEnabled: isDepthSeriesEnabled,
+      isAwsLambdaEnabled: isAwsLambdaEnabled
     }
     $timeout( function(){
         getUiConfiguration();
-    }, 1000 );
+    }, 5000 );
     return service;
 
     function getUiConfiguration() {
@@ -51,6 +52,17 @@ function UiConfiguration($http, $q, $log, $timeout) {
     function isDepthSeriesEnabled() {
         if(angular.isDefined(configs)){
             if (configs.depthSeries === 'false') {
+                return false;
+            } else {
+                return true;
+            }
+        }
+
+    }
+
+    function isAwsLambdaEnabled() {
+        if(angular.isDefined(configs)){
+            if (configs.awsLambda === 'false') {
                 return false;
             } else {
                 return true;

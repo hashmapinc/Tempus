@@ -28,8 +28,13 @@ public class LongDataEntry extends BasicKvEntry {
         this.value = value;
     }
 
-    public LongDataEntry(String key, String unit, Long value) {
-        super(key, unit);
+    public LongDataEntry(String key, String unit, String sourceUnit, Long value) {
+        super(key, unit, sourceUnit);
+        this.value = value;
+    }
+
+    public LongDataEntry(String key, String sourceUnit, Long value) {
+        super(key, sourceUnit);
         this.value = value;
     }
 
@@ -67,6 +72,7 @@ public class LongDataEntry extends BasicKvEntry {
         return "LongDataEntry{" +
                 "value=" + value +
                 ", unit=" + super.getUnit().orElse(null) +
+                ", sourceUnit=" + super.getSourceUnit().orElse(null) +
                 "} " + super.toString();
     }
     

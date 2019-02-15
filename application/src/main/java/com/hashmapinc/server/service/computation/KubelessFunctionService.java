@@ -46,7 +46,7 @@ import java.util.Map;
 
 @Slf4j
 @Service
-public class KubelessFunctionService implements ComputationFunctionService {
+public class KubelessFunctionService implements ServerlessFunctionService {
 
     public static final String DEFAULT_NAMESPACE = "default";
     public static final String TXT = "txt";
@@ -69,7 +69,7 @@ public class KubelessFunctionService implements ComputationFunctionService {
     private Base64.Decoder decoder = Base64.getDecoder();
 
     @Override
-    public boolean deployKubelessFunction(Computations computation) {
+    public boolean deployFunction(Computations computation) {
         try {
             KubelessV1beta1FunctionApi functionApi = KubelessConnectionCache.getInstance(KubelessV1beta1FunctionApi.class.getName(),
                     clusterModeEnabled, kublessConfigPath, DEFAULT_NAMESPACE);
@@ -102,15 +102,15 @@ public class KubelessFunctionService implements ComputationFunctionService {
             }
         }
         catch (ApiException e){
-            log.info("Kubeless api kubeconfig exception for deploy funtion : {}", e);
+            log.info("Kubeless api kubeconfig exception for deployFunction function : {}", e);
         } catch (IOException e) {
-            log.info("");
+            log.info("IOExecption : {}", e);
         }
         return false;
     }
 
     @Override
-    public boolean checkKubelessFunction(Computations computation) {
+    public boolean functionExists(Computations computation) {
         try {
             KubelessComputationMetadata md = (KubelessComputationMetadata)(computation.getComputationMetadata());
             KubelessV1beta1FunctionApi functionApi = KubelessConnectionCache.getInstance(KubelessV1beta1FunctionApi.class.getName(),
@@ -132,7 +132,7 @@ public class KubelessFunctionService implements ComputationFunctionService {
     }
 
     @Override
-    public boolean deleteKubelessFunction(Computations computation) {
+    public boolean deleteFunction(Computations computation) {
         try {
             KubelessComputationMetadata md = (KubelessComputationMetadata)(computation.getComputationMetadata());
             KubelessV1beta1FunctionApi functionApi = KubelessConnectionCache.getInstance(KubelessV1beta1FunctionApi.class.getName(),
@@ -225,7 +225,7 @@ public class KubelessFunctionService implements ComputationFunctionService {
     }
 
     @Override
-    public boolean checkTrigger(ComputationJob computationJob) {
+    public boolean triggerExists(ComputationJob computationJob) {
         try {
             if (computationJob.getConfiguration().getClass() == KafkaKubelessTrigger.class) {
                 KubelessV1beta1KafkaTriggerApi triggerApi = KubelessConnectionCache.getInstance(KubelessV1beta1KafkaTriggerApi.class.getName(),
@@ -269,7 +269,7 @@ public class KubelessFunctionService implements ComputationFunctionService {
                     return true;
             }
         } catch (ApiException e) {
-            log.error("Kubeless api exception for delete trigger : {}", e);
+            log.error("Kubeless api exception for deleteFunction trigger : {}", e);
         } catch (IOException e) {
             log.error(IO_EXECPTION, e);
         }
