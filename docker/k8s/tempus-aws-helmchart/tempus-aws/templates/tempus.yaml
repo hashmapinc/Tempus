@@ -118,6 +118,16 @@ spec:
             configMapKeyRef:
               name: tempus-config
               key: identity.base.url
+        - name: AWS_ACCESS_KEY
+          valueFrom:
+            secretKeyRef:
+              name: aws
+              key: accesskey
+        - name: AWS_SECRET_KEY
+          valueFrom:
+            secretKeyRef:
+              name: aws
+              key: secretkey                           
         - name: METADATA_BASE_URL
           valueFrom:
             configMapKeyRef:

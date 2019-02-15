@@ -12,6 +12,7 @@ Platforms
     :maxdepth: 1
 
     linux
+    aws_ec2
     temp
 
 
