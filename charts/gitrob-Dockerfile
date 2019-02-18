@@ -1,0 +1,5 @@
+FROM golang
+
+RUN go get github.com/michenriksen/gitrob
+
+ENTRYPOINT gitrob -github-access-token <Github-access-token> hashmapinc

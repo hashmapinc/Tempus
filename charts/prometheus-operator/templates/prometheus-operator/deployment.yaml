@@ -1,0 +1,82 @@
+#
+# Copyright © 2016-2018 The Thingsboard Authors
+# Modifications © 2017-2018 Hashmap, Inc
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+{{- if .Values.prometheusOperator.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ template "prometheus-operator.fullname" . }}-operator
+  labels:
+    app: {{ template "prometheus-operator.name" . }}-operator
+{{ include "prometheus-operator.labels" . | indent 4 }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ template "prometheus-operator.name" . }}-operator
+      release: {{ .Release.Name | quote }}
+  template:
+    metadata:
+      labels:
+        app: {{ template "prometheus-operator.name" . }}-operator
+{{ include "prometheus-operator.labels" . | indent 8 }}
+{{- if .Values.prometheusOperator.podLabels }}
+{{ toYaml .Values.prometheusOperator.podLabels | indent 8 }}
+{{- end }}
+    spec:
+    {{- if .Values.prometheusOperator.priorityClassName }}
+      priorityClassName: {{ .Values.prometheusOperator.priorityClassName }}
+    {{- end }}
+      containers:
+        - name: {{ template "prometheus-operator.name" . }}
+          image: "{{ .Values.prometheusOperator.image.repository }}:{{ .Values.prometheusOperator.image.tag }}"
+          imagePullPolicy: "{{ .Values.prometheusOperator.image.pullPolicy }}"
+          args:
+          {{- if .Values.prometheusOperator.kubeletService.enabled }}
+            - --kubelet-service={{ .Values.prometheusOperator.kubeletService.namespace }}/{{ template "prometheus-operator.fullname" . }}-kubelet
+          {{- end }}
+            - --logtostderr=true
+            - --crd-apigroup={{ .Values.prometheusOperator.crdApiGroup | default "monitoring.coreos.com" }}
+            - --localhost=127.0.0.1
+            - --prometheus-config-reloader={{ .Values.prometheusOperator.prometheusConfigReloaderImage.repository }}:{{ .Values.prometheusOperator.prometheusConfigReloaderImage.tag }}
+            - --config-reloader-image={{ .Values.prometheusOperator.configmapReloadImage.repository }}:{{ .Values.prometheusOperator.configmapReloadImage.tag }}
+          ports:
+            - containerPort: 8080
+              name: http
+          resources:
+{{ toYaml .Values.prometheusOperator.resources | indent 12 }}
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+{{- if .Values.prometheusOperator.securityContext }}
+      securityContext:
+{{ toYaml .Values.prometheusOperator.securityContext | indent 8 }}
+{{- end }}
+      serviceAccountName: {{ template "prometheus-operator.operator.serviceAccountName" . }}
+    {{- with .Values.prometheusOperator.nodeSelector }}
+      nodeSelector:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+    {{- with .Values.prometheusOperator.affinity }}
+      affinity:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+    {{- with .Values.prometheusOperator.tolerations }}
+      tolerations:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+{{- end }}
