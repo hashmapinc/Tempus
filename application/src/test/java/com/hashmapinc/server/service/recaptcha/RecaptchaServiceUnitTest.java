@@ -45,8 +45,6 @@ public class RecaptchaServiceUnitTest {
     @Mock
     private RestTemplate restTemplate;
 
-    private static final String GOOGLE_RECAPTCHA_VERIFY_URL = "https://www.google.com/recaptcha/api/siteverify";
-
     @Test
     public void shouldReturnSuccess() {
         Map<String, Object> body = new HashMap<>();

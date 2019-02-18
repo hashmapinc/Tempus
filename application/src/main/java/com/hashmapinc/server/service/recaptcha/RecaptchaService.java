@@ -38,11 +38,12 @@ public class RecaptchaService {
     @Value("${google-recaptcha.secret_key}")
     private String recaptchaSecret;
 
-    private static final String GOOGLE_RECAPTCHA_VERIFY_URL = "https://www.google.com/recaptcha/api/siteverify";
+    @Value("${google-recaptcha.verify_url}")
+    private String GOOGLE_RECAPTCHA_VERIFY_URL;
 
     @Autowired
-    @Qualifier("clientRestTemplate")
-    private RestTemplate restTemplate;
+    @Qualifier("simpleRestTemplate")
+    private RestTemplate template;
 
 
     public String verifyRecaptcha(String recaptchaResponse){
@@ -52,7 +53,7 @@ public class RecaptchaService {
         log.debug("Request body for recaptcha: {}", body);
 
         ResponseEntity<Map> recaptchaResponseEntity =
-                restTemplate.postForEntity(GOOGLE_RECAPTCHA_VERIFY_URL +"?secret=" + recaptchaSecret +"&response=" + recaptchaResponse,body,Map.class);
+                template.postForEntity(GOOGLE_RECAPTCHA_VERIFY_URL +"?secret=" + recaptchaSecret +"&response=" + recaptchaResponse,body,Map.class);
 
         log.info("Response from recaptcha: {}", recaptchaResponseEntity);
 
