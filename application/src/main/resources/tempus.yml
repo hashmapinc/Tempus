@@ -444,3 +444,4 @@ user.trial:
 # Google Captcha
 google-recaptcha:
   secret_key: "${RECAPTCHA_SECRET_KEY:RECAPTCHA_SECRET_KEY}"
+  verify_url: "https://www.google.com/recaptcha/api/siteverify"
