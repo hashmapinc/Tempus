@@ -23,11 +23,41 @@
         </v-pane-content>
     </v-pane>
 </v-accordion>-->
-<div ng-repeat="track in vm.trackList">
+<!--<div ng-repeat="track in vm.model.Track">
     <tb-well-log-component
     track-detail="track"
+    datasources = "datasources"
     ></tb-well-log-component>
-</div>
+</div>-->
+
+<v-accordion id="accordionA" class="vAccordion--default" control="accordionA" onexpand="expandCallback(index, id)" oncollapse="collapseCallback(index, id)">
+
+    <v-pane id="{{ ::pane.id }}" ng-repeat="track in vm.model.Track" expanded="pane.isExpanded">
+        <v-pane-header id="{{ ::pane.id }}-header" aria-controls="{{ ::pane.id }}-content">
+            <lable>Track {{track.id}}</lable>
+            <md-button class="md-icon-button md-primary"
+                       style="min-width: 40px;"
+
+                       aria-label="{{ 'action.remove' | translate }}">
+                <md-tooltip md-direction="top">
+                    {{ 'action.remove' | translate }}
+                </md-tooltip>
+                <md-icon aria-label="{{ 'action.delete' | translate }}"
+                         class="material-icons">
+                    close
+                </md-icon>
+            </md-button>
+        </v-pane-header>
+
+        <v-pane-content id="{{ ::pane.id }}-content" aria-labelledby="{{ ::pane.id }}-header">
+            <tb-well-log-component
+                    track-detail="track"
+                    datasources = "datasources"
+            ></tb-well-log-component>
+        </v-pane-content>
+    </v-pane>
+
+</v-accordion>
 
 <md-button ng-disabled="$root.loading" ng-click="vm.addTrack($event)" class="md-raised md-primary md-button md-ink-ripple md-themeDark-theme" aria-label="Add Track">
         Add Track

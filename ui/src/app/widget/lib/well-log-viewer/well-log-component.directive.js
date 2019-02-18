@@ -27,31 +27,29 @@ export default function WellLogViewerTrackDirective($compile, $templateCache, $l
     var linker = function (scope, element) {
         var template = $templateCache.get(wellTrackComponent);
         element.html(template);
-        $log.log('well-component');
-        $log.log(scope.trackDetail);
-        scope.count = 0;
         scope.trackWidth =[1,2,3,4,5];
         scope.trackDetail.details ={
             component :[]
         }
+        var vm = this;
+        vm.count = 1;
 
-
+        $log.log(scope)
         $compile(element.contents())(scope);
-
+        scope.trackDetail.component = [];
         scope.addComponent = function (){
-            $log.log(scope.trackDetail);
             var insertDetail = {
-                        id: scope.count + 1,
-                        componentDetail: []
-                    }
-            scope.trackDetail.details.component.push(insertDetail);
+                id: vm.count ++
+            }
+            scope.trackDetail.component.push(insertDetail);
         }
     }
     return {
         restrict: "E",
         link: linker,
         scope: {
-            trackDetail: '='
+            trackDetail: '=',
+            datasources: '='
         }
     };
 }

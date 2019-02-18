@@ -19,22 +19,9 @@
 <md-content class="md-padding" layout="column">
     <md-card>
         <div style="margin-left: 2%;margin-right: 2%;">
-            <lable>Track {{trackDetail.id}}</lable>
-            <md-button class="md-icon-button md-primary"
-                       style="min-width: 40px;"
-
-                       aria-label="{{ 'action.remove' | translate }}">
-                <md-tooltip md-direction="top">
-                    {{ 'action.remove' | translate }}
-                </md-tooltip>
-                <md-icon aria-label="{{ 'action.delete' | translate }}"
-                         class="material-icons">
-                    close
-                </md-icon>
-            </md-button>
             <br>
             <md-input-container class="md-block">
-                <md-select ng-model="trackDetail.details.width" placeholder="Track Width">
+                <md-select ng-model="trackDetail.width" placeholder="Track Width">
                     <md-option ng-value="width" ng-repeat="width in trackWidth">{{ width }}</md-option>
                 </md-select>
             </md-input-container>
@@ -48,11 +35,40 @@
             </md-button>-->
             <br>
             <div>
-                <div ng-repeat="component in trackDetail.details.component">
+                <!--<div ng-repeat="component in trackDetail.component">
                     <tb-well-log-components
                             track-component="component"
+                            datasources="datasources"
                     ></tb-well-log-components>
-                </div>
+                </div>-->
+                <v-accordion id="accordionA" class="vAccordion--default" control="accordionA" onexpand="expandCallback(index, id)" oncollapse="collapseCallback(index, id)">
+
+                    <v-pane id="{{ ::pane.id }}" ng-repeat="component in trackDetail.component" expanded="pane.isExpanded">
+                        <v-pane-header id="{{ ::pane.id }}-header" aria-controls="{{ ::pane.id }}-content">
+                            <lable>Component {{component.id}}</lable>
+                            <md-button class="md-icon-button md-primary"
+                                       style="min-width: 40px;"
+
+                                       aria-label="{{ 'action.remove' | translate }}">
+                                <md-tooltip md-direction="top">
+                                    {{ 'action.remove' | translate }}
+                                </md-tooltip>
+                                <md-icon aria-label="{{ 'action.delete' | translate }}"
+                                         class="material-icons">
+                                    close
+                                </md-icon>
+                            </md-button>
+                        </v-pane-header>
+
+                        <v-pane-content id="{{ ::pane.id }}-content" aria-labelledby="{{ ::pane.id }}-header">
+                            <tb-well-log-components
+                                    track-component="component"
+                                    datasources="datasources"
+                            ></tb-well-log-components>
+                        </v-pane-content>
+                    </v-pane>
+
+                </v-accordion>
                 <br/>
                 <md-button ng-disabled="$root.loading" ng-click="addComponent($event)" class="md-raised md-primary md-button md-ink-ripple md-themeDark-theme" aria-label="Add Track">
                     <md-tooltip>

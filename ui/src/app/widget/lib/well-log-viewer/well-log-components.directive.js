@@ -29,7 +29,7 @@ export default function WellLogViewerComponentsDirective($compile, $templateCach
         scope.fillTypes =["Left", "Right"];
         scope.styleTypes =["Dashed", "Solid"];
         $log.log('well-components');
-        $log.log(scope.trackComponent);
+        $log.log(scope);
 
         $compile(element.contents())(scope);
     }
@@ -37,7 +37,8 @@ export default function WellLogViewerComponentsDirective($compile, $templateCach
         restrict: "E",
         link: linker,
         scope: {
-            trackComponent: '='
+            trackComponent: '=',
+            datasources:'='
         }
     };
 }

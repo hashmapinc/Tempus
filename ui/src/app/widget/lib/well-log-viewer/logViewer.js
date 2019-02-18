@@ -68,7 +68,7 @@ export default function loadLogViewer(ctx, sequence){
         else {
           datasources.forEach(function(datasource){
             if(settings.dataSource === datasource.dataKey.label){
-              ds = datasource;
+              ds = datasources[0];
             }
          })
         }

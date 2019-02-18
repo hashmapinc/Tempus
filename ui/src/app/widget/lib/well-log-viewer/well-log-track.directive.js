@@ -58,7 +58,8 @@ function WellLogViewerTrack() {
             schema: '=',
             form: '=',
             model: '=',
-            formControl:'='
+            formControl:'=',
+            datasources:'='
         },
         controller: WellLogTrackController,
         controllerAs: 'vm',
@@ -77,15 +78,23 @@ function WellLogTrackController($scope, $log, $sce) {
     vm.trackList = [];
     vm.trackWidth =[1,2,3,4,5];
     vm.trackComponent = wellTrackComponent;
-
+    $log.log("track");
+    //$log.log(vm);
+    vm.model.Track = [];
     function addTrack(){
         vm.count = vm.count + 1;
         var insertDetail = {
             id: vm.count,
             details: []
         }
+        var inset ={
+            id: vm.count,
+            width:""
+        }
         vm.trackList.push(insertDetail);
-        $log.log(vm.trackList);
+        //$log.log(vm)
+        //$log.log(vm.model)
+        vm.model.Track.push(inset);
     }
      $scope.deliberatelyTrustDangerousSnippet = function() {
      $log.log(wellTrackComponent)
