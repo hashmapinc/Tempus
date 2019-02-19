@@ -17,6 +17,7 @@
 package com.hashmapinc.server.dao.mail;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.hashmapinc.server.common.data.User;
 import com.hashmapinc.server.common.data.exception.TempusException;
 import com.hashmapinc.server.common.data.id.TenantId;
 
@@ -43,4 +44,7 @@ public interface MailService {
     void sendExpiryRemainderMailToUser(String email) throws TempusException;
 
     void sendAccountExpiryMail(String email) throws TempusException;
+
+    void sendNewUserSignInNotificationToSysAdmin(User user)throws TempusException;
+
 }

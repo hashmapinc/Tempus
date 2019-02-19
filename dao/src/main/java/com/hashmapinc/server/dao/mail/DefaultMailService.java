@@ -17,6 +17,7 @@
 package com.hashmapinc.server.dao.mail;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hashmapinc.server.common.data.User;
 import com.hashmapinc.server.common.data.UserSettings;
 import com.hashmapinc.server.common.data.exception.TempusErrorCode;
@@ -47,6 +48,7 @@ import javax.mail.internet.MimeMessage;
 import java.io.StringWriter;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Properties;
 
 @Lazy
@@ -59,6 +61,14 @@ public class DefaultMailService implements MailService {
     public static final String UTF_8 = "UTF-8";
     public static final String DEVICE_NAME = "deviceName";
     public static final String ASSET_NAME = "assetName";
+    public static final String CUSTOMER_NAME = "customerName";
+    public static final String ORGANIZATION = "companyName";
+    public static final String PHONE_NO = "phone";
+    public static final String EMAIL = "email";
+
+
+
+
     @Autowired
     private MessageSource messages;
     
@@ -276,6 +286,32 @@ public class DefaultMailService implements MailService {
 
         sendMail(mailSender, mailFrom, email, subject, message);
     }
+
+    @Override
+    public void sendNewUserSignInNotificationToSysAdmin(User user) throws TempusException {
+        String subject = messages.getMessage("trial.user.notification.subject", null, Locale.US);
+
+        VelocityContext velocityContext = getVelocityContext(adminEmail, user);
+
+        String message = mergeVelocityTemplate("templates/trial.user.notification.vm", velocityContext);
+
+        sendMail(mailSender, mailFrom, adminEmail, "New User Registration", message);
+    }
+
+    private VelocityContext getVelocityContext(String email, User user) {
+        VelocityContext velocityContext = new VelocityContext();
+        ObjectMapper mapper = new ObjectMapper();
+        Map<String,String> additionalInfo = mapper.convertValue(user.getAdditionalInfo(), Map.class);
+        velocityContext.put(TARGET_EMAIL, email);
+        velocityContext.put(CUSTOMER_NAME,user.getFirstName() + " " + user.getLastName());
+        velocityContext.put(EMAIL,user.getEmail());
+        velocityContext.put(ORGANIZATION, additionalInfo.get(ORGANIZATION));
+        velocityContext.put(PHONE_NO, additionalInfo.get(PHONE_NO));
+        velocityContext.put(TARGET_EMAIL, email);
+
+        return velocityContext;
+    }
+
 
     private void sendMail(JavaMailSenderImpl mailSender,
                           String mailFrom, String email,
