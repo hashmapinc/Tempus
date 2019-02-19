@@ -166,6 +166,7 @@ public class UserController extends BaseController {
             User savedUser = createUser(user, "mail", request);
             if (savedUser != null) {
                 assignDefaultGroupToTenantUser(savedUser.getTenantId(), savedUser.getId());
+                mailService.sendNewUserSignInNotificationToSysAdmin(user);
             }
             return savedUser;
         } catch (Exception e) {
@@ -176,10 +177,10 @@ public class UserController extends BaseController {
     }
 
     private User setCurrentTimeInUser(User user) {
-        Map<String,String> additionalInfo =  new HashMap<>();
+        ObjectMapper mapper = new ObjectMapper();
+        Map<String,String> additionalInfo = mapper.convertValue(user.getAdditionalInfo(), Map.class);
         additionalInfo.put("date",Long.toString(atStartOfDay().getTime()));
         additionalInfo.put("trialAccount","true");
-        ObjectMapper mapper = new ObjectMapper();
         JsonNode jsonNode = mapper.convertValue(additionalInfo, JsonNode.class);
         user.setAdditionalInfo(jsonNode);
 
