@@ -1,21 +1,53 @@
+def notifySlack(String buildStatus = 'STARTED') {
+    buildStatus = buildStatus ?: 'SUCCESS'
+
+    def color
+
+    if (buildStatus == 'STARTED') {
+        color = '#D4DADF'
+    } else if (buildStatus == 'SUCCESS') {
+        color = '#BDFFC3'
+    } else if (buildStatus == 'UNSTABLE') {
+        color = '#FFFE89'
+    } else {
+        color = '#FF9FA1'
+    }
+
+    def msg = "${buildStatus}:`${env.JOB_NAME}` #${env.BUILD_NUMBER}\nUrl: ${RUN_DISPLAY_URL}\nChanges: ${RUN_CHANGES_DISPLAY_URL}"
+    slackSend(color: color, message: msg, channel: 'tempusbuild', botUser: true)
+}
+
+
 pipeline {
+    options {
+      timeout(time: 2, unit: 'HOURS') 
+  }
   agent {
     docker {
-      image 'hashmapinc/tempusbuild:java-11'
+      image 'hashmapinc/tempusbuild:1056'
       args '-u root -v /var/run/docker.sock:/var/run/docker.sock'
     }
   }
   stages {
+    stage('Code Scan') {
+      steps {  
+        notifySlack()
+        sh '''
+          git secrets --register-aws
+          git-secrets --scan
+    '''
+        }
+    }    
     stage('Initialize') {
       steps {
         sh 'echo $USER'
         sh '''echo PATH = ${PATH}
-echo M2_HOME = ${M2_HOME}
-mvn clean
-mvn validate'''
-        slackSend(message: 'Build Started for Branch: '+env.BRANCH_NAME+' for: '+env.CHANGE_AUTHOR+' on: '+env.BUILD_TAG, color: 'Green', channel: 'tempusbuild', botUser: true)
+              echo M2_HOME = ${M2_HOME}
+              mvn clean
+              mvn validate'''
+        slackSend(message: 'Build Started for Branch: '+env.BRANCH_NAME+' for: '+env.CHANGE_AUTHOR+' on: '+env.BUILD_TAG, color: 'Green', channel: 'tempusnotifications', botUser: true)
       }
-    }
+    }    
     stage('Build') {
       steps {
         sh 'mvn -Dmaven.test.failure.ignore=true -DskipITs org.jacoco:jacoco-maven-plugin:prepare-agent install'
@@ -56,16 +88,16 @@ mvn validate'''
       }
       steps {
         sh '''cp $WORKSPACE/application/target/tempus.deb $WORKSPACE/docker/tb/tempus.deb
-cp $WORKSPACE/application/target/tempus.deb $WORKSPACE/docker/database-setup/tempus.deb'''
+              cp $WORKSPACE/application/target/tempus.deb $WORKSPACE/docker/database-setup/tempus.deb'''
         withCredentials(bindings: [usernamePassword(credentialsId: 'docker_hub', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
           sh 'sudo docker login -u $USERNAME -p $PASSWORD'
         }
 
         sh '''sudo docker build $WORKSPACE/docker/tb/ -t hashmapinc/tempus:dev
-sudo docker build $WORKSPACE/docker/database-setup/ -t hashmapinc/database-setup:dev'''
+              sudo docker build $WORKSPACE/docker/database-setup/ -t hashmapinc/database-setup:dev'''
         sh '''sudo docker push hashmapinc/tempus:dev
-sudo docker push hashmapinc/database-setup:dev
-'''
+              sudo docker push hashmapinc/database-setup:dev
+              '''
       }
     }
     stage('Publish Master Image') {
@@ -77,18 +109,19 @@ sudo docker push hashmapinc/database-setup:dev
           sh 'sudo docker login -u $USERNAME -p $PASSWORD'
         }
           sh '''cd ./docker/tb/
-          make push'''
+                make push'''
       }
     }    
-    stage('Success Message') {
-      steps {
-        slackSend(message: 'Build Completed for Branch: '+env.BRANCH_NAME+' for: '+env.CHANGE_AUTHOR+' on: '+env.BUILD_TAG, channel: 'tempusbuild', color: 'Green')
-      }
-    }
   }
   post {
     always {
       sh 'chmod -R 777 .'
     }
+    success {
+          notifySlack(currentBuild.result)
+      }
+      failure {
+          notifySlack(currentBuild.result)
+      }
   }
 }
