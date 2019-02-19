@@ -16,29 +16,16 @@
     limitations under the License.
 
 -->
-<!--<v-accordion class="vAccordion&#45;&#45;default">
-    <v-pane ng-repeat="track in vm.trackList">
-        <v-pane-header></v-pane-header>
-        <v-pane-content  ng-bind-html="vm.trackComponent">
-        </v-pane-content>
-    </v-pane>
-</v-accordion>-->
-<!--<div ng-repeat="track in vm.model.Track">
-    <tb-well-log-component
-    track-detail="track"
-    datasources = "datasources"
-    ></tb-well-log-component>
-</div>-->
-
 <v-accordion id="accordionA" class="vAccordion--default" control="accordionA" onexpand="expandCallback(index, id)" oncollapse="collapseCallback(index, id)">
 
-    <v-pane id="{{ ::pane.id }}" ng-repeat="track in vm.model.Track" expanded="pane.isExpanded">
-        <v-pane-header id="{{ ::pane.id }}-header" aria-controls="{{ ::pane.id }}-content">
+    <v-pane id="{{ ::pane.id }}" ng-repeat="track in model.Track" expanded="pane.isExpanded">
+        <v-pane-header aria-controls="{{ ::pane.id }}-content">
             <lable>Track {{track.id}}</lable>
             <md-button class="md-icon-button md-primary"
                        style="min-width: 40px;"
 
-                       aria-label="{{ 'action.remove' | translate }}">
+                       aria-label="{{ 'action.remove' | translate }}"
+                ng-click="removeTrack($event,track.id)">
                 <md-tooltip md-direction="top">
                     {{ 'action.remove' | translate }}
                 </md-tooltip>
@@ -59,7 +46,7 @@
 
 </v-accordion>
 
-<md-button ng-disabled="$root.loading" ng-click="vm.addTrack($event)" class="md-raised md-primary md-button md-ink-ripple md-themeDark-theme" aria-label="Add Track">
+<md-button ng-disabled="$root.loading" ng-click="addTrack($event)" class="md-raised md-primary md-button md-ink-ripple md-themeDark-theme" aria-label="Add Track">
         Add Track
 </md-button>
 

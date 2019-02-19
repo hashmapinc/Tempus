@@ -17,7 +17,7 @@
 /* eslint-disable import/no-unresolved, import/default */
 
 import wellLogViewerTrackFieldsetTemplate from './well-log-track.tpl.html';
-import wellTrackComponent from './well-log-component.tpl.html'
+//import wellTrackComponent from './well-log-component.tpl.html'
 import WellLogViewerTrackDirective from './well-log-component.directive.js'
 import WellLogComponentsDirective from './well-log-components.directive.js'
 
@@ -50,55 +50,73 @@ export default angular.module('tempus.directives.wellLogViewerTrack', [])
     .name;
 
 /*@ngInject*/
-function WellLogViewerTrack() {
+function WellLogViewerTrack($compile, $templateCache) {
+     var linker = function (scope, element) {
+            var template = $templateCache.get(wellLogViewerTrackFieldsetTemplate);
+            element.html(template);
+
+            scope.addTrack = function (){
+                if(angular.isUndefined(scope.model.Track)){
+                    scope.model.Track = [];
+                }
+                var insert ={
+                    id: scope.model.Track.length + 1,
+                    width:"",
+                    component:[]
+                }
+
+                scope.model.Track.push(insert);
+            }
+
+             $compile(element.contents())(scope);
+
+     }
     return {
         restrict: "E",
-        scope: true,
-        bindToController: {
+        scope: {
             schema: '=',
             form: '=',
             model: '=',
             formControl:'=',
             datasources:'='
         },
-        controller: WellLogTrackController,
+        link: linker,
+        /*bindToController: {
+            schema: '=',
+            form: '=',
+            model: '=',
+            formControl:'=',
+            datasources:'='
+        },*/
+       /* controller: WellLogTrackController,
         controllerAs: 'vm',
-        templateUrl: wellLogViewerTrackFieldsetTemplate
+        templateUrl: wellLogViewerTrackFieldsetTemplate*/
     };
 }
 
 /* eslint-disable angular/angularelement */
 
 /*@ngInject*/
-function WellLogTrackController($scope, $log, $sce) {
+/*function WellLogTrackController($scope, $log) {
 
-    let vm = this;
-    vm.count = 0;
-    vm.addTrack = addTrack;
-    vm.trackList = [];
-    vm.trackWidth =[1,2,3,4,5];
-    vm.trackComponent = wellTrackComponent;
-    $log.log("track");
-    //$log.log(vm);
-    vm.model.Track = [];
-    function addTrack(){
-        vm.count = vm.count + 1;
-        var insertDetail = {
-            id: vm.count,
-            details: []
+    $scope.addTrack = function (){
+    $log.log("iin add");
+            $log.log($scope)
+        if(!$scope.vm.model.Track){
+            $scope.vm.model={
+                Track:[]
+            }
         }
-        var inset ={
-            id: vm.count,
-            width:""
+        var insert ={
+            id: $scope.vm.model.Track.length + 1,
+            width:"",
+            component:[]
         }
-        vm.trackList.push(insertDetail);
-        //$log.log(vm)
-        //$log.log(vm.model)
-        vm.model.Track.push(inset);
-    }
-     $scope.deliberatelyTrustDangerousSnippet = function() {
-     $log.log(wellTrackComponent)
-                   return $sce.trustAsHtml(wellTrackComponent);
-                 };
 
-}
+        $scope.vm.model.Track.push(insert);
+    }*/
+     /*$scope.deliberatelyTrustDangerousSnippet = function() {
+           return $sce.trustAsHtml(wellTrackComponent);
+     };*/
+
+/*}*/

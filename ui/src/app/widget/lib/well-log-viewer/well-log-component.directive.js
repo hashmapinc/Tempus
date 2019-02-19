@@ -23,26 +23,20 @@ import wellTrackComponent from './well-log-component.tpl.html'
 /*@ngInject*/
 
 
-export default function WellLogViewerTrackDirective($compile, $templateCache, $log) {
+export default function WellLogViewerTrackDirective($compile, $templateCache) {
     var linker = function (scope, element) {
         var template = $templateCache.get(wellTrackComponent);
         element.html(template);
         scope.trackWidth =[1,2,3,4,5];
-        scope.trackDetail.details ={
-            component :[]
-        }
-        var vm = this;
-        vm.count = 1;
 
-        $log.log(scope)
-        $compile(element.contents())(scope);
-        scope.trackDetail.component = [];
         scope.addComponent = function (){
+
             var insertDetail = {
-                id: vm.count ++
+                id: scope.trackDetail.component.length ? scope.trackDetail.component.length + 1 : 1
             }
             scope.trackDetail.component.push(insertDetail);
         }
+        $compile(element.contents())(scope);
     }
     return {
         restrict: "E",

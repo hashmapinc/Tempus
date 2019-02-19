@@ -189,7 +189,7 @@ function WidgetConfig($compile, $templateCache, $rootScope, $translate, $timeout
 
         scope.updateSchemaForm = function() {
             $log.log('update schema form');
-            $log.log(scope.currentSettings)
+            $log.log(scope)
             if (scope.widgetSettingsSchema && scope.widgetSettingsSchema.schema) {
                 scope.currentSettingsSchema = scope.widgetSettingsSchema.schema;
                 scope.currentSettingsForm = scope.widgetSettingsSchema.form || angular.copy(scope.defaultSettingsForm);
@@ -277,12 +277,16 @@ function WidgetConfig($compile, $templateCache, $rootScope, $translate, $timeout
         });
 
         scope.$watch('currentSettings', function () {
+            $log.log('in current setting');
+            $log.log(ngModelCtrl.$viewValue);
             if (ngModelCtrl.$viewValue) {
+                $log.log(scope.currentSettings);
                 var value = ngModelCtrl.$viewValue;
                 if (value.config) {
                     value.config.settings = scope.currentSettings;
                     ngModelCtrl.$setViewValue(value);
                 }
+                $log.log(value.config.settings)
             }
         }, true);
 
