@@ -440,3 +440,8 @@ user.trial:
   expirationTime: 21600 # Number of minutes (15 days)
   reminderMailTime : 18720 # Number of minutes (13 days)
   purgeCronExpression: 0 0 0 * * * # 12 midnight
+
+# Google Captcha
+google-recaptcha:
+  secret_key: "${RECAPTCHA_SECRET_KEY:RECAPTCHA_SECRET_KEY}"
+  verify_url: "https://www.google.com/recaptcha/api/siteverify"
