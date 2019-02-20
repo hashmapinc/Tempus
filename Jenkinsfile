@@ -1,7 +1,9 @@
-def notifySlack(String buildStatus = 'STARTED',String security = 'ANALYSING') {
+def security = 'ANALYSING'
+def notifySlack(String buildStatus = 'STARTED') {
     buildStatus = buildStatus ?: 'SUCCESS'
 
     def color
+
     if (buildStatus == 'STARTED') {
         color = '#D4DADF'
     } else if (buildStatus == 'SUCCESS') {
@@ -12,7 +14,7 @@ def notifySlack(String buildStatus = 'STARTED',String security = 'ANALYSING') {
         color = '#FF9FA1'
     }
 
-    def msg = "${buildStatus}:`${env.JOB_NAME}` #${env.BUILD_NUMBER}\nSECURITY STATUS: `${security}`\nUrl: ${RUN_DISPLAY_URL}\nChanges: ${RUN_CHANGES_DISPLAY_URL}"
+    def msg = "${buildStatus}:`${env.JOB_NAME}` #${env.BUILD_NUMBER}\nSecurity: `${security}`\nUrl: ${RUN_DISPLAY_URL}\nChanges: ${RUN_CHANGES_DISPLAY_URL}"
     slackSend(color: color, message: msg, channel: 'tempusbuild', botUser: true)
 }
 
@@ -31,12 +33,10 @@ pipeline {
     stage('Code Scan') {
       steps {  
         notifySlack()
-        def security = 'BREACHED'
         sh '''
           git secrets --register-aws
           git-secrets --scan
     '''
-        def security = 'SECURE'
         }
     }    
     stage('Initialize') {
@@ -119,10 +119,10 @@ pipeline {
       sh 'chmod -R 777 .'
     }
     success {
-          notifySlack(currentBuild.result,currentBuild.security)
+          notifySlack(currentBuild.result)
       }
       failure {
-          notifySlack(currentBuild.result,currentBuild.security)
+          notifySlack(currentBuild.result)
       }
   }
 }
