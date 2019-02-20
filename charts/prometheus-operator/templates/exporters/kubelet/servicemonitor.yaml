@@ -1,0 +1,62 @@
+#
+# Copyright © 2016-2018 The Thingsboard Authors
+# Modifications © 2017-2018 Hashmap, Inc
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+{{- if .Values.kubelet.enabled }}
+apiVersion: {{ printf "%s/v1" (.Values.prometheusOperator.crdApiGroup | default "monitoring.coreos.com") }}
+kind: ServiceMonitor
+metadata:
+  name: {{ template "prometheus-operator.fullname" . }}-kubelet
+  labels:
+    app: {{ template "prometheus-operator.name" . }}-kubelet
+{{ include "prometheus-operator.labels" . | indent 4 }}
+spec:
+  endpoints:
+  {{- if .Values.kubelet.serviceMonitor.https }}
+  - port: https-metrics
+    scheme: https
+    interval: 15s
+    tlsConfig:
+      caFile: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+      insecureSkipVerify: true
+    bearerTokenFile: /var/run/secrets/kubernetes.io/serviceaccount/token
+    honorLabels: true
+  - port: https-metrics
+    scheme: https
+    path: /metrics/cadvisor
+    interval: 30s
+    honorLabels: true
+    tlsConfig:
+      caFile: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+      insecureSkipVerify: true
+    bearerTokenFile: /var/run/secrets/kubernetes.io/serviceaccount/token
+  {{- else }}
+  - port: http-metrics
+    interval: 30s
+    honorLabels: true
+  - port: http-metrics
+    path: /metrics/cadvisor
+    interval: 30s
+    honorLabels: true
+  {{- end }}
+  jobLabel: k8s-app
+  namespaceSelector:
+    matchNames:
+    - {{ .Values.kubelet.namespace }}
+  selector:
+    matchLabels:
+      k8s-app: kubelet
+{{- end}}

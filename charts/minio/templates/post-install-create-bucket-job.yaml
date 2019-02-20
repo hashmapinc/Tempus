@@ -1,0 +1,76 @@
+#
+# Copyright © 2016-2018 The Thingsboard Authors
+# Modifications © 2017-2018 Hashmap, Inc
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+{{- if or .Values.defaultBucket.enabled .Values.buckets }}
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ template "minio.fullname" . }}-make-bucket-job
+  labels:
+    app: {{ template "minio.name" . }}
+    chart: {{ template "minio.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+  annotations:
+    "helm.sh/hook": post-install,post-upgrade
+    "helm.sh/hook-delete-policy": hook-succeeded
+spec:
+  template:
+    metadata:
+      labels:
+        app: {{ template "minio.name" . }}
+        release: {{ .Release.Name }}
+    spec:
+      restartPolicy: OnFailure
+{{- if .Values.nodeSelector }}
+      nodeSelector:
+{{ toYaml .Values.nodeSelector | indent 8 }}
+{{- end }}
+      volumes:
+        - name: minio-configuration
+          projected:
+            sources:
+            - configMap:
+                name: {{ template "minio.fullname" . }}
+            - secret:
+                name: {{ template "minio.fullname" . }}
+        {{- if .Values.tls.enabled }}
+        - name: cert-secret-volume-mc
+          secret:
+            secretName: {{ .Values.tls.certSecret }}
+            items:
+            - key: {{ .Values.tls.publicCrt }}
+              path: CAs/public.crt
+        {{ end }}
+      containers:
+      - name: minio-mc
+        image: "{{ .Values.mcImage.repository }}:{{ .Values.mcImage.tag }}"
+        imagePullPolicy: {{ .Values.mcImage.pullPolicy }}
+        command: ["/bin/sh", "/config/initialize"]
+        env:
+          - name: MINIO_ENDPOINT
+            value: {{ template "minio.fullname" . }}
+          - name: MINIO_PORT
+            value: {{ .Values.service.port | quote }}
+        volumeMounts:
+          - name: minio-configuration
+            mountPath: /config
+          {{- if .Values.tls.enabled }}
+          - name: cert-secret-volume-mc
+            mountPath: {{ .Values.configPathmc }}certs
+          {{ end }}
+{{- end }}

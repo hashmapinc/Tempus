@@ -1,0 +1,234 @@
+#
+# Copyright © 2016-2018 The Thingsboard Authors
+# Modifications © 2017-2018 Hashmap, Inc
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+# Default values for tempus-aws.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+replicaCount: 1
+
+##
+global:
+  rbac:
+    create: true
+#    pspEnabled: true
+
+nameOverride: ""
+fullnameOverride: ""
+
+storageclass: nfs
+
+serviceAccount:
+  create: true
+  name: ""
+
+image:
+  repository: hashmapinc/tempus
+  tag: dev
+  pullPolicy: Always
+
+externaldb: true
+
+ConfigMapData:
+  spark.jars.bucket: "tempus-spark-jars"
+  computation.location: "http://s3fs"
+  cassandra.url: "tempus-data-cassandra:9042"
+  cassandra.host: "tempus-data-cassandra"
+  cassandra.port: "9042"
+  database.type: "cassandra"
+  postgres.host: "tempus-data-postgresql"
+  postgres.port: "5432"
+  schema.data: "false"
+  demo.data: "true"
+  mqtt.address: "0.0.0.0"
+  mqtt.port: "1883"
+  coap.address: "0.0.0.0"
+  coap.port: "5683"
+  spark.path: "/tmp"
+  http.port: "8080"
+  livy.host: "livy"
+  livy.port: "8998"
+  spring.datasource.url: "jdbc:postgresql://tempus-data-postgresql:5432/identity"
+  spring.datasource.username: "identity"
+  spring.datasource.password: "identity"
+  spring.jpa.db: "org.hibernate.dialect.PostgreSQLDialect"
+  spring.jpa.driver: "org.postgresql.Driver"  
+
+
+role:
+  kubeless: true
+  java: true   
+  
+service:
+  type: NodePort
+  ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: 8080
+      name: https
+    - protocol: TCP
+      port: 1883
+      targetPort: 1883
+      name: mqtt  
+
+ingress:
+  enabled: false
+  tls: false
+  hostname: tempus-qa.hashmapinc.com
+  annotations: 
+    kubernetes.io/ingress.class: nginx
+    ingress.kubernetes.io/rewrite-target: /
+    # kubernetes.io/tls-acme: "true"
+  #paths: []
+  # tls: []
+  #  - secretName: chart-example-tls
+  #    hosts:
+  #      - chart-example.local
+
+# Configuration of other essential services 
+
+databaseSetup: 
+  enabled: false
+  name: "db-setup"
+  image:
+    repository: hashmapinc/database-setup
+    tag: dev
+    pullPolicy: Always  
+
+nifi:
+  enabled: false
+  name: nifi-svc
+  serviceType: NodePort
+  image:
+    repository: apache/nifi
+    tag: 1.6.0 
+
+zookeeper:
+  enabled: true
+  name: zk
+  image:
+    repository: hashmapinc/zk
+    tag: "1.0"
+    pullPolicy: Always
+  replicas: 1
+
+discovery:
+  enabled: true
+  name: redtail-api-discovery
+  replicaCount: 1
+  image:
+    repository: hashmapinc/redtail-api-discovery
+    tag: latest
+    pullPolicy: Always
+  app:
+    port: 8761
+  service:
+    type: ClusterIP
+    port: 80
+  pdb:
+    minAvailable: 1
+
+identity:
+  enabled: true
+  name: redtail-identity-service
+  replicaCount: 1
+  externaldb: true  
+  image:
+    repository: hashmapinc/redtail-identity-service
+    tag: latest
+    pullPolicy: Always
+  app:
+    port: 9002
+  service:
+    type: ClusterIP
+    port: 80
+  pdb:
+    minAvailable: 1
+  ConfigMapData:
+    spring.jpa.db: "org.hibernate.dialect.PostgreSQLDialect"
+    spring.jpa.driver: "org.postgresql.Driver"
+    spring.ds.url: "jdbc:postgresql://tempus-data-postgresql:5432/identity"
+    spring.ds.username: identity
+    spring.ds.password: identity 
+
+metadata:
+  enabled: false
+  name: redtail-metadata-api
+  externaldb: true
+  replicaCount: 1
+  image:
+    repository: hashmapinc/redtail-metadata-api
+    tag: latest
+    pullPolicy: Always
+  app:
+    port: 9003
+  service:
+    type: ClusterIP
+    port: 80
+  pdb:
+    minAvailable: 1
+  ## Using same db as identity for now, we can change these values later if we want a separate db instance for metadata-api
+  ConfigMapData:
+    spring.jpa.db: "org.hibernate.dialect.PostgreSQLDialect"
+    spring.jpa.driver: "org.postgresql.Driver"
+    spring.ds.url: "jdbc:postgresql://tempus-data-postgresql:5432/identity"
+    spring.ds.username: identity
+    spring.ds.password: identity 
+
+dataquality:
+  enabled: false
+  name: redtail-data-quality-service
+  replicaCount: 1
+  image:
+    repository: hashmapinc/redtail-data-quality-service
+    tag: latest
+    pullPolicy: Always
+  app:
+    port: 9004
+  service:
+    type: ClusterIP
+    port: 80
+  pdb:
+    minAvailable: 1
+
+spark:
+  enabled: false
+  name: livy
+  image: hashmapinc/livy-k8s:latest
+  s3connector: 
+    enabled: true
+    name: s3fs
+    image: gnut3ll4/s3fsweb:latest
+    s3bucket: tempus-spark-jars
+
+resources: {}
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  # limits:
+  #  cpu: 100m
+  #  memory: 128Mi
+  # requests:
+  #  cpu: 100m
+  #  memory: 128Mi
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
