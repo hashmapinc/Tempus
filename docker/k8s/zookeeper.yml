@@ -39,7 +39,7 @@ metadata:
     app: zk
 spec:
   ports:
-  - port: 2181
+  - port: 2181 
     name: client
     targetPort: 2181
   selector:
