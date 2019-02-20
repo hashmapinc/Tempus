@@ -1,5 +1,4 @@
-def security = 'ANALYSING'
-def notifySlack(String buildStatus = 'STARTED',security) {
+def notifySlack(String buildStatus = 'STARTED',String security = 'ANALYSING' ) {
     buildStatus = buildStatus ?: 'SUCCESS'
 
     def color
@@ -119,7 +118,7 @@ pipeline {
       sh 'chmod -R 777 .'
     }
     success {
-          notifySlack(currentBuild.result)
+          notifySlack(currentBuild.result,'SECURE')
       }
       failure {
           notifySlack(currentBuild.result)
