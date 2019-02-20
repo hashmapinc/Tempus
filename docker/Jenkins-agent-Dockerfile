@@ -1,0 +1,18 @@
+FROM hashmapinc/tempusbuild:latest
+
+RUN wget --no-cookies --no-check-certificate --header "Cookie: oraclelicense=accept-securebackup-cookie" \
+    http://download.oracle.com/otn-pub/java/jdk/11.0.2+9/f51449fcd52f4d52b93a989c5c56ed3c/jdk-11.0.2_linux-x64_bin.deb \
+    && dpkg -i jdk-11.0.2_linux-x64_bin.deb \
+    && update-alternatives --install /usr/bin/java java  /usr/lib/jvm/jdk-11.0.2/bin/java 2081 \
+    && update-alternatives --auto java \
+    && unlink /docker-java-home \
+    && ln -svT /usr/lib/jvm/jdk-11.0.2 /docker-java-home \
+    && rm -rf jdk-11.0.2_linux-x64_bin.deb /var/lib/apt/lists/* /var/lib/
+
+RUN git clone https://github.com/awslabs/git-secrets.git 
+RUN cd git-secrets \
+    && make install \
+    && git secrets --install \
+    && git secrets --register-aws --global
+
+CMD ["mvn"]
