@@ -36,6 +36,14 @@ export default function WellLogViewerTrackDirective($compile, $templateCache) {
             }
             scope.trackDetail.component.push(insertDetail);
         }
+        scope.removeComponent = function ($event,id){
+            var index = scope.trackDetail.component.findIndex(x => x.id==id);
+            if($event){
+                  $event.stopPropagation();
+                  $event.preventDefault();
+            }
+            scope.trackDetail.component.splice(index, 1);
+        }
         $compile(element.contents())(scope);
     }
     return {

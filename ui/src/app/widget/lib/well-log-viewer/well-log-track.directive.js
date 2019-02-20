@@ -67,9 +67,15 @@ function WellLogViewerTrack($compile, $templateCache) {
 
                 scope.model.Track.push(insert);
             }
-
+            scope.removeTrack = function ($event,id){
+                var index = scope.model.Track.findIndex(x => x.id==id);
+                if($event){
+                      $event.stopPropagation();
+                      $event.preventDefault();
+                }
+                scope.model.Track.splice(index, 1);
+            }
              $compile(element.contents())(scope);
-
      }
     return {
         restrict: "E",
