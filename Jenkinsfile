@@ -24,12 +24,12 @@ pipeline {
   }
   agent {
     docker {
-      image 'hashmapinc/tempusbuild:1056'
+      image 'hashmapinc/tempusbuild:java-11'
       args '-u root -v /var/run/docker.sock:/var/run/docker.sock'
     }
   }
   stages {
-    stage('Code Scan') {
+    stage('Secret Scan') {
       steps {  
         notifySlack()
         script{        
@@ -51,7 +51,6 @@ pipeline {
               echo M2_HOME = ${M2_HOME}
               mvn clean
               mvn validate'''
-        slackSend(message: 'Build Started for Branch: '+env.BRANCH_NAME+' for: '+env.CHANGE_AUTHOR+' on: '+env.BUILD_TAG, color: 'Green', channel: 'tempusnotifications', botUser: true)
       }
     }    
     stage('Build') {
