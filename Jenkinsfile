@@ -32,6 +32,9 @@ pipeline {
     stage('Code Scan') {
       steps {  
         notifySlack()
+        script{        
+            securitystatus = "BREACHED"
+        }
         sh '''
           git secrets --register-aws
           git-secrets --scan
@@ -40,6 +43,9 @@ pipeline {
     }    
     stage('Initialize') {
       steps {
+        script{        
+            securitystatus = "SECURE"
+        }        
         sh 'echo $USER'
         sh '''echo PATH = ${PATH}
               echo M2_HOME = ${M2_HOME}
@@ -121,7 +127,7 @@ pipeline {
           notifySlack(currentBuild.result,'SECURE')
       }
       failure {
-          notifySlack(currentBuild.result)
+          notifySlack(currentBuild.result,securitystatus)
       }
   }
 }
