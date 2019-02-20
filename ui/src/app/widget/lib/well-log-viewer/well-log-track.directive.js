@@ -19,7 +19,8 @@
 import wellLogViewerTrackFieldsetTemplate from './well-log-track.tpl.html';
 //import wellTrackComponent from './well-log-component.tpl.html'
 import WellLogViewerTrackDirective from './well-log-component.directive.js'
-import WellLogComponentsDirective from './well-log-components.directive.js'
+import WellLogComponentsDirective from './well-log-components.directive.js';
+import './well-log-track.scss';
 
 /* eslint-enable import/no-unresolved, import/default */
 

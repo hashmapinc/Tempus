@@ -44,11 +44,9 @@
                 <v-accordion id="accordionA" class="vAccordion--default" control="accordionA" onexpand="expandCallback(index, id)" oncollapse="collapseCallback(index, id)">
 
                     <v-pane id="{{ ::pane.id }}" ng-repeat="component in trackDetail.component" expanded="pane.isExpanded">
-                        <v-pane-header id="{{ ::pane.id }}-header" aria-controls="{{ ::pane.id }}-content">
-                            <lable>Component {{component.id}}</lable>
-                            <md-button class="md-icon-button md-primary"
-                                       style="min-width: 40px;"
-
+                        <v-pane-header id="{{ ::pane.id }}-header" style="border:outset;">
+                            <lable class="trackLabel">Component {{component.id}}</lable>
+                            <md-button class="md-icon-button md-primary compBtn"
                                        aria-label="{{ 'action.remove' | translate }}"
                             ng-click="removeComponent($event,component.id)">
                                 <md-tooltip md-direction="top">
