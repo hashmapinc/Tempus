@@ -1,5 +1,4 @@
-def security = 'ANALYSING'
-def notifySlack(String buildStatus = 'STARTED') {
+def notifySlack(String buildStatus = 'STARTED',String security = 'ANALYSING') {
     buildStatus = buildStatus ?: 'SUCCESS'
 
     def color
@@ -32,12 +31,12 @@ pipeline {
     stage('Code Scan') {
       steps {  
         notifySlack()
-        security = 'BREACHED'
+        currentBuild.security = 'BREACHED'
         sh '''
           git secrets --register-aws
           git-secrets --scan
     '''
-        security = 'SECURE'
+        currentBuild.security = 'SECURE'
         }
     }    
     stage('Initialize') {
@@ -120,10 +119,10 @@ pipeline {
       sh 'chmod -R 777 .'
     }
     success {
-          notifySlack(currentBuild.result)
+          notifySlack(currentBuild.result,currentBuild.security)
       }
       failure {
-          notifySlack(currentBuild.result)
+          notifySlack(currentBuild.result,currentBuild.security)
       }
   }
 }
