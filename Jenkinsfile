@@ -1,5 +1,5 @@
 def security = 'ANALYSING'
-def notifySlack(String buildStatus = 'STARTED') {
+def notifySlack(String buildStatus = 'STARTED',security) {
     buildStatus = buildStatus ?: 'SUCCESS'
 
     def color
