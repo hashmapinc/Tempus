@@ -17,37 +17,17 @@
 /* eslint-disable import/no-unresolved, import/default */
 
 import wellLogViewerTrackFieldsetTemplate from './well-log-track.tpl.html';
-//import wellTrackComponent from './well-log-component.tpl.html'
-import WellLogViewerTrackDirective from './well-log-component.directive.js'
-import WellLogComponentsDirective from './well-log-components.directive.js';
+import WellLogComponentListDirective from './well-log-component-list.directive.js'
+import WellLogComponentDirective from './well-log-component.directive.js';
 import './well-log-track.scss';
 
 /* eslint-enable import/no-unresolved, import/default */
 
 
-/*export default function WellLogViewerTrackDirective($compile, $templateCache) {
-    var linker = function (scope, element) {
-        var template = $templateCache.get(wellLogViewerTrackFieldsetTemplate);
-        element.html(template);
-        $compile(element.contents())(scope);
-    }
-    return {
-        restrict: "E",
-        link: linker,
-        scope: {
-            widgetsBundle: '=',
-            isEdit: '=',
-            isReadOnly: '=',
-            theForm: '=',
-            onExportWidgetsBundle: '&',
-            onDeleteWidgetsBundle: '&'
-        }
-    };
-}*/
 export default angular.module('tempus.directives.wellLogViewerTrack', [])
     .directive('tbWellLogViewerTrack', WellLogViewerTrack)
-    .directive('tbWellLogComponent', WellLogViewerTrackDirective)
-    .directive('tbWellLogComponents', WellLogComponentsDirective)
+    .directive('tbWellLogComponentList', WellLogComponentListDirective)
+    .directive('tbWellLogComponent', WellLogComponentDirective)
     .name;
 
 /*@ngInject*/
@@ -87,43 +67,6 @@ function WellLogViewerTrack($compile, $templateCache) {
             formControl:'=',
             datasources:'='
         },
-        link: linker,
-        /*bindToController: {
-            schema: '=',
-            form: '=',
-            model: '=',
-            formControl:'=',
-            datasources:'='
-        },*/
-       /* controller: WellLogTrackController,
-        controllerAs: 'vm',
-        templateUrl: wellLogViewerTrackFieldsetTemplate*/
+        link: linker
     };
 }
-
-/* eslint-disable angular/angularelement */
-
-/*@ngInject*/
-/*function WellLogTrackController($scope, $log) {
-
-    $scope.addTrack = function (){
-    $log.log("iin add");
-            $log.log($scope)
-        if(!$scope.vm.model.Track){
-            $scope.vm.model={
-                Track:[]
-            }
-        }
-        var insert ={
-            id: $scope.vm.model.Track.length + 1,
-            width:"",
-            component:[]
-        }
-
-        $scope.vm.model.Track.push(insert);
-    }*/
-     /*$scope.deliberatelyTrustDangerousSnippet = function() {
-           return $sce.trustAsHtml(wellTrackComponent);
-     };*/
-
-/*}*/

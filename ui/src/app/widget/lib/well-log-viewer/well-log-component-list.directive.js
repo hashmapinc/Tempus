@@ -16,27 +16,42 @@
  */
 /* eslint-disable import/no-unresolved, import/default */
 
-import wellTrackComponents from './well-log-components.tpl.html'
+import wellTrackComponent from './well-log-component-list.tpl.html'
 
 /* eslint-enable import/no-unresolved, import/default */
 
 /*@ngInject*/
-export default function WellLogViewerComponentsDirective($compile, $templateCache) {
-    var linker = function (scope, element) {
-        var template = $templateCache.get(wellTrackComponents);
-        element.html(template);
-        scope.componentTypes =["Line", "Linear Grid", "Time Y axis", "Mud Log Viewer"];
-        scope.fillTypes =["left", "right"];
-        scope.styleTypes =["dashed", "solid"];
 
+
+export default function WellLogViewerTrackDirective($compile, $templateCache) {
+    var linker = function (scope, element) {
+        var template = $templateCache.get(wellTrackComponent);
+        element.html(template);
+        scope.trackWidth =[1,2,3,4,5];
+
+        scope.addComponent = function (){
+
+            var insertDetail = {
+                id: scope.trackDetail.component.length ? scope.trackDetail.component.length + 1 : 1
+            }
+            scope.trackDetail.component.push(insertDetail);
+        }
+        scope.removeComponent = function ($event,id){
+            var index = scope.trackDetail.component.findIndex(x => x.id==id);
+            if($event){
+                  $event.stopPropagation();
+                  $event.preventDefault();
+            }
+            scope.trackDetail.component.splice(index, 1);
+        }
         $compile(element.contents())(scope);
     }
     return {
         restrict: "E",
         link: linker,
         scope: {
-            trackComponent: '=',
-            datasources:'='
+            trackDetail: '=',
+            datasources: '='
         }
     };
 }
