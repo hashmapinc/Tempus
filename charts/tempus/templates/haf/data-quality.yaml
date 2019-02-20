@@ -1,0 +1,94 @@
+#
+# Copyright © 2016-2018 The Thingsboard Authors
+# Modifications © 2017-2018 Hashmap, Inc
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+{{- if .Values.dataquality.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.dataquality.name }}
+  labels:
+    app: {{ .Values.dataquality.name }}
+spec:
+  type: {{ .Values.dataquality.service.type }}
+  ports:
+    - port: {{ .Values.dataquality.service.port }}
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    app: {{ .Values.dataquality.name }}
+---
+apiVersion: policy/v1beta1
+kind: PodDisruptionBudget
+metadata:
+  name: {{ .Values.dataquality.name }}
+spec:
+  selector:
+    matchLabels:
+      app: {{ .Values.dataquality.name }}
+  minAvailable: {{ .Values.dataquality.pdb.minAvailable }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Values.dataquality.name }}
+data:
+  identity.base.url: "http://{{ .Values.identity.name }}:{{ .Values.identity.service.port }}/uaa"
+  tempus.url: "http://{{ .Values.identity.name }}:{{ .Values.identity.service.port }}/uaa"
+  mqtt.url: "0.0.0.0:1833"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.dataquality.name }}
+  labels:
+    app: {{ .Values.dataquality.name }}
+spec:
+  replicas: {{ .Values.dataquality.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ .Values.dataquality.name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.dataquality.name }}
+    spec:
+      containers:
+      - name: {{ .Values.dataquality.name }}
+        image: "{{ .Values.dataquality.image.repository }}:{{ .Values.dataquality.image.tag }}"
+        imagePullPolicy: {{ .Values.dataquality.image.pullPolicy }}
+        ports:
+        - name: http
+          containerPort: {{ .Values.dataquality.app.port }}
+          protocol: TCP
+        env:
+        - name: IDENTITY_BASE_URL
+          valueFrom:
+            configMapKeyRef:
+              name: {{ .Values.dataquality.name }}
+              key: identity.base.url
+        - name: TEMPUS_MQTT_URL
+          valueFrom:
+            configMapKeyRef:
+              name: {{ .Values.dataquality.name }}
+              key: mqtt.url
+        - name: TEMPUS_URL
+          valueFrom:
+            configMapKeyRef:
+              name: {{ .Values.dataquality.name }}
+              key: mqtt.url
+{{- end }}              

@@ -1,0 +1,118 @@
+#
+# Copyright © 2016-2018 The Thingsboard Authors
+# Modifications © 2017-2018 Hashmap, Inc
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+{{- if .Values.identity.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.identity.name }}
+  labels:
+    app: {{ .Values.identity.name }}
+spec:
+  type: {{ .Values.identity.service.type }}
+  ports:
+  - port: {{ .Values.identity.service.port }}
+    targetPort: http
+    protocol: TCP
+    name: http
+  selector:
+    app: {{ .Values.identity.name }}
+---
+apiVersion: policy/v1beta1
+kind: PodDisruptionBudget
+metadata:
+  name: {{ .Values.identity.name }}
+spec:
+  selector:
+    matchLabels:
+      app: {{ .Values.identity.name }}
+  minAvailable: {{ .Values.identity.pdb.minAvailable }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Values.identity.name }}
+{{- with .Values.identity.ConfigMapData }} 
+data:
+  {{ toYaml . | nindent 2 }} 
+{{- end }}
+  eureka.server.host: "{{ .Values.discovery.name }}"
+  eureka.server.port: "{{ .Values.discovery.service.port }}"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.identity.name }}
+  labels:
+    app: {{ .Values.identity.name }}
+spec:
+  replicas: {{ .Values.identity.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ .Values.identity.name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.identity.name }}
+    spec:
+      containers:
+      - name: {{ .Values.identity.name }}
+        image: "{{ .Values.identity.image.repository }}:{{ .Values.identity.image.tag }}"
+        imagePullPolicy: {{ .Values.identity.image.pullPolicy }}
+        ports:
+        - name: http
+          containerPort: {{ .Values.identity.app.port }}
+          protocol: TCP
+        env:
+        - name: EUREKA_SERVER_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: {{ .Values.identity.name }}
+              key: eureka.server.host
+        - name: EUREKA_SERVER_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: {{ .Values.identity.name }}
+              key: eureka.server.port
+{{- if .Values.identity.externaldb }}              
+        - name: SPRING_JPA_DATABASE_PLATFORM
+          valueFrom:
+            configMapKeyRef:
+              name: {{ .Values.identity.name }}
+              key: spring.jpa.db
+        - name: SPRING_DRIVER_CLASS_NAME
+          valueFrom:
+            configMapKeyRef:
+              name: {{ .Values.identity.name }}
+              key: spring.jpa.driver
+        - name: SPRING_DATASOURCE_URL
+          valueFrom:
+            configMapKeyRef:
+              name: {{ .Values.identity.name }}
+              key: spring.ds.url
+        - name: SPRING_DATASOURCE_USERNAME
+          valueFrom:
+            configMapKeyRef:
+              name: {{ .Values.identity.name }}
+              key: spring.ds.username
+        - name: SPRING_DATASOURCE_PASSWORD
+          valueFrom:
+            configMapKeyRef:
+              name: {{ .Values.identity.name }}
+              key: spring.ds.password  
+{{- end }}                            
+{{- end }}               

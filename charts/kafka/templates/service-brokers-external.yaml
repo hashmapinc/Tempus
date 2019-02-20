@@ -1,0 +1,81 @@
+#
+# Copyright © 2016-2018 The Thingsboard Authors
+# Modifications © 2017-2018 Hashmap, Inc
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+{{- if .Values.external.enabled }}
+  {{- $fullName := include "kafka.fullname" . }}
+  {{- $replicas := .Values.replicas | int }}
+  {{- $servicePort := .Values.external.servicePort }}
+  {{- $dnsPrefix := printf "%s" .Release.Name }}
+  {{- $root := . }}
+  {{- range $i, $e := until $replicas }}
+    {{- $externalListenerPort := add $root.Values.external.firstListenerPort $i }}
+    {{- $responsiblePod := printf "%s-%d" (printf "%s" $fullName) $i }}
+    {{- $distinctPrefix := printf "%s-%d" $dnsPrefix $i }}
+    {{- $loadBalancerIP := index $root.Values.external.loadBalancerIP $i }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    {{- if $root.Values.external.distinct }}
+      {{- if $root.Values.external.dns.useInternal }}
+    dns.alpha.kubernetes.io/internal: "{{ $distinctPrefix }}.{{ $root.Values.external.domain }}"
+      {{- end }}
+      {{- if $root.Values.external.dns.useExternal }}
+    external-dns.alpha.kubernetes.io/hostname: "{{ $distinctPrefix }}.{{ $root.Values.external.domain }}"
+      {{- end }}
+    {{- else }}
+      {{- if $root.Values.external.dns.useInternal }}
+    dns.alpha.kubernetes.io/internal: "{{ $dnsPrefix }}.{{ $root.Values.external.domain }}"
+      {{- end }}
+      {{- if $root.Values.external.dns.useExternal }}
+    external-dns.alpha.kubernetes.io/hostname: "{{ $dnsPrefix }}.{{ $root.Values.external.domain }}"
+      {{- end }}
+    {{- end }}
+    {{- if $root.Values.external.annotations }}
+{{ toYaml $root.Values.external.annotations | indent 4 }}
+    {{- end }}
+  name: {{ $root.Release.Name }}-{{ $i }}-external
+  labels:
+    app: {{ include "kafka.name" $root }}
+    chart: {{ $root.Chart.Name }}-{{ $root.Chart.Version }}
+    release: {{ $root.Release.Name }}
+    heritage: {{ $root.Release.Service }}
+    pod: {{ $responsiblePod | quote }}
+spec:
+  type: {{ $root.Values.external.type }}
+  ports:
+    - name: external-broker
+      {{- if and (eq $root.Values.external.type "LoadBalancer") (not $root.Values.external.distinct) }}
+      port: {{ $externalListenerPort }}
+      {{- else }}
+      port: {{ $servicePort }}
+      {{- end }}
+      targetPort: {{ $externalListenerPort }}
+      {{- if eq $root.Values.external.type "NodePort" }}
+      nodePort: {{ $externalListenerPort }}
+      {{- end }}
+      protocol: TCP
+  {{- if eq $root.Values.external.type "LoadBalancer" }}
+  loadBalancerIP: {{ $loadBalancerIP }}
+  {{- end }}
+  selector:
+    app: {{ include "kafka.name" $root }}
+    release: {{ $root.Release.Name }}
+    pod: {{ $responsiblePod | quote }}
+  {{- end }}
+{{- end }}
