@@ -24,7 +24,7 @@ pipeline {
   }
   agent {
     docker {
-      image 'hashmapinc/tempusbuild:java-11'
+      image 'hashmapinc/tempusbuild:java-11-secret-scan'
       args '-u root -v /var/run/docker.sock:/var/run/docker.sock'
     }
   }
