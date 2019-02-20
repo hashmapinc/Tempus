@@ -31,12 +31,12 @@ pipeline {
     stage('Code Scan') {
       steps {  
         notifySlack()
-        currentBuild.security = 'BREACHED'
+        def security = 'BREACHED'
         sh '''
           git secrets --register-aws
           git-secrets --scan
     '''
-        currentBuild.security = 'SECURE'
+        def security = 'SECURE'
         }
     }    
     stage('Initialize') {
