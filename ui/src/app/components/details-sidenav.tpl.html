@@ -36,7 +36,7 @@
 	        </div>
 		    <section ng-if="!isReadOnly" layout="row" layout-wrap
 				   class="tb-header-buttons md-fab">
-				<md-button ng-show="true"
+				<md-button ng-show="isEdit" ng-disabled="$root.loading || theForm.$invalid || !theForm.$dirty"
 							 class="tb-btn-header md-accent md-hue-2 md-fab md-fab-bottom-right"
 							 aria-label="{{ 'action.apply' | translate }}"
 							 ng-click="detailsApply()">
