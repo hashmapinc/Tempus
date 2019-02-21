@@ -18,10 +18,10 @@
 -->
 <md-content class="md-padding" layout="column">
     <md-card>
-        <div style="margin-left: 2%;margin-right: 2%;">
+        <div class="comp-margin">
             <br>
             <md-input-container class="md-block">
-                <md-select ng-model="trackDetail.width" placeholder="Track Width">
+                <md-select ng-model="trackDetail.width" placeholder="{{ 'wellLog.track-width' | translate}}">
                     <md-option ng-value="width" ng-repeat="width in trackWidth">{{ width }}</md-option>
                 </md-select>
             </md-input-container>
@@ -32,7 +32,7 @@
 
                     <v-pane id="{{ ::pane.id }}" ng-repeat="component in trackDetail.component" expanded="pane.isExpanded">
                         <v-pane-header id="{{ ::pane.id }}-header" style="border:outset;">
-                            <lable class="trackLabel">Component {{component.id}}</lable>
+                            <lable class="trackLabel">{{ 'wellLog.component' | translate}} {{component.id}}</lable>
                             <md-button class="md-icon-button md-primary compBtn"
                                        aria-label="{{ 'action.remove' | translate }}"
                             ng-click="removeComponent($event,component.id)">
@@ -41,7 +41,7 @@
                                 </md-tooltip>
                                 <md-icon aria-label="{{ 'action.delete' | translate }}"
                                          class="material-icons">
-                                    close
+                                    {{ 'action.close' | translate }}
                                 </md-icon>
                             </md-button>
                         </v-pane-header>
@@ -58,9 +58,9 @@
                 <br/>
                 <md-button ng-disabled="$root.loading" ng-click="addComponent($event)" class="md-raised md-primary md-button md-ink-ripple md-themeDark-theme" aria-label="Add Track">
                     <md-tooltip>
-                        Add Component
+                        {{ 'wellLog.add-component' | translate }}
                     </md-tooltip>
-                    Add Component
+                    {{ 'wellLog.add-component' | translate }}
 
                 </md-button>
             </div>

@@ -1899,6 +1899,30 @@ export default angular.module('tempus.locale', [])
                     "first-name": "First Name",
                     "sign-up": "Sign up to get your own personal account for Free !",
                     "emailSuccess": "Email is sent on your email id.Please check."
+                },
+                "wellLog":{
+                    "select-component":"Select Component",
+                    "color":"Color",
+                    "line-width":"Line Width",
+                    "has-header":"Has Header",
+                    "header-minimum":"Header Minimum",
+                    "header-maximum":"Header Maximum",
+                    "header-name":"Header Name",
+                    "enable-area-fill":"Enable Area Fill",
+                    "select-area-fill":"Select Area Fill",
+                    "fill-color":"Fill Color",
+                    "fill-opacity":"Fill opacity",
+                    "grid-minor-lines":"Grid minor lines",
+                    "number-of-lines":"Number of lines",
+                    "line-weight":"Line weight",
+                    "style":"Style",
+                    "grid-major-lines":"Grid major lines",
+                    "datasource":"Datasource",
+                    "track-width":"Track Width",
+                    "component":"Component",
+                    "add-component":"Add Component",
+                    "track":"Track",
+                    "add-track":"Add Track"
                 }
             }
         }

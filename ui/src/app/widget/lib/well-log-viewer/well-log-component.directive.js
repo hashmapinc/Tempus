@@ -21,13 +21,13 @@ import wellTrackComponents from './well-log-component.tpl.html'
 /* eslint-enable import/no-unresolved, import/default */
 
 /*@ngInject*/
-export default function WellLogViewerComponentsDirective($compile, $templateCache) {
+export default function WellLogViewerComponentsDirective($compile, $templateCache,types) {
     var linker = function (scope, element) {
         var template = $templateCache.get(wellTrackComponents);
         element.html(template);
-        scope.componentTypes =["Line", "Linear Grid", "Time Y axis", "Mud Log Viewer"];
-        scope.fillTypes =["left", "right"];
-        scope.styleTypes =["dashed", "solid"];
+        scope.componentTypes = types.wellLogComponent.componentTypes;
+        scope.fillTypes = types.wellLogComponent.fillTypes;
+        scope.styleTypes = types.wellLogComponent.styleTypes;
 
         $compile(element.contents())(scope);
     }
