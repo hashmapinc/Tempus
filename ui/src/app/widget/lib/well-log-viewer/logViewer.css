@@ -65,6 +65,7 @@ svg {
 }
 .track {
   display: inline-block;
+  vertical-align: bottom;
 }
 
   /* Below, we set the tick length to 10px. The stroke-dasharray only displays 6px to create a minor tick effect. */
@@ -73,3 +74,22 @@ svg {
     stroke-width: 1px;
     //stroke-dasharray: 6,2;
 }
+
+
+.linearGrid {
+    vertical-align: bottom;
+}
+/*.axis text {
+  font: 10px sans-serif;
+}
+.axis line,
+.axis path {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
+.path-line {
+  fill: none;
+  stroke: yellow;
+  stroke-width: 1.5px;
+}*/

@@ -51,7 +51,7 @@ var headerLegend = function(lineConfig, headerCount, data, state, index, width) 
  
   function header(group) {
     // group-scope
-    if(state === 'init'){
+    if(o.state === 'init'){
       group.each(render);
     }  
   }

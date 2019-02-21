@@ -28,23 +28,10 @@ export default class WellLogViewer {
           //  var settings = ctx.settings;
             this.init();
      }
+
      init() {
-		//loadLogViewer(this.ctx, "init");
-        //alert(test);
+		//loadLogViewier(this.ctx, "init");
         //alert("test.test");
-     }
-
-     test(){
-     	var datasources = this.ctx.datasources;
-        console.log(settings);
-        var dataKeys = [];
-        datasources.forEach(function(dkeys){
-        	dkeys.dataKeys.forEach(function(datakey){
-
-        		dataKeys.push({"value": datakey.label, "label": datakey.label});
-        	})
-        })
-     	return dataKeys;
      }
 
      update() {
@@ -84,7 +71,7 @@ export default class WellLogViewer {
 			                         	"cType": {
 			                  	            "title": "Component Type",
 			                                "type": "string",
-			                          		"enum": ["line","linearGrid"]
+			                          		"enum": ["Line", "Linear Grid", "Time Y axis", "Mud Log Viewer"]
 			                      		},
 			                      		"dataSource": {
 											"title": "Data Source",
@@ -176,7 +163,7 @@ export default class WellLogViewer {
 			                        }
 			                 	}
 			             	}		                 			               
-			            }       	          
+			            }
 			        }
 			      }
 			    }
@@ -194,15 +181,15 @@ export default class WellLogViewer {
 	               			"type": "rc-select",
 		                    "multiple": false,
 		                    "items": [],
-		                    "condition": "model.Track[form.key[1]].component[form.arrayIndex].cType === 'line'"
+		                    "condition": "model.Track[form.key[1]].component[form.arrayIndex].cType === 'Line'"
 	               		},             		
 	               		 {
 	                 		 "key": "Track[].component[].color",
-	                	 	 "condition": "model.Track[form.key[1]].component[form.arrayIndex].cType === 'line'"
+	                	 	 "condition": "model.Track[form.key[1]].component[form.arrayIndex].cType === 'Line'"
 	               		 },
 	               		 {
 	                 		 "key": "Track[].component[].lineWeight",
-	                	 	 "condition": "model.Track[form.key[1]].component[form.arrayIndex].cType === 'line'"
+	                	 	 "condition": "model.Track[form.key[1]].component[form.arrayIndex].cType === 'Line'"
 	               		 },
 	               		 "Track[].component[].hasHeader",
 	               		 {
@@ -219,15 +206,15 @@ export default class WellLogViewer {
 	               		 },
 	               		 {
 	                 		 "key": "Track[].component[].areaFill",
-	                	 	 "condition": "model.Track[form.key[1]].component[form.arrayIndex].cType === 'line'"
+	                	 	 "condition": "model.Track[form.key[1]].component[form.arrayIndex].cType === 'Line'"
 	               		 },
 	               		 {
 	                 		 "key": "Track[].component[].minorLines",
-	                	 	 "condition": "model.Track[form.key[1]].component[form.arrayIndex].cType === 'linearGrid'"
+	                	 	 "condition": "model.Track[form.key[1]].component[form.arrayIndex].cType === 'Linear Grid'"
 	               		 },
 	               		 {
 	                 		 "key": "Track[].component[].majorLines",
-	                	 	 "condition": "model.Track[form.key[1]].component[form.arrayIndex].cType === 'linearGrid'"
+	                	 	 "condition": "model.Track[form.key[1]].component[form.arrayIndex].cType === 'Linear Grid'"
 	               		 }
 	               		
 	                ]

@@ -27,7 +27,6 @@ var linearGrid = function(lineConfig, data, state, index, width) {
      // local;
 
   o = {
-    wodth: 200,
     value: null,
     key: null,
     majorLines: parseInt(lineConfig.majorLines.lines) -1,

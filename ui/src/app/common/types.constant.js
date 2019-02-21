@@ -840,6 +840,12 @@ export default angular.module('tempus.types', [])
             },
             metadataSinkType: {
                 rest: "REST"
+            },
+            wellLogComponent:{
+               componentTypes:["Line", "Linear Grid", "Time Y axis", "Mud Log Viewer"],
+               fillTypes:["left", "right"],
+               styleTypes:["dashed", "solid"],
+               trackWidth:[1,2,3,4,5]
             }
         }
     ).name;

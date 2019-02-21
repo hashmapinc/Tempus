@@ -23,6 +23,7 @@ import tempusDepthwindow from '../depthwindow.directive';
 import tempusLegendConfig from '../legend-config.directive';
 import tempusJsonForm from '../json-form.directive';
 import tempusManageWidgetActions from './action/manage-widget-actions.directive';
+import tempusWellLogViewerTrack from '../../widget/lib/well-log-viewer/well-log-track.directive';
 import 'angular-ui-ace';
 
 import './widget-config.scss';
@@ -44,6 +45,7 @@ export default angular.module('tempus.directives.widgetConfig', [tempusTypes,
     tempusDepthwindow,
     tempusLegendConfig,
     tempusManageWidgetActions,
+    tempusWellLogViewerTrack,
     'ui.ace'])
     .directive('tbWidgetConfig', WidgetConfig)
     .name;

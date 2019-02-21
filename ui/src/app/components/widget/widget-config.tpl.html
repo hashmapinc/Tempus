@@ -270,7 +270,7 @@
                                  ng-model="showLegend">{{ 'widget-config.display-legend' | translate }}
                     </md-checkbox>
                     <section flex layout="row" layout-align="start center" style="margin-bottom: 16px;">
-                        <tb-legend-config ng-disabled="!showLegend" flex ng-model="legendConfig"></tb-legend-config>
+                        <!--<tb-legend-config ng-disabled="!showLegend" flex ng-model="react-component"></tb-legend-config>-->
                     </section>
                 </div>
                 <span translate>widget-config.mobile-mode-settings</span>
@@ -287,7 +287,7 @@
             </md-content>
         </div>
     </md-tab>
-    <md-tab ng-if="displayAdvanced()" label="{{ 'widget-config.advanced' | translate }}">
+    <!--<md-tab ng-if="displayAdvanced()" label="{{ 'widget-config.advanced' | translate }}">
         <md-content flex class="md-padding tb-advanced-widget-config" layout="column">
             <ng-form flex name="ngform"
                      layout="column"
@@ -299,7 +299,23 @@
                 </tb-json-form>
             </ng-form>
         </md-content>
+    </md-tab>-->
+    <md-tab ng-if="displayAdvanced()" label="{{ 'widget-config.advanced' | translate }}">
+        <md-content flex class="md-padding tb-advanced-widget-config" layout="column">
+            <ng-form flex name="ngform"
+                     layout="column"
+                     layout-padding>
+                <tb-well-log-viewer-track
+                        schema="currentSettingsSchema"
+                        form="currentSettingsForm"
+                        model="currentSettings"
+                        form-control="ngform"
+                        datasources = "datasources">
+                </tb-well-log-viewer-track>
+            </ng-form>
+        </md-content>
     </md-tab>
+
     <md-tab label="{{ 'widget-config.actions' | translate }}">
         <md-content class="md-padding" layout="column">
             <tb-manage-widget-actions
