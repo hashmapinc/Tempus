@@ -20,8 +20,8 @@
 
     <v-pane id="{{ ::pane.id }}" ng-repeat="track in model.Track" expanded="pane.isExpanded">
         <v-pane-header class="trackHeader" style="border: outset">
-            <lable class="trackLabel">{{ 'wellLog.track' | translate }} {{track.id}}</lable>
-            <md-button class="md-icon-button md-primary trackBtn"
+            <lable class="track-label">{{ 'wellLog.track' | translate }} {{track.id}}</lable>
+            <md-button class="md-icon-button md-primary track-btn"
                        aria-label="{{ 'action.remove' | translate }}"
                 ng-click="removeTrack($event,track.id)">
                 <md-tooltip md-direction="top">
@@ -29,7 +29,7 @@
                 </md-tooltip>
                 <md-icon aria-label="{{ 'action.delete' | translate }}"
                          class="material-icons">
-                    {{ 'action.close' | translate }}
+                    close
                 </md-icon>
             </md-button>
         </v-pane-header>

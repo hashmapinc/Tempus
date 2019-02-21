@@ -32,8 +32,8 @@
 
                     <v-pane id="{{ ::pane.id }}" ng-repeat="component in trackDetail.component" expanded="pane.isExpanded">
                         <v-pane-header id="{{ ::pane.id }}-header" style="border:outset;">
-                            <lable class="trackLabel">{{ 'wellLog.component' | translate}} {{component.id}}</lable>
-                            <md-button class="md-icon-button md-primary compBtn"
+                            <lable class="track-label">{{ 'wellLog.component' | translate}} {{component.id}}</lable>
+                            <md-button class="md-icon-button md-primary comp-btn"
                                        aria-label="{{ 'action.remove' | translate }}"
                             ng-click="removeComponent($event,component.id)">
                                 <md-tooltip md-direction="top">
@@ -41,7 +41,7 @@
                                 </md-tooltip>
                                 <md-icon aria-label="{{ 'action.delete' | translate }}"
                                          class="material-icons">
-                                    {{ 'action.close' | translate }}
+                                    close
                                 </md-icon>
                             </md-button>
                         </v-pane-header>
