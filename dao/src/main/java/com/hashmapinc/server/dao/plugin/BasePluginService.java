@@ -16,6 +16,8 @@
  */
 package com.hashmapinc.server.dao.plugin;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.hashmapinc.server.common.data.id.PluginId;
 import com.hashmapinc.server.common.data.id.TenantId;
@@ -30,9 +32,11 @@ import com.hashmapinc.server.dao.exception.IncorrectParameterException;
 import com.hashmapinc.server.dao.model.ModelConstants;
 import com.hashmapinc.server.dao.rule.RuleDao;
 import com.hashmapinc.server.dao.service.DataValidator;
+import com.hashmapinc.server.dao.service.Encryption;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import com.hashmapinc.server.common.data.plugin.PluginMetaData;
 import com.hashmapinc.server.common.data.rule.RuleMetaData;
@@ -41,9 +45,8 @@ import com.hashmapinc.server.dao.exception.DataValidationException;
 import com.hashmapinc.server.dao.service.PaginatedRemover;
 import com.hashmapinc.server.dao.service.Validator;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.security.SecureRandom;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.hashmapinc.server.dao.service.Validator.validateId;
@@ -53,6 +56,13 @@ public class BasePluginService extends AbstractEntityService implements PluginSe
 
     //TODO: move to a better place.
     public static final TenantId SYSTEM_TENANT = new TenantId(ModelConstants.NULL_UUID);
+
+    @Value("${encryption.aes_key}")
+    private String aesKey;
+
+    public static final String KINESIS_PLUGIN = "com.hashmapinc.server.extensions.kinesis.plugin.KinesisPlugin";
+    public static final String ACCESS_KEY_ID = "accessKeyId";
+    public static final String SECRET_ACCESS_KEY = "secretAccessKey";
 
     @Autowired
     private PluginDao pluginDao;
@@ -97,13 +107,13 @@ public class BasePluginService extends AbstractEntityService implements PluginSe
         if (!componentDescriptorService.validate(descriptor, plugin.getConfiguration())) {
             throw new IncorrectParameterException("Filters configuration is not valid!");
         }
-        return pluginDao.save(plugin);
+        return decoder(pluginDao.save(encoder(plugin)));
     }
 
     @Override
     public PluginMetaData findPluginById(PluginId pluginId) {
         Validator.validateId(pluginId, "Incorrect plugin id for search request.");
-        return pluginDao.findById(pluginId);
+        return decoder(pluginDao.findById(pluginId));
     }
 
     @Override
@@ -115,13 +125,13 @@ public class BasePluginService extends AbstractEntityService implements PluginSe
     @Override
     public PluginMetaData findPluginByApiToken(String apiToken) {
         Validator.validateString(apiToken, "Incorrect plugin apiToken for search request.");
-        return pluginDao.findByApiToken(apiToken);
+        return decoder(pluginDao.findByApiToken(apiToken));
     }
 
     @Override
     public TextPageData<PluginMetaData> findSystemPlugins(TextPageLink pageLink) {
         Validator.validatePageLink(pageLink, "Incorrect PageLink object for search system plugin request.");
-        List<PluginMetaData> plugins = pluginDao.findByTenantIdAndPageLink(SYSTEM_TENANT, pageLink);
+        List<PluginMetaData> plugins = pluginDao.findByTenantIdAndPageLink(SYSTEM_TENANT, pageLink).stream().map(this::decoder).collect(Collectors.toList());
         return new TextPageData<>(plugins, pageLink);
     }
 
@@ -129,7 +139,7 @@ public class BasePluginService extends AbstractEntityService implements PluginSe
     public TextPageData<PluginMetaData> findTenantPlugins(TenantId tenantId, TextPageLink pageLink) {
         Validator.validateId(tenantId, "Incorrect tenant id for search plugins request.");
         Validator.validatePageLink(pageLink, "Incorrect PageLink object for search plugin request.");
-        List<PluginMetaData> plugins = pluginDao.findByTenantIdAndPageLink(tenantId, pageLink);
+        List<PluginMetaData> plugins = pluginDao.findByTenantIdAndPageLink(tenantId, pageLink).stream().map(this::decoder).collect(Collectors.toList());
         return new TextPageData<>(plugins, pageLink);
     }
 
@@ -154,7 +164,7 @@ public class BasePluginService extends AbstractEntityService implements PluginSe
         log.trace("Executing findAllTenantPluginsByTenantIdAndPageLink, tenantId [{}], pageLink [{}]", tenantId, pageLink);
         Validator.validateId(tenantId, "Incorrect tenantId " + tenantId);
         Validator.validatePageLink(pageLink, "Incorrect page link " + pageLink);
-        List<PluginMetaData> plugins = pluginDao.findAllTenantPluginsByTenantId(tenantId.getId(), pageLink);
+        List<PluginMetaData> plugins = pluginDao.findAllTenantPluginsByTenantId(tenantId.getId(), pageLink).stream().map(this::decoder).collect(Collectors.toList());
         return new TextPageData<>(plugins, pageLink);
     }
 
@@ -229,9 +239,48 @@ public class BasePluginService extends AbstractEntityService implements PluginSe
     @Override
     public PluginMetaData findPluginByClass(String pluginClazz) {
         Validator.validateString(pluginClazz, "Incorrect plugin class for search request.");
-        return pluginDao.findByPluginClass(pluginClazz);
+        return decoder(pluginDao.findByPluginClass(pluginClazz));
     }
 
+    private PluginMetaData encoder(PluginMetaData plugin) {
+        if(plugin == null)
+            return null;
+        PluginMetaData pluginMetaData = new PluginMetaData(plugin);
+        if(pluginMetaData.getClazz().equals(KINESIS_PLUGIN)){
+            ObjectMapper mapper = new ObjectMapper();
+            Map<String,String> configuration = mapper.convertValue(pluginMetaData.getConfiguration(), Map.class);
+            String encryptedAccessKeyId = Encryption.encrypt(configuration.get(ACCESS_KEY_ID),aesKey);
+            String  encryptedSecretAccessKey = Encryption.encrypt(configuration.get(SECRET_ACCESS_KEY),aesKey);
+            if(encryptedAccessKeyId != null)
+                configuration.put(ACCESS_KEY_ID,encryptedAccessKeyId);
+            if(encryptedSecretAccessKey != null)
+                configuration.put(SECRET_ACCESS_KEY,encryptedSecretAccessKey);
+            JsonNode jsonNode = mapper.convertValue(configuration, JsonNode.class);
+            pluginMetaData.setConfiguration(jsonNode);
+            return pluginMetaData;
+        }
+        return pluginMetaData;
+    }
+
+    private PluginMetaData decoder(PluginMetaData plugin) {
+        if(plugin == null)
+            return null;
+        PluginMetaData pluginMetaData = new PluginMetaData(plugin);
+        if(pluginMetaData.getClazz().equals(KINESIS_PLUGIN)){
+            ObjectMapper mapper = new ObjectMapper();
+            Map<String,String> configuration = mapper.convertValue(pluginMetaData.getConfiguration(), Map.class);
+            String decryptedAccessKeyId = Encryption.decrypt(configuration.get(ACCESS_KEY_ID),aesKey);
+            String  decryptedSecretAccessKey = Encryption.decrypt(configuration.get(SECRET_ACCESS_KEY),aesKey);
+            if(decryptedAccessKeyId != null)
+                configuration.put(ACCESS_KEY_ID,decryptedAccessKeyId);
+            if(decryptedSecretAccessKey != null)
+                configuration.put(SECRET_ACCESS_KEY,decryptedSecretAccessKey);
+            JsonNode jsonNode = mapper.convertValue(configuration, JsonNode.class);
+            pluginMetaData.setConfiguration(jsonNode);
+            return pluginMetaData;
+        }
+        return pluginMetaData;
+    }
 
     private DataValidator<PluginMetaData> pluginValidator =
             new DataValidator<PluginMetaData>() {
