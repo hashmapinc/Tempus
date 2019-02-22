@@ -287,7 +287,7 @@
             </md-content>
         </div>
     </md-tab>
-    <!--<md-tab ng-if="displayAdvanced()" label="{{ 'widget-config.advanced' | translate }}">
+    <md-tab ng-if="displayAdvanced() && title != 'Well Log Viewer'" label="{{ 'widget-config.advanced' | translate }}">
         <md-content flex class="md-padding tb-advanced-widget-config" layout="column">
             <ng-form flex name="ngform"
                      layout="column"
@@ -299,8 +299,8 @@
                 </tb-json-form>
             </ng-form>
         </md-content>
-    </md-tab>-->
-    <md-tab ng-if="displayAdvanced()" label="{{ 'widget-config.advanced' | translate }}">
+    </md-tab>
+    <md-tab ng-if="displayAdvanced() && title == 'Well Log Viewer'" label="{{ 'widget-config.advanced' | translate }}">
         <md-content flex class="md-padding tb-advanced-widget-config" layout="column">
             <ng-form flex name="ngform"
                      layout="column"
