@@ -21,6 +21,7 @@ import tempusApiFileUpload from '../api/file-upload.service';
 import FileUploadRoutes from './file-upload.routes';
 import FileUploadController from './file-upload.controller';
 import RenameFileController from './rename-file.controller';
+import FileUploadDirective from './file-upload.directive';
 
 export default angular.module('tempus.fileUpload', [
     uiRouter,
@@ -29,5 +30,6 @@ export default angular.module('tempus.fileUpload', [
 ])
     .config(FileUploadRoutes)
     .controller('FileUploadController', FileUploadController)
+    .directive('tbFileUpload', FileUploadDirective)
     .controller('RenameFileController', RenameFileController)
-    .name;
+    .name

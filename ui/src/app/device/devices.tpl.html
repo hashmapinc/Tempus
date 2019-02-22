@@ -158,6 +158,11 @@
                             entity-id="vm.grid.operatingItem().id.id">
             </tb-alarm-table>
         </md-tab>
+        <md-tab ng-if="!vm.grid.detailsConfig.isDetailsEditMode && vm.grid.isTenantAdmin()" md-on-select="vm.grid.triggerResize()" label="{{ 'file-upload.upload' | translate }}">
+            <tb-file-upload flex entity-type="vm.types.entityType.device"
+                            entity-id="vm.grid.operatingItem().id.id">
+            </tb-file-upload>
+        </md-tab>
         <md-tab ng-if="!vm.grid.detailsConfig.isDetailsEditMode" md-on-select="vm.grid.triggerResize()" label="{{ 'device.events' | translate }}">
             <tb-event-table flex entity-type="vm.types.entityType.device"
                             entity-id="vm.grid.operatingItem().id.id"
@@ -185,4 +190,7 @@
                                 audit-log-mode="{{vm.types.auditLogMode.entity}}">
             </tb-audit-log-table>
         </md-tab>
+
+    </md-tabs>
+
 </tb-grid>

@@ -81,7 +81,7 @@ public class UploadService {
         String bucketName = CloudStorageServiceUtils.createBucketName(tenantService.findTenantById(tenantId));
         String oldObjectUrl = CloudStorageServiceUtils.createObjectName(oldFileName, StorageTypes.FILES);
         String newObjectUrl = CloudStorageServiceUtils.createObjectName(newFileName, StorageTypes.FILES);
-        if(cloudStorageService.copyFile(bucketName, oldObjectUrl, newObjectUrl)) {
+        if (!oldObjectUrl.contentEquals(newObjectUrl) && cloudStorageService.copyFile(bucketName, oldObjectUrl, newObjectUrl)) {
             cloudStorageService.delete(bucketName, oldObjectUrl);
         }
     }

@@ -812,8 +812,6 @@ export default angular.module('tempus.locale', [])
                     "fileType": "File Type",
                     "fileSize": "File Size(In KB)",
                     "renameDoc": "Rename File",
-                    "download": "Download",
-                    "delete": "Delete",
                     "fileNameNew": "New File Name",
                     "replace-file": "Replace file",
                     "fileSizeError": "File size should be less than or equal to 100 MB",
