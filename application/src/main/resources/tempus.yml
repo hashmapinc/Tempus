@@ -451,3 +451,8 @@ user.trial:
 google-recaptcha:
   secret_key: "${RECAPTCHA_SECRET_KEY:RECAPTCHA_SECRET_KEY}"
   verify_url: "https://www.google.com/recaptcha/api/siteverify"
+
+
+# AES Encryption
+encryption:
+  aes_key: "${AES_KEY:AES_KEY}"
