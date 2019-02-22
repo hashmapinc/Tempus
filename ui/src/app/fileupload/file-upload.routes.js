@@ -35,9 +35,12 @@ export default function FileUploadRoutes($stateProvider) {
                     controllerAs: 'vm'
                 }
             },
-
+            data: {
+                searchEnabled: false,
+                pageTitle: 'file-upload.upload'
+            },
             ncyBreadcrumb: {
-                label: '{"icon": "file_upload", "label": "file-upload.upload", "link": "/static/svg/baseline-cloud_upload.svg"}'
+                label: '{"icon": "file_upload", "label": "file-upload.upload"}'
             }
         });
 
