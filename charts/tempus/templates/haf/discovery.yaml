@@ -66,4 +66,6 @@ spec:
         - name: http
           containerPort: {{ .Values.discovery.app.port }}
           protocol: TCP
+        resources:
+{{ toYaml .Values.resources | indent 10 }}          
 {{- end }}            

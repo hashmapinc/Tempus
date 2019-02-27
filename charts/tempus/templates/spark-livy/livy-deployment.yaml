@@ -65,6 +65,8 @@ spec:
             secretKeyRef:
               name: aws
               key: secretkey
+        resources:
+{{ toYaml .Values.resources | indent 10 }}               
         ports:
         - containerPort: 8998
           name: livy-rest

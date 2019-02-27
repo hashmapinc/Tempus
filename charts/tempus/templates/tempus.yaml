@@ -97,6 +97,8 @@ spec:
           name: rpc
         - containerPort: 9999
           name: tempus-port
+        resources:
+{{ toYaml .Values.tempusresources | indent 10 }}          
         env:
 {{- if .Values.externaldb }}
         - name: SPRING_DRIVER_CLASS_NAME
