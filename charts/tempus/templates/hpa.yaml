@@ -1,0 +1,25 @@
+apiVersion: {{ .Values.autoscalingapiversion }}
+kind: HorizontalPodAutoscaler
+metadata:
+  name: {{ include "tempus.fullname" . }}
+spec:
+  maxReplicas: 3
+  metrics:
+  - resource:
+      name: memory
+      target:
+        averageUtilization: 80
+        type: Utilization
+    type: Resource
+  - resource:
+      name: cpu
+      target:
+        averageUtilization: 80
+        type: Utilization
+    type: Resource
+  minReplicas: 1
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: StatefulSet
+    name: tempus
+

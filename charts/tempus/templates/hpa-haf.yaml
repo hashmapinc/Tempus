@@ -1,0 +1,125 @@
+apiVersion: {{ .Values.autoscalingapiversion }}
+kind: HorizontalPodAutoscaler
+metadata:
+  name: {{ .Values.dataquality.name }}
+spec:
+  maxReplicas: 3
+  metrics:
+  - resource:
+      name: memory
+      target:
+        averageUtilization: 80
+        type: Utilization
+    type: Resource
+  - resource:
+      name: cpu
+      target:
+        averageUtilization: 80
+        type: Utilization
+    type: Resource
+  minReplicas: 1
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: {{ .Values.dataquality.name }}
+---
+apiVersion: {{ .Values.autoscalingapiversion }}
+kind: HorizontalPodAutoscaler
+metadata:
+  name: {{ .Values.discovery.name }}
+spec:
+  maxReplicas: 3
+  metrics:
+  - resource:
+      name: memory
+      target:
+        averageUtilization: 80
+        type: Utilization
+    type: Resource
+  - resource:
+      name: cpu
+      target:
+        averageUtilization: 80
+        type: Utilization
+    type: Resource
+  minReplicas: 1
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: {{ .Values.discovery.name }}
+---
+apiVersion: {{ .Values.autoscalingapiversion }}
+kind: HorizontalPodAutoscaler
+metadata:
+  name: {{ .Values.identity.name }}
+spec:
+  maxReplicas: 3
+  metrics:
+  - resource:
+      name: memory
+      target:
+        averageUtilization: 80
+        type: Utilization
+    type: Resource
+  - resource:
+      name: cpu
+      target:
+        averageUtilization: 80
+        type: Utilization
+    type: Resource
+  minReplicas: 1
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: {{ .Values.identity.name }}
+---
+apiVersion: {{ .Values.autoscalingapiversion }}
+kind: HorizontalPodAutoscaler
+metadata:
+  name: {{ .Values.metadata.name }}
+spec:
+  maxReplicas: 3
+  metrics:
+  - resource:
+      name: memory
+      target:
+        averageUtilization: 80
+        type: Utilization
+    type: Resource
+  - resource:
+      name: cpu
+      target:
+        averageUtilization: 80
+        type: Utilization
+    type: Resource
+  minReplicas: 1
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: {{ .Values.metadata.name }}
+---
+apiVersion: {{ .Values.autoscalingapiversion }}
+kind: HorizontalPodAutoscaler
+metadata:
+  name: {{ .Values.zookeeper.name }}
+spec:
+  maxReplicas: 3
+  metrics:
+  - resource:
+      name: memory
+      target:
+        averageUtilization: 80
+        type: Utilization
+    type: Resource
+  - resource:
+      name: cpu
+      target:
+        averageUtilization: 80
+        type: Utilization
+    type: Resource
+  minReplicas: 1
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: {{ .Values.zookeeper.name }}
+
