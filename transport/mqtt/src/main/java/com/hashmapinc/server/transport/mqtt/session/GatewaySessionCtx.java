@@ -275,12 +275,11 @@ public class GatewaySessionCtx {
             event.setBody(eventInfo);
             eventService.save(event);
             GatewayDeviceSessionCtx deviceSessionCtx = devices.get(device.getName());
-            log.info("\n\ndevice gateway session \n\n" + deviceSessionCtx);
             deviceSessionCtx.onMsg(new EventToDeviceResponseMsg(requestId));
         } catch (IOException e) {
-            log.info("Object mapping execption {}", e);
+            log.info("Object mapping exception {}", e);
         } catch (SessionException e) {
-            log.info("Session Execption {}", e);
+            log.info("Session exception {}", e);
         }
     }
 
