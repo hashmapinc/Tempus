@@ -65,11 +65,7 @@ public abstract class DeviceAwareSessionContext implements SessionContext {
     }
 
     protected void onMsg(ToDeviceMsg msg) throws SessionException {
-        msgTypeNotSupported(msg.getMsgType());
-    }
-
-    private void msgTypeNotSupported(MsgType msgType) {
-        throw new TempusRuntimeException("Not supported msg type: " + msgType + "!");
+        throw new TempusRuntimeException("Not supported msg type: " + msg.getMsgType() + "!");
     }
 
     public DeviceAuthService getAuthService() {
