@@ -113,6 +113,8 @@ spec:
           valueFrom:
             configMapKeyRef:
               name: {{ .Values.identity.name }}
-              key: spring.ds.password  
+              key: spring.ds.password 
+        resources:
+{{ toYaml .Values.resources | indent 10 }}               
 {{- end }}                            
 {{- end }}               
