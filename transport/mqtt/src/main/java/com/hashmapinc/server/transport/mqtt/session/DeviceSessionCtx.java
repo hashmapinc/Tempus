@@ -88,7 +88,6 @@ public class DeviceSessionCtx extends DeviceAwareSessionContext {
         try {
             adaptor.convertToAdaptorMsg(msg).ifPresent(this::pushToNetwork);
         } catch (AdaptorException e) {
-            //TODO: close channel with disconnect
             logAndWrap(e);
         }
     }
