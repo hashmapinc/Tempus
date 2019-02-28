@@ -18,6 +18,10 @@ package com.hashmapinc.server.common.transport.session;
 
 import com.hashmapinc.server.common.data.Device;
 import com.hashmapinc.server.common.data.security.DeviceCredentialsFilter;
+import com.hashmapinc.server.common.msg.exception.TempusRuntimeException;
+import com.hashmapinc.server.common.msg.session.MsgType;
+import com.hashmapinc.server.common.msg.session.ToDeviceMsg;
+import com.hashmapinc.server.common.msg.session.ex.SessionException;
 import com.hashmapinc.server.common.transport.auth.DeviceAuthService;
 import lombok.extern.slf4j.Slf4j;
 import com.hashmapinc.server.common.msg.session.SessionContext;
@@ -58,6 +62,14 @@ public abstract class DeviceAwareSessionContext implements SessionContext {
             log.debug("Can't find device using credentials [{}] due to {}", credentials, result.getErrorMsg());
             return false;
         }
+    }
+
+    protected void onMsg(ToDeviceMsg msg) throws SessionException {
+        msgTypeNotSupported(msg.getMsgType());
+    }
+
+    private void msgTypeNotSupported(MsgType msgType) {
+        throw new TempusRuntimeException("Not supported msg type: " + msgType + "!");
     }
 
     public DeviceAuthService getAuthService() {

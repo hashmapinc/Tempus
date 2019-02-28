@@ -14,17 +14,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.hashmapinc.server.transport.mqtt.adaptors;
+package com.hashmapinc.server.common.msg.session;
 
-import com.hashmapinc.server.common.msg.session.ToDeviceMsg;
-import com.hashmapinc.server.common.transport.adaptor.AdaptorException;
-import io.netty.handler.codec.mqtt.MqttMessage;
-import com.hashmapinc.server.common.transport.TransportAdaptor;
-import com.hashmapinc.server.transport.mqtt.session.DeviceSessionCtx;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 
-import java.util.Optional;
+@AllArgsConstructor
+@Data
+public class EventToDeviceResponseMsg implements ToDeviceMsg {
+    private int requestId;
 
+    @Override
+    public boolean isSuccess() {
+        return true;
+    }
 
-public interface MqttTransportAdaptor extends TransportAdaptor<DeviceSessionCtx, MqttMessage, MqttMessage> {
-    Optional<MqttMessage> convertToAdaptorMsg(ToDeviceMsg msg) throws AdaptorException;
+    @Override
+    public MsgType getMsgType() {
+        return MsgType.POST_DEVICE_EVENT;
+    }
 }

@@ -84,6 +84,24 @@ public class GatewayDeviceSessionCtx extends DeviceAwareSessionContext {
         message.ifPresent(parent::writeAndFlush);
     }
 
+    @Override
+    public void onMsg(ToDeviceMsg msg) throws SessionException {
+        Optional<MqttMessage> message = getToDeviceMsg(msg);
+        message.ifPresent(parent::writeAndFlush);
+    }
+
+    private Optional<MqttMessage> getToDeviceMsg(ToDeviceMsg msg) {
+        MqttMessage result = null;
+        if (msg.getMsgType() == MsgType.POST_DEVICE_EVENT) {
+            EventToDeviceResponseMsg eventRspMsg = (EventToDeviceResponseMsg) msg;
+            int requestId = eventRspMsg.getRequestId();
+            if (requestId >= 0) {
+                result = MqttTransportHandler.createMqttPubAckMsg(requestId);
+            }
+        }
+        return Optional.ofNullable(result);
+    }
+
     private Optional<MqttMessage> getToDeviceMsg(SessionActorToAdaptorMsg sessionMsg) {
         ToDeviceMsg msg = sessionMsg.getMsg();
         switch (msg.getMsgType()) {
