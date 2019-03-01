@@ -67,7 +67,7 @@ export default function loadLogViewer(ctx, sequence){
         }
         else {
           datasources.forEach(function(datasource){
-            if(settings.dataSource === datasource.dataKey.label){
+            if(settings.datasource === datasource.dataKey.label){
               ds = datasources[0];
             }
          })
@@ -164,8 +164,6 @@ export default function loadLogViewer(ctx, sequence){
       }
       localStorage.setItem("dragCount", angular.toJson(dragCount));
 
-     console.log(d3.event.x);
-     console.log(d3.event.y);
     }
    
     function addListeners() {

@@ -43,7 +43,18 @@ var lineGraph = function(lineConfig, data, state, index, width) {
     index: index,
     width: width
   }
-
+var data = [
+    {"ds" : "100", "value": -10},
+    {"ds" : "200", "value": 34},
+    {"ds" : "250", "value": 10},
+    {"ds" : "280", "value": -60},
+    {"ds" : "300", "value": -40},
+    {"ds" : "400", "value": 20},
+    {"ds" : "440", "value": 45},
+    {"ds" : "500", "value": 50},
+    {"ds" : "553", "value": 60},
+    {"ds" : "600", "value": 40}
+]
   if(angular.isUndefined(o.width)){
     o.width = 3;
   } 
@@ -55,7 +66,7 @@ var lineGraph = function(lineConfig, data, state, index, width) {
 
 
   //dataGen = dataGenerator();
- 
+
   function lineChart(group) {
     // group-scope
     group.each(render);
@@ -72,62 +83,49 @@ var lineGraph = function(lineConfig, data, state, index, width) {
       w = o.width*110 - margin.right - margin.left,
       h = 700 - margin.top;
 
-    let x = d3.scaleLinear().domain(o.min, o.max).range([0 + margin.left, w]);
-    let y = d3.scaleLinear().range([h, 0]);
+    let x = d3.scaleLinear().domain(d3.min(data, function(d) { return d.value; }),d3.max(data, function(d) { return d.value; })).range([0 , w]);
+    let y = d3.scaleLinear().domain(d3.min(data, function(d) { return d.ds; }),d3.max(data, function(d) { return d.ds; })).range([h, 0]);
 
-    let xAxis = d3.axisTop()
-      .scale(x)
 
+
+    let xAxis =  d3.axisTop()
+                 .scale(x)
     let yAxis = d3.axisLeft()
-      .scale(y)
-      .tickSize(0)
-      .tickFormat("");
+        .scale(y)
+
+
 
     let line = d3.line()
-      .y((d) => y(d[0]))
-      .y(function(d) { return y(d[0]); })
+      .y((d) => y(d.ds))
+      .y(function(d) { return y(d.ds); })
      // .y((d, i) => y(i + dataGen.time))
-      .x(d => x(d[1]))
+      .x(d => x(d.value))
       .curve(d3.curveLinear);
+
+
 
     if(angular.isDefined(o.areaFill)){
       if(o.areaFill.fill === "left"){
         var area = d3.area()
-          .x0(-14)
-          .x1(d => x(d[1]))
-          .y((d) => y(d[0]))
+          .x0(h)
+          .x1(d => x(d.ds))
+          .y((d) => y(d.value))
           .curve(d3.curveLinear);
       }
       if(o.areaFill.fill === "right"){
          area = d3.area()
-          .x0(d => x(d[1]))
+          .x0(d => x(d.ds))
           .x1(w)
-          .y((d) => y(d[0]))
+          .y((d) => y(d.value))
           .curve(d3.curveLinear);
       }
     }
 
 if(o.state === "init"){
-
-    // context.select('.linearGrid')
-    // .append('g')
-    //   .attr('transform', 'translate(30, 20)');
-
-    // let $xAxis = context.select('.linearGrid')
-      //  context.select('.linearGrid')
-      // .attr("width", w + margin.right + 1)
-      // .append('g')
-      // .attr('class', 'x axis')
-      // .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
-     // .call(xAxis);
-
-
-    //grid
-    // let $yAxis = context.select('.linearGrid').append('g')
-      context.select('.linearGrid').append('g')
-      .attr('class', 'y axis')
-      .attr("transform", "translate(" + margin.left + ", 0)")
-      .call(yAxis);
+//      context.select('.linearGrid').append('g')
+//      .attr('class', 'y axis')
+//      .attr("transform", "translate(" + margin.left + ", 0)")
+//      .call(yAxis);
 
     let $lineGraph = context.select('.linearGrid')
       .attr("width", w + margin.right + 1)
@@ -137,7 +135,8 @@ if(o.state === "init"){
       .append('path')
       .attr('stroke', o.color)
       .attr('fill', 'none')
-      .attr('stroke-width', o.lineWeight);
+      .attr('stroke-width', o.lineWeight)
+
 
     let $areaGraph = context.select('.linearGrid')
       .append('g')
@@ -145,73 +144,48 @@ if(o.state === "init"){
       .append('path')
       .attr('fill', o.areaFill.color)
       .style("opacity", o.areaFill.opacity);
- 
- } 
+
+
+
+
+ }
+
     function update() {
       var leftPadding = margin.left + 15;
-     // x.domain(d3.extent(o.data.data, function(d) { return d[1]; }));
-      y.domain(d3.extent(o.data.data, function(d) { return d[0]; }).reverse());
-   //   y.domain([dataGen.time + dataGen.num, dataGen.time]);
-       let xDom = [o.min, o.max];
-       // xDom[0] = o.min;
-       // xDom[1] = o.max;
-       x.domain(xDom);
-     // x.domain([-500,500]);
+      y.domain(d3.extent(data, function(d) { return d.ds; }));
+      x.domain(d3.extent(data, function(d) { return d.value; }));
 
-      // $xAxis
-        // .call(xAxis);
 
-       // $yAxis
-       //   .call(yAxis);
-   //    let $lngrp = context.select('.linearGrid').select('.linepath')
 
-    //  $lngrp
 
-      let $lineGraph = context.select('.linearGrid').select('.linepath'+o.index).select('path');
-      
-      $lineGraph
-        .data([o.data.data])
+
+
+
+      let $line= context.select('.linearGrid').select('.linepath'+o.index).select('path');
+
+      $line
+        .data([data])
+        .attr('class', 'grid')
         .attr('d', line)
         .attr("transform", "translate(" + leftPadding + ", 0)")
         .attr('stroke', o.color)
         .attr('fill', 'none')
-        .attr('stroke-width', o.lineWeight)
+        .attr('stroke-width', '10px')
+        .attr("border",1);
+
+
 
        let $areaGraph = context.select('.linearGrid').select('.areapath'+o.index).select('path');
 
-      // .attr('fill', o.areaFill.color)
-      // .style("opacity", o.areaFill.opacity);
-
-   //   $lineGraph
-   //      //.datum(dataGen.latestData)
-   //      .datum(o.data.data)
-   // //     .attr("transform", "translate(" + leftPadding + ", 0)")
-   //      .attr('d', line);
-
        $areaGraph
-        .data([o.data.data])
+        .data([data])
         .attr("transform", "translate(" + leftPadding + ", 0)")
         .attr('d', area)
         .attr('fill', o.areaFill.color)
         .style("opacity", o.areaFill.opacity);
 
-      // $rects
-      //   .attr('height', (_, i) => Math.abs(latestDeltas[i] * h / 10))
-      //   .attr('fill', (_, i) => latestDeltas[i] < 0 ? 'red' : 'green')
-      //   .attr('y', (_, i) => h - Math.abs(latestDeltas[i] * h / 10) - 42);
-    }
-
-    // for (let i = 0; i < dataGen.num + 50; i++) {
-    //   dataGen.tick();
-    // }
-
+       }
     update();
-
-    // setInterval(() => {
-    //   dataGen.tick();
-    //   update();
-    // }, 300);
-
 
   }
   lineChart.order = 2;

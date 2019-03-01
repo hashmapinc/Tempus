@@ -19,11 +19,12 @@
 }
 
 .grid line {
-  stroke: #fff;
+  stroke:gray;
 }
 
+
 .grid .minor line {
-  stroke-opacity: .5;
+  stroke-opacity: 2;
 }
 
 .grid text {
@@ -37,6 +38,8 @@
 .axis path,
 .grid path {
   display: none;
+  shape-rendering: crispEdges;
+    stroke-width: 10px;
 }
 
 .yaxis {
@@ -46,12 +49,12 @@
 .line-graph {
   fill: none;
   stroke: #fff;
-  stroke-width: 2px;
+  stroke-width: 10px;
 }
 
 .data {
   stroke: #fff;
-  stroke-width: 2px;
+  stroke-width: 10px;
 }
 
 svg {

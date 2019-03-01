@@ -55,7 +55,7 @@
     "clipboard": "^1.5.15",
     "compass-sass-mixins": "^0.12.7",
     "crypto-js": "^3.1.9-1",
-    "d3": "4",
+    "d3": "^5.9.1",
     "event-source-polyfill": "0.0.9",
     "flot": "git://github.com/flot/flot.git#0.9-work",
     "flot.curvedlines": "*",
