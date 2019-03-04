@@ -63,6 +63,7 @@ import com.hashmapinc.server.dao.logo.LogoService;
 import com.hashmapinc.server.dao.mail.DefaultMailService;
 import com.hashmapinc.server.dao.metadataingestion.MetadataIngestionService;
 import com.hashmapinc.server.dao.plugin.PluginDao;
+import com.hashmapinc.server.dao.plugin.PluginDataEncoderService;
 import com.hashmapinc.server.dao.plugin.PluginService;
 import com.hashmapinc.server.dao.relation.RelationService;
 import com.hashmapinc.server.dao.rule.RuleService;
@@ -197,6 +198,9 @@ public abstract class AbstractServiceTest {
 
     @Autowired
     protected PluginDao pluginDao;
+
+    @Autowired
+    protected PluginDataEncoderService pluginDataEncoderService;
 
     class IdComparator<D extends BaseData<? extends UUIDBased>> implements Comparator<D> {
         @Override

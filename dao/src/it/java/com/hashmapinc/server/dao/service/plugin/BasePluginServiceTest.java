@@ -22,16 +22,13 @@ import com.hashmapinc.server.common.data.page.TextPageData;
 import com.hashmapinc.server.common.data.page.TextPageLink;
 import com.hashmapinc.server.common.data.plugin.PluginMetaData;
 import com.hashmapinc.server.dao.model.ModelConstants;
-import com.hashmapinc.server.dao.plugin.BasePluginService;
 import com.hashmapinc.server.dao.service.AbstractServiceTest;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Assert;
 import org.junit.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.UUID;
 
-import static com.hashmapinc.server.dao.plugin.BasePluginService.KINESIS_PLUGIN;
 
 @Slf4j
 public abstract class BasePluginServiceTest extends AbstractServiceTest {
@@ -116,18 +113,6 @@ public abstract class BasePluginServiceTest extends AbstractServiceTest {
     pluginService.deletePluginsByTenantId(tenantId);
     found = pluginService.findTenantPlugins(tenantId, new TextPageLink(100));
     Assert.assertEquals(0, found.getData().size());
-  }
-
-
-  @Test
-  public void saveKinesisPluginWithABSCredentialsEncrypted() throws Exception {
-    PluginMetaData pluginMetaData = generatePlugin(null, null,KINESIS_PLUGIN,"com.hashmapinc.component.ActionTest","TestKinesisPluginDescriptor.json","TestKinesisPluginConfigurationData.json");
-    PluginMetaData savedPluginMetaData = pluginService.savePlugin(pluginMetaData);
-    PluginMetaData encryptedPluginMetaData = pluginDao.findById(savedPluginMetaData.getId());
-
-    Assert.assertNotEquals(pluginMetaData.getConfiguration(),encryptedPluginMetaData.getConfiguration());
-    Assert.assertEquals(pluginMetaData.getConfiguration(),savedPluginMetaData.getConfiguration());
-
   }
 
 }

@@ -458,6 +458,16 @@ public class ModelConstants {
     public static final String FILE_META_DATA_FILE_LAST_UPDATED = "last_updated";
     public static final String FILE_META_DATA_FILE_SIZE = "file_size";
 
+    public static final String PLUGIN_DESCRIPTOR_TYPE = "type";
+    public static final String PLUGIN_DESCRIPTOR_KEY = "key";
+    public static final String PLUGIN_DESCRIPTOR_PASSWORD = "password";
+
+    /**
+     * AES-ENCRYPTION
+     */
+    public static final String UTF_8 = "UTF8";
+    public static final String ALGORITHM_STR = "AES/ECB/PKCS5Padding";
+
     protected static final String[] NONE_AGGREGATION_COLUMNS = new String[]{LONG_VALUE_COLUMN, DOUBLE_VALUE_COLUMN, BOOLEAN_VALUE_COLUMN, STRING_VALUE_COLUMN, JSON_VALUE_COLUMN, KEY_COLUMN, TS_COLUMN};
     protected static final String[] NONE_DS_AGGREGATION_COLUMNS = new String[]{LONG_VALUE_COLUMN, DOUBLE_VALUE_COLUMN, BOOLEAN_VALUE_COLUMN, STRING_VALUE_COLUMN, JSON_VALUE_COLUMN, KEY_COLUMN, DS_COLUMN};
 
