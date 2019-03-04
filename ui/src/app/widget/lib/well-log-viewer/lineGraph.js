@@ -25,21 +25,19 @@ import './logViewer.css';
 var lineGraph = function(lineConfig, data, state, index, width) {
 
   'use strict';
-  var o,
-      dataGen;
+  var lineParameter;
 
-
-  o = {
-    color: lineConfig.color,
-    min: lineConfig.headerMin,
-    max: lineConfig.headerMax,
-    lineWeight: lineConfig.lineWeight,
-    areaFill: lineConfig.areaFill,  
-    data: data,    
-    state:state,
-    index: index,
-    width: width
-  }
+  lineParameter = {
+      color: lineConfig.color,
+      min: lineConfig.headerMin,
+      max: lineConfig.headerMax,
+      lineWeight: lineConfig.lineWeight,
+      areaFill: lineConfig.areaFill,
+      data: data,
+      state:state,
+      index: index,
+      width: width
+    }
 var data = [
     {"ds" : "100", "value": -10},
     {"ds" : "200", "value": -20},
@@ -54,8 +52,8 @@ var data = [
     {"ds" : "1000", "value": 58}
 
 ]
-  if(angular.isUndefined(o.width)){
-    o.width = 3;
+  if(angular.isUndefined(lineParameter.width)){
+    lineParameter.width = 3;
   } 
 
   function lineChart(group) {
@@ -69,7 +67,7 @@ var data = [
     context = d3.select(this);
 
     let margin = {top: 30, right: 10, bottom: 30, left: 10},
-      w = o.width*110 - margin.right - margin.left,
+      w = lineParameter.width*110 - margin.right - margin.left,
       h = 700 - margin.top;
 
     let x = d3.scaleLinear().domain(d3.min(data, function(d) { return d.value; }),d3.max(data, function(d) { return d.value; })).range([0 , w]);
@@ -92,8 +90,8 @@ var data = [
 
 
 
-    if(angular.isDefined(o.areaFill)){
-      if(o.areaFill.fill === "left"){
+    if(angular.isDefined(lineParameter.areaFill)){
+      if(lineParameter.areaFill.fill === "left"){
 
         var area = d3.area()
               .x0(-14)
@@ -101,7 +99,7 @@ var data = [
               .y((d) => y(d.ds))
               .curve(d3.curveLinear);
       }
-      if(o.areaFill.fill === "right"){
+      if(lineParameter.areaFill.fill === "right"){
           area = d3.area()
                 .x0((d) => x(d.value))
                 .x1(w)
@@ -110,24 +108,24 @@ var data = [
       }
     }
 
-if(o.state === "init"){
+if(lineParameter.state === "init"){
     let $lineGraph = context.select('.linearGrid')
       .attr("width", w + margin.right + 1)
       .attr("height", h)
       .append('g')
-      .attr("class", 'linepath'+o.index)
+      .attr("class", 'linepath'+lineParameter.index)
       .append('path')
-      .attr('stroke', o.color)
+      .attr('stroke', lineParameter.color)
       .attr('fill', 'none')
-      .attr('stroke-width', o.lineWeight)
+      .attr('stroke-width', lineParameter.lineWeight)
 
 
     let $areaGraph = context.select('.linearGrid')
       .append('g')
-      .attr("class", 'areapath'+o.index)
+      .attr("class", 'areapath'+lineParameter.index)
       .append('path')
-      .attr('fill', o.areaFill.color)
-      .style("opacity", o.areaFill.opacity);
+      .attr('fill', lineParameter.areaFill.color)
+      .style("opacity", lineParameter.areaFill.opacity);
  }
 
     function update() {
@@ -135,26 +133,26 @@ if(o.state === "init"){
       y.domain(d3.extent(data, function(d) { return d.ds; }));
       x.domain(d3.extent(data, function(d) { return d.value; }));
 
-      let $line= context.select('.linearGrid').select('.linepath'+o.index).select('path');
+      let $line= context.select('.linearGrid').select('.linepath'+lineParameter.index).select('path');
 
       $line
         .data([data])
         .attr('class', 'grid')
         .attr('d', line)
         .attr("transform", "translate(" + leftPadding + ", 0)")
-        .attr('stroke', o.color)
+        .attr('stroke', lineParameter.color)
         .attr('fill', 'none')
         .attr('stroke-width', '10px')
         .attr("border",1);
 
-       let $areaGraph = context.select('.linearGrid').select('.areapath'+o.index).select('path');
+       let $areaGraph = context.select('.linearGrid').select('.areapath'+lineParameter.index).select('path');
 
        $areaGraph
         .data([data])
         .attr("transform", "translate(" + leftPadding + ", 0)")
         .attr('d', area)
-        .attr('fill', o.areaFill.color)
-        .style("opacity", o.areaFill.opacity);
+        .attr('fill', lineParameter.areaFill.color)
+        .style("opacity", lineParameter.areaFill.opacity);
        }
     update();
 
