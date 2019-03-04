@@ -16,25 +16,28 @@
  */
 package com.hashmapinc.server.dao.service;
 
+import com.hashmapinc.server.dao.encryption.EncryptionService;
+import com.hashmapinc.server.dao.encryption.EncryptionServiceImpl;
 import org.junit.Assert;
 import org.junit.Test;
 
 public class EncryptionUnitTest{
 
     private static final String aesKey = "ABCRFGTHDKHLMNTF";
+    private EncryptionService encryptionService = new EncryptionServiceImpl();
 
     @Test()
     public void testEncrypt(){
         String plainText = "B4azA3QJl1E64D/4g/GIKA==";
-        String encryptText = Encryption.encrypt(plainText,aesKey);
+        String encryptText = encryptionService.encrypt(plainText,aesKey);
         Assert.assertNotEquals(plainText,encryptText);
     }
 
     @Test()
     public void testDecrypt() throws Exception{
         String plainText = "B4azA3QJl1E64D/4g/GIKA==";
-        String encryptText = Encryption.encrypt(plainText,aesKey);
-        String decryptedText = Encryption.decrypt(encryptText,aesKey);
+        String encryptText = encryptionService.encrypt(plainText,aesKey);
+        String decryptedText = encryptionService.decrypt(encryptText,aesKey);
         Assert.assertEquals(plainText,decryptedText);
     }
 }
