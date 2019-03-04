@@ -26,13 +26,10 @@ var lineGraph = function(lineConfig, data, state, index, width) {
 
   'use strict';
   var o,
-     // local,
       dataGen;
 
 
   o = {
-    // value: null,
-    // key: null,
     color: lineConfig.color,
     min: lineConfig.headerMin,
     max: lineConfig.headerMax,
@@ -45,37 +42,29 @@ var lineGraph = function(lineConfig, data, state, index, width) {
   }
 var data = [
     {"ds" : "100", "value": -10},
-    {"ds" : "200", "value": 34},
-    {"ds" : "250", "value": 10},
-    {"ds" : "280", "value": -60},
-    {"ds" : "300", "value": -40},
-    {"ds" : "400", "value": 20},
-    {"ds" : "440", "value": 45},
-    {"ds" : "500", "value": 50},
-    {"ds" : "553", "value": 60},
-    {"ds" : "600", "value": 40}
+    {"ds" : "200", "value": -20},
+    {"ds" : "250", "value": -33},
+    {"ds" : "380", "value": -40},
+    {"ds" : "400", "value": -50},
+    {"ds" : "500", "value": 10},
+    {"ds" : "640", "value": 25},
+    {"ds" : "700", "value": 40},
+    {"ds" : "853", "value": 48},
+    {"ds" : "900", "value": 50},
+    {"ds" : "1000", "value": 58}
+
 ]
   if(angular.isUndefined(o.width)){
     o.width = 3;
   } 
 
-  // local = {
-  // //  label: d3.local(),
-  // //  dimensions: d3.local()
-  // };
-
-
-  //dataGen = dataGenerator();
-
   function lineChart(group) {
-    // group-scope
     group.each(render);
   }
  
  // function render(data) {
   function render() {
     var context;
-     //   dim;
 
     context = d3.select(this);
 
@@ -98,7 +87,6 @@ var data = [
     let line = d3.line()
       .y((d) => y(d.ds))
       .y(function(d) { return y(d.ds); })
-     // .y((d, i) => y(i + dataGen.time))
       .x(d => x(d.value))
       .curve(d3.curveLinear);
 
@@ -106,27 +94,23 @@ var data = [
 
     if(angular.isDefined(o.areaFill)){
       if(o.areaFill.fill === "left"){
+
         var area = d3.area()
-          .x0(h)
-          .x1(d => x(d.ds))
-          .y((d) => y(d.value))
-          .curve(d3.curveLinear);
+              .x0(-14)
+              .x1((d) => x(d.value))
+              .y((d) => y(d.ds))
+              .curve(d3.curveLinear);
       }
       if(o.areaFill.fill === "right"){
-         area = d3.area()
-          .x0(d => x(d.ds))
-          .x1(w)
-          .y((d) => y(d.value))
-          .curve(d3.curveLinear);
+          area = d3.area()
+                .x0((d) => x(d.value))
+                .x1(w)
+                .y((d) => y(d.ds))
+                .curve(d3.curveLinear);
       }
     }
 
 if(o.state === "init"){
-//      context.select('.linearGrid').append('g')
-//      .attr('class', 'y axis')
-//      .attr("transform", "translate(" + margin.left + ", 0)")
-//      .call(yAxis);
-
     let $lineGraph = context.select('.linearGrid')
       .attr("width", w + margin.right + 1)
       .attr("height", h)
@@ -144,22 +128,12 @@ if(o.state === "init"){
       .append('path')
       .attr('fill', o.areaFill.color)
       .style("opacity", o.areaFill.opacity);
-
-
-
-
  }
 
     function update() {
       var leftPadding = margin.left + 15;
       y.domain(d3.extent(data, function(d) { return d.ds; }));
       x.domain(d3.extent(data, function(d) { return d.value; }));
-
-
-
-
-
-
 
       let $line= context.select('.linearGrid').select('.linepath'+o.index).select('path');
 
@@ -173,8 +147,6 @@ if(o.state === "init"){
         .attr('stroke-width', '10px')
         .attr("border",1);
 
-
-
        let $areaGraph = context.select('.linearGrid').select('.areapath'+o.index).select('path');
 
        $areaGraph
@@ -183,7 +155,6 @@ if(o.state === "init"){
         .attr('d', area)
         .attr('fill', o.areaFill.color)
         .style("opacity", o.areaFill.opacity);
-
        }
     update();
 
