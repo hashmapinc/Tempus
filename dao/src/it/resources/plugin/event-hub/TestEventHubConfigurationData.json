@@ -1,0 +1,6 @@
+{
+  "eventHubNamespace": "Namespace",
+  "eventHubName": "EventHubName",
+  "eventHubPolicyName": "PolicyName",
+  "eventHubSasKey": "PublicKey"
+}
