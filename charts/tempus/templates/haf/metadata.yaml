@@ -108,5 +108,7 @@ spec:
             configMapKeyRef:
               name: {{ .Values.metadata.name }}
               key: spring.ds.password
+        resources:
+{{ toYaml .Values.resources | indent 10 }}              
 {{- end }}              
 {{- end }}              

@@ -56,7 +56,7 @@ export default function EditWidgetDirective($compile, $templateCache, types, wid
                             }
 
                             scope.functionsOnly = scope.dashboard ? false : true;
-
+                            scope.theForm.alias = widgetInfo.alias;
                             scope.theForm.$setPristine();
                         });
                     }

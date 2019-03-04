@@ -21,7 +21,7 @@
 
 replicaCount: 1
 
-autoscalingapiversion: autoscaling/v2beta2
+autoscalingapiversion: autoscaling/v2beta1
 
 ##
 global:
@@ -32,7 +32,7 @@ global:
 nameOverride: ""
 fullnameOverride: ""
 
-storageclass: nfs
+storageclass: tempus
 
 serviceAccount:
   create: true
@@ -46,11 +46,11 @@ image:
 externaldb: true
 
 ConfigMapData:
-  cassandra.url: "aws-tempus-cassandra:9042"
-  cassandra.host: "aws-tempus-cassandra"
+  cassandra.url: "tempus-data-cassandra:9042"
+  cassandra.host: "tempus-data-cassandra"
   cassandra.port: "9042"
   database.type: "cassandra"
-  postgres.host: "aws-tempus-postgresql"
+  postgres.host: "tempus-data-postgresql"
   postgres.port: "5432"
   schema.data: "false"
   demo.data: "true"
@@ -62,7 +62,7 @@ ConfigMapData:
   http.port: "8080"
   livy.host: "livy"
   livy.port: "8998"
-  spring.datasource.url: "jdbc:postgresql://aws-tempus-postgresql:5432/identity"
+  spring.datasource.url: "jdbc:postgresql://tempus-data-postgresql:5432/identity"
   spring.datasource.username: "identity"
   spring.datasource.password: "identity"
   spring.jpa.db: "org.hibernate.dialect.PostgreSQLDialect"
@@ -88,7 +88,7 @@ service:
 ingress:
   enabled: true
   tls: false
-  hostname: tempus-qa.hashmapinc.com
+  hostname: tempus.hashmapinc.com
   annotations: 
     kubernetes.io/ingress.class: nginx
     ingress.kubernetes.io/rewrite-target: /
@@ -161,7 +161,7 @@ identity:
   ConfigMapData:
     spring.jpa.db: "org.hibernate.dialect.PostgreSQLDialect"
     spring.jpa.driver: "org.postgresql.Driver"
-    spring.ds.url: "jdbc:postgresql://aws-tempus-postgresql:5432/identity"
+    spring.ds.url: "jdbc:postgresql://tempus-data-postgresql:5432/identity"
     spring.ds.username: identity
     spring.ds.password: identity 
 
@@ -185,7 +185,7 @@ metadata:
   ConfigMapData:
     spring.jpa.db: "org.hibernate.dialect.PostgreSQLDialect"
     spring.jpa.driver: "org.postgresql.Driver"
-    spring.ds.url: "jdbc:postgresql://aws-tempus-postgresql:5432/identity"
+    spring.ds.url: "jdbc:postgresql://tempus-data-postgresql:5432/identity"
     spring.ds.username: identity
     spring.ds.password: identity 
 

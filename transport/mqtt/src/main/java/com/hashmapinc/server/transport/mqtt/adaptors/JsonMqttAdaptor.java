@@ -157,6 +157,19 @@ public class JsonMqttAdaptor implements MqttTransportAdaptor {
         return Optional.ofNullable(result);
     }
 
+    @Override
+    public Optional<MqttMessage> convertToAdaptorMsg(ToDeviceMsg msg) {
+        MqttMessage result = null;
+        if (msg.getMsgType() == MsgType.POST_DEVICE_EVENT) {
+            EventToDeviceResponseMsg eventRspMsg = (EventToDeviceResponseMsg) msg;
+            int requestId = eventRspMsg.getRequestId();
+            if (requestId >= 0) {
+                result = MqttTransportHandler.createMqttPubAckMsg(requestId);
+            }
+        }
+        return Optional.ofNullable(result);
+    }
+
     private MqttMessage convertResponseMsg(DeviceSessionCtx ctx, ToDeviceMsg msg,
                                            ResponseMsg<?> responseMsg, Optional<Exception> responseError) throws AdaptorException {
         MqttMessage result = null;
