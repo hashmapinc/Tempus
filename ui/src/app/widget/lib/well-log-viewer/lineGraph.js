@@ -119,13 +119,15 @@ if(lineParameter.state === "init"){
       .attr('fill', 'none')
       .attr('stroke-width', lineParameter.lineWeight)
 
+    if(angular.isDefined(lineParameter.areaFill)){
+         let $areaGraph = context.select('.linearGrid')
+              .append('g')
+              .attr("class", 'areapath'+lineParameter.index)
+              .append('path')
+              .attr('fill', lineParameter.areaFill.color)
+              .style("opacity", lineParameter.areaFill.opacity);
+    }
 
-    let $areaGraph = context.select('.linearGrid')
-      .append('g')
-      .attr("class", 'areapath'+lineParameter.index)
-      .append('path')
-      .attr('fill', lineParameter.areaFill.color)
-      .style("opacity", lineParameter.areaFill.opacity);
  }
 
     function update() {
@@ -145,17 +147,19 @@ if(lineParameter.state === "init"){
         .attr('stroke-width', '10px')
         .attr("border",1);
 
-       let $areaGraph = context.select('.linearGrid').select('.areapath'+lineParameter.index).select('path');
 
-       $areaGraph
-        .data([data])
-        .attr("transform", "translate(" + leftPadding + ", 0)")
-        .attr('d', area)
-        .attr('fill', lineParameter.areaFill.color)
-        .style("opacity", lineParameter.areaFill.opacity);
+       if(angular.isDefined(lineParameter.areaFill)){
+       let $areaGraph = context.select('.linearGrid').select('.areapath'+lineParameter.index).select('path');
+        $areaGraph
+                .data([data])
+                .attr("transform", "translate(" + leftPadding + ", 0)")
+                .attr('d', area)
+                .attr('fill', lineParameter.areaFill.color)
+                .style("opacity", lineParameter.areaFill.opacity);
+
+       }
        }
     update();
-
   }
   lineChart.order = 2;
   return lineChart;
