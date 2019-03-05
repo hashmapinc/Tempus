@@ -24,8 +24,10 @@ import com.hashmapinc.server.common.data.security.DeviceTokenCredentials;
 import com.hashmapinc.server.common.data.security.DeviceX509Credentials;
 import com.hashmapinc.server.common.msg.session.AdaptorToSessionActorMsg;
 import com.hashmapinc.server.common.msg.session.BasicToDeviceActorSessionMsg;
+import com.hashmapinc.server.common.msg.session.EventToDeviceResponseMsg;
 import com.hashmapinc.server.common.msg.session.MsgType;
 import com.hashmapinc.server.common.msg.session.ctrl.SessionCloseMsg;
+import com.hashmapinc.server.common.msg.session.ex.SessionException;
 import com.hashmapinc.server.common.transport.SessionMsgProcessor;
 import com.hashmapinc.server.common.transport.adaptor.AdaptorException;
 import com.hashmapinc.server.common.transport.auth.DeviceAuthService;
@@ -261,10 +263,13 @@ public class MqttTransportHandler extends ChannelInboundHandlerAdapter implement
             event.setType("QUALITY_EVENT");
             event.setBody(eventInfo);
             eventService.save(event);
-
-        } catch (IOException ex) {
-            log.info("Execption occurred : {}", ex);
-            throw new AdaptorException(ex);
+            deviceSessionCtx.onMsg(new EventToDeviceResponseMsg(inbound.variableHeader().packetId()));
+        } catch (IOException e) {
+            log.info("IOException occurred : {}", e);
+            throw new AdaptorException(e);
+        } catch (SessionException e) {
+            log.info("Session execption : {}", e);
+            throw new AdaptorException(e);
         }
     }
 

@@ -17,6 +17,7 @@
 package com.hashmapinc.server.transport.mqtt.session;
 
 import com.hashmapinc.server.common.data.id.SessionId;
+import com.hashmapinc.server.common.msg.session.ToDeviceMsg;
 import com.hashmapinc.server.common.msg.session.ctrl.SessionCloseMsg;
 import com.hashmapinc.server.common.msg.session.ex.SessionException;
 import com.hashmapinc.server.common.transport.auth.DeviceAuthService;
@@ -79,6 +80,15 @@ public class DeviceSessionCtx extends DeviceAwareSessionContext {
         if (msg instanceof SessionCloseMsg) {
             pushToNetwork(new MqttMessage(new MqttFixedHeader(MqttMessageType.DISCONNECT, false, MqttQoS.AT_MOST_ONCE, false, 0)));
             channel.close();
+        }
+    }
+
+    @Override
+    public void onMsg(ToDeviceMsg msg) throws SessionException {
+        try {
+            adaptor.convertToAdaptorMsg(msg).ifPresent(this::pushToNetwork);
+        } catch (AdaptorException e) {
+            logAndWrap(e);
         }
     }
 

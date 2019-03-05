@@ -91,4 +91,6 @@ spec:
             configMapKeyRef:
               name: {{ .Values.dataquality.name }}
               key: mqtt.url
+        resources:
+{{ toYaml .Values.dataqualityresources | indent 10 }}              
 {{- end }}              

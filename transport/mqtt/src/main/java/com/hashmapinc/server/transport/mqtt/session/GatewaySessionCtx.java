@@ -38,7 +38,9 @@ import com.hashmapinc.server.common.msg.core.*;
 import com.hashmapinc.server.common.msg.exception.TempusRuntimeException;
 import com.hashmapinc.server.common.msg.session.BasicAdaptorToSessionActorMsg;
 import com.hashmapinc.server.common.msg.session.BasicToDeviceActorSessionMsg;
+import com.hashmapinc.server.common.msg.session.EventToDeviceResponseMsg;
 import com.hashmapinc.server.common.msg.session.ctrl.SessionCloseMsg;
+import com.hashmapinc.server.common.msg.session.ex.SessionException;
 import com.hashmapinc.server.common.transport.SessionMsgProcessor;
 import com.hashmapinc.server.common.transport.adaptor.AdaptorException;
 import com.hashmapinc.server.common.transport.adaptor.JsonConverter;
@@ -246,12 +248,15 @@ public class GatewaySessionCtx {
 
     public void onDeviceEventMsg(MqttPublishMessage mqttMsg) throws AdaptorException {
         JsonElement json = validateJsonPayload(gatewaySessionId, mqttMsg.payload());
+        int requestId = mqttMsg.variableHeader().packetId();
         if (json.isJsonObject()) {
             JsonObject jsonObj = json.getAsJsonObject();
             for (Map.Entry<String, JsonElement> deviceEntry : jsonObj.entrySet()) {
                 Device device = deviceService.findDeviceByTenantIdAndName(gateway.getTenantId(), deviceEntry.getKey());
                 if (device != null) {
-                    saveDeviceEventInfo(device, deviceEntry.getValue().toString());
+                    GatewayDeviceSessionCtx ctx = new GatewayDeviceSessionCtx(this, device);
+                    devices.put(device.getName(), ctx);
+                    saveDeviceEventInfo(device, deviceEntry.getValue().toString(), requestId);
                 }
             }
         } else {
@@ -259,7 +264,7 @@ public class GatewaySessionCtx {
         }
     }
 
-    public void saveDeviceEventInfo(Device device, String strEventInfo) {
+    public void saveDeviceEventInfo(Device device, String strEventInfo, int requestId) {
         try {
             ObjectMapper mapper = new ObjectMapper();
             JsonNode eventInfo = mapper.readTree(strEventInfo);
@@ -269,8 +274,12 @@ public class GatewaySessionCtx {
             event.setType("QUALITY_EVENT");
             event.setBody(eventInfo);
             eventService.save(event);
+            GatewayDeviceSessionCtx deviceSessionCtx = devices.get(device.getName());
+            deviceSessionCtx.onMsg(new EventToDeviceResponseMsg(requestId));
         } catch (IOException e) {
-            log.info("Object mapping execption {}", e);
+            log.info("Object mapping exception {}", e);
+        } catch (SessionException e) {
+            log.info("Session exception {}", e);
         }
     }
 
