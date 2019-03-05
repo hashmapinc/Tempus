@@ -88,6 +88,8 @@ spec:
         volumeMounts:
         - name: {{ .Values.zookeeper.name }}-datadir
           mountPath: /var/lib/zookeeper
+        resources:
+{{ toYaml .Values.resources | indent 10 }}          
   volumeClaimTemplates:
   - metadata:
       name: {{ .Values.zookeeper.name }}-datadir

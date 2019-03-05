@@ -59,6 +59,7 @@ function WidgetConfig($compile, $templateCache, $rootScope, $translate, $timeout
         element.html(template);
 
         scope.types = types;
+        scope.alias = null;
         scope.widgetEditMode = $rootScope.widgetEditMode;
         scope.emptySettingsSchema = {
             type: "object",
@@ -98,6 +99,11 @@ function WidgetConfig($compile, $templateCache, $rootScope, $translate, $timeout
         }
 
         ngModelCtrl.$render = function () {
+            if(angular.isUndefined (scope.widgetInfo)){
+                scope.alias = scope.theForm.alias;
+            }else {
+                scope.alias = scope.widgetInfo.alias;
+            }
             if (ngModelCtrl.$viewValue) {
                 var config = ngModelCtrl.$viewValue.config;
                 var layout = ngModelCtrl.$viewValue.layout;
