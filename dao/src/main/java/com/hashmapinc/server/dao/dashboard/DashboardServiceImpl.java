@@ -251,7 +251,7 @@ public class DashboardServiceImpl extends AbstractEntityService implements Dashb
                 @Override
                 protected void validateCreate(Dashboard dashboard) {
                     String searchText  = dashboard.getSearchText().toLowerCase();
-                    List<Dashboard> foundDashboards = dashboardDao.findDashboardBySearchText(searchText);
+                    List<Dashboard> foundDashboards = dashboardDao.findDashboardBySearchTextAndTenantId(searchText,dashboard.getTenantId().getId());
                     if(!foundDashboards.isEmpty())
                         throw new DataValidationException("Dashboard is already created for name " + dashboard.getTitle());
                     
