@@ -81,6 +81,7 @@ svg {
 
 .linearGrid {
     vertical-align: bottom;
+    border: 1px solid lightgray;
 }
 /*.axis text {
   font: 10px sans-serif;

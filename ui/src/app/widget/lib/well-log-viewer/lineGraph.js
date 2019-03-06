@@ -145,7 +145,6 @@ if(lineParameter.state === "init"){
         .attr('stroke', lineParameter.color)
         .attr('fill', 'none')
         .attr('stroke-width', '10px')
-        .attr("border",1);
 
 
        if(angular.isDefined(lineParameter.areaFill)){
