@@ -38,20 +38,7 @@ var lineGraph = function(lineConfig, data, state, index, width) {
       index: index,
       width: width
     }
-var data = [
-    {"ds" : "100", "value": -10},
-    {"ds" : "200", "value": -20},
-    {"ds" : "250", "value": -33},
-    {"ds" : "380", "value": -40},
-    {"ds" : "400", "value": -50},
-    {"ds" : "500", "value": 10},
-    {"ds" : "640", "value": 25},
-    {"ds" : "700", "value": 40},
-    {"ds" : "853", "value": 48},
-    {"ds" : "900", "value": 50},
-    {"ds" : "1000", "value": 58}
 
-]
   if(angular.isUndefined(lineParameter.width)){
     lineParameter.width = 3;
   } 
@@ -70,8 +57,8 @@ var data = [
       w = lineParameter.width*110 - margin.right - margin.left,
       h = 700 - margin.top;
 
-    let x = d3.scaleLinear().domain(d3.min(data, function(d) { return d.value; }),d3.max(data, function(d) { return d.value; })).range([0 , w]);
-    let y = d3.scaleLinear().domain(d3.min(data, function(d) { return d.ds; }),d3.max(data, function(d) { return d.ds; })).range([h, 0]);
+    let x = d3.scaleLinear().domain(d3.min(lineParameter.data.data, function(d) { return d[1]; }),d3.max(lineParameter.data.data, function(d) { return d[1]; })).range([0 , w]);
+    let y = d3.scaleLinear().domain(d3.min(lineParameter.data.data, function(d) { return d[0]; }),d3.max(lineParameter.data.data, function(d) { return d[0]; })).range([h, 0]);
 
 
 
@@ -83,9 +70,9 @@ var data = [
 
 
     let line = d3.line()
-      .y((d) => y(d.ds))
-      .y(function(d) { return y(d.ds); })
-      .x(d => x(d.value))
+      .y((d) => y(d[0]))
+      .y(function(d) { return y(d[0]); })
+      .x(d => x(d[1]))
       .curve(d3.curveLinear);
 
 
@@ -95,15 +82,15 @@ var data = [
 
         var area = d3.area()
               .x0(-14)
-              .x1((d) => x(d.value))
-              .y((d) => y(d.ds))
+              .x1((d) => x(d[1]))
+              .y((d) => y(d[0]))
               .curve(d3.curveLinear);
       }
       if(lineParameter.areaFill.fill === "right"){
           area = d3.area()
-                .x0((d) => x(d.value))
+                .x0((d) => x(d[1]))
                 .x1(w)
-                .y((d) => y(d.ds))
+                .y((d) => y(d[0]))
                 .curve(d3.curveLinear);
       }
     }
@@ -132,25 +119,25 @@ if(lineParameter.state === "init"){
 
     function update() {
       var leftPadding = margin.left + 15;
-      y.domain(d3.extent(data, function(d) { return d.ds; }));
-      x.domain(d3.extent(data, function(d) { return d.value; }));
+      y.domain(d3.extent(lineParameter.data.data, function(d) { return d[0]; }));
+      x.domain(d3.extent(lineParameter.data.data, function(d) { return d[1]; }));
 
       let $line= context.select('.linearGrid').select('.linepath'+lineParameter.index).select('path');
 
       $line
-        .data([data])
+        .data([lineParameter.data.data])
         .attr('class', 'grid')
         .attr('d', line)
         .attr("transform", "translate(" + leftPadding + ", 0)")
         .attr('stroke', lineParameter.color)
         .attr('fill', 'none')
-        .attr('stroke-width', '10px')
+        .attr('stroke-width', lineParameter.lineWeight)
 
 
        if(angular.isDefined(lineParameter.areaFill)){
        let $areaGraph = context.select('.linearGrid').select('.areapath'+lineParameter.index).select('path');
         $areaGraph
-                .data([data])
+                .data([lineParameter.data.data])
                 .attr("transform", "translate(" + leftPadding + ", 0)")
                 .attr('d', area)
                 .attr('fill', lineParameter.areaFill.color)
