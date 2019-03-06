@@ -28,9 +28,9 @@
 </div>
 <div>
     <md-input-container class="md-block">
-        <div ng-repeat="datasource in datasources">
+        <div>
                 <md-select ng-model="trackComponent.datasource" placeholder="{{'wellLog.datasource' | translate}}">
-                    <md-option ng-value="d.label" ng-repeat="d in datasource.value.dataKeys">{{ d.label }}</md-option>
+                    <md-option ng-value="d.label" ng-repeat="d in datasourcesList">{{ d.label }}</md-option>
                 </md-select>
         </div>
     </md-input-container>

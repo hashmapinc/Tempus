@@ -28,7 +28,12 @@ export default function WellLogViewerComponentsDirective($compile, $templateCach
         scope.componentTypes = types.wellLogComponent.componentTypes;
         scope.fillTypes = types.wellLogComponent.fillTypes;
         scope.styleTypes = types.wellLogComponent.styleTypes;
-
+        scope.datasourcesList = [];
+        scope.datasources.forEach(function(dataSources){
+            dataSources.value.dataKeys.forEach(function(keys){
+                scope.datasourcesList.push(keys)
+            })
+        })
         $compile(element.contents())(scope);
     }
     return {
