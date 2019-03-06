@@ -14,22 +14,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.hashmapinc.server.common.data.upload;
+package com.hashmapinc.server.dao.filemetadata;
 
 import com.hashmapinc.server.common.data.id.EntityId;
 import com.hashmapinc.server.common.data.id.TenantId;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import com.hashmapinc.server.common.data.upload.FileMetaData;
 
-@NoArgsConstructor
-@AllArgsConstructor
-@Data
-public class FileMetaData {
-    TenantId tenantId;
-    EntityId relatedEntity;
-    private String fileName;
-    private String extension;
-    private long lastUpdated;
-    private double size;
+import java.util.List;
+
+public interface FileMetaDataDao {
+    FileMetaData save(FileMetaData fileMetaData);
+    List<FileMetaData> getFilesByTenantAndRelatedEntity(TenantId tenantId, EntityId entityId);
+    List<FileMetaData> getFileMetaData(TenantId tenantId, EntityId entityId, String fileName, String extension);
+    void delete(TenantId tenantId, EntityId entityId, String fileName, String extension);
 }

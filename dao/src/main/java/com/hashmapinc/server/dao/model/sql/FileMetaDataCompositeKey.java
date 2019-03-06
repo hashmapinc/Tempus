@@ -14,22 +14,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.hashmapinc.server.common.data.upload;
+package com.hashmapinc.server.dao.model.sql;
 
-import com.hashmapinc.server.common.data.id.EntityId;
-import com.hashmapinc.server.common.data.id.TenantId;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@NoArgsConstructor
-@AllArgsConstructor
+import java.io.Serializable;
+
 @Data
-public class FileMetaData {
-    TenantId tenantId;
-    EntityId relatedEntity;
+@AllArgsConstructor
+@NoArgsConstructor
+public class FileMetaDataCompositeKey implements Serializable {
+    private String tenantId;
+    private String relatedEntity;
     private String fileName;
     private String extension;
-    private long lastUpdated;
-    private double size;
 }
