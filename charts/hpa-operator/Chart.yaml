@@ -1,0 +1,12 @@
+description: A Helm chart for Kubernetes
+home: https://banzaicloud.com
+keywords:
+- hpa
+- autoscale
+maintainers:
+- email: info@banzaicloud.com
+  name: Banzai Cloud
+name: hpa-operator
+sources:
+- https://github.com/banzaicloud/hpa-operator
+version: 0.0.7
