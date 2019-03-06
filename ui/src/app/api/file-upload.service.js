@@ -39,12 +39,12 @@ function FileUploadService(toast, $http, $q, $translate, $window, $document, $in
 
 	return service;
 
-	function uploadFile(file) {
+	function uploadFile(file, entityId) {
 		var deferred = $q.defer();
-		var url = '/api/file';
+		var url = '/api/file?relatedEntityId=' + entityId;
 		var fd = new FormData();
 		fd.append("file", file);
-		$http.post(url, fd, {
+		$http.post(url, fd,{
 			transformRequest: angular.identity,
 			headers: {
 				'Content-Type': undefined
@@ -57,14 +57,14 @@ function FileUploadService(toast, $http, $q, $translate, $window, $document, $in
 		return deferred.promise;
 	}
 
-	function exportFile(fileName, extension) {
+	function exportFile(fileName, extension, entityId) {
 		if (extension != getTypes().fileUpload.na && extension != "") {
 			var name = fileName + "." + extension;
 		} else {
 			name = fileName;
 		}
 
-		getFile(name).then(
+		getFile(name, entityId).then(
 			function success(file) {
 				exportToPc(prepareExport(file), name);
 			},
@@ -124,9 +124,9 @@ function FileUploadService(toast, $http, $q, $translate, $window, $document, $in
 		}
 	}
 
-	function getFile(fileName) {
+	function getFile(fileName, entityId) {
 		var deferred = $q.defer();
-		var url = '/api/file/' + fileName;
+		var url = '/api/file/' + fileName+'?relatedEntityId=' + entityId;
 		$http.get(url).then(function success(response) {
 			deferred.resolve(response.data);
 		}, function fail(response) {
@@ -136,9 +136,9 @@ function FileUploadService(toast, $http, $q, $translate, $window, $document, $in
 	}
 
 
-	function getAllFile() {
+	function getAllFile(entityId) {
 		var deferred = $q.defer();
-		var url = '/api/file';
+		var url = '/api/file?relatedEntityId=' + entityId;
 		$http.get(url).then(function success(response) {
 			deferred.resolve(response.data);
 		}, function fail() {
@@ -147,12 +147,12 @@ function FileUploadService(toast, $http, $q, $translate, $window, $document, $in
 		return deferred.promise;
 	}
 
-	function deleteFile(fileName, extension) {
+	function deleteFile(fileName, extension, entityId) {
 
 		if (extension != getTypes().fileUpload.na && extension != "") {
-			var url = '/api/file/' + fileName; + "." + extension;
+			var url = '/api/file/' + fileName; + "." + extension+'?relatedEntityId=' + entityId ;
 		} else {
-			url = '/api/file/' + fileName;
+			url = '/api/file/' + fileName+'?relatedEntityId=' + entityId;
 		}
 
 		var deferred = $q.defer();
@@ -166,13 +166,13 @@ function FileUploadService(toast, $http, $q, $translate, $window, $document, $in
 	}
 
 
-	function renameFile(oldFileName, newFileName, extension) {
+	function renameFile(oldFileName, newFileName, extension, entityId) {
 		var deferred = $q.defer();
 		if (extension != getTypes().fileUpload.na && extension != "") {
-			var url = '/api/file/' + oldFileName + "." + extension;
+			var url = '/api/file/' + oldFileName + "." + extension+'?relatedEntityId=' + entityId;
 			newFileName = newFileName + "." + extension;
 		} else {
-			url = '/api/file/' + oldFileName;
+			url = '/api/file/' + oldFileName+'?relatedEntityId=' + entityId;
 		}
 		$http.put(url, newFileName, {
 			transformRequest: angular.identity,
@@ -187,13 +187,13 @@ function FileUploadService(toast, $http, $q, $translate, $window, $document, $in
 		return deferred.promise;
 	}
 
-	function searchFile(fileName, extension) {
+	function searchFile(fileName, extension, entityId) {
 		var deferred = $q.defer();
 
 		if (extension != getTypes().fileUpload.na && extension != "") {
-			var url = '/api/file?fileName=' + fileName + "." + extension;
+			var url = '/api/file?fileName=' + fileName + "." + extension+ '&relatedEntityId=' + entityId;
 		} else {
-			url = '/api/file?fileName=' + fileName;
+			url = '/api/file?fileName=' + fileName+ '&relatedEntityId=' + entityId;
 		}
 		$http.get(url, {
 			transformRequest: angular.identity,
