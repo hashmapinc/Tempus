@@ -18,6 +18,7 @@ package com.hashmapinc.server.dao.encryption;
 
 
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.Cipher;
@@ -33,8 +34,8 @@ public class EncryptionServiceImpl implements EncryptionService{
 
     public String encrypt(String plainText , String key) {
         try {
-            if(plainText == null)
-                return null;
+            if(StringUtils.isEmpty(plainText))
+                return plainText;
             Cipher cipher = Cipher.getInstance(ALGORITHM_STR);
             SecretKeySpec secretKey = new SecretKeySpec(key.getBytes(), "AES");
             cipher.init(Cipher.ENCRYPT_MODE, secretKey);
@@ -48,8 +49,8 @@ public class EncryptionServiceImpl implements EncryptionService{
 
     public String decrypt(String encryptedText , String key) {
         try {
-            if(encryptedText == null)
-                return null;
+            if(StringUtils.isEmpty(encryptedText))
+                return encryptedText;
             Cipher cipher = Cipher.getInstance(ALGORITHM_STR);
             SecretKeySpec secretKey = new SecretKeySpec(key.getBytes(), "AES");
             cipher.init(Cipher.DECRYPT_MODE, secretKey);

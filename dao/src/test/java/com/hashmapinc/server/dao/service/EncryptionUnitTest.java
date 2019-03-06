@@ -34,8 +34,24 @@ public class EncryptionUnitTest{
     }
 
     @Test()
+    public void testEncryptWithEmptyPlainText(){
+        String plainText = "";
+        String encryptText = encryptionService.encrypt(plainText,aesKey);
+        Assert.assertEquals(plainText,encryptText);
+    }
+
+    @Test()
     public void testDecrypt() throws Exception{
         String plainText = "B4azA3QJl1E64D/4g/GIKA==";
+        String encryptText = encryptionService.encrypt(plainText,aesKey);
+        String decryptedText = encryptionService.decrypt(encryptText,aesKey);
+        Assert.assertEquals(plainText,decryptedText);
+    }
+
+
+    @Test()
+    public void testDecryptWithEmptyEncryptedText(){
+        String plainText = "";
         String encryptText = encryptionService.encrypt(plainText,aesKey);
         String decryptedText = encryptionService.decrypt(encryptText,aesKey);
         Assert.assertEquals(plainText,decryptedText);
