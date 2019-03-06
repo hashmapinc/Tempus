@@ -16,7 +16,12 @@
  */
 package com.hashmapinc.server.controller;
 
+import com.hashmapinc.server.common.data.EntityType;
+import com.hashmapinc.server.common.data.UUIDConverter;
 import com.hashmapinc.server.common.data.exception.TempusException;
+import com.hashmapinc.server.common.data.id.AssetId;
+import com.hashmapinc.server.common.data.id.DeviceId;
+import com.hashmapinc.server.common.data.id.EntityId;
 import com.hashmapinc.server.common.data.upload.FileMetaData;
 import com.hashmapinc.server.common.data.upload.InputStreamWrapper;
 import com.hashmapinc.server.service.computation.CloudStorageService;
@@ -30,6 +35,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api")
@@ -45,9 +51,11 @@ public class UploadController extends BaseController {
     @PreAuthorize("hasAuthority('TENANT_ADMIN')")
     @PostMapping(value = "/file")
     @ResponseBody
-    public FileMetaData upload(@RequestParam("file") MultipartFile file) throws TempusException {
+    public FileMetaData upload(@RequestParam("file") MultipartFile file,
+                               @RequestParam("relatedEntityId") String strRelatedEntityId) throws TempusException {
         try {
-            FileMetaData savedFileMetaData = checkNotNull(uploadService.uploadFile(file, getCurrentUser().getTenantId()));
+            EntityId relatedEntityId = getRelatedEntityId(strRelatedEntityId);
+            FileMetaData savedFileMetaData = checkNotNull(uploadService.uploadFile(file, getCurrentUser().getTenantId(), relatedEntityId));
             return savedFileMetaData;
         } catch (Exception e) {
             log.info("Exception occurred {}", e);
@@ -58,9 +66,11 @@ public class UploadController extends BaseController {
     @PreAuthorize("hasAuthority('TENANT_ADMIN')")
     @GetMapping(value = "/file")
     @ResponseBody
-    public List<FileMetaData> getFileList(@RequestParam(value = "fileName", required = false) String fileName) throws TempusException {
+    public List<FileMetaData> getFileList(@RequestParam(value = "fileName", required = false) String fileName,
+                                          @RequestParam("relatedEntityId") String strRelatedEntityId) throws TempusException {
         try {
-            return uploadService.getFileList(getCurrentUser().getTenantId(), fileName);
+            EntityId relatedEntityId = getRelatedEntityId(strRelatedEntityId);
+            return uploadService.getFileList(getCurrentUser().getTenantId(), relatedEntityId, fileName);
         } catch (Exception e) {
             log.info("Exception occurred {}", e);
             throw handleException(e);
@@ -70,9 +80,12 @@ public class UploadController extends BaseController {
     @PreAuthorize("hasAuthority('TENANT_ADMIN')")
     @GetMapping(value = "/file/{name}")
     @ResponseBody
-    public void downloadFile(@PathVariable("name") String name, HttpServletResponse response) throws TempusException {
+    public void downloadFile(@PathVariable("name") String name,
+                             @RequestParam("relatedEntityId") String strRelatedEntityId,
+                             HttpServletResponse response) throws TempusException {
         try {
-            InputStreamWrapper inputStreamWrapper = uploadService.downloadFile(name, getCurrentUser().getTenantId());
+            EntityId relatedEntityId = getRelatedEntityId(strRelatedEntityId);
+            InputStreamWrapper inputStreamWrapper = uploadService.downloadFile(name, getCurrentUser().getTenantId(), relatedEntityId);
             response.addHeader("Content-disposition", "attachment;filename=" + name);
             response.setContentType(inputStreamWrapper.getContentType());
             IOUtils.copy(inputStreamWrapper.getInputStream(), response.getOutputStream());
@@ -86,9 +99,11 @@ public class UploadController extends BaseController {
     @PreAuthorize("hasAuthority('TENANT_ADMIN')")
     @DeleteMapping(value = "/file/{name}")
     @ResponseBody
-    public void deleteFile(@PathVariable("name") String name) throws TempusException {
+    public void deleteFile(@PathVariable("name") String name,
+                           @RequestParam("relatedEntityId") String strRelatedEntityId) throws TempusException {
         try {
-            uploadService.deleteFile(name, getCurrentUser().getTenantId());
+            EntityId relatedEntityId = getRelatedEntityId(strRelatedEntityId);
+            uploadService.deleteFile(name, getCurrentUser().getTenantId(), relatedEntityId);
         } catch (Exception e) {
             log.info("Exception occurred {}", e);
             throw handleException(e);
@@ -98,12 +113,30 @@ public class UploadController extends BaseController {
     @PreAuthorize("hasAuthority('TENANT_ADMIN')")
     @PutMapping(value = "/file/{oldName}")
     @ResponseBody
-    public void changeFileName(@PathVariable("oldName") String oldName, @RequestBody String newFileName) throws TempusException {
+    public void changeFileName(@PathVariable("oldName") String oldName,
+                               @RequestParam("relatedEntityId") String strRelatedEntityId,
+                               @RequestBody String newFileName) throws TempusException {
         try {
-            uploadService.renameFile(oldName, newFileName, getCurrentUser().getTenantId());
+            EntityId relatedEntityId = getRelatedEntityId(strRelatedEntityId);
+            uploadService.renameFile(oldName, newFileName, getCurrentUser().getTenantId(), relatedEntityId);
         } catch (Exception e) {
             log.info("Exception occurred {}", e);
             throw handleException(e);
         }
     }
+
+    private EntityId getRelatedEntityId(String relatedEntityStr) {
+        return new EntityId() {
+            @Override
+            public UUID getId() {
+                return toUUID(relatedEntityStr);
+            }
+
+            @Override
+            public EntityType getEntityType() {
+                return null;
+            }
+        };
+    }
+
 }

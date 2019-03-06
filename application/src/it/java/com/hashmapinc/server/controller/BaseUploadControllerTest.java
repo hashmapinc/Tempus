@@ -78,7 +78,7 @@ public abstract class BaseUploadControllerTest extends AbstractControllerTest {
     public void uploadFile() throws Exception {
         when(cloudStorageService.upload(any(), any(), any(), any())).thenReturn(true);
         when(cloudStorageService.getAllFiles(any(), any())).thenReturn(items);
-        uploadService.uploadFile(multipartFile, tenantId);
+        //uploadService.uploadFile(multipartFile, tenantId);
         FileMetaData retFileMetaData = doPostFile("/api/file", multipartFile, FileMetaData.class);
         Assert.assertNotNull(retFileMetaData);
         Assert.assertEquals("temp", retFileMetaData.getFileName());

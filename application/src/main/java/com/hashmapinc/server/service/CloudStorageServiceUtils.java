@@ -17,12 +17,13 @@
 package com.hashmapinc.server.service;
 
 import com.hashmapinc.server.common.data.Tenant;
+import com.hashmapinc.server.common.data.id.EntityId;
 
 public class CloudStorageServiceUtils {
 
     private static final String FILE_URL_FORMAT = "/%s/%s";
+    private static final String FILE_FOR_ENTITY_URL_FORMAT = "/%s/%s/%s";
     private static final String FOLDER_URL_FORMAT = "/%s";
-    private static final String PREFIX_FORMAT = "%s/%s";
 
     public static String createBucketName(Tenant tenant) {
         return (tenant.getName() + "-" + tenant.getId().getId()).toLowerCase().replace(" ", "-");
@@ -34,8 +35,10 @@ public class CloudStorageServiceUtils {
         return String.format(FILE_URL_FORMAT, folder, fileName.toLowerCase().replace(" ", "-"));
     }
 
-    public static String createPrefix(String fileName, String type) {
-        return String.format(PREFIX_FORMAT, type, fileName.toLowerCase().replace(" ", "-"));
+    public static String createObjectName(String fileName, EntityId entityId, String folder) {
+        if (fileName.contentEquals(""))
+            return String.format(FILE_URL_FORMAT, entityId.getId(), folder);
+        return String.format(FILE_FOR_ENTITY_URL_FORMAT, entityId.getId(), folder, fileName.toLowerCase().replace(" ", "-"));
     }
 
 }

@@ -14,22 +14,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.hashmapinc.server.common.data.upload;
+package com.hashmapinc.server.dao.sql.filemetadata;
 
-import com.hashmapinc.server.common.data.id.EntityId;
-import com.hashmapinc.server.common.data.id.TenantId;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import com.hashmapinc.server.dao.model.sql.FileMetaDataCompositeKey;
+import com.hashmapinc.server.dao.model.sql.FileMetaDataEntity;
+import org.springframework.data.repository.CrudRepository;
+import org.springframework.stereotype.Repository;
 
-@NoArgsConstructor
-@AllArgsConstructor
-@Data
-public class FileMetaData {
-    TenantId tenantId;
-    EntityId relatedEntity;
-    private String fileName;
-    private String extension;
-    private long lastUpdated;
-    private double size;
+import java.util.List;
+
+@Repository
+public interface FileMetaDataRepository extends CrudRepository<FileMetaDataEntity, FileMetaDataCompositeKey> {
+    List<FileMetaDataEntity> findByTenantIdAndRelatedEntity(String tenantId, String entityId);
 }

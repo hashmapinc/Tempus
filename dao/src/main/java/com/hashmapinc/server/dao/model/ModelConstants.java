@@ -446,6 +446,16 @@ public class ModelConstants {
     public static final String LAMBDA_KINESIS_STARTING_OFFSET = "LATEST";
     public static final int LAMBDA_KINESIS_BATCH_SIZE = 200;
 
+    /**
+     * File Meta Data constants
+     */
+
+    public static final String FILE_META_DATA_TABLE_NAME = "file_meta_data";
+    public static final String FILE_META_DATA_RELATED_ENTITY = "related_entity";
+    public static final String FILE_META_DATA_FILE_NAME = "file_name";
+    public static final String FILE_META_DATA_FILE_EXETENSION = "file_ext";
+    public static final String FILE_META_DATA_FILE_LAST_UPDATED = "last_updated";
+    public static final String FILE_META_DATA_FILE_SIZE = "file_size";
 
     protected static final String[] NONE_AGGREGATION_COLUMNS = new String[]{LONG_VALUE_COLUMN, DOUBLE_VALUE_COLUMN, BOOLEAN_VALUE_COLUMN, STRING_VALUE_COLUMN, JSON_VALUE_COLUMN, KEY_COLUMN, TS_COLUMN};
     protected static final String[] NONE_DS_AGGREGATION_COLUMNS = new String[]{LONG_VALUE_COLUMN, DOUBLE_VALUE_COLUMN, BOOLEAN_VALUE_COLUMN, STRING_VALUE_COLUMN, JSON_VALUE_COLUMN, KEY_COLUMN, DS_COLUMN};
