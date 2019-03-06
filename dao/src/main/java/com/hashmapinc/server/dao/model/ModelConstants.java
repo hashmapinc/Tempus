@@ -458,9 +458,10 @@ public class ModelConstants {
     public static final String FILE_META_DATA_FILE_LAST_UPDATED = "last_updated";
     public static final String FILE_META_DATA_FILE_SIZE = "file_size";
 
-    public static final String PLUGIN_DESCRIPTOR_TYPE = "type";
-    public static final String PLUGIN_DESCRIPTOR_KEY = "key";
-    public static final String PLUGIN_DESCRIPTOR_PASSWORD = "password";
+
+    public static final String DESCRIPTOR_TYPE = "type";
+    public static final String DESCRIPTOR_KEY = "key";
+    public static final String DESCRIPTOR_PASSWORD = "password";
 
     /**
      * AES-ENCRYPTION

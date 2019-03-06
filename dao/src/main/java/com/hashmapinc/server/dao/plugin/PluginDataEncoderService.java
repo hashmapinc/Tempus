@@ -17,22 +17,16 @@
 package com.hashmapinc.server.dao.plugin;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hashmapinc.server.common.data.plugin.ComponentDescriptor;
 import com.hashmapinc.server.common.data.plugin.PluginMetaData;
 import com.hashmapinc.server.dao.component.ComponentDescriptorService;
-import com.hashmapinc.server.dao.encryption.EncryptionService;
+import com.hashmapinc.server.dao.encoder.DataEncoderService;
 import com.hashmapinc.server.dao.exception.IncorrectParameterException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-
-import static com.hashmapinc.server.dao.model.ModelConstants.*;
 
 @Slf4j
 @Service
@@ -42,10 +36,7 @@ public  class PluginDataEncoderService {
     private ComponentDescriptorService componentDescriptorService;
 
     @Autowired
-    private EncryptionService encryptionService;
-
-    @Value("${encryption.aes_key}")
-    private String aesKey;
+    private DataEncoderService dataEncoderService;
 
      public  PluginMetaData encoder(PluginMetaData pluginMetaData) {
          if(pluginMetaData == null)
@@ -59,26 +50,12 @@ public  class PluginDataEncoderService {
          if (componentDescriptor == null)
              throw new IncorrectParameterException("Plugin descriptor not found!");
 
-         JsonNode configurationDescriptor = componentDescriptor.getConfigurationDescriptor();
-         List<String> attributesToEncrypt  = getAttributesOfPasswordType(configurationDescriptor.get("form"));
-         JsonNode configuration = encodeJsonNode(plugin.getConfiguration() ,attributesToEncrypt);
+         List<String> attributesToEncrypt  = dataEncoderService.getAttributesOfPasswordType(componentDescriptor);
+         JsonNode configuration = dataEncoderService.encodeJsonNode(plugin.getConfiguration() ,attributesToEncrypt);
          plugin.setConfiguration(configuration);
          return plugin;
      }
 
-    private JsonNode encodeJsonNode(JsonNode jsonNode, List<String> attributesToEncrypt) {
-         if(attributesToEncrypt.isEmpty())
-             return jsonNode;
-        ObjectMapper mapper = new ObjectMapper();
-        Map<String,String> configuration = mapper.convertValue(jsonNode, Map.class);
-
-        for(String attribute :attributesToEncrypt) {
-            String encryptedAttributeValue = encryptionService.encrypt(configuration.get(attribute),aesKey);
-            if(encryptedAttributeValue != null)
-                configuration.put(attribute,encryptedAttributeValue);
-        }
-        return mapper.convertValue(configuration, JsonNode.class);
-    }
 
     public  PluginMetaData decoder(PluginMetaData pluginMetaData) {
         if(pluginMetaData == null)
@@ -92,39 +69,9 @@ public  class PluginDataEncoderService {
         if (componentDescriptor == null)
             throw new IncorrectParameterException("Plugin descriptor not found!");
 
-        JsonNode configurationDescriptor = componentDescriptor.getConfigurationDescriptor();
-        List<String> attributesToDecrypt  = getAttributesOfPasswordType(configurationDescriptor.get("form"));
-        JsonNode configuration = decodeJsonNode(plugin.getConfiguration() ,attributesToDecrypt);
+        List<String> attributesToDecrypt  = dataEncoderService.getAttributesOfPasswordType(componentDescriptor);
+        JsonNode configuration = dataEncoderService.decodeJsonNode(plugin.getConfiguration() ,attributesToDecrypt);
         plugin.setConfiguration(configuration);
         return plugin;
-    }
-
-    private JsonNode decodeJsonNode(JsonNode jsonNode, List<String> attributesToDecrypt) {
-        if(attributesToDecrypt.isEmpty())
-            return jsonNode;
-        ObjectMapper mapper = new ObjectMapper();
-        Map<String,String> configuration = mapper.convertValue(jsonNode, Map.class);
-
-        for(String attribute :attributesToDecrypt) {
-            String decryptedAttributeValue = encryptionService.decrypt(configuration.get(attribute),aesKey);
-            if(decryptedAttributeValue != null)
-                configuration.put(attribute,decryptedAttributeValue);
-        }
-        return mapper.convertValue(configuration, JsonNode.class);
-    }
-
-    public List<String> getAttributesOfPasswordType(JsonNode jsonNode) {
-        List<String> attributesOfPasswordType = new ArrayList<>();
-        if (jsonNode.isArray()) {
-            for (JsonNode objNode : jsonNode) {
-                if(objNode.isObject()) {
-                    JsonNode type = objNode.get(PLUGIN_DESCRIPTOR_TYPE);
-                    JsonNode key =  objNode.get(PLUGIN_DESCRIPTOR_KEY);
-                    if((type != null) && (key != null) && (type.asText().equals(PLUGIN_DESCRIPTOR_PASSWORD)))
-                        attributesOfPasswordType.add(key.asText());
-                }
-            }
-        }
-        return attributesOfPasswordType;
     }
 }

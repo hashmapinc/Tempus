@@ -16,10 +16,11 @@
  */
 package com.hashmapinc.server.dao.service.plugin;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import com.hashmapinc.server.common.data.plugin.ComponentDescriptor;
 import com.hashmapinc.server.common.data.plugin.PluginMetaData;
 import com.hashmapinc.server.dao.service.AbstractServiceTest;
 import org.junit.Test;
+
 import java.util.List;
 
 import static org.junit.Assert.*;
@@ -32,8 +33,8 @@ public abstract class  PluginDataEncoderTest  extends AbstractServiceTest {
         PluginMetaData savedPluginMetaData = pluginService.savePlugin(pluginMetaData);
         PluginMetaData encryptedPluginMetaData = pluginDao.findById(savedPluginMetaData.getId());
 
-        JsonNode configurationDescriptor = readFromResource("plugin/kinesis/TestKinesisPluginDescriptor.json");
-        List<String> keysToEncrypt = pluginDataEncoderService.getAttributesOfPasswordType(configurationDescriptor.get("form"));
+        ComponentDescriptor componentDescriptor = componentDescriptorService.findByClazz(pluginMetaData.getClazz());
+        List<String> keysToEncrypt  = dataEncoderService.getAttributesOfPasswordType(componentDescriptor);
         assertEquals(2, keysToEncrypt.size());
 
         for (String key : keysToEncrypt) {
@@ -47,8 +48,8 @@ public abstract class  PluginDataEncoderTest  extends AbstractServiceTest {
         PluginMetaData savedPluginMetaData = pluginService.savePlugin(pluginMetaData);
         PluginMetaData encryptedPluginMetaData = pluginDao.findById(savedPluginMetaData.getId());
 
-        JsonNode configurationDescriptor = readFromResource("plugin/kafka/TestKafkaPluginDescriptor.json");
-        List<String> keysToEncrypt = pluginDataEncoderService.getAttributesOfPasswordType(configurationDescriptor.get("form"));
+        ComponentDescriptor componentDescriptor = componentDescriptorService.findByClazz(pluginMetaData.getClazz());
+        List<String> keysToEncrypt  = dataEncoderService.getAttributesOfPasswordType(componentDescriptor);
         assertEquals(0, keysToEncrypt.size());
 
         for (String key : keysToEncrypt) {
@@ -62,8 +63,8 @@ public abstract class  PluginDataEncoderTest  extends AbstractServiceTest {
         PluginMetaData savedPluginMetaData = pluginService.savePlugin(pluginMetaData);
         PluginMetaData encryptedPluginMetaData = pluginDao.findById(savedPluginMetaData.getId());
 
-        JsonNode configurationDescriptor = readFromResource("plugin/sns/TestSnsPluginDescriptor.json");
-        List<String> keysToEncrypt = pluginDataEncoderService.getAttributesOfPasswordType(configurationDescriptor.get("form"));
+        ComponentDescriptor componentDescriptor = componentDescriptorService.findByClazz(pluginMetaData.getClazz());
+        List<String> keysToEncrypt  = dataEncoderService.getAttributesOfPasswordType(componentDescriptor);
         assertEquals(2, keysToEncrypt.size());
 
         for (String key : keysToEncrypt) {
@@ -77,8 +78,8 @@ public abstract class  PluginDataEncoderTest  extends AbstractServiceTest {
         PluginMetaData savedPluginMetaData = pluginService.savePlugin(pluginMetaData);
         PluginMetaData encryptedPluginMetaData = pluginDao.findById(savedPluginMetaData.getId());
 
-        JsonNode configurationDescriptor = readFromResource("plugin/event-hub/TestEventHubPluginDescriptor.json");
-        List<String> keysToEncrypt = pluginDataEncoderService.getAttributesOfPasswordType(configurationDescriptor.get("form"));
+        ComponentDescriptor componentDescriptor = componentDescriptorService.findByClazz(pluginMetaData.getClazz());
+        List<String> keysToEncrypt  = dataEncoderService.getAttributesOfPasswordType(componentDescriptor);
         assertEquals(0, keysToEncrypt.size());
 
         for (String key : keysToEncrypt) {
@@ -92,8 +93,8 @@ public abstract class  PluginDataEncoderTest  extends AbstractServiceTest {
         PluginMetaData savedPluginMetaData = pluginService.savePlugin(pluginMetaData);
         PluginMetaData encryptedPluginMetaData = pluginDao.findById(savedPluginMetaData.getId());
 
-        JsonNode configurationDescriptor = readFromResource("plugin/rest-api-call/TestRestApiCallPluginDescriptor.json");
-        List<String> keysToEncrypt = pluginDataEncoderService.getAttributesOfPasswordType(configurationDescriptor.get("form"));
+        ComponentDescriptor componentDescriptor = componentDescriptorService.findByClazz(pluginMetaData.getClazz());
+        List<String> keysToEncrypt  = dataEncoderService.getAttributesOfPasswordType(componentDescriptor);
         assertEquals(1, keysToEncrypt.size());
 
         for (String key : keysToEncrypt) {
