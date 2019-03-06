@@ -11,7 +11,7 @@
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
+ * See the License for the specific language goentityTypeverning permissions and
  * limitations under the License.
  */
 
@@ -31,7 +31,7 @@ export default function fileUploadDirective($compile, $templateCache, fileUpload
 		scope.files = [];
 
 		function loadTableData() {
-			var promise = fileUploadService.getAllFile();
+			var promise = fileUploadService.getAllFile(scope.entityId);
 			if (promise) {
 				promise.then(function success(items) {
 					scope.files = items;
@@ -60,7 +60,7 @@ export default function fileUploadDirective($compile, $templateCache, fileUpload
 				fileName = fullFileName;
 				extension = "";
 			}
-			fileUploadService.searchFile(fileName, extension).then(
+			fileUploadService.searchFile(fileName, extension, scope.entityId).then(
 				function success(searchItems) {
 
 					if (searchItems.length == 0) {
@@ -85,7 +85,7 @@ export default function fileUploadDirective($compile, $templateCache, fileUpload
 
 		function saveFile(file) {
 			var deferred = $q.defer();
-			fileUploadService.uploadFile(file).then(
+			fileUploadService.uploadFile(file, scope.entityId).then(
 				function success(savedFile) {
 					loadTableData();
 					toast.showSuccess($translate.instant('file-upload.fileSuccess'));
@@ -100,7 +100,7 @@ export default function fileUploadDirective($compile, $templateCache, fileUpload
 
 		scope.downloadFile = function ($event, file) {
 			$event.stopPropagation();
-			fileUploadService.exportFile(file.fileName, file.extension);
+			fileUploadService.exportFile(file.fileName, file.extension, scope.entityId);
 		}
 
 
@@ -113,7 +113,7 @@ export default function fileUploadDirective($compile, $templateCache, fileUpload
 				.cancel($translate.instant('action.no'))
 				.ok($translate.instant('action.yes'));
 			$mdDialog.show(confirm).then(function () {
-				fileUploadService.deleteFile(file.fileName, file.extension).then(function success() {
+				fileUploadService.deleteFile(file.fileName, file.extension, scope.entityId).then(function success() {
 					scope.resetFilter();
 
 				});
@@ -142,7 +142,8 @@ export default function fileUploadDirective($compile, $templateCache, fileUpload
 				parent: angular.element($document[0].body),
 				locals: {
 					oldFileName: file.fileName,
-					extension: file.extension
+					extension: file.extension,
+					entityId : scope.entityId,
 				},
 				fullscreen: true,
 				targetEvent: $event
@@ -177,6 +178,13 @@ export default function fileUploadDirective($compile, $templateCache, fileUpload
 			return $translate.instant('file-upload.replace-file-text');
 		}
 
+		scope.$watch("entityId", function(newVal, prevVal) {
+                    if (newVal && !angular.equals(newVal, prevVal)) {
+                        scope.resetFilter();
+                        scope.reload();
+                    }
+                });
+
 		$compile(element.contents())(scope);
 	}
 
@@ -186,8 +194,6 @@ export default function fileUploadDirective($compile, $templateCache, fileUpload
 		scope: {
 			entityType: '=?',
 			entityId: '=?',
-			userId: '=?',
-			customerId: '=?',
 			pageMode: '@?'
 		}
 	};
