@@ -125,11 +125,11 @@ export default function loadLogViewer(ctx, sequence){
              .append("div")
              .attr("class", "header")
              // .append("svg")
-             // .attr("class", "header")
              // .attr("width", 440)
              // .attr("height", 0)
-
           d3.select(trackId)
+                       .append("div")
+          .attr("class", "track-div")
              .append("svg")
              .attr("class", "linearGrid")
         }
