@@ -137,20 +137,22 @@ function FileUploadService(toast, $http, $q, $translate, $window, $document, $in
 
 
 	function getAllFile(entityId) {
-		var deferred = $q.defer();
-		var url = '/api/file?relatedEntityId=' + entityId;
-		$http.get(url).then(function success(response) {
-			deferred.resolve(response.data);
-		}, function fail() {
-			deferred.reject();
-		});
+        if(angular.isDefined(entityId)) {
+            var deferred = $q.defer();
+            var url = '/api/file?relatedEntityId=' + entityId;
+            $http.get(url).then(function success(response) {
+                deferred.resolve(response.data);
+            }, function fail() {
+                deferred.reject();
+            });
 		return deferred.promise;
+		}
 	}
 
 	function deleteFile(fileName, extension, entityId) {
 
 		if (extension != getTypes().fileUpload.na && extension != "") {
-			var url = '/api/file/' + fileName; + "." + extension+'?relatedEntityId=' + entityId ;
+			var url = '/api/file/' + fileName + "." + extension+'?relatedEntityId=' + entityId ;
 		} else {
 			url = '/api/file/' + fileName+'?relatedEntityId=' + entityId;
 		}
