@@ -57,15 +57,15 @@ var lineGraph = function(lineConfig, data, state, index, width) {
       w = lineParameter.width*110 - margin.right - margin.left,
       h = 700 - margin.top;
 
-    let x = d3.scaleLinear().domain(d3.min(lineParameter.data.data, function(d) { return d[1]; }),d3.max(lineParameter.data.data, function(d) { return d[1]; })).range([0 , w]);
-    let y = d3.scaleLinear().domain(d3.min(lineParameter.data.data, function(d) { return d[0]; }),d3.max(lineParameter.data.data, function(d) { return d[0]; })).range([h, 0]);
+    let xScale = d3.scaleLinear().domain(d3.min(lineParameter.data.data, function(d) { return d[1]; }),d3.max(lineParameter.data.data, function(d) { return d[1]; })).range([0 , w]);
+    let yScale = d3.scaleLinear().domain(d3.min(lineParameter.data.data, function(d) { return d[0]; }),d3.max(lineParameter.data.data, function(d) { return d[0]; })).range([h, 0]);
 
 
 
     let xAxis =  d3.axisTop()
-                 .scale(x)
+                 .scale(xScale)
     let yAxis = d3.axisLeft()
-        .scale(y)
+        .scale(yScale)
 
 
 
@@ -119,8 +119,8 @@ if(lineParameter.state === "init"){
 
     function update() {
       var leftPadding = margin.left + 15;
-      y.domain(d3.extent(lineParameter.data.data, function(d) { return d[0]; }));
-      x.domain(d3.extent(lineParameter.data.data, function(d) { return d[1]; }));
+      yScale.domain(d3.extent(lineParameter.data.data, function(d) { return d[0]; }));
+      xScale.domain(d3.extent(lineParameter.data.data, function(d) { return d[1]; }));
 
       let $line= context.select('.linearGrid').select('.linepath'+lineParameter.index).select('path');
 

@@ -21,36 +21,33 @@ import wellTrackComponents from './well-log-component.tpl.html'
 /* eslint-enable import/no-unresolved, import/default */
 
 /*@ngInject*/
-export default function WellLogViewerComponentsDirective($compile, $templateCache,types, $log) {
+export default function WellLogViewerComponentsDirective($compile, $templateCache,types) {
     var linker = function (scope, element) {
         var template = $templateCache.get(wellTrackComponents);
         element.html(template);
-
         scope.showGrid = true;
-        $log.log("in well components");
-        $log.log(scope.datasources)
-        scope.$watch('datasources', function () {
-             $log.log("in well components")
-             $log.log(scope.datasources)
-        });
-        scope.$watch('datasources', function(newValue, oldValue) {
-           $log.log("in well components")
-                        $log.log(newValue + oldValue)
-        });
+
+        scope.$watch('datasources', function() {
+           scope.filterDatasource();
+        }, true);
         scope.componentTypes = types.wellLogComponent.componentTypes;
         scope.fillTypes = types.wellLogComponent.fillTypes;
         scope.styleTypes = types.wellLogComponent.styleTypes;
-        scope.datasourcesList = [];
-        scope.datasources.forEach(function(dataSources){
-            dataSources.value.dataKeys.forEach(function(keys){
-                scope.datasourcesList.push(keys)
+
+        scope.filterDatasource = function() {
+            scope.datasourcesList = [];
+            scope.datasources.forEach(function(dataSources){
+                dataSources.value.dataKeys.forEach(function(keys){
+                    scope.datasourcesList.push(keys)
+                })
             })
-        })
+        }
         scope.changeComponentType = function (){
             if(scope.trackComponent.cType === 'Line'){
                 scope.showGrid = false;
             }
         }
+        scope.filterDatasource();
         $compile(element.contents())(scope);
     }
     return {
