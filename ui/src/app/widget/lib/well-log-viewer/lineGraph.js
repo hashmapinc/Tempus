@@ -70,9 +70,9 @@ var lineGraph = function(lineConfig, data, state, index, width) {
 
 
     let line = d3.line()
-      .y((d) => y(d[0]))
-      .y(function(d) { return y(d[0]); })
-      .x(d => x(d[1]))
+      .y((d) => yScale(d[0]))
+      .y(function(d) { return yScale(d[0]); })
+      .x(d => xScale(d[1]))
       .curve(d3.curveLinear);
 
 
@@ -82,15 +82,15 @@ var lineGraph = function(lineConfig, data, state, index, width) {
 
         var area = d3.area()
               .x0(-14)
-              .x1((d) => x(d[1]))
-              .y((d) => y(d[0]))
+              .x1((d) => xScale(d[1]))
+              .y((d) => yScale(d[0]))
               .curve(d3.curveLinear);
       }
       if(lineParameter.areaFill.fill === "right"){
           area = d3.area()
-                .x0((d) => x(d[1]))
+                .x0((d) => xScale(d[1]))
                 .x1(w)
-                .y((d) => y(d[0]))
+                .y((d) => yScale(d[0]))
                 .curve(d3.curveLinear);
       }
     }
