@@ -21,16 +21,16 @@
         <div class="comp-margin">
 <div>
     <md-input-container class="md-block">
-        <md-select ng-model="trackComponent.cType" placeholder="{{'wellLog.select-component' | translate}}">
+        <md-select ng-model="trackComponent.cType" placeholder="{{'wellLog.select-component' | translate}}" ng-change="changeComponentType()">
             <md-option ng-value="cType" ng-repeat="cType in componentTypes">{{ cType }}</md-option>
         </md-select>
     </md-input-container>
 </div>
-<div>
-    <md-input-container class="md-block">
+<div >
+    <md-input-container class="md-block" ng-repeat="datasource in datasources">
         <div>
                 <md-select ng-model="trackComponent.datasource" placeholder="{{'wellLog.datasource' | translate}}">
-                    <md-option ng-value="d.label" ng-repeat="d in datasourcesList">{{ d.label }}</md-option>
+                    <md-option ng-value="d.label" ng-repeat="d in datasources.datasource.value.dataKeys">{{ d.label }}</md-option>
                 </md-select>
         </div>
     </md-input-container>
@@ -53,22 +53,19 @@
     </md-input-container>
 </div>
 <div>
-    <md-checkbox ng-model="trackComponent.hasHeader" aria-label="Checkbox 1">
-        {{ 'wellLog.has-header' | translate}}
-    </md-checkbox>
     <br/>
-    <fieldset ng-if="trackComponent.hasHeader">
+    <fieldset>
         <md-input-container class="md-block">
-            <label translate>{{ 'wellLog.header-minimum' | translate}}</label>
-            <input  name="name" ng-model="trackComponent.headerMin">
+            <label translate>{{ 'wellLog.header-minimum' | translate}}<span class="asterisc">*</span></label>
+            <input  name="name" ng-model="trackComponent.headerMin" required>
         </md-input-container>
         <md-input-container class="md-block">
-            <label translate>{{ 'wellLog.header-maximum' | translate}}</label>
-            <input  name="name" ng-model="trackComponent.headerMax">
+            <label translate>{{ 'wellLog.header-maximum' | translate}}<span class="asterisc">*</span></label>
+            <input  name="name" ng-model="trackComponent.headerMax" required>
         </md-input-container>
         <md-input-container class="md-block">
-            <label translate>{{ 'wellLog.header-name' | translate}}</label>
-            <input  name="name" ng-model="trackComponent.headerName">
+            <label translate>{{ 'wellLog.header-name' | translate}}<span class="asterisc">*</span></label>
+            <input  name="name" ng-model="trackComponent.headerName" required>
         </md-input-container>
     </fieldset>
 </div>
@@ -100,7 +97,7 @@
         </md-input-container>
     </fieldset>
 </div>
-<div>
+<div ng-if="showGrid">
     <md-checkbox ng-model="trackComponent.componentDetail.girdMinorLines" aria-label="Checkbox 1">
         {{ 'wellLog.grid-minor-lines' | translate}}
     </md-checkbox>
@@ -121,7 +118,7 @@
         </md-input-container>
     </fieldset>
 </div>
-<div>
+<div ng-if="showGrid">
     <md-checkbox ng-model="trackComponent.componentDetail.girdMajorLines" aria-label="Checkbox 1">
         {{ 'wellLog.grid-major-lines' | translate}}
     </md-checkbox>

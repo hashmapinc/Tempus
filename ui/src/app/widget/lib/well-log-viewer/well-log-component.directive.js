@@ -21,10 +21,22 @@ import wellTrackComponents from './well-log-component.tpl.html'
 /* eslint-enable import/no-unresolved, import/default */
 
 /*@ngInject*/
-export default function WellLogViewerComponentsDirective($compile, $templateCache,types) {
+export default function WellLogViewerComponentsDirective($compile, $templateCache,types, $log) {
     var linker = function (scope, element) {
         var template = $templateCache.get(wellTrackComponents);
         element.html(template);
+
+        scope.showGrid = true;
+        $log.log("in well components");
+        $log.log(scope.datasources)
+        scope.$watch('datasources', function () {
+             $log.log("in well components")
+             $log.log(scope.datasources)
+        });
+        scope.$watch('datasources', function(newValue, oldValue) {
+           $log.log("in well components")
+                        $log.log(newValue + oldValue)
+        });
         scope.componentTypes = types.wellLogComponent.componentTypes;
         scope.fillTypes = types.wellLogComponent.fillTypes;
         scope.styleTypes = types.wellLogComponent.styleTypes;
@@ -34,6 +46,11 @@ export default function WellLogViewerComponentsDirective($compile, $templateCach
                 scope.datasourcesList.push(keys)
             })
         })
+        scope.changeComponentType = function (){
+            if(scope.trackComponent.cType === 'Line'){
+                scope.showGrid = false;
+            }
+        }
         $compile(element.contents())(scope);
     }
     return {
