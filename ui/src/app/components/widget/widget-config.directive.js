@@ -51,7 +51,7 @@ export default angular.module('tempus.directives.widgetConfig', [tempusTypes,
     .name;
 
 /*@ngInject*/
-function WidgetConfig($compile, $templateCache, $rootScope, $translate, $timeout, types, utils, $log) {
+function WidgetConfig($compile, $templateCache, $rootScope, $translate, $timeout, types, utils) {
 
     var linker = function (scope, element, attrs, ngModelCtrl) {
         
@@ -325,7 +325,6 @@ function WidgetConfig($compile, $templateCache, $rootScope, $translate, $timeout
                 && scope.widgetType !== types.widgetType.rpc.value
                 && scope.widgetType !== types.widgetType.alarm.value
                 && scope.widgetType !== types.widgetType.static.value && scope.isDataEnabled) {
-                $log.log("if if")
                 var value = ngModelCtrl.$viewValue;
                 var config = value.config;
                 if (config.datasources) {
@@ -338,7 +337,6 @@ function WidgetConfig($compile, $templateCache, $rootScope, $translate, $timeout
                         config.datasources.push(scope.datasources[i].value);
                     }
                 }
-                $log.log(scope.datasources)
                 ngModelCtrl.$setViewValue(value);
                 scope.updateValidity();
             }

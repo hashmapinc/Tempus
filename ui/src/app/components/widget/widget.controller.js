@@ -585,7 +585,6 @@ export default function WidgetController($scope, $state, $timeout, $window, $ele
             } else {
                 layoutType = 'row';
             }
-            $log.log(widgetInfo);
             var legendStyle;
             switch($scope.legendConfig.position) {
                 case types.position.top.value:
