@@ -17,7 +17,6 @@
 package com.hashmapinc.server.controller;
 
 import com.hashmapinc.server.common.data.EntityType;
-import com.hashmapinc.server.common.data.UUIDConverter;
 import com.hashmapinc.server.common.data.exception.TempusException;
 import com.hashmapinc.server.common.data.id.AssetId;
 import com.hashmapinc.server.common.data.id.DeviceId;
@@ -35,7 +34,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
 import java.util.List;
-import java.util.UUID;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api")
@@ -52,9 +51,11 @@ public class UploadController extends BaseController {
     @PostMapping(value = "/file")
     @ResponseBody
     public FileMetaData upload(@RequestParam("file") MultipartFile file,
-                               @RequestParam("relatedEntityId") String strRelatedEntityId) throws TempusException {
+                               @RequestParam Map<String, String> relatedEntityInfo) throws TempusException {
         try {
-            EntityId relatedEntityId = getRelatedEntityId(strRelatedEntityId);
+            String strRelatedEntityId = relatedEntityInfo.get("relatedEntityId");
+            String strRelatedEntityType = relatedEntityInfo.get("relatedEntityType");
+            EntityId relatedEntityId = createRelatedEntityId(strRelatedEntityId, strRelatedEntityType);//getRelatedEntityId(strRelatedEntityId);
             FileMetaData savedFileMetaData = checkNotNull(uploadService.uploadFile(file, getCurrentUser().getTenantId(), relatedEntityId));
             return savedFileMetaData;
         } catch (Exception e) {
@@ -66,11 +67,16 @@ public class UploadController extends BaseController {
     @PreAuthorize("hasAuthority('TENANT_ADMIN')")
     @GetMapping(value = "/file")
     @ResponseBody
-    public List<FileMetaData> getFileList(@RequestParam(value = "fileName", required = false) String fileName,
-                                          @RequestParam("relatedEntityId") String strRelatedEntityId) throws TempusException {
+    public List<FileMetaData> getFileList(@RequestParam Map<String, String> relatedEntityInfo) throws TempusException {
         try {
-            EntityId relatedEntityId = getRelatedEntityId(strRelatedEntityId);
-            return uploadService.getFileList(getCurrentUser().getTenantId(), relatedEntityId, fileName);
+            String strRelatedEntityId = relatedEntityInfo.get("relatedEntityId");
+            String strRelatedEntityType = relatedEntityInfo.get("relatedEntityType");
+            String fileName = null;
+            if(relatedEntityInfo.containsKey("fileName"))
+                fileName = relatedEntityInfo.get("fileName");
+            EntityId relatedEntityId = createRelatedEntityId(strRelatedEntityId, strRelatedEntityType);
+            List<FileMetaData> fileMetaDataList = uploadService.getFileList(getCurrentUser().getTenantId(), relatedEntityId, fileName);
+            return fileMetaDataList;
         } catch (Exception e) {
             log.info("Exception occurred {}", e);
             throw handleException(e);
@@ -81,10 +87,12 @@ public class UploadController extends BaseController {
     @GetMapping(value = "/file/{name}")
     @ResponseBody
     public void downloadFile(@PathVariable("name") String name,
-                             @RequestParam("relatedEntityId") String strRelatedEntityId,
+                             @RequestParam Map<String, String> relatedEntityInfo,
                              HttpServletResponse response) throws TempusException {
         try {
-            EntityId relatedEntityId = getRelatedEntityId(strRelatedEntityId);
+            String strRelatedEntityId = relatedEntityInfo.get("relatedEntityId");
+            String strRelatedEntityType = relatedEntityInfo.get("relatedEntityType");
+            EntityId relatedEntityId = createRelatedEntityId(strRelatedEntityId, strRelatedEntityType);
             InputStreamWrapper inputStreamWrapper = uploadService.downloadFile(name, getCurrentUser().getTenantId(), relatedEntityId);
             response.addHeader("Content-disposition", "attachment;filename=" + name);
             response.setContentType(inputStreamWrapper.getContentType());
@@ -100,9 +108,11 @@ public class UploadController extends BaseController {
     @DeleteMapping(value = "/file/{name}")
     @ResponseBody
     public void deleteFile(@PathVariable("name") String name,
-                           @RequestParam("relatedEntityId") String strRelatedEntityId) throws TempusException {
+                           @RequestParam Map<String, String> relatedEntityInfo) throws TempusException {
         try {
-            EntityId relatedEntityId = getRelatedEntityId(strRelatedEntityId);
+            String strRelatedEntityId = relatedEntityInfo.get("relatedEntityId");
+            String strRelatedEntityType = relatedEntityInfo.get("relatedEntityType");
+            EntityId relatedEntityId = createRelatedEntityId(strRelatedEntityId, strRelatedEntityType);
             uploadService.deleteFile(name, getCurrentUser().getTenantId(), relatedEntityId);
         } catch (Exception e) {
             log.info("Exception occurred {}", e);
@@ -114,10 +124,12 @@ public class UploadController extends BaseController {
     @PutMapping(value = "/file/{oldName}")
     @ResponseBody
     public void changeFileName(@PathVariable("oldName") String oldName,
-                               @RequestParam("relatedEntityId") String strRelatedEntityId,
-                               @RequestBody String newFileName) throws TempusException {
+                               @RequestBody Map<String, String> body) throws TempusException {
         try {
-            EntityId relatedEntityId = getRelatedEntityId(strRelatedEntityId);
+            String strRelatedEntityId = body.get("relatedEntityId");
+            String strRelatedEntityType = body.get("relatedEntityType");
+            String newFileName = body.get("newFileName");
+            EntityId relatedEntityId = createRelatedEntityId(strRelatedEntityId, strRelatedEntityType);
             uploadService.renameFile(oldName, newFileName, getCurrentUser().getTenantId(), relatedEntityId);
         } catch (Exception e) {
             log.info("Exception occurred {}", e);
@@ -125,18 +137,14 @@ public class UploadController extends BaseController {
         }
     }
 
-    private EntityId getRelatedEntityId(String relatedEntityStr) {
-        return new EntityId() {
-            @Override
-            public UUID getId() {
-                return toUUID(relatedEntityStr);
-            }
-
-            @Override
-            public EntityType getEntityType() {
-                return null;
-            }
-        };
+    private EntityId createRelatedEntityId(String strRelatedEntity, String strEntityType) {
+        EntityId entityId = null;
+        switch (EntityType.valueOf(strEntityType)) {
+            case DEVICE: entityId = new DeviceId(toUUID(strRelatedEntity));
+            break;
+            case ASSET: entityId = new AssetId(toUUID(strRelatedEntity));
+            break;
+        }
+        return entityId;
     }
-
 }

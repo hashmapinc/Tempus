@@ -19,15 +19,16 @@
 /* eslint-enable import/no-unresolved, import/default */
 
 /*@ngInject*/
-export default function RenameFileController($mdDialog, fileUploadService, $scope, oldFileName, extension, entityId, $q, toast, $translate) {
+export default function RenameFileController($mdDialog, fileUploadService, $scope, oldFileName, extension, entityId, entityType, $q, toast, $translate) {
 
 	var vm = this;
 	vm.newFileName = oldFileName;
 	vm.oldFileName = oldFileName;
     vm.entityId = entityId;
+    vm.entityType = entityType;
 	vm.rename = function () {
 		var deferred = $q.defer();
-		fileUploadService.searchFile(vm.newFileName, extension, vm.entityId).then(
+		fileUploadService.searchFile(vm.newFileName, extension, vm.entityId, vm.entityType).then(
 			function success(searchItems) {
 				var existFile = 0;
 				if (searchItems.length == 0) {
@@ -47,7 +48,7 @@ export default function RenameFileController($mdDialog, fileUploadService, $scop
 				}
 
 				if (existFile == 0) {
-					fileUploadService.renameFile(vm.oldFileName, vm.newFileName, extension,vm.entityId).then(function success(item) {
+					fileUploadService.renameFile(vm.oldFileName, vm.newFileName, extension, vm.entityId, vm.entityType).then(function success(item) {
 						vm.item = item;
 						$scope.theForm.$setPristine();
 						$mdDialog.hide();

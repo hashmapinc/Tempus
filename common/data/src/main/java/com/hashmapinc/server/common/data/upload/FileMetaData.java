@@ -16,6 +16,7 @@
  */
 package com.hashmapinc.server.common.data.upload;
 
+import com.hashmapinc.server.common.data.EntityType;
 import com.hashmapinc.server.common.data.id.EntityId;
 import com.hashmapinc.server.common.data.id.TenantId;
 import lombok.AllArgsConstructor;
@@ -27,7 +28,8 @@ import lombok.NoArgsConstructor;
 @Data
 public class FileMetaData {
     TenantId tenantId;
-    EntityId relatedEntity;
+    EntityId relatedEntityId;
+    EntityType relatedEntityType;
     private String fileName;
     private String extension;
     private long lastUpdated;

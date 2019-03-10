@@ -18,6 +18,8 @@ package com.hashmapinc.server.dao.model.sql;
 
 import com.hashmapinc.server.common.data.EntityType;
 import com.hashmapinc.server.common.data.UUIDConverter;
+import com.hashmapinc.server.common.data.id.AssetId;
+import com.hashmapinc.server.common.data.id.DeviceId;
 import com.hashmapinc.server.common.data.id.EntityId;
 import com.hashmapinc.server.common.data.id.TenantId;
 import com.hashmapinc.server.common.data.upload.FileMetaData;
@@ -28,7 +30,6 @@ import lombok.EqualsAndHashCode;
 
 import javax.persistence.*;
 import java.io.Serializable;
-import java.util.UUID;
 
 
 @Data
@@ -43,15 +44,19 @@ public class FileMetaDataEntity implements ToData<FileMetaData>, Serializable {
     private String tenantId;
 
     @Id
-    @Column(name = ModelConstants.FILE_META_DATA_RELATED_ENTITY)
-    private String relatedEntity;
+    @Column(name = ModelConstants.FILE_META_DATA_RELATED_ENTITY_ID)
+    private String relatedEntityId;
 
     @Id
     @Column(name = ModelConstants.FILE_META_DATA_FILE_NAME)
     private String fileName;
 
-    @Column(name = ModelConstants.FILE_META_DATA_FILE_EXETENSION)
+    @Id
+    @Column(name = ModelConstants.FILE_META_DATA_FILE_EXTENSION)
     private String extension;
+
+    @Column(name = ModelConstants.FILE_META_DATA_RELATED_ENTITY_TYPE)
+    private String relatedEntityType;
 
     @Column(name = ModelConstants.FILE_META_DATA_FILE_LAST_UPDATED)
     private long lastUpdated;
@@ -66,10 +71,12 @@ public class FileMetaDataEntity implements ToData<FileMetaData>, Serializable {
             this.fileName = fileMetaData.getFileName();
         if (fileMetaData.getExtension() != null)
             this.extension = fileMetaData.getExtension();
-        if (fileMetaData.getRelatedEntity() != null)
-            this.relatedEntity = UUIDConverter.fromTimeUUID(fileMetaData.getRelatedEntity().getId());
+        if (fileMetaData.getRelatedEntityId() != null)
+            this.relatedEntityId = UUIDConverter.fromTimeUUID(fileMetaData.getRelatedEntityId().getId());
         if (fileMetaData.getTenantId() != null)
             this.tenantId = UUIDConverter.fromTimeUUID(fileMetaData.getTenantId().getId());
+        if (fileMetaData.getRelatedEntityType() != null)
+            this.relatedEntityType = fileMetaData.getRelatedEntityType().name();
         this.lastUpdated = fileMetaData.getLastUpdated();
         this.size = fileMetaData.getSize();
     }
@@ -79,8 +86,10 @@ public class FileMetaDataEntity implements ToData<FileMetaData>, Serializable {
         FileMetaData fileMetaData = new FileMetaData();
         if (tenantId != null)
             fileMetaData.setTenantId(new TenantId(UUIDConverter.fromString(tenantId)));
-        if (relatedEntity != null)
-            fileMetaData.setRelatedEntity(null);
+        if (relatedEntityId != null && relatedEntityType != null) {
+            fileMetaData.setRelatedEntityId(createRelatedEntityId());
+            fileMetaData.setRelatedEntityType(EntityType.valueOf(relatedEntityType));
+        }
         if (fileName != null)
             fileMetaData.setFileName(fileName);
         if (extension != null)
@@ -91,17 +100,14 @@ public class FileMetaDataEntity implements ToData<FileMetaData>, Serializable {
         return fileMetaData;
     }
 
-    private EntityId createRelatedEntity(String relatedEntity) {
-        return new EntityId() {
-            @Override
-            public UUID getId() {
-                return UUIDConverter.fromString(relatedEntity);
-            }
-
-            @Override
-            public EntityType getEntityType() {
-                return null;
-            }
-        };
+    private EntityId createRelatedEntityId() {
+        EntityId entityId = null;
+        switch (EntityType.valueOf(relatedEntityType)) {
+            case DEVICE: entityId = new DeviceId(UUIDConverter.fromString(relatedEntityId));
+                break;
+            case ASSET: entityId = new AssetId(UUIDConverter.fromString(relatedEntityId));
+                break;
+        }
+        return entityId;
     }
 }

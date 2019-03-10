@@ -25,5 +25,5 @@ import java.util.List;
 
 @Repository
 public interface FileMetaDataRepository extends CrudRepository<FileMetaDataEntity, FileMetaDataCompositeKey> {
-    List<FileMetaDataEntity> findByTenantIdAndRelatedEntity(String tenantId, String entityId);
+    List<FileMetaDataEntity> findByTenantIdAndRelatedEntityId(String tenantId, String entityId);
 }

@@ -30,7 +30,7 @@ export default function fileUploadDirective($compile, $templateCache, fileUpload
 		scope.files = [];
 
 		function loadTableData() {
-			var promise = fileUploadService.getAllFile(scope.entityId);
+			var promise = fileUploadService.getAllFile(scope.entityId, scope.entityType);
 			if (promise) {
 				promise.then(function success(items) {
 					scope.files = items;
@@ -59,7 +59,7 @@ export default function fileUploadDirective($compile, $templateCache, fileUpload
 				fileName = fullFileName;
 				extension = "";
 			}
-			fileUploadService.searchFile(fileName, extension, scope.entityId).then(
+			fileUploadService.searchFile(fileName, extension, scope.entityId, scope.entityType).then(
 				function success(searchItems) {
 
 					if (searchItems.length == 0) {
@@ -84,7 +84,7 @@ export default function fileUploadDirective($compile, $templateCache, fileUpload
 
 		function saveFile(file) {
 			var deferred = $q.defer();
-			fileUploadService.uploadFile(file, scope.entityId).then(
+			fileUploadService.uploadFile(file, scope.entityId, scope.entityType).then(
 				function success(savedFile) {
 					loadTableData();
 					toast.showSuccess($translate.instant('file-upload.fileSuccess'));
@@ -99,7 +99,7 @@ export default function fileUploadDirective($compile, $templateCache, fileUpload
 
 		scope.downloadFile = function ($event, file) {
 			$event.stopPropagation();
-			fileUploadService.exportFile(file.fileName, file.extension, scope.entityId);
+			fileUploadService.exportFile(file.fileName, file.extension, scope.entityId, scope.entityType);
 		}
 
 
@@ -112,7 +112,7 @@ export default function fileUploadDirective($compile, $templateCache, fileUpload
 				.cancel($translate.instant('action.no'))
 				.ok($translate.instant('action.yes'));
 			$mdDialog.show(confirm).then(function () {
-				fileUploadService.deleteFile(file.fileName, file.extension, scope.entityId).then(function success() {
+				fileUploadService.deleteFile(file.fileName, file.extension, scope.entityId, scope.entityType).then(function success() {
 					scope.resetFilter();
 
 				});
@@ -143,6 +143,7 @@ export default function fileUploadDirective($compile, $templateCache, fileUpload
 					oldFileName: file.fileName,
 					extension: file.extension,
 					entityId : scope.entityId,
+					entityType : scope.entityType,
 				},
 				fullscreen: true,
 				targetEvent: $event

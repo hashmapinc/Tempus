@@ -27,7 +27,7 @@ import java.io.Serializable;
 @NoArgsConstructor
 public class FileMetaDataCompositeKey implements Serializable {
     private String tenantId;
-    private String relatedEntity;
+    private String relatedEntityId;
     private String fileName;
     private String extension;
 }

@@ -48,7 +48,7 @@ public class JpaFileMetaDataDao extends JpaAbstractDaoListeningExecutorService i
 
     @Override
     public List<FileMetaData> getFilesByTenantAndRelatedEntity(TenantId tenantId, EntityId entityId) {
-        List<FileMetaData> fileMetaData = DaoUtil.convertDataList(fileMetaDataRepository.findByTenantIdAndRelatedEntity(UUIDConverter.fromTimeUUID(tenantId.getId()),
+        List<FileMetaData> fileMetaData = DaoUtil.convertDataList(fileMetaDataRepository.findByTenantIdAndRelatedEntityId(UUIDConverter.fromTimeUUID(tenantId.getId()),
                 UUIDConverter.fromTimeUUID(entityId.getId())));
         return  fileMetaData;
     }

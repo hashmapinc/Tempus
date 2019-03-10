@@ -451,9 +451,10 @@ public class ModelConstants {
      */
 
     public static final String FILE_META_DATA_TABLE_NAME = "file_meta_data";
-    public static final String FILE_META_DATA_RELATED_ENTITY = "related_entity";
+    public static final String FILE_META_DATA_RELATED_ENTITY_ID = "related_entity_id";
+    public static final String FILE_META_DATA_RELATED_ENTITY_TYPE = "related_entity_type";
     public static final String FILE_META_DATA_FILE_NAME = "file_name";
-    public static final String FILE_META_DATA_FILE_EXETENSION = "file_ext";
+    public static final String FILE_META_DATA_FILE_EXTENSION = "file_ext";
     public static final String FILE_META_DATA_FILE_LAST_UPDATED = "last_updated";
     public static final String FILE_META_DATA_FILE_SIZE = "file_size";
 
