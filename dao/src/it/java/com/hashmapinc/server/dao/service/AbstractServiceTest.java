@@ -57,7 +57,7 @@ import com.hashmapinc.server.dao.datamodel.DataModelService;
 import com.hashmapinc.server.dao.depthseries.DepthSeriesService;
 import com.hashmapinc.server.dao.device.DeviceCredentialsService;
 import com.hashmapinc.server.dao.device.DeviceService;
-import com.hashmapinc.server.dao.encoder.DataEncoderService;
+import com.hashmapinc.server.dao.encoder.DescriptorEncoderDecoderService;
 import com.hashmapinc.server.dao.event.EventService;
 import com.hashmapinc.server.dao.gatewayconfiguration.TempusGatewayConfigurationService;
 import com.hashmapinc.server.dao.logo.LogoService;
@@ -201,7 +201,7 @@ public abstract class AbstractServiceTest {
     protected PluginDataEncoderService pluginDataEncoderService;
 
     @Autowired
-    protected DataEncoderService dataEncoderService;
+    protected DescriptorEncoderDecoderService descriptorEncoderDecoderService;
 
     class IdComparator<D extends BaseData<? extends UUIDBased>> implements Comparator<D> {
         @Override

@@ -34,7 +34,7 @@ public abstract class  PluginDataEncoderTest  extends AbstractServiceTest {
         PluginMetaData encryptedPluginMetaData = pluginDao.findById(savedPluginMetaData.getId());
 
         ComponentDescriptor componentDescriptor = componentDescriptorService.findByClazz(pluginMetaData.getClazz());
-        List<String> keysToEncrypt  = dataEncoderService.getAttributesOfPasswordType(componentDescriptor);
+        List<String> keysToEncrypt  = descriptorEncoderDecoderService.getAttributesOfPasswordType(componentDescriptor);
         assertEquals(2, keysToEncrypt.size());
 
         for (String key : keysToEncrypt) {
@@ -49,7 +49,7 @@ public abstract class  PluginDataEncoderTest  extends AbstractServiceTest {
         PluginMetaData encryptedPluginMetaData = pluginDao.findById(savedPluginMetaData.getId());
 
         ComponentDescriptor componentDescriptor = componentDescriptorService.findByClazz(pluginMetaData.getClazz());
-        List<String> keysToEncrypt  = dataEncoderService.getAttributesOfPasswordType(componentDescriptor);
+        List<String> keysToEncrypt  = descriptorEncoderDecoderService.getAttributesOfPasswordType(componentDescriptor);
         assertEquals(0, keysToEncrypt.size());
 
         for (String key : keysToEncrypt) {
@@ -64,7 +64,7 @@ public abstract class  PluginDataEncoderTest  extends AbstractServiceTest {
         PluginMetaData encryptedPluginMetaData = pluginDao.findById(savedPluginMetaData.getId());
 
         ComponentDescriptor componentDescriptor = componentDescriptorService.findByClazz(pluginMetaData.getClazz());
-        List<String> keysToEncrypt  = dataEncoderService.getAttributesOfPasswordType(componentDescriptor);
+        List<String> keysToEncrypt  = descriptorEncoderDecoderService.getAttributesOfPasswordType(componentDescriptor);
         assertEquals(2, keysToEncrypt.size());
 
         for (String key : keysToEncrypt) {
@@ -79,7 +79,7 @@ public abstract class  PluginDataEncoderTest  extends AbstractServiceTest {
         PluginMetaData encryptedPluginMetaData = pluginDao.findById(savedPluginMetaData.getId());
 
         ComponentDescriptor componentDescriptor = componentDescriptorService.findByClazz(pluginMetaData.getClazz());
-        List<String> keysToEncrypt  = dataEncoderService.getAttributesOfPasswordType(componentDescriptor);
+        List<String> keysToEncrypt  = descriptorEncoderDecoderService.getAttributesOfPasswordType(componentDescriptor);
         assertEquals(0, keysToEncrypt.size());
 
         for (String key : keysToEncrypt) {
@@ -94,7 +94,7 @@ public abstract class  PluginDataEncoderTest  extends AbstractServiceTest {
         PluginMetaData encryptedPluginMetaData = pluginDao.findById(savedPluginMetaData.getId());
 
         ComponentDescriptor componentDescriptor = componentDescriptorService.findByClazz(pluginMetaData.getClazz());
-        List<String> keysToEncrypt  = dataEncoderService.getAttributesOfPasswordType(componentDescriptor);
+        List<String> keysToEncrypt  = descriptorEncoderDecoderService.getAttributesOfPasswordType(componentDescriptor);
         assertEquals(1, keysToEncrypt.size());
 
         for (String key : keysToEncrypt) {

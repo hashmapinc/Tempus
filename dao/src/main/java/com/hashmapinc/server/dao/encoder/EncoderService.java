@@ -19,10 +19,6 @@ package com.hashmapinc.server.dao.encoder;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.hashmapinc.server.common.data.plugin.ComponentDescriptor;
 
-import java.util.List;
-
-public interface DataEncoderService {
-     JsonNode encodeJsonNode(JsonNode jsonNode, List<String> attributesToEncrypt);
-     JsonNode decodeJsonNode(JsonNode jsonNode, List<String> attributesToDecrypt);
-     List<String> getAttributesOfPasswordType(ComponentDescriptor componentDescriptor);
+public interface EncoderService {
+    JsonNode encode(JsonNode jsonNode, ComponentDescriptor componentDescriptor);
 }

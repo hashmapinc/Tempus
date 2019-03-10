@@ -20,13 +20,11 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.hashmapinc.server.common.data.plugin.ComponentDescriptor;
 import com.hashmapinc.server.common.data.plugin.PluginMetaData;
 import com.hashmapinc.server.dao.component.ComponentDescriptorService;
-import com.hashmapinc.server.dao.encoder.DataEncoderService;
+import com.hashmapinc.server.dao.encoder.DescriptorEncoderDecoderService;
 import com.hashmapinc.server.dao.exception.IncorrectParameterException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Slf4j
 @Service
@@ -36,7 +34,7 @@ public  class PluginDataEncoderService {
     private ComponentDescriptorService componentDescriptorService;
 
     @Autowired
-    private DataEncoderService dataEncoderService;
+    private DescriptorEncoderDecoderService descriptorEncoderDecoderService;
 
      public  PluginMetaData encoder(PluginMetaData pluginMetaData) {
          if(pluginMetaData == null)
@@ -50,8 +48,7 @@ public  class PluginDataEncoderService {
          if (componentDescriptor == null)
              throw new IncorrectParameterException("Plugin descriptor not found!");
 
-         List<String> attributesToEncrypt  = dataEncoderService.getAttributesOfPasswordType(componentDescriptor);
-         JsonNode configuration = dataEncoderService.encodeJsonNode(plugin.getConfiguration() ,attributesToEncrypt);
+         JsonNode configuration = descriptorEncoderDecoderService.encode(plugin.getConfiguration() ,componentDescriptor);
          plugin.setConfiguration(configuration);
          return plugin;
      }
@@ -69,8 +66,7 @@ public  class PluginDataEncoderService {
         if (componentDescriptor == null)
             throw new IncorrectParameterException("Plugin descriptor not found!");
 
-        List<String> attributesToDecrypt  = dataEncoderService.getAttributesOfPasswordType(componentDescriptor);
-        JsonNode configuration = dataEncoderService.decodeJsonNode(plugin.getConfiguration() ,attributesToDecrypt);
+        JsonNode configuration = descriptorEncoderDecoderService.decode(plugin.getConfiguration() ,componentDescriptor);
         plugin.setConfiguration(configuration);
         return plugin;
     }

@@ -21,7 +21,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hashmapinc.server.common.data.plugin.ComponentDescriptor;
 import com.hashmapinc.server.dao.encryption.EncryptionService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -31,36 +30,37 @@ import java.util.Map;
 import static com.hashmapinc.server.dao.model.ModelConstants.*;
 
 @Service
-public class DataEncoderServiceImpl implements DataEncoderService {
-
-    @Value("${encryption.aes_key}")
-    private String aesKey;
+public class DescriptorEncoderDecoderService implements EncoderService ,DecoderService{
 
     @Autowired
     private EncryptionService encryptionService;
 
-    public JsonNode encodeJsonNode(JsonNode jsonNode, List<String> attributesToEncrypt) {
+    @Override
+    public JsonNode encode(JsonNode jsonNode,ComponentDescriptor componentDescriptor) {
+        List<String> attributesToEncrypt  = getAttributesOfPasswordType(componentDescriptor);
         if(attributesToEncrypt.isEmpty())
             return jsonNode;
         ObjectMapper mapper = new ObjectMapper();
         Map<String,String> configuration = mapper.convertValue(jsonNode, Map.class);
 
         for(String attribute :attributesToEncrypt) {
-            String encryptedAttributeValue = encryptionService.encrypt(configuration.get(attribute),aesKey);
+            String encryptedAttributeValue = encryptionService.encrypt(configuration.get(attribute));
             if(encryptedAttributeValue != null)
                 configuration.put(attribute,encryptedAttributeValue);
         }
         return mapper.convertValue(configuration, JsonNode.class);
     }
 
-    public JsonNode decodeJsonNode(JsonNode jsonNode, List<String> attributesToDecrypt) {
+    @Override
+    public JsonNode decode(JsonNode jsonNode, ComponentDescriptor componentDescriptor) {
+        List<String> attributesToDecrypt  = getAttributesOfPasswordType(componentDescriptor);
         if(attributesToDecrypt.isEmpty())
             return jsonNode;
         ObjectMapper mapper = new ObjectMapper();
         Map<String,String> configuration = mapper.convertValue(jsonNode, Map.class);
 
         for(String attribute :attributesToDecrypt) {
-            String decryptedAttributeValue = encryptionService.decrypt(configuration.get(attribute),aesKey);
+            String decryptedAttributeValue = encryptionService.decrypt(configuration.get(attribute));
             if(decryptedAttributeValue != null)
                 configuration.put(attribute,decryptedAttributeValue);
         }
@@ -84,4 +84,3 @@ public class DataEncoderServiceImpl implements DataEncoderService {
         return attributesOfPasswordType;
     }
 }
-
