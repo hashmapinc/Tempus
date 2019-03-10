@@ -19,6 +19,7 @@ package com.hashmapinc.server.dao.encryption;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.Cipher;
@@ -32,7 +33,10 @@ import static com.hashmapinc.server.dao.model.ModelConstants.UTF_8;
 @Service
 public class EncryptionServiceImpl implements EncryptionService{
 
-    public String encrypt(String plainText , String key) {
+    @Value("${encryption.aes_key}")
+    private String key;
+
+    public String encrypt(String plainText) {
         try {
             if(StringUtils.isEmpty(plainText))
                 return plainText;
@@ -47,7 +51,7 @@ public class EncryptionServiceImpl implements EncryptionService{
         return null;
     }
 
-    public String decrypt(String encryptedText , String key) {
+    public String decrypt(String encryptedText) {
         try {
             if(StringUtils.isEmpty(encryptedText))
                 return encryptedText;

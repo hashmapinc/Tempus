@@ -17,6 +17,6 @@
 package com.hashmapinc.server.dao.encryption;
 
 public interface EncryptionService {
-    String encrypt(String plainText , String key);
-    String decrypt(String encryptedText , String key);
+    String encrypt(String plainText);
+    String decrypt(String encryptedText);
 }

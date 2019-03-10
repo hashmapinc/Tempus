@@ -16,35 +16,50 @@
  */
 package com.hashmapinc.server.dao.service;
 
-import com.hashmapinc.server.dao.encryption.EncryptionService;
+
 import com.hashmapinc.server.dao.encryption.EncryptionServiceImpl;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.runners.MockitoJUnitRunner;
+import org.springframework.test.util.ReflectionTestUtils;
 
+
+@RunWith(MockitoJUnitRunner.class)
 public class EncryptionUnitTest{
 
     private static final String aesKey = "ABCRFGTHDKHLMNTF";
-    private EncryptionService encryptionService = new EncryptionServiceImpl();
+
+    @InjectMocks
+    private EncryptionServiceImpl encryptionService;
+
+    @Before
+    public void setup(){
+        ReflectionTestUtils.setField(encryptionService, "key", aesKey);
+    }
+
 
     @Test()
     public void testEncrypt(){
         String plainText = "B4azA3QJl1E64D/4g/GIKA==";
-        String encryptText = encryptionService.encrypt(plainText,aesKey);
+        String encryptText = encryptionService.encrypt(plainText);
         Assert.assertNotEquals(plainText,encryptText);
     }
 
     @Test()
     public void testEncryptWithEmptyPlainText(){
         String plainText = "";
-        String encryptText = encryptionService.encrypt(plainText,aesKey);
+        String encryptText = encryptionService.encrypt(plainText);
         Assert.assertEquals(plainText,encryptText);
     }
 
     @Test()
     public void testDecrypt() throws Exception{
         String plainText = "B4azA3QJl1E64D/4g/GIKA==";
-        String encryptText = encryptionService.encrypt(plainText,aesKey);
-        String decryptedText = encryptionService.decrypt(encryptText,aesKey);
+        String encryptText = encryptionService.encrypt(plainText);
+        String decryptedText = encryptionService.decrypt(encryptText);
         Assert.assertEquals(plainText,decryptedText);
     }
 
@@ -52,8 +67,8 @@ public class EncryptionUnitTest{
     @Test()
     public void testDecryptWithEmptyEncryptedText(){
         String plainText = "";
-        String encryptText = encryptionService.encrypt(plainText,aesKey);
-        String decryptedText = encryptionService.decrypt(encryptText,aesKey);
+        String encryptText = encryptionService.encrypt(plainText);
+        String decryptedText = encryptionService.decrypt(encryptText);
         Assert.assertEquals(plainText,decryptedText);
     }
 }

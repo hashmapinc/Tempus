@@ -35,7 +35,6 @@ import com.hashmapinc.server.dao.service.DataValidator;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import com.hashmapinc.server.common.data.plugin.PluginMetaData;
 import com.hashmapinc.server.common.data.rule.RuleMetaData;
@@ -54,9 +53,6 @@ public class BasePluginService extends AbstractEntityService implements PluginSe
 
     //TODO: move to a better place.
     public static final TenantId SYSTEM_TENANT = new TenantId(ModelConstants.NULL_UUID);
-
-    @Value("${encryption.aes_key}")
-    private String aesKey;
 
     @Autowired
     private PluginDao pluginDao;
