@@ -18,10 +18,11 @@
 ALTER TABLE tenant ALTER COLUMN logo TYPE varchar;
 CREATE TABLE IF NOT EXISTS file_meta_data (
     tenant_id varchar(31),
-    related_entity varchar(31),
+    related_entity_id varchar(31),
+    related_entity_type varchar,
     file_name varchar,
     file_ext varchar,
     last_updated bigint,
     file_size double precision,
-    CONSTRAINT file_meta_data_pkey PRIMARY KEY (tenant_id, related_entity, file_name, file_ext)
+    CONSTRAINT file_meta_data_pkey PRIMARY KEY (tenant_id, related_entity_id, file_name, file_ext)
 );

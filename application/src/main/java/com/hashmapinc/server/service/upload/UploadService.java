@@ -25,19 +25,13 @@ import com.hashmapinc.server.dao.filemetadata.FileMetaDataDao;
 import com.hashmapinc.server.dao.tenant.TenantService;
 import com.hashmapinc.server.service.CloudStorageServiceUtils;
 import com.hashmapinc.server.service.computation.CloudStorageService;
-import io.minio.messages.Item;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.math3.util.Precision;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-import org.xmlpull.v1.XmlPullParserException;
 
-import java.io.IOException;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -63,7 +57,7 @@ public class UploadService {
         return null;
     }
 
-    public List<FileMetaData> getFileList(TenantId tenantId, EntityId entityId, String fileName) throws Exception{
+    public List<FileMetaData> getFileList(TenantId tenantId, EntityId entityId, String fileName) {
         if(fileName != null) {
             return fileMetaDataDao.getFileMetaData(tenantId, entityId, getFileNameWithoutExt(fileName),
                     getFileExtension(fileName));
@@ -101,7 +95,6 @@ public class UploadService {
 
             fileMetaData.setFileName(newFileWithoutExt);
             fileMetaData.setExtension(newFileExt);
-            fileMetaData.setRelatedEntity(entityId);
             fileMetaData.setLastUpdated(System.currentTimeMillis());
             fileMetaDataDao.save(fileMetaData);
         }
@@ -112,13 +105,13 @@ public class UploadService {
         String[] arrList = originalFilename.split("\\.");
         if (arrList.length >= 2) {
             String fileNameWithoutExt = getFileNameWithoutExt(originalFilename);
-            return new FileMetaData(tenantId, entityId, fileNameWithoutExt, arrList[arrList.length - 1],
+            return new FileMetaData(tenantId, entityId, entityId.getEntityType(), fileNameWithoutExt, arrList[arrList.length - 1],
                     System.currentTimeMillis(),
-                    Precision.round((file.getSize() / 1024.0), 4));
+                    Precision.round((file.getSize() / 1024.0), 3));
         }
-        return new FileMetaData(tenantId, entityId, originalFilename, "NA",
+        return new FileMetaData(tenantId, entityId, entityId.getEntityType(), originalFilename, "NA",
                 System.currentTimeMillis(),
-                Precision.round((file.getSize() / 1024.0), 4));
+                Precision.round((file.getSize() / 1024.0), 3));
 
     }
 
