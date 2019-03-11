@@ -66,6 +66,10 @@ spec:
       app: {{ .Values.dataquality.name }}
   template:
     metadata:
+{{- if .Values.autoscaling.enabled }}    
+      annotations:
+{{ toYaml .Values.annotations | indent 8 }}  
+{{- end }}    
       labels:
         app: {{ .Values.dataquality.name }}
     spec:
@@ -119,5 +123,11 @@ spec:
         - name: DATA_QUALITY_TOPIC
           value: {{ .Values.dataquality.dataqualitytopic }}
         resources:
-{{ toYaml .Values.dataqualityresources | indent 10 }}              
+          limits:
+            cpu: 3000m
+            memory: 5000Mi
+          requests:
+            cpu: 2000m
+            memory: 2500Mi             
+{{- end }}  
 {{- end }}              
