@@ -112,7 +112,7 @@ public abstract class BaseDashboardServiceTest extends AbstractServiceTest {
     @Test
     public void testSaveDashboardWithDuplicateNameShouldThrowException() throws DataValidationException{
         expectedEx.expect(DataValidationException.class);
-        expectedEx.expectMessage("Dashboard is already created for name well-dashboard");
+        expectedEx.expectMessage("Dashboard well-dashboard is already created");
 
         Dashboard dashboard = new Dashboard();
         dashboard.setTitle("well-dashboard");
@@ -126,9 +126,9 @@ public abstract class BaseDashboardServiceTest extends AbstractServiceTest {
         Dashboard dashboard = new Dashboard();
         dashboard.setTitle("well-dashboard");
         dashboard.setTenantId(tenantId);
-        dashboardService.saveDashboard(dashboard);
+        Assert.assertNotNull(dashboardService.saveDashboard(dashboard));
         dashboard.setTenantId(tenantId2);
-        dashboardService.saveDashboard(dashboard);
+        Assert.assertNotNull(dashboardService.saveDashboard(dashboard));
     }
 
 
