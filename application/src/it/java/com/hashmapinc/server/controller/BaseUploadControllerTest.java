@@ -17,6 +17,7 @@
 package com.hashmapinc.server.controller;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.hashmapinc.server.common.data.Device;
 import com.hashmapinc.server.common.data.upload.FileMetaData;
 import com.hashmapinc.server.common.data.upload.InputStreamWrapper;
 import com.hashmapinc.server.common.data.upload.StorageTypes;
@@ -35,8 +36,9 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.util.ArrayList;
-import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -51,6 +53,7 @@ public abstract class BaseUploadControllerTest extends AbstractControllerTest {
     private CloudStorageService cloudStorageService;
 
     private MultipartFile multipartFile = null;
+    private MultipartFile multipartFile2 = null;
 
     private List<Item> items = new ArrayList<>();
 
@@ -59,63 +62,67 @@ public abstract class BaseUploadControllerTest extends AbstractControllerTest {
         loginTenantAdmin();
 
         ClassLoader classLoader = this.getClass().getClassLoader();
-        multipartFile = new MockMultipartFile("file", new FileInputStream(new File(classLoader.
+        multipartFile = new MockMultipartFile("file", "file.txt", "txt", new FileInputStream(new File(classLoader.
                 getResource("file.txt").getFile())));
 
-        String objectName1 = StorageTypes.FILES + "/" + "temp.txt";
-        String objectName2 = StorageTypes.FILES + "/" + "temp2";
-        Item item = new Item(objectName1, false);
-        item.putIfAbsent("LastModified", "2019-02-02T05:06:10.249Z");
-        item.putIfAbsent("Size", 1);
-        Item item2 = new Item(objectName2, false);
-        item2.putIfAbsent("LastModified", "2019-02-02T05:06:10.249Z");
-        item2.putIfAbsent("Size", 1);
-        items.add(item);
-        items.add(item2);
+        multipartFile2 = new MockMultipartFile("file", "file2.txt", "txt", new FileInputStream(new File(classLoader.
+                getResource("file2.txt").getFile())));
+    }
+
+    private Device createDevice() throws Exception {
+        Device device = new Device();
+        device.setName("My device");
+        device.setType("default");
+        Device savedDevice = doPost("/api/device", device, Device.class);
+        Assert.assertNotNull(savedDevice);
+        return savedDevice;
     }
 
     @Test
     public void uploadFile() throws Exception {
         when(cloudStorageService.upload(any(), any(), any(), any())).thenReturn(true);
-        when(cloudStorageService.getAllFiles(any(), any())).thenReturn(items);
-        //uploadService.uploadFile(multipartFile, tenantId);
-        FileMetaData retFileMetaData = doPostFile("/api/file", multipartFile, FileMetaData.class);
+        Device device = createDevice();
+        String requestParams = "?relatedEntityId=" + device.getId() + "&relatedEntityType=DEVICE";
+        FileMetaData retFileMetaData = doPostFile("/api/file" + requestParams, multipartFile, FileMetaData.class);
         Assert.assertNotNull(retFileMetaData);
-        Assert.assertEquals("temp", retFileMetaData.getFileName());
+        Assert.assertEquals("file", retFileMetaData.getFileName());
+
     }
 
     @Test
     public void uploadFileReturnsNotFoundException() throws Exception {
         when(cloudStorageService.upload(any(), any(), any(), any())).thenReturn(false);
-        doPostFile("/api/file", multipartFile).andExpect(status().isNotFound());
+        Device device = createDevice();
+        String requestParams = "?relatedEntityId=" + device.getId() + "&relatedEntityType=DEVICE";
+        doPostFile("/api/file" + requestParams, multipartFile).andExpect(status().isNotFound());
     }
 
     @Test
     public void getAllFiles() throws Exception {
-        when(cloudStorageService.getAllFiles(any(), any())).thenReturn(items);
-        List<FileMetaData> retFileMetaDataList = doGetTyped("/api/file", new TypeReference<>() {});
-        Assert.assertEquals(2, retFileMetaDataList.size());
-    }
+        when(cloudStorageService.upload(any(), any(), any(), any())).thenReturn(true);
+        Device device = createDevice();
+        String requestParams = "?relatedEntityId=" + device.getId() + "&relatedEntityType=DEVICE";
 
-    @Test
-    public void getFilesForPrefix() throws Exception {
-        List<Item> items = new ArrayList<>();
-        String objectName = StorageTypes.FILES + "/" + "image.jpg";
-        Item item = new Item(objectName, false);
-        item.putIfAbsent("LastModified", "2019-02-02T05:06:10.249Z");
-        item.putIfAbsent("Size", 1);
-        items.add(item);
-        when(cloudStorageService.getAllFiles(any(), any())).thenReturn(items);
-        List<FileMetaData> retFileMetaDataList = doGetTyped("/api/file?fileName=image.jpg", new TypeReference<>() {});
-        Assert.assertEquals(1, retFileMetaDataList.size());
+        FileMetaData retFileMetaData = doPostFile("/api/file" + requestParams, multipartFile, FileMetaData.class);
+        Assert.assertNotNull(retFileMetaData);
+
+        FileMetaData retFileMetaData2 = doPostFile("/api/file" + requestParams, multipartFile2, FileMetaData.class);
+        Assert.assertNotNull(retFileMetaData2);
+
+        List<FileMetaData> retFileMetaDataList = doGetTyped("/api/file" + requestParams, new TypeReference<>() {});
+        Assert.assertEquals(2, retFileMetaDataList.size());
     }
 
     @Test
     public void downloadFile() throws Exception {
         InputStreamWrapper streamWrapper = new InputStreamWrapper(new ByteArrayInputStream("xtz".getBytes()), "txt");
         when(cloudStorageService.getFile(any(), any())).thenReturn(streamWrapper);
+
+        Device device = createDevice();
+        String requestParams = "?relatedEntityId=" + device.getId() + "&relatedEntityType=DEVICE";
+
         ResultActions resultActions = doGet("/api/file/" +
-                "image.jpg");
+                "file.txt" + requestParams);
         Assert.assertEquals(200, resultActions.andReturn().getResponse().getStatus());
     }
 
@@ -123,13 +130,25 @@ public abstract class BaseUploadControllerTest extends AbstractControllerTest {
     public void downloadFileThrowsInternalServerError() throws Exception {
         InputStreamWrapper streamWrapper = null;
         when(cloudStorageService.getFile(any(), any())).thenReturn(streamWrapper);
-        doGet("/api/file/image.jpg").andExpect(status().isInternalServerError());
+        doGet("/api/file/file.txt").andExpect(status().isInternalServerError());
     }
 
     @Test
     public void renameFile() throws Exception {
+        when(cloudStorageService.upload(any(), any(), any(), any())).thenReturn(true);
         when(cloudStorageService.copyFile(any(), any(), any())).thenReturn(true);
         when(cloudStorageService.delete(any(), any())).thenReturn(true);
-        doPut("/api/file/image.jpg", "image2.jpg").andExpect(status().isOk());
+        Device device = createDevice();
+
+        String requestParams = "?relatedEntityId=" + device.getId() + "&relatedEntityType=DEVICE";
+        FileMetaData retFileMetaData = doPostFile("/api/file" + requestParams, multipartFile, FileMetaData.class);
+        Assert.assertNotNull(retFileMetaData);
+
+        Map<String, String> map = new HashMap<>();
+        map.put("relatedEntityId", device.getId().toString());
+        map.put("relatedEntityType", "DEVICE");
+        map.put("newFileName", "file3.txt");
+
+        doPut("/api/file/file.txt", map).andExpect(status().isOk());
     }
 }
