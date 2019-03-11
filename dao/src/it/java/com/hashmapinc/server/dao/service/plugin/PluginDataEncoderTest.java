@@ -31,14 +31,13 @@ public abstract class  PluginDataEncoderTest  extends AbstractServiceTest {
     public void saveKinesisPluginWithOneEncryptedPasswordAttribute() throws Exception {
         PluginMetaData pluginMetaData = generatePlugin(null, null, "com.hashmapinc.server.extensions.kinesis.plugin.KinesisPlugin", "com.hashmapinc.component.ActionTest", "plugin/kinesis/TestKinesisPluginDescriptor.json", "plugin/kinesis/TestKinesisPluginConfigurationData.json");
         PluginMetaData savedPluginMetaData = pluginService.savePlugin(pluginMetaData);
-        PluginMetaData encryptedPluginMetaData = pluginDao.findById(savedPluginMetaData.getId());
 
         ComponentDescriptor componentDescriptor = componentDescriptorService.findByClazz(pluginMetaData.getClazz());
         List<String> keysToEncrypt  = descriptorEncoderDecoderService.getAttributesOfPasswordType(componentDescriptor);
         assertEquals(2, keysToEncrypt.size());
 
         for (String key : keysToEncrypt) {
-            assertNotEquals(encryptedPluginMetaData.getConfiguration().get(key), savedPluginMetaData.getConfiguration().get(key));
+            assertNotEquals(pluginMetaData.getConfiguration().get(key), savedPluginMetaData.getConfiguration().get(key));
         }
     }
 
@@ -46,14 +45,13 @@ public abstract class  PluginDataEncoderTest  extends AbstractServiceTest {
     public void saveKafkaPluginWithNoEncryptedPasswordAttribute() throws Exception {
         PluginMetaData pluginMetaData = generatePlugin(null, null, "com.hashmapinc.server.extensions.kafka.plugin.KafkaPlugin", "com.hashmapinc.component.ActionTest", "plugin/kafka/TestKafkaPluginDescriptor.json", "plugin/kafka/TestKafkaPluginConfigurationData.json");
         PluginMetaData savedPluginMetaData = pluginService.savePlugin(pluginMetaData);
-        PluginMetaData encryptedPluginMetaData = pluginDao.findById(savedPluginMetaData.getId());
 
         ComponentDescriptor componentDescriptor = componentDescriptorService.findByClazz(pluginMetaData.getClazz());
         List<String> keysToEncrypt  = descriptorEncoderDecoderService.getAttributesOfPasswordType(componentDescriptor);
         assertEquals(0, keysToEncrypt.size());
 
         for (String key : keysToEncrypt) {
-            assertNotEquals(encryptedPluginMetaData.getConfiguration().get(key), savedPluginMetaData.getConfiguration().get(key));
+            assertNotEquals(pluginMetaData.getConfiguration().get(key), savedPluginMetaData.getConfiguration().get(key));
         }
     }
 
@@ -61,14 +59,13 @@ public abstract class  PluginDataEncoderTest  extends AbstractServiceTest {
     public void saveSnsPluginWithTwoEncryptedPasswordAttribute() throws Exception {
         PluginMetaData pluginMetaData = generatePlugin(null, null, "com.hashmapinc.server.extensions.sns.plugin.SnsPlugin", "com.hashmapinc.component.ActionTest", "plugin/sns/TestSnsPluginDescriptor.json", "plugin/sns/TestSnsPluginConfigurationData.json");
         PluginMetaData savedPluginMetaData = pluginService.savePlugin(pluginMetaData);
-        PluginMetaData encryptedPluginMetaData = pluginDao.findById(savedPluginMetaData.getId());
 
         ComponentDescriptor componentDescriptor = componentDescriptorService.findByClazz(pluginMetaData.getClazz());
         List<String> keysToEncrypt  = descriptorEncoderDecoderService.getAttributesOfPasswordType(componentDescriptor);
         assertEquals(2, keysToEncrypt.size());
 
         for (String key : keysToEncrypt) {
-            assertNotEquals(encryptedPluginMetaData.getConfiguration().get(key), savedPluginMetaData.getConfiguration().get(key));
+            assertNotEquals(pluginMetaData.getConfiguration().get(key), savedPluginMetaData.getConfiguration().get(key));
         }
     }
 
@@ -76,14 +73,13 @@ public abstract class  PluginDataEncoderTest  extends AbstractServiceTest {
     public void saveEventHubPluginWithNoEncryptedPasswordAttribute() throws Exception {
         PluginMetaData pluginMetaData = generatePlugin(null, null, "com.hashmapinc.server.extensions.eventhub.plugin.EventHubPlugin", "com.hashmapinc.component.ActionTest", "plugin/event-hub/TestEventHubPluginDescriptor.json", "plugin/event-hub/TestEventHubConfigurationData.json");
         PluginMetaData savedPluginMetaData = pluginService.savePlugin(pluginMetaData);
-        PluginMetaData encryptedPluginMetaData = pluginDao.findById(savedPluginMetaData.getId());
 
         ComponentDescriptor componentDescriptor = componentDescriptorService.findByClazz(pluginMetaData.getClazz());
         List<String> keysToEncrypt  = descriptorEncoderDecoderService.getAttributesOfPasswordType(componentDescriptor);
         assertEquals(0, keysToEncrypt.size());
 
         for (String key : keysToEncrypt) {
-            assertNotEquals(encryptedPluginMetaData.getConfiguration().get(key), savedPluginMetaData.getConfiguration().get(key));
+            assertNotEquals(pluginMetaData.getConfiguration().get(key), savedPluginMetaData.getConfiguration().get(key));
         }
     }
 
@@ -91,14 +87,13 @@ public abstract class  PluginDataEncoderTest  extends AbstractServiceTest {
     public void saveRestApiCallPluginWithOneEncryptedPasswordAttribute() throws Exception {
         PluginMetaData pluginMetaData = generatePlugin(null, null, "com.hashmapinc.server.extensions.rest.plugin.RestApiCallPlugin", "com.hashmapinc.component.ActionTest", "plugin/rest-api-call/TestRestApiCallPluginDescriptor.json", "plugin/rest-api-call/TestRestApiCallPluginConfigurationData.json");
         PluginMetaData savedPluginMetaData = pluginService.savePlugin(pluginMetaData);
-        PluginMetaData encryptedPluginMetaData = pluginDao.findById(savedPluginMetaData.getId());
 
         ComponentDescriptor componentDescriptor = componentDescriptorService.findByClazz(pluginMetaData.getClazz());
         List<String> keysToEncrypt  = descriptorEncoderDecoderService.getAttributesOfPasswordType(componentDescriptor);
         assertEquals(1, keysToEncrypt.size());
 
         for (String key : keysToEncrypt) {
-            assertNotEquals(encryptedPluginMetaData.getConfiguration().get(key), savedPluginMetaData.getConfiguration().get(key));
+            assertNotEquals(pluginMetaData.getConfiguration().get(key), savedPluginMetaData.getConfiguration().get(key));
         }
     }
 }
