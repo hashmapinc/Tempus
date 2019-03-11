@@ -71,6 +71,10 @@ spec:
   podManagementPolicy: Parallel
   template:
     metadata:
+{{- if .Values.autoscaling.enabled }}    
+      annotations:
+{{ toYaml .Values.annotations | indent 8 }}  
+{{- end }}     
       labels:
         app: {{ .Values.zookeeper.name }}
     spec:
@@ -88,8 +92,15 @@ spec:
         volumeMounts:
         - name: {{ .Values.zookeeper.name }}-datadir
           mountPath: /var/lib/zookeeper
+{{- if .Values.autoscaling.enabled }}
         resources:
-{{ toYaml .Values.resources | indent 10 }}          
+          limits:
+            cpu: 2000m
+            memory: 4000Mi
+          requests:
+            cpu: 1000m
+            memory: 2000Mi 
+{{- end }}                 
   volumeClaimTemplates:
   - metadata:
       name: {{ .Values.zookeeper.name }}-datadir

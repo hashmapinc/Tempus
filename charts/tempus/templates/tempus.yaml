@@ -101,8 +101,15 @@ spec:
           name: rpc
         - containerPort: 9999
           name: tempus-port
+{{- if .Values.autoscaling.enabled }}          
         resources:
-{{ toYaml .Values.tempusresources | indent 10 }}          
+          limits:
+            cpu: 3000m
+            memory: 5000Mi
+          requests:
+            cpu: 2000m
+            memory: 2500Mi  
+{{- end }}                   
         env:
 {{- if .Values.externaldb }}
         - name: SPRING_DRIVER_CLASS_NAME

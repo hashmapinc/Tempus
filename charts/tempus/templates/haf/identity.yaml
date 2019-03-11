@@ -66,6 +66,10 @@ spec:
       app: {{ .Values.identity.name }}
   template:
     metadata:
+{{- if .Values.autoscaling.enabled }}    
+      annotations:
+{{ toYaml .Values.annotations | indent 8 }}  
+{{- end }}   
       labels:
         app: {{ .Values.identity.name }}
     spec:
@@ -114,7 +118,14 @@ spec:
             configMapKeyRef:
               name: {{ .Values.identity.name }}
               key: spring.ds.password 
+{{- if .Values.autoscaling.enabled }}              
         resources:
-{{ toYaml .Values.resources | indent 10 }}               
+          limits:
+            cpu: 2000m
+            memory: 4000Mi
+          requests:
+            cpu: 1000m
+            memory: 2000Mi            
 {{- end }}                            
+{{- end }}    
 {{- end }}               
