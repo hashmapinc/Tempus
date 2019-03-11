@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+@import "~compass-sass-mixins/lib/compass";
 @import '../../scss/constants';
 
 
@@ -120,4 +121,19 @@ md-card.tb-signup-card {
 .input-cls {
     border-color:white !important;
     color:white !important;
+}
+.policy-para {
+font-size: 0.8em;
+margin-left: 10px;
+}
+.policy-list{
+text-align: left;
+}
+.policy-sub-list{
+list-style-type: circle;
+}
+.policy-header{
+text-align: center;
+font-size: 1em;
+font-weight: bold;
 }
