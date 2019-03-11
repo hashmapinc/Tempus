@@ -24,7 +24,7 @@ import java.util.List;
 
 public interface FileMetaDataDao {
     FileMetaData save(FileMetaData fileMetaData);
-    List<FileMetaData> getFilesByTenantAndRelatedEntity(TenantId tenantId, EntityId entityId);
-    List<FileMetaData> getFileMetaData(TenantId tenantId, EntityId entityId, String fileName, String extension);
+    List<FileMetaData> getFiles(TenantId tenantId, EntityId entityId);
+    List<FileMetaData> getFiles(TenantId tenantId, EntityId entityId, String fileName, String extension);
     void delete(TenantId tenantId, EntityId entityId, String fileName, String extension);
 }
