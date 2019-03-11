@@ -49,7 +49,7 @@ function DeviceService($http, $q, $window, userService, attributeService, custom
 
     function getTenantDevices(pageLink, applyCustomersInfo, config, type, pageNum) {
         var deferred = $q.defer();
-        if(angular.isDefined(type) && type == 'Gateway') {
+        if(angular.isUndefined(pageNum)) {
           pageNum = 0;
         }
         var url = '/api/tenant/devices?limit=' + pageLink.limit + '&pageNum=' + pageNum;
