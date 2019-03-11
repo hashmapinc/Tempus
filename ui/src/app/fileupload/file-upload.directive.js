@@ -142,8 +142,8 @@ export default function fileUploadDirective($compile, $templateCache, fileUpload
 				locals: {
 					oldFileName: file.fileName,
 					extension: file.extension,
-					entityId : scope.entityId,
-					entityType : scope.entityType,
+					entityId: scope.entityId,
+					entityType: scope.entityType,
 				},
 				fullscreen: true,
 				targetEvent: $event
@@ -178,12 +178,12 @@ export default function fileUploadDirective($compile, $templateCache, fileUpload
 			return $translate.instant('file-upload.replace-file-text');
 		}
 
-		scope.$watch("entityId", function(newVal, prevVal) {
-                    if (newVal && !angular.equals(newVal, prevVal)) {
-                        scope.resetFilter();
-                        scope.reload();
-                    }
-                });
+		scope.$watch("entityId", function (newVal, prevVal) {
+			if (newVal && !angular.equals(newVal, prevVal)) {
+				scope.resetFilter();
+				scope.reload();
+			}
+		});
 
 		$compile(element.contents())(scope);
 	}
@@ -193,8 +193,7 @@ export default function fileUploadDirective($compile, $templateCache, fileUpload
 		link: linker,
 		scope: {
 			entityType: '=?',
-			entityId: '=?',
-			pageMode: '@?'
+			entityId: '=?'
 		}
 	};
 }
