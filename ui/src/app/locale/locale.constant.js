@@ -816,7 +816,7 @@ export default angular.module('tempus.locale', [])
                     "replace-file": "Replace file",
                     "fileSizeError": "File size should be less than or equal to 100 MB",
                     "fileRenameError": "Name extension can not be compressed or executable file, Please provide name in valid format",
-                    "fileExtensionError": "File type is not supported to upload",
+                    "fileExtensionError": "File type is not supported",
                     "fileNameError": "Given file name is already existing file name",
                     "fileSuccess": "File has been successfully uploaded",
                     "deleteSuccess": "File has been successfully deleted",

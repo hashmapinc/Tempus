@@ -32,19 +32,18 @@ function FileUploadService(toast, $http, $q, $translate, $window, $document, $in
 		renameFile: renameFile,
 		fileValidation: fileValidation,
 		extensionValidation: extensionValidation,
-		searchFile: searchFile,
-		newNameValidation: newNameValidation
+		searchFile: searchFile
 
 	}
 
 	return service;
 
-	function uploadFile(file, entityId, entityType){
+	function uploadFile(file, entityId, entityType) {
 		var deferred = $q.defer();
 		var url = '/api/file?relatedEntityId=' + entityId + '&relatedEntityType=' + entityType;
 		var fd = new FormData();
 		fd.append("file", file);
-		$http.post(url, fd,{
+		$http.post(url, fd, {
 			transformRequest: angular.identity,
 			headers: {
 				'Content-Type': undefined
@@ -108,20 +107,22 @@ function FileUploadService(toast, $http, $q, $translate, $window, $document, $in
 			$window.navigator.msSaveOrOpenBlob(data, filename);
 		} else {
 
-		var urlCreator = $window.URL || $window.webkitURL;
+			var urlCreator = $window.URL || $window.webkitURL;
 
-		var anchor = angular.element('<a/>');
-		anchor.attr({
-		href: urlCreator.createObjectURL(data),
-		download: filename
-		})[0].click();
+			var anchor = angular.element('<a/>');
+			anchor.attr({
+				href: urlCreator.createObjectURL(data),
+				download: filename
+			})[0].click();
 		}
 	}
 
 	function getFile(fileName, entityId, entityType) {
 		var deferred = $q.defer();
 		var url = '/api/file/' + fileName + '?relatedEntityId=' + entityId + '&relatedEntityType=' + entityType;
-		$http.get(url, { responseType: 'blob' }).then(function success(response) {
+		$http.get(url, {
+			responseType: 'blob'
+		}).then(function success(response) {
 			deferred.resolve(response.data);
 		}, function fail(response) {
 			deferred.reject(response.data);
@@ -131,24 +132,24 @@ function FileUploadService(toast, $http, $q, $translate, $window, $document, $in
 
 
 	function getAllFile(entityId, entityType) {
-        if(angular.isDefined(entityId)) {
-            var deferred = $q.defer();
-            var url = '/api/file?relatedEntityId=' + entityId + '&relatedEntityType=' + entityType;
-            $http.get(url).then(function success(response) {
-                deferred.resolve(response.data);
-            }, function fail() {
-                deferred.reject();
-            });
-		return deferred.promise;
+		if (angular.isDefined(entityId)) {
+			var deferred = $q.defer();
+			var url = '/api/file?relatedEntityId=' + entityId + '&relatedEntityType=' + entityType;
+			$http.get(url).then(function success(response) {
+				deferred.resolve(response.data);
+			}, function fail() {
+				deferred.reject();
+			});
+			return deferred.promise;
 		}
 	}
 
 	function deleteFile(fileName, extension, entityId, entityType) {
 
 		if (extension != getTypes().fileUpload.na && extension != "") {
-			var url = '/api/file/' + fileName + "." + extension+'?relatedEntityId=' + entityId + '&relatedEntityType=' + entityType;
+			var url = '/api/file/' + fileName + "." + extension + '?relatedEntityId=' + entityId + '&relatedEntityType=' + entityType;
 		} else {
-			url = '/api/file/' + fileName+'?relatedEntityId=' + entityId + '&relatedEntityType=' + entityType;
+			url = '/api/file/' + fileName + '?relatedEntityId=' + entityId + '&relatedEntityType=' + entityType;
 		}
 
 		var deferred = $q.defer();
@@ -165,10 +166,10 @@ function FileUploadService(toast, $http, $q, $translate, $window, $document, $in
 	function renameFile(oldFileName, newFileName, extension, entityId, entityType) {
 		var deferred = $q.defer();
 		if (extension != getTypes().fileUpload.na && extension != "") {
-			var url = '/api/file/' + oldFileName + "." + extension;//+'?relatedEntityId=' + entityId + '&relatedEntityType=' + entityType;
+			var url = '/api/file/' + oldFileName + "." + extension; //+'?relatedEntityId=' + entityId + '&relatedEntityType=' + entityType;
 			newFileName = newFileName + "." + extension;
 		} else {
-			url = '/api/file/' + oldFileName;//+'?relatedEntityId=' + entityId + '&relatedEntityType=' + entityType;
+			url = '/api/file/' + oldFileName; //+'?relatedEntityId=' + entityId + '&relatedEntityType=' + entityType;
 		}
 		var map = createEntityInfoMap(entityId, entityType);
 		map.newFileName = newFileName;
@@ -189,9 +190,9 @@ function FileUploadService(toast, $http, $q, $translate, $window, $document, $in
 		var deferred = $q.defer();
 
 		if (extension != getTypes().fileUpload.na && extension != "") {
-			var url = '/api/file?fileName=' + fileName + "." + extension+ '&relatedEntityId=' + entityId + '&relatedEntityType=' + entityType;
+			var url = '/api/file?fileName=' + fileName + "." + extension + '&relatedEntityId=' + entityId + '&relatedEntityType=' + entityType;
 		} else {
-			url = '/api/file?fileName=' + fileName+ '&relatedEntityId=' + entityId + '&relatedEntityType=' + entityType;
+			url = '/api/file?fileName=' + fileName + '&relatedEntityId=' + entityId + '&relatedEntityType=' + entityType;
 		}
 		$http.get(url, {
 			transformRequest: angular.identity,
@@ -224,37 +225,6 @@ function FileUploadService(toast, $http, $q, $translate, $window, $document, $in
 	}
 
 
-	function newNameValidation(fileName) {
-		var deferred = $q.defer();
-		searchFile(fileName).then(
-			function success(searchItems) {
-				var existFile = 0;
-				if (searchItems.length == 0) {
-
-					existFile = 0;
-				} else {
-
-					for (var i = 0; i < searchItems.length; i++) {
-						if (searchItems[i].fileName == fileName) {
-							existFile++;
-						}
-					}
-					if (existFile == 0) {
-						return true;
-					} else {
-						toast.showError($translate.instant('file-upload.fileNameError'));
-						return false;
-					}
-				}
-			},
-			function fail() {
-				deferred.reject();
-			}
-		);
-		return deferred.promise;
-	}
-
-
 	function extensionValidation(fileName) {
 		var ext = fileName.split(".");
 		var listOfExtension = getTypes().fileUpload.listOfExtension;
@@ -268,11 +238,11 @@ function FileUploadService(toast, $http, $q, $translate, $window, $document, $in
 	}
 
 	function createEntityInfoMap(entityId, entityType) {
-	var map = {
-	"relatedEntityId" : entityId,
-	"relatedEntityType": entityType
-	}
-	return map;
+		var map = {
+			"relatedEntityId": entityId,
+			"relatedEntityType": entityType
+		}
+		return map;
 	}
 
 }
