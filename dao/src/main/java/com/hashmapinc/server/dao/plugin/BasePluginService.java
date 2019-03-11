@@ -100,32 +100,31 @@ public class BasePluginService extends AbstractEntityService implements PluginSe
         if (!componentDescriptorService.validate(descriptor, plugin.getConfiguration())) {
             throw new IncorrectParameterException("Filters configuration is not valid!");
         }
-        return pluginDataEncoderService.decoder(pluginDao.save(pluginDataEncoderService.encoder(plugin)));
+        return pluginDao.save(pluginDataEncoderService.encoder(plugin));
     }
 
     @Override
     public PluginMetaData findPluginById(PluginId pluginId) {
         Validator.validateId(pluginId, "Incorrect plugin id for search request.");
-        return pluginDataEncoderService.decoder(pluginDao.findById(pluginId));
+        return pluginDao.findById(pluginId);
     }
 
     @Override
     public ListenableFuture<PluginMetaData> findPluginByIdAsync(PluginId pluginId) {
         validateId(pluginId, "Incorrect plugin id for search plugin request.");
-        return Futures.transform(pluginDao.findByIdAsync(pluginId.getId()),
-                (Function<? super PluginMetaData, ? extends PluginMetaData>) pluginDataEncoderService::decoder);
+        return pluginDao.findByIdAsync(pluginId.getId());
     }
 
     @Override
     public PluginMetaData findPluginByApiToken(String apiToken) {
         Validator.validateString(apiToken, "Incorrect plugin apiToken for search request.");
-        return pluginDataEncoderService.decoder(pluginDao.findByApiToken(apiToken));
+        return pluginDao.findByApiToken(apiToken);
     }
 
     @Override
     public TextPageData<PluginMetaData> findSystemPlugins(TextPageLink pageLink) {
         Validator.validatePageLink(pageLink, "Incorrect PageLink object for search system plugin request.");
-        List<PluginMetaData> plugins = pluginDao.findByTenantIdAndPageLink(SYSTEM_TENANT, pageLink).stream().map(pluginDataEncoderService::decoder).collect(Collectors.toList());
+        List<PluginMetaData> plugins = pluginDao.findByTenantIdAndPageLink(SYSTEM_TENANT, pageLink);
         return new TextPageData<>(plugins, pageLink);
     }
 
@@ -133,7 +132,7 @@ public class BasePluginService extends AbstractEntityService implements PluginSe
     public TextPageData<PluginMetaData> findTenantPlugins(TenantId tenantId, TextPageLink pageLink) {
         Validator.validateId(tenantId, "Incorrect tenant id for search plugins request.");
         Validator.validatePageLink(pageLink, "Incorrect PageLink object for search plugin request.");
-        List<PluginMetaData> plugins = pluginDao.findByTenantIdAndPageLink(tenantId, pageLink).stream().map(pluginDataEncoderService::decoder).collect(Collectors.toList());
+        List<PluginMetaData> plugins = pluginDao.findByTenantIdAndPageLink(tenantId, pageLink);
         return new TextPageData<>(plugins, pageLink);
     }
 
@@ -158,7 +157,7 @@ public class BasePluginService extends AbstractEntityService implements PluginSe
         log.trace("Executing findAllTenantPluginsByTenantIdAndPageLink, tenantId [{}], pageLink [{}]", tenantId, pageLink);
         Validator.validateId(tenantId, "Incorrect tenantId " + tenantId);
         Validator.validatePageLink(pageLink, "Incorrect page link " + pageLink);
-        List<PluginMetaData> plugins = pluginDao.findAllTenantPluginsByTenantId(tenantId.getId(), pageLink).stream().map(pluginDataEncoderService::decoder).collect(Collectors.toList());
+        List<PluginMetaData> plugins = pluginDao.findAllTenantPluginsByTenantId(tenantId.getId(), pageLink);
         return new TextPageData<>(plugins, pageLink);
     }
 
@@ -233,7 +232,7 @@ public class BasePluginService extends AbstractEntityService implements PluginSe
     @Override
     public PluginMetaData findPluginByClass(String pluginClazz) {
         Validator.validateString(pluginClazz, "Incorrect plugin class for search request.");
-        return pluginDataEncoderService.decoder(pluginDao.findByPluginClass(pluginClazz));
+        return pluginDao.findByPluginClass(pluginClazz);
     }
 
     private DataValidator<PluginMetaData> pluginValidator =
