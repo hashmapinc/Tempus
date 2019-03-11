@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.hashmapinc.server.service.upload;
+package com.hashmapinc.server.service.entityfile;
 
 import com.hashmapinc.server.common.data.id.EntityId;
 import com.hashmapinc.server.common.data.id.TenantId;
@@ -35,7 +35,7 @@ import java.util.List;
 
 @Service
 @Slf4j
-public class UploadService {
+public class EntityFileService {
 
     @Autowired
     private CloudStorageService cloudStorageService;
@@ -59,10 +59,10 @@ public class UploadService {
 
     public List<FileMetaData> getFileList(TenantId tenantId, EntityId entityId, String fileName) {
         if(fileName != null) {
-            return fileMetaDataDao.getFileMetaData(tenantId, entityId, getFileNameWithoutExt(fileName),
+            return fileMetaDataDao.getFiles(tenantId, entityId, getFileNameWithOrWithoutExt(fileName),
                     getFileExtension(fileName));
         }
-        return fileMetaDataDao.getFilesByTenantAndRelatedEntity(tenantId, entityId);
+        return fileMetaDataDao.getFiles(tenantId, entityId);
     }
 
     public InputStreamWrapper downloadFile(String fileName, TenantId tenantId, EntityId entityId) throws Exception {
@@ -75,7 +75,7 @@ public class UploadService {
         String bucketName = CloudStorageServiceUtils.createBucketName(tenantService.findTenantById(tenantId));
         String objectUrl = CloudStorageServiceUtils.createObjectName(fileName, entityId, StorageTypes.FILES);
         if (cloudStorageService.delete(bucketName, objectUrl))
-            fileMetaDataDao.delete(tenantId, entityId, getFileNameWithoutExt(fileName),
+            fileMetaDataDao.delete(tenantId, entityId, getFileNameWithOrWithoutExt(fileName),
                     getFileExtension(fileName));
     }
 
@@ -83,39 +83,38 @@ public class UploadService {
         String bucketName = CloudStorageServiceUtils.createBucketName(tenantService.findTenantById(tenantId));
         String oldObjectUrl = CloudStorageServiceUtils.createObjectName(oldFileName, entityId, StorageTypes.FILES);
         String newObjectUrl = CloudStorageServiceUtils.createObjectName(newFileName, entityId, StorageTypes.FILES);
-        if (!oldObjectUrl.contentEquals(newObjectUrl) && cloudStorageService.copyFile(bucketName, oldObjectUrl, newObjectUrl)) {
-            cloudStorageService.delete(bucketName, oldObjectUrl);
-            String oldFileNameWithoutExt = getFileNameWithoutExt(oldFileName);
-            String oldFileExt = getFileExtension(oldFileName);
-            FileMetaData fileMetaData = fileMetaDataDao.getFileMetaData(tenantId, entityId, oldFileNameWithoutExt,
-                    oldFileExt).get(0);
-            fileMetaDataDao.delete(tenantId, entityId, oldFileNameWithoutExt, oldFileExt);
-            String newFileWithoutExt = getFileNameWithoutExt(newFileName);
-            String newFileExt = getFileExtension(newFileName);
-
-            fileMetaData.setFileName(newFileWithoutExt);
-            fileMetaData.setExtension(newFileExt);
-            fileMetaData.setLastUpdated(System.currentTimeMillis());
-            fileMetaDataDao.save(fileMetaData);
+        if (cloudStorageService.copyFile(bucketName, oldObjectUrl, newObjectUrl)) {
+            if(!oldObjectUrl.contentEquals(newObjectUrl))
+                cloudStorageService.delete(bucketName, oldObjectUrl);
+            renameFileInDb(oldFileName, newFileName, tenantId, entityId);
         }
+    }
+
+    private void renameFileInDb(String oldFileName, String newFileName, TenantId tenantId, EntityId entityId) {
+        String oldFileNameWithoutExt = getFileNameWithOrWithoutExt(oldFileName);
+        String oldFileExt = getFileExtension(oldFileName);
+        FileMetaData fileMetaData = fileMetaDataDao.getFiles(tenantId, entityId, oldFileNameWithoutExt,
+                oldFileExt).get(0);
+        fileMetaDataDao.delete(tenantId, entityId, oldFileNameWithoutExt, oldFileExt);
+        String newFileWithoutExt = getFileNameWithOrWithoutExt(newFileName);
+        String newFileExt = getFileExtension(newFileName);
+
+        fileMetaData.setFileName(newFileWithoutExt);
+        fileMetaData.setExtension(newFileExt);
+        fileMetaData.setLastUpdated(System.currentTimeMillis());
+        fileMetaDataDao.save(fileMetaData);
     }
 
     private FileMetaData createFileMetaData(MultipartFile file, TenantId tenantId, EntityId entityId) {
         final String originalFilename = file.getOriginalFilename();
-        String[] arrList = originalFilename.split("\\.");
-        if (arrList.length >= 2) {
-            String fileNameWithoutExt = getFileNameWithoutExt(originalFilename);
-            return new FileMetaData(tenantId, entityId, entityId.getEntityType(), fileNameWithoutExt, arrList[arrList.length - 1],
-                    System.currentTimeMillis(),
-                    Precision.round((file.getSize() / 1024.0), 3));
-        }
-        return new FileMetaData(tenantId, entityId, entityId.getEntityType(), originalFilename, "NA",
+        String fileName = getFileNameWithOrWithoutExt(originalFilename);
+        String extension = getFileExtension(originalFilename);
+        return new FileMetaData(tenantId, entityId, entityId.getEntityType(), fileName, extension,
                 System.currentTimeMillis(),
                 Precision.round((file.getSize() / 1024.0), 3));
-
     }
 
-    private String getFileNameWithoutExt(String fileName) {
+    private String getFileNameWithOrWithoutExt(String fileName) {
         String[] arrList = fileName.split("\\.");
         if (arrList.length >= 2) {
             return fileName.substring(0, fileName.lastIndexOf(".")).replace(" ", "-");

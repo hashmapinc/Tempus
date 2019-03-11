@@ -14,11 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.hashmapinc.server.controller.nosql;
+package com.hashmapinc.server.controller.sql;
 
-import com.hashmapinc.server.controller.BaseUploadControllerTest;
-import com.hashmapinc.server.dao.service.DaoNoSqlTest;
+import com.hashmapinc.server.controller.EntityFileControllerTest;
+import com.hashmapinc.server.dao.service.DaoSqlTest;
 
-@DaoNoSqlTest
-public class UploadControllerNoSqlTest extends BaseUploadControllerTest {
+@DaoSqlTest
+public class EntityFileControllerSqlTest extends EntityFileControllerTest {
 }

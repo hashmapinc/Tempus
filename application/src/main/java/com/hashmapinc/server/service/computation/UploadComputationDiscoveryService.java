@@ -31,6 +31,7 @@ import com.hashmapinc.server.exception.TempusApplicationException;
 import com.hashmapinc.server.service.CloudStorageServiceUtils;
 import com.hashmapinc.server.service.computation.annotation.AnnotationsProcessor;
 import com.hashmapinc.server.service.computation.classloader.RuntimeJavaCompiler;
+import com.hashmapinc.server.service.minio.MinioService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -20,10 +20,8 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.hashmapinc.server.common.data.Device;
 import com.hashmapinc.server.common.data.upload.FileMetaData;
 import com.hashmapinc.server.common.data.upload.InputStreamWrapper;
-import com.hashmapinc.server.common.data.upload.StorageTypes;
 import com.hashmapinc.server.service.computation.CloudStorageService;
-import com.hashmapinc.server.service.upload.UploadService;
-import io.minio.messages.Item;
+import com.hashmapinc.server.service.entityfile.EntityFileService;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -35,7 +33,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -44,10 +41,10 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-public abstract class BaseUploadControllerTest extends AbstractControllerTest {
+public abstract class EntityFileControllerTest extends AbstractControllerTest {
 
     @Autowired
-    private UploadService uploadService;
+    private EntityFileService entityFileService;
 
     @Autowired
     private CloudStorageService cloudStorageService;
@@ -55,7 +52,7 @@ public abstract class BaseUploadControllerTest extends AbstractControllerTest {
     private MultipartFile multipartFile = null;
     private MultipartFile multipartFile2 = null;
 
-    private List<Item> items = new ArrayList<>();
+    private Device device = null;
 
     @Before
     public void beforeTest() throws Exception {
@@ -67,21 +64,24 @@ public abstract class BaseUploadControllerTest extends AbstractControllerTest {
 
         multipartFile2 = new MockMultipartFile("file", "file2.txt", "txt", new FileInputStream(new File(classLoader.
                 getResource("file2.txt").getFile())));
+
+        createDevice();
     }
 
-    private Device createDevice() throws Exception {
-        Device device = new Device();
-        device.setName("My device");
-        device.setType("default");
-        Device savedDevice = doPost("/api/device", device, Device.class);
-        Assert.assertNotNull(savedDevice);
-        return savedDevice;
+    private void createDevice() throws Exception {
+        if(this.device == null) {
+            Device device = new Device();
+            device.setName("My device");
+            device.setType("default");
+            Device savedDevice = doPost("/api/device", device, Device.class);
+            Assert.assertNotNull(savedDevice);
+            this.device = savedDevice;
+        }
     }
 
     @Test
     public void uploadFile() throws Exception {
         when(cloudStorageService.upload(any(), any(), any(), any())).thenReturn(true);
-        Device device = createDevice();
         String requestParams = "?relatedEntityId=" + device.getId() + "&relatedEntityType=DEVICE";
         FileMetaData retFileMetaData = doPostFile("/api/file" + requestParams, multipartFile, FileMetaData.class);
         Assert.assertNotNull(retFileMetaData);
@@ -92,7 +92,6 @@ public abstract class BaseUploadControllerTest extends AbstractControllerTest {
     @Test
     public void uploadFileReturnsNotFoundException() throws Exception {
         when(cloudStorageService.upload(any(), any(), any(), any())).thenReturn(false);
-        Device device = createDevice();
         String requestParams = "?relatedEntityId=" + device.getId() + "&relatedEntityType=DEVICE";
         doPostFile("/api/file" + requestParams, multipartFile).andExpect(status().isNotFound());
     }
@@ -100,7 +99,6 @@ public abstract class BaseUploadControllerTest extends AbstractControllerTest {
     @Test
     public void getAllFiles() throws Exception {
         when(cloudStorageService.upload(any(), any(), any(), any())).thenReturn(true);
-        Device device = createDevice();
         String requestParams = "?relatedEntityId=" + device.getId() + "&relatedEntityType=DEVICE";
 
         FileMetaData retFileMetaData = doPostFile("/api/file" + requestParams, multipartFile, FileMetaData.class);
@@ -118,7 +116,6 @@ public abstract class BaseUploadControllerTest extends AbstractControllerTest {
         InputStreamWrapper streamWrapper = new InputStreamWrapper(new ByteArrayInputStream("xtz".getBytes()), "txt");
         when(cloudStorageService.getFile(any(), any())).thenReturn(streamWrapper);
 
-        Device device = createDevice();
         String requestParams = "?relatedEntityId=" + device.getId() + "&relatedEntityType=DEVICE";
 
         ResultActions resultActions = doGet("/api/file/" +
@@ -138,7 +135,6 @@ public abstract class BaseUploadControllerTest extends AbstractControllerTest {
         when(cloudStorageService.upload(any(), any(), any(), any())).thenReturn(true);
         when(cloudStorageService.copyFile(any(), any(), any())).thenReturn(true);
         when(cloudStorageService.delete(any(), any())).thenReturn(true);
-        Device device = createDevice();
 
         String requestParams = "?relatedEntityId=" + device.getId() + "&relatedEntityType=DEVICE";
         FileMetaData retFileMetaData = doPostFile("/api/file" + requestParams, multipartFile, FileMetaData.class);

@@ -14,10 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.hashmapinc.server.service.computation;
+package com.hashmapinc.server.service.minio;
 
 import com.hashmapinc.server.common.data.upload.InputStreamWrapper;
 import com.hashmapinc.server.dao.tenant.TenantService;
+import com.hashmapinc.server.service.computation.CloudStorageService;
 import io.minio.MinioClient;
 import io.minio.ObjectStat;
 import io.minio.Result;
