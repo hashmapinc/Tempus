@@ -26,11 +26,11 @@ import com.hashmapinc.server.common.data.upload.InputStreamWrapper;
 import com.hashmapinc.server.service.computation.CloudStorageService;
 import com.hashmapinc.server.service.entityfile.EntityFileService;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
 import javax.servlet.http.HttpServletResponse;
 import java.util.List;
@@ -86,9 +86,9 @@ public class EntityFileController extends BaseController {
     @PreAuthorize("hasAuthority('TENANT_ADMIN')")
     @GetMapping(value = "/file/{name}")
     @ResponseBody
-    public void downloadFile(@PathVariable("name") String name,
-                             @RequestParam Map<String, String> relatedEntityInfo,
-                             HttpServletResponse response) throws TempusException {
+    public StreamingResponseBody downloadFile(@PathVariable("name") String name,
+                                              @RequestParam Map<String, String> relatedEntityInfo,
+                                              HttpServletResponse response) throws TempusException {
         try {
             String strRelatedEntityId = relatedEntityInfo.get("relatedEntityId");
             String strRelatedEntityType = relatedEntityInfo.get("relatedEntityType");
@@ -96,8 +96,13 @@ public class EntityFileController extends BaseController {
             InputStreamWrapper inputStreamWrapper = entityFileService.downloadFile(name, getCurrentUser().getTenantId(), relatedEntityId);
             response.addHeader("Content-disposition", "attachment;filename=" + name);
             response.setContentType(inputStreamWrapper.getContentType());
-            IOUtils.copy(inputStreamWrapper.getInputStream(), response.getOutputStream());
-            response.flushBuffer();
+            return outputStream -> {
+                int nRead;
+                byte[] data = new byte[1024];
+                while ((nRead = inputStreamWrapper.getInputStream().read(data, 0, data.length)) != -1) {
+                    outputStream.write(data, 0, nRead);
+                }
+            };
         } catch (Exception e) {
             log.info("Exception occurred {}", e);
             throw handleException(e);

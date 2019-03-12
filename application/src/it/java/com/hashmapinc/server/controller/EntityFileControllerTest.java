@@ -51,6 +51,7 @@ public abstract class EntityFileControllerTest extends AbstractControllerTest {
 
     private MultipartFile multipartFile = null;
     private MultipartFile multipartFile2 = null;
+    private MultipartFile multipartFile3 = null;
 
     private Device device = null;
 
@@ -64,6 +65,9 @@ public abstract class EntityFileControllerTest extends AbstractControllerTest {
 
         multipartFile2 = new MockMultipartFile("file", "file2.txt", "txt", new FileInputStream(new File(classLoader.
                 getResource("file2.txt").getFile())));
+
+        multipartFile3 = new MockMultipartFile("file", "tempus-logo.jpg", "svg", new FileInputStream(new File(classLoader.
+                getResource("tempus-logo.jpg").getFile())));
 
         createDevice();
     }
@@ -107,8 +111,11 @@ public abstract class EntityFileControllerTest extends AbstractControllerTest {
         FileMetaData retFileMetaData2 = doPostFile("/api/file" + requestParams, multipartFile2, FileMetaData.class);
         Assert.assertNotNull(retFileMetaData2);
 
+        FileMetaData retFileMetaData3 = doPostFile("/api/file" + requestParams, multipartFile3, FileMetaData.class);
+        Assert.assertNotNull(retFileMetaData3);
+
         List<FileMetaData> retFileMetaDataList = doGetTyped("/api/file" + requestParams, new TypeReference<>() {});
-        Assert.assertEquals(2, retFileMetaDataList.size());
+        Assert.assertEquals(3, retFileMetaDataList.size());
     }
 
     @Test
