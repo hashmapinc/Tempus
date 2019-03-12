@@ -97,7 +97,7 @@ export default function loadLogViewer(ctx, sequence){
           if(componentObj.cType === 'Line'){
             var lnGraph = lineGraph(componentObj, datasourceFilter(componentObj, dArray), state, index, parseInt(track.width));
             trackObj.push(lnGraph);
-          }          
+          }
           if(componentObj.cType === 'Mud Log Viewer'){
             var mdlog = mudLog(componentObj, datasourceFilter(componentObj, dArray), state, index, parseInt(track.width));
             trackObj.push(mdlog);

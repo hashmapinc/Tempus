@@ -28,13 +28,13 @@ export default function WellLogViewerComponentsDirective($compile, $templateCach
         scope.showGrid = true;
 
         scope.$watch('datasources', function() {
-           scope.filterDatasource();
+           scope.extractDataKeys();
         }, true);
         scope.componentTypes = types.wellLogComponent.componentTypes;
         scope.fillTypes = types.wellLogComponent.fillTypes;
         scope.styleTypes = types.wellLogComponent.styleTypes;
 
-        scope.filterDatasource = function() {
+        scope.extractDataKeys = function() {
             scope.datasourcesList = [];
             scope.datasources.forEach(function(dataSources){
                 dataSources.value.dataKeys.forEach(function(keys){
@@ -47,7 +47,7 @@ export default function WellLogViewerComponentsDirective($compile, $templateCach
                 scope.showGrid = false;
             }
         }
-        scope.filterDatasource();
+        scope.extractDataKeys();
         $compile(element.contents())(scope);
     }
     return {
