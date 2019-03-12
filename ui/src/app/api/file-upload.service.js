@@ -40,9 +40,11 @@ function FileUploadService(toast, $http, $q, $translate, $window, $document, $in
 
 	function uploadFile(file, entityId, entityType) {
 		var deferred = $q.defer();
-		var url = '/api/file?relatedEntityId=' + entityId + '&relatedEntityType=' + entityType;
+		var url = '/api/file';
 		var fd = new FormData();
 		fd.append("file", file);
+		fd.append("relatedEntityId", entityId);
+		fd.append("relatedEntityType", entityType);
 		$http.post(url, fd, {
 			transformRequest: angular.identity,
 			headers: {
@@ -166,10 +168,10 @@ function FileUploadService(toast, $http, $q, $translate, $window, $document, $in
 	function renameFile(oldFileName, newFileName, extension, entityId, entityType) {
 		var deferred = $q.defer();
 		if (extension != getTypes().fileUpload.na && extension != "") {
-			var url = '/api/file/' + oldFileName + "." + extension; //+'?relatedEntityId=' + entityId + '&relatedEntityType=' + entityType;
+			var url = '/api/file/' + oldFileName + "." + extension;
 			newFileName = newFileName + "." + extension;
 		} else {
-			url = '/api/file/' + oldFileName; //+'?relatedEntityId=' + entityId + '&relatedEntityType=' + entityType;
+			url = '/api/file/' + oldFileName;
 		}
 		var map = createEntityInfoMap(entityId, entityType);
 		map.newFileName = newFileName;
