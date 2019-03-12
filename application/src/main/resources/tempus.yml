@@ -356,6 +356,9 @@ spring.main.allow-bean-definition-overriding: true
 #    url: "${SPRING_DATASOURCE_URL:jdbc:hsqldb:file:${SQL_DATA_FOLDER:/tmp}/tempusDb;sql.enforce_size=false}"
 #    username: "${SPRING_DATASOURCE_USERNAME:sa}"
 #    password: "${SPRING_DATASOURCE_PASSWORD:}"
+#  mvc:
+#    async:
+#      request-timeout: 3600000
 
 # PostgreSQL DAO Configuration
 spring:
@@ -372,6 +375,9 @@ spring:
     url: "${SPRING_DATASOURCE_URL:jdbc:postgresql://postgres:5432/tempus}"
     username: "${SPRING_DATASOURCE_USERNAME:postgres}"
     password: "${SPRING_DATASOURCE_PASSWORD:postgres}"
+  mvc:
+    async:
+      request-timeout: 3600000
 
 ##max file and request size
 spring.servlet:
