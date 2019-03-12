@@ -9,7 +9,7 @@
       "alias": "welllogviewer",
       "name": "Well Log Viewer",
       "descriptor": {
-        "type": "timeseries",
+        "type": "depthseries",
         "sizeX": 8,
         "sizeY": 5,
         "resources": [],

@@ -25,10 +25,29 @@ export default function WellLogViewerComponentsDirective($compile, $templateCach
     var linker = function (scope, element) {
         var template = $templateCache.get(wellTrackComponents);
         element.html(template);
+        scope.showGrid = true;
+
+        scope.$watch('datasources', function() {
+           scope.extractDataKeys();
+        }, true);
         scope.componentTypes = types.wellLogComponent.componentTypes;
         scope.fillTypes = types.wellLogComponent.fillTypes;
         scope.styleTypes = types.wellLogComponent.styleTypes;
 
+        scope.extractDataKeys = function() {
+            scope.datasourcesList = [];
+            scope.datasources.forEach(function(dataSources){
+                dataSources.value.dataKeys.forEach(function(keys){
+                    scope.datasourcesList.push(keys)
+                })
+            })
+        }
+        scope.changeComponentType = function (){
+            if(scope.trackComponent.cType === 'Line'){
+                scope.showGrid = false;
+            }
+        }
+        scope.extractDataKeys();
         $compile(element.contents())(scope);
     }
     return {

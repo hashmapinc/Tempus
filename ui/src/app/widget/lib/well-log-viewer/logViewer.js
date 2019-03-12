@@ -67,8 +67,8 @@ export default function loadLogViewer(ctx, sequence){
         }
         else {
           datasources.forEach(function(datasource){
-            if(settings.dataSource === datasource.dataKey.label){
-              ds = datasources[0];
+            if(settings.datasource === datasource.dataKey.label){
+              ds = datasource;
             }
          })
         }
@@ -97,7 +97,7 @@ export default function loadLogViewer(ctx, sequence){
           if(componentObj.cType === 'Line'){
             var lnGraph = lineGraph(componentObj, datasourceFilter(componentObj, dArray), state, index, parseInt(track.width));
             trackObj.push(lnGraph);
-          }          
+          }
           if(componentObj.cType === 'Mud Log Viewer'){
             var mdlog = mudLog(componentObj, datasourceFilter(componentObj, dArray), state, index, parseInt(track.width));
             trackObj.push(mdlog);
@@ -124,12 +124,9 @@ export default function loadLogViewer(ctx, sequence){
           d3.select(trackId)
              .append("div")
              .attr("class", "header")
-             // .append("svg")
-             // .attr("class", "header")
-             // .attr("width", 440)
-             // .attr("height", 0)
-
           d3.select(trackId)
+                       .append("div")
+          .attr("class", "track-div")
              .append("svg")
              .attr("class", "linearGrid")
         }
@@ -164,8 +161,6 @@ export default function loadLogViewer(ctx, sequence){
       }
       localStorage.setItem("dragCount", angular.toJson(dragCount));
 
-     console.log(d3.event.x);
-     console.log(d3.event.y);
     }
    
     function addListeners() {

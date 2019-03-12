@@ -585,7 +585,6 @@ export default function WidgetController($scope, $state, $timeout, $window, $ele
             } else {
                 layoutType = 'row';
             }
-
             var legendStyle;
             switch($scope.legendConfig.position) {
                 case types.position.top.value:
@@ -601,8 +600,10 @@ export default function WidgetController($scope, $state, $timeout, $window, $ele
                     legendStyle = 'padding-left: 0px; max-width: 50%; overflow-y: auto;';
                     break;
             }
-
-            var legendHtml = '<tb-legend style="'+legendStyle+'" legend-config="legendConfig" legend-data="legendData"></tb-legend>';
+            var legendHtml='';
+            if(widgetInfo.alias != 'welllogviewer') {
+               legendHtml = '<tb-legend style="'+legendStyle+'" legend-config="legendConfig" legend-data="legendData"></tb-legend>';
+            }
             containerHtml = '<div flex id="widget-container">' + containerHtml + '</div>';
             html += '<div class="tb-absolute-fill" layout="'+layoutType+'">';
             if ($scope.legendConfig.position === types.position.top.value ||
