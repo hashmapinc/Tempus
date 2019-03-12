@@ -38,7 +38,7 @@ public class CloudStorageServiceUtils {
     public static String createObjectName(String fileName, EntityId entityId, String folder) {
         if (fileName.contentEquals(""))
             return String.format(FILE_URL_FORMAT, entityId.getId(), folder);
-        return String.format(FILE_FOR_ENTITY_URL_FORMAT, entityId.getId(), folder, fileName.toLowerCase().replace(" ", "-"));
+        return String.format(FILE_FOR_ENTITY_URL_FORMAT, entityId.getId(), folder, fileName);
     }
 
 }
