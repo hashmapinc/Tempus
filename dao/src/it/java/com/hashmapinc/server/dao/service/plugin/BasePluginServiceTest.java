@@ -29,6 +29,7 @@ import org.junit.Test;
 
 import java.util.UUID;
 
+
 @Slf4j
 public abstract class BasePluginServiceTest extends AbstractServiceTest {
 

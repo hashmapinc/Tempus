@@ -16,6 +16,8 @@
  */
 package com.hashmapinc.server.dao.plugin;
 
+import com.google.common.base.Function;
+import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.hashmapinc.server.common.data.id.PluginId;
 import com.hashmapinc.server.common.data.id.TenantId;
@@ -41,9 +43,7 @@ import com.hashmapinc.server.dao.exception.DataValidationException;
 import com.hashmapinc.server.dao.service.PaginatedRemover;
 import com.hashmapinc.server.dao.service.Validator;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.hashmapinc.server.dao.service.Validator.validateId;
@@ -62,6 +62,9 @@ public class BasePluginService extends AbstractEntityService implements PluginSe
 
     @Autowired
     private ComponentDescriptorService componentDescriptorService;
+
+    @Autowired
+    private PluginDataEncoderService pluginDataEncoderService;
 
     @Override
     public PluginMetaData savePlugin(PluginMetaData plugin) {
@@ -97,7 +100,7 @@ public class BasePluginService extends AbstractEntityService implements PluginSe
         if (!componentDescriptorService.validate(descriptor, plugin.getConfiguration())) {
             throw new IncorrectParameterException("Filters configuration is not valid!");
         }
-        return pluginDao.save(plugin);
+        return pluginDao.save(pluginDataEncoderService.encoder(plugin));
     }
 
     @Override
@@ -231,7 +234,6 @@ public class BasePluginService extends AbstractEntityService implements PluginSe
         Validator.validateString(pluginClazz, "Incorrect plugin class for search request.");
         return pluginDao.findByPluginClass(pluginClazz);
     }
-
 
     private DataValidator<PluginMetaData> pluginValidator =
             new DataValidator<PluginMetaData>() {

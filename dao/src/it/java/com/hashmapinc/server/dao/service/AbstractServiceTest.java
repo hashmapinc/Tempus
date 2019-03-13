@@ -57,11 +57,13 @@ import com.hashmapinc.server.dao.datamodel.DataModelService;
 import com.hashmapinc.server.dao.depthseries.DepthSeriesService;
 import com.hashmapinc.server.dao.device.DeviceCredentialsService;
 import com.hashmapinc.server.dao.device.DeviceService;
+import com.hashmapinc.server.dao.encoder.DescriptorEncoderDecoderService;
 import com.hashmapinc.server.dao.event.EventService;
 import com.hashmapinc.server.dao.gatewayconfiguration.TempusGatewayConfigurationService;
 import com.hashmapinc.server.dao.logo.LogoService;
-import com.hashmapinc.server.dao.mail.DefaultMailService;
 import com.hashmapinc.server.dao.metadataingestion.MetadataIngestionService;
+import com.hashmapinc.server.dao.plugin.PluginDao;
+import com.hashmapinc.server.dao.plugin.PluginDataEncoderService;
 import com.hashmapinc.server.dao.plugin.PluginService;
 import com.hashmapinc.server.dao.relation.RelationService;
 import com.hashmapinc.server.dao.rule.RuleService;
@@ -74,14 +76,12 @@ import com.hashmapinc.server.dao.unitconversion.UnitConversionService;
 import com.hashmapinc.server.dao.user.UserService;
 import com.hashmapinc.server.dao.widget.WidgetTypeService;
 import com.hashmapinc.server.dao.widget.WidgetsBundleService;
-import jnr.ffi.annotations.Meta;
 import org.junit.Assert;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.FilterType;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
@@ -165,7 +165,7 @@ public abstract class AbstractServiceTest {
     protected ComputationsService computationsService;
 
     @Autowired
-    private ComponentDescriptorService componentDescriptorService;
+    protected ComponentDescriptorService componentDescriptorService;
 
     @Autowired
     protected NodeMetricService nodeMetricService;
@@ -193,6 +193,15 @@ public abstract class AbstractServiceTest {
 
     @Autowired
     protected UnitConversionService unitConversionService;
+
+    @Autowired
+    protected PluginDao pluginDao;
+
+    @Autowired
+    protected PluginDataEncoderService pluginDataEncoderService;
+
+    @Autowired
+    protected DescriptorEncoderDecoderService descriptorEncoderDecoderService;
 
     class IdComparator<D extends BaseData<? extends UUIDBased>> implements Comparator<D> {
         @Override
