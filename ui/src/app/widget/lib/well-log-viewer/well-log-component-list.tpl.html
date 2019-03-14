@@ -56,12 +56,17 @@
 
                 </v-accordion>
                 <br/>
-                <md-button ng-disabled="$root.loading" ng-click="addComponent($event)" class="md-raised md-primary md-button md-ink-ripple md-themeDark-theme" aria-label="Add Track">
-                    <md-tooltip>
-                        {{ 'wellLog.add-component' | translate }}
-                    </md-tooltip>
-                    {{ 'wellLog.add-component' | translate }}
-
+                <md-button ng-disabled="$root.loading", ng-hide="isLineButtonHidden", ng-click="addComponent('Line')" class="md-raised md-primary md-button md-ink-ripple md-themeDark-theme">
+                    <md-tooltip>{{ 'wellLog.add-lineComponent' | translate }}</md-tooltip>
+                    {{ 'wellLog.add-lineComponent' | translate }}
+                </md-button>
+                <md-button ng-disabled="$root.loading", ng-hide="isGridButtonHidden", ng-click="addComponent('Linear Grid')" class="md-raised md-primary md-button md-ink-ripple md-themeDark-theme">
+                    <md-tooltip>{{ 'wellLog.add-gridComponent' | translate }}</md-tooltip>
+                    {{ 'wellLog.add-gridComponent' | translate }}
+                </md-button>
+                <md-button ng-disabled="$root.loading", ng-hide="isTimeYButtonHidden", ng-click="addComponent('Time Y axis')" class="md-raised md-primary md-button md-ink-ripple md-themeDark-theme">
+                    <md-tooltip>{{ 'wellLog.add-timeYComponent' | translate }}</md-tooltip>    
+                    {{ 'wellLog.add-timeYComponent' | translate }}
                 </md-button>
             </div>
         </div>

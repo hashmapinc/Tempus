@@ -1918,7 +1918,9 @@ export default angular.module('tempus.locale', [])
                     "datasource":"Datasource",
                     "track-width":"Track Width",
                     "component":"Component",
-                    "add-component":"Add Component",
+                    "add-lineComponent":"Add Line Component",
+                    "add-gridComponent":"Add Grid Component",
+                    "add-timeYComponent":"Add Time Y axis Component",
                     "track":"Track",
                     "add-track":"Add Track"
                 },

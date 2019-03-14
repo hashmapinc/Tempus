@@ -28,16 +28,23 @@ export default function WellLogViewerTrackDirective($compile, $templateCache,typ
         var template = $templateCache.get(wellTrackComponent);
         element.html(template);
         scope.trackWidth =types.wellLogComponent.trackWidth;
+        scope.isLineButtonHidden = false;
+        scope.isGridButtonHidden = false;
+        scope.isTimeYButtonHidden = false;
 
-        scope.addComponent = function (){
-
+        scope.addComponent = function (componentType){
+            changeButtonVisibility(componentType, scope, true);
             var insertDetail = {
-                id: scope.trackDetail.component.length ? scope.trackDetail.component.length + 1 : 1
+                id: scope.trackDetail.component.length ? scope.trackDetail.component.length + 1 : 1,
+                cType: componentType
             }
             scope.trackDetail.component.push(insertDetail);
         }
+
         scope.removeComponent = function ($event,id){
             var index = scope.trackDetail.component.findIndex(x => x.id==id);
+            var componentType = scope.trackDetail.component.find(x => x.id==id).cType;
+            changeButtonVisibility(componentType, scope, false);
             if($event){
                   $event.stopPropagation();
                   $event.preventDefault();
@@ -54,4 +61,16 @@ export default function WellLogViewerTrackDirective($compile, $templateCache,typ
             datasources: '='
         }
     };
+
+    function changeButtonVisibility(componentType, scope, isHidden) {
+        if (componentType === 'Line') {
+            scope.isLineButtonHidden = isHidden;
+        }
+        if (componentType === 'Linear Grid') {
+            scope.isGridButtonHidden = isHidden;
+        }
+        if (componentType === 'Time Y axis') {
+            scope.isTimeYButtonHidden = isHidden;
+        }
+    }
 }
