@@ -49,6 +49,8 @@ metadata:
   labels:
     app: {{ .Values.discovery.name }}
 spec:
+  strategy:
+    type: RollingUpdate
   replicas: {{ .Values.discovery.replicaCount }}
   selector:
     matchLabels:

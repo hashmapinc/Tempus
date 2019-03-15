@@ -61,6 +61,8 @@ metadata:
     app: {{ .Values.identity.name }}
 spec:
   replicas: {{ .Values.identity.replicaCount }}
+  strategy:
+    type: RollingUpdate
   selector:
     matchLabels:
       app: {{ .Values.identity.name }}

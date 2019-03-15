@@ -60,6 +60,8 @@ metadata:
   labels:
     app: {{ .Values.dataquality.name }}
 spec:
+  strategy:
+    type: RollingUpdate
   replicas: {{ .Values.dataquality.replicaCount }}
   selector:
     matchLabels:

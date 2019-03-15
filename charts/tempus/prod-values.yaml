@@ -26,7 +26,7 @@ autoscaling:
 
 annotations:
   hpa.autoscaling.banzaicloud.io/minReplicas: "1"
-  hpa.autoscaling.banzaicloud.io/maxReplicas: "3"
+  hpa.autoscaling.banzaicloud.io/maxReplicas: "1"
   cpu.hpa.autoscaling.banzaicloud.io/targetAverageUtilization: "80"      
   memory.hpa.autoscaling.banzaicloud.io/targetAverageUtilization: "80"   
 
@@ -86,7 +86,7 @@ role:
   java: true   
   
 service:
-  type: NodePort
+  type: ClusterIP
   ports:
     - protocol: TCP
       port: 8080

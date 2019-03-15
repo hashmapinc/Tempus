@@ -114,7 +114,7 @@ ingress:
 # Configuration of other essential services 
 
 databaseSetup: 
-  enabled: false
+  enabled: true
   name: "db-setup"
   image:
     repository: hashmapinc/database-setup
