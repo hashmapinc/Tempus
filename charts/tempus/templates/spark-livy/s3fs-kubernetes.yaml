@@ -21,6 +21,8 @@ kind: Deployment
 metadata:
   name: {{ .Values.spark.s3connector.name }}-deployment
 spec:
+  strategy:
+    type: RollingUpdate
   replicas: 1
   template:
     metadata:
