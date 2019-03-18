@@ -1899,7 +1899,9 @@ export default angular.module('tempus.locale', [])
                     "emailSuccess": "Email is sent on your email id.Please check."
                 },
                 "wellLog":{
-                    "select-component":"Select Component",
+                    "line-component":"Line Component",
+                    "grid-component":"Grid Component",
+                    "timeY-component":"Time Y axis Component",
                     "color":"Color",
                     "line-width":"Line Width",
                     "has-header":"Has Header",

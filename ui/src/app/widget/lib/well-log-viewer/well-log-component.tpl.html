@@ -20,11 +20,9 @@
     <md-card>
         <div class="comp-margin">
 <div>
-    <md-input-container class="md-block">
-        <md-select ng-model="trackComponent.cType" placeholder="{{'wellLog.select-component' | translate}}" ng-change="changeComponentType()">
-            <md-option ng-value="cType" ng-repeat="cType in componentTypes">{{ cType }}</md-option>
-        </md-select>
-    </md-input-container>
+    <label id="display-label-line" ng-show="trackComponent.cType == 'Line'">{{ 'wellLog.line-component' | translate}}</label>
+    <label id="display-label-grid" ng-show="trackComponent.cType == 'Linear Grid'">{{ 'wellLog.grid-component' | translate}}</label>
+    <label id="display-label-timeyaxis" ng-show="trackComponent.cType == 'Time Y axis'">{{ 'wellLog.timeY-component' | translate}}</label>
 </div>
 <div>
     <md-input-container class="md-block">
