@@ -32,7 +32,8 @@
 }
 
 .axis line {
-  stroke: gray;
+  stroke: #d3d3d3;
+ /* stroke: red;*/
 }
 
 .axis path,

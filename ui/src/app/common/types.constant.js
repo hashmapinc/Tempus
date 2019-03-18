@@ -846,7 +846,8 @@ export default angular.module('tempus.types', [])
                fillTypes:["left", "right"],
                allFillTypes:["left", "right", "between"],
                styleTypes:["dashed", "solid"],
-               trackWidth:[1,2,3,4,5]
+               trackWidth:[1,2,3,4,5],
+               gridTypes:['Linear','Logarithmic']
             }
         }
     ).name;

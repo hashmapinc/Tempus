@@ -29,7 +29,7 @@ var lineGraph = function(lineConfig, areaFillConfig, state, currentComponentInde
   function lineChart(group) {
     group.each(render);
   }
- 
+
   function render() {
     var context;
 
@@ -40,7 +40,7 @@ var lineGraph = function(lineConfig, areaFillConfig, state, currentComponentInde
       h = 700 - margin.top;
 
     lineConfig.forEach(function(element, index) {
-        
+
       var lineToBeRendered = element.line;
       var data = element.data;
 
@@ -119,13 +119,13 @@ var lineGraph = function(lineConfig, areaFillConfig, state, currentComponentInde
           .attr('stroke', lineToBeRendered.color)
           .attr('fill', 'none')
           .attr('stroke-width', lineToBeRendered.lineWeight)
-        
+
         if(angular.isDefined(areaFillConfig) && areaFillConfig.enable){
           if(areaFillConfig.referenceLine == lineToBeRendered.headerName){
             if(areaFillConfig.fill === "between") {
               let otherLineData = lineConfig[Math.abs(index-1)].data.data;
               let combinedData = [];
-              data.data.forEach(dataElement => 
+              data.data.forEach(dataElement =>
                 combinedData.push([dataElement[0], dataElement[1], findCorrespondingDataPoint(dataElement)]));
 
               function findCorrespondingDataPoint(dataElement) {
@@ -141,7 +141,7 @@ var lineGraph = function(lineConfig, areaFillConfig, state, currentComponentInde
               .attr("transform", "translate(" + leftPadding + ", 0)")
               .attr('d', area)
               .attr('fill', areaFillConfig.color)
-              .style("opacity", areaFillConfig.opacity);  
+              .style("opacity", areaFillConfig.opacity);
             } else {
               context.select('.linearGrid')
               .select('.areapath'+index+currentComponentIndex)
@@ -150,7 +150,7 @@ var lineGraph = function(lineConfig, areaFillConfig, state, currentComponentInde
               .attr("transform", "translate(" + leftPadding + ", 0)")
               .attr('d', area)
               .attr('fill', areaFillConfig.color)
-              .style("opacity", areaFillConfig.opacity);  
+              .style("opacity", areaFillConfig.opacity);
             }
           }
         }

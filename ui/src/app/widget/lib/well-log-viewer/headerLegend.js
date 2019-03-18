@@ -53,7 +53,7 @@ var headerLegend = function(lineConfig, state, index, width) {
     context = d3.select(this);
 
     var margin = {top: 30, right: 10, bottom: 30, left: 10},
-      width = o.width*110 - margin.right - margin.left,
+      width = o.width*140 - margin.right - margin.left,
       height = 60 - margin.top - margin.bottom;
 
     var x = d3.scaleLinear()
