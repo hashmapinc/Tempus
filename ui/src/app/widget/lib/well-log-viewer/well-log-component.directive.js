@@ -34,6 +34,19 @@ export default function WellLogViewerComponentsDirective($compile, $templateCach
         scope.fillTypes = types.wellLogComponent.fillTypes;
         scope.styleTypes = types.wellLogComponent.styleTypes;
 
+        scope.lines = function() {
+            return scope.components.filter(component => component.cType === "Line")
+        }
+
+        scope.removeLine = function ($event,id){
+            var index = scope.components.findIndex(x => x.id==id);
+            if($event){
+                  $event.stopPropagation();
+                  $event.preventDefault();
+            }
+            scope.components.splice(index, 1);
+        }
+
         scope.extractDataKeys = function() {
             scope.datasourcesList = [];
             scope.datasources.forEach(function(dataSources){
@@ -54,6 +67,7 @@ export default function WellLogViewerComponentsDirective($compile, $templateCach
         restrict: "E",
         link: linker,
         scope: {
+            components: '=',
             trackComponent: '=',
             datasources:'='
         }
