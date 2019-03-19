@@ -62,7 +62,7 @@ export default function loadLogViewer(ctx, sequence){
     function build(dArray, state) {
       function datasourceFilter(settings, datasources){
         var ds;
-        if(settings.cType === 'Linear Grid' || settings.cType === 'Time Y axis'){
+        if(settings.cType === 'Grid' || settings.cType === 'Time Y axis'){
           ds = datasources[0];
         }
         else {
@@ -86,7 +86,7 @@ export default function loadLogViewer(ctx, sequence){
             var hLegend = headerLegend(componentObj, headerCount, datasourceFilter(componentObj, dArray), state, index, parseInt(track.width));
             trackObj.push(hLegend);
           }
-          if(componentObj.cType === 'Linear Grid'){
+          if(componentObj.cType === 'Grid'){
             var lnGrid = linearGrid(componentObj, datasourceFilter(componentObj, dArray), state, index, parseInt(track.width));
             trackObj.push(lnGrid);
           }
@@ -95,8 +95,11 @@ export default function loadLogViewer(ctx, sequence){
             trackObj.push(tYaxis);
           }
           if(componentObj.cType === 'Line'){
-            var lnGraph = lineGraph(componentObj, datasourceFilter(componentObj, dArray), state, index, parseInt(track.width));
-            trackObj.push(lnGraph);
+            if(angular.isArray(componentObj.lines)){
+              componentObj.lines.forEach(function(line) {
+                trackObj.push(lineGraph(line, datasourceFilter(line, dArray), state, index, parseInt(track.width)));
+              })
+            }
           }
           if(componentObj.cType === 'Mud Log Viewer'){
             var mdlog = mudLog(componentObj, datasourceFilter(componentObj, dArray), state, index, parseInt(track.width));

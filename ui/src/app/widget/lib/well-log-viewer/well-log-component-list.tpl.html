@@ -32,7 +32,7 @@
 
                     <v-pane id="{{ ::pane.id }}" ng-repeat="component in trackDetail.component" expanded="pane.isExpanded">
                         <v-pane-header id="{{ ::pane.id }}-header" style="border:outset;">
-                            <lable class="track-label">{{ 'wellLog.component' | translate}} {{component.id}}</lable>
+                            <lable class="track-label">{{ componentName(component) }}  {{ 'wellLog.component' | translate}}</lable>
                             <md-button class="md-icon-button md-primary comp-btn"
                                        aria-label="{{ 'action.remove' | translate }}"
                             ng-click="removeComponent($event,component.id)">
@@ -61,7 +61,7 @@
                     <md-tooltip>{{ 'wellLog.add-lineComponent' | translate }}</md-tooltip>
                     {{ 'wellLog.add-lineComponent' | translate }}
                 </md-button>
-                <md-button ng-disabled="$root.loading", ng-hide="isGridButtonHidden", ng-click="addComponent('Linear Grid')" class="md-raised md-primary md-button md-ink-ripple md-themeDark-theme">
+                <md-button ng-disabled="$root.loading", ng-hide="isGridButtonHidden", ng-click="addComponent('Grid')" class="md-raised md-primary md-button md-ink-ripple md-themeDark-theme">
                     <md-tooltip>{{ 'wellLog.add-gridComponent' | translate }}</md-tooltip>
                     {{ 'wellLog.add-gridComponent' | translate }}
                 </md-button>

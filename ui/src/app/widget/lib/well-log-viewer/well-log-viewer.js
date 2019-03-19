@@ -71,7 +71,7 @@ export default class WellLogViewer {
 			                         	"cType": {
 			                  	            "title": "Component Type",
 			                                "type": "string",
-			                          		"enum": ["Line", "Linear Grid", "Time Y axis", "Mud Log Viewer"]
+			                          		"enum": ["Line", "Grid", "Time Y axis", "Mud Log Viewer"]
 			                      		},
 			                      		"dataSource": {
 											"title": "Data Source",
@@ -210,11 +210,11 @@ export default class WellLogViewer {
 	               		 },
 	               		 {
 	                 		 "key": "Track[].component[].minorLines",
-	                	 	 "condition": "model.Track[form.key[1]].component[form.arrayIndex].cType === 'Linear Grid'"
+	                	 	 "condition": "model.Track[form.key[1]].component[form.arrayIndex].cType === 'Grid'"
 	               		 },
 	               		 {
 	                 		 "key": "Track[].component[].majorLines",
-	                	 	 "condition": "model.Track[form.key[1]].component[form.arrayIndex].cType === 'Linear Grid'"
+	                	 	 "condition": "model.Track[form.key[1]].component[form.arrayIndex].cType === 'Grid'"
 	               		 }
 	               		
 	                ]

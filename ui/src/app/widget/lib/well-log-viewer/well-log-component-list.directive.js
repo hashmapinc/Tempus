@@ -28,9 +28,9 @@ export default function WellLogViewerTrackDirective($compile, $templateCache,typ
         var template = $templateCache.get(wellTrackComponent);
         element.html(template);
         scope.trackWidth =types.wellLogComponent.trackWidth;
-        scope.isLineButtonHidden = false;
-        scope.isGridButtonHidden = false;
-        scope.isTimeYButtonHidden = false;
+        scope.isLineButtonHidden = isComponentPresent(scope.trackDetail.component, 'Line')
+        scope.isGridButtonHidden = isComponentPresent(scope.trackDetail.component, 'Grid');
+        scope.isTimeYButtonHidden = isComponentPresent(scope.trackDetail.component, 'Time Y axis');
 
         scope.addComponent = function (componentType){
             changeButtonVisibility(componentType, scope, true);
@@ -51,6 +51,14 @@ export default function WellLogViewerTrackDirective($compile, $templateCache,typ
             }
             scope.trackDetail.component.splice(index, 1);
         }
+
+        scope.componentName = function(component) {
+            switch(component.cType) {
+                case 'Line' : return component.lines.map(getHeadername).join(' & ') + ' Line';
+                case 'Grid' : return 'Grid';
+                case 'Time Y axis' : return 'Time Y axis';
+            } 
+        }
         $compile(element.contents())(scope);
     }
     return {
@@ -62,11 +70,19 @@ export default function WellLogViewerTrackDirective($compile, $templateCache,typ
         }
     };
 
+    function getHeadername(line) {
+        return ((line.headerName) ? line.headerName : '');
+    }
+
+    function isComponentPresent(components, componentType) {
+        return components.filter(component => component.cType == componentType).length > 0
+    }
+
     function changeButtonVisibility(componentType, scope, isHidden) {
         if (componentType === 'Line') {
             scope.isLineButtonHidden = isHidden;
         }
-        if (componentType === 'Linear Grid') {
+        if (componentType === 'Grid') {
             scope.isGridButtonHidden = isHidden;
         }
         if (componentType === 'Time Y axis') {

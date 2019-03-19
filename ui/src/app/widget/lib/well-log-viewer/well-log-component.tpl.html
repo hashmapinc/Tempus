@@ -21,7 +21,7 @@
 <div class="comp-margin">
     <div>
         <label id="display-label-line" ng-show="trackComponent.cType == 'Line'">{{ 'wellLog.line-component' | translate}}</label>
-        <label id="display-label-grid" ng-show="trackComponent.cType == 'Linear Grid'">{{ 'wellLog.grid-component' | translate}}</label>
+        <label id="display-label-grid" ng-show="trackComponent.cType == 'Grid'">{{ 'wellLog.grid-component' | translate}}</label>
         <label id="display-label-timeyaxis" ng-show="trackComponent.cType == 'Time Y axis'">{{ 'wellLog.timeY-component' | translate}}</label>
     </div>
     <div>
@@ -46,7 +46,7 @@
                     <div>
                         <md-input-container class="md-block">
                             <div>
-                                <md-select ng-model="trackComponent.datasource" placeholder="{{'wellLog.datasource' | translate}}">
+                                <md-select ng-model="line.datasource" placeholder="{{'wellLog.datasource' | translate}}">
                                     <md-option ng-value="d.label" ng-repeat="d in datasourcesList">{{ d.label }}</md-option>
                                 </md-select>
                             </div>
@@ -54,7 +54,7 @@
                     </div>
                     <div flex
                         md-color-picker
-                        ng-model="trackComponent.color"
+                        ng-model="line.color"
                         label="{{'wellLog.color' | translate}}"
                         icon="format_color_fill"
                         default="rgba(0, 0, 0, 0.87)"
@@ -66,7 +66,7 @@
                     <div>
                         <md-input-container class="md-block">
                             <label translate>{{ 'wellLog.line-width' | translate}}</label>
-                            <input  name="lineWidth" ng-model="trackComponent.lineWidth">
+                            <input  name="lineWidth" ng-model="line.lineWidth">
                         </md-input-container>
                     </div>
                     <div>
@@ -74,32 +74,32 @@
                         <fieldset>
                             <md-input-container class="md-block">
                                 <label translate>{{ 'wellLog.header-minimum' | translate}}<span class="asterisc">*</span></label>
-                                <input  name="name" ng-model="trackComponent.headerMin" required>
+                                <input  name="name" ng-model="line.headerMin" required>
                             </md-input-container>
                             <md-input-container class="md-block">
                                 <label translate>{{ 'wellLog.header-maximum' | translate}}<span class="asterisc">*</span></label>
-                                <input  name="name" ng-model="trackComponent.headerMax" required>
+                                <input  name="name" ng-model="line.headerMax" required>
                             </md-input-container>
                             <md-input-container class="md-block">
                                 <label translate>{{ 'wellLog.header-name' | translate}}<span class="asterisc">*</span></label>
-                                <input  name="name" ng-model="trackComponent.headerName" required>
+                                <input  name="name" ng-model="line.headerName" required>
                             </md-input-container>
                         </fieldset>
                     </div>
                     <div>
-                        <md-checkbox ng-model="trackComponent.areaFill.enable" aria-label="Checkbox 1">
+                        <md-checkbox ng-model="line.areaFill.enable" aria-label="Checkbox 1">
                             {{ 'wellLog.enable-area-fill' | translate}}
                         </md-checkbox>
                         <br/>
-                        <fieldset ng-if="trackComponent.areaFill.enable">
+                        <fieldset ng-if="line.areaFill.enable">
                             <md-input-container class="md-block">
-                            <md-select ng-model="trackComponent.areaFill.fill" placeholder="{{ 'wellLog.select-area-fill' | translate}}">
+                            <md-select ng-model="line.areaFill.fill" placeholder="{{ 'wellLog.select-area-fill' | translate}}">
                                 <md-option ng-value="fill" ng-repeat="fill in fillTypes">{{ fill }}</md-option>
                             </md-select>
                             </md-input-container>
                             <div flex
                                 md-color-picker
-                                ng-model="trackComponent.areaFill.color"
+                                ng-model="line.areaFill.color"
                                 label="{{ 'wellLog.fill-color' | translate}}"
                                 icon="format_color_fill"
                                 default="rgba(0, 0, 0, 0.87)"
@@ -110,7 +110,7 @@
                             ></div>
                             <md-input-container class="md-block">
                                 <label translate>{{ 'wellLog.fill-opacity' | translate}}</label>
-                                <input  name="name" ng-model="trackComponent.areaFill.opacity">
+                                <input  name="name" ng-model="line.areaFill.opacity">
                             </md-input-container>
                         </fieldset>
                     </div>
@@ -120,6 +120,10 @@
         </v-accordion>
         <br/>
     </div>
+    <md-button ng-disabled="$root.loading", ng-hide="isAddLineButtonHidden", ng-click="addLine()" class="md-raised md-primary md-button md-ink-ripple md-themeDark-theme">
+        <md-tooltip>{{ 'wellLog.add-line' | translate }}</md-tooltip>
+        {{ 'wellLog.add-line' | translate }}
+    </md-button>
 </div>
     </md-card>
 </md-content>
