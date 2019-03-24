@@ -41,12 +41,12 @@ export default function WellLogViewerComponentsDirective($compile, $templateCach
         scope.isAddLineButtonHidden = scope.lines.length == 2;
 
         scope.removeLine = function ($event,id){
-            var index = scope.components.findIndex(x => x.id==id);
+            var index = scope.trackComponent.lines.findIndex(x => x.id==id);
             if($event){
                   $event.stopPropagation();
                   $event.preventDefault();
             }
-            scope.components.splice(index, 1);
+            scope.trackComponent.lines.splice(index, 1);
             scope.isAddLineButtonHidden = false;
         };
 
@@ -57,7 +57,7 @@ export default function WellLogViewerComponentsDirective($compile, $templateCach
                 cType: 'Line'
             }
             scope.trackComponent.lines ? scope.trackComponent.lines.push(line) : scope.trackComponent.lines = [line];
-            // Hiding after 1 length since we just adds one more and it makes it 2. 2 lines is what we are supporting for now. 
+            // Hiding after 1 length since we just added one more and it makes it 2. 2 lines is what we are supporting for now. 
             scope.isAddLineButtonHidden = scope.lines.length == 1
         };
 

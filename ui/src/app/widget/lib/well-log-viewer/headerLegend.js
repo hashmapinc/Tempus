@@ -21,7 +21,7 @@ import './logViewer.css';
 
 /*@ngInject*/
 
-var headerLegend = function(lineConfig, headerCount, data, state, index, width) {
+var headerLegend = function(lineConfig, data, state, index, width) {
   'use strict';
   var o;
      // local;
@@ -34,7 +34,6 @@ var headerLegend = function(lineConfig, headerCount, data, state, index, width) 
     lineWeight: lineConfig.lineWeight,
     color: lineConfig.color,
     label: lineConfig.headerName,
-    headerCount: headerCount,
     data: data,
     state:state,
     index: index,
@@ -81,7 +80,7 @@ var headerLegend = function(lineConfig, headerCount, data, state, index, width) 
 
     context.select(".header")
          .append("svg")
-         .attr("class", "header"+ headerCount)
+         .attr("class", "header"+ index)
          // .attr("width", 440)
          // .attr("height", 0)
         .attr("width", width + margin.right + margin.left)
@@ -97,7 +96,7 @@ var headerLegend = function(lineConfig, headerCount, data, state, index, width) 
           .style("stroke", o.color)
           .style("stroke-width", o.lineWeight)
 
-          context.select('.header'+ headerCount)
+          context.select('.header'+ index)
           .append("text")             
           .attr("transform",
                 "translate(" + (width/2) + " ," + 
