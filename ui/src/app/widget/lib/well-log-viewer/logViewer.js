@@ -118,7 +118,6 @@ export default function loadLogViewer(ctx, sequence){
     function addToDom(state) {
       var panelTracker = 1;
       buildArray.forEach(function(track){
-        console.log(track);
         var trackId = '#track' + panelTracker;
         panelTracker += 1;
 
