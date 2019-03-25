@@ -456,3 +456,7 @@ google-recaptcha:
 # AES Encryption
 encryption:
   aes_key: "${AES_KEY:AES_KEY}"
+
+# Cache Control Configuration for tenant logo
+cache-control:
+  logo_max_age: 60  # Time in Seconds
