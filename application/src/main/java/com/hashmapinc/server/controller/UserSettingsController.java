@@ -18,7 +18,6 @@ package com.hashmapinc.server.controller;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import com.hashmapinc.server.common.data.*;
 import com.hashmapinc.server.common.data.Logo;
 import com.hashmapinc.server.common.data.Theme;
 import com.hashmapinc.server.common.data.UserSettings;
@@ -31,7 +30,10 @@ import com.hashmapinc.server.common.data.exception.TempusException;
 import com.hashmapinc.server.dao.mail.MailService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.CacheControl;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -40,6 +42,7 @@ import com.hashmapinc.server.common.data.id.TenantId;
 
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 
 @Slf4j
@@ -62,6 +65,8 @@ public class UserSettingsController extends BaseController {
     @Autowired
     private TenantService tenantService;
 
+    @Value("${cache-control.logo_max_age}")
+    private int maxAge;
 
     @PreAuthorize("hasAnyAuthority('TENANT_ADMIN', 'CUSTOMER_USER', 'SYS_ADMIN')")
     @GetMapping(value = "/settings/{key}")
@@ -176,11 +181,13 @@ public class UserSettingsController extends BaseController {
 
     @GetMapping(value = "/settings/{tenantId}/logo")
     @ResponseStatus(value = HttpStatus.OK)
-    public String userLogo(@PathVariable("tenantId") String strTenantId) throws TempusException {
+    public ResponseEntity<String> userLogo(@PathVariable("tenantId") String strTenantId) throws TempusException {
         checkParameter("tenantId", strTenantId);
         try {
             TenantId tenantId = new TenantId(toUUID(strTenantId));
-            return tenantService.findLogoByTenantId(tenantId);
+            return ResponseEntity.ok()
+                    .cacheControl(CacheControl.maxAge(maxAge, TimeUnit.SECONDS))
+                    .body(tenantService.findLogoByTenantId(tenantId));
         } catch (Exception e) {
             throw handleException(e);
         }
