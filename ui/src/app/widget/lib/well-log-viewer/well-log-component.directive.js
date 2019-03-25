@@ -31,14 +31,19 @@ export default function WellLogViewerComponentsDirective($compile, $templateCach
            scope.extractDataKeys();
         }, true);
         scope.componentTypes = types.wellLogComponent.componentTypes;
-        scope.fillTypes = types.wellLogComponent.fillTypes;
         scope.styleTypes = types.wellLogComponent.styleTypes;
 
+        scope.fillTypes = function() {
+            if(scope.trackComponent.lines.length == 1) {
+                return types.wellLogComponent.fillTypes;
+            }
+            if(scope.trackComponent.lines.length == 2) {
+                return types.wellLogComponent.allFillTypes;
+            }
+        }
         scope.lines = function () {
             return scope.trackComponent.lines ? scope.trackComponent.lines : [];
         };
-
-        scope.isAddLineButtonHidden = scope.lines.length == 2;
 
         scope.removeLine = function ($event,id){
             var index = scope.trackComponent.lines.findIndex(x => x.id==id);
@@ -47,7 +52,6 @@ export default function WellLogViewerComponentsDirective($compile, $templateCach
                   $event.preventDefault();
             }
             scope.trackComponent.lines.splice(index, 1);
-            scope.isAddLineButtonHidden = false;
         };
 
         scope.addLine = function (){
@@ -57,8 +61,6 @@ export default function WellLogViewerComponentsDirective($compile, $templateCach
                 cType: 'Line'
             }
             scope.trackComponent.lines ? scope.trackComponent.lines.push(line) : scope.trackComponent.lines = [line];
-            // Hiding after 1 length since we just added one more and it makes it 2. 2 lines is what we are supporting for now. 
-            scope.isAddLineButtonHidden = scope.lines.length == 1
         };
 
         scope.extractDataKeys = function() {

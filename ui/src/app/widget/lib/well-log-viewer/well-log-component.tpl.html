@@ -86,41 +86,46 @@
                             </md-input-container>
                         </fieldset>
                     </div>
-                    <div>
-                        <md-checkbox ng-model="line.areaFill.enable" aria-label="Checkbox 1">
-                            {{ 'wellLog.enable-area-fill' | translate}}
-                        </md-checkbox>
-                        <br/>
-                        <fieldset ng-if="line.areaFill.enable">
-                            <md-input-container class="md-block">
-                            <md-select ng-model="line.areaFill.fill" placeholder="{{ 'wellLog.select-area-fill' | translate}}">
-                                <md-option ng-value="fill" ng-repeat="fill in fillTypes">{{ fill }}</md-option>
-                            </md-select>
-                            </md-input-container>
-                            <div flex
-                                md-color-picker
-                                ng-model="line.areaFill.color"
-                                label="{{ 'wellLog.fill-color' | translate}}"
-                                icon="format_color_fill"
-                                default="rgba(0, 0, 0, 0.87)"
-                                md-color-clear-button="false"
-                                open-on-input="true"
-                                md-color-generic-palette="false"
-                                md-color-history="false"
-                            ></div>
-                            <md-input-container class="md-block">
-                                <label translate>{{ 'wellLog.fill-opacity' | translate}}</label>
-                                <input  name="name" ng-model="line.areaFill.opacity">
-                            </md-input-container>
-                        </fieldset>
-                    </div>
+                    
                 </v-pane-content>
             </v-pane>
-
         </v-accordion>
         <br/>
+        <div>
+            <md-checkbox ng-model="trackComponent.areaFill.enable" ng-hide="lines().length == 0" aria-label="Checkbox 1">
+                {{ 'wellLog.enable-area-fill' | translate}}
+            </md-checkbox>
+            <br/>
+            <fieldset ng-if="trackComponent.areaFill.enable">
+                <md-input-container class="md-block">
+                <md-select ng-model="trackComponent.areaFill.fill" placeholder="{{ 'wellLog.select-area-fill' | translate}}">
+                    <md-option ng-value="fill" ng-repeat="fill in fillTypes()">{{ fill }}</md-option>
+                </md-select>
+                </md-input-container>
+                <md-input-container ng-if="lines().length == 2" class="md-block">
+                    <md-select ng-model="trackComponent.areaFill.referenceLine" placeholder="{{ 'wellLog.select-area-fill-reference-line' | translate}}">
+                        <md-option ng-value="referenceLine" ng-repeat="line in lines()">{{ line.headerName }}</md-option>
+                    </md-select>
+                </md-input-container>
+                <div flex
+                    md-color-picker
+                    ng-model="trackComponent.areaFill.color"
+                    label="{{ 'wellLog.fill-color' | translate}}"
+                    icon="format_color_fill"
+                    default="rgba(0, 0, 0, 0.87)"
+                    md-color-clear-button="false"
+                    open-on-input="true"
+                    md-color-generic-palette="false"
+                    md-color-history="false"
+                ></div>
+                <md-input-container class="md-block">
+                    <label translate>{{ 'wellLog.fill-opacity' | translate}}</label>
+                    <input  name="name" ng-model="trackComponent.areaFill.opacity">
+                </md-input-container>
+            </fieldset>
+        </div>
     </div>
-    <md-button ng-disabled="$root.loading", ng-hide="isAddLineButtonHidden", ng-click="addLine()" class="md-raised md-primary md-button md-ink-ripple md-themeDark-theme">
+    <md-button ng-disabled="$root.loading", ng-hide="trackComponent.lines.length >= 2", ng-click="addLine()" class="md-raised md-primary md-button md-ink-ripple md-themeDark-theme">
         <md-tooltip>{{ 'wellLog.add-line' | translate }}</md-tooltip>
         {{ 'wellLog.add-line' | translate }}
     </md-button>

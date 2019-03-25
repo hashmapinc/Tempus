@@ -21,12 +21,9 @@ import './logViewer.css';
 
 /*@ngInject*/
 
-var headerLegend = function(lineConfig, data, state, index, width) {
+var headerLegend = function(lineConfig, state, index, width) {
   'use strict';
-  var o;
-     // local;
-
-  o = {
+  var o = {
     value: null,
     key: null,
     min: lineConfig.headerMin,
@@ -34,7 +31,6 @@ var headerLegend = function(lineConfig, data, state, index, width) {
     lineWeight: lineConfig.lineWeight,
     color: lineConfig.color,
     label: lineConfig.headerName,
-    data: data,
     state:state,
     index: index,
     width: width
@@ -43,11 +39,7 @@ var headerLegend = function(lineConfig, data, state, index, width) {
   if(angular.isUndefined(o.width)){
     o.width = 3;
   } 
-  // local = {
-  // //  label: d3.local(),
-  // //  dimensions: d3.local()
-  // };
- 
+
   function header(group) {
     // group-scope
     if(o.state === 'init'){
@@ -55,10 +47,8 @@ var headerLegend = function(lineConfig, data, state, index, width) {
     }  
   }
  
-  //function render(data) {
   function render() {
     var context;
-       // dim;
 
     context = d3.select(this);
 
@@ -70,9 +60,6 @@ var headerLegend = function(lineConfig, data, state, index, width) {
         .domain([o.min, o.max])
         .range([0, width])
 
-    // var y = d3.scaleLinear()
-    //     .range([0, height]);
-
     var xAxis = d3.axisTop()
         .scale(x)
         .tickValues([o.min, o.max])
@@ -81,8 +68,6 @@ var headerLegend = function(lineConfig, data, state, index, width) {
     context.select(".header")
          .append("svg")
          .attr("class", "header"+ index)
-         // .attr("width", 440)
-         // .attr("height", 0)
         .attr("width", width + margin.right + margin.left)
         .attr("height", height + margin.top + margin.bottom)
       .append("g")

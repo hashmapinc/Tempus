@@ -1910,6 +1910,7 @@ export default angular.module('tempus.locale', [])
                     "header-name":"Header Name",
                     "enable-area-fill":"Enable Area Fill",
                     "select-area-fill":"Select Area Fill",
+                    "select-area-fill-reference-line":"Select reference line",
                     "fill-color":"Fill Color",
                     "fill-opacity":"Fill opacity",
                     "grid-minor-lines":"Grid minor lines",

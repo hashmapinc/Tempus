@@ -93,14 +93,16 @@ export default function loadLogViewer(ctx, sequence){
           }
           if(componentObj.cType === 'Line'){
             if(angular.isArray(componentObj.lines)){
+              var lineData = [];
               componentObj.lines.forEach(function(line) {
-                var hLegend = headerLegend(line, datasourceFilter(line, dArray), state, graphElementsNumber, parseInt(track.width));
+                var hLegend = headerLegend(line, state, graphElementsNumber, parseInt(track.width));
                 trackObj.push(hLegend);
                 graphElementsNumber+=1;
-                var lnGraph = lineGraph(line, datasourceFilter(line, dArray), state, graphElementsNumber, parseInt(track.width));
-                trackObj.push(lnGraph);
-                graphElementsNumber+=1;
+                lineData.push({'line': line, 'data': datasourceFilter(line, dArray)}  )
               })
+              var lnGraph = lineGraph(lineData, state, graphElementsNumber, parseInt(track.width));
+              trackObj.push(lnGraph);
+              graphElementsNumber+=1;
             }
           }
           if(componentObj.cType === 'Mud Log Viewer'){

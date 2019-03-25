@@ -21,7 +21,7 @@
         <div class="comp-margin">
             <br>
             <md-input-container class="md-block">
-                <md-select ng-model="trackDetail.width" placeholder="{{ 'wellLog.track-width' | translate}}">
+                <md-select ng-model="trackDetail.width" placeholder="{{ 'wellLog.track-width' | translate}}" required>
                     <md-option ng-value="width" ng-repeat="width in trackWidth">{{ width }}</md-option>
                 </md-select>
             </md-input-container>
