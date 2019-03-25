@@ -132,12 +132,10 @@ export default function AppRun($rootScope, $window, $injector, $location, $state
                 if (userService.isAuthenticated()) {
 
                    $rootScope.authority = userService.getCurrentUser().authority;
-                   if(angular.isUndefined($rootScope.tenantlogo) || $rootScope.tenantlogo == null) {
                      if($rootScope.authority !== "SYS_ADMIN") {
                          var currentUser = userService.getCurrentUser();
                          getLogoForUser(currentUser);
                      }
-                   }
 
                     if (userService.isPublic()) {
                         if (userService.parsePublicId() !== publicId) {
