@@ -47,16 +47,8 @@ var lineGraph = function(lineConfig, areaFillConfig, state, currentComponentInde
       let xScale = d3.scaleLinear().domain(d3.min(data.data, function(d) { return d[1]; }),d3.max(data.data, function(d) { return d[1]; })).range([0 , w]);
       let yScale = d3.scaleLinear().domain(d3.min(data.data, function(d) { return d[0]; }),d3.max(data.data, function(d) { return d[0]; })).range([h, 0]);
 
-
-
-      let xAxis =  d3.axisTop()
-                  .scale(xScale)
-      let yAxis = d3.axisLeft()
-          .scale(yScale)
-
       let line = d3.line()
-        .y((d) => yScale(d[0]))
-        .y(function(d) { return yScale(d[0]); })
+        .y(d => yScale(d[0]))
         .x(d => xScale(d[1]))
         .curve(d3.curveLinear);
 
@@ -82,7 +74,7 @@ var lineGraph = function(lineConfig, areaFillConfig, state, currentComponentInde
             let xScaleOfOtherLine = d3.scaleLinear().domain(d3.min(otherLineConfig.data.data, function(d) { return d[1]; }),d3.max(otherLineConfig.data.data, function(d) { return d[1]; })).range([0 , w]);
             area = d3.area()
                     .x0((d) => xScale(d[1]))
-                    .x1((d) => xScaleOfOtherLine(d[1]))
+                    .x1((d) => xScaleOfOtherLine(d[2]))
                     .y((d) => yScale(d[0]))
                     .curve(d3.curveLinear);
           }
@@ -130,7 +122,28 @@ var lineGraph = function(lineConfig, areaFillConfig, state, currentComponentInde
         
         if(angular.isDefined(areaFillConfig) && areaFillConfig.enable){
           if(areaFillConfig.referenceLine == lineToBeRendered.headerName){
-            context.select('.linearGrid')
+            if(areaFillConfig.fill === "between") {
+              let otherLineData = lineConfig[Math.abs(index-1)].data.data;
+              let combinedData = [];
+              data.data.forEach(dataElement => 
+                combinedData.push([dataElement[0], dataElement[1], findCorrespondingDataPoint(dataElement)]));
+
+              function findCorrespondingDataPoint(dataElement) {
+                let dataPoint = otherLineData.find(element => element[0] == dataElement[0]);
+                if(dataPoint) {
+                  return dataPoint[1];
+                }
+              }
+              context.select('.linearGrid')
+              .select('.areapath'+index+currentComponentIndex)
+              .select('path')
+              .data([combinedData])
+              .attr("transform", "translate(" + leftPadding + ", 0)")
+              .attr('d', area)
+              .attr('fill', areaFillConfig.color)
+              .style("opacity", areaFillConfig.opacity);  
+            } else {
+              context.select('.linearGrid')
               .select('.areapath'+index+currentComponentIndex)
               .select('path')
               .data([data.data])
@@ -138,6 +151,7 @@ var lineGraph = function(lineConfig, areaFillConfig, state, currentComponentInde
               .attr('d', area)
               .attr('fill', areaFillConfig.color)
               .style("opacity", areaFillConfig.opacity);  
+            }
           }
         }
       }
