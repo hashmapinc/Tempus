@@ -52,10 +52,10 @@ var linearGrid = function(lineConfig, data, state, index, width) {
 
     if(lineConfig.gridType === 'Linear'){
         xScale = d3.scaleLinear()
-            .domain([0, width / 2])
+            .domain([0, width])
             .range([0, width]);
         yScale = d3.scaleLinear()
-            .domain([0, height / 2])
+            .domain([0, height])
             .range([0, height]);
     }else if(lineConfig.gridType === 'Logarithmic') {
         xScale = d3.scaleLog()
