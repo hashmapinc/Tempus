@@ -247,16 +247,31 @@ spec:
               name: google
               key: secretkey 
         - name: TRIAL_USER_EXPIRATION_TIME
-          value: 21600
+          value: "21600"
         - name: TRIAL_USER_REMINDER_MAIL_TIME
-          value: 18720
+          value: "18720"
         - name: TRIAL_USER_PURGE_CRON_EXPRESSION
-          value: 0 0 0 * * *
+          value: "0 0 0 * * *"
         - name: AES_KEY
           valueFrom:
             secretKeyRef:
               name: aes
-              key: key         
+              key: key   
+        - name: TEMPUS_GATEWAY_IMAGE
+          valueFrom:
+            configMapKeyRef:
+              name: {{ include "tempus.fullname" . }}-config
+              key: gateway.image
+        - name: GATEWAY_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: {{ include "tempus.fullname" . }}-config
+              key: gateway.host
+        - name: GATEWAY_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: {{ include "tempus.fullname" . }}-config
+              key: gateway.port                   
         command:
         - sh
         - -c
