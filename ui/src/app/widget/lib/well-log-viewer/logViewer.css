@@ -73,11 +73,10 @@ svg {
 }
 
   /* Below, we set the tick length to 10px. The stroke-dasharray only displays 6px to create a minor tick effect. */
-.axis .minor line {
-    stroke: red;
-    stroke-width: 10px;
+.axis .major line {
+    stroke: #A9A9A9 !important;
+    stroke-width: 3x;
     stroke-opacity: 10;
-    stroke-dasharray: 6,2;
 }
 
 
@@ -89,7 +88,7 @@ svg {
     max-height: 500px;
     overflow: auto;
 }
-.minor{
+.major{
   stroke: #A9A9A9 !important;
   stroke-width: 3px !important;
 }

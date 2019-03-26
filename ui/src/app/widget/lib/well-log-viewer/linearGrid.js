@@ -61,9 +61,9 @@ var linearGrid = function(lineConfig, data, state, index, width) {
         xScale = d3.scaleLog()
                .domain([0.1,2000])
               .range([0 , width]);
-        yScale = d3.scaleLog()
-             .domain([0.1,2000])
-             .range([height, 0]);
+        yScale = d3.scaleLinear()
+                    .domain([0, height])
+                    .range([0, height]);
     }
 
     var xAxis = d3.axisBottom()
@@ -106,13 +106,19 @@ var linearGrid = function(lineConfig, data, state, index, width) {
         context.select('.linearGrid')
          .select("#moving-axis")
          .call(yAxis);
+         if(lineConfig.gridType === 'Linear'){
+            var count = context.select('.linearGrid').select("#x_axis").selectAll('g.tick');
+            var middle = count._groups[0][Math.round((count._groups[0].length - 1) / 2)];
+            middle.classList.add("major");
+         }else if(lineConfig.gridType === 'Logarithmic') {
+            context.select('.linearGrid').select("#x_axis").selectAll('g.tick')
+                        .filter(function(d,i){
+                            return (i%9) === 0;
+                        } )
+                      .select('line') //grab the tick line
+                      .attr('class', 'major') //style with a custom class and CSS
+         }
 
-          context.select('.linearGrid').select("#x_axis").selectAll('g.tick')
-            .filter(function(d,i){
-                return (i%9) === 0;
-            } )
-            .select('line') //grab the tick line
-            .attr('class', 'minor') //style with a custom class and CSS
     }
   }
   
