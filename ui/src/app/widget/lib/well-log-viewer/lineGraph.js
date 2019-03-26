@@ -22,7 +22,7 @@ import {dataGenerator} from './dataGenerator';
 import './logViewer.css';
 
 /*@ngInject*/
-var lineGraph = function(lineConfig, state, currentComponentIndex, width) {
+var lineGraph = function(lineConfig, areaFillConfig, state, currentComponentIndex, width) {
 
   'use strict';
 
@@ -40,7 +40,6 @@ var lineGraph = function(lineConfig, state, currentComponentIndex, width) {
       h = 700 - margin.top;
 
     lineConfig.forEach(function(element, index) {
-      
         
       var lineToBeRendered = element.line;
       var data = element.data;
@@ -55,31 +54,38 @@ var lineGraph = function(lineConfig, state, currentComponentIndex, width) {
       let yAxis = d3.axisLeft()
           .scale(yScale)
 
-
-
       let line = d3.line()
         .y((d) => yScale(d[0]))
         .y(function(d) { return yScale(d[0]); })
         .x(d => xScale(d[1]))
         .curve(d3.curveLinear);
 
+      if(angular.isDefined(areaFillConfig) && areaFillConfig.enable){
+        if(areaFillConfig.referenceLine == lineToBeRendered.headerName){
+          if(areaFillConfig.fill === "left"){
 
-
-      if(angular.isDefined(lineToBeRendered.areaFill)){
-        if(lineToBeRendered.areaFill.fill === "left"){
-
-          var area = d3.area()
-                .x0(-14)
-                .x1((d) => xScale(d[1]))
-                .y((d) => yScale(d[0]))
-                .curve(d3.curveLinear);
-        }
-        if(lineToBeRendered.areaFill.fill === "right"){
-            area = d3.area()
-                  .x0((d) => xScale(d[1]))
-                  .x1(w)
+            var area = d3.area()
+                  .x0(-14)
+                  .x1((d) => xScale(d[1]))
                   .y((d) => yScale(d[0]))
                   .curve(d3.curveLinear);
+          }
+          if(areaFillConfig.fill === "right"){
+              area = d3.area()
+                    .x0((d) => xScale(d[1]))
+                    .x1(w)
+                    .y((d) => yScale(d[0]))
+                    .curve(d3.curveLinear);
+          }
+          if(areaFillConfig.fill === "between"){
+            let otherLineConfig = lineConfig[Math.abs(index-1)]
+            let xScaleOfOtherLine = d3.scaleLinear().domain(d3.min(otherLineConfig.data.data, function(d) { return d[1]; }),d3.max(otherLineConfig.data.data, function(d) { return d[1]; })).range([0 , w]);
+            area = d3.area()
+                    .x0((d) => xScale(d[1]))
+                    .x1((d) => xScaleOfOtherLine(d[1]))
+                    .y((d) => yScale(d[0]))
+                    .curve(d3.curveLinear);
+          }
         }
       }
 
@@ -94,13 +100,15 @@ var lineGraph = function(lineConfig, state, currentComponentIndex, width) {
           .attr('fill', 'none')
           .attr('stroke-width', lineToBeRendered.lineWeight)
 
-        if(angular.isDefined(lineToBeRendered.areaFill)){
-            let $areaGraph = context.select('.linearGrid')
-                  .append('g')
-                  .attr("class", 'areapath'+index+currentComponentIndex)
-                  .append('path')
-                  .attr('fill', lineToBeRendered.areaFill.color)
-                  .style("opacity", lineToBeRendered.areaFill.opacity);
+          if(angular.isDefined(areaFillConfig) && areaFillConfig.enable){
+            if(areaFillConfig.referenceLine == lineToBeRendered.headerName){
+              context.select('.linearGrid')
+                .append('g')
+                .attr("class", 'areapath'+index+currentComponentIndex)
+                .append('path')
+                .attr('fill', areaFillConfig.color)
+                .style("opacity", areaFillConfig.opacity);
+          }
         }
       }
 
@@ -119,19 +127,20 @@ var lineGraph = function(lineConfig, state, currentComponentIndex, width) {
           .attr('stroke', lineToBeRendered.color)
           .attr('fill', 'none')
           .attr('stroke-width', lineToBeRendered.lineWeight)
-
-
-        if(angular.isDefined(lineToBeRendered.areaFill)){
-        let $areaGraph = context.select('.linearGrid').select('.areapath'+index+currentComponentIndex).select('path');
-          $areaGraph
-                  .data([data.data])
-                  .attr("transform", "translate(" + leftPadding + ", 0)")
-                  .attr('d', area)
-                  .attr('fill', lineToBeRendered.areaFill.color)
-                  .style("opacity", lineToBeRendered.areaFill.opacity);
-
+        
+        if(angular.isDefined(areaFillConfig) && areaFillConfig.enable){
+          if(areaFillConfig.referenceLine == lineToBeRendered.headerName){
+            context.select('.linearGrid')
+              .select('.areapath'+index+currentComponentIndex)
+              .select('path')
+              .data([data.data])
+              .attr("transform", "translate(" + leftPadding + ", 0)")
+              .attr('d', area)
+              .attr('fill', areaFillConfig.color)
+              .style("opacity", areaFillConfig.opacity);  
+          }
         }
-        }
+      }
       update();
     });
   }

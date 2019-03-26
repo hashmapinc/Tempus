@@ -104,7 +104,7 @@
                 </md-input-container>
                 <md-input-container ng-if="lines().length == 2" class="md-block">
                     <md-select ng-model="trackComponent.areaFill.referenceLine" placeholder="{{ 'wellLog.select-area-fill-reference-line' | translate}}">
-                        <md-option ng-value="referenceLine" ng-repeat="line in lines()">{{ line.headerName }}</md-option>
+                        <md-option ng-repeat="line in lines()" ng-value="line.headerName">{{ line.headerName }}</md-option>
                     </md-select>
                 </md-input-container>
                 <div flex

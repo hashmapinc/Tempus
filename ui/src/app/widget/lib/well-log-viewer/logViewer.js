@@ -100,7 +100,7 @@ export default function loadLogViewer(ctx, sequence){
                 graphElementsNumber+=1;
                 lineData.push({'line': line, 'data': datasourceFilter(line, dArray)}  )
               })
-              var lnGraph = lineGraph(lineData, state, graphElementsNumber, parseInt(track.width));
+              var lnGraph = lineGraph(lineData, componentObj.areaFill, state, graphElementsNumber, parseInt(track.width));
               trackObj.push(lnGraph);
               graphElementsNumber+=1;
             }
