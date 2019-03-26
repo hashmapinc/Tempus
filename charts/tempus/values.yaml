@@ -204,6 +204,11 @@ dataquality:
     port: 80
   pdb:
     minAvailable: 1
+  streamname: stream-name
+  shardid: shardId
+  kafka: kafka
+  dataqualitytopic: data-quality-topic
+
 
 spark:
   enabled: false

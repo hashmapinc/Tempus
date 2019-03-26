@@ -245,7 +245,18 @@ spec:
           valueFrom:
             secretKeyRef:
               name: google
-              key: secretkey                            
+              key: secretkey 
+        - name: TRIAL_USER_EXPIRATION_TIME
+          value: 21600
+        - name: TRIAL_USER_REMINDER_MAIL_TIME
+          value: 18720
+        - name: TRIAL_USER_PURGE_CRON_EXPRESSION
+          value: 0 0 0 * * *
+        - name: AES_KEY
+          valueFrom:
+            secretKeyRef:
+              name: aes
+              key: key         
         command:
         - sh
         - -c
