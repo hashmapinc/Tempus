@@ -21,8 +21,11 @@
 
 replicaCount: 1
 
-autoscalingapiversion: autoscaling/v2beta2
+#autoscalingapiversion: autoscaling/v2beta2
 
+autoscaling: 
+  enabled: false
+  
 ##
 global:
   rbac:
