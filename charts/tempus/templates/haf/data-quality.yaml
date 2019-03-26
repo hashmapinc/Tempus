@@ -124,6 +124,7 @@ spec:
           value: {{ .Values.dataquality.kafka }}  
         - name: DATA_QUALITY_TOPIC
           value: {{ .Values.dataquality.dataqualitytopic }}
+{{- if .Values.autoscaling.enabled }}          
         resources:
           limits:
             cpu: 3000m
