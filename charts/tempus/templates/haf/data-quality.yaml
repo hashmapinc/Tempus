@@ -49,7 +49,9 @@ metadata:
 data:
   identity.base.url: "http://{{ .Values.identity.name }}:{{ .Values.identity.service.port }}/uaa"
   tempus.url: "http://{{ .Values.identity.name }}:{{ .Values.identity.service.port }}/uaa"
-  mqtt.url: "0.0.0.0:1833"
+  mqtt.host: "0.0.0.0"
+  mqtt.port: "1883"
+  tempus.url: "http://localhost:8080"
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -81,16 +83,41 @@ spec:
             configMapKeyRef:
               name: {{ .Values.dataquality.name }}
               key: identity.base.url
-        - name: TEMPUS_MQTT_URL
+        - name: TEMPUS_MQTT_BIND_ADDRESS
           valueFrom:
             configMapKeyRef:
               name: {{ .Values.dataquality.name }}
-              key: mqtt.url
+              key: mqtt.host
+        - name: TEMPUS_MQTT_BIND_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: {{ .Values.dataquality.name }}
+              key: mqtt.port              
         - name: TEMPUS_URL
           valueFrom:
             configMapKeyRef:
               name: {{ .Values.dataquality.name }}
-              key: mqtt.url
+              key: tempus.url
+        - name: AWS_ACCESS_KEY
+          valueFrom:
+            secretKeyRef:
+              name: aws
+              key: accesskey
+        - name: AWS_SECRET_KEY
+          valueFrom:
+            secretKeyRef:
+              name: aws
+              key: secretkey  
+        - name: KINESIS_SUPPORT_ENABLED
+          value: true
+        - name: STREAM_NAME
+          value: {{ .Values.dataquality.streamname }} 
+        - name: SHARD_ID
+          value: {{ .Values.dataquality.shardid }}  
+        - name: KAFKA_BIND_ADDRESS   
+          value: {{ .Values.dataquality.kafka }}  
+        - name: DATA_QUALITY_TOPIC
+          value: {{ .Values.dataquality.dataqualitytopic }}
         resources:
 {{ toYaml .Values.dataqualityresources | indent 10 }}              
 {{- end }}              
