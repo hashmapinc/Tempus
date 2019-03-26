@@ -109,7 +109,7 @@ spec:
               name: aws
               key: secretkey  
         - name: KINESIS_SUPPORT_ENABLED
-          value: true
+          value: "true"
         - name: STREAM_NAME
           value: {{ .Values.dataquality.streamname }} 
         - name: SHARD_ID

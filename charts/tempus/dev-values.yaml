@@ -67,6 +67,9 @@ ConfigMapData:
   spring.datasource.password: "identity"
   spring.jpa.db: "org.hibernate.dialect.PostgreSQLDialect"
   spring.jpa.driver: "org.postgresql.Driver"  
+  gateway.host: "tempus.tempus"
+  gateway.port: "9095"
+  gateway.image: "hashmapinc/tempus-gateway"  
 
 
 role:
@@ -110,7 +113,7 @@ databaseSetup:
     pullPolicy: Always  
 
 nifi:
-  enabled: true
+  enabled: false
   name: nifi-svc
   serviceType: NodePort
   image:
@@ -204,6 +207,10 @@ dataquality:
     port: 80
   pdb:
     minAvailable: 1
+  streamname: stream-name
+  shardid: shardId
+  kafka: kafka
+  dataqualitytopic: data-quality-topic    
 
 spark:
   enabled: true
