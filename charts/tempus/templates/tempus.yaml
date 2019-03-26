@@ -57,8 +57,8 @@ data:
   identity.base.url: "http://{{ .Values.identity.name }}:{{ .Values.identity.service.port }}/uaa"
   metadata.base.url: "http://{{ .Values.metadata.name }}:{{ .Values.metadata.service.port }}/api"  
 ---
-apiVersion: "apps/v1beta1"
-kind: StatefulSet
+apiVersion: "apps/v1"
+kind: Deployment
 metadata:
   name: {{ include "tempus.fullname" . }}
   labels:
@@ -72,11 +72,15 @@ spec:
       app: {{ include "tempus.name" . }}
   serviceName: {{ include "tempus.fullname" . }}
   replicas: 1
-  updateStrategy:
+  strategy:
     type: RollingUpdate
   podManagementPolicy: Parallel
   template:
     metadata:
+{{- if .Values.autoscaling.enabled }}    
+      annotations:
+{{ toYaml .Values.annotations | indent 8 }}  
+{{- end }}     
       labels:
         app: {{ include "tempus.name" . }}
     spec:
