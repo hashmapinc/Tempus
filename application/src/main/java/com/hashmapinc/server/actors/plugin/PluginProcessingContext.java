@@ -643,7 +643,7 @@ public final class PluginProcessingContext implements PluginContext {
     }
 
     private <E extends KvEntry, T extends E> List<E> convertKvEntriesToUnitSystem(List<E> kvEntries, Class<T> tClass) {
-        if (securityCtx.isPresent()) {
+        if (securityCtx.isPresent() && (securityCtx.get().getTenantId() != null) ) {
             return convertKvEntriesToUnitSystemByTenantId(kvEntries , securityCtx.get().getTenantId(), tClass);
         } else {
             return convertKvEntriesToUnitSystemByTenantId(kvEntries , nullTenantId, tClass);
