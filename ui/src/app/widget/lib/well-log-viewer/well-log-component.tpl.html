@@ -124,11 +124,11 @@
                 </md-input-container>
             </fieldset>
         </div>
+        <md-button ng-disabled="$root.loading" ng-hide="trackComponent.lines.length >= 2", ng-click="addLine()" class="md-raised md-primary md-button md-ink-ripple md-themeDark-theme">
+            <md-tooltip>{{ 'wellLog.add-line' | translate }}</md-tooltip>
+            {{ 'wellLog.add-line' | translate }}
+        </md-button>
     </div>
-    <md-button ng-disabled="$root.loading", ng-if="trackComponent.cType == 'Line'" ng-hide="trackComponent.lines.length >= 2", ng-click="addLine()" class="md-raised md-primary md-button md-ink-ripple md-themeDark-theme">
-        <md-tooltip>{{ 'wellLog.add-line' | translate }}</md-tooltip>
-        {{ 'wellLog.add-line' | translate }}
-    </md-button>
     <div ng-if="trackComponent.cType == 'Grid'">
         <md-input-container class="md-block">
             <div>
