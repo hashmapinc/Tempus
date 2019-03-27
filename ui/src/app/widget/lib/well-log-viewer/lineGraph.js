@@ -45,8 +45,8 @@ var lineGraph = function(lineConfig, areaFillConfig, state, currentComponentInde
       var lineToBeRendered = element.line;
       var data = element.data;
 
-      let xScale = d3.scaleLinear().domain(d3.min(data.data, function(d) { return d[1]; }),d3.max(data.data, function(d) { return d[1]; })).range([0 , w]);
-      let yScale = d3.scaleLinear().domain(d3.min(data.data, function(d) { return d[0]; }),d3.max(data.data, function(d) { return d[0]; })).range([h, 0]);
+      let xScale = d3.scaleLinear().domain(lineToBeRendered.headerMin, lineToBeRendered.headerMax).range([-20 , w-20]);
+      let yScale = d3.scaleLinear().domain(d3.min(data.data.map(function(d){return d[0]})),d3.max(data.data.map(function(d){return d[0]}))).range([h, 0]);
 
       let line = d3.line()
         .y(d => yScale(d[0]))
