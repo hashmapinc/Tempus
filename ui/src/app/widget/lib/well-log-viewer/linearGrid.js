@@ -28,7 +28,9 @@ var linearGrid = function(lineConfig, data, state, index, width) {
 
   gridParameter = {
     state:state,
-    width: width
+    width: width,
+    isLinearScale: lineConfig.gridType === 'Linear',
+    isLogarithmicScale: lineConfig.gridType === 'Logarithmic'
   }; 
 
   if(angular.isUndefined(gridParameter.width)){
@@ -50,31 +52,40 @@ var linearGrid = function(lineConfig, data, state, index, width) {
       width = gridParameter.width*140 - margin.right - margin.left,
       height = 700 - margin.top - margin.bottom;
 
-    if(lineConfig.gridType === 'Linear'){
+    if(gridParameter.isLinearScale){
         xScale = d3.scaleLinear()
             .domain([0, width])
             .range([0, width]);
         yScale = d3.scaleLinear()
             .domain([0, height])
             .range([0, height]);
-    }else if(lineConfig.gridType === 'Logarithmic') {
+    }else if(gridParameter.isLogarithmicScale) {
         xScale = d3.scaleLog()
-               .domain([0.1,2000])
+               .domain([0.1, 1000])
               .range([0 , width]);
         yScale = d3.scaleLinear()
                     .domain([0, height])
                     .range([0, height]);
     }
 
-    var xAxis = d3.axisBottom()
-        .scale(xScale)
+
+    var xAxis;
+    if(gridParameter.isLinearScale) {
+      xAxis = d3.axisBottom()
         .ticks(25)
-        .tickSize(-height);
+        .tickSize(-height)
+        .scale(xScale);
+    }else if(gridParameter.isLogarithmicScale) {
+      xAxis = d3.axisBottom()
+        .ticks(40)
+        .tickSize(-height)
+        .scale(xScale)
+    }
 
     var yAxis = d3.axisLeft()
-        .scale(yScale)
         .ticks(30)
-        .tickSize(-width);
+        .tickSize(-width)
+        .scale(yScale);
 
 
     if(gridParameter.state === 'init'){
@@ -100,7 +111,7 @@ var linearGrid = function(lineConfig, data, state, index, width) {
 
         context.select('.linearGrid').select(".x axis")
           .attr("id", "x_axis")
-          .style("stroke-width", '0.5px')
+          .style("stroke-width", '2px')
           .call(xAxis)
 
         context.select('.linearGrid')

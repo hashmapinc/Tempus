@@ -41,6 +41,7 @@ var lineGraph = function(lineConfig, areaFillConfig, state, currentComponentInde
 
     lineConfig.forEach(function(element, index) {
 
+
       var lineToBeRendered = element.line;
       var data = element.data;
 
