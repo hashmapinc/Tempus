@@ -38,4 +38,6 @@ public interface DashboardDao extends Dao<Dashboard> {
     List<Dashboard> findDashboardByDataModelObjectId(UUID dataModelObjectId);
 
     List<Dashboard> findDashboardBySearchText(String searchText);
+
+    List<Dashboard> findDashboardBySearchTextAndTenantId(String searchText , UUID tenantId);
 }

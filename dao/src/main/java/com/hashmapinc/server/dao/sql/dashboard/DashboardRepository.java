@@ -19,7 +19,6 @@ package com.hashmapinc.server.dao.sql.dashboard;
 import com.hashmapinc.server.dao.model.ModelConstants;
 import com.hashmapinc.server.dao.model.sql.DashboardEntity;
 import org.springframework.data.repository.CrudRepository;
-import com.hashmapinc.server.dao.util.SqlDao;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
@@ -32,4 +31,6 @@ import java.util.List;
 public interface DashboardRepository extends CrudRepository<DashboardEntity, String> {
     List<DashboardEntity> findByAssetLandingInfoEntity_dataModelObjectId(String dataModelObjectId);
     List<DashboardEntity> findBySearchText(@Param(ModelConstants.SEARCH_TEXT_PROPERTY) String searchText);
+    List<DashboardEntity> findBySearchTextAndTenantId(String searchText, String tenantId);
+
 }
