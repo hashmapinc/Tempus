@@ -31,8 +31,37 @@ export default function WellLogViewerComponentsDirective($compile, $templateCach
            scope.extractDataKeys();
         }, true);
         scope.componentTypes = types.wellLogComponent.componentTypes;
-        scope.fillTypes = types.wellLogComponent.fillTypes;
         scope.styleTypes = types.wellLogComponent.styleTypes;
+
+        scope.fillTypes = function() {
+            if(scope.trackComponent.lines.length == 1) {
+                return types.wellLogComponent.fillTypes;
+            }
+            if(scope.trackComponent.lines.length == 2) {
+                return types.wellLogComponent.allFillTypes;
+            }
+        }
+        scope.lines = function () {
+            return scope.trackComponent.lines ? scope.trackComponent.lines : [];
+        };
+
+        scope.removeLine = function ($event,id){
+            var index = scope.trackComponent.lines.findIndex(x => x.id==id);
+            if($event){
+                  $event.stopPropagation();
+                  $event.preventDefault();
+            }
+            scope.trackComponent.lines.splice(index, 1);
+        };
+
+        scope.addLine = function (){
+            var lines = scope.lines()
+            var line = {
+                id: lines.length ? lines.length + 1 : 1,
+                cType: 'Line'
+            }
+            scope.trackComponent.lines ? scope.trackComponent.lines.push(line) : scope.trackComponent.lines = [line];
+        };
 
         scope.extractDataKeys = function() {
             scope.datasourcesList = [];
@@ -41,12 +70,12 @@ export default function WellLogViewerComponentsDirective($compile, $templateCach
                     scope.datasourcesList.push(keys)
                 })
             })
-        }
+        };
         scope.changeComponentType = function (){
             if(scope.trackComponent.cType === 'Line'){
                 scope.showGrid = false;
             }
-        }
+        };
         scope.extractDataKeys();
         $compile(element.contents())(scope);
     }
@@ -54,6 +83,7 @@ export default function WellLogViewerComponentsDirective($compile, $templateCach
         restrict: "E",
         link: linker,
         scope: {
+            components: '=',
             trackComponent: '=',
             datasources:'='
         }

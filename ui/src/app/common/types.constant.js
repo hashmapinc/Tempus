@@ -844,6 +844,7 @@ export default angular.module('tempus.types', [])
             wellLogComponent:{
                componentTypes:["Line", "Linear Grid", "Time Y axis", "Mud Log Viewer"],
                fillTypes:["left", "right"],
+               allFillTypes:["left", "right", "between"],
                styleTypes:["dashed", "solid"],
                trackWidth:[1,2,3,4,5]
             }

@@ -1899,7 +1899,9 @@ export default angular.module('tempus.locale', [])
                     "emailSuccess": "Email is sent on your email id.Please check."
                 },
                 "wellLog":{
-                    "select-component":"Select Component",
+                    "line-component":"Line Component",
+                    "grid-component":"Grid Component",
+                    "timeY-component":"Time Y axis Component",
                     "color":"Color",
                     "line-width":"Line Width",
                     "has-header":"Has Header",
@@ -1908,6 +1910,7 @@ export default angular.module('tempus.locale', [])
                     "header-name":"Header Name",
                     "enable-area-fill":"Enable Area Fill",
                     "select-area-fill":"Select Area Fill",
+                    "select-area-fill-reference-line":"Select reference line",
                     "fill-color":"Fill Color",
                     "fill-opacity":"Fill opacity",
                     "grid-minor-lines":"Grid minor lines",
@@ -1918,7 +1921,11 @@ export default angular.module('tempus.locale', [])
                     "datasource":"Datasource",
                     "track-width":"Track Width",
                     "component":"Component",
-                    "add-component":"Add Component",
+                    "line":"Line",
+                    "add-lineComponent":"Add Line Component",
+                    "add-gridComponent":"Add Grid Component",
+                    "add-timeYComponent":"Add Time Y axis Component",
+                    "add-line":"Add Line",
                     "track":"Track",
                     "add-track":"Add Track"
                 },
