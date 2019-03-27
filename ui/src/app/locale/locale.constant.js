@@ -1005,7 +1005,7 @@ export default angular.module('tempus.locale', [])
                     "private-key": "Private key file *",
                     "cert": "Certificate file *",
                     "no-file": "No file selected.",
-                    "drop-file": "Drop a file or click to select a file to upload.",
+                    "drop-file": "Drop a file or click to select a file to upload",
                     "mapping": "Mapping",
                     "topic-filter": "Topic filter",
                     "converter-type": "Converter type",

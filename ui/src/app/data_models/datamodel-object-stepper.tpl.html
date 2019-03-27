@@ -76,17 +76,16 @@
 
                   <div class="alert tb-flow-drop" flow-drop>
 
-                    <label for="select" translate>import.drop-file</label>
-                    <input flow-attrs="{accept:'.jpg,.png,.svg,.jpeg'}"
-                           class="file-input"
-                           flow-btn id="select"
+                    <label for="select" class="label-height"  translate>import.drop-file</label>
+                    <input id="select" flow-attrs="{accept:'.jpg,.png,.svg,.jpeg'}"
+                           class="file-input input-image"
+                           flow-btn
                            ng-model="vm.stepperData.logoFileName"
                     >
                   </div>
                 </div>
               </div>
-              <div>
-              </div>
+
             </md-input-container>
             <div ng-hide ="vm.stepperData.type == 'Device'">Note:- If No Icon Uploaded Then Default Icon Of Assets Will Be Applied.</div>
           </md-content>
@@ -219,10 +218,9 @@
             <md-list-item>
               <p class="dmoFont"><span translate>dataModels.child</span>: <span class="datamodel-value">{{vm.childNode.length > 0 ? vm.childName : "None"}}</span></p>
             </md-list-item>
-            <md-subheader class="md-no-sticky reviewHeader">Image</md-subheader>
 
             <md-list-item>
-              <label>Icon:<img class="" style="width: 98%; margin-top: -1%;"ng-src="{{vm.stepperData.logoFile}}"></label>
+              <label>Icon:</label><p><img class="datamodel-object-icon" style="width: 98%; margin-top: -1%;"ng-src="{{vm.stepperData.logoFile}}"></p>
             </md-list-item>
 
           </md-content>
