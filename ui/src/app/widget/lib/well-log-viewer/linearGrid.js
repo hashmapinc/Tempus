@@ -17,154 +17,125 @@
  //var d3 = require('./node_modules/d3/build/d3');
 //require('./node_modules/d3-selection-multi/build/d3-selection-multi');
 //import * as d3 from 'well-log-viewer/node_modules/d3/build/d3';
-import * as d3 from 'd3';
 
+import * as d3 from 'd3';
 import './logViewer.css';
+
 /*@ngInject*/
 var linearGrid = function(lineConfig, data, state, index, width) {
   'use strict';
-  var o;
-     // local;
+  var gridParameter;
 
-  o = {
-    value: null,
-    key: null,
-    majorLines: parseInt(lineConfig.majorLines.lines) -1,
-    minorLines: parseInt(lineConfig.minorLines.lines) +1,
-    majorColor: lineConfig.majorLines.color,
-    minorColor: lineConfig.minorLines.color,
-    majorLineWeight: lineConfig.majorLines.lineWeight,
-    minorLineWeight: lineConfig.minorLines.lineWeight,
-    data : data,
+  gridParameter = {
     state:state,
-    index: index,
-    width: width
+    width: width,
+    isLinearScale: lineConfig.gridType === 'Linear',
+    isLogarithmicScale: lineConfig.gridType === 'Logarithmic'
   }; 
 
-  if(angular.isUndefined(o.width)){
-    o.width = 3;
+  if(angular.isUndefined(gridParameter.width)){
+    gridParameter.width = 3;
   } 
-  if(lineConfig.minorLines.style === "dashed"){
-    o.mirorStroke = "6,4";
-  }
-  else if(lineConfig.minorLines.style === "solid"){
-    o.mirorStroke = "6,0";
-  }
 
-  // local = {
-  // //  label: d3.local(),
-  // //  dimensions: d3.local()
-  // };
- 
   function lGrid(group) {
     // group-scope
     group.each(render);
   }
  
-  //function render(data) {
   function render() {
-    var context,
-      //  dim,
-        ticks = [];
+    var context,xScale,yScale;
+    gridParameter.mirorStroke = "6,0";
 
     context = d3.select(this);
 
     var margin = {top: 0, right: 10, bottom: 20, left: 10},
-      width = o.width*110 - margin.right - margin.left,
+      width = gridParameter.width*140 - margin.right - margin.left,
       height = 700 - margin.top - margin.bottom;
 
-     // var dx = width - margin.right - margin.left;
-
-    var isMajorTick = function (index) {
-      return ticks[index].isVisible;
+    if(gridParameter.isLinearScale){
+        xScale = d3.scaleLinear()
+            .domain([0, width])
+            .range([0, width]);
+        yScale = d3.scaleLinear()
+            .domain([0, height])
+            .range([0, height]);
+    }else if(gridParameter.isLogarithmicScale) {
+        xScale = d3.scaleLog()
+               .domain([0.1, 1000])
+              .range([0 , width]);
+        yScale = d3.scaleLinear()
+                    .domain([0, height])
+                    .range([0, height]);
     }
-    
-    for (var i = 0; i <= o.minorLines*o.majorLines; i++) {
-      ticks.push( { value: i, isVisible: i % o.minorLines === 0 });
+
+
+    var xAxis;
+    if(gridParameter.isLinearScale) {
+      xAxis = d3.axisBottom()
+        .ticks(25)
+        .tickSize(-height)
+        .scale(xScale);
+    }else if(gridParameter.isLogarithmicScale) {
+      xAxis = d3.axisBottom()
+        .ticks(40)
+        .tickSize(-height)
+        .scale(xScale)
     }
-
-    var tickValues = ticks.map( function(t) { return t.value; });
-
-    var xScale = d3.scaleLinear()
-        .domain([tickValues[0], tickValues[tickValues.length - 1]])
-        .range([margin.left, width + margin.left]);
-
-    var xAxis = d3.axisBottom(xScale)
-        .tickSizeInner(-height)
-        .tickSizeOuter(0)
-        .tickValues(tickValues)
-        .tickFormat(function (d, i) {
-          return isMajorTick(i) ? "" : "";
-        });
-
-    var y = d3.scaleLinear()
-        .domain(d3.extent(o.data.data, function(d) { return d[0]; }))
-        .range([0, height]);
 
     var yAxis = d3.axisLeft()
-        .scale(y)
-        .tickFormat(function(d){ return d.x;})
-        .ticks(10)
-        .tickSize(-width);
+        .ticks(30)
+        .tickSize(-width)
+        .scale(yScale);
 
-    if(o.state === 'init'){
+
+    if(gridParameter.state === 'init'){
       context.select('.linearGrid')
           .attr('width', width + margin.right + margin.left)
           .attr('height', height + margin.top + margin.bottom)
 
-
-
-        var x_axis =  context.select('.linearGrid').append("g")
+      context.select('.linearGrid').append("g")
           .attr("id", "x_axis")
           .attr("class", "x axis")
-          .style("stroke-width", o.majorLineWeight)
+          .style("stroke-width", '0.5px')
           .attr("transform", "translate(0," +  height +")")
-          .call(xAxis)
-        // Add the class 'minor' to all minor ticks
-        x_axis.selectAll("g")
-          .filter(function (d, i) {
-            return !isMajorTick(i);
-          })
-          .classed("minor", true)
-          .style("stroke-width", o.minorLineWeight)
-          .style("stroke-dasharray", o.mirorStroke)
-        // console.log("all the visible points", xAxis.scale().ticks(xAxis.ticks()[0]));
+          .call(xAxis);
+
 
       context.select('.linearGrid')
-      .append("g")
-            .attr("class", "axis")
-            .attr("id", "moving-axis")
-            .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
-            .call(yAxis);
+           .append("g")
+           .attr("class", "axis")
+           .attr("id", "moving-axis")
+           .call(yAxis);
     }
-    if(o.state === 'update'){
+    if(gridParameter.state === 'update'){
 
-        x_axis =  context.select('.linearGrid').select(".x axis")
+        context.select('.linearGrid').select(".x axis")
           .attr("id", "x_axis")
-          .style("stroke-width", o.majorLineWeight)
-          .attr("transform", "translate(0," +  height +")")
+          .style("stroke-width", '2px')
           .call(xAxis)
-        // Add the class 'minor' to all minor ticks
-        x_axis.selectAll("g")
-          .filter(function (d, i) {
-            return !isMajorTick(i);
-          })
-          .classed("minor", true)
-          .style("stroke-width", o.minorLineWeight)
-          .style("stroke-dasharray", o.mirorStroke)
-        // console.log("all the visible points", xAxis.scale().ticks(xAxis.ticks()[0]));
 
         context.select('.linearGrid')
          .select("#moving-axis")
          .call(yAxis);
-    }
+         if(lineConfig.gridType === 'Linear'){
+            var count = context.select('.linearGrid').select("#x_axis").selectAll('g.tick');
+            var middle = count._groups[0][Math.round((count._groups[0].length - 1) / 2)];
+            middle.classList.add("major");
+         }else if(lineConfig.gridType === 'Logarithmic') {
+            context.select('.linearGrid').select("#x_axis").selectAll('g.tick')
+                        .filter(function(d,i){
+                            return (i%9) === 0;
+                        } )
+                      .select('line') //grab the tick line
+                      .attr('class', 'major') //style with a custom class and CSS
+         }
 
+    }
   }
   
   lGrid.width = function(){/*...*/}
   lGrid.order = 1;
-  // set other methods here
- 
+
   return lGrid;
 };
 export {linearGrid};

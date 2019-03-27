@@ -25,8 +25,8 @@ export default function WellLogViewerComponentsDirective($compile, $templateCach
     var linker = function (scope, element) {
         var template = $templateCache.get(wellTrackComponents);
         element.html(template);
-        scope.showGrid = true;
-
+        scope.gridTypes = types.wellLogComponent.gridTypes;
+        scope.showConfigParam =  false;
         scope.$watch('datasources', function() {
            scope.extractDataKeys();
         }, true);
@@ -70,11 +70,6 @@ export default function WellLogViewerComponentsDirective($compile, $templateCach
                     scope.datasourcesList.push(keys)
                 })
             })
-        };
-        scope.changeComponentType = function (){
-            if(scope.trackComponent.cType === 'Line'){
-                scope.showGrid = false;
-            }
         };
         scope.extractDataKeys();
         $compile(element.contents())(scope);

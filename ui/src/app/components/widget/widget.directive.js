@@ -87,9 +87,9 @@ function Widget($controller, widgetService) {
                                  }
                             })
                         }
-                        
+
                     })
-                    
+
                 }
 
                 scope.loadingData = true;

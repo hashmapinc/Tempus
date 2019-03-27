@@ -24,7 +24,7 @@
         <label id="display-label-grid" ng-show="trackComponent.cType == 'Grid'">{{ 'wellLog.grid-component' | translate}}</label>
         <label id="display-label-timeyaxis" ng-show="trackComponent.cType == 'Time Y axis'">{{ 'wellLog.timeY-component' | translate}}</label>
     </div>
-    <div>
+    <div ng-if="trackComponent.cType == 'Line'">
         <v-accordion id="accordionline" class="vAccordion--default" control="accordionA" onexpand="expandCallback(index, id)" oncollapse="collapseCallback(index, id)">
             <v-pane id="{{ ::pane.id }}" ng-repeat="line in lines()" expanded="pane.isExpanded">
                 <v-pane-header id="{{ ::pane.id }}-header" style="border:outset;">
@@ -86,7 +86,7 @@
                             </md-input-container>
                         </fieldset>
                     </div>
-                    
+
                 </v-pane-content>
             </v-pane>
         </v-accordion>
@@ -125,10 +125,19 @@
             </fieldset>
         </div>
     </div>
-    <md-button ng-disabled="$root.loading", ng-hide="trackComponent.lines.length >= 2", ng-click="addLine()" class="md-raised md-primary md-button md-ink-ripple md-themeDark-theme">
+    <md-button ng-disabled="$root.loading", ng-if="trackComponent.cType == 'Line'" ng-hide="trackComponent.lines.length >= 2", ng-click="addLine()" class="md-raised md-primary md-button md-ink-ripple md-themeDark-theme">
         <md-tooltip>{{ 'wellLog.add-line' | translate }}</md-tooltip>
         {{ 'wellLog.add-line' | translate }}
     </md-button>
+    <div ng-if="trackComponent.cType == 'Grid'">
+        <md-input-container class="md-block">
+            <div>
+                <md-select ng-model="trackComponent.gridType" placeholder="Select Grid Type">
+                    <md-option ng-value="gridType" ng-repeat="gridType in gridTypes">{{ gridType }}</md-option>
+                </md-select>
+            </div>
+        </md-input-container>
+    </div>
 </div>
     </md-card>
 </md-content>
