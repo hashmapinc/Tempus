@@ -28,7 +28,7 @@
         <v-accordion id="accordionline" class="vAccordion--default" control="accordionA" onexpand="expandCallback(index, id)" oncollapse="collapseCallback(index, id)">
             <v-pane id="{{ ::pane.id }}" ng-repeat="line in lines()" expanded="pane.isExpanded">
                 <v-pane-header id="{{ ::pane.id }}-header" style="border:outset;">
-                    <lable class="line-label">{{ 'wellLog.line' | translate}} {{line.id}}</lable>
+                    <lable class="line-label">{{ line.headerName }} {{ 'wellLog.line' | translate}} - {{ line.id }}</lable>
                     <md-button class="md-icon-button md-primary comp-btn"
                                 aria-label="{{ 'action.remove' | translate }}"
                     ng-click="removeLine($event,line.id)">

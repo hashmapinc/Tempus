@@ -36,7 +36,7 @@ var lineGraph = function(lineConfig, areaFillConfig, state, currentComponentInde
     context = d3.select(this);
 
     let margin = {top: 30, right: 10, bottom: 30, left: 10},
-      w = width*110 - margin.right - margin.left,
+      w = width*140 - margin.right - margin.left,
       h = 700 - margin.top;
 
     lineConfig.forEach(function(element, index) {
@@ -46,7 +46,7 @@ var lineGraph = function(lineConfig, areaFillConfig, state, currentComponentInde
       var data = element.data;
 
       let xScale = d3.scaleLinear().domain(lineToBeRendered.headerMin, lineToBeRendered.headerMax).range([-20 , w-20]);
-      let yScale = d3.scaleLinear().domain(d3.min(data.data.map(function(d){return d[0]})),d3.max(data.data.map(function(d){return d[0]}))).range([h, 0]);
+      let yScale = d3.scaleLinear().domain(d3.extent(data.data.map(d => d[0]))).range([h, 0]);
 
       let line = d3.line()
         .y(d => yScale(d[0]))
@@ -106,7 +106,6 @@ var lineGraph = function(lineConfig, areaFillConfig, state, currentComponentInde
       }
 
       function update() {
-        var leftPadding = margin.left + 15;
         yScale.domain(d3.extent(data.data, function(d) { return d[0]; }));
         xScale.domain(d3.extent(data.data, function(d) { return d[1]; }));
 
@@ -116,7 +115,7 @@ var lineGraph = function(lineConfig, areaFillConfig, state, currentComponentInde
           .data([data.data])
           .attr('class', 'grid')
           .attr('d', line)
-          .attr("transform", "translate(" + leftPadding + ", 0)")
+          .attr("transform", "translate(" + margin.left + ", 0)")
           .attr('stroke', lineToBeRendered.color)
           .attr('fill', 'none')
           .attr('stroke-width', lineToBeRendered.lineWeight)
@@ -139,7 +138,7 @@ var lineGraph = function(lineConfig, areaFillConfig, state, currentComponentInde
               .select('.areapath'+index+currentComponentIndex)
               .select('path')
               .data([combinedData])
-              .attr("transform", "translate(" + leftPadding + ", 0)")
+              .attr("transform", "translate(" + margin.left + ", 0)")
               .attr('d', area)
               .attr('fill', areaFillConfig.color)
               .style("opacity", areaFillConfig.opacity);
@@ -148,7 +147,7 @@ var lineGraph = function(lineConfig, areaFillConfig, state, currentComponentInde
               .select('.areapath'+index+currentComponentIndex)
               .select('path')
               .data([data.data])
-              .attr("transform", "translate(" + leftPadding + ", 0)")
+              .attr("transform", "translate(" + margin.left + ", 0)")
               .attr('d', area)
               .attr('fill', areaFillConfig.color)
               .style("opacity", areaFillConfig.opacity);
