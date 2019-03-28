@@ -36,7 +36,7 @@ var lineGraph = function(lineConfig, areaFillConfig, state, currentComponentInde
     context = d3.select(this);
 
     let margin = {top: 30, right: 10, bottom: 30, left: 10},
-      w = width*110 - margin.right - margin.left,
+      w = width*140 - margin.right - margin.left,
       h = 700 - margin.top;
 
     lineConfig.forEach(function(element, index) {
@@ -45,8 +45,8 @@ var lineGraph = function(lineConfig, areaFillConfig, state, currentComponentInde
       var lineToBeRendered = element.line;
       var data = element.data;
 
-      let xScale = d3.scaleLinear().domain(lineToBeRendered.headerMin, lineToBeRendered.headerMax).range([-20 , w-20]);
-      let yScale = d3.scaleLinear().domain(d3.min(data.data.map(function(d){return d[0]})),d3.max(data.data.map(function(d){return d[0]}))).range([h, 0]);
+      let xScale = d3.scaleLinear().domain(d3.extent(data.data.map(d => d[1]))).range([-20 , w-20]);
+      let yScale = d3.scaleLinear().domain(d3.extent(data.data.map(d => d[0]))).range([h, 0]);
 
       let line = d3.line()
         .y(d => yScale(d[0]))
