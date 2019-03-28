@@ -45,7 +45,7 @@ var lineGraph = function(lineConfig, areaFillConfig, state, currentComponentInde
       var lineToBeRendered = element.line;
       var data = element.data;
 
-      let xScale = d3.scaleLinear().domain(d3.extent(data.data.map(d => d[1]))).range([-20 , w-20]);
+      let xScale = d3.scaleLinear().domain(lineToBeRendered.headerMin, lineToBeRendered.headerMax).range([-20 , w-20]);
       let yScale = d3.scaleLinear().domain(d3.extent(data.data.map(d => d[0]))).range([h, 0]);
 
       let line = d3.line()
@@ -106,7 +106,6 @@ var lineGraph = function(lineConfig, areaFillConfig, state, currentComponentInde
       }
 
       function update() {
-        var leftPadding = margin.left + 15;
         yScale.domain(d3.extent(data.data, function(d) { return d[0]; }));
         xScale.domain(d3.extent(data.data, function(d) { return d[1]; }));
 
@@ -116,7 +115,7 @@ var lineGraph = function(lineConfig, areaFillConfig, state, currentComponentInde
           .data([data.data])
           .attr('class', 'grid')
           .attr('d', line)
-          .attr("transform", "translate(" + leftPadding + ", 0)")
+          .attr("transform", "translate(" + margin.left + ", 0)")
           .attr('stroke', lineToBeRendered.color)
           .attr('fill', 'none')
           .attr('stroke-width', lineToBeRendered.lineWeight)
@@ -139,7 +138,7 @@ var lineGraph = function(lineConfig, areaFillConfig, state, currentComponentInde
               .select('.areapath'+index+currentComponentIndex)
               .select('path')
               .data([combinedData])
-              .attr("transform", "translate(" + leftPadding + ", 0)")
+              .attr("transform", "translate(" + margin.left + ", 0)")
               .attr('d', area)
               .attr('fill', areaFillConfig.color)
               .style("opacity", areaFillConfig.opacity);
@@ -148,7 +147,7 @@ var lineGraph = function(lineConfig, areaFillConfig, state, currentComponentInde
               .select('.areapath'+index+currentComponentIndex)
               .select('path')
               .data([data.data])
-              .attr("transform", "translate(" + leftPadding + ", 0)")
+              .attr("transform", "translate(" + margin.left + ", 0)")
               .attr('d', area)
               .attr('fill', areaFillConfig.color)
               .style("opacity", areaFillConfig.opacity);
