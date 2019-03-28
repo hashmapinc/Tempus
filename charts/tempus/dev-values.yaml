@@ -114,7 +114,7 @@ ingress:
 # Configuration of other essential services 
 
 databaseSetup: 
-  enabled: true
+  enabled: false
   name: "db-setup"
   image:
     repository: hashmapinc/database-setup
@@ -216,10 +216,11 @@ dataquality:
     port: 80
   pdb:
     minAvailable: 1
-  streamname: stream-name
-  shardid: shardId
+  streamname: lambda-stream
+  shardid: shardId-000000000000
   kafka: kafka
-  dataqualitytopic: data-quality-topic    
+  dataqualitytopic: data-quality-topic   
+  tempusurl: tempus.tempus:8080
 
 spark:
   enabled: true

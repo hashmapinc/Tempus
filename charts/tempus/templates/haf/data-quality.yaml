@@ -51,7 +51,7 @@ data:
   tempus.url: "http://{{ .Values.identity.name }}:{{ .Values.identity.service.port }}/uaa"
   mqtt.host: "0.0.0.0"
   mqtt.port: "1883"
-  tempus.url: "http://localhost:8080"
+  tempus.url: {{ .Values.dataquality.tempusurl }}
 ---
 apiVersion: apps/v1
 kind: Deployment
