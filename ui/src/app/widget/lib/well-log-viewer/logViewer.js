@@ -20,8 +20,8 @@ import * as d3 from 'd3';
 import {linearGrid} from './linearGrid';
 import {headerLegend} from './headerLegend';
 import {lineGraph} from './lineGraph';
-import {timeYaxis} from './timeYaxis';
-import {mudLog} from './mudLog';
+// import {timeYaxis} from './timeYaxis';
+// import {mudLog} from './mudLog';
 import './logViewer.css';
 
 // var loadConfig = require('./config');
@@ -80,38 +80,30 @@ export default function loadLogViewer(ctx, sequence){
       config.Track.forEach(function(track){
         var trackObj = [];
         var graphElementsNumber = 0;
-        track.component.forEach(function(componentObj){
-          if(componentObj.cType === 'Grid'){
-            var lnGrid = linearGrid(componentObj, datasourceFilter(componentObj, dArray), state, graphElementsNumber, parseInt(track.width));
-            trackObj.push(lnGrid);
-            graphElementsNumber+=1;
-          }
-          if(componentObj.cType === 'Time Y axis'){
-             var tYaxis = timeYaxis(componentObj, datasourceFilter(componentObj, dArray), state, graphElementsNumber, parseInt(track.width));
-            trackObj.push(tYaxis);
-            graphElementsNumber+=1;
-          }
-          if(componentObj.cType === 'Line'){
-            if(angular.isArray(componentObj.lines)){
-              var lineData = [];
-              componentObj.lines.forEach(function(line) {
-                var hLegend = headerLegend(line, state, graphElementsNumber, parseInt(track.width));
-                trackObj.push(hLegend);
-                graphElementsNumber+=1;
-                lineData.push({'line': line, 'data': datasourceFilter(line, dArray)}  )
-              })
-              var lnGraph = lineGraph(lineData, componentObj.areaFill, state, graphElementsNumber, parseInt(track.width));
-              trackObj.push(lnGraph);
-              graphElementsNumber+=1;
-            }
-          }
-          if(componentObj.cType === 'Mud Log Viewer'){
-            var mdlog = mudLog(componentObj, datasourceFilter(componentObj, dArray), state, graphElementsNumber, parseInt(track.width));
-            trackObj.push(mdlog);
-            graphElementsNumber+=1;
-          }
 
-        })
+
+        let gridComponent = track.component.find(componentObj => componentObj.cType === 'Grid')
+        if(gridComponent){
+          var lnGrid = linearGrid(gridComponent, datasourceFilter(gridComponent, dArray), state, graphElementsNumber, parseInt(track.width));
+          trackObj.push(lnGrid);
+          graphElementsNumber+=1;
+        }
+
+        let lineComponent = track.component.find(componentObj => componentObj.cType === 'Line')
+        if(lineComponent) {
+          if(angular.isArray(lineComponent.lines)){
+            var lineData = [];
+            lineComponent.lines.forEach(function(line) {
+              var hLegend = headerLegend(line, state, graphElementsNumber, parseInt(track.width));
+              trackObj.push(hLegend);
+              graphElementsNumber+=1;
+              lineData.push({'line': line, 'data': datasourceFilter(line, dArray)}  )
+            })
+            var lnGraph = lineGraph(lineData, lineComponent.areaFill, state, graphElementsNumber, parseInt(track.width));
+            trackObj.push(lnGraph);
+            graphElementsNumber+=1;
+          }
+        }
         buildArray.push(trackObj);
       })
      }
@@ -138,9 +130,6 @@ export default function loadLogViewer(ctx, sequence){
              .attr("class", "linearGrid")
         }
 
-        track.sort(function(left, right) {
-          left.order - right.order;
-        });
         track.forEach(function(component){
             d3.select(trackId)
               .call(component);
