@@ -21,12 +21,9 @@ import './logViewer.css';
 
 /*@ngInject*/
 
-var headerLegend = function(lineConfig, headerCount, data, state, index, width) {
+var headerLegend = function(lineConfig, state, index, width) {
   'use strict';
-  var o;
-     // local;
-
-  o = {
+  var o = {
     value: null,
     key: null,
     min: lineConfig.headerMin,
@@ -34,8 +31,6 @@ var headerLegend = function(lineConfig, headerCount, data, state, index, width) 
     lineWeight: lineConfig.lineWeight,
     color: lineConfig.color,
     label: lineConfig.headerName,
-    headerCount: headerCount,
-    data: data,
     state:state,
     index: index,
     width: width
@@ -44,11 +39,7 @@ var headerLegend = function(lineConfig, headerCount, data, state, index, width) 
   if(angular.isUndefined(o.width)){
     o.width = 3;
   } 
-  // local = {
-  // //  label: d3.local(),
-  // //  dimensions: d3.local()
-  // };
- 
+
   function header(group) {
     // group-scope
     if(o.state === 'init'){
@@ -56,23 +47,18 @@ var headerLegend = function(lineConfig, headerCount, data, state, index, width) 
     }  
   }
  
-  //function render(data) {
   function render() {
     var context;
-       // dim;
 
     context = d3.select(this);
 
     var margin = {top: 30, right: 10, bottom: 30, left: 10},
-      width = o.width*110 - margin.right - margin.left,
+      width = o.width*140 - margin.right - margin.left,
       height = 60 - margin.top - margin.bottom;
 
     var x = d3.scaleLinear()
         .domain([o.min, o.max])
         .range([0, width])
-
-    // var y = d3.scaleLinear()
-    //     .range([0, height]);
 
     var xAxis = d3.axisTop()
         .scale(x)
@@ -81,9 +67,7 @@ var headerLegend = function(lineConfig, headerCount, data, state, index, width) 
 
     context.select(".header")
          .append("svg")
-         .attr("class", "header"+ headerCount)
-         // .attr("width", 440)
-         // .attr("height", 0)
+         .attr("class", "header"+ index)
         .attr("width", width + margin.right + margin.left)
         .attr("height", height + margin.top + margin.bottom)
       .append("g")
@@ -97,7 +81,7 @@ var headerLegend = function(lineConfig, headerCount, data, state, index, width) 
           .style("stroke", o.color)
           .style("stroke-width", o.lineWeight)
 
-          context.select('.header'+ headerCount)
+          context.select('.header'+ index)
           .append("text")             
           .attr("transform",
                 "translate(" + (width/2) + " ," + 

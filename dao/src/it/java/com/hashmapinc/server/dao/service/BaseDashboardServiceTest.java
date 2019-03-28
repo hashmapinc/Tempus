@@ -39,6 +39,8 @@ public abstract class BaseDashboardServiceTest extends AbstractServiceTest {
     private IdComparator<DashboardInfo> idComparator = new IdComparator<>();
     
     protected TenantId tenantId;
+    protected TenantId tenantId2;
+
 
     @Before
     public void before() {
@@ -47,11 +49,17 @@ public abstract class BaseDashboardServiceTest extends AbstractServiceTest {
         Tenant savedTenant = tenantService.saveTenant(tenant);
         Assert.assertNotNull(savedTenant);
         tenantId = savedTenant.getId();
+
+        tenant.setTitle("My second tenant");
+        Tenant savedTenant2 = tenantService.saveTenant(tenant);
+        Assert.assertNotNull(savedTenant2);
+        tenantId2 = savedTenant2.getId();
     }
 
     @After
     public void after() {
         tenantService.deleteTenant(tenantId);
+        tenantService.deleteTenant(tenantId2);
     }
 
     @Rule
@@ -104,7 +112,7 @@ public abstract class BaseDashboardServiceTest extends AbstractServiceTest {
     @Test
     public void testSaveDashboardWithDuplicateNameShouldThrowException() throws DataValidationException{
         expectedEx.expect(DataValidationException.class);
-        expectedEx.expectMessage("Dashboard is already created for name well-dashboard");
+        expectedEx.expectMessage("Dashboard well-dashboard is already created");
 
         Dashboard dashboard = new Dashboard();
         dashboard.setTitle("well-dashboard");
@@ -112,6 +120,17 @@ public abstract class BaseDashboardServiceTest extends AbstractServiceTest {
         dashboardService.saveDashboard(dashboard);
         dashboardService.saveDashboard(dashboard);
     }
+
+    @Test
+    public void saveDashboardWithSameNameForTwoDifferentTenant() throws DataValidationException{
+        Dashboard dashboard = new Dashboard();
+        dashboard.setTitle("well-dashboard");
+        dashboard.setTenantId(tenantId);
+        Assert.assertNotNull(dashboardService.saveDashboard(dashboard));
+        dashboard.setTenantId(tenantId2);
+        Assert.assertNotNull(dashboardService.saveDashboard(dashboard));
+    }
+
 
     @Test(expected = DataValidationException.class)
     public void testAssignDashboardToNonExistentCustomer() {

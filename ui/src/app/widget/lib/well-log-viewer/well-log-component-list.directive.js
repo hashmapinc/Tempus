@@ -28,21 +28,36 @@ export default function WellLogViewerTrackDirective($compile, $templateCache,typ
         var template = $templateCache.get(wellTrackComponent);
         element.html(template);
         scope.trackWidth =types.wellLogComponent.trackWidth;
+        scope.isLineButtonHidden = isComponentPresent(scope.trackDetail.component, 'Line')
+        scope.isGridButtonHidden = isComponentPresent(scope.trackDetail.component, 'Grid');
+        scope.isTimeYButtonHidden = isComponentPresent(scope.trackDetail.component, 'Time Y axis');
 
-        scope.addComponent = function (){
-
+        scope.addComponent = function (componentType){
+            changeButtonVisibility(componentType, scope, true);
             var insertDetail = {
-                id: scope.trackDetail.component.length ? scope.trackDetail.component.length + 1 : 1
+                id: scope.trackDetail.component.length ? scope.trackDetail.component.length + 1 : 1,
+                cType: componentType
             }
             scope.trackDetail.component.push(insertDetail);
         }
+
         scope.removeComponent = function ($event,id){
             var index = scope.trackDetail.component.findIndex(x => x.id==id);
+            var componentType = scope.trackDetail.component.find(x => x.id==id).cType;
+            changeButtonVisibility(componentType, scope, false);
             if($event){
                   $event.stopPropagation();
                   $event.preventDefault();
             }
             scope.trackDetail.component.splice(index, 1);
+        }
+
+        scope.componentName = function(component) {
+            switch(component.cType) {
+                case 'Line' : return component.lines.map(getHeadername).join(' & ') + ' Line';
+                case 'Grid' : return 'Grid';
+                case 'Time Y axis' : return 'Time Y axis';
+            } 
         }
         $compile(element.contents())(scope);
     }
@@ -54,4 +69,24 @@ export default function WellLogViewerTrackDirective($compile, $templateCache,typ
             datasources: '='
         }
     };
+
+    function getHeadername(line) {
+        return ((line.headerName) ? line.headerName : '');
+    }
+
+    function isComponentPresent(components, componentType) {
+        return components.filter(component => component.cType == componentType).length > 0
+    }
+
+    function changeButtonVisibility(componentType, scope, isHidden) {
+        if (componentType === 'Line') {
+            scope.isLineButtonHidden = isHidden;
+        }
+        if (componentType === 'Grid') {
+            scope.isGridButtonHidden = isHidden;
+        }
+        if (componentType === 'Time Y axis') {
+            scope.isTimeYButtonHidden = isHidden;
+        }
+    }
 }

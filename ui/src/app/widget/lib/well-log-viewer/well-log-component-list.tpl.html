@@ -21,7 +21,7 @@
         <div class="comp-margin">
             <br>
             <md-input-container class="md-block">
-                <md-select ng-model="trackDetail.width" placeholder="{{ 'wellLog.track-width' | translate}}">
+                <md-select ng-model="trackDetail.width" placeholder="{{ 'wellLog.track-width' | translate}}" required>
                     <md-option ng-value="width" ng-repeat="width in trackWidth">{{ width }}</md-option>
                 </md-select>
             </md-input-container>
@@ -32,7 +32,7 @@
 
                     <v-pane id="{{ ::pane.id }}" ng-repeat="component in trackDetail.component" expanded="pane.isExpanded">
                         <v-pane-header id="{{ ::pane.id }}-header" style="border:outset;">
-                            <lable class="track-label">{{ 'wellLog.component' | translate}} {{component.id}}</lable>
+                            <lable class="track-label">{{ componentName(component) }}  {{ 'wellLog.component' | translate}}</lable>
                             <md-button class="md-icon-button md-primary comp-btn"
                                        aria-label="{{ 'action.remove' | translate }}"
                             ng-click="removeComponent($event,component.id)">
@@ -48,6 +48,7 @@
 
                         <v-pane-content id="{{ ::pane.id }}-content" aria-labelledby="{{ ::pane.id }}-header">
                             <tb-well-log-component
+                                    components="trackDetail.component"
                                     track-component="component"
                                     datasources="datasources"
                             ></tb-well-log-component>
@@ -56,12 +57,17 @@
 
                 </v-accordion>
                 <br/>
-                <md-button ng-disabled="$root.loading" ng-click="addComponent($event)" class="md-raised md-primary md-button md-ink-ripple md-themeDark-theme" aria-label="Add Track">
-                    <md-tooltip>
-                        {{ 'wellLog.add-component' | translate }}
-                    </md-tooltip>
-                    {{ 'wellLog.add-component' | translate }}
-
+                <md-button ng-disabled="$root.loading", ng-hide="isLineButtonHidden", ng-click="addComponent('Line')" class="md-raised md-primary md-button md-ink-ripple md-themeDark-theme">
+                    <md-tooltip>{{ 'wellLog.add-lineComponent' | translate }}</md-tooltip>
+                    {{ 'wellLog.add-lineComponent' | translate }}
+                </md-button>
+                <md-button ng-disabled="$root.loading", ng-hide="isGridButtonHidden", ng-click="addComponent('Grid')" class="md-raised md-primary md-button md-ink-ripple md-themeDark-theme">
+                    <md-tooltip>{{ 'wellLog.add-gridComponent' | translate }}</md-tooltip>
+                    {{ 'wellLog.add-gridComponent' | translate }}
+                </md-button>
+                <md-button ng-disabled="$root.loading", ng-hide="isTimeYButtonHidden", ng-click="addComponent('Time Y axis')" class="md-raised md-primary md-button md-ink-ripple md-themeDark-theme">
+                    <md-tooltip>{{ 'wellLog.add-timeYComponent' | translate }}</md-tooltip>    
+                    {{ 'wellLog.add-timeYComponent' | translate }}
                 </md-button>
             </div>
         </div>

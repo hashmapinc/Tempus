@@ -20,7 +20,6 @@ import com.hashmapinc.server.common.data.Dashboard;
 import com.hashmapinc.server.common.data.UUIDConverter;
 import com.hashmapinc.server.dao.DaoUtil;
 import com.hashmapinc.server.dao.model.sql.DashboardEntity;
-import com.hashmapinc.server.dao.util.SqlDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Component;
@@ -59,6 +58,12 @@ public class JpaDashboardDao extends JpaAbstractSearchTextDao<DashboardEntity, D
     @Override
     public List<Dashboard> findDashboardBySearchText(String searchText) {
         List<DashboardEntity> entities = dashboardRepository.findBySearchText(searchText);
+        return DaoUtil.convertDataList(entities);
+    }
+
+    @Override
+    public List<Dashboard> findDashboardBySearchTextAndTenantId(String searchText , UUID tenantId) {
+        List<DashboardEntity> entities = dashboardRepository.findBySearchTextAndTenantId(searchText, UUIDConverter.fromTimeUUID(tenantId));
         return DaoUtil.convertDataList(entities);
     }
 }
