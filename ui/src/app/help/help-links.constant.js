@@ -46,14 +46,15 @@ var pluginActionsClazzHelpLinkMap = {
     'com.hashmapinc.server.extensions.rest.action.RestApiCallPluginAction': 'pluginActionRestApiCall'
 };
 
-var helpBaseUrl = "http://tempus-cloud.s3-website-us-west-2.amazonaws.com/help";
+//var helpBaseUrl = "http://tempus-cloud.s3-website-us-west-2.amazonaws.com/help";
+var helpBaseUrl = "https://tempus.readthedocs.io/en/latest";
 
 export default angular.module('tempus.help', [])
     .constant('helpLinks',
         {
             linksMap: {
                 outgoingMailSettings: helpBaseUrl + "/admin/mail.html",
-                plugins: helpBaseUrl + "/features/ruleengine.html#plugins",
+                plugins: helpBaseUrl + "/admin/plugins.html",
                 pluginDeviceMessaging: helpBaseUrl + "/reference/plugins/devicemessaging.html",
                 pluginTelemetryStorage: helpBaseUrl + "/reference/plugins/telemetry.html",
                 pluginRpcPlugin: helpBaseUrl + "/reference/plugins/rpc.html",
@@ -62,7 +63,7 @@ export default angular.module('tempus.help', [])
                 pluginTimePlugin: helpBaseUrl + "/reference/plugins/timerpc.html",
                 pluginKafkaPlugin: helpBaseUrl + "/reference/plugins/kafka.html",
                 pluginRabbitMqPlugin: helpBaseUrl + "/reference/plugins/kafka.html",
-                rules: helpBaseUrl + "/features/ruleengine.html#rules",
+                rules: helpBaseUrl + "/admin/rules.html",
                 filters: helpBaseUrl + "/features/ruleengine.html#filters",
                 filterMsgType: helpBaseUrl + "/reference/filters/messagetypefilter.html",
                 filterDeviceTelemetry: helpBaseUrl + "/reference/filters/devicetelemetryfilter.html",
