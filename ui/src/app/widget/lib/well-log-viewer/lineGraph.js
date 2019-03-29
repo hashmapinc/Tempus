@@ -48,40 +48,6 @@ var lineGraph = function(lineConfig, areaFillConfig, state, currentComponentInde
       let xScale = d3.scaleLinear().domain([lineToBeRendered.headerMin, lineToBeRendered.headerMax]).range([-20 , w-20]);
       let yScale = d3.scaleLinear().domain(d3.extent(data.data.map(d => d[0]))).range([h, 0]);
 
-      let line = d3.line()
-        .y(d => yScale(d[0]))
-        .x(d => xScale(d[1]))
-        .curve(d3.curveLinear);
-
-      if(angular.isDefined(areaFillConfig) && areaFillConfig.enable){
-        if(areaFillConfig.referenceLine === lineToBeRendered.headerName){
-          let area;
-          if(areaFillConfig.fill === "left"){
-
-            area = d3.area()
-                  .x0(-14)
-                  .x1((d) => xScale(d[1]))
-                  .y((d) => yScale(d[0]))
-                  .curve(d3.curveLinear);
-          }
-          if(areaFillConfig.fill === "right"){
-              area = d3.area()
-                    .x0((d) => xScale(d[1]))
-                    .x1(w)
-                    .y((d) => yScale(d[0]))
-                    .curve(d3.curveLinear);
-          }
-          if(areaFillConfig.fill === "between"){
-            let otherLineConfig = lineConfig[Math.abs(index-1)]
-            let xScaleOfOtherLine = d3.scaleLinear().domain(d3.min(otherLineConfig.data.data, function(d) { return d[1]; }),d3.max(otherLineConfig.data.data, function(d) { return d[1]; })).range([0 , w]);
-            area = d3.area()
-                    .x0((d) => xScale(d[1]))
-                    .x1((d) => xScaleOfOtherLine(d[2]))
-                    .y((d) => yScale(d[0]))
-                    .curve(d3.curveLinear);
-          }
-        }
-      }
 
       if(state === "init"){
         let $lineGraph = context.select('.linearGrid')
@@ -92,7 +58,7 @@ var lineGraph = function(lineConfig, areaFillConfig, state, currentComponentInde
           .append('path')
           .attr('stroke', lineToBeRendered.color)
           .attr('fill', 'none')
-          .attr('stroke-width', lineToBeRendered.lineWeight)
+          .attr('stroke-width', lineToBeRendered.lineWeight);
 
           if(angular.isDefined(areaFillConfig) && areaFillConfig.enable){
             if(areaFillConfig.referenceLine === lineToBeRendered.headerName){
@@ -107,26 +73,61 @@ var lineGraph = function(lineConfig, areaFillConfig, state, currentComponentInde
       }
 
       function update() {
-        
 
-        let $line= context.select('.linearGrid').select('.linepath'+index+currentComponentIndex).select('path');
+        //line painting
 
-        $line
-          .data([data.data])
-          .attr('class', 'grid')
-          .attr('d', line)
-          .attr("transform", "translate(" + margin.left + ", 0)")
-          .attr('stroke', lineToBeRendered.color)
-          .attr('fill', 'none')
-          .attr('stroke-width', lineToBeRendered.lineWeight)
+        let line = d3.line()
+            .y(d => yScale(d[0]))
+            .x(d => xScale(d[1]))
+            .curve(d3.curveLinear);
+
+        context.select('.linearGrid').select('.linepath'+index+currentComponentIndex).select('path')
+            .data([data.data])
+            .attr('class', 'grid')
+            .attr('d', line)
+            .attr("transform", "translate(" + margin.left + ", 0)")
+            .attr('stroke', lineToBeRendered.color)
+            .attr('fill', 'none')
+            .attr('stroke-width', lineToBeRendered.lineWeight);
+
+        //area painting
+
+        let area;
 
         if(angular.isDefined(areaFillConfig) && areaFillConfig.enable){
           if(areaFillConfig.referenceLine === lineToBeRendered.headerName){
-            if(areaFillConfig.fill === "between") {
+            if(areaFillConfig.fill === "left"){
+
+              area = d3.area()
+                  .x0(-14)
+                  .x1((d) => xScale(d[1]))
+                  .y((d) => yScale(d[0]))
+                  .curve(d3.curveLinear);
+
+              paintArea();
+            }
+            if(areaFillConfig.fill === "right"){
+              area = d3.area()
+                  .x0((d) => xScale(d[1]))
+                  .x1(w)
+                  .y((d) => yScale(d[0]))
+                  .curve(d3.curveLinear);
+
+              paintArea();
+            }
+            if(areaFillConfig.fill === "between"){
+              let otherLineConfig = lineConfig[Math.abs(index-1)];
+              let xScaleOfOtherLine = d3.scaleLinear().domain(d3.min(otherLineConfig.data.data, function(d) { return d[1]; }),d3.max(otherLineConfig.data.data, function(d) { return d[1]; })).range([0 , w]);
+              area = d3.area()
+                  .x0((d) => xScale(d[1]))
+                  .x1((d) => xScaleOfOtherLine(d[2]))
+                  .y((d) => yScale(d[0]))
+                  .curve(d3.curveLinear);
+
               let otherLineData = lineConfig[Math.abs(index-1)].data.data;
               let combinedData = [];
               data.data.forEach(dataElement =>
-                combinedData.push([dataElement[0], dataElement[1], findCorrespondingDataPoint(dataElement)]));
+                  combinedData.push([dataElement[0], dataElement[1], findCorrespondingDataPoint(dataElement)]));
 
               function findCorrespondingDataPoint(dataElement) {
                 let dataPoint = otherLineData.find(element => element[0] === dataElement[0]);
@@ -135,24 +136,25 @@ var lineGraph = function(lineConfig, areaFillConfig, state, currentComponentInde
                 }
               }
               context.select('.linearGrid')
-              .select('.areapath'+index+currentComponentIndex)
-              .select('path')
-              .data([combinedData])
-              .attr("transform", "translate(" + margin.left + ", 0)")
-              .attr('d', area)
-              .attr('fill', areaFillConfig.color)
-              .style("opacity", areaFillConfig.opacity);
-            } else {
-              context.select('.linearGrid')
-              .select('.areapath'+index+currentComponentIndex)
+                  .select('.areapath'+index+currentComponentIndex)
+                  .select('path')
+                  .data([combinedData])
+                  .attr("transform", "translate(" + margin.left + ", 0)")
+                  .attr('d', area)
+                  .attr('fill', areaFillConfig.color)
+                  .style("opacity", areaFillConfig.opacity);
+            }
+          }
+        }
+        function paintArea() {
+          context.select('.linearGrid')
+              .select('.areapath' + index + currentComponentIndex)
               .select('path')
               .data([data.data])
               .attr("transform", "translate(" + margin.left + ", 0)")
               .attr('d', area)
               .attr('fill', areaFillConfig.color)
               .style("opacity", areaFillConfig.opacity);
-            }
-          }
         }
       }
       update();
