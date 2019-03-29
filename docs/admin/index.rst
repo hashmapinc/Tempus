@@ -20,7 +20,7 @@ Administration
     plugins
     widgets
     dashboards
+    assetlanding
     cluster
     mail
-    whitelabeling
-    agent
+    whitelabeling    agent
