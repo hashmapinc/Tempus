@@ -50,6 +50,7 @@ var lineGraph = function(lineConfig, areaFillConfig, state, currentComponentInde
       let yScale = d3.scaleLinear().domain(d3.extent(data.data.map(d => d[0]))).range([h, 0]);
 
 
+
       if(state === "init"){
         let $lineGraph = context.select('.linearGrid')
           .attr("width", w + margin.right + 1)
@@ -147,6 +148,7 @@ var lineGraph = function(lineConfig, areaFillConfig, state, currentComponentInde
       }
       update();
     });
+
   }
   lineChart.order = 2;
   return lineChart;

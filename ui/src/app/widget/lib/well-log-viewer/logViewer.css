@@ -92,6 +92,20 @@ svg {
   stroke: #A9A9A9 !important;
   stroke-width: 3px !important;
 }
+.overlay {
+  fill: none;
+  pointer-events: all;
+}
+.hover-line {
+  stroke: #B74779;
+  stroke-width: 2px;
+  stroke-dasharray: 3,3;
+}
+.g_main {
+    cursor:pointer;
+    pointer-events: all;
+  }
+
 
 /*.axis text {
   font: 10px sans-serif;
