@@ -16,6 +16,9 @@
  */
  /* eslint-disable */
 //import * as d3 from 'well-log-viewer/node_modules/d3/build/d3';
+
+"use strict";
+
 import * as d3 from 'd3';
 
 import {dataGenerator} from './dataGenerator';
@@ -23,8 +26,6 @@ import './logViewer.css';
 
 /*@ngInject*/
 var lineGraph = function(lineConfig, areaFillConfig, state, currentComponentIndex, width) {
-
-  "use strict";
 
   function lineChart(group) {
     group.each(render);
@@ -104,7 +105,7 @@ var lineGraph = function(lineConfig, areaFillConfig, state, currentComponentInde
                   .y((d) => yScale(d[0]))
                   .curve(d3.curveLinear);
 
-              paintArea();
+              paintArea(data.data);
             }
             if(areaFillConfig.fill === "right"){
               area = d3.area()
@@ -113,44 +114,31 @@ var lineGraph = function(lineConfig, areaFillConfig, state, currentComponentInde
                   .y((d) => yScale(d[0]))
                   .curve(d3.curveLinear);
 
-              paintArea();
+              paintArea(data.data);
             }
             if(areaFillConfig.fill === "between"){
               let otherLineConfig = lineConfig[Math.abs(index-1)];
               let xScaleOfOtherLine = d3.scaleLinear().domain(d3.min(otherLineConfig.data.data, function(d) { return d[1]; }),d3.max(otherLineConfig.data.data, function(d) { return d[1]; })).range([0 , w]);
-              area = d3.area()
-                  .x0((d) => xScale(d[1]))
-                  .x1((d) => xScaleOfOtherLine(d[2]))
-                  .y((d) => yScale(d[0]))
-                  .curve(d3.curveLinear);
-
               let otherLineData = lineConfig[Math.abs(index-1)].data.data;
               let combinedData = [];
               data.data.forEach(dataElement =>
-                  combinedData.push([dataElement[0], dataElement[1], findCorrespondingDataPoint(dataElement)]));
+                  combinedData.push([dataElement[0], dataElement[1], findCorrespondingDataPoint(dataElement, otherLineData)]));
+              combinedData = combinedData.filter(element => angular.isDefined(element[2]));
 
-              function findCorrespondingDataPoint(dataElement) {
-                let dataPoint = otherLineData.find(element => element[0] === dataElement[0]);
-                if(dataPoint) {
-                  return dataPoint[1];
-                }
-              }
-              context.select('.linearGrid')
-                  .select('.areapath'+index+currentComponentIndex)
-                  .select('path')
-                  .data([combinedData])
-                  .attr("transform", "translate(" + margin.left + ", 0)")
-                  .attr('d', area)
-                  .attr('fill', areaFillConfig.color)
-                  .style("opacity", areaFillConfig.opacity);
+              area = d3.area()
+                  .x0((d) => xScale(combinedData[d][1]))
+                  .x1((d) => xScaleOfOtherLine(combinedData[d][2]))
+                  .y((d) => yScale(combinedData[d][0]))
+                  .curve(d3.curveLinear);
+              paintArea(d3.range(combinedData.length));
             }
           }
         }
-        function paintArea() {
+        function paintArea(dataToBeUsed) {
           context.select('.linearGrid')
               .select('.areapath' + index + currentComponentIndex)
               .select('path')
-              .data([data.data])
+              .data([dataToBeUsed])
               .attr("transform", "translate(" + margin.left + ", 0)")
               .attr('d', area)
               .attr('fill', areaFillConfig.color)
@@ -164,3 +152,11 @@ var lineGraph = function(lineConfig, areaFillConfig, state, currentComponentInde
   return lineChart;
 };
 export {lineGraph};
+
+
+function findCorrespondingDataPoint(dataElement, otherLineData) {
+  let dataPoint = otherLineData.find(element => Math.abs(element[0] - dataElement[0]) < 0.03);
+  if(dataPoint) {
+    return dataPoint[1];
+  }
+}
