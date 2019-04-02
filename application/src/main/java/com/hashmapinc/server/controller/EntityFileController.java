@@ -21,6 +21,7 @@ import com.hashmapinc.server.common.data.exception.TempusException;
 import com.hashmapinc.server.common.data.id.AssetId;
 import com.hashmapinc.server.common.data.id.DeviceId;
 import com.hashmapinc.server.common.data.id.EntityId;
+import com.hashmapinc.server.common.data.page.PaginatedResult;
 import com.hashmapinc.server.common.data.upload.FileMetaData;
 import com.hashmapinc.server.common.data.upload.InputStreamWrapper;
 import com.hashmapinc.server.service.computation.CloudStorageService;
@@ -33,7 +34,6 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
 import javax.servlet.http.HttpServletResponse;
-import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -67,16 +67,12 @@ public class EntityFileController extends BaseController {
     @PreAuthorize("hasAuthority('TENANT_ADMIN')")
     @GetMapping(value = "/file")
     @ResponseBody
-    public List<FileMetaData> getFileList(@RequestParam Map<String, String> relatedEntityInfo) throws TempusException {
+    public PaginatedResult<FileMetaData> getFile(@RequestParam Map<String, String> relatedEntityInfo) throws TempusException {
         try {
             String strRelatedEntityId = relatedEntityInfo.get("relatedEntityId");
             String strRelatedEntityType = relatedEntityInfo.get("relatedEntityType");
-            String fileName = null;
-            if(relatedEntityInfo.containsKey("fileName"))
-                fileName = relatedEntityInfo.get("fileName");
-            EntityId relatedEntityId = createRelatedEntityId(strRelatedEntityId, strRelatedEntityType);
-            List<FileMetaData> fileMetaDataList = entityFileService.getFileList(getCurrentUser().getTenantId(), relatedEntityId, fileName);
-            return fileMetaDataList;
+            EntityId entityId = createRelatedEntityId(strRelatedEntityId, strRelatedEntityType);
+            return entityFileService.findAll(getCurrentUser().getTenantId(), entityId,relatedEntityInfo);
         } catch (Exception e) {
             log.info("Exception occurred {}", e);
             throw handleException(e);
