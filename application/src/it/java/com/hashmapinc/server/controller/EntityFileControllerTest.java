@@ -18,6 +18,8 @@ package com.hashmapinc.server.controller;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.hashmapinc.server.common.data.Device;
+import com.hashmapinc.server.common.data.page.PaginatedResult;
+import com.hashmapinc.server.common.data.page.TextPageLink;
 import com.hashmapinc.server.common.data.upload.FileMetaData;
 import com.hashmapinc.server.common.data.upload.InputStreamWrapper;
 import com.hashmapinc.server.service.computation.CloudStorageService;
@@ -33,9 +35,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -52,6 +52,8 @@ public abstract class EntityFileControllerTest extends AbstractControllerTest {
     private MultipartFile multipartFile = null;
     private MultipartFile multipartFile2 = null;
     private MultipartFile multipartFile3 = null;
+    private MultipartFile multipartFile4 = null;
+    private MultipartFile multipartFile5 = null;
 
     private Device device = null;
 
@@ -68,6 +70,12 @@ public abstract class EntityFileControllerTest extends AbstractControllerTest {
 
         multipartFile3 = new MockMultipartFile("file", "tempus-logo.jpg", "svg", new FileInputStream(new File(classLoader.
                 getResource("tempus-logo.jpg").getFile())));
+
+        multipartFile4 = new MockMultipartFile("file", "demo1.txt", "txt", new FileInputStream(new File(classLoader.
+                getResource("demo1.txt").getFile())));
+
+        multipartFile5 = new MockMultipartFile("file", "demo2.txt", "txt", new FileInputStream(new File(classLoader.
+                getResource("demo2.txt").getFile())));
 
         createDevice();
     }
@@ -98,24 +106,6 @@ public abstract class EntityFileControllerTest extends AbstractControllerTest {
         when(cloudStorageService.upload(any(), any(), any(), any())).thenReturn(false);
         String requestParams = "?relatedEntityId=" + device.getId() + "&relatedEntityType=DEVICE";
         doPostFile("/api/file" + requestParams, multipartFile).andExpect(status().isNotFound());
-    }
-
-    @Test
-    public void getAllFiles() throws Exception {
-        when(cloudStorageService.upload(any(), any(), any(), any())).thenReturn(true);
-        String requestParams = "?relatedEntityId=" + device.getId() + "&relatedEntityType=DEVICE";
-
-        FileMetaData retFileMetaData = doPostFile("/api/file" + requestParams, multipartFile, FileMetaData.class);
-        Assert.assertNotNull(retFileMetaData);
-
-        FileMetaData retFileMetaData2 = doPostFile("/api/file" + requestParams, multipartFile2, FileMetaData.class);
-        Assert.assertNotNull(retFileMetaData2);
-
-        FileMetaData retFileMetaData3 = doPostFile("/api/file" + requestParams, multipartFile3, FileMetaData.class);
-        Assert.assertNotNull(retFileMetaData3);
-
-        List<FileMetaData> retFileMetaDataList = doGetTyped("/api/file" + requestParams, new TypeReference<>() {});
-        Assert.assertEquals(3, retFileMetaDataList.size());
     }
 
     @Test
@@ -153,5 +143,76 @@ public abstract class EntityFileControllerTest extends AbstractControllerTest {
         map.put("newFileName", "file3.txt");
 
         doPut("/api/file/file.txt", map).andExpect(status().isOk());
+    }
+
+    @Test
+    public void getAllFiles() throws Exception {
+        when(cloudStorageService.upload(any(), any(), any(), any())).thenReturn(true);
+        String requestParams = "?relatedEntityId=" + device.getId() + "&relatedEntityType=DEVICE";
+        List<FileMetaData> fileMetaData = new ArrayList<>();
+
+        FileMetaData retFileMetaData = doPostFile("/api/file" + requestParams, multipartFile, FileMetaData.class);
+        Assert.assertNotNull(retFileMetaData);
+        fileMetaData.add(retFileMetaData);
+
+        FileMetaData retFileMetaData2 = doPostFile("/api/file" + requestParams, multipartFile2, FileMetaData.class);
+        Assert.assertNotNull(retFileMetaData2);
+        fileMetaData.add(retFileMetaData2);
+
+        FileMetaData retFileMetaData3 = doPostFile("/api/file" + requestParams, multipartFile3, FileMetaData.class);
+        Assert.assertNotNull(retFileMetaData3);
+        fileMetaData.add(retFileMetaData3);
+
+        FileMetaData retFileMetaData4 = doPostFile("/api/file" + requestParams, multipartFile4, FileMetaData.class);
+        Assert.assertNotNull(retFileMetaData4);
+        fileMetaData.add(retFileMetaData4);
+
+        FileMetaData retFileMetaData5 = doPostFile("/api/file" + requestParams, multipartFile5, FileMetaData.class);
+        Assert.assertNotNull(retFileMetaData5);
+        fileMetaData.add(retFileMetaData5);
+
+        List<FileMetaData> loadedFileMetaData = new ArrayList<>();
+        int page = 0;
+        int limit = 2;
+        PaginatedResult<FileMetaData> pageData;
+        do {
+            String requestParams1 = "?relatedEntityId=" + device.getId() + "&relatedEntityType=DEVICE" + "&limit=" + limit + "&pageNum=" + page +"&searchText=" + "&sortBy=fileName&orderBy=asc";
+            pageData = doGetTyped("/api/file" + requestParams1, new TypeReference<>() {});
+            loadedFileMetaData.addAll(pageData.getData());
+            page += 1;
+        } while (pageData.isHasNext());
+
+        fileMetaData.sort(Comparator.comparing(FileMetaData::getFileName));
+        Assert.assertEquals(fileMetaData, loadedFileMetaData);
+    }
+
+    @Test
+    public void getAllFilesWithSearchText() throws Exception {
+        when(cloudStorageService.upload(any(), any(), any(), any())).thenReturn(true);
+        String requestParams = "?relatedEntityId=" + device.getId() + "&relatedEntityType=DEVICE";
+
+        FileMetaData retFileMetaData = doPostFile("/api/file" + requestParams, multipartFile, FileMetaData.class);
+        Assert.assertNotNull(retFileMetaData);
+
+        FileMetaData retFileMetaData2 = doPostFile("/api/file" + requestParams, multipartFile2, FileMetaData.class);
+        Assert.assertNotNull(retFileMetaData2);
+
+        FileMetaData retFileMetaData3 = doPostFile("/api/file" + requestParams, multipartFile3, FileMetaData.class);
+        Assert.assertNotNull(retFileMetaData3);
+
+        FileMetaData retFileMetaData4 = doPostFile("/api/file" + requestParams, multipartFile4, FileMetaData.class);
+        Assert.assertNotNull(retFileMetaData4);
+
+        FileMetaData retFileMetaData5 = doPostFile("/api/file" + requestParams, multipartFile5, FileMetaData.class);
+        Assert.assertNotNull(retFileMetaData5);
+
+        String requestParams1 = "?relatedEntityId=" + device.getId() + "&relatedEntityType=DEVICE" + "&limit=1&pageNum=0&searchText=file";
+
+        PaginatedResult<FileMetaData> fileMetaDataPaginatedResult;
+
+        fileMetaDataPaginatedResult = doGetTyped("/api/file" + requestParams1, new TypeReference<>() {});
+        Assert.assertEquals(1, fileMetaDataPaginatedResult.getData().size());
+        Assert.assertEquals(2,fileMetaDataPaginatedResult.getTotalElements());
+        Assert.assertTrue(fileMetaDataPaginatedResult.isHasNext());
     }
 }
