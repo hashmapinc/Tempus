@@ -810,7 +810,7 @@ export default angular.module('tempus.locale', [])
                     "businessUnit":"Business Unit"
                 },
                 "file-upload":{
-                    "upload": "Upload",
+                    "upload": "Files",
                     "fileName": "File Name",
                     "createdOn": "Created On",
                     "fileType": "File Type",
