@@ -750,7 +750,7 @@ export function DataModelController($scope, $mdDialog, $document, $stateParams, 
         vm.childArray = [];
         vm.childStr = '';
         var child_node = [];
-        var deleteString = "Are you sure you want to delete " + "'" + vm.stepperData.name + "'" + "?";
+        var deleteString =$translate.instant('dataModels.delete-parent-title',{dataModelName: vm.stepperData.name});
         var child_nodes = getChildNodes(vm.stepperData.node_id, child_node);
 
         if (angular.isDefined(vm.stepperData.child_node_id)) {
@@ -767,8 +767,7 @@ export function DataModelController($scope, $mdDialog, $document, $stateParams, 
             });
 
             vm.childStr = vm.childArray.join(',');
-            deleteString = "Are you sure you want to delete " + "'" + vm.stepperData.name + "'" + "?<br/>" +
-                "You would also be deleting " + "'" + vm.childStr + "'";
+            deleteString = $translate.instant('dataModels.delete-child-title',{dataModelName: vm.stepperData.name, childDataModel: vm.childStr});
 
         }
 
