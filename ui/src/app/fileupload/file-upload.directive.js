@@ -35,7 +35,7 @@ export default function fileUploadDirective($compile, $templateCache, fileUpload
         };
 
         scope.query = {
-            order: 'lastUpdated',
+            order: '-lastUpdated',
             limit: 5,
             page: 1,
             search: null,
@@ -43,7 +43,8 @@ export default function fileUploadDirective($compile, $templateCache, fileUpload
         };
 
 		function loadTableData() {
-			var promise = fileUploadService.getAllFile(scope.entityId, scope.entityType,scope.query.limit,scope.query.page-1,scope.query.order,scope.query.direction,scope.query.search);
+            var order = scope.query.order.indexOf('-') === 0 ? scope.query.order.substr(1): scope.query.order;
+			var promise = fileUploadService.getAllFile(scope.entityId, scope.entityType,scope.query.limit,scope.query.page-1,order,scope.query.direction,scope.query.search);
 			if (promise) {
 				promise.then(function success(items) {
 					scope.files.data = items.data;
@@ -61,7 +62,6 @@ export default function fileUploadDirective($compile, $templateCache, fileUpload
 
         scope.onReorder = function() {
             scope.query.direction = scope.query.order.indexOf('-') === 0 ? 'DESC': 'ASC';
-            scope.query.order = scope.query.order.indexOf('-') === 0 ? scope.query.order.substr(1): scope.query.order;
             loadTableData();
         }
 
@@ -159,7 +159,7 @@ export default function fileUploadDirective($compile, $templateCache, fileUpload
 
 		scope.resetFilter = function () {
             scope.query = {
-                order: 'lastUpdated',
+                order: '-lastUpdated',
                 limit: 5,
                 page: 1,
                 search: null,
@@ -226,7 +226,7 @@ export default function fileUploadDirective($compile, $templateCache, fileUpload
 		scope.$watch("entityId", function (newVal, prevVal) {
 			if (newVal && !angular.equals(newVal, prevVal)) {
 				scope.resetFilter();
-				scope.reload();
+				//scope.reload();
 			}
 		});
 
