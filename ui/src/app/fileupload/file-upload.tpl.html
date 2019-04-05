@@ -22,7 +22,7 @@
 
         <md-input-container flex>
             <label>&nbsp;</label>
-            <input ng-model="query.search" placeholder="{{ 'common.enter-search' | translate }}"/>
+            <input ng-keyup="$event.keyCode == 13 && search()" ng-model="query.search" placeholder="{{ 'common.enter-search' | translate }}"/>
         </md-input-container>
         <md-button class="md-icon-button" aria-label="{{ 'action.back' | translate }}" ng-click="exitFilterMode()">
             <md-icon aria-label="{{ 'action.close' | translate }}" class="material-icons">close</md-icon>
@@ -85,14 +85,14 @@
             <td md-cell >{{file.size}}</td>
 
             <td md-cell class="tb-value-cell">
-                <span><ng-md-icon size="16" icon="edit" ng-click="renameFileName($event, file)"></ng-md-icon></span>
+                <span><ng-md-icon class="md-icon-cursor" size="16" icon="edit" ng-click="renameFileName($event, file)"></ng-md-icon></span>
             </td>
 
             <td md-cell class="tb-value-cell" >
-                <span><ng-md-icon size="16" icon="file_download" ng-click="downloadFile($event, file)"></ng-md-icon></span>
+                <span><ng-md-icon class="md-icon-cursor" size="16"  icon="file_download" ng-click="downloadFile($event, file)"></ng-md-icon></span>
             </td>
             <td md-cell class="tb-value-cell">
-                <span><ng-md-icon size="16" icon="delete"  ng-click="deleteFile($event, file)" ></ng-md-icon></span>
+                <span><ng-md-icon class="md-icon-cursor" size="16" icon="delete"  ng-click="deleteFile($event, file)" ></ng-md-icon></span>
             </td>
         </tr>
         </tbody>
