@@ -260,12 +260,8 @@ public class SparkComputationJobActorMessageProcessor extends ComponentMsgProces
         List<String> kinesisArgs = new ArrayList<String>();
         kinesisArgs.add("--kinesisStreamName");
         kinesisArgs.add(conf.get("kinesisStreamName").asText());
-        kinesisArgs.add("--kinesisAppName");
-        kinesisArgs.add(conf.get("kinesisAppName").asText());
         kinesisArgs.add("--kinesisRegion");
         kinesisArgs.add(conf.get("kinesisRegion").asText());
-        kinesisArgs.add("--kinesisEndpoint");
-        kinesisArgs.add("kinesis."+conf.get("kinesisRegion").asText()+".amazonaws.com");
         return kinesisArgs;
     }
 
