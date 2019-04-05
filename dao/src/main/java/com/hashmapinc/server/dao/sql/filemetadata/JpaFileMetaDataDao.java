@@ -83,7 +83,7 @@ public class JpaFileMetaDataDao extends JpaAbstractDaoListeningExecutorService i
 
         final Pageable pageable = PageRequest.of(Integer.parseInt(pageNum), Integer.parseInt(limit), Sort.Direction.fromString(orderBy), sortBy);
 
-        final Page<FileMetaDataEntity> page = fileMetaDataRepository.findByTenantIdAndRelatedEntityIdAndFileNameStartingWith(UUIDConverter.fromTimeUUID(tenantId.getId()),
+        final Page<FileMetaDataEntity> page = fileMetaDataRepository.findByTenantIdAndRelatedEntityIdAndFileNameStartingWithIgnoreCase(UUIDConverter.fromTimeUUID(tenantId.getId()),
                 UUIDConverter.fromTimeUUID(entityId.getId()),
                 searchText,
                 pageable);
