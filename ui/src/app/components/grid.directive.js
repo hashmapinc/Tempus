@@ -222,7 +222,15 @@ function GridController($scope, $rootScope, $state, $mdDialog, $document, $q, $m
                     vm.items.pending = true;
                     promise.then(
                         function success(items) {
-                            pageNumber = pageNumber + 1;
+
+                            if($scope.searchConfig.searchEntitySubtype !== '' || $scope.searchConfig.searchText !== '') {
+
+                                 pageNumber = 0;
+                            } else {
+
+                                pageNumber = pageNumber + 1;
+                            }
+
                             if (vm.items.reloadPending) {
                                 vm.items.pending = false;
                                 reload();
@@ -532,6 +540,7 @@ function GridController($scope, $rootScope, $state, $mdDialog, $document, $q, $m
         } else {
           pageNumber = pageNumber-1;
         }
+
         reload();
     });
 
