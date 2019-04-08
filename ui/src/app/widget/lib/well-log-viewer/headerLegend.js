@@ -53,8 +53,8 @@ var headerLegend = function(lineConfig, state, index, width) {
     context = d3.select(this);
 
     var margin = {top: 30, right: 10, bottom: 30, left: 10},
-      width = o.width*140 - margin.right - margin.left,
-      height = 60 - margin.top - margin.bottom;
+      width = o.width*140 - margin.right - margin.left;
+      //height = 60 - margin.top - margin.bottom;
 
     var x = d3.scaleLinear()
         .domain([o.min, o.max])
@@ -69,7 +69,7 @@ var headerLegend = function(lineConfig, state, index, width) {
          .append("svg")
          .attr("class", "header"+ index)
         .attr("width", width + margin.right + margin.left)
-        .attr("height", height + margin.top + margin.bottom)
+        .attr("height","80")
       .append("g")
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
           .call(xAxis)
@@ -80,7 +80,6 @@ var headerLegend = function(lineConfig, state, index, width) {
           .style("fill", "none")
           .style("stroke", o.color)
           .style("stroke-width", o.lineWeight)
-
           context.select('.header'+ index)
           .append("text")             
           .attr("transform",
@@ -88,6 +87,16 @@ var headerLegend = function(lineConfig, state, index, width) {
                                (20) + ")")
           .style("text-anchor", "middle")
           .text(o.label);
+
+        context.select(".header"+ index)
+
+        .append("text")
+        .attr("class", "log-data"+ index)
+                  .attr("transform",
+                        "translate(" + (width/2) + " ," +
+                                       (60) + ")")
+                  .style("text-anchor", "middle")
+                  .text("");
 
   }
   header.order = 0;
