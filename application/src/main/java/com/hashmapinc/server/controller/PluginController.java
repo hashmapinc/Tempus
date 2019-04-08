@@ -32,6 +32,7 @@ import com.hashmapinc.server.dao.model.ModelConstants;
 import com.hashmapinc.server.common.data.exception.TempusException;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api")
@@ -46,7 +47,7 @@ public class PluginController extends BaseController {
         checkParameter(PLUGIN_ID, strPluginId);
         try {
             PluginId pluginId = new PluginId(toUUID(strPluginId));
-            return checkPlugin(pluginService.findPluginById(pluginId));
+            return checkPlugin(pluginDataEncoderService.encoder(pluginService.findPluginById(pluginId)));
         } catch (Exception e) {
             throw handleException(e);
         }
@@ -58,7 +59,7 @@ public class PluginController extends BaseController {
     public PluginMetaData getPluginByToken(@PathVariable("pluginToken") String pluginToken) throws TempusException {
         checkParameter("pluginToken", pluginToken);
         try {
-            return checkPlugin(pluginService.findPluginByApiToken(pluginToken));
+            return checkPlugin(pluginDataEncoderService.encoder(pluginService.findPluginByApiToken(pluginToken)));
         } catch (Exception e) {
             throw handleException(e);
         }
@@ -79,7 +80,7 @@ public class PluginController extends BaseController {
                     null,
                     created ? ActionType.ADDED : ActionType.UPDATED, null);
 
-            return plugin;
+            return pluginDataEncoderService.encoder(plugin);
         } catch (Exception e) {
 
             logEntityAction(emptyId(EntityType.PLUGIN), source,
@@ -151,7 +152,9 @@ public class PluginController extends BaseController {
             @RequestParam(required = false) String textOffset) throws TempusException {
         try {
             TextPageLink pageLink = createPageLink(limit, textSearch, idOffset, textOffset);
-            return checkNotNull(pluginService.findSystemPlugins(pageLink));
+            TextPageData<PluginMetaData> pluginMetaDataTextPageData =  checkNotNull(pluginService.findSystemPlugins(pageLink));
+            List<PluginMetaData> pluginMetaData = pluginMetaDataTextPageData.getData().stream().map(pluginDataEncoderService::encoder).collect(Collectors.toList());
+            return new TextPageData<>(pluginMetaData,pageLink);
         } catch (Exception e) {
             throw handleException(e);
         }
@@ -170,7 +173,9 @@ public class PluginController extends BaseController {
         try {
             TenantId tenantId = new TenantId(toUUID(strTenantId));
             TextPageLink pageLink = createPageLink(limit, textSearch, idOffset, textOffset);
-            return checkNotNull(pluginService.findTenantPlugins(tenantId, pageLink));
+            TextPageData<PluginMetaData> pluginMetaDataTextPageData = checkNotNull(pluginService.findTenantPlugins(tenantId, pageLink));
+            List<PluginMetaData> pluginMetaData = pluginMetaDataTextPageData.getData().stream().map(pluginDataEncoderService::encoder).collect(Collectors.toList());
+            return new TextPageData<>(pluginMetaData,pageLink);
         } catch (Exception e) {
             throw handleException(e);
         }
@@ -182,10 +187,10 @@ public class PluginController extends BaseController {
     public List<PluginMetaData> getPlugins() throws TempusException {
         try {
             if (getCurrentUser().getAuthority() == Authority.SYS_ADMIN) {
-                return checkNotNull(pluginService.findSystemPlugins());
+                return checkNotNull(pluginService.findSystemPlugins().stream().map(pluginDataEncoderService::encoder).collect(Collectors.toList()));
             } else {
                 TenantId tenantId = getCurrentUser().getTenantId();
-                List<PluginMetaData> plugins = checkNotNull(pluginService.findAllTenantPluginsByTenantId(tenantId));
+                List<PluginMetaData> plugins = checkNotNull(pluginService.findAllTenantPluginsByTenantId(tenantId).stream().map(pluginDataEncoderService::encoder).collect(Collectors.toList()));
                 plugins.stream()
                         .filter(plugin -> plugin.getTenantId().getId().equals(ModelConstants.NULL_UUID))
                         .forEach(plugin -> plugin.setConfiguration(null));
@@ -207,7 +212,9 @@ public class PluginController extends BaseController {
         try {
             TenantId tenantId = getCurrentUser().getTenantId();
             TextPageLink pageLink = createPageLink(limit, textSearch, idOffset, textOffset);
-            return checkNotNull(pluginService.findTenantPlugins(tenantId, pageLink));
+            TextPageData<PluginMetaData> pluginMetaDataTextPageData =  checkNotNull(pluginService.findTenantPlugins(tenantId, pageLink));
+            List<PluginMetaData> pluginMetaData = pluginMetaDataTextPageData.getData().stream().map(pluginDataEncoderService::encoder).collect(Collectors.toList());
+            return new TextPageData<>(pluginMetaData,pageLink);
         } catch (Exception e) {
             throw handleException(e);
         }

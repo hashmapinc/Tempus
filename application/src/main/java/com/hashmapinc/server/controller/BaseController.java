@@ -53,6 +53,7 @@ import com.hashmapinc.server.dao.exception.IncorrectParameterException;
 import com.hashmapinc.server.dao.gatewayconfiguration.TempusGatewayConfigurationService;
 import com.hashmapinc.server.dao.metadataingestion.MetadataIngestionService;
 import com.hashmapinc.server.dao.model.ModelConstants;
+import com.hashmapinc.server.dao.plugin.PluginDataEncoderService;
 import com.hashmapinc.server.dao.plugin.PluginService;
 import com.hashmapinc.server.dao.relation.RelationService;
 import com.hashmapinc.server.dao.rule.RuleService;
@@ -188,6 +189,9 @@ public abstract class BaseController {
 
     @Autowired
     protected AttributeBasedPermissionEvaluator evaluator;
+
+    @Autowired
+    protected PluginDataEncoderService pluginDataEncoderService;
 
     @ExceptionHandler(TempusException.class)
     public void handleTempusException(TempusException ex, HttpServletResponse response) {
