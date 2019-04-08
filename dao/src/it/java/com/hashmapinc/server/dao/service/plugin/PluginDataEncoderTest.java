@@ -28,7 +28,7 @@ import static org.junit.Assert.*;
 public abstract class  PluginDataEncoderTest  extends AbstractServiceTest {
 
     @Test
-    public void saveKinesisPluginWithOneEncryptedPasswordAttribute() throws Exception {
+    public void saveKinesisPluginWithTwoEncryptedPasswordAttribute() throws Exception {
         PluginMetaData pluginMetaData = generatePlugin(null, null, "com.hashmapinc.server.extensions.kinesis.plugin.KinesisPlugin", "com.hashmapinc.component.ActionTest", "plugin/kinesis/TestKinesisPluginDescriptor.json", "plugin/kinesis/TestKinesisPluginConfigurationData.json");
         PluginMetaData savedPluginMetaData = pluginService.savePlugin(pluginMetaData);
 
@@ -37,7 +37,7 @@ public abstract class  PluginDataEncoderTest  extends AbstractServiceTest {
         assertEquals(2, keysToEncrypt.size());
 
         for (String key : keysToEncrypt) {
-            assertNotEquals(pluginMetaData.getConfiguration().get(key), savedPluginMetaData.getConfiguration().get(key));
+            assertEquals(pluginMetaData.getConfiguration().get(key), savedPluginMetaData.getConfiguration().get(key));
         }
     }
 
@@ -51,7 +51,7 @@ public abstract class  PluginDataEncoderTest  extends AbstractServiceTest {
         assertEquals(0, keysToEncrypt.size());
 
         for (String key : keysToEncrypt) {
-            assertNotEquals(pluginMetaData.getConfiguration().get(key), savedPluginMetaData.getConfiguration().get(key));
+            assertEquals(pluginMetaData.getConfiguration().get(key), savedPluginMetaData.getConfiguration().get(key));
         }
     }
 
@@ -65,7 +65,7 @@ public abstract class  PluginDataEncoderTest  extends AbstractServiceTest {
         assertEquals(2, keysToEncrypt.size());
 
         for (String key : keysToEncrypt) {
-            assertNotEquals(pluginMetaData.getConfiguration().get(key), savedPluginMetaData.getConfiguration().get(key));
+            assertEquals(pluginMetaData.getConfiguration().get(key), savedPluginMetaData.getConfiguration().get(key));
         }
     }
 
@@ -79,7 +79,7 @@ public abstract class  PluginDataEncoderTest  extends AbstractServiceTest {
         assertEquals(0, keysToEncrypt.size());
 
         for (String key : keysToEncrypt) {
-            assertNotEquals(pluginMetaData.getConfiguration().get(key), savedPluginMetaData.getConfiguration().get(key));
+            assertEquals(pluginMetaData.getConfiguration().get(key), savedPluginMetaData.getConfiguration().get(key));
         }
     }
 
@@ -93,7 +93,7 @@ public abstract class  PluginDataEncoderTest  extends AbstractServiceTest {
         assertEquals(1, keysToEncrypt.size());
 
         for (String key : keysToEncrypt) {
-            assertNotEquals(pluginMetaData.getConfiguration().get(key), savedPluginMetaData.getConfiguration().get(key));
+            assertEquals(pluginMetaData.getConfiguration().get(key), savedPluginMetaData.getConfiguration().get(key));
         }
     }
 }
