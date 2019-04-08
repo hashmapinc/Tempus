@@ -60,7 +60,6 @@ var lineGraph = function (lineConfig, areaFillConfig, state, currentComponentInd
 
 		lineConfig.forEach(function (element, index) {
 
-
 			let lineToBeRendered = element.line;
 			let data = element.data;
 
@@ -78,7 +77,6 @@ var lineGraph = function (lineConfig, areaFillConfig, state, currentComponentInd
 					.attr('stroke', lineToBeRendered.color)
 					.attr('fill', 'none')
 					.attr('stroke-width', lineToBeRendered.lineWeight);
-
 
 				if (angular.isDefined(areaFillConfig) && areaFillConfig.enable) {
 					if (areaFillConfig.referenceLine === lineToBeRendered.headerName) {
@@ -127,34 +125,38 @@ var lineGraph = function (lineConfig, areaFillConfig, state, currentComponentInd
 
 						let yValue = yScale.invert(d3.mouse(this)[0]);
 
-
 						if (firstLineData) {
 							let i = bisect(firstLineData, yValue);
 							let startData = firstLineData[i - 1];
 							let endData = firstLineData[i];
 
-							let data = yValue - startData[0] > endData[0] - yValue ? endData : startData;
-							headerOne._groups[0][0].childNodes[2].textContent = data[1]
-						}
+                            if(startData && endData){
+                                let data = yValue - startData[0] > endData[0] - yValue ? endData : startData;
+                                headerOne._groups[0][0].childNodes[2].textContent = data[1]
+                            }
 
+						}
 						if (secondLineData) {
 							let ind = bisect(secondLineData, yValue);
-							let startData1 = secondLineData[ind - 1];
-							let endData1 = secondLineData[ind];
-
-							let data = yValue - startData1[0] > endData1[0] - yValue ? endData1 : startData1;
-							headerSecond._groups[0][0].childNodes[2].textContent = data[1]
+							let startData = secondLineData[ind - 1];
+							let endData = secondLineData[ind];
+                            if(startData && endData){
+							    let data = yValue - startData[0] > endData[0] - yValue ? endData : startData;
+							    headerSecond._groups[0][0].childNodes[2].textContent = data[1];
+							}
 						}
-
-
 					})
 					.on("mouseover", function () {
 						d3.selectAll('.line_over').style("display", "block");
 					})
 					.on("mouseout", function () {
 						d3.selectAll('.line_over').style("display", "none");
-						headerOne._groups[0][0].childNodes[2].textContent = "";
-						headerSecond._groups[0][0].childNodes[2].textContent = "";
+						if (firstLineData) {
+						    headerOne._groups[0][0].childNodes[2].textContent = "";
+						}
+						if(secondLineData){
+						    headerSecond._groups[0][0].childNodes[2].textContent = "";
+						}
 					})
 					.append('rect')
 					.attr('class', 'click-capture')
