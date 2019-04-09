@@ -16,6 +16,7 @@
  */
 package com.hashmapinc.server.service.entityfile;
 
+import com.hashmapinc.server.common.data.FileCriteriaSpec;
 import com.hashmapinc.server.common.data.id.EntityId;
 import com.hashmapinc.server.common.data.id.TenantId;
 import com.hashmapinc.server.common.data.page.PaginatedResult;
@@ -59,16 +60,16 @@ public class EntityFileService {
         return null;
     }
 
-    public PaginatedResult<FileMetaData>  findAll(TenantId tenantId,EntityId entityId,  Map<String, String> relatedEntityInfo) {
+    public PaginatedResult<FileMetaData>  findAll(TenantId tenantId,EntityId entityId,  FileCriteriaSpec fileCriteriaSpec) {
         String fileName = null;
-        if(relatedEntityInfo.containsKey("fileName")) {
-            fileName = relatedEntityInfo.get("fileName");
+        if(fileCriteriaSpec.getFileName().isPresent()) {
+            fileName = fileCriteriaSpec.getFileName().get();
             List<FileMetaData> fileList =  fileMetaDataDao.getFiles(tenantId, entityId, getFileNameWithOrWithoutExt(fileName),
                     getFileExtension(fileName));
             return new PaginatedResult(fileList,0,1,1,false,false);
 
         }
-        return fileMetaDataDao.findByTenantIdAndRelatedEntityIdAndSearchText(tenantId,entityId,relatedEntityInfo);
+        return fileMetaDataDao.findByTenantIdAndRelatedEntityIdAndSearchText(tenantId,entityId,fileCriteriaSpec);
     }
 
     public InputStreamWrapper downloadFile(String fileName, TenantId tenantId, EntityId entityId) throws Exception {

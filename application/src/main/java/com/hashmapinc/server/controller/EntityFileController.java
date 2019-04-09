@@ -17,6 +17,7 @@
 package com.hashmapinc.server.controller;
 
 import com.hashmapinc.server.common.data.EntityType;
+import com.hashmapinc.server.common.data.FileCriteriaSpec;
 import com.hashmapinc.server.common.data.exception.TempusException;
 import com.hashmapinc.server.common.data.id.AssetId;
 import com.hashmapinc.server.common.data.id.DeviceId;
@@ -67,12 +68,12 @@ public class EntityFileController extends BaseController {
     @PreAuthorize("hasAuthority('TENANT_ADMIN')")
     @GetMapping(value = "/file")
     @ResponseBody
-    public PaginatedResult<FileMetaData> getFile(@RequestParam Map<String, String> relatedEntityInfo) throws TempusException {
+    public PaginatedResult<FileMetaData> getFile(FileCriteriaSpec fileCriteriaSpec) throws TempusException {
         try {
-            String strRelatedEntityId = relatedEntityInfo.get("relatedEntityId");
-            String strRelatedEntityType = relatedEntityInfo.get("relatedEntityType");
+            String strRelatedEntityId = fileCriteriaSpec.getRelatedEntityId();
+            String strRelatedEntityType = fileCriteriaSpec.getRelatedEntityType();
             EntityId entityId = createRelatedEntityId(strRelatedEntityId, strRelatedEntityType);
-            return entityFileService.findAll(getCurrentUser().getTenantId(), entityId,relatedEntityInfo);
+            return entityFileService.findAll(getCurrentUser().getTenantId(), entityId,fileCriteriaSpec);
         } catch (Exception e) {
             log.info("Exception occurred {}", e);
             throw handleException(e);

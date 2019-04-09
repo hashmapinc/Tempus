@@ -16,6 +16,7 @@
  */
 package com.hashmapinc.server.dao.sql.filemetadata;
 
+import com.hashmapinc.server.common.data.FileCriteriaSpec;
 import com.hashmapinc.server.common.data.UUIDConverter;
 import com.hashmapinc.server.common.data.id.EntityId;
 import com.hashmapinc.server.common.data.id.TenantId;
@@ -35,6 +36,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+
+import static com.hashmapinc.server.dao.model.ModelConstants.*;
 
 @Slf4j
 @Service
@@ -69,17 +72,12 @@ public class JpaFileMetaDataDao extends JpaAbstractDaoListeningExecutorService i
     }
 
     @Override
-    public PaginatedResult<FileMetaData> findByTenantIdAndRelatedEntityIdAndSearchText(TenantId tenantId,EntityId entityId , Map<String, String> relatedEntityInfo) {
-        String limit = relatedEntityInfo.get("limit");
-        String pageNum = relatedEntityInfo.get("pageNum");
-        String sortBy = relatedEntityInfo.get("sortBy");
-        String orderBy = relatedEntityInfo.get("orderBy");
-        String searchText = relatedEntityInfo.get("searchText");
-
-        if(sortBy == null)
-            sortBy = "lastUpdated";
-        if(orderBy == null)
-            orderBy = "desc";
+    public PaginatedResult<FileMetaData> findByTenantIdAndRelatedEntityIdAndSearchText(TenantId tenantId, EntityId entityId , FileCriteriaSpec fileCriteriaSpec) {
+        String limit = fileCriteriaSpec.getLimit().orElse(FILE_META_DATA_DEFAULT_LIMIT);
+        String pageNum = fileCriteriaSpec.getPageNum().orElse(FILE_META_DATA_DEFAULT_PAGE_NUM);
+        String sortBy = fileCriteriaSpec.getSortBy().orElse(FILE_META_DATA_DEFAULT_SORT_BY);
+        String orderBy = fileCriteriaSpec.getOrderBy().orElse(FILE_META_DATA_DEFAULT_ORDER_BY);
+        String searchText = fileCriteriaSpec.getSearchText().orElse(FILE_META_DATA_DEFAULT_SEARCH_TEXT);
 
         final Pageable pageable = PageRequest.of(Integer.parseInt(pageNum), Integer.parseInt(limit), Sort.Direction.fromString(orderBy), sortBy);
 

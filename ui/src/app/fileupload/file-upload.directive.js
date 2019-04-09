@@ -226,7 +226,6 @@ export default function fileUploadDirective($compile, $templateCache, fileUpload
 		scope.$watch("entityId", function (newVal, prevVal) {
 			if (newVal && !angular.equals(newVal, prevVal)) {
 				scope.resetFilter();
-				//scope.reload();
 			}
 		});
 
