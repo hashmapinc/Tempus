@@ -49,12 +49,12 @@ var lineGraph = function (lineConfig, areaFillConfig, state, currentComponentInd
 			headerOne, headerSecond, firstLineData, secondLineData;
 
 		if (lineConfig.length === 2) {
-			headerOne = context.select(".header0");
-			headerSecond = context.select(".header1");
+			headerOne = context.select(".log-data0");
+			headerSecond = context.select(".log-data1");
 			firstLineData = lineConfig[0].data.data;
 			secondLineData = lineConfig[1].data.data;
 		} else {
-			headerOne = context.select(".header0");
+			headerOne = context.select(".log-data0");
 			firstLineData = lineConfig[0].data.data;
 		}
 
@@ -132,9 +132,8 @@ var lineGraph = function (lineConfig, areaFillConfig, state, currentComponentInd
 
                             if(startData && endData){
                                 let data = yValue - startData[0] > endData[0] - yValue ? endData : startData;
-                                headerOne._groups[0][0].childNodes[2].textContent = data[1]
+                                headerOne._groups[0][0].childNodes[1].textContent = data[1]
                             }
-
 						}
 						if (secondLineData) {
 							let ind = bisect(secondLineData, yValue);
@@ -142,7 +141,7 @@ var lineGraph = function (lineConfig, areaFillConfig, state, currentComponentInd
 							let endData = secondLineData[ind];
                             if(startData && endData){
 							    let data = yValue - startData[0] > endData[0] - yValue ? endData : startData;
-							    headerSecond._groups[0][0].childNodes[2].textContent = data[1];
+							    headerSecond._groups[0][0].childNodes[1].textContent = data[1];
 							}
 						}
 					})
