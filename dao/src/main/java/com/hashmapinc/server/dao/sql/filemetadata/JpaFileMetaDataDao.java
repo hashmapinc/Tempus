@@ -16,9 +16,11 @@
  */
 package com.hashmapinc.server.dao.sql.filemetadata;
 
+import com.hashmapinc.server.common.data.FileCriteriaSpec;
 import com.hashmapinc.server.common.data.UUIDConverter;
 import com.hashmapinc.server.common.data.id.EntityId;
 import com.hashmapinc.server.common.data.id.TenantId;
+import com.hashmapinc.server.common.data.page.PaginatedResult;
 import com.hashmapinc.server.common.data.upload.FileMetaData;
 import com.hashmapinc.server.dao.DaoUtil;
 import com.hashmapinc.server.dao.filemetadata.FileMetaDataDao;
@@ -27,11 +29,15 @@ import com.hashmapinc.server.dao.model.sql.FileMetaDataEntity;
 import com.hashmapinc.server.dao.sql.JpaAbstractDaoListeningExecutorService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+
+import static com.hashmapinc.server.dao.model.ModelConstants.*;
 
 @Slf4j
 @Service
@@ -63,6 +69,28 @@ public class JpaFileMetaDataDao extends JpaAbstractDaoListeningExecutorService i
         if (entityOptional.isPresent())
              fileMetaDataList.add(entityOptional.get().toData());
         return fileMetaDataList;
+    }
+
+    @Override
+    public PaginatedResult<FileMetaData> findByTenantIdAndRelatedEntityIdAndSearchText(TenantId tenantId, EntityId entityId , FileCriteriaSpec fileCriteriaSpec) {
+        String limit = fileCriteriaSpec.getLimit().orElse(FILE_META_DATA_DEFAULT_LIMIT);
+        String pageNum = fileCriteriaSpec.getPageNum().orElse(FILE_META_DATA_DEFAULT_PAGE_NUM);
+        String sortBy = fileCriteriaSpec.getSortBy().orElse(FILE_META_DATA_DEFAULT_SORT_BY);
+        String orderBy = fileCriteriaSpec.getOrderBy().orElse(FILE_META_DATA_DEFAULT_ORDER_BY);
+        String searchText = fileCriteriaSpec.getSearchText().orElse(FILE_META_DATA_DEFAULT_SEARCH_TEXT);
+
+        final Pageable pageable = PageRequest.of(Integer.parseInt(pageNum), Integer.parseInt(limit), Sort.Direction.fromString(orderBy), sortBy);
+
+        final Page<FileMetaDataEntity> page = fileMetaDataRepository.findByTenantIdAndRelatedEntityIdAndFileNameStartingWithIgnoreCase(UUIDConverter.fromTimeUUID(tenantId.getId()),
+                UUIDConverter.fromTimeUUID(entityId.getId()),
+                searchText,
+                pageable);
+        final List<FileMetaData> fileMetaData = page != null ? DaoUtil.convertDataList(page.getContent()) : Collections.emptyList();
+        final long totalElements = page != null ? page.getTotalElements() : 0;
+        final int totalPages = page != null ? page.getTotalPages() : 0;
+        final boolean hasNext = page != null && page.hasNext();
+        final boolean hasPrevious = page != null && page.hasPrevious();
+        return new PaginatedResult<>(fileMetaData, Integer.parseInt(pageNum), totalElements, totalPages, hasNext, hasPrevious);
     }
 
     @Override

@@ -17,7 +17,29 @@
 
 -->
 
-<md-toolbar class="md-table-toolbar tb-device-toolbar md-default ">
+<md-toolbar class="md-table-toolbar tb-device-toolbar md-default" ng-show="tableView && query.search != null">
+    <div class="md-toolbar-tools">
+
+        <md-input-container flex>
+            <label>&nbsp;</label>
+            <input ng-keyup="$event.keyCode == 13 && search()" ng-model="query.search" placeholder="{{ 'common.enter-search' | translate }}"/>
+        </md-input-container>
+        <md-button class="md-icon-button" aria-label="{{ 'action.back' | translate }}" ng-click="exitFilterMode()">
+            <md-icon aria-label="{{ 'action.close' | translate }}" class="material-icons">close</md-icon>
+            <md-tooltip md-direction="top">
+                {{ 'action.close' | translate }}
+            </md-tooltip>
+        </md-button>
+        <md-button class="md-icon-button" aria-label="{{ 'action.search' | translate }}" ng-click="search()">
+            <md-icon aria-label="{{ 'action.search' | translate }}" class="material-icons">search</md-icon>
+            <md-tooltip md-direction="top">
+                {{ 'action.search' | translate }}
+            </md-tooltip>
+        </md-button>
+    </div>
+</md-toolbar>
+
+<md-toolbar class="md-table-toolbar tb-device-toolbar md-default " ng-show="tableView && query.search === null">
 
     <div class="md-toolbar-tools">
         <span flex></span>
@@ -36,7 +58,7 @@
                 {{ 'action.search' | translate }}
             </md-tooltip>
         </md-button>
-        <md-button  class="md-icon-button" ng-click="vm.resetFilter()">
+        <md-button  class="md-icon-button" ng-click="resetFilter()">
             <md-icon>refresh</md-icon>
             <md-tooltip md-direction="top">
                 {{ 'action.refresh' | translate }}
@@ -44,34 +66,40 @@
         </md-button>
     </div>
 </md-toolbar>
-<md-table-container class ="tb-device-container">
+
+<md-table-container ng-show="tableView" class ="tb-device-container">
     <table class="tb-device-table" md-table>
         <thead md-head md-order="query.order" md-on-reorder="onReorder">
         <tr md-row>
-            <th md-column><span translate>file-upload.fileName</span></th>
-            <th md-column><span translate>file-upload.createdOn</span></th>
-            <th md-column><span translate>file-upload.fileType</span></th>
-            <th md-column><span translate>file-upload.fileSize</span></th>
+            <th md-column md-order-by="fileName"><span translate>file-upload.fileName</span></th>
+            <th md-column md-order-by="lastUpdated" md-desc><span translate>file-upload.createdOn</span></th>
+            <th md-column md-order-by="extension"><span translate>file-upload.fileType</span></th>
+            <th md-column md-order-by="size"><span translate>file-upload.fileSize</span></th>
         </tr>
         </thead>
         <tbody md-body>
-        <tr md-row ng-repeat="file in files">
+        <tr md-row ng-repeat="file in files.data">
             <td md-cell width="30%" ><b>{{file.fileName}}</b></td>
             <td md-cell width="20%">{{file.lastUpdated | date :  'yyyy-MM-dd HH:mm:ss'}}</td>
             <td md-cell >{{file.extension}}</td>
             <td md-cell >{{file.size}}</td>
 
             <td md-cell class="tb-value-cell">
-                <span><ng-md-icon size="16" icon="edit" ng-click="renameFileName($event, file)"></ng-md-icon></span>
+                <span><ng-md-icon class="md-icon-cursor" size="16" icon="edit" ng-click="renameFileName($event, file)"></ng-md-icon></span>
             </td>
 
             <td md-cell class="tb-value-cell" >
-                <span><ng-md-icon size="16" icon="file_download" ng-click="downloadFile($event, file)"></ng-md-icon></span>
+                <span><ng-md-icon class="md-icon-cursor" size="16"  icon="file_download" ng-click="downloadFile($event, file)"></ng-md-icon></span>
             </td>
             <td md-cell class="tb-value-cell">
-                <span><ng-md-icon size="16" icon="delete"  ng-click="deleteFile($event, file)" ></ng-md-icon></span>
+                <span><ng-md-icon class="md-icon-cursor" size="16" icon="delete"  ng-click="deleteFile($event, file)" ></ng-md-icon></span>
             </td>
         </tr>
         </tbody>
     </table>
 </md-table-container>
+<md-table-pagination class ="tb-device-container" ng-show="tableView" md-limit="query.limit" md-limit-options="[5, 10, 15]"
+                     md-page="query.page" md-total="{{files.count}}"
+                     md-on-paginate="onPaginate" md-page-select>
+</md-table-pagination>
+

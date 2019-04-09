@@ -458,6 +458,12 @@ public class ModelConstants {
     public static final String FILE_META_DATA_FILE_LAST_UPDATED = "last_updated";
     public static final String FILE_META_DATA_FILE_SIZE = "file_size";
 
+    public static final String FILE_META_DATA_DEFAULT_SORT_BY = "lastUpdated";
+    public static final String FILE_META_DATA_DEFAULT_ORDER_BY = "desc";
+    public static final String FILE_META_DATA_DEFAULT_SEARCH_TEXT = "";
+    public static final String FILE_META_DATA_DEFAULT_PAGE_NUM = "0";
+    public static final String FILE_META_DATA_DEFAULT_LIMIT = "1";
+
 
     public static final String DESCRIPTOR_TYPE = "type";
     public static final String DESCRIPTOR_KEY = "key";

@@ -27,18 +27,43 @@ export default function fileUploadDirective($compile, $templateCache, fileUpload
 	var linker = function (scope, element) {
 		var template = $templateCache.get(fileUploadTemplate);
 		element.html(template);
-		scope.files = [];
+        scope.tableView = true;
+
+        scope.files = {
+            count: 0,
+            data: []
+        };
+
+        scope.query = {
+            order: '-lastUpdated',
+            limit: 5,
+            page: 1,
+            search: null,
+			direction:'DESC'
+        };
 
 		function loadTableData() {
-			var promise = fileUploadService.getAllFile(scope.entityId, scope.entityType);
+            var order = scope.query.order.indexOf('-') === 0 ? scope.query.order.substr(1): scope.query.order;
+			var promise = fileUploadService.getAllFile(scope.entityId, scope.entityType,scope.query.limit,scope.query.page-1,order,scope.query.direction,scope.query.search);
 			if (promise) {
 				promise.then(function success(items) {
-					scope.files = items;
+					scope.files.data = items.data;
+					scope.files.count = items.totalElements
 				})
 			}
 		}
 
 		loadTableData();
+
+        scope.onPaginate = function(page) {
+            scope.query.page = page;
+            loadTableData();
+        }
+
+        scope.onReorder = function() {
+            scope.query.direction = scope.query.order.indexOf('-') === 0 ? 'DESC': 'ASC';
+            loadTableData();
+        }
 
 		scope.openFileDialog = function () {
 			angular.element($document[0].getElementById('inputFile').click());
@@ -119,7 +144,27 @@ export default function fileUploadDirective($compile, $templateCache, fileUpload
 			});
 		}
 
+        scope.enterFilterMode = function() {
+			scope.query.search = '';
+        }
+
+        scope.exitFilterMode = function() {
+            scope.query.search = null;
+            loadTableData();
+        }
+
+        scope.search = function() {
+            loadTableData()
+        }
+
 		scope.resetFilter = function () {
+            scope.query = {
+                order: '-lastUpdated',
+                limit: 5,
+                page: 1,
+                search: null,
+                direction:'DESC'
+            };
 			loadTableData();
 		}
 
@@ -181,7 +226,6 @@ export default function fileUploadDirective($compile, $templateCache, fileUpload
 		scope.$watch("entityId", function (newVal, prevVal) {
 			if (newVal && !angular.equals(newVal, prevVal)) {
 				scope.resetFilter();
-				scope.reload();
 			}
 		});
 

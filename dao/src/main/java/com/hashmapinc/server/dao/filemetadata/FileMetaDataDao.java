@@ -16,8 +16,11 @@
  */
 package com.hashmapinc.server.dao.filemetadata;
 
+
+import com.hashmapinc.server.common.data.FileCriteriaSpec;
 import com.hashmapinc.server.common.data.id.EntityId;
 import com.hashmapinc.server.common.data.id.TenantId;
+import com.hashmapinc.server.common.data.page.PaginatedResult;
 import com.hashmapinc.server.common.data.upload.FileMetaData;
 
 import java.util.List;
@@ -27,4 +30,5 @@ public interface FileMetaDataDao {
     List<FileMetaData> getFiles(TenantId tenantId, EntityId entityId);
     List<FileMetaData> getFiles(TenantId tenantId, EntityId entityId, String fileName, String extension);
     void delete(TenantId tenantId, EntityId entityId, String fileName, String extension);
+    PaginatedResult<FileMetaData> findByTenantIdAndRelatedEntityIdAndSearchText(TenantId tenantId,EntityId entityId, FileCriteriaSpec fileCriteriaSpec);
 }

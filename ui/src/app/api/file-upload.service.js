@@ -133,10 +133,19 @@ function FileUploadService(toast, $http, $q, $translate, $window, $document, $in
 	}
 
 
-	function getAllFile(entityId, entityType) {
+	function getAllFile(entityId, entityType,limit,pageNum,order,direction,searchText) {
+
 		if (angular.isDefined(entityId)) {
 			var deferred = $q.defer();
-			var url = '/api/file?relatedEntityId=' + entityId + '&relatedEntityType=' + entityType;
+
+            if(angular.isDefined(searchText) && searchText != null) {
+                var url = '/api/file?relatedEntityId=' + entityId + '&relatedEntityType=' + entityType + '&limit=' + limit + "&pageNum=" + pageNum + "&searchText=" + searchText
+                    + "&sortBy=" + order + "&orderBy=" + direction;
+            }else {
+                 url = '/api/file?relatedEntityId=' + entityId + '&relatedEntityType=' + entityType + '&limit=' + limit + "&pageNum=" + pageNum + "&searchText="
+                    + "&sortBy=" + order + "&orderBy=" + direction;
+			}
+
 			$http.get(url).then(function success(response) {
 				deferred.resolve(response.data);
 			}, function fail() {
@@ -202,7 +211,7 @@ function FileUploadService(toast, $http, $q, $translate, $window, $document, $in
 				'Content-Type': undefined
 			}
 		}).then(function success(response) {
-			deferred.resolve(response.data);
+			deferred.resolve(response.data.data);
 		}, function fail(response) {
 			deferred.reject(response.data);
 		});

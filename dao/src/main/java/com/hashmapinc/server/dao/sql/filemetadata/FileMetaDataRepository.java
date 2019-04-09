@@ -16,14 +16,18 @@
  */
 package com.hashmapinc.server.dao.sql.filemetadata;
 
+
 import com.hashmapinc.server.dao.model.sql.FileMetaDataCompositeKey;
 import com.hashmapinc.server.dao.model.sql.FileMetaDataEntity;
+import org.springframework.data.domain.Page;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import org.springframework.data.domain.Pageable;
 
 @Repository
 public interface FileMetaDataRepository extends CrudRepository<FileMetaDataEntity, FileMetaDataCompositeKey> {
     List<FileMetaDataEntity> findByTenantIdAndRelatedEntityId(String tenantId, String entityId);
+    Page<FileMetaDataEntity> findByTenantIdAndRelatedEntityIdAndFileNameStartingWithIgnoreCase(String tenantId, String entityId, String searchText, Pageable pageable);
 }

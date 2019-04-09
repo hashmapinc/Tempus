@@ -16,8 +16,10 @@
  */
 package com.hashmapinc.server.service.entityfile;
 
+import com.hashmapinc.server.common.data.FileCriteriaSpec;
 import com.hashmapinc.server.common.data.id.EntityId;
 import com.hashmapinc.server.common.data.id.TenantId;
+import com.hashmapinc.server.common.data.page.PaginatedResult;
 import com.hashmapinc.server.common.data.upload.FileMetaData;
 import com.hashmapinc.server.common.data.upload.InputStreamWrapper;
 import com.hashmapinc.server.common.data.upload.StorageTypes;
@@ -32,6 +34,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.Map;
 
 @Service
 @Slf4j
@@ -57,12 +60,16 @@ public class EntityFileService {
         return null;
     }
 
-    public List<FileMetaData> getFileList(TenantId tenantId, EntityId entityId, String fileName) {
-        if(fileName != null) {
-            return fileMetaDataDao.getFiles(tenantId, entityId, getFileNameWithOrWithoutExt(fileName),
+    public PaginatedResult<FileMetaData>  findAll(TenantId tenantId,EntityId entityId,  FileCriteriaSpec fileCriteriaSpec) {
+        String fileName = null;
+        if(fileCriteriaSpec.getFileName().isPresent()) {
+            fileName = fileCriteriaSpec.getFileName().get();
+            List<FileMetaData> fileList =  fileMetaDataDao.getFiles(tenantId, entityId, getFileNameWithOrWithoutExt(fileName),
                     getFileExtension(fileName));
+            return new PaginatedResult(fileList,0,1,1,false,false);
+
         }
-        return fileMetaDataDao.getFiles(tenantId, entityId);
+        return fileMetaDataDao.findByTenantIdAndRelatedEntityIdAndSearchText(tenantId,entityId,fileCriteriaSpec);
     }
 
     public InputStreamWrapper downloadFile(String fileName, TenantId tenantId, EntityId entityId) throws Exception {
