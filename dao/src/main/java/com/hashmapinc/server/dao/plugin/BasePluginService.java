@@ -260,7 +260,7 @@ public class BasePluginService extends AbstractEntityService implements PluginSe
 
                 @Override
                 protected List<PluginMetaData> findEntities(TenantId id, TextPageLink pageLink) {
-                    return pluginDao.findByTenantIdAndPageLink(id, pageLink).stream().map(pluginDataEncoderService::decoder).collect(Collectors.toList());
+                    return pluginDao.findByTenantIdAndPageLink(id, pageLink);
                 }
 
                 @Override
