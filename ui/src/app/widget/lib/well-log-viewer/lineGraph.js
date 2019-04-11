@@ -47,14 +47,13 @@ var lineGraph = function (lineConfig, areaFillConfig, state, currentComponentInd
 			w = width * 140 - margin.right - margin.left,
 			h = 700 - margin.top,
 			headerOne, headerSecond, firstLineData, secondLineData;
-
 		if (lineConfig.length === 2) {
-			headerOne = context.select(".log-data0");
-			headerSecond = context.select(".log-data1");
+			headerOne = document.querySelectorAll("[class^=log-data]")[0];
+			headerSecond = document.querySelectorAll("[class^=log-data]")[1];
 			firstLineData = lineConfig[0].data.data;
 			secondLineData = lineConfig[1].data.data;
 		} else {
-			headerOne = context.select(".log-data0");
+			headerOne = document.querySelectorAll("[class^=log-data]")[0];
 			firstLineData = lineConfig[0].data.data;
 		}
 
@@ -132,7 +131,7 @@ var lineGraph = function (lineConfig, areaFillConfig, state, currentComponentInd
 
                             if(startData && endData){
                                 let data = yValue - startData[0] > endData[0] - yValue ? endData : startData;
-                                headerOne._groups[0][0].childNodes[1].textContent = data[1]
+                                headerOne.childNodes[1].textContent = data[1]
                             }
 						}
 						if (secondLineData) {
@@ -141,7 +140,7 @@ var lineGraph = function (lineConfig, areaFillConfig, state, currentComponentInd
 							let endData = secondLineData[ind];
                             if(startData && endData){
 							    let data = yValue - startData[0] > endData[0] - yValue ? endData : startData;
-							    headerSecond._groups[0][0].childNodes[1].textContent = data[1];
+							    headerSecond.childNodes[1].textContent = data[1];
 							}
 						}
 					})
@@ -151,10 +150,10 @@ var lineGraph = function (lineConfig, areaFillConfig, state, currentComponentInd
 					.on("mouseout", function () {
 						d3.selectAll('.line_over').style("display", "none");
 						if (firstLineData) {
-						    headerOne._groups[0][0].childNodes[2].textContent = "";
+						    headerOne.childNodes[1].textContent = "";
 						}
 						if(secondLineData){
-						    headerSecond._groups[0][0].childNodes[2].textContent = "";
+						    headerSecond.childNodes[1].textContent = "";
 						}
 					})
 					.append('rect')
