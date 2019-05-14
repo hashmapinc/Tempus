@@ -93,7 +93,7 @@ Tempus was made to simplify ingest/analysis/storage/visualization of your IIoT d
 
 ## Requirements
 
-* JDK 1.8 or newer
+* JDK 11 or newer
 * Apache Maven 3.1.0 or newer
 * Git Client
 
