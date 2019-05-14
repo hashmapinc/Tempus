@@ -73,7 +73,7 @@ Pre-requisites
 * Docker Compose
 * Make
 * Maven > 3.1
-* JDK 8
+* JDK 11
 
 Source Code
 ===========
