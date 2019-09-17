@@ -123,6 +123,7 @@ export default function loadLogViewer(ctx, sequence){
           d3.select(trackId)
              .append("div")
              .attr("class", "header")
+             .attr("margin-bottom", "10px")
           d3.select(trackId)
                        .append("div")
           .attr("class", "track-div")

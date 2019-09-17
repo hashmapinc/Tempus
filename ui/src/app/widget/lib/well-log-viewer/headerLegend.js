@@ -52,9 +52,9 @@ var headerLegend = function(lineConfig, state, index, width) {
 
     context = d3.select(this);
 
-    var margin = {top: 30, right: 10, bottom: 30, left: 10},
+    var margin = {top: 30, right: 10, bottom: 30, left: 15},
       width = o.width*140 - margin.right - margin.left,
-      height = 60 - margin.top - margin.bottom;
+      height = 40;
 
     var x = d3.scaleLinear()
         .domain([o.min, o.max])
@@ -69,7 +69,7 @@ var headerLegend = function(lineConfig, state, index, width) {
          .append("svg")
          .attr("class", "header"+ index)
         .attr("width", width + margin.right + margin.left)
-        .attr("height", height + margin.top + margin.bottom)
+        .attr("height",height)
       .append("g")
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
           .call(xAxis)
@@ -80,14 +80,34 @@ var headerLegend = function(lineConfig, state, index, width) {
           .style("fill", "none")
           .style("stroke", o.color)
           .style("stroke-width", o.lineWeight)
-
           context.select('.header'+ index)
-          .append("text")             
+          .append("text")
           .attr("transform",
                 "translate(" + (width/2) + " ," + 
                                (20) + ")")
           .style("text-anchor", "middle")
           .text(o.label);
+
+    context.select(".header")
+         .append("svg")
+            .attr("class", "log-data"+ index)
+            .attr("width", width + margin.right + margin.left)
+            .attr("height",height)
+            .append("g")
+            .style("fill", "none")
+            .style("stroke", o.color)
+            .style("stroke-width", "1")
+            .selectAll("path")
+            .style("fill", "none")
+            .style("stroke", o.color)
+            .style("stroke-width", o.lineWeight)
+            context.select('.log-data'+ index)
+            .append("text")
+            .attr("transform",
+                "translate(" + (width/2) + " ," +
+                               (20) + ")")
+            .style("text-anchor", "middle")
+            .text("");
 
   }
   header.order = 0;
