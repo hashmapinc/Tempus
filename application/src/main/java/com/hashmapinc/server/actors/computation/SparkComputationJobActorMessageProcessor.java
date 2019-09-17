@@ -61,6 +61,7 @@ public class SparkComputationJobActorMessageProcessor extends ComponentMsgProces
     private ObjectMapper objectMapper = new ObjectMapper();
     private final ActorRef self;
     private final ActorRef parent;
+    private final String mainClass = "com.hashmapinc.tempus.Computation";
 
     protected SparkComputationJobActorMessageProcessor(TenantId tenantId, ComputationJobId id, ActorSystemContext systemContext
             , LoggingAdapter logger, ActorRef parent, ActorRef self, Computations computation) {
@@ -217,7 +218,7 @@ public class SparkComputationJobActorMessageProcessor extends ComponentMsgProces
         logger.info("Jar name is {}, main class is {}, arg parameters are {}, location is {}", md.getJarName(), md.getMainClass(), md.getArgsformat(), systemContext.getComputationLocation());
         SparkComputationRequest.SparkComputationRequestBuilder builder = SparkComputationRequest.builder();
         builder.file(systemContext.getComputationLocation() + md.getJarName());
-        builder.className(md.getMainClass());
+        builder.className(mainClass);
         builder.args(args());
         SparkComputationRequest sparkComputationRequest = builder.build();
         return objectMapper.writeValueAsString(sparkComputationRequest);
@@ -239,8 +240,38 @@ public class SparkComputationJobActorMessageProcessor extends ComponentMsgProces
                 }
             }
         }
+        if(md.getArgsType().equals(ArgType.NAMED)){
+            args.add("--computation-class");
+            args.add(md.getMainClass());
+            args.add("--source");
+            String source = conf.get("source").asText();
+            args.add(source);
+            if("kinesis".equalsIgnoreCase(source)){
+                args.addAll(kinesisParameters(conf));
+            }else{
+                args.addAll(kafkaParameters(conf));
+            }
+        }
         logger.info("Argument array list to spark job " + args);
         return args.toArray(new String[args.size()]);
+    }
+
+    private List<String> kinesisParameters(JsonNode conf){
+        List<String> kinesisArgs = new ArrayList<String>();
+        kinesisArgs.add("--kinesisStreamName");
+        kinesisArgs.add(conf.get("kinesisStreamName").asText());
+        kinesisArgs.add("--kinesisRegion");
+        kinesisArgs.add(conf.get("kinesisRegion").asText());
+        return kinesisArgs;
+    }
+
+    private List<String> kafkaParameters(JsonNode conf){
+        List<String> kafkaArgs = new ArrayList<String>();
+        kafkaArgs.add("--kafkaTopic");
+        kafkaArgs.add(conf.get("kafkaTopic").asText());
+        kafkaArgs.add("--kafkaUrl");
+        kafkaArgs.add(conf.get("kafkaUrl").asText());
+        return kafkaArgs;
     }
 
     private void stopJobOnServer(){
