@@ -108,6 +108,7 @@ export default function HomeController(types, loginService, userService, deviceS
             $scope.entitySubtypeWatch = $scope.$watch('searchConfig.searchEntitySubtype', function (newVal, prevVal) {
                 if (!angular.equals(newVal, prevVal)) {
                     $scope.$broadcast('searchEntitySubtypeUpdated');
+                     $scope.$broadcast('searchEntitySubtypeUpdatedForDeviceTbl');
                 }
             });
         }
@@ -152,6 +153,7 @@ export default function HomeController(types, loginService, userService, deviceS
 
     function searchTextUpdated() {
         $scope.$broadcast('searchTextUpdated');
+        $scope.$broadcast('searchTextUpdatedForDeviceTable');
     }
 
     function openSidenav() {

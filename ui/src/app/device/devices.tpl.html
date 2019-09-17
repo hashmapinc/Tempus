@@ -26,26 +26,6 @@
     <label class="tb-small" translate>Tabular View</label>
 </section>
 
-<md-toolbar class="md-table-toolbar tb-device-toolbar md-default" ng-show="tableView && query.search != null">
-    <div class="md-toolbar-tools">
-        <md-button class="md-icon-button" aria-label="{{ 'action.search' | translate }}">
-            <md-icon aria-label="{{ 'action.search' | translate }}" class="material-icons">search</md-icon>
-            <md-tooltip md-direction="top">
-                {{ 'action.search' | translate }}
-            </md-tooltip>
-        </md-button>
-        <md-input-container flex>
-            <label>&nbsp;</label>
-            <input ng-model="query.search" placeholder="{{ 'common.enter-search' | translate }}"/>
-        </md-input-container>
-        <md-button class="md-icon-button" aria-label="{{ 'action.back' | translate }}" ng-click="exitFilterMode()">
-            <md-icon aria-label="{{ 'action.close' | translate }}" class="material-icons">close</md-icon>
-            <md-tooltip md-direction="top">
-                {{ 'action.close' | translate }}
-            </md-tooltip>
-        </md-button>
-    </div>
-</md-toolbar>
 <md-toolbar class="md-table-toolbar tb-device-toolbar md-default " ng-show="tableView && query.search === null">
 
     <div class="md-toolbar-tools">
@@ -54,12 +34,6 @@
             <md-icon>add</md-icon>
             <md-tooltip md-direction="top">
                 {{ 'action.add' | translate }}
-            </md-tooltip>
-        </md-button>
-        <md-button class="md-icon-button" ng-click="enterFilterMode()">
-            <md-icon>search</md-icon>
-            <md-tooltip md-direction="top">
-                {{ 'action.search' | translate }}
             </md-tooltip>
         </md-button>
         <md-button  class="md-icon-button" ng-click="resetFilter()">
