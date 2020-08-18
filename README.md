@@ -99,7 +99,7 @@ Tempus was made to simplify ingest/analysis/storage/visualization of your IIoT d
 
 ## Getting Started
 
-- Read through the [Tempus Developer Quickstart](https://tempus.readthedocs.io/development/quickstart.html/).
+- Read through the [Tempus Developer Quickstart](https://tempus.readthedocs.io/en/latest/development/quickstart.html).
   It will include a section on how to build the local development environment via Docker to get you up and running quickly.
 
 To build:
