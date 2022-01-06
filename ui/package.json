@@ -63,7 +63,7 @@
     "imports-loader": "^0.8.0",
     "javascript-detect-element-resize": "^0.5.3",
     "jquery": "^3.1.0",
-    "jquery.terminal": "^1.5.0",
+    "jquery.terminal": "^2.31.1",
     "js-beautify": "^1.6.4",
     "json-loader": "^0.5.7",
     "json-schema-defaults": "^0.2.0",
