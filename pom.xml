@@ -93,7 +93,7 @@
         <spring-cloud.version>2.0.2.RELEASE</spring-cloud.version>
         <javax.annotation.version>1.3.2</javax.annotation.version>
         <commons-collections4.version>4.2</commons-collections4.version>
-        <snakeyaml.version>1.23</snakeyaml.version>
+        <snakeyaml.version>1.31</snakeyaml.version>
         <maven-install-plugin.version>2.5.1</maven-install-plugin.version>
         <unit-converion.version>1.0.4</unit-converion.version>
         <poi-ooxml.version>4.0.1</poi-ooxml.version>
